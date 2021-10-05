@@ -5,7 +5,9 @@ import jp.co.soramitsu.common.data.mappers.mapEncryptionToCryptoType
 import jp.co.soramitsu.common.data.secrets.v2.ChainAccountSecrets
 import jp.co.soramitsu.common.data.secrets.v2.MetaAccountSecrets
 import jp.co.soramitsu.common.data.secrets.v2.mapKeypairStructToKeypair
+import jp.co.soramitsu.common.utils.DEFAULT_DERIVATION_PATH
 import jp.co.soramitsu.common.utils.castOrNull
+import jp.co.soramitsu.common.utils.default
 import jp.co.soramitsu.common.utils.deriveSeed32
 import jp.co.soramitsu.core.model.CryptoType
 import jp.co.soramitsu.fearless_utils.encrypt.EncryptionType
@@ -108,9 +110,11 @@ class AccountSecretsFactory(
         )
 
         val ethereumKeypair = accountSource.castOrNull<AccountSource.Mnemonic>()?.let {
-            val seed = deriveSeed(it.mnemonic, password = null, ethereum = true).seed
+            val ethereumDerivationPath = BIP32JunctionDecoder.default()
 
-            EthereumKeypairFactory.generate(seed = seed, junctions = emptyList())
+            val seed = deriveSeed(it.mnemonic, password = ethereumDerivationPath.password, ethereum = true).seed
+
+            EthereumKeypairFactory.generate(seed = seed, junctions = ethereumDerivationPath.junctions)
         }
 
         val secrets = MetaAccountSecrets(

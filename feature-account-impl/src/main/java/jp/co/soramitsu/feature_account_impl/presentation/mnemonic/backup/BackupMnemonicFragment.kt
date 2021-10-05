@@ -7,14 +7,11 @@ import android.view.ViewGroup
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import jp.co.soramitsu.common.base.BaseFragment
 import jp.co.soramitsu.common.di.FeatureUtils
-import jp.co.soramitsu.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet.Payload
-import jp.co.soramitsu.core.model.Node
 import jp.co.soramitsu.feature_account_api.di.AccountFeatureApi
 import jp.co.soramitsu.feature_account_api.presenatation.account.add.AddAccountPayload
 import jp.co.soramitsu.feature_account_impl.R
 import jp.co.soramitsu.feature_account_impl.di.AccountFeatureComponent
-import jp.co.soramitsu.feature_account_impl.presentation.view.advanced.encryption.EncryptionTypeChooserBottomSheetDialog
-import jp.co.soramitsu.feature_account_impl.presentation.view.advanced.encryption.model.CryptoTypeModel
+import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.impl.setupCryptoTypeChooserUi
 import kotlinx.android.synthetic.main.fragment_backup_mnemonic.advancedBlockView
 import kotlinx.android.synthetic.main.fragment_backup_mnemonic.backupMnemonicViewer
 import kotlinx.android.synthetic.main.fragment_backup_mnemonic.nextBtn
@@ -23,6 +20,7 @@ import kotlinx.android.synthetic.main.fragment_backup_mnemonic.toolbar
 class BackupMnemonicFragment : BaseFragment<BackupMnemonicViewModel>() {
 
     companion object {
+
         private const val KEY_ACCOUNT_NAME = "account_name"
         private const val KEY_ADD_ACCOUNT_PAYLOAD = "BackupMnemonicFragment.addAccountPayload"
 
@@ -51,10 +49,6 @@ class BackupMnemonicFragment : BaseFragment<BackupMnemonicViewModel>() {
             viewModel.infoClicked()
         }
 
-        advancedBlockView.setOnEncryptionTypeClickListener {
-            viewModel.chooseEncryptionClicked()
-        }
-
         nextBtn.setOnClickListener {
             viewModel.nextClicked(advancedBlockView.getDerivationPath())
         }
@@ -72,26 +66,15 @@ class BackupMnemonicFragment : BaseFragment<BackupMnemonicViewModel>() {
     }
 
     override fun subscribe(viewModel: BackupMnemonicViewModel) {
+        setupCryptoTypeChooserUi(viewModel, advancedBlockView)
+
         viewModel.mnemonicLiveData.observe {
             backupMnemonicViewer.submitList(it)
-        }
-
-        viewModel.encryptionTypeChooserEvent.observeEvent(::showEncryptionChooser)
-
-        viewModel.selectedEncryptionTypeLiveData.observe {
-            advancedBlockView.setEncryption(it.name)
         }
 
         viewModel.showInfoEvent.observeEvent {
             showMnemonicInfoDialog()
         }
-    }
-
-    private fun showEncryptionChooser(payload: Payload<CryptoTypeModel>) {
-        EncryptionTypeChooserBottomSheetDialog(
-            requireActivity(), payload,
-            viewModel.selectedEncryptionTypeLiveData::setValue
-        ).show()
     }
 
     private fun showMnemonicInfoDialog() {

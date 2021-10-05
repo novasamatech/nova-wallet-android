@@ -1,48 +1,74 @@
 package jp.co.soramitsu.feature_account_impl.presentation.common.mixin.impl
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.liveData
+import jp.co.soramitsu.common.mixin.MixinFactory
 import jp.co.soramitsu.common.resources.ResourceManager
 import jp.co.soramitsu.common.utils.Event
-import jp.co.soramitsu.common.utils.mediatorLiveData
-import jp.co.soramitsu.common.utils.updateFrom
+import jp.co.soramitsu.common.utils.castOrNull
 import jp.co.soramitsu.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet.Payload
 import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountInteractor
 import jp.co.soramitsu.feature_account_api.presenatation.account.add.AddAccountPayload
 import jp.co.soramitsu.feature_account_impl.data.mappers.mapCryptoTypeToCryptoTypeModel
 import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.api.CryptoTypeChooserMixin
 import jp.co.soramitsu.feature_account_impl.presentation.view.advanced.encryption.model.CryptoTypeModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+
+class CryptoTypeChooserFactory(
+    private val interactor: AccountInteractor,
+    private val addAccountPayload: AddAccountPayload,
+    private val resourceManager: ResourceManager
+) : MixinFactory<CryptoTypeChooserMixin> {
+
+    override fun create(scope: CoroutineScope): CryptoTypeChooser {
+        return CryptoTypeChooser(interactor, addAccountPayload, scope, resourceManager)
+    }
+}
 
 class CryptoTypeChooser(
     private val interactor: AccountInteractor,
+    private val addAccountPayload: AddAccountPayload,
+    private val scope: CoroutineScope,
     private val resourceManager: ResourceManager
 ) : CryptoTypeChooserMixin {
 
     private val encryptionTypes = getCryptoTypeModels()
 
-    override val selectedEncryptionTypeLiveData = mediatorLiveData<CryptoTypeModel> {
-        updateFrom(preferredTypeLiveData())
-    }
+    override val selectedEncryptionTypeFlow = MutableSharedFlow<CryptoTypeModel>(replay = 1)
+    override val selectionFrozen = MutableSharedFlow<Boolean>(replay = 1)
 
-    private val _encryptionTypeChooserEvent = MutableLiveData<Event<Payload<CryptoTypeModel>>>()
+    init {
+        scope.launch(Dispatchers.Default) {
+            val chainId = addAccountPayload.castOrNull<AddAccountPayload.ChainAccount>()?.chainId
 
-    override val encryptionTypeChooserEvent: LiveData<Event<Payload<CryptoTypeModel>>> =
-        _encryptionTypeChooserEvent
+            val (cryptoType, frozen) = interactor.getPreferredCryptoType(chainId)
 
-    override fun chooseEncryptionClicked() {
-        val selectedType = selectedEncryptionTypeLiveData.value
-
-        if (selectedType != null) {
-            _encryptionTypeChooserEvent.value = Event(Payload(encryptionTypes, selectedType))
+            selectedEncryptionTypeFlow.emit(mapCryptoTypeToCryptoTypeModel(resourceManager, cryptoType))
+            selectionFrozen.emit(frozen)
         }
     }
 
-    private fun preferredTypeLiveData() = liveData {
-        val cryptoType = interactor.getPreferredCryptoType()
-        val mapped = mapCryptoTypeToCryptoTypeModel(resourceManager, cryptoType)
+    override val encryptionTypeChooserEvent = MutableLiveData<Event<Payload<CryptoTypeModel>>>()
 
-        emit(mapped)
+    override fun chooseEncryptionClicked() = ensureNotFrozen {
+        val selectedType = selectedEncryptionTypeFlow.first()
+
+        encryptionTypeChooserEvent.value = Event(Payload(encryptionTypes, selectedType))
+    }
+
+    override fun selectedEncryptionChanged(newCryptoType: CryptoTypeModel) = ensureNotFrozen {
+        selectedEncryptionTypeFlow.emit(newCryptoType)
+    }
+
+    private inline fun ensureNotFrozen(crossinline action: suspend () -> Unit) {
+        scope.launch {
+            if (selectionFrozen.first().not()) {
+                action()
+            }
+        }
     }
 
     private fun getCryptoTypeModels(): List<CryptoTypeModel> {

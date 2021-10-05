@@ -10,13 +10,12 @@ import jp.co.soramitsu.common.base.BaseFragment
 import jp.co.soramitsu.common.di.FeatureUtils
 import jp.co.soramitsu.common.utils.bindTo
 import jp.co.soramitsu.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet.Payload
-import jp.co.soramitsu.core.model.Node
 import jp.co.soramitsu.feature_account_api.di.AccountFeatureApi
-import jp.co.soramitsu.feature_account_api.domain.model.AddAccountType
 import jp.co.soramitsu.feature_account_api.presenatation.account.add.AddAccountPayload
 import jp.co.soramitsu.feature_account_impl.R
 import jp.co.soramitsu.feature_account_impl.di.AccountFeatureComponent
 import jp.co.soramitsu.feature_account_impl.presentation.common.accountSource.SourceTypeChooserBottomSheetDialog
+import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.impl.setupCryptoTypeChooserUi
 import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.impl.setupForcedChainUi
 import jp.co.soramitsu.feature_account_impl.presentation.importing.source.model.FileRequester
 import jp.co.soramitsu.feature_account_impl.presentation.importing.source.model.ImportSource
@@ -29,7 +28,6 @@ import jp.co.soramitsu.feature_account_impl.presentation.importing.source.view.J
 import jp.co.soramitsu.feature_account_impl.presentation.importing.source.view.MnemonicImportView
 import jp.co.soramitsu.feature_account_impl.presentation.importing.source.view.SeedImportView
 import jp.co.soramitsu.feature_account_impl.presentation.view.advanced.AdvancedBlockView.FieldState
-import jp.co.soramitsu.feature_account_impl.presentation.view.advanced.encryption.EncryptionTypeChooserBottomSheetDialog
 import kotlinx.android.synthetic.main.fragment_import_account.advancedBlockView
 import kotlinx.android.synthetic.main.fragment_import_account.importForcedChain
 import kotlinx.android.synthetic.main.fragment_import_account.nextBtn
@@ -69,10 +67,6 @@ class ImportAccountFragment : BaseFragment<ImportAccountViewModel>() {
         toolbar.setHomeButtonListener { viewModel.homeButtonClicked() }
 
         sourceTypeInput.setWholeClickListener { viewModel.openSourceChooserClicked() }
-
-        advancedBlockView.setOnEncryptionTypeClickListener {
-            viewModel.chooseEncryptionClicked()
-        }
 
         nextBtn.setOnClickListener { viewModel.nextClicked() }
 
@@ -114,22 +108,20 @@ class ImportAccountFragment : BaseFragment<ImportAccountViewModel>() {
             sourceTypeInput.setMessage(it.nameRes)
         }
 
-        viewModel.encryptionTypeChooserEvent.observeEvent {
-            EncryptionTypeChooserBottomSheetDialog(
-                requireActivity(),
-                it,
-                viewModel.selectedEncryptionTypeLiveData::setValue
-            )
-                .show()
-        }
-
-        viewModel.selectedEncryptionTypeLiveData.observe {
-            advancedBlockView.setEncryption(it.name)
-        }
-
         viewModel.nextButtonState.observe(nextBtn::setState)
 
-        viewModel.advancedBlockExceptNetworkEnabled.observe(::setSelectorsEnabled)
+        viewModel.changeableAdvancedFields.observe {
+            val derivationPathState = getFieldState(it, disabledState = FieldState.HIDDEN)
+
+            with(advancedBlockView) {
+                configure(derivationPathField, derivationPathState)
+            }
+        }
+
+        setupCryptoTypeChooserUi(viewModel, advancedBlockView, ignoreSelectionFrozen = true)
+        viewModel.cryptoTypeChooserEnabled.observe {
+            advancedBlockView.setEnabled(advancedBlockView.encryptionTypeField, it)
+        }
 
         advancedBlockView.derivationPathEditText.bindTo(viewModel.derivationPathLiveData, viewLifecycleOwner)
     }
@@ -139,16 +131,6 @@ class ImportAccountFragment : BaseFragment<ImportAccountViewModel>() {
             source.chooseJsonFileEvent.observeEvent {
                 openFilePicker(it)
             }
-        }
-    }
-
-    private fun setSelectorsEnabled(selectorsEnabled: Boolean) {
-        val chooserState = getFieldState(selectorsEnabled)
-        val derivationPathState = getFieldState(selectorsEnabled, disabledState = FieldState.HIDDEN)
-
-        with(advancedBlockView) {
-            configure(encryptionTypeField, chooserState)
-            configure(derivationPathField, derivationPathState)
         }
     }
 

@@ -17,7 +17,6 @@ import jp.co.soramitsu.common.view.bottomSheet.list.dynamic.DynamicListBottomShe
 import jp.co.soramitsu.core.model.CryptoType
 import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountAlreadyExistsException
 import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountInteractor
-import jp.co.soramitsu.feature_account_api.domain.model.AddAccountType
 import jp.co.soramitsu.feature_account_api.presenatation.account.add.AddAccountPayload
 import jp.co.soramitsu.feature_account_impl.R
 import jp.co.soramitsu.feature_account_impl.data.mappers.mapAddAccountPayloadToAddAccountType
@@ -25,13 +24,16 @@ import jp.co.soramitsu.feature_account_impl.domain.account.add.AddAccountInterac
 import jp.co.soramitsu.feature_account_impl.presentation.AccountRouter
 import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.api.CryptoTypeChooserMixin
 import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.api.ForcedChainMixin
+import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.api.WithCryptoTypeChooserMixin
 import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.api.WithForcedChainMixin
+import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.impl.CryptoTypeChooserFactory
 import jp.co.soramitsu.feature_account_impl.presentation.importing.source.model.FileRequester
 import jp.co.soramitsu.feature_account_impl.presentation.importing.source.model.ImportError
 import jp.co.soramitsu.feature_account_impl.presentation.importing.source.model.ImportSource
 import jp.co.soramitsu.feature_account_impl.presentation.importing.source.model.JsonImportSource
 import jp.co.soramitsu.feature_account_impl.presentation.importing.source.model.MnemonicImportSource
 import jp.co.soramitsu.feature_account_impl.presentation.importing.source.model.RawSeedImportSource
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class ImportAccountViewModel(
@@ -39,16 +41,17 @@ class ImportAccountViewModel(
     private val interactor: AccountInteractor,
     private val router: AccountRouter,
     private val resourceManager: ResourceManager,
-    private val cryptoTypeChooserMixin: CryptoTypeChooserMixin,
     forcedChainMixinFactory: MixinFactory<ForcedChainMixin>,
+    cryptoTypeChooserFactory: MixinFactory<CryptoTypeChooserMixin>,
     private val clipboardManager: ClipboardManager,
     private val fileReader: FileReader,
     private val payload: AddAccountPayload,
 ) : BaseViewModel(),
-    CryptoTypeChooserMixin by cryptoTypeChooserMixin,
+    WithCryptoTypeChooserMixin,
     WithForcedChainMixin {
 
     override val forcedChainMixin: ForcedChainMixin = forcedChainMixinFactory.create(scope = this)
+    override val cryptoTypeChooserMixin: CryptoTypeChooserMixin = cryptoTypeChooserFactory.create(scope = this)
 
     val nameLiveData = MutableLiveData<String>()
 
@@ -79,7 +82,10 @@ class ImportAccountViewModel(
         }
     }
 
-    val advancedBlockExceptNetworkEnabled = _selectedSourceTypeLiveData.map { it !is JsonImportSource }
+    val changeableAdvancedFields = _selectedSourceTypeLiveData.map { it !is JsonImportSource }
+    val cryptoTypeChooserEnabled = changeableAdvancedFields.combine(cryptoTypeChooserMixin.selectionFrozen.asLiveData()) { changeable, selectionFrozen ->
+        changeable && !selectionFrozen
+    }
 
     init {
         _selectedSourceTypeLiveData.value = sourceTypes.first()
@@ -99,12 +105,12 @@ class ImportAccountViewModel(
         _selectedSourceTypeLiveData.value = it
     }
 
-    fun nextClicked() {
+    fun nextClicked() = launch {
         importInProgressLiveData.value = true
 
         val sourceType = selectedSourceTypeLiveData.value!!
 
-        val cryptoType = selectedEncryptionTypeLiveData.value!!.cryptoType
+        val cryptoType = cryptoTypeChooserMixin.selectedEncryptionTypeFlow.first().cryptoType
         val derivationPath = derivationPathLiveData.value.orEmpty()
         val name = nameLiveData.value!!
 
@@ -161,7 +167,7 @@ class ImportAccountViewModel(
             MnemonicImportSource(),
             JsonImportSource(
                 nameLiveData,
-                cryptoTypeChooserMixin.selectedEncryptionTypeLiveData,
+                cryptoTypeChooserMixin,
                 addAccountInteractor,
                 resourceManager,
                 clipboardManager,

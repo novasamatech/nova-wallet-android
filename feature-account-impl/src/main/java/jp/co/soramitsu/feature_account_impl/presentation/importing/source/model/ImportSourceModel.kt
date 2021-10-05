@@ -21,6 +21,7 @@ import jp.co.soramitsu.feature_account_impl.data.mappers.mapCryptoTypeToCryptoTy
 import jp.co.soramitsu.feature_account_impl.data.secrets.AccountSecretsFactory
 import jp.co.soramitsu.feature_account_impl.domain.account.add.AddAccountInteractor
 import jp.co.soramitsu.feature_account_impl.presentation.common.accountSource.AccountSource
+import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.api.CryptoTypeChooserMixin
 import jp.co.soramitsu.feature_account_impl.presentation.importing.FileReader
 import jp.co.soramitsu.feature_account_impl.presentation.view.advanced.encryption.model.CryptoTypeModel
 import kotlinx.coroutines.CoroutineScope
@@ -56,7 +57,7 @@ private const val PICK_FILE_RESULT_CODE = 101
 
 class JsonImportSource(
     private val nameLiveData: MutableLiveData<String>,
-    private val cryptoTypeLiveData: MutableLiveData<CryptoTypeModel>,
+    private val cryptoTypeChooserMixin: CryptoTypeChooserMixin,
     private val addAccountInteractor: AddAccountInteractor,
     private val resourceManager: ResourceManager,
     private val clipboardManager: ClipboardManager,
@@ -140,7 +141,7 @@ class JsonImportSource(
         showNetworkWarningLiveData.value = showShowNetworkWarning(importJsonMetaData.chainId)
 
         val cryptoModel = mapCryptoTypeToCryptoTypeModel(resourceManager, importJsonMetaData.encryptionType)
-        cryptoTypeLiveData.value = cryptoModel
+        cryptoTypeChooserMixin.selectedEncryptionChanged(cryptoModel)
 
         nameLiveData.value = importJsonMetaData.name
     }

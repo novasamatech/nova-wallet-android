@@ -38,8 +38,6 @@ import jp.co.soramitsu.feature_account_impl.domain.AccountInteractorImpl
 import jp.co.soramitsu.feature_account_impl.domain.NodeHostValidator
 import jp.co.soramitsu.feature_account_impl.domain.account.add.AddAccountInteractor
 import jp.co.soramitsu.feature_account_impl.domain.account.details.AccountDetailsInteractor
-import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.api.CryptoTypeChooserMixin
-import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.impl.CryptoTypeChooser
 import jp.co.soramitsu.runtime.extrinsic.ExtrinsicBuilderFactory
 import jp.co.soramitsu.runtime.multiNetwork.ChainRegistry
 import jp.co.soramitsu.runtime.network.rpc.RpcCalls
@@ -74,12 +72,6 @@ class AccountFeatureModule {
     ) = JsonSeedEncoder(jsonMapper, random)
 
     @Provides
-    fun provideCryptoChooserMixin(
-        interactor: AccountInteractor,
-        resourceManager: ResourceManager,
-    ): CryptoTypeChooserMixin = CryptoTypeChooser(interactor, resourceManager)
-
-    @Provides
     @FeatureScope
     fun provideAccountRepository(
         accountDataSource: AccountDataSource,
@@ -102,9 +94,10 @@ class AccountFeatureModule {
     @Provides
     @FeatureScope
     fun provideAccountInteractor(
+        chainRegistry: ChainRegistry,
         accountRepository: AccountRepository,
     ): AccountInteractor {
-        return AccountInteractorImpl(accountRepository)
+        return AccountInteractorImpl(chainRegistry, accountRepository)
     }
 
     @Provides

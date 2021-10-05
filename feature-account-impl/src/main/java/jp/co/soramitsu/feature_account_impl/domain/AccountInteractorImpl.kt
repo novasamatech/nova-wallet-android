@@ -10,13 +10,17 @@ import jp.co.soramitsu.feature_account_api.domain.model.Account
 import jp.co.soramitsu.feature_account_api.domain.model.ImportJsonMetaData
 import jp.co.soramitsu.feature_account_api.domain.model.LightMetaAccount
 import jp.co.soramitsu.feature_account_api.domain.model.MetaAccountOrdering
+import jp.co.soramitsu.feature_account_api.domain.model.PreferredCryptoType
 import jp.co.soramitsu.feature_account_impl.domain.errors.NodeAlreadyExistsException
 import jp.co.soramitsu.feature_account_impl.domain.errors.UnsupportedNetworkException
+import jp.co.soramitsu.runtime.multiNetwork.ChainRegistry
+import jp.co.soramitsu.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
 class AccountInteractorImpl(
+    private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository
 ) : AccountInteractor {
 
@@ -32,8 +36,12 @@ class AccountInteractorImpl(
         return accountRepository.getEncryptionTypes()
     }
 
-    override suspend fun getPreferredCryptoType(): CryptoType {
-        return accountRepository.getPreferredCryptoType()
+    override suspend fun getPreferredCryptoType(chainId: ChainId?): PreferredCryptoType = withContext(Dispatchers.Default) {
+        if (chainId != null && chainRegistry.getChain(chainId).isEthereumBased) {
+            PreferredCryptoType(CryptoType.ECDSA, frozen = true)
+        } else {
+            PreferredCryptoType(accountRepository.getPreferredCryptoType(), frozen = false)
+        }
     }
 
     override suspend fun isCodeSet(): Boolean {

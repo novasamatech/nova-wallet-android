@@ -20,6 +20,7 @@ import jp.co.soramitsu.feature_account_impl.domain.account.add.AddAccountInterac
 import jp.co.soramitsu.feature_account_impl.presentation.AccountRouter
 import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.api.CryptoTypeChooserMixin
 import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.api.ForcedChainMixin
+import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.impl.CryptoTypeChooserFactory
 import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.impl.ForcedChainMixinFactory
 import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.impl.ForcedChainProvider
 import jp.co.soramitsu.feature_account_impl.presentation.importing.FileReader
@@ -28,6 +29,20 @@ import jp.co.soramitsu.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
 class ImportAccountModule {
+
+    @Provides
+    @ScreenScope
+    fun provideCryptoChooserMixinFactory(
+        interactor: AccountInteractor,
+        addAccountPayload: AddAccountPayload,
+        resourceManager: ResourceManager,
+    ): MixinFactory<CryptoTypeChooserMixin> {
+        return CryptoTypeChooserFactory(
+            interactor,
+            addAccountPayload,
+            resourceManager
+        )
+    }
 
     @Provides
     @ScreenScope
@@ -51,7 +66,7 @@ class ImportAccountModule {
         router: AccountRouter,
         resourceManager: ResourceManager,
         forcedChainMixinFactory: MixinFactory<ForcedChainMixin>,
-        cryptoChooserMixin: CryptoTypeChooserMixin,
+        cryptoChooserMixinFactory: MixinFactory<CryptoTypeChooserMixin>,
         clipboardManager: ClipboardManager,
         fileReader: FileReader,
         payload: AddAccountPayload
@@ -61,8 +76,8 @@ class ImportAccountModule {
             interactor,
             router,
             resourceManager,
-            cryptoChooserMixin,
             forcedChainMixinFactory,
+            cryptoChooserMixinFactory,
             clipboardManager,
             fileReader,
             payload
