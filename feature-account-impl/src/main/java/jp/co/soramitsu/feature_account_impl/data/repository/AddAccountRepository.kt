@@ -2,9 +2,11 @@ package jp.co.soramitsu.feature_account_impl.data.repository
 
 import android.database.sqlite.SQLiteConstraintException
 import jp.co.soramitsu.common.data.mappers.mapEncryptionToCryptoType
+import jp.co.soramitsu.common.utils.DEFAULT_DERIVATION_PATH
 import jp.co.soramitsu.common.utils.removeHexPrefix
 import jp.co.soramitsu.core.model.CryptoType
 import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedDecoder
+import jp.co.soramitsu.fearless_utils.encrypt.junction.BIP32JunctionDecoder
 import jp.co.soramitsu.fearless_utils.encrypt.model.NetworkTypeIdentifier
 import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountAlreadyExistsException
 import jp.co.soramitsu.feature_account_api.domain.model.AddAccountType
@@ -94,8 +96,14 @@ class AddAccountRepository(
             is AddAccountType.ChainAccount -> {
                 val chain = chainRegistry.getChain(addAccountType.chainId)
 
+                val derivationPathOrDefault = if (derivationPath.isEmpty() && chain.isEthereumBased) {
+                    BIP32JunctionDecoder.DEFAULT_DERIVATION_PATH
+                } else {
+                    derivationPath
+                }
+
                 val (secrets, cryptoType) = accountSecretsFactory.chainAccountSecrets(
-                    derivationPath = derivationPath,
+                    derivationPath = derivationPathOrDefault,
                     accountSource = accountSource,
                     isEthereum = chain.isEthereumBased
                 )

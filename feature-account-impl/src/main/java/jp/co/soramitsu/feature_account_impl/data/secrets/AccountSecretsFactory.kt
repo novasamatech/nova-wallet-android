@@ -5,6 +5,7 @@ import jp.co.soramitsu.common.data.mappers.mapEncryptionToCryptoType
 import jp.co.soramitsu.common.data.secrets.v2.ChainAccountSecrets
 import jp.co.soramitsu.common.data.secrets.v2.MetaAccountSecrets
 import jp.co.soramitsu.common.data.secrets.v2.mapKeypairStructToKeypair
+import jp.co.soramitsu.common.utils.DEFAULT_DERIVATION_PATH
 import jp.co.soramitsu.common.utils.castOrNull
 import jp.co.soramitsu.common.utils.default
 import jp.co.soramitsu.common.utils.deriveSeed32
@@ -14,6 +15,7 @@ import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedDecoder
 import jp.co.soramitsu.fearless_utils.encrypt.junction.BIP32JunctionDecoder
 import jp.co.soramitsu.fearless_utils.encrypt.junction.JunctionDecoder
 import jp.co.soramitsu.fearless_utils.encrypt.junction.SubstrateJunctionDecoder
+import jp.co.soramitsu.fearless_utils.encrypt.keypair.ethereum.Bip32KeypairFactory
 import jp.co.soramitsu.fearless_utils.encrypt.keypair.ethereum.EthereumKeypairFactory
 import jp.co.soramitsu.fearless_utils.encrypt.keypair.substrate.SubstrateKeypairFactory
 import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.MnemonicCreator
@@ -129,7 +131,7 @@ class AccountSecretsFactory(
 
     private fun deriveSeed(mnemonic: String, password: String?, ethereum: Boolean): SeedFactory.Result {
         return if (ethereum) {
-            EthereumSeedFactory.deriveSeed32(mnemonic, password)
+            EthereumSeedFactory.deriveSeed(mnemonic, password)
         } else {
             SubstrateSeedFactory.deriveSeed32(mnemonic, password)
         }
