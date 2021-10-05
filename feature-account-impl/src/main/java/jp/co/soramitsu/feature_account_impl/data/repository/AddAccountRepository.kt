@@ -1,10 +1,12 @@
 package jp.co.soramitsu.feature_account_impl.data.repository
 
+import android.database.sqlite.SQLiteConstraintException
 import jp.co.soramitsu.common.data.mappers.mapEncryptionToCryptoType
 import jp.co.soramitsu.common.utils.removeHexPrefix
 import jp.co.soramitsu.core.model.CryptoType
 import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedDecoder
 import jp.co.soramitsu.fearless_utils.encrypt.model.NetworkTypeIdentifier
+import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountAlreadyExistsException
 import jp.co.soramitsu.feature_account_api.domain.model.AddAccountType
 import jp.co.soramitsu.feature_account_api.domain.model.ImportJsonMetaData
 import jp.co.soramitsu.feature_account_impl.data.repository.datasource.AccountDataSource
@@ -80,11 +82,13 @@ class AddAccountRepository(
                     accountSource = accountSource
                 )
 
-                accountDataSource.insertMetaAccount(
-                    name = accountName,
-                    substrateCryptoType = substrateCryptoType,
-                    secrets = secrets
-                )
+                transformingInsertionErrors {
+                    accountDataSource.insertMetaAccount(
+                        name = accountName,
+                        substrateCryptoType = substrateCryptoType,
+                        secrets = secrets
+                    )
+                }
             }
 
             is AddAccountType.ChainAccount -> {
@@ -96,12 +100,14 @@ class AddAccountRepository(
                     isEthereum = chain.isEthereumBased
                 )
 
-                accountDataSource.insertChainAccount(
-                    metaId = addAccountType.metaId,
-                    chain = chain,
-                    cryptoType = cryptoType,
-                    secrets = secrets
-                )
+                transformingInsertionErrors {
+                    accountDataSource.insertChainAccount(
+                        metaId = addAccountType.metaId,
+                        chain = chain,
+                        cryptoType = cryptoType,
+                        secrets = secrets
+                    )
+                }
             }
         }
     }
@@ -115,5 +121,11 @@ class AddAccountRepository(
 
             ImportJsonMetaData(name, chainId, cryptoType)
         }
+    }
+
+    private inline fun <R> transformingInsertionErrors(action: () -> R) = try {
+        action()
+    } catch (_: SQLiteConstraintException) {
+        throw AccountAlreadyExistsException()
     }
 }

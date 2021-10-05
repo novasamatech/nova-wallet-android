@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+    <string name="account_invalid_derivation_path_title">Invalid derivation path</string>
+    <string name="account_invalid_derivation_path_message">Derivation path contains unsupported symbols or has incorrect structure</string>
+
     <string name="import_json_unsupported_crypto_title">Unsupported encryption type</string>
     <string name="import_json_unsupported_crypto_message">Cannot import account for Ethereum-based chain based on secret with encryption other than ECDSA</string>
     <string name="common_chain">Chain</string>

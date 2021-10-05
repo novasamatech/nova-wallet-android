@@ -15,6 +15,8 @@ import jp.co.soramitsu.common.utils.switchMap
 import jp.co.soramitsu.common.view.ButtonState
 import jp.co.soramitsu.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet.Payload
 import jp.co.soramitsu.core.model.CryptoType
+import jp.co.soramitsu.fearless_utils.encrypt.junction.BIP32JunctionDecoder
+import jp.co.soramitsu.fearless_utils.encrypt.junction.JunctionDecoder
 import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountAlreadyExistsException
 import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountInteractor
 import jp.co.soramitsu.feature_account_api.presenatation.account.add.AddAccountPayload
@@ -26,7 +28,6 @@ import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.api.Crypto
 import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.api.ForcedChainMixin
 import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.api.WithCryptoTypeChooserMixin
 import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.api.WithForcedChainMixin
-import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.impl.CryptoTypeChooserFactory
 import jp.co.soramitsu.feature_account_impl.presentation.importing.source.model.FileRequester
 import jp.co.soramitsu.feature_account_impl.presentation.importing.source.model.ImportError
 import jp.co.soramitsu.feature_account_impl.presentation.importing.source.model.ImportSource
@@ -151,6 +152,10 @@ class ImportAccountViewModel(
                 is AccountAlreadyExistsException -> ImportError(
                     titleRes = R.string.account_add_already_exists_message,
                     messageRes = R.string.account_error_try_another_one
+                )
+                is JunctionDecoder.DecodingError, is BIP32JunctionDecoder.DecodingError -> ImportError(
+                    titleRes = R.string.account_invalid_derivation_path_title,
+                    messageRes = R.string.account_invalid_derivation_path_message
                 )
                 else -> ImportError()
             }
