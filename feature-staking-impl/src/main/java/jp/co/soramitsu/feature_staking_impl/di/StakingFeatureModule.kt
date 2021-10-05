@@ -9,6 +9,7 @@ import jp.co.soramitsu.common.data.network.NetworkApiCreator
 import jp.co.soramitsu.common.data.network.rpc.BulkRetriever
 import jp.co.soramitsu.common.data.storage.Preferences
 import jp.co.soramitsu.common.di.scope.FeatureScope
+import jp.co.soramitsu.common.mixin.MixinFactory
 import jp.co.soramitsu.common.resources.ResourceManager
 import jp.co.soramitsu.core.storage.StorageCache
 import jp.co.soramitsu.core_db.dao.AccountStakingDao
@@ -87,7 +88,7 @@ class StakingFeatureModule {
         assetUseCase: AssetUseCase,
         singleAssetSharedState: StakingSharedState,
         resourceManager: ResourceManager
-    ): AssetSelectorMixin.Presentation.Factory = AssetSelectorFactory(
+    ): MixinFactory<AssetSelectorMixin.Presentation> = AssetSelectorFactory(
         assetUseCase,
         singleAssetSharedState,
         resourceManager

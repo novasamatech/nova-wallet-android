@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.View
+import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -23,6 +24,7 @@ class LabeledTextView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
+
     init {
         View.inflate(context, R.layout.view_labeled_text, this)
 
@@ -34,6 +36,9 @@ class LabeledTextView @JvmOverloads constructor(
     }
 
     private var singleLine: Boolean = true
+
+    val textIconView: ImageView
+        get() = labeledTextIcon
 
     private fun applyAttributes(attrs: AttributeSet?) {
         attrs?.let {
@@ -52,7 +57,7 @@ class LabeledTextView @JvmOverloads constructor(
             isEnabled = enabled
 
             val actionIcon = typedArray.getDrawable(R.styleable.LabeledTextView_actionIcon)
-            actionIcon?.let(::setActionIcon)
+            setActionIcon(actionIcon)
 
             singleLine = typedArray.getBoolean(R.styleable.LabeledTextView_android_singleLine, true)
             labeledTextText.isSingleLine = singleLine
@@ -71,10 +76,10 @@ class LabeledTextView @JvmOverloads constructor(
         labeledTextLabel.text = label
     }
 
-    fun setActionIcon(icon: Drawable) {
+    fun setActionIcon(icon: Drawable?) {
         labeledTextAction.setImageDrawable(icon)
 
-        labeledTextAction.setVisible(true)
+        labeledTextAction.setVisible(icon != null)
     }
 
     fun setMessage(@StringRes messageRes: Int) = setMessage(context.getString(messageRes))

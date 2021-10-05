@@ -10,7 +10,9 @@ import jp.co.soramitsu.common.base.BaseFragment
 import jp.co.soramitsu.common.di.FeatureUtils
 import jp.co.soramitsu.common.mixin.impl.observeBrowserEvents
 import jp.co.soramitsu.common.utils.createSpannable
+import jp.co.soramitsu.common.utils.setVisible
 import jp.co.soramitsu.core.model.Node
+import jp.co.soramitsu.feature_account_api.presenatation.account.add.AddAccountPayload
 import jp.co.soramitsu.feature_onboarding_api.di.OnboardingFeatureApi
 import jp.co.soramitsu.feature_onboarding_impl.R
 import jp.co.soramitsu.feature_onboarding_impl.di.OnboardingFeatureComponent
@@ -23,19 +25,20 @@ class WelcomeFragment : BaseFragment<WelcomeViewModel>() {
 
     companion object {
         private const val KEY_DISPLAY_BACK = "display_back"
-        private const val KEY_NETWORK_TYPE = "network_type"
+        private const val KEY_ADD_ACCOUNT_PAYLOAD = "add_account_payload"
 
-        fun getBundle(displayBack: Boolean): Bundle {
+        fun bundle(displayBack: Boolean): Bundle {
 
             return Bundle().apply {
                 putBoolean(KEY_DISPLAY_BACK, displayBack)
+                putParcelable(KEY_ADD_ACCOUNT_PAYLOAD, AddAccountPayload.MetaAccount)
             }
         }
 
-        fun getBundleWithNetworkType(displayBack: Boolean, networkType: Node.NetworkType): Bundle {
+        fun bundle(payload: AddAccountPayload): Bundle {
             return Bundle().apply {
-                putSerializable(KEY_NETWORK_TYPE, networkType)
-                putBoolean(KEY_DISPLAY_BACK, displayBack)
+                putBoolean(KEY_DISPLAY_BACK, true)
+                putParcelable(KEY_ADD_ACCOUNT_PAYLOAD, payload)
             }
         }
     }
@@ -73,19 +76,18 @@ class WelcomeFragment : BaseFragment<WelcomeViewModel>() {
     }
 
     override fun inject() {
-        val shouldShowBack = arguments!![KEY_DISPLAY_BACK] as Boolean
-        val networkType = argument<Node.NetworkType?>(KEY_NETWORK_TYPE)
-
         FeatureUtils.getFeature<OnboardingFeatureComponent>(context!!, OnboardingFeatureApi::class.java)
             .welcomeComponentFactory()
-            .create(this, shouldShowBack, networkType)
+            .create(
+                fragment = this,
+                shouldShowBack= argument(KEY_DISPLAY_BACK),
+                addAccountPayload = argument(KEY_ADD_ACCOUNT_PAYLOAD)
+            )
             .inject(this)
     }
 
     override fun subscribe(viewModel: WelcomeViewModel) {
-        viewModel.shouldShowBackLiveData.observe {
-            back.visibility = if (it) View.VISIBLE else View.GONE
-        }
+        viewModel.shouldShowBackLiveData.observe(back::setVisible)
 
         observeBrowserEvents(viewModel)
     }

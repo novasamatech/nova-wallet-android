@@ -29,11 +29,14 @@ import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalAccount
 import jp.co.soramitsu.feature_account_impl.data.network.blockchain.AccountSubstrateSource
 import jp.co.soramitsu.feature_account_impl.data.network.blockchain.AccountSubstrateSourceImpl
 import jp.co.soramitsu.feature_account_impl.data.repository.AccountRepositoryImpl
+import jp.co.soramitsu.feature_account_impl.data.repository.AddAccountRepository
 import jp.co.soramitsu.feature_account_impl.data.repository.datasource.AccountDataSource
 import jp.co.soramitsu.feature_account_impl.data.repository.datasource.AccountDataSourceImpl
 import jp.co.soramitsu.feature_account_impl.data.repository.datasource.migration.AccountDataMigration
+import jp.co.soramitsu.feature_account_impl.data.secrets.AccountSecretsFactory
 import jp.co.soramitsu.feature_account_impl.domain.AccountInteractorImpl
 import jp.co.soramitsu.feature_account_impl.domain.NodeHostValidator
+import jp.co.soramitsu.feature_account_impl.domain.account.add.AddAccountInteractor
 import jp.co.soramitsu.feature_account_impl.domain.account.details.AccountDetailsInteractor
 import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.api.CryptoTypeChooserMixin
 import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.impl.CryptoTypeChooser
@@ -82,7 +85,6 @@ class AccountFeatureModule {
         accountDataSource: AccountDataSource,
         accountDao: AccountDao,
         nodeDao: NodeDao,
-        jsonSeedDecoder: JsonSeedDecoder,
         jsonSeedEncoder: JsonSeedEncoder,
         accountSubstrateSource: AccountSubstrateSource,
         languagesHolder: LanguagesHolder,
@@ -91,7 +93,6 @@ class AccountFeatureModule {
             accountDataSource,
             accountDao,
             nodeDao,
-            jsonSeedDecoder,
             jsonSeedEncoder,
             languagesHolder,
             accountSubstrateSource
@@ -111,7 +112,6 @@ class AccountFeatureModule {
     fun provideAccountDataSource(
         preferences: Preferences,
         encryptedPreferences: EncryptedPreferences,
-        jsonMapper: Gson,
         nodeDao: NodeDao,
         secretStoreV1: SecretStoreV1,
         accountDataMigration: AccountDataMigration,
@@ -123,7 +123,6 @@ class AccountFeatureModule {
             preferences,
             encryptedPreferences,
             nodeDao,
-            jsonMapper,
             metaAccountDao,
             chainRegistry,
             secretStoreV2,
@@ -188,4 +187,30 @@ class AccountFeatureModule {
         accountRepository,
         chainRegistry
     )
+
+    @Provides
+    @FeatureScope
+    fun provideAccountSecretsFactory(
+        jsonSeedDecoder: JsonSeedDecoder
+    ) = AccountSecretsFactory(jsonSeedDecoder)
+
+    @Provides
+    @FeatureScope
+    fun provideAddAccountRepository(
+        accountDataSource: AccountDataSource,
+        accountSecretsFactory: AccountSecretsFactory,
+        jsonSeedDecoder: JsonSeedDecoder,
+        chainRegistry: ChainRegistry,
+    ) = AddAccountRepository(
+        accountDataSource,
+        accountSecretsFactory,
+        jsonSeedDecoder,
+        chainRegistry
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideAddAccountInteractor(
+        addAccountRepository: AddAccountRepository
+    ) = AddAccountInteractor(addAccountRepository)
 }

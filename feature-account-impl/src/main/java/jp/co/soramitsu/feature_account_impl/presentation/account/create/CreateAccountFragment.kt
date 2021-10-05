@@ -4,37 +4,40 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import coil.ImageLoader
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import jp.co.soramitsu.common.base.BaseFragment
 import jp.co.soramitsu.common.di.FeatureUtils
 import jp.co.soramitsu.common.utils.hideSoftKeyboard
 import jp.co.soramitsu.common.utils.nameInputFilters
 import jp.co.soramitsu.common.utils.onTextChanged
-import jp.co.soramitsu.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
-import jp.co.soramitsu.core.model.Node
 import jp.co.soramitsu.feature_account_api.di.AccountFeatureApi
+import jp.co.soramitsu.feature_account_api.presenatation.account.add.AddAccountPayload
 import jp.co.soramitsu.feature_account_impl.R
 import jp.co.soramitsu.feature_account_impl.di.AccountFeatureComponent
-import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.api.chooseNetworkClicked
-import jp.co.soramitsu.feature_account_impl.presentation.view.advanced.network.NetworkChooserBottomSheetDialog
-import jp.co.soramitsu.feature_account_impl.presentation.view.advanced.network.model.NetworkModel
+import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.impl.setupForcedChainUi
 import kotlinx.android.synthetic.main.fragment_create_account.accountNameInput
-import kotlinx.android.synthetic.main.fragment_create_account.networkInput
+import kotlinx.android.synthetic.main.fragment_create_account.createAccountForcedChain
 import kotlinx.android.synthetic.main.fragment_create_account.nextBtn
 import kotlinx.android.synthetic.main.fragment_create_account.toolbar
+import javax.inject.Inject
 
 class CreateAccountFragment : BaseFragment<CreateAccountViewModel>() {
 
     companion object {
-        private const val KEY_FORCED_NETWORK_TYPE = "forced_network_type"
 
-        fun getBundle(networkType: Node.NetworkType?): Bundle {
+        private const val PAYLOAD = "CreateAccountFragment.payload"
+
+        fun getBundle(payload: AddAccountPayload): Bundle {
 
             return Bundle().apply {
-                putSerializable(KEY_FORCED_NETWORK_TYPE, networkType)
+                putParcelable(PAYLOAD, payload)
             }
         }
     }
+
+    @Inject
+    lateinit var imageLoader: ImageLoader
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_create_account, container, false)
@@ -52,19 +55,13 @@ class CreateAccountFragment : BaseFragment<CreateAccountViewModel>() {
             viewModel.accountNameChanged(it)
         }
 
-        networkInput.setWholeClickListener {
-            viewModel.chooseNetworkClicked()
-        }
-
         accountNameInput.content.filters = nameInputFilters()
     }
 
     override fun inject() {
-        val networkType = argument<Node.NetworkType?>(KEY_FORCED_NETWORK_TYPE)
-
-        FeatureUtils.getFeature<AccountFeatureComponent>(context!!, AccountFeatureApi::class.java)
+        FeatureUtils.getFeature<AccountFeatureComponent>(requireContext(), AccountFeatureApi::class.java)
             .createAccountComponentFactory()
-            .create(this, networkType)
+            .create(this, argument(PAYLOAD))
             .inject(this)
     }
 
@@ -77,21 +74,7 @@ class CreateAccountFragment : BaseFragment<CreateAccountViewModel>() {
             showScreenshotWarningDialog()
         }
 
-        viewModel.selectedNetworkLiveData.observe {
-            networkInput.setTextIcon(it.networkTypeUI.icon)
-            networkInput.setMessage(it.name)
-        }
-
-        networkInput.isEnabled = viewModel.isNetworkTypeChangeAvailable
-
-        viewModel.networkChooserEvent.observeEvent(::showNetworkChooser)
-    }
-
-    private fun showNetworkChooser(payload: DynamicListBottomSheet.Payload<NetworkModel>) {
-        NetworkChooserBottomSheetDialog(
-            requireActivity(), payload,
-            viewModel.selectedNetworkLiveData::setValue
-        ).show()
+        setupForcedChainUi(viewModel, createAccountForcedChain, imageLoader)
     }
 
     private fun showScreenshotWarningDialog() {

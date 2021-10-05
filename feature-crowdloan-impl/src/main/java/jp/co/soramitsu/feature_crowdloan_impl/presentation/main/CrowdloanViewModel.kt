@@ -5,6 +5,7 @@ import jp.co.soramitsu.common.address.createAddressIcon
 import jp.co.soramitsu.common.base.BaseViewModel
 import jp.co.soramitsu.common.list.toListWithHeaders
 import jp.co.soramitsu.common.list.toValueList
+import jp.co.soramitsu.common.mixin.MixinFactory
 import jp.co.soramitsu.common.presentation.LoadingState
 import jp.co.soramitsu.common.presentation.mapLoading
 import jp.co.soramitsu.common.resources.ResourceManager
@@ -50,7 +51,7 @@ class CrowdloanViewModel(
     private val router: CrowdloanRouter,
     private val sharedState: CrowdloanSharedState,
     private val crowdloanUpdateSystem: UpdateSystem,
-    assetSelectorFactory: AssetSelectorMixin.Presentation.Factory,
+    assetSelectorFactory: MixinFactory<AssetSelectorMixin.Presentation>,
 ) : BaseViewModel(), WithAssetSelector {
 
     override val assetSelectorMixin = assetSelectorFactory.create(scope = this)

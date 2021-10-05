@@ -83,7 +83,7 @@ class NodesViewModel(
     }
 
     fun createAccountForNetworkType(networkType: Node.NetworkType) {
-        router.createAccountForNetworkType(networkType)
+//        router.createAccountForNetworkType(networkType)
     }
 
     fun deleteNodeClicked(nodeModel: NodeModel) {

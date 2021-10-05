@@ -1,14 +1,12 @@
 package jp.co.soramitsu.feature_onboarding_impl
 
-import jp.co.soramitsu.core.model.Node
+import jp.co.soramitsu.feature_account_api.presenatation.account.add.AddAccountPayload
 
 interface OnboardingRouter {
 
-    fun openCreateAccount(selectedNetworkType: Node.NetworkType?)
+    fun openCreateAccount(addAccountPayload: AddAccountPayload)
 
-    fun backToWelcomeScreen()
-
-    fun openImportAccountScreen(selectedNetworkType: Node.NetworkType?)
+    fun openImportAccountScreen(addAccountPayload: AddAccountPayload)
 
     fun back()
 }

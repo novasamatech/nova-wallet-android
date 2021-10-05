@@ -1,5 +1,6 @@
 package jp.co.soramitsu.feature_wallet_impl.data.network.blockchain.updaters
 
+import android.util.Log
 import jp.co.soramitsu.common.data.network.runtime.binding.ExtrinsicStatusEvent
 import jp.co.soramitsu.common.utils.Modules
 import jp.co.soramitsu.common.utils.system
@@ -74,11 +75,13 @@ class PaymentUpdater(
 
         return storageSubscriptionBuilder.subscribe(key)
             .onEach { change ->
-                val newAccountInfo = bindAccountInfoOrDefault(change.value, runtime)
+                runCatching { bindAccountInfoOrDefault(change.value, runtime) }
+                    .onFailure { Log.e("RX", "Failed to update balance in ${chain.name}") }
+                    .onSuccess {
+                        assetCache.updateAsset(metaAccount.id, accountId, chain.utilityAsset, it)
 
-                assetCache.updateAsset(metaAccount.id, accountId, chain.utilityAsset, newAccountInfo)
-
-                fetchTransfers(change.block, chain, accountId)
+                        fetchTransfers(change.block, chain, accountId)
+                    }
             }
             .noSideAffects()
     }

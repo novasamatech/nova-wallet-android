@@ -9,6 +9,7 @@ import dagger.multibindings.IntoMap
 import jp.co.soramitsu.common.address.AddressIconGenerator
 import jp.co.soramitsu.common.di.viewmodel.ViewModelKey
 import jp.co.soramitsu.common.di.viewmodel.ViewModelModule
+import jp.co.soramitsu.common.mixin.MixinFactory
 import jp.co.soramitsu.common.resources.ResourceManager
 import jp.co.soramitsu.core.updater.UpdateSystem
 import jp.co.soramitsu.feature_crowdloan_impl.data.CrowdloanSharedState
@@ -33,7 +34,7 @@ class CrowdloanModule {
         router: CrowdloanRouter,
         crowdloanUpdateSystem: UpdateSystem,
         sharedState: CrowdloanSharedState,
-        assetSelectorFactory: AssetSelectorMixin.Presentation.Factory
+        assetSelectorFactory: MixinFactory<AssetSelectorMixin.Presentation>
     ): ViewModel {
         return CrowdloanViewModel(
             interactor,

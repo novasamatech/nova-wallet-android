@@ -20,11 +20,6 @@ interface AssetSelectorMixin {
 
     interface Presentation : AssetSelectorMixin {
 
-        interface Factory {
-
-            fun create(scope: CoroutineScope): Presentation
-        }
-
         val selectedAssetFlow: Flow<Asset>
     }
 }

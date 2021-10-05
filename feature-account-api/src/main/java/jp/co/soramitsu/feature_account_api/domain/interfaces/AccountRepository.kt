@@ -2,12 +2,11 @@ package jp.co.soramitsu.feature_account_api.domain.interfaces
 
 import jp.co.soramitsu.core.model.CryptoType
 import jp.co.soramitsu.core.model.Language
-import jp.co.soramitsu.core.model.Network
 import jp.co.soramitsu.core.model.Node
 import jp.co.soramitsu.core.model.SecuritySource
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.feature_account_api.domain.model.Account
-import jp.co.soramitsu.feature_account_api.domain.model.ImportJsonData
+import jp.co.soramitsu.feature_account_api.domain.model.ImportJsonMetaData
 import jp.co.soramitsu.feature_account_api.domain.model.LightMetaAccount
 import jp.co.soramitsu.feature_account_api.domain.model.MetaAccount
 import jp.co.soramitsu.feature_account_api.domain.model.MetaAccountOrdering
@@ -20,8 +19,6 @@ interface AccountRepository {
     fun getEncryptionTypes(): List<CryptoType>
 
     suspend fun getNode(nodeId: Int): Node
-
-    suspend fun getNetworks(): List<Network>
 
     suspend fun getSelectedNodeOrDefault(): Node
 
@@ -53,14 +50,6 @@ interface AccountRepository {
 
     suspend fun isAccountSelected(): Boolean
 
-    suspend fun createAccount(
-        accountName: String,
-        mnemonic: String,
-        encryptionType: CryptoType,
-        derivationPath: String,
-        networkType: Node.NetworkType
-    )
-
     suspend fun deleteAccount(metaId: Long)
 
     suspend fun getAccounts(): List<Account>
@@ -70,29 +59,6 @@ interface AccountRepository {
     suspend fun getAccountOrNull(address: String): Account?
 
     suspend fun getMyAccounts(query: String, chainId: String): Set<Account>
-
-    suspend fun importFromMnemonic(
-        keyString: String,
-        username: String,
-        derivationPath: String,
-        selectedEncryptionType: CryptoType,
-        networkType: Node.NetworkType
-    )
-
-    suspend fun importFromSeed(
-        seed: String,
-        username: String,
-        derivationPath: String,
-        selectedEncryptionType: CryptoType,
-        networkType: Node.NetworkType
-    )
-
-    suspend fun importFromJson(
-        json: String,
-        password: String,
-        networkType: Node.NetworkType,
-        name: String
-    )
 
     suspend fun isCodeSet(): Boolean
 
@@ -111,8 +77,6 @@ interface AccountRepository {
     fun nodesFlow(): Flow<List<Node>>
 
     suspend fun updateAccountsOrdering(accountOrdering: List<MetaAccountOrdering>)
-
-    suspend fun processAccountJson(json: String): ImportJsonData
 
     fun getLanguages(): List<Language>
 

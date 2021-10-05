@@ -5,6 +5,7 @@ import dagger.BindsInstance
 import dagger.Subcomponent
 import jp.co.soramitsu.common.di.scope.ScreenScope
 import jp.co.soramitsu.core.model.Node
+import jp.co.soramitsu.feature_account_api.presenatation.account.add.AddAccountPayload
 import jp.co.soramitsu.feature_onboarding_impl.presentation.welcome.WelcomeFragment
 
 @Subcomponent(
@@ -21,7 +22,7 @@ interface WelcomeComponent {
         fun create(
             @BindsInstance fragment: Fragment,
             @BindsInstance shouldShowBack: Boolean,
-            @BindsInstance networkType: Node.NetworkType?
+            @BindsInstance addAccountPayload: AddAccountPayload,
         ): WelcomeComponent
     }
 

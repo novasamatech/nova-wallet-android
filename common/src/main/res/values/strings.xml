@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+    <string name="import_json_unsupported_crypto_title">Unsupported encryption type</string>
+    <string name="import_json_unsupported_crypto_message">Cannot import account for Ethereum-based chain based on secret with encryption other than ECDSA</string>
+    <string name="common_chain">Chain</string>
+    <string name="import_json_chains_dont_match">Supplied JSON file was created for different network.</string>
+
     <string name="profile_accounts_title_2_0">Wallets</string>
     <string name="username_setup_choose_title_2_0">Wallet nickname</string>
     <string name="account_info_title_2_0">Wallet</string>

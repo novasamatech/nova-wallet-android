@@ -5,6 +5,7 @@ import jp.co.soramitsu.common.address.AddressIconGenerator
 import jp.co.soramitsu.common.address.AddressModel
 import jp.co.soramitsu.common.address.createAddressModel
 import jp.co.soramitsu.common.base.BaseViewModel
+import jp.co.soramitsu.common.mixin.MixinFactory
 import jp.co.soramitsu.common.mixin.api.Validatable
 import jp.co.soramitsu.common.presentation.LoadingState
 import jp.co.soramitsu.common.presentation.flatMapLoading
@@ -69,7 +70,7 @@ class StakingViewModel(
     private val bondMoreValidationSystem: ManageStakingValidationSystem,
     private val validationExecutor: ValidationExecutor,
     private val stakingUpdateSystem: UpdateSystem,
-    private val assetSelectorMixinFactory: AssetSelectorMixin.Presentation.Factory,
+    private val assetSelectorMixinFactory: MixinFactory<AssetSelectorMixin.Presentation>,
 ) : BaseViewModel(),
     WithAssetSelector,
     Validatable by validationExecutor {

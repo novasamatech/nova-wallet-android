@@ -10,6 +10,7 @@ import jp.co.soramitsu.common.di.viewmodel.ViewModelKey
 import jp.co.soramitsu.common.di.viewmodel.ViewModelModule
 import jp.co.soramitsu.core.model.Node
 import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountInteractor
+import jp.co.soramitsu.feature_account_api.presenatation.account.add.AddAccountPayload
 import jp.co.soramitsu.feature_account_impl.presentation.AccountRouter
 import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.api.CryptoTypeChooserMixin
 import jp.co.soramitsu.feature_account_impl.presentation.mnemonic.backup.BackupMnemonicViewModel
@@ -24,14 +25,14 @@ class BackupMnemonicModule {
         interactor: AccountInteractor,
         router: AccountRouter,
         accountName: String,
-        networkType: Node.NetworkType,
+        addAccountPayload: AddAccountPayload,
         cryptoTypeChooserMixin: CryptoTypeChooserMixin
     ): ViewModel {
         return BackupMnemonicViewModel(
             interactor,
             router,
             accountName,
-            networkType,
+            addAccountPayload,
             cryptoTypeChooserMixin
         )
     }

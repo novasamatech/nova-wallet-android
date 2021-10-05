@@ -74,4 +74,7 @@ interface MetaAccountDao {
 
     @Query("DELETE FROM meta_accounts WHERE id = :metaId")
     suspend fun delete(metaId: Long)
+
+    @Query("SELECT COALESCE(MAX(position), 0)  + 1 FROM meta_accounts")
+    suspend fun nextAccountPosition(): Int
 }

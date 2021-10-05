@@ -13,7 +13,6 @@ import jp.co.soramitsu.feature_account_impl.presentation.importing.source.model.
 import jp.co.soramitsu.feature_account_impl.presentation.importing.source.model.MnemonicImportSource
 import kotlinx.android.synthetic.main.import_source_mnemonic.view.importMnemonicContent
 import kotlinx.android.synthetic.main.import_source_mnemonic.view.importMnemonicContentContainer
-import kotlinx.android.synthetic.main.import_source_mnemonic.view.importMnemonicNetworkInput
 import kotlinx.android.synthetic.main.import_source_mnemonic.view.importMnemonicUsernameInput
 
 class MnemonicImportView @JvmOverloads constructor(
@@ -21,9 +20,6 @@ class MnemonicImportView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : ImportSourceView(R.layout.import_source_mnemonic, context, attrs, defStyleAttr) {
-
-    override val networkInputView: LabeledTextView
-        get() = importMnemonicNetworkInput
 
     override val nameInputView: InputField
         get() = importMnemonicUsernameInput

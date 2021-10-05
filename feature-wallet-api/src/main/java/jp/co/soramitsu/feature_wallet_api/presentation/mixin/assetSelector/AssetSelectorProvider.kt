@@ -1,6 +1,7 @@
 package jp.co.soramitsu.feature_wallet_api.presentation.mixin.assetSelector
 
 import androidx.lifecycle.MutableLiveData
+import jp.co.soramitsu.common.mixin.MixinFactory
 import jp.co.soramitsu.common.resources.ResourceManager
 import jp.co.soramitsu.common.utils.Event
 import jp.co.soramitsu.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
@@ -21,7 +22,7 @@ class AssetSelectorFactory(
     private val assetUseCase: AssetUseCase,
     private val singleAssetSharedState: SingleAssetSharedState,
     private val resourceManager: ResourceManager
-) : AssetSelectorMixin.Presentation.Factory {
+) : MixinFactory<AssetSelectorMixin.Presentation> {
 
     override fun create(scope: CoroutineScope): AssetSelectorMixin.Presentation {
         return AssetSelectorProvider(assetUseCase, resourceManager, singleAssetSharedState, scope)

@@ -1,14 +1,9 @@
 package jp.co.soramitsu.feature_account_impl.data.repository
 
-import android.database.sqlite.SQLiteConstraintException
 import jp.co.soramitsu.common.data.mappers.mapCryptoTypeToEncryption
-import jp.co.soramitsu.common.data.mappers.mapEncryptionToCryptoType
 import jp.co.soramitsu.common.resources.LanguagesHolder
-import jp.co.soramitsu.common.utils.deriveSeed32
 import jp.co.soramitsu.common.utils.mapList
 import jp.co.soramitsu.common.utils.networkType
-import jp.co.soramitsu.common.utils.nullIfEmpty
-import jp.co.soramitsu.common.utils.toAddress
 import jp.co.soramitsu.core.model.CryptoType
 import jp.co.soramitsu.core.model.JsonFormer
 import jp.co.soramitsu.core.model.Language
@@ -23,20 +18,15 @@ import jp.co.soramitsu.core_db.model.AccountLocal
 import jp.co.soramitsu.core_db.model.NodeLocal
 import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedDecoder
 import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedEncoder
-import jp.co.soramitsu.fearless_utils.encrypt.junction.SubstrateJunctionDecoder
-import jp.co.soramitsu.fearless_utils.encrypt.keypair.substrate.SubstrateKeypairFactory
 import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.Mnemonic
 import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.MnemonicCreator
 import jp.co.soramitsu.fearless_utils.encrypt.model.NetworkTypeIdentifier
 import jp.co.soramitsu.fearless_utils.encrypt.qr.QrSharing
-import jp.co.soramitsu.fearless_utils.encrypt.seed.substrate.SubstrateSeedFactory
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountAlreadyExistsException
 import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountRepository
 import jp.co.soramitsu.feature_account_api.domain.model.Account
 import jp.co.soramitsu.feature_account_api.domain.model.AuthType
-import jp.co.soramitsu.feature_account_api.domain.model.ImportJsonData
 import jp.co.soramitsu.feature_account_api.domain.model.LightMetaAccount
 import jp.co.soramitsu.feature_account_api.domain.model.MetaAccount
 import jp.co.soramitsu.feature_account_api.domain.model.MetaAccountOrdering
@@ -50,13 +40,11 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import org.bouncycastle.util.encoders.Hex
 
 class AccountRepositoryImpl(
     private val accountDataSource: AccountDataSource,
     private val accountDao: AccountDao,
     private val nodeDao: NodeDao,
-    private val jsonSeedDecoder: JsonSeedDecoder,
     private val jsonSeedEncoder: JsonSeedEncoder,
     private val languagesHolder: LanguagesHolder,
     private val accountSubstrateSource: AccountSubstrateSource,
@@ -71,16 +59,6 @@ class AccountRepositoryImpl(
             val node = nodeDao.getNodeById(nodeId)
 
             mapNodeLocalToNode(node)
-        }
-    }
-
-    override suspend fun getNetworks(): List<Network> {
-        return withContext(Dispatchers.Default) {
-            nodeDao.getNodes()
-                .map(::mapNodeLocalToNode)
-                .map(Node::networkType)
-                .distinct()
-                .map { getNetworkForType(it) }
         }
     }
 
@@ -172,25 +150,6 @@ class AccountRepositoryImpl(
         return accountDataSource.anyAccountSelected()
     }
 
-    override suspend fun createAccount(
-        accountName: String,
-        mnemonic: String,
-        encryptionType: CryptoType,
-        derivationPath: String,
-        networkType: Node.NetworkType,
-    ) {
-        val account = saveFromMnemonic(
-            accountName,
-            mnemonic,
-            derivationPath,
-            encryptionType,
-            networkType,
-            isImport = false
-        )
-
-        selectAccount(account)
-    }
-
     override suspend fun deleteAccount(metaId: Long) {
         accountDataSource.deleteMetaAccount(metaId)
     }
@@ -217,91 +176,6 @@ class AccountRepositoryImpl(
 //        }
 
         return emptySet() // TODO wallet
-    }
-
-    override suspend fun importFromMnemonic(
-        keyString: String,
-        username: String,
-        derivationPath: String,
-        selectedEncryptionType: CryptoType,
-        networkType: Node.NetworkType,
-    ) {
-        val account = saveFromMnemonic(
-            username,
-            keyString,
-            derivationPath,
-            selectedEncryptionType,
-            networkType,
-            isImport = true
-        )
-
-        selectAccount(account)
-    }
-
-    override suspend fun importFromSeed(
-        seed: String,
-        username: String,
-        derivationPath: String,
-        selectedEncryptionType: CryptoType,
-        networkType: Node.NetworkType,
-    ) {
-        return withContext(Dispatchers.Default) {
-            val seedBytes = Hex.decode(seed.removePrefix("0x"))
-
-            val derivationPathOrNull = derivationPath.nullIfEmpty()
-            val decodedDerivationPath = derivationPathOrNull?.let {
-                SubstrateJunctionDecoder.decode(it)
-            }
-
-            val keys = SubstrateKeypairFactory.generate(
-                mapCryptoTypeToEncryption(selectedEncryptionType),
-                seedBytes,
-                decodedDerivationPath?.junctions.orEmpty()
-            )
-
-            val address = keys.publicKey.toAddress(networkType)
-
-            val securitySource = SecuritySource.Specified.Seed(seedBytes, keys, derivationPath)
-
-            val publicKeyEncoded = Hex.toHexString(keys.publicKey)
-
-            val accountLocal = insertAccount(address, username, publicKeyEncoded, selectedEncryptionType, networkType)
-
-            accountDataSource.saveSecuritySource(address, securitySource)
-
-            val account = mapAccountLocalToAccount(accountLocal)
-
-            selectAccount(account)
-        }
-    }
-
-    override suspend fun importFromJson(
-        json: String,
-        password: String,
-        networkType: Node.NetworkType,
-        name: String,
-    ) {
-        return withContext(Dispatchers.Default) {
-            val importData = jsonSeedDecoder.decode(json, password)
-
-            val newAccount = with(importData) {
-                val publicKeyEncoded = Hex.toHexString(keypair.publicKey)
-
-                val cryptoType = mapEncryptionToCryptoType(encryptionType)
-
-                val securitySource = SecuritySource.Specified.Json(seed, keypair)
-
-                val actualAddress = keypair.publicKey.toAddress(networkType)
-
-                val accountLocal = insertAccount(actualAddress, name, publicKeyEncoded, cryptoType, networkType)
-
-                accountDataSource.saveSecuritySource(actualAddress, securitySource)
-
-                mapAccountLocalToAccount(accountLocal)
-            }
-
-            selectAccount(newAccount)
-        }
     }
 
     override suspend fun isCodeSet(): Boolean {
@@ -338,19 +212,6 @@ class AccountRepositoryImpl(
 
     override suspend fun updateAccountsOrdering(accountOrdering: List<MetaAccountOrdering>) {
         return accountDataSource.updateAccountPositions(accountOrdering)
-    }
-
-    override suspend fun processAccountJson(json: String): ImportJsonData {
-        return withContext(Dispatchers.Default) {
-            val importAccountMeta = jsonSeedDecoder.extractImportMetaData(json)
-
-            with(importAccountMeta) {
-                val networkType = constructNetworkType(networkTypeIdentifier)
-                val cryptoType = mapEncryptionToCryptoType(encryptionType)
-
-                ImportJsonData(name, networkType, cryptoType)
-            }
-        }
     }
 
     override suspend fun getSecuritySource(accountAddress: String): SecuritySource {
@@ -437,53 +298,6 @@ class AccountRepositoryImpl(
         return QrSharing.encode(payload)
     }
 
-    private suspend fun saveFromMnemonic(
-        accountName: String,
-        mnemonicWords: String,
-        derivationPath: String,
-        cryptoType: CryptoType,
-        networkType: Node.NetworkType,
-        isImport: Boolean,
-    ): Account {
-        return withContext(Dispatchers.Default) {
-            val derivationPathOrNull = derivationPath.nullIfEmpty()
-            val decodedDerivationPath = derivationPathOrNull?.let {
-                SubstrateJunctionDecoder.decode(it)
-            }
-
-            val derivationResult = SubstrateSeedFactory.deriveSeed32(mnemonicWords, decodedDerivationPath?.password)
-
-            val keys = SubstrateKeypairFactory.generate(
-                encryptionType = mapCryptoTypeToEncryption(cryptoType),
-                seed = derivationResult.seed,
-                decodedDerivationPath?.junctions.orEmpty()
-            )
-
-            val address = keys.publicKey.toAddress(networkType)
-
-            val securitySource: SecuritySource.Specified = if (isImport) {
-                SecuritySource.Specified.Mnemonic(derivationResult.seed, keys, derivationResult.mnemonic.words, derivationPathOrNull)
-            } else {
-                SecuritySource.Specified.Create(derivationResult.seed, keys, derivationResult.mnemonic.words, derivationPathOrNull)
-            }
-
-            val publicKeyEncoded = Hex.toHexString(keys.publicKey)
-
-            val accountLocal = insertAccount(address, accountName, publicKeyEncoded, cryptoType, networkType)
-            accountDataSource.saveSecuritySource(address, securitySource)
-
-            mapAccountLocalToAccount(accountLocal)
-        }
-    }
-
-    private fun constructNetworkType(identifier: NetworkTypeIdentifier): Node.NetworkType? {
-        return when (identifier) {
-            is NetworkTypeIdentifier.Genesis -> Node.NetworkType.findByGenesis(identifier.genesis)
-            is NetworkTypeIdentifier.AddressByte -> Node.NetworkType.findByAddressByte(identifier.addressByte)
-            is NetworkTypeIdentifier.Undefined -> null
-        }
-    }
-
     private suspend fun mapAccountLocalToAccount(accountLocal: AccountLocal): Account {
         val network = getNetworkForType(accountLocal.networkType)
 
@@ -497,48 +311,6 @@ class AccountRepositoryImpl(
                 position = position
             )
         }
-    }
-
-    private fun mapAccountToAccountLocal(account: Account): AccountLocal {
-        val nameLocal = account.name ?: ""
-
-        return with(account) {
-            AccountLocal(
-                address = address,
-                username = nameLocal,
-                cryptoType = cryptoType.ordinal,
-                networkType = network.type,
-                publicKey = accountIdHex,
-                position = position
-            )
-        }
-    }
-
-    private suspend fun insertAccount(
-        address: String,
-        accountName: String,
-        publicKeyEncoded: String,
-        cryptoType: CryptoType,
-        networkType: Node.NetworkType,
-    ) = try {
-        val cryptoTypeLocal = cryptoType.ordinal
-
-        val positionInGroup = accountDao.getNextPosition()
-
-        val account = AccountLocal(
-            address = address,
-            username = accountName,
-            publicKey = publicKeyEncoded,
-            cryptoType = cryptoTypeLocal,
-            networkType = networkType,
-            position = positionInGroup
-        )
-
-        accountDao.insert(account)
-
-        account
-    } catch (e: SQLiteConstraintException) {
-        throw AccountAlreadyExistsException()
     }
 
     private fun getNetworkForType(networkType: Node.NetworkType): Network {

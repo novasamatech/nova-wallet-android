@@ -51,8 +51,8 @@ class ChainAccountHolder(view: View) : GroupedListHolder(view) {
         handler: ChainAccountsAdapter.Handler,
         imageLoader: ImageLoader
     ) = with(containerView) {
-        chainAccountChainIcon.load(item.chainIcon, imageLoader)
-        chainAccountChainName.text = item.chainName
+        chainAccountChainIcon.load(item.chain.icon, imageLoader)
+        chainAccountChainName.text = item.chain.name
 
         chainAccountAccountIcon.setImageDrawable(item.accountIcon)
         chainAccountAccountAddress.text = item.address
@@ -72,12 +72,10 @@ private object DiffCallback : BaseGroupedDiffCallback<TextHeader, AccountInChain
     }
 
     override fun areChildItemsTheSame(oldItem: AccountInChainUi, newItem: AccountInChainUi): Boolean {
-        return oldItem.chainName == newItem.chainName
+        return oldItem.chain.id == newItem.chain.id
     }
 
     override fun areChildContentsTheSame(oldItem: AccountInChainUi, newItem: AccountInChainUi): Boolean {
-        return oldItem.chainName == newItem.chainName &&
-            oldItem.chainIcon == newItem.chainIcon &&
-            oldItem.address == newItem.address
+        return oldItem.chain == newItem.chain && oldItem.address == newItem.address
     }
 }

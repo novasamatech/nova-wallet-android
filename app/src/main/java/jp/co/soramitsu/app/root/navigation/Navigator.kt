@@ -10,7 +10,7 @@ import jp.co.soramitsu.app.R
 import jp.co.soramitsu.app.root.presentation.RootRouter
 import jp.co.soramitsu.common.navigation.DelayedNavigation
 import jp.co.soramitsu.common.utils.postToUiThread
-import jp.co.soramitsu.core.model.Node
+import jp.co.soramitsu.feature_account_api.presenatation.account.add.AddAccountPayload
 import jp.co.soramitsu.feature_account_impl.presentation.AccountRouter
 import jp.co.soramitsu.feature_account_impl.presentation.account.create.CreateAccountFragment
 import jp.co.soramitsu.feature_account_impl.presentation.account.details.AccountDetailsFragment
@@ -102,7 +102,7 @@ class Navigator :
     }
 
     override fun openAddFirstAccount() {
-        navController?.navigate(R.id.action_splash_to_onboarding, WelcomeFragment.getBundle(false))
+        navController?.navigate(R.id.action_splash_to_onboarding, WelcomeFragment.bundle(false))
     }
 
     override fun openInitialCheckPincode() {
@@ -111,12 +111,8 @@ class Navigator :
         navController?.navigate(R.id.action_splash_to_pin, bundle)
     }
 
-    override fun openCreateAccount(selectedNetworkType: Node.NetworkType?) {
-        navController?.navigate(R.id.action_welcomeFragment_to_createAccountFragment, CreateAccountFragment.getBundle(selectedNetworkType))
-    }
-
-    override fun backToWelcomeScreen() {
-        navController?.popBackStack()
+    override fun openCreateAccount(addAccountPayload: AddAccountPayload) {
+        navController?.navigate(R.id.action_welcomeFragment_to_createAccountFragment, CreateAccountFragment.getBundle(addAccountPayload))
     }
 
     override fun openMain() {
@@ -160,25 +156,13 @@ class Navigator :
         navController?.navigate(R.id.action_profileFragment_to_aboutFragment)
     }
 
-    override fun openImportAccountScreen(selectedNetworkType: Node.NetworkType?) {
-        navController?.navigate(R.id.importAction, ImportAccountFragment.getBundle(selectedNetworkType))
+    override fun openImportAccountScreen(addAccountPayload: AddAccountPayload) {
+        navController?.navigate(R.id.importAction, ImportAccountFragment.getBundle(addAccountPayload))
     }
 
-    override fun openMnemonicScreen(accountName: String, selectedNetworkType: Node.NetworkType) {
-        val bundle = BackupMnemonicFragment.getBundle(accountName, selectedNetworkType)
+    override fun openMnemonicScreen(accountName: String, payload: AddAccountPayload) {
+        val bundle = BackupMnemonicFragment.getBundle(accountName, payload)
         navController?.navigate(R.id.action_createAccountFragment_to_backupMnemonicFragment, bundle)
-    }
-
-    override fun backToCreateAccountScreen() {
-        navController?.popBackStack()
-    }
-
-    override fun backToBackupMnemonicScreen() {
-        navController?.popBackStack()
-    }
-
-    override fun backToProfileScreen() {
-        navController?.popBackStack()
     }
 
     override fun openSetupStaking() {
@@ -403,10 +387,6 @@ class Navigator :
         navController?.navigate(R.id.action_mainFragment_to_languagesFragment)
     }
 
-    override fun openAddAccount() {
-        navController?.navigate(R.id.action_open_onboarding, WelcomeFragment.getBundle(true))
-    }
-
     override fun openChangeAccountFromWallet() {
         openAccounts(AccountChosenNavDirection.BACK)
     }
@@ -454,8 +434,8 @@ class Navigator :
         navController?.navigate(R.id.action_nodesFragment_to_addNodeFragment)
     }
 
-    override fun createAccountForNetworkType(networkType: Node.NetworkType) {
-        navController?.navigate(R.id.action_nodes_to_onboarding, WelcomeFragment.getBundleWithNetworkType(true, networkType))
+    override fun openAddAccount(payload: AddAccountPayload) {
+        navController?.navigate(R.id.action_open_onboarding, WelcomeFragment.bundle(payload))
     }
 
     override fun openExportMnemonic(accountAddress: String): DelayedNavigation {

@@ -10,6 +10,7 @@ import jp.co.soramitsu.common.di.viewmodel.ViewModelKey
 import jp.co.soramitsu.common.di.viewmodel.ViewModelModule
 import jp.co.soramitsu.common.vibration.DeviceVibrator
 import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountInteractor
+import jp.co.soramitsu.feature_account_impl.domain.account.add.AddAccountInteractor
 import jp.co.soramitsu.feature_account_impl.presentation.AccountRouter
 import jp.co.soramitsu.feature_account_impl.presentation.mnemonic.confirm.ConfirmMnemonicPayload
 import jp.co.soramitsu.feature_account_impl.presentation.mnemonic.confirm.ConfirmMnemonicViewModel
@@ -22,11 +23,12 @@ class ConfirmMnemonicModule {
     @ViewModelKey(ConfirmMnemonicViewModel::class)
     fun provideViewModel(
         interactor: AccountInteractor,
+        addAccountInteractor: AddAccountInteractor,
         router: AccountRouter,
         deviceVibrator: DeviceVibrator,
         payload: ConfirmMnemonicPayload
     ): ViewModel {
-        return ConfirmMnemonicViewModel(interactor, router, deviceVibrator, payload)
+        return ConfirmMnemonicViewModel(interactor, addAccountInteractor, router, deviceVibrator, payload)
     }
 
     @Provides

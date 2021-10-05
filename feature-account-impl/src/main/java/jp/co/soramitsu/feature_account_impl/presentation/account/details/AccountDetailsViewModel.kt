@@ -9,6 +9,8 @@ import jp.co.soramitsu.common.resources.ResourceManager
 import jp.co.soramitsu.common.utils.flowOf
 import jp.co.soramitsu.common.utils.inBackground
 import jp.co.soramitsu.common.utils.invoke
+import jp.co.soramitsu.feature_account_api.data.mappers.mapChainToUi
+import jp.co.soramitsu.feature_account_api.presenatation.account.add.AddAccountPayload
 import jp.co.soramitsu.feature_account_impl.R
 import jp.co.soramitsu.feature_account_impl.domain.account.details.AccountDetailsInteractor
 import jp.co.soramitsu.feature_account_impl.domain.account.details.AccountInChain
@@ -85,14 +87,15 @@ class AccountDetailsViewModel(
         } ?: resourceManager.getDrawable(R.drawable.ic_warning_filled)
 
         AccountInChainUi(
-            chainName = chain.name,
-            chainIcon = chain.icon,
+            chain = mapChainToUi(chain),
             address = address,
             accountIcon = accountIcon
         )
     }
 
     fun chainAccountClicked(item: AccountInChainUi) {
-        // TODO view in external explorers
+        // TODO show bottom sheet
+
+        accountRouter.openAddAccount(AddAccountPayload.ChainAccount(item.chain.id, metaId))
     }
 }

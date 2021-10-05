@@ -10,6 +10,7 @@ import jp.co.soramitsu.common.di.FeatureUtils
 import jp.co.soramitsu.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet.Payload
 import jp.co.soramitsu.core.model.Node
 import jp.co.soramitsu.feature_account_api.di.AccountFeatureApi
+import jp.co.soramitsu.feature_account_api.presenatation.account.add.AddAccountPayload
 import jp.co.soramitsu.feature_account_impl.R
 import jp.co.soramitsu.feature_account_impl.di.AccountFeatureComponent
 import jp.co.soramitsu.feature_account_impl.presentation.view.advanced.encryption.EncryptionTypeChooserBottomSheetDialog
@@ -23,12 +24,12 @@ class BackupMnemonicFragment : BaseFragment<BackupMnemonicViewModel>() {
 
     companion object {
         private const val KEY_ACCOUNT_NAME = "account_name"
-        private const val KEY_NETWORK_TYPE = "network_type"
+        private const val KEY_ADD_ACCOUNT_PAYLOAD = "BackupMnemonicFragment.addAccountPayload"
 
-        fun getBundle(accountName: String, selectedNetworkType: Node.NetworkType): Bundle {
+        fun getBundle(accountName: String, addAccountPayload: AddAccountPayload): Bundle {
             return Bundle().apply {
                 putString(KEY_ACCOUNT_NAME, accountName)
-                putSerializable(KEY_NETWORK_TYPE, selectedNetworkType)
+                putParcelable(KEY_ADD_ACCOUNT_PAYLOAD, addAccountPayload)
             }
         }
     }
@@ -60,12 +61,13 @@ class BackupMnemonicFragment : BaseFragment<BackupMnemonicViewModel>() {
     }
 
     override fun inject() {
-        val accountName = argument<String>(KEY_ACCOUNT_NAME)
-        val selectedNetworkType = argument<Node.NetworkType>(KEY_NETWORK_TYPE)
-
         FeatureUtils.getFeature<AccountFeatureComponent>(context!!, AccountFeatureApi::class.java)
             .backupMnemonicComponentFactory()
-            .create(this, accountName, selectedNetworkType)
+            .create(
+                fragment = this,
+                accountName = argument(KEY_ACCOUNT_NAME),
+                addAccountPayload = argument(KEY_ADD_ACCOUNT_PAYLOAD)
+            )
             .inject(this)
     }
 

@@ -5,6 +5,7 @@ import dagger.Provides
 import jp.co.soramitsu.common.data.network.NetworkApiCreator
 import jp.co.soramitsu.common.data.storage.Preferences
 import jp.co.soramitsu.common.di.scope.FeatureScope
+import jp.co.soramitsu.common.mixin.MixinFactory
 import jp.co.soramitsu.common.resources.ResourceManager
 import jp.co.soramitsu.feature_account_api.data.extrinsic.ExtrinsicService
 import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountRepository
@@ -55,7 +56,7 @@ class CrowdloanFeatureModule {
         assetUseCase: AssetUseCase,
         singleAssetSharedState: CrowdloanSharedState,
         resourceManager: ResourceManager
-    ): AssetSelectorMixin.Presentation.Factory = AssetSelectorFactory(
+    ): MixinFactory<AssetSelectorMixin.Presentation> = AssetSelectorFactory(
         assetUseCase,
         singleAssetSharedState,
         resourceManager

@@ -40,6 +40,8 @@ fun StorageEntry.defaultInHex() = default.toHexString(withPrefix = true)
 
 fun ByteArray.toAddress(networkType: Node.NetworkType) = toAddress(networkType.runtimeConfiguration.addressByte)
 
+fun String.removeHexPrefix() = removePrefix("0x")
+
 fun <T> DataType<T>.fromHex(hex: String): T {
     val codecReader = ScaleCodecReader(hex.fromHex())
 

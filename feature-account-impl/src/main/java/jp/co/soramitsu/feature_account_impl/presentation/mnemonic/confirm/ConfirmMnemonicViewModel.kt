@@ -4,17 +4,21 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import jp.co.soramitsu.common.base.BaseViewModel
+import jp.co.soramitsu.common.data.secrets.v2.MetaAccountSecrets
 import jp.co.soramitsu.common.utils.Event
 import jp.co.soramitsu.common.utils.map
-import jp.co.soramitsu.common.utils.requireException
 import jp.co.soramitsu.common.utils.sendEvent
 import jp.co.soramitsu.common.vibration.DeviceVibrator
 import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountInteractor
+import jp.co.soramitsu.feature_account_impl.data.mappers.mapAddAccountPayloadToAddAccountType
+import jp.co.soramitsu.feature_account_impl.data.secrets.AccountSecretsFactory
+import jp.co.soramitsu.feature_account_impl.domain.account.add.AddAccountInteractor
 import jp.co.soramitsu.feature_account_impl.presentation.AccountRouter
 import kotlinx.coroutines.launch
 
 class ConfirmMnemonicViewModel(
     private val interactor: AccountInteractor,
+    private val addAccountInteractor: AddAccountInteractor,
     private val router: AccountRouter,
     private val deviceVibrator: DeviceVibrator,
     private val payload: ConfirmMnemonicPayload
@@ -42,7 +46,7 @@ class ConfirmMnemonicViewModel(
     val matchingMnemonicErrorAnimationEvent: LiveData<Event<Unit>> = _matchingMnemonicErrorAnimationEvent
 
     fun homeButtonClicked() {
-        router.backToBackupMnemonicScreen()
+        router.back()
     }
 
     fun resetConfirmationClicked() {
@@ -108,13 +112,11 @@ class ConfirmMnemonicViewModel(
             val mnemonicString = originMnemonic.joinToString(" ")
 
             with(extras) {
-                val result = interactor.createAccount(accountName, mnemonicString, cryptoType, derivationPath, networkType)
+                val addAccountType = mapAddAccountPayloadToAddAccountType(addAccountPayload)
 
-                if (result.isSuccess) {
-                    continueBasedOnCodeStatus()
-                } else {
-                    showError(result.requireException())
-                }
+                addAccountInteractor.createAccount(accountName, mnemonicString, cryptoType, derivationPath, addAccountType)
+                    .onSuccess { continueBasedOnCodeStatus() }
+                    .onFailure(::showError)
             }
         }
     }

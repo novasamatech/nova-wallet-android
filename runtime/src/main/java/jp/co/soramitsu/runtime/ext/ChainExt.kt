@@ -3,6 +3,7 @@ package jp.co.soramitsu.runtime.ext
 import jp.co.soramitsu.common.data.network.runtime.binding.MultiAddress
 import jp.co.soramitsu.common.utils.ethereumAddressFromPublicKey
 import jp.co.soramitsu.common.utils.ethereumAddressToHex
+import jp.co.soramitsu.common.utils.substrateAccountId
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.addressByte
@@ -40,6 +41,14 @@ fun Chain.accountIdOf(address: String): ByteArray {
         address.fromHex()
     } else {
         address.toAccountId()
+    }
+}
+
+fun Chain.accountIdOf(publicKey: ByteArray): ByteArray {
+    return if (isEthereumBased) {
+        publicKey.ethereumAddressFromPublicKey()
+    } else {
+        publicKey.substrateAccountId()
     }
 }
 

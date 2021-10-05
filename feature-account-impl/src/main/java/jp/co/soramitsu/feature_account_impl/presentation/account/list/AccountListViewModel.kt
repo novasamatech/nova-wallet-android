@@ -3,6 +3,7 @@ package jp.co.soramitsu.feature_account_impl.presentation.account.list
 import jp.co.soramitsu.common.base.BaseViewModel
 import jp.co.soramitsu.common.utils.inBackground
 import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountInteractor
+import jp.co.soramitsu.feature_account_api.presenatation.account.add.AddAccountPayload
 import jp.co.soramitsu.feature_account_impl.presentation.AccountRouter
 import jp.co.soramitsu.feature_account_impl.presentation.account.mixin.api.AccountListingMixin
 import jp.co.soramitsu.feature_account_impl.presentation.account.model.LightMetaAccountUi
@@ -49,6 +50,6 @@ class AccountListViewModel(
     }
 
     fun addAccountClicked() {
-        accountRouter.openAddAccount()
+        accountRouter.openAddAccount(AddAccountPayload.MetaAccount)
     }
 }
