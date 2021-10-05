@@ -6,7 +6,6 @@ import androidx.lifecycle.LifecycleOwner
 import jp.co.soramitsu.common.utils.bindTo
 import jp.co.soramitsu.common.utils.nameInputFilters
 import jp.co.soramitsu.common.view.InputField
-import jp.co.soramitsu.common.view.LabeledTextView
 import jp.co.soramitsu.common.view.shape.getIdleDrawable
 import jp.co.soramitsu.feature_account_impl.R
 import jp.co.soramitsu.feature_account_impl.presentation.importing.source.model.ImportSource

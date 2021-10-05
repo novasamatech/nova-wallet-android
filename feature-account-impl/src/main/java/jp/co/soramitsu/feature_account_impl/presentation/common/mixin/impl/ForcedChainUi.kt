@@ -12,7 +12,7 @@ fun <V> BaseFragment<V>.setupForcedChainUi(
     viewModel: V,
     ui: LabeledTextView,
     imageLoader: ImageLoader
-) where V : BaseViewModel, V: WithForcedChainMixin {
+) where V : BaseViewModel, V : WithForcedChainMixin {
     viewModel.forcedChainMixin.forcedChainLiveData.observe { chainUi ->
         ui.setVisible(chainUi != null)
 

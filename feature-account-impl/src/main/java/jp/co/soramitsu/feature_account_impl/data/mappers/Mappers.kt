@@ -163,8 +163,8 @@ fun mapChainAccountToAccount(
     )
 }
 
-fun mapAddAccountPayloadToAddAccountType(payload: AddAccountPayload) : AddAccountType {
-    return when(payload) {
+fun mapAddAccountPayloadToAddAccountType(payload: AddAccountPayload): AddAccountType {
+    return when (payload) {
         AddAccountPayload.MetaAccount -> AddAccountType.MetaAccount
         is AddAccountPayload.ChainAccount -> AddAccountType.ChainAccount(payload.chainId, payload.metaId)
     }

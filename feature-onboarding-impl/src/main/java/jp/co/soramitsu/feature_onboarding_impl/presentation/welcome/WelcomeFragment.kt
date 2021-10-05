@@ -11,7 +11,6 @@ import jp.co.soramitsu.common.di.FeatureUtils
 import jp.co.soramitsu.common.mixin.impl.observeBrowserEvents
 import jp.co.soramitsu.common.utils.createSpannable
 import jp.co.soramitsu.common.utils.setVisible
-import jp.co.soramitsu.core.model.Node
 import jp.co.soramitsu.feature_account_api.presenatation.account.add.AddAccountPayload
 import jp.co.soramitsu.feature_onboarding_api.di.OnboardingFeatureApi
 import jp.co.soramitsu.feature_onboarding_impl.R
@@ -80,7 +79,7 @@ class WelcomeFragment : BaseFragment<WelcomeViewModel>() {
             .welcomeComponentFactory()
             .create(
                 fragment = this,
-                shouldShowBack= argument(KEY_DISPLAY_BACK),
+                shouldShowBack = argument(KEY_DISPLAY_BACK),
                 addAccountPayload = argument(KEY_ADD_ACCOUNT_PAYLOAD)
             )
             .inject(this)

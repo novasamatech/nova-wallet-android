@@ -5,12 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import jp.co.soramitsu.common.base.BaseViewModel
 import jp.co.soramitsu.common.mixin.MixinFactory
 import jp.co.soramitsu.common.utils.Event
-import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountInteractor
 import jp.co.soramitsu.feature_account_api.presenatation.account.add.AddAccountPayload
 import jp.co.soramitsu.feature_account_impl.presentation.AccountRouter
 import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.api.ForcedChainMixin
 import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.api.WithForcedChainMixin
-import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.impl.ForcedChainMixinFactory
 
 class CreateAccountViewModel(
     private val router: AccountRouter,

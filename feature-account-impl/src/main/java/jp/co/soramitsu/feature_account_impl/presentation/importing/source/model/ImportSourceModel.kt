@@ -13,7 +13,6 @@ import jp.co.soramitsu.common.utils.sendEvent
 import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedDecodingException.IncorrectPasswordException
 import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedDecodingException.InvalidJsonException
 import jp.co.soramitsu.fearless_utils.exceptions.Bip39Exception
-import jp.co.soramitsu.feature_account_api.domain.model.AddAccountType
 import jp.co.soramitsu.feature_account_api.domain.model.ImportJsonMetaData
 import jp.co.soramitsu.feature_account_api.presenatation.account.add.AddAccountPayload
 import jp.co.soramitsu.feature_account_impl.R
@@ -23,7 +22,6 @@ import jp.co.soramitsu.feature_account_impl.domain.account.add.AddAccountInterac
 import jp.co.soramitsu.feature_account_impl.presentation.common.accountSource.AccountSource
 import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.api.CryptoTypeChooserMixin
 import jp.co.soramitsu.feature_account_impl.presentation.importing.FileReader
-import jp.co.soramitsu.feature_account_impl.presentation.view.advanced.encryption.model.CryptoTypeModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.bouncycastle.util.encoders.DecoderException

@@ -6,5 +6,5 @@ sealed class AddAccountType {
 
     object MetaAccount : AddAccountType()
 
-    class ChainAccount(val chainId: ChainId, val metaId: Long): AddAccountType()
+    class ChainAccount(val chainId: ChainId, val metaId: Long) : AddAccountType()
 }

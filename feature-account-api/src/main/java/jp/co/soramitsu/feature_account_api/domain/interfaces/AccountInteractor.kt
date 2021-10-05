@@ -5,7 +5,6 @@ import jp.co.soramitsu.core.model.Language
 import jp.co.soramitsu.core.model.Node
 import jp.co.soramitsu.core.model.SecuritySource
 import jp.co.soramitsu.feature_account_api.domain.model.Account
-import jp.co.soramitsu.feature_account_api.domain.model.ImportJsonMetaData
 import jp.co.soramitsu.feature_account_api.domain.model.LightMetaAccount
 import jp.co.soramitsu.feature_account_api.domain.model.PreferredCryptoType
 import jp.co.soramitsu.runtime.multiNetwork.chain.model.ChainId

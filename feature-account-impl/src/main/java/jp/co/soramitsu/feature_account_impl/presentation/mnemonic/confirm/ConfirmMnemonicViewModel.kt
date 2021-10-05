@@ -4,8 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import jp.co.soramitsu.common.base.BaseViewModel
-import jp.co.soramitsu.common.base.TitleAndMessage
-import jp.co.soramitsu.common.data.secrets.v2.MetaAccountSecrets
 import jp.co.soramitsu.common.resources.ResourceManager
 import jp.co.soramitsu.common.utils.Event
 import jp.co.soramitsu.common.utils.map
@@ -13,13 +11,9 @@ import jp.co.soramitsu.common.utils.sendEvent
 import jp.co.soramitsu.common.vibration.DeviceVibrator
 import jp.co.soramitsu.fearless_utils.encrypt.junction.BIP32JunctionDecoder
 import jp.co.soramitsu.fearless_utils.encrypt.junction.JunctionDecoder
-import jp.co.soramitsu.fearless_utils.encrypt.junction.SubstrateJunctionDecoder
-import jp.co.soramitsu.fearless_utils.encrypt.keypair.ethereum.Bip32KeypairFactory
-import jp.co.soramitsu.fearless_utils.encrypt.seed.SeedFactory
 import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountInteractor
 import jp.co.soramitsu.feature_account_impl.R
 import jp.co.soramitsu.feature_account_impl.data.mappers.mapAddAccountPayloadToAddAccountType
-import jp.co.soramitsu.feature_account_impl.data.secrets.AccountSecretsFactory
 import jp.co.soramitsu.feature_account_impl.domain.account.add.AddAccountInteractor
 import jp.co.soramitsu.feature_account_impl.presentation.AccountRouter
 import kotlinx.coroutines.launch
@@ -131,8 +125,8 @@ class ConfirmMnemonicViewModel(
     }
 
     private fun showAccountCreationError(throwable: Throwable) {
-        val (title, message) = when(throwable) {
-            is JunctionDecoder.DecodingError, is BIP32JunctionDecoder.DecodingError-> {
+        val (title, message) = when (throwable) {
+            is JunctionDecoder.DecodingError, is BIP32JunctionDecoder.DecodingError -> {
                 resourceManager.getString(R.string.account_invalid_derivation_path_title) to
                     resourceManager.getString(R.string.account_invalid_derivation_path_message)
             }

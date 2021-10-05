@@ -5,7 +5,6 @@ import jp.co.soramitsu.common.data.mappers.mapEncryptionToCryptoType
 import jp.co.soramitsu.common.data.secrets.v2.ChainAccountSecrets
 import jp.co.soramitsu.common.data.secrets.v2.MetaAccountSecrets
 import jp.co.soramitsu.common.data.secrets.v2.mapKeypairStructToKeypair
-import jp.co.soramitsu.common.utils.DEFAULT_DERIVATION_PATH
 import jp.co.soramitsu.common.utils.castOrNull
 import jp.co.soramitsu.common.utils.default
 import jp.co.soramitsu.common.utils.deriveSeed32
@@ -24,7 +23,6 @@ import jp.co.soramitsu.fearless_utils.encrypt.seed.substrate.SubstrateSeedFactor
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.scale.EncodableStruct
 import jp.co.soramitsu.fearless_utils.scale.Schema
-import jp.co.soramitsu.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -45,7 +43,7 @@ class AccountSecretsFactory(
         class NotValidEthereumCryptoType(val actualCryptoType: CryptoType) : SecretsError()
     }
 
-    data class Result<S: Schema<S>>(val secrets: EncodableStruct<S>, val cryptoType: CryptoType)
+    data class Result<S : Schema<S>>(val secrets: EncodableStruct<S>, val cryptoType: CryptoType)
 
     suspend fun chainAccountSecrets(
         derivationPath: String,
@@ -65,7 +63,7 @@ class AccountSecretsFactory(
             }
         }
 
-        val encryptionType = when(accountSource) {
+        val encryptionType = when (accountSource) {
             is AccountSource.Mnemonic -> mapCryptoTypeToEncryption(accountSource.cryptoType)
             is AccountSource.Seed -> mapCryptoTypeToEncryption(accountSource.cryptoType)
             is AccountSource.Json -> decodedJson!!.encryptionType

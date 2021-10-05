@@ -13,7 +13,6 @@ import jp.co.soramitsu.common.di.viewmodel.ViewModelModule
 import jp.co.soramitsu.common.mixin.MixinFactory
 import jp.co.soramitsu.common.resources.ClipboardManager
 import jp.co.soramitsu.common.resources.ResourceManager
-import jp.co.soramitsu.core.model.Node
 import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountInteractor
 import jp.co.soramitsu.feature_account_api.presenatation.account.add.AddAccountPayload
 import jp.co.soramitsu.feature_account_impl.domain.account.add.AddAccountInteractor
@@ -22,7 +21,6 @@ import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.api.Crypto
 import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.api.ForcedChainMixin
 import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.impl.CryptoTypeChooserFactory
 import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.impl.ForcedChainMixinFactory
-import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.impl.ForcedChainProvider
 import jp.co.soramitsu.feature_account_impl.presentation.importing.FileReader
 import jp.co.soramitsu.feature_account_impl.presentation.importing.ImportAccountViewModel
 import jp.co.soramitsu.runtime.multiNetwork.ChainRegistry

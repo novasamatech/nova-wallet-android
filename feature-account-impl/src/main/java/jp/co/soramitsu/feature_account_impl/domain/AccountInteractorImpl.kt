@@ -7,7 +7,6 @@ import jp.co.soramitsu.core.model.SecuritySource
 import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountInteractor
 import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountRepository
 import jp.co.soramitsu.feature_account_api.domain.model.Account
-import jp.co.soramitsu.feature_account_api.domain.model.ImportJsonMetaData
 import jp.co.soramitsu.feature_account_api.domain.model.LightMetaAccount
 import jp.co.soramitsu.feature_account_api.domain.model.MetaAccountOrdering
 import jp.co.soramitsu.feature_account_api.domain.model.PreferredCryptoType

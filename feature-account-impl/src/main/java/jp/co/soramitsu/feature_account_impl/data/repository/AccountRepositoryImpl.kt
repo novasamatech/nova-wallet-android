@@ -16,11 +16,9 @@ import jp.co.soramitsu.core_db.dao.AccountDao
 import jp.co.soramitsu.core_db.dao.NodeDao
 import jp.co.soramitsu.core_db.model.AccountLocal
 import jp.co.soramitsu.core_db.model.NodeLocal
-import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedDecoder
 import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedEncoder
 import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.Mnemonic
 import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.MnemonicCreator
-import jp.co.soramitsu.fearless_utils.encrypt.model.NetworkTypeIdentifier
 import jp.co.soramitsu.fearless_utils.encrypt.qr.QrSharing
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
