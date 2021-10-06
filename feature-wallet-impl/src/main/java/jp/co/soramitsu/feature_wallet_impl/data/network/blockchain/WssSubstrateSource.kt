@@ -20,6 +20,7 @@ import jp.co.soramitsu.feature_account_api.data.extrinsic.ExtrinsicService
 import jp.co.soramitsu.feature_wallet_api.domain.model.Transfer
 import jp.co.soramitsu.feature_wallet_impl.data.network.blockchain.bindings.bindTransferExtrinsic
 import jp.co.soramitsu.runtime.ext.accountIdOf
+import jp.co.soramitsu.runtime.ext.multiAddressOf
 import jp.co.soramitsu.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.runtime.network.rpc.RpcCalls
@@ -109,7 +110,7 @@ class WssSubstrateSource(
 
     private fun ExtrinsicBuilder.transfer(chain: Chain, transfer: Transfer): ExtrinsicBuilder {
         return transfer(
-            recipientAccountId = chain.accountIdOf(transfer.recipient),
+            multiAddress = chain.multiAddressOf(transfer.recipient),
             amount = transfer.amountInPlanks
         )
     }

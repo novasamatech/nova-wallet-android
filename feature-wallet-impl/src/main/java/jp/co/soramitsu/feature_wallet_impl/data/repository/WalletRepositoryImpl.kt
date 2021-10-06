@@ -4,6 +4,7 @@ import jp.co.soramitsu.common.data.model.CursorPage
 import jp.co.soramitsu.common.data.network.HttpExceptionHandler
 import jp.co.soramitsu.common.data.network.coingecko.PriceInfo
 import jp.co.soramitsu.common.utils.mapList
+import jp.co.soramitsu.core_db.dao.AccountDao
 import jp.co.soramitsu.core_db.dao.OperationDao
 import jp.co.soramitsu.core_db.dao.PhishingAddressDao
 import jp.co.soramitsu.core_db.model.AssetWithToken
@@ -12,6 +13,8 @@ import jp.co.soramitsu.core_db.model.PhishingAddressLocal
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
+import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountRepository
+import jp.co.soramitsu.feature_account_api.domain.interfaces.findMetaAccountOrThrow
 import jp.co.soramitsu.feature_wallet_api.data.cache.AssetCache
 import jp.co.soramitsu.feature_wallet_api.domain.interfaces.TransactionFilter
 import jp.co.soramitsu.feature_wallet_api.domain.interfaces.WalletConstants
@@ -43,7 +46,9 @@ import jp.co.soramitsu.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.withContext
@@ -55,6 +60,7 @@ class WalletRepositoryImpl(
     private val walletOperationsApi: SubQueryOperationsApi,
     private val httpExceptionHandler: HttpExceptionHandler,
     private val phishingApi: PhishingApi,
+    private val accountRepository: AccountRepository,
     private val assetCache: AssetCache,
     private val walletConstants: WalletConstants,
     private val phishingAddressDao: PhishingAddressDao,
@@ -105,12 +111,15 @@ class WalletRepositoryImpl(
     }
 
     override fun assetFlow(accountId: AccountId, chainAsset: Chain.Asset): Flow<Asset> {
-        return assetCache.observeAsset(accountId, chainAsset.chainId, chainAsset.symbol)
-            .map { mapAssetLocalToAsset(it, chainAsset) }
+        return flow {
+            val metaAccount = accountRepository.findMetaAccountOrThrow(accountId)
+
+            emitAll(assetCache.observeAsset(metaAccount.id, chainAsset.chainId, chainAsset.symbol))
+        }.map { mapAssetLocalToAsset(it, chainAsset) }
     }
 
     override suspend fun getAsset(accountId: AccountId, chainAsset: Chain.Asset): Asset? {
-        val assetLocal = assetCache.getAsset(accountId, chainAsset.chainId, chainAsset.symbol)
+        val assetLocal = getAsset(accountId, chainAsset.chainId, chainAsset.symbol)
 
         return assetLocal?.let { mapAssetLocalToAsset(it, chainAsset) }
     }
@@ -223,7 +232,7 @@ class WalletRepositoryImpl(
         val totalRecipientBalanceInPlanks = recipientInfo.totalBalance
         val totalRecipientBalance = chainAsset.amountFromPlanks(totalRecipientBalanceInPlanks)
 
-        val assetLocal = assetCache.getAsset(accountId, chainAsset.chainId, chainAsset.symbol)!!
+        val assetLocal = getAsset(accountId, chainAsset.chainId, chainAsset.symbol)!!
         val asset = mapAssetLocalToAsset(assetLocal, chainAsset)
 
         val existentialDepositInPlanks = walletConstants.existentialDeposit(chain.id)
@@ -293,4 +302,10 @@ class WalletRepositoryImpl(
     }
 
     private suspend fun <T> apiCall(block: suspend () -> T): T = httpExceptionHandler.wrap(block)
+
+    private suspend fun getAsset(accountId: AccountId, chainId: String, symbol: String) = withContext(Dispatchers.Default) {
+        val metaAccount = accountRepository.findMetaAccountOrThrow(accountId)
+
+        assetCache.getAsset(metaAccount.id, chainId, symbol)
+    }
 }

@@ -4,6 +4,8 @@ import jp.co.soramitsu.common.data.mappers.mapCryptoTypeToEncryption
 import jp.co.soramitsu.common.utils.requireValue
 import jp.co.soramitsu.core.model.Node
 import jp.co.soramitsu.fearless_utils.encrypt.Signer
+import jp.co.soramitsu.fearless_utils.extensions.toHexString
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.feature_account_api.domain.model.Account
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -21,3 +23,6 @@ suspend fun AccountRepository.signWithAccount(account: Account, message: ByteArr
 
     Signer.sign(encryptionType, message, securitySource.keypair).signature
 }
+
+suspend fun AccountRepository.findMetaAccountOrThrow(accountId: AccountId) = findMetaAccount(accountId)
+    ?: error("No meta account found for accountId: ${accountId.toHexString()}")

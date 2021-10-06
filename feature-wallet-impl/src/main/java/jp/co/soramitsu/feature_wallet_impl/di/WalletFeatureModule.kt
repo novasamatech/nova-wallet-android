@@ -119,6 +119,7 @@ class WalletFeatureModule {
         walletConstants: WalletConstants,
         assetCache: AssetCache,
         coingeckoApi: CoingeckoApi,
+        accountRepository: AccountRepository,
         cursorStorage: TransferCursorStorage,
         chainRegistry: ChainRegistry,
     ): WalletRepository = WalletRepositoryImpl(
@@ -127,6 +128,7 @@ class WalletFeatureModule {
         subQueryOperationsApi,
         httpExceptionHandler,
         phishingApi,
+        accountRepository,
         assetCache,
         walletConstants,
         phishingAddressDao,

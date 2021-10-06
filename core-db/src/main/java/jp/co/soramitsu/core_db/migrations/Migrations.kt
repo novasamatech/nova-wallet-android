@@ -68,7 +68,6 @@ val MigrateTablesToV2_27_28 = object : Migration(27, 28) {
             CREATE TABLE IF NOT EXISTS `assets` (
             `tokenSymbol` TEXT NOT NULL,
             `chainId` TEXT NOT NULL,
-            `accountId` BLOB NOT NULL,
             `metaId` INTEGER NOT NULL,
             `freeInPlanks` TEXT NOT NULL,
             `reservedInPlanks` TEXT NOT NULL,

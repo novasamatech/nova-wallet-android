@@ -23,7 +23,6 @@ class AssetCache(
 
     suspend fun updateAsset(
         metaId: Long,
-        accountId: AccountId,
         chainAsset: Chain.Asset,
         builder: (local: AssetLocal) -> AssetLocal,
     ) = withContext(Dispatchers.IO) {
@@ -33,7 +32,7 @@ class AssetCache(
         assetUpdateMutex.withLock {
             tokenDao.ensureToken(symbol)
 
-            val cachedAsset = assetDao.getAsset(metaId, chainId, symbol)?.asset ?: AssetLocal.createEmpty(accountId, symbol, chainId, metaId)
+            val cachedAsset = assetDao.getAsset(metaId, chainId, symbol)?.asset ?: AssetLocal.createEmpty(symbol, chainId, metaId)
 
             val newAsset = builder.invoke(cachedAsset)
 
@@ -49,7 +48,7 @@ class AssetCache(
         val applicableMetaAccount = accountRepository.findMetaAccount(accountId)
 
         applicableMetaAccount?.let {
-            updateAsset(it.id, accountId, chainAsset, builder)
+            updateAsset(it.id, chainAsset, builder)
         }
     }
 

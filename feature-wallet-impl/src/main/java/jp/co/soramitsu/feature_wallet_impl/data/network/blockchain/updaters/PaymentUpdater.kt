@@ -68,7 +68,7 @@ class PaymentUpdater(
 
         val metaAccount = scope.getAccount()
 
-        val accountId = scope.getAccount().accountIdIn(chain) ?: return emptyFlow()
+        val accountId = metaAccount.accountIdIn(chain) ?: return emptyFlow()
         val runtime = chainRegistry.getRuntime(chainId)
 
         val key = runtime.metadata.system().storage("Account").storageKey(runtime, accountId)
@@ -78,7 +78,7 @@ class PaymentUpdater(
                 runCatching { bindAccountInfoOrDefault(change.value, runtime) }
                     .onFailure { Log.e("RX", "Failed to update balance in ${chain.name}") }
                     .onSuccess {
-                        assetCache.updateAsset(metaAccount.id, accountId, chain.utilityAsset, it)
+                        assetCache.updateAsset(metaAccount.id, chain.utilityAsset, it)
 
                         fetchTransfers(change.block, chain, accountId)
                     }

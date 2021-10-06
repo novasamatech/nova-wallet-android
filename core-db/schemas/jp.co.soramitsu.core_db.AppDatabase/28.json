@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 28,
-    "identityHash": "4ab65574bbf24a1e50561c7c454040f3",
+    "identityHash": "a015d5654c8a3627f85b1c37adfbfdac",
     "entities": [
       {
         "tableName": "users",
@@ -106,7 +106,7 @@
       },
       {
         "tableName": "assets",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`tokenSymbol` TEXT NOT NULL, `chainId` TEXT NOT NULL, `accountId` BLOB NOT NULL, `metaId` INTEGER NOT NULL, `freeInPlanks` TEXT NOT NULL, `reservedInPlanks` TEXT NOT NULL, `miscFrozenInPlanks` TEXT NOT NULL, `feeFrozenInPlanks` TEXT NOT NULL, `bondedInPlanks` TEXT NOT NULL, `redeemableInPlanks` TEXT NOT NULL, `unbondingInPlanks` TEXT NOT NULL, PRIMARY KEY(`tokenSymbol`, `chainId`, `accountId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`tokenSymbol` TEXT NOT NULL, `chainId` TEXT NOT NULL, `metaId` INTEGER NOT NULL, `freeInPlanks` TEXT NOT NULL, `reservedInPlanks` TEXT NOT NULL, `miscFrozenInPlanks` TEXT NOT NULL, `feeFrozenInPlanks` TEXT NOT NULL, `bondedInPlanks` TEXT NOT NULL, `redeemableInPlanks` TEXT NOT NULL, `unbondingInPlanks` TEXT NOT NULL, PRIMARY KEY(`tokenSymbol`, `chainId`, `metaId`))",
         "fields": [
           {
             "fieldPath": "tokenSymbol",
@@ -118,12 +118,6 @@
             "fieldPath": "chainId",
             "columnName": "chainId",
             "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "accountId",
-            "columnName": "accountId",
-            "affinity": "BLOB",
             "notNull": true
           },
           {
@@ -179,7 +173,7 @@
           "columnNames": [
             "tokenSymbol",
             "chainId",
-            "accountId"
+            "metaId"
           ],
           "autoGenerate": false
         },
@@ -942,7 +936,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4ab65574bbf24a1e50561c7c454040f3')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a015d5654c8a3627f85b1c37adfbfdac')"
     ]
   }
 }
