@@ -18,6 +18,7 @@ import jp.co.soramitsu.feature_wallet_impl.presentation.send.TransferValidityChe
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.amount.ChooseAmountViewModel
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.phishing.warning.api.PhishingWarningMixin
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.phishing.warning.impl.PhishingWarningProvider
+import jp.co.soramitsu.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
 class ChooseAmountModule {
@@ -38,6 +39,8 @@ class ChooseAmountModule {
         transferValidityChecks: TransferValidityChecks.Presentation,
         recipientAddress: String,
         walletConstants: WalletConstants,
+        assetPayload: AssetPayload,
+        chainRegistry: ChainRegistry,
         phishingWarning: PhishingWarningMixin
     ): ViewModel {
         return ChooseAmountViewModel(
@@ -48,7 +51,8 @@ class ChooseAmountModule {
             transferValidityChecks,
             walletConstants,
             recipientAddress,
-            AssetPayload.stub(), // TODO pass payload from previous screen
+            assetPayload,
+            chainRegistry,
             phishingWarning
         )
     }

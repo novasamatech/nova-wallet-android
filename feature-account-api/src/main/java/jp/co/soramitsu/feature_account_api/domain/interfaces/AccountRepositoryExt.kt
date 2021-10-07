@@ -16,13 +16,13 @@ suspend fun AccountRepository.currentNetworkType() = runCatching { getSelectedAc
     .recover { DEFAULT_NETWORK_TYPE }
     .requireValue()
 
-suspend fun AccountRepository.signWithAccount(account: Account, message: ByteArray) = withContext(Dispatchers.Default) {
-    val securitySource = getSecuritySource(account.address)
-
-    val encryptionType = mapCryptoTypeToEncryption(account.cryptoType)
-
-    Signer.sign(encryptionType, message, securitySource.keypair).signature
-}
+//suspend fun AccountRepository.signWithAccount(account: Account, message: ByteArray) = withContext(Dispatchers.Default) {
+//    val securitySource = getSecuritySource(account.address)
+//
+//    val encryptionType = mapCryptoTypeToEncryption(account.cryptoType)
+//
+//    Signer.sign(encryptionType, message, securitySource.keypair, ).signature
+//}
 
 suspend fun AccountRepository.findMetaAccountOrThrow(accountId: AccountId) = findMetaAccount(accountId)
     ?: error("No meta account found for accountId: ${accountId.toHexString()}")

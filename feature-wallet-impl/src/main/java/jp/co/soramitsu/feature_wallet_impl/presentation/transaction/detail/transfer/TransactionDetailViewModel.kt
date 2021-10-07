@@ -16,6 +16,7 @@ import jp.co.soramitsu.core.model.Node
 import jp.co.soramitsu.feature_account_api.presenatation.account.AddressDisplayUseCase
 import jp.co.soramitsu.feature_wallet_api.domain.interfaces.WalletInteractor
 import jp.co.soramitsu.feature_wallet_impl.R
+import jp.co.soramitsu.feature_wallet_impl.presentation.AssetPayload
 import jp.co.soramitsu.feature_wallet_impl.presentation.WalletRouter
 import jp.co.soramitsu.feature_wallet_impl.presentation.model.OperationParcelizeModel
 
@@ -64,7 +65,7 @@ class TransactionDetailViewModel(
     fun repeatTransaction() {
         val retryAddress = retryAddressModelLiveData.value?.address ?: return
 
-        router.openRepeatTransaction(retryAddress)
+        router.openRepeatTransaction(retryAddress, AssetPayload(operation.chainId, operation.assetId))
     }
 
     private suspend fun getIcon(address: String) = addressIconGenerator.createAddressModel(address, ICON_SIZE_DP, addressDisplayUseCase(address))

@@ -16,6 +16,7 @@ import jp.co.soramitsu.feature_wallet_impl.presentation.WalletRouter
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.TransferDraft
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.TransferValidityChecks
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.confirm.ConfirmTransferViewModel
+import jp.co.soramitsu.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
 class ConfirmTransferModule {
@@ -30,7 +31,8 @@ class ConfirmTransferModule {
         walletConstants: WalletConstants,
         externalAccountActions: ExternalAccountActions.Presentation,
         transferValidityChecks: TransferValidityChecks.Presentation,
-        transferDraft: TransferDraft
+        transferDraft: TransferDraft,
+        chainRegistry: ChainRegistry,
     ): ViewModel {
         return ConfirmTransferViewModel(
             interactor,
@@ -39,6 +41,7 @@ class ConfirmTransferModule {
             externalAccountActions,
             walletConstants,
             transferValidityChecks,
+            chainRegistry,
             transferDraft
         )
     }

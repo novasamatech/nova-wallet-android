@@ -177,7 +177,7 @@ class WalletInteractorImpl(
         transfer: Transfer,
         fee: BigDecimal,
         maxAllowedLevel: TransferValidityLevel,
-    ): Result<Unit> {
+    ) = withContext(Dispatchers.Default) {
         val metaAccount = accountRepository.getSelectedMetaAccount()
         val chain = chainRegistry.getChain(transfer.chainAsset.chainId)
         val accountId = metaAccount.accountIdIn(chain)!!
@@ -185,10 +185,10 @@ class WalletInteractorImpl(
         val validityStatus = walletRepository.checkTransferValidity(accountId, chain, transfer)
 
         if (validityStatus.level > maxAllowedLevel) {
-            return Result.failure(NotValidTransferStatus(validityStatus))
+            return@withContext Result.failure(NotValidTransferStatus(validityStatus))
         }
 
-        return runCatching {
+        runCatching {
             walletRepository.performTransfer(accountId, chain, transfer, fee)
         }
     }

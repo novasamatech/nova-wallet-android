@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import coil.ImageLoader
+import coil.load
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import jp.co.soramitsu.common.base.BaseFragment
 import jp.co.soramitsu.common.di.FeatureUtils
@@ -12,7 +14,6 @@ import jp.co.soramitsu.common.utils.formatAsChange
 import jp.co.soramitsu.common.utils.formatAsCurrency
 import jp.co.soramitsu.common.utils.hideKeyboard
 import jp.co.soramitsu.common.utils.setTextColorRes
-import jp.co.soramitsu.feature_wallet_api.data.mappers.icon
 import jp.co.soramitsu.feature_wallet_api.di.WalletFeatureApi
 import jp.co.soramitsu.feature_wallet_api.presentation.formatters.formatTokenAmount
 import jp.co.soramitsu.feature_wallet_impl.R
@@ -36,18 +37,22 @@ import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailToken
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailTokenName
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailTotal
 import kotlinx.android.synthetic.main.fragment_balance_detail.transfersContainer
+import javax.inject.Inject
 
 private const val KEY_TOKEN = "KEY_TOKEN"
 
 class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
 
     companion object {
+
         fun getBundle(assetPayload: AssetPayload): Bundle {
             return Bundle().apply {
                 putParcelable(KEY_TOKEN, assetPayload)
             }
         }
     }
+
+    @Inject lateinit var imageLoader: ImageLoader
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -113,7 +118,7 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
         setupBuyIntegration(viewModel)
 
         viewModel.assetLiveData.observe { asset ->
-            balanceDetailTokenIcon.setImageResource(asset.token.configuration.icon)
+            balanceDetailTokenIcon.load(asset.token.configuration.iconUrl, imageLoader)
             balanceDetailTokenName.text = asset.token.configuration.name
 
             asset.token.dollarRate?.let {

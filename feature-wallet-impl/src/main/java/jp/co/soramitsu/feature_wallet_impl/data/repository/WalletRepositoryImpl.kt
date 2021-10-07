@@ -39,6 +39,7 @@ import jp.co.soramitsu.feature_wallet_impl.data.network.subquery.SubQueryOperati
 import jp.co.soramitsu.feature_wallet_impl.data.storage.TransferCursorStorage
 import jp.co.soramitsu.runtime.ext.accountIdOf
 import jp.co.soramitsu.runtime.ext.addressOf
+import jp.co.soramitsu.runtime.ext.historySupported
 import jp.co.soramitsu.runtime.ext.utilityAsset
 import jp.co.soramitsu.runtime.multiNetwork.ChainRegistry
 import jp.co.soramitsu.runtime.multiNetwork.chain.model.Chain
@@ -49,6 +50,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.withContext
@@ -172,6 +174,10 @@ class WalletRepositoryImpl(
         chain: Chain,
         chainAsset: Chain.Asset
     ): Flow<CursorPage<Operation>> {
+        if (!chain.historySupported) {
+            return flowOf(CursorPage(nextCursor = null, items = emptyList()))
+        }
+
         val accountAddress = chain.addressOf(accountId)
 
         return operationDao.observe(accountAddress, chain.id, chainAsset.id)

@@ -15,6 +15,7 @@ import jp.co.soramitsu.common.utils.onTextChanged
 import jp.co.soramitsu.feature_wallet_api.di.WalletFeatureApi
 import jp.co.soramitsu.feature_wallet_impl.R
 import jp.co.soramitsu.feature_wallet_impl.di.WalletFeatureComponent
+import jp.co.soramitsu.feature_wallet_impl.presentation.AssetPayload
 import jp.co.soramitsu.feature_wallet_impl.presentation.common.askPermissionsSafely
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.phishing.observePhishingCheck
 import kotlinx.android.synthetic.main.fragment_choose_recipient.searchRecipientField
@@ -32,6 +33,12 @@ class ChooseRecipientFragment : BaseFragment<ChooseRecipientViewModel>(), Choose
     companion object {
         private const val PICK_IMAGE_REQUEST = 101
         private const val QR_CODE_IMAGE_TYPE = "image/*"
+
+        private const val PAYLOAD = "ChooseRecipientFragment.PAYLOAD"
+
+        fun getBundle(assetPayload: AssetPayload) = Bundle().apply {
+            putParcelable(PAYLOAD, assetPayload)
+        }
     }
 
     private lateinit var adapter: ChooseRecipientAdapter
@@ -67,7 +74,7 @@ class ChooseRecipientFragment : BaseFragment<ChooseRecipientViewModel>(), Choose
             WalletFeatureApi::class.java
         )
             .chooseRecipientComponentFactory()
-            .create(this)
+            .create(this, argument(PAYLOAD))
             .inject(this)
     }
 

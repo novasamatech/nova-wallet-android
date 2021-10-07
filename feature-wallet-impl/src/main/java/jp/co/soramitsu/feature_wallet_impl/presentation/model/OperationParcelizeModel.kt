@@ -1,6 +1,7 @@
 package jp.co.soramitsu.feature_wallet_impl.presentation.model
 
 import android.os.Parcelable
+import jp.co.soramitsu.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.android.parcel.Parcelize
 
 sealed class OperationParcelizeModel : Parcelable {
@@ -29,6 +30,8 @@ sealed class OperationParcelizeModel : Parcelable {
 
     @Parcelize
     class Transfer(
+        val chainId: ChainId,
+        val assetId: Int,
         val time: Long,
         val address: String,
         val hash: String?,

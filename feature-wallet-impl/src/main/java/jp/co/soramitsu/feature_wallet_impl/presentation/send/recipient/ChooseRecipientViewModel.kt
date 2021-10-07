@@ -13,7 +13,10 @@ import jp.co.soramitsu.common.resources.ResourceManager
 import jp.co.soramitsu.common.utils.Event
 import jp.co.soramitsu.common.utils.combine
 import jp.co.soramitsu.common.utils.distinctUntilChanged
+import jp.co.soramitsu.common.utils.invoke
+import jp.co.soramitsu.common.utils.lazyAsync
 import jp.co.soramitsu.common.utils.requireValue
+import jp.co.soramitsu.feature_account_api.presenatation.account.icon.createAddressModel
 import jp.co.soramitsu.feature_wallet_api.domain.interfaces.WalletInteractor
 import jp.co.soramitsu.feature_wallet_api.domain.model.WalletAccount
 import jp.co.soramitsu.feature_wallet_impl.R
@@ -23,6 +26,7 @@ import jp.co.soramitsu.feature_wallet_impl.presentation.send.phishing.warning.ap
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.phishing.warning.api.PhishingWarningPresentation
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.phishing.warning.api.proceedOrShowPhishingWarning
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.recipient.model.ContactsHeader
+import jp.co.soramitsu.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,10 +52,13 @@ class ChooseRecipientViewModel(
     private val addressIconGenerator: AddressIconGenerator,
     private val qrBitmapDecoder: QrBitmapDecoder,
     private val payload: AssetPayload,
+    private val chainRegistry: ChainRegistry,
     private val phishingWarning: PhishingWarningMixin,
 ) : BaseViewModel(),
     PhishingWarningMixin by phishingWarning,
     PhishingWarningPresentation {
+
+    private val chain by lazyAsync { chainRegistry.getChain(payload.chainId) }
 
     private val searchEvents = MutableStateFlow(INITIAL_QUERY)
 
@@ -83,7 +90,7 @@ class ChooseRecipientViewModel(
     }
 
     override fun proceedAddress(address: String) {
-        router.openChooseAmount(address)
+        router.openChooseAmount(address, payload)
     }
 
     override fun declinePhishingAddress() {
@@ -148,7 +155,7 @@ class ChooseRecipientViewModel(
     }
 
     private suspend fun formSearchResults(address: String): List<Any> = withContext(Dispatchers.Default) {
-        val isValidAddress = interactor.validateSendAddress(address, payload.chainId)
+        val isValidAddress = interactor.validateSendAddress(payload.chainId, address)
         val searchResult = interactor.getRecipients(address, payload.chainId)
 
         val resultWithHeader = maybeAppendResultHeader(isValidAddress, address)
@@ -193,6 +200,6 @@ class ChooseRecipientViewModel(
     private fun getHeader(@StringRes resId: Int) = ContactsHeader(resourceManager.getString(resId))
 
     private suspend fun generateAddressModel(address: String, accountName: String? = null): AddressModel {
-        return addressIconGenerator.createAddressModel(address, ICON_SIZE_IN_DP, accountName)
+        return addressIconGenerator.createAddressModel(chain(), address, ICON_SIZE_IN_DP, accountName)
     }
 }

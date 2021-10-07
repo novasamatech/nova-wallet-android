@@ -4,6 +4,7 @@ import jp.co.soramitsu.common.data.network.runtime.binding.MultiAddress
 import jp.co.soramitsu.common.utils.ethereumAddressFromPublicKey
 import jp.co.soramitsu.common.utils.ethereumAddressToHex
 import jp.co.soramitsu.common.utils.substrateAccountId
+import jp.co.soramitsu.fearless_utils.encrypt.Signer
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.addressByte
@@ -52,6 +53,13 @@ fun Chain.accountIdOf(publicKey: ByteArray): ByteArray {
     }
 }
 
+val Chain.signatureHashing
+    get() = if (isEthereumBased) {
+        Signer.MessageHashing.ETHEREUM
+    } else {
+        Signer.MessageHashing.SUBSTRATE
+    }
+
 fun Chain.hexAccountIdOf(address: String): String {
     return accountIdOf(address).toHexString()
 }
@@ -71,6 +79,21 @@ fun Chain.addressFromPublicKey(publicKey: ByteArray): String {
         publicKey.toAddress(addressPrefix.toByte())
     }
 }
+
+fun Chain.accountIdFromPublicKey(publicKey: ByteArray): ByteArray {
+    return if (isEthereumBased) {
+        publicKey.ethereumAddressFromPublicKey()
+    } else {
+        publicKey.substrateAccountId()
+    }
+}
+
+val Chain.historySupported: Boolean
+    get() {
+        val historyType = externalApi?.history?.type ?: return false
+
+        return historyType != Chain.ExternalApi.Section.Type.UNKNOWN
+    }
 
 fun Chain.isValidAddress(address: String): Boolean {
     return runCatching {

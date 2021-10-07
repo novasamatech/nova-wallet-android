@@ -317,6 +317,8 @@ fun mapOperationToParcel(
                 val total = operationType.amount + feeOrZero
 
                 OperationParcelizeModel.Transfer(
+                    chainId = operation.chainAsset.chainId,
+                    assetId = operation.chainAsset.id,
                     time = time,
                     address = address,
                     hash = operationType.hash,

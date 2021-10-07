@@ -69,6 +69,7 @@ import jp.co.soramitsu.feature_wallet_impl.presentation.model.OperationParcelize
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.TransferDraft
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.amount.ChooseAmountFragment
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.confirm.ConfirmTransferFragment
+import jp.co.soramitsu.feature_wallet_impl.presentation.send.recipient.ChooseRecipientFragment
 import jp.co.soramitsu.feature_wallet_impl.presentation.transaction.detail.extrinsic.ExtrinsicDetailFragment
 import jp.co.soramitsu.feature_wallet_impl.presentation.transaction.detail.reward.RewardDetailFragment
 import jp.co.soramitsu.feature_wallet_impl.presentation.transaction.detail.transfer.TransferDetailFragment
@@ -327,16 +328,16 @@ class Navigator :
         navController?.navigate(R.id.open_validator_details, ValidatorDetailsFragment.getBundle(validatorDetails))
     }
 
-    override fun openChooseRecipient() {
-        navController?.navigate(R.id.action_open_send)
+    override fun openChooseRecipient(assetPayload: AssetPayload) {
+        navController?.navigate(R.id.action_open_send, ChooseRecipientFragment.getBundle(assetPayload))
     }
 
     override fun openFilter() {
         navController?.navigate(R.id.action_mainFragment_to_filterFragment)
     }
 
-    override fun openChooseAmount(recipientAddress: String) {
-        val bundle = ChooseAmountFragment.getBundle(recipientAddress)
+    override fun openChooseAmount(recipientAddress: String, assetPayload: AssetPayload) {
+        val bundle = ChooseAmountFragment.getBundle(recipientAddress, assetPayload)
 
         navController?.navigate(R.id.action_chooseRecipientFragment_to_chooseAmountFragment, bundle)
     }
@@ -351,8 +352,8 @@ class Navigator :
         navController?.navigate(R.id.finish_send_flow)
     }
 
-    override fun openRepeatTransaction(recipientAddress: String) {
-        val bundle = ChooseAmountFragment.getBundle(recipientAddress)
+    override fun openRepeatTransaction(recipientAddress: String, assetPayload: AssetPayload) {
+        val bundle = ChooseAmountFragment.getBundle(recipientAddress, assetPayload)
 
         navController?.navigate(R.id.openSelectAmount, bundle)
     }

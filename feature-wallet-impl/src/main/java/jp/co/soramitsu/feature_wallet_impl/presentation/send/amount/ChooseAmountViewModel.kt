@@ -10,9 +10,12 @@ import jp.co.soramitsu.common.address.createAddressModel
 import jp.co.soramitsu.common.base.BaseViewModel
 import jp.co.soramitsu.common.utils.Event
 import jp.co.soramitsu.common.utils.combine
+import jp.co.soramitsu.common.utils.invoke
+import jp.co.soramitsu.common.utils.lazyAsync
 import jp.co.soramitsu.common.utils.map
 import jp.co.soramitsu.common.utils.requireValue
 import jp.co.soramitsu.common.view.ButtonState
+import jp.co.soramitsu.feature_account_api.presenatation.account.icon.createAddressModel
 import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalAccountActions
 import jp.co.soramitsu.feature_wallet_api.domain.interfaces.WalletConstants
 import jp.co.soramitsu.feature_wallet_api.domain.interfaces.WalletInteractor
@@ -34,6 +37,7 @@ import jp.co.soramitsu.feature_wallet_impl.presentation.send.TransferValidityChe
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.phishing.warning.api.PhishingWarningMixin
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.phishing.warning.api.PhishingWarningPresentation
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.phishing.warning.api.proceedOrShowPhishingWarning
+import jp.co.soramitsu.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
@@ -51,8 +55,6 @@ import kotlin.time.milliseconds
 
 private const val AVATAR_SIZE_DP = 24
 
-private const val RETRY_TIMES = 3L
-
 enum class RetryReason(val reasonRes: Int) {
     CHECK_ENOUGH_FUNDS(R.string.choose_amount_error_balance),
     LOAD_FEE(R.string.choose_amount_error_fee)
@@ -67,12 +69,15 @@ class ChooseAmountViewModel(
     private val walletConstants: WalletConstants,
     private val recipientAddress: String,
     private val assetPayload: AssetPayload,
+    private val chainRegistry: ChainRegistry,
     private val phishingAddress: PhishingWarningMixin
 ) : BaseViewModel(),
     ExternalAccountActions by externalAccountActions,
     TransferValidityChecks by transferValidityChecks,
     PhishingWarningMixin by phishingAddress,
     PhishingWarningPresentation {
+
+    private val chain by lazyAsync { chainRegistry.getChain(assetPayload.chainId) }
 
     val recipientModelLiveData = liveData {
         emit(generateAddressModel(recipientAddress))
@@ -81,7 +86,7 @@ class ChooseAmountViewModel(
     private val amountEvents = MutableStateFlow("0")
     private val amountRawLiveData = amountEvents.asLiveData()
 
-    private val _feeLoadingLiveData = MutableLiveData<Boolean>(true)
+    private val _feeLoadingLiveData = MutableLiveData(true)
     val feeLoadingLiveData = _feeLoadingLiveData
 
     val feeLiveData = feeFlow().asLiveData()
@@ -185,7 +190,6 @@ class ChooseAmountViewModel(
 
             interactor.getTransferFee(transfer)
         }
-        .retry(RETRY_TIMES)
         .catch {
             _feeErrorLiveData.postValue(Event(RetryReason.LOAD_FEE))
 
@@ -195,7 +199,7 @@ class ChooseAmountViewModel(
         }
 
     private suspend fun generateAddressModel(address: String): AddressModel {
-        return addressIconGenerator.createAddressModel(address, AVATAR_SIZE_DP)
+        return addressIconGenerator.createAddressModel(chain(), address, AVATAR_SIZE_DP)
     }
 
     private fun checkEnoughFunds() {

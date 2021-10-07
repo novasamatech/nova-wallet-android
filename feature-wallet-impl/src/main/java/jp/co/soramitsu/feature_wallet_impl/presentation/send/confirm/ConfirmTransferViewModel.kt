@@ -9,10 +9,14 @@ import jp.co.soramitsu.common.address.AddressModel
 import jp.co.soramitsu.common.address.createAddressModel
 import jp.co.soramitsu.common.base.BaseViewModel
 import jp.co.soramitsu.common.utils.Event
+import jp.co.soramitsu.common.utils.inBackground
+import jp.co.soramitsu.common.utils.invoke
+import jp.co.soramitsu.common.utils.lazyAsync
 import jp.co.soramitsu.common.utils.map
 import jp.co.soramitsu.common.utils.requireException
 import jp.co.soramitsu.common.view.ButtonState
 import jp.co.soramitsu.core.model.Node
+import jp.co.soramitsu.feature_account_api.presenatation.account.icon.createAddressModel
 import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalAccountActions
 import jp.co.soramitsu.feature_wallet_api.domain.interfaces.NotValidTransferStatus
 import jp.co.soramitsu.feature_wallet_api.domain.interfaces.WalletConstants
@@ -26,6 +30,7 @@ import jp.co.soramitsu.feature_wallet_impl.presentation.WalletRouter
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.BalanceDetailsBottomSheet
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.TransferDraft
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.TransferValidityChecks
+import jp.co.soramitsu.runtime.multiNetwork.ChainRegistry
 import jp.co.soramitsu.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -39,10 +44,13 @@ class ConfirmTransferViewModel(
     private val externalAccountActions: ExternalAccountActions.Presentation,
     private val walletConstants: WalletConstants,
     private val transferValidityChecks: TransferValidityChecks.Presentation,
+    private val chainRegistry: ChainRegistry,
     val transferDraft: TransferDraft
 ) : BaseViewModel(),
     ExternalAccountActions by externalAccountActions,
     TransferValidityChecks by transferValidityChecks {
+
+    private val chain by lazyAsync { chainRegistry.getChain(transferDraft.assetPayload.chainId) }
 
     private val _showBalanceDetailsEvent = MutableLiveData<Event<BalanceDetailsBottomSheet.Payload>>()
     val showBalanceDetailsEvent: LiveData<Event<BalanceDetailsBottomSheet.Payload>> = _showBalanceDetailsEvent
@@ -61,6 +69,7 @@ class ConfirmTransferViewModel(
 
     val assetLiveData = interactor.assetFlow(transferDraft.assetPayload.chainId, transferDraft.assetPayload.chainAssetId)
         .map(::mapAssetToAssetModel)
+        .inBackground()
         .asLiveData()
 
     fun backClicked() {
@@ -130,7 +139,7 @@ class ConfirmTransferViewModel(
     }
 
     private suspend fun getAddressIcon(): AddressModel {
-        return addressIconGenerator.createAddressModel(transferDraft.recipientAddress, ICON_IN_DP)
+        return addressIconGenerator.createAddressModel(chain(), transferDraft.recipientAddress, ICON_IN_DP)
     }
 
     private fun createTransfer(token: Chain.Asset): Transfer {

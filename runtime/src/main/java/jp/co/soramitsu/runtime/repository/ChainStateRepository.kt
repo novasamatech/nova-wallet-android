@@ -3,9 +3,11 @@ package jp.co.soramitsu.runtime.repository
 import jp.co.soramitsu.common.data.network.runtime.binding.BlockNumber
 import jp.co.soramitsu.common.data.network.runtime.binding.bindBlockNumber
 import jp.co.soramitsu.common.utils.babe
+import jp.co.soramitsu.common.utils.babeOrNull
 import jp.co.soramitsu.common.utils.numberConstant
 import jp.co.soramitsu.common.utils.optionalNumberConstant
 import jp.co.soramitsu.common.utils.system
+import jp.co.soramitsu.common.utils.timestampOrNull
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
@@ -27,6 +29,18 @@ class ChainStateRepository(
         val runtime = chainRegistry.getRuntime(chainId)
 
         return runtime.metadata.babe().numberConstant("ExpectedBlockTime", runtime)
+    }
+
+    suspend fun expectedBlockTimeInMillisOrNull(chainId: ChainId): BigInteger? {
+        val runtime = chainRegistry.getRuntime(chainId)
+
+        return runtime.metadata.babeOrNull()?.numberConstant("ExpectedBlockTime", runtime)
+    }
+
+    suspend fun minimumPeriodOrNull(chainId: ChainId): BigInteger? {
+        val runtime = chainRegistry.getRuntime(chainId)
+
+        return runtime.metadata.timestampOrNull()?.numberConstant("MinimumPeriod", runtime)
     }
 
     suspend fun blockHashCount(chainId: ChainId): BigInteger? {

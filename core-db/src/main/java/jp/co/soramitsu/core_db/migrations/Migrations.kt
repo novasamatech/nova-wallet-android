@@ -76,7 +76,7 @@ val MigrateTablesToV2_27_28 = object : Migration(27, 28) {
             `bondedInPlanks` TEXT NOT NULL,
             `redeemableInPlanks` TEXT NOT NULL,
             `unbondingInPlanks` TEXT NOT NULL,
-            PRIMARY KEY(`tokenSymbol`, `chainId`, `accountId`)
+            PRIMARY KEY(`tokenSymbol`, `chainId`, `metaId`)
             )
             """.trimIndent()
         )

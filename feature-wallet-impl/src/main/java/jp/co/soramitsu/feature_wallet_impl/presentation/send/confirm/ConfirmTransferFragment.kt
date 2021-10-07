@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
+import coil.ImageLoader
+import coil.load
 import jp.co.soramitsu.common.base.BaseFragment
 import jp.co.soramitsu.common.di.FeatureUtils
 import jp.co.soramitsu.feature_account_api.presenatation.actions.setupExternalActions
@@ -23,16 +25,20 @@ import kotlinx.android.synthetic.main.fragment_confirm_transfer.confirmTransferS
 import kotlinx.android.synthetic.main.fragment_confirm_transfer.confirmTransferToken
 import kotlinx.android.synthetic.main.fragment_confirm_transfer.confirmTransferToolbar
 import kotlinx.android.synthetic.main.fragment_confirm_transfer.confirmTransferTotal
+import javax.inject.Inject
 
 private const val KEY_DRAFT = "KEY_DRAFT"
 
 class ConfirmTransferFragment : BaseFragment<ConfirmTransferViewModel>() {
 
     companion object {
+
         fun getBundle(transferDraft: TransferDraft) = Bundle().apply {
             putParcelable(KEY_DRAFT, transferDraft)
         }
     }
+
+    @Inject lateinit var imageLoader: ImageLoader
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -84,8 +90,7 @@ class ConfirmTransferFragment : BaseFragment<ConfirmTransferViewModel>() {
             confirmTransferBalance.text = it.available.formatTokenAmount(it.token.configuration)
 
             with(viewModel.transferDraft) {
-                // TODO wallet - icon
-//            confirmTransferToken.setTextIcon(chainAsset.icon)
+                confirmTransferToken.textIconView.load(chainAsset.iconUrl, imageLoader)
                 confirmTransferToken.setMessage(chainAsset.symbol)
 
                 confirmTransferFee.text = fee.formatTokenAmount(chainAsset)

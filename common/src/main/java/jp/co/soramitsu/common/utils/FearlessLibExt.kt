@@ -102,6 +102,9 @@ fun RuntimeMetadata.balances() = module(Modules.BALANCES)
 fun RuntimeMetadata.crowdloan() = module(Modules.CROWDLOAN)
 
 fun RuntimeMetadata.babe() = module(Modules.BABE)
+fun RuntimeMetadata.babeOrNull() = moduleOrNull(Modules.BABE)
+
+fun RuntimeMetadata.timestampOrNull() = moduleOrNull(Modules.TIMESTAMP)
 
 fun RuntimeMetadata.slots() = module(Modules.SLOTS)
 
@@ -147,6 +150,7 @@ object Modules {
     const val SYSTEM = "System"
     const val CROWDLOAN = "Crowdloan"
     const val BABE = "Babe"
+    const val TIMESTAMP = "Timestamp"
     const val SLOTS = "Slots"
     const val SESSION = "Session"
 }
