@@ -17,5 +17,3 @@ fun ExtrinsicBuilder.transfer(accountId: AccountId, amount: BigInteger, keepAliv
         )
     )
 }
-
-

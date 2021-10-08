@@ -2,7 +2,6 @@ package jp.co.soramitsu.core_db.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import java.math.BigInteger
 
 @Entity(
