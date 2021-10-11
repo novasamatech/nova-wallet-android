@@ -45,7 +45,7 @@ jobs:
     - name: Restore JKS
       run: |
         echo "${{ secrets.CI_KEYSTORE }}" > keystore.asc
-        gpg -d --passphrase CI_KEYSTORE_PASS --batch keytore.asc > CI_KEYSTORE_PATH
+        gpg -d --passphrase CI_KEYSTORE_PASS --batch keystore.asc > CI_KEYSTORE_PATH
       
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
