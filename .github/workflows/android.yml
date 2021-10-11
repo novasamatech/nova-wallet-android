@@ -7,7 +7,7 @@ env:
   CI_KEYSTORE_PASS: ${{ secrets.CI_KEYSTORE_PASS }}
   CI_KEYSTORE_KEY_ALIAS: ${{ secrets.CI_KEYSTORE_KEY_ALIAS }}
   CI_KEYSTORE_KEY_PASS: ${{ secrets.CI_KEYSTORE_KEY_PASS }}
-  CI_KEYSTORE_PATH: app/keystore
+  CI_KEYSTORE_PATH: app/keystore.jks
 
 on:
   push:
@@ -29,6 +29,12 @@ jobs:
         distribution: 'adopt'
         cache: gradle
 
+    - name: Restore JKS
+      run: |
+        echo "${{ secrets.CI_KEYSTORE }}" > keystore.jks.asc
+        gpg --version
+        gpg -d --passphrase CI_KEYSTORE_PASS --batch keystore.jks.asc > CI_KEYSTORE_PATH
+
     - name: Setup Android NDK
       uses: nttld/setup-ndk@v1
       with:
@@ -41,11 +47,6 @@ jobs:
         rm -rf /usr/local/lib/android/sdk/ndk/23.0.7599858
         mv /usr/local/lib/android/sdk/ndk/21.4.7075529 /usr/local/lib/android/sdk/ndk/23.0.7599858
         ls /usr/local/lib/android/sdk/ndk/23.0.7599858/toolchains/llvm/prebuilt/linux-x86_64/bin/
-
-    - name: Restore JKS
-      run: |
-        echo "${{ secrets.CI_KEYSTORE }}" > keystore.asc
-        gpg -d --passphrase CI_KEYSTORE_PASS --batch keystore.asc > CI_KEYSTORE_PATH
       
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
