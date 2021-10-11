@@ -35,6 +35,7 @@ jobs:
         ls /usr/local/lib/android/sdk/ndk
         ls /usr/local/lib/android/sdk/ndk/21.4.7075529/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android-strip
         mv /usr/local/lib/android/sdk/ndk/21.4.7075529 /usr/local/lib/android/sdk/ndk/23.0.7599858
+        ls /usr/local/lib/android/sdk/ndk/23.0.7599858
         ls /usr/local/lib/android/sdk/ndk/23.0.7599858/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android-strip
 
     - name: Ls strip
