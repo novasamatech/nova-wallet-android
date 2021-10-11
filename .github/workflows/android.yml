@@ -4,6 +4,10 @@ env:
   MOONPAY_TEST_SECRET: ${{ secrets.MOONPAY_TEST_SECRET }}
   SUBSCAN_API_KEY: ${{ secrets.SUBSCAN_API_KEY }}
   MOONPAY_PRODUCTION_SECRET: ${{ secrets.MOONPAY_PRODUCTION_SECRET }}
+  CI_KEYSTORE_PASS: ${{ CI_KEYSTORE_PASS }}
+  CI_KEYSTORE_KEY_ALIAS: ${{ CI_KEYSTORE_KEY_ALIAS }}
+  CI_KEYSTORE_KEY_PASS: ${{ CI_KEYSTORE_KEY_PASS }}
+  CI_KEYSTORE_PATH: app/keystore
 
 on:
   push:
@@ -36,11 +40,12 @@ jobs:
         ls /usr/local/lib/android/sdk/ndk/21.4.7075529/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android-strip
         rm -rf /usr/local/lib/android/sdk/ndk/23.0.7599858
         mv /usr/local/lib/android/sdk/ndk/21.4.7075529 /usr/local/lib/android/sdk/ndk/23.0.7599858
-        ls /usr/local/lib/android/sdk/ndk/23.0.7599858
         ls /usr/local/lib/android/sdk/ndk/23.0.7599858/toolchains/llvm/prebuilt/linux-x86_64/bin/
 
-    - name: Ls strip
-      run: ls /usr/local/lib/android/sdk/ndk/23.0.7599858/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android-strip
+    - name: Restore JKS
+      run: |
+        echo "${{ secrets.CI_KEYSTORE }}" > keystore.asc
+        gpg -d --passphrase CI_KEYSTORE_PASS --batch kestore.asc > CI_KEYSTORE_PATH
       
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
