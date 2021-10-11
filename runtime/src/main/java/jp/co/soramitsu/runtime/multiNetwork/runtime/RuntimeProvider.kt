@@ -120,13 +120,12 @@ class RuntimeProvider(
                 runtimeFactory.constructRuntime(chainId, typesUsage).also {
                     runtimeFlow.emit(it)
                 }
-
             }.onFailure {
                 when (it) {
                     ChainInfoNotInCacheException -> runtimeSyncService.cacheNotFound(chainId)
                     BaseTypesNotInCacheException -> baseTypeSynchronizer.cacheNotFound()
                     NoRuntimeVersionException -> {} // pass
-                    else -> Log.e(this@RuntimeProvider.LOG_TAG, "Failed to construct runtime (${chainId}): ${it.message}")
+                    else -> Log.e(this@RuntimeProvider.LOG_TAG, "Failed to construct runtime ($chainId): ${it.message}")
                 }
             }
 

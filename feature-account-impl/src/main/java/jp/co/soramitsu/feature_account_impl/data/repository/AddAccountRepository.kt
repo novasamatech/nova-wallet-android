@@ -79,7 +79,7 @@ class AddAccountRepository(
         derivationPath: String,
         addAccountType: AddAccountType,
         accountSource: AccountSecretsFactory.AccountSource
-    ) : Long {
+    ): Long {
         return when (addAccountType) {
             is AddAccountType.MetaAccount -> {
                 val (secrets, substrateCryptoType) = accountSecretsFactory.metaAccountSecrets(
@@ -87,8 +87,8 @@ class AddAccountRepository(
                     accountSource = accountSource
                 )
 
-                 transformingInsertionErrors {
-                     accountDataSource.insertMetaAccount(
+                transformingInsertionErrors {
+                    accountDataSource.insertMetaAccount(
                         name = accountName,
                         substrateCryptoType = substrateCryptoType,
                         secrets = secrets
