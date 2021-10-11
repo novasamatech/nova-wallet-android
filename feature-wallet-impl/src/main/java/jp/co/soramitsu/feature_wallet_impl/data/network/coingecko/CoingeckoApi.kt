@@ -8,7 +8,7 @@ interface CoingeckoApi {
 
     @GET("//api.coingecko.com/api/v3/simple/price")
     suspend fun getAssetPrice(
-        @Query("ids") priceId: String,
+        @Query("ids") priceIds: String,
         @Query("vs_currencies") currency: String,
         @Query("include_24hr_change") includeRateChange: Boolean
     ): Map<String, PriceInfo>

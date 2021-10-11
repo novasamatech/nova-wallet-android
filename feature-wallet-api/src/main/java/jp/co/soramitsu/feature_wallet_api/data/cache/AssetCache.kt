@@ -64,4 +64,6 @@ class AssetCache(
             tokenDao.insertToken(newToken)
         }
     }
+
+    suspend fun insertTokens(tokens: List<TokenLocal>) = tokenDao.insertTokens(tokens)
 }

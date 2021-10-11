@@ -3,12 +3,14 @@ package jp.co.soramitsu.feature_wallet_impl.data.repository
 import jp.co.soramitsu.common.data.model.CursorPage
 import jp.co.soramitsu.common.data.network.HttpExceptionHandler
 import jp.co.soramitsu.common.data.network.coingecko.PriceInfo
+import jp.co.soramitsu.common.utils.asQueryParam
 import jp.co.soramitsu.common.utils.mapList
 import jp.co.soramitsu.core_db.dao.OperationDao
 import jp.co.soramitsu.core_db.dao.PhishingAddressDao
 import jp.co.soramitsu.core_db.model.AssetWithToken
 import jp.co.soramitsu.core_db.model.OperationLocal
 import jp.co.soramitsu.core_db.model.PhishingAddressLocal
+import jp.co.soramitsu.core_db.model.TokenLocal
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
@@ -39,7 +41,6 @@ import jp.co.soramitsu.feature_wallet_impl.data.storage.TransferCursorStorage
 import jp.co.soramitsu.runtime.ext.accountIdOf
 import jp.co.soramitsu.runtime.ext.addressOf
 import jp.co.soramitsu.runtime.ext.historySupported
-import jp.co.soramitsu.runtime.ext.utilityAsset
 import jp.co.soramitsu.runtime.multiNetwork.ChainRegistry
 import jp.co.soramitsu.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.runtime.multiNetwork.chain.model.ChainId
@@ -100,14 +101,26 @@ class WalletRepositoryImpl(
     }
 
     override suspend fun syncAssetsRates() {
-        // TODO FLW-1147 - coingecko integration
-        val firstChain = chainRegistry.currentChains.first().first()
-        val asset = firstChain.utilityAsset
+        val chains = chainRegistry.currentChains.first()
 
-        asset.priceId?.let {
-            val priceStats = getAssetPriceCoingecko(it)
+        val syncingPriceIdsToSymbols = chains.flatMap(Chain::assets)
+            .filter { it.priceId != null }
+            .distinctBy { it.priceId }
+            .associateBy(
+                keySelector = { it.priceId!! },
+                valueTransform = { it.symbol }
+            )
 
-            updateAssetRates(asset.symbol, priceStats)
+        if (syncingPriceIdsToSymbols.isNotEmpty()) {
+            val priceStats = getAssetPriceCoingecko(syncingPriceIdsToSymbols.keys)
+
+            val updatedTokens = priceStats.mapNotNull { (priceId, tokenStats) ->
+                syncingPriceIdsToSymbols[priceId]?.let { symbol ->
+                    TokenLocal(symbol, tokenStats.price, tokenStats.rateChange)
+                }
+            }
+
+            assetCache.insertTokens(updatedTokens)
         }
     }
 
@@ -287,23 +300,8 @@ class WalletRepositoryImpl(
             source = source
         )
 
-    private suspend fun updateAssetRates(
-        symbol: String,
-        priceStats: Map<String, PriceInfo>?,
-    ) = assetCache.updateToken(symbol) { cached ->
-        val priceStat = priceStats?.values?.first()
-
-        val price = priceStat?.price
-        val change = priceStat?.rateChange
-
-        cached.copy(
-            dollarRate = price,
-            recentRateChange = change
-        )
-    }
-
-    private suspend fun getAssetPriceCoingecko(priceId: String): Map<String, PriceInfo> {
-        return apiCall { coingeckoApi.getAssetPrice(priceId, "usd", true) }
+    private suspend fun getAssetPriceCoingecko(priceIds: Set<String>): Map<String, PriceInfo> {
+        return apiCall { coingeckoApi.getAssetPrice(priceIds.asQueryParam(), currency = "usd", includeRateChange = true) }
     }
 
     private suspend fun <T> apiCall(block: suspend () -> T): T = httpExceptionHandler.wrap(block)
