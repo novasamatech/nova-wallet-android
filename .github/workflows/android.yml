@@ -7,7 +7,6 @@ env:
   CI_KEYSTORE_PASS: ${{ secrets.CI_KEYSTORE_PASS }}
   CI_KEYSTORE_KEY_ALIAS: ${{ secrets.CI_KEYSTORE_KEY_ALIAS }}
   CI_KEYSTORE_KEY_PASS: ${{ secrets.CI_KEYSTORE_KEY_PASS }}
-  CI_KEYSTORE_PATH: app/keystore.jks
 
 on:
   push:
@@ -28,12 +27,6 @@ jobs:
         java-version: '11'
         distribution: 'adopt'
         cache: gradle
-
-    - name: Restore JKS
-      run: |
-        echo "${{ secrets.CI_KEYSTORE }}" > keystore.jks.asc
-        gpg --version
-        gpg -d --passphrase CI_KEYSTORE_PASS --batch keystore.jks.asc > CI_KEYSTORE_PATH
 
     - name: Setup Android NDK
       uses: nttld/setup-ndk@v1
