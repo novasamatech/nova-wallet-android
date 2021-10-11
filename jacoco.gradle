@@ -6,6 +6,7 @@ jacoco {
 
 tasks.withType(Test) {
     jacoco.includeNoLocationClasses = true
+    excludes = ['jdk.internal.*']
 }
 
 afterEvaluate {
