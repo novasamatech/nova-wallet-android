@@ -69,12 +69,19 @@ class PaymentUpdater(
         val metaAccount = scope.getAccount()
 
         val accountId = metaAccount.accountIdIn(chain) ?: return emptyFlow()
+
+        Log.d("RX", "Loading metadata: ${chain.name}")
+
         val runtime = chainRegistry.getRuntime(chainId)
+
+        Log.d("RX", "Got metadata: ${chain.name}")
 
         val key = runtime.metadata.system().storage("Account").storageKey(runtime, accountId)
 
         return storageSubscriptionBuilder.subscribe(key)
             .onEach { change ->
+                Log.d("RX", "Got balance update: ${chain.name}")
+
                 runCatching { bindAccountInfoOrDefault(change.value, runtime) }
                     .onFailure { Log.e("RX", "Failed to update balance in ${chain.name}") }
                     .onSuccess {

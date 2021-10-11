@@ -1,5 +1,6 @@
 package jp.co.soramitsu.runtime.multiNetwork.runtime
 
+import android.util.Log
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.runtime.ext.typesUsage
 import jp.co.soramitsu.runtime.multiNetwork.chain.model.Chain
@@ -73,6 +74,8 @@ class RuntimeProvider(
 
     private fun considerReconstructingRuntime(runtimeSyncResult: SyncResult) {
         launch {
+            Log.d("RX", "Got new sync result: $chainId")
+
             currentConstructionJob?.join()
 
             val currentVersion = runtimeFlow.replayCache.firstOrNull()
@@ -114,15 +117,22 @@ class RuntimeProvider(
         currentConstructionJob = launch {
             invalidateRuntime()
 
+            Log.d("RX", "Starting constructing runtime: $chainId")
+
             runCatching {
                 runtimeFactory.constructRuntime(chainId, typesUsage)?.also {
+                    Log.d("RX", "Constructed runtime: $chainId")
+
                     runtimeFlow.emit(it)
-                }
+                } ?: Log.d("RX", "Got null runtime: $chainId")
+
+
+
             }.onFailure {
                 when (it) {
                     ChainInfoNotInCacheException -> runtimeSyncService.cacheNotFound(chainId)
                     BaseTypesNotInCacheException -> baseTypeSynchronizer.cacheNotFound()
-                    else -> it.printStackTrace()
+                    else -> Log.e("RX", "Failed to construct runtime (${chainId}): ${it.message}")
                 }
             }
 

@@ -30,7 +30,7 @@ class AddAccountRepository(
         encryptionType: CryptoType,
         derivationPath: String,
         addAccountType: AddAccountType
-    ) = withContext(Dispatchers.Default) {
+    ): Long = withContext(Dispatchers.Default) {
         addAccount(
             accountName = accountName,
             derivationPath = derivationPath,
@@ -45,7 +45,7 @@ class AddAccountRepository(
         encryptionType: CryptoType,
         derivationPath: String,
         addAccountType: AddAccountType
-    ) = withContext(Dispatchers.Default) {
+    ): Long = withContext(Dispatchers.Default) {
 
         addAccount(
             accountName = accountName,
@@ -61,7 +61,7 @@ class AddAccountRepository(
         password: String,
         derivationPath: String,
         addAccountType: AddAccountType
-    ) = withContext(Dispatchers.Default) {
+    ): Long = withContext(Dispatchers.Default) {
 
         addAccount(
             accountName = accountName,
@@ -71,21 +71,24 @@ class AddAccountRepository(
         )
     }
 
+    /**
+     * @return id of inserted/modified metaAccount
+     */
     private suspend fun addAccount(
         accountName: String,
         derivationPath: String,
         addAccountType: AddAccountType,
         accountSource: AccountSecretsFactory.AccountSource
-    ) {
-        when (addAccountType) {
+    ) : Long {
+        return when (addAccountType) {
             is AddAccountType.MetaAccount -> {
                 val (secrets, substrateCryptoType) = accountSecretsFactory.metaAccountSecrets(
                     substrateDerivationPath = derivationPath,
                     accountSource = accountSource
                 )
 
-                transformingInsertionErrors {
-                    accountDataSource.insertMetaAccount(
+                 transformingInsertionErrors {
+                     accountDataSource.insertMetaAccount(
                         name = accountName,
                         substrateCryptoType = substrateCryptoType,
                         secrets = secrets
@@ -116,6 +119,8 @@ class AddAccountRepository(
                         secrets = secrets
                     )
                 }
+
+                addAccountType.metaId
             }
         }
     }

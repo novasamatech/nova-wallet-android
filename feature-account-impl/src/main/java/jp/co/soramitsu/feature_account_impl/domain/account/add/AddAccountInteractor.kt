@@ -1,12 +1,14 @@
 package jp.co.soramitsu.feature_account_impl.domain.account.add
 
 import jp.co.soramitsu.core.model.CryptoType
+import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountRepository
 import jp.co.soramitsu.feature_account_api.domain.model.AddAccountType
 import jp.co.soramitsu.feature_account_api.domain.model.ImportJsonMetaData
 import jp.co.soramitsu.feature_account_impl.data.repository.AddAccountRepository
 
 class AddAccountInteractor(
-    private val repository: AddAccountRepository,
+    private val addAccountRepository: AddAccountRepository,
+    private val accountRepository: AccountRepository,
 ) {
 
     suspend fun createAccount(
@@ -16,8 +18,8 @@ class AddAccountInteractor(
         derivationPath: String,
         addAccountType: AddAccountType
     ): Result<Unit> {
-        return runCatching {
-            repository.addFromMnemonic(
+        return addAccount(addAccountType) {
+            addAccountRepository.addFromMnemonic(
                 accountName,
                 mnemonic,
                 encryptionType,
@@ -34,8 +36,8 @@ class AddAccountInteractor(
         derivationPath: String,
         addAccountType: AddAccountType
     ): Result<Unit> {
-        return runCatching {
-            repository.addFromMnemonic(
+        return addAccount(addAccountType) {
+            addAccountRepository.addFromMnemonic(
                 accountName,
                 mnemonic,
                 encryptionType,
@@ -52,8 +54,8 @@ class AddAccountInteractor(
         derivationPath: String,
         addAccountType: AddAccountType
     ): Result<Unit> {
-        return runCatching {
-            repository.addFromSeed(
+        return addAccount(addAccountType) {
+            addAccountRepository.addFromSeed(
                 accountName,
                 seed,
                 encryptionType,
@@ -69,8 +71,8 @@ class AddAccountInteractor(
         name: String,
         addAccountType: AddAccountType
     ): Result<Unit> {
-        return runCatching {
-            repository.addFromJson(
+        return addAccount(addAccountType) {
+            addAccountRepository.addFromJson(
                 accountName = name,
                 json = json,
                 password = password,
@@ -80,9 +82,17 @@ class AddAccountInteractor(
         }
     }
 
+    private suspend inline fun addAccount(addAccountType: AddAccountType, accountInserter: () -> Long) = runCatching {
+        val metaId = accountInserter()
+
+        if (addAccountType is AddAccountType.MetaAccount) {
+            accountRepository.selectMetaAccount(metaId)
+        }
+    }
+
     suspend fun extractJsonMetadata(json: String): Result<ImportJsonMetaData> {
         return runCatching {
-            repository.extractJsonMetadata(json)
+            addAccountRepository.extractJsonMetadata(json)
         }
     }
 }

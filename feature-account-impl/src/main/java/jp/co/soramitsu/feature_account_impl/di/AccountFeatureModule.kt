@@ -204,6 +204,7 @@ class AccountFeatureModule {
     @Provides
     @FeatureScope
     fun provideAddAccountInteractor(
-        addAccountRepository: AddAccountRepository
-    ) = AddAccountInteractor(addAccountRepository)
+        addAccountRepository: AddAccountRepository,
+        accountRepository: AccountRepository,
+    ) = AddAccountInteractor(addAccountRepository, accountRepository)
 }

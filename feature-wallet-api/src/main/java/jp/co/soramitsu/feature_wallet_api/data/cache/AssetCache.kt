@@ -1,5 +1,6 @@
 package jp.co.soramitsu.feature_wallet_api.data.cache
 
+import android.util.Log
 import jp.co.soramitsu.core_db.dao.AssetDao
 import jp.co.soramitsu.core_db.dao.AssetReadOnlyCache
 import jp.co.soramitsu.core_db.dao.TokenDao
@@ -30,6 +31,8 @@ class AssetCache(
         val chainId = chainAsset.chainId
 
         assetUpdateMutex.withLock {
+            Log.d("RX", "Updating balance")
+
             tokenDao.ensureToken(symbol)
 
             val cachedAsset = assetDao.getAsset(metaId, chainId, symbol)?.asset ?: AssetLocal.createEmpty(symbol, chainId, metaId)
