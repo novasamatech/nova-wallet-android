@@ -75,8 +75,6 @@ class RuntimeProvider(
 
     private fun considerReconstructingRuntime(runtimeSyncResult: SyncResult) {
         launch {
-            Log.d("RX", "Got new sync result: $chainId")
-
             currentConstructionJob?.join()
 
             val currentVersion = runtimeFlow.replayCache.firstOrNull()
@@ -118,12 +116,8 @@ class RuntimeProvider(
         currentConstructionJob = launch {
             invalidateRuntime()
 
-            Log.d(this@RuntimeProvider.LOG_TAG, "Starting constructing runtime: $chainId")
-
             runCatching {
                 runtimeFactory.constructRuntime(chainId, typesUsage).also {
-                    Log.d(this@RuntimeProvider.LOG_TAG, "Constructed runtime: $chainId")
-
                     runtimeFlow.emit(it)
                 }
 
