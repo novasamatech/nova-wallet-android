@@ -25,9 +25,14 @@ jobs:
         distribution: 'adopt'
         cache: gradle
 
-    - name: Show local
-      run: echo $(<local.properties)
-      
+    - name: Setup Android NDK
+      uses: nttld/setup-ndk@v1
+      with:
+        ndk-version: r21d
+
+    - name: Copy NDK 21 folder to NDK 23
+      run: cp -RT /usr/local/lib/android/sdk/ndk/21.3.6528147 /usr/local/lib/android/sdk/ndk/23.0.7599858
+
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
