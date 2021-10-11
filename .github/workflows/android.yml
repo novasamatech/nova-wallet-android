@@ -30,8 +30,8 @@ jobs:
       with:
         ndk-version: r21d
 
-    - name: Copy NDK 21 folder to NDK 23
-      run: cp -RT /usr/local/lib/android/sdk/ndk/21.4.7075529 /usr/local/lib/android/sdk/ndk/23.0.7599858
+    - name: Rename NDK 21 folder to NDK 23
+      run: mv /usr/local/lib/android/sdk/ndk/21.4.7075529 /usr/local/lib/android/sdk/ndk/23.0.7599858
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
