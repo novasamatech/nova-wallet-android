@@ -84,7 +84,6 @@ fun MetaAccount.addressIn(chain: Chain): String? {
     }
 }
 
-
 val MetaAccount.defaultSubstrateAddress
     get() = substrateAccountId.toAddress(SS58Encoder.DEFAULT_PREFIX)
 

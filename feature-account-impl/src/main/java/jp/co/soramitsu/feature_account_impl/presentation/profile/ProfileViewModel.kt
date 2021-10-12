@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-
 class ProfileViewModel(
     private val interactor: AccountInteractor,
     private val router: AccountRouter,
