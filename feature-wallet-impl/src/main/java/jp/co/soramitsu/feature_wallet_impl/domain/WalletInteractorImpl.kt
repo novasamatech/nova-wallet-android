@@ -29,6 +29,7 @@ import jp.co.soramitsu.runtime.multiNetwork.chainWithAsset
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.withIndex
@@ -48,10 +49,13 @@ class WalletInteractorImpl(
             .flatMapLatest { walletRepository.assetsFlow(it.id) }
             .filter { it.isNotEmpty() }
             .map { assets ->
+                val chains = chainRegistry.chainsById.first()
+
                 assets.sortedWith(
                     compareByDescending<Asset> { it.token.fiatAmount(it.total) }
                         .thenByDescending { it.total }
-                        .thenBy { it.token.configuration.symbol }
+                        .thenBy { chains.getValue(it.token.configuration.chainId).name }
+                        .thenBy { it.token.configuration.id }
                 )
             }
     }
