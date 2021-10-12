@@ -6,6 +6,7 @@ import jp.co.soramitsu.core.model.Node
 import jp.co.soramitsu.core.model.SecuritySource
 import jp.co.soramitsu.feature_account_api.domain.model.Account
 import jp.co.soramitsu.feature_account_api.domain.model.LightMetaAccount
+import jp.co.soramitsu.feature_account_api.domain.model.MetaAccount
 import jp.co.soramitsu.feature_account_api.domain.model.PreferredCryptoType
 import jp.co.soramitsu.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.flow.Flow
@@ -34,9 +35,9 @@ interface AccountInteractor {
 
     suspend fun getAccount(address: String): Account
 
-    fun selectedAccountFlow(): Flow<Account>
-
     fun lightMetaAccountsFlow(): Flow<List<LightMetaAccount>>
+
+    fun selectedMetaAccountFlow(): Flow<MetaAccount>
 
     suspend fun selectMetaAccount(metaId: Long)
 

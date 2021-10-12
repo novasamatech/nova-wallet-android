@@ -24,6 +24,7 @@ import jp.co.soramitsu.fearless_utils.scale.EncodableStruct
 import jp.co.soramitsu.fearless_utils.scale.Schema
 import jp.co.soramitsu.fearless_utils.scale.dataType.DataType
 import jp.co.soramitsu.fearless_utils.scale.dataType.uint32
+import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.addressByte
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAddress
@@ -33,6 +34,9 @@ import java.io.ByteArrayOutputStream
 
 val BIP32JunctionDecoder.DEFAULT_DERIVATION_PATH: String
     get() = "//44//60//0/0/0"
+
+val SS58Encoder.DEFAULT_PREFIX: Byte
+    get() = 42.toByte()
 
 fun BIP32JunctionDecoder.default() = decode(DEFAULT_DERIVATION_PATH)
 
@@ -117,7 +121,7 @@ fun <T> StorageEntry.storageKeys(runtime: RuntimeSnapshot, singleMapArguments: C
 inline fun <K, T> StorageEntry.storageKeys(
     runtime: RuntimeSnapshot,
     singleMapArguments: Collection<T>,
-    argumentTransform: (T) -> K
+    argumentTransform: (T) -> K,
 ): Map<String, K> {
     return singleMapArguments.associateBy(
         keySelector = { storageKey(runtime, it) },

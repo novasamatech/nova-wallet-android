@@ -69,7 +69,7 @@ class BalanceListFragment : BaseFragment<BalanceListViewModel>(), BalanceListAda
     override fun subscribe(viewModel: BalanceListViewModel) {
         viewModel.sync()
 
-        viewModel.balanceLiveData.observe {
+        viewModel.balancesFlow.observe {
             adapter.submitList(it.assetModels)
 
             balanceListTotalAmount.text = it.totalBalance.formatAsCurrency()

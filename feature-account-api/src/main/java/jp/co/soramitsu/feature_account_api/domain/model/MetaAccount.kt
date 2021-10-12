@@ -1,7 +1,9 @@
 package jp.co.soramitsu.feature_account_api.domain.model
 
+import jp.co.soramitsu.common.utils.DEFAULT_PREFIX
 import jp.co.soramitsu.common.utils.ethereumAddressToHex
 import jp.co.soramitsu.core.model.CryptoType
+import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAddress
 import jp.co.soramitsu.runtime.ext.addressOf
 import jp.co.soramitsu.runtime.multiNetwork.chain.model.Chain
@@ -81,6 +83,10 @@ fun MetaAccount.addressIn(chain: Chain): String? {
         else -> substrateAccountId.toAddress(chain.addressPrefix.toByte())
     }
 }
+
+
+val MetaAccount.defaultSubstrateAddress
+    get() = substrateAccountId.toAddress(SS58Encoder.DEFAULT_PREFIX)
 
 fun MetaAccount.accountIdIn(chain: Chain): ByteArray? {
     return when {

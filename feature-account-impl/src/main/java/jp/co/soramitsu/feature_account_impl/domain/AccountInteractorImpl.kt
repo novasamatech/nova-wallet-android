@@ -8,6 +8,7 @@ import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountInteractor
 import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountRepository
 import jp.co.soramitsu.feature_account_api.domain.model.Account
 import jp.co.soramitsu.feature_account_api.domain.model.LightMetaAccount
+import jp.co.soramitsu.feature_account_api.domain.model.MetaAccount
 import jp.co.soramitsu.feature_account_api.domain.model.MetaAccountOrdering
 import jp.co.soramitsu.feature_account_api.domain.model.PreferredCryptoType
 import jp.co.soramitsu.feature_account_impl.domain.errors.NodeAlreadyExistsException
@@ -73,10 +74,12 @@ class AccountInteractorImpl(
         return accountRepository.getAccount(address)
     }
 
-    override fun selectedAccountFlow() = accountRepository.selectedAccountFlow()
-
     override fun lightMetaAccountsFlow(): Flow<List<LightMetaAccount>> {
         return accountRepository.lightMetaAccountsFlow()
+    }
+
+    override fun selectedMetaAccountFlow(): Flow<MetaAccount> {
+        return accountRepository.selectedMetaAccountFlow()
     }
 
     override suspend fun selectMetaAccount(metaId: Long) {
