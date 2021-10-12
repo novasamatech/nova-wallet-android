@@ -14,7 +14,7 @@ private const val RETRIEVE_ASSET_SQL_META_ID = """
 """
 
 private const val RETRIEVE_ACCOUNT_ASSETS_QUERY = """
-       select * from assets as a inner join tokens as t on a.tokenSymbol = t.symbol WHERE a.metaId = :metaId ORDER BY a.tokenSymbol, a.chainId
+       select * from assets as a inner join tokens as t on a.tokenSymbol = t.symbol WHERE a.metaId = :metaId
 """
 
 interface AssetReadOnlyCache {

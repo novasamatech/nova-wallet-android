@@ -24,7 +24,6 @@ import jp.co.soramitsu.feature_crowdloan_impl.presentation.contribute.select.par
 import jp.co.soramitsu.feature_crowdloan_impl.presentation.contribute.select.parcel.mapParachainMetadataToParcel
 import jp.co.soramitsu.feature_crowdloan_impl.presentation.main.model.CrowdloanModel
 import jp.co.soramitsu.feature_crowdloan_impl.presentation.main.model.CrowdloanStatusModel
-import jp.co.soramitsu.feature_wallet_api.domain.AssetUseCase
 import jp.co.soramitsu.feature_wallet_api.domain.model.Asset
 import jp.co.soramitsu.feature_wallet_api.domain.model.amountFromPlanks
 import jp.co.soramitsu.feature_wallet_api.presentation.formatters.formatTokenAmount
@@ -44,7 +43,6 @@ private const val ICON_SIZE_DP = 40
 
 class CrowdloanViewModel(
     private val interactor: CrowdloanInteractor,
-    private val assetUseCase: AssetUseCase,
     private val iconGenerator: AddressIconGenerator,
     private val resourceManager: ResourceManager,
     private val crowdloanSharedState: CrowdloanSharedState,
@@ -56,10 +54,7 @@ class CrowdloanViewModel(
 
     override val assetSelectorMixin = assetSelectorFactory.create(scope = this)
 
-    private val assetFlow = assetUseCase.currentAssetFlow()
-        .share()
-
-    val mainDescription = assetFlow.map {
+    val mainDescription = assetSelectorMixin.selectedAssetFlow.map {
         resourceManager.getString(R.string.crowdloan_main_description, it.token.configuration.symbol)
     }
 
@@ -78,7 +73,7 @@ class CrowdloanViewModel(
         .share()
 
     val crowdloanModelsFlow = groupedCrowdloansFlow.mapLoading { groupedCrowdloans ->
-        val asset = assetFlow.first()
+        val asset = assetSelectorMixin.selectedAssetFlow.first()
         val chain = crowdloanSharedState.chain()
 
         groupedCrowdloans

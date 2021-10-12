@@ -47,6 +47,13 @@ class WalletInteractorImpl(
         return accountRepository.selectedMetaAccountFlow()
             .flatMapLatest { walletRepository.assetsFlow(it.id) }
             .filter { it.isNotEmpty() }
+            .map { assets ->
+                assets.sortedWith(
+                    compareByDescending<Asset> { it.token.fiatAmount(it.total) }
+                        .thenByDescending { it.total }
+                        .thenBy { it.token.configuration.symbol }
+                )
+            }
     }
 
     override suspend fun syncAssetsRates(): Result<Unit> {

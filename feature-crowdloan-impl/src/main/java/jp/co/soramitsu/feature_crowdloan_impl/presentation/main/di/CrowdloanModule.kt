@@ -16,7 +16,6 @@ import jp.co.soramitsu.feature_crowdloan_impl.data.CrowdloanSharedState
 import jp.co.soramitsu.feature_crowdloan_impl.domain.main.CrowdloanInteractor
 import jp.co.soramitsu.feature_crowdloan_impl.presentation.CrowdloanRouter
 import jp.co.soramitsu.feature_crowdloan_impl.presentation.main.CrowdloanViewModel
-import jp.co.soramitsu.feature_wallet_api.domain.AssetUseCase
 import jp.co.soramitsu.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorMixin
 
 @Module(includes = [ViewModelModule::class])
@@ -27,7 +26,6 @@ class CrowdloanModule {
     @ViewModelKey(CrowdloanViewModel::class)
     fun provideViewModel(
         interactor: CrowdloanInteractor,
-        assetUseCase: AssetUseCase,
         resourceManager: ResourceManager,
         iconGenerator: AddressIconGenerator,
         crowdloanSharedState: CrowdloanSharedState,
@@ -38,7 +36,6 @@ class CrowdloanModule {
     ): ViewModel {
         return CrowdloanViewModel(
             interactor,
-            assetUseCase,
             iconGenerator,
             resourceManager,
             crowdloanSharedState,
