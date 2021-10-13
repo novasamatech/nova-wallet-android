@@ -68,10 +68,9 @@ class WalletInteractorImpl(
 
     override fun assetFlow(chainId: ChainId, chainAssetId: Int): Flow<Asset> {
         return accountRepository.selectedMetaAccountFlow().flatMapLatest { metaAccount ->
-            val (chain, chainAsset) = chainRegistry.chainWithAsset(chainId, chainAssetId)
-            val accountId = metaAccount.accountIdIn(chain)!!
+            val (_, chainAsset) = chainRegistry.chainWithAsset(chainId, chainAssetId)
 
-            walletRepository.assetFlow(accountId, chainAsset)
+            walletRepository.assetFlow(metaAccount.id, chainAsset)
         }
     }
 

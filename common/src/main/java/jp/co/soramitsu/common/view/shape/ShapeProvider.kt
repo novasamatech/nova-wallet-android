@@ -15,13 +15,16 @@ import jp.co.soramitsu.common.R
 
 fun Int.toColorStateList() = ColorStateList.valueOf(this)
 
-fun Context.addRipple(drawable: Drawable? = null, mask: Drawable? = null): Drawable {
-    val rippleColor = getColor(R.color.colorSelected)
+fun Context.addRipple(
+    drawable: Drawable? = null,
+    mask: Drawable? = null,
+    @ColorInt rippleColor: Int = getColor(R.color.colorSelected)
+): Drawable {
 
     return RippleDrawable(rippleColor.toColorStateList(), drawable, mask)
 }
 
-fun Context.getCutCornersStateDrawable(
+fun Context.getCornersStateDrawable(
     disabledDrawable: Drawable = getDisabledDrawable(),
     focusedDrawable: Drawable = getFocusedDrawable(),
     idleDrawable: Drawable = getIdleDrawable(),
@@ -33,9 +36,9 @@ fun Context.getCutCornersStateDrawable(
     }
 }
 
-fun Context.getFocusedDrawable(): Drawable = getCutCornerDrawable(strokeColorRes = R.color.white)
-fun Context.getDisabledDrawable(): Drawable = getCutCornerDrawable(fillColorRes = R.color.gray3)
-fun Context.getIdleDrawable(): Drawable = getCutCornerDrawable(strokeColorRes = R.color.gray2)
+fun Context.getFocusedDrawable(): Drawable = getRoundedCornerDrawable(strokeColorRes = R.color.white)
+fun Context.getDisabledDrawable(): Drawable = getRoundedCornerDrawable(fillColorRes = R.color.gray3)
+fun Context.getIdleDrawable(): Drawable = getRoundedCornerDrawable(strokeColorRes = R.color.gray2)
 
 fun Context.getCutCornerDrawable(
     @ColorRes fillColorRes: Int = R.color.black,
@@ -55,47 +58,69 @@ fun Context.getCutCornerDrawableFromColors(
     cornerSizeInDp: Int = 10,
     strokeSizeInDp: Int = 1,
 ): Drawable {
+  return cornerDrawableFromColors(
+      fillColor = fillColor,
+      strokeColor = strokeColor,
+      cornerSizeInDp = cornerSizeInDp,
+      strokeSizeInDp = strokeSizeInDp,
+      shapeBuilder = { cornerSizePx ->
+          ShapeAppearanceModel.Builder()
+              .setTopLeftCorner(CornerFamily.CUT, cornerSizePx)
+              .setBottomRightCorner(CornerFamily.CUT, cornerSizePx)
+              .build()
+      }
+  )
+}
+
+
+fun Context.getRoundedCornerDrawable(
+    @ColorRes fillColorRes: Int = R.color.black,
+    @ColorRes strokeColorRes: Int? = null,
+    cornerSizeInDp: Int = 10,
+    strokeSizeInDp: Int = 1,
+): Drawable {
+    val fillColor = getColor(fillColorRes)
+    val strokeColor = strokeColorRes?.let(this::getColor)
+
+    return getRoundedCornerDrawableFromColors(fillColor,strokeColor, cornerSizeInDp, strokeSizeInDp)
+}
+
+fun Context.getRoundedCornerDrawableFromColors(
+    @ColorInt fillColor: Int = getColor(R.color.black),
+    @ColorInt strokeColor: Int? = null,
+    cornerSizeInDp: Int = 10,
+    strokeSizeInDp: Int = 1,
+): Drawable {
+    return cornerDrawableFromColors(
+        fillColor = fillColor,
+        strokeColor = strokeColor,
+        cornerSizeInDp = cornerSizeInDp,
+        strokeSizeInDp = strokeSizeInDp,
+        shapeBuilder = { cornerSizePx ->
+            ShapeAppearanceModel.Builder()
+                .setAllCorners(CornerFamily.ROUNDED, cornerSizePx)
+                .build()
+        }
+    )
+}
+
+private fun Context.cornerDrawableFromColors(
+    @ColorInt fillColor: Int,
+    @ColorInt strokeColor: Int?,
+    cornerSizeInDp: Int,
+    strokeSizeInDp: Int,
+    shapeBuilder: (cornerSize: Float) -> ShapeAppearanceModel
+): Drawable {
     val density = resources.displayMetrics.density
 
     val cornerSizePx = density * cornerSizeInDp
     val strokeSizePx = density * strokeSizeInDp
 
-    return MaterialShapeDrawable(
-        ShapeAppearanceModel.Builder()
-            .setTopLeftCorner(CornerFamily.CUT, cornerSizePx)
-            .setBottomRightCorner(CornerFamily.CUT, cornerSizePx)
-            .build()
-    ).apply {
+    return MaterialShapeDrawable(shapeBuilder(cornerSizePx)).apply {
         setFillColor(ColorStateList.valueOf(fillColor))
 
         strokeColor?.let {
             setStroke(strokeSizePx, it)
         }
-    }
-}
-
-fun Context.getRoundedCornerDrawable(
-    @ColorRes fillColorRes: Int = R.color.black,
-    cornerSizeInDp: Int = 10,
-): Drawable {
-    val fillColor = getColor(fillColorRes)
-
-    return getRoundedCornerDrawableFromColors(fillColor, cornerSizeInDp)
-}
-
-fun Context.getRoundedCornerDrawableFromColors(
-    @ColorInt fillColor: Int = getColor(R.color.black),
-    cornerSizeInDp: Int = 10,
-): Drawable {
-    val density = resources.displayMetrics.density
-
-    val cornerSizePx = density * cornerSizeInDp
-
-    return MaterialShapeDrawable(
-        ShapeAppearanceModel.Builder()
-            .setAllCorners(CornerFamily.ROUNDED, cornerSizePx)
-            .build()
-    ).apply {
-        setFillColor(ColorStateList.valueOf(fillColor))
     }
 }

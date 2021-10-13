@@ -410,7 +410,7 @@ class Navigator :
     override fun openAccountDetails(metaAccountId: Long) {
         val extras = AccountDetailsFragment.getBundle(metaAccountId)
 
-        navController?.navigate(R.id.action_accountsFragment_to_accountDetailsFragment, extras)
+        navController?.navigate(R.id.action_open_account_details, extras)
     }
 
     override fun openEditAccounts() {

@@ -1,6 +1,6 @@
 package jp.co.soramitsu.common.address
 
-import android.graphics.drawable.PictureDrawable
+import android.graphics.drawable.Drawable
 import androidx.annotation.ColorRes
 import jp.co.soramitsu.common.R
 import jp.co.soramitsu.common.resources.ResourceManager
@@ -27,7 +27,7 @@ interface AddressIconGenerator {
         accountId: AccountId,
         sizeInDp: Int,
         @ColorRes backgroundColorRes: Int = R.color.account_icon_light
-    ): PictureDrawable
+    ): Drawable
 }
 
 @Throws(AddressFormatException::class)
@@ -48,13 +48,13 @@ class CachingAddressIconGenerator(
     private val delegate: AddressIconGenerator
 ) : AddressIconGenerator {
 
-    val cache = ConcurrentHashMap<String, PictureDrawable>()
+    val cache = ConcurrentHashMap<String, Drawable>()
 
     override suspend fun createAddressIcon(
         accountId: AccountId,
         sizeInDp: Int,
         @ColorRes backgroundColorRes: Int
-    ): PictureDrawable = withContext(Dispatchers.Default) {
+    ): Drawable = withContext(Dispatchers.Default) {
         val key = "${accountId.toHexString()}:$sizeInDp:$backgroundColorRes"
 
         cache.getOrPut(key) {

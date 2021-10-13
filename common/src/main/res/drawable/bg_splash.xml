@@ -9,9 +9,4 @@
         
         android:drawable="@drawable/drawable_nova_logo" />
 
-    <item
-        android:bottom="60dp"
-        android:gravity="center_horizontal|bottom"
-        android:drawable="@drawable/drawable_soramitsu_brand" />
-
 </layer-list>

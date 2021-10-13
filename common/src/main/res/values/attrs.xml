@@ -66,4 +66,11 @@
         <attr name="icon" />
         <attr name="actionIcon" />
     </declare-styleable>
+
+    <declare-styleable name="PrimaryButton">
+        <attr format="enum" name="appearance">
+            <enum name="fill" value="0" />
+            <enum name="outline" value="1" />
+        </attr>
+    </declare-styleable>
 </resources>

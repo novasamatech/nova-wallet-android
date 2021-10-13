@@ -13,7 +13,7 @@ import jp.co.soramitsu.common.utils.getDrawableCompat
 import jp.co.soramitsu.common.utils.makeVisible
 import jp.co.soramitsu.common.utils.setVisible
 import jp.co.soramitsu.common.view.shape.addRipple
-import jp.co.soramitsu.common.view.shape.getCutCornersStateDrawable
+import jp.co.soramitsu.common.view.shape.getCornersStateDrawable
 import kotlinx.android.synthetic.main.view_labeled_text.view.labeledTextAction
 import kotlinx.android.synthetic.main.view_labeled_text.view.labeledTextIcon
 import kotlinx.android.synthetic.main.view_labeled_text.view.labeledTextLabel
@@ -29,7 +29,7 @@ class LabeledTextView @JvmOverloads constructor(
         View.inflate(context, R.layout.view_labeled_text, this)
 
         with(context) {
-            background = addRipple(getCutCornersStateDrawable())
+            background = addRipple(getCornersStateDrawable())
         }
 
         applyAttributes(attrs)

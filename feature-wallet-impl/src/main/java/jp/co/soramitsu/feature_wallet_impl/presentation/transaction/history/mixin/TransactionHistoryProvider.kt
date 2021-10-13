@@ -4,6 +4,8 @@ import jp.co.soramitsu.common.address.AddressIconGenerator
 import jp.co.soramitsu.common.resources.ResourceManager
 import jp.co.soramitsu.common.utils.daysFromMillis
 import jp.co.soramitsu.common.utils.inBackground
+import jp.co.soramitsu.common.utils.invoke
+import jp.co.soramitsu.common.utils.lazyAsync
 import jp.co.soramitsu.feature_account_api.presenatation.account.AddressDisplayUseCase
 import jp.co.soramitsu.feature_wallet_api.domain.interfaces.WalletInteractor
 import jp.co.soramitsu.feature_wallet_api.domain.model.Operation
@@ -16,6 +18,7 @@ import jp.co.soramitsu.feature_wallet_impl.presentation.transaction.filter.Histo
 import jp.co.soramitsu.feature_wallet_impl.presentation.transaction.history.mixin.TransactionStateMachine.Action
 import jp.co.soramitsu.feature_wallet_impl.presentation.transaction.history.mixin.TransactionStateMachine.State
 import jp.co.soramitsu.feature_wallet_impl.presentation.transaction.history.model.DayHeader
+import jp.co.soramitsu.runtime.multiNetwork.ChainRegistry
 import jp.co.soramitsu.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -31,8 +34,6 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-private const val ICON_SIZE_DP = 32
-
 class TransactionHistoryProvider(
     private val walletInteractor: WalletInteractor,
     private val iconGenerator: AddressIconGenerator,
@@ -40,6 +41,7 @@ class TransactionHistoryProvider(
     private val historyFiltersProvider: HistoryFiltersProvider,
     private val resourceManager: ResourceManager,
     private val addressDisplayUseCase: AddressDisplayUseCase,
+    private val chainRegistry: ChainRegistry,
     private val chainId: ChainId,
     private val assetId: Int
 ) : TransactionHistoryMixin, CoroutineScope by CoroutineScope(Dispatchers.Default) {
@@ -47,6 +49,10 @@ class TransactionHistoryProvider(
     private val domainState = MutableStateFlow<State>(
         State.EmptyProgress(filters = historyFiltersProvider.currentFilters())
     )
+
+    private val chainAsync by lazyAsync {
+        chainRegistry.getChain(chainId)
+    }
 
     override val state = domainState.map(::mapOperationHistoryStateToUi)
         .inBackground()
@@ -148,9 +154,10 @@ class TransactionHistoryProvider(
 
     private suspend fun transformData(data: List<Operation>): List<Any> {
         val accountIdentifier = addressDisplayUseCase.createIdentifier()
+        val chain = chainAsync()
 
-        val operations = data.map {
-            mapOperationToOperationModel(it, accountIdentifier, resourceManager, iconGenerator)
+        val operations = data.map { operation ->
+            mapOperationToOperationModel(chain, operation, accountIdentifier, resourceManager, iconGenerator)
         }
 
         return regroup(operations)

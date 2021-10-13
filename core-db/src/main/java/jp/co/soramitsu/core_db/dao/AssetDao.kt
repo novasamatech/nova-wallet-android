@@ -22,7 +22,7 @@ interface AssetReadOnlyCache {
     fun observeAssets(metaId: Long): Flow<List<AssetWithToken>>
     suspend fun getAssets(metaId: Long): List<AssetWithToken>
 
-    fun observeAsset(metaId: Long, chainId: String, symbol: String): Flow<AssetWithToken>
+    fun observeAsset(metaId: Long, chainId: String, symbol: String): Flow<AssetWithToken?>
 
     suspend fun getAsset(metaId: Long, chainId: String, symbol: String): AssetWithToken?
 }

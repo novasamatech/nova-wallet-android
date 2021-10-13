@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#004CB7</color>
-    <color name="colorSelected">#66FF009A</color>
     <color name="colorPrimaryDark">#80004CB7</color>
+    <color name="colorSelected">@color/colorPrimaryDark</color>
     <color name="colorAccent">#FF009A</color>
     <color name="white">#fff</color>
     <color name="colorHint">#ccc</color>
@@ -38,4 +38,6 @@
     <color name="account_icon_dark">@color/black</color>
 
     <color name="error_red">#FF3B30</color>
+
+    <color name="accentBlue">#409DF3</color>
 </resources>

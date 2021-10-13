@@ -48,9 +48,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.withContext
@@ -128,8 +128,14 @@ class WalletRepositoryImpl(
         return flow {
             val metaAccount = accountRepository.findMetaAccountOrThrow(accountId)
 
-            emitAll(assetCache.observeAsset(metaAccount.id, chainAsset.chainId, chainAsset.symbol))
-        }.map { mapAssetLocalToAsset(it, chainAsset) }
+            emitAll(assetFlow(metaAccount.id, chainAsset))
+        }
+    }
+
+    override fun assetFlow(metaId: Long, chainAsset: Chain.Asset): Flow<Asset> {
+        return assetCache.observeAsset(metaId, chainAsset.chainId, chainAsset.symbol)
+            .filterNotNull()
+            .map { mapAssetLocalToAsset(it, chainAsset) }
     }
 
     override suspend fun getAsset(accountId: AccountId, chainAsset: Chain.Asset): Asset? {
@@ -186,10 +192,6 @@ class WalletRepositoryImpl(
         chain: Chain,
         chainAsset: Chain.Asset
     ): Flow<CursorPage<Operation>> {
-        if (!chain.historySupported) {
-            return flowOf(CursorPage(nextCursor = null, items = emptyList()))
-        }
-
         val accountAddress = chain.addressOf(accountId)
 
         return operationDao.observe(accountAddress, chain.id, chainAsset.id)
@@ -197,7 +199,11 @@ class WalletRepositoryImpl(
                 mapOperationLocalToOperation(it, chainAsset)
             }
             .mapLatest { operations ->
-                val cursor = cursorStorage.awaitCursor(chain.id, chainAsset.id, accountId)
+                val cursor = if (chain.historySupported) {
+                    cursorStorage.awaitCursor(chain.id, chainAsset.id, accountId)
+                } else {
+                    null
+                }
 
                 CursorPage(cursor, operations)
             }

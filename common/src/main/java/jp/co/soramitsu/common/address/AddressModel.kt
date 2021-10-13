@@ -1,10 +1,10 @@
 package jp.co.soramitsu.common.address
 
-import android.graphics.drawable.PictureDrawable
+import android.graphics.drawable.Drawable
 
 class AddressModel(
     val address: String,
-    val image: PictureDrawable,
+    val image: Drawable,
     val name: String? = null
 ) {
     val nameOrAddress = name ?: address
