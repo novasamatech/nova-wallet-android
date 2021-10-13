@@ -15,7 +15,7 @@ import jp.co.soramitsu.common.utils.formatAsCurrency
 import jp.co.soramitsu.common.utils.inflateChild
 import jp.co.soramitsu.common.utils.setTextColorRes
 import jp.co.soramitsu.common.view.shape.addRipple
-import jp.co.soramitsu.common.view.shape.getCutCornerDrawable
+import jp.co.soramitsu.common.view.shape.getRoundedCornerDrawable
 import jp.co.soramitsu.feature_wallet_impl.R
 import jp.co.soramitsu.feature_wallet_impl.presentation.model.AssetModel
 import kotlinx.android.extensions.LayoutContainer
@@ -73,7 +73,7 @@ class AssetViewHolder(
     init {
         with(containerView) {
             val background = with(context) {
-                addRipple(getCutCornerDrawable(R.color.blurColor))
+                addRipple(getRoundedCornerDrawable(R.color.blurColor))
             }
 
             containerView.itemAssetContainer.background = background
