@@ -1,4 +1,4 @@
-name: Android CI
+name: Develop with deploy debug app
 
 env:
   MOONPAY_TEST_SECRET: ${{ secrets.MOONPAY_TEST_SECRET }}
@@ -10,8 +10,6 @@ env:
 
 on:
   push:
-    branches: [develop]
-  pull_request:
     branches: [develop]
 
 jobs:
