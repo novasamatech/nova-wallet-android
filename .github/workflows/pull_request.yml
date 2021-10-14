@@ -8,9 +8,7 @@ env:
   CI_KEYSTORE_KEY_ALIAS: ${{ secrets.CI_KEYSTORE_KEY_ALIAS }}
   CI_KEYSTORE_KEY_PASS: ${{ secrets.CI_KEYSTORE_KEY_PASS }}
 
-on:
-  pull_request:
-    branches: [develop]
+on: [pull_request]
 
 jobs:
   build:
