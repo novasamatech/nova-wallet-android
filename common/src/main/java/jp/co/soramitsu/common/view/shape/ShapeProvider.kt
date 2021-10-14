@@ -58,20 +58,19 @@ fun Context.getCutCornerDrawableFromColors(
     cornerSizeInDp: Int = 10,
     strokeSizeInDp: Int = 1,
 ): Drawable {
-  return cornerDrawableFromColors(
-      fillColor = fillColor,
-      strokeColor = strokeColor,
-      cornerSizeInDp = cornerSizeInDp,
-      strokeSizeInDp = strokeSizeInDp,
-      shapeBuilder = { cornerSizePx ->
-          ShapeAppearanceModel.Builder()
-              .setTopLeftCorner(CornerFamily.CUT, cornerSizePx)
-              .setBottomRightCorner(CornerFamily.CUT, cornerSizePx)
-              .build()
-      }
-  )
+    return cornerDrawableFromColors(
+        fillColor = fillColor,
+        strokeColor = strokeColor,
+        cornerSizeInDp = cornerSizeInDp,
+        strokeSizeInDp = strokeSizeInDp,
+        shapeBuilder = { cornerSizePx ->
+            ShapeAppearanceModel.Builder()
+                .setTopLeftCorner(CornerFamily.CUT, cornerSizePx)
+                .setBottomRightCorner(CornerFamily.CUT, cornerSizePx)
+                .build()
+        }
+    )
 }
-
 
 fun Context.getRoundedCornerDrawable(
     @ColorRes fillColorRes: Int = R.color.black,
@@ -82,7 +81,7 @@ fun Context.getRoundedCornerDrawable(
     val fillColor = getColor(fillColorRes)
     val strokeColor = strokeColorRes?.let(this::getColor)
 
-    return getRoundedCornerDrawableFromColors(fillColor,strokeColor, cornerSizeInDp, strokeSizeInDp)
+    return getRoundedCornerDrawableFromColors(fillColor, strokeColor, cornerSizeInDp, strokeSizeInDp)
 }
 
 fun Context.getRoundedCornerDrawableFromColors(

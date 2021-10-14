@@ -74,7 +74,7 @@ class TransactionDetailViewModel(
     }
 
     private suspend fun getIcon(address: String): AddressModel {
-        return addressIconGenerator.createAddressModel(chain(),  address, AddressIconGenerator.SIZE_BIG, addressDisplayUseCase(address))
+        return addressIconGenerator.createAddressModel(chain(), address, AddressIconGenerator.SIZE_BIG, addressDisplayUseCase(address))
     }
 
     fun showExternalActionsClicked(externalActionsSource: ExternalActionsSource) {
