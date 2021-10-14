@@ -1,4 +1,4 @@
-name: Android CI
+name: Pull request
 
 env:
   MOONPAY_TEST_SECRET: ${{ secrets.MOONPAY_TEST_SECRET }}
@@ -8,11 +8,7 @@ env:
   CI_KEYSTORE_KEY_ALIAS: ${{ secrets.CI_KEYSTORE_KEY_ALIAS }}
   CI_KEYSTORE_KEY_PASS: ${{ secrets.CI_KEYSTORE_KEY_PASS }}
 
-on:
-  push:
-    branches: [develop]
-  pull_request:
-    branches: [develop]
+on: [pull_request]
 
 jobs:
   build:
@@ -42,14 +38,3 @@ jobs:
 
       - name: Run tests
         run: ./gradlew runTest
-
-      - name: Build with Gradle
-        run: ./gradlew assembleDebug
-
-      - name: Upload artifact to Firebase App Distribution
-        uses: wzieba/Firebase-Distribution-Github-Action@v1
-        with:
-          appId: ${{ secrets.ANDROID_DEV_FIREBASE_APP_ID }}
-          token: ${{ secrets.ANDROID_DEV_FIREBASE_TOKEN }}
-          groups: dev-team
-          file: app/build/outputs/apk/debug/app-debug.apk
