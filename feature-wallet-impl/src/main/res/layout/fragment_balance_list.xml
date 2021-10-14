@@ -19,8 +19,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
-            android:text="@string/wallet_assets_total_title"
-            android:textColor="@color/colorAccent"
+            android:includeFontPadding="false"
+            tools:text="@tools:sample/full_names"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -32,6 +32,7 @@
             android:layout_marginEnd="16dp"
             android:ellipsize="end"
             android:singleLine="true"
+            android:includeFontPadding="false"
             app:layout_constraintEnd_toStartOf="@+id/balanceListAvatar"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/balanceListTotalTitle"
@@ -42,11 +43,11 @@
             android:id="@+id/balanceListAvatar"
             android:layout_width="@dimen/avatar_size"
             android:layout_height="@dimen/avatar_size"
-            android:layout_marginTop="28dp"
             android:layout_marginEnd="16dp"
             android:src="@color/white"
+            app:layout_constraintBottom_toBottomOf="@+id/balanceListTotalAmount"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="@+id/balanceListTotalTitle" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/balanceListAssets"
@@ -54,6 +55,7 @@
             android:layout_height="0dp"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
+            android:layout_marginTop="8dp"
             android:overScrollMode="never"
             android:paddingBottom="16dp"
             android:clipToPadding="false"

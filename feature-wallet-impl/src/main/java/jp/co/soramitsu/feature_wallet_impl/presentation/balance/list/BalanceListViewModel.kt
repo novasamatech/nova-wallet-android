@@ -9,10 +9,9 @@ import jp.co.soramitsu.common.address.createAddressModel
 import jp.co.soramitsu.common.base.BaseViewModel
 import jp.co.soramitsu.common.utils.Event
 import jp.co.soramitsu.common.utils.inBackground
-import jp.co.soramitsu.core.model.Node
-import jp.co.soramitsu.core.model.chainId
+import jp.co.soramitsu.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import jp.co.soramitsu.feature_account_api.domain.model.defaultSubstrateAddress
 import jp.co.soramitsu.feature_wallet_api.domain.interfaces.WalletInteractor
-import jp.co.soramitsu.feature_wallet_api.domain.model.WalletAccount
 import jp.co.soramitsu.feature_wallet_impl.data.mappers.mapAssetToAssetModel
 import jp.co.soramitsu.feature_wallet_impl.presentation.AssetPayload
 import jp.co.soramitsu.feature_wallet_impl.presentation.WalletRouter
@@ -27,6 +26,7 @@ private const val CURRENT_ICON_SIZE = 40
 class BalanceListViewModel(
     private val interactor: WalletInteractor,
     private val addressIconGenerator: AddressIconGenerator,
+    private val selectedAccountUseCase: SelectedAccountUseCase,
     private val router: WalletRouter,
 ) : BaseViewModel() {
 
@@ -63,13 +63,10 @@ class BalanceListViewModel(
     }
 
     private fun currentAddressModelFlow(): Flow<AddressModel> {
-        return interactor.selectedAccountFlow(Node.NetworkType.POLKADOT.chainId) //  TODO stub
-            .map { generateAddressModel(it, CURRENT_ICON_SIZE) }
+        return selectedAccountUseCase.selectedMetaAccountFlow()
+            .map { addressIconGenerator.createAddressModel(it.defaultSubstrateAddress, CURRENT_ICON_SIZE, it.name) }
     }
 
-    private suspend fun generateAddressModel(account: WalletAccount, sizeInDp: Int): AddressModel {
-        return addressIconGenerator.createAddressModel(account.address, sizeInDp, account.name)
-    }
 
     private fun balanceFlow(): Flow<BalanceModel> {
         return interactor.assetsFlow()

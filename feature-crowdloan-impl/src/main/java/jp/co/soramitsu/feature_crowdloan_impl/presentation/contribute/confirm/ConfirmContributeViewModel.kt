@@ -13,6 +13,7 @@ import jp.co.soramitsu.common.utils.inBackground
 import jp.co.soramitsu.common.validation.ValidationExecutor
 import jp.co.soramitsu.common.validation.progressConsumer
 import jp.co.soramitsu.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import jp.co.soramitsu.feature_account_api.domain.model.defaultSubstrateAddress
 import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalAccountActions
 import jp.co.soramitsu.feature_crowdloan_impl.R
 import jp.co.soramitsu.feature_crowdloan_impl.di.customCrowdloan.CustomContributeManager
@@ -63,9 +64,9 @@ class ConfirmContributeViewModel(
         .inBackground()
         .share()
 
-    val selectedAddressModelFlow = accountUseCase.selectedAccountFlow()
+    val selectedAddressModelFlow = accountUseCase.selectedMetaAccountFlow()
         .map {
-            addressModelGenerator.createAddressModel(it.address, AddressIconGenerator.SIZE_SMALL, it.name)
+            addressModelGenerator.createAddressModel(it.defaultSubstrateAddress, AddressIconGenerator.SIZE_SMALL, it.name)
         }
 
     val selectedAmount = payload.amount.toString()
@@ -79,7 +80,7 @@ class ConfirmContributeViewModel(
         .share()
 
     val enteredFiatAmountFlow = assetFlow.map { asset ->
-        asset.token.fiatAmount(payload.amount)?.formatAsCurrency()
+        asset.token.fiatAmount(payload.amount).formatAsCurrency()
     }
         .inBackground()
         .share()
