@@ -3,7 +3,6 @@ package jp.co.soramitsu.feature_account_impl.di
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
-import jp.co.soramitsu.common.data.network.AppLinksProvider
 import jp.co.soramitsu.common.data.network.rpc.SocketSingleRequestExecutor
 import jp.co.soramitsu.common.data.secrets.v1.SecretStoreV1
 import jp.co.soramitsu.common.data.secrets.v2.SecretStoreV2
@@ -24,8 +23,8 @@ import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountRepository
 import jp.co.soramitsu.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import jp.co.soramitsu.feature_account_api.domain.updaters.AccountUpdateScope
 import jp.co.soramitsu.feature_account_api.presenatation.account.AddressDisplayUseCase
-import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalAccountActions
-import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalAccountActionsProvider
+import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalActions
+import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalActionsProvider
 import jp.co.soramitsu.feature_account_impl.data.network.blockchain.AccountSubstrateSource
 import jp.co.soramitsu.feature_account_impl.data.network.blockchain.AccountSubstrateSourceImpl
 import jp.co.soramitsu.feature_account_impl.data.repository.AccountRepositoryImpl
@@ -147,10 +146,9 @@ class AccountFeatureModule {
     @FeatureScope
     fun provideExternalAccountActions(
         clipboardManager: ClipboardManager,
-        appLinksProvider: AppLinksProvider,
         resourceManager: ResourceManager,
-    ): ExternalAccountActions.Presentation {
-        return ExternalAccountActionsProvider(clipboardManager, appLinksProvider, resourceManager)
+    ): ExternalActions.Presentation {
+        return ExternalActionsProvider(clipboardManager, resourceManager)
     }
 
     @Provides

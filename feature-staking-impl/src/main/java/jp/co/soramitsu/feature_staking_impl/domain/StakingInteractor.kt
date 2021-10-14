@@ -196,8 +196,6 @@ class StakingInteractor(
         getLockupPeriodInDays(stakingSharedState.chainId())
     }
 
-    fun selectedChainFlow() = stakingSharedState.assetWithChain.map { it.chain }
-
     suspend fun getEraHoursLength(): Int = withContext(Dispatchers.Default) {
         val chainId = stakingSharedState.chainId()
 

@@ -6,7 +6,6 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import jp.co.soramitsu.common.address.AddressIconGenerator
 import jp.co.soramitsu.common.address.AddressModel
-import jp.co.soramitsu.common.address.createAddressModel
 import jp.co.soramitsu.common.base.BaseViewModel
 import jp.co.soramitsu.common.utils.Event
 import jp.co.soramitsu.common.utils.inBackground
@@ -15,9 +14,8 @@ import jp.co.soramitsu.common.utils.lazyAsync
 import jp.co.soramitsu.common.utils.map
 import jp.co.soramitsu.common.utils.requireException
 import jp.co.soramitsu.common.view.ButtonState
-import jp.co.soramitsu.core.model.Node
 import jp.co.soramitsu.feature_account_api.presenatation.account.icon.createAddressModel
-import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalAccountActions
+import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalActions
 import jp.co.soramitsu.feature_wallet_api.domain.interfaces.NotValidTransferStatus
 import jp.co.soramitsu.feature_wallet_api.domain.interfaces.WalletConstants
 import jp.co.soramitsu.feature_wallet_api.domain.interfaces.WalletInteractor
@@ -41,13 +39,13 @@ class ConfirmTransferViewModel(
     private val interactor: WalletInteractor,
     private val router: WalletRouter,
     private val addressIconGenerator: AddressIconGenerator,
-    private val externalAccountActions: ExternalAccountActions.Presentation,
+    private val externalActions: ExternalActions.Presentation,
     private val walletConstants: WalletConstants,
     private val transferValidityChecks: TransferValidityChecks.Presentation,
     private val chainRegistry: ChainRegistry,
-    val transferDraft: TransferDraft
+    val transferDraft: TransferDraft,
 ) : BaseViewModel(),
-    ExternalAccountActions by externalAccountActions,
+    ExternalActions by externalActions,
     TransferValidityChecks by transferValidityChecks {
 
     private val chain by lazyAsync { chainRegistry.getChain(transferDraft.assetPayload.chainId) }
@@ -76,11 +74,8 @@ class ConfirmTransferViewModel(
         router.back()
     }
 
-    fun copyRecipientAddressClicked() {
-        val networkType = Node.NetworkType.findByGenesis(transferDraft.assetPayload.chainId)!! // TODO stub
-        val payload = ExternalAccountActions.Payload(transferDraft.recipientAddress, networkType)
-
-        externalAccountActions.showExternalActions(payload)
+    fun copyRecipientAddressClicked() = launch {
+        externalActions.showExternalActions(ExternalActions.Type.Address(transferDraft.recipientAddress), chain())
     }
 
     fun availableBalanceClicked() {

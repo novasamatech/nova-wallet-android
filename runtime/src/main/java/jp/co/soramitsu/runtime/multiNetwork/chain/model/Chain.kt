@@ -1,12 +1,14 @@
 package jp.co.soramitsu.runtime.multiNetwork.chain.model
 
 typealias ChainId = String
+typealias StringTemplate = String
 
 data class Chain(
     val id: ChainId,
     val name: String,
     val assets: List<Asset>,
     val nodes: List<Node>,
+    val explorers: List<Explorer>,
     val externalApi: ExternalApi?,
     val icon: String,
     val addressPrefix: Int,
@@ -44,6 +46,13 @@ data class Chain(
     data class Node(
         val url: String,
         val name: String,
+    )
+
+    data class Explorer(
+        val name: String,
+        val account: StringTemplate?,
+        val extrinsic: StringTemplate?,
+        val event: StringTemplate?
     )
 
     data class ExternalApi(

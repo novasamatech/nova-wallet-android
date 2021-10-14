@@ -6,7 +6,7 @@ import jp.co.soramitsu.common.base.BaseViewModel
 import jp.co.soramitsu.common.resources.ResourceManager
 import jp.co.soramitsu.common.utils.formatAsCurrency
 import jp.co.soramitsu.common.utils.inBackground
-import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalAccountActions
+import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalActions
 import jp.co.soramitsu.feature_staking_impl.R
 import jp.co.soramitsu.feature_staking_impl.domain.StakingInteractor
 import jp.co.soramitsu.feature_staking_impl.presentation.StakingRouter
@@ -15,16 +15,20 @@ import jp.co.soramitsu.feature_staking_impl.presentation.payouts.model.PendingPa
 import jp.co.soramitsu.feature_wallet_api.domain.model.Asset
 import jp.co.soramitsu.feature_wallet_api.domain.model.amountFromPlanks
 import jp.co.soramitsu.feature_wallet_api.presentation.formatters.formatTokenAmount
+import jp.co.soramitsu.runtime.state.SingleAssetSharedState
+import jp.co.soramitsu.runtime.state.chain
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 class PayoutDetailsViewModel(
     private val interactor: StakingInteractor,
     private val router: StakingRouter,
     private val payout: PendingPayoutParcelable,
     private val addressModelGenerator: AddressIconGenerator,
-    private val externalAccountActions: ExternalAccountActions.Presentation,
+    private val externalActions: ExternalActions.Presentation,
     private val resourceManager: ResourceManager,
-) : BaseViewModel(), ExternalAccountActions.Presentation by externalAccountActions {
+    private val selectedAssetState: SingleAssetSharedState,
+) : BaseViewModel(), ExternalActions.Presentation by externalActions {
 
     val payoutDetails = interactor.currentAssetFlow()
         .map(::mapPayoutParcelableToPayoutDetailsModel)
@@ -44,10 +48,8 @@ class PayoutDetailsViewModel(
         router.openConfirmPayout(payload)
     }
 
-    fun validatorExternalActionClicked() {
-        val payload = ExternalAccountActions.Payload.fromAddress(payout.validatorInfo.address)
-
-        externalAccountActions.showExternalActions(payload)
+    fun validatorExternalActionClicked() = launch {
+        externalActions.showExternalActions(ExternalActions.Type.Address(payout.validatorInfo.address), selectedAssetState.chain())
     }
 
     private suspend fun mapPayoutParcelableToPayoutDetailsModel(asset: Asset): PayoutDetailsModel {
@@ -63,7 +65,7 @@ class PayoutDetailsViewModel(
             createdAt = payout.createdAt,
             eraDisplay = resourceManager.getString(R.string.staking_era_index_no_prefix, payout.era.toLong()),
             reward = rewardAmount.formatTokenAmount(tokenType),
-            rewardFiat = asset.token.fiatAmount(rewardAmount)?.formatAsCurrency()
+            rewardFiat = asset.token.fiatAmount(rewardAmount).formatAsCurrency()
         )
     }
 }

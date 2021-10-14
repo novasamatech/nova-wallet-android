@@ -14,7 +14,7 @@ import jp.co.soramitsu.common.validation.ValidationExecutor
 import jp.co.soramitsu.common.validation.progressConsumer
 import jp.co.soramitsu.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import jp.co.soramitsu.feature_account_api.domain.model.defaultSubstrateAddress
-import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalAccountActions
+import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalActions
 import jp.co.soramitsu.feature_crowdloan_impl.R
 import jp.co.soramitsu.feature_crowdloan_impl.di.customCrowdloan.CustomContributeManager
 import jp.co.soramitsu.feature_crowdloan_impl.domain.contribute.CrowdloanContributeInteractor
@@ -30,6 +30,8 @@ import jp.co.soramitsu.feature_wallet_api.data.mappers.mapFeeToFeeModel
 import jp.co.soramitsu.feature_wallet_api.domain.AssetUseCase
 import jp.co.soramitsu.feature_wallet_api.presentation.formatters.formatTokenAmount
 import jp.co.soramitsu.feature_wallet_api.presentation.mixin.fee.FeeStatus
+import jp.co.soramitsu.runtime.state.SingleAssetSharedState
+import jp.co.soramitsu.runtime.state.chain
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -46,10 +48,11 @@ class ConfirmContributeViewModel(
     private val payload: ConfirmContributePayload,
     private val validationSystem: ContributeValidationSystem,
     private val customContributeManager: CustomContributeManager,
-    private val externalAccountActions: ExternalAccountActions.Presentation
+    private val externalActions: ExternalActions.Presentation,
+    private val assetSharedState: SingleAssetSharedState,
 ) : BaseViewModel(),
     Validatable by validationExecutor,
-    ExternalAccountActions by externalAccountActions {
+    ExternalActions by externalActions {
 
     override val openBrowserEvent = MutableLiveData<Event<String>>()
 
@@ -123,8 +126,9 @@ class ConfirmContributeViewModel(
     fun originAccountClicked() {
         launch {
             val accountAddress = selectedAddressModelFlow.first().address
+            val chain = assetSharedState.chain()
 
-            externalAccountActions.showExternalActions(ExternalAccountActions.Payload.fromAddress(accountAddress))
+            externalActions.showExternalActions(ExternalActions.Type.Address(accountAddress), chain)
         }
     }
 

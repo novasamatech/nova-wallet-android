@@ -82,8 +82,9 @@ inline fun <T> Iterable<T>.filterToSet(predicate: (T) -> Boolean): Set<T> = filt
 
 fun String.nullIfEmpty(): String? = if (isEmpty()) null else this
 
-
 private val NAMED_PATTERN_REGEX = "\\{([a-zA-z]+)\\}".toRegex()
+
+fun String.formatNamed(vararg values: Pair<String, String>) = formatNamed(values.toMap())
 
 /**
  * Replaces all parts in form of '{name}' to the corresponding value from values using 'name' as a key.

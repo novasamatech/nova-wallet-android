@@ -94,3 +94,11 @@ fun MetaAccount.accountIdIn(chain: Chain): ByteArray? {
         else -> substrateAccountId
     }
 }
+
+fun MetaAccount.publicKeyIn(chain: Chain): ByteArray? {
+    return when {
+        hasChainAccountIn(chain.id) -> chainAccounts.getValue(chain.id).publicKey
+        chain.isEthereumBased -> ethereumPublicKey
+        else -> substratePublicKey
+    }
+}

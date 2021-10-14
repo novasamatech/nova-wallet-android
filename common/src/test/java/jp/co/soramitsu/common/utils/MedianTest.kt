@@ -3,7 +3,7 @@ package jp.co.soramitsu.common.utils
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class KotlinExtTest {
+class MedianTest {
 
     @Test
     fun `should calculate median of single element list`() {

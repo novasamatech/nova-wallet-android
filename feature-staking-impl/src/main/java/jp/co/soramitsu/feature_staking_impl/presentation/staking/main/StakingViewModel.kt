@@ -9,7 +9,6 @@ import jp.co.soramitsu.common.mixin.MixinFactory
 import jp.co.soramitsu.common.mixin.api.Validatable
 import jp.co.soramitsu.common.presentation.LoadingState
 import jp.co.soramitsu.common.presentation.flatMapLoading
-import jp.co.soramitsu.common.presentation.map
 import jp.co.soramitsu.common.presentation.mapLoading
 import jp.co.soramitsu.common.resources.ResourceManager
 import jp.co.soramitsu.common.utils.childScope
@@ -43,6 +42,8 @@ import jp.co.soramitsu.feature_wallet_api.domain.model.amountFromPlanks
 import jp.co.soramitsu.feature_wallet_api.presentation.formatters.formatTokenAmount
 import jp.co.soramitsu.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorMixin
 import jp.co.soramitsu.feature_wallet_api.presentation.mixin.assetSelector.WithAssetSelector
+import jp.co.soramitsu.runtime.state.SingleAssetSharedState
+import jp.co.soramitsu.runtime.state.selectedChainFlow
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -71,6 +72,7 @@ class StakingViewModel(
     private val validationExecutor: ValidationExecutor,
     private val stakingUpdateSystem: UpdateSystem,
     private val assetSelectorMixinFactory: MixinFactory<AssetSelectorMixin.Presentation>,
+    private val selectedAssetState: SingleAssetSharedState,
 ) : BaseViewModel(),
     WithAssetSelector,
     Validatable by validationExecutor {
@@ -93,7 +95,7 @@ class StakingViewModel(
         .inBackground()
         .share()
 
-    private val selectedChain = interactor.selectedChainFlow()
+    private val selectedChain = selectedAssetState.selectedChainFlow()
         .share()
 
     val networkInfoStateLiveData = selectedChain
@@ -183,13 +185,13 @@ class StakingViewModel(
     }
 
     private fun formatAlertTokenAmount(amount: BigDecimal, token: Token): String {
-        val formattedFiat = token.fiatAmount(amount)?.formatAsCurrency()
+        val formattedFiat = token.fiatAmount(amount).formatAsCurrency()
         val formattedAmount = amount.formatTokenAmount(token.configuration)
 
         return buildString {
             append(formattedAmount)
 
-            formattedFiat?.let {
+            formattedFiat.let {
                 append(" ($it)")
             }
         }
@@ -262,12 +264,12 @@ class StakingViewModel(
         val totalStake = asset.token.amountFromPlanks(networkInfo.totalStake)
         val totalStakeFormatted = totalStake.formatTokenAmount(asset.token.configuration)
 
-        val totalStakeFiat = asset.token.fiatAmount(totalStake)?.formatAsCurrency()
+        val totalStakeFiat = asset.token.fiatAmount(totalStake).formatAsCurrency()
 
         val minimumStake = asset.token.amountFromPlanks(networkInfo.minimumStake)
         val minimumStakeFormatted = minimumStake.formatTokenAmount(asset.token.configuration)
 
-        val minimumStakeFiat = asset.token.fiatAmount(minimumStake)?.formatAsCurrency()
+        val minimumStakeFiat = asset.token.fiatAmount(minimumStake).formatAsCurrency()
 
         val lockupPeriod = resourceManager.getQuantityString(R.plurals.staking_main_lockup_period_value, networkInfo.lockupPeriodInDays)
             .format(networkInfo.lockupPeriodInDays)

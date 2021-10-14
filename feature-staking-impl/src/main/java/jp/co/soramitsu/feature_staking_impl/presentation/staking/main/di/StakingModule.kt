@@ -14,6 +14,7 @@ import jp.co.soramitsu.common.mixin.MixinFactory
 import jp.co.soramitsu.common.resources.ResourceManager
 import jp.co.soramitsu.common.validation.ValidationExecutor
 import jp.co.soramitsu.core.updater.UpdateSystem
+import jp.co.soramitsu.feature_staking_impl.data.StakingSharedState
 import jp.co.soramitsu.feature_staking_impl.domain.StakingInteractor
 import jp.co.soramitsu.feature_staking_impl.domain.alerts.AlertsInteractor
 import jp.co.soramitsu.feature_staking_impl.domain.rewards.RewardCalculatorFactory
@@ -64,7 +65,8 @@ class StakingModule {
         @Named(SYSTEM_MANAGE_STAKING_BOND_MORE) bondMoreValidationSystem: ManageStakingValidationSystem,
         validationExecutor: ValidationExecutor,
         stakingUpdateSystem: UpdateSystem,
-        assetSelectorFactory: MixinFactory<AssetSelectorMixin.Presentation>
+        assetSelectorFactory: MixinFactory<AssetSelectorMixin.Presentation>,
+        selectedAssetState: StakingSharedState
     ): ViewModel {
         return StakingViewModel(
             interactor,
@@ -78,6 +80,7 @@ class StakingModule {
             validationExecutor,
             stakingUpdateSystem,
             assetSelectorFactory,
+            selectedAssetState,
         )
     }
 

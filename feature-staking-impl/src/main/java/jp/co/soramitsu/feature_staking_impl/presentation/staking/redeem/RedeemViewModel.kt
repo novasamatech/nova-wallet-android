@@ -16,7 +16,7 @@ import jp.co.soramitsu.common.utils.requireException
 import jp.co.soramitsu.common.utils.requireValue
 import jp.co.soramitsu.common.validation.ValidationExecutor
 import jp.co.soramitsu.common.validation.progressConsumer
-import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalAccountActions
+import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalActions
 import jp.co.soramitsu.feature_staking_api.domain.model.StakingState
 import jp.co.soramitsu.feature_staking_impl.domain.StakingInteractor
 import jp.co.soramitsu.feature_staking_impl.domain.staking.redeem.RedeemInteractor
@@ -26,6 +26,8 @@ import jp.co.soramitsu.feature_staking_impl.presentation.StakingRouter
 import jp.co.soramitsu.feature_wallet_api.data.mappers.mapAssetToAssetModel
 import jp.co.soramitsu.feature_wallet_api.domain.model.Asset
 import jp.co.soramitsu.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import jp.co.soramitsu.runtime.state.SingleAssetSharedState
+import jp.co.soramitsu.runtime.state.chain
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
@@ -42,12 +44,13 @@ class RedeemViewModel(
     private val validationSystem: RedeemValidationSystem,
     private val iconGenerator: AddressIconGenerator,
     private val feeLoaderMixin: FeeLoaderMixin.Presentation,
-    private val externalAccountActions: ExternalAccountActions.Presentation,
-    private val payload: RedeemPayload
+    private val externalActions: ExternalActions.Presentation,
+    private val payload: RedeemPayload,
+    private val selectedAssetState: SingleAssetSharedState,
 ) : BaseViewModel(),
     Validatable by validationExecutor,
     FeeLoaderMixin by feeLoaderMixin,
-    ExternalAccountActions by externalAccountActions {
+    ExternalActions by externalActions {
 
     private val _showNextProgress = MutableLiveData(false)
     val showNextProgress: LiveData<Boolean> = _showNextProgress
@@ -63,7 +66,7 @@ class RedeemViewModel(
     val amountLiveData = assetFlow.map { asset ->
         val redeemable = asset.redeemable
 
-        redeemable.format() to asset.token.fiatAmount(redeemable)?.formatAsCurrency()
+        redeemable.format() to asset.token.fiatAmount(redeemable).formatAsCurrency()
     }
         .inBackground()
         .asLiveData()
@@ -96,9 +99,9 @@ class RedeemViewModel(
     fun originAccountClicked() {
         val address = originAddressModelLiveData.value?.address ?: return
 
-        val externalActionsPayload = ExternalAccountActions.Payload.fromAddress(address)
-
-        externalAccountActions.showExternalActions(externalActionsPayload)
+        launch {
+            externalActions.showExternalActions(ExternalActions.Type.Address(address), selectedAssetState.chain())
+        }
     }
 
     private fun loadFee() {

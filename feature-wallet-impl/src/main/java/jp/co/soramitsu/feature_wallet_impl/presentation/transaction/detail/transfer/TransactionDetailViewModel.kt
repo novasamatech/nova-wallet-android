@@ -1,45 +1,31 @@
 package jp.co.soramitsu.feature_wallet_impl.presentation.transaction.detail.transfer
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
 import jp.co.soramitsu.common.address.AddressIconGenerator
 import jp.co.soramitsu.common.address.AddressModel
 import jp.co.soramitsu.common.base.BaseViewModel
-import jp.co.soramitsu.common.data.network.AppLinksProvider
-import jp.co.soramitsu.common.data.network.ExternalAnalyzer
-import jp.co.soramitsu.common.mixin.api.Browserable
-import jp.co.soramitsu.common.resources.ClipboardManager
-import jp.co.soramitsu.common.resources.ResourceManager
 import jp.co.soramitsu.common.utils.Event
 import jp.co.soramitsu.common.utils.invoke
 import jp.co.soramitsu.common.utils.lazyAsync
-import jp.co.soramitsu.core.model.Node
 import jp.co.soramitsu.feature_account_api.presenatation.account.AddressDisplayUseCase
 import jp.co.soramitsu.feature_account_api.presenatation.account.icon.createAddressModel
-import jp.co.soramitsu.feature_wallet_impl.R
+import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalActions
 import jp.co.soramitsu.feature_wallet_impl.presentation.AssetPayload
 import jp.co.soramitsu.feature_wallet_impl.presentation.WalletRouter
 import jp.co.soramitsu.feature_wallet_impl.presentation.model.OperationParcelizeModel
 import jp.co.soramitsu.runtime.multiNetwork.ChainRegistry
-
-enum class ExternalActionsSource {
-    TRANSACTION_HASH, FROM_ADDRESS, TO_ADDRESS
-}
+import kotlinx.coroutines.launch
 
 class TransactionDetailViewModel(
     private val router: WalletRouter,
-    private val resourceManager: ResourceManager,
     private val addressIconGenerator: AddressIconGenerator,
-    private val clipboardManager: ClipboardManager,
-    private val appLinksProvider: AppLinksProvider,
     private val addressDisplayUseCase: AddressDisplayUseCase,
     private val chainRegistry: ChainRegistry,
-    val operation: OperationParcelizeModel.Transfer
-) : BaseViewModel(), Browserable {
-
-    private val _showExternalViewEvent = MutableLiveData<Event<ExternalActionsSource>>()
-    val showExternalTransactionActionsEvent: LiveData<Event<ExternalActionsSource>> = _showExternalViewEvent
+    val operation: OperationParcelizeModel.Transfer,
+    private val externalActions: ExternalActions.Presentation,
+) : BaseViewModel(),
+    ExternalActions by externalActions {
 
     private val chain by lazyAsync {
         chainRegistry.getChain(operation.chainId)
@@ -57,12 +43,6 @@ class TransactionDetailViewModel(
 
     val retryAddressModelLiveData = if (operation.isIncome) senderAddressModelLiveData else recipientAddressModelLiveData
 
-    fun copyStringClicked(address: String) {
-        clipboardManager.addToClipboard(address)
-
-        showMessage(resourceManager.getString(R.string.common_copied))
-    }
-
     fun backClicked() {
         router.back()
     }
@@ -77,19 +57,19 @@ class TransactionDetailViewModel(
         return addressIconGenerator.createAddressModel(chain(), address, AddressIconGenerator.SIZE_BIG, addressDisplayUseCase(address))
     }
 
-    fun showExternalActionsClicked(externalActionsSource: ExternalActionsSource) {
-        _showExternalViewEvent.value = Event(externalActionsSource)
+    fun transactionHashClicked() = operation.hash?.let {
+        showExternalActions(ExternalActions.Type.Extrinsic(it))
     }
 
-    fun viewTransactionExternalClicked(analyzer: ExternalAnalyzer, hash: String, networkType: Node.NetworkType) {
-        val url = appLinksProvider.getExternalTransactionUrl(analyzer, hash, networkType)
-
-        openBrowserEvent.value = Event(url)
+    fun fromAddressClicked() {
+        showExternalActions(ExternalActions.Type.Address(operation.sender))
     }
 
-    fun viewAccountExternalClicked(analyzer: ExternalAnalyzer, address: String, networkType: Node.NetworkType) {
-        val url = appLinksProvider.getExternalAddressUrl(analyzer, address, networkType)
+    fun toAddressClicked() {
+        showExternalActions(ExternalActions.Type.Address(operation.receiver))
+    }
 
-        openBrowserEvent.value = Event(url)
+    private fun showExternalActions(type: ExternalActions.Type) = launch {
+        externalActions.showExternalActions(type, chain())
     }
 }

@@ -13,7 +13,8 @@ import jp.co.soramitsu.common.resources.ResourceManager
 import jp.co.soramitsu.common.validation.ValidationExecutor
 import jp.co.soramitsu.common.validation.ValidationSystem
 import jp.co.soramitsu.feature_account_api.presenatation.account.AddressDisplayUseCase
-import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalAccountActions
+import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalActions
+import jp.co.soramitsu.feature_staking_impl.data.StakingSharedState
 import jp.co.soramitsu.feature_staking_impl.domain.StakingInteractor
 import jp.co.soramitsu.feature_staking_impl.domain.setup.SetupStakingInteractor
 import jp.co.soramitsu.feature_staking_impl.domain.validations.setup.SetupStakingPayload
@@ -40,7 +41,8 @@ class ConfirmStakingModule {
         validationExecutor: ValidationExecutor,
         setupStakingSharedState: SetupStakingSharedState,
         feeLoaderMixin: FeeLoaderMixin.Presentation,
-        externalAccountActions: ExternalAccountActions.Presentation,
+        externalActions: ExternalActions.Presentation,
+        singleAssetSharedState: StakingSharedState,
     ): ViewModel {
         return ConfirmStakingViewModel(
             router,
@@ -52,7 +54,8 @@ class ConfirmStakingModule {
             setupStakingSharedState,
             setupStakingInteractor,
             feeLoaderMixin,
-            externalAccountActions,
+            externalActions,
+            singleAssetSharedState,
             validationExecutor
         )
     }
@@ -60,7 +63,7 @@ class ConfirmStakingModule {
     @Provides
     fun provideViewModelCreator(
         fragment: Fragment,
-        viewModelFactory: ViewModelProvider.Factory
+        viewModelFactory: ViewModelProvider.Factory,
     ): ConfirmStakingViewModel {
         return ViewModelProvider(fragment, viewModelFactory).get(ConfirmStakingViewModel::class.java)
     }

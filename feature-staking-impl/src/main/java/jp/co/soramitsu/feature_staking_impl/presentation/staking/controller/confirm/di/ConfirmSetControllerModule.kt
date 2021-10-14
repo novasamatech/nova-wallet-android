@@ -11,7 +11,8 @@ import jp.co.soramitsu.common.di.viewmodel.ViewModelKey
 import jp.co.soramitsu.common.di.viewmodel.ViewModelModule
 import jp.co.soramitsu.common.resources.ResourceManager
 import jp.co.soramitsu.common.validation.ValidationExecutor
-import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalAccountActions
+import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalActions
+import jp.co.soramitsu.feature_staking_impl.data.StakingSharedState
 import jp.co.soramitsu.feature_staking_impl.domain.StakingInteractor
 import jp.co.soramitsu.feature_staking_impl.domain.staking.controller.ControllerInteractor
 import jp.co.soramitsu.feature_staking_impl.domain.validations.controller.SetControllerValidationSystem
@@ -31,9 +32,10 @@ class ConfirmSetControllerModule {
         payload: ConfirmSetControllerPayload,
         interactor: StakingInteractor,
         resourceManager: ResourceManager,
-        externalActions: ExternalAccountActions.Presentation,
+        externalActions: ExternalActions.Presentation,
         validationExecutor: ValidationExecutor,
-        validationSystem: SetControllerValidationSystem
+        validationSystem: SetControllerValidationSystem,
+        singleAssetSharedState: StakingSharedState,
     ): ViewModel {
         return ConfirmSetControllerViewModel(
             router,
@@ -44,7 +46,8 @@ class ConfirmSetControllerModule {
             resourceManager,
             externalActions,
             validationExecutor,
-            validationSystem
+            validationSystem,
+            singleAssetSharedState
         )
     }
 

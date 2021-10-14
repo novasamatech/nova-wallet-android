@@ -17,7 +17,7 @@ import jp.co.soramitsu.common.utils.updateFrom
 import jp.co.soramitsu.common.validation.ValidationExecutor
 import jp.co.soramitsu.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet.Payload
 import jp.co.soramitsu.feature_account_api.presenatation.account.AddressDisplayUseCase
-import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalAccountActions
+import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalActions
 import jp.co.soramitsu.feature_staking_api.domain.model.StakingAccount
 import jp.co.soramitsu.feature_staking_api.domain.model.StakingState
 import jp.co.soramitsu.feature_staking_impl.domain.StakingInteractor
@@ -28,6 +28,8 @@ import jp.co.soramitsu.feature_staking_impl.presentation.StakingRouter
 import jp.co.soramitsu.feature_staking_impl.presentation.staking.controller.confirm.ConfirmSetControllerPayload
 import jp.co.soramitsu.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import jp.co.soramitsu.feature_wallet_api.presentation.mixin.fee.requireFee
+import jp.co.soramitsu.runtime.state.SingleAssetSharedState
+import jp.co.soramitsu.runtime.state.chain
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -39,15 +41,16 @@ class SetControllerViewModel(
     private val addressIconGenerator: AddressIconGenerator,
     private val router: StakingRouter,
     private val feeLoaderMixin: FeeLoaderMixin.Presentation,
-    private val externalActions: ExternalAccountActions.Presentation,
+    private val externalActions: ExternalActions.Presentation,
     private val appLinksProvider: AppLinksProvider,
     private val resourceManager: ResourceManager,
     private val addressDisplayUseCase: AddressDisplayUseCase,
     private val validationExecutor: ValidationExecutor,
-    private val validationSystem: SetControllerValidationSystem
+    private val validationSystem: SetControllerValidationSystem,
+    private val selectedAssetState: SingleAssetSharedState,
 ) : BaseViewModel(),
     FeeLoaderMixin by feeLoaderMixin,
-    ExternalAccountActions by externalActions,
+    ExternalActions by externalActions,
     Validatable by validationExecutor {
 
     private val accountStakingFlow = stakingInteractor.selectedAccountStakingStateFlow()
@@ -90,7 +93,7 @@ class SetControllerViewModel(
 
     fun openExternalActions() {
         viewModelScope.launch {
-            externalActions.showExternalActions(ExternalAccountActions.Payload.fromAddress(stashAddress()))
+            externalActions.showExternalActions(ExternalActions.Type.Address(stashAddress()), selectedAssetState.chain())
         }
     }
 

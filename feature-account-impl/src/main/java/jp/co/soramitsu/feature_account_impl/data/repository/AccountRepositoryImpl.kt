@@ -20,7 +20,6 @@ import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedEncoder
 import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.Mnemonic
 import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.MnemonicCreator
 import jp.co.soramitsu.fearless_utils.encrypt.qr.QrSharing
-import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountRepository
 import jp.co.soramitsu.feature_account_api.domain.model.Account
@@ -28,9 +27,12 @@ import jp.co.soramitsu.feature_account_api.domain.model.AuthType
 import jp.co.soramitsu.feature_account_api.domain.model.LightMetaAccount
 import jp.co.soramitsu.feature_account_api.domain.model.MetaAccount
 import jp.co.soramitsu.feature_account_api.domain.model.MetaAccountOrdering
+import jp.co.soramitsu.feature_account_api.domain.model.addressIn
+import jp.co.soramitsu.feature_account_api.domain.model.publicKeyIn
 import jp.co.soramitsu.feature_account_impl.data.mappers.mapNodeLocalToNode
 import jp.co.soramitsu.feature_account_impl.data.network.blockchain.AccountSubstrateSource
 import jp.co.soramitsu.feature_account_impl.data.repository.datasource.AccountDataSource
+import jp.co.soramitsu.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
@@ -290,8 +292,12 @@ class AccountRepositoryImpl(
         return nodeDao.deleteNode(nodeId)
     }
 
-    override fun createQrAccountContent(account: Account): String {
-        val payload = QrSharing.Payload(account.address, account.accountIdHex.fromHex(), account.name)
+    override suspend fun createQrAccountContent(chain: Chain, account: MetaAccount): String {
+        val payload = QrSharing.Payload(
+            address = account.addressIn(chain)!!,
+            publicKey = account.publicKeyIn(chain)!!,
+            name = account.name
+        )
 
         return QrSharing.encode(payload)
     }

@@ -10,7 +10,6 @@ import jp.co.soramitsu.common.utils.lazyAsync
 import jp.co.soramitsu.feature_staking_api.domain.model.Validator
 import jp.co.soramitsu.feature_staking_impl.R
 import jp.co.soramitsu.feature_staking_impl.domain.StakingInteractor
-import jp.co.soramitsu.feature_staking_impl.domain.getSelectedChain
 import jp.co.soramitsu.feature_staking_impl.domain.recommendations.ValidatorRecommendatorFactory
 import jp.co.soramitsu.feature_staking_impl.domain.recommendations.settings.RecommendationSettingsProviderFactory
 import jp.co.soramitsu.feature_staking_impl.presentation.StakingRouter
@@ -23,6 +22,8 @@ import jp.co.soramitsu.feature_staking_impl.presentation.validators.change.Valid
 import jp.co.soramitsu.feature_staking_impl.presentation.validators.change.setRecommendedValidators
 import jp.co.soramitsu.feature_wallet_api.domain.TokenUseCase
 import jp.co.soramitsu.feature_wallet_api.domain.model.Token
+import jp.co.soramitsu.runtime.state.SingleAssetSharedState
+import jp.co.soramitsu.runtime.state.chain
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -37,6 +38,7 @@ class RecommendedValidatorsViewModel(
     private val resourceManager: ResourceManager,
     private val sharedStateSetup: SetupStakingSharedState,
     private val tokenUseCase: TokenUseCase,
+    private val selectedAssetState: SingleAssetSharedState
 ) : BaseViewModel() {
 
     private val recommendedSettings by lazyAsync {
@@ -82,7 +84,7 @@ class RecommendedValidatorsViewModel(
         validators: List<Validator>,
         token: Token
     ): List<ValidatorModel> {
-        val chain = interactor.getSelectedChain()
+        val chain = selectedAssetState.chain()
 
         return validators.map {
             mapValidatorToValidatorModel(chain, it, addressIconGenerator, token)

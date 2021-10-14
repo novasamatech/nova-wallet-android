@@ -13,7 +13,7 @@ import jp.co.soramitsu.common.utils.requireException
 import jp.co.soramitsu.common.validation.ValidationExecutor
 import jp.co.soramitsu.common.validation.progressConsumer
 import jp.co.soramitsu.feature_account_api.presenatation.account.AddressDisplayUseCase
-import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalAccountActions
+import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalActions
 import jp.co.soramitsu.feature_staking_api.domain.model.RewardDestination
 import jp.co.soramitsu.feature_staking_api.domain.model.StakingAccount
 import jp.co.soramitsu.feature_staking_api.domain.model.StakingState
@@ -30,6 +30,8 @@ import jp.co.soramitsu.feature_staking_impl.presentation.staking.rewardDestinati
 import jp.co.soramitsu.feature_staking_impl.presentation.staking.rewardDestination.select.rewardDestinationValidationFailure
 import jp.co.soramitsu.feature_wallet_api.data.mappers.mapFeeToFeeModel
 import jp.co.soramitsu.feature_wallet_api.presentation.mixin.fee.FeeStatus
+import jp.co.soramitsu.runtime.state.SingleAssetSharedState
+import jp.co.soramitsu.runtime.state.chain
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
@@ -44,13 +46,14 @@ class ConfirmRewardDestinationViewModel(
     private val resourceManager: ResourceManager,
     private val validationSystem: RewardDestinationValidationSystem,
     private val rewardDestinationInteractor: ChangeRewardDestinationInteractor,
-    private val externalAccountActions: ExternalAccountActions.Presentation,
+    private val externalActions: ExternalActions.Presentation,
     private val addressDisplayUseCase: AddressDisplayUseCase,
     private val validationExecutor: ValidationExecutor,
     private val payload: ConfirmRewardDestinationPayload,
+    private val selectedAssetState: SingleAssetSharedState,
 ) : BaseViewModel(),
     Validatable by validationExecutor,
-    ExternalAccountActions by externalAccountActions {
+    ExternalActions by externalActions {
 
     private val stashFlow = interactor.selectedAccountStakingStateFlow()
         .filterIsInstance<StakingState.Stash>()
@@ -98,10 +101,8 @@ class ConfirmRewardDestinationViewModel(
         showAddressExternalActions(payoutDestination.destination.address)
     }
 
-    private fun showAddressExternalActions(address: String) {
-        val payload = ExternalAccountActions.Payload.fromAddress(address)
-
-        externalAccountActions.showExternalActions(payload)
+    private fun showAddressExternalActions(address: String) = launch {
+        externalActions.showExternalActions(ExternalActions.Type.Address(address), selectedAssetState.chain())
     }
 
     private suspend fun mapRewardDestinationParcelModelToRewardDestinationModel(

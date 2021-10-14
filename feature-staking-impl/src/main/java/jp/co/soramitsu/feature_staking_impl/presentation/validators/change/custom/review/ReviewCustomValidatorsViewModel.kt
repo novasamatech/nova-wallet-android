@@ -7,7 +7,6 @@ import jp.co.soramitsu.common.utils.flowOf
 import jp.co.soramitsu.common.utils.inBackground
 import jp.co.soramitsu.feature_staking_impl.R
 import jp.co.soramitsu.feature_staking_impl.domain.StakingInteractor
-import jp.co.soramitsu.feature_staking_impl.domain.getSelectedChain
 import jp.co.soramitsu.feature_staking_impl.presentation.StakingRouter
 import jp.co.soramitsu.feature_staking_impl.presentation.common.SetupStakingProcess
 import jp.co.soramitsu.feature_staking_impl.presentation.common.SetupStakingSharedState
@@ -17,6 +16,8 @@ import jp.co.soramitsu.feature_staking_impl.presentation.validators.change.Valid
 import jp.co.soramitsu.feature_staking_impl.presentation.validators.change.custom.review.model.ValidatorsSelectionState
 import jp.co.soramitsu.feature_staking_impl.presentation.validators.change.setCustomValidators
 import jp.co.soramitsu.feature_wallet_api.domain.TokenUseCase
+import jp.co.soramitsu.runtime.state.SingleAssetSharedState
+import jp.co.soramitsu.runtime.state.chain
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterIsInstance
@@ -30,6 +31,7 @@ class ReviewCustomValidatorsViewModel(
     private val interactor: StakingInteractor,
     private val resourceManager: ResourceManager,
     private val sharedStateSetup: SetupStakingSharedState,
+    private val selectedAssetState: SingleAssetSharedState,
     tokenUseCase: TokenUseCase,
 ) : BaseViewModel() {
 
@@ -70,7 +72,7 @@ class ReviewCustomValidatorsViewModel(
         currentTokenFlow
     ) { validators, token ->
         validators.map { validator ->
-            val chain = interactor.getSelectedChain()
+            val chain = selectedAssetState.chain()
 
             mapValidatorToValidatorModel(chain, validator, addressIconGenerator, token)
         }

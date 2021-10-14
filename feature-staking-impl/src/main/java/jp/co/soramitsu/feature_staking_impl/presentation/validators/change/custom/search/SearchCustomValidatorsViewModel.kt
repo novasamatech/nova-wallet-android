@@ -12,8 +12,6 @@ import jp.co.soramitsu.common.utils.invoke
 import jp.co.soramitsu.common.utils.toggle
 import jp.co.soramitsu.common.utils.withLoadingSingle
 import jp.co.soramitsu.feature_staking_impl.R
-import jp.co.soramitsu.feature_staking_impl.domain.StakingInteractor
-import jp.co.soramitsu.feature_staking_impl.domain.getSelectedChain
 import jp.co.soramitsu.feature_staking_impl.domain.recommendations.ValidatorRecommendatorFactory
 import jp.co.soramitsu.feature_staking_impl.domain.validators.current.search.SearchCustomValidatorsInteractor
 import jp.co.soramitsu.feature_staking_impl.presentation.StakingRouter
@@ -24,6 +22,8 @@ import jp.co.soramitsu.feature_staking_impl.presentation.mappers.mapValidatorToV
 import jp.co.soramitsu.feature_staking_impl.presentation.validators.change.ValidatorModel
 import jp.co.soramitsu.feature_staking_impl.presentation.validators.change.setCustomValidators
 import jp.co.soramitsu.feature_wallet_api.domain.TokenUseCase
+import jp.co.soramitsu.runtime.state.SingleAssetSharedState
+import jp.co.soramitsu.runtime.state.chain
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -47,10 +47,10 @@ class SearchCustomValidatorsViewModel(
     private val router: StakingRouter,
     private val addressIconGenerator: AddressIconGenerator,
     private val interactor: SearchCustomValidatorsInteractor,
-    private val stakingInteractor: StakingInteractor,
     private val resourceManager: ResourceManager,
     private val sharedStateSetup: SetupStakingSharedState,
     private val validatorRecommendatorFactory: ValidatorRecommendatorFactory,
+    private val singleAssetSharedState: SingleAssetSharedState,
     tokenUseCase: TokenUseCase,
 ) : BaseViewModel() {
 
@@ -88,7 +88,7 @@ class SearchCustomValidatorsViewModel(
         foundValidatorsState,
         currentTokenFlow
     ) { selectedValidators, foundValidatorsState, token ->
-        val chain = stakingInteractor.getSelectedChain()
+        val chain = singleAssetSharedState.chain()
 
         foundValidatorsState.map { validators ->
             validators?.map { validator ->

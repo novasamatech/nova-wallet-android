@@ -335,6 +335,7 @@ fun mapOperationToParcel(
 
             is Operation.Type.Reward -> {
                 OperationParcelizeModel.Reward(
+                    chainId = chainAsset.chainId,
                     eventId = id,
                     address = address,
                     time = time,
@@ -347,6 +348,7 @@ fun mapOperationToParcel(
 
             is Operation.Type.Extrinsic -> {
                 OperationParcelizeModel.Extrinsic(
+                    chainId = chainAsset.chainId,
                     time = time,
                     originAddress = address,
                     hash = operationType.hash,

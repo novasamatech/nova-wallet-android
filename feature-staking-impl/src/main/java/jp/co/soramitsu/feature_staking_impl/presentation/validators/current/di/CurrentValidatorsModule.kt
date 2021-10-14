@@ -10,6 +10,7 @@ import jp.co.soramitsu.common.address.AddressIconGenerator
 import jp.co.soramitsu.common.di.viewmodel.ViewModelKey
 import jp.co.soramitsu.common.di.viewmodel.ViewModelModule
 import jp.co.soramitsu.common.resources.ResourceManager
+import jp.co.soramitsu.feature_staking_impl.data.StakingSharedState
 import jp.co.soramitsu.feature_staking_impl.domain.StakingInteractor
 import jp.co.soramitsu.feature_staking_impl.domain.validators.current.CurrentValidatorsInteractor
 import jp.co.soramitsu.feature_staking_impl.presentation.StakingRouter
@@ -29,6 +30,7 @@ class CurrentValidatorsModule {
         currentValidatorsInteractor: CurrentValidatorsInteractor,
         setupStakingSharedState: SetupStakingSharedState,
         router: StakingRouter,
+        selectedAssetState: StakingSharedState
     ): ViewModel {
         return CurrentValidatorsViewModel(
             router,
@@ -36,7 +38,8 @@ class CurrentValidatorsModule {
             stakingInteractor,
             iconGenerator,
             currentValidatorsInteractor,
-            setupStakingSharedState
+            setupStakingSharedState,
+            selectedAssetState
         )
     }
 

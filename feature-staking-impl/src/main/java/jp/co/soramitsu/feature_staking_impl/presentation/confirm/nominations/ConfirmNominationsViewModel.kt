@@ -9,7 +9,6 @@ import jp.co.soramitsu.common.resources.ResourceManager
 import jp.co.soramitsu.feature_staking_api.domain.model.Validator
 import jp.co.soramitsu.feature_staking_impl.R
 import jp.co.soramitsu.feature_staking_impl.domain.StakingInteractor
-import jp.co.soramitsu.feature_staking_impl.domain.getSelectedChain
 import jp.co.soramitsu.feature_staking_impl.presentation.StakingRouter
 import jp.co.soramitsu.feature_staking_impl.presentation.common.SetupStakingProcess
 import jp.co.soramitsu.feature_staking_impl.presentation.common.SetupStakingSharedState
@@ -19,6 +18,8 @@ import jp.co.soramitsu.feature_staking_impl.presentation.validators.change.Valid
 import jp.co.soramitsu.feature_staking_impl.presentation.validators.findSelectedValidator
 import jp.co.soramitsu.feature_wallet_api.domain.TokenUseCase
 import jp.co.soramitsu.feature_wallet_api.domain.model.Token
+import jp.co.soramitsu.runtime.state.SingleAssetSharedState
+import jp.co.soramitsu.runtime.state.chain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -28,6 +29,7 @@ class ConfirmNominationsViewModel(
     private val resourceManager: ResourceManager,
     private val sharedStateSetup: SetupStakingSharedState,
     private val interactor: StakingInteractor,
+    private val selectedAssetState: SingleAssetSharedState,
     private val tokenUseCase: TokenUseCase
 ) : BaseViewModel() {
 
@@ -59,7 +61,7 @@ class ConfirmNominationsViewModel(
         validators: List<Validator>,
         token: Token,
     ): List<ValidatorModel> {
-        val chain = interactor.getSelectedChain()
+        val chain = selectedAssetState.chain()
 
         return validators.map {
             mapValidatorToValidatorModel(chain, it, addressIconGenerator, token)

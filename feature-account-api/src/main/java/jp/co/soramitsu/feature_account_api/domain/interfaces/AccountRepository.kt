@@ -9,6 +9,7 @@ import jp.co.soramitsu.feature_account_api.domain.model.Account
 import jp.co.soramitsu.feature_account_api.domain.model.LightMetaAccount
 import jp.co.soramitsu.feature_account_api.domain.model.MetaAccount
 import jp.co.soramitsu.feature_account_api.domain.model.MetaAccountOrdering
+import jp.co.soramitsu.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
 
 class AccountAlreadyExistsException : Exception()
@@ -100,7 +101,7 @@ interface AccountRepository {
 
     suspend fun deleteNode(nodeId: Int)
 
-    fun createQrAccountContent(account: Account): String
+    suspend fun createQrAccountContent(chain: Chain, account: MetaAccount): String
 
     suspend fun generateRestoreJson(account: Account, password: String): String
 

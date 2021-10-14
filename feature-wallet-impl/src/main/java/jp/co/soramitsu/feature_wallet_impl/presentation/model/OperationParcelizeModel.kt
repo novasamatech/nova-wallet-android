@@ -8,6 +8,7 @@ sealed class OperationParcelizeModel : Parcelable {
 
     @Parcelize
     class Reward(
+        val chainId: ChainId,
         val eventId: String,
         val address: String,
         val time: Long,
@@ -19,6 +20,7 @@ sealed class OperationParcelizeModel : Parcelable {
 
     @Parcelize
     class Extrinsic(
+        val chainId: ChainId,
         val time: Long,
         val originAddress: String,
         val hash: String,

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+    <string name="transaction_details_view_explorer">View in %s</string>
+
     <string name="account_invalid_derivation_path_title">Invalid derivation path</string>
     <string name="account_invalid_derivation_path_message">Derivation path contains unsupported symbols or has incorrect structure</string>
 

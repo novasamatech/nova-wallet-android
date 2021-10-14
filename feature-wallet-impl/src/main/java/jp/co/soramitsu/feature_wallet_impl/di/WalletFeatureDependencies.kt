@@ -25,7 +25,7 @@ import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountRepository
 import jp.co.soramitsu.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import jp.co.soramitsu.feature_account_api.domain.updaters.AccountUpdateScope
 import jp.co.soramitsu.feature_account_api.presenatation.account.AddressDisplayUseCase
-import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalAccountActions
+import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalActions
 import jp.co.soramitsu.runtime.di.LOCAL_STORAGE_SOURCE
 import jp.co.soramitsu.runtime.di.REMOTE_STORAGE_SOURCE
 import jp.co.soramitsu.runtime.multiNetwork.ChainRegistry
@@ -71,7 +71,7 @@ interface WalletFeatureDependencies {
 
     fun fileProvider(): FileProvider
 
-    fun externalAccountActions(): ExternalAccountActions.Presentation
+    fun externalAccountActions(): ExternalActions.Presentation
 
     fun httpExceptionHandler(): HttpExceptionHandler
 

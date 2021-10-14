@@ -2,31 +2,34 @@ package jp.co.soramitsu.feature_wallet_impl.presentation.receive
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import jp.co.soramitsu.common.address.AddressIconGenerator
-import jp.co.soramitsu.common.address.AddressModel
 import jp.co.soramitsu.common.address.createAddressModel
 import jp.co.soramitsu.common.base.BaseViewModel
 import jp.co.soramitsu.common.resources.ResourceManager
 import jp.co.soramitsu.common.utils.Event
 import jp.co.soramitsu.common.utils.QrCodeGenerator
+import jp.co.soramitsu.common.utils.flowOf
+import jp.co.soramitsu.common.utils.inBackground
+import jp.co.soramitsu.common.utils.invoke
+import jp.co.soramitsu.common.utils.lazyAsync
 import jp.co.soramitsu.common.utils.requireException
 import jp.co.soramitsu.common.utils.requireValue
 import jp.co.soramitsu.common.utils.write
-import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalAccountActions
+import jp.co.soramitsu.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import jp.co.soramitsu.feature_account_api.domain.model.addressIn
+import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalActions
 import jp.co.soramitsu.feature_wallet_api.domain.interfaces.WalletInteractor
 import jp.co.soramitsu.feature_wallet_impl.R
 import jp.co.soramitsu.feature_wallet_impl.presentation.AssetPayload
 import jp.co.soramitsu.feature_wallet_impl.presentation.WalletRouter
-import jp.co.soramitsu.feature_wallet_impl.presentation.model.networkType
 import jp.co.soramitsu.feature_wallet_impl.presentation.receive.model.QrSharingPayload
+import jp.co.soramitsu.runtime.multiNetwork.ChainRegistry
 import jp.co.soramitsu.runtime.multiNetwork.chain.model.Chain
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-private const val AVATAR_SIZE_DP = 32
 private const val QR_TEMP_IMAGE_NAME = "address.png"
 
 class ReceiveViewModel(
@@ -34,41 +37,50 @@ class ReceiveViewModel(
     private val qrCodeGenerator: QrCodeGenerator,
     private val addressIconGenerator: AddressIconGenerator,
     private val resourceManager: ResourceManager,
-    private val externalAccountActions: ExternalAccountActions.Presentation,
+    private val externalActions: ExternalActions.Presentation,
     private val assetPayload: AssetPayload,
-    private val router: WalletRouter
-) : BaseViewModel(), ExternalAccountActions by externalAccountActions {
+    private val chainRegistry: ChainRegistry,
+    selectedAccountUseCase: SelectedAccountUseCase,
+    private val router: WalletRouter,
+) : BaseViewModel(), ExternalActions by externalActions {
 
-    val qrBitmapLiveData = liveData {
-        val qrString = interactor.getQrCodeSharingString()
-
-        emit(qrCodeGenerator.generateQrBitmap(qrString))
+    val chain by lazyAsync {
+        chainRegistry.getChain(assetPayload.chainId)
     }
 
-    val accountLiveData = interactor.selectedAccountFlow(assetPayload.chainId)
-        .asLiveData()
+    val qrBitmapFlow = flowOf {
+        val qrString = interactor.getQrCodeSharingString(assetPayload.chainId)
 
-    val accountIconLiveData: LiveData<AddressModel> = accountIconFlow()
-        .asLiveData()
+        qrCodeGenerator.generateQrBitmap(qrString)
+    }
+        .inBackground()
+        .share()
+
+    val accountAddressModelFlow = selectedAccountUseCase.selectedMetaAccountFlow()
+        .map {
+            val address = it.addressIn(chain())!!
+
+            addressIconGenerator.createAddressModel(address, AddressIconGenerator.SIZE_BIG, it.name)
+        }
+        .inBackground()
+        .share()
 
     private val _shareEvent = MutableLiveData<Event<QrSharingPayload>>()
     val shareEvent: LiveData<Event<QrSharingPayload>> = _shareEvent
 
-    fun recipientClicked() {
-        val account = accountLiveData.value ?: return
+    fun recipientClicked() = launch {
+        val accountAddress = accountAddressModelFlow.first().address
 
-        val payload = ExternalAccountActions.Payload(account.address, account.network.type)
-
-        externalAccountActions.showExternalActions(payload)
+        externalActions.showExternalActions(ExternalActions.Type.Address(accountAddress), chain())
     }
 
     fun backClicked() {
         router.back()
     }
 
-    fun shareButtonClicked() {
-        val qrBitmap = qrBitmapLiveData.value ?: return
-        val address = accountIconLiveData.value?.address ?: return
+    fun shareButtonClicked() = launch {
+        val qrBitmap = qrBitmapFlow.first()
+        val address = accountAddressModelFlow.first().address
 
         viewModelScope.launch {
             val result = interactor.createFileInTempStorageAndRetrieveAsset(assetPayload.chainId, assetPayload.chainAssetId, QR_TEMP_IMAGE_NAME)
@@ -78,7 +90,7 @@ class ReceiveViewModel(
 
                 file.write(qrBitmap)
 
-                val message = generateMessage(asset.token.configuration, address)
+                val message = generateMessage(chain(), asset.token.configuration, address)
 
                 _shareEvent.value = Event(QrSharingPayload(file, message))
             } else {
@@ -87,15 +99,9 @@ class ReceiveViewModel(
         }
     }
 
-    private fun accountIconFlow(): Flow<AddressModel> {
-        return interactor.selectedAccountFlow(assetPayload.chainId)
-            .map { addressIconGenerator.createAddressModel(it.address, AVATAR_SIZE_DP) }
-    }
-
-    // TODO pass chain to screen
-    private fun generateMessage(tokenType: Chain.Asset, address: String): String {
+    private fun generateMessage(chain: Chain, tokenType: Chain.Asset, address: String): String {
         return resourceManager.getString(R.string.wallet_receive_share_message).format(
-            tokenType.networkType?.readableName,
+            chain.name,
             tokenType.symbol
         ) + " " + address
     }

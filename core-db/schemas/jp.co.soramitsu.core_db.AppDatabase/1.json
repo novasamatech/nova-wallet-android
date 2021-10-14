@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 28,
-    "identityHash": "a015d5654c8a3627f85b1c37adfbfdac",
+    "version": 1,
+    "identityHash": "1de2f03c109d9fbbbbefa9bdb7c605c1",
     "entities": [
       {
         "tableName": "users",
@@ -755,6 +755,72 @@
         "foreignKeys": []
       },
       {
+        "tableName": "chain_explorers",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`chainId` TEXT NOT NULL, `name` TEXT NOT NULL, `extrinsic` TEXT, `account` TEXT, `event` TEXT, PRIMARY KEY(`chainId`, `name`), FOREIGN KEY(`chainId`) REFERENCES `chains`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "chainId",
+            "columnName": "chainId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "extrinsic",
+            "columnName": "extrinsic",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "account",
+            "columnName": "account",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "event",
+            "columnName": "event",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "chainId",
+            "name"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_chain_explorers_chainId",
+            "unique": false,
+            "columnNames": [
+              "chainId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_chain_explorers_chainId` ON `${TABLE_NAME}` (`chainId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "chains",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "chainId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
         "tableName": "meta_accounts",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `substratePublicKey` BLOB NOT NULL, `substrateCryptoType` TEXT NOT NULL, `substrateAccountId` BLOB NOT NULL, `ethereumPublicKey` BLOB, `ethereumAddress` BLOB, `name` TEXT NOT NULL, `isSelected` INTEGER NOT NULL, `position` INTEGER NOT NULL)",
         "fields": [
@@ -936,7 +1002,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a015d5654c8a3627f85b1c37adfbfdac')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1de2f03c109d9fbbbbefa9bdb7c605c1')"
     ]
   }
 }

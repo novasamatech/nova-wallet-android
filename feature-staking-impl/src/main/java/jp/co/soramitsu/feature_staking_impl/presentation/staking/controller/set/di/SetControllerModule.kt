@@ -13,13 +13,14 @@ import jp.co.soramitsu.common.di.viewmodel.ViewModelModule
 import jp.co.soramitsu.common.resources.ResourceManager
 import jp.co.soramitsu.common.validation.ValidationExecutor
 import jp.co.soramitsu.feature_account_api.presenatation.account.AddressDisplayUseCase
-import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalAccountActions
+import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalActions
+import jp.co.soramitsu.feature_staking_impl.data.StakingSharedState
 import jp.co.soramitsu.feature_staking_impl.domain.StakingInteractor
 import jp.co.soramitsu.feature_staking_impl.domain.staking.controller.ControllerInteractor
 import jp.co.soramitsu.feature_staking_impl.domain.validations.controller.SetControllerValidationSystem
 import jp.co.soramitsu.feature_staking_impl.presentation.StakingRouter
-import jp.co.soramitsu.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import jp.co.soramitsu.feature_staking_impl.presentation.staking.controller.set.SetControllerViewModel
+import jp.co.soramitsu.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 
 @Module(includes = [ViewModelModule::class])
 class SetControllerModule {
@@ -32,12 +33,13 @@ class SetControllerModule {
         addressIconGenerator: AddressIconGenerator,
         router: StakingRouter,
         feeLoaderMixin: FeeLoaderMixin.Presentation,
-        externalActions: ExternalAccountActions.Presentation,
+        externalActions: ExternalActions.Presentation,
         appLinksProvider: AppLinksProvider,
         resourceManager: ResourceManager,
         addressDisplayUseCase: AddressDisplayUseCase,
         validationExecutor: ValidationExecutor,
-        validationSystem: SetControllerValidationSystem
+        validationSystem: SetControllerValidationSystem,
+        selectedAssetState: StakingSharedState
     ): ViewModel {
         return SetControllerViewModel(
             interactor,
@@ -50,7 +52,8 @@ class SetControllerModule {
             resourceManager,
             addressDisplayUseCase,
             validationExecutor,
-            validationSystem
+            validationSystem,
+            selectedAssetState
         )
     }
 

@@ -67,7 +67,6 @@ class BalanceListViewModel(
             .map { addressIconGenerator.createAddressModel(it.defaultSubstrateAddress, CURRENT_ICON_SIZE, it.name) }
     }
 
-
     private fun balanceFlow(): Flow<BalanceModel> {
         return interactor.assetsFlow()
             .map {

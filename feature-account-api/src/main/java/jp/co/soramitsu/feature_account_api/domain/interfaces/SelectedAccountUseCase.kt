@@ -8,4 +8,6 @@ class SelectedAccountUseCase(
 ) {
 
     fun selectedMetaAccountFlow(): Flow<MetaAccount> = accountRepository.selectedMetaAccountFlow()
+
+    suspend fun getSelectedMetaAccount(): MetaAccount = accountRepository.getSelectedMetaAccount()
 }

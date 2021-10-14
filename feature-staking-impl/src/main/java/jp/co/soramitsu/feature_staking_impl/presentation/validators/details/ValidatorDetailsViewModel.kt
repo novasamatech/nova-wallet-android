@@ -11,12 +11,10 @@ import jp.co.soramitsu.common.utils.Event
 import jp.co.soramitsu.common.utils.flowOf
 import jp.co.soramitsu.common.utils.formatAsCurrency
 import jp.co.soramitsu.common.utils.inBackground
-import jp.co.soramitsu.common.utils.networkType
 import jp.co.soramitsu.common.utils.sumByBigInteger
-import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalAccountActions
+import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalActions
 import jp.co.soramitsu.feature_staking_impl.R
 import jp.co.soramitsu.feature_staking_impl.domain.StakingInteractor
-import jp.co.soramitsu.feature_staking_impl.domain.getSelectedChain
 import jp.co.soramitsu.feature_staking_impl.presentation.StakingRouter
 import jp.co.soramitsu.feature_staking_impl.presentation.mappers.mapValidatorDetailsParcelToValidatorDetailsModel
 import jp.co.soramitsu.feature_staking_impl.presentation.mappers.mapValidatorDetailsToErrors
@@ -26,6 +24,8 @@ import jp.co.soramitsu.feature_staking_impl.presentation.validators.parcel.Valid
 import jp.co.soramitsu.feature_wallet_api.domain.model.Asset
 import jp.co.soramitsu.feature_wallet_api.domain.model.amountFromPlanks
 import jp.co.soramitsu.feature_wallet_api.presentation.formatters.formatTokenAmount
+import jp.co.soramitsu.runtime.state.SingleAssetSharedState
+import jp.co.soramitsu.runtime.state.chain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -37,10 +37,11 @@ class ValidatorDetailsViewModel(
     private val router: StakingRouter,
     private val validator: ValidatorDetailsParcelModel,
     private val iconGenerator: AddressIconGenerator,
-    private val externalAccountActions: ExternalAccountActions.Presentation,
+    private val externalActions: ExternalActions.Presentation,
     private val appLinksProvider: AppLinksProvider,
     private val resourceManager: ResourceManager,
-) : BaseViewModel(), ExternalAccountActions.Presentation by externalAccountActions {
+    private val selectedAssetState: SingleAssetSharedState,
+) : BaseViewModel(), ExternalActions.Presentation by externalActions {
 
     private val assetFlow = interactor.currentAssetFlow()
         .share()
@@ -49,12 +50,12 @@ class ValidatorDetailsViewModel(
         .inBackground()
 
     val validatorDetails = maxNominators.combine(assetFlow) { maxNominators, asset ->
-        val chain = interactor.getSelectedChain()
+        val chain = selectedAssetState.chain()
 
         mapValidatorDetailsParcelToValidatorDetailsModel(chain, validator, asset, maxNominators, iconGenerator, resourceManager)
     }
         .inBackground()
-        .asLiveData()
+        .share()
 
     val errorFlow = flowOf { mapValidatorDetailsToErrors(validator) }
         .inBackground()
@@ -84,16 +85,16 @@ class ValidatorDetailsViewModel(
 
         val ownStake = asset.token.amountFromPlanks(validatorStake.ownStake)
         val ownStakeFormatted = ownStake.formatTokenAmount(asset.token.configuration)
-        val ownStakeFiatFormatted = asset.token.fiatAmount(ownStake)?.formatAsCurrency()
+        val ownStakeFiatFormatted = asset.token.fiatAmount(ownStake).formatAsCurrency()
 
         val nominatorsStakeValue = validatorStake.nominators.sumByBigInteger(NominatorParcelModel::value)
         val nominatorsStake = asset.token.amountFromPlanks(nominatorsStakeValue)
         val nominatorsStakeFormatted = nominatorsStake.formatTokenAmount(asset.token.configuration)
-        val nominatorsStakeFiatFormatted = asset.token.fiatAmount(nominatorsStake)?.formatAsCurrency()
+        val nominatorsStakeFiatFormatted = asset.token.fiatAmount(nominatorsStake).formatAsCurrency()
 
         val totalStake = asset.token.amountFromPlanks(validatorStake.totalStake)
         val totalStakeFormatted = totalStake.formatTokenAmount(asset.token.configuration)
-        val totalStakeFiatFormatted = asset.token.fiatAmount(totalStake)?.formatAsCurrency()
+        val totalStakeFiatFormatted = asset.token.fiatAmount(totalStake).formatAsCurrency()
 
         ValidatorStakeBottomSheet.Payload(
             resourceManager.getString(R.string.staking_validator_own_stake),
@@ -126,8 +127,10 @@ class ValidatorDetailsViewModel(
         }
     }
 
-    fun accountActionsClicked() {
-        val address = validatorDetails.value?.address ?: return
-        externalAccountActions.showExternalActions(ExternalAccountActions.Payload(address, address.networkType()))
+    fun accountActionsClicked() = launch {
+        val address = validatorDetails.first().address
+        val chain = selectedAssetState.chain()
+
+        externalActions.showExternalActions(ExternalActions.Type.Address(address), chain)
     }
 }
