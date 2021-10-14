@@ -1,4 +1,4 @@
-name: Pull request to develop
+name: Pull request
 
 env:
   MOONPAY_TEST_SECRET: ${{ secrets.MOONPAY_TEST_SECRET }}
