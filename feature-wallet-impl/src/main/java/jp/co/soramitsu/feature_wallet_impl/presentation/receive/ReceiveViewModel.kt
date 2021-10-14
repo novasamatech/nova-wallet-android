@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import jp.co.soramitsu.common.address.AddressIconGenerator
-import jp.co.soramitsu.common.address.createAddressModel
 import jp.co.soramitsu.common.base.BaseViewModel
 import jp.co.soramitsu.common.resources.ResourceManager
 import jp.co.soramitsu.common.utils.Event
@@ -18,6 +17,7 @@ import jp.co.soramitsu.common.utils.requireValue
 import jp.co.soramitsu.common.utils.write
 import jp.co.soramitsu.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import jp.co.soramitsu.feature_account_api.domain.model.addressIn
+import jp.co.soramitsu.feature_account_api.presenatation.account.icon.createAddressModel
 import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalActions
 import jp.co.soramitsu.feature_wallet_api.domain.interfaces.WalletInteractor
 import jp.co.soramitsu.feature_wallet_impl.R
@@ -60,7 +60,7 @@ class ReceiveViewModel(
         .map {
             val address = it.addressIn(chain())!!
 
-            addressIconGenerator.createAddressModel(address, AddressIconGenerator.SIZE_BIG, it.name)
+            addressIconGenerator.createAddressModel(chain(), address, AddressIconGenerator.SIZE_BIG, it.name)
         }
         .inBackground()
         .share()

@@ -66,6 +66,7 @@ import jp.co.soramitsu.feature_wallet_impl.presentation.AssetPayload
 import jp.co.soramitsu.feature_wallet_impl.presentation.WalletRouter
 import jp.co.soramitsu.feature_wallet_impl.presentation.balance.detail.BalanceDetailFragment
 import jp.co.soramitsu.feature_wallet_impl.presentation.model.OperationParcelizeModel
+import jp.co.soramitsu.feature_wallet_impl.presentation.receive.ReceiveFragment
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.TransferDraft
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.amount.ChooseAmountFragment
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.confirm.ConfirmTransferFragment
@@ -396,8 +397,8 @@ class Navigator :
         openAccounts(AccountChosenNavDirection.BACK)
     }
 
-    override fun openReceive() {
-        navController?.navigate(R.id.action_open_receive)
+    override fun openReceive(assetPayload: AssetPayload) {
+        navController?.navigate(R.id.action_open_receive, ReceiveFragment.getBundle(assetPayload))
     }
 
     override fun returnToWallet() {
