@@ -77,7 +77,7 @@ fun mapChainRemoteToChain(
         )
     }
 
-    val explorers = chainRemote.explorers.map {
+    val explorers = chainRemote.explorers.orEmpty().map {
         Chain.Explorer(
             name = it.name,
             account = it.account,
@@ -213,7 +213,7 @@ fun mapChainToChainLocal(chain: Chain): JoinedChainInfo {
             name = it.name,
             extrinsic = it.extrinsic,
             account = it.account,
-            event = it.account
+            event = it.event
         )
     }
 

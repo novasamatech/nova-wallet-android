@@ -1,11 +1,9 @@
 package jp.co.soramitsu.feature_wallet_impl.presentation.transaction.detail.transfer
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
 import jp.co.soramitsu.common.address.AddressIconGenerator
 import jp.co.soramitsu.common.address.AddressModel
 import jp.co.soramitsu.common.base.BaseViewModel
-import jp.co.soramitsu.common.utils.Event
 import jp.co.soramitsu.common.utils.invoke
 import jp.co.soramitsu.common.utils.lazyAsync
 import jp.co.soramitsu.feature_account_api.presenatation.account.AddressDisplayUseCase
@@ -30,8 +28,6 @@ class TransactionDetailViewModel(
     private val chain by lazyAsync {
         chainRegistry.getChain(operation.chainId)
     }
-
-    override val openBrowserEvent: MutableLiveData<Event<String>> = MutableLiveData()
 
     val recipientAddressModelLiveData = liveData {
         emit(getIcon(operation.receiver))
