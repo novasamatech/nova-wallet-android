@@ -28,8 +28,6 @@ interface AccountRepository {
 
     suspend fun selectAccount(account: Account, newNode: Node? = null)
 
-    fun selectedAccountFlow(): Flow<Account>
-
     suspend fun getSelectedAccount(): Account
 
     suspend fun getSelectedAccount(chainId: String): Account
