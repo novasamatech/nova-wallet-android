@@ -98,3 +98,7 @@ fun String.formatNamed(values: Map<String, String>): String {
         values[argumentName] ?: "null"
     }
 }
+
+inline fun <T> T?.defaultOnNull(lazyProducer: () -> T): T {
+    return this ?: lazyProducer()
+}

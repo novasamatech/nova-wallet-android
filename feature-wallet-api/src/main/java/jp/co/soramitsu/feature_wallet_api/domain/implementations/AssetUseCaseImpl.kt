@@ -1,7 +1,6 @@
 package jp.co.soramitsu.feature_wallet_api.domain.implementations
 
 import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountRepository
-import jp.co.soramitsu.feature_account_api.domain.model.accountIdIn
 import jp.co.soramitsu.feature_wallet_api.domain.AssetUseCase
 import jp.co.soramitsu.feature_wallet_api.domain.interfaces.WalletRepository
 import jp.co.soramitsu.feature_wallet_api.domain.model.Asset
@@ -22,10 +21,10 @@ class AssetUseCaseImpl(
         sharedState.assetWithChain,
         ::Pair
     ).flatMapLatest { (selectedMetaAccount, chainAndAsset) ->
-        val (chain, chainAsset) = chainAndAsset
+        val (_, chainAsset) = chainAndAsset
 
         walletRepository.assetFlow(
-            accountId = selectedMetaAccount.accountIdIn(chain)!!,
+            metaId = selectedMetaAccount.id,
             chainAsset = chainAsset
         )
     }

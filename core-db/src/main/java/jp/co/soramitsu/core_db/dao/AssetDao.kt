@@ -37,7 +37,7 @@ abstract class AssetDao : AssetReadOnlyCache {
     abstract override suspend fun getAssets(metaId: Long): List<AssetWithToken>
 
     @Query(RETRIEVE_ASSET_SQL_META_ID)
-    abstract override fun observeAsset(metaId: Long, chainId: String, symbol: String): Flow<AssetWithToken>
+    abstract override fun observeAsset(metaId: Long, chainId: String, symbol: String): Flow<AssetWithToken?>
 
     @Query(RETRIEVE_ASSET_SQL_META_ID)
     abstract override suspend fun getAsset(metaId: Long, chainId: String, symbol: String): AssetWithToken?

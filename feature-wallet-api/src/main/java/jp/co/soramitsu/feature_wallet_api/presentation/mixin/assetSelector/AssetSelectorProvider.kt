@@ -57,7 +57,7 @@ private class AssetSelectorProvider(
 
             val selectedChainAsset = selectedAssetFlow.first().token.configuration
 
-            val selectedModel = models.first { it.chainAssetId == selectedChainAsset.id && it.chainId == selectedChainAsset.chainId }
+            val selectedModel = models.firstOrNull { it.chainAssetId == selectedChainAsset.id && it.chainId == selectedChainAsset.chainId }
 
             showAssetChooser.value = Event(DynamicListBottomSheet.Payload(models, selectedModel))
         }

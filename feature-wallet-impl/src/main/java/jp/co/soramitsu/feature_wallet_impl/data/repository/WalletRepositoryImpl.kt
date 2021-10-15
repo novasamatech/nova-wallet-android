@@ -4,9 +4,12 @@ import jp.co.soramitsu.common.data.model.CursorPage
 import jp.co.soramitsu.common.data.network.HttpExceptionHandler
 import jp.co.soramitsu.common.data.network.coingecko.PriceInfo
 import jp.co.soramitsu.common.utils.asQueryParam
+import jp.co.soramitsu.common.utils.defaultOnNull
 import jp.co.soramitsu.common.utils.mapList
 import jp.co.soramitsu.core_db.dao.OperationDao
 import jp.co.soramitsu.core_db.dao.PhishingAddressDao
+import jp.co.soramitsu.core_db.dao.TokenDao
+import jp.co.soramitsu.core_db.model.AssetLocal
 import jp.co.soramitsu.core_db.model.AssetWithToken
 import jp.co.soramitsu.core_db.model.OperationLocal
 import jp.co.soramitsu.core_db.model.PhishingAddressLocal
@@ -48,7 +51,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -69,6 +71,7 @@ class WalletRepositoryImpl(
     private val cursorStorage: TransferCursorStorage,
     private val coingeckoApi: CoingeckoApi,
     private val chainRegistry: ChainRegistry,
+    private val tokenDao: TokenDao,
 ) : WalletRepository {
 
     override fun assetsFlow(metaId: Long): Flow<List<Asset>> {
@@ -93,7 +96,7 @@ class WalletRepositoryImpl(
 
     private fun mapAssetToLocalAsset(
         chainsById: Map<ChainId, Chain>,
-        assetLocal: AssetWithToken
+        assetLocal: AssetWithToken,
     ): Asset {
         val chainAsset = chainsById.getValue(assetLocal.asset.chainId).assetsBySymbol.getValue(assetLocal.token.symbol)
 
@@ -134,7 +137,14 @@ class WalletRepositoryImpl(
 
     override fun assetFlow(metaId: Long, chainAsset: Chain.Asset): Flow<Asset> {
         return assetCache.observeAsset(metaId, chainAsset.chainId, chainAsset.symbol)
-            .filterNotNull()
+            .map {
+                it.defaultOnNull {
+                    val asset = AssetLocal.createEmpty(chainAsset.symbol, chainAsset.chainId, metaId)
+                    val token = tokenDao.getTokenOrDefault(chainAsset.symbol)
+
+                    AssetWithToken(asset, token)
+                }
+            }
             .map { mapAssetLocalToAsset(it, chainAsset) }
     }
 
@@ -149,7 +159,7 @@ class WalletRepositoryImpl(
         filters: Set<TransactionFilter>,
         accountId: AccountId,
         chain: Chain,
-        chainAsset: Chain.Asset
+        chainAsset: Chain.Asset,
     ) {
         val accountAddress = chain.addressOf(accountId)
         val page = getOperations(pageSize, cursor = null, filters, accountId, chain, chainAsset)
@@ -190,7 +200,7 @@ class WalletRepositoryImpl(
     override fun operationsFirstPageFlow(
         accountId: AccountId,
         chain: Chain,
-        chainAsset: Chain.Asset
+        chainAsset: Chain.Asset,
     ): Flow<CursorPage<Operation>> {
         val accountAddress = chain.addressOf(accountId)
 
@@ -212,7 +222,7 @@ class WalletRepositoryImpl(
     override suspend fun getContacts(
         accountId: AccountId,
         chain: Chain,
-        query: String
+        query: String,
     ): Set<String> {
         return operationDao.getContacts(query, chain.addressOf(accountId), chain.id).toSet()
     }
@@ -227,7 +237,7 @@ class WalletRepositoryImpl(
         accountId: AccountId,
         chain: Chain,
         transfer: Transfer,
-        fee: BigDecimal
+        fee: BigDecimal,
     ) {
         val operationHash = substrateSource.performTransfer(accountId, chain, transfer)
         val accountAddress = chain.addressOf(accountId)
@@ -246,7 +256,7 @@ class WalletRepositoryImpl(
     override suspend fun checkTransferValidity(
         accountId: AccountId,
         chain: Chain,
-        transfer: Transfer
+        transfer: Transfer,
     ): TransferValidityStatus {
         val feeResponse = getTransferFee(chain, transfer)
 
@@ -291,7 +301,7 @@ class WalletRepositoryImpl(
         transfer: Transfer,
         senderAddress: String,
         fee: BigDecimal,
-        source: OperationLocal.Source
+        source: OperationLocal.Source,
     ) =
         OperationLocal.manualTransfer(
             hash = hash,
@@ -317,4 +327,7 @@ class WalletRepositoryImpl(
 
         assetCache.getAsset(metaAccount.id, chainId, symbol)
     }
+
+    private suspend fun TokenDao.getTokenOrDefault(symbol: String) =
+        getToken(symbol) ?: TokenLocal.createEmpty(symbol)
 }
