@@ -2,24 +2,31 @@ package jp.co.soramitsu.feature_crowdloan_impl.presentation.contribute.custom.ka
 
 import jp.co.soramitsu.common.resources.ResourceManager
 import jp.co.soramitsu.feature_crowdloan_impl.R
-import jp.co.soramitsu.feature_crowdloan_impl.domain.contribute.custom.karura.KaruraContributeInteractor
+import jp.co.soramitsu.feature_crowdloan_impl.domain.contribute.custom.karura.AcalaContributeInteractor
 import jp.co.soramitsu.feature_crowdloan_impl.presentation.contribute.custom.model.CustomContributePayload
 import jp.co.soramitsu.feature_crowdloan_impl.presentation.contribute.custom.referral.ReferralCodePayload
 import jp.co.soramitsu.feature_crowdloan_impl.presentation.contribute.custom.referral.ReferralContributeViewState
+import java.math.BigDecimal
 
-class KaruraContributeViewState(
-    private val interactor: KaruraContributeInteractor,
+class AcalaContributeViewState(
+    private val interactor: AcalaContributeInteractor,
     customContributePayload: CustomContributePayload,
-    resourceManager: ResourceManager
+    resourceManager: ResourceManager,
+    defaultReferralCode: String,
+    private val bonusPercentage: BigDecimal,
 ) : ReferralContributeViewState(
     customContributePayload = customContributePayload,
     resourceManager = resourceManager,
-    fearlessReferralCode = interactor.fearlessReferralCode,
-    bonusPercentage = KARURA_BONUS_MULTIPLIER
+    defaultReferralCode = defaultReferralCode,
+    bonusPercentage = bonusPercentage
 ) {
 
     override fun createBonusPayload(referralCode: String): ReferralCodePayload {
-        return KaruraBonusPayload(referralCode, customContributePayload.parachainMetadata.rewardRate)
+        return AcalaBonusPayload(
+            referralCode = referralCode,
+            rewardRate = customContributePayload.parachainMetadata.rewardRate,
+            referralBonus = bonusPercentage
+        )
     }
 
     override suspend fun validatePayload(payload: ReferralCodePayload) {

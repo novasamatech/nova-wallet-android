@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+    <string name="crowdloan_agree_with_policy">Agree with Terms and Conditions</string>
+    <string name="crowdloan_privacy_policy">I have read and agree to Terms and Conditions</string>
+    <string name="crowdloan_referral_code">Referral code</string>
+
     <string name="transaction_details_view_explorer">View in %s</string>
 
     <string name="account_invalid_derivation_path_title">Invalid derivation path</string>

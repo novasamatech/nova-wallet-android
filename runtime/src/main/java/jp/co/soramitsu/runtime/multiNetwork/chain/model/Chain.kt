@@ -19,6 +19,8 @@ data class Chain(
     val parentId: String?,
 ) {
 
+    companion object // extensions
+
     val assetsBySymbol = assets.associateBy(Asset::symbol)
     val assetsById = assets.associateBy(Asset::id)
 

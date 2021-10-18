@@ -126,9 +126,19 @@ fun Chain.Explorer.eventUrlOf(eventId: String): String {
 private inline fun Chain.Explorer.format(
     templateExtractor: (Chain.Explorer) -> StringTemplate?,
     argumentName: String,
-    argumentValue: String
+    argumentValue: String,
 ): String {
     val template = templateExtractor(this) ?: throw Exception("Cannot find template in the chain explorer: $name")
 
     return template.formatNamed(argumentName to argumentValue)
 }
+
+object ChainGeneses {
+
+    const val KUSAMA = "b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"
+    const val POLKADOT = "91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"
+    const val ROCOCO_ACALA = "52f04247aeababaab46c262a94819b174b847dd403400145c0522c7f17844c68"
+}
+
+val Chain.Companion.Geneses
+    get() = ChainGeneses

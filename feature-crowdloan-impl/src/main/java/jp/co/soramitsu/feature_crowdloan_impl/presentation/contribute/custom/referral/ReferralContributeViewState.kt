@@ -21,7 +21,7 @@ import java.math.BigDecimal
 abstract class ReferralContributeViewState(
     protected val customContributePayload: CustomContributePayload,
     protected val resourceManager: ResourceManager,
-    private val fearlessReferralCode: String,
+    private val defaultReferralCode: String,
     private val bonusPercentage: BigDecimal,
     private val termsUrl: String = customContributePayload.parachainMetadata.website,
     private val learnMoreUrl: String = customContributePayload.parachainMetadata.website,
@@ -41,7 +41,7 @@ abstract class ReferralContributeViewState(
     val applyFearlessTitle = createFearlessBonusTitle()
 
     val applyFearlessCodeEnabledFlow = enteredReferralCodeFlow.map {
-        it != fearlessReferralCode
+        it != defaultReferralCode
     }
 
     val learnBonusesTitle = LearnMoreModel(
@@ -67,7 +67,7 @@ abstract class ReferralContributeViewState(
     }
 
     fun applyFearlessCode() {
-        enteredReferralCodeFlow.value = fearlessReferralCode
+        enteredReferralCodeFlow.value = defaultReferralCode
     }
 
     fun termsClicked() {
@@ -81,7 +81,7 @@ abstract class ReferralContributeViewState(
     override val applyActionState = enteredReferralCodeFlow.combine(privacyAcceptedFlow) { referral, privacyAccepted ->
         when {
             referral.isEmpty() -> ApplyActionState.Unavailable(reason = resourceManager.getString(R.string.crowdloan_enter_referral))
-            privacyAccepted.not() -> ApplyActionState.Unavailable(reason = resourceManager.getString(R.string.crowdloan_empty_bonus_title))
+            privacyAccepted.not() -> ApplyActionState.Unavailable(reason = resourceManager.getString(R.string.crowdloan_agree_with_policy))
             else -> ApplyActionState.Available
         }
     }

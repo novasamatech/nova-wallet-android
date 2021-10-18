@@ -11,7 +11,6 @@ import jp.co.soramitsu.core.model.Network
 import jp.co.soramitsu.core.model.Node
 import jp.co.soramitsu.core.model.SecuritySource
 import jp.co.soramitsu.core.model.WithJson
-import jp.co.soramitsu.core.model.chainId
 import jp.co.soramitsu.core_db.dao.AccountDao
 import jp.co.soramitsu.core_db.dao.NodeDao
 import jp.co.soramitsu.core_db.model.AccountLocal
@@ -91,11 +90,6 @@ class AccountRepositoryImpl(
                 selectNode(defaultNode)
             }
         }
-    }
-
-    // TODO remove
-    override suspend fun getSelectedAccount(): Account {
-        return getSelectedAccount(Node.NetworkType.POLKADOT.chainId)
     }
 
     override suspend fun getSelectedAccount(chainId: String): Account {

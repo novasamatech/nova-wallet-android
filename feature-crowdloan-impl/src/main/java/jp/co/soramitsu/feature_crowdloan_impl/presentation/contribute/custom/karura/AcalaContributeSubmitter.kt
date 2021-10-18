@@ -1,19 +1,19 @@
 package jp.co.soramitsu.feature_crowdloan_impl.presentation.contribute.custom.karura
 
-import jp.co.soramitsu.feature_crowdloan_impl.domain.contribute.custom.karura.KaruraContributeInteractor
+import jp.co.soramitsu.feature_crowdloan_impl.domain.contribute.custom.karura.AcalaContributeInteractor
 import jp.co.soramitsu.feature_crowdloan_impl.presentation.contribute.custom.BonusPayload
 import jp.co.soramitsu.feature_crowdloan_impl.presentation.contribute.custom.CustomContributeSubmitter
 import java.math.BigDecimal
 
-class KaruraContributeSubmitter(
-    private val interactor: KaruraContributeInteractor
+class AcalaContributeSubmitter(
+    private val interactor: AcalaContributeInteractor
 ) : CustomContributeSubmitter {
 
     override suspend fun submitOffChain(
         payload: BonusPayload,
         amount: BigDecimal
     ): Result<Unit> {
-        require(payload is KaruraBonusPayload)
+        require(payload is AcalaBonusPayload)
 
         return interactor.registerInBonusProgram(payload.referralCode, amount)
     }

@@ -6,6 +6,7 @@ import jp.co.soramitsu.common.address.AddressIconGenerator
 import jp.co.soramitsu.common.data.network.AppLinksProvider
 import jp.co.soramitsu.common.data.network.HttpExceptionHandler
 import jp.co.soramitsu.common.data.network.NetworkApiCreator
+import jp.co.soramitsu.common.data.secrets.v2.SecretStoreV2
 import jp.co.soramitsu.common.data.storage.Preferences
 import jp.co.soramitsu.common.resources.ResourceManager
 import jp.co.soramitsu.common.validation.ValidationExecutor
@@ -72,4 +73,6 @@ interface CrowdloanFeatureDependencies {
     fun chainRegistry(): ChainRegistry
 
     fun preferences(): Preferences
+
+    fun secretStoreV2(): SecretStoreV2
 }

@@ -16,7 +16,7 @@ class BifrostContributeViewState(
 ) : ReferralContributeViewState(
     customContributePayload = customContributePayload,
     resourceManager = resourceManager,
-    fearlessReferralCode = interactor.fearlessReferralCode,
+    defaultReferralCode = interactor.fearlessReferralCode,
     bonusPercentage = BIFROST_BONUS_MULTIPLIER,
     termsUrl = termsLink
 ) {
