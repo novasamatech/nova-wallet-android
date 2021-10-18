@@ -1,5 +1,9 @@
 package jp.co.soramitsu.feature_account_impl.domain.account.details
 
+import jp.co.soramitsu.common.data.secrets.v2.SecretStoreV2
+import jp.co.soramitsu.common.data.secrets.v2.entropy
+import jp.co.soramitsu.common.data.secrets.v2.getAccountSecrets
+import jp.co.soramitsu.common.data.secrets.v2.seed
 import jp.co.soramitsu.common.list.GroupedList
 import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountRepository
 import jp.co.soramitsu.feature_account_api.domain.model.MetaAccount
@@ -8,12 +12,14 @@ import jp.co.soramitsu.feature_account_api.domain.model.addressIn
 import jp.co.soramitsu.feature_account_api.domain.model.hasChainAccountIn
 import jp.co.soramitsu.feature_account_impl.domain.account.details.AccountInChain.From
 import jp.co.soramitsu.runtime.multiNetwork.ChainRegistry
+import jp.co.soramitsu.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 
 class AccountDetailsInteractor(
     private val accountRepository: AccountRepository,
+    private val secretStoreV2: SecretStoreV2,
     private val chainRegistry: ChainRegistry
 ) {
 
@@ -44,5 +50,20 @@ class AccountDetailsInteractor(
                 from = if (metaAccount.hasChainAccountIn(chain.id)) From.CHAIN_ACCOUNT else From.META_ACCOUNT
             )
         }.groupBy(AccountInChain::from)
+    }
+
+    suspend fun availableExportTypes(
+        metaAccount: MetaAccount,
+        chain: Chain
+    ): List<AvailableExportType> = withContext(Dispatchers.Default) {
+        val accountId = metaAccount.accountIdIn(chain) ?: return@withContext emptyList()
+
+        val secrets = secretStoreV2.getAccountSecrets(metaAccount.id, accountId)
+
+        listOfNotNull(
+            AvailableExportType.MNEMONC.takeIf { secrets.entropy() != null },
+            AvailableExportType.SEED.takeIf { secrets.seed() != null },
+            AvailableExportType.JSON // always available
+        )
     }
 }

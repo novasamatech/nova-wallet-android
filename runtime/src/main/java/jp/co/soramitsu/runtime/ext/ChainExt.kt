@@ -12,7 +12,7 @@ import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.addressByte
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAddress
 import jp.co.soramitsu.runtime.multiNetwork.chain.model.Chain
-import jp.co.soramitsu.runtime.multiNetwork.chain.model.StringTemplate
+import jp.co.soramitsu.runtime.multiNetwork.chain.model.ExplorerTemplateExtractor
 import jp.co.soramitsu.runtime.multiNetwork.chain.model.TypesUsage
 
 val Chain.typesUsage: TypesUsage
@@ -109,7 +109,7 @@ fun Chain.isValidAddress(address: String): Boolean {
 
 fun Chain.multiAddressOf(address: String): MultiAddress = multiAddressOf(accountIdOf(address))
 
-fun Chain.availableExplorersFor(field: (Chain.Explorer) -> StringTemplate?) = explorers.filter { field(it) != null }
+fun Chain.availableExplorersFor(field: ExplorerTemplateExtractor) = explorers.filter { field(it) != null }
 
 fun Chain.Explorer.accountUrlOf(address: String): String {
     return format(Chain.Explorer::account, "address", address)
@@ -124,7 +124,7 @@ fun Chain.Explorer.eventUrlOf(eventId: String): String {
 }
 
 private inline fun Chain.Explorer.format(
-    templateExtractor: (Chain.Explorer) -> StringTemplate?,
+    templateExtractor: ExplorerTemplateExtractor,
     argumentName: String,
     argumentValue: String
 ): String {

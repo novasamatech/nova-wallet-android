@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+    <string name="account_chain_change">Change account</string>
+
     <string name="transaction_details_view_explorer">View in %s</string>
 
     <string name="account_invalid_derivation_path_title">Invalid derivation path</string>

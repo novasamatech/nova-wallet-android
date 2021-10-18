@@ -173,9 +173,11 @@ class AccountFeatureModule {
     @FeatureScope
     fun provideAccountDetailsInteractor(
         accountRepository: AccountRepository,
+        secretStoreV2: SecretStoreV2,
         chainRegistry: ChainRegistry,
     ) = AccountDetailsInteractor(
         accountRepository,
+        secretStoreV2,
         chainRegistry
     )
 

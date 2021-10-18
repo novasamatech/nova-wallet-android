@@ -4,7 +4,8 @@ import android.graphics.drawable.Drawable
 import jp.co.soramitsu.feature_account_api.presenatation.chain.ChainUi
 
 class AccountInChainUi(
-    val chain: ChainUi,
-    val address: String,
+    val chainUi: ChainUi,
+    val addressOrHint: String,
+    val address: String?,
     val accountIcon: Drawable
 )

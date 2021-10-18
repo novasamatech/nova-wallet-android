@@ -11,9 +11,11 @@ import jp.co.soramitsu.common.di.modules.Caching
 import jp.co.soramitsu.common.di.viewmodel.ViewModelKey
 import jp.co.soramitsu.common.di.viewmodel.ViewModelModule
 import jp.co.soramitsu.common.resources.ResourceManager
+import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalActions
 import jp.co.soramitsu.feature_account_impl.domain.account.details.AccountDetailsInteractor
 import jp.co.soramitsu.feature_account_impl.presentation.AccountRouter
 import jp.co.soramitsu.feature_account_impl.presentation.account.details.AccountDetailsViewModel
+import jp.co.soramitsu.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
 class AccountDetailsModule {
@@ -25,16 +27,19 @@ class AccountDetailsModule {
         interactor: AccountDetailsInteractor,
         router: AccountRouter,
         resourceManager: ResourceManager,
-        @Caching
-        iconGenerator: AddressIconGenerator,
+        @Caching iconGenerator: AddressIconGenerator,
         metaId: Long,
+        externalActions: ExternalActions.Presentation,
+        chainRegistry: ChainRegistry,
     ): ViewModel {
         return AccountDetailsViewModel(
             interactor,
             router,
             iconGenerator,
             resourceManager,
-            metaId
+            metaId,
+            externalActions,
+            chainRegistry,
         )
     }
 
