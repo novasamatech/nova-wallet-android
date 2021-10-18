@@ -60,7 +60,6 @@ class AccountDetailsViewModel(
     private val _showExportSourceChooser = MutableLiveData<Event<ExportChooserPayload>>()
     val showExportSourceChooser: LiveData<Event<ExportChooserPayload>> = _showExportSourceChooser
 
-
     val chainAccountProjections = flowOf { interactor.getChainProjections(metaAccount()) }
         .map { groupedList ->
             groupedList.mapKeys { (from, _) -> mapFromToTextHeader(from) }
@@ -138,7 +137,6 @@ class AccountDetailsViewModel(
                 )
             )
         }
-
     }
 
     fun exportTypeChosen(exportSource: ExportSource, chain: Chain) {
@@ -156,7 +154,7 @@ class AccountDetailsViewModel(
     private fun mapAvailableExportTypeToUI(
         availableExportType: AvailableExportType
     ): ExportSource {
-        return when(availableExportType) {
+        return when (availableExportType) {
             AvailableExportType.MNEMONC -> ExportSource.Mnemonic
             AvailableExportType.SEED -> ExportSource.Seed
             AvailableExportType.JSON -> ExportSource.Json

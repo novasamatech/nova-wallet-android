@@ -104,7 +104,10 @@ suspend fun SecretStoreV2.getMetaAccountKeypair(
 }
 
 private fun noMetaSecrets(metaId: Long): Nothing = error("No secrets found for meta account $metaId")
-private fun noChainSecrets(metaId: Long, accountId: ByteArray): Nothing = error("No secrets found for meta account $metaId for account ${accountId.toHexString()}")
+
+private fun noChainSecrets(metaId: Long, accountId: ByteArray): Nothing {
+    error("No secrets found for meta account $metaId for account ${accountId.toHexString()}")
+}
 
 fun mapKeypairStructToKeypair(struct: EncodableStruct<KeyPairSchema>): Keypair {
     return Keypair(
