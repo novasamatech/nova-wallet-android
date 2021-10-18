@@ -6,15 +6,15 @@
     android:layout_width="match_parent"
     tools:background="@color/blurColor"
     android:layout_height="@dimen/asset_height"
-    android:layout_marginTop="8dp"
+    android:layout_marginBottom="8dp"
     android:layout_weight="1">
 
     <ImageView
         android:id="@+id/itemAssetImage"
         android:layout_width="@dimen/asset_image_width"
         android:layout_height="0dp"
-        android:paddingStart="16dp"
-        android:paddingEnd="17dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

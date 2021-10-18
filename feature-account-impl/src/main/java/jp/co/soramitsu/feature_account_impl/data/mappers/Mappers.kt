@@ -1,6 +1,5 @@
 package jp.co.soramitsu.feature_account_impl.data.mappers
 
-import android.graphics.drawable.PictureDrawable
 import jp.co.soramitsu.common.resources.ResourceManager
 import jp.co.soramitsu.core.model.CryptoType
 import jp.co.soramitsu.core.model.Node
@@ -8,13 +7,16 @@ import jp.co.soramitsu.core.model.Node.NetworkType
 import jp.co.soramitsu.core_db.model.NodeLocal
 import jp.co.soramitsu.core_db.model.chain.ChainAccountLocal
 import jp.co.soramitsu.core_db.model.chain.JoinedMetaAccountInfo
+import jp.co.soramitsu.core_db.model.chain.MetaAccountLocal
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.feature_account_api.data.mappers.stubNetwork
 import jp.co.soramitsu.feature_account_api.domain.model.Account
+import jp.co.soramitsu.feature_account_api.domain.model.LightMetaAccount
 import jp.co.soramitsu.feature_account_api.domain.model.MetaAccount
 import jp.co.soramitsu.feature_account_api.domain.model.addressIn
+import jp.co.soramitsu.feature_account_api.presenatation.account.add.AddAccountPayload
 import jp.co.soramitsu.feature_account_impl.R
-import jp.co.soramitsu.feature_account_impl.presentation.account.model.AccountModel
+import jp.co.soramitsu.feature_account_api.domain.model.AddAccountType
 import jp.co.soramitsu.feature_account_impl.presentation.node.model.NodeModel
 import jp.co.soramitsu.feature_account_impl.presentation.view.advanced.encryption.model.CryptoTypeModel
 import jp.co.soramitsu.feature_account_impl.presentation.view.advanced.network.model.NetworkModel
@@ -54,37 +56,6 @@ fun mapCryptoTypeToCryptoTypeModel(
     return CryptoTypeModel(name, encryptionType)
 }
 
-fun mapAccountModelToAccount(accountModel: AccountModel, position: Int = accountModel.position): Account {
-    return with(accountModel) {
-        Account(
-            address,
-            name,
-            accountIdHex,
-            cryptoTypeModel.cryptoType,
-            position,
-            network,
-        )
-    }
-}
-
-fun mapAccountToAccountModel(
-    account: Account,
-    accountIcon: PictureDrawable,
-    resourceManager: ResourceManager
-): AccountModel {
-    return with(account) {
-        AccountModel(
-            address = address,
-            name = name,
-            image = accountIcon,
-            accountIdHex = accountIdHex,
-            position = position,
-            cryptoTypeModel = mapCryptoTypeToCryptoTypeModel(resourceManager, cryptoType),
-            network = network
-        )
-    }
-}
-
 fun mapNodeToNodeModel(node: Node): NodeModel {
     val networkModelType = mapNetworkTypeToNetworkModel(node.networkType)
 
@@ -111,6 +82,21 @@ fun mapNodeLocalToNode(nodeLocal: NodeLocal): Node {
             isDefault = isDefault
         )
     }
+}
+
+fun mapMetaAccountLocalToLightMetaAccount(
+    metaAccountLocal: MetaAccountLocal
+): LightMetaAccount = with(metaAccountLocal) {
+    LightMetaAccount(
+        id = id,
+        substratePublicKey = substratePublicKey,
+        substrateCryptoType = substrateCryptoType,
+        substrateAccountId = substrateAccountId,
+        ethereumAddress = ethereumAddress,
+        ethereumPublicKey = ethereumPublicKey,
+        isSelected = isSelected,
+        name = name
+    )
 }
 
 fun mapMetaAccountLocalToMetaAccount(
@@ -175,4 +161,11 @@ fun mapChainAccountToAccount(
         position = 0,
         network = stubNetwork(chain.id),
     )
+}
+
+fun mapAddAccountPayloadToAddAccountType(payload: AddAccountPayload): AddAccountType {
+    return when (payload) {
+        AddAccountPayload.MetaAccount -> AddAccountType.MetaAccount
+        is AddAccountPayload.ChainAccount -> AddAccountType.ChainAccount(payload.chainId, payload.metaId)
+    }
 }

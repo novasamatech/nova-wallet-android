@@ -1,5 +1,7 @@
 package jp.co.soramitsu.runtime.multiNetwork.runtime
 
+import android.util.Log
+import jp.co.soramitsu.common.utils.LOG_TAG
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.runtime.ext.typesUsage
 import jp.co.soramitsu.runtime.multiNetwork.chain.model.Chain
@@ -115,14 +117,15 @@ class RuntimeProvider(
             invalidateRuntime()
 
             runCatching {
-                runtimeFactory.constructRuntime(chainId, typesUsage)?.also {
+                runtimeFactory.constructRuntime(chainId, typesUsage).also {
                     runtimeFlow.emit(it)
                 }
             }.onFailure {
                 when (it) {
                     ChainInfoNotInCacheException -> runtimeSyncService.cacheNotFound(chainId)
                     BaseTypesNotInCacheException -> baseTypeSynchronizer.cacheNotFound()
-                    else -> it.printStackTrace()
+                    NoRuntimeVersionException -> {} // pass
+                    else -> Log.e(this@RuntimeProvider.LOG_TAG, "Failed to construct runtime ($chainId): ${it.message}")
                 }
             }
 

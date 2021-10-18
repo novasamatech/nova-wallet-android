@@ -1,12 +1,15 @@
 package jp.co.soramitsu.feature_wallet_impl.data.mappers
 
+import jp.co.soramitsu.common.utils.isNonNegative
 import jp.co.soramitsu.core_db.model.AssetWithToken
 import jp.co.soramitsu.core_db.model.TokenLocal
 import jp.co.soramitsu.feature_wallet_api.domain.model.Asset
 import jp.co.soramitsu.feature_wallet_api.domain.model.Token
+import jp.co.soramitsu.feature_wallet_impl.R
 import jp.co.soramitsu.feature_wallet_impl.presentation.model.AssetModel
 import jp.co.soramitsu.feature_wallet_impl.presentation.model.TokenModel
 import jp.co.soramitsu.runtime.multiNetwork.chain.model.Chain
+import java.math.BigDecimal
 
 fun mapTokenLocalToToken(
     tokenLocal: TokenLocal,
@@ -23,10 +26,19 @@ fun mapTokenLocalToToken(
 
 fun mapTokenToTokenModel(token: Token): TokenModel {
     return with(token) {
+        val rateChange = token.recentRateChange
+
+        val changeColorRes = when {
+            rateChange == null -> R.color.gray2
+            rateChange.isNonNegative -> R.color.green
+            else -> R.color.red
+        }
+
         TokenModel(
             configuration = configuration,
-            dollarRate = dollarRate,
-            recentRateChange = recentRateChange
+            dollarRate = dollarRate ?: BigDecimal.ZERO,
+            recentRateChange = recentRateChange ?: BigDecimal.ZERO,
+            rateChangeColorRes = changeColorRes
         )
     }
 }

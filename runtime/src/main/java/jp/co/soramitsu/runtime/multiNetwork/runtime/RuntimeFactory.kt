@@ -44,12 +44,13 @@ class RuntimeFactory(
     /**
      * @throws BaseTypesNotInCacheException
      * @throws ChainInfoNotInCacheException
+     * @throws NoRuntimeVersionException
      */
     suspend fun constructRuntime(
         chainId: String,
         typesUsage: TypesUsage,
-    ): ConstructedRuntime? = withContext(dispatcher) {
-        val runtimeVersion = chainDao.runtimeInfo(chainId)?.syncedVersion ?: return@withContext null
+    ): ConstructedRuntime = withContext(dispatcher) {
+        val runtimeVersion = chainDao.runtimeInfo(chainId)?.syncedVersion ?: throw NoRuntimeVersionException
 
         val (types, baseHash, ownHash) = when (typesUsage) {
             TypesUsage.BASE -> {

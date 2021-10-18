@@ -32,7 +32,10 @@ class MortalityConstructor(
         val startBlockNumber = if (currentNumber - finalizedNumber > MAX_FINALITY_LAG) currentNumber else finalizedNumber
 
         val blockHashCount = chainStateRepository.blockHashCount(chainId)?.toInt()
-        val blockTime = chainStateRepository.expectedBlockTimeInMillis(chainId).toInt() // TODO Babe.ExpectedBlockTime may be null for some chains
+
+        val blockTime = chainStateRepository.expectedBlockTimeInMillisOrNull(chainId)?.toInt()
+            ?: chainStateRepository.minimumPeriodOrNull(chainId)?.toInt()
+            ?: FALLBACK_PERIOD
 
         val mortalPeriod = MORTAL_PERIOD / blockTime + MAX_FINALITY_LAG
 

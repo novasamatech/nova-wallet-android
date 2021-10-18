@@ -3,12 +3,16 @@ package jp.co.soramitsu.runtime.ext
 import jp.co.soramitsu.common.data.network.runtime.binding.MultiAddress
 import jp.co.soramitsu.common.utils.ethereumAddressFromPublicKey
 import jp.co.soramitsu.common.utils.ethereumAddressToHex
+import jp.co.soramitsu.common.utils.formatNamed
+import jp.co.soramitsu.common.utils.substrateAccountId
+import jp.co.soramitsu.fearless_utils.encrypt.Signer
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.addressByte
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAddress
 import jp.co.soramitsu.runtime.multiNetwork.chain.model.Chain
+import jp.co.soramitsu.runtime.multiNetwork.chain.model.StringTemplate
 import jp.co.soramitsu.runtime.multiNetwork.chain.model.TypesUsage
 
 val Chain.typesUsage: TypesUsage
@@ -43,6 +47,21 @@ fun Chain.accountIdOf(address: String): ByteArray {
     }
 }
 
+fun Chain.accountIdOf(publicKey: ByteArray): ByteArray {
+    return if (isEthereumBased) {
+        publicKey.ethereumAddressFromPublicKey()
+    } else {
+        publicKey.substrateAccountId()
+    }
+}
+
+val Chain.signatureHashing
+    get() = if (isEthereumBased) {
+        Signer.MessageHashing.ETHEREUM
+    } else {
+        Signer.MessageHashing.SUBSTRATE
+    }
+
 fun Chain.hexAccountIdOf(address: String): String {
     return accountIdOf(address).toHexString()
 }
@@ -63,6 +82,21 @@ fun Chain.addressFromPublicKey(publicKey: ByteArray): String {
     }
 }
 
+fun Chain.accountIdFromPublicKey(publicKey: ByteArray): ByteArray {
+    return if (isEthereumBased) {
+        publicKey.ethereumAddressFromPublicKey()
+    } else {
+        publicKey.substrateAccountId()
+    }
+}
+
+val Chain.historySupported: Boolean
+    get() {
+        val historyType = externalApi?.history?.type ?: return false
+
+        return historyType != Chain.ExternalApi.Section.Type.UNKNOWN
+    }
+
 fun Chain.isValidAddress(address: String): Boolean {
     return runCatching {
         if (isEthereumBased) {
@@ -74,3 +108,27 @@ fun Chain.isValidAddress(address: String): Boolean {
 }
 
 fun Chain.multiAddressOf(address: String): MultiAddress = multiAddressOf(accountIdOf(address))
+
+fun Chain.availableExplorersFor(field: (Chain.Explorer) -> StringTemplate?) = explorers.filter { field(it) != null }
+
+fun Chain.Explorer.accountUrlOf(address: String): String {
+    return format(Chain.Explorer::account, "address", address)
+}
+
+fun Chain.Explorer.extrinsicUrlOf(extrinsicHash: String): String {
+    return format(Chain.Explorer::extrinsic, "hash", extrinsicHash)
+}
+
+fun Chain.Explorer.eventUrlOf(eventId: String): String {
+    return format(Chain.Explorer::event, "event", eventId)
+}
+
+private inline fun Chain.Explorer.format(
+    templateExtractor: (Chain.Explorer) -> StringTemplate?,
+    argumentName: String,
+    argumentValue: String
+): String {
+    val template = templateExtractor(this) ?: throw Exception("Cannot find template in the chain explorer: $name")
+
+    return template.formatNamed(argumentName to argumentValue)
+}

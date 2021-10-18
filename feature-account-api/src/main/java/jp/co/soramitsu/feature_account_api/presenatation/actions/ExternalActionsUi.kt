@@ -1,33 +1,29 @@
 package jp.co.soramitsu.feature_account_api.presenatation.actions
 
-import jp.co.soramitsu.common.R
 import jp.co.soramitsu.common.base.BaseFragment
 import jp.co.soramitsu.common.base.BaseViewModel
 import jp.co.soramitsu.common.mixin.impl.observeBrowserEvents
 
-fun <T> BaseFragment<T>.setupExternalActions(viewModel: T) where T : BaseViewModel, T : ExternalAccountActions {
+fun <T> BaseFragment<T>.setupExternalActions(viewModel: T) where T : BaseViewModel, T : ExternalActions {
     observeBrowserEvents(viewModel)
 
     viewModel.showExternalActionsEvent.observeEvent {
-        showAccountExternalActions(it, viewModel)
+        showExternalActions(it, viewModel)
     }
 }
 
-fun <T> BaseFragment<T>.showAccountExternalActions(
-    payload: ExternalAccountActions.Payload,
+fun <T> BaseFragment<T>.showExternalActions(
+    payload: ExternalActions.Payload,
     viewModel: T
-) where T : BaseViewModel, T : ExternalAccountActions {
+) where T : BaseViewModel, T : ExternalActions {
     ExternalActionsSheet(
         requireContext(),
-        ExternalActionsSheet.Payload(
-            R.string.common_copy_address,
-            payload
-        ),
+        payload,
         viewModel::copyAddressClicked,
         viewModel::viewExternalClicked
     ).show()
 }
 
-fun <T> T.copyAddressClicked(address: String) where T : BaseViewModel, T : ExternalAccountActions {
+fun <T> T.copyAddressClicked(address: String) where T : BaseViewModel, T : ExternalActions {
     copyAddress(address, ::showMessage)
 }

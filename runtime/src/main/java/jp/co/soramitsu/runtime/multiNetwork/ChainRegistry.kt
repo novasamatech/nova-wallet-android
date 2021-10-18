@@ -82,7 +82,7 @@ class ChainRegistry(
 
     fun getRuntimeProvider(chainId: String) = runtimeProviderPool.getRuntimeProvider(chainId)
 
-    suspend fun getChain(chainId: String) = chainsById.first().getValue(chainId)
+    suspend fun getChain(chainId: String): Chain = chainsById.first().getValue(chainId)
 }
 
 suspend fun ChainRegistry.chainWithAsset(chainId: String, assetId: Int): Pair<Chain, Chain.Asset> {

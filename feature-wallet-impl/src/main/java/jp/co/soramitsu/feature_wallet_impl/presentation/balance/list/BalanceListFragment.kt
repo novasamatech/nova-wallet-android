@@ -18,6 +18,7 @@ import kotlinx.android.synthetic.main.fragment_balance_list.balanceListAssets
 import kotlinx.android.synthetic.main.fragment_balance_list.balanceListAvatar
 import kotlinx.android.synthetic.main.fragment_balance_list.balanceListContent
 import kotlinx.android.synthetic.main.fragment_balance_list.balanceListTotalAmount
+import kotlinx.android.synthetic.main.fragment_balance_list.balanceListTotalTitle
 import kotlinx.android.synthetic.main.fragment_balance_list.walletContainer
 import javax.inject.Inject
 
@@ -69,13 +70,14 @@ class BalanceListFragment : BaseFragment<BalanceListViewModel>(), BalanceListAda
     override fun subscribe(viewModel: BalanceListViewModel) {
         viewModel.sync()
 
-        viewModel.balanceLiveData.observe {
+        viewModel.balancesFlow.observe {
             adapter.submitList(it.assetModels)
 
             balanceListTotalAmount.text = it.totalBalance.formatAsCurrency()
         }
 
         viewModel.currentAddressModelLiveData.observe {
+            balanceListTotalTitle.text = it.name
             balanceListAvatar.setImageDrawable(it.image)
         }
 

@@ -9,7 +9,6 @@ import jp.co.soramitsu.feature_wallet_api.domain.model.RecipientSearchResult
 import jp.co.soramitsu.feature_wallet_api.domain.model.Transfer
 import jp.co.soramitsu.feature_wallet_api.domain.model.TransferValidityLevel
 import jp.co.soramitsu.feature_wallet_api.domain.model.TransferValidityStatus
-import jp.co.soramitsu.feature_wallet_api.domain.model.WalletAccount
 import jp.co.soramitsu.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.flow.Flow
 import java.io.File
@@ -44,8 +43,6 @@ interface WalletInteractor {
         filters: Set<TransactionFilter>
     ): Result<CursorPage<Operation>>
 
-    fun selectedAccountFlow(chainId: ChainId): Flow<WalletAccount>
-
     suspend fun getRecipients(query: String, chainId: ChainId): RecipientSearchResult
 
     suspend fun validateSendAddress(chainId: ChainId, address: String): Boolean
@@ -62,7 +59,7 @@ interface WalletInteractor {
 
     suspend fun checkTransferValidityStatus(transfer: Transfer): Result<TransferValidityStatus>
 
-    suspend fun getQrCodeSharingString(): String
+    suspend fun getQrCodeSharingString(chainId: ChainId): String
 
     suspend fun createFileInTempStorageAndRetrieveAsset(
         chainId: ChainId,

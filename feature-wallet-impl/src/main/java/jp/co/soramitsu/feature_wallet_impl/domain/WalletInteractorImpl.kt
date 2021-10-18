@@ -3,11 +3,8 @@ package jp.co.soramitsu.feature_wallet_impl.domain
 import jp.co.soramitsu.common.data.model.CursorPage
 import jp.co.soramitsu.common.interfaces.FileProvider
 import jp.co.soramitsu.fearless_utils.encrypt.qr.QrSharing
-import jp.co.soramitsu.feature_account_api.data.mappers.stubNetwork
 import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountRepository
-import jp.co.soramitsu.feature_account_api.domain.model.MetaAccount
 import jp.co.soramitsu.feature_account_api.domain.model.accountIdIn
-import jp.co.soramitsu.feature_account_api.domain.model.addressIn
 import jp.co.soramitsu.feature_wallet_api.domain.interfaces.NotValidTransferStatus
 import jp.co.soramitsu.feature_wallet_api.domain.interfaces.TransactionFilter
 import jp.co.soramitsu.feature_wallet_api.domain.interfaces.WalletInteractor
@@ -20,15 +17,14 @@ import jp.co.soramitsu.feature_wallet_api.domain.model.RecipientSearchResult
 import jp.co.soramitsu.feature_wallet_api.domain.model.Transfer
 import jp.co.soramitsu.feature_wallet_api.domain.model.TransferValidityLevel
 import jp.co.soramitsu.feature_wallet_api.domain.model.TransferValidityStatus
-import jp.co.soramitsu.feature_wallet_api.domain.model.WalletAccount
 import jp.co.soramitsu.runtime.ext.isValidAddress
 import jp.co.soramitsu.runtime.multiNetwork.ChainRegistry
-import jp.co.soramitsu.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.runtime.multiNetwork.chainWithAsset
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.withIndex
@@ -47,6 +43,16 @@ class WalletInteractorImpl(
         return accountRepository.selectedMetaAccountFlow()
             .flatMapLatest { walletRepository.assetsFlow(it.id) }
             .filter { it.isNotEmpty() }
+            .map { assets ->
+                val chains = chainRegistry.chainsById.first()
+
+                assets.sortedWith(
+                    compareByDescending<Asset> { it.token.fiatAmount(it.total) }
+                        .thenByDescending { it.total }
+                        .thenBy { chains.getValue(it.token.configuration.chainId).name }
+                        .thenBy { it.token.configuration.id }
+                )
+            }
     }
 
     override suspend fun syncAssetsRates(): Result<Unit> {
@@ -57,10 +63,9 @@ class WalletInteractorImpl(
 
     override fun assetFlow(chainId: ChainId, chainAssetId: Int): Flow<Asset> {
         return accountRepository.selectedMetaAccountFlow().flatMapLatest { metaAccount ->
-            val (chain, chainAsset) = chainRegistry.chainWithAsset(chainId, chainAssetId)
-            val accountId = metaAccount.accountIdIn(chain)!!
+            val (_, chainAsset) = chainRegistry.chainWithAsset(chainId, chainAssetId)
 
-            walletRepository.assetFlow(accountId, chainAsset)
+            walletRepository.assetFlow(metaAccount.id, chainAsset)
         }
     }
 
@@ -121,15 +126,6 @@ class WalletInteractorImpl(
         }
     }
 
-    override fun selectedAccountFlow(chainId: ChainId): Flow<WalletAccount> {
-        return accountRepository.selectedMetaAccountFlow()
-            .map { metaAccount ->
-                val chain = chainRegistry.getChain(chainId)
-
-                mapAccountToWalletAccount(chain, metaAccount)
-            }
-    }
-
     // TODO wallet
     override suspend fun getRecipients(query: String, chainId: ChainId): RecipientSearchResult {
 //        val metaAccount = accountRepository.getSelectedMetaAccount()
@@ -166,7 +162,6 @@ class WalletInteractorImpl(
         return /*walletRepository.isAccountIdFromPhishingList(address)*/ false
     }
 
-    // TODO wallet fee
     override suspend fun getTransferFee(transfer: Transfer): Fee {
         val chain = chainRegistry.getChain(transfer.chainAsset.chainId)
 
@@ -177,7 +172,7 @@ class WalletInteractorImpl(
         transfer: Transfer,
         fee: BigDecimal,
         maxAllowedLevel: TransferValidityLevel,
-    ): Result<Unit> {
+    ) = withContext(Dispatchers.Default) {
         val metaAccount = accountRepository.getSelectedMetaAccount()
         val chain = chainRegistry.getChain(transfer.chainAsset.chainId)
         val accountId = metaAccount.accountIdIn(chain)!!
@@ -185,10 +180,10 @@ class WalletInteractorImpl(
         val validityStatus = walletRepository.checkTransferValidity(accountId, chain, transfer)
 
         if (validityStatus.level > maxAllowedLevel) {
-            return Result.failure(NotValidTransferStatus(validityStatus))
+            return@withContext Result.failure(NotValidTransferStatus(validityStatus))
         }
 
-        return runCatching {
+        runCatching {
             walletRepository.performTransfer(accountId, chain, transfer, fee)
         }
     }
@@ -203,18 +198,18 @@ class WalletInteractorImpl(
         }
     }
 
-    // TODO wallet receive
-    override suspend fun getQrCodeSharingString(): String {
-        val account = accountRepository.getSelectedAccount()
+    override suspend fun getQrCodeSharingString(chainId: ChainId): String = withContext(Dispatchers.Default) {
+        val chain = chainRegistry.getChain(chainId)
+        val account = accountRepository.getSelectedMetaAccount()
 
-        return accountRepository.createQrAccountContent(account)
+        accountRepository.createQrAccountContent(chain, account)
     }
 
     // TODO just create file, screens can retrieve asset with getCurrentAsset()
     override suspend fun createFileInTempStorageAndRetrieveAsset(
         chainId: ChainId,
         chainAssetId: Int,
-        fileName: String
+        fileName: String,
     ): Result<Pair<File, Asset>> {
         return runCatching {
             val file = fileProvider.getFileInExternalCacheStorage(fileName)
@@ -229,9 +224,5 @@ class WalletInteractorImpl(
                 QrSharing.decode(content).address
             }
         }
-    }
-
-    private fun mapAccountToWalletAccount(chain: Chain, account: MetaAccount) = with(account) {
-        WalletAccount(account.addressIn(chain)!!, name, stubNetwork(chain.id))
     }
 }

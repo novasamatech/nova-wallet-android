@@ -1,6 +1,7 @@
 package jp.co.soramitsu.runtime.multiNetwork.chain
 
 import jp.co.soramitsu.core_db.model.chain.ChainAssetLocal
+import jp.co.soramitsu.core_db.model.chain.ChainExplorerLocal
 import jp.co.soramitsu.core_db.model.chain.ChainLocal
 import jp.co.soramitsu.core_db.model.chain.ChainNodeLocal
 import jp.co.soramitsu.core_db.model.chain.JoinedChainInfo
@@ -76,6 +77,15 @@ fun mapChainRemoteToChain(
         )
     }
 
+    val explorers = chainRemote.explorers.orEmpty().map {
+        Chain.Explorer(
+            name = it.name,
+            account = it.account,
+            extrinsic = it.extrinsic,
+            event = it.event
+        )
+    }
+
     val types = chainRemote.types?.let {
         Chain.Types(
             url = it.url,
@@ -101,6 +111,7 @@ fun mapChainRemoteToChain(
             assets = assets,
             types = types,
             nodes = nodes,
+            explorers = explorers,
             icon = icon,
             externalApi = externalApi,
             addressPrefix = addressPrefix,
@@ -132,6 +143,15 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo): Chain {
         )
     }
 
+    val explorers = chainLocal.explorers.map {
+        Chain.Explorer(
+            name = it.name,
+            account = it.account,
+            extrinsic = it.extrinsic,
+            event = it.event
+        )
+    }
+
     val types = chainLocal.chain.types?.let {
         Chain.Types(
             url = it.url,
@@ -155,6 +175,7 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo): Chain {
             assets = assets,
             types = types,
             nodes = nodes,
+            explorers = explorers,
             icon = icon,
             externalApi = externalApi,
             addressPrefix = prefix,
@@ -183,6 +204,16 @@ fun mapChainToChainLocal(chain: Chain): JoinedChainInfo {
             name = it.name,
             priceId = it.priceId,
             staking = mapStakingTypeToLocal(it.staking)
+        )
+    }
+
+    val explorers = chain.explorers.map {
+        ChainExplorerLocal(
+            chainId = chain.id,
+            name = it.name,
+            extrinsic = it.extrinsic,
+            account = it.account,
+            event = it.event
         )
     }
 
@@ -219,6 +250,7 @@ fun mapChainToChainLocal(chain: Chain): JoinedChainInfo {
     return JoinedChainInfo(
         chain = chainLocal,
         nodes = nodes,
-        assets = assets
+        assets = assets,
+        explorers = explorers
     )
 }

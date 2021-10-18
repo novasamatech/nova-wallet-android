@@ -10,9 +10,6 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 abstract class TokenDao {
 
-    @Query("SELECT EXISTS(SELECT * FROM tokens WHERE symbol = :symbol)")
-    abstract suspend fun isTokenExists(symbol: String): Boolean
-
     @Query("select * from tokens where symbol = :symbol")
     abstract suspend fun getToken(symbol: String): TokenLocal?
 
@@ -21,6 +18,9 @@ abstract class TokenDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insertToken(token: TokenLocal)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract suspend fun insertTokens(tokens: List<TokenLocal>)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract suspend fun insertTokenOrIgnore(token: TokenLocal)

@@ -11,12 +11,22 @@ import jp.co.soramitsu.feature_account_api.presenatation.actions.setupExternalAc
 import jp.co.soramitsu.feature_wallet_api.di.WalletFeatureApi
 import jp.co.soramitsu.feature_wallet_impl.R
 import jp.co.soramitsu.feature_wallet_impl.di.WalletFeatureComponent
+import jp.co.soramitsu.feature_wallet_impl.presentation.AssetPayload
 import jp.co.soramitsu.feature_wallet_impl.presentation.receive.model.QrSharingPayload
 import kotlinx.android.synthetic.main.fragment_receive.accountView
 import kotlinx.android.synthetic.main.fragment_receive.fearlessToolbar
 import kotlinx.android.synthetic.main.fragment_receive.qrImg
 
+private const val KEY_PAYLOAD = "KEY_PAYLOAD"
+
 class ReceiveFragment : BaseFragment<ReceiveViewModel>() {
+
+    companion object {
+
+        fun getBundle(assetPayload: AssetPayload) = Bundle().apply {
+            putParcelable(KEY_PAYLOAD, assetPayload)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,24 +52,21 @@ class ReceiveFragment : BaseFragment<ReceiveViewModel>() {
             WalletFeatureApi::class.java
         )
             .receiveComponentFactory()
-            .create(this)
+            .create(this, argument(KEY_PAYLOAD))
             .inject(this)
     }
 
     override fun subscribe(viewModel: ReceiveViewModel) {
         setupExternalActions(viewModel)
 
-        viewModel.qrBitmapLiveData.observe {
+        viewModel.qrBitmapFlow.observe {
             qrImg.setImageBitmap(it)
         }
 
-        viewModel.accountLiveData.observe { account ->
-            account.name?.let(accountView::setTitle)
-            accountView.setText(account.address)
-        }
-
-        viewModel.accountIconLiveData.observe {
+        viewModel.accountAddressModelFlow.observe {
             accountView.setAccountIcon(it.image)
+            accountView.setText(it.address)
+            it.name?.let(accountView::setTitle)
         }
 
         viewModel.shareEvent.observeEvent(::startQrSharingIntent)

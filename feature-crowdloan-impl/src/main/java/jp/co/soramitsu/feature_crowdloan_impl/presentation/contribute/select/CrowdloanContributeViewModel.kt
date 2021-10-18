@@ -86,6 +86,7 @@ class CrowdloanContributeViewModel(
     val showNextProgress: LiveData<Boolean> = _showNextProgress
 
     private val assetFlow = assetUseCase.currentAssetFlow()
+        .inBackground()
         .share()
 
     val assetModelFlow = assetFlow
@@ -147,7 +148,7 @@ class CrowdloanContributeViewModel(
         .share()
 
     val enteredFiatAmountFlow = assetFlow.combine(parsedAmountFlow) { asset, amount ->
-        asset.token.fiatAmount(amount)?.formatAsCurrency()
+        asset.token.fiatAmount(amount).formatAsCurrency()
     }
         .inBackground()
         .asLiveData()

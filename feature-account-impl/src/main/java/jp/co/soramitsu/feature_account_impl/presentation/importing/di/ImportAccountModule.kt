@@ -10,23 +10,45 @@ import dagger.multibindings.IntoMap
 import jp.co.soramitsu.common.di.scope.ScreenScope
 import jp.co.soramitsu.common.di.viewmodel.ViewModelKey
 import jp.co.soramitsu.common.di.viewmodel.ViewModelModule
+import jp.co.soramitsu.common.mixin.MixinFactory
 import jp.co.soramitsu.common.resources.ClipboardManager
 import jp.co.soramitsu.common.resources.ResourceManager
-import jp.co.soramitsu.core.model.Node
 import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountInteractor
+import jp.co.soramitsu.feature_account_api.presenatation.account.add.AddAccountPayload
+import jp.co.soramitsu.feature_account_impl.domain.account.add.AddAccountInteractor
 import jp.co.soramitsu.feature_account_impl.presentation.AccountRouter
 import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.api.CryptoTypeChooserMixin
-import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.api.NetworkChooserMixin
-import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.impl.NetworkChooser
+import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.api.ForcedChainMixin
+import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.impl.CryptoTypeChooserFactory
+import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.impl.ForcedChainMixinFactory
 import jp.co.soramitsu.feature_account_impl.presentation.importing.FileReader
 import jp.co.soramitsu.feature_account_impl.presentation.importing.ImportAccountViewModel
+import jp.co.soramitsu.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
 class ImportAccountModule {
 
     @Provides
-    fun provideNetworkChooserMixin(interactor: AccountInteractor, forcedNetworkType: Node.NetworkType?): NetworkChooserMixin {
-        return NetworkChooser(interactor, forcedNetworkType)
+    @ScreenScope
+    fun provideCryptoChooserMixinFactory(
+        interactor: AccountInteractor,
+        addAccountPayload: AddAccountPayload,
+        resourceManager: ResourceManager,
+    ): MixinFactory<CryptoTypeChooserMixin> {
+        return CryptoTypeChooserFactory(
+            interactor,
+            addAccountPayload,
+            resourceManager
+        )
+    }
+
+    @Provides
+    @ScreenScope
+    fun provideForcedChainMixinFactory(
+        chainRegistry: ChainRegistry,
+        payload: AddAccountPayload
+    ): MixinFactory<ForcedChainMixin> {
+        return ForcedChainMixinFactory(chainRegistry, payload)
     }
 
     @Provides
@@ -38,22 +60,25 @@ class ImportAccountModule {
     @ViewModelKey(ImportAccountViewModel::class)
     fun provideViewModel(
         interactor: AccountInteractor,
+        addAccountInteractor: AddAccountInteractor,
         router: AccountRouter,
         resourceManager: ResourceManager,
-        networkChooserMixin: NetworkChooserMixin,
-        cryptoChooserMixin: CryptoTypeChooserMixin,
+        forcedChainMixinFactory: MixinFactory<ForcedChainMixin>,
+        cryptoChooserMixinFactory: MixinFactory<CryptoTypeChooserMixin>,
         clipboardManager: ClipboardManager,
         fileReader: FileReader,
-        networkType: Node.NetworkType?
+        payload: AddAccountPayload
     ): ViewModel {
         return ImportAccountViewModel(
+            addAccountInteractor,
             interactor,
             router,
             resourceManager,
-            cryptoChooserMixin,
-            networkChooserMixin,
+            forcedChainMixinFactory,
+            cryptoChooserMixinFactory,
             clipboardManager,
-            fileReader
+            fileReader,
+            payload
         )
     }
 

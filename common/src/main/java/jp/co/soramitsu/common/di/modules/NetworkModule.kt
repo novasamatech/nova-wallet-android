@@ -8,8 +8,6 @@ import dagger.Provides
 import jp.co.soramitsu.common.BuildConfig
 import jp.co.soramitsu.common.data.network.AndroidLogger
 import jp.co.soramitsu.common.data.network.AppLinksProvider
-import jp.co.soramitsu.common.data.network.ExternalAnalyzer
-import jp.co.soramitsu.common.data.network.ExternalAnalyzerLinks
 import jp.co.soramitsu.common.data.network.HttpExceptionHandler
 import jp.co.soramitsu.common.data.network.NetworkApiCreator
 import jp.co.soramitsu.common.data.network.rpc.SocketSingleRequestExecutor
@@ -36,24 +34,9 @@ class NetworkModule {
     @Provides
     @ApplicationScope
     fun provideAppLinksProvider(): AppLinksProvider {
-        val externalAnalyzerTemplates = mapOf(
-            ExternalAnalyzer.POLKASCAN to ExternalAnalyzerLinks(
-                transaction = BuildConfig.POLKSASCAN_TRANSACTION_TEMPLATE,
-                account = BuildConfig.POLKSASCAN_ACCOUNT_TEMPLATE,
-                event = BuildConfig.POLKSASCAN_EVENT_TEMPLATE
-            ),
-
-            ExternalAnalyzer.SUBSCAN to ExternalAnalyzerLinks(
-                transaction = BuildConfig.SUBSCAN_TRANSACTION_TEMPLATE,
-                account = BuildConfig.SUBSCAN_ACCOUNT_TEMPLATE,
-                event = null
-            )
-        )
-
         return AppLinksProvider(
             termsUrl = BuildConfig.TERMS_URL,
             privacyUrl = BuildConfig.PRIVACY_URL,
-            externalAnalyzerTemplates = externalAnalyzerTemplates,
             payoutsLearnMore = BuildConfig.PAYOUTS_LEARN_MORE,
             twitterAccountTemplate = BuildConfig.TWITTER_ACCOUNT_TEMPLATE,
             setControllerLearnMore = BuildConfig.SET_CONTROLLER_LEARN_MORE

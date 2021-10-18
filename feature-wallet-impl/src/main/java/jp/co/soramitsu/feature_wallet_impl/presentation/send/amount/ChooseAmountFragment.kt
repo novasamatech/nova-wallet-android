@@ -5,16 +5,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
+import coil.ImageLoader
+import coil.load
 import jp.co.soramitsu.common.base.BaseFragment
 import jp.co.soramitsu.common.di.FeatureUtils
 import jp.co.soramitsu.common.utils.onTextChanged
 import jp.co.soramitsu.common.utils.setTextColorRes
 import jp.co.soramitsu.feature_account_api.presenatation.actions.setupExternalActions
-import jp.co.soramitsu.feature_wallet_api.data.mappers.icon
 import jp.co.soramitsu.feature_wallet_api.di.WalletFeatureApi
 import jp.co.soramitsu.feature_wallet_api.presentation.formatters.formatTokenAmount
 import jp.co.soramitsu.feature_wallet_impl.R
 import jp.co.soramitsu.feature_wallet_impl.di.WalletFeatureComponent
+import jp.co.soramitsu.feature_wallet_impl.presentation.AssetPayload
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.BalanceDetailsBottomSheet
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.observeTransferChecks
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.phishing.observePhishingCheck
@@ -27,16 +29,22 @@ import kotlinx.android.synthetic.main.fragment_choose_amount.chooseAmountNext
 import kotlinx.android.synthetic.main.fragment_choose_amount.chooseAmountRecipientView
 import kotlinx.android.synthetic.main.fragment_choose_amount.chooseAmountToken
 import kotlinx.android.synthetic.main.fragment_choose_amount.chooseAmountToolbar
+import javax.inject.Inject
 
 private const val KEY_ADDRESS = "KEY_ADDRESS"
+private const val KEY_ASSET_PAYLOAD = "KEY_ASSET_PAYLOAD"
 
 class ChooseAmountFragment : BaseFragment<ChooseAmountViewModel>() {
 
     companion object {
-        fun getBundle(recipientAddress: String) = Bundle().apply {
+
+        fun getBundle(recipientAddress: String, assetPayload: AssetPayload) = Bundle().apply {
             putString(KEY_ADDRESS, recipientAddress)
+            putParcelable(KEY_ASSET_PAYLOAD, assetPayload)
         }
     }
+
+    @Inject lateinit var imageLoader: ImageLoader
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -57,14 +65,12 @@ class ChooseAmountFragment : BaseFragment<ChooseAmountViewModel>() {
     }
 
     override fun inject() {
-        val address = argument<String>(KEY_ADDRESS)
-
         FeatureUtils.getFeature<WalletFeatureComponent>(
             requireContext(),
             WalletFeatureApi::class.java
         )
             .chooseAmountComponentFactory()
-            .create(this, address)
+            .create(this, argument(KEY_ADDRESS), argument(KEY_ASSET_PAYLOAD))
             .inject(this)
     }
 
@@ -93,7 +99,7 @@ class ChooseAmountFragment : BaseFragment<ChooseAmountViewModel>() {
         viewModel.assetLiveData.observe {
             chooseAmountBalance.text = it.available.formatTokenAmount(it.token.configuration)
 
-            chooseAmountToken.setTextIcon(it.token.configuration.icon)
+            chooseAmountToken.textIconView.load(it.token.configuration.iconUrl, imageLoader)
             chooseAmountToken.setMessage(it.token.configuration.symbol)
         }
 

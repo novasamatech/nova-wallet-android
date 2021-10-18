@@ -9,10 +9,9 @@ import jp.co.soramitsu.runtime.multiNetwork.chain.model.Chain
 
 suspend fun AssetCache.updateAsset(
     metaId: Long,
-    accountId: AccountId,
     chainAsset: Chain.Asset,
     accountInfo: AccountInfo,
-) = updateAsset(metaId, accountId, chainAsset, accountInfoUpdater(accountInfo))
+) = updateAsset(metaId, chainAsset, accountInfoUpdater(accountInfo))
 
 suspend fun AssetCache.updateAsset(
     accountId: AccountId,

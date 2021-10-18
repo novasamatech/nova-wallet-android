@@ -12,7 +12,8 @@ import jp.co.soramitsu.common.di.viewmodel.ViewModelModule
 import jp.co.soramitsu.common.resources.ResourceManager
 import jp.co.soramitsu.common.validation.ValidationExecutor
 import jp.co.soramitsu.feature_account_api.presenatation.account.AddressDisplayUseCase
-import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalAccountActions
+import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalActions
+import jp.co.soramitsu.feature_staking_impl.data.StakingSharedState
 import jp.co.soramitsu.feature_staking_impl.domain.StakingInteractor
 import jp.co.soramitsu.feature_staking_impl.domain.staking.rewardDestination.ChangeRewardDestinationInteractor
 import jp.co.soramitsu.feature_staking_impl.domain.validations.rewardDestination.RewardDestinationValidationSystem
@@ -34,9 +35,10 @@ class ConfirmRewardDestinationModule {
         validationSystem: RewardDestinationValidationSystem,
         validationExecutor: ValidationExecutor,
         rewardDestinationInteractor: ChangeRewardDestinationInteractor,
-        externalAccountActions: ExternalAccountActions.Presentation,
+        externalActions: ExternalActions.Presentation,
         addressDisplayUseCase: AddressDisplayUseCase,
-        payload: ConfirmRewardDestinationPayload
+        payload: ConfirmRewardDestinationPayload,
+        singleAssetSharedState: StakingSharedState,
     ): ViewModel {
         return ConfirmRewardDestinationViewModel(
             router,
@@ -45,10 +47,11 @@ class ConfirmRewardDestinationModule {
             resourceManager,
             validationSystem,
             rewardDestinationInteractor,
-            externalAccountActions,
+            externalActions,
             addressDisplayUseCase,
             validationExecutor,
-            payload
+            payload,
+            singleAssetSharedState
         )
     }
 

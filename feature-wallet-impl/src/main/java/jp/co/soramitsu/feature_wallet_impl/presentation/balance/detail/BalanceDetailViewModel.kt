@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import jp.co.soramitsu.common.base.BaseViewModel
 import jp.co.soramitsu.common.utils.Event
+import jp.co.soramitsu.common.utils.inBackground
 import jp.co.soramitsu.feature_wallet_api.domain.interfaces.WalletInteractor
 import jp.co.soramitsu.feature_wallet_impl.data.mappers.mapAssetToAssetModel
 import jp.co.soramitsu.feature_wallet_impl.presentation.AssetPayload
@@ -75,11 +76,11 @@ class BalanceDetailViewModel(
     }
 
     fun sendClicked() {
-        router.openChooseRecipient()
+        router.openChooseRecipient(assetPayload)
     }
 
     fun receiveClicked() {
-        router.openReceive()
+        router.openReceive(assetPayload)
     }
 
     fun buyClicked() {
@@ -97,5 +98,6 @@ class BalanceDetailViewModel(
     private fun currentAssetFlow(): Flow<AssetModel> {
         return interactor.assetFlow(assetPayload.chainId, assetPayload.chainAssetId)
             .map { mapAssetToAssetModel(it) }
+            .inBackground()
     }
 }

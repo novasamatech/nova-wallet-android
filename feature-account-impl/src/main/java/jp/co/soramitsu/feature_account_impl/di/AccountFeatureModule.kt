@@ -3,7 +3,6 @@ package jp.co.soramitsu.feature_account_impl.di
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
-import jp.co.soramitsu.common.data.network.AppLinksProvider
 import jp.co.soramitsu.common.data.network.rpc.SocketSingleRequestExecutor
 import jp.co.soramitsu.common.data.secrets.v1.SecretStoreV1
 import jp.co.soramitsu.common.data.secrets.v2.SecretStoreV2
@@ -24,18 +23,20 @@ import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountRepository
 import jp.co.soramitsu.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import jp.co.soramitsu.feature_account_api.domain.updaters.AccountUpdateScope
 import jp.co.soramitsu.feature_account_api.presenatation.account.AddressDisplayUseCase
-import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalAccountActions
-import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalAccountActionsProvider
+import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalActions
+import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalActionsProvider
 import jp.co.soramitsu.feature_account_impl.data.network.blockchain.AccountSubstrateSource
 import jp.co.soramitsu.feature_account_impl.data.network.blockchain.AccountSubstrateSourceImpl
 import jp.co.soramitsu.feature_account_impl.data.repository.AccountRepositoryImpl
+import jp.co.soramitsu.feature_account_impl.data.repository.AddAccountRepository
 import jp.co.soramitsu.feature_account_impl.data.repository.datasource.AccountDataSource
 import jp.co.soramitsu.feature_account_impl.data.repository.datasource.AccountDataSourceImpl
 import jp.co.soramitsu.feature_account_impl.data.repository.datasource.migration.AccountDataMigration
+import jp.co.soramitsu.feature_account_impl.data.secrets.AccountSecretsFactory
 import jp.co.soramitsu.feature_account_impl.domain.AccountInteractorImpl
 import jp.co.soramitsu.feature_account_impl.domain.NodeHostValidator
-import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.api.CryptoTypeChooserMixin
-import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.impl.CryptoTypeChooser
+import jp.co.soramitsu.feature_account_impl.domain.account.add.AddAccountInteractor
+import jp.co.soramitsu.feature_account_impl.domain.account.details.AccountDetailsInteractor
 import jp.co.soramitsu.runtime.extrinsic.ExtrinsicBuilderFactory
 import jp.co.soramitsu.runtime.multiNetwork.ChainRegistry
 import jp.co.soramitsu.runtime.network.rpc.RpcCalls
@@ -70,18 +71,11 @@ class AccountFeatureModule {
     ) = JsonSeedEncoder(jsonMapper, random)
 
     @Provides
-    fun provideCryptoChooserMixin(
-        interactor: AccountInteractor,
-        resourceManager: ResourceManager,
-    ): CryptoTypeChooserMixin = CryptoTypeChooser(interactor, resourceManager)
-
-    @Provides
     @FeatureScope
     fun provideAccountRepository(
         accountDataSource: AccountDataSource,
         accountDao: AccountDao,
         nodeDao: NodeDao,
-        jsonSeedDecoder: JsonSeedDecoder,
         jsonSeedEncoder: JsonSeedEncoder,
         accountSubstrateSource: AccountSubstrateSource,
         languagesHolder: LanguagesHolder,
@@ -90,7 +84,6 @@ class AccountFeatureModule {
             accountDataSource,
             accountDao,
             nodeDao,
-            jsonSeedDecoder,
             jsonSeedEncoder,
             languagesHolder,
             accountSubstrateSource
@@ -100,9 +93,10 @@ class AccountFeatureModule {
     @Provides
     @FeatureScope
     fun provideAccountInteractor(
+        chainRegistry: ChainRegistry,
         accountRepository: AccountRepository,
     ): AccountInteractor {
-        return AccountInteractorImpl(accountRepository)
+        return AccountInteractorImpl(chainRegistry, accountRepository)
     }
 
     @Provides
@@ -110,20 +104,20 @@ class AccountFeatureModule {
     fun provideAccountDataSource(
         preferences: Preferences,
         encryptedPreferences: EncryptedPreferences,
-        jsonMapper: Gson,
         nodeDao: NodeDao,
         secretStoreV1: SecretStoreV1,
         accountDataMigration: AccountDataMigration,
         metaAccountDao: MetaAccountDao,
         chainRegistry: ChainRegistry,
+        secretStoreV2: SecretStoreV2,
     ): AccountDataSource {
         return AccountDataSourceImpl(
             preferences,
             encryptedPreferences,
             nodeDao,
-            jsonMapper,
             metaAccountDao,
             chainRegistry,
+            secretStoreV2,
             secretStoreV1,
             accountDataMigration
         )
@@ -152,10 +146,9 @@ class AccountFeatureModule {
     @FeatureScope
     fun provideExternalAccountActions(
         clipboardManager: ClipboardManager,
-        appLinksProvider: AppLinksProvider,
         resourceManager: ResourceManager,
-    ): ExternalAccountActions.Presentation {
-        return ExternalAccountActionsProvider(clipboardManager, appLinksProvider, resourceManager)
+    ): ExternalActions.Presentation {
+        return ExternalActionsProvider(clipboardManager, resourceManager)
     }
 
     @Provides
@@ -175,4 +168,41 @@ class AccountFeatureModule {
     fun provideAccountUseCase(
         accountRepository: AccountRepository,
     ) = SelectedAccountUseCase(accountRepository)
+
+    @Provides
+    @FeatureScope
+    fun provideAccountDetailsInteractor(
+        accountRepository: AccountRepository,
+        chainRegistry: ChainRegistry,
+    ) = AccountDetailsInteractor(
+        accountRepository,
+        chainRegistry
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideAccountSecretsFactory(
+        jsonSeedDecoder: JsonSeedDecoder
+    ) = AccountSecretsFactory(jsonSeedDecoder)
+
+    @Provides
+    @FeatureScope
+    fun provideAddAccountRepository(
+        accountDataSource: AccountDataSource,
+        accountSecretsFactory: AccountSecretsFactory,
+        jsonSeedDecoder: JsonSeedDecoder,
+        chainRegistry: ChainRegistry,
+    ) = AddAccountRepository(
+        accountDataSource,
+        accountSecretsFactory,
+        jsonSeedDecoder,
+        chainRegistry
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideAddAccountInteractor(
+        addAccountRepository: AddAccountRepository,
+        accountRepository: AccountRepository,
+    ) = AddAccountInteractor(addAccountRepository, accountRepository)
 }

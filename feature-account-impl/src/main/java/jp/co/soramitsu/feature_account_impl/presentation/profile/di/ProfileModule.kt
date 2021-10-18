@@ -10,7 +10,6 @@ import jp.co.soramitsu.common.address.AddressIconGenerator
 import jp.co.soramitsu.common.di.viewmodel.ViewModelKey
 import jp.co.soramitsu.common.di.viewmodel.ViewModelModule
 import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountInteractor
-import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalAccountActions
 import jp.co.soramitsu.feature_account_impl.presentation.AccountRouter
 import jp.co.soramitsu.feature_account_impl.presentation.profile.ProfileViewModel
 
@@ -24,13 +23,11 @@ class ProfileModule {
         interactor: AccountInteractor,
         router: AccountRouter,
         addressIconGenerator: AddressIconGenerator,
-        externalAccountActions: ExternalAccountActions.Presentation
     ): ViewModel {
         return ProfileViewModel(
             interactor,
             router,
-            addressIconGenerator,
-            externalAccountActions
+            addressIconGenerator
         )
     }
 

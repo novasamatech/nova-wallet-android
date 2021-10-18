@@ -13,15 +13,15 @@ import jp.co.soramitsu.common.utils.sendEvent
 import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedDecodingException.IncorrectPasswordException
 import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedDecodingException.InvalidJsonException
 import jp.co.soramitsu.fearless_utils.exceptions.Bip39Exception
-import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountInteractor
-import jp.co.soramitsu.feature_account_api.domain.model.ImportJsonData
+import jp.co.soramitsu.feature_account_api.domain.model.ImportJsonMetaData
+import jp.co.soramitsu.feature_account_api.presenatation.account.add.AddAccountPayload
 import jp.co.soramitsu.feature_account_impl.R
 import jp.co.soramitsu.feature_account_impl.data.mappers.mapCryptoTypeToCryptoTypeModel
-import jp.co.soramitsu.feature_account_impl.data.mappers.mapNetworkTypeToNetworkModel
+import jp.co.soramitsu.feature_account_impl.data.secrets.AccountSecretsFactory
+import jp.co.soramitsu.feature_account_impl.domain.account.add.AddAccountInteractor
 import jp.co.soramitsu.feature_account_impl.presentation.common.accountSource.AccountSource
+import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.api.CryptoTypeChooserMixin
 import jp.co.soramitsu.feature_account_impl.presentation.importing.FileReader
-import jp.co.soramitsu.feature_account_impl.presentation.view.advanced.encryption.model.CryptoTypeModel
-import jp.co.soramitsu.feature_account_impl.presentation.view.advanced.network.model.NetworkModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.bouncycastle.util.encoders.DecoderException
@@ -54,14 +54,14 @@ sealed class ImportSource(@StringRes nameRes: Int) : AccountSource(nameRes) {
 private const val PICK_FILE_RESULT_CODE = 101
 
 class JsonImportSource(
-    private val networkLiveData: MutableLiveData<NetworkModel>,
     private val nameLiveData: MutableLiveData<String>,
-    private val cryptoTypeLiveData: MutableLiveData<CryptoTypeModel>,
-    private val interactor: AccountInteractor,
+    private val cryptoTypeChooserMixin: CryptoTypeChooserMixin,
+    private val addAccountInteractor: AddAccountInteractor,
     private val resourceManager: ResourceManager,
     private val clipboardManager: ClipboardManager,
     private val fileReader: FileReader,
-    private val scope: CoroutineScope
+    private val scope: CoroutineScope,
+    private val payload: AddAccountPayload,
 ) : ImportSource(R.string.recovery_json), FileRequester {
 
     val jsonContentLiveData = MutableLiveData<String>()
@@ -70,10 +70,8 @@ class JsonImportSource(
     private val _showJsonInputOptionsEvent = MutableLiveData<Event<Unit>>()
     val showJsonInputOptionsEvent: LiveData<Event<Unit>> = _showJsonInputOptionsEvent
 
-    private val _enableNetworkInputLiveData = MutableLiveData<Boolean>(false)
-    val enableNetworkInputLiveData = _enableNetworkInputLiveData
-
-    val showNetworkWarningLiveData = enableNetworkInputLiveData
+    private val _showNetworkWarningLiveData = MutableLiveData(false)
+    val showNetworkWarningLiveData = _showNetworkWarningLiveData
 
     override val chooseJsonFileEvent = MutableLiveData<Event<RequestCode>>()
 
@@ -96,6 +94,10 @@ class JsonImportSource(
             is InvalidJsonException -> ImportError(
                 titleRes = R.string.import_json_invalid_format_title,
                 messageRes = R.string.import_json_invalid_format_message
+            )
+            is AccountSecretsFactory.SecretsError.NotValidEthereumCryptoType -> ImportError(
+                titleRes = R.string.import_json_unsupported_crypto_title,
+                messageRes = R.string.import_json_unsupported_crypto_message
             )
             else -> null
         }
@@ -125,7 +127,7 @@ class JsonImportSource(
         jsonContentLiveData.value = newJson
 
         scope.launch {
-            val result = interactor.processAccountJson(newJson)
+            val result = addAccountInteractor.extractJsonMetadata(newJson)
 
             if (result.isSuccess) {
                 handleParsedImportData(result.getOrThrow())
@@ -133,18 +135,20 @@ class JsonImportSource(
         }
     }
 
-    private fun handleParsedImportData(importJsonData: ImportJsonData) {
-        _enableNetworkInputLiveData.value = importJsonData.networkType == null
+    private fun handleParsedImportData(importJsonMetaData: ImportJsonMetaData) {
+        showNetworkWarningLiveData.value = showShowNetworkWarning(importJsonMetaData.chainId)
 
-        importJsonData.networkType?.let {
-            val networkModel = mapNetworkTypeToNetworkModel(it)
-            networkLiveData.value = networkModel
-        }
+        val cryptoModel = mapCryptoTypeToCryptoTypeModel(resourceManager, importJsonMetaData.encryptionType)
+        cryptoTypeChooserMixin.selectedEncryptionChanged(cryptoModel)
 
-        val cryptoModel = mapCryptoTypeToCryptoTypeModel(resourceManager, importJsonData.encryptionType)
-        cryptoTypeLiveData.value = cryptoModel
+        nameLiveData.value = importJsonMetaData.name
+    }
 
-        nameLiveData.value = importJsonData.name
+    private fun showShowNetworkWarning(jsonChainId: String?): Boolean {
+        val forcedChainId = (payload as? AddAccountPayload.ChainAccount)?.chainId
+
+        // show warning if supplied json has network different than chain which account is creating for
+        return jsonChainId != null && forcedChainId != null && jsonChainId != forcedChainId
     }
 }
 

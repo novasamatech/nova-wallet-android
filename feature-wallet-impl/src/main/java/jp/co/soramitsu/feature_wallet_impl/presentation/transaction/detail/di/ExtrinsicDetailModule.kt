@@ -7,15 +7,14 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
 import jp.co.soramitsu.common.address.AddressIconGenerator
-import jp.co.soramitsu.common.data.network.AppLinksProvider
 import jp.co.soramitsu.common.di.viewmodel.ViewModelKey
 import jp.co.soramitsu.common.di.viewmodel.ViewModelModule
-import jp.co.soramitsu.common.resources.ClipboardManager
-import jp.co.soramitsu.common.resources.ResourceManager
 import jp.co.soramitsu.feature_account_api.presenatation.account.AddressDisplayUseCase
+import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalActions
 import jp.co.soramitsu.feature_wallet_impl.presentation.WalletRouter
 import jp.co.soramitsu.feature_wallet_impl.presentation.model.OperationParcelizeModel
 import jp.co.soramitsu.feature_wallet_impl.presentation.transaction.detail.extrinsic.ExtrinsicDetailViewModel
+import jp.co.soramitsu.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
 class ExtrinsicDetailModule {
@@ -23,22 +22,20 @@ class ExtrinsicDetailModule {
     @IntoMap
     @ViewModelKey(ExtrinsicDetailViewModel::class)
     fun provideViewModel(
-        appLinksProvider: AppLinksProvider,
-        clipboardManager: ClipboardManager,
-        resourceManager: ResourceManager,
         addressDisplayUseCase: AddressDisplayUseCase,
         addressIconGenerator: AddressIconGenerator,
+        chainRegistry: ChainRegistry,
         router: WalletRouter,
         operation: OperationParcelizeModel.Extrinsic,
+        externalActions: ExternalActions.Presentation,
     ): ViewModel {
         return ExtrinsicDetailViewModel(
-            appLinksProvider,
-            clipboardManager,
-            resourceManager,
             addressDisplayUseCase,
             addressIconGenerator,
+            chainRegistry,
             router,
             operation,
+            externalActions,
         )
     }
 

@@ -1,12 +1,14 @@
 package jp.co.soramitsu.feature_wallet_impl.presentation.model
 
 import android.os.Parcelable
+import jp.co.soramitsu.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.android.parcel.Parcelize
 
 sealed class OperationParcelizeModel : Parcelable {
 
     @Parcelize
     class Reward(
+        val chainId: ChainId,
         val eventId: String,
         val address: String,
         val time: Long,
@@ -18,6 +20,7 @@ sealed class OperationParcelizeModel : Parcelable {
 
     @Parcelize
     class Extrinsic(
+        val chainId: ChainId,
         val time: Long,
         val originAddress: String,
         val hash: String,
@@ -29,6 +32,8 @@ sealed class OperationParcelizeModel : Parcelable {
 
     @Parcelize
     class Transfer(
+        val chainId: ChainId,
+        val assetId: Int,
         val time: Long,
         val address: String,
         val hash: String?,

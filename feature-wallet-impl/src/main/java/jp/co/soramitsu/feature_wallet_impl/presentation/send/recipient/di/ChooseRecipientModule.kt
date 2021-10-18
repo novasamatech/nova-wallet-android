@@ -18,6 +18,7 @@ import jp.co.soramitsu.feature_wallet_impl.presentation.send.phishing.warning.ap
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.phishing.warning.impl.PhishingWarningProvider
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.recipient.ChooseRecipientViewModel
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.recipient.QrBitmapDecoder
+import jp.co.soramitsu.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
 class ChooseRecipientModule {
@@ -36,6 +37,8 @@ class ChooseRecipientModule {
         resourceManager: ResourceManager,
         addressIconGenerator: AddressIconGenerator,
         qrBitmapDecoder: QrBitmapDecoder,
+        assetPayload: AssetPayload,
+        chainRegistry: ChainRegistry,
         phishingWarning: PhishingWarningMixin
     ): ViewModel {
         return ChooseRecipientViewModel(
@@ -44,7 +47,8 @@ class ChooseRecipientModule {
             resourceManager,
             addressIconGenerator,
             qrBitmapDecoder,
-            AssetPayload.stub(), // TODO pass payload from previous screen
+            assetPayload,
+            chainRegistry,
             phishingWarning
         )
     }

@@ -9,6 +9,14 @@ import com.github.razir.progressbutton.hideProgress
 import com.github.razir.progressbutton.isProgressActive
 import com.github.razir.progressbutton.showProgress
 import jp.co.soramitsu.common.R
+import jp.co.soramitsu.common.utils.getColorFromAttr
+import jp.co.soramitsu.common.utils.getEnum
+import jp.co.soramitsu.common.utils.useAttributes
+import jp.co.soramitsu.common.view.shape.addRipple
+import jp.co.soramitsu.common.view.shape.getCornersStateDrawable
+import jp.co.soramitsu.common.view.shape.getIdleDrawable
+import jp.co.soramitsu.common.view.shape.getRoundedCornerDrawable
+import jp.co.soramitsu.common.view.shape.getRoundedCornerDrawableFromColors
 
 enum class ButtonState(val viewEnabled: Boolean) {
     NORMAL(true),
@@ -22,9 +30,45 @@ class PrimaryButton @JvmOverloads constructor(
     defStyle: Int = 0
 ) : AppCompatTextView(context, attrs, defStyle) {
 
+    enum class Appearance {
+        FILL, OUTLINE
+    }
+
     private var cachedText: String? = null
 
     private var preparedForProgress = false
+
+    init {
+        attrs?.let(this::applyAttrs)
+    }
+
+    private fun applyAttrs(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.PrimaryButton) { typedArray ->
+        val appearance = typedArray.getEnum(R.styleable.PrimaryButton_appearance, Appearance.FILL)
+        setAppearance(appearance)
+    }
+
+    fun setAppearance(appearance: Appearance) = with(context) {
+        val baseBackground = when (appearance) {
+            Appearance.FILL -> {
+                val fillColor = getColorFromAttr(R.attr.colorAccent)
+                val activeState = getRoundedCornerDrawableFromColors(fillColor = fillColor)
+
+                val disabledState = getRoundedCornerDrawable(fillColorRes = R.color.gray3)
+
+                getCornersStateDrawable(
+                    disabledDrawable = disabledState,
+                    focusedDrawable = activeState,
+                    idleDrawable = activeState
+                )
+            }
+            Appearance.OUTLINE -> getIdleDrawable()
+        }
+
+        val rippleColor = getColorFromAttr(R.attr.colorControlHighlight)
+        val background = addRipple(baseBackground, rippleColor = rippleColor)
+
+        setBackground(background)
+    }
 
     fun prepareForProgress(lifecycleOwner: LifecycleOwner) {
         lifecycleOwner.bindProgressButton(this)

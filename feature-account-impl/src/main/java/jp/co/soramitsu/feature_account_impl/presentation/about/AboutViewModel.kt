@@ -47,7 +47,7 @@ class AboutViewModel(
     }
 
     fun backButtonPressed() {
-        router.backToProfileScreen()
+        router.back()
     }
 
     fun websiteClicked() {

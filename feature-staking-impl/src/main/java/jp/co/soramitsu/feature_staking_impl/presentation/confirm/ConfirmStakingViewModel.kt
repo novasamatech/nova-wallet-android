@@ -6,6 +6,7 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import jp.co.soramitsu.common.address.AddressIconGenerator
 import jp.co.soramitsu.common.address.AddressModel
+import jp.co.soramitsu.common.address.createAddressModel
 import jp.co.soramitsu.common.base.BaseViewModel
 import jp.co.soramitsu.common.mixin.api.Retriable
 import jp.co.soramitsu.common.mixin.api.Validatable
@@ -16,13 +17,12 @@ import jp.co.soramitsu.common.validation.ValidationExecutor
 import jp.co.soramitsu.common.validation.ValidationSystem
 import jp.co.soramitsu.common.validation.progressConsumer
 import jp.co.soramitsu.feature_account_api.presenatation.account.AddressDisplayUseCase
-import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalAccountActions
+import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalActions
 import jp.co.soramitsu.feature_staking_api.domain.model.RewardDestination
 import jp.co.soramitsu.feature_staking_api.domain.model.StakingState
 import jp.co.soramitsu.feature_staking_api.domain.model.Validator
 import jp.co.soramitsu.feature_staking_impl.R
 import jp.co.soramitsu.feature_staking_impl.domain.StakingInteractor
-import jp.co.soramitsu.feature_staking_impl.domain.getSelectedChain
 import jp.co.soramitsu.feature_staking_impl.domain.setup.BondPayload
 import jp.co.soramitsu.feature_staking_impl.domain.setup.SetupStakingInteractor
 import jp.co.soramitsu.feature_staking_impl.domain.validations.setup.SetupStakingPayload
@@ -36,6 +36,8 @@ import jp.co.soramitsu.feature_staking_impl.presentation.common.validation.staki
 import jp.co.soramitsu.feature_wallet_api.data.mappers.mapAssetToAssetModel
 import jp.co.soramitsu.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import jp.co.soramitsu.runtime.ext.addressOf
+import jp.co.soramitsu.runtime.state.SingleAssetSharedState
+import jp.co.soramitsu.runtime.state.chain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filterIsInstance
@@ -59,13 +61,14 @@ class ConfirmStakingViewModel(
     private val setupStakingSharedState: SetupStakingSharedState,
     private val setupStakingInteractor: SetupStakingInteractor,
     private val feeLoaderMixin: FeeLoaderMixin.Presentation,
-    private val externalAccountActions: ExternalAccountActions.Presentation,
+    private val externalActions: ExternalActions.Presentation,
+    private val selectedAssetState: SingleAssetSharedState,
     private val validationExecutor: ValidationExecutor,
 ) : BaseViewModel(),
     Retriable,
     Validatable by validationExecutor,
     FeeLoaderMixin by feeLoaderMixin,
-    ExternalAccountActions by externalAccountActions {
+    ExternalActions by externalActions {
 
     private val currentProcessState = setupStakingSharedState.get<SetupStakingProcess.ReadyToSubmit>()
 
@@ -98,9 +101,11 @@ class ConfirmStakingViewModel(
         .flowOn(Dispatchers.Default)
         .asLiveData()
 
-    val currentAccountModelLiveData = controllerAddressFlow.map {
+    val currentAccountModelFlow = controllerAddressFlow.map {
         generateDestinationModel(it, addressDisplayUseCase(it))
-    }.asLiveData()
+    }
+        .inBackground()
+        .share()
 
     val nominationsLiveData = liveData(Dispatchers.Default) {
         val selectedCount = payload.validators.size
@@ -164,22 +169,17 @@ class ConfirmStakingViewModel(
         router.back()
     }
 
-    fun originAccountClicked() {
-        viewModelScope.launch {
-            val account = interactor.getSelectedAccountProjection()
+    fun originAccountClicked() = launch {
+        val address = currentAccountModelFlow.first().address
 
-            val payload = ExternalAccountActions.Payload(account.address, account.network.type)
-
-            externalAccountActions.showExternalActions(payload)
-        }
+        externalActions.showExternalActions(ExternalActions.Type.Address(address), selectedAssetState.chain())
     }
 
-    fun payoutAccountClicked() {
-        val payoutDestination = rewardDestinationLiveData.value as? RewardDestinationModel.Payout ?: return
+    fun payoutAccountClicked() = launch {
+        val payoutDestination = rewardDestinationLiveData.value as? RewardDestinationModel.Payout ?: return@launch
 
-        val payload = ExternalAccountActions.Payload.fromAddress(payoutDestination.destination.address)
-
-        externalAccountActions.showExternalActions(payload)
+        val type = ExternalActions.Type.Address(payoutDestination.destination.address)
+        externalActions.showExternalActions(type, selectedAssetState.chain())
     }
 
     fun nominationsClicked() {
@@ -208,7 +208,7 @@ class ConfirmStakingViewModel(
         return when (rewardDestination) {
             is RewardDestination.Restake -> RewardDestinationModel.Restake
             is RewardDestination.Payout -> {
-                val chain = interactor.getSelectedChain()
+                val chain = selectedAssetState.chain()
                 val address = chain.addressOf(rewardDestination.targetAccountId)
                 val name = addressDisplayUseCase(address)
 

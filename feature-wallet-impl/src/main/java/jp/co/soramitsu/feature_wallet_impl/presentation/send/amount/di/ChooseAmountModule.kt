@@ -9,7 +9,7 @@ import dagger.multibindings.IntoMap
 import jp.co.soramitsu.common.address.AddressIconGenerator
 import jp.co.soramitsu.common.di.viewmodel.ViewModelKey
 import jp.co.soramitsu.common.di.viewmodel.ViewModelModule
-import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalAccountActions
+import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalActions
 import jp.co.soramitsu.feature_wallet_api.domain.interfaces.WalletConstants
 import jp.co.soramitsu.feature_wallet_api.domain.interfaces.WalletInteractor
 import jp.co.soramitsu.feature_wallet_impl.presentation.AssetPayload
@@ -18,6 +18,7 @@ import jp.co.soramitsu.feature_wallet_impl.presentation.send.TransferValidityChe
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.amount.ChooseAmountViewModel
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.phishing.warning.api.PhishingWarningMixin
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.phishing.warning.impl.PhishingWarningProvider
+import jp.co.soramitsu.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
 class ChooseAmountModule {
@@ -34,21 +35,24 @@ class ChooseAmountModule {
         interactor: WalletInteractor,
         router: WalletRouter,
         addressModelGenerator: AddressIconGenerator,
-        externalAccountActions: ExternalAccountActions.Presentation,
+        externalActions: ExternalActions.Presentation,
         transferValidityChecks: TransferValidityChecks.Presentation,
         recipientAddress: String,
         walletConstants: WalletConstants,
+        assetPayload: AssetPayload,
+        chainRegistry: ChainRegistry,
         phishingWarning: PhishingWarningMixin
     ): ViewModel {
         return ChooseAmountViewModel(
             interactor,
             router,
             addressModelGenerator,
-            externalAccountActions,
+            externalActions,
             transferValidityChecks,
             walletConstants,
             recipientAddress,
-            AssetPayload.stub(), // TODO pass payload from previous screen
+            assetPayload,
+            chainRegistry,
             phishingWarning
         )
     }

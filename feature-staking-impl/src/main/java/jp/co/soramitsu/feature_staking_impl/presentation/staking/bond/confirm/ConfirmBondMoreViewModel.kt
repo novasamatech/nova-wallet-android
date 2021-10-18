@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
 import jp.co.soramitsu.common.address.AddressIconGenerator
+import jp.co.soramitsu.common.address.createAddressModel
 import jp.co.soramitsu.common.base.BaseViewModel
 import jp.co.soramitsu.common.mixin.api.Validatable
 import jp.co.soramitsu.common.resources.ResourceManager
@@ -12,7 +13,7 @@ import jp.co.soramitsu.common.utils.inBackground
 import jp.co.soramitsu.common.utils.requireException
 import jp.co.soramitsu.common.validation.ValidationExecutor
 import jp.co.soramitsu.common.validation.progressConsumer
-import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalAccountActions
+import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalActions
 import jp.co.soramitsu.feature_staking_impl.R
 import jp.co.soramitsu.feature_staking_impl.domain.StakingInteractor
 import jp.co.soramitsu.feature_staking_impl.domain.staking.bond.BondMoreInteractor
@@ -24,6 +25,8 @@ import jp.co.soramitsu.feature_wallet_api.data.mappers.mapAssetToAssetModel
 import jp.co.soramitsu.feature_wallet_api.data.mappers.mapFeeToFeeModel
 import jp.co.soramitsu.feature_wallet_api.domain.model.planksFromAmount
 import jp.co.soramitsu.feature_wallet_api.presentation.mixin.fee.FeeStatus
+import jp.co.soramitsu.runtime.state.SingleAssetSharedState
+import jp.co.soramitsu.runtime.state.chain
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -36,10 +39,11 @@ class ConfirmBondMoreViewModel(
     private val validationExecutor: ValidationExecutor,
     private val iconGenerator: AddressIconGenerator,
     private val validationSystem: BondMoreValidationSystem,
-    private val externalAccountActions: ExternalAccountActions.Presentation,
+    private val externalActions: ExternalActions.Presentation,
     private val payload: ConfirmBondMorePayload,
+    private val selectedAssetState: SingleAssetSharedState,
 ) : BaseViewModel(),
-    ExternalAccountActions by externalAccountActions,
+    ExternalActions by externalActions,
     Validatable by validationExecutor {
 
     private val _showNextProgress = MutableLiveData(false)
@@ -54,7 +58,7 @@ class ConfirmBondMoreViewModel(
         .asLiveData()
 
     val amountFiatFLow = assetFlow.map { asset ->
-        asset.token.fiatAmount(payload.amount)?.formatAsCurrency()
+        asset.token.fiatAmount(payload.amount).formatAsCurrency()
     }
         .inBackground()
         .asLiveData()
@@ -86,10 +90,8 @@ class ConfirmBondMoreViewModel(
         router.back()
     }
 
-    fun originAccountClicked() {
-        val externalActionsPayload = ExternalAccountActions.Payload.fromAddress(payload.stashAddress)
-
-        externalAccountActions.showExternalActions(externalActionsPayload)
+    fun originAccountClicked() = launch {
+        externalActions.showExternalActions(ExternalActions.Type.Address(payload.stashAddress), selectedAssetState.chain())
     }
 
     private fun maybeGoToNext() = launch {

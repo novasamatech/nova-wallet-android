@@ -71,11 +71,16 @@
     </style>
 
     <style name="Widget.Fearless.Button.Primary">
-        <item name="android:background">@drawable/bg_button_primary_selector</item>
+<!--        <item name="android:background">@drawable/bg_button_primary_selector</item>-->
+        <item name="appearance">fill</item>
     </style>
 
     <style  name="Widget.Fearless.Button.Outline">
-        <item name="android:background">@drawable/bg_button_outline_selector</item>
+        <item name="appearance">outline</item>
+    </style>
+
+    <style name="AccentBlue" parent="">
+        <item name="colorAccent">@color/accentBlue</item>
     </style>
 
     <style name="Widget.Fearless.Puller" parent="">

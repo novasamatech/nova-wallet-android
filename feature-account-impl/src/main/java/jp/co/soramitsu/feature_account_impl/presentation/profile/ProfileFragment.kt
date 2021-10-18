@@ -6,10 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import jp.co.soramitsu.common.base.BaseFragment
 import jp.co.soramitsu.common.di.FeatureUtils
-import jp.co.soramitsu.common.mixin.impl.observeBrowserEvents
 import jp.co.soramitsu.feature_account_api.di.AccountFeatureApi
-import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalAccountActions
-import jp.co.soramitsu.feature_account_api.presenatation.actions.copyAddressClicked
+import jp.co.soramitsu.feature_account_api.domain.model.defaultSubstrateAddress
 import jp.co.soramitsu.feature_account_impl.R
 import jp.co.soramitsu.feature_account_impl.di.AccountFeatureComponent
 import kotlinx.android.synthetic.main.fragment_profile.aboutTv
@@ -19,7 +17,6 @@ import kotlinx.android.synthetic.main.fragment_profile.languageWrapper
 import kotlinx.android.synthetic.main.fragment_profile.networkWrapper
 import kotlinx.android.synthetic.main.fragment_profile.profileAccounts
 import kotlinx.android.synthetic.main.fragment_profile.selectedLanguageTv
-import kotlinx.android.synthetic.main.fragment_profile.selectedNetworkTv
 
 class ProfileFragment : BaseFragment<ProfileViewModel>() {
 
@@ -53,34 +50,16 @@ class ProfileFragment : BaseFragment<ProfileViewModel>() {
     }
 
     override fun subscribe(viewModel: ProfileViewModel) {
-        observeBrowserEvents(viewModel)
+        viewModel.selectedAccountFlow.observe { account ->
+            accountView.setTitle(account.name)
 
-        viewModel.selectedAccountLiveData.observe { account ->
-            account.name?.let(accountView::setTitle)
-
-            accountView.setText(account.address)
-
-            selectedNetworkTv.text = account.network.name
+            accountView.setText(account.defaultSubstrateAddress)
         }
 
-        viewModel.accountIconLiveData.observe {
-            accountView.setAccountIcon(it.image)
-        }
+        viewModel.accountIconFlow.observe(accountView::setAccountIcon)
 
         viewModel.selectedLanguageLiveData.observe {
             selectedLanguageTv.text = it.displayName
         }
-
-        viewModel.showExternalActionsEvent.observeEvent(::showAccountActions)
-    }
-
-    private fun showAccountActions(payload: ExternalAccountActions.Payload) {
-        ProfileActionsSheet(
-            requireContext(),
-            payload,
-            viewModel::copyAddressClicked,
-            viewModel::viewExternalClicked,
-            viewModel::accountsClicked
-        ).show()
     }
 }

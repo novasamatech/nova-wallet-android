@@ -20,6 +20,7 @@ import jp.co.soramitsu.feature_wallet_impl.presentation.balance.detail.BalanceDe
 import jp.co.soramitsu.feature_wallet_impl.presentation.transaction.filter.HistoryFiltersProvider
 import jp.co.soramitsu.feature_wallet_impl.presentation.transaction.history.mixin.TransactionHistoryMixin
 import jp.co.soramitsu.feature_wallet_impl.presentation.transaction.history.mixin.TransactionHistoryProvider
+import jp.co.soramitsu.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
 class BalanceDetailModule {
@@ -34,6 +35,7 @@ class BalanceDetailModule {
         resourceManager: ResourceManager,
         assetPayload: AssetPayload,
         addressDisplayUseCase: AddressDisplayUseCase,
+        chainRegistry: ChainRegistry,
     ): TransactionHistoryMixin {
         return TransactionHistoryProvider(
             walletInteractor,
@@ -42,6 +44,7 @@ class BalanceDetailModule {
             historyFiltersProvider,
             resourceManager,
             addressDisplayUseCase,
+            chainRegistry,
             assetPayload.chainId,
             assetPayload.chainAssetId
         )

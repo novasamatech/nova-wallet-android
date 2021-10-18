@@ -1,9 +1,11 @@
 package jp.co.soramitsu.feature_crowdloan_impl.presentation.main
 
 import jp.co.soramitsu.common.address.AddressIconGenerator
+import jp.co.soramitsu.common.address.createAddressIcon
 import jp.co.soramitsu.common.base.BaseViewModel
 import jp.co.soramitsu.common.list.toListWithHeaders
 import jp.co.soramitsu.common.list.toValueList
+import jp.co.soramitsu.common.mixin.MixinFactory
 import jp.co.soramitsu.common.presentation.LoadingState
 import jp.co.soramitsu.common.presentation.mapLoading
 import jp.co.soramitsu.common.resources.ResourceManager
@@ -22,7 +24,6 @@ import jp.co.soramitsu.feature_crowdloan_impl.presentation.contribute.select.par
 import jp.co.soramitsu.feature_crowdloan_impl.presentation.contribute.select.parcel.mapParachainMetadataToParcel
 import jp.co.soramitsu.feature_crowdloan_impl.presentation.main.model.CrowdloanModel
 import jp.co.soramitsu.feature_crowdloan_impl.presentation.main.model.CrowdloanStatusModel
-import jp.co.soramitsu.feature_wallet_api.domain.AssetUseCase
 import jp.co.soramitsu.feature_wallet_api.domain.model.Asset
 import jp.co.soramitsu.feature_wallet_api.domain.model.amountFromPlanks
 import jp.co.soramitsu.feature_wallet_api.presentation.formatters.formatTokenAmount
@@ -42,22 +43,18 @@ private const val ICON_SIZE_DP = 40
 
 class CrowdloanViewModel(
     private val interactor: CrowdloanInteractor,
-    private val assetUseCase: AssetUseCase,
     private val iconGenerator: AddressIconGenerator,
     private val resourceManager: ResourceManager,
     private val crowdloanSharedState: CrowdloanSharedState,
     private val router: CrowdloanRouter,
     private val sharedState: CrowdloanSharedState,
     private val crowdloanUpdateSystem: UpdateSystem,
-    assetSelectorFactory: AssetSelectorMixin.Presentation.Factory,
+    assetSelectorFactory: MixinFactory<AssetSelectorMixin.Presentation>,
 ) : BaseViewModel(), WithAssetSelector {
 
     override val assetSelectorMixin = assetSelectorFactory.create(scope = this)
 
-    private val assetFlow = assetUseCase.currentAssetFlow()
-        .share()
-
-    val mainDescription = assetFlow.map {
+    val mainDescription = assetSelectorMixin.selectedAssetFlow.map {
         resourceManager.getString(R.string.crowdloan_main_description, it.token.configuration.symbol)
     }
 
@@ -76,7 +73,7 @@ class CrowdloanViewModel(
         .share()
 
     val crowdloanModelsFlow = groupedCrowdloansFlow.mapLoading { groupedCrowdloans ->
-        val asset = assetFlow.first()
+        val asset = assetSelectorMixin.selectedAssetFlow.first()
         val chain = crowdloanSharedState.chain()
 
         groupedCrowdloans

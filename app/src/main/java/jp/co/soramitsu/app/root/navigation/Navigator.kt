@@ -10,7 +10,7 @@ import jp.co.soramitsu.app.R
 import jp.co.soramitsu.app.root.presentation.RootRouter
 import jp.co.soramitsu.common.navigation.DelayedNavigation
 import jp.co.soramitsu.common.utils.postToUiThread
-import jp.co.soramitsu.core.model.Node
+import jp.co.soramitsu.feature_account_api.presenatation.account.add.AddAccountPayload
 import jp.co.soramitsu.feature_account_impl.presentation.AccountRouter
 import jp.co.soramitsu.feature_account_impl.presentation.account.create.CreateAccountFragment
 import jp.co.soramitsu.feature_account_impl.presentation.account.details.AccountDetailsFragment
@@ -66,9 +66,11 @@ import jp.co.soramitsu.feature_wallet_impl.presentation.AssetPayload
 import jp.co.soramitsu.feature_wallet_impl.presentation.WalletRouter
 import jp.co.soramitsu.feature_wallet_impl.presentation.balance.detail.BalanceDetailFragment
 import jp.co.soramitsu.feature_wallet_impl.presentation.model.OperationParcelizeModel
+import jp.co.soramitsu.feature_wallet_impl.presentation.receive.ReceiveFragment
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.TransferDraft
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.amount.ChooseAmountFragment
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.confirm.ConfirmTransferFragment
+import jp.co.soramitsu.feature_wallet_impl.presentation.send.recipient.ChooseRecipientFragment
 import jp.co.soramitsu.feature_wallet_impl.presentation.transaction.detail.extrinsic.ExtrinsicDetailFragment
 import jp.co.soramitsu.feature_wallet_impl.presentation.transaction.detail.reward.RewardDetailFragment
 import jp.co.soramitsu.feature_wallet_impl.presentation.transaction.detail.transfer.TransferDetailFragment
@@ -102,7 +104,7 @@ class Navigator :
     }
 
     override fun openAddFirstAccount() {
-        navController?.navigate(R.id.action_splash_to_onboarding, WelcomeFragment.getBundle(false))
+        navController?.navigate(R.id.action_splash_to_onboarding, WelcomeFragment.bundle(false))
     }
 
     override fun openInitialCheckPincode() {
@@ -111,12 +113,8 @@ class Navigator :
         navController?.navigate(R.id.action_splash_to_pin, bundle)
     }
 
-    override fun openCreateAccount(selectedNetworkType: Node.NetworkType?) {
-        navController?.navigate(R.id.action_welcomeFragment_to_createAccountFragment, CreateAccountFragment.getBundle(selectedNetworkType))
-    }
-
-    override fun backToWelcomeScreen() {
-        navController?.popBackStack()
+    override fun openCreateAccount(addAccountPayload: AddAccountPayload) {
+        navController?.navigate(R.id.action_welcomeFragment_to_createAccountFragment, CreateAccountFragment.getBundle(addAccountPayload))
     }
 
     override fun openMain() {
@@ -160,25 +158,13 @@ class Navigator :
         navController?.navigate(R.id.action_profileFragment_to_aboutFragment)
     }
 
-    override fun openImportAccountScreen(selectedNetworkType: Node.NetworkType?) {
-        navController?.navigate(R.id.importAction, ImportAccountFragment.getBundle(selectedNetworkType))
+    override fun openImportAccountScreen(addAccountPayload: AddAccountPayload) {
+        navController?.navigate(R.id.importAction, ImportAccountFragment.getBundle(addAccountPayload))
     }
 
-    override fun openMnemonicScreen(accountName: String, selectedNetworkType: Node.NetworkType) {
-        val bundle = BackupMnemonicFragment.getBundle(accountName, selectedNetworkType)
+    override fun openMnemonicScreen(accountName: String, payload: AddAccountPayload) {
+        val bundle = BackupMnemonicFragment.getBundle(accountName, payload)
         navController?.navigate(R.id.action_createAccountFragment_to_backupMnemonicFragment, bundle)
-    }
-
-    override fun backToCreateAccountScreen() {
-        navController?.popBackStack()
-    }
-
-    override fun backToBackupMnemonicScreen() {
-        navController?.popBackStack()
-    }
-
-    override fun backToProfileScreen() {
-        navController?.popBackStack()
     }
 
     override fun openSetupStaking() {
@@ -343,16 +329,16 @@ class Navigator :
         navController?.navigate(R.id.open_validator_details, ValidatorDetailsFragment.getBundle(validatorDetails))
     }
 
-    override fun openChooseRecipient() {
-        navController?.navigate(R.id.action_open_send)
+    override fun openChooseRecipient(assetPayload: AssetPayload) {
+        navController?.navigate(R.id.action_open_send, ChooseRecipientFragment.getBundle(assetPayload))
     }
 
     override fun openFilter() {
         navController?.navigate(R.id.action_mainFragment_to_filterFragment)
     }
 
-    override fun openChooseAmount(recipientAddress: String) {
-        val bundle = ChooseAmountFragment.getBundle(recipientAddress)
+    override fun openChooseAmount(recipientAddress: String, assetPayload: AssetPayload) {
+        val bundle = ChooseAmountFragment.getBundle(recipientAddress, assetPayload)
 
         navController?.navigate(R.id.action_chooseRecipientFragment_to_chooseAmountFragment, bundle)
     }
@@ -367,8 +353,8 @@ class Navigator :
         navController?.navigate(R.id.finish_send_flow)
     }
 
-    override fun openRepeatTransaction(recipientAddress: String) {
-        val bundle = ChooseAmountFragment.getBundle(recipientAddress)
+    override fun openRepeatTransaction(recipientAddress: String, assetPayload: AssetPayload) {
+        val bundle = ChooseAmountFragment.getBundle(recipientAddress, assetPayload)
 
         navController?.navigate(R.id.openSelectAmount, bundle)
     }
@@ -403,10 +389,6 @@ class Navigator :
         navController?.navigate(R.id.action_mainFragment_to_languagesFragment)
     }
 
-    override fun openAddAccount() {
-        navController?.navigate(R.id.action_open_onboarding, WelcomeFragment.getBundle(true))
-    }
-
     override fun openChangeAccountFromWallet() {
         openAccounts(AccountChosenNavDirection.BACK)
     }
@@ -415,8 +397,8 @@ class Navigator :
         openAccounts(AccountChosenNavDirection.BACK)
     }
 
-    override fun openReceive() {
-        navController?.navigate(R.id.action_open_receive)
+    override fun openReceive(assetPayload: AssetPayload) {
+        navController?.navigate(R.id.action_open_receive, ReceiveFragment.getBundle(assetPayload))
     }
 
     override fun returnToWallet() {
@@ -426,10 +408,10 @@ class Navigator :
         }
     }
 
-    override fun openAccountDetails(address: String) {
-        val extras = AccountDetailsFragment.getBundle(address)
+    override fun openAccountDetails(metaAccountId: Long) {
+        val extras = AccountDetailsFragment.getBundle(metaAccountId)
 
-        navController?.navigate(R.id.action_accountsFragment_to_accountDetailsFragment, extras)
+        navController?.navigate(R.id.action_open_account_details, extras)
     }
 
     override fun openEditAccounts() {
@@ -454,8 +436,8 @@ class Navigator :
         navController?.navigate(R.id.action_nodesFragment_to_addNodeFragment)
     }
 
-    override fun createAccountForNetworkType(networkType: Node.NetworkType) {
-        navController?.navigate(R.id.action_nodes_to_onboarding, WelcomeFragment.getBundleWithNetworkType(true, networkType))
+    override fun openAddAccount(payload: AddAccountPayload) {
+        navController?.navigate(R.id.action_open_onboarding, WelcomeFragment.bundle(payload))
     }
 
     override fun openExportMnemonic(accountAddress: String): DelayedNavigation {

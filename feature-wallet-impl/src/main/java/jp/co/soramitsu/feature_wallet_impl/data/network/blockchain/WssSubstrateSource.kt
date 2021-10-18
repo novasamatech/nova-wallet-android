@@ -13,7 +13,6 @@ import jp.co.soramitsu.common.utils.system
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.transfer
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
 import jp.co.soramitsu.feature_account_api.data.extrinsic.ExtrinsicService
@@ -109,7 +108,7 @@ class WssSubstrateSource(
 
     private fun ExtrinsicBuilder.transfer(chain: Chain, transfer: Transfer): ExtrinsicBuilder {
         return transfer(
-            recipientAccountId = chain.accountIdOf(transfer.recipient),
+            accountId = chain.accountIdOf(transfer.recipient),
             amount = transfer.amountInPlanks
         )
     }

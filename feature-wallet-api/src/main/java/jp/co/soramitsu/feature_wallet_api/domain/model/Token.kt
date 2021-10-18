@@ -10,7 +10,7 @@ class Token(
     val configuration: Chain.Asset
 ) {
 
-    fun fiatAmount(tokenAmount: BigDecimal): BigDecimal? = dollarRate?.multiply(tokenAmount)
+    fun fiatAmount(tokenAmount: BigDecimal): BigDecimal = dollarRate?.multiply(tokenAmount) ?: BigDecimal.ZERO
 }
 
 fun Token.amountFromPlanks(amountInPlanks: BigInteger) = configuration.amountFromPlanks(amountInPlanks)

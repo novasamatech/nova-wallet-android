@@ -9,10 +9,13 @@ import jp.co.soramitsu.common.address.AddressModel
 import jp.co.soramitsu.common.base.BaseViewModel
 import jp.co.soramitsu.common.utils.Event
 import jp.co.soramitsu.common.utils.combine
+import jp.co.soramitsu.common.utils.invoke
+import jp.co.soramitsu.common.utils.lazyAsync
 import jp.co.soramitsu.common.utils.map
 import jp.co.soramitsu.common.utils.requireValue
 import jp.co.soramitsu.common.view.ButtonState
-import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalAccountActions
+import jp.co.soramitsu.feature_account_api.presenatation.account.icon.createAddressModel
+import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalActions
 import jp.co.soramitsu.feature_wallet_api.domain.interfaces.WalletConstants
 import jp.co.soramitsu.feature_wallet_api.domain.interfaces.WalletInteractor
 import jp.co.soramitsu.feature_wallet_api.domain.model.Fee
@@ -26,13 +29,13 @@ import jp.co.soramitsu.feature_wallet_impl.R
 import jp.co.soramitsu.feature_wallet_impl.data.mappers.mapAssetToAssetModel
 import jp.co.soramitsu.feature_wallet_impl.presentation.AssetPayload
 import jp.co.soramitsu.feature_wallet_impl.presentation.WalletRouter
-import jp.co.soramitsu.feature_wallet_impl.presentation.model.networkType
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.BalanceDetailsBottomSheet
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.TransferDraft
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.TransferValidityChecks
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.phishing.warning.api.PhishingWarningMixin
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.phishing.warning.api.PhishingWarningPresentation
 import jp.co.soramitsu.feature_wallet_impl.presentation.send.phishing.warning.api.proceedOrShowPhishingWarning
+import jp.co.soramitsu.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
@@ -41,7 +44,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -49,8 +51,6 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.milliseconds
 
 private const val AVATAR_SIZE_DP = 24
-
-private const val RETRY_TIMES = 3L
 
 enum class RetryReason(val reasonRes: Int) {
     CHECK_ENOUGH_FUNDS(R.string.choose_amount_error_balance),
@@ -61,17 +61,20 @@ class ChooseAmountViewModel(
     private val interactor: WalletInteractor,
     private val router: WalletRouter,
     private val addressIconGenerator: AddressIconGenerator,
-    private val externalAccountActions: ExternalAccountActions.Presentation,
+    private val externalActions: ExternalActions.Presentation,
     private val transferValidityChecks: TransferValidityChecks.Presentation,
     private val walletConstants: WalletConstants,
     private val recipientAddress: String,
     private val assetPayload: AssetPayload,
+    private val chainRegistry: ChainRegistry,
     private val phishingAddress: PhishingWarningMixin
 ) : BaseViewModel(),
-    ExternalAccountActions by externalAccountActions,
+    ExternalActions by externalActions,
     TransferValidityChecks by transferValidityChecks,
     PhishingWarningMixin by phishingAddress,
     PhishingWarningPresentation {
+
+    private val chain by lazyAsync { chainRegistry.getChain(assetPayload.chainId) }
 
     val recipientModelLiveData = liveData {
         emit(generateAddressModel(recipientAddress))
@@ -80,7 +83,7 @@ class ChooseAmountViewModel(
     private val amountEvents = MutableStateFlow("0")
     private val amountRawLiveData = amountEvents.asLiveData()
 
-    private val _feeLoadingLiveData = MutableLiveData<Boolean>(true)
+    private val _feeLoadingLiveData = MutableLiveData(true)
     val feeLoadingLiveData = _feeLoadingLiveData
 
     val feeLiveData = feeFlow().asLiveData()
@@ -139,11 +142,10 @@ class ChooseAmountViewModel(
         }
     }
 
-    fun recipientAddressClicked() {
-        val recipientAddress = recipientModelLiveData.value?.address ?: return
-        val networkType = assetLiveData.value?.token?.configuration?.networkType ?: return
+    fun recipientAddressClicked() = launch {
+        val recipientAddress = recipientModelLiveData.value?.address ?: return@launch
 
-        externalAccountActions.showExternalActions(ExternalAccountActions.Payload(recipientAddress, networkType))
+        externalActions.showExternalActions(ExternalActions.Type.Address(recipientAddress), chain())
     }
 
     fun availableBalanceClicked() {
@@ -184,7 +186,6 @@ class ChooseAmountViewModel(
 
             interactor.getTransferFee(transfer)
         }
-        .retry(RETRY_TIMES)
         .catch {
             _feeErrorLiveData.postValue(Event(RetryReason.LOAD_FEE))
 
@@ -194,7 +195,7 @@ class ChooseAmountViewModel(
         }
 
     private suspend fun generateAddressModel(address: String): AddressModel {
-        return addressIconGenerator.createAddressModel(address, AVATAR_SIZE_DP)
+        return addressIconGenerator.createAddressModel(chain(), address, AVATAR_SIZE_DP)
     }
 
     private fun checkEnoughFunds() {

@@ -27,6 +27,10 @@ inline fun <T> List<T>.sumByBigDecimal(extractor: (T) -> BigDecimal) = fold(BigD
     acc + extractor(element)
 }
 
+inline fun <reified T> Any?.castOrNull(): T? {
+    return this as? T
+}
+
 fun <K, V> Map<K, V>.reversed() = HashMap<V, K>().also { newMap ->
     entries.forEach { newMap[it.value] = it.key }
 }
@@ -77,3 +81,20 @@ inline fun <T> CoroutineScope.lazyAsync(crossinline producer: suspend () -> T) =
 inline fun <T> Iterable<T>.filterToSet(predicate: (T) -> Boolean): Set<T> = filterTo(mutableSetOf(), predicate)
 
 fun String.nullIfEmpty(): String? = if (isEmpty()) null else this
+
+private val NAMED_PATTERN_REGEX = "\\{([a-zA-z]+)\\}".toRegex()
+
+fun String.formatNamed(vararg values: Pair<String, String>) = formatNamed(values.toMap())
+
+/**
+ * Replaces all parts in form of '{name}' to the corresponding value from values using 'name' as a key.
+ *
+ * @return formatted string
+ */
+fun String.formatNamed(values: Map<String, String>): String {
+    return NAMED_PATTERN_REGEX.replace(this) { matchResult ->
+        val argumentName = matchResult.groupValues.second()
+
+        values[argumentName] ?: "null"
+    }
+}

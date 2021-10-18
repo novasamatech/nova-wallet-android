@@ -3,15 +3,19 @@ package jp.co.soramitsu.feature_wallet_impl.data.repository
 import jp.co.soramitsu.common.data.model.CursorPage
 import jp.co.soramitsu.common.data.network.HttpExceptionHandler
 import jp.co.soramitsu.common.data.network.coingecko.PriceInfo
+import jp.co.soramitsu.common.utils.asQueryParam
 import jp.co.soramitsu.common.utils.mapList
 import jp.co.soramitsu.core_db.dao.OperationDao
 import jp.co.soramitsu.core_db.dao.PhishingAddressDao
 import jp.co.soramitsu.core_db.model.AssetWithToken
 import jp.co.soramitsu.core_db.model.OperationLocal
 import jp.co.soramitsu.core_db.model.PhishingAddressLocal
+import jp.co.soramitsu.core_db.model.TokenLocal
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
+import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountRepository
+import jp.co.soramitsu.feature_account_api.domain.interfaces.findMetaAccountOrThrow
 import jp.co.soramitsu.feature_wallet_api.data.cache.AssetCache
 import jp.co.soramitsu.feature_wallet_api.domain.interfaces.TransactionFilter
 import jp.co.soramitsu.feature_wallet_api.domain.interfaces.WalletConstants
@@ -36,14 +40,17 @@ import jp.co.soramitsu.feature_wallet_impl.data.network.subquery.SubQueryOperati
 import jp.co.soramitsu.feature_wallet_impl.data.storage.TransferCursorStorage
 import jp.co.soramitsu.runtime.ext.accountIdOf
 import jp.co.soramitsu.runtime.ext.addressOf
-import jp.co.soramitsu.runtime.ext.utilityAsset
+import jp.co.soramitsu.runtime.ext.historySupported
 import jp.co.soramitsu.runtime.multiNetwork.ChainRegistry
 import jp.co.soramitsu.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.withContext
@@ -55,6 +62,7 @@ class WalletRepositoryImpl(
     private val walletOperationsApi: SubQueryOperationsApi,
     private val httpExceptionHandler: HttpExceptionHandler,
     private val phishingApi: PhishingApi,
+    private val accountRepository: AccountRepository,
     private val assetCache: AssetCache,
     private val walletConstants: WalletConstants,
     private val phishingAddressDao: PhishingAddressDao,
@@ -93,24 +101,45 @@ class WalletRepositoryImpl(
     }
 
     override suspend fun syncAssetsRates() {
-        // TODO FLW-1147 - coingecko integration
-        val firstChain = chainRegistry.currentChains.first().first()
-        val asset = firstChain.utilityAsset
+        val chains = chainRegistry.currentChains.first()
 
-        asset.priceId?.let {
-            val priceStats = getAssetPriceCoingecko(it)
+        val syncingPriceIdsToSymbols = chains.flatMap(Chain::assets)
+            .filter { it.priceId != null }
+            .distinctBy { it.priceId }
+            .associateBy(
+                keySelector = { it.priceId!! },
+                valueTransform = { it.symbol }
+            )
 
-            updateAssetRates(asset.symbol, priceStats)
+        if (syncingPriceIdsToSymbols.isNotEmpty()) {
+            val priceStats = getAssetPriceCoingecko(syncingPriceIdsToSymbols.keys)
+
+            val updatedTokens = priceStats.mapNotNull { (priceId, tokenStats) ->
+                syncingPriceIdsToSymbols[priceId]?.let { symbol ->
+                    TokenLocal(symbol, tokenStats.price, tokenStats.rateChange)
+                }
+            }
+
+            assetCache.insertTokens(updatedTokens)
         }
     }
 
     override fun assetFlow(accountId: AccountId, chainAsset: Chain.Asset): Flow<Asset> {
-        return assetCache.observeAsset(accountId, chainAsset.chainId, chainAsset.symbol)
+        return flow {
+            val metaAccount = accountRepository.findMetaAccountOrThrow(accountId)
+
+            emitAll(assetFlow(metaAccount.id, chainAsset))
+        }
+    }
+
+    override fun assetFlow(metaId: Long, chainAsset: Chain.Asset): Flow<Asset> {
+        return assetCache.observeAsset(metaId, chainAsset.chainId, chainAsset.symbol)
+            .filterNotNull()
             .map { mapAssetLocalToAsset(it, chainAsset) }
     }
 
     override suspend fun getAsset(accountId: AccountId, chainAsset: Chain.Asset): Asset? {
-        val assetLocal = assetCache.getAsset(accountId, chainAsset.chainId, chainAsset.symbol)
+        val assetLocal = getAsset(accountId, chainAsset.chainId, chainAsset.symbol)
 
         return assetLocal?.let { mapAssetLocalToAsset(it, chainAsset) }
     }
@@ -170,7 +199,11 @@ class WalletRepositoryImpl(
                 mapOperationLocalToOperation(it, chainAsset)
             }
             .mapLatest { operations ->
-                val cursor = cursorStorage.awaitCursor(chain.id, chainAsset.id, accountId)
+                val cursor = if (chain.historySupported) {
+                    cursorStorage.awaitCursor(chain.id, chainAsset.id, accountId)
+                } else {
+                    null
+                }
 
                 CursorPage(cursor, operations)
             }
@@ -223,7 +256,7 @@ class WalletRepositoryImpl(
         val totalRecipientBalanceInPlanks = recipientInfo.totalBalance
         val totalRecipientBalance = chainAsset.amountFromPlanks(totalRecipientBalanceInPlanks)
 
-        val assetLocal = assetCache.getAsset(accountId, chainAsset.chainId, chainAsset.symbol)!!
+        val assetLocal = getAsset(accountId, chainAsset.chainId, chainAsset.symbol)!!
         val asset = mapAssetLocalToAsset(assetLocal, chainAsset)
 
         val existentialDepositInPlanks = walletConstants.existentialDeposit(chain.id)
@@ -273,24 +306,15 @@ class WalletRepositoryImpl(
             source = source
         )
 
-    private suspend fun updateAssetRates(
-        symbol: String,
-        priceStats: Map<String, PriceInfo>?,
-    ) = assetCache.updateToken(symbol) { cached ->
-        val priceStat = priceStats?.values?.first()
-
-        val price = priceStat?.price
-        val change = priceStat?.rateChange
-
-        cached.copy(
-            dollarRate = price,
-            recentRateChange = change
-        )
-    }
-
-    private suspend fun getAssetPriceCoingecko(priceId: String): Map<String, PriceInfo> {
-        return apiCall { coingeckoApi.getAssetPrice(priceId, "usd", true) }
+    private suspend fun getAssetPriceCoingecko(priceIds: Set<String>): Map<String, PriceInfo> {
+        return apiCall { coingeckoApi.getAssetPrice(priceIds.asQueryParam(), currency = "usd", includeRateChange = true) }
     }
 
     private suspend fun <T> apiCall(block: suspend () -> T): T = httpExceptionHandler.wrap(block)
+
+    private suspend fun getAsset(accountId: AccountId, chainId: String, symbol: String) = withContext(Dispatchers.Default) {
+        val metaAccount = accountRepository.findMetaAccountOrThrow(accountId)
+
+        assetCache.getAsset(metaAccount.id, chainId, symbol)
+    }
 }

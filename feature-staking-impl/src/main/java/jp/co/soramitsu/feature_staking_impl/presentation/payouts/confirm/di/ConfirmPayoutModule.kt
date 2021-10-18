@@ -13,15 +13,16 @@ import jp.co.soramitsu.common.resources.ResourceManager
 import jp.co.soramitsu.common.validation.ValidationExecutor
 import jp.co.soramitsu.common.validation.ValidationSystem
 import jp.co.soramitsu.feature_account_api.presenatation.account.AddressDisplayUseCase
-import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalAccountActions
+import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalActions
+import jp.co.soramitsu.feature_staking_impl.data.StakingSharedState
 import jp.co.soramitsu.feature_staking_impl.domain.StakingInteractor
 import jp.co.soramitsu.feature_staking_impl.domain.payout.PayoutInteractor
 import jp.co.soramitsu.feature_staking_impl.domain.validations.payout.MakePayoutPayload
 import jp.co.soramitsu.feature_staking_impl.domain.validations.payout.PayoutValidationFailure
 import jp.co.soramitsu.feature_staking_impl.presentation.StakingRouter
-import jp.co.soramitsu.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import jp.co.soramitsu.feature_staking_impl.presentation.payouts.confirm.ConfirmPayoutViewModel
 import jp.co.soramitsu.feature_staking_impl.presentation.payouts.confirm.model.ConfirmPayoutPayload
+import jp.co.soramitsu.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 
 @Module(includes = [ViewModelModule::class])
 class ConfirmPayoutModule {
@@ -35,12 +36,13 @@ class ConfirmPayoutModule {
         payload: ConfirmPayoutPayload,
         payoutInteractor: PayoutInteractor,
         addressIconGenerator: AddressIconGenerator,
-        externalAccountActions: ExternalAccountActions.Presentation,
+        externalActions: ExternalActions.Presentation,
         feeLoaderMixin: FeeLoaderMixin.Presentation,
         validationSystem: ValidationSystem<MakePayoutPayload, PayoutValidationFailure>,
         validationExecutor: ValidationExecutor,
         addressDisplayUseCase: AddressDisplayUseCase,
-        resourceManager: ResourceManager
+        resourceManager: ResourceManager,
+        singleAssetSharedState: StakingSharedState,
     ): ViewModel {
         return ConfirmPayoutViewModel(
             interactor,
@@ -48,19 +50,20 @@ class ConfirmPayoutModule {
             router,
             payload,
             addressIconGenerator,
-            externalAccountActions,
+            externalActions,
             feeLoaderMixin,
             addressDisplayUseCase,
             validationSystem,
             validationExecutor,
-            resourceManager
+            resourceManager,
+            singleAssetSharedState
         )
     }
 
     @Provides
     fun provideViewModelCreator(
         fragment: Fragment,
-        viewModelFactory: ViewModelProvider.Factory
+        viewModelFactory: ViewModelProvider.Factory,
     ): ConfirmPayoutViewModel {
         return ViewModelProvider(fragment, viewModelFactory).get(ConfirmPayoutViewModel::class.java)
     }

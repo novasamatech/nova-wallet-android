@@ -24,7 +24,7 @@
         android:id="@+id/accountView"
         android:layout_marginStart="@dimen/x2"
         android:layout_marginEnd="@dimen/x2"
-        app:accountActionIcon="@drawable/ic_more_vertical"
+        app:accountActionIcon="@drawable/ic_info_white_24"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
@@ -48,17 +48,19 @@
         android:paddingTop="@dimen/x1_5"
         android:paddingEnd="@dimen/x2"
         android:paddingBottom="@dimen/x1_5"
-        android:text="@string/profile_accounts_title"
+        android:text="@string/profile_accounts_title_2_0"
         android:textColor="@color/white" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
+        android:visibility="gone"
         android:layout_marginStart="@dimen/x2"
         android:layout_marginEnd="@dimen/x2"
         android:background="@color/dividerGray" />
 
     <LinearLayout
+        android:visibility="gone"
         android:id="@+id/networkWrapper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

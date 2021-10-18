@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import jp.co.soramitsu.common.address.AddressIconGenerator
+import jp.co.soramitsu.common.address.createAddressModel
 import jp.co.soramitsu.common.base.BaseViewModel
 import jp.co.soramitsu.common.base.TitleAndMessage
 import jp.co.soramitsu.common.mixin.api.Validatable
@@ -17,7 +18,7 @@ import jp.co.soramitsu.common.validation.ValidationExecutor
 import jp.co.soramitsu.common.validation.ValidationSystem
 import jp.co.soramitsu.common.validation.progressConsumer
 import jp.co.soramitsu.feature_account_api.presenatation.account.AddressDisplayUseCase
-import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalAccountActions
+import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalActions
 import jp.co.soramitsu.feature_staking_api.domain.model.RewardDestination
 import jp.co.soramitsu.feature_staking_api.domain.model.StakingState
 import jp.co.soramitsu.feature_staking_impl.R
@@ -32,6 +33,8 @@ import jp.co.soramitsu.feature_wallet_api.domain.model.amountFromPlanks
 import jp.co.soramitsu.feature_wallet_api.presentation.formatters.formatTokenAmount
 import jp.co.soramitsu.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import jp.co.soramitsu.feature_wallet_api.presentation.mixin.fee.requireFee
+import jp.co.soramitsu.runtime.state.SingleAssetSharedState
+import jp.co.soramitsu.runtime.state.chain
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -42,14 +45,15 @@ class ConfirmPayoutViewModel(
     private val router: StakingRouter,
     private val payload: ConfirmPayoutPayload,
     private val addressModelGenerator: AddressIconGenerator,
-    private val externalAccountActions: ExternalAccountActions.Presentation,
+    private val externalActions: ExternalActions.Presentation,
     private val feeLoaderMixin: FeeLoaderMixin.Presentation,
     private val addressDisplayUseCase: AddressDisplayUseCase,
     private val validationSystem: ValidationSystem<MakePayoutPayload, PayoutValidationFailure>,
     private val validationExecutor: ValidationExecutor,
     private val resourceManager: ResourceManager,
+    private val selectedAssetState: SingleAssetSharedState,
 ) : BaseViewModel(),
-    ExternalAccountActions.Presentation by externalAccountActions,
+    ExternalActions.Presentation by externalActions,
     FeeLoaderMixin by feeLoaderMixin,
     Validatable by validationExecutor {
 
@@ -68,7 +72,7 @@ class ConfirmPayoutViewModel(
         val token = it.token
         val totalReward = token.amountFromPlanks(payload.totalRewardInPlanks)
         val inToken = totalReward.formatTokenAmount(token.configuration)
-        val inFiat = token.fiatAmount(totalReward)?.formatAsCurrency()
+        val inFiat = token.fiatAmount(totalReward).formatAsCurrency()
 
         inToken to inFiat
     }
@@ -180,6 +184,8 @@ class ConfirmPayoutViewModel(
     private fun maybeShowExternalActions(addressProducer: () -> String?) {
         val address = addressProducer() ?: return
 
-        externalAccountActions.showExternalActions(ExternalAccountActions.Payload.fromAddress(address))
+        launch {
+            externalActions.showExternalActions(ExternalActions.Type.Address(address), selectedAssetState.chain())
+        }
     }
 }

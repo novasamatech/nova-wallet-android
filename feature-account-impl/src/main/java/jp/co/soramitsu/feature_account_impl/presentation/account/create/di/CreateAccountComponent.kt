@@ -4,7 +4,7 @@ import androidx.fragment.app.Fragment
 import dagger.BindsInstance
 import dagger.Subcomponent
 import jp.co.soramitsu.common.di.scope.ScreenScope
-import jp.co.soramitsu.core.model.Node
+import jp.co.soramitsu.feature_account_api.presenatation.account.add.AddAccountPayload
 import jp.co.soramitsu.feature_account_impl.presentation.account.create.CreateAccountFragment
 
 @Subcomponent(
@@ -20,7 +20,7 @@ interface CreateAccountComponent {
 
         fun create(
             @BindsInstance fragment: Fragment,
-            @BindsInstance networkType: Node.NetworkType?
+            @BindsInstance payload: AddAccountPayload
         ): CreateAccountComponent
     }
 

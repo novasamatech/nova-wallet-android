@@ -5,15 +5,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import coil.ImageLoader
 import jp.co.soramitsu.common.base.BaseFragment
 import jp.co.soramitsu.common.di.FeatureUtils
 import jp.co.soramitsu.common.utils.bindTo
 import jp.co.soramitsu.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet.Payload
-import jp.co.soramitsu.core.model.Node
 import jp.co.soramitsu.feature_account_api.di.AccountFeatureApi
+import jp.co.soramitsu.feature_account_api.presenatation.account.add.AddAccountPayload
 import jp.co.soramitsu.feature_account_impl.R
 import jp.co.soramitsu.feature_account_impl.di.AccountFeatureComponent
 import jp.co.soramitsu.feature_account_impl.presentation.common.accountSource.SourceTypeChooserBottomSheetDialog
+import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.impl.setupCryptoTypeChooserUi
+import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.impl.setupForcedChainUi
 import jp.co.soramitsu.feature_account_impl.presentation.importing.source.model.FileRequester
 import jp.co.soramitsu.feature_account_impl.presentation.importing.source.model.ImportSource
 import jp.co.soramitsu.feature_account_impl.presentation.importing.source.model.JsonImportSource
@@ -25,23 +28,27 @@ import jp.co.soramitsu.feature_account_impl.presentation.importing.source.view.J
 import jp.co.soramitsu.feature_account_impl.presentation.importing.source.view.MnemonicImportView
 import jp.co.soramitsu.feature_account_impl.presentation.importing.source.view.SeedImportView
 import jp.co.soramitsu.feature_account_impl.presentation.view.advanced.AdvancedBlockView.FieldState
-import jp.co.soramitsu.feature_account_impl.presentation.view.advanced.encryption.EncryptionTypeChooserBottomSheetDialog
-import jp.co.soramitsu.feature_account_impl.presentation.view.advanced.network.NetworkChooserBottomSheetDialog
 import kotlinx.android.synthetic.main.fragment_import_account.advancedBlockView
+import kotlinx.android.synthetic.main.fragment_import_account.importForcedChain
 import kotlinx.android.synthetic.main.fragment_import_account.nextBtn
 import kotlinx.android.synthetic.main.fragment_import_account.sourceTypeContainer
 import kotlinx.android.synthetic.main.fragment_import_account.sourceTypeInput
 import kotlinx.android.synthetic.main.fragment_import_account.toolbar
+import javax.inject.Inject
 
 class ImportAccountFragment : BaseFragment<ImportAccountViewModel>() {
 
-    companion object {
-        private const val KEY_FORCED_NETWORK_TYPE = "network_type"
+    @Inject
+    lateinit var imageLoader: ImageLoader
 
-        fun getBundle(networkType: Node.NetworkType?): Bundle {
+    companion object {
+
+        private const val PAYLOAD = "network_type"
+
+        fun getBundle(payload: AddAccountPayload): Bundle {
 
             return Bundle().apply {
-                putSerializable(KEY_FORCED_NETWORK_TYPE, networkType)
+                putParcelable(PAYLOAD, payload)
             }
         }
     }
@@ -61,24 +68,18 @@ class ImportAccountFragment : BaseFragment<ImportAccountViewModel>() {
 
         sourceTypeInput.setWholeClickListener { viewModel.openSourceChooserClicked() }
 
-        advancedBlockView.setOnEncryptionTypeClickListener {
-            viewModel.chooseEncryptionClicked()
-        }
-
         nextBtn.setOnClickListener { viewModel.nextClicked() }
 
         nextBtn.prepareForProgress(viewLifecycleOwner)
     }
 
     override fun inject() {
-        val forcedNetworkType = argument<Node.NetworkType?>(KEY_FORCED_NETWORK_TYPE)
-
         FeatureUtils.getFeature<AccountFeatureComponent>(
             requireContext(),
             AccountFeatureApi::class.java
         )
             .importAccountComponentFactory()
-            .create(this, forcedNetworkType)
+            .create(this, argument(PAYLOAD))
             .inject(this)
     }
 
@@ -94,6 +95,8 @@ class ImportAccountFragment : BaseFragment<ImportAccountViewModel>() {
             view
         }
 
+        setupForcedChainUi(viewModel, importForcedChain, imageLoader)
+
         viewModel.showSourceSelectorChooserLiveData.observeEvent(::showTypeChooser)
 
         viewModel.selectedSourceTypeLiveData.observe {
@@ -105,30 +108,20 @@ class ImportAccountFragment : BaseFragment<ImportAccountViewModel>() {
             sourceTypeInput.setMessage(it.nameRes)
         }
 
-        viewModel.encryptionTypeChooserEvent.observeEvent {
-            EncryptionTypeChooserBottomSheetDialog(
-                requireActivity(),
-                it,
-                viewModel.selectedEncryptionTypeLiveData::setValue
-            )
-                .show()
-        }
-
-        viewModel.selectedEncryptionTypeLiveData.observe {
-            advancedBlockView.setEncryption(it.name)
-        }
-
-        viewModel.networkChooserEvent.observeEvent {
-            NetworkChooserBottomSheetDialog(
-                requireActivity(),
-                it,
-                viewModel.selectedNetworkLiveData::setValue
-            ).show()
-        }
-
         viewModel.nextButtonState.observe(nextBtn::setState)
 
-        viewModel.advancedBlockExceptNetworkEnabled.observe(::setSelectorsEnabled)
+        viewModel.changeableAdvancedFields.observe {
+            val derivationPathState = getFieldState(it, disabledState = FieldState.HIDDEN)
+
+            with(advancedBlockView) {
+                configure(derivationPathField, derivationPathState)
+            }
+        }
+
+        setupCryptoTypeChooserUi(viewModel, advancedBlockView, ignoreSelectionFrozen = true)
+        viewModel.cryptoTypeChooserEnabled.observe {
+            advancedBlockView.setEnabled(advancedBlockView.encryptionTypeField, it)
+        }
 
         advancedBlockView.derivationPathEditText.bindTo(viewModel.derivationPathLiveData, viewLifecycleOwner)
     }
@@ -138,16 +131,6 @@ class ImportAccountFragment : BaseFragment<ImportAccountViewModel>() {
             source.chooseJsonFileEvent.observeEvent {
                 openFilePicker(it)
             }
-        }
-    }
-
-    private fun setSelectorsEnabled(selectorsEnabled: Boolean) {
-        val chooserState = getFieldState(selectorsEnabled)
-        val derivationPathState = getFieldState(selectorsEnabled, disabledState = FieldState.HIDDEN)
-
-        with(advancedBlockView) {
-            configure(encryptionTypeField, chooserState)
-            configure(derivationPathField, derivationPathState)
         }
     }
 

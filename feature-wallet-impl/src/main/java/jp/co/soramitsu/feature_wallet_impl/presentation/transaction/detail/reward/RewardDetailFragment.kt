@@ -3,18 +3,11 @@ package jp.co.soramitsu.feature_wallet_impl.presentation.transaction.detail.rewa
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.annotation.StringRes
 import jp.co.soramitsu.common.base.BaseFragment
-import jp.co.soramitsu.common.data.network.ExternalAnalyzer
 import jp.co.soramitsu.common.di.FeatureUtils
 import jp.co.soramitsu.common.utils.formatDateTime
 import jp.co.soramitsu.common.utils.makeGone
-import jp.co.soramitsu.common.utils.networkType
 import jp.co.soramitsu.common.utils.setTextColorRes
-import jp.co.soramitsu.common.utils.showBrowser
-import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalAccountActions
-import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalActionsSheet
-import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalViewCallback
 import jp.co.soramitsu.feature_wallet_api.di.WalletFeatureApi
 import jp.co.soramitsu.feature_wallet_impl.R
 import jp.co.soramitsu.feature_wallet_impl.di.WalletFeatureComponent
@@ -46,11 +39,11 @@ class RewardDetailFragment : BaseFragment<RewardDetailViewModel>() {
         rewardDetailToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         rewardDetailHash.setWholeClickListener {
-            viewModel.showExternalActionsClicked(ExternalActionsSource.TRANSACTION_HASH)
+            viewModel.eventIdClicked()
         }
 
         rewardDetailValidator.setWholeClickListener {
-            viewModel.showExternalActionsClicked(ExternalActionsSource.VALIDATOR_ADDRESS)
+            viewModel.validatorAddressClicked()
         }
     }
 
@@ -85,10 +78,6 @@ class RewardDetailFragment : BaseFragment<RewardDetailViewModel>() {
             }
         }
 
-        viewModel.showExternalRewardActionsEvent.observeEvent(::showExternalActions)
-
-        viewModel.openBrowserEvent.observeEvent(::showBrowser)
-
         viewModel.validatorAddressModelLiveData.observe { addressModel ->
             if (addressModel != null) {
                 rewardDetailValidator.setMessage(addressModel.nameOrAddress)
@@ -101,55 +90,5 @@ class RewardDetailFragment : BaseFragment<RewardDetailViewModel>() {
         viewModel.eraLiveData.observe {
             rewardDetailEra.text = it
         }
-    }
-
-    private fun showExternalActions(externalActionsSource: ExternalActionsSource) {
-        val transaction = viewModel.operation
-
-        when (externalActionsSource) {
-            ExternalActionsSource.TRANSACTION_HASH -> showExternalEventActions()
-            ExternalActionsSource.VALIDATOR_ADDRESS -> showExternalAddressActions(transaction.validator!!)
-        }
-    }
-
-    private fun showExternalAddressActions(
-        address: String
-    ) = showExternalActionsSheet(
-        copyLabelRes = R.string.common_copy_address,
-        value = address,
-        externalViewCallback = viewModel::viewAccountExternalClicked
-    )
-
-    private fun showExternalEventActions() {
-        showExternalActionsSheet(
-            R.string.common_copy_id,
-            viewModel.operation.eventId,
-            viewModel::viewEventExternalClicked,
-            forceForbid = setOf(ExternalAnalyzer.SUBSCAN)
-        )
-    }
-
-    private fun showExternalActionsSheet(
-        @StringRes copyLabelRes: Int,
-        value: String,
-        externalViewCallback: ExternalViewCallback,
-        forceForbid: Set<ExternalAnalyzer> = emptySet(),
-    ) {
-        val payload = ExternalActionsSheet.Payload(
-            copyLabel = copyLabelRes,
-            content = ExternalAccountActions.Payload(
-                value = value,
-                networkType = viewModel.operation.address.networkType()
-            ),
-            forceForbid = forceForbid
-        )
-
-        ExternalActionsSheet(
-            context = requireContext(),
-            payload = payload,
-            onCopy = viewModel::copyStringClicked,
-            onViewExternal = externalViewCallback
-        )
-            .show()
     }
 }

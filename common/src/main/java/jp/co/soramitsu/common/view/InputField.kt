@@ -7,7 +7,7 @@ import android.view.View
 import android.widget.EditText
 import com.google.android.material.textfield.TextInputLayout
 import jp.co.soramitsu.common.R
-import jp.co.soramitsu.common.view.shape.getCutCornersStateDrawable
+import jp.co.soramitsu.common.view.shape.getCornersStateDrawable
 
 class InputField @JvmOverloads constructor(
     context: Context,
@@ -21,7 +21,7 @@ class InputField @JvmOverloads constructor(
     init {
         View.inflate(context, R.layout.view_input_field, this)
 
-        content.background = context.getCutCornersStateDrawable()
+        content.background = context.getCornersStateDrawable()
 
         attrs?.let(::applyAttributes)
     }

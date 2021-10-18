@@ -1,6 +1,8 @@
 package jp.co.soramitsu.feature_wallet_impl.data.network.blockchain.updaters
 
+import android.util.Log
 import jp.co.soramitsu.common.data.network.runtime.binding.ExtrinsicStatusEvent
+import jp.co.soramitsu.common.utils.LOG_TAG
 import jp.co.soramitsu.common.utils.Modules
 import jp.co.soramitsu.common.utils.system
 import jp.co.soramitsu.core.model.Node
@@ -67,38 +69,42 @@ class PaymentUpdater(
 
         val metaAccount = scope.getAccount()
 
-        val accountId = scope.getAccount().accountIdIn(chain) ?: return emptyFlow()
+        val accountId = metaAccount.accountIdIn(chain) ?: return emptyFlow()
+
         val runtime = chainRegistry.getRuntime(chainId)
 
         val key = runtime.metadata.system().storage("Account").storageKey(runtime, accountId)
 
         return storageSubscriptionBuilder.subscribe(key)
             .onEach { change ->
-                val newAccountInfo = bindAccountInfoOrDefault(change.value, runtime)
+                runCatching { bindAccountInfoOrDefault(change.value, runtime) }
+                    .onFailure { Log.e("RX", "Failed to update balance in ${chain.name}") }
+                    .onSuccess {
+                        assetCache.updateAsset(metaAccount.id, chain.utilityAsset, it)
 
-                assetCache.updateAsset(metaAccount.id, accountId, chain.utilityAsset, newAccountInfo)
-
-                fetchTransfers(change.block, chain, accountId)
+                        fetchTransfers(change.block, chain, accountId)
+                    }
             }
             .noSideAffects()
     }
 
     private suspend fun fetchTransfers(blockHash: String, chain: Chain, accountId: AccountId) {
-        val result = substrateSource.fetchAccountTransfersInBlock(chainId, blockHash, accountId)
+        substrateSource.fetchAccountTransfersInBlock(chainId, blockHash, accountId)
+            .onSuccess { blockTransfers ->
+                val local = blockTransfers.map {
+                    val localStatus = when (it.statusEvent) {
+                        ExtrinsicStatusEvent.SUCCESS -> Operation.Status.COMPLETED
+                        ExtrinsicStatusEvent.FAILURE -> Operation.Status.FAILED
+                        null -> Operation.Status.PENDING
+                    }
 
-        val blockTransfers = result.getOrNull() ?: return
+                    createTransferOperationLocal(it.extrinsic, localStatus, accountId, chain)
+                }
 
-        val local = blockTransfers.map {
-            val localStatus = when (it.statusEvent) {
-                ExtrinsicStatusEvent.SUCCESS -> Operation.Status.COMPLETED
-                ExtrinsicStatusEvent.FAILURE -> Operation.Status.FAILED
-                null -> Operation.Status.PENDING
+                operationDao.insertAll(local)
+            }.onFailure {
+                Log.e(LOG_TAG, "Failed to retrieve transactions from block (${chain.name}): ${it.message}")
             }
-
-            createTransferOperationLocal(it.extrinsic, localStatus, accountId, chain)
-        }
-
-        operationDao.insertAll(local)
     }
 
     private suspend fun createTransferOperationLocal(

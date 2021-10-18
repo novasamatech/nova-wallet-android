@@ -11,8 +11,8 @@ import jp.co.soramitsu.common.R
 import jp.co.soramitsu.common.utils.makeGone
 import jp.co.soramitsu.common.utils.makeVisible
 import jp.co.soramitsu.common.utils.setTextOrHide
+import jp.co.soramitsu.common.view.shape.getCornersStateDrawable
 import jp.co.soramitsu.common.view.shape.getCutCornerDrawable
-import jp.co.soramitsu.common.view.shape.getCutCornersStateDrawable
 import kotlinx.android.synthetic.main.view_staking_amount.view.stakingAmountInput
 import kotlinx.android.synthetic.main.view_staking_amount.view.stakingAssetBalance
 import kotlinx.android.synthetic.main.view_staking_amount.view.stakingAssetDollarAmount
@@ -59,7 +59,7 @@ class AmountView @JvmOverloads constructor(
     }
 
     private fun setBackground() {
-        background = context.getCutCornersStateDrawable(
+        background = context.getCornersStateDrawable(
             focusedDrawable = context.getCutCornerDrawable(
                 R.color.blurColor,
                 R.color.white

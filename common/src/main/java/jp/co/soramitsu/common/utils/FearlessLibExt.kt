@@ -24,6 +24,7 @@ import jp.co.soramitsu.fearless_utils.scale.EncodableStruct
 import jp.co.soramitsu.fearless_utils.scale.Schema
 import jp.co.soramitsu.fearless_utils.scale.dataType.DataType
 import jp.co.soramitsu.fearless_utils.scale.dataType.uint32
+import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.addressByte
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAddress
@@ -32,13 +33,18 @@ import jp.co.soramitsu.fearless_utils.wsrpc.mappers.pojo
 import java.io.ByteArrayOutputStream
 
 val BIP32JunctionDecoder.DEFAULT_DERIVATION_PATH: String
-    get() = "//44//60//0/0"
+    get() = "//44//60//0/0/0"
+
+val SS58Encoder.DEFAULT_PREFIX: Byte
+    get() = 42.toByte()
 
 fun BIP32JunctionDecoder.default() = decode(DEFAULT_DERIVATION_PATH)
 
 fun StorageEntry.defaultInHex() = default.toHexString(withPrefix = true)
 
 fun ByteArray.toAddress(networkType: Node.NetworkType) = toAddress(networkType.runtimeConfiguration.addressByte)
+
+fun String.removeHexPrefix() = removePrefix("0x")
 
 fun <T> DataType<T>.fromHex(hex: String): T {
     val codecReader = ScaleCodecReader(hex.fromHex())
@@ -100,6 +106,9 @@ fun RuntimeMetadata.balances() = module(Modules.BALANCES)
 fun RuntimeMetadata.crowdloan() = module(Modules.CROWDLOAN)
 
 fun RuntimeMetadata.babe() = module(Modules.BABE)
+fun RuntimeMetadata.babeOrNull() = moduleOrNull(Modules.BABE)
+
+fun RuntimeMetadata.timestampOrNull() = moduleOrNull(Modules.TIMESTAMP)
 
 fun RuntimeMetadata.slots() = module(Modules.SLOTS)
 
@@ -112,7 +121,7 @@ fun <T> StorageEntry.storageKeys(runtime: RuntimeSnapshot, singleMapArguments: C
 inline fun <K, T> StorageEntry.storageKeys(
     runtime: RuntimeSnapshot,
     singleMapArguments: Collection<T>,
-    argumentTransform: (T) -> K
+    argumentTransform: (T) -> K,
 ): Map<String, K> {
     return singleMapArguments.associateBy(
         keySelector = { storageKey(runtime, it) },
@@ -145,6 +154,7 @@ object Modules {
     const val SYSTEM = "System"
     const val CROWDLOAN = "Crowdloan"
     const val BABE = "Babe"
+    const val TIMESTAMP = "Timestamp"
     const val SLOTS = "Slots"
     const val SESSION = "Session"
 }

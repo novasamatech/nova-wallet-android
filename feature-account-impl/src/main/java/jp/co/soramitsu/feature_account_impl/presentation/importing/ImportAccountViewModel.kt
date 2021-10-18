@@ -5,42 +5,54 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import jp.co.soramitsu.common.base.BaseViewModel
+import jp.co.soramitsu.common.mixin.MixinFactory
 import jp.co.soramitsu.common.resources.ClipboardManager
 import jp.co.soramitsu.common.resources.ResourceManager
 import jp.co.soramitsu.common.utils.Event
 import jp.co.soramitsu.common.utils.combine
 import jp.co.soramitsu.common.utils.map
-import jp.co.soramitsu.common.utils.requireException
 import jp.co.soramitsu.common.utils.switchMap
 import jp.co.soramitsu.common.view.ButtonState
 import jp.co.soramitsu.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet.Payload
 import jp.co.soramitsu.core.model.CryptoType
-import jp.co.soramitsu.core.model.Node
+import jp.co.soramitsu.fearless_utils.encrypt.junction.BIP32JunctionDecoder
+import jp.co.soramitsu.fearless_utils.encrypt.junction.JunctionDecoder
 import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountAlreadyExistsException
 import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountInteractor
+import jp.co.soramitsu.feature_account_api.presenatation.account.add.AddAccountPayload
 import jp.co.soramitsu.feature_account_impl.R
+import jp.co.soramitsu.feature_account_impl.data.mappers.mapAddAccountPayloadToAddAccountType
+import jp.co.soramitsu.feature_account_impl.domain.account.add.AddAccountInteractor
 import jp.co.soramitsu.feature_account_impl.presentation.AccountRouter
 import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.api.CryptoTypeChooserMixin
-import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.api.NetworkChooserMixin
+import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.api.ForcedChainMixin
+import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.api.WithCryptoTypeChooserMixin
+import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.api.WithForcedChainMixin
 import jp.co.soramitsu.feature_account_impl.presentation.importing.source.model.FileRequester
 import jp.co.soramitsu.feature_account_impl.presentation.importing.source.model.ImportError
 import jp.co.soramitsu.feature_account_impl.presentation.importing.source.model.ImportSource
 import jp.co.soramitsu.feature_account_impl.presentation.importing.source.model.JsonImportSource
 import jp.co.soramitsu.feature_account_impl.presentation.importing.source.model.MnemonicImportSource
 import jp.co.soramitsu.feature_account_impl.presentation.importing.source.model.RawSeedImportSource
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class ImportAccountViewModel(
+    private val addAccountInteractor: AddAccountInteractor,
     private val interactor: AccountInteractor,
     private val router: AccountRouter,
     private val resourceManager: ResourceManager,
-    private val cryptoTypeChooserMixin: CryptoTypeChooserMixin,
-    private val networkChooserMixin: NetworkChooserMixin,
+    forcedChainMixinFactory: MixinFactory<ForcedChainMixin>,
+    cryptoTypeChooserFactory: MixinFactory<CryptoTypeChooserMixin>,
     private val clipboardManager: ClipboardManager,
-    private val fileReader: FileReader
+    private val fileReader: FileReader,
+    private val payload: AddAccountPayload,
 ) : BaseViewModel(),
-    CryptoTypeChooserMixin by cryptoTypeChooserMixin,
-    NetworkChooserMixin by networkChooserMixin {
+    WithCryptoTypeChooserMixin,
+    WithForcedChainMixin {
+
+    override val forcedChainMixin: ForcedChainMixin = forcedChainMixinFactory.create(scope = this)
+    override val cryptoTypeChooserMixin: CryptoTypeChooserMixin = cryptoTypeChooserFactory.create(scope = this)
 
     val nameLiveData = MutableLiveData<String>()
 
@@ -57,7 +69,7 @@ class ImportAccountViewModel(
 
     private val sourceTypeValid = _selectedSourceTypeLiveData.switchMap(ImportSource::validationLiveData)
 
-    private val importInProgressLiveData = MutableLiveData<Boolean>(false)
+    private val importInProgressLiveData = MutableLiveData(false)
 
     private val nextButtonEnabledLiveData = sourceTypeValid.combine(nameLiveData) { sourceTypeValid, name ->
         sourceTypeValid && name.isNotEmpty()
@@ -71,22 +83,17 @@ class ImportAccountViewModel(
         }
     }
 
-    val networkChooserEnabledLiveData = _selectedSourceTypeLiveData.switchMap {
-        if (it is JsonImportSource) {
-            it.enableNetworkInputLiveData
-        } else {
-            MutableLiveData(true)
-        }
+    val changeableAdvancedFields = _selectedSourceTypeLiveData.map { it !is JsonImportSource }
+    val cryptoTypeChooserEnabled = changeableAdvancedFields.combine(cryptoTypeChooserMixin.selectionFrozen.asLiveData()) { changeable, selectionFrozen ->
+        changeable && !selectionFrozen
     }
-
-    val advancedBlockExceptNetworkEnabled = _selectedSourceTypeLiveData.map { it !is JsonImportSource }
 
     init {
         _selectedSourceTypeLiveData.value = sourceTypes.first()
     }
 
     fun homeButtonClicked() {
-        router.backToWelcomeScreen()
+        router.back()
     }
 
     fun openSourceChooserClicked() {
@@ -99,24 +106,19 @@ class ImportAccountViewModel(
         _selectedSourceTypeLiveData.value = it
     }
 
-    fun nextClicked() {
+    fun nextClicked() = launch {
         importInProgressLiveData.value = true
 
         val sourceType = selectedSourceTypeLiveData.value!!
 
-        val networkType = selectedNetworkLiveData.value!!.networkTypeUI.networkType
-        val cryptoType = selectedEncryptionTypeLiveData.value!!.cryptoType
+        val cryptoType = cryptoTypeChooserMixin.selectedEncryptionTypeFlow.first().cryptoType
         val derivationPath = derivationPathLiveData.value.orEmpty()
         val name = nameLiveData.value!!
 
         viewModelScope.launch {
-            val result = import(sourceType, name, derivationPath, cryptoType, networkType)
-
-            if (result.isSuccess) {
-                continueBasedOnCodeStatus()
-            } else {
-                handleCreateAccountError(result.requireException())
-            }
+            import(sourceType, name, derivationPath, cryptoType)
+                .onSuccess { continueBasedOnCodeStatus() }
+                .onFailure(::handleCreateAccountError)
 
             importInProgressLiveData.value = false
         }
@@ -151,6 +153,10 @@ class ImportAccountViewModel(
                     titleRes = R.string.account_add_already_exists_message,
                     messageRes = R.string.account_error_try_another_one
                 )
+                is JunctionDecoder.DecodingError, is BIP32JunctionDecoder.DecodingError -> ImportError(
+                    titleRes = R.string.account_invalid_derivation_path_title,
+                    messageRes = R.string.account_invalid_derivation_path_message
+                )
                 else -> ImportError()
             }
         }
@@ -165,14 +171,14 @@ class ImportAccountViewModel(
         return listOf(
             MnemonicImportSource(),
             JsonImportSource(
-                networkChooserMixin.selectedNetworkLiveData,
                 nameLiveData,
-                cryptoTypeChooserMixin.selectedEncryptionTypeLiveData,
-                interactor,
+                cryptoTypeChooserMixin,
+                addAccountInteractor,
                 resourceManager,
                 clipboardManager,
                 fileReader,
-                viewModelScope
+                viewModelScope,
+                payload
             ),
             RawSeedImportSource()
         )
@@ -182,29 +188,30 @@ class ImportAccountViewModel(
         sourceType: ImportSource,
         name: String,
         derivationPath: String,
-        cryptoType: CryptoType,
-        networkType: Node.NetworkType
+        cryptoType: CryptoType
     ): Result<Unit> {
+        val addAccountType = mapAddAccountPayloadToAddAccountType(payload)
+
         return when (sourceType) {
-            is MnemonicImportSource -> interactor.importFromMnemonic(
-                sourceType.mnemonicContentLiveData.value!!,
-                name,
-                derivationPath,
-                cryptoType,
-                networkType
+            is MnemonicImportSource -> addAccountInteractor.importFromMnemonic(
+                accountName = name,
+                mnemonic = sourceType.mnemonicContentLiveData.value!!,
+                encryptionType = cryptoType,
+                derivationPath = derivationPath,
+                addAccountType = addAccountType
             )
-            is RawSeedImportSource -> interactor.importFromSeed(
-                sourceType.rawSeedLiveData.value!!,
-                name,
-                derivationPath,
-                cryptoType,
-                networkType
+            is RawSeedImportSource -> addAccountInteractor.importFromSeed(
+                accountName = name,
+                seed = sourceType.rawSeedLiveData.value!!,
+                encryptionType = cryptoType,
+                derivationPath = derivationPath,
+                addAccountType = addAccountType
             )
-            is JsonImportSource -> interactor.importFromJson(
-                sourceType.jsonContentLiveData.value!!,
-                sourceType.passwordLiveData.value!!,
-                networkType,
-                name
+            is JsonImportSource -> addAccountInteractor.importFromJson(
+                json = sourceType.jsonContentLiveData.value!!,
+                password = sourceType.passwordLiveData.value!!,
+                name = name,
+                addAccountType = addAccountType
             )
         }
     }

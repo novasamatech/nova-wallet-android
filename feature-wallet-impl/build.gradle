@@ -12,7 +12,7 @@ android {
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField "String", "RAMP_TOKEN", "\"4bk3yhfrg99fer764bo7egrqmxbfene7gbrpwmp3\""
         buildConfigField "String", "RAMP_HOST", "\"ri-widget-staging.firebaseapp.com\""
@@ -96,4 +96,8 @@ dependencies {
     implementation zXingEmbeddedDep
 
     implementation insetterDep
+
+    androidTestImplementation androidTestRunnerDep
+    androidTestImplementation androidTestRulesDep
+    androidTestImplementation androidJunitDep
 }

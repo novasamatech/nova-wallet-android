@@ -10,7 +10,8 @@ import jp.co.soramitsu.common.address.AddressIconGenerator
 import jp.co.soramitsu.common.di.viewmodel.ViewModelKey
 import jp.co.soramitsu.common.di.viewmodel.ViewModelModule
 import jp.co.soramitsu.common.resources.ResourceManager
-import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalAccountActions
+import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalActions
+import jp.co.soramitsu.feature_staking_impl.data.StakingSharedState
 import jp.co.soramitsu.feature_staking_impl.domain.StakingInteractor
 import jp.co.soramitsu.feature_staking_impl.presentation.StakingRouter
 import jp.co.soramitsu.feature_staking_impl.presentation.payouts.detail.PayoutDetailsViewModel
@@ -27,16 +28,18 @@ class PayoutDetailsModule {
         router: StakingRouter,
         payout: PendingPayoutParcelable,
         addressIconGenerator: AddressIconGenerator,
-        externalAccountActions: ExternalAccountActions.Presentation,
-        resourceManager: ResourceManager
+        externalActions: ExternalActions.Presentation,
+        resourceManager: ResourceManager,
+        selectedAssetState: StakingSharedState
     ): ViewModel {
         return PayoutDetailsViewModel(
             interactor,
             router,
             payout,
             addressIconGenerator,
-            externalAccountActions,
-            resourceManager
+            externalActions,
+            resourceManager,
+            selectedAssetState
         )
     }
 

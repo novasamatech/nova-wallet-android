@@ -2,10 +2,13 @@ package jp.co.soramitsu.core_db.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 import jp.co.soramitsu.core_db.model.chain.ChainAccountLocal
 import jp.co.soramitsu.core_db.model.chain.MetaAccountLocal
+import jp.co.soramitsu.core_db.model.chain.MetaAccountPositionUpdate
 import jp.co.soramitsu.core_db.model.chain.RelationJoinedMetaAccountInfo
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
@@ -33,7 +36,7 @@ interface MetaAccountDao {
     @Insert
     suspend fun insertMetaAccount(metaAccount: MetaAccountLocal): Long
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertChainAccount(chainAccount: ChainAccountLocal)
 
     @Query("SELECT * FROM meta_accounts")
@@ -42,6 +45,15 @@ interface MetaAccountDao {
     @Query("SELECT * FROM meta_accounts")
     @Transaction
     fun getJoinedMetaAccountsInfo(): List<RelationJoinedMetaAccountInfo>
+
+    @Query("SELECT * FROM meta_accounts")
+    fun metaAccountsFlow(): Flow<List<MetaAccountLocal>>
+
+    @Query("UPDATE meta_accounts SET isSelected = (id = :metaId)")
+    suspend fun selectMetaAccount(metaId: Long)
+
+    @Update(entity = MetaAccountLocal::class)
+    suspend fun updatePositions(updates: List<MetaAccountPositionUpdate>)
 
     @Query("SELECT * FROM meta_accounts WHERE id = :metaId")
     @Transaction
@@ -55,5 +67,15 @@ interface MetaAccountDao {
     fun isMetaAccountExists(accountId: AccountId): Boolean
 
     @Query(FIND_BY_ADDRESS_QUERY)
+    @Transaction
     fun getMetaAccountInfo(accountId: AccountId): RelationJoinedMetaAccountInfo?
+
+    @Query("UPDATE meta_accounts SET name = :newName WHERE id = :metaId")
+    suspend fun updateName(metaId: Long, newName: String)
+
+    @Query("DELETE FROM meta_accounts WHERE id = :metaId")
+    suspend fun delete(metaId: Long)
+
+    @Query("SELECT COALESCE(MAX(position), 0)  + 1 FROM meta_accounts")
+    suspend fun nextAccountPosition(): Int
 }

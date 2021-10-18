@@ -1,6 +1,7 @@
 package jp.co.soramitsu.feature_staking_impl.presentation.validators.current
 
 import jp.co.soramitsu.common.address.AddressIconGenerator
+import jp.co.soramitsu.common.address.createAddressModel
 import jp.co.soramitsu.common.base.BaseViewModel
 import jp.co.soramitsu.common.list.toListWithHeaders
 import jp.co.soramitsu.common.list.toValueList
@@ -13,7 +14,6 @@ import jp.co.soramitsu.feature_staking_api.domain.model.NominatedValidator
 import jp.co.soramitsu.feature_staking_api.domain.model.StakingState
 import jp.co.soramitsu.feature_staking_impl.R
 import jp.co.soramitsu.feature_staking_impl.domain.StakingInteractor
-import jp.co.soramitsu.feature_staking_impl.domain.getSelectedChain
 import jp.co.soramitsu.feature_staking_impl.domain.validators.current.CurrentValidatorsInteractor
 import jp.co.soramitsu.feature_staking_impl.presentation.StakingRouter
 import jp.co.soramitsu.feature_staking_impl.presentation.common.SetupStakingProcess
@@ -28,6 +28,8 @@ import jp.co.soramitsu.feature_wallet_api.domain.model.amountFromPlanks
 import jp.co.soramitsu.feature_wallet_api.presentation.formatters.formatTokenAmount
 import jp.co.soramitsu.runtime.ext.addressOf
 import jp.co.soramitsu.runtime.multiNetwork.chain.model.Chain
+import jp.co.soramitsu.runtime.state.SingleAssetSharedState
+import jp.co.soramitsu.runtime.state.chain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterIsInstance
@@ -44,6 +46,7 @@ class CurrentValidatorsViewModel(
     private val iconGenerator: AddressIconGenerator,
     private val currentValidatorsInteractor: CurrentValidatorsInteractor,
     private val setupStakingSharedState: SetupStakingSharedState,
+    private val selectedAssetState: SingleAssetSharedState,
 ) : BaseViewModel() {
 
     private val groupedCurrentValidatorsFlow = stakingInteractor.selectedAccountStakingStateFlow()
@@ -62,7 +65,7 @@ class CurrentValidatorsViewModel(
         .share()
 
     val currentValidatorModelsLiveData = groupedCurrentValidatorsFlow.combine(tokenFlow) { gropedList, token ->
-        val chain = stakingInteractor.getSelectedChain()
+        val chain = selectedAssetState.chain()
 
         gropedList.mapKeys { (statusGroup, _) -> mapNominatedValidatorStatusToUiModel(statusGroup) }
             .mapValues { (_, nominatedValidators) -> nominatedValidators.map { mapNominatedValidatorToUiModel(chain, it, token) } }
@@ -73,7 +76,7 @@ class CurrentValidatorsViewModel(
         .asLiveData()
 
     val shouldShowOversubscribedNoRewardWarning = groupedCurrentValidatorsFlow.map { groupedList ->
-        val (_, validators) = groupedList.entries.first { (group, _) -> group is NominatedValidator.Status.Group.Active }
+        val (_, validators) = groupedList.entries.firstOrNull { (group, _) -> group is NominatedValidator.Status.Group.Active } ?: return@map false
 
         validators.any { (it.status as NominatedValidator.Status.Active).willUserBeRewarded.not() }
     }

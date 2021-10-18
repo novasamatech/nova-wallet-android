@@ -26,6 +26,11 @@ interface WalletRepository {
         chainAsset: Chain.Asset
     ): Flow<Asset>
 
+    fun assetFlow(
+        metaId: Long,
+        chainAsset: Chain.Asset
+    ): Flow<Asset>
+
     suspend fun getAsset(
         accountId: AccountId,
         chainAsset: Chain.Asset

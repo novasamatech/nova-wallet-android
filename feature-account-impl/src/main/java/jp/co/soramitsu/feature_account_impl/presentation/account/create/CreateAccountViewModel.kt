@@ -3,17 +3,21 @@ package jp.co.soramitsu.feature_account_impl.presentation.account.create
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import jp.co.soramitsu.common.base.BaseViewModel
+import jp.co.soramitsu.common.mixin.MixinFactory
 import jp.co.soramitsu.common.utils.Event
-import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountInteractor
+import jp.co.soramitsu.feature_account_api.presenatation.account.add.AddAccountPayload
 import jp.co.soramitsu.feature_account_impl.presentation.AccountRouter
-import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.api.NetworkChooserMixin
+import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.api.ForcedChainMixin
+import jp.co.soramitsu.feature_account_impl.presentation.common.mixin.api.WithForcedChainMixin
 
 class CreateAccountViewModel(
-    private val interactor: AccountInteractor,
     private val router: AccountRouter,
-    private val networkChooserMixin: NetworkChooserMixin
+    private val payload: AddAccountPayload,
+    forcedChainMixinFactory: MixinFactory<ForcedChainMixin>
 ) : BaseViewModel(),
-    NetworkChooserMixin by networkChooserMixin {
+    WithForcedChainMixin {
+
+    override val forcedChainMixin: ForcedChainMixin = forcedChainMixinFactory.create(scope = this)
 
     private val _nextButtonEnabledLiveData = MutableLiveData<Boolean>()
     val nextButtonEnabledLiveData: LiveData<Boolean> = _nextButtonEnabledLiveData
@@ -22,7 +26,7 @@ class CreateAccountViewModel(
     val showScreenshotsWarningEvent: LiveData<Event<Unit>> = _showScreenshotsWarningEvent
 
     fun homeButtonClicked() {
-        router.backToWelcomeScreen()
+        router.back()
     }
 
     fun accountNameChanged(accountName: CharSequence) {
@@ -34,7 +38,6 @@ class CreateAccountViewModel(
     }
 
     fun screenshotWarningConfirmed(accountName: String) {
-        val selectedNetwork = selectedNetworkLiveData.value ?: return
-        router.openMnemonicScreen(accountName, selectedNetwork.networkTypeUI.networkType)
+        router.openMnemonicScreen(accountName, payload)
     }
 }

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/black"
     android:fitsSystemWindows="true"
     android:orientation="vertical">
@@ -15,14 +15,15 @@
         app:titleText="@string/onboarding_create_account" />
 
     <jp.co.soramitsu.common.view.LabeledTextView
-        android:id="@+id/networkInput"
+        android:id="@+id/createAccountForcedChain"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/x2"
         android:layout_marginTop="@dimen/x1"
         android:layout_marginEnd="@dimen/x2"
-        app:actionIcon="@drawable/ic_pin_white_24"
-        app:label="@string/common_choose_network"
+        app:actionIcon="@null"
+        app:enabled="false"
+        app:label="@string/common_chain"
         tools:message="Kusama"
         tools:textIcon="@drawable/ic_ksm_24" />
 

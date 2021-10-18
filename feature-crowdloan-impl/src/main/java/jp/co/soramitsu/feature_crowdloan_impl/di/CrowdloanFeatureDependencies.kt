@@ -14,7 +14,7 @@ import jp.co.soramitsu.feature_account_api.data.extrinsic.ExtrinsicService
 import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountRepository
 import jp.co.soramitsu.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import jp.co.soramitsu.feature_account_api.presenatation.account.AddressDisplayUseCase
-import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalAccountActions
+import jp.co.soramitsu.feature_account_api.presenatation.actions.ExternalActions
 import jp.co.soramitsu.feature_wallet_api.domain.interfaces.TokenRepository
 import jp.co.soramitsu.feature_wallet_api.domain.interfaces.WalletConstants
 import jp.co.soramitsu.feature_wallet_api.domain.interfaces.WalletRepository
@@ -47,7 +47,7 @@ interface CrowdloanFeatureDependencies {
 
     fun resourceManager(): ResourceManager
 
-    fun externalAccountActions(): ExternalAccountActions.Presentation
+    fun externalAccountActions(): ExternalActions.Presentation
 
     fun networkApiCreator(): NetworkApiCreator
 

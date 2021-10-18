@@ -2,52 +2,24 @@ package jp.co.soramitsu.feature_account_api.domain.interfaces
 
 import jp.co.soramitsu.core.model.CryptoType
 import jp.co.soramitsu.core.model.Language
-import jp.co.soramitsu.core.model.Network
 import jp.co.soramitsu.core.model.Node
 import jp.co.soramitsu.core.model.SecuritySource
 import jp.co.soramitsu.feature_account_api.domain.model.Account
-import jp.co.soramitsu.feature_account_api.domain.model.ImportJsonData
+import jp.co.soramitsu.feature_account_api.domain.model.LightMetaAccount
+import jp.co.soramitsu.feature_account_api.domain.model.MetaAccount
+import jp.co.soramitsu.feature_account_api.domain.model.PreferredCryptoType
+import jp.co.soramitsu.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.flow.Flow
 
 interface AccountInteractor {
+
     suspend fun getSecuritySource(accountAddress: String): SecuritySource
 
     suspend fun generateMnemonic(): List<String>
 
     fun getCryptoTypes(): List<CryptoType>
 
-    suspend fun getPreferredCryptoType(): CryptoType
-
-    suspend fun createAccount(
-        accountName: String,
-        mnemonic: String,
-        encryptionType: CryptoType,
-        derivationPath: String,
-        networkType: Node.NetworkType
-    ): Result<Unit>
-
-    suspend fun importFromMnemonic(
-        keyString: String,
-        username: String,
-        derivationPath: String,
-        selectedEncryptionType: CryptoType,
-        networkType: Node.NetworkType
-    ): Result<Unit>
-
-    suspend fun importFromSeed(
-        keyString: String,
-        username: String,
-        derivationPath: String,
-        selectedEncryptionType: CryptoType,
-        networkType: Node.NetworkType
-    ): Result<Unit>
-
-    suspend fun importFromJson(
-        json: String,
-        password: String,
-        networkType: Node.NetworkType,
-        name: String
-    ): Result<Unit>
+    suspend fun getPreferredCryptoType(chainId: ChainId? = null): PreferredCryptoType
 
     suspend fun isCodeSet(): Boolean
 
@@ -63,29 +35,19 @@ interface AccountInteractor {
 
     suspend fun getAccount(address: String): Account
 
-    fun selectedAccountFlow(): Flow<Account>
+    fun lightMetaAccountsFlow(): Flow<List<LightMetaAccount>>
 
-    suspend fun selectedNetworkType(): Node.NetworkType
+    fun selectedMetaAccountFlow(): Flow<MetaAccount>
 
-    suspend fun getSelectedAccount(): Account
+    suspend fun selectMetaAccount(metaId: Long)
 
-    suspend fun getNetworks(): List<Network>
+    suspend fun deleteAccount(metaId: Long)
 
-    fun groupedAccountsFlow(): Flow<List<Any>>
-
-    suspend fun selectAccount(address: String)
-
-    suspend fun updateAccountName(account: Account, newName: String)
-
-    suspend fun deleteAccount(address: String)
-
-    suspend fun updateAccountPositionsInNetwork(newOrdering: List<Account>)
+    suspend fun updateMetaAccountPositions(idsInNewOrder: List<Long>)
 
     fun nodesFlow(): Flow<List<Node>>
 
     suspend fun getNode(nodeId: Int): Node
-
-    suspend fun processAccountJson(json: String): Result<ImportJsonData>
 
     fun getLanguages(): List<Language>
 

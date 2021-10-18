@@ -5,6 +5,7 @@ import jp.co.soramitsu.common.resources.ResourceManager
 import jp.co.soramitsu.common.utils.nullIfEmpty
 import jp.co.soramitsu.core_db.model.OperationLocal
 import jp.co.soramitsu.feature_account_api.presenatation.account.AddressDisplayUseCase
+import jp.co.soramitsu.feature_account_api.presenatation.account.icon.createAddressIcon
 import jp.co.soramitsu.feature_wallet_api.domain.model.Operation
 import jp.co.soramitsu.feature_wallet_api.domain.model.amountFromPlanks
 import jp.co.soramitsu.feature_wallet_api.presentation.formatters.formatTokenAmount
@@ -237,6 +238,7 @@ private fun Operation.Type.Extrinsic.formattedCall() = call.camelCaseToCapitaliz
 private fun Operation.Type.Extrinsic.formattedModule() = module.camelCaseToCapitalizedWords()
 
 suspend fun mapOperationToOperationModel(
+    chain: Chain,
     operation: Operation,
     nameIdentifier: AddressDisplayUseCase.Identifier,
     resourceManager: ResourceManager,
@@ -275,7 +277,7 @@ suspend fun mapOperationToOperationModel(
                     amountColorRes = amountColor,
                     header = nameIdentifier.nameOrAddress(operationType.displayAddress),
                     statusAppearance = statusAppearance,
-                    operationIcon = iconGenerator.createAddressIcon(operationType.displayAddress, AddressIconGenerator.SIZE_BIG),
+                    operationIcon = iconGenerator.createAddressIcon(chain, operationType.displayAddress, AddressIconGenerator.SIZE_BIG),
                     subHeader = resourceManager.getString(R.string.transfer_title),
                 )
             }
@@ -316,6 +318,8 @@ fun mapOperationToParcel(
                 val total = operationType.amount + feeOrZero
 
                 OperationParcelizeModel.Transfer(
+                    chainId = operation.chainAsset.chainId,
+                    assetId = operation.chainAsset.id,
                     time = time,
                     address = address,
                     hash = operationType.hash,
@@ -331,6 +335,7 @@ fun mapOperationToParcel(
 
             is Operation.Type.Reward -> {
                 OperationParcelizeModel.Reward(
+                    chainId = chainAsset.chainId,
                     eventId = id,
                     address = address,
                     time = time,
@@ -343,6 +348,7 @@ fun mapOperationToParcel(
 
             is Operation.Type.Extrinsic -> {
                 OperationParcelizeModel.Extrinsic(
+                    chainId = chainAsset.chainId,
                     time = time,
                     originAddress = address,
                     hash = operationType.hash,
