@@ -1,30 +1,40 @@
 package jp.co.soramitsu.feature_account_impl.presentation.exporting.seed
 
 import jp.co.soramitsu.common.resources.ResourceManager
-import jp.co.soramitsu.common.utils.map
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
+import jp.co.soramitsu.common.utils.flowOf
+import jp.co.soramitsu.common.utils.inBackground
+import jp.co.soramitsu.common.utils.invoke
 import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountInteractor
-import jp.co.soramitsu.core.model.WithDerivationPath
-import jp.co.soramitsu.core.model.WithSeed
 import jp.co.soramitsu.feature_account_impl.R
+import jp.co.soramitsu.feature_account_impl.domain.account.export.seed.ExportSeedInteractor
 import jp.co.soramitsu.feature_account_impl.presentation.AccountRouter
+import jp.co.soramitsu.feature_account_impl.presentation.exporting.ExportPayload
 import jp.co.soramitsu.feature_account_impl.presentation.exporting.ExportSource
 import jp.co.soramitsu.feature_account_impl.presentation.exporting.ExportViewModel
+import jp.co.soramitsu.runtime.multiNetwork.ChainRegistry
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 class ExportSeedViewModel(
     private val router: AccountRouter,
+    private val interactor: ExportSeedInteractor,
     resourceManager: ResourceManager,
     accountInteractor: AccountInteractor,
-    accountAddress: String
-) : ExportViewModel(accountInteractor, accountAddress, resourceManager, ExportSource.Seed) {
+    chainRegistry: ChainRegistry,
+    payload: ExportPayload,
+) : ExportViewModel(
+    accountInteractor,
+    payload,
+    resourceManager,
+    chainRegistry,
+    ExportSource.Seed
+) {
 
-    val seedLiveData = securityTypeLiveData.map {
-        (it as WithSeed).seed!!.toHexString(withPrefix = true)
+    val exportingSecretFlow = flowOf {
+        interactor.getSeedForExport(payload.metaId, payload.chainId)
     }
-
-    val derivationPathLiveData = securityTypeLiveData.map {
-        (it as? WithDerivationPath)?.derivationPath
-    }
+        .inBackground()
+        .share()
 
     fun back() {
         router.back()
@@ -35,17 +45,17 @@ class ExportSeedViewModel(
     }
 
     override fun securityWarningConfirmed() {
-        val seed = seedLiveData.value ?: return
-        val networkType = networkTypeLiveData.value?.name ?: return
+        launch {
+            val exportingSecret = exportingSecretFlow.first()
+            val chainName = chain().name
 
-        val derivationPath = derivationPathLiveData.value
+            val shareText = if (exportingSecret.derivationPath.isNullOrBlank()) {
+                resourceManager.getString(R.string.export_seed_without_derivation, chainName, exportingSecret.secret)
+            } else {
+                resourceManager.getString(R.string.export_seed_with_derivation, chainName, exportingSecret.secret, exportingSecret.derivationPath)
+            }
 
-        val shareText = if (derivationPath.isNullOrBlank()) {
-            resourceManager.getString(R.string.export_seed_without_derivation, networkType, seed)
-        } else {
-            resourceManager.getString(R.string.export_seed_with_derivation, networkType, seed, derivationPath)
+            exportText(shareText)
         }
-
-        exportText(shareText)
     }
 }

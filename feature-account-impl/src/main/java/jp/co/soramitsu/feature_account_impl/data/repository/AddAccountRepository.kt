@@ -130,7 +130,7 @@ class AddAccountRepository(
 
         with(importAccountMeta) {
             val chainId = (networkTypeIdentifier as? NetworkTypeIdentifier.Genesis)?.genesis?.removeHexPrefix()
-            val cryptoType = mapEncryptionToCryptoType(encryptionType)
+            val cryptoType = mapEncryptionToCryptoType(encryption.encryptionType)
 
             ImportJsonMetaData(name, chainId, cryptoType)
         }

@@ -19,7 +19,7 @@ class SourceTypeChooserBottomSheetDialog<T : AccountSource>(
     context: Context,
     payload: Payload<T>,
     onClicked: ClickHandler<T>
-) : DynamicListBottomSheet<T>(context, payload, AccountSourceDiffCallback<T>(), onClicked) {
+) : DynamicListBottomSheet<T>(context, payload, AccountSourceDiffCallback(), onClicked) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

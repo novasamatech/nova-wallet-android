@@ -12,7 +12,7 @@ import jp.co.soramitsu.runtime.multiNetwork.chain.model.Chain
 
 class ExternalActionsProvider(
     val clipboardManager: ClipboardManager,
-    val resourceManager: ResourceManager
+    val resourceManager: ResourceManager,
 ) : ExternalActions.Presentation {
 
     override val openBrowserEvent = MutableLiveData<Event<String>>()
@@ -24,9 +24,10 @@ class ExternalActionsProvider(
             is ExternalActions.Type.Address -> explorer.accountUrlOf(type.address)
             is ExternalActions.Type.Event -> explorer.eventUrlOf(type.id)
             is ExternalActions.Type.Extrinsic -> explorer.extrinsicUrlOf(type.hash)
+            is ExternalActions.Type.None -> null
         }
 
-        showBrowser(url)
+        url?.let { showBrowser(url) }
     }
 
     override fun showBrowser(url: String) {
@@ -38,6 +39,7 @@ class ExternalActionsProvider(
             is ExternalActions.Type.Address -> R.string.common_copy_address
             is ExternalActions.Type.Event -> R.string.common_copy_id
             is ExternalActions.Type.Extrinsic -> R.string.transaction_details_copy_hash
+            is ExternalActions.Type.None -> null
         }
 
         val payload = ExternalActions.Payload(

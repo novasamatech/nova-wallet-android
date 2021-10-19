@@ -3,7 +3,6 @@ package jp.co.soramitsu.feature_account_api.domain.interfaces
 import jp.co.soramitsu.core.model.CryptoType
 import jp.co.soramitsu.core.model.Language
 import jp.co.soramitsu.core.model.Node
-import jp.co.soramitsu.core.model.SecuritySource
 import jp.co.soramitsu.feature_account_api.domain.model.Account
 import jp.co.soramitsu.feature_account_api.domain.model.LightMetaAccount
 import jp.co.soramitsu.feature_account_api.domain.model.MetaAccount
@@ -12,8 +11,6 @@ import jp.co.soramitsu.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.flow.Flow
 
 interface AccountInteractor {
-
-    suspend fun getSecuritySource(accountAddress: String): SecuritySource
 
     suspend fun generateMnemonic(): List<String>
 
@@ -33,7 +30,7 @@ interface AccountInteractor {
 
     suspend fun setBiometricOff()
 
-    suspend fun getAccount(address: String): Account
+    suspend fun getMetaAccount(metaId: Long): MetaAccount
 
     fun lightMetaAccountsFlow(): Flow<List<LightMetaAccount>>
 
@@ -66,6 +63,4 @@ interface AccountInteractor {
     suspend fun selectNode(nodeId: Int)
 
     suspend fun deleteNode(nodeId: Int)
-
-    suspend fun generateRestoreJson(accountAddress: String, password: String): Result<String>
 }

@@ -3,6 +3,8 @@ package jp.co.soramitsu.runtime.multiNetwork.chain.model
 typealias ChainId = String
 typealias StringTemplate = String
 
+typealias ExplorerTemplateExtractor = (Chain.Explorer) -> StringTemplate?
+
 data class Chain(
     val id: ChainId,
     val name: String,

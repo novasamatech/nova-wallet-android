@@ -13,7 +13,7 @@ typealias CopyCallback = (String) -> Unit
 
 open class ExternalActionsSheet(
     context: Context,
-    private val payload: ExternalActions.Payload,
+    protected val payload: ExternalActions.Payload,
     val onCopy: CopyCallback,
     val onViewExternal: ExternalViewCallback,
 ) : FixedListBottomSheet(context) {
@@ -23,18 +23,22 @@ open class ExternalActionsSheet(
 
         setTitle(payload.type.primaryValue)
 
-        item(R.drawable.ic_copy_24, payload.copyLabelRes) {
-            onCopy(payload.type.primaryValue)
+        payload.copyLabelRes?.let {
+            item(R.drawable.ic_copy_24, it) {
+                onCopy(payload.type.primaryValue)
+            }
         }
 
-        payload.chain
-            .availableExplorersFor(Chain.Explorer::account)
-            .forEach { explorer ->
-                val title = context.getString(R.string.transaction_details_view_explorer, explorer.name)
+        payload.type.explorerTemplateExtractor?.let {
+            payload.chain
+                .availableExplorersFor(it)
+                .forEach { explorer ->
+                    val title = context.getString(R.string.transaction_details_view_explorer, explorer.name)
 
-                item(R.drawable.ic_globe_24, title) {
-                    onViewExternal(explorer, payload.type)
+                    item(R.drawable.ic_globe_24, title) {
+                        onViewExternal(explorer, payload.type)
+                    }
                 }
-            }
+        }
     }
 }

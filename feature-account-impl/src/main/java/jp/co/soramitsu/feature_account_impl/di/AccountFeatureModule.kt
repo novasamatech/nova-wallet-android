@@ -40,7 +40,6 @@ import jp.co.soramitsu.feature_account_impl.domain.account.details.AccountDetail
 import jp.co.soramitsu.runtime.extrinsic.ExtrinsicBuilderFactory
 import jp.co.soramitsu.runtime.multiNetwork.ChainRegistry
 import jp.co.soramitsu.runtime.network.rpc.RpcCalls
-import java.util.Random
 
 @Module
 class AccountFeatureModule {
@@ -66,9 +65,8 @@ class AccountFeatureModule {
     @Provides
     @FeatureScope
     fun provideJsonEncoder(
-        random: Random,
         jsonMapper: Gson,
-    ) = JsonSeedEncoder(jsonMapper, random)
+    ) = JsonSeedEncoder(jsonMapper)
 
     @Provides
     @FeatureScope
@@ -79,6 +77,7 @@ class AccountFeatureModule {
         jsonSeedEncoder: JsonSeedEncoder,
         accountSubstrateSource: AccountSubstrateSource,
         languagesHolder: LanguagesHolder,
+        secretStoreV2: SecretStoreV2,
     ): AccountRepository {
         return AccountRepositoryImpl(
             accountDataSource,
@@ -86,7 +85,8 @@ class AccountFeatureModule {
             nodeDao,
             jsonSeedEncoder,
             languagesHolder,
-            accountSubstrateSource
+            accountSubstrateSource,
+            secretStoreV2
         )
     }
 
@@ -173,9 +173,11 @@ class AccountFeatureModule {
     @FeatureScope
     fun provideAccountDetailsInteractor(
         accountRepository: AccountRepository,
+        secretStoreV2: SecretStoreV2,
         chainRegistry: ChainRegistry,
     ) = AccountDetailsInteractor(
         accountRepository,
+        secretStoreV2,
         chainRegistry
     )
 

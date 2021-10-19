@@ -1,16 +1,16 @@
 package jp.co.soramitsu.feature_account_impl.data.repository
 
-import jp.co.soramitsu.common.data.mappers.mapCryptoTypeToEncryption
+import jp.co.soramitsu.common.data.secrets.v2.SecretStoreV2
+import jp.co.soramitsu.common.data.secrets.v2.getAccountSecrets
+import jp.co.soramitsu.common.data.secrets.v2.seed
 import jp.co.soramitsu.common.resources.LanguagesHolder
 import jp.co.soramitsu.common.utils.mapList
 import jp.co.soramitsu.common.utils.networkType
 import jp.co.soramitsu.core.model.CryptoType
-import jp.co.soramitsu.core.model.JsonFormer
 import jp.co.soramitsu.core.model.Language
 import jp.co.soramitsu.core.model.Network
 import jp.co.soramitsu.core.model.Node
-import jp.co.soramitsu.core.model.SecuritySource
-import jp.co.soramitsu.core.model.WithJson
+import jp.co.soramitsu.core.model.chainId
 import jp.co.soramitsu.core_db.dao.AccountDao
 import jp.co.soramitsu.core_db.dao.NodeDao
 import jp.co.soramitsu.core_db.model.AccountLocal
@@ -20,17 +20,21 @@ import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.Mnemonic
 import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.MnemonicCreator
 import jp.co.soramitsu.fearless_utils.encrypt.qr.QrSharing
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import jp.co.soramitsu.feature_account_api.data.secrets.keypair
 import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountRepository
 import jp.co.soramitsu.feature_account_api.domain.model.Account
 import jp.co.soramitsu.feature_account_api.domain.model.AuthType
 import jp.co.soramitsu.feature_account_api.domain.model.LightMetaAccount
 import jp.co.soramitsu.feature_account_api.domain.model.MetaAccount
 import jp.co.soramitsu.feature_account_api.domain.model.MetaAccountOrdering
+import jp.co.soramitsu.feature_account_api.domain.model.accountIdIn
 import jp.co.soramitsu.feature_account_api.domain.model.addressIn
+import jp.co.soramitsu.feature_account_api.domain.model.multiChainEncryptionIn
 import jp.co.soramitsu.feature_account_api.domain.model.publicKeyIn
 import jp.co.soramitsu.feature_account_impl.data.mappers.mapNodeLocalToNode
 import jp.co.soramitsu.feature_account_impl.data.network.blockchain.AccountSubstrateSource
 import jp.co.soramitsu.feature_account_impl.data.repository.datasource.AccountDataSource
+import jp.co.soramitsu.runtime.ext.genesisHash
 import jp.co.soramitsu.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -46,6 +50,7 @@ class AccountRepositoryImpl(
     private val jsonSeedEncoder: JsonSeedEncoder,
     private val languagesHolder: LanguagesHolder,
     private val accountSubstrateSource: AccountSubstrateSource,
+    private val secretStoreV2: SecretStoreV2,
 ) : AccountRepository {
 
     override fun getEncryptionTypes(): List<CryptoType> {
@@ -200,28 +205,25 @@ class AccountRepositoryImpl(
         return accountDataSource.updateAccountPositions(accountOrdering)
     }
 
-    override suspend fun getSecuritySource(accountAddress: String): SecuritySource {
-        return accountDataSource.getSecuritySource(accountAddress)!!
-    }
-
-    override suspend fun generateRestoreJson(account: Account, password: String): String {
+    override suspend fun generateRestoreJson(
+        metaAccount: MetaAccount,
+        chain: Chain,
+        password: String,
+    ): String {
         return withContext(Dispatchers.Default) {
-            val securitySource = getSecuritySource(account.address)
-            require(securitySource is WithJson)
+            val accountId = metaAccount.accountIdIn(chain)!!
+            val address = metaAccount.addressIn(chain)!!
 
-            val seed = (securitySource.jsonFormer() as? JsonFormer.Seed)?.seed
-
-            val cryptoType = mapCryptoTypeToEncryption(account.cryptoType)
-            val runtimeConfiguration = account.network.type.runtimeConfiguration
+            val secrets = secretStoreV2.getAccountSecrets(metaAccount.id, accountId)
 
             jsonSeedEncoder.generate(
-                keypair = securitySource.keypair,
-                seed = seed,
+                keypair = secrets.keypair(chain),
+                seed = secrets.seed(),
                 password = password,
-                name = account.name.orEmpty(),
-                encryptionType = cryptoType,
-                genesisHash = runtimeConfiguration.genesisHash,
-                addressByte = runtimeConfiguration.addressByte
+                name = metaAccount.name,
+                multiChainEncryption = metaAccount.multiChainEncryptionIn(chain),
+                genesisHash = chain.genesisHash,
+                address = address
             )
         }
     }
