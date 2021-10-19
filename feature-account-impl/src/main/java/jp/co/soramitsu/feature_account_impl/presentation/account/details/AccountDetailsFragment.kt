@@ -10,8 +10,11 @@ import jp.co.soramitsu.common.di.FeatureUtils
 import jp.co.soramitsu.common.utils.bindTo
 import jp.co.soramitsu.common.utils.nameInputFilters
 import jp.co.soramitsu.feature_account_api.di.AccountFeatureApi
+import jp.co.soramitsu.feature_account_api.presenatation.actions.copyAddressClicked
+import jp.co.soramitsu.feature_account_api.presenatation.actions.setupExternalActions
 import jp.co.soramitsu.feature_account_impl.R
 import jp.co.soramitsu.feature_account_impl.di.AccountFeatureComponent
+import jp.co.soramitsu.feature_account_impl.presentation.common.accountSource.SourceTypeChooserBottomSheetDialog
 import kotlinx.android.synthetic.main.fragment_account_details.accountDetailsChainAccounts
 import kotlinx.android.synthetic.main.fragment_account_details.accountDetailsNameField
 import kotlinx.android.synthetic.main.fragment_account_details.accountDetailsToolbar
@@ -65,6 +68,25 @@ class AccountDetailsFragment : BaseFragment<AccountDetailsViewModel>(), ChainAcc
     }
 
     override fun subscribe(viewModel: AccountDetailsViewModel) {
+        setupExternalActions(viewModel) { context, payload ->
+            ChainAccountActionsSheet(
+                context,
+                payload,
+                onCopy = viewModel::copyAddressClicked,
+                onViewExternal = viewModel::viewExternalClicked,
+                onChange = viewModel::changeChainAccountClicked,
+                onExport = viewModel::exportClicked
+            )
+        }
+
+        viewModel.showExportSourceChooser.observeEvent { payload ->
+            SourceTypeChooserBottomSheetDialog(
+                context = requireContext(),
+                payload = payload.dynamicListPayload,
+                onClicked = { viewModel.exportTypeChosen(it, payload.chain) }
+            ).show()
+        }
+
         accountDetailsNameField.content.bindTo(viewModel.accountNameFlow, viewLifecycleOwner.lifecycleScope)
 
         viewModel.chainAccountProjections.observe { adapter.submitList(it) }

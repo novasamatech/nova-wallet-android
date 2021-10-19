@@ -8,9 +8,11 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import jp.co.soramitsu.common.di.viewmodel.ViewModelKey
 import jp.co.soramitsu.common.di.viewmodel.ViewModelModule
-import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountInteractor
+import jp.co.soramitsu.feature_account_impl.domain.account.export.json.ExportJsonInteractor
 import jp.co.soramitsu.feature_account_impl.presentation.AccountRouter
+import jp.co.soramitsu.feature_account_impl.presentation.exporting.ExportPayload
 import jp.co.soramitsu.feature_account_impl.presentation.exporting.json.password.ExportJsonPasswordViewModel
+import jp.co.soramitsu.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
 class ExportJsonPasswordModule {
@@ -20,10 +22,11 @@ class ExportJsonPasswordModule {
     @ViewModelKey(ExportJsonPasswordViewModel::class)
     fun provideViewModel(
         router: AccountRouter,
-        accountInteractor: AccountInteractor,
-        accountAddress: String
+        accountInteractor: ExportJsonInteractor,
+        chainRegistry: ChainRegistry,
+        payload: ExportPayload
     ): ViewModel {
-        return ExportJsonPasswordViewModel(router, accountInteractor, accountAddress)
+        return ExportJsonPasswordViewModel(router, accountInteractor, chainRegistry, payload)
     }
 
     @Provides

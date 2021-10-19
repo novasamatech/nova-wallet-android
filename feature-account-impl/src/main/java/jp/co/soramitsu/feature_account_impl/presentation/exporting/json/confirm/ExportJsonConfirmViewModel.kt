@@ -5,13 +5,21 @@ import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountInteractor
 import jp.co.soramitsu.feature_account_impl.presentation.AccountRouter
 import jp.co.soramitsu.feature_account_impl.presentation.exporting.ExportSource
 import jp.co.soramitsu.feature_account_impl.presentation.exporting.ExportViewModel
+import jp.co.soramitsu.runtime.multiNetwork.ChainRegistry
 
 class ExportJsonConfirmViewModel(
     private val router: AccountRouter,
     resourceManager: ResourceManager,
     accountInteractor: AccountInteractor,
+    chainRegistry: ChainRegistry,
     payload: ExportJsonConfirmPayload
-) : ExportViewModel(accountInteractor, payload.address, resourceManager, ExportSource.Json) {
+) : ExportViewModel(
+    accountInteractor,
+    payload.exportPayload,
+    resourceManager,
+    chainRegistry,
+    ExportSource.Json
+) {
 
     val json = payload.json
 

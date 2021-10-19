@@ -9,7 +9,7 @@ import jp.co.soramitsu.common.utils.castOrNull
 import jp.co.soramitsu.common.utils.default
 import jp.co.soramitsu.common.utils.deriveSeed32
 import jp.co.soramitsu.core.model.CryptoType
-import jp.co.soramitsu.fearless_utils.encrypt.EncryptionType
+import jp.co.soramitsu.fearless_utils.encrypt.MultiChainEncryption
 import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedDecoder
 import jp.co.soramitsu.fearless_utils.encrypt.junction.BIP32JunctionDecoder
 import jp.co.soramitsu.fearless_utils.encrypt.junction.JunctionDecoder
@@ -40,7 +40,9 @@ class AccountSecretsFactory(
 
     sealed class SecretsError : Exception() {
 
-        class NotValidEthereumCryptoType(val actualCryptoType: CryptoType) : SecretsError()
+        class NotValidEthereumCryptoType : SecretsError()
+
+        class NotValidSubstrateCryptoType : SecretsError()
     }
 
     data class Result<S : Schema<S>>(val secrets: EncodableStruct<S>, val cryptoType: CryptoType)
@@ -56,9 +58,14 @@ class AccountSecretsFactory(
 
         val decodedJson = accountSource.castOrNull<AccountSource.Json>()?.let { jsonSource ->
             jsonSeedDecoder.decode(jsonSource.json, jsonSource.password).also {
-                // only allow ECDSA JSONs for ethereum chains
-                if (isEthereum && it.encryptionType != EncryptionType.ECDSA) {
-                    throw SecretsError.NotValidEthereumCryptoType(mapEncryptionToCryptoType(it.encryptionType))
+                // only allow Ethereum JSONs for ethereum chains
+                if (isEthereum && it.multiChainEncryption != MultiChainEncryption.Ethereum) {
+                    throw SecretsError.NotValidEthereumCryptoType()
+                }
+
+                // only allow Substrate JSONs for substrate chains
+                if (!isEthereum && it.multiChainEncryption == MultiChainEncryption.Ethereum) {
+                    throw SecretsError.NotValidSubstrateCryptoType()
                 }
             }
         }
@@ -66,7 +73,7 @@ class AccountSecretsFactory(
         val encryptionType = when (accountSource) {
             is AccountSource.Mnemonic -> mapCryptoTypeToEncryption(accountSource.cryptoType)
             is AccountSource.Seed -> mapCryptoTypeToEncryption(accountSource.cryptoType)
-            is AccountSource.Json -> decodedJson!!.encryptionType
+            is AccountSource.Json -> decodedJson!!.multiChainEncryption.encryptionType
         }
 
         val seed = when (accountSource) {
@@ -83,7 +90,7 @@ class AccountSecretsFactory(
             } else {
                 SubstrateKeypairFactory.generate(encryptionType, seed, junctions)
             }
-        } else { // seed is null only when importing SR25519 with JSON
+        } else { // seed is null for some cases when importing with JSON
             decodedJson!!.keypair
         }
 

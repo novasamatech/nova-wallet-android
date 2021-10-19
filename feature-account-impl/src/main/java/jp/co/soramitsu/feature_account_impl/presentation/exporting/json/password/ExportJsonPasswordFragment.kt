@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import coil.ImageLoader
+import coil.load
 import jp.co.soramitsu.common.base.BaseFragment
 import jp.co.soramitsu.common.di.FeatureUtils
 import jp.co.soramitsu.common.utils.setDrawableStart
@@ -11,21 +13,26 @@ import jp.co.soramitsu.common.utils.setVisible
 import jp.co.soramitsu.feature_account_api.di.AccountFeatureApi
 import jp.co.soramitsu.feature_account_impl.R
 import jp.co.soramitsu.feature_account_impl.di.AccountFeatureComponent
+import jp.co.soramitsu.feature_account_impl.presentation.exporting.ExportPayload
 import kotlinx.android.synthetic.main.fragment_export_json_password.exportJsonPasswordConfirmField
 import kotlinx.android.synthetic.main.fragment_export_json_password.exportJsonPasswordMatchingError
 import kotlinx.android.synthetic.main.fragment_export_json_password.exportJsonPasswordNetworkInput
 import kotlinx.android.synthetic.main.fragment_export_json_password.exportJsonPasswordNewField
 import kotlinx.android.synthetic.main.fragment_export_json_password.exportJsonPasswordNext
 import kotlinx.android.synthetic.main.fragment_export_json_password.exportJsonPasswordToolbar
+import javax.inject.Inject
 
-private const val ACCOUNT_ADDRESS_KEY = "ACCOUNT_ADDRESS_KEY"
+private const val PAYLOAD_KEY = "PAYLOAD_KEY"
 
 class ExportJsonPasswordFragment : BaseFragment<ExportJsonPasswordViewModel>() {
 
+    @Inject
+    lateinit var imageLoader: ImageLoader
+
     companion object {
-        fun getBundle(accountAddress: String): Bundle {
+        fun getBundle(exportPayload: ExportPayload): Bundle {
             return Bundle().apply {
-                putString(ACCOUNT_ADDRESS_KEY, accountAddress)
+                putParcelable(PAYLOAD_KEY, exportPayload)
             }
         }
     }
@@ -45,11 +52,9 @@ class ExportJsonPasswordFragment : BaseFragment<ExportJsonPasswordViewModel>() {
     }
 
     override fun inject() {
-        val accountAddress = argument<String>(ACCOUNT_ADDRESS_KEY)
-
         FeatureUtils.getFeature<AccountFeatureComponent>(requireContext(), AccountFeatureApi::class.java)
             .exportJsonPasswordFactory()
-            .create(this, accountAddress)
+            .create(this, argument(PAYLOAD_KEY))
             .inject(this)
     }
 
@@ -63,8 +68,8 @@ class ExportJsonPasswordFragment : BaseFragment<ExportJsonPasswordViewModel>() {
             exportJsonPasswordMatchingError.setVisible(it, falseState = View.INVISIBLE)
         }
 
-        viewModel.networkTypeLiveData.observe {
-            exportJsonPasswordNetworkInput.setTextIcon(it.networkTypeUI.icon)
+        viewModel.chainFlow.observe {
+            exportJsonPasswordNetworkInput.textIconView.load(it.icon, imageLoader)
             exportJsonPasswordNetworkInput.setMessage(it.name)
         }
     }

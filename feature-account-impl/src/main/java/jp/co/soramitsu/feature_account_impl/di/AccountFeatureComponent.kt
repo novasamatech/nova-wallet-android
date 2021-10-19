@@ -33,7 +33,8 @@ import jp.co.soramitsu.runtime.di.RuntimeApi
         AccountFeatureDependencies::class
     ],
     modules = [
-        AccountFeatureModule::class
+        AccountFeatureModule::class,
+        ExportModule::class
     ]
 )
 @FeatureScope

@@ -3,7 +3,6 @@ package jp.co.soramitsu.feature_account_impl.domain
 import jp.co.soramitsu.core.model.CryptoType
 import jp.co.soramitsu.core.model.Language
 import jp.co.soramitsu.core.model.Node
-import jp.co.soramitsu.core.model.SecuritySource
 import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountInteractor
 import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountRepository
 import jp.co.soramitsu.feature_account_api.domain.model.Account
@@ -21,12 +20,8 @@ import kotlinx.coroutines.withContext
 
 class AccountInteractorImpl(
     private val chainRegistry: ChainRegistry,
-    private val accountRepository: AccountRepository
+    private val accountRepository: AccountRepository,
 ) : AccountInteractor {
-
-    override suspend fun getSecuritySource(accountAddress: String): SecuritySource {
-        return accountRepository.getSecuritySource(accountAddress)
-    }
 
     override suspend fun generateMnemonic(): List<String> {
         return accountRepository.generateMnemonic()
@@ -70,8 +65,8 @@ class AccountInteractorImpl(
         return accountRepository.setBiometricOff()
     }
 
-    override suspend fun getAccount(address: String): Account {
-        return accountRepository.getAccount(address)
+    override suspend fun getMetaAccount(metaId: Long): MetaAccount {
+        return accountRepository.getMetaAccount(metaId)
     }
 
     override fun lightMetaAccountsFlow(): Flow<List<LightMetaAccount>> {
@@ -180,13 +175,5 @@ class AccountInteractorImpl(
 
     override suspend fun deleteNode(nodeId: Int) {
         return accountRepository.deleteNode(nodeId)
-    }
-
-    override suspend fun generateRestoreJson(accountAddress: String, password: String): Result<String> {
-        val account = accountRepository.getAccount(accountAddress)
-
-        return runCatching {
-            accountRepository.generateRestoreJson(account, password)
-        }
     }
 }

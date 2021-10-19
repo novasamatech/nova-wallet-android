@@ -5,22 +5,28 @@ import androidx.lifecycle.LiveData
 import jp.co.soramitsu.common.mixin.api.Browserable
 import jp.co.soramitsu.common.utils.Event
 import jp.co.soramitsu.runtime.multiNetwork.chain.model.Chain
+import jp.co.soramitsu.runtime.multiNetwork.chain.model.ExplorerTemplateExtractor
 
 interface ExternalActions : Browserable {
 
     class Payload(
         val type: Type,
         val chain: Chain,
-        @StringRes val copyLabelRes: Int,
+        @StringRes val copyLabelRes: Int?,
     )
 
-    sealed class Type(val primaryValue: String) {
+    sealed class Type(
+        val primaryValue: String,
+        val explorerTemplateExtractor: ExplorerTemplateExtractor?,
+    ) {
 
-        class Address(val address: String) : Type(address)
+        class None(primaryValue: String) : Type(primaryValue, explorerTemplateExtractor = null)
 
-        class Extrinsic(val hash: String) : Type(hash)
+        class Address(val address: String) : Type(address, explorerTemplateExtractor = Chain.Explorer::account)
 
-        class Event(val id: String) : Type(id)
+        class Extrinsic(val hash: String) : Type(hash, explorerTemplateExtractor = Chain.Explorer::extrinsic)
+
+        class Event(val id: String) : Type(id, explorerTemplateExtractor = Chain.Explorer::event)
     }
 
     val showExternalActionsEvent: LiveData<Event<Payload>>

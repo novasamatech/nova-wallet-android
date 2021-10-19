@@ -1,32 +1,48 @@
 package jp.co.soramitsu.feature_account_impl.presentation.exporting.mnemonic
 
 import jp.co.soramitsu.common.resources.ResourceManager
-import jp.co.soramitsu.common.utils.map
-import jp.co.soramitsu.core.model.WithDerivationPath
-import jp.co.soramitsu.core.model.WithMnemonic
+import jp.co.soramitsu.common.utils.flowOf
+import jp.co.soramitsu.common.utils.inBackground
+import jp.co.soramitsu.common.utils.invoke
 import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountInteractor
 import jp.co.soramitsu.feature_account_impl.R
+import jp.co.soramitsu.feature_account_impl.domain.account.export.mnemonic.ExportMnemonicInteractor
 import jp.co.soramitsu.feature_account_impl.presentation.AccountRouter
+import jp.co.soramitsu.feature_account_impl.presentation.exporting.ExportPayload
 import jp.co.soramitsu.feature_account_impl.presentation.exporting.ExportSource
 import jp.co.soramitsu.feature_account_impl.presentation.exporting.ExportViewModel
 import jp.co.soramitsu.feature_account_impl.presentation.view.mnemonic.mapMnemonicToMnemonicWords
+import jp.co.soramitsu.runtime.multiNetwork.ChainRegistry
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 class ExportMnemonicViewModel(
     private val router: AccountRouter,
+    private val interactor: ExportMnemonicInteractor,
     resourceManager: ResourceManager,
+    chainRegistry: ChainRegistry,
     accountInteractor: AccountInteractor,
-    accountAddress: String
-) : ExportViewModel(accountInteractor, accountAddress, resourceManager, ExportSource.Mnemonic) {
+    payload: ExportPayload,
+) : ExportViewModel(
+    accountInteractor,
+    payload,
+    resourceManager,
+    chainRegistry,
+    ExportSource.Mnemonic
+) {
 
-    private val mnemonicSourceLiveData = securityTypeLiveData.map { it as WithMnemonic }
-
-    val mnemonicWordsLiveData = mnemonicSourceLiveData.map {
-        mapMnemonicToMnemonicWords(it.mnemonicWords())
+    val exportingSecretFlow = flowOf {
+        interactor.getMnemonic(payload.metaId, payload.chainId)
     }
+        .inBackground()
+        .share()
 
-    val derivationPathLiveData = securityTypeLiveData.map {
-        (it as? WithDerivationPath)?.derivationPath
+    val mnemonicWordsFlow = exportingSecretFlow.map {
+        mapMnemonicToMnemonicWords(it.secret.wordList)
     }
+        .inBackground()
+        .share()
 
     fun back() {
         router.back()
@@ -37,24 +53,27 @@ class ExportMnemonicViewModel(
     }
 
     override fun securityWarningConfirmed() {
-        val mnemonic = mnemonicSourceLiveData.value?.mnemonic ?: return
+        launch {
+            val exportingSecret = exportingSecretFlow.first()
 
-        val networkType = networkTypeLiveData.value?.name ?: return
+            val mnemonic = exportingSecret.secret.words
+            val chainName = chain().name
 
-        val derivationPath = derivationPathLiveData.value
+            val derivationPath = exportingSecret.derivationPath
 
-        val shareText = if (derivationPath.isNullOrBlank()) {
-            resourceManager.getString(R.string.export_mnemonic_without_derivation, networkType, mnemonic)
-        } else {
-            resourceManager.getString(R.string.export_mnemonic_with_derivation, networkType, mnemonic, derivationPath)
+            val shareText = if (derivationPath.isNullOrBlank()) {
+                resourceManager.getString(R.string.export_mnemonic_without_derivation, chainName, mnemonic)
+            } else {
+                resourceManager.getString(R.string.export_mnemonic_with_derivation, chainName, mnemonic, derivationPath)
+            }
+
+            exportText(shareText)
         }
-
-        exportText(shareText)
     }
 
-    fun openConfirmMnemonic() {
-        val mnemonicSource = mnemonicSourceLiveData.value ?: return
+    fun openConfirmMnemonic() = launch {
+        val mnemonic = exportingSecretFlow.first().secret
 
-        router.openConfirmMnemonicOnExport(mnemonicSource.mnemonicWords())
+        router.openConfirmMnemonicOnExport(mnemonic.wordList)
     }
 }

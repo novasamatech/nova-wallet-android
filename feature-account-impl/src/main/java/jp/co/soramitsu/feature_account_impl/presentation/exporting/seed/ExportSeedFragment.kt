@@ -9,6 +9,7 @@ import jp.co.soramitsu.feature_account_api.di.AccountFeatureApi
 import jp.co.soramitsu.feature_account_impl.R
 import jp.co.soramitsu.feature_account_impl.di.AccountFeatureComponent
 import jp.co.soramitsu.feature_account_impl.presentation.exporting.ExportFragment
+import jp.co.soramitsu.feature_account_impl.presentation.exporting.ExportPayload
 import jp.co.soramitsu.feature_account_impl.presentation.view.advanced.AdvancedBlockView.FieldState
 import kotlinx.android.synthetic.main.fragment_export_seed.exportSeedAdvanced
 import kotlinx.android.synthetic.main.fragment_export_seed.exportSeedExport
@@ -16,14 +17,14 @@ import kotlinx.android.synthetic.main.fragment_export_seed.exportSeedToolbar
 import kotlinx.android.synthetic.main.fragment_export_seed.exportSeedType
 import kotlinx.android.synthetic.main.fragment_export_seed.exportSeedValue
 
-private const val ACCOUNT_ADDRESS_KEY = "ACCOUNT_ADDRESS_KEY"
+private const val PAYLOAD_KEY = "PAYLOAD_KEY"
 
 class ExportSeedFragment : ExportFragment<ExportSeedViewModel>() {
 
     companion object {
-        fun getBundle(accountAddress: String): Bundle {
+        fun getBundle(exportPayload: ExportPayload): Bundle {
             return Bundle().apply {
-                putString(ACCOUNT_ADDRESS_KEY, accountAddress)
+                putParcelable(PAYLOAD_KEY, exportPayload)
             }
         }
     }
@@ -47,36 +48,30 @@ class ExportSeedFragment : ExportFragment<ExportSeedViewModel>() {
     }
 
     override fun inject() {
-        val accountAddress = argument<String>(ACCOUNT_ADDRESS_KEY)
-
         FeatureUtils.getFeature<AccountFeatureComponent>(requireContext(), AccountFeatureApi::class.java)
             .exportSeedFactory()
-            .create(this, accountAddress)
+            .create(this, argument(PAYLOAD_KEY))
             .inject(this)
     }
 
     override fun subscribe(viewModel: ExportSeedViewModel) {
         super.subscribe(viewModel)
 
-        val typeNameRes = viewModel.exportSource.nameRes
+        exportSeedType.setMessage(viewModel.exportSource.nameRes)
 
-        exportSeedType.setMessage(typeNameRes)
-
-        viewModel.derivationPathLiveData.observe {
-            val state = if (it.isNullOrBlank()) FieldState.HIDDEN else FieldState.DISABLED
+        viewModel.exportingSecretFlow.observe {
+            val state = if (it.derivationPath.isNullOrBlank()) FieldState.HIDDEN else FieldState.DISABLED
 
             with(exportSeedAdvanced) {
                 configure(derivationPathField, state)
 
-                setDerivationPath(it)
+                setDerivationPath(it.derivationPath)
             }
+
+            exportSeedValue.setMessage(it.secret)
         }
 
-        viewModel.seedLiveData.observe {
-            exportSeedValue.setMessage(it)
-        }
-
-        viewModel.cryptoTypeLiveData.observe {
+        viewModel.cryptoTypeFlow.observe {
             exportSeedAdvanced.setEncryption(it.name)
         }
     }
