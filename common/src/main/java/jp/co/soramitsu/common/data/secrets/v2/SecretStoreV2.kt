@@ -54,7 +54,7 @@ class SecretStoreV2(
 
 suspend fun SecretStoreV2.getAccountSecrets(
     metaId: Long,
-    accountId: ByteArray
+    accountId: ByteArray,
 ): AccountSecrets {
     return if (hasChainSecrets(metaId, accountId)) {
         Union.right(
@@ -90,24 +90,48 @@ suspend fun SecretStoreV2.getChainAccountKeypair(
 
 suspend fun SecretStoreV2.getMetaAccountKeypair(
     metaId: Long,
-    isEthereum: Boolean
+    isEthereum: Boolean,
 ): Keypair = withContext(Dispatchers.Default) {
     val secrets = getMetaAccountSecrets(metaId) ?: noMetaSecrets(metaId)
 
-    val keypairStruct = if (isEthereum) {
-        secrets[MetaAccountSecrets.EthereumKeypair] ?: error("No ethereum keypair found for meta account $metaId")
+    mapMetaAccountSecretsToKeypair(secrets, isEthereum)
+}
+
+fun mapMetaAccountSecretsToKeypair(
+    secrets: EncodableStruct<MetaAccountSecrets>,
+    ethereum: Boolean,
+): Keypair {
+    val keypairStruct = if (ethereum) {
+        secrets[MetaAccountSecrets.EthereumKeypair] ?: noEthereumSecret()
     } else {
         secrets[MetaAccountSecrets.SubstrateKeypair]
     }
 
-    mapKeypairStructToKeypair(keypairStruct)
+    return mapKeypairStructToKeypair(keypairStruct)
 }
+
+fun mapMetaAccountSecretsToDerivationPath(
+    secrets: EncodableStruct<MetaAccountSecrets>,
+    ethereum: Boolean,
+): String? {
+    return if (ethereum) {
+        secrets[MetaAccountSecrets.EthereumDerivationPath]
+    } else {
+        secrets[MetaAccountSecrets.SubstrateDerivationPath]
+    }
+}
+
+fun mapChainAccountSecretsToKeypair(
+    secrets: EncodableStruct<ChainAccountSecrets>
+) = mapKeypairStructToKeypair(secrets[ChainAccountSecrets.Keypair])
 
 private fun noMetaSecrets(metaId: Long): Nothing = error("No secrets found for meta account $metaId")
 
 private fun noChainSecrets(metaId: Long, accountId: ByteArray): Nothing {
     error("No secrets found for meta account $metaId for account ${accountId.toHexString()}")
 }
+
+private fun noEthereumSecret(): Nothing = error("No ethereum keypair found")
 
 fun mapKeypairStructToKeypair(struct: EncodableStruct<KeyPairSchema>): Keypair {
     return Keypair(

@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import coil.ImageLoader
+import coil.load
 import jp.co.soramitsu.common.di.FeatureUtils
 import jp.co.soramitsu.feature_account_api.di.AccountFeatureApi
 import jp.co.soramitsu.feature_account_impl.R
@@ -16,10 +18,14 @@ import kotlinx.android.synthetic.main.fragment_export_json_confirm.exportJsonCon
 import kotlinx.android.synthetic.main.fragment_export_json_confirm.exportJsonConfirmNetworkInput
 import kotlinx.android.synthetic.main.fragment_export_json_confirm.exportJsonConfirmToolbar
 import kotlinx.android.synthetic.main.fragment_export_json_confirm.exportJsonConfirmValue
+import javax.inject.Inject
 
 private const val PAYLOAD_KEY = "PAYLOAD_KEY"
 
 class ExportJsonConfirmFragment : ExportFragment<ExportJsonConfirmViewModel>() {
+
+    @Inject
+    lateinit var imageLoader: ImageLoader
 
     companion object {
         fun getBundle(payload: ExportJsonConfirmPayload): Bundle {
@@ -60,12 +66,12 @@ class ExportJsonConfirmFragment : ExportFragment<ExportJsonConfirmViewModel>() {
     override fun subscribe(viewModel: ExportJsonConfirmViewModel) {
         super.subscribe(viewModel)
 
-        viewModel.cryptoTypeLiveData.observe {
+        viewModel.cryptoTypeFlow.observe {
             exportJsonConfirmAdvanced.setEncryption(it.name)
         }
 
-        viewModel.networkTypeLiveData.observe {
-            exportJsonConfirmNetworkInput.setTextIcon(it.networkTypeUI.icon)
+        viewModel.chainUiFlow.observe {
+            exportJsonConfirmNetworkInput.textIconView.load(it.icon, imageLoader)
             exportJsonConfirmNetworkInput.setMessage(it.name)
         }
 

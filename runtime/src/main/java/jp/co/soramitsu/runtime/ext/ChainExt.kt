@@ -5,7 +5,6 @@ import jp.co.soramitsu.common.utils.ethereumAddressFromPublicKey
 import jp.co.soramitsu.common.utils.ethereumAddressToHex
 import jp.co.soramitsu.common.utils.formatNamed
 import jp.co.soramitsu.common.utils.substrateAccountId
-import jp.co.soramitsu.fearless_utils.encrypt.Signer
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.addressByte
@@ -54,13 +53,6 @@ fun Chain.accountIdOf(publicKey: ByteArray): ByteArray {
         publicKey.substrateAccountId()
     }
 }
-
-val Chain.signatureHashing
-    get() = if (isEthereumBased) {
-        Signer.MessageHashing.ETHEREUM
-    } else {
-        Signer.MessageHashing.SUBSTRATE
-    }
 
 fun Chain.hexAccountIdOf(address: String): String {
     return accountIdOf(address).toHexString()

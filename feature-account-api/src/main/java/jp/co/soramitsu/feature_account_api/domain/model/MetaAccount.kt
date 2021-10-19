@@ -1,8 +1,11 @@
+
 package jp.co.soramitsu.feature_account_api.domain.model
 
+import jp.co.soramitsu.common.data.mappers.mapCryptoTypeToEncryption
 import jp.co.soramitsu.common.utils.DEFAULT_PREFIX
 import jp.co.soramitsu.common.utils.ethereumAddressToHex
 import jp.co.soramitsu.core.model.CryptoType
+import jp.co.soramitsu.fearless_utils.encrypt.MultiChainEncryption
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAddress
 import jp.co.soramitsu.runtime.ext.addressOf
@@ -100,5 +103,21 @@ fun MetaAccount.publicKeyIn(chain: Chain): ByteArray? {
         hasChainAccountIn(chain.id) -> chainAccounts.getValue(chain.id).publicKey
         chain.isEthereumBased -> ethereumPublicKey
         else -> substratePublicKey
+    }
+}
+
+fun MetaAccount.multiChainEncryptionIn(chain: Chain): MultiChainEncryption {
+    return when {
+        chain.isEthereumBased -> MultiChainEncryption.Ethereum
+        else -> {
+            val cryptoType = when {
+                hasChainAccountIn(chain.id) -> chainAccounts.getValue(chain.id).cryptoType
+                else -> substrateCryptoType
+            }
+
+            val encryptionType = mapCryptoTypeToEncryption(cryptoType)
+
+            MultiChainEncryption.Substrate(encryptionType)
+        }
     }
 }

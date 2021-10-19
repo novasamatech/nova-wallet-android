@@ -97,7 +97,11 @@ class JsonImportSource(
             )
             is AccountSecretsFactory.SecretsError.NotValidEthereumCryptoType -> ImportError(
                 titleRes = R.string.import_json_unsupported_crypto_title,
-                messageRes = R.string.import_json_unsupported_crypto_message
+                messageRes = R.string.import_json_unsupported_ethereum_crypto_message
+            )
+            is AccountSecretsFactory.SecretsError.NotValidSubstrateCryptoType -> ImportError(
+                titleRes = R.string.import_json_unsupported_crypto_title,
+                messageRes = R.string.import_json_unsupported_substrate_crypto_message
             )
             else -> null
         }

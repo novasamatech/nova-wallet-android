@@ -2,17 +2,16 @@ package jp.co.soramitsu.runtime.extrinsic
 
 import jp.co.soramitsu.common.data.mappers.mapCryptoTypeToEncryption
 import jp.co.soramitsu.core.model.CryptoType
+import jp.co.soramitsu.fearless_utils.encrypt.MultiChainEncryption
 import jp.co.soramitsu.fearless_utils.encrypt.keypair.Keypair
 import jp.co.soramitsu.fearless_utils.encrypt.keypair.ethereum.EthereumKeypairFactory
 import jp.co.soramitsu.fearless_utils.encrypt.keypair.substrate.SubstrateKeypairFactory
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHex
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.instances.AddressInstanceConstructor
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import jp.co.soramitsu.runtime.ext.accountIdFromPublicKey
 import jp.co.soramitsu.runtime.ext.addressOf
 import jp.co.soramitsu.runtime.ext.genesisHash
-import jp.co.soramitsu.runtime.ext.signatureHashing
 import jp.co.soramitsu.runtime.multiNetwork.ChainRegistry
 import jp.co.soramitsu.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.runtime.multiNetwork.getRuntime
@@ -44,6 +43,14 @@ class ExtrinsicBuilderFactory(
         keypair: Keypair,
         cryptoType: CryptoType,
     ): ExtrinsicBuilder {
+        val multiChainEncryption = if (chain.isEthereumBased){
+            MultiChainEncryption.Ethereum
+        } else {
+            val encryptionType = mapCryptoTypeToEncryption(cryptoType)
+
+            MultiChainEncryption.Substrate(encryptionType)
+        }
+
         val runtime = chainRegistry.getRuntime(chain.id)
 
         val accountId = chain.accountIdFromPublicKey(keypair.publicKey)
@@ -61,9 +68,8 @@ class ExtrinsicBuilderFactory(
             genesisHash = chain.genesisHash.fromHex(),
             blockHash = mortality.blockHash.fromHex(),
             era = mortality.era,
-            encryptionType = mapCryptoTypeToEncryption(cryptoType),
-            accountIdentifier = AddressInstanceConstructor.constructInstance(runtime.typeRegistry, accountId),
-            signatureHashing = chain.signatureHashing
+            multiChainEncryption = multiChainEncryption,
+            accountIdentifier = AddressInstanceConstructor.constructInstance(runtime.typeRegistry, accountId)
         )
     }
 

@@ -21,6 +21,7 @@ import jp.co.soramitsu.feature_account_impl.domain.account.details.AccountDetail
 import jp.co.soramitsu.feature_account_impl.domain.account.details.AccountInChain
 import jp.co.soramitsu.feature_account_impl.domain.account.details.AvailableExportType
 import jp.co.soramitsu.feature_account_impl.presentation.AccountRouter
+import jp.co.soramitsu.feature_account_impl.presentation.exporting.ExportPayload
 import jp.co.soramitsu.feature_account_impl.presentation.exporting.ExportSource
 import jp.co.soramitsu.runtime.multiNetwork.ChainRegistry
 import jp.co.soramitsu.runtime.multiNetwork.chain.model.Chain
@@ -140,11 +141,15 @@ class AccountDetailsViewModel(
     }
 
     fun exportTypeChosen(exportSource: ExportSource, chain: Chain) {
-//        when(exportSource) {
-//            ExportSource.Mnemonic -> accountRouter.openExportMnemonic()
-//            ExportSource.Json -> accountRouter.openExportJsonPassword()
-//            ExportSource.Seed -> accountRouter.openExportSeed()
-//        }
+        val exportPayload = ExportPayload(metaId, chain.id)
+
+        val navigationAction = when(exportSource) {
+            ExportSource.Mnemonic -> accountRouter.exportMnemonicAction(exportPayload)
+            ExportSource.Json -> accountRouter.exportJsonPasswordAction(exportPayload)
+            ExportSource.Seed -> accountRouter.exportSeedAction(exportPayload)
+        }
+
+        accountRouter.withPinCodeCheckRequired(navigationAction)
     }
 
     fun changeChainAccountClicked(inChain: Chain) {

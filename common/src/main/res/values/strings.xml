@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
-    <string name="account_chain_change">Change account</string>
+    <string name="accounts_change_chain_secrets">Change account</string>
 
     <string name="transaction_details_view_explorer">View in %s</string>
 
@@ -8,7 +8,8 @@
     <string name="account_invalid_derivation_path_message">Derivation path contains unsupported symbols or has incorrect structure</string>
 
     <string name="import_json_unsupported_crypto_title">Unsupported encryption type</string>
-    <string name="import_json_unsupported_crypto_message">Cannot import account for Ethereum-based chain based on secret with encryption other than ECDSA</string>
+    <string name="import_json_unsupported_ethereum_crypto_message">Cannot import account for Ethereum-based chain based on secret with Substrate encryption</string>
+    <string name="import_json_unsupported_substrate_crypto_message">Cannot import account for Substrate-based chain based on secret with Ethereum encryption</string>
     <string name="common_chain">Chain</string>
     <string name="import_json_chains_dont_match">Supplied JSON file was created for different network.</string>
 

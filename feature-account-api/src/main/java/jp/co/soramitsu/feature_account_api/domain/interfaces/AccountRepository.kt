@@ -3,7 +3,6 @@ package jp.co.soramitsu.feature_account_api.domain.interfaces
 import jp.co.soramitsu.core.model.CryptoType
 import jp.co.soramitsu.core.model.Language
 import jp.co.soramitsu.core.model.Node
-import jp.co.soramitsu.core.model.SecuritySource
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.feature_account_api.domain.model.Account
 import jp.co.soramitsu.feature_account_api.domain.model.LightMetaAccount
@@ -82,8 +81,6 @@ interface AccountRepository {
 
     suspend fun changeLanguage(language: Language)
 
-    suspend fun getSecuritySource(accountAddress: String): SecuritySource
-
     suspend fun addNode(nodeName: String, nodeHost: String, networkType: Node.NetworkType)
 
     suspend fun updateNode(nodeId: Int, newName: String, newHost: String, networkType: Node.NetworkType)
@@ -101,7 +98,11 @@ interface AccountRepository {
 
     suspend fun createQrAccountContent(chain: Chain, account: MetaAccount): String
 
-    suspend fun generateRestoreJson(account: Account, password: String): String
+    suspend fun generateRestoreJson(
+        metaAccount: MetaAccount,
+        chain: Chain,
+        password: String
+    ): String
 
     suspend fun isAccountExists(accountId: AccountId): Boolean
 }

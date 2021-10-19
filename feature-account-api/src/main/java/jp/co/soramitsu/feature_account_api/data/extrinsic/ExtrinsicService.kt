@@ -1,11 +1,11 @@
 package jp.co.soramitsu.feature_account_api.data.extrinsic
 
 import jp.co.soramitsu.common.data.secrets.v2.SecretStoreV2
-import jp.co.soramitsu.common.data.secrets.v2.getChainAccountKeypair
-import jp.co.soramitsu.common.data.secrets.v2.getMetaAccountKeypair
+import jp.co.soramitsu.common.data.secrets.v2.getAccountSecrets
 import jp.co.soramitsu.fearless_utils.encrypt.keypair.Keypair
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
+import jp.co.soramitsu.feature_account_api.data.secrets.keypair
 import jp.co.soramitsu.feature_account_api.domain.interfaces.AccountRepository
 import jp.co.soramitsu.feature_account_api.domain.model.MetaAccount
 import jp.co.soramitsu.feature_account_api.domain.model.cryptoTypeIn
@@ -56,10 +56,6 @@ class ExtrinsicService(
         chain: Chain,
         accountId: ByteArray,
     ): Keypair {
-        return if (hasChainSecrets(metaAccount.id, accountId)) {
-            getChainAccountKeypair(metaAccount.id, accountId)
-        } else {
-            getMetaAccountKeypair(metaAccount.id, chain.isEthereumBased)
-        }
+        return getAccountSecrets(metaAccount.id, accountId).keypair(chain)
     }
 }

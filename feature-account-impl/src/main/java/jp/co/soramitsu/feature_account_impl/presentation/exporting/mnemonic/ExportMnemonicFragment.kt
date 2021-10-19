@@ -9,6 +9,7 @@ import jp.co.soramitsu.feature_account_api.di.AccountFeatureApi
 import jp.co.soramitsu.feature_account_impl.R
 import jp.co.soramitsu.feature_account_impl.di.AccountFeatureComponent
 import jp.co.soramitsu.feature_account_impl.presentation.exporting.ExportFragment
+import jp.co.soramitsu.feature_account_impl.presentation.exporting.ExportPayload
 import jp.co.soramitsu.feature_account_impl.presentation.view.advanced.AdvancedBlockView.FieldState
 import kotlinx.android.synthetic.main.fragment_export_mnemonic.exportMnemonicAdvanced
 import kotlinx.android.synthetic.main.fragment_export_mnemonic.exportMnemonicConfirm
@@ -17,14 +18,14 @@ import kotlinx.android.synthetic.main.fragment_export_mnemonic.exportMnemonicToo
 import kotlinx.android.synthetic.main.fragment_export_mnemonic.exportMnemonicType
 import kotlinx.android.synthetic.main.fragment_export_mnemonic.exportMnemonicViewer
 
-private const val ACCOUNT_ADDRESS_KEY = "ACCOUNT_ADDRESS_KEY"
+private const val PAYLOAD_KEY = "PAYLOAD_KEY"
 
 class ExportMnemonicFragment : ExportFragment<ExportMnemonicViewModel>() {
 
     companion object {
-        fun getBundle(accountAddress: String): Bundle {
+        fun getBundle(exportPayload: ExportPayload): Bundle {
             return Bundle().apply {
-                putString(ACCOUNT_ADDRESS_KEY, accountAddress)
+                putParcelable(PAYLOAD_KEY, exportPayload)
             }
         }
     }
@@ -50,36 +51,34 @@ class ExportMnemonicFragment : ExportFragment<ExportMnemonicViewModel>() {
     }
 
     override fun inject() {
-        val accountAddress = argument<String>(ACCOUNT_ADDRESS_KEY)
-
         FeatureUtils.getFeature<AccountFeatureComponent>(requireContext(), AccountFeatureApi::class.java)
             .exportMnemonicFactory()
-            .create(this, accountAddress)
+            .create(this, argument(PAYLOAD_KEY))
             .inject(this)
     }
 
     override fun subscribe(viewModel: ExportMnemonicViewModel) {
         super.subscribe(viewModel)
 
-        val typeNameRes = viewModel.exportSource.nameRes
+        exportMnemonicType.setMessage(viewModel.exportSource.nameRes)
 
-        exportMnemonicType.setMessage(typeNameRes)
-
-        viewModel.mnemonicWordsLiveData.observe {
+        viewModel.mnemonicWordsFlow.observe {
             exportMnemonicViewer.submitList(it)
         }
 
-        viewModel.derivationPathLiveData.observe {
-            val state = if (it.isNullOrBlank()) FieldState.HIDDEN else FieldState.DISABLED
+        viewModel.exportingSecretFlow.observe {
+            val derivationPath = it.derivationPath
+
+            val state = if (derivationPath.isNullOrBlank()) FieldState.HIDDEN else FieldState.DISABLED
 
             with(exportMnemonicAdvanced) {
                 configure(derivationPathField, state)
 
-                setDerivationPath(it)
+                setDerivationPath(derivationPath)
             }
         }
 
-        viewModel.cryptoTypeLiveData.observe {
+        viewModel.cryptoTypeFlow.observe {
             exportMnemonicAdvanced.setEncryption(it.name)
         }
     }
