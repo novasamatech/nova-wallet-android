@@ -28,7 +28,7 @@ class ExportMnemonicInteractor(
 
         val accountSecrets = secretStoreV2.getAccountSecrets(metaAccount, chain)
 
-        val entropy =  secretStoreV2.getAccountSecrets(metaAccount, chain).entropy()
+        val entropy = secretStoreV2.getAccountSecrets(metaAccount, chain).entropy()
             ?: error("No mnemonic found for account ${metaAccount.name} in ${chain.name}")
 
         ExportingSecret(

@@ -143,7 +143,7 @@ class AccountDetailsViewModel(
     fun exportTypeChosen(exportSource: ExportSource, chain: Chain) {
         val exportPayload = ExportPayload(metaId, chain.id)
 
-        val navigationAction = when(exportSource) {
+        val navigationAction = when (exportSource) {
             ExportSource.Mnemonic -> accountRouter.exportMnemonicAction(exportPayload)
             ExportSource.Json -> accountRouter.exportJsonPasswordAction(exportPayload)
             ExportSource.Seed -> accountRouter.exportSeedAction(exportPayload)

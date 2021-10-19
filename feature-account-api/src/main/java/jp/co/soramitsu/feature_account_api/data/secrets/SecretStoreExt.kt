@@ -16,7 +16,7 @@ import jp.co.soramitsu.runtime.multiNetwork.chain.model.Chain
 suspend fun SecretStoreV2.getAccountSecrets(
     metaAccount: MetaAccount,
     chain: Chain
-) : AccountSecrets {
+): AccountSecrets {
     val accountId = metaAccount.accountIdIn(chain) ?: error("No account for chain $chain in meta account ${metaAccount.name}")
 
     return getAccountSecrets(metaAccount.id, accountId)

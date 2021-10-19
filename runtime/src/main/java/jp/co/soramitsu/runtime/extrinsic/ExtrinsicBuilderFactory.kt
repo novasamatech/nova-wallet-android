@@ -43,7 +43,7 @@ class ExtrinsicBuilderFactory(
         keypair: Keypair,
         cryptoType: CryptoType,
     ): ExtrinsicBuilder {
-        val multiChainEncryption = if (chain.isEthereumBased){
+        val multiChainEncryption = if (chain.isEthereumBased) {
             MultiChainEncryption.Ethereum
         } else {
             val encryptionType = mapCryptoTypeToEncryption(cryptoType)

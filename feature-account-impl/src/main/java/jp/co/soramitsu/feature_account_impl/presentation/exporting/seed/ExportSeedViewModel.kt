@@ -44,7 +44,7 @@ class ExportSeedViewModel(
         showSecurityWarning()
     }
 
-    override fun securityWarningConfirmed(){
+    override fun securityWarningConfirmed() {
         launch {
             val exportingSecret = exportingSecretFlow.first()
             val chainName = chain().name

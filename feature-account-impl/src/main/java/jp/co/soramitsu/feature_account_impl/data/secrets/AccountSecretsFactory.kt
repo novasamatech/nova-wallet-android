@@ -42,7 +42,7 @@ class AccountSecretsFactory(
 
         class NotValidEthereumCryptoType : SecretsError()
 
-        class NotValidSubstrateCryptoType: SecretsError()
+        class NotValidSubstrateCryptoType : SecretsError()
     }
 
     data class Result<S : Schema<S>>(val secrets: EncodableStruct<S>, val cryptoType: CryptoType)

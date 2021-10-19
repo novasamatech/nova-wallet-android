@@ -37,7 +37,7 @@ abstract class ExportViewModel(
     }
 
     val cryptoTypeFlow = metaAccountLiveData.map {
-        val cryptoType =  it.cryptoTypeIn(chain())
+        val cryptoType = it.cryptoTypeIn(chain())
 
         mapCryptoTypeToCryptoTypeModel(resourceManager, cryptoType)
     }

@@ -8,4 +8,4 @@ import kotlinx.android.parcel.Parcelize
 class ExportPayload(
     val metaId: Long,
     val chainId: ChainId
-): Parcelable
+) : Parcelable
