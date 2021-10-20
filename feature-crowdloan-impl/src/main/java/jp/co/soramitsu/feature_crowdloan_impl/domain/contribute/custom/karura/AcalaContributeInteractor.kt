@@ -9,6 +9,9 @@ import jp.co.soramitsu.feature_account_api.domain.model.addressIn
 import jp.co.soramitsu.feature_crowdloan_impl.data.network.api.karura.AcalaApi
 import jp.co.soramitsu.feature_crowdloan_impl.data.network.api.karura.VerifyKaruraParticipationRequest
 import jp.co.soramitsu.feature_wallet_api.domain.model.planksFromAmount
+import jp.co.soramitsu.runtime.ext.ChainGeneses
+import jp.co.soramitsu.runtime.ext.genesisHash
+import jp.co.soramitsu.runtime.multiNetwork.ChainRegistry
 import jp.co.soramitsu.runtime.state.SingleAssetSharedState
 import jp.co.soramitsu.runtime.state.chain
 import jp.co.soramitsu.runtime.state.chainAndAsset
@@ -19,6 +22,7 @@ class AcalaContributeInteractor(
     private val httpExceptionHandler: HttpExceptionHandler,
     private val accountRepository: AccountRepository,
     private val secretStoreV2: SecretStoreV2,
+    private val chainRegistry: ChainRegistry,
     private val selectedAssetState: SingleAssetSharedState,
 ) {
 
@@ -30,8 +34,13 @@ class AcalaContributeInteractor(
 
             val statement = acalaApi.getStatement(AcalaApi.getBaseUrl(chain)).statement
 
+            val chainForAddress = when(chain.genesisHash) {
+                ChainGeneses.ROCOCO_ACALA -> chainRegistry.getChain(ChainGeneses.POLKADOT) // api requires polkadot address even in rococo testnet
+                else -> chain
+            }
+
             val request = VerifyKaruraParticipationRequest(
-                address = selectedMetaAccount.addressIn(chain)!!,
+                address = selectedMetaAccount.addressIn(chainForAddress)!!,
                 amount = chainAsset.planksFromAmount(amount),
                 referral = referralCode,
                 signature = secretStoreV2.sign(selectedMetaAccount, chain, statement)

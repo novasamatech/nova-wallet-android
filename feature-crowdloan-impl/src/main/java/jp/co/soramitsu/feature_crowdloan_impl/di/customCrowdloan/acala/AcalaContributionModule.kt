@@ -14,6 +14,7 @@ import jp.co.soramitsu.feature_crowdloan_impl.data.network.api.karura.AcalaApi
 import jp.co.soramitsu.feature_crowdloan_impl.di.customCrowdloan.CustomContributeFactory
 import jp.co.soramitsu.feature_crowdloan_impl.domain.contribute.custom.karura.AcalaContributeInteractor
 import jp.co.soramitsu.feature_crowdloan_impl.presentation.contribute.custom.karura.AcalaContributeSubmitter
+import jp.co.soramitsu.runtime.multiNetwork.ChainRegistry
 
 @Module
 class AcalaContributionModule {
@@ -31,8 +32,9 @@ class AcalaContributionModule {
         httpExceptionHandler: HttpExceptionHandler,
         secretStoreV2: SecretStoreV2,
         selectAssetSharedState: CrowdloanSharedState,
+        chainRegistry: ChainRegistry,
         accountRepository: AccountRepository,
-    ) = AcalaContributeInteractor(acalaApi, httpExceptionHandler, accountRepository, secretStoreV2, selectAssetSharedState)
+    ) = AcalaContributeInteractor(acalaApi, httpExceptionHandler, accountRepository, secretStoreV2, chainRegistry, selectAssetSharedState)
 
     @Provides
     @FeatureScope

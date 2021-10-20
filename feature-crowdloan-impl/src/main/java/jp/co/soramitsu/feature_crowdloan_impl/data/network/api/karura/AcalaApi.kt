@@ -1,12 +1,16 @@
 package jp.co.soramitsu.feature_crowdloan_impl.data.network.api.karura
 
+import jp.co.soramitsu.feature_crowdloan_impl.BuildConfig
 import jp.co.soramitsu.runtime.ext.Geneses
 import jp.co.soramitsu.runtime.ext.genesisHash
 import jp.co.soramitsu.runtime.multiNetwork.chain.model.Chain
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Path
+
+private const val AUTH_HEADER = "Authorization: Bearer ${BuildConfig.ACALA_AUTH_TOKEN}"
 
 interface AcalaApi {
 
@@ -21,17 +25,20 @@ interface AcalaApi {
     }
 
     @GET("//{baseUrl}/referral/{referral}")
+    @Headers(AUTH_HEADER)
     suspend fun isReferralValid(
         @Path("baseUrl") baseUrl: String,
         @Path("referral") referral: String,
     ): ReferralCheck
 
     @GET("//{baseUrl}/statement")
+    @Headers(AUTH_HEADER)
     suspend fun getStatement(
         @Path("baseUrl") baseUrl: String,
     ): AcalaStatement
 
-    @POST("//{baseUrl}/verify")
+    @POST("//{baseUrl}/contribute")
+    @Headers(AUTH_HEADER)
     suspend fun applyForBonus(
         @Path("baseUrl") baseUrl: String,
         @Body body: VerifyKaruraParticipationRequest,

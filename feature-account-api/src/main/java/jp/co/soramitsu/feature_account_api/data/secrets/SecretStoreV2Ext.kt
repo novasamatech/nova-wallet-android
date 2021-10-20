@@ -1,6 +1,5 @@
 package jp.co.soramitsu.feature_account_api.data.secrets
 
-import jp.co.soramitsu.common.data.mappers.mapCryptoTypeToEncryption
 import jp.co.soramitsu.common.data.secrets.v2.SecretStoreV2
 import jp.co.soramitsu.common.data.secrets.v2.getChainAccountKeypair
 import jp.co.soramitsu.common.data.secrets.v2.getMetaAccountKeypair
@@ -9,8 +8,7 @@ import jp.co.soramitsu.fearless_utils.encrypt.keypair.Keypair
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.feature_account_api.domain.model.MetaAccount
 import jp.co.soramitsu.feature_account_api.domain.model.accountIdIn
-import jp.co.soramitsu.feature_account_api.domain.model.cryptoTypeIn
-import jp.co.soramitsu.runtime.ext.signatureHashing
+import jp.co.soramitsu.feature_account_api.domain.model.multiChainEncryptionIn
 import jp.co.soramitsu.runtime.multiNetwork.chain.model.Chain
 
 suspend fun SecretStoreV2.sign(
@@ -24,10 +22,9 @@ suspend fun SecretStoreV2.sign(
     chain: Chain,
     message: ByteArray,
 ) = Signer.sign(
-    encryptionType = mapCryptoTypeToEncryption(metaAccount.cryptoTypeIn(chain)),
+    multiChainEncryption = metaAccount.multiChainEncryptionIn(chain),
     message = message,
     keypair = getKeypair(metaAccount, chain),
-    messageHashing = chain.signatureHashing
 ).signature
 
 suspend fun SecretStoreV2.getKeypair(
