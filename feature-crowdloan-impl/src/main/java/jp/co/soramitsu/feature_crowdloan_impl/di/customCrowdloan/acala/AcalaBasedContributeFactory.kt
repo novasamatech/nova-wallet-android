@@ -52,7 +52,7 @@ class KaruraContributeFactory(
     interactor = interactor,
     resourceManager = resourceManager,
     defaultReferralCode = BuildConfig.KARURA_NOVA_REFERRAL
-)  {
+) {
 
     override val flowType: String = "Karura"
 }

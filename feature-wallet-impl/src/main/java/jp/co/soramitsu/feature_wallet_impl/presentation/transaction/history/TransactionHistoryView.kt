@@ -12,23 +12,34 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import jp.co.soramitsu.common.utils.dp
 import jp.co.soramitsu.common.utils.enableShowingNewlyAddedTopElements
 import jp.co.soramitsu.common.utils.makeGone
 import jp.co.soramitsu.common.utils.makeVisible
+import jp.co.soramitsu.common.utils.setVisible
+import jp.co.soramitsu.common.utils.updateTopMargin
 import jp.co.soramitsu.common.view.bottomSheet.LockBottomSheetBehavior
+import jp.co.soramitsu.common.view.shape.getTopRoundedCornerDrawable
 import jp.co.soramitsu.feature_wallet_impl.R
 import jp.co.soramitsu.feature_wallet_impl.presentation.model.OperationModel
 import kotlinx.android.synthetic.main.view_transfer_history.view.placeholder
 import kotlinx.android.synthetic.main.view_transfer_history.view.transactionHistoryFilter
 import kotlinx.android.synthetic.main.view_transfer_history.view.transactionHistoryList
 import kotlinx.android.synthetic.main.view_transfer_history.view.transactionHistoryProgress
+import kotlinx.android.synthetic.main.view_transfer_history.view.transactionHistoryPuller
+import kotlinx.android.synthetic.main.view_transfer_history.view.transactionHistoryTitle
 
 typealias ScrollingListener = (position: Int) -> Unit
 typealias SlidingStateListener = (Int) -> Unit
 typealias TransactionClickListener = (OperationModel) -> Unit
 
-private const val MIN_ALPHA = 0.55 * 255
+private const val MIN_ALPHA = (0.55 * 255).toInt()
 private const val MAX_ALPHA = 1 * 255
+
+private const val MIN_MARGIN = 16 // dp
+private const val MAX_MARGIN = 32 // dp
+
+private const val PULLER_VISIBILITY_OFFSET = 0.9
 
 private const val OFFSET_KEY = "OFFSET"
 private const val SUPER_STATE = "SUPER_STATE"
@@ -62,14 +73,14 @@ class TransferHistorySheet @JvmOverloads constructor(
     init {
         View.inflate(context, R.layout.view_transfer_history, this)
 
-        setBackgroundResource(R.drawable.bg_transfers)
+        background = context.getTopRoundedCornerDrawable(fillColorRes = R.color.black)
 
         transactionHistoryList.adapter = adapter
         transactionHistoryList.setHasFixedSize(true)
 
         addScrollListener()
 
-        updateBackgroundAlpha()
+        updateSlidingEffects()
     }
 
     fun showProgress() {
@@ -128,7 +139,7 @@ class TransferHistorySheet @JvmOverloads constructor(
             super.onRestoreInstanceState(state[SUPER_STATE] as Parcelable)
 
             lastOffset = state.getFloat(OFFSET_KEY)
-            updateBackgroundAlpha()
+            updateSlidingEffects()
         }
 
         bottomSheetBehavior?.state?.let {
@@ -149,7 +160,7 @@ class TransferHistorySheet @JvmOverloads constructor(
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
                 lastOffset = slideOffset
 
-                updateBackgroundAlpha()
+                updateSlidingEffects()
             }
 
             override fun onStateChanged(bottomSheet: View, newState: Int) {
@@ -200,14 +211,40 @@ class TransferHistorySheet @JvmOverloads constructor(
         parentView.viewTreeObserver.addOnGlobalLayoutListener(layoutListener)
     }
 
-    private fun updateBackgroundAlpha() {
-        val updatedAlpha = MIN_ALPHA + (MAX_ALPHA - MIN_ALPHA) * lastOffset
+    private fun updateSlidingEffects() {
+        updateBackgroundAlpha()
 
-        val color = Color.argb(updatedAlpha.toInt(), 0, 0, 0)
+        updateTitleMargin()
+
+        updatePullerVisibility()
+
+        requestLayout()
+    }
+
+    private fun updateTitleMargin() {
+        val newMargin = linearUpdate(MIN_MARGIN, MAX_MARGIN, lastOffset)
+        val newMarginPx = newMargin.dp(context)
+
+        transactionHistoryTitle.updateTopMargin(newMarginPx)
+        transactionHistoryFilter.updateTopMargin(newMarginPx)
+    }
+
+    private fun updatePullerVisibility() {
+        transactionHistoryPuller.setVisible(lastOffset < PULLER_VISIBILITY_OFFSET, falseState = View.INVISIBLE)
+    }
+
+    private fun updateBackgroundAlpha() {
+        val updatedAlpha = linearUpdate(MIN_ALPHA, MAX_ALPHA, lastOffset)
+
+        val color = Color.argb(updatedAlpha, 0, 0, 0)
 
         backgroundTintList = ColorStateList.valueOf(color)
     }
 
     private val parentView: View
         get() = parent as View
+
+    private fun linearUpdate(min: Int, max: Int, progress: Float): Int {
+        return (min + (max - min) * progress).toInt()
+    }
 }

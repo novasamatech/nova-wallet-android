@@ -34,7 +34,7 @@ class AcalaContributeInteractor(
 
             val statement = acalaApi.getStatement(AcalaApi.getBaseUrl(chain)).statement
 
-            val chainForAddress = when(chain.genesisHash) {
+            val chainForAddress = when (chain.genesisHash) {
                 ChainGeneses.ROCOCO_ACALA -> chainRegistry.getChain(ChainGeneses.POLKADOT) // api requires polkadot address even in rococo testnet
                 else -> chain
             }

@@ -7,7 +7,10 @@ import jp.co.soramitsu.common.base.BaseViewModel
 import jp.co.soramitsu.common.utils.Event
 import jp.co.soramitsu.common.utils.inBackground
 import jp.co.soramitsu.feature_wallet_api.domain.interfaces.WalletInteractor
+import jp.co.soramitsu.feature_wallet_api.domain.model.Asset
+import jp.co.soramitsu.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import jp.co.soramitsu.feature_wallet_impl.data.mappers.mapAssetToAssetModel
+import jp.co.soramitsu.feature_wallet_impl.data.mappers.mapTokenToTokenModel
 import jp.co.soramitsu.feature_wallet_impl.presentation.AssetPayload
 import jp.co.soramitsu.feature_wallet_impl.presentation.WalletRouter
 import jp.co.soramitsu.feature_wallet_impl.presentation.balance.assetActions.buy.BuyMixin
@@ -17,7 +20,7 @@ import jp.co.soramitsu.feature_wallet_impl.presentation.transaction.history.mixi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -37,7 +40,19 @@ class BalanceDetailViewModel(
     private val _showFrozenDetailsEvent = MutableLiveData<Event<AssetModel>>()
     val showFrozenDetailsEvent: LiveData<Event<AssetModel>> = _showFrozenDetailsEvent
 
-    val assetLiveData = currentAssetFlow().asLiveData()
+    private val assetFlow = interactor.assetFlow(assetPayload.chainId, assetPayload.chainAssetId)
+        .inBackground()
+        .share()
+
+    val assetDetailsModel = assetFlow
+        .map { mapAssetToUi(it) }
+        .inBackground()
+        .share()
+
+    private val assetModel = assetFlow
+        .map { mapAssetToAssetModel(it) }
+        .inBackground()
+        .share()
 
     val buyEnabled = buyMixin.isBuyEnabled(assetPayload.chainId, assetPayload.chainAssetId)
 
@@ -89,15 +104,16 @@ class BalanceDetailViewModel(
         }
     }
 
-    fun frozenInfoClicked() {
-        assetLiveData.value?.let {
-            _showFrozenDetailsEvent.value = Event(it)
-        }
+    fun frozenInfoClicked() = launch {
+        _showFrozenDetailsEvent.value = Event(assetModel.first())
     }
 
-    private fun currentAssetFlow(): Flow<AssetModel> {
-        return interactor.assetFlow(assetPayload.chainId, assetPayload.chainAssetId)
-            .map { mapAssetToAssetModel(it) }
-            .inBackground()
+    private fun mapAssetToUi(asset: Asset): AssetDetailsModel {
+        return AssetDetailsModel(
+            token = mapTokenToTokenModel(asset.token),
+            total = mapAmountToAmountModel(asset.total, asset),
+            transferable = mapAmountToAmountModel(asset.transferable, asset),
+            locked = mapAmountToAmountModel(asset.frozen, asset)
+        )
     }
 }

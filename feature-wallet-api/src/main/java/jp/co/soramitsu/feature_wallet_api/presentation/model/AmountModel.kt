@@ -9,7 +9,7 @@ import java.math.BigInteger
 
 data class AmountModel(
     val token: String,
-    val fiat: String?
+    val fiat: String
 )
 
 fun mapAmountToAmountModel(
@@ -30,6 +30,6 @@ fun mapAmountToAmountModel(
 
     return AmountModel(
         token = amount.formatTokenAmount(token.configuration),
-        fiat = fiatAmount?.formatAsCurrency()
+        fiat = fiatAmount.formatAsCurrency()
     )
 }
