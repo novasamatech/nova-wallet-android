@@ -27,8 +27,6 @@ interface AccountRepository {
 
     suspend fun selectAccount(account: Account, newNode: Node? = null)
 
-    suspend fun getSelectedAccount(): Account
-
     suspend fun getSelectedAccount(chainId: String): Account
     suspend fun getSelectedMetaAccount(): MetaAccount
     suspend fun getMetaAccount(metaId: Long): MetaAccount

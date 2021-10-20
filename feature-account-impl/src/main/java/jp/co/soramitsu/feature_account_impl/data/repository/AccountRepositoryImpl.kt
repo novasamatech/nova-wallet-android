@@ -97,11 +97,6 @@ class AccountRepositoryImpl(
         }
     }
 
-    // TODO remove
-    override suspend fun getSelectedAccount(): Account {
-        return getSelectedAccount(Node.NetworkType.POLKADOT.chainId)
-    }
-
     override suspend fun getSelectedAccount(chainId: String): Account {
         return accountDataSource.selectedAccountMapping.first().getValue(chainId)!!
     }

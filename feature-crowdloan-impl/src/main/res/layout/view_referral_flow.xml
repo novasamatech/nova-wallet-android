@@ -20,7 +20,7 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="@string/crowdloan_fearless_bonus" />
+        tools:text="@string/crowdloan_app_bonus_format" />
 
     <TextView
         android:id="@+id/referralFearlessBonusApply"
@@ -60,7 +60,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:hint="@string/crowdloan_referral_code_invalid"
+        android:hint="@string/crowdloan_referral_code"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/divider1" />
@@ -90,7 +90,7 @@
         android:layout_marginStart="16dp"
         android:id="@+id/referralPrivacyText"
         app:layout_constrainedWidth="true"
-        android:text="@string/onboarding_terms_and_conditions_1"
+        android:text="@string/crowdloan_privacy_policy"
         app:layout_constraintBottom_toBottomOf="@+id/referralPrivacySwitch"
         app:layout_constraintEnd_toEndOf="@+id/referralBonus"
         app:layout_constraintHorizontal_bias="0.0"
@@ -103,6 +103,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         app:actionIcon="@drawable/ic_arrow_top_right_white_16"
+        tools:text="@string/crowdloan_learn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"

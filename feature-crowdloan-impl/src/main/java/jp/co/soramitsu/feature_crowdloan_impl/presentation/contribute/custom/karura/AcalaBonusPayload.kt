@@ -4,15 +4,14 @@ import jp.co.soramitsu.feature_crowdloan_impl.presentation.contribute.custom.ref
 import kotlinx.android.parcel.Parcelize
 import java.math.BigDecimal
 
-val KARURA_BONUS_MULTIPLIER = 0.05.toBigDecimal() // 5%
-
 @Parcelize
-class KaruraBonusPayload(
+class AcalaBonusPayload(
     override val referralCode: String,
+    private val referralBonus: BigDecimal,
     private val rewardRate: BigDecimal?
 ) : ReferralCodePayload {
 
     override fun calculateBonus(amount: BigDecimal): BigDecimal? {
-        return rewardRate?.let { amount * rewardRate * KARURA_BONUS_MULTIPLIER }
+        return rewardRate?.let { amount * rewardRate * referralBonus }
     }
 }

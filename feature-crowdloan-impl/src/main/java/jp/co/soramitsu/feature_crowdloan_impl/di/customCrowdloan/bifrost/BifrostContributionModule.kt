@@ -27,7 +27,7 @@ class BifrostContributionModule {
     fun provideBifrostInteractor(
         bifrostApi: BifrostApi,
         httpExceptionHandler: HttpExceptionHandler
-    ) = BifrostContributeInteractor(BuildConfig.BIFROST_FEALRESS_REFERRAL, bifrostApi, httpExceptionHandler)
+    ) = BifrostContributeInteractor(BuildConfig.BIFROST_NOVA_REFERRAL, bifrostApi, httpExceptionHandler)
 
     @Provides
     @FeatureScope
