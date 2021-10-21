@@ -79,7 +79,7 @@ private fun TextView.setCompoundDrawable(
     widthInDp: Int?,
     heightInDp: Int?,
     @ColorRes tint: Int?,
-    padding: Int = 0,
+    paddingInDp: Int = 0,
     applier: TextView.(Drawable) -> Unit,
 ) {
     if (drawableRes == null) {
@@ -91,24 +91,25 @@ private fun TextView.setCompoundDrawable(
 
     tint?.let { drawable.mutate().setTint(context.getColor(it)) }
 
-    val widthInPx = if (widthInDp != null) (resources.displayMetrics.density * widthInDp).toInt() else drawable.intrinsicWidth
-    val heightInPx = if (heightInDp != null) (resources.displayMetrics.density * heightInDp).toInt() else drawable.intrinsicHeight
+    val widthInPx = widthInDp?.dp(context) ?: drawable.intrinsicWidth
+    val heightInPx = heightInDp?.dp(context) ?: drawable.intrinsicHeight
+    val paddingInPx = paddingInDp.dp(context)
 
     drawable.setBounds(0, 0, widthInPx, heightInPx)
 
     applier(drawable)
 
-    compoundDrawablePadding = padding
+    compoundDrawablePadding = paddingInPx
 }
 
 fun TextView.setDrawableEnd(
     @DrawableRes drawableRes: Int? = null,
     widthInDp: Int? = null,
     heightInDp: Int? = widthInDp,
-    padding: Int = 0,
+    paddingInDp: Int = 0,
     @ColorRes tint: Int? = null,
 ) {
-    setCompoundDrawable(drawableRes, widthInDp, heightInDp, tint, padding) {
+    setCompoundDrawable(drawableRes, widthInDp, heightInDp, tint, paddingInDp) {
         setCompoundDrawablesRelative(null, null, it, null)
     }
 }
@@ -117,10 +118,10 @@ fun TextView.setDrawableStart(
     @DrawableRes drawableRes: Int? = null,
     widthInDp: Int? = null,
     heightInDp: Int? = widthInDp,
-    padding: Int = 0,
+    paddingInDp: Int = 0,
     @ColorRes tint: Int? = null,
 ) {
-    setCompoundDrawable(drawableRes, widthInDp, heightInDp, tint, padding) {
+    setCompoundDrawable(drawableRes, widthInDp, heightInDp, tint, paddingInDp) {
         setCompoundDrawablesRelative(it, null, null, null)
     }
 }

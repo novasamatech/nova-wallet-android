@@ -5,7 +5,6 @@
     android:layout_height="wrap_content"
     android:background="@drawable/bg_primary_list_item"
     android:drawableStart="@drawable/ic_copy_24"
-    android:drawablePadding="16dp"
     android:padding="18dp"
     android:paddingStart="20dp"
     android:paddingEnd="20dp"

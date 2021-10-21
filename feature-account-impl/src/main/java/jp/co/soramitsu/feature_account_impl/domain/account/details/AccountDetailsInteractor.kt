@@ -20,7 +20,7 @@ import kotlinx.coroutines.withContext
 class AccountDetailsInteractor(
     private val accountRepository: AccountRepository,
     private val secretStoreV2: SecretStoreV2,
-    private val chainRegistry: ChainRegistry
+    private val chainRegistry: ChainRegistry,
 ) {
 
     suspend fun getMetaAccount(metaId: Long): MetaAccount {
@@ -49,12 +49,14 @@ class AccountDetailsInteractor(
                 projection = projection,
                 from = if (metaAccount.hasChainAccountIn(chain.id)) From.CHAIN_ACCOUNT else From.META_ACCOUNT
             )
-        }.groupBy(AccountInChain::from)
+        }
+            .groupBy(AccountInChain::from)
+            .toSortedMap(compareBy(From::ordering))
     }
 
     suspend fun availableExportTypes(
         metaAccount: MetaAccount,
-        chain: Chain
+        chain: Chain,
     ): List<AvailableExportType> = withContext(Dispatchers.Default) {
         val accountId = metaAccount.accountIdIn(chain) ?: return@withContext emptyList()
 
@@ -67,3 +69,9 @@ class AccountDetailsInteractor(
         )
     }
 }
+
+private val From.ordering
+    get() = when (this) {
+        From.CHAIN_ACCOUNT -> 0
+        From.META_ACCOUNT -> 1
+    }
