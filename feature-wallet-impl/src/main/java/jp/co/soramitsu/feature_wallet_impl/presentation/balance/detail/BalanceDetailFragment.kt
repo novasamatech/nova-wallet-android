@@ -7,15 +7,13 @@ import android.view.ViewGroup
 import coil.ImageLoader
 import coil.load
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import dev.chrisbanes.insetter.applyInsetter
 import jp.co.soramitsu.common.base.BaseFragment
 import jp.co.soramitsu.common.di.FeatureUtils
-import jp.co.soramitsu.common.utils.format
-import jp.co.soramitsu.common.utils.formatAsChange
-import jp.co.soramitsu.common.utils.formatAsCurrency
 import jp.co.soramitsu.common.utils.hideKeyboard
 import jp.co.soramitsu.common.utils.setTextColorRes
 import jp.co.soramitsu.feature_wallet_api.di.WalletFeatureApi
-import jp.co.soramitsu.feature_wallet_api.presentation.formatters.formatTokenAmount
+import jp.co.soramitsu.feature_wallet_api.presentation.view.setAmount
 import jp.co.soramitsu.feature_wallet_impl.R
 import jp.co.soramitsu.feature_wallet_impl.di.WalletFeatureComponent
 import jp.co.soramitsu.feature_wallet_impl.presentation.AssetPayload
@@ -23,19 +21,14 @@ import jp.co.soramitsu.feature_wallet_impl.presentation.balance.assetActions.buy
 import jp.co.soramitsu.feature_wallet_impl.presentation.model.AssetModel
 import jp.co.soramitsu.feature_wallet_impl.presentation.transaction.history.showState
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetaiActions
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailAvailableAmount
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailBack
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailContainer
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailContent
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailDollarAmount
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailDollarGroup
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailFrozenAmount
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailFrozenTitle
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailRate
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailRateChange
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailTokenIcon
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailTokenName
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailTotal
+import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailsBalances
 import kotlinx.android.synthetic.main.fragment_balance_detail.transfersContainer
 import javax.inject.Inject
 
@@ -65,6 +58,14 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
     override fun initViews() {
         hideKeyboard()
 
+        balanceDetailContent.applyInsetter {
+            type(statusBars = true) {
+                margin()
+            }
+
+            consume(true)
+        }
+
         transfersContainer.initializeBehavior(anchorView = balanceDetailContent)
 
         transfersContainer.setScrollingListener(viewModel::transactionsScrolled)
@@ -93,7 +94,7 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
             viewModel.buyClicked()
         }
 
-        balanceDetailFrozenTitle.setOnClickListener {
+        balanceDetailsBalances.locked.setOnClickListener {
             viewModel.frozenInfoClicked()
         }
     }
@@ -117,27 +118,18 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
 
         setupBuyIntegration(viewModel)
 
-        viewModel.assetLiveData.observe { asset ->
+        viewModel.assetDetailsModel.observe { asset ->
             balanceDetailTokenIcon.load(asset.token.configuration.iconUrl, imageLoader)
-            balanceDetailTokenName.text = asset.token.configuration.name
+            balanceDetailTokenName.text = asset.token.configuration.symbol
 
-            asset.token.dollarRate?.let {
-                balanceDetailDollarGroup.visibility = View.VISIBLE
+            balanceDetailRate.text = asset.token.dollarRate
 
-                balanceDetailRate.text = it.formatAsCurrency()
-            }
+            balanceDetailRateChange.setTextColorRes(asset.token.rateChangeColorRes)
+            balanceDetailRateChange.text = asset.token.recentRateChange
 
-            asset.token.recentRateChange?.let {
-                balanceDetailRateChange.setTextColorRes(asset.token.rateChangeColorRes!!)
-                balanceDetailRateChange.text = it.formatAsChange()
-            }
-
-            asset.dollarAmount?.let { balanceDetailDollarAmount.text = it.formatAsCurrency() }
-
-            balanceDetailTotal.text = asset.total.formatTokenAmount(asset.token.configuration)
-
-            balanceDetailFrozenAmount.text = asset.frozen.format()
-            balanceDetailAvailableAmount.text = asset.available.format()
+            balanceDetailsBalances.total.setAmount(asset.total)
+            balanceDetailsBalances.transferable.setAmount(asset.transferable)
+            balanceDetailsBalances.locked.setAmount(asset.locked)
         }
 
         viewModel.hideRefreshEvent.observeEvent {

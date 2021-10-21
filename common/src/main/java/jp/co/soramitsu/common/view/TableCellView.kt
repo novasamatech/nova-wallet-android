@@ -5,6 +5,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.annotation.ColorRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.Group
 import jp.co.soramitsu.common.R
@@ -28,10 +29,10 @@ open class TableCellView @JvmOverloads constructor(
     val title: TextView
         get() = tableCellTitle
 
-    private val valuePrimary: TextView
+    val valuePrimary: TextView
         get() = tableCellValuePrimary
 
-    private val valueSecondary: TextView
+    val valueSecondary: TextView
         get() = tableCellValueSecondary
 
     private val valueProgress: ProgressBar
@@ -73,6 +74,10 @@ open class TableCellView @JvmOverloads constructor(
 
     fun setDividerVisible(visible: Boolean) {
         tableCellValueDivider.setVisible(visible)
+    }
+
+    fun setDividerColor(@ColorRes colorRes: Int) {
+        tableCellValueDivider.setBackgroundColor(context.getColor(colorRes))
     }
 
     fun showValue(primary: String, secondary: String? = null) {

@@ -6,4 +6,8 @@
             <enum name="bordered" value="1"/>
         </attr>
     </declare-styleable>
+
+    <declare-styleable name="BalancesView">
+        <attr name="title" />
+    </declare-styleable>
 </resources>

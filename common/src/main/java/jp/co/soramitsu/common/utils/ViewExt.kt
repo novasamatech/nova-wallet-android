@@ -3,12 +3,14 @@ package jp.co.soramitsu.common.utils
 import android.content.Context
 import android.content.res.ColorStateList
 import android.content.res.TypedArray
+import android.graphics.drawable.Drawable
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.MarginLayoutParams
 import android.view.ViewTreeObserver
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
@@ -27,7 +29,7 @@ fun View.updatePadding(
     top: Int = paddingTop,
     bottom: Int = paddingBottom,
     start: Int = paddingStart,
-    end: Int = paddingEnd
+    end: Int = paddingEnd,
 ) {
     setPadding(start, top, end, bottom)
 }
@@ -66,18 +68,26 @@ fun ViewGroup.inflateChild(@LayoutRes id: Int): View {
 
 fun TextView.setTextColorRes(@ColorRes colorRes: Int) = setTextColor(ContextCompat.getColor(context, colorRes))
 
-fun TextView.setDrawableStart(
-    @DrawableRes start: Int? = null,
-    widthInDp: Int? = null,
-    heightInDp: Int? = widthInDp,
-    @ColorRes tint: Int? = null
+fun View.updateTopMargin(newMargin: Int) {
+    (layoutParams as? MarginLayoutParams)?.let {
+        it.setMargins(it.leftMargin, newMargin, it.rightMargin, it.bottomMargin)
+    }
+}
+
+private fun TextView.setCompoundDrawable(
+    @DrawableRes drawableRes: Int?,
+    widthInDp: Int?,
+    heightInDp: Int?,
+    @ColorRes tint: Int?,
+    padding: Int = 0,
+    applier: TextView.(Drawable) -> Unit,
 ) {
-    if (start == null) {
+    if (drawableRes == null) {
         setCompoundDrawablesWithIntrinsicBounds(null, null, null, null)
         return
     }
 
-    val drawable = context.getDrawableCompat(start)
+    val drawable = context.getDrawableCompat(drawableRes)
 
     tint?.let { drawable.mutate().setTint(context.getColor(it)) }
 
@@ -86,7 +96,33 @@ fun TextView.setDrawableStart(
 
     drawable.setBounds(0, 0, widthInPx, heightInPx)
 
-    setCompoundDrawablesRelative(drawable, null, null, null)
+    applier(drawable)
+
+    compoundDrawablePadding = padding
+}
+
+fun TextView.setDrawableEnd(
+    @DrawableRes drawableRes: Int? = null,
+    widthInDp: Int? = null,
+    heightInDp: Int? = widthInDp,
+    padding: Int = 0,
+    @ColorRes tint: Int? = null,
+) {
+    setCompoundDrawable(drawableRes, widthInDp, heightInDp, tint, padding) {
+        setCompoundDrawablesRelative(null, null, it, null)
+    }
+}
+
+fun TextView.setDrawableStart(
+    @DrawableRes drawableRes: Int? = null,
+    widthInDp: Int? = null,
+    heightInDp: Int? = widthInDp,
+    padding: Int = 0,
+    @ColorRes tint: Int? = null,
+) {
+    setCompoundDrawable(drawableRes, widthInDp, heightInDp, tint, padding) {
+        setCompoundDrawablesRelative(it, null, null, null)
+    }
 }
 
 inline fun View.doOnGlobalLayout(crossinline action: () -> Unit) {
@@ -168,7 +204,7 @@ inline fun <reified T : Enum<T>> TypedArray.getEnum(index: Int, default: T) =
 inline fun Context.useAttributes(
     attributeSet: AttributeSet,
     @StyleableRes styleable: IntArray,
-    block: (TypedArray) -> Unit
+    block: (TypedArray) -> Unit,
 ) {
     val typedArray = obtainStyledAttributes(attributeSet, styleable)
 

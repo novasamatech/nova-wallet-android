@@ -10,7 +10,6 @@ import coil.load
 import jp.co.soramitsu.common.list.PayloadGenerator
 import jp.co.soramitsu.common.list.resolvePayload
 import jp.co.soramitsu.common.utils.format
-import jp.co.soramitsu.common.utils.formatAsChange
 import jp.co.soramitsu.common.utils.formatAsCurrency
 import jp.co.soramitsu.common.utils.inflateChild
 import jp.co.soramitsu.common.utils.setTextColorRes
@@ -103,11 +102,11 @@ class AssetViewHolder(
 
     fun bindRecentChange(asset: AssetModel) = with(containerView) {
         itemAssetRateChange.setTextColorRes(asset.token.rateChangeColorRes)
-        itemAssetRateChange.text = asset.token.recentRateChange?.formatAsChange()
+        itemAssetRateChange.text = asset.token.recentRateChange
     }
 
     fun bindDollarInfo(asset: AssetModel) = with(containerView) {
-        itemAssetRate.text = asset.token.dollarRate?.formatAsCurrency()
+        itemAssetRate.text = asset.token.dollarRate
         bindDollarAmount(asset.dollarAmount)
     }
 
@@ -126,7 +125,7 @@ private object AssetDiffCallback : DiffUtil.ItemCallback<AssetModel>() {
         return oldItem == newItem
     }
 
-    override fun getChangePayload(oldItem: AssetModel, newItem: AssetModel): Any? {
+    override fun getChangePayload(oldItem: AssetModel, newItem: AssetModel): Any {
         return AssetPayloadGenerator.diff(oldItem, newItem)
     }
 }

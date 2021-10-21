@@ -7,7 +7,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import jp.co.soramitsu.common.utils.dp
 import jp.co.soramitsu.common.utils.updatePadding
-import jp.co.soramitsu.common.view.shape.getCutCornerDrawable
+import jp.co.soramitsu.common.view.shape.getBlurDrawable
 import jp.co.soramitsu.feature_wallet_impl.R
 import kotlinx.android.synthetic.main.view_asset_actions.view.assetActionsBuy
 import kotlinx.android.synthetic.main.view_asset_actions.view.assetActionsReceive
@@ -24,7 +24,7 @@ class AssetActionsView @JvmOverloads constructor(
 
         View.inflate(context, R.layout.view_asset_actions, this)
 
-        background = context.getCutCornerDrawable(R.color.blurColor)
+        background = context.getBlurDrawable()
 
         updatePadding(top = 4.dp(context), bottom = 4.dp(context))
     }

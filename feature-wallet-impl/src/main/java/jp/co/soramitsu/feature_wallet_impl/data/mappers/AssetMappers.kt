@@ -1,5 +1,7 @@
 package jp.co.soramitsu.feature_wallet_impl.data.mappers
 
+import jp.co.soramitsu.common.utils.formatAsChange
+import jp.co.soramitsu.common.utils.formatAsCurrency
 import jp.co.soramitsu.common.utils.isNonNegative
 import jp.co.soramitsu.core_db.model.AssetWithToken
 import jp.co.soramitsu.core_db.model.TokenLocal
@@ -36,8 +38,8 @@ fun mapTokenToTokenModel(token: Token): TokenModel {
 
         TokenModel(
             configuration = configuration,
-            dollarRate = dollarRate ?: BigDecimal.ZERO,
-            recentRateChange = recentRateChange ?: BigDecimal.ZERO,
+            dollarRate = (dollarRate ?: BigDecimal.ZERO).formatAsCurrency(),
+            recentRateChange = (recentRateChange ?: BigDecimal.ZERO).formatAsChange(),
             rateChangeColorRes = changeColorRes
         )
     }

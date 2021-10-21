@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+    <string name="wallet_your_balance">Your balance</string>
+    <string name="wallet_balance_transferable">Transferable</string>
+
     <string name="accounts_change_chain_secrets">Change account</string>
 
     <string name="crowdloan_agree_with_policy">Agree with Terms and Conditions</string>
