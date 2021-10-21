@@ -1,0 +1,61 @@
+package io.novafoundation.nova.feature_staking_impl.presentation.staking.controller.confirm.di
+
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import dagger.Module
+import dagger.Provides
+import dagger.multibindings.IntoMap
+import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
+import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.staking.controller.ControllerInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.validations.controller.SetControllerValidationSystem
+import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.controller.confirm.ConfirmSetControllerPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.controller.confirm.ConfirmSetControllerViewModel
+
+@Module(includes = [ViewModelModule::class])
+class ConfirmSetControllerModule {
+    @Provides
+    @IntoMap
+    @ViewModelKey(ConfirmSetControllerViewModel::class)
+    fun provideViewModule(
+        router: StakingRouter,
+        controllerInteractor: ControllerInteractor,
+        addressIconGenerator: AddressIconGenerator,
+        payload: ConfirmSetControllerPayload,
+        interactor: StakingInteractor,
+        resourceManager: ResourceManager,
+        externalActions: ExternalActions.Presentation,
+        validationExecutor: ValidationExecutor,
+        validationSystem: SetControllerValidationSystem,
+        singleAssetSharedState: StakingSharedState,
+    ): ViewModel {
+        return ConfirmSetControllerViewModel(
+            router,
+            controllerInteractor,
+            addressIconGenerator,
+            payload,
+            interactor,
+            resourceManager,
+            externalActions,
+            validationExecutor,
+            validationSystem,
+            singleAssetSharedState
+        )
+    }
+
+    @Provides
+    fun provideViewModelCreator(
+        fragment: Fragment,
+        viewModelFactory: ViewModelProvider.Factory
+    ): ConfirmSetControllerViewModel {
+        return ViewModelProvider(fragment, viewModelFactory).get(ConfirmSetControllerViewModel::class.java)
+    }
+}

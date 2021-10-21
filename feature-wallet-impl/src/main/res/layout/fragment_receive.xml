@@ -8,7 +8,7 @@
     android:orientation="vertical"
     tools:background="@color/black">
 
-    <jp.co.soramitsu.common.view.Toolbar
+    <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/fearlessToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -16,7 +16,7 @@
         app:iconRight="@drawable/ic_share_arrow_white_24"
         app:titleText="@string/wallet_asset_receive" />
 
-    <jp.co.soramitsu.common.view.AccountInfoView
+    <io.novafoundation.nova.common.view.AccountInfoView
         android:id="@+id/accountView"
         app:accountActionIcon="@drawable/ic_more_vertical"
         android:layout_width="match_parent"

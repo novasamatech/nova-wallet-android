@@ -41,7 +41,7 @@
         android:visibility="gone"
         tools:visibility="visible">
 
-        <jp.co.soramitsu.common.view.LabeledTextView
+        <io.novafoundation.nova.common.view.LabeledTextView
             android:id="@+id/encryptionTypeInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -49,7 +49,7 @@
             app:label="@string/common_crypto_type"
             app:message="@string/sr25519_selection_title" />
 
-        <jp.co.soramitsu.common.view.InputField
+        <io.novafoundation.nova.common.view.InputField
             android:id="@+id/derivationPathInput"
             style="@style/Widget.Fearless.Input.Primary.External"
             android:layout_width="match_parent"

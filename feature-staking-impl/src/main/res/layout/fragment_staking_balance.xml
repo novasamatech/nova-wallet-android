@@ -19,7 +19,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <jp.co.soramitsu.feature_staking_impl.presentation.staking.balance.view.StakingBalanceView
+            <io.novafoundation.nova.feature_staking_impl.presentation.staking.balance.view.StakingBalanceView
                 android:id="@+id/stakingBalanceInfo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -27,7 +27,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp" />
 
-            <jp.co.soramitsu.feature_staking_impl.presentation.staking.balance.view.StakingBalanceActions
+            <io.novafoundation.nova.feature_staking_impl.presentation.staking.balance.view.StakingBalanceActions
                 android:id="@+id/stakingBalanceActions"
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
@@ -35,7 +35,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp" />
 
-            <jp.co.soramitsu.feature_staking_impl.presentation.staking.balance.view.UnbondingsView
+            <io.novafoundation.nova.feature_staking_impl.presentation.staking.balance.view.UnbondingsView
                 android:layout_width="match_parent"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
@@ -47,7 +47,7 @@
         </LinearLayout>
     </ScrollView>
 
-    <jp.co.soramitsu.common.view.Toolbar
+    <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/stakingBalanceToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -8,7 +8,7 @@
     android:orientation="vertical"
     tools:background="@color/black">
 
-    <jp.co.soramitsu.common.view.Toolbar
+    <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/transactionDetailToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -27,7 +27,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <jp.co.soramitsu.common.view.LabeledTextView
+            <io.novafoundation.nova.common.view.LabeledTextView
                 android:id="@+id/transactionDetailHash"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -38,7 +38,7 @@
                 app:layout_constraintStart_toStartOf="@+id/transactionDetailDivider4"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <jp.co.soramitsu.common.view.LabeledTextView
+            <io.novafoundation.nova.common.view.LabeledTextView
                 android:id="@+id/transactionDetailFrom"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -51,7 +51,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/transactionDetailHash"
                 tools:textIcon="@color/colorAccent" />
 
-            <jp.co.soramitsu.common.view.LabeledTextView
+            <io.novafoundation.nova.common.view.LabeledTextView
                 android:id="@+id/transactionDetailTo"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -246,7 +246,7 @@
             app:layout_constraintEnd_toEndOf="@+id/transactionDetailDivider5"
             tools:text="1.001 KSM" />
 
-        <jp.co.soramitsu.common.view.AccountInfoView
+        <io.novafoundation.nova.common.view.AccountInfoView
             android:id="@+id/transactionDetailRepeat"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

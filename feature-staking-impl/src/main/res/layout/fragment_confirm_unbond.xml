@@ -8,13 +8,13 @@
     android:orientation="vertical"
     tools:background="@color/black">
 
-    <jp.co.soramitsu.common.view.Toolbar
+    <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/confirmUnbondToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:titleText="@string/common_confirm" />
 
-    <jp.co.soramitsu.common.view.LabeledTextView
+    <io.novafoundation.nova.common.view.LabeledTextView
         android:id="@+id/confirmUnbondOriginAccount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -24,7 +24,7 @@
         app:actionIcon="@drawable/ic_more_vertical"
         app:label="@string/account_info_title" />
 
-    <jp.co.soramitsu.common.view.AmountView
+    <io.novafoundation.nova.common.view.AmountView
         android:id="@+id/confirmUnbondAmount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -85,14 +85,14 @@
         android:background="@color/black4"
         android:orientation="vertical">
 
-        <jp.co.soramitsu.feature_wallet_api.presentation.view.FeeView
+        <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
             android:id="@+id/confirmUnbondFee"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp" />
 
-        <jp.co.soramitsu.common.view.PrimaryButton
+        <io.novafoundation.nova.common.view.PrimaryButton
             android:id="@+id/confirmUnbondConfirm"
             style="@style/Widget.Fearless.Button.Primary"
             android:layout_width="match_parent"
