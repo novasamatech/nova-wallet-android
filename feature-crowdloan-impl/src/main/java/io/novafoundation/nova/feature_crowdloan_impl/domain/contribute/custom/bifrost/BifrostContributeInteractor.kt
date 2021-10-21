@@ -10,9 +10,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class BifrostContributeInteractor(
-    val fearlessReferralCode: String,
+    val novaReferralCode: String,
     private val bifrostApi: BifrostApi,
-    private val httpExceptionHandler: HttpExceptionHandler
+    private val httpExceptionHandler: HttpExceptionHandler,
 ) {
 
     suspend fun isCodeValid(code: String): Boolean {

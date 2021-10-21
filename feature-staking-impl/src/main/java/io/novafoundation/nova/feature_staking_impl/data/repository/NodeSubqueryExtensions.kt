@@ -4,7 +4,7 @@ import io.novafoundation.nova.core.model.Node
 
 class WrongNetworkTypeForSubqueryRequest(message: String) : Exception(message)
 
-fun Node.NetworkType.subqueryFearlessApiPath() =
+fun Node.NetworkType.subqueryNovaApiPath() =
     when (this) {
         Node.NetworkType.POLKADOT -> "fearless-wallet"
         Node.NetworkType.KUSAMA -> "fearless-wallet-ksm"

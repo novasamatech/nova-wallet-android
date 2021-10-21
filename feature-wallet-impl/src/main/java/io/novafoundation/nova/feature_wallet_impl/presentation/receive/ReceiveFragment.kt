@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_wallet_impl.di.WalletFeatureComponent
 import io.novafoundation.nova.feature_wallet_impl.presentation.AssetPayload
 import io.novafoundation.nova.feature_wallet_impl.presentation.receive.model.QrSharingPayload
 import kotlinx.android.synthetic.main.fragment_receive.accountView
-import kotlinx.android.synthetic.main.fragment_receive.fearlessToolbar
+import kotlinx.android.synthetic.main.fragment_receive.novaToolbar
 import kotlinx.android.synthetic.main.fragment_receive.qrImg
 
 private const val KEY_PAYLOAD = "KEY_PAYLOAD"
@@ -37,11 +37,11 @@ class ReceiveFragment : BaseFragment<ReceiveViewModel>() {
     override fun initViews() {
         accountView.setWholeClickListener { viewModel.recipientClicked() }
 
-        fearlessToolbar.setHomeButtonListener {
+        novaToolbar.setHomeButtonListener {
             viewModel.backClicked()
         }
 
-        fearlessToolbar.setRightActionClickListener {
+        novaToolbar.setRightActionClickListener {
             viewModel.shareButtonClicked()
         }
     }

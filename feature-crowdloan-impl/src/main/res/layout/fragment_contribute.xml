@@ -25,7 +25,7 @@
             android:orientation="vertical">
 
             <TextView
-                style="@style/TextAppearance.Soramitsu.Header4"
+                style="@style/TextAppearance.NovaFoundation.Header4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -105,7 +105,7 @@
                     android:src="@drawable/ic_basic_circle_star_24" />
 
                 <TextView
-                    style="@style/TextAppearance.Soramitsu.Body1"
+                    style="@style/TextAppearance.NovaFoundation.Body1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="13dp"
@@ -116,7 +116,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/colorAccent"
-                    style="@style/TextAppearance.Soramitsu.Body2"
+                    style="@style/TextAppearance.NovaFoundation.Body2"
                     android:id="@+id/crowdloanContributeBonusReward"
                     tools:text="@string/crowdloan_bonus_action" />
 
@@ -134,7 +134,7 @@
                 android:background="@color/dividerGray" />
 
             <TextView
-                style="@style/TextAppearance.Soramitsu.Header4"
+                style="@style/TextAppearance.NovaFoundation.Header4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -167,7 +167,7 @@
 
     <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/crowdloanContributeContinue"
-        style="@style/Widget.Fearless.Button.Primary"
+        style="@style/Widget.Nova.Button.Primary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"

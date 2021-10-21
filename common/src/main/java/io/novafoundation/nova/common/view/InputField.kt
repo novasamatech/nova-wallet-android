@@ -12,7 +12,7 @@ import io.novafoundation.nova.common.view.shape.getCornersStateDrawable
 class InputField @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyle: Int = R.style.Widget_Fearless_Input_Primary_External
+    defStyle: Int = R.style.Widget_Nova_Input_Primary_External,
 ) : TextInputLayout(context, attrs, defStyle) {
 
     val content: EditText

@@ -9,7 +9,7 @@
 
     <io.novafoundation.nova.common.view.InputField
         android:id="@+id/importMnemonicUsernameInput"
-        style="@style/Widget.Fearless.Input.Primary.External"
+        style="@style/Widget.Nova.Input.Primary.External"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="@string/username_setup_choose_title"
@@ -20,7 +20,7 @@
 
     <TextView
         android:id="@+id/usernameHintTv"
-        style="@style/TextAppearance.Soramitsu.Body2"
+        style="@style/TextAppearance.NovaFoundation.Body2"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
@@ -41,7 +41,7 @@
 
         <TextView
             android:id="@+id/importMnemonicTitle"
-            style="@style/TextAppearance.Soramitsu.Body2"
+            style="@style/TextAppearance.NovaFoundation.Body2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"

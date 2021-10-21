@@ -19,7 +19,7 @@
 
     <TextView
         android:id="@+id/itemListElementTitleLeft"
-        style="@style/TextAppearance.Soramitsu.Body1"
+        style="@style/TextAppearance.NovaFoundation.Body1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -34,7 +34,7 @@
 
     <TextView
         android:id="@+id/itemListElementDescriptionLeft"
-        style="@style/TextAppearance.Soramitsu.Body2"
+        style="@style/TextAppearance.NovaFoundation.Body2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
@@ -46,7 +46,7 @@
 
     <TextView
         android:id="@+id/itemListElementTitleRight"
-        style="@style/TextAppearance.Soramitsu.Body1"
+        style="@style/TextAppearance.NovaFoundation.Body1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
@@ -59,7 +59,7 @@
         tools:text="+0.012 KSM" />
 
     <TextView
-        style="@style/TextAppearance.Soramitsu.Body2"
+        style="@style/TextAppearance.NovaFoundation.Body2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"

@@ -19,7 +19,7 @@
 
             <TextView
                 android:id="@+id/stakingTitle"
-                style="@style/TextAppearance.Soramitsu.Header1"
+                style="@style/TextAppearance.NovaFoundation.Header1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
@@ -89,7 +89,7 @@
 
         <io.novafoundation.nova.common.view.PrimaryButton
             android:id="@+id/startStakingBtn"
-            style="@style/Widget.Fearless.Button.Primary"
+            style="@style/Widget.Nova.Button.Primary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"

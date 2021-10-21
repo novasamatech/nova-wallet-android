@@ -16,7 +16,7 @@
         app:titleText="@string/staking_controller_account" />
 
     <TextView
-        style="@style/TextAppearance.Soramitsu.Body1"
+        style="@style/TextAppearance.NovaFoundation.Body1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -51,7 +51,7 @@
             app:tint="@color/black2" />
 
         <TextView
-            style="@style/TextAppearance.Soramitsu.Body2"
+            style="@style/TextAppearance.NovaFoundation.Body2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -85,7 +85,7 @@
             app:tint="@color/black2" />
 
         <TextView
-            style="@style/TextAppearance.Soramitsu.Body2"
+            style="@style/TextAppearance.NovaFoundation.Body2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -104,7 +104,7 @@
 
     <TextView
         android:id="@+id/setControllerLearnMore"
-        style="@style/TextAppearance.Soramitsu.Body1"
+        style="@style/TextAppearance.NovaFoundation.Body1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
@@ -139,7 +139,7 @@
             android:src="@drawable/ic_alert_triangle_yellow_24" />
 
         <TextView
-            style="@style/TextAppearance.Soramitsu.Body2"
+            style="@style/TextAppearance.NovaFoundation.Body2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -150,7 +150,7 @@
 
     <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/setControllerContinueBtn"
-        style="@style/Widget.Fearless.Button.Primary"
+        style="@style/Widget.Nova.Button.Primary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"

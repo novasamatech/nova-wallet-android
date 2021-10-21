@@ -21,7 +21,7 @@
 
     <TextView
         android:id="@+id/titleTv"
-        style="@style/TextAppearance.Soramitsu.Header3"
+        style="@style/TextAppearance.NovaFoundation.Header3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -43,7 +43,7 @@
 
     <TextView
         android:id="@+id/rightText"
-        style="@style/TextAppearance.Soramitsu.Body2"
+        style="@style/TextAppearance.NovaFoundation.Body2"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="center_vertical|end"

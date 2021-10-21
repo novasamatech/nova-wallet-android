@@ -86,7 +86,7 @@ interface AccountRepository {
     suspend fun checkNodeExists(nodeHost: String): Boolean
 
     /**
-     * @throws FearlessException
+     * @throws NovaException
      */
     suspend fun getNetworkName(nodeHost: String): String
 

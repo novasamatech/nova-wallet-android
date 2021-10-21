@@ -9,7 +9,7 @@
 
     <TextView
         android:id="@+id/stakingTitle"
-        style="@style/TextAppearance.Soramitsu.Body2"
+        style="@style/TextAppearance.NovaFoundation.Body2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -22,7 +22,7 @@
 
     <TextView
         android:id="@+id/stakingAssetDollarAmount"
-        style="@style/TextAppearance.Soramitsu.Body2"
+        style="@style/TextAppearance.NovaFoundation.Body2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -46,7 +46,7 @@
 
     <TextView
         android:id="@+id/stakingAssetToken"
-        style="@style/TextAppearance.Soramitsu.Header4"
+        style="@style/TextAppearance.NovaFoundation.Header4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="6dp"
@@ -58,7 +58,7 @@
 
     <EditText
         android:id="@+id/stakingAmountInput"
-        style="@style/TextAppearance.Soramitsu.Header4"
+        style="@style/TextAppearance.NovaFoundation.Header4"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -79,7 +79,7 @@
 
     <TextView
         android:id="@+id/stakingAssetBalance"
-        style="@style/TextAppearance.Soramitsu.Body2"
+        style="@style/TextAppearance.NovaFoundation.Body2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"

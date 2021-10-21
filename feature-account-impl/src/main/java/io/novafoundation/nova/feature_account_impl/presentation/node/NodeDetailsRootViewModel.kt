@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.presentation.node
 
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.base.errors.FearlessException
+import io.novafoundation.nova.common.base.errors.NovaException
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core.model.Node
 import io.novafoundation.nova.feature_account_impl.R
@@ -16,8 +16,8 @@ abstract class NodeDetailsRootViewModel(
         when (throwable) {
             is NodeAlreadyExistsException -> showError(resourceManager.getString(R.string.connection_add_already_exists_error))
             is UnsupportedNetworkException -> showError(getUnsupportedNodeError())
-            is FearlessException -> {
-                if (FearlessException.Kind.NETWORK == throwable.kind) {
+            is NovaException -> {
+                if (NovaException.Kind.NETWORK == throwable.kind) {
                     showError(resourceManager.getString(R.string.connection_add_invalid_error))
                 } else {
                     throwable.message?.let(::showError)

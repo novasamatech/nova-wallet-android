@@ -17,7 +17,7 @@
 
         <TextView
             android:id="@+id/stakeSummaryTitle"
-            style="@style/TextAppearance.Soramitsu.Body1"
+            style="@style/TextAppearance.NovaFoundation.Body1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -86,7 +86,7 @@
 
         <TextView
             android:id="@+id/stakeSummaryStatus"
-            style="@style/TextAppearance.Soramitsu.CapsTitle2"
+            style="@style/TextAppearance.NovaFoundation.CapsTitle2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
@@ -101,7 +101,7 @@
 
         <TextView
             android:id="@+id/stakeSummaryStatusHelper"
-            style="@style/TextAppearance.Soramitsu.CapsTitle2"
+            style="@style/TextAppearance.NovaFoundation.CapsTitle2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"

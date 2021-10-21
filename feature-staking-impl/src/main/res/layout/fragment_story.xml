@@ -33,7 +33,7 @@
 
         <TextView
             android:id="@+id/storyTitle"
-            style="@style/TextAppearance.Soramitsu.Header1"
+            style="@style/TextAppearance.NovaFoundation.Header1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
@@ -42,7 +42,7 @@
 
         <TextView
             android:id="@+id/storyBody"
-            style="@style/TextAppearance.Soramitsu.Body0"
+            style="@style/TextAppearance.NovaFoundation.Body0"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginStart="16dp"
@@ -53,7 +53,7 @@
 
         <io.novafoundation.nova.common.view.PrimaryButton
             android:id="@+id/stakingStoryLearnMore"
-            style="@style/Widget.Fearless.Button.Primary"
+            style="@style/Widget.Nova.Button.Primary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"

@@ -19,9 +19,9 @@ import io.novafoundation.nova.feature_crowdloan_impl.di.CrowdloanFeatureComponen
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.CustomContributeView
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.CustomContributeViewState
 import kotlinx.android.synthetic.main.view_referral_flow.view.referralBonus
-import kotlinx.android.synthetic.main.view_referral_flow.view.referralFearlessBonusApply
-import kotlinx.android.synthetic.main.view_referral_flow.view.referralFearlessBonusTitle
 import kotlinx.android.synthetic.main.view_referral_flow.view.referralLearnMore
+import kotlinx.android.synthetic.main.view_referral_flow.view.referralNovaBonusApply
+import kotlinx.android.synthetic.main.view_referral_flow.view.referralNovaBonusTitle
 import kotlinx.android.synthetic.main.view_referral_flow.view.referralPrivacySwitch
 import kotlinx.android.synthetic.main.view_referral_flow.view.referralPrivacyText
 import kotlinx.android.synthetic.main.view_referral_flow.view.referralReferralCodeInput
@@ -55,13 +55,13 @@ class ReferralContributeView @JvmOverloads constructor(
         referralReferralCodeInput.content.bindTo(viewState.enteredReferralCodeFlow, scope)
         referralPrivacySwitch.bindTo(viewState.privacyAcceptedFlow, scope)
 
-        referralFearlessBonusTitle.text = viewState.applyFearlessTitle
+        referralNovaBonusTitle.text = viewState.applyNovaTitle
 
-        viewState.applyFearlessCodeEnabledFlow.observe(scope) { enabled ->
-            referralFearlessBonusApply.isEnabled = enabled
+        viewState.applyNovaCodeEnabledFlow.observe(scope) { enabled ->
+            referralNovaBonusApply.isEnabled = enabled
 
             val applyBonusButtonText = if (enabled) R.string.common_apply else R.string.common_applied
-            referralFearlessBonusApply.setText(applyBonusButtonText)
+            referralNovaBonusApply.setText(applyBonusButtonText)
         }
 
         viewState.bonusFlow.observe(scope) { bonus ->
@@ -77,7 +77,7 @@ class ReferralContributeView @JvmOverloads constructor(
             referralLearnMore.setOnClickListener { viewState.learnMoreClicked() }
         }
 
-        referralFearlessBonusApply.setOnClickListener { viewState.applyFearlessCode() }
+        referralNovaBonusApply.setOnClickListener { viewState.applyNovaCode() }
 
         referralPrivacyText.text = createSpannable(context.getString(R.string.onboarding_terms_and_conditions_1)) {
             clickable(context.getString(R.string.onboarding_terms_and_conditions_2)) {

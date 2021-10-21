@@ -16,7 +16,7 @@
         app:titleText="@string/profile_settings_title" />
 
     <TextView
-        style="@style/TextAppearance.Soramitsu.Header3"
+        style="@style/TextAppearance.NovaFoundation.Header3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -25,7 +25,7 @@
         android:text="@string/wallet_filters_header" />
 
     <com.google.android.material.switchmaterial.SwitchMaterial
-        style="@style/Widget.Fearless.Switch"
+        style="@style/Widget.Nova.Switch"
         android:layout_width="match_parent"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
@@ -36,7 +36,7 @@
         android:text="@string/staking_recommended_feature_3" />
 
     <com.google.android.material.switchmaterial.SwitchMaterial
-        style="@style/Widget.Fearless.Switch"
+        style="@style/Widget.Nova.Switch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -45,7 +45,7 @@
         android:text="@string/staking_recommended_feature_4" />
 
     <com.google.android.material.switchmaterial.SwitchMaterial
-        style="@style/Widget.Fearless.Switch"
+        style="@style/Widget.Nova.Switch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -55,7 +55,7 @@
         android:text="@string/staking_recommended_feature_2" />
 
     <com.google.android.material.switchmaterial.SwitchMaterial
-        style="@style/Widget.Fearless.Switch"
+        style="@style/Widget.Nova.Switch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -66,7 +66,7 @@
 
 
     <TextView
-        style="@style/TextAppearance.Soramitsu.Header3"
+        style="@style/TextAppearance.NovaFoundation.Header3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -83,7 +83,7 @@
         android:layout_marginTop="8dp">
 
         <com.google.android.material.radiobutton.MaterialRadioButton
-            style="@style/TextAppearance.Soramitsu.Body1"
+            style="@style/TextAppearance.NovaFoundation.Body1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:checked="true"
@@ -93,7 +93,7 @@
             android:textColor="@color/gray1" />
 
         <com.google.android.material.radiobutton.MaterialRadioButton
-            style="@style/TextAppearance.Soramitsu.Body1"
+            style="@style/TextAppearance.NovaFoundation.Body1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/customValidatorSettingsSortTotalStake"
@@ -102,7 +102,7 @@
             android:textColor="@color/gray1" />
 
         <com.google.android.material.radiobutton.MaterialRadioButton
-            style="@style/TextAppearance.Soramitsu.Body1"
+            style="@style/TextAppearance.NovaFoundation.Body1"
             android:layout_width="match_parent"
             android:id="@+id/customValidatorSettingsSortOwnStake"
             android:layout_height="wrap_content"
@@ -120,7 +120,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:id="@+id/customValidatorSettingsApply"
-        style="@style/Widget.Fearless.Button.Primary"
+        style="@style/Widget.Nova.Button.Primary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"

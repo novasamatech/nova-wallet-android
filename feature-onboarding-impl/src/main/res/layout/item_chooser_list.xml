@@ -16,7 +16,7 @@
         android:gravity="center_vertical"
         android:layout_marginEnd="@dimen/x1_2"
         android:drawablePadding="@dimen/x2"
-        style="@style/TextAppearance.Soramitsu.Body0"
+        style="@style/TextAppearance.NovaFoundation.Body0"
         android:textColor="@color/white" />
 
     <ImageView

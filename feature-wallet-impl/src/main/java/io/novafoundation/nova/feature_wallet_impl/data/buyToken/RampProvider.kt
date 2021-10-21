@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.BuyTokenRegistry
 import io.novafoundation.nova.feature_wallet_impl.R
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
-private const val RAMP_APP_NAME = "Fearless Wallet"
+private const val RAMP_APP_NAME = "Nova Wallet"
 private const val RAMP_APP_LOGO = "https://raw.githubusercontent.com/sora-xor/sora-branding/master/Fearless-Wallet-brand/fearless-wallet-logo-ramp.png"
 
 class RampProvider(

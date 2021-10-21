@@ -8,7 +8,7 @@
     tools:background="@color/black">
 
     <io.novafoundation.nova.common.view.Toolbar
-        android:id="@+id/fearlessToolbar"
+        android:id="@+id/novaToolbar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
@@ -25,12 +25,12 @@
         app:layout_constraintBottom_toTopOf="@+id/addConnectionTv"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/fearlessToolbar"
+        app:layout_constraintTop_toBottomOf="@+id/novaToolbar"
         tools:listitem="@layout/item_node" />
 
     <TextView
         android:id="@+id/addConnectionTv"
-        style="@style/TextAppearance.Soramitsu.Body1"
+        style="@style/TextAppearance.NovaFoundation.Body1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@color/gray4"

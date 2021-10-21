@@ -11,11 +11,11 @@ import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
-import kotlinx.android.synthetic.main.fragment_node_details.fearlessToolbar
 import kotlinx.android.synthetic.main.fragment_node_details.nodeDetailsHostField
 import kotlinx.android.synthetic.main.fragment_node_details.nodeDetailsNameField
 import kotlinx.android.synthetic.main.fragment_node_details.nodeDetailsNetworkType
 import kotlinx.android.synthetic.main.fragment_node_details.nodeHostCopy
+import kotlinx.android.synthetic.main.fragment_node_details.novaToolbar
 import kotlinx.android.synthetic.main.fragment_node_details.updateBtn
 
 class NodeDetailsFragment : BaseFragment<NodeDetailsViewModel>() {
@@ -37,7 +37,7 @@ class NodeDetailsFragment : BaseFragment<NodeDetailsViewModel>() {
     ) = layoutInflater.inflate(R.layout.fragment_node_details, container, false)
 
     override fun initViews() {
-        fearlessToolbar.setHomeButtonListener { viewModel.backClicked() }
+        novaToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         nodeHostCopy.setOnClickListener {
             viewModel.copyNodeHostClicked()

@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.node.list.accoun
 import io.novafoundation.nova.feature_account_impl.presentation.node.model.NodeModel
 import kotlinx.android.synthetic.main.fragment_nodes.addConnectionTv
 import kotlinx.android.synthetic.main.fragment_nodes.connectionsList
-import kotlinx.android.synthetic.main.fragment_nodes.fearlessToolbar
+import kotlinx.android.synthetic.main.fragment_nodes.novaToolbar
 
 class NodesFragment : BaseFragment<NodesViewModel>(), NodesAdapter.NodeItemHandler {
 
@@ -32,11 +32,11 @@ class NodesFragment : BaseFragment<NodesViewModel>(), NodesAdapter.NodeItemHandl
         connectionsList.setHasFixedSize(true)
         connectionsList.adapter = adapter
 
-        fearlessToolbar.setHomeButtonListener {
+        novaToolbar.setHomeButtonListener {
             viewModel.backClicked()
         }
 
-        fearlessToolbar.setRightActionClickListener {
+        novaToolbar.setRightActionClickListener {
             viewModel.editClicked()
         }
 
@@ -68,7 +68,7 @@ class NodesFragment : BaseFragment<NodesViewModel>(), NodesAdapter.NodeItemHandl
 
         viewModel.editMode.observe(adapter::switchToEdit)
 
-        viewModel.toolbarAction.observe(fearlessToolbar::setTextRight)
+        viewModel.toolbarAction.observe(novaToolbar::setTextRight)
 
         viewModel.deleteNodeEvent.observeEvent(::showDeleteNodeDialog)
     }

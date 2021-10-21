@@ -10,7 +10,7 @@
     android:orientation="vertical">
 
     <TextView
-        style="@style/TextAppearance.Soramitsu.Header1"
+        style="@style/TextAppearance.NovaFoundation.Header1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/x2"
@@ -33,7 +33,7 @@
         android:layout_height="32dp" />
 
     <TextView
-        style="@style/TextAppearance.Soramitsu.Body1"
+        style="@style/TextAppearance.NovaFoundation.Body1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_primary_list_item"
@@ -74,7 +74,7 @@
         android:paddingBottom="@dimen/x1_5">
 
         <TextView
-            style="@style/TextAppearance.Soramitsu.Body1"
+            style="@style/TextAppearance.NovaFoundation.Body1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -86,7 +86,7 @@
 
         <TextView
             android:id="@+id/selectedNetworkTv"
-            style="@style/TextAppearance.Soramitsu.Body1"
+            style="@style/TextAppearance.NovaFoundation.Body1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:drawableEnd="@drawable/ic_arrow_right_24"
@@ -117,7 +117,7 @@
         android:paddingBottom="@dimen/x1_5">
 
         <TextView
-            style="@style/TextAppearance.Soramitsu.Body1"
+            style="@style/TextAppearance.NovaFoundation.Body1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -129,7 +129,7 @@
 
         <TextView
             android:id="@+id/selectedLanguageTv"
-            style="@style/TextAppearance.Soramitsu.Body1"
+            style="@style/TextAppearance.NovaFoundation.Body1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:drawableEnd="@drawable/ic_arrow_right_24"
@@ -148,7 +148,7 @@
 
     <TextView
         android:id="@+id/changePinCodeTv"
-        style="@style/TextAppearance.Soramitsu.Body1"
+        style="@style/TextAppearance.NovaFoundation.Body1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_primary_list_item"
@@ -174,7 +174,7 @@
 
     <TextView
         android:id="@+id/aboutTv"
-        style="@style/TextAppearance.Soramitsu.Body1"
+        style="@style/TextAppearance.NovaFoundation.Body1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_primary_list_item"

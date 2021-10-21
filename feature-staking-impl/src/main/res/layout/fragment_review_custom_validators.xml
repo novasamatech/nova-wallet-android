@@ -25,7 +25,7 @@
 
         <TextView
             android:id="@+id/reviewCustomValidatorsAccounts"
-            style="@style/TextAppearance.Soramitsu.CapsTitle2"
+            style="@style/TextAppearance.NovaFoundation.CapsTitle2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
@@ -34,7 +34,7 @@
             android:textColor="@color/gray1" />
 
         <TextView
-            style="@style/TextAppearance.Soramitsu.CapsTitle2"
+            style="@style/TextAppearance.NovaFoundation.CapsTitle2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
@@ -57,7 +57,7 @@
 
     <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/reviewCustomValidatorsNext"
-        style="@style/Widget.Fearless.Button.Primary"
+        style="@style/Widget.Nova.Button.Primary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"

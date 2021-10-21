@@ -10,7 +10,7 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.language.model.LanguageModel
-import kotlinx.android.synthetic.main.fragment_accounts.fearlessToolbar
+import kotlinx.android.synthetic.main.fragment_accounts.novaToolbar
 import kotlinx.android.synthetic.main.fragment_languages.languagesList
 
 class LanguagesFragment : BaseFragment<LanguagesViewModel>(), LanguagesAdapter.LanguagesItemHandler {
@@ -29,7 +29,7 @@ class LanguagesFragment : BaseFragment<LanguagesViewModel>(), LanguagesAdapter.L
         languagesList.setHasFixedSize(true)
         languagesList.adapter = adapter
 
-        fearlessToolbar.setHomeButtonListener {
+        novaToolbar.setHomeButtonListener {
             viewModel.backClicked()
         }
     }

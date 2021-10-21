@@ -9,9 +9,9 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import kotlinx.android.synthetic.main.fragment_node_add.addBtn
-import kotlinx.android.synthetic.main.fragment_node_add.fearlessToolbar
 import kotlinx.android.synthetic.main.fragment_node_add.nodeHostField
 import kotlinx.android.synthetic.main.fragment_node_add.nodeNameField
+import kotlinx.android.synthetic.main.fragment_node_add.novaToolbar
 
 class AddNodeFragment : BaseFragment<AddNodeViewModel>() {
 
@@ -22,7 +22,7 @@ class AddNodeFragment : BaseFragment<AddNodeViewModel>() {
     ) = layoutInflater.inflate(R.layout.fragment_node_add, container, false)
 
     override fun initViews() {
-        fearlessToolbar.setHomeButtonListener { viewModel.backClicked() }
+        novaToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         nodeNameField.content.bindTo(viewModel.nodeNameInputLiveData)
 

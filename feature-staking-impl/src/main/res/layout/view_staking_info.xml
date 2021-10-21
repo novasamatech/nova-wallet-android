@@ -9,7 +9,7 @@
 
     <TextView
         android:id="@+id/stakingInfoTitle"
-        style="@style/TextAppearance.Soramitsu.Body2"
+        style="@style/TextAppearance.NovaFoundation.Body2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:includeFontPadding="false"
@@ -26,7 +26,7 @@
 
         <TextView
             android:id="@+id/stakingInfoExtraBlockAdditional"
-            style="@style/TextAppearance.Soramitsu.Body2"
+            style="@style/TextAppearance.NovaFoundation.Body2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="4dp"
@@ -37,7 +37,7 @@
 
         <TextView
             android:id="@+id/stakingInfoTitleDetail"
-            style="@style/TextAppearance.Soramitsu.Body2"
+            style="@style/TextAppearance.NovaFoundation.Body2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:includeFontPadding="false"
@@ -55,7 +55,7 @@
         tools:visibility="visible">
 
         <TextView
-            style="@style/TextAppearance.Soramitsu.Body0"
+            style="@style/TextAppearance.NovaFoundation.Body0"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:includeFontPadding="false" />
@@ -70,7 +70,7 @@
 
     <TextView
         android:id="@+id/stakingInfoBody"
-        style="@style/TextAppearance.Soramitsu.Body0"
+        style="@style/TextAppearance.NovaFoundation.Body0"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
@@ -93,13 +93,13 @@
             tools:visibility="visible">
 
             <TextView
-                style="@style/TextAppearance.Soramitsu.Body2"
+                style="@style/TextAppearance.NovaFoundation.Body2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:includeFontPadding="false" />
 
             <View
-                style="@style/TextAppearance.Soramitsu.Body0"
+                style="@style/TextAppearance.NovaFoundation.Body0"
                 android:layout_width="58dp"
                 android:layout_height="6dp"
                 android:layout_gravity="center"
@@ -109,7 +109,7 @@
 
         <TextView
             android:id="@+id/stakingInfoExtraBlockValue"
-            style="@style/TextAppearance.Soramitsu.Body2"
+            style="@style/TextAppearance.NovaFoundation.Body2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:includeFontPadding="false"

@@ -26,7 +26,7 @@
 
         <TextView
             android:id="@+id/itemSheetStakingActionText"
-            style="@style/TextAppearance.Soramitsu.Body1"
+            style="@style/TextAppearance.NovaFoundation.Body1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
