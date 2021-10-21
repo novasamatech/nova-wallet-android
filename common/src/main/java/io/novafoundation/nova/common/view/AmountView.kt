@@ -11,8 +11,8 @@ import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setTextOrHide
+import io.novafoundation.nova.common.view.shape.getBlurDrawable
 import io.novafoundation.nova.common.view.shape.getCornersStateDrawable
-import io.novafoundation.nova.common.view.shape.getCutCornerDrawable
 import kotlinx.android.synthetic.main.view_staking_amount.view.stakingAmountInput
 import kotlinx.android.synthetic.main.view_staking_amount.view.stakingAssetBalance
 import kotlinx.android.synthetic.main.view_staking_amount.view.stakingAssetDollarAmount
@@ -60,13 +60,11 @@ class AmountView @JvmOverloads constructor(
 
     private fun setBackground() {
         background = context.getCornersStateDrawable(
-            focusedDrawable = context.getCutCornerDrawable(
-                R.color.blurColor,
-                R.color.white
+            focusedDrawable = context.getBlurDrawable(
+                strokeColorRes = R.color.white
             ),
-            idleDrawable = context.getCutCornerDrawable(
-                R.color.blurColor,
-                R.color.white_40
+            idleDrawable = context.getBlurDrawable(
+                strokeColorRes = R.color.white_40
             )
         )
     }

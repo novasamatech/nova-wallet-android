@@ -9,11 +9,16 @@ import androidx.annotation.StringRes
 import io.novafoundation.nova.common.utils.setCompoundDrawableTint
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.view.shape.addRipple
-import io.novafoundation.nova.common.view.shape.getCutCornerDrawable
+import io.novafoundation.nova.common.view.shape.getBlurDrawable
 import io.novafoundation.nova.common.view.startTimer
 import io.novafoundation.nova.common.view.stopTimer
 import io.novafoundation.nova.feature_staking_impl.R
-import kotlinx.android.synthetic.main.view_stake_summary.view.*
+import kotlinx.android.synthetic.main.view_stake_summary.view.stakeMoreActions
+import kotlinx.android.synthetic.main.view_stake_summary.view.stakeSummaryStatus
+import kotlinx.android.synthetic.main.view_stake_summary.view.stakeSummaryStatusHelper
+import kotlinx.android.synthetic.main.view_stake_summary.view.stakeTotalRewardsView
+import kotlinx.android.synthetic.main.view_stake_summary.view.stakeTotalStakedView
+import kotlinx.android.synthetic.main.view_stake_summary.view.statusTapZone
 import kotlin.time.ExperimentalTime
 
 class StakeSummaryView @JvmOverloads constructor(
@@ -37,7 +42,7 @@ class StakeSummaryView @JvmOverloads constructor(
         orientation = VERTICAL
 
         with(context) {
-            background = addRipple(getCutCornerDrawable(R.color.blurColor))
+            background = addRipple(getBlurDrawable())
         }
     }
 

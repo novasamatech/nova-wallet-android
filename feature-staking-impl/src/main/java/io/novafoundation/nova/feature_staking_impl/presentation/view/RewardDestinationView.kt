@@ -9,8 +9,8 @@ import android.widget.Checkable
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.utils.getPrimaryColor
 import io.novafoundation.nova.common.utils.setTextOrHide
-import io.novafoundation.nova.common.view.shape.getCutCornerDrawable
-import io.novafoundation.nova.common.view.shape.getCutCornerDrawableFromColors
+import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
+import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawableFromColors
 import io.novafoundation.nova.feature_staking_impl.R
 import kotlinx.android.synthetic.main.view_payout_target.view.payoutTargetAmountFiat
 import kotlinx.android.synthetic.main.view_payout_target.view.payoutTargetAmountGain
@@ -89,7 +89,7 @@ class RewardDestinationView @JvmOverloads constructor(
     }
 
     private fun stateDrawable() = StateListDrawable().apply {
-        addState(CheckedStateSet, context.getCutCornerDrawableFromColors(strokeColor = context.getPrimaryColor()))
-        addState(StateSet.WILD_CARD, context.getCutCornerDrawable(strokeColorRes = RCommon.color.gray2))
+        addState(CheckedStateSet, context.getRoundedCornerDrawableFromColors(strokeColor = context.getPrimaryColor()))
+        addState(StateSet.WILD_CARD, context.getRoundedCornerDrawable(strokeColorRes = RCommon.color.gray2))
     }
 }

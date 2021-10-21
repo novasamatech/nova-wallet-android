@@ -7,7 +7,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.updatePadding
-import io.novafoundation.nova.common.view.shape.getCutCornerDrawable
+import io.novafoundation.nova.common.view.shape.getBlurDrawable
 import io.novafoundation.nova.feature_staking_impl.R
 import kotlinx.android.synthetic.main.view_staking_balance_actions.view.stakingBalanceActionsBondMore
 import kotlinx.android.synthetic.main.view_staking_balance_actions.view.stakingBalanceActionsRedeem
@@ -17,7 +17,7 @@ class StakingBalanceActions
 @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyle: Int = 0
+    defStyle: Int = 0,
 ) : LinearLayout(context, attrs, defStyle) {
 
     init {
@@ -25,7 +25,7 @@ class StakingBalanceActions
 
         View.inflate(context, R.layout.view_staking_balance_actions, this)
 
-        background = context.getCutCornerDrawable(R.color.blurColor)
+        background = context.getBlurDrawable()
 
         updatePadding(top = 4.dp(context), bottom = 4.dp(context))
     }
