@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
@@ -30,6 +31,14 @@ class AboutFragment : BaseFragment<AboutViewModel>() {
     }
 
     override fun initViews() {
+        backIv.applyInsetter {
+            type(statusBars = true) {
+                margin()
+            }
+
+            consume(false)
+        }
+
         backIv.setOnClickListener { viewModel.backButtonPressed() }
         websiteWrapper.setOnClickListener { viewModel.websiteClicked() }
         githubWrapper.setOnClickListener { viewModel.githubClicked() }

@@ -76,4 +76,6 @@ dependencies {
     testImplementation mockitoDep
 
     implementation gsonDep
+
+    implementation insetterDep
 }
