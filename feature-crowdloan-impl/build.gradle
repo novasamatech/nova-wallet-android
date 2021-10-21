@@ -26,6 +26,8 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            buildConfigField "String", "ACALA_NOVA_REFERRAL", "\"0xc5c184f0565e2192d6aedae584ee736cef875f0e1c558ee3ede26869acd0b4d6\""
         }
     }
 
