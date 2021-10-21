@@ -46,7 +46,7 @@ class ExportJsonPasswordFragment : BaseFragment<ExportJsonPasswordViewModel>() {
 
         exportJsonPasswordNext.setOnClickListener { viewModel.nextClicked() }
 
-        exportJsonPasswordMatchingError.setDrawableStart(R.drawable.ic_red_cross, 24)
+        exportJsonPasswordMatchingError.setDrawableStart(R.drawable.ic_red_cross, widthInDp = 24, paddingInDp = 8)
 
         exportJsonPasswordNetworkInput.isEnabled = false
     }
