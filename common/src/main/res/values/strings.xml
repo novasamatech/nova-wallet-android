@@ -384,7 +384,7 @@ Derivation path: %s</string>
     <string name="crodloan_private_crowdloan_title">Private crowdloan</string>
     <string name="crodloan_private_crowdloan_message">Private crowdloans are not yet supported.</string>
     <string name="common_bonus">Bonus</string>
-    <string name="crowdloan_app_bonus_format">Fearless Wallet bonus (%s)</string>
+    <string name="crowdloan_app_bonus_format">Nova Wallet bonus (%s)</string>
     <string name="crowdloan_enter_referral">Enter your referral code</string>
     <string name="staking_add_controller">Add controller account %s to the application to perform this action.</string>
     <string name="crowdloan_empty_bonus_title">Get a special bonus</string>
@@ -396,7 +396,7 @@ Derivation path: %s</string>
     <string name="staking_select_recommended">Select recommended</string>
     <string name="staking_select_custom">Select by yourself</string>
     <string name="staking_selected_validators_count_v1.9.1" formatted="false">selected %d (max %d)</string>
-    <string name="staking_start_change_validators_recommended_subtitle">Fearless algorithm selected a list of recommended validators based on the criteria:</string>
+    <string name="staking_start_change_validators_recommended_subtitle">Nova algorithm selected a list of recommended validators based on the criteria:</string>
     <string name="common_not_enough_funds_message">Sorry, you don\'t have enough funds to pay the network fee.</string>
     <string name="choose_amount_error_too_big">Sorry, you don\'t have enough funds to spend specified amount</string>
     <string name="staking_custom_validators_list_title">Select validators</string>
@@ -449,7 +449,7 @@ Derivation path: %s</string>
     <string name="staking_hint_no_rewards">Tokens in unstaking period generate no rewards.</string>
     <string name="staking_hint_redeem">After unstaking period you will need to redeem your tokens.</string>
     <string name="staking_hint_reward_bond_more">Your rewards will be increased starting from the next era.</string>
-    <string name="staking_hint_unbond_kills_stash">Fearless wallet will change rewards destination
+    <string name="staking_hint_unbond_kills_stash">Nova wallet will change rewards destination
 to your account to avoid remaining stake.</string>
     <string name="staking_custom_validators_settings_sort_apy">Estimated rewards (% APY)</string>
     <string name="common_options_title">Select an option</string>
@@ -462,13 +462,13 @@ to your account to avoid remaining stake.</string>
     <string name="staking_story_staking_page_2">Staking is an important part of network security and reliability. Anyone can run validator nodes, but only those who have enough tokens staked will be elected by the network to participate in composing new blocks and receive the rewards. Validators often do not have enough tokens by themselves, so nominators are helping them by locking their tokens for them to achieve the required amount of stake.</string>
     <string name="staking_story_nominator_title">Who is a nominator?</string>
     <string name="staking_story_nominator_page_1">Nominator earns passive income by locking his tokens for securing the network. To achieve that, the nominator should select a number of validators to support. The nominator should be careful when selecting validators. If selected validator won’t behave properly, slashing penalties would be applied to both of them, based on the severity of the incident.</string>
-    <string name="staking_story_nominator_page_2">Fearless Wallet provides a support for nominators by helping them to select validators. The mobile app fetches data from the blockchain and composes a list of validators, which have: most profits, identity with contact info, not slashed and available to receive nominations. Fearless Wallet also cares about decentralization, so if one person or a company runs several validator nodes, only up to 2 nodes from them will be shown in the recommended list.</string>
+    <string name="staking_story_nominator_page_2">Nova Wallet provides a support for nominators by helping them to select validators. The mobile app fetches data from the blockchain and composes a list of validators, which have: most profits, identity with contact info, not slashed and available to receive nominations. Nova Wallet also cares about decentralization, so if one person or a company runs several validator nodes, only up to 2 nodes from them will be shown in the recommended list.</string>
     <string name="staking_story_validator_title">Who is a validator?</string>
     <string name="staking_story_validator_page_1">The validator runs a blockchain node 24/7 and is required to have enough stake locked (both owned and provided by nominators) to be elected by the network. Validators should maintain their nodes\' performance and reliability to be rewarded. Being a validator is almost a full-time job, there are companies that are focused to be validators on the blockchain networks.</string>
     <string name="staking_story_validator_page_2">Everyone can be a validator and run a blockchain node, but that requires a certain level of technical skills and responsibility. Polkadot and Kusama networks have a program, named Thousand Validators Programme, to provide support for beginners. Moreover, the network itself will always reward more validators, who have less stake (but enough to be elected) to improve decentralization.</string>
     <string name="staking_story_reward_title">Receiving rewards</string>
     <string name="staking_story_reward_page_1">Rewards for staking are available to payout at the end of each era (6 hours in Kusama and 24 hours in Polkadot). Network stores pending rewards during 84 eras and in most cases validators are paying out the rewards for everyone. However, validators might forget or something might happen with them, so nominators can payout their rewards by themselves.</string>
-    <string name="staking_story_reward_page_2">Although rewards are usually distributed by validators, Fearless Wallet helps by alerting if there are any pending rewards that are close to expiring. You will receive alerts about this and other activities on the staking screen.</string>
+    <string name="staking_story_reward_page_2">Although rewards are usually distributed by validators, Nova Wallet helps by alerting if there are any pending rewards that are close to expiring. You will receive alerts about this and other activities on the staking screen.</string>
     <string name="staking_selected_validators_mask">Validators (%d)</string>
     <string name="staking_controller_change_success">Controller is changed</string>
     <string name="staking_already_controller_title">Already controller</string>

@@ -8,7 +8,7 @@
 
     <TextView
         android:id="@+id/viewBalancesTitle"
-        style="@style/TextAppearance.Soramitsu.Header5"
+        style="@style/TextAppearance.NovaFoundation.Header5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         tools:text="@string/common_balance"

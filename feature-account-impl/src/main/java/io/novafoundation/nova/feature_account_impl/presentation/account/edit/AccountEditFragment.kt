@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.model.LightMetaAccountUi
 import kotlinx.android.synthetic.main.fragment_accounts.addAccount
 import kotlinx.android.synthetic.main.fragment_edit_accounts.accountsList
-import kotlinx.android.synthetic.main.fragment_edit_accounts.fearlessToolbar
+import kotlinx.android.synthetic.main.fragment_edit_accounts.novaToolbar
 
 class AccountEditFragment : BaseFragment<EditAccountsViewModel>(), EditAccountsAdapter.EditAccountItemHandler {
     private lateinit var adapter: EditAccountsAdapter
@@ -34,11 +34,11 @@ class AccountEditFragment : BaseFragment<EditAccountsViewModel>(), EditAccountsA
         adapter = EditAccountsAdapter(this, dragHelper)
         accountsList.adapter = adapter
 
-        fearlessToolbar.setRightActionClickListener {
+        novaToolbar.setRightActionClickListener {
             viewModel.doneClicked()
         }
 
-        fearlessToolbar.setHomeButtonListener {
+        novaToolbar.setHomeButtonListener {
             viewModel.backClicked()
         }
 

@@ -38,9 +38,9 @@ abstract class ReferralContributeViewState(
 
     val privacyAcceptedFlow = MutableStateFlow(false)
 
-    val applyFearlessTitle = createFearlessBonusTitle()
+    val applyNovaTitle = createNovaBonusTitle()
 
-    val applyFearlessCodeEnabledFlow = enteredReferralCodeFlow.map {
+    val applyNovaCodeEnabledFlow = enteredReferralCodeFlow.map {
         it != defaultReferralCode
     }
 
@@ -66,7 +66,7 @@ abstract class ReferralContributeViewState(
         }
     }
 
-    fun applyFearlessCode() {
+    fun applyNovaCode() {
         enteredReferralCodeFlow.value = defaultReferralCode
     }
 
@@ -94,7 +94,7 @@ abstract class ReferralContributeViewState(
         payload
     }
 
-    private fun createFearlessBonusTitle(): String {
+    private fun createNovaBonusTitle(): String {
         val percentage = bonusPercentage.fractionToPercentage().formatAsPercentage()
 
         return resourceManager.getString(R.string.crowdloan_app_bonus_format, percentage)

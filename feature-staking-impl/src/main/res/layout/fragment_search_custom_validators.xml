@@ -20,7 +20,7 @@
     <EditText
         app:layout_constraintTop_toBottomOf="@id/searchCustomValidatorsToolbar"
         android:id="@+id/searchCustomValidatorsField"
-        style="@style/TextAppearance.Soramitsu.Body1"
+        style="@style/TextAppearance.NovaFoundation.Body1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -43,7 +43,7 @@
         app:layout_constraintTop_toBottomOf="@id/searchCustomValidatorsField"
         android:layout_marginTop="21dp"
         android:id="@+id/searchCustomValidatorAccounts"
-        style="@style/TextAppearance.Soramitsu.CapsTitle2"
+        style="@style/TextAppearance.NovaFoundation.CapsTitle2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="start"
@@ -52,7 +52,7 @@
         android:textColor="@color/gray1" />
 
     <TextView
-        style="@style/TextAppearance.Soramitsu.CapsTitle2"
+        style="@style/TextAppearance.NovaFoundation.CapsTitle2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
@@ -97,7 +97,7 @@
         android:layout_height="wrap_content" />
 
     <TextView
-        style="@style/TextAppearance.Soramitsu.Body2"
+        style="@style/TextAppearance.NovaFoundation.Body2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"

@@ -28,7 +28,7 @@
 
     <TextView
         android:id="@+id/itemValidatorName"
-        style="@style/TextAppearance.Soramitsu.Body1"
+        style="@style/TextAppearance.NovaFoundation.Body1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
@@ -47,7 +47,7 @@
 
         <TextView
             android:id="@+id/itemValidatorScoringPrimary"
-            style="@style/TextAppearance.Soramitsu.Body1"
+            style="@style/TextAppearance.NovaFoundation.Body1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -55,7 +55,7 @@
 
         <TextView
             android:id="@+id/itemValidatorScoringSecondary"
-            style="@style/TextAppearance.Soramitsu.Body2"
+            style="@style/TextAppearance.NovaFoundation.Body2"
             android:textColor="@color/black2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

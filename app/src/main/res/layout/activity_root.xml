@@ -23,7 +23,7 @@
         android:paddingTop="16dp"
         android:visibility="gone"
         android:paddingBottom="2dp"
-        style="@style/TextAppearance.Soramitsu.Body2"
+        style="@style/TextAppearance.NovaFoundation.Body2"
         android:layout_height="wrap_content"
         android:layout_gravity="top" />
 

@@ -5,7 +5,7 @@ import com.neovisionaries.ws.client.WebSocket
 import com.neovisionaries.ws.client.WebSocketAdapter
 import com.neovisionaries.ws.client.WebSocketException
 import com.neovisionaries.ws.client.WebSocketFactory
-import io.novafoundation.nova.common.base.errors.FearlessException
+import io.novafoundation.nova.common.base.errors.NovaException
 import io.novafoundation.nova.common.resources.ResourceManager
 import jp.co.soramitsu.fearless_utils.wsrpc.logging.Logger
 import jp.co.soramitsu.fearless_utils.wsrpc.mappers.ResponseMapper
@@ -43,7 +43,7 @@ import kotlin.coroutines.resumeWithException
         try {
             executeRequestInternal(request, url)
         } catch (e: Exception) {
-            throw FearlessException.networkError(resourceManager, e)
+            throw NovaException.networkError(resourceManager, e)
         }
     }
 

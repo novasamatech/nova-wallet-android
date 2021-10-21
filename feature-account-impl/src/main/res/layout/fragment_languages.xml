@@ -9,7 +9,7 @@
     tools:background="@color/black">
 
     <io.novafoundation.nova.common.view.Toolbar
-        android:id="@+id/fearlessToolbar"
+        android:id="@+id/novaToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:titleText="@string/language_title" />

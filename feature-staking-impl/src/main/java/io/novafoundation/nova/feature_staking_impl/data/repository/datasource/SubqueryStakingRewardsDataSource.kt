@@ -7,7 +7,7 @@ import io.novafoundation.nova.feature_staking_impl.data.mappers.mapSubqueryHisto
 import io.novafoundation.nova.feature_staking_impl.data.mappers.mapTotalRewardLocalToTotalReward
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.StakingApi
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.request.StakingSumRewardRequest
-import io.novafoundation.nova.feature_staking_impl.data.repository.subqueryFearlessApiPath
+import io.novafoundation.nova.feature_staking_impl.data.repository.subqueryNovaApiPath
 import io.novafoundation.nova.feature_staking_impl.domain.model.TotalReward
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
@@ -25,7 +25,7 @@ class SubqueryStakingRewardsDataSource(
     }
 
     override suspend fun sync(accountAddress: String) {
-        val subqueryPath = accountAddress.networkType().subqueryFearlessApiPath()
+        val subqueryPath = accountAddress.networkType().subqueryNovaApiPath()
 
         val totalReward = mapSubqueryHistoryToTotalReward(
             stakingApi.getSumReward(

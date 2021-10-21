@@ -143,7 +143,7 @@ class AccountInteractorImpl(
 
     /**
      * @throws UnsupportedNetworkException, if node network is not supported
-     * @throws FearlessException - in case of network issues
+     * @throws NovaException - in case of network issues
      */
     private suspend fun getNetworkTypeByNodeHost(nodeHost: String): Node.NetworkType {
         val networkName = accountRepository.getNetworkName(nodeHost)

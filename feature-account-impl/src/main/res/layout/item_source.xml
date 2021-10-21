@@ -11,7 +11,7 @@
 
     <TextView
         android:id="@+id/sourceTv"
-        style="@style/TextAppearance.Soramitsu.Body0"
+        style="@style/TextAppearance.NovaFoundation.Body0"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"

@@ -19,7 +19,7 @@
 
     <TextView
         android:id="@+id/itemCrowdloanParaName"
-        style="@style/TextAppearance.Soramitsu.Body1"
+        style="@style/TextAppearance.NovaFoundation.Body1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -35,7 +35,7 @@
 
     <TextView
         android:id="@+id/itemCrowdloanTimeRemaining"
-        style="@style/TextAppearance.Soramitsu.Body3"
+        style="@style/TextAppearance.NovaFoundation.Body3"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textColor="@color/black1"
@@ -57,7 +57,7 @@
 
     <TextView
         android:id="@+id/itemCrowdloanParaDescription"
-        style="@style/TextAppearance.Soramitsu.Body2"
+        style="@style/TextAppearance.NovaFoundation.Body2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -70,7 +70,7 @@
 
     <TextView
         android:id="@+id/itemCrowdloanParaRaised"
-        style="@style/TextAppearance.Soramitsu.Body2"
+        style="@style/TextAppearance.NovaFoundation.Body2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -82,7 +82,7 @@
 
     <TextView
         android:id="@+id/itemCrowdloanMyContribution"
-        style="@style/TextAppearance.Soramitsu.Body2"
+        style="@style/TextAppearance.NovaFoundation.Body2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"

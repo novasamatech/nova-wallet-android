@@ -46,7 +46,7 @@
         android:paddingBottom="15dp">
 
         <TextView
-            style="@style/TextAppearance.Soramitsu.Body1"
+            style="@style/TextAppearance.NovaFoundation.Body1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -55,7 +55,7 @@
 
         <TextView
             android:id="@+id/confirmPayoutRewardToken"
-            style="@style/TextAppearance.Soramitsu.Body1"
+            style="@style/TextAppearance.NovaFoundation.Body1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -64,7 +64,7 @@
 
         <TextView
             android:id="@+id/confirmPayoutRewardFiat"
-            style="@style/TextAppearance.Soramitsu.Body1"
+            style="@style/TextAppearance.NovaFoundation.Body1"
             android:layout_width="wrap_content"
             tools:text="$0.5"
             android:layout_height="wrap_content"
@@ -98,7 +98,7 @@
             android:orientation="horizontal">
 
             <TextView
-                style="@style/TextAppearance.Soramitsu.Body1"
+                style="@style/TextAppearance.NovaFoundation.Body1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -115,7 +115,7 @@
 
             <TextView
                 android:id="@+id/confirmPayoutFeeToken"
-                style="@style/TextAppearance.Soramitsu.Body1"
+                style="@style/TextAppearance.NovaFoundation.Body1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
@@ -125,7 +125,7 @@
 
             <TextView
                 android:id="@+id/confirmPayoutFeeFiat"
-                style="@style/TextAppearance.Soramitsu.Body1"
+                style="@style/TextAppearance.NovaFoundation.Body1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/gray2" />
@@ -142,7 +142,7 @@
 
         <io.novafoundation.nova.common.view.PrimaryButton
             android:id="@+id/confirmPayoutConfirm"
-            style="@style/Widget.Fearless.Button.Primary"
+            style="@style/Widget.Nova.Button.Primary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"

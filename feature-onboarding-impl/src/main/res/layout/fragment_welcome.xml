@@ -42,7 +42,7 @@
 
         <io.novafoundation.nova.common.view.PrimaryButton
             android:id="@+id/createAccountBtn"
-            style="@style/Widget.Fearless.Button.Primary"
+            style="@style/Widget.Nova.Button.Primary"
             android:layout_width="match_parent"
             android:theme="@style/AccentBlue"
             android:layout_height="wrap_content"
@@ -51,7 +51,7 @@
 
         <io.novafoundation.nova.common.view.PrimaryButton
             android:id="@+id/importAccountBtn"
-            style="@style/Widget.Fearless.Button.Primary"
+            style="@style/Widget.Nova.Button.Primary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:theme="@style/AccentBlue"
@@ -62,7 +62,7 @@
 
     <TextView
         android:id="@+id/termsTv"
-        style="@style/TextAppearance.Soramitsu.Body1"
+        style="@style/TextAppearance.NovaFoundation.Body1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/x2"

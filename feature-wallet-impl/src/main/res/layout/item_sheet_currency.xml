@@ -11,7 +11,7 @@
     tools:background="@color/black">
 
     <TextView
-        style="@style/TextAppearance.Soramitsu.Body1"
+        style="@style/TextAppearance.NovaFoundation.Body1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
@@ -20,7 +20,7 @@
         tools:text="Label" />
 
     <TextView
-        style="@style/TextAppearance.Soramitsu.Body1"
+        style="@style/TextAppearance.NovaFoundation.Body1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/itemCurrencyValue"

@@ -10,7 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         tools:background="@drawable/bg_mnemonic_word_light"
-        style="@style/TextAppearance.Soramitsu.Body1"
+        style="@style/TextAppearance.NovaFoundation.Body1"
         android:textColor="@color/white"
         android:layout_gravity="center"
         android:paddingStart="10dp"

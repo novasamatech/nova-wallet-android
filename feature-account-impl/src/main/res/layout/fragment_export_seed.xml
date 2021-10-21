@@ -58,7 +58,7 @@
 
     <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/exportSeedExport"
-        style="@style/Widget.Fearless.Button.Primary"
+        style="@style/Widget.Nova.Button.Primary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"

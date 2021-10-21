@@ -15,7 +15,7 @@
         app:titleText="@string/staking_recommended_title" />
 
     <TextView
-        style="@style/TextAppearance.Soramitsu.Header4"
+        style="@style/TextAppearance.NovaFoundation.Header4"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -24,7 +24,7 @@
         android:text="@string/staking_start_change_validators_recommended_title" />
 
     <TextView
-        style="@style/TextAppearance.Soramitsu.Body2"
+        style="@style/TextAppearance.NovaFoundation.Body2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -35,7 +35,7 @@
 
     <TextView
         android:id="@+id/startChangeValidatorsRecommendedFeatures"
-        style="@style/TextAppearance.Soramitsu.Body2"
+        style="@style/TextAppearance.NovaFoundation.Body2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -56,7 +56,7 @@
         app:inProgress="true" />
 
     <TextView
-        style="@style/TextAppearance.Soramitsu.Header4"
+        style="@style/TextAppearance.NovaFoundation.Header4"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -65,7 +65,7 @@
         android:text="@string/staking_start_change_validators_custom_title" />
 
     <TextView
-        style="@style/TextAppearance.Soramitsu.Body2"
+        style="@style/TextAppearance.NovaFoundation.Body2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"

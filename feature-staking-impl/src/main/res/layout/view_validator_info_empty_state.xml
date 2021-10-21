@@ -14,7 +14,7 @@
         android:src="@drawable/ic_validator_not_elected" />
 
     <TextView
-        style="@style/TextAppearance.Soramitsu.Body2"
+        style="@style/TextAppearance.NovaFoundation.Body2"
         android:layout_width="180dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"

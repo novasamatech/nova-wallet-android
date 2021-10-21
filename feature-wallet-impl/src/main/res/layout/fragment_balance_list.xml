@@ -14,7 +14,7 @@
 
         <TextView
             android:id="@+id/balanceListTotalTitle"
-            style="@style/TextAppearance.Soramitsu.Body1"
+            style="@style/TextAppearance.NovaFoundation.Body1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -26,7 +26,7 @@
 
         <TextView
             android:id="@+id/balanceListTotalAmount"
-            style="@style/TextAppearance.Soramitsu.Header1"
+            style="@style/TextAppearance.NovaFoundation.Header1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"

@@ -11,7 +11,7 @@ import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.model.LightMetaAccountUi
 import kotlinx.android.synthetic.main.fragment_accounts.accountsList
 import kotlinx.android.synthetic.main.fragment_accounts.addAccount
-import kotlinx.android.synthetic.main.fragment_accounts.fearlessToolbar
+import kotlinx.android.synthetic.main.fragment_accounts.novaToolbar
 
 private const val ARG_DIRECTION = "ARG_DIRECTION"
 
@@ -37,11 +37,11 @@ class AccountListFragment : BaseFragment<AccountListViewModel>(), AccountsAdapte
         accountsList.setHasFixedSize(true)
         accountsList.adapter = adapter
 
-        fearlessToolbar.setRightActionClickListener {
+        novaToolbar.setRightActionClickListener {
             viewModel.editClicked()
         }
 
-        fearlessToolbar.setHomeButtonListener {
+        novaToolbar.setHomeButtonListener {
             viewModel.backClicked()
         }
 
