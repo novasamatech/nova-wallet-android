@@ -8,7 +8,7 @@
     android:orientation="vertical"
     tools:background="@color/black">
 
-    <jp.co.soramitsu.common.view.Toolbar
+    <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/crowdloanContributeToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -32,7 +32,7 @@
                 android:layout_marginTop="24dp"
                 android:text="@string/crowdloan_contribute_title" />
 
-            <jp.co.soramitsu.common.view.AmountView
+            <io.novafoundation.nova.common.view.AmountView
                 android:id="@+id/crowdloanContributeAmount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -63,7 +63,7 @@
                     tools:text="Your KSM tokens will be returned after the leasing period." />
             </LinearLayout>
 
-            <jp.co.soramitsu.feature_wallet_api.presentation.view.FeeView
+            <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
                 android:id="@+id/crowdloanContributeFee"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -72,7 +72,7 @@
                 android:layout_marginEnd="16dp"
                 app:title="@string/network_fee" />
 
-            <jp.co.soramitsu.common.view.TableCellView
+            <io.novafoundation.nova.common.view.TableCellView
                 android:id="@+id/crowdloanContributeReward"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -80,7 +80,7 @@
                 android:layout_marginEnd="16dp"
                 app:title="@string/staking_validator_estimated_reward" />
 
-            <jp.co.soramitsu.common.view.TableCellView
+            <io.novafoundation.nova.common.view.TableCellView
                 android:id="@+id/crowdloanContributeLeasingPeriod"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -141,7 +141,7 @@
                 android:layout_marginTop="24dp"
                 android:text="@string/crowdloan_info" />
 
-            <jp.co.soramitsu.common.view.TableCellView
+            <io.novafoundation.nova.common.view.TableCellView
                 android:id="@+id/crowdloanContributeRaised"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -149,7 +149,7 @@
                 android:layout_marginEnd="16dp"
                 app:title="@string/crowdloan_raised" />
 
-            <jp.co.soramitsu.common.view.TableCellView
+            <io.novafoundation.nova.common.view.TableCellView
                 android:id="@+id/crowdloanContributeTimeLeft"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -157,7 +157,7 @@
                 android:layout_marginEnd="16dp"
                 app:title="@string/common_time_left" />
 
-            <jp.co.soramitsu.common.view.GoNextView
+            <io.novafoundation.nova.common.view.GoNextView
                 android:layout_width="match_parent"
                 app:actionIcon="@drawable/ic_arrow_top_right_white_16"
                 android:id="@+id/crowdloanContributeLearnMore"
@@ -165,7 +165,7 @@
         </LinearLayout>
     </ScrollView>
 
-    <jp.co.soramitsu.common.view.PrimaryButton
+    <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/crowdloanContributeContinue"
         style="@style/Widget.Fearless.Button.Primary"
         android:layout_width="match_parent"

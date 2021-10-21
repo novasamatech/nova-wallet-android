@@ -52,7 +52,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/referralFearlessBonusTitle" />
 
-    <jp.co.soramitsu.common.view.InputField
+    <io.novafoundation.nova.common.view.InputField
         android:id="@+id/referralReferralCodeInput"
         style="@style/Widget.Fearless.Input.Primary.External"
         android:layout_width="0dp"
@@ -65,7 +65,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/divider1" />
 
-    <jp.co.soramitsu.common.view.TableCellView
+    <io.novafoundation.nova.common.view.TableCellView
         android:id="@+id/referralBonus"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -97,7 +97,7 @@
         app:layout_constraintStart_toEndOf="@+id/referralPrivacySwitch"
         app:layout_constraintTop_toTopOf="@+id/referralPrivacySwitch" />
 
-    <jp.co.soramitsu.common.view.GoNextView
+    <io.novafoundation.nova.common.view.GoNextView
         android:id="@+id/referralLearnMore"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

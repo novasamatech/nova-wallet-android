@@ -1,0 +1,15 @@
+package io.novafoundation.nova.common.data.network
+
+class AppLinksProvider(
+    val termsUrl: String,
+    val privacyUrl: String,
+
+    val payoutsLearnMore: String,
+    val twitterAccountTemplate: String,
+    val setControllerLearnMore: String
+) {
+
+    fun getTwitterAccountUrl(
+        accountName: String
+    ): String = twitterAccountTemplate.format(accountName)
+}

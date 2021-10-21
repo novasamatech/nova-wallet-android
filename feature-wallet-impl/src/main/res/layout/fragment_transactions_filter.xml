@@ -8,7 +8,7 @@
     android:fitsSystemWindows="true"
     tools:background="@color/black">
 
-    <jp.co.soramitsu.common.view.Toolbar
+    <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/transactionsFilterToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -58,7 +58,7 @@
         android:layout_height="0dp"
         android:layout_weight="1" />
 
-    <jp.co.soramitsu.common.view.PrimaryButton
+    <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/transactionFilterApplyBtn"
         style="@style/Widget.Fearless.Button.Primary"
         android:layout_width="match_parent"

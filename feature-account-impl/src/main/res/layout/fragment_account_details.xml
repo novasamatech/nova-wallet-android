@@ -8,7 +8,7 @@
     android:orientation="vertical"
     tools:background="@color/black">
 
-    <jp.co.soramitsu.common.view.Toolbar
+    <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/accountDetailsToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -16,7 +16,7 @@
         app:homeButtonIcon="@drawable/ic_close"
         app:titleText="@string/account_info_title_2_0" />
 
-    <jp.co.soramitsu.common.view.InputField
+    <io.novafoundation.nova.common.view.InputField
         android:id="@+id/accountDetailsNameField"
         style="@style/Widget.Fearless.Input.Primary.External"
         android:layout_width="match_parent"
@@ -30,7 +30,7 @@
         android:layout_width="match_parent"
         android:id="@+id/accountDetailsChainAccounts"
         android:layout_height="match_parent"
-        app:layoutManager="jp.co.soramitsu.common.view.recyclerview.LinearLayoutManagerFixed"
+        app:layoutManager="io.novafoundation.nova.common.view.recyclerview.LinearLayoutManagerFixed"
         android:layout_marginTop="16dp"
         tools:listitem="@layout/item_chain_acount" />
 

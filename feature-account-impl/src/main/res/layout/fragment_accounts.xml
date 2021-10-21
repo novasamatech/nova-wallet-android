@@ -14,7 +14,7 @@
         android:fitsSystemWindows="true"
         android:orientation="vertical">
 
-        <jp.co.soramitsu.common.view.Toolbar
+        <io.novafoundation.nova.common.view.Toolbar
             android:id="@+id/fearlessToolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -39,7 +39,7 @@
 
     </LinearLayout>
 
-    <jp.co.soramitsu.common.view.PrimaryButton
+    <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/addAccount"
         style="@style/Widget.Fearless.Button.Primary"
         android:layout_width="match_parent"

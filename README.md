@@ -1,5 +1,5 @@
 ### Fearless Wallet Android
-[![Google Play](https://img.shields.io/badge/Google%20Play-Android-green?logo=google%20play)](https://play.google.com/store/apps/details?id=jp.co.soramitsu.fearless)
+[![Google Play](https://img.shields.io/badge/Google%20Play-Android-green?logo=google%20play)](https://play.google.com/store/apps/details?id=io.co.soramitsu.fearless)
 
 ![logo](/docs/fearlesswallet_promo.png)
 

@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:590490556751:android:45e21c2cc9c0b271becd3a",
         "android_client_info": {
-          "package_name": "jp.co.soramitsu.fearless"
+          "package_name": "io.co.soramitsu.fearless"
         }
       },
       "oauth_client": [

@@ -1,0 +1,10 @@
+package io.novafoundation.nova.feature_staking_impl.domain.validations.bond
+
+import io.novafoundation.nova.common.validation.ValidationSystem
+import io.novafoundation.nova.feature_staking_impl.domain.validations.NotZeroAmountValidation
+import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughToPayFeesValidation
+
+typealias BondMoreFeeValidation = EnoughToPayFeesValidation<BondMoreValidationPayload, BondMoreValidationFailure>
+typealias NotZeroBondValidation = NotZeroAmountValidation<BondMoreValidationPayload, BondMoreValidationFailure>
+
+typealias BondMoreValidationSystem = ValidationSystem<BondMoreValidationPayload, BondMoreValidationFailure>

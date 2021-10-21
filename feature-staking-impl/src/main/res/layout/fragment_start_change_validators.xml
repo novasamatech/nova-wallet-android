@@ -8,7 +8,7 @@
     android:id="@+id/startChangeValidatorsContainer"
     tools:background="@color/black">
 
-    <jp.co.soramitsu.common.view.Toolbar
+    <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/startChangeValidatorsToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -45,7 +45,7 @@
         android:textColor="@color/black1"
         tools:text="✅ Most profitable\n✅ Most profitable" />
 
-    <jp.co.soramitsu.common.view.GoNextView
+    <io.novafoundation.nova.common.view.GoNextView
         android:id="@+id/startChangeValidatorsRecommended"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -74,7 +74,7 @@
         android:text="@string/staking_start_change_validators_custom_subtitle"
         android:textColor="@color/black1" />
 
-    <jp.co.soramitsu.common.view.GoNextView
+    <io.novafoundation.nova.common.view.GoNextView
         android:id="@+id/startChangeValidatorsCustom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
