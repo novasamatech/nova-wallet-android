@@ -7,7 +7,7 @@ import android.view.View
 import android.widget.EditText
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.view.shape.addRipple
-import io.novafoundation.nova.common.view.shape.getCutCornerDrawable
+import io.novafoundation.nova.common.view.shape.getBlurDrawable
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.model.RewardEstimation
 import kotlinx.android.synthetic.main.view_estimate_earning.view.estimateEarningAmount
@@ -28,7 +28,7 @@ class EstimateEarningView @JvmOverloads constructor(
         View.inflate(context, R.layout.view_estimate_earning, this)
 
         with(context) {
-            background = addRipple(getCutCornerDrawable(R.color.blurColor))
+            background = addRipple(getBlurDrawable())
         }
 
 //        attrs?.let { applyAttributes(it) }
