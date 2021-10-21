@@ -5,7 +5,7 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.utils.setVisible
-import io.novafoundation.nova.common.view.shape.getCutCornerDrawable
+import io.novafoundation.nova.common.view.shape.getBlurDrawable
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.balance.UnbondingsAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.balance.model.UnbondingModel
@@ -25,7 +25,7 @@ class UnbondingsView @JvmOverloads constructor(
     init {
         View.inflate(context, R.layout.view_unbondings, this)
 
-        background = context.getCutCornerDrawable(fillColorRes = R.color.blurColor)
+        background = context.getBlurDrawable()
 
         unbondingsList.adapter = unbondingsAdapter
     }

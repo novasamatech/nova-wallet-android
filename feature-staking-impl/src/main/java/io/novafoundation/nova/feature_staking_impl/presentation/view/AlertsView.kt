@@ -6,7 +6,7 @@ import android.view.View
 import android.widget.LinearLayout
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
-import io.novafoundation.nova.common.view.shape.getCutCornerDrawable
+import io.novafoundation.nova.common.view.shape.getBlurDrawable
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.alerts.AlertsAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.alerts.model.AlertModel
@@ -28,7 +28,7 @@ class AlertsView @JvmOverloads constructor(
         orientation = VERTICAL
 
         with(context) {
-            background = getCutCornerDrawable(R.color.blurColor)
+            background = getBlurDrawable()
         }
 
         alertsRecycler.adapter = alertsAdapter

@@ -7,7 +7,7 @@ import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
-import io.novafoundation.nova.common.view.shape.getCutCornerDrawable
+import io.novafoundation.nova.common.view.shape.getBlurDrawable
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.StakingStoriesAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.model.StakingStoryModel
@@ -44,7 +44,7 @@ class NetworkInfoView @JvmOverloads constructor(
         View.inflate(context, R.layout.view_network_info, this)
 
         with(context) {
-            background = getCutCornerDrawable(R.color.blurColor)
+            background = getBlurDrawable()
         }
 
         orientation = VERTICAL
