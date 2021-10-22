@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.combine
+import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.mediatorLiveData
 import io.novafoundation.nova.common.utils.updateFrom
 import io.novafoundation.nova.common.validation.ValidationExecutor
@@ -55,6 +56,7 @@ class SetControllerViewModel(
 
     private val accountStakingFlow = stakingInteractor.selectedAccountStakingStateFlow()
         .filterIsInstance<StakingState.Stash>()
+        .inBackground()
         .share()
 
     val showNotStashAccountWarning = accountStakingFlow.map { stakingState ->
@@ -66,6 +68,7 @@ class SetControllerViewModel(
     }.asLiveData()
 
     private val assetFlow = stakingInteractor.currentAssetFlow()
+        .inBackground()
         .share()
 
     private val _controllerAccountModel = MutableLiveData<AddressModel>()

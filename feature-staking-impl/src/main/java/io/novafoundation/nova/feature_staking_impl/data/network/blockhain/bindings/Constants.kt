@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindi
 import io.novafoundation.nova.common.data.network.runtime.binding.UseCaseBinding
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumberConstant
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.metadata.Constant
+import jp.co.soramitsu.fearless_utils.runtime.metadata.module.Constant
 import java.math.BigInteger
 
 /*

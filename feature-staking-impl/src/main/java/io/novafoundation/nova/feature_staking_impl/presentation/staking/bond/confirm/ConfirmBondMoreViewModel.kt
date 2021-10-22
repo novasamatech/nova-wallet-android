@@ -50,6 +50,7 @@ class ConfirmBondMoreViewModel(
     val showNextProgress: LiveData<Boolean> = _showNextProgress
 
     private val assetFlow = interactor.assetFlow(payload.stashAddress)
+        .inBackground()
         .share()
 
     val assetModelFlow = assetFlow
