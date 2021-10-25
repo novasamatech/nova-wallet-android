@@ -3,8 +3,7 @@
     <string name="crowdloan_moonbeam_terms_submit">Submit agreement</string>
     <string name="crowdloan_terms_conditions_named">%s\'s Terms and Conditions</string>
 
-    <string name="crowdloan_moonbeam_terms_title">Submit agreement with Terms &amp; Conditions to proceed.</string>
-    <string name="crowdloan_moonbeam_terms_subtitle">This is required to be done only once for all following Moonbeam contributions</string>
+    <string name="crowdloan_moonbeam_terms_subtitle">You need to submit agreement with Terms &amp; Conditions on the blockchain to proceed. This is required to be done only once for all following Moonbeam contributions</string>
 
     <string name="crowdloan_moonbeam_region_restriction_title">Your region is not supported</string>
     <string name="crowdloan_moonbeam_region_restriction_message">This crowdloan isn\'t available in your location.</string>
