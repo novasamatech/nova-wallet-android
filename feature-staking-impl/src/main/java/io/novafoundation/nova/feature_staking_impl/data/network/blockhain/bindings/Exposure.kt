@@ -4,11 +4,14 @@ import io.novafoundation.nova.common.data.network.runtime.binding.HelperBinding
 import io.novafoundation.nova.common.data.network.runtime.binding.UseCaseBinding
 import io.novafoundation.nova.common.data.network.runtime.binding.incompatible
 import io.novafoundation.nova.common.data.network.runtime.binding.requireType
+import io.novafoundation.nova.common.data.network.runtime.binding.returnType
+import io.novafoundation.nova.common.utils.staking
 import io.novafoundation.nova.feature_staking_api.domain.model.Exposure
 import io.novafoundation.nova.feature_staking_api.domain.model.IndividualExposure
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHexOrNull
+import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import java.math.BigInteger
 
 /*
@@ -36,7 +39,8 @@ fun bindIndividualExposure(dynamicInstance: Any?, runtime: RuntimeSnapshot): Ind
  */
 @UseCaseBinding
 fun bindExposure(scale: String, runtime: RuntimeSnapshot): Exposure {
-    val type = runtime.typeRegistry["Exposure"] ?: incompatible()
+    val type = runtime.metadata.staking().storage("ErasStakers").returnType()
+
     val decoded = type.fromHexOrNull(runtime, scale) as? Struct.Instance ?: incompatible()
 
     val total = decoded.get<BigInteger>("total") ?: incompatible()

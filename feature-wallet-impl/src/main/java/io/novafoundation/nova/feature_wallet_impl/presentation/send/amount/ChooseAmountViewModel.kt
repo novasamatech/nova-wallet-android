@@ -187,6 +187,8 @@ class ChooseAmountViewModel(
             interactor.getTransferFee(transfer)
         }
         .catch {
+            it.printStackTrace()
+
             _feeErrorLiveData.postValue(Event(RetryReason.LOAD_FEE))
 
             emit(null)

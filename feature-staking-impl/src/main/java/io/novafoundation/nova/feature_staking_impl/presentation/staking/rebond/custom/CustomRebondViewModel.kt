@@ -59,11 +59,13 @@ class CustomRebondViewModel(
 
     private val accountStakingFlow = interactor.selectedAccountStakingStateFlow()
         .filterIsInstance<StakingState.Stash>()
+        .inBackground()
         .share()
 
     private val assetFlow = accountStakingFlow.flatMapLatest {
         interactor.assetFlow(it.controllerAddress)
     }
+        .inBackground()
         .share()
 
     val assetModelFlow = assetFlow

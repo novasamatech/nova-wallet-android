@@ -12,9 +12,12 @@ import jp.co.soramitsu.fearless_utils.runtime.definitions.dynamic.DynamicTypeRes
 import jp.co.soramitsu.fearless_utils.runtime.definitions.dynamic.extentsions.GenericsExtension
 import jp.co.soramitsu.fearless_utils.runtime.definitions.registry.TypePreset
 import jp.co.soramitsu.fearless_utils.runtime.definitions.registry.TypeRegistry
-import jp.co.soramitsu.fearless_utils.runtime.definitions.registry.substratePreParsePreset
-import jp.co.soramitsu.fearless_utils.runtime.metadata.RuntimeMetadata
-import jp.co.soramitsu.fearless_utils.runtime.metadata.RuntimeMetadataSchema
+import jp.co.soramitsu.fearless_utils.runtime.definitions.registry.v13Preset
+import jp.co.soramitsu.fearless_utils.runtime.definitions.registry.v14Preset
+import jp.co.soramitsu.fearless_utils.runtime.definitions.v14.TypesParserV14
+import jp.co.soramitsu.fearless_utils.runtime.metadata.RuntimeMetadataReader
+import jp.co.soramitsu.fearless_utils.runtime.metadata.builder.VersionedRuntimeBuilder
+import jp.co.soramitsu.fearless_utils.runtime.metadata.v14.RuntimeMetadataSchemaV14
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
@@ -52,27 +55,33 @@ class RuntimeFactory(
     ): ConstructedRuntime = withContext(dispatcher) {
         val runtimeVersion = chainDao.runtimeInfo(chainId)?.syncedVersion ?: throw NoRuntimeVersionException
 
+        val runtimeMetadataRaw = runCatching { runtimeFilesCache.getChainMetadata(chainId) }
+            .getOrElse { throw ChainInfoNotInCacheException }
+
+        val metadataReader = RuntimeMetadataReader.read(runtimeMetadataRaw)
+
+        val typePreset = if (metadataReader.metadataVersion < 14) {
+            v13Preset()
+        } else {
+            TypesParserV14.parse(metadataReader.metadata[RuntimeMetadataSchemaV14.lookup], v14Preset()).typePreset
+        }
+
         val (types, baseHash, ownHash) = when (typesUsage) {
             TypesUsage.BASE -> {
-                val (types, baseHash) = constructBaseTypes()
+                val (types, baseHash) = constructBaseTypes(typePreset)
 
                 Triple(types, baseHash, null)
             }
-            TypesUsage.BOTH -> constructBaseAndChainTypes(chainId, runtimeVersion)
+            TypesUsage.BOTH -> constructBaseAndChainTypes(chainId, runtimeVersion, typePreset)
             TypesUsage.OWN -> {
-                val (types, ownHash) = constructOwnTypes(chainId, runtimeVersion)
+                val (types, ownHash) = constructOwnTypes(chainId, runtimeVersion, typePreset)
 
                 Triple(types, null, ownHash)
             }
         }
 
         val typeRegistry = TypeRegistry(types, DynamicTypeResolver(DynamicTypeResolver.DEFAULT_COMPOUND_EXTENSIONS + GenericsExtension))
-
-        val runtimeMetadataRaw = runCatching { runtimeFilesCache.getChainMetadata(chainId) }
-            .getOrElse { throw ChainInfoNotInCacheException }
-
-        val runtimeMetadataStruct = RuntimeMetadataSchema.read(runtimeMetadataRaw)
-        val runtimeMetadata = RuntimeMetadata(typeRegistry, runtimeMetadataStruct)
+        val runtimeMetadata = VersionedRuntimeBuilder.buildMetadata(metadataReader, typeRegistry)
 
         ConstructedRuntime(
             runtime = RuntimeSnapshot(typeRegistry, runtimeMetadata),
@@ -87,8 +96,9 @@ class RuntimeFactory(
     private suspend fun constructBaseAndChainTypes(
         chainId: String,
         runtimeVersion: Int,
+        initialPreset: TypePreset,
     ): Triple<TypePreset, String, String> {
-        val (basePreset, baseHash) = constructBaseTypes()
+        val (basePreset, baseHash) = constructBaseTypes(initialPreset)
         val (chainPreset, ownHash) = constructOwnTypes(chainId, runtimeVersion, basePreset)
 
         return Triple(chainPreset, baseHash, ownHash)
@@ -97,7 +107,7 @@ class RuntimeFactory(
     private suspend fun constructOwnTypes(
         chainId: String,
         runtimeVersion: Int,
-        baseTypes: TypePreset = substratePreParsePreset(),
+        baseTypes: TypePreset,
     ): Pair<TypePreset, String> {
         val ownTypesRaw = runCatching { runtimeFilesCache.getChainTypes(chainId) }
             .getOrElse { throw ChainInfoNotInCacheException }
@@ -111,11 +121,11 @@ class RuntimeFactory(
         return typePreset to ownTypesRaw.md5()
     }
 
-    private suspend fun constructBaseTypes(): Pair<TypePreset, String> {
+    private suspend fun constructBaseTypes(initialPreset: TypePreset): Pair<TypePreset, String> {
         val baseTypesRaw = runCatching { runtimeFilesCache.getBaseTypes() }
             .getOrElse { throw BaseTypesNotInCacheException }
 
-        val typePreset = parseBaseDefinitions(fromJson(baseTypesRaw), substratePreParsePreset()).typePreset
+        val typePreset = parseBaseDefinitions(fromJson(baseTypesRaw), initialPreset).typePreset
 
         return typePreset to baseTypesRaw.md5()
     }

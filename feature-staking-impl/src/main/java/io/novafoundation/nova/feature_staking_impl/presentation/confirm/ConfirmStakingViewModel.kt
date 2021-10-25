@@ -45,7 +45,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.launch
@@ -81,6 +80,7 @@ class ConfirmStakingViewModel(
 
     private val stashFlow = interactor.selectedAccountStakingStateFlow()
         .filterIsInstance<StakingState.Stash>()
+        .inBackground()
         .share()
 
     private val controllerAddressFlow = flowOf(payload)
@@ -90,15 +90,17 @@ class ConfirmStakingViewModel(
                 else -> stashFlow.first().controllerAddress
             }
         }
+        .inBackground()
         .share()
 
     private val controllerAssetFlow = controllerAddressFlow
         .flatMapLatest { interactor.assetFlow(it) }
+        .inBackground()
         .share()
 
     val assetModelLiveData = controllerAssetFlow
         .map { mapAssetToAssetModel(it, resourceManager) }
-        .flowOn(Dispatchers.Default)
+        .inBackground()
         .asLiveData()
 
     val currentAccountModelFlow = controllerAddressFlow.map {

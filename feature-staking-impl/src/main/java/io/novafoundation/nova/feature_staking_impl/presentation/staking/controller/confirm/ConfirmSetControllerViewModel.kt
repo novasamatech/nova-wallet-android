@@ -39,6 +39,7 @@ class ConfirmSetControllerViewModel(
     ExternalActions by externalActions {
 
     private val assetFlow = interactor.assetFlow(payload.stashAddress)
+        .inBackground()
         .share()
 
     val feeStatusLiveData = assetFlow.map { asset ->

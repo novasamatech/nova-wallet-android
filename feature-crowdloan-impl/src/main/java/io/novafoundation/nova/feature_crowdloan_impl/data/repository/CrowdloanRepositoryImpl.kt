@@ -26,7 +26,6 @@ import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.hash.Hasher.blake2b256
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.bytes
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.primitives.u32
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.toByteArray
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
@@ -109,7 +108,7 @@ class CrowdloanRepositoryImpl(
         trieIndex: BigInteger
     ): Contribution? {
         return remoteStorage.queryChildState(
-            storageKeyBuilder = { it.typeRegistry["AccountId"]!!.bytes(it, accountId).toHexString(withPrefix = true) },
+            storageKeyBuilder = { accountId.toHexString(withPrefix = true) },
             childKeyBuilder = {
                 val suffix = (CONTRIBUTIONS_CHILD_SUFFIX.encodeToByteArray() + u32.toByteArray(it, trieIndex))
                     .blake2b256()

@@ -57,15 +57,19 @@ class ConfirmRewardDestinationViewModel(
 
     private val stashFlow = interactor.selectedAccountStakingStateFlow()
         .filterIsInstance<StakingState.Stash>()
+        .inBackground()
         .share()
 
     private val controllerAssetFlow = stashFlow
         .flatMapLatest { interactor.assetFlow(it.controllerAddress) }
+        .inBackground()
         .share()
 
     val originAccountModelLiveData = stashFlow.map {
         generateDestinationModel(interactor.getProjectedAccount(it.controllerAddress))
-    }.asLiveData()
+    }
+        .inBackground()
+        .asLiveData()
 
     val rewardDestinationLiveData = flowOf(payload)
         .map { mapRewardDestinationParcelModelToRewardDestinationModel(it.rewardDestination) }

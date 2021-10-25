@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Retriable
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_staking_api.domain.model.RewardDestination
@@ -55,16 +56,19 @@ class SelectRewardDestinationViewModel(
 
     private val rewardCalculator = viewModelScope.async { rewardCalculatorFactory.create() }
 
-    val rewardDestinationFlow = rewardDestinationMixin.rewardDestinationModelFlow
+    private val rewardDestinationFlow = rewardDestinationMixin.rewardDestinationModelFlow
         .map { mapRewardDestinationModelToRewardDestination(it) }
+        .inBackground()
         .share()
 
     private val stashStateFlow = interactor.selectedAccountStakingStateFlow()
         .filterIsInstance<StakingState.Stash>()
+        .inBackground()
         .share()
 
     private val controllerAssetFlow = stashStateFlow
         .flatMapLatest { interactor.assetFlow(it.controllerAddress) }
+        .inBackground()
         .share()
 
     val continueAvailable = rewardDestinationMixin.rewardDestinationChangedFlow
