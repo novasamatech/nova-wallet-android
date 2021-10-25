@@ -129,7 +129,7 @@ object ChainGeneses {
 
     const val KUSAMA = "b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"
     const val POLKADOT = "91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"
-    const val ROCOCO_ACALA = "52f04247aeababaab46c262a94819b174b847dd403400145c0522c7f17844c68"
+    const val ROCOCO_ACALA = "a84b46a3e602245284bb9a72c4abd58ee979aa7a5d7f8c4dfdddfaaf0665a4ae"
 }
 
 val Chain.Companion.Geneses
