@@ -1,6 +1,9 @@
 package io.novafoundation.nova.common.mixin.api
 
 import androidx.lifecycle.LiveData
+import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer.Payload.DialogAction
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 
 interface CustomDialogDisplayer {
@@ -29,5 +32,21 @@ interface CustomDialogDisplayer {
     interface Presentation : CustomDialogDisplayer {
 
         fun displayDialog(payload: Payload)
+    }
+}
+
+fun CustomDialogDisplayer.Presentation.displayError(
+    resourceManager: ResourceManager,
+    error: Throwable,
+) {
+    error.message?.let {
+        displayDialog(
+            CustomDialogDisplayer.Payload(
+                title = resourceManager.getString(R.string.common_error_general_title),
+                message = it,
+                okAction = DialogAction.noOp(resourceManager.getString(R.string.common_ok)),
+                cancelAction = null
+            ),
+        )
     }
 }

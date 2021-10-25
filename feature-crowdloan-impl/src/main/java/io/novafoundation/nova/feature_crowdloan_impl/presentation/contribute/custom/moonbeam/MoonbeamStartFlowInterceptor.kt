@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.cu
 
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer.Payload.DialogAction
+import io.novafoundation.nova.common.mixin.api.displayError
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_crowdloan_impl.R
@@ -21,10 +22,14 @@ class MoonbeamStartFlowInterceptor(
 ) : StartFlowInterceptor {
 
     override suspend fun startFlow(payload: ContributePayload) {
-        val status = withContext(Dispatchers.Default) {
+        withContext(Dispatchers.Default) {
             moonbeamInteractor.flowStatus()
         }
+            .onSuccess { handleMoonbeamStatus(it, payload) }
+            .onFailure { customDialogDisplayer.displayError(resourceManager, it) }
+    }
 
+    private fun handleMoonbeamStatus(status: MoonbeamFlowStatus, payload: ContributePayload) {
         when (status) {
             MoonbeamFlowStatus.Completed -> crowdloanRouter.openContribute(payload)
 
