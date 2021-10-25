@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.di.validations.CrowdloansVa
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.confirm.di.ConfirmContributeComponent
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.di.CustomContributeComponent
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.terms.di.MoonbeamCrowdloanTermsComponent
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.referral.ReferralContributeView
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.di.CrowdloanContributeComponent
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.main.di.CrowdloanComponent
@@ -37,6 +38,8 @@ interface CrowdloanFeatureComponent : CrowdloanFeatureApi {
     fun confirmContributeFactory(): ConfirmContributeComponent.Factory
 
     fun customContributeFactory(): CustomContributeComponent.Factory
+
+    fun moonbeamTermsFactory(): MoonbeamCrowdloanTermsComponent.Factory
 
     fun inject(view: ReferralContributeView)
 

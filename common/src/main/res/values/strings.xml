@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+    <string name="crowdloan_moonbeam_terms_submit">Submit agreement</string>
+    <string name="crowdloan_terms_conditions_named">%s\'s Terms and Conditions</string>
+
+    <string name="crowdloan_moonbeam_terms_title">Submit agreement with Terms &amp; Conditions to proceed.</string>
+    <string name="crowdloan_moonbeam_terms_subtitle">This is required to be done only once for all following Moonbeam contributions</string>
+
+    <string name="crowdloan_moonbeam_region_restriction_title">Your region is not supported</string>
+    <string name="crowdloan_moonbeam_region_restriction_message">This crowdloan isn\'t available in your location.</string>
+
+    <string name="crowdloan_moonbeam_missing_account_title">Moonbeam account is missing</string>
+    <string name="crowdloan_moonbeam_missing_account_message">You should add Moonbeam account to the wallet in order to participate in Moonbeam crowdloan</string>
+
     <string name="wallet_your_balance">Your balance</string>
     <string name="wallet_balance_transferable">Transferable</string>
 

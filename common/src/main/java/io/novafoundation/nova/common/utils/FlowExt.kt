@@ -125,6 +125,14 @@ fun EditText.bindTo(flow: MutableStateFlow<String>, scope: CoroutineScope) {
     }
 }
 
+inline fun MutableStateFlow<Boolean>.withFlagSet(action: () -> Unit) {
+    value = true
+
+    action()
+
+    value = false
+}
+
 fun CompoundButton.bindTo(flow: MutableStateFlow<Boolean>, scope: CoroutineScope) {
     scope.launch {
         flow.collect { newValue ->

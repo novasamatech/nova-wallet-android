@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.list.toValueList
 import io.novafoundation.nova.common.mixin.MixinFactory
+import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.presentation.mapLoading
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -17,6 +18,7 @@ import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.ParaId
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.data.CrowdloanSharedState
+import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomContributeManager
 import io.novafoundation.nova.feature_crowdloan_impl.domain.main.Crowdloan
 import io.novafoundation.nova.feature_crowdloan_impl.domain.main.CrowdloanInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
@@ -48,9 +50,13 @@ class CrowdloanViewModel(
     private val crowdloanSharedState: CrowdloanSharedState,
     private val router: CrowdloanRouter,
     private val sharedState: CrowdloanSharedState,
+    private val customContributeManager: CustomContributeManager,
     private val crowdloanUpdateSystem: UpdateSystem,
     assetSelectorFactory: MixinFactory<AssetSelectorMixin.Presentation>,
-) : BaseViewModel(), WithAssetSelector {
+    customDialogDisplayer: CustomDialogDisplayer,
+) : BaseViewModel(),
+    WithAssetSelector,
+    CustomDialogDisplayer by customDialogDisplayer {
 
     override val assetSelectorMixin = assetSelectorFactory.create(scope = this)
 
@@ -165,7 +171,15 @@ class CrowdloanViewModel(
                 parachainMetadata = crowdloan.parachainMetadata?.let(::mapParachainMetadataToParcel)
             )
 
-            router.openContribute(payload)
+            val startFlowInterceptor = crowdloan.parachainMetadata?.customFlow?.let { customFlow ->
+                customContributeManager.getFactoryOrNull(customFlow)?.startFlowInterceptor
+            }
+
+            if (startFlowInterceptor != null) {
+                startFlowInterceptor.startFlow(payload)
+            } else {
+                router.openContribute(payload)
+            }
         }
     }
 }

@@ -127,6 +127,7 @@ private inline fun Chain.Explorer.format(
 
 object ChainGeneses {
 
+    const val MOONBEAM = "401a1f9dca3da46f5c4091016c8a2f26dcea05865116b286f60f668207d1474b" // TODO Moonriver genesis is used, replace with Moonbeam once it is launched
     const val KUSAMA = "b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"
     const val POLKADOT = "91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"
     const val ROCOCO_ACALA = "a84b46a3e602245284bb9a72c4abd58ee979aa7a5d7f8c4dfdddfaaf0665a4ae"

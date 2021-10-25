@@ -12,7 +12,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_crowdloan_impl.data.CrowdloanSharedState
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.karura.AcalaApi
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomContributeFactory
-import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.karura.AcalaContributeInteractor
+import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.acala.AcalaContributeInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.karura.AcalaContributeSubmitter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -42,15 +42,23 @@ class AcalaContributionModule {
         interactor: AcalaContributeInteractor,
     ) = AcalaContributeSubmitter(interactor)
 
+
     @Provides
     @FeatureScope
-    @IntoSet
-    fun provideAcalaFactory(
-        submitter: AcalaContributeSubmitter,
+    fun provideAcalaExtraBonusFlow(
         acalaInteractor: AcalaContributeInteractor,
         resourceManager: ResourceManager,
-    ): CustomContributeFactory = AcalaContributeFactory(
-        submitter = submitter,
+    ): AcalaExtraBonusFlow = AcalaExtraBonusFlow(
+        interactor = acalaInteractor,
+        resourceManager = resourceManager,
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideKaruraExtraBonusFlow(
+        acalaInteractor: AcalaContributeInteractor,
+        resourceManager: ResourceManager,
+    ): KaruraExtraBonusFlow = KaruraExtraBonusFlow(
         interactor = acalaInteractor,
         resourceManager = resourceManager,
     )
@@ -58,13 +66,22 @@ class AcalaContributionModule {
     @Provides
     @FeatureScope
     @IntoSet
+    fun provideAcalaFactory(
+        submitter: AcalaContributeSubmitter,
+        acalaExtraBonusFlow: AcalaExtraBonusFlow,
+    ): CustomContributeFactory = AcalaContributeFactory(
+        submitter = submitter,
+        extraBonusFlow = acalaExtraBonusFlow
+    )
+
+    @Provides
+    @FeatureScope
+    @IntoSet
     fun provideKaruraFactory(
         submitter: AcalaContributeSubmitter,
-        acalaInteractor: AcalaContributeInteractor,
-        resourceManager: ResourceManager,
+        karuraExtraBonusFlow: KaruraExtraBonusFlow,
     ): CustomContributeFactory = KaruraContributeFactory(
         submitter = submitter,
-        interactor = acalaInteractor,
-        resourceManager = resourceManager
+        extraBonusFlow = karuraExtraBonusFlow
     )
 }

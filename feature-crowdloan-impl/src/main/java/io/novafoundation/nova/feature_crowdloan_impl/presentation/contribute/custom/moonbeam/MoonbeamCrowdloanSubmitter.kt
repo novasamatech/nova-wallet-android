@@ -1,0 +1,5 @@
+package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam
+
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.CustomContributeSubmitter
+
+class MoonbeamCrowdloanSubmitter : CustomContributeSubmitter

@@ -45,7 +45,7 @@ class Toolbar @JvmOverloads constructor(
             val typedArray = context.obtainStyledAttributes(attrs, R.styleable.Toolbar)
 
             val title = typedArray.getString(R.styleable.Toolbar_titleText)
-            title?.let { setTitle(it) }
+            setTitle(title)
 
             val rightIcon = typedArray.getDrawable(R.styleable.Toolbar_iconRight)
             rightIcon?.let { setRightIconDrawable(it) }
@@ -80,7 +80,7 @@ class Toolbar @JvmOverloads constructor(
         rightText.text = action
     }
 
-    fun setTitle(title: String) {
+    fun setTitle(title: String?) {
         titleTv.text = title
     }
 

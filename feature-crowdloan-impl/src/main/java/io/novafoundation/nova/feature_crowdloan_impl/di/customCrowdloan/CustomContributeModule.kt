@@ -5,11 +5,13 @@ import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.acala.AcalaContributionModule
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.bifrost.BifrostContributionModule
+import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.moonbeam.MoonbeamContributionModule
 
 @Module(
     includes = [
         AcalaContributionModule::class,
-        BifrostContributionModule::class
+        BifrostContributionModule::class,
+        MoonbeamContributionModule::class
     ]
 )
 class CustomContributeModule {
@@ -17,6 +19,6 @@ class CustomContributeModule {
     @Provides
     @FeatureScope
     fun provideCustomContributionManager(
-        factories: @JvmSuppressWildcards Set<CustomContributeFactory>
+        factories: @JvmSuppressWildcards Set<CustomContributeFactory>,
     ) = CustomContributeManager(factories)
 }

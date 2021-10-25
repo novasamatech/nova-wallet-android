@@ -22,7 +22,7 @@ class CustomContributeViewModel(
     val customFlowType = payload.parachainMetadata.customFlow!!
 
     val viewStateFlow = flow {
-        emit(customContributeManager.createNewState(customFlowType, viewModelScope, payload))
+        emit(customContributeManager.relevantExtraBonusFlow(customFlowType).createViewState(viewModelScope, payload))
     }.inBackground()
         .share()
 

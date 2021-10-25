@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.setVisible
 import kotlinx.android.synthetic.main.view_go_next.view.goNextActionImage
 import kotlinx.android.synthetic.main.view_go_next.view.goNextBadgeText
+import kotlinx.android.synthetic.main.view_go_next.view.goNextDivider
 import kotlinx.android.synthetic.main.view_go_next.view.goNextIcon
 import kotlinx.android.synthetic.main.view_go_next.view.goNextProgress
 import kotlinx.android.synthetic.main.view_go_next.view.goNextTitle
@@ -42,6 +43,10 @@ class GoNextView @JvmOverloads constructor(
         goNextProgress.setVisible(inProgress)
     }
 
+    fun setDividerVisible(visible: Boolean) {
+        goNextDivider.setVisible(visible)
+    }
+
     fun setBadgeText(badgeText: String?) {
         goNextBadgeText.setTextOrHide(badgeText)
     }
@@ -60,6 +65,9 @@ class GoNextView @JvmOverloads constructor(
 
         val actionIconDrawable = typedArray.getDrawable(R.styleable.GoNextView_actionIcon)
         goNextActionImage.setImageDrawable(actionIconDrawable)
+
+        val dividerVisible = typedArray.getBoolean(R.styleable.GoNextView_dividerVisible, true)
+        setDividerVisible(dividerVisible)
 
         typedArray.recycle()
     }

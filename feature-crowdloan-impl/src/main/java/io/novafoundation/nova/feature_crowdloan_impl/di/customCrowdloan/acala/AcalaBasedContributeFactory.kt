@@ -4,7 +4,8 @@ import android.content.Context
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_crowdloan_impl.BuildConfig
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomContributeFactory
-import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.karura.AcalaContributeInteractor
+import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.ExtraBonusFlow
+import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.acala.AcalaContributeInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.CustomContributeViewState
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.karura.AcalaContributeSubmitter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.karura.AcalaContributeViewState
@@ -15,10 +16,14 @@ import java.math.BigDecimal
 
 abstract class AcalaBasedContributeFactory(
     override val submitter: AcalaContributeSubmitter,
+    override val extraBonusFlow: AcalaBasedExtraBonusFlow,
+) : CustomContributeFactory
+
+abstract class AcalaBasedExtraBonusFlow(
     private val interactor: AcalaContributeInteractor,
     private val resourceManager: ResourceManager,
     private val defaultReferralCode: String,
-) : CustomContributeFactory {
+) : ExtraBonusFlow {
 
     protected open val bonusMultiplier: BigDecimal = 0.05.toBigDecimal()
 
@@ -31,28 +36,41 @@ abstract class AcalaBasedContributeFactory(
 
 class AcalaContributeFactory(
     submitter: AcalaContributeSubmitter,
-    interactor: AcalaContributeInteractor,
-    resourceManager: ResourceManager,
+    extraBonusFlow: AcalaExtraBonusFlow,
 ) : AcalaBasedContributeFactory(
     submitter = submitter,
-    interactor = interactor,
-    resourceManager = resourceManager,
-    defaultReferralCode = BuildConfig.ACALA_NOVA_REFERRAL
+    extraBonusFlow = extraBonusFlow
 ) {
 
     override val flowType: String = "Acala"
 }
 
-class KaruraContributeFactory(
-    submitter: AcalaContributeSubmitter,
+class AcalaExtraBonusFlow(
     interactor: AcalaContributeInteractor,
     resourceManager: ResourceManager,
-) : AcalaBasedContributeFactory(
-    submitter = submitter,
+) : AcalaBasedExtraBonusFlow(
     interactor = interactor,
     resourceManager = resourceManager,
-    defaultReferralCode = BuildConfig.KARURA_NOVA_REFERRAL
+    defaultReferralCode = BuildConfig.ACALA_NOVA_REFERRAL
+)
+
+class KaruraContributeFactory(
+    submitter: AcalaContributeSubmitter,
+    extraBonusFlow: KaruraExtraBonusFlow,
+) : AcalaBasedContributeFactory(
+    submitter = submitter,
+    extraBonusFlow = extraBonusFlow
 ) {
 
     override val flowType: String = "Karura"
 }
+
+
+class KaruraExtraBonusFlow(
+    interactor: AcalaContributeInteractor,
+    resourceManager: ResourceManager,
+) : AcalaBasedExtraBonusFlow(
+    interactor = interactor,
+    resourceManager = resourceManager,
+    defaultReferralCode = BuildConfig.KARURA_NOVA_REFERRAL
+)

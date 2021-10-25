@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.data.storage.Preferences
+import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.core.storage.StorageCache
@@ -75,4 +76,6 @@ interface CrowdloanFeatureDependencies {
     fun preferences(): Preferences
 
     fun secretStoreV2(): SecretStoreV2
+
+    fun customDialogDisplayer(): CustomDialogDisplayer.Presentation
 }

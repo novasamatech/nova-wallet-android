@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.cu
 
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_crowdloan_impl.R
-import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.karura.AcalaContributeInteractor
+import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.acala.AcalaContributeInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.model.CustomContributePayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.referral.ReferralCodePayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.referral.ReferralContributeViewState

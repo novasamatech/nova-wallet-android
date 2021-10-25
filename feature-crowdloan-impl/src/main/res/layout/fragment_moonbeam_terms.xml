@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:id="@+id/moonbeamTermsContainer"
+    tools:background="@color/black">
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/moonbeamTermsToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:dividerVisible="false"
+        app:title="@null" />
+
+    <TextView
+        style="@style/TextAppearance.NovaFoundation.Header2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/crowdloan_moonbeam_terms_title" />
+
+    <TextView
+        style="@style/TextAppearance.NovaFoundation.Body1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/crowdloan_moonbeam_terms_subtitle"
+        android:textColor="@color/white_64" />
+
+    <io.novafoundation.nova.common.view.GoNextView
+        android:id="@+id/moonbeamTermsLink"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:actionIcon="@drawable/ic_arrow_right_24"
+        app:dividerVisible="false"
+        tools:text="Moonbeam’s Terms &amp; Conditions" />
+
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/moonbeamTermsCheckbox"
+        style="@style/TextAppearance.NovaFoundation.Body2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:checked="false"
+        android:text="@string/crowdloan_privacy_policy"
+        android:textColor="@color/white_64"
+        app:layout_constraintStart_toStartOf="@+id/referralBonus"
+        app:layout_constraintTop_toBottomOf="@+id/referralBonus" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/black4"
+        android:orientation="vertical">
+
+        <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
+            android:id="@+id/moonbeamTermsFee"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp" />
+
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/moonbeamTermsConfirm"
+            style="@style/Widget.Nova.Button.Primary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:text="@string/common_confirm" />
+    </LinearLayout>
+</LinearLayout>

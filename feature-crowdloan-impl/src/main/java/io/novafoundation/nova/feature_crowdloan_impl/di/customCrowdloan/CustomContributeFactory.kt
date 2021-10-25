@@ -4,6 +4,7 @@ import android.content.Context
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.CustomContributeSubmitter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.CustomContributeView
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.CustomContributeViewState
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.StartFlowInterceptor
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.model.CustomContributePayload
 import kotlinx.coroutines.CoroutineScope
 
@@ -11,12 +12,22 @@ interface CustomContributeFactory {
 
     val flowType: String
 
+    val submitter: CustomContributeSubmitter
+
+    val startFlowInterceptor: StartFlowInterceptor?
+        get() = null
+
+    val extraBonusFlow: ExtraBonusFlow?
+        get() = null
+}
+
+interface ExtraBonusFlow {
+
     fun createViewState(scope: CoroutineScope, payload: CustomContributePayload): CustomContributeViewState
 
     fun createView(context: Context): CustomContributeView
-
-    val submitter: CustomContributeSubmitter
 }
+
 
 fun CustomContributeFactory.supports(otherFlowType: String): Boolean {
     return otherFlowType == flowType
