@@ -5,6 +5,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.Pr
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.CustomContributeSubmitter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.CustomContributeView
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.CustomContributeViewState
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.MainFlowCustomization
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.StartFlowInterceptor
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.model.CustomContributePayload
 import kotlinx.coroutines.CoroutineScope
@@ -23,6 +24,12 @@ interface CustomContributeFactory {
 
     val extraBonusFlow: ExtraBonusFlow?
         get() = null
+
+    val selectContributeCustomization: MainFlowCustomization?
+        get() = null
+
+    val confirmContributeCustomization: MainFlowCustomization?
+        get() = null
 }
 
 interface ExtraBonusFlow {
@@ -31,7 +38,6 @@ interface ExtraBonusFlow {
 
     fun createView(context: Context): CustomContributeView
 }
-
 
 fun CustomContributeFactory.supports(otherFlowType: String): Boolean {
     return otherFlowType == flowType

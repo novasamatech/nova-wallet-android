@@ -5,14 +5,18 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.withFlagSet
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.moonbeam.MoonbeamCrowdloanInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.parcel.ContributePayload
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.parcel.mapParachainMetadataFromParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 sealed class SubmitActionState {
@@ -52,6 +56,10 @@ class MoonbeamCrowdloanTermsViewModel(
 
     private val submittingInProgressFlow = MutableStateFlow(false)
 
+    private val parachainMetadata = flowOf { mapParachainMetadataFromParcel(payload.parachainMetadata!!) }
+        .inBackground()
+        .share()
+
     val submitButtonState = combine(
         termsCheckedFlow,
         submittingInProgressFlow
@@ -71,7 +79,7 @@ class MoonbeamCrowdloanTermsViewModel(
 
     fun submitClicked() = launch {
         submittingInProgressFlow.withFlagSet {
-            interactor.submitAgreement()
+            interactor.submitAgreement(parachainMetadata.first())
                 .onFailure(::showError)
                 .onSuccess {
                     router.openContribute(payload)

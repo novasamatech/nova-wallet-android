@@ -10,5 +10,6 @@ class ParachainMetadataRemote(
     val token: String,
     val rewardRate: Double?,
     val customFlow: String?,
-    val website: String
+    val website: String,
+    val extras: Map<String, String>?,
 )

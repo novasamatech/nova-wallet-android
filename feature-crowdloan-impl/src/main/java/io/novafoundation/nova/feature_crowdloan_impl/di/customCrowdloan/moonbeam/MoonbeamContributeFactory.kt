@@ -4,11 +4,13 @@ import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomCo
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.moonbeam.MoonbeamPrivateSignatureProvider
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.CustomContributeSubmitter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.MoonbeamStartFlowInterceptor
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.selectContribute.SelectContributeMoonbeamCustomization
 
 class MoonbeamContributeFactory(
     override val submitter: CustomContributeSubmitter,
     override val startFlowInterceptor: MoonbeamStartFlowInterceptor,
     override val privateCrowdloanSignatureProvider: MoonbeamPrivateSignatureProvider,
+    override val selectContributeCustomization: SelectContributeMoonbeamCustomization,
 ) : CustomContributeFactory {
 
     override val flowType: String = "Moonbeam"

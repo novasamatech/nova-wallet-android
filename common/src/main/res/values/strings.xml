@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+    <string name="crowdloan_moonbeam_reward_destination">%s Reward destination</string>
+
     <string name="crowdloan_moonbeam_terms_submit">Submit agreement</string>
     <string name="crowdloan_terms_conditions_named">%s\'s Terms and Conditions</string>
 

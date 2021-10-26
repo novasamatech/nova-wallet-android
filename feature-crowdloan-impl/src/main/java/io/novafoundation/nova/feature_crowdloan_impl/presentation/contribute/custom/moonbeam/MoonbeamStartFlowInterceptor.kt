@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.mo
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.StartFlowInterceptor
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.parcel.ContributePayload
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.parcel.mapParachainMetadataFromParcel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -23,7 +24,7 @@ class MoonbeamStartFlowInterceptor(
 
     override suspend fun startFlow(payload: ContributePayload) {
         withContext(Dispatchers.Default) {
-            moonbeamInteractor.flowStatus()
+            moonbeamInteractor.flowStatus(mapParachainMetadataFromParcel(payload.parachainMetadata!!))
         }
             .onSuccess { handleMoonbeamStatus(it, payload) }
             .onFailure { customDialogDisplayer.displayError(resourceManager, it) }

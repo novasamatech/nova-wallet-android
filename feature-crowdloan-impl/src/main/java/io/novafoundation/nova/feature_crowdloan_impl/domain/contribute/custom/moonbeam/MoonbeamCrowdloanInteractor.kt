@@ -11,16 +11,17 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.domain.model.hasChainAccountIn
+import io.novafoundation.nova.feature_crowdloan_api.data.repository.ParachainMetadata
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.moonbeam.AgreeRemarkRequest
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.moonbeam.MoonbeamApi
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.moonbeam.VerifyRemarkRequest
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.moonbeam.agreeRemark
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.moonbeam.checkRemark
+import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.moonbeam.moonbeamChainId
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.moonbeam.verifyRemark
-import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.extrinsic.systemRemark
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
@@ -38,16 +39,27 @@ class MoonbeamCrowdloanInteractor(
     private val extrinsicService: ExtrinsicService,
     private val moonbeamApi: MoonbeamApi,
     private val selectedChainAssetState: SingleAssetSharedState,
+    private val chainRegistry: ChainRegistry,
     private val httpExceptionHandler: HttpExceptionHandler,
     private val secretStoreV2: SecretStoreV2,
 ) {
 
     fun getTermsLink() = "https://github.com/moonbeam-foundation/crowdloan-self-attestation/blob/main/moonbeam/README.md"
 
-    suspend fun flowStatus(): Result<MoonbeamFlowStatus> = withContext(Dispatchers.Default) {
+    suspend fun getMoonbeamRewardDestination(parachainMetadata: ParachainMetadata): CrossChainRewardDestination {
+        val currentAccount = accountRepository.getSelectedMetaAccount()
+        val moonbeamChain = chainRegistry.getChain(parachainMetadata.moonbeamChainId())
+
+        return CrossChainRewardDestination(
+            addressInDestination = currentAccount.addressIn(moonbeamChain)!!,
+            destination = moonbeamChain
+        )
+    }
+
+    suspend fun flowStatus(parachainMetadata: ParachainMetadata): Result<MoonbeamFlowStatus> = withContext(Dispatchers.Default) {
         runCatching {
             val metaAccount = accountRepository.getSelectedMetaAccount()
-            val moonbeamChainId = Chain.Geneses.MOONBEAM
+            val moonbeamChainId = parachainMetadata.moonbeamChainId()
             val currentChain = selectedChainAssetState.chain()
             val currentAddress = metaAccount.addressIn(currentChain)!!
 
@@ -56,7 +68,7 @@ class MoonbeamCrowdloanInteractor(
                     chainId = moonbeamChainId,
                     metaId = metaAccount.id
                 )
-                else -> when (checkRemark(currentChain, currentAddress)) {
+                else -> when (checkRemark(parachainMetadata, currentAddress)) {
                     null -> MoonbeamFlowStatus.RegionNotSupported
                     true -> MoonbeamFlowStatus.Completed
                     false -> MoonbeamFlowStatus.ReadyToComplete
@@ -73,7 +85,7 @@ class MoonbeamCrowdloanInteractor(
         }
     }
 
-    suspend fun submitAgreement(): Result<*> = withContext(Dispatchers.Default) {
+    suspend fun submitAgreement(parachainMetadata: ParachainMetadata): Result<*> = withContext(Dispatchers.Default) {
         runCatching {
             val chain = selectedChainAssetState.chain()
             val metaAccount = accountRepository.getSelectedMetaAccount()
@@ -85,7 +97,7 @@ class MoonbeamCrowdloanInteractor(
             val signedHash = secretStoreV2.sign(metaAccount, chain, legalHash)
 
             val agreeRemarkRequest = AgreeRemarkRequest(currentAddress, signedHash)
-            val remark = httpExceptionHandler.wrap { moonbeamApi.agreeRemark(chain, agreeRemarkRequest) }.remark
+            val remark = httpExceptionHandler.wrap { moonbeamApi.agreeRemark(parachainMetadata, agreeRemarkRequest) }.remark
 
             val finalizedStatus = extrinsicService.submitAndWatchExtrinsic(chain, metaAccount.accountIdIn(chain)!!) {
                 systemRemark(remark.encodeToByteArray())
@@ -100,7 +112,7 @@ class MoonbeamCrowdloanInteractor(
                 extrinsicHash = finalizedStatus.extrinsicHash,
                 blockHash = finalizedStatus.blockHash
             )
-            val verificationResponse = httpExceptionHandler.wrap { moonbeamApi.verifyRemark(chain, verificationRequest) }
+            val verificationResponse = httpExceptionHandler.wrap { moonbeamApi.verifyRemark(parachainMetadata, verificationRequest) }
 
             if (!verificationResponse.verified) throw VerificationError()
         }
@@ -111,8 +123,8 @@ class MoonbeamCrowdloanInteractor(
     /**
      * @return null if Geo-fenced or application unavailable. True if user already agreed with terms. False otherwise
      */
-    private suspend fun checkRemark(chain: Chain, address: String): Boolean? = try {
-        moonbeamApi.checkRemark(chain, address).verified
+    private suspend fun checkRemark(parachainMetadata: ParachainMetadata, address: String): Boolean? = try {
+        moonbeamApi.checkRemark(parachainMetadata, address).verified
     } catch (e: HttpException) {
         if (e.code() == 403) { // Moonbeam answers with 403 in case geo-fenced or application unavailable
             null

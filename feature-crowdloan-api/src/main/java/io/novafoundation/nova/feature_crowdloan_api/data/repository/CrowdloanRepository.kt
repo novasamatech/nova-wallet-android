@@ -37,5 +37,8 @@ class ParachainMetadata(
     val rewardRate: BigDecimal?,
     val website: String,
     val customFlow: String?,
-    val token: String
+    val token: String,
+    val extras: Map<String, String>,
 )
+
+fun ParachainMetadata.getExtra(key: String) = extras[key] ?: throw IllegalArgumentException("No key $key found in parachain metadata extras for $name")

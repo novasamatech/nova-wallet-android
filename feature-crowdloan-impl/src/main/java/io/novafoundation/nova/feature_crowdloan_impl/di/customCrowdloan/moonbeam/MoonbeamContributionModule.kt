@@ -1,8 +1,10 @@
 package io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.moonbeam
 
+import coil.ImageLoader
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
+import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
@@ -19,6 +21,9 @@ import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.mo
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.MoonbeamCrowdloanSubmitter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.MoonbeamStartFlowInterceptor
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.selectContribute.SelectContributeMoonbeamCustomization
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.selectContribute.SelectContributeMoonbeamViewStateFactory
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module
 class MoonbeamContributionModule {
@@ -38,11 +43,13 @@ class MoonbeamContributionModule {
         selectedAssetSharedState: CrowdloanSharedState,
         httpExceptionHandler: HttpExceptionHandler,
         secretStoreV2: SecretStoreV2,
+        chainRegistry: ChainRegistry,
     ) = MoonbeamCrowdloanInteractor(
         accountRepository,
         extrinsicService,
         moonbeamApi,
         selectedAssetSharedState,
+        chainRegistry,
         httpExceptionHandler,
         secretStoreV2
     )
@@ -73,14 +80,31 @@ class MoonbeamContributionModule {
 
     @Provides
     @FeatureScope
+    fun provideSelectContributeMoonbeamViewStateFactory(
+        interactor: MoonbeamCrowdloanInteractor,
+        resourceManager: ResourceManager,
+        iconGenerator: AddressIconGenerator,
+    ) = SelectContributeMoonbeamViewStateFactory(interactor, resourceManager, iconGenerator)
+
+    @Provides
+    @FeatureScope
+    fun provideSelectContributeMoonbeamCustomization(
+        viewStateFactory: SelectContributeMoonbeamViewStateFactory,
+        imageLoader: ImageLoader,
+    ) = SelectContributeMoonbeamCustomization(viewStateFactory, imageLoader)
+
+    @Provides
+    @FeatureScope
     @IntoSet
     fun provideMoonbeamFactory(
         submitter: MoonbeamCrowdloanSubmitter,
         moonbeamStartFlowInterceptor: MoonbeamStartFlowInterceptor,
         privateSignatureProvider: MoonbeamPrivateSignatureProvider,
+        selectContributeMoonbeamCustomization: SelectContributeMoonbeamCustomization,
     ): CustomContributeFactory = MoonbeamContributeFactory(
         submitter = submitter,
         startFlowInterceptor = moonbeamStartFlowInterceptor,
-        privateCrowdloanSignatureProvider = privateSignatureProvider
+        privateCrowdloanSignatureProvider = privateSignatureProvider,
+        selectContributeCustomization = selectContributeMoonbeamCustomization
     )
 }

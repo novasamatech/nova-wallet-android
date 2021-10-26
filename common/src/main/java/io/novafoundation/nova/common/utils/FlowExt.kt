@@ -192,3 +192,12 @@ fun MutableStateFlow<Boolean>.toggle() {
 fun <T> flowOf(producer: suspend () -> T) = flow {
     emit(producer())
 }
+
+inline fun <T> Flow<T>.observeInLifecycle(
+    lifecycleCoroutineScope: LifecycleCoroutineScope,
+    crossinline observer: suspend (T) -> Unit,
+) {
+    lifecycleCoroutineScope.launchWhenResumed {
+        collect(observer)
+    }
+}
