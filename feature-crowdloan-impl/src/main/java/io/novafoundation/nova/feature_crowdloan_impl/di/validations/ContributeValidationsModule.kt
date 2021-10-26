@@ -6,6 +6,7 @@ import dagger.multibindings.IntoSet
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.validation.CompositeValidation
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRepository
+import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomContributeManager
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.CapExceededValidation
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.ContributeEnoughToPayFeesValidation
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.ContributeExistentialDepositValidation
@@ -68,7 +69,9 @@ class ContributeValidationsModule {
     @Provides
     @IntoSet
     @FeatureScope
-    fun providePublicCrowdloanValidation(): ContributeValidation = PublicCrowdloanValidation()
+    fun providePublicCrowdloanValidation(
+        customContributeManager: CustomContributeManager,
+    ): ContributeValidation = PublicCrowdloanValidation(customContributeManager)
 
     @Provides
     @FeatureScope

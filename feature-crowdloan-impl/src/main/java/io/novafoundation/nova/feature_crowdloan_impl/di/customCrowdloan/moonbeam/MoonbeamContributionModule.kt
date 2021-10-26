@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.data.CrowdloanSharedState
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.moonbeam.MoonbeamApi
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomContributeFactory
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.moonbeam.MoonbeamCrowdloanInteractor
+import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.moonbeam.MoonbeamPrivateSignatureProvider
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.MoonbeamCrowdloanSubmitter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.MoonbeamStartFlowInterceptor
@@ -66,12 +67,20 @@ class MoonbeamContributionModule {
 
     @Provides
     @FeatureScope
+    fun provideMoonbeamPrivateSignatureProvider(
+        interactor: MoonbeamCrowdloanInteractor,
+    ) = MoonbeamPrivateSignatureProvider(interactor)
+
+    @Provides
+    @FeatureScope
     @IntoSet
     fun provideMoonbeamFactory(
         submitter: MoonbeamCrowdloanSubmitter,
         moonbeamStartFlowInterceptor: MoonbeamStartFlowInterceptor,
+        privateSignatureProvider: MoonbeamPrivateSignatureProvider,
     ): CustomContributeFactory = MoonbeamContributeFactory(
         submitter = submitter,
-        startFlowInterceptor = moonbeamStartFlowInterceptor
+        startFlowInterceptor = moonbeamStartFlowInterceptor,
+        privateCrowdloanSignatureProvider = privateSignatureProvider
     )
 }

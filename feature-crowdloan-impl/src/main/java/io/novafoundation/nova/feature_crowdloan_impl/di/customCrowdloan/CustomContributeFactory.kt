@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan
 
 import android.content.Context
+import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.PrivateCrowdloanSignatureProvider
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.CustomContributeSubmitter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.CustomContributeView
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.CustomContributeViewState
@@ -11,6 +12,9 @@ import kotlinx.coroutines.CoroutineScope
 interface CustomContributeFactory {
 
     val flowType: String
+
+    val privateCrowdloanSignatureProvider: PrivateCrowdloanSignatureProvider?
+        get() = null
 
     val submitter: CustomContributeSubmitter
 

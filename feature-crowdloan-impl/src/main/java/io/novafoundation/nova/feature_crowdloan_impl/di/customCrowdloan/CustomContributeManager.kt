@@ -6,10 +6,6 @@ class CustomContributeManager(
     private val factories: Set<CustomContributeFactory>
 ) {
 
-    fun isCustomFlowSupported(flowType: String): Boolean {
-        return relevantFactoryOrNull(flowType) != null
-    }
-
     fun getSubmitter(flowType: String): CustomContributeSubmitter {
         return relevantFactory(flowType).submitter
     }
@@ -34,3 +30,7 @@ class CustomContributeManager(
 
     private fun unexpectedBonusFlow(flowType: String): Nothing = throw IllegalStateException("No extra bonus flow found for flow $flowType")
 }
+
+fun CustomContributeManager.hasExtraBonusFlow(flowType: String) = getFactoryOrNull(flowType)?.extraBonusFlow != null
+
+fun CustomContributeManager.supportsPrivateCrowdloans(flowType: String) = getFactoryOrNull(flowType)?.privateCrowdloanSignatureProvider != null
