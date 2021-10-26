@@ -226,7 +226,12 @@ class Navigator :
     }
 
     override fun openContribute(payload: ContributePayload) {
-        navController?.navigate(R.id.action_mainFragment_to_crowdloanContributeFragment, CrowdloanContributeFragment.getBundle(payload))
+        val bundle = CrowdloanContributeFragment.getBundle(payload)
+
+        when (navController?.currentDestination?.id) {
+            R.id.mainFragment -> navController?.navigate(R.id.action_mainFragment_to_crowdloanContributeFragment, bundle)
+            R.id.moonbeamCrowdloanTermsFragment -> navController?.navigate(R.id.action_moonbeamCrowdloanTermsFragment_to_crowdloanContributeFragment, bundle)
+        }
     }
 
     override val customBonusFlow: Flow<BonusPayload?>

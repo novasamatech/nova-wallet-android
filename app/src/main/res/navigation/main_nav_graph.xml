@@ -851,6 +851,16 @@
         tools:layout="@layout/fragment_moonbeam_terms"
         android:id="@+id/moonbeamCrowdloanTermsFragment"
         android:name="io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.terms.MoonbeamCrowdloanTermsFragment"
-        android:label="MoonbeamCrowdloanTermsFragment" />
+        android:label="MoonbeamCrowdloanTermsFragment">
+
+        <action
+            android:id="@+id/action_moonbeamCrowdloanTermsFragment_to_crowdloanContributeFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@id/mainFragment"
+            app:destination="@id/crowdloanContributeFragment" />
+    </fragment>
 
 </navigation>

@@ -71,10 +71,10 @@ class MoonbeamCrowdloanTermsViewModel(
 
     fun submitClicked() = launch {
         submittingInProgressFlow.withFlagSet {
-            interactor.submitTerms()
+            interactor.submitAgreement()
                 .onFailure(::showError)
                 .onSuccess {
-                    showMessage("Success, ready to go next")
+                    router.openContribute(payload)
                 }
         }
     }

@@ -13,8 +13,10 @@ import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.domain.model.hasChainAccountIn
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.moonbeam.AgreeRemarkRequest
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.moonbeam.MoonbeamApi
+import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.moonbeam.VerifyRemarkRequest
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.moonbeam.agreeRemark
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.moonbeam.checkRemark
+import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.moonbeam.verifyRemark
 import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.extrinsic.systemRemark
@@ -28,6 +30,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.math.BigInteger
+
+class VerificationError : Exception()
 
 class MoonbeamCrowdloanInteractor(
     private val accountRepository: AccountRepository,
@@ -69,7 +73,7 @@ class MoonbeamCrowdloanInteractor(
         }
     }
 
-    suspend fun submitTerms(): Result<*> = withContext(Dispatchers.Default) {
+    suspend fun submitAgreement(): Result<*> = withContext(Dispatchers.Default) {
         runCatching {
             val chain = selectedChainAssetState.chain()
             val metaAccount = accountRepository.getSelectedMetaAccount()
@@ -90,6 +94,15 @@ class MoonbeamCrowdloanInteractor(
                 .first()
 
             Log.d(this@MoonbeamCrowdloanInteractor.LOG_TAG, "Finalized ${finalizedStatus.extrinsicHash} in block ${finalizedStatus.blockHash}")
+
+            val verificationRequest = VerifyRemarkRequest(
+                address = currentAddress,
+                extrinsicHash = finalizedStatus.extrinsicHash,
+                blockHash = finalizedStatus.blockHash
+            )
+            val verificationResponse = httpExceptionHandler.wrap { moonbeamApi.verifyRemark(chain, verificationRequest) }
+
+            if (!verificationResponse.verified) throw VerificationError()
         }
     }
 
