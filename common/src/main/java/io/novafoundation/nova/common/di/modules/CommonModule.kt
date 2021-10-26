@@ -25,6 +25,8 @@ import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferencesIm
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptionUtil
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.common.interfaces.FileProvider
+import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
+import io.novafoundation.nova.common.mixin.impl.CustomDialogProvider
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.LanguagesHolder
@@ -178,12 +180,16 @@ class CommonModule {
     @Provides
     @ApplicationScope
     fun provideSecretStoreV1(
-        encryptedPreferences: EncryptedPreferences
+        encryptedPreferences: EncryptedPreferences,
     ): SecretStoreV1 = SecretStoreV1Impl(encryptedPreferences)
 
     @Provides
     @ApplicationScope
     fun provideSecretStoreV2(
-        encryptedPreferences: EncryptedPreferences
+        encryptedPreferences: EncryptedPreferences,
     ) = SecretStoreV2(encryptedPreferences)
+
+    @Provides
+    @ApplicationScope
+    fun provideCustomDialogDisplayer(): CustomDialogDisplayer.Presentation = CustomDialogProvider()
 }

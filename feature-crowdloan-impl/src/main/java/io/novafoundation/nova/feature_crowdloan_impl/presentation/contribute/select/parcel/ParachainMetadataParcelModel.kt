@@ -13,11 +13,12 @@ class ParachainMetadataParcelModel(
     val rewardRate: BigDecimal?,
     val website: String,
     val customFlow: String?,
-    val token: String
+    val token: String,
+    val extras: Map<String, String>,
 ) : Parcelable
 
 fun mapParachainMetadataToParcel(
-    parachainMetadata: ParachainMetadata
+    parachainMetadata: ParachainMetadata,
 ) = with(parachainMetadata) {
     ParachainMetadataParcelModel(
         iconLink = iconLink,
@@ -26,12 +27,13 @@ fun mapParachainMetadataToParcel(
         rewardRate = rewardRate,
         website = website,
         token = token,
-        customFlow = customFlow
+        customFlow = customFlow,
+        extras = parachainMetadata.extras
     )
 }
 
 fun mapParachainMetadataFromParcel(
-    parcelModel: ParachainMetadataParcelModel
+    parcelModel: ParachainMetadataParcelModel,
 ) = with(parcelModel) {
     ParachainMetadata(
         iconLink = iconLink,
@@ -40,6 +42,7 @@ fun mapParachainMetadataFromParcel(
         rewardRate = rewardRate,
         customFlow = customFlow,
         website = website,
-        token = token
+        token = token,
+        extras = extras
     )
 }

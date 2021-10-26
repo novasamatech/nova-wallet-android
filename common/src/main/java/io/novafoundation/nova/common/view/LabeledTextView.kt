@@ -17,12 +17,13 @@ import io.novafoundation.nova.common.view.shape.getCornersStateDrawable
 import kotlinx.android.synthetic.main.view_labeled_text.view.labeledTextAction
 import kotlinx.android.synthetic.main.view_labeled_text.view.labeledTextIcon
 import kotlinx.android.synthetic.main.view_labeled_text.view.labeledTextLabel
+import kotlinx.android.synthetic.main.view_labeled_text.view.labeledTextPrimaryIcon
 import kotlinx.android.synthetic.main.view_labeled_text.view.labeledTextText
 
 class LabeledTextView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
     init {
@@ -39,6 +40,9 @@ class LabeledTextView @JvmOverloads constructor(
 
     val textIconView: ImageView
         get() = labeledTextIcon
+
+    val primaryIcon: ImageView
+        get() = labeledTextPrimaryIcon
 
     private fun applyAttributes(attrs: AttributeSet?) {
         attrs?.let {

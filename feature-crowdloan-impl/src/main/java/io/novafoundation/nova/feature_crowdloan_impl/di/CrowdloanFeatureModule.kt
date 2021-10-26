@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRep
 import io.novafoundation.nova.feature_crowdloan_impl.data.CrowdloanSharedState
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.parachain.ParachainMetadataApi
 import io.novafoundation.nova.feature_crowdloan_impl.data.repository.CrowdloanRepositoryImpl
+import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomContributeManager
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomContributeModule
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.CrowdloanContributeInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.domain.main.CrowdloanInteractor
@@ -126,11 +127,13 @@ class CrowdloanFeatureModule {
         accountRepository: AccountRepository,
         chainStateRepository: ChainStateRepository,
         sharedState: CrowdloanSharedState,
-        crowdloanRepository: CrowdloanRepository
+        crowdloanRepository: CrowdloanRepository,
+        customContributeManager: CustomContributeManager,
     ) = CrowdloanContributeInteractor(
         extrinsicService,
         accountRepository,
         chainStateRepository,
+        customContributeManager,
         sharedState,
         crowdloanRepository
     )

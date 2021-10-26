@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.format
 import io.novafoundation.nova.common.utils.formatAsCurrency
 import io.novafoundation.nova.common.utils.formatAsPercentage
@@ -17,6 +18,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomContributeManager
+import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.hasExtraBonusFlow
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.CrowdloanContributeInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.ContributeValidationPayload
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.ContributeValidationSystem
@@ -26,6 +28,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.add
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.confirm.parcel.ConfirmContributePayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.contributeValidationFailure
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.BonusPayload
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.MainFlowCustomization
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.model.CustomContributePayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.model.CrowdloanDetailsModel
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.model.LearnMoreModel
@@ -36,6 +39,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
@@ -54,13 +58,13 @@ import kotlin.time.milliseconds
 
 private const val DEBOUNCE_DURATION_MILLIS = 500
 
-sealed class CustomContributionState {
+sealed class ExtraBonusState {
 
-    object NotSupported : CustomContributionState()
+    object NotSupported : ExtraBonusState()
 
     class Active(val customFlow: String, val payload: BonusPayload, val tokenName: String)
 
-    object Inactive : CustomContributionState()
+    object Inactive : ExtraBonusState()
 }
 
 class CrowdloanContributeViewModel(
@@ -94,46 +98,58 @@ class CrowdloanContributeViewModel(
         .inBackground()
         .share()
 
+    private val relevantCustomFlowFactory = payload.parachainMetadata?.customFlow?.let {
+        customContributeManager.getFactoryOrNull(it)
+    }
+
+    val customizationConfiguration: Flow<Pair<MainFlowCustomization, MainFlowCustomization.ViewState>?> = flowOf {
+        relevantCustomFlowFactory?.selectContributeCustomization?.let {
+            it to it.createViewState(coroutineScope = this, parachainMetadata)
+        }
+    }
+        .inBackground()
+        .share()
+
     val enteredAmountFlow = MutableStateFlow("")
 
     private val parsedAmountFlow = enteredAmountFlow.mapNotNull { it.toBigDecimalOrNull() ?: BigDecimal.ZERO }
 
-    private val customContributionFlow = flow {
+    private val extraBonusFlow = flow {
         val customFlow = payload.parachainMetadata?.customFlow
 
         if (
             customFlow != null &&
-            customContributeManager.isCustomFlowSupported(customFlow)
+            customContributeManager.hasExtraBonusFlow(customFlow)
         ) {
-            emit(CustomContributionState.Inactive)
+            emit(ExtraBonusState.Inactive)
 
             val source = router.customBonusFlow.map {
                 if (it != null) {
-                    CustomContributionState.Active(customFlow, it, parachainMetadata!!.token)
+                    ExtraBonusState.Active(customFlow, it, parachainMetadata!!.token)
                 } else {
-                    CustomContributionState.Inactive
+                    ExtraBonusState.Inactive
                 }
             }
 
             emitAll(source)
         } else {
-            emit(CustomContributionState.NotSupported)
+            emit(ExtraBonusState.NotSupported)
         }
     }
         .share()
 
     val bonusDisplayFlow = combine(
-        customContributionFlow,
+        extraBonusFlow,
         parsedAmountFlow
     ) { contributionState, amount ->
         when (contributionState) {
-            is CustomContributionState.Active -> {
+            is ExtraBonusState.Active -> {
                 val bonus = contributionState.payload.calculateBonus(amount)
 
                 bonus?.formatTokenAmount(contributionState.tokenName)
             }
 
-            is CustomContributionState.Inactive -> resourceManager.getString(R.string.crowdloan_empty_bonus_title)
+            is ExtraBonusState.Inactive -> resourceManager.getString(R.string.crowdloan_empty_bonus_title)
 
             else -> null
         }
@@ -227,24 +243,31 @@ class CrowdloanContributeViewModel(
     private fun listenFee() {
         combine(
             parsedAmountFlow.debounce(DEBOUNCE_DURATION_MILLIS.milliseconds),
-            customContributionFlow,
+            extraBonusFlow,
             ::Pair
         )
             .onEach { (amount, bonusState) ->
-                loadFee(amount, bonusState as? CustomContributionState.Active)
+                loadFee(amount, bonusState as? ExtraBonusState.Active)
             }
             .launchIn(viewModelScope)
     }
 
-    private fun loadFee(amount: BigDecimal, bonusActiveState: CustomContributionState.Active?) {
+    private fun loadFee(amount: BigDecimal, bonusActiveState: ExtraBonusState.Active?) {
         feeLoaderMixin.loadFee(
             coroutineScope = viewModelScope,
             feeConstructor = {
-                val additionalSubmission = bonusActiveState?.let {
-                    additionalOnChainSubmission(it.payload, it.customFlow, amount, customContributeManager)
+                val crowdloan = crowdloanFlow.first()
+
+                val additionalSubmission = relevantCustomFlowFactory?.let {
+                    additionalOnChainSubmission(
+                        bonusPayload = bonusActiveState?.payload,
+                        crowdloan = crowdloan,
+                        amount = amount,
+                        factory = it
+                    )
                 }
 
-                contributionInteractor.estimateFee(payload.paraId, amount, additionalSubmission)
+                contributionInteractor.estimateFee(crowdloan, amount, additionalSubmission)
             },
             onRetryCancelled = ::backClicked
         )
@@ -282,13 +305,20 @@ class CrowdloanContributeViewModel(
     private fun openConfirmScreen(
         validationPayload: ContributeValidationPayload
     ) = launch {
+        val customizationPayload = customizationConfiguration.first()?.let {
+            val (_, customViewState) = it
+
+            customViewState.buildCustomPayload()
+        }
+
         val confirmContributePayload = ConfirmContributePayload(
             paraId = payload.paraId,
             fee = validationPayload.fee,
             amount = validationPayload.contributionAmount,
             estimatedRewardDisplay = estimatedRewardFlow.first(),
             bonusPayload = router.latestCustomBonus,
-            metadata = payload.parachainMetadata
+            metadata = payload.parachainMetadata,
+            customizationPayload = customizationPayload
         )
 
         router.openConfirmContribute(confirmContributePayload)

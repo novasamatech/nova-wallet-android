@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.bifrost
 
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.bifrost.BifrostContributeInteractor
+import io.novafoundation.nova.feature_crowdloan_impl.domain.main.Crowdloan
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.BonusPayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.CustomContributeSubmitter
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
@@ -10,9 +11,16 @@ class BifrostContributeSubmitter(
     private val interactor: BifrostContributeInteractor
 ) : CustomContributeSubmitter {
 
-    override suspend fun submitOnChain(payload: BonusPayload, amount: BigDecimal, extrinsicBuilder: ExtrinsicBuilder) {
-        require(payload is BifrostBonusPayload)
+    override suspend fun submitOnChain(
+        crowdloan: Crowdloan,
+        payload: BonusPayload?,
+        amount: BigDecimal,
+        extrinsicBuilder: ExtrinsicBuilder,
+    ) {
+        require(payload is BifrostBonusPayload?)
 
-        interactor.submitOnChain(payload.parachainId, payload.referralCode, extrinsicBuilder)
+        payload?.let {
+            interactor.submitOnChain(payload.parachainId, payload.referralCode, extrinsicBuilder)
+        }
     }
 }

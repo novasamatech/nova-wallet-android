@@ -8,6 +8,7 @@ import coil.ImageLoader
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.impl.setupCustomDialogDisplayer
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.ParaId
@@ -62,6 +63,7 @@ class CrowdloanFragment : BaseFragment<CrowdloanViewModel>(), CrowdloanAdapter.H
 
     override fun subscribe(viewModel: CrowdloanViewModel) {
         setupAssetSelector(crowdloanAssetSelector, viewModel, imageLoader)
+        setupCustomDialogDisplayer(viewModel)
 
         viewModel.crowdloanModelsFlow.observe { loadingState ->
             crowdloanList.setVisible(loadingState is LoadingState.Loaded && loadingState.data.isNotEmpty())

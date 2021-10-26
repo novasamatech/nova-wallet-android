@@ -87,7 +87,7 @@ class CustomContributeFragment : BaseFragment<CustomContributeViewModel>() {
         viewModel.viewStateFlow.observe { viewState ->
             customFlowContainer.removeAllViews()
 
-            val newView = contributionManager.createView(viewModel.customFlowType, requireContext())
+            val newView = contributionManager.relevantExtraBonusFlow(viewModel.customFlowType).createView(requireContext())
 
             customFlowContainer.addView(newView)
 

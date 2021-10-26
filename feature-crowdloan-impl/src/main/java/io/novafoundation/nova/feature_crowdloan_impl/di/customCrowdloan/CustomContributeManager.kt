@@ -1,35 +1,16 @@
 package io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan
 
-import android.content.Context
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.CustomContributeSubmitter
-import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.CustomContributeView
-import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.CustomContributeViewState
-import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.model.CustomContributePayload
-import kotlinx.coroutines.CoroutineScope
 
 class CustomContributeManager(
     private val factories: Set<CustomContributeFactory>
 ) {
 
-    fun isCustomFlowSupported(flowType: String): Boolean {
-        return relevantFactoryOrNull(flowType) != null
-    }
-
-    fun createNewState(
-        flowType: String,
-        scope: CoroutineScope,
-        payload: CustomContributePayload
-    ): CustomContributeViewState {
-        return relevantFactory(flowType).createViewState(scope, payload)
-    }
-
     fun getSubmitter(flowType: String): CustomContributeSubmitter {
         return relevantFactory(flowType).submitter
     }
 
-    fun createView(flowType: String, context: Context): CustomContributeView {
-        return relevantFactory(flowType).createView(context)
-    }
+    fun getFactoryOrNull(flowType: String): CustomContributeFactory? = relevantFactoryOrNull(flowType)
 
     private fun relevantFactory(flowType: String) = relevantFactoryOrNull(flowType) ?: noFactoryFound(flowType)
 
@@ -39,5 +20,17 @@ class CustomContributeManager(
         return factories.firstOrNull { it.supports(flowType) }
     }
 
+    fun relevantExtraBonusFlow(flowType: String): ExtraBonusFlow {
+        val factory = relevantFactory(flowType)
+
+        return factory.extraBonusFlow ?: unexpectedBonusFlow(flowType)
+    }
+
     private fun noFactoryFound(flowType: String): Nothing = throw NoSuchElementException("Factory for $flowType was not found")
+
+    private fun unexpectedBonusFlow(flowType: String): Nothing = throw IllegalStateException("No extra bonus flow found for flow $flowType")
 }
+
+fun CustomContributeManager.hasExtraBonusFlow(flowType: String) = getFactoryOrNull(flowType)?.extraBonusFlow != null
+
+fun CustomContributeManager.supportsPrivateCrowdloans(flowType: String) = getFactoryOrNull(flowType)?.privateCrowdloanSignatureProvider != null

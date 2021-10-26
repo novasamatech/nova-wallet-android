@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.transformLatest
+import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
 
 inline fun <T, R> Flow<List<T>>.mapList(crossinline mapper: suspend (T) -> R) = map { list ->
@@ -53,6 +54,15 @@ fun <T, R> Flow<T>.withLoading(sourceSupplier: suspend (T) -> Flow<R>): Flow<Loa
 
         emitAll(newSource)
     }
+}
+
+/**
+ * Similar to [Flow.takeWhile] but emits last element too
+ */
+fun <T> Flow<T>.takeWhileInclusive(predicate: suspend (T) -> Boolean) = transformWhile {
+    emit(it)
+
+    predicate(it)
 }
 
 /**
@@ -125,6 +135,14 @@ fun EditText.bindTo(flow: MutableStateFlow<String>, scope: CoroutineScope) {
     }
 }
 
+inline fun MutableStateFlow<Boolean>.withFlagSet(action: () -> Unit) {
+    value = true
+
+    action()
+
+    value = false
+}
+
 fun CompoundButton.bindTo(flow: MutableStateFlow<Boolean>, scope: CoroutineScope) {
     scope.launch {
         flow.collect { newValue ->
@@ -172,4 +190,13 @@ fun MutableStateFlow<Boolean>.toggle() {
 
 fun <T> flowOf(producer: suspend () -> T) = flow {
     emit(producer())
+}
+
+inline fun <T> Flow<T>.observeInLifecycle(
+    lifecycleCoroutineScope: LifecycleCoroutineScope,
+    crossinline observer: suspend (T) -> Unit,
+) {
+    lifecycleCoroutineScope.launchWhenResumed {
+        collect(observer)
+    }
 }

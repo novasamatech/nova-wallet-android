@@ -145,6 +145,14 @@ fun View.hideSoftKeyboard() {
     inputMethodManager.hideSoftInputFromWindow(windowToken, 0)
 }
 
+fun ViewGroup.addAfter(anchor: View, newViews: List<View>) {
+    val index = indexOfChild(anchor)
+
+    newViews.forEachIndexed { offset, view ->
+        addView(view, index + offset + 1)
+    }
+}
+
 fun RecyclerView.scrollToTopWhenItemsShuffled(lifecycleOwner: LifecycleOwner) {
     val adapterDataObserver = object : RecyclerView.AdapterDataObserver() {
         override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {

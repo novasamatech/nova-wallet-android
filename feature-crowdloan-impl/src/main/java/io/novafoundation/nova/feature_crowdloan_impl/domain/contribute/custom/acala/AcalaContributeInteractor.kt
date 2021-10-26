@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.karura
+package io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.acala
 
 import io.novafoundation.nova.common.base.BaseException
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler

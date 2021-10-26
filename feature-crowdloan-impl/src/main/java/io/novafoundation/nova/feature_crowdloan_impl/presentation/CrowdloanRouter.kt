@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_crowdloan_impl.presentation
 
+import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.confirm.parcel.ConfirmContributePayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.BonusPayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.model.CustomContributePayload
@@ -23,4 +24,7 @@ interface CrowdloanRouter {
     fun back()
 
     fun returnToMain()
+
+    fun openMoonbeamFlow(payload: ContributePayload)
+    fun openAddAccount(payload: AddAccountPayload)
 }

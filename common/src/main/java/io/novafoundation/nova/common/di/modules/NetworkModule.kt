@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.data.network.AndroidLogger
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
+import io.novafoundation.nova.common.data.network.TimeHeaderInterceptor
 import io.novafoundation.nova.common.data.network.rpc.SocketSingleRequestExecutor
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
@@ -54,6 +55,7 @@ class NetworkModule {
             .readTimeout(10, TimeUnit.SECONDS)
             .cache(Cache(File(context.cacheDir, HTTP_CACHE), CACHE_SIZE))
             .retryOnConnectionFailure(true)
+            .addInterceptor(TimeHeaderInterceptor())
 
         if (BuildConfig.DEBUG) {
             builder.addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
@@ -85,11 +87,9 @@ class NetworkModule {
     fun provideSocketFactory() = WebSocketFactory()
 
     @Provides
-    @ApplicationScope
     fun provideReconnector() = Reconnector()
 
     @Provides
-    @ApplicationScope
     fun provideRequestExecutor() = RequestExecutor()
 
     @Provides

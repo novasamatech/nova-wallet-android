@@ -10,9 +10,11 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.MixinFactory
+import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_crowdloan_impl.data.CrowdloanSharedState
+import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomContributeManager
 import io.novafoundation.nova.feature_crowdloan_impl.domain.main.CrowdloanInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.main.CrowdloanViewModel
@@ -32,7 +34,9 @@ class CrowdloanModule {
         router: CrowdloanRouter,
         crowdloanUpdateSystem: UpdateSystem,
         sharedState: CrowdloanSharedState,
-        assetSelectorFactory: MixinFactory<AssetSelectorMixin.Presentation>
+        assetSelectorFactory: MixinFactory<AssetSelectorMixin.Presentation>,
+        customDialogDisplayer: CustomDialogDisplayer.Presentation,
+        customContributeManager: CustomContributeManager,
     ): ViewModel {
         return CrowdloanViewModel(
             interactor,
@@ -41,8 +45,10 @@ class CrowdloanModule {
             crowdloanSharedState,
             router,
             sharedState,
+            customContributeManager,
             crowdloanUpdateSystem,
-            assetSelectorFactory
+            assetSelectorFactory,
+            customDialogDisplayer
         )
     }
 

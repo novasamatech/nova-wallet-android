@@ -10,20 +10,29 @@ import io.novafoundation.nova.common.data.network.runtime.calls.NextAccountIndex
 import io.novafoundation.nova.common.data.network.runtime.model.FeeResponse
 import io.novafoundation.nova.common.data.network.runtime.model.SignedBlock
 import io.novafoundation.nova.common.data.network.runtime.model.SignedBlock.Block.Header
+import io.novafoundation.nova.common.utils.extrinsicHash
+import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
+import io.novafoundation.nova.runtime.extrinsic.asExtrinsicStatus
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.wsrpc.executeAsync
 import jp.co.soramitsu.fearless_utils.wsrpc.mappers.nonNull
 import jp.co.soramitsu.fearless_utils.wsrpc.mappers.pojo
 import jp.co.soramitsu.fearless_utils.wsrpc.request.DeliveryType
+import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.author.SubmitAndWatchExtrinsicRequest
 import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.author.SubmitExtrinsicRequest
 import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.chain.RuntimeVersion
 import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.chain.RuntimeVersionRequest
+import jp.co.soramitsu.fearless_utils.wsrpc.subscriptionFlow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import java.math.BigInteger
 
 @Suppress("EXPERIMENTAL_API_USAGE")
 class RpcCalls(
-    private val chainRegistry: ChainRegistry
+    private val chainRegistry: ChainRegistry,
 ) {
 
     suspend fun getExtrinsicFee(chainId: ChainId, extrinsic: String): BigInteger {
@@ -42,6 +51,18 @@ class RpcCalls(
             mapper = pojo<String>().nonNull(),
             deliveryType = DeliveryType.AT_MOST_ONCE
         )
+    }
+
+    fun submitAndWatchExtrinsic(chainId: ChainId, extrinsic: String): Flow<ExtrinsicStatus> {
+        return flow {
+            val hash = extrinsic.extrinsicHash()
+            val request = SubmitAndWatchExtrinsicRequest(extrinsic)
+
+            val inner = socketFor(chainId).subscriptionFlow(request, unsubscribeMethod = "author_unwatchExtrinsic")
+                .map { it.asExtrinsicStatus(hash) }
+
+            emitAll(inner)
+        }
     }
 
     suspend fun getNonce(chainId: ChainId, accountAddress: String): BigInteger {
