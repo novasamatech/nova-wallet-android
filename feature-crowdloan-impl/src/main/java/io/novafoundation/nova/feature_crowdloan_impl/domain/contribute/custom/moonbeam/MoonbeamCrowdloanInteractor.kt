@@ -5,11 +5,13 @@ import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.sha256
+import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.secrets.sign
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
+import io.novafoundation.nova.feature_account_api.domain.model.cryptoTypeIn
 import io.novafoundation.nova.feature_account_api.domain.model.hasChainAccountIn
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ParachainMetadata
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.moonbeam.AgreeRemarkRequest
@@ -75,7 +77,9 @@ class MoonbeamCrowdloanInteractor(
     suspend fun flowStatus(parachainMetadata: ParachainMetadata): Result<MoonbeamFlowStatus> = withContext(Dispatchers.Default) {
         runCatching {
             val metaAccount = accountRepository.getSelectedMetaAccount()
+
             val moonbeamChainId = parachainMetadata.moonbeamChainId()
+
             val currentChain = selectedChainAssetState.chain()
             val currentAddress = metaAccount.addressIn(currentChain)!!
 
@@ -84,6 +88,9 @@ class MoonbeamCrowdloanInteractor(
                     chainId = moonbeamChainId,
                     metaId = metaAccount.id
                 )
+
+                metaAccount.cryptoTypeIn(currentChain) != CryptoType.SR25519 -> MoonbeamFlowStatus.UnsupportedAccountEncryption
+
                 else -> when (checkRemark(parachainMetadata, currentAddress)) {
                     null -> MoonbeamFlowStatus.RegionNotSupported
                     true -> MoonbeamFlowStatus.Completed

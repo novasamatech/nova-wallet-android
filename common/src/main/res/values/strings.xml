@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+    <string name="crowdloan_moonbeam_encryption_not_supported_title">Cannot contribute with this account</string>
+    <string name="crowdloan_moonbeam_encryption_not_supported_message">Moonbeam crowdloan supports only SR25519 crypto type accounts. Please consider using another account for contribution</string>
+
     <string name="crowdloan_moonbeam_reward_destination">%s Reward destination</string>
 
     <string name="crowdloan_moonbeam_terms_submit">Submit agreement</string>

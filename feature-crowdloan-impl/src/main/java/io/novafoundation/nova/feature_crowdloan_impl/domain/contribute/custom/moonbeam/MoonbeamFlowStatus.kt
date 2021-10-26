@@ -10,5 +10,7 @@ sealed class MoonbeamFlowStatus {
 
     class NeedsChainAccount(val chainId: ChainId, val metaId: Long) : MoonbeamFlowStatus()
 
+    object UnsupportedAccountEncryption : MoonbeamFlowStatus()
+
     object ReadyToComplete : MoonbeamFlowStatus()
 }

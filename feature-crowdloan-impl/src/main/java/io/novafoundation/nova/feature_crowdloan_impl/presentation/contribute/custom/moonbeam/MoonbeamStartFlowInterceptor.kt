@@ -60,6 +60,14 @@ class MoonbeamStartFlowInterceptor(
                     )
                 )
             }
+            MoonbeamFlowStatus.UnsupportedAccountEncryption -> customDialogDisplayer.displayDialog(
+                CustomDialogDisplayer.Payload(
+                    title = resourceManager.getString(R.string.crowdloan_moonbeam_encryption_not_supported_title),
+                    message = resourceManager.getString(R.string.crowdloan_moonbeam_encryption_not_supported_message),
+                    okAction = DialogAction.noOp(resourceManager.getString(R.string.common_ok)),
+                    cancelAction = null
+                )
+            )
         }
     }
 }
