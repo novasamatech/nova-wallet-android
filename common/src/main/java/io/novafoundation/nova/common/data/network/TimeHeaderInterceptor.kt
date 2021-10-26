@@ -42,12 +42,10 @@ class TimeHeaderInterceptor : Interceptor {
             builder.removeHeader(WRITE_TIMEOUT)
         }
 
-        return chain.run {
-            withConnectTimeout(connectTimeout, TimeUnit.MILLISECONDS)
-            withReadTimeout(readTimeout, TimeUnit.MILLISECONDS)
-            withWriteTimeout(writeTimeout, TimeUnit.MILLISECONDS)
-
-            proceed(builder.build())
-        }
+        return chain
+            .withConnectTimeout(connectTimeout, TimeUnit.MILLISECONDS)
+            .withReadTimeout(readTimeout, TimeUnit.MILLISECONDS)
+            .withWriteTimeout(writeTimeout, TimeUnit.MILLISECONDS)
+            .proceed(builder.build())
     }
 }
