@@ -85,11 +85,9 @@ class NetworkModule {
     fun provideSocketFactory() = WebSocketFactory()
 
     @Provides
-    @ApplicationScope
     fun provideReconnector() = Reconnector()
 
     @Provides
-    @ApplicationScope
     fun provideRequestExecutor() = RequestExecutor()
 
     @Provides

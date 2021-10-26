@@ -5,6 +5,7 @@ import jp.co.soramitsu.fearless_utils.encrypt.keypair.ECDSAUtils
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.hash.Hasher.blake2b256
 import org.bouncycastle.jcajce.provider.digest.Keccak
+import org.bouncycastle.jcajce.provider.digest.SHA256
 import java.security.MessageDigest
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
@@ -41,6 +42,12 @@ fun ByteArray.copyLast(n: Int) = copyOfRange(fromIndex = size - n, size)
 
 fun ByteArray.keccak256(): ByteArray {
     val digest = Keccak.Digest256()
+
+    return digest.digest(this)
+}
+
+fun ByteArray.sha256(): ByteArray {
+    val digest = SHA256.Digest()
 
     return digest.digest(this)
 }

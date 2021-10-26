@@ -4,8 +4,10 @@ import io.novafoundation.nova.feature_crowdloan_impl.BuildConfig
 import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Headers
+import retrofit2.http.POST
 import retrofit2.http.Path
 
 private const val AUTH_HEADER = "x-api-key: ${BuildConfig.MOONBEAM_AUTH_TOKEN}"
@@ -27,6 +29,15 @@ interface MoonbeamApi {
         @Path("baseUrl") baseUrl: String,
         @Path("address") address: String,
     ): CheckRemarkResponse
+
+    @POST("//{baseUrl}/agree-remark")
+    @Headers(AUTH_HEADER)
+    suspend fun agreeRemark(
+        @Path("baseUrl") baseUrl: String,
+        @Body body: AgreeRemarkRequest,
+    ): AgreeRemarkResponse
 }
 
 suspend fun MoonbeamApi.checkRemark(chain: Chain, address: String) = checkRemark(urlOf(chain.id), address)
+
+suspend fun MoonbeamApi.agreeRemark(chain: Chain, body: AgreeRemarkRequest) = agreeRemark(urlOf(chain.id), body)

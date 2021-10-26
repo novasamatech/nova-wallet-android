@@ -5,6 +5,7 @@ import dagger.Provides
 import dagger.multibindings.IntoSet
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
+import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -35,12 +36,14 @@ class MoonbeamContributionModule {
         moonbeamApi: MoonbeamApi,
         selectedAssetSharedState: CrowdloanSharedState,
         httpExceptionHandler: HttpExceptionHandler,
+        secretStoreV2: SecretStoreV2,
     ) = MoonbeamCrowdloanInteractor(
         accountRepository,
         extrinsicService,
         moonbeamApi,
         selectedAssetSharedState,
-        httpExceptionHandler
+        httpExceptionHandler,
+        secretStoreV2
     )
 
     @Provides
