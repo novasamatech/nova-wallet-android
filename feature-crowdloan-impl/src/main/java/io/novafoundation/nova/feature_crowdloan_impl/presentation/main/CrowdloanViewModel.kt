@@ -12,6 +12,8 @@ import io.novafoundation.nova.common.presentation.mapLoading
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.resources.formatTimeLeft
 import io.novafoundation.nova.common.utils.format
+import io.novafoundation.nova.common.utils.formatAsPercentage
+import io.novafoundation.nova.common.utils.fractionToPercentage
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.core.updater.UpdateSystem
@@ -98,12 +100,12 @@ class CrowdloanViewModel(
     private fun mapCrowdloanStatusToUi(statusClass: KClass<out Crowdloan.State>, statusCount: Int): CrowdloanStatusModel {
         return when (statusClass) {
             Crowdloan.State.Finished::class -> CrowdloanStatusModel(
-                text = resourceManager.getString(R.string.common_completed_with_count, statusCount),
-                textColorRes = R.color.black1
+                status = resourceManager.getString(R.string.common_completed_with_count_v2_0),
+                count = statusCount.toString()
             )
             Crowdloan.State.Active::class -> CrowdloanStatusModel(
-                text = resourceManager.getString(R.string.crowdloan_active_section_format, statusCount),
-                textColorRes = R.color.green
+                status = resourceManager.getString(R.string.crowdloan_active_section_format_v2_0),
+                count = statusCount.toString()
             )
             else -> throw IllegalArgumentException("Unsupported crowdloan status type: ${statusClass.simpleName}")
         }
@@ -112,7 +114,7 @@ class CrowdloanViewModel(
     private suspend fun mapCrowdloanToCrowdloanModel(
         chain: Chain,
         crowdloan: Crowdloan,
-        asset: Asset
+        asset: Asset,
     ): CrowdloanModel {
         val token = asset.token
 
@@ -137,11 +139,13 @@ class CrowdloanViewModel(
             }
         }
 
-        val myContributionDisplay = crowdloan.myContribution?.let {
-            val myContributionFormatted = token.amountFromPlanks(it.amount).formatTokenAmount(token.configuration)
+//        val myContributionDisplay = crowdloan.myContribution?.let {
+//            val myContributionFormatted = token.amountFromPlanks(it.amount).formatTokenAmount(token.configuration)
+//
+//            resourceManager.getString(R.string.crowdloan_contribution_format, myContributionFormatted)
+//        }
 
-            resourceManager.getString(R.string.crowdloan_contribution_format, myContributionFormatted)
-        }
+        val raisedPercentage = crowdloan.raisedFraction.fractionToPercentage()
 
         return CrowdloanModel(
             relaychainId = chain.id,
@@ -149,8 +153,11 @@ class CrowdloanViewModel(
             title = crowdloan.parachainMetadata?.name ?: crowdloan.parachainId.toString(),
             description = crowdloan.parachainMetadata?.description ?: depositorAddress,
             icon = icon,
-            raised = resourceManager.getString(R.string.crownloans_raised_format, raisedDisplay, capDisplay),
-            myContribution = myContributionDisplay,
+            raised = CrowdloanModel.Raised(
+                value = resourceManager.getString(R.string.crownloans_raised_format, raisedDisplay, capDisplay),
+                percentage = raisedPercentage.toInt(),
+                percentageDisplay = raisedPercentage.formatAsPercentage()
+            ),
             state = stateFormatted,
         )
     }
@@ -181,5 +188,9 @@ class CrowdloanViewModel(
                 router.openContribute(payload)
             }
         }
+    }
+
+    fun myContributionsClicked() {
+        // TODO
     }
 }

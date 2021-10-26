@@ -14,18 +14,21 @@ import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setTextColorRes
-import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.common.view.shape.addRipple
+import io.novafoundation.nova.common.view.shape.getBlurDrawable
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.ParaId
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.main.model.CrowdloanModel
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.main.model.CrowdloanStatusModel
 import kotlinx.android.synthetic.main.item_crowdloan.view.itemCrowdloanArrow
 import kotlinx.android.synthetic.main.item_crowdloan.view.itemCrowdloanIcon
-import kotlinx.android.synthetic.main.item_crowdloan.view.itemCrowdloanMyContribution
 import kotlinx.android.synthetic.main.item_crowdloan.view.itemCrowdloanParaDescription
 import kotlinx.android.synthetic.main.item_crowdloan.view.itemCrowdloanParaName
 import kotlinx.android.synthetic.main.item_crowdloan.view.itemCrowdloanParaRaised
+import kotlinx.android.synthetic.main.item_crowdloan.view.itemCrowdloanParaRaisedPercentage
+import kotlinx.android.synthetic.main.item_crowdloan.view.itemCrowdloanParaRaisedProgress
 import kotlinx.android.synthetic.main.item_crowdloan.view.itemCrowdloanTimeRemaining
+import kotlinx.android.synthetic.main.item_crowdloan_group.view.itemCrowdloanGroupCounter
 import kotlinx.android.synthetic.main.item_crowdloan_group.view.itemCrowdloanGroupStatus
 
 class CrowdloanAdapter(
@@ -59,7 +62,6 @@ class CrowdloanAdapter(
             when (it) {
                 CrowdloanModel::state -> (holder as CrowdloanChildHolder).bindState(child, handler)
                 CrowdloanModel::raised -> (holder as CrowdloanChildHolder).bindRaised(child)
-                CrowdloanModel::myContribution -> (holder as CrowdloanChildHolder).bindMyContribution(child)
             }
         }
     }
@@ -95,14 +97,14 @@ private object CrowdloanDiffCallback : BaseGroupedDiffCallback<CrowdloanStatusMo
 }
 
 private object CrowdloanPayloadGenerator : PayloadGenerator<CrowdloanModel>(
-    CrowdloanModel::state, CrowdloanModel::raised, CrowdloanModel::myContribution
+    CrowdloanModel::state, CrowdloanModel::raised
 )
 
 private class CrowdloanGroupHolder(containerView: View) : GroupedListHolder(containerView) {
 
     fun bind(item: CrowdloanStatusModel) = with(containerView) {
-        itemCrowdloanGroupStatus.text = item.text
-        itemCrowdloanGroupStatus.setTextColorRes(item.textColorRes)
+        itemCrowdloanGroupStatus.text = item.status
+        itemCrowdloanGroupCounter.text = item.count
     }
 }
 
@@ -110,6 +112,12 @@ private class CrowdloanChildHolder(
     private val imageLoader: ImageLoader,
     containerView: View,
 ) : GroupedListHolder(containerView) {
+
+    init {
+        with(containerView.context) {
+            containerView.background = addRipple(getBlurDrawable())
+        }
+    }
 
     fun bind(
         item: CrowdloanModel,
@@ -119,7 +127,6 @@ private class CrowdloanChildHolder(
         itemCrowdloanParaName.text = item.title
 
         bindRaised(item)
-        bindMyContribution(item)
 
         when (val icon = item.icon) {
             is CrowdloanModel.Icon.FromDrawable -> {
@@ -141,17 +148,23 @@ private class CrowdloanChildHolder(
             itemCrowdloanParaName.setTextColorRes(R.color.white)
             itemCrowdloanParaDescription.setTextColorRes(R.color.black1)
             itemCrowdloanParaRaised.setTextColorRes(R.color.white)
+            itemCrowdloanParaRaisedPercentage.setTextColorRes(R.color.accentBlue)
 
             itemCrowdloanArrow.makeVisible()
 
             setOnClickListener { handler.crowdloanClicked(item.parachainId) }
+
+            itemCrowdloanParaRaisedProgress.isEnabled = true
         } else {
             itemCrowdloanTimeRemaining.makeGone()
             itemCrowdloanArrow.makeGone()
 
-            itemCrowdloanParaName.setTextColorRes(R.color.black2)
-            itemCrowdloanParaDescription.setTextColorRes(R.color.black2)
-            itemCrowdloanParaRaised.setTextColorRes(R.color.black2)
+            itemCrowdloanParaName.setTextColorRes(R.color.white_64)
+            itemCrowdloanParaDescription.setTextColorRes(R.color.white_64)
+            itemCrowdloanParaRaised.setTextColorRes(R.color.white_64)
+            itemCrowdloanParaRaisedPercentage.setTextColorRes(R.color.white_64)
+
+            itemCrowdloanParaRaisedProgress.isEnabled = false
 
             setOnClickListener(null)
         }
@@ -163,12 +176,9 @@ private class CrowdloanChildHolder(
         }
     }
 
-    fun bindRaised(item: CrowdloanModel) {
-        containerView.itemCrowdloanParaRaised.text = item.raised
-    }
-
-    fun bindMyContribution(item: CrowdloanModel) {
-        containerView.itemCrowdloanMyContribution.setVisible(item.myContribution != null)
-        containerView.itemCrowdloanMyContribution.text = item.myContribution
+    fun bindRaised(item: CrowdloanModel) = with(containerView) {
+        itemCrowdloanParaRaised.text = item.raised.value
+        itemCrowdloanParaRaisedProgress.progress = item.raised.percentage
+        itemCrowdloanParaRaisedPercentage.text = item.raised.percentageDisplay
     }
 }

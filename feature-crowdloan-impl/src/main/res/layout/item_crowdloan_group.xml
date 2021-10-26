@@ -1,15 +1,35 @@
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/itemCrowdloanGroupStatus"
-    style="@style/TextAppearance.NovaFoundation.CapsTitle2"
-    android:layout_width="wrap_content"
+    android:id="@+id/itemCrowdloanGroup"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:drawablePadding="8dp"
-    android:paddingTop="21dp"
-    android:paddingBottom="6dp"
-    android:paddingStart="16dp"
-    android:paddingEnd="16dp"
-    android:includeFontPadding="false"
-    tools:background="@color/black"
-    tools:text="active (1)"
-    tools:textColor="@color/green" />
+    android:orientation="horizontal"
+    android:paddingStart="4dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="16dp">
+
+    <TextView
+        android:id="@+id/itemCrowdloanGroupStatus"
+        style="@style/TextAppearance.NovaFoundation.Header3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:includeFontPadding="false"
+        tools:text="Active" />
+
+    <TextView
+        android:id="@+id/itemCrowdloanGroupCounter"
+        style="@style/TextAppearance.NovaFoundation.Header5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/bg_crowdloan_status_chip"
+        android:includeFontPadding="false"
+        android:paddingStart="10dp"
+        android:paddingTop="3dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="2dp"
+        tools:text="13" />
+
+</LinearLayout>
+

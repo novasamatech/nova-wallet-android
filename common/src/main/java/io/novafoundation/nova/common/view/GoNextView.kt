@@ -1,6 +1,7 @@
 package io.novafoundation.nova.common.view
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.View
 import android.widget.ImageView
@@ -24,8 +25,6 @@ class GoNextView @JvmOverloads constructor(
 
     init {
         View.inflate(context, R.layout.view_go_next, this)
-
-        setBackgroundResource(R.drawable.bg_primary_list_item)
 
         attrs?.let(this::applyAttributes)
     }
@@ -51,6 +50,11 @@ class GoNextView @JvmOverloads constructor(
         goNextBadgeText.setTextOrHide(badgeText)
     }
 
+    fun setIcon(drawable: Drawable?) {
+        icon.setImageDrawable(drawable)
+        icon.setVisible(drawable != null)
+    }
+
     private fun applyAttributes(attributeSet: AttributeSet?) {
         val typedArray = context.obtainStyledAttributes(attributeSet, R.styleable.GoNextView)
 
@@ -61,13 +65,16 @@ class GoNextView @JvmOverloads constructor(
         setInProgress(inProgress)
 
         val iconDrawable = typedArray.getDrawable(R.styleable.GoNextView_icon)
-        icon.setImageDrawable(iconDrawable)
+        setIcon(iconDrawable)
 
         val actionIconDrawable = typedArray.getDrawable(R.styleable.GoNextView_actionIcon)
         goNextActionImage.setImageDrawable(actionIconDrawable)
 
         val dividerVisible = typedArray.getBoolean(R.styleable.GoNextView_dividerVisible, true)
         setDividerVisible(dividerVisible)
+
+        val backgroundDrawable = typedArray.getDrawable(R.styleable.GoNextView_android_background)
+        if (backgroundDrawable != null) background = backgroundDrawable else setBackgroundResource(R.drawable.bg_primary_list_item)
 
         typedArray.recycle()
     }
