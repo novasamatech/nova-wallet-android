@@ -15,7 +15,7 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         buildConfigField "String", "KARURA_NOVA_REFERRAL", "\"0x9642d0db9f3b301b44df74b63b0b930011e3f52154c5ca24b4dc67b3c7322f15\""
-        buildConfigField "String", "ACALA_NOVA_REFERRAL", "\"0xbcb330a49b5766dcd63fff92cf95243ec2a29c4131f19155724095e5cfd5197a\"" // TODO fill with actual acala code
+        buildConfigField "String", "ACALA_NOVA_REFERRAL", "\"0x08eb319467ea54784cd9edfbd03bbcc53f7a021ed8d9ed2ca97b6ae46b3f6014\""
         buildConfigField "String", "BIFROST_NOVA_REFERRAL", "\"FRLS69\""
         buildConfigField "String", "BIFROST_TERMS_LINKS", "\"https://docs.google.com/document/d/1PDpgHnIcAmaa7dEFusmLYgjlvAbk2VKtMd755bdEsf4\""
 
@@ -27,8 +27,6 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-
-            buildConfigField "String", "ACALA_NOVA_REFERRAL", "\"0xc5c184f0565e2192d6aedae584ee736cef875f0e1c558ee3ede26869acd0b4d6\""
         }
     }
 
