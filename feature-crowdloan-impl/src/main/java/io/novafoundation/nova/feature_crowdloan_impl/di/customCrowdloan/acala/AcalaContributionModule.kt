@@ -42,7 +42,6 @@ class AcalaContributionModule {
         interactor: AcalaContributeInteractor,
     ) = AcalaContributeSubmitter(interactor)
 
-
     @Provides
     @FeatureScope
     fun provideAcalaExtraBonusFlow(

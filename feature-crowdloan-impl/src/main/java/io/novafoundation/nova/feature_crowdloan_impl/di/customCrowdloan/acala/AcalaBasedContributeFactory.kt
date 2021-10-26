@@ -65,7 +65,6 @@ class KaruraContributeFactory(
     override val flowType: String = "Karura"
 }
 
-
 class KaruraExtraBonusFlow(
     interactor: AcalaContributeInteractor,
     resourceManager: ResourceManager,

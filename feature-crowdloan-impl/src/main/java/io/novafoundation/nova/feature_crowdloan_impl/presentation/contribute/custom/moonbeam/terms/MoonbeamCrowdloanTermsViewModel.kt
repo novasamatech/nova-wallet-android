@@ -27,7 +27,6 @@ sealed class SubmitActionState {
     class Unavailable(val reason: String) : SubmitActionState()
 }
 
-
 class TermsLinkContent(
     val title: String,
     val iconUrl: String,

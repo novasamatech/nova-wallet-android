@@ -17,5 +17,3 @@ class MoonbeamContributeFactory(
 
     override val flowType: String = "Moonbeam"
 }
-
-
