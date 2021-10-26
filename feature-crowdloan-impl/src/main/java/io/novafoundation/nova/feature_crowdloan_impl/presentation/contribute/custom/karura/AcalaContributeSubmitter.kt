@@ -10,11 +10,13 @@ class AcalaContributeSubmitter(
 ) : CustomContributeSubmitter {
 
     override suspend fun submitOffChain(
-        payload: BonusPayload,
-        amount: BigDecimal
+        payload: BonusPayload?,
+        amount: BigDecimal,
     ): Result<Unit> {
-        require(payload is AcalaBonusPayload)
+        require(payload is AcalaBonusPayload?)
 
-        return interactor.registerInBonusProgram(payload.referralCode, amount)
+        return payload?.let {
+            interactor.registerInBonusProgram(payload.referralCode, amount)
+        } ?: Result.success(Unit)
     }
 }

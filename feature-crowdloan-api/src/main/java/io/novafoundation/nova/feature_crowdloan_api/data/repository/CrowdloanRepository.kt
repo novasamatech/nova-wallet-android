@@ -27,6 +27,8 @@ interface CrowdloanRepository {
 
     fun fundInfoFlow(chainId: ChainId, parachainId: ParaId): Flow<FundInfo>
 
+    suspend fun getFundInfo(chainId: ChainId, parachainId: ParaId): FundInfo
+
     suspend fun minContribution(chainId: ChainId): BigInteger
 }
 

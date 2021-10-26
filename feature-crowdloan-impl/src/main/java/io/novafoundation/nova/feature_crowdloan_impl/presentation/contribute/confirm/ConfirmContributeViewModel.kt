@@ -96,9 +96,11 @@ class ConfirmContributeViewModel(
         customContributeManager.getFactoryOrNull(it)
     }
 
+    private val parachainMetadata = payload.metadata?.let(::mapParachainMetadataFromParcel)
+
     val customizationConfiguration: Flow<Pair<MainFlowCustomization, MainFlowCustomization.ViewState>?> = flowOf {
         relevantCustomFlowFactory?.confirmContributeCustomization?.let {
-            it to it.createViewState(coroutineScope = this, payload.metadata?.let(::mapParachainMetadataFromParcel))
+            it to it.createViewState(coroutineScope = this, parachainMetadata)
         }
     }
         .inBackground()
@@ -106,7 +108,7 @@ class ConfirmContributeViewModel(
 
     val estimatedReward = payload.estimatedRewardDisplay
 
-    private val crowdloanFlow = contributionInteractor.crowdloanStateFlow(payload.paraId)
+    private val crowdloanFlow = contributionInteractor.crowdloanStateFlow(payload.paraId, parachainMetadata)
         .inBackground()
         .share()
 
@@ -178,12 +180,19 @@ class ConfirmContributeViewModel(
             }
 
             customSubmissionResult.mapCatching {
-                val additionalSubmission = payload.bonusPayload?.let {
-                    additionalOnChainSubmission(it, payload.metadata!!.customFlow!!, payload.amount, customContributeManager)
+                val crowdloan = crowdloanFlow.first()
+
+                val additionalSubmission = relevantCustomFlowFactory?.let {
+                    additionalOnChainSubmission(
+                        bonusPayload = payload.bonusPayload,
+                        crowdloan = crowdloan,
+                        amount = payload.amount,
+                        factory = it
+                    )
                 }
 
                 contributionInteractor.contribute(
-                    parachainId = payload.paraId,
+                    crowdloan = crowdloan,
                     contribution = payload.amount,
                     additional = additionalSubmission
                 )

@@ -19,12 +19,16 @@ import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.moonbeam.a
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.moonbeam.checkRemark
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.moonbeam.moonbeamChainId
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.moonbeam.verifyRemark
+import io.novafoundation.nova.feature_crowdloan_impl.data.network.blockhain.extrinsic.addMemo
+import io.novafoundation.nova.feature_crowdloan_impl.domain.main.Crowdloan
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.extrinsic.systemRemark
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
+import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
+import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
@@ -53,6 +57,18 @@ class MoonbeamCrowdloanInteractor(
         return CrossChainRewardDestination(
             addressInDestination = currentAccount.addressIn(moonbeamChain)!!,
             destination = moonbeamChain
+        )
+    }
+
+    suspend fun additionalSubmission(
+        crowdloan: Crowdloan,
+        extrinsicBuilder: ExtrinsicBuilder,
+    ) {
+        val rewardDestination = getMoonbeamRewardDestination(crowdloan.parachainMetadata!!)
+
+        extrinsicBuilder.addMemo(
+            parachainId = crowdloan.parachainId,
+            memo = rewardDestination.addressInDestination.fromHex()
         )
     }
 

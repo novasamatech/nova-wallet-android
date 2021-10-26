@@ -41,6 +41,13 @@ interface MoonbeamApi {
         @Header("x-api-key") apiToken: String?,
         @Body body: VerifyRemarkRequest,
     ): VerifyRemarkResponse
+
+    @POST("//{baseUrl}/make-signature")
+    suspend fun makeSignature(
+        @Path("baseUrl") baseUrl: String,
+        @Header("x-api-key") apiToken: String?,
+        @Body body: MakeSignatureRequest,
+    ): MakeSignatureResponse
 }
 
 fun ParachainMetadata.moonbeamChainId() = getExtra("paraId")
@@ -58,4 +65,8 @@ suspend fun MoonbeamApi.agreeRemark(chainMetadata: ParachainMetadata, body: Agre
 
 suspend fun MoonbeamApi.verifyRemark(chainMetadata: ParachainMetadata, body: VerifyRemarkRequest): VerifyRemarkResponse {
     return verifyRemark(chainMetadata.apiBaseUrl(), chainMetadata.apiToken(), body)
+}
+
+suspend fun MoonbeamApi.makeSignature(chainMetadata: ParachainMetadata, body: MakeSignatureRequest): MakeSignatureResponse {
+    return makeSignature(chainMetadata.apiBaseUrl(), chainMetadata.apiToken(), body)
 }

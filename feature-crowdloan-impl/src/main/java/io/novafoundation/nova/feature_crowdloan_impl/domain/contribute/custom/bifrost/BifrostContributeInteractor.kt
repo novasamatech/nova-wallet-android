@@ -6,8 +6,6 @@ import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.bifrost.Bi
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.bifrost.getAccountByReferralCode
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.blockhain.extrinsic.addMemo
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 class BifrostContributeInteractor(
     val novaReferralCode: String,
@@ -21,11 +19,9 @@ class BifrostContributeInteractor(
         return response.data.getAccountByInvitationCode.account.isNullOrEmpty().not()
     }
 
-    suspend fun submitOnChain(
+    fun submitOnChain(
         paraId: ParaId,
         referralCode: String,
-        extrinsicBuilder: ExtrinsicBuilder
-    ) = withContext(Dispatchers.Default) {
-        extrinsicBuilder.addMemo(paraId, referralCode)
-    }
+        extrinsicBuilder: ExtrinsicBuilder,
+    ) = extrinsicBuilder.addMemo(paraId, referralCode)
 }

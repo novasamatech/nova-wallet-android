@@ -5,6 +5,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.Contribution
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.FundInfo
+import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.ParaId
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRepository
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ParachainMetadata
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.getContributions
@@ -16,18 +17,17 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import java.math.BigDecimal
-import java.math.BigInteger
 import kotlin.reflect.KClass
 
 class Crowdloan(
     val parachainMetadata: ParachainMetadata?,
-    val parachainId: BigInteger,
+    val parachainId: ParaId,
     val raisedFraction: BigDecimal,
     val state: State,
     val leasePeriodInMillis: Long,
     val leasedUntilInMillis: Long,
     val fundInfo: FundInfo,
-    val myContribution: Contribution?
+    val myContribution: Contribution?,
 ) {
 
     sealed class State {

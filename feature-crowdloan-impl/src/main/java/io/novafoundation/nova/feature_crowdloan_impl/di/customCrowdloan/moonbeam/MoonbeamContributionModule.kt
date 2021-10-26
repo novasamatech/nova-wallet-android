@@ -57,7 +57,7 @@ class MoonbeamContributionModule {
 
     @Provides
     @FeatureScope
-    fun provideMoonbeamSubmitter() = MoonbeamCrowdloanSubmitter()
+    fun provideMoonbeamSubmitter(interactor: MoonbeamCrowdloanInteractor) = MoonbeamCrowdloanSubmitter(interactor)
 
     @Provides
     @FeatureScope
@@ -76,8 +76,9 @@ class MoonbeamContributionModule {
     @Provides
     @FeatureScope
     fun provideMoonbeamPrivateSignatureProvider(
-        interactor: MoonbeamCrowdloanInteractor,
-    ) = MoonbeamPrivateSignatureProvider(interactor)
+        moonbeamApi: MoonbeamApi,
+        httpExceptionHandler: HttpExceptionHandler,
+    ) = MoonbeamPrivateSignatureProvider(moonbeamApi, httpExceptionHandler)
 
     @Provides
     @FeatureScope

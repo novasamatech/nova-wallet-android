@@ -95,6 +95,14 @@ class CrowdloanRepositoryImpl(
         )
     }
 
+    override suspend fun getFundInfo(chainId: ChainId, parachainId: ParaId): FundInfo {
+        return remoteStorage.query(
+            keyBuilder = { it.metadata.crowdloan().storage("Funds").storageKey(it, parachainId) },
+            binding = { scale, runtime -> bindFundInfo(scale!!, runtime, parachainId) },
+            chainId = chainId
+        )
+    }
+
     override suspend fun minContribution(chainId: ChainId): BigInteger {
         val runtime = runtimeFor(chainId)
 
@@ -105,7 +113,7 @@ class CrowdloanRepositoryImpl(
         chainId: ChainId,
         accountId: AccountId,
         paraId: ParaId,
-        trieIndex: BigInteger
+        trieIndex: BigInteger,
     ): Contribution? {
         return remoteStorage.queryChildState(
             storageKeyBuilder = { accountId.toHexString(withPrefix = true) },
