@@ -20,7 +20,6 @@ class MoonbeamPrivateSignatureProvider(
     private val httpExceptionHandler: HttpExceptionHandler,
 ) : PrivateCrowdloanSignatureProvider {
 
-
     override suspend fun provideSignature(
         chainMetadata: ParachainMetadata,
         previousContribution: BigInteger,

@@ -108,7 +108,7 @@ class ConfirmContributeMoonbeamCustomization(
 
     override fun createTitleView(context: Context): TextView {
         return TextView(context, null, 0, R.style.TextAppearance_NovaFoundation_Body1).apply {
-            layoutParams = injectionLayoutParams(context, topMarginDp = 15)
+            layoutParams = injectionLayoutParams(context, topMarginDp = 0)
 
             setTextColorRes(R.color.black1)
         }
