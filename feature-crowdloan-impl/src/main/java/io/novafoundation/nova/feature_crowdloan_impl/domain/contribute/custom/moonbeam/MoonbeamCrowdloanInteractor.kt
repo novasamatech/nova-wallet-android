@@ -1,11 +1,14 @@
 package io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.moonbeam
 
+import android.util.Log
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
+import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.sha256
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.secrets.sign
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.domain.model.hasChainAccountIn
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.moonbeam.AgreeRemarkRequest
@@ -13,12 +16,15 @@ import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.moonbeam.M
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.moonbeam.agreeRemark
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.moonbeam.checkRemark
 import io.novafoundation.nova.runtime.ext.Geneses
+import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.extrinsic.systemRemark
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.math.BigInteger
@@ -63,7 +69,7 @@ class MoonbeamCrowdloanInteractor(
         }
     }
 
-    suspend fun submitTerms(): Result<Unit> = withContext(Dispatchers.Default) {
+    suspend fun submitTerms(): Result<*> = withContext(Dispatchers.Default) {
         runCatching {
             val chain = selectedChainAssetState.chain()
             val metaAccount = accountRepository.getSelectedMetaAccount()
@@ -76,6 +82,14 @@ class MoonbeamCrowdloanInteractor(
 
             val agreeRemarkRequest = AgreeRemarkRequest(currentAddress, signedHash)
             val remark = httpExceptionHandler.wrap { moonbeamApi.agreeRemark(chain, agreeRemarkRequest) }.remark
+
+            val finalizedStatus = extrinsicService.submitAndWatchExtrinsic(chain, metaAccount.accountIdIn(chain)!!) {
+                systemRemark(remark.encodeToByteArray())
+            }
+                .filterIsInstance<ExtrinsicStatus.Finalized>()
+                .first()
+
+            Log.d(this@MoonbeamCrowdloanInteractor.LOG_TAG, "Finalized ${finalizedStatus.extrinsicHash} in block ${finalizedStatus.blockHash}")
         }
     }
 
