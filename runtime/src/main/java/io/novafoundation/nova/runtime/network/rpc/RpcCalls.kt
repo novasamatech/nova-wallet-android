@@ -1,6 +1,5 @@
 package io.novafoundation.nova.runtime.network.rpc
 
-import android.util.Log
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.data.network.runtime.calls.FeeCalculationRequest
 import io.novafoundation.nova.common.data.network.runtime.calls.GetBlockHashRequest
@@ -29,7 +28,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import java.math.BigInteger
 
 @Suppress("EXPERIMENTAL_API_USAGE")
@@ -64,7 +62,7 @@ class RpcCalls(
                 .map { it.asExtrinsicStatus(hash) }
 
             emitAll(inner)
-        }.onEach { Log.d("RX", it.toString()) }
+        }
     }
 
     suspend fun getNonce(chainId: ChainId, accountAddress: String): BigInteger {
