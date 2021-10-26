@@ -25,18 +25,18 @@ class MoonbeamRewardDestinationUi(
     val title: String,
 )
 
-class SelectContributeMoonbeamViewStateFactory(
+class MoonbeamMainFlowCustomViewStateFactory(
     private val interactor: MoonbeamCrowdloanInteractor,
     private val resourceManager: ResourceManager,
     private val iconGenerator: AddressIconGenerator,
 ) {
 
-    fun create(scope: CoroutineScope, parachainMetadata: ParachainMetadata): SelectContributeMoonbeamViewState {
-        return SelectContributeMoonbeamViewState(scope, parachainMetadata, interactor, resourceManager, iconGenerator)
+    fun create(scope: CoroutineScope, parachainMetadata: ParachainMetadata): MoonbeamMainFlowCustomViewState {
+        return MoonbeamMainFlowCustomViewState(scope, parachainMetadata, interactor, resourceManager, iconGenerator)
     }
 }
 
-class SelectContributeMoonbeamViewState(
+class MoonbeamMainFlowCustomViewState(
     coroutineScope: CoroutineScope,
     private val parachainMetadata: ParachainMetadata,
     interactor: MoonbeamCrowdloanInteractor,

@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatAsCurrency
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.validation.ValidationExecutor
@@ -25,6 +26,8 @@ import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.add
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.confirm.model.LeasePeriodModel
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.confirm.parcel.ConfirmContributePayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.contributeValidationFailure
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.MainFlowCustomization
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.parcel.mapParachainMetadataFromParcel
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapAssetToAssetModel
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapFeeToFeeModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
@@ -32,6 +35,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatT
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -84,6 +88,18 @@ class ConfirmContributeViewModel(
 
     val enteredFiatAmountFlow = assetFlow.map { asset ->
         asset.token.fiatAmount(payload.amount).formatAsCurrency()
+    }
+        .inBackground()
+        .share()
+
+    private val relevantCustomFlowFactory = payload.metadata?.customFlow?.let {
+        customContributeManager.getFactoryOrNull(it)
+    }
+
+    val customizationConfiguration: Flow<Pair<MainFlowCustomization, MainFlowCustomization.ViewState>?> = flowOf {
+        relevantCustomFlowFactory?.confirmContributeCustomization?.let {
+            it to it.createViewState(coroutineScope = this, payload.metadata?.let(::mapParachainMetadataFromParcel))
+        }
     }
         .inBackground()
         .share()

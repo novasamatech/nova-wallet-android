@@ -21,8 +21,9 @@ import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.mo
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.MoonbeamCrowdloanSubmitter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.MoonbeamStartFlowInterceptor
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.selectContribute.ConfirmContributeMoonbeamCustomization
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.selectContribute.MoonbeamMainFlowCustomViewStateFactory
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.selectContribute.SelectContributeMoonbeamCustomization
-import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.selectContribute.SelectContributeMoonbeamViewStateFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module
@@ -84,14 +85,21 @@ class MoonbeamContributionModule {
         interactor: MoonbeamCrowdloanInteractor,
         resourceManager: ResourceManager,
         iconGenerator: AddressIconGenerator,
-    ) = SelectContributeMoonbeamViewStateFactory(interactor, resourceManager, iconGenerator)
+    ) = MoonbeamMainFlowCustomViewStateFactory(interactor, resourceManager, iconGenerator)
 
     @Provides
     @FeatureScope
     fun provideSelectContributeMoonbeamCustomization(
-        viewStateFactory: SelectContributeMoonbeamViewStateFactory,
+        viewStateFactory: MoonbeamMainFlowCustomViewStateFactory,
         imageLoader: ImageLoader,
     ) = SelectContributeMoonbeamCustomization(viewStateFactory, imageLoader)
+
+    @Provides
+    @FeatureScope
+    fun provideConfirmContributeMoonbeamCustomization(
+        viewStateFactory: MoonbeamMainFlowCustomViewStateFactory,
+        imageLoader: ImageLoader,
+    ) = ConfirmContributeMoonbeamCustomization(viewStateFactory, imageLoader)
 
     @Provides
     @FeatureScope
@@ -101,10 +109,12 @@ class MoonbeamContributionModule {
         moonbeamStartFlowInterceptor: MoonbeamStartFlowInterceptor,
         privateSignatureProvider: MoonbeamPrivateSignatureProvider,
         selectContributeMoonbeamCustomization: SelectContributeMoonbeamCustomization,
+        confirmContributeMoonbeamCustomization: ConfirmContributeMoonbeamCustomization,
     ): CustomContributeFactory = MoonbeamContributeFactory(
         submitter = submitter,
         startFlowInterceptor = moonbeamStartFlowInterceptor,
         privateCrowdloanSignatureProvider = privateSignatureProvider,
-        selectContributeCustomization = selectContributeMoonbeamCustomization
+        selectContributeCustomization = selectContributeMoonbeamCustomization,
+        confirmContributeCustomization = confirmContributeMoonbeamCustomization
     )
 }

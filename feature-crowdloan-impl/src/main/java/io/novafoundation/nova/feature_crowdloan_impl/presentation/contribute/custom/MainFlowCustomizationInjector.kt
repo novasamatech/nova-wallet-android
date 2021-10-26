@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.cu
 import android.os.Parcelable
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleCoroutineScope
-import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.parcel.ContributePayload
+import io.novafoundation.nova.feature_crowdloan_api.data.repository.ParachainMetadata
 import kotlinx.coroutines.CoroutineScope
 
 interface MainFlowCustomization {
@@ -15,5 +15,5 @@ interface MainFlowCustomization {
 
     fun injectViews(into: ViewGroup, state: ViewState, scope: LifecycleCoroutineScope)
 
-    fun createViewState(coroutineScope: CoroutineScope, contributionPayload: ContributePayload): ViewState
+    fun createViewState(coroutineScope: CoroutineScope, parachainMetadata: ParachainMetadata?): ViewState
 }

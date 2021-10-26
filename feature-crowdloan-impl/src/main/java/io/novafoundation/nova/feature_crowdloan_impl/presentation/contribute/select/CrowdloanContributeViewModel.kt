@@ -104,7 +104,7 @@ class CrowdloanContributeViewModel(
 
     val customizationConfiguration: Flow<Pair<MainFlowCustomization, MainFlowCustomization.ViewState>?> = flowOf {
         relevantCustomFlowFactory?.selectContributeCustomization?.let {
-            it to it.createViewState(coroutineScope = this, payload)
+            it to it.createViewState(coroutineScope = this, parachainMetadata)
         }
     }
         .inBackground()

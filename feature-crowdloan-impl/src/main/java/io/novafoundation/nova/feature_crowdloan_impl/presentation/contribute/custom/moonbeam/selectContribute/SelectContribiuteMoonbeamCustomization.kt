@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.selectContribute
 
 import android.content.Context
+import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
@@ -12,28 +13,34 @@ import coil.load
 import io.novafoundation.nova.common.utils.addAfter
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.observeInLifecycle
+import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.LabeledTextView
+import io.novafoundation.nova.feature_crowdloan_api.data.repository.ParachainMetadata
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.MainFlowCustomization
-import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.parcel.ContributePayload
-import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.parcel.mapParachainMetadataFromParcel
 import kotlinx.android.synthetic.main.fragment_contribute.view.crowdloanContributeDescription
 import kotlinx.android.synthetic.main.fragment_contribute.view.crowdloanContributeScrollableContent
+import kotlinx.android.synthetic.main.fragment_contribute_confirm.view.confirmContributeAmount
+import kotlinx.android.synthetic.main.fragment_contribute_confirm.view.confirmContributeInjectionParent
 import kotlinx.coroutines.CoroutineScope
 
-class SelectContributeMoonbeamCustomization(
-    private val viewStateFactory: SelectContributeMoonbeamViewStateFactory,
+abstract class MainFlowMoonbeamCustomization(
+    private val viewStateFactory: MoonbeamMainFlowCustomViewStateFactory,
     private val imageLoader: ImageLoader,
 ) : MainFlowCustomization {
 
+    protected abstract fun getInjectionContainer(into: ViewGroup): ViewGroup
+
+    protected abstract fun getAnchor(into: ViewGroup): View
+
+    protected abstract fun createTitleView(context: Context): TextView
+
     override fun injectViews(into: ViewGroup, state: MainFlowCustomization.ViewState, scope: LifecycleCoroutineScope) {
-        require(state is SelectContributeMoonbeamViewState)
+        require(state is MoonbeamMainFlowCustomViewState)
 
         with(into) {
-            val title = TextView(context, null, 0, R.style.TextAppearance_NovaFoundation_Header4).apply {
-                layoutParams = injectionLayoutParams(context, topMarginDp = 22)
-            }
+            val title = createTitleView(context)
 
             val rewardDestinationView = LabeledTextView(context).apply {
                 setActionIcon(null)
@@ -41,8 +48,8 @@ class SelectContributeMoonbeamCustomization(
                 layoutParams = injectionLayoutParams(context, topMarginDp = 10)
             }
 
-            crowdloanContributeScrollableContent.addAfter(
-                anchor = crowdloanContributeDescription,
+            getInjectionContainer(into).addAfter(
+                anchor = getAnchor(into),
                 newViews = listOf(title, rewardDestinationView)
             )
 
@@ -58,7 +65,7 @@ class SelectContributeMoonbeamCustomization(
         }
     }
 
-    private fun injectionLayoutParams(
+    protected fun injectionLayoutParams(
         context: Context,
         topMarginDp: Int,
     ): LinearLayout.LayoutParams {
@@ -69,7 +76,41 @@ class SelectContributeMoonbeamCustomization(
         }
     }
 
-    override fun createViewState(coroutineScope: CoroutineScope, contributionPayload: ContributePayload): SelectContributeMoonbeamViewState {
-        return viewStateFactory.create(coroutineScope, mapParachainMetadataFromParcel(contributionPayload.parachainMetadata!!))
+    override fun createViewState(coroutineScope: CoroutineScope, parachainMetadata: ParachainMetadata?): MoonbeamMainFlowCustomViewState {
+        return viewStateFactory.create(coroutineScope, parachainMetadata!!)
+    }
+}
+
+class SelectContributeMoonbeamCustomization(
+    viewStateFactory: MoonbeamMainFlowCustomViewStateFactory,
+    imageLoader: ImageLoader,
+) : MainFlowMoonbeamCustomization(viewStateFactory, imageLoader) {
+
+    override fun getInjectionContainer(into: ViewGroup): ViewGroup = into.crowdloanContributeScrollableContent
+
+    override fun getAnchor(into: ViewGroup): View = into.crowdloanContributeDescription
+
+    override fun createTitleView(context: Context): TextView {
+        return TextView(context, null, 0, R.style.TextAppearance_NovaFoundation_Header4).apply {
+            layoutParams = injectionLayoutParams(context, topMarginDp = 22)
+        }
+    }
+}
+
+class ConfirmContributeMoonbeamCustomization(
+    viewStateFactory: MoonbeamMainFlowCustomViewStateFactory,
+    imageLoader: ImageLoader,
+) : MainFlowMoonbeamCustomization(viewStateFactory, imageLoader) {
+
+    override fun getInjectionContainer(into: ViewGroup): ViewGroup = into.confirmContributeInjectionParent
+
+    override fun getAnchor(into: ViewGroup): View = into.confirmContributeAmount
+
+    override fun createTitleView(context: Context): TextView {
+        return TextView(context, null, 0, R.style.TextAppearance_NovaFoundation_Body1).apply {
+            layoutParams = injectionLayoutParams(context, topMarginDp = 15)
+
+            setTextColorRes(R.color.black1)
+        }
     }
 }
