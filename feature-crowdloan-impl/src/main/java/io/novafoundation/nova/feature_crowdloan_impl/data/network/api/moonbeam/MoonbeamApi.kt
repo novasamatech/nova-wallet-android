@@ -12,7 +12,8 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 
 private val AUTH_TOKENS = mapOf(
-    "MOONBEAM_TEST_AUTH_TOKEN" to BuildConfig.MOONBEAM_TEST_AUTH_TOKEN
+    "MOONBEAM_TEST_AUTH_TOKEN" to BuildConfig.MOONBEAM_TEST_AUTH_TOKEN,
+    "MOONBEAM_PROD_AUTH_TOKEN" to BuildConfig.MOONBEAM_PROD_AUTH_TOKEN
 )
 
 interface MoonbeamApi {
