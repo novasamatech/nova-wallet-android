@@ -207,6 +207,14 @@
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit"
             app:destination="@id/moonbeamCrowdloanTermsFragment" />
+
+        <action
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            android:id="@+id/action_mainFragment_to_userContributionsFragment"
+            app:destination="@id/userContributionsFragment" />
     </fragment>
 
     <fragment
@@ -862,5 +870,11 @@
             app:popUpTo="@id/mainFragment"
             app:destination="@id/crowdloanContributeFragment" />
     </fragment>
+
+    <fragment
+        tools:layout="@layout/fragment_my_contributions"
+        android:id="@+id/userContributionsFragment"
+        android:name="io.novafoundation.nova.feature_crowdloan_impl.presentation.contributions.UserContributionsFragment"
+        android:label="UserContributionsFragment" />
 
 </navigation>

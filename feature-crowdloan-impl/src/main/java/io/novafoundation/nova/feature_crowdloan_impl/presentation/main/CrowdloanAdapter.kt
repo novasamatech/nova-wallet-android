@@ -4,7 +4,6 @@ import android.view.View
 import android.view.ViewGroup
 import coil.ImageLoader
 import coil.clear
-import coil.load
 import io.novafoundation.nova.common.list.BaseGroupedDiffCallback
 import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
@@ -20,6 +19,7 @@ import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.bindi
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.main.model.CrowdloanModel
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.main.model.CrowdloanStatusModel
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.model.setIcon
 import kotlinx.android.synthetic.main.item_crowdloan.view.itemCrowdloanArrow
 import kotlinx.android.synthetic.main.item_crowdloan.view.itemCrowdloanIcon
 import kotlinx.android.synthetic.main.item_crowdloan.view.itemCrowdloanParaDescription
@@ -128,14 +128,7 @@ private class CrowdloanChildHolder(
 
         bindRaised(item)
 
-        when (val icon = item.icon) {
-            is CrowdloanModel.Icon.FromDrawable -> {
-                itemCrowdloanIcon.setImageDrawable(icon.data)
-            }
-            is CrowdloanModel.Icon.FromLink -> {
-                itemCrowdloanIcon.load(icon.data, imageLoader)
-            }
-        }
+        itemCrowdloanIcon.setIcon(item.icon, imageLoader)
 
         bindState(item, handler)
     }

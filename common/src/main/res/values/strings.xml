@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+    <string name="crowdloan_contributions_placeholder">Your contributions\n will appear here</string>
+
     <string name="crowdloan_active_section_format_v2_0">Active</string>
     <string name="common_completed_with_count_v2_0">Completed</string>
 

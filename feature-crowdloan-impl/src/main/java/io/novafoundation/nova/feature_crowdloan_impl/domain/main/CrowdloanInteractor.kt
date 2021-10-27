@@ -57,12 +57,25 @@ class CrowdloanInteractor(
     private val chainStateRepository: ChainStateRepository,
 ) {
 
-    fun crowdloansFlow(chain: Chain): Flow<GroupedCrowdloans> {
+    fun contributedCrowdloansFlow(chain: Chain): Flow<List<Crowdloan>> {
+        return crowdloansFlow(chain)
+            .map { crowdloans -> crowdloans.filter { it.myContribution != null } }
+    }
+
+    fun groupedCrowdloansFlow(chain: Chain): Flow<GroupedCrowdloans> {
+        return crowdloansFlow(chain).map { crowdloans ->
+            crowdloans
+                .groupBy { it.state::class }
+                .toSortedMap(Crowdloan.State.STATE_CLASS_COMPARATOR)
+        }
+    }
+
+    private fun crowdloansFlow(chain: Chain): Flow<List<Crowdloan>> {
         return flow {
             val chainId = chain.id
 
             if (crowdloanRepository.isCrowdloansAvailable(chainId).not()) {
-                emit(emptyMap())
+                emit(emptyList())
 
                 return@flow
             }
@@ -105,8 +118,6 @@ class CrowdloanInteractor(
                         compareByDescending<Crowdloan> { it.fundInfo.raised }
                             .thenBy { it.fundInfo.end }
                     )
-                    .groupBy { it.state::class }
-                    .toSortedMap(Crowdloan.State.STATE_CLASS_COMPARATOR)
             }
 
             emitAll(withBlockUpdates)

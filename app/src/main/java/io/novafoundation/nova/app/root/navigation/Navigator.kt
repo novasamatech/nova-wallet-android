@@ -451,6 +451,10 @@ class Navigator :
         navController?.navigate(R.id.action_open_onboarding, WelcomeFragment.bundle(payload))
     }
 
+    override fun openUserContributions() {
+        navController?.navigate(R.id.action_mainFragment_to_userContributionsFragment)
+    }
+
     override fun exportMnemonicAction(exportPayload: ExportPayload): DelayedNavigation {
         val extras = ExportMnemonicFragment.getBundle(exportPayload)
 

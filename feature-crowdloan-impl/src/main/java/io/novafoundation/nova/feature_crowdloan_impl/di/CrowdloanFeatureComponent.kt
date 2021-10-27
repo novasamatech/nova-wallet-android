@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.cus
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.terms.di.MoonbeamCrowdloanTermsComponent
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.referral.ReferralContributeView
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.di.CrowdloanContributeComponent
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contributions.di.UserContributionsComponent
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.main.di.CrowdloanComponent
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
@@ -32,6 +33,8 @@ import io.novafoundation.nova.runtime.di.RuntimeApi
 interface CrowdloanFeatureComponent : CrowdloanFeatureApi {
 
     fun crowdloansFactory(): CrowdloanComponent.Factory
+
+    fun userContributionsFactory(): UserContributionsComponent.Factory
 
     fun selectContributeFactory(): CrowdloanContributeComponent.Factory
 
