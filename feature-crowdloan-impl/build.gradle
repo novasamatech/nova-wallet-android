@@ -19,6 +19,8 @@ android {
         buildConfigField "String", "BIFROST_NOVA_REFERRAL", "\"FRLS69\""
         buildConfigField "String", "BIFROST_TERMS_LINKS", "\"https://docs.google.com/document/d/1PDpgHnIcAmaa7dEFusmLYgjlvAbk2VKtMd755bdEsf4\""
 
+        buildConfigField "String", "ACALA_TERMS_LINK", "\"https://acala.network/acala/terms\""
+
         buildConfigField "String", "ACALA_TEST_AUTH_TOKEN", readSecret("ACALA_TEST_AUTH_TOKEN")
         buildConfigField "String", "ACALA_PROD_AUTH_TOKEN", readSecret("ACALA_PROD_AUTH_TOKEN")
 
