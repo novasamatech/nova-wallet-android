@@ -12,4 +12,4 @@ app/*.apk
 # ignore jacoco coverage reports
 /coverage
 
-fearless.jks
+*.jks
