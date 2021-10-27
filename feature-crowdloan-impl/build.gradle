@@ -25,6 +25,7 @@ android {
         buildConfigField "String", "ACALA_PROD_AUTH_TOKEN", readSecret("ACALA_PROD_AUTH_TOKEN")
 
         buildConfigField "String", "MOONBEAM_TEST_AUTH_TOKEN", readSecret("MOONBEAM_TEST_AUTH_TOKEN")
+        buildConfigField "String", "MOONBEAM_PROD_AUTH_TOKEN", readSecret("MOONBEAM_PROD_AUTH_TOKEN")
     }
 
     buildTypes {
