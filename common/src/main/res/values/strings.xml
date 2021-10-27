@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+    <string name="crowdloan_contributions_placeholder">Your contributions\n will appear here</string>
+
+    <string name="crowdloan_active_section_format_v2_0">Active</string>
+    <string name="common_completed_with_count_v2_0">Completed</string>
+
+    <string name="crowdloan_your_contributions">Your contributions</string>
+    <string name="crowdloan_about">About crowdloans</string>
+
     <string name="crowdloan_moonbeam_encryption_not_supported_title">Cannot contribute with this account</string>
     <string name="crowdloan_moonbeam_encryption_not_supported_message">Moonbeam crowdloan supports only SR25519 crypto type accounts. Please consider using another account for contribution</string>
 

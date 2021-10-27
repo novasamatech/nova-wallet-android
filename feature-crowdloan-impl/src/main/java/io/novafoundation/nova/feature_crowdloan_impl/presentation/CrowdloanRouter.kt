@@ -27,4 +27,6 @@ interface CrowdloanRouter {
 
     fun openMoonbeamFlow(payload: ContributePayload)
     fun openAddAccount(payload: AddAccountPayload)
+
+    fun openUserContributions()
 }

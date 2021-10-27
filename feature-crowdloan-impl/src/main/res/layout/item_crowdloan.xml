@@ -3,9 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:layout_marginBottom="8dp"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_primary_list_item"
-    tools:background="@color/black">
+    tools:background="@color/blurColor">
 
     <ImageView
         android:id="@+id/itemCrowdloanIcon"
@@ -24,46 +25,35 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:includeFontPadding="false"
-        android:textColor="@color/white"
-        android:singleLine="true"
         android:ellipsize="end"
-        app:layout_constraintEnd_toStartOf="@+id/itemCrowdloanTimeRemaining"
+        android:includeFontPadding="false"
+        android:singleLine="true"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toStartOf="@+id/itemCrowdloanArrow"
         app:layout_constraintStart_toEndOf="@+id/itemCrowdloanIcon"
         app:layout_constraintTop_toTopOf="@+id/itemCrowdloanIcon"
         tools:text="Karura (KAR)" />
-
-    <TextView
-        android:id="@+id/itemCrowdloanTimeRemaining"
-        style="@style/TextAppearance.NovaFoundation.Body3"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:textColor="@color/black1"
-        app:layout_constraintBottom_toBottomOf="@+id/itemCrowdloanParaName"
-        app:layout_constraintEnd_toStartOf="@+id/itemCrowdloanArrow"
-        app:layout_constraintTop_toTopOf="@+id/itemCrowdloanParaName"
-        tools:text="4 days left" />
 
 
     <ImageView
         android:id="@+id/itemCrowdloanArrow"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_marginEnd="25dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="20dp"
         android:src="@drawable/ic_arrow_right_24"
-        app:layout_constraintBottom_toBottomOf="@+id/itemCrowdloanTimeRemaining"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/itemCrowdloanTimeRemaining" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/white_64" />
 
     <TextView
         android:id="@+id/itemCrowdloanParaDescription"
         style="@style/TextAppearance.NovaFoundation.Body2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:textColor="@color/black2"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/itemCrowdloanArrow"
         app:layout_constraintStart_toStartOf="@+id/itemCrowdloanParaName"
         app:layout_constraintTop_toBottomOf="@+id/itemCrowdloanParaName"
         tools:text="Ethereum-compatible smart contract parachain on Kusama" />
@@ -73,34 +63,49 @@
         style="@style/TextAppearance.NovaFoundation.Body2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
         android:textColor="@color/white"
-        app:layout_constraintEnd_toEndOf="@+id/itemCrowdloanParaDescription"
-        app:layout_constraintStart_toStartOf="@+id/itemCrowdloanParaName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/itemCrowdloanParaDescription"
-        tools:text="RAISED: 2,638 OF 100,000 KSM" />
+        tools:text="Raised: 883,913 of 1M DOT" />
+
+    <ProgressBar
+        android:id="@+id/itemCrowdloanParaRaisedProgress"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="0dp"
+        android:layout_height="5dp"
+        android:layout_marginTop="8dp"
+        android:progressDrawable="@drawable/bg_progress_bar"
+        app:layout_constraintEnd_toEndOf="@id/itemCrowdloanParaRaised"
+        app:layout_constraintStart_toStartOf="@id/itemCrowdloanParaRaised"
+        app:layout_constraintTop_toBottomOf="@id/itemCrowdloanParaRaised"
+        tools:progress="49" />
 
     <TextView
-        android:id="@+id/itemCrowdloanMyContribution"
+        android:id="@+id/itemCrowdloanParaRaisedPercentage"
+        style="@style/TextAppearance.NovaFoundation.Body2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="14dp"
+        android:textColor="?attr/colorAccent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/itemCrowdloanParaRaisedProgress"
+        app:layout_constraintTop_toBottomOf="@id/itemCrowdloanParaRaisedProgress"
+        tools:text="49%" />
+
+    <TextView
+        android:id="@+id/itemCrowdloanTimeRemaining"
         style="@style/TextAppearance.NovaFoundation.Body2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:textColor="@color/white"
-        app:layout_constraintEnd_toEndOf="@+id/itemCrowdloanParaDescription"
-        app:layout_constraintStart_toStartOf="@+id/itemCrowdloanParaName"
-        app:layout_constraintTop_toBottomOf="@+id/itemCrowdloanParaRaised"
-        tools:text="Contributed: 2,638 KSM" />
-
-
-    <View
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:background="@color/dividerGray"
+        android:textColor="@color/white_64"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/itemCrowdloanMyContribution" />
+        app:layout_constraintTop_toBottomOf="@id/itemCrowdloanParaRaisedProgress"
+        tools:text="4 days left" />
 </androidx.constraintlayout.widget.ConstraintLayout>

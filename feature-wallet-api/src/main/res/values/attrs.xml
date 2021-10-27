@@ -5,6 +5,7 @@
             <enum name="blurred" value="0"/>
             <enum name="bordered" value="1"/>
         </attr>
+        <attr name="actionIcon" />
     </declare-styleable>
 
     <declare-styleable name="BalancesView">

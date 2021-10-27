@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_crowdloan_impl.presentation.main
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
-import io.novafoundation.nova.common.address.createAddressIcon
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.list.toValueList
@@ -12,6 +11,8 @@ import io.novafoundation.nova.common.presentation.mapLoading
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.resources.formatTimeLeft
 import io.novafoundation.nova.common.utils.format
+import io.novafoundation.nova.common.utils.formatAsPercentage
+import io.novafoundation.nova.common.utils.fractionToPercentage
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.core.updater.UpdateSystem
@@ -26,6 +27,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.sel
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.parcel.mapParachainMetadataToParcel
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.main.model.CrowdloanModel
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.main.model.CrowdloanStatusModel
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.model.generateCrowdloanIcon
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
@@ -41,15 +43,12 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlin.reflect.KClass
 
-private const val ICON_SIZE_DP = 40
-
 class CrowdloanViewModel(
     private val interactor: CrowdloanInteractor,
     private val iconGenerator: AddressIconGenerator,
     private val resourceManager: ResourceManager,
     private val crowdloanSharedState: CrowdloanSharedState,
     private val router: CrowdloanRouter,
-    private val sharedState: CrowdloanSharedState,
     private val customContributeManager: CustomContributeManager,
     private val crowdloanUpdateSystem: UpdateSystem,
     assetSelectorFactory: MixinFactory<AssetSelectorMixin.Presentation>,
@@ -64,11 +63,11 @@ class CrowdloanViewModel(
         resourceManager.getString(R.string.crowdloan_main_description, it.token.configuration.symbol)
     }
 
-    private val selectedChain = sharedState.selectedChainFlow()
+    private val selectedChain = crowdloanSharedState.selectedChainFlow()
         .share()
 
     private val groupedCrowdloansFlow = selectedChain.withLoading {
-        interactor.crowdloansFlow(it)
+        interactor.groupedCrowdloansFlow(it)
     }
         .inBackground()
         .share()
@@ -90,6 +89,12 @@ class CrowdloanViewModel(
         .inBackground()
         .share()
 
+    val myContributionsCount = crowdloansFlow.mapLoading { crowdloans ->
+        crowdloans.count { it.myContribution != null }.toString()
+    }
+        .inBackground()
+        .share()
+
     init {
         crowdloanUpdateSystem.start()
             .launchIn(this)
@@ -98,12 +103,12 @@ class CrowdloanViewModel(
     private fun mapCrowdloanStatusToUi(statusClass: KClass<out Crowdloan.State>, statusCount: Int): CrowdloanStatusModel {
         return when (statusClass) {
             Crowdloan.State.Finished::class -> CrowdloanStatusModel(
-                text = resourceManager.getString(R.string.common_completed_with_count, statusCount),
-                textColorRes = R.color.black1
+                status = resourceManager.getString(R.string.common_completed_with_count_v2_0),
+                count = statusCount.toString()
             )
             Crowdloan.State.Active::class -> CrowdloanStatusModel(
-                text = resourceManager.getString(R.string.crowdloan_active_section_format, statusCount),
-                textColorRes = R.color.green
+                status = resourceManager.getString(R.string.crowdloan_active_section_format_v2_0),
+                count = statusCount.toString()
             )
             else -> throw IllegalArgumentException("Unsupported crowdloan status type: ${statusClass.simpleName}")
         }
@@ -112,7 +117,7 @@ class CrowdloanViewModel(
     private suspend fun mapCrowdloanToCrowdloanModel(
         chain: Chain,
         crowdloan: Crowdloan,
-        asset: Asset
+        asset: Asset,
     ): CrowdloanModel {
         val token = asset.token
 
@@ -120,12 +125,6 @@ class CrowdloanViewModel(
         val capDisplay = token.amountFromPlanks(crowdloan.fundInfo.cap).formatTokenAmount(token.configuration)
 
         val depositorAddress = chain.addressOf(crowdloan.fundInfo.depositor)
-
-        val icon = if (crowdloan.parachainMetadata != null) {
-            CrowdloanModel.Icon.FromLink(crowdloan.parachainMetadata.iconLink)
-        } else {
-            generateDepositorIcon(depositorAddress)
-        }
 
         val stateFormatted = when (val state = crowdloan.state) {
             Crowdloan.State.Finished -> CrowdloanModel.State.Finished
@@ -137,28 +136,21 @@ class CrowdloanViewModel(
             }
         }
 
-        val myContributionDisplay = crowdloan.myContribution?.let {
-            val myContributionFormatted = token.amountFromPlanks(it.amount).formatTokenAmount(token.configuration)
-
-            resourceManager.getString(R.string.crowdloan_contribution_format, myContributionFormatted)
-        }
+        val raisedPercentage = crowdloan.raisedFraction.fractionToPercentage()
 
         return CrowdloanModel(
             relaychainId = chain.id,
             parachainId = crowdloan.parachainId,
             title = crowdloan.parachainMetadata?.name ?: crowdloan.parachainId.toString(),
             description = crowdloan.parachainMetadata?.description ?: depositorAddress,
-            icon = icon,
-            raised = resourceManager.getString(R.string.crownloans_raised_format, raisedDisplay, capDisplay),
-            myContribution = myContributionDisplay,
+            icon = generateCrowdloanIcon(crowdloan, depositorAddress, iconGenerator),
+            raised = CrowdloanModel.Raised(
+                value = resourceManager.getString(R.string.crownloans_raised_format, raisedDisplay, capDisplay),
+                percentage = raisedPercentage.toInt(),
+                percentageDisplay = raisedPercentage.formatAsPercentage()
+            ),
             state = stateFormatted,
         )
-    }
-
-    private suspend fun generateDepositorIcon(depositorAddress: String): CrowdloanModel.Icon {
-        val icon = iconGenerator.createAddressIcon(depositorAddress, ICON_SIZE_DP)
-
-        return CrowdloanModel.Icon.FromDrawable(icon)
     }
 
     fun crowdloanClicked(paraId: ParaId) {
@@ -181,5 +173,9 @@ class CrowdloanViewModel(
                 router.openContribute(payload)
             }
         }
+    }
+
+    fun myContributionsClicked() {
+        router.openUserContributions()
     }
 }
