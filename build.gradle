@@ -5,9 +5,9 @@ buildscript {
         versionCode = 1
 
         // SDK and tools
-        compileSdkVersion = 29
+        compileSdkVersion = 30
         minSdkVersion = 24
-        targetSdkVersion = 29
+        targetSdkVersion = 30
 
         kotlinVersion = '1.4.31'
 
