@@ -7,9 +7,9 @@ import android.view.ViewGroup
 import coil.ImageLoader
 import coil.load
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.applyBarMargin
 import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
@@ -58,13 +58,8 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
     override fun initViews() {
         hideKeyboard()
 
-        balanceDetailContent.applyInsetter {
-            type(statusBars = true) {
-                margin()
-            }
-
-            consume(true)
-        }
+        balanceDetailBack.applyBarMargin()
+        balanceDetailTokenName.applyBarMargin()
 
         transfersContainer.initializeBehavior(anchorView = balanceDetailContent)
 

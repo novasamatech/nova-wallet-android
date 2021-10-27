@@ -24,6 +24,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import dev.chrisbanes.insetter.applyInsetter
 
 fun View.updatePadding(
     top: Int = paddingTop,
@@ -220,4 +221,10 @@ inline fun Context.useAttributes(
     block(typedArray)
 
     typedArray.recycle()
+}
+
+fun View.applyBarMargin() = applyInsetter {
+    type(statusBars = true) {
+        margin()
+    }
 }
