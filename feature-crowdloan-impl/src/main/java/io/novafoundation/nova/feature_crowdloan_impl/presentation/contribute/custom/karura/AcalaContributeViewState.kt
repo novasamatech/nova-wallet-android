@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.karura
 
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_crowdloan_impl.BuildConfig
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.acala.AcalaContributeInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.model.CustomContributePayload
@@ -18,7 +19,8 @@ class AcalaContributeViewState(
     customContributePayload = customContributePayload,
     resourceManager = resourceManager,
     defaultReferralCode = defaultReferralCode,
-    bonusPercentage = bonusPercentage
+    bonusPercentage = bonusPercentage,
+    termsUrl = BuildConfig.ACALA_TERMS_LINK
 ) {
 
     override fun createBonusPayload(referralCode: String): ReferralCodePayload {
