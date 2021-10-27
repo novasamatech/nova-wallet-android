@@ -92,6 +92,12 @@ class CrowdloanViewModel(
         .inBackground()
         .share()
 
+    val myContributionsCount = crowdloansFlow.mapLoading { crowdloans ->
+        crowdloans.count { it.myContribution != null }.toString()
+    }
+        .inBackground()
+        .share()
+
     init {
         crowdloanUpdateSystem.start()
             .launchIn(this)

@@ -85,6 +85,11 @@ class CrowdloanFragment : BaseFragment<CrowdloanViewModel>(), CrowdloanAdapter.H
             }
         }
 
+        viewModel.myContributionsCount.observe {
+            crowdloanMyContributions.setInProgress(it is LoadingState.Loading)
+            crowdloanMyContributions.setBadgeText((it as? LoadingState.Loaded)?.data)
+        }
+
         viewModel.mainDescription.observe(crowdloanMainDescription::setText)
     }
 
