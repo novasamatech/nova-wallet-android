@@ -42,7 +42,7 @@ buildscript {
 
         bouncyCastleVersion = '1.60'
 
-        fearlessLibVersion = '1.0.77'
+        fearlessLibVersion = '1.0.95'
 
         gifVersion = '1.2.19'
 
@@ -135,6 +135,12 @@ buildscript {
         archCoreTestDep = "androidx.arch.core:core-testing:$architectureComponentVersion"
 
         progressButtonDep = "com.github.razir.progressbutton:progressbutton:$progressButtonsVersion"
+
+        androidTestRunnerDep = 'androidx.test:runner:1.4.0'
+        androidTestRulesDep = 'androidx.test:rules:1.4.0'
+        androidJunitDep = 'androidx.test.ext:junit:1.1.3'
+
+        roomTestsDep = "androidx.room:room-testing:$architectureComponentVersion"
     }
 
     repositories {

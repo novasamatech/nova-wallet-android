@@ -1,0 +1,7 @@
+package io.novafoundation.nova.feature_staking_impl.domain.validations.setup
+
+import io.novafoundation.nova.feature_staking_impl.domain.validations.MaxNominatorsReachedValidation
+import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughToPayFeesValidation
+
+typealias SetupStakingFeeValidation = EnoughToPayFeesValidation<SetupStakingPayload, SetupStakingValidationFailure>
+typealias SetupStakingMaximumNominatorsValidation = MaxNominatorsReachedValidation<SetupStakingPayload, SetupStakingValidationFailure>

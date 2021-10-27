@@ -1,0 +1,95 @@
+package io.novafoundation.nova.feature_staking_impl.presentation.view
+
+import android.content.Context
+import android.graphics.drawable.StateListDrawable
+import android.util.AttributeSet
+import android.util.StateSet
+import android.view.View
+import android.widget.Checkable
+import androidx.constraintlayout.widget.ConstraintLayout
+import io.novafoundation.nova.common.utils.getPrimaryColor
+import io.novafoundation.nova.common.utils.setTextOrHide
+import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
+import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawableFromColors
+import io.novafoundation.nova.feature_staking_impl.R
+import kotlinx.android.synthetic.main.view_payout_target.view.payoutTargetAmountFiat
+import kotlinx.android.synthetic.main.view_payout_target.view.payoutTargetAmountGain
+import kotlinx.android.synthetic.main.view_payout_target.view.payoutTargetAmountToken
+import kotlinx.android.synthetic.main.view_payout_target.view.payoutTargetCheck
+import kotlinx.android.synthetic.main.view_payout_target.view.payoutTargetName
+import io.novafoundation.nova.common.R as RCommon
+
+private val CheckedStateSet = intArrayOf(android.R.attr.state_checked)
+
+class RewardDestinationView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0,
+) : ConstraintLayout(context, attrs, defStyleAttr), Checkable {
+
+    private var isChecked: Boolean = false
+
+    init {
+        View.inflate(context, R.layout.view_payout_target, this)
+
+        background = stateDrawable()
+
+        attrs?.let(this::applyAttrs)
+    }
+
+    private fun applyAttrs(attrs: AttributeSet) {
+        val typedArray = context.obtainStyledAttributes(attrs, R.styleable.RewardDestinationView)
+
+        val checked = typedArray.getBoolean(R.styleable.RewardDestinationView_android_checked, false)
+        setChecked(checked)
+
+        val targetName = typedArray.getString(R.styleable.RewardDestinationView_targetName)
+        targetName?.let(::setName)
+
+        typedArray.recycle()
+    }
+
+    fun setName(name: String) {
+        payoutTargetName.text = name
+    }
+
+    fun setTokenAmount(amount: String) {
+        payoutTargetAmountToken.text = amount
+    }
+
+    fun setPercentageGain(gain: String) {
+        payoutTargetAmountGain.text = gain
+    }
+
+    fun setFiatAmount(amount: String?) {
+        payoutTargetAmountFiat.setTextOrHide(amount)
+    }
+
+    override fun setChecked(checked: Boolean) {
+        isChecked = checked
+        payoutTargetCheck.isChecked = checked
+        refreshDrawableState()
+    }
+
+    override fun isChecked(): Boolean = isChecked
+
+    override fun toggle() {
+        isChecked = !isChecked
+        refreshDrawableState()
+    }
+
+    override fun onCreateDrawableState(extraSpace: Int): IntArray {
+        val drawableState = super.onCreateDrawableState(extraSpace + 1)
+
+        if (isChecked()) {
+            mergeDrawableStates(drawableState, CheckedStateSet)
+        }
+
+        return drawableState
+    }
+
+    private fun stateDrawable() = StateListDrawable().apply {
+        addState(CheckedStateSet, context.getRoundedCornerDrawableFromColors(strokeColor = context.getPrimaryColor()))
+        addState(StateSet.WILD_CARD, context.getRoundedCornerDrawable(strokeColorRes = RCommon.color.gray2))
+    }
+}

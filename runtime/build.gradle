@@ -9,8 +9,9 @@ android {
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
+        buildConfigField "String", "CHAINS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/chains/chains_dev.json\""
     }
 
     buildTypes {
@@ -21,6 +22,8 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            buildConfigField "String", "CHAINS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/chains/chains.json\""
         }
     }
 
@@ -37,7 +40,6 @@ dependencies {
 
     implementation project(":common")
     implementation project(":core-db")
-    implementation project(":feature-account-api")
 
     implementation project(":core-api")
 
@@ -54,4 +56,8 @@ dependencies {
     kapt daggerKapt
 
     testImplementation project(':test-shared')
+
+    androidTestImplementation androidTestRunnerDep
+    androidTestImplementation androidTestRulesDep
+    androidTestImplementation androidJunitDep
 }

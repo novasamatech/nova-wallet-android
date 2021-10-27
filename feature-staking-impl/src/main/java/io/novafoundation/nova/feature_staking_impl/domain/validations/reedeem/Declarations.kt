@@ -1,0 +1,8 @@
+package io.novafoundation.nova.feature_staking_impl.domain.validations.reedeem
+
+import io.novafoundation.nova.common.validation.ValidationSystem
+import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughToPayFeesValidation
+
+typealias RedeemFeeValidation = EnoughToPayFeesValidation<RedeemValidationPayload, RedeemValidationFailure>
+
+typealias RedeemValidationSystem = ValidationSystem<RedeemValidationPayload, RedeemValidationFailure>

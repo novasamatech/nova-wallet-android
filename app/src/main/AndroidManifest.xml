@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="jp.co.soramitsu.app">
+    package="io.novafoundation.nova.app">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -11,16 +11,16 @@
 
     <application
         tools:replace="android:allowBackup"
-        android:name="jp.co.soramitsu.app.App"
+        android:name="io.novafoundation.nova.app.App"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true">
 
         <activity
-            android:name="jp.co.soramitsu.app.root.presentation.RootActivity"
+            android:name="io.novafoundation.nova.app.root.presentation.RootActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.Soramitsu.Fearless"
+            android:theme="@style/Theme.NovaFoundation.Nova"
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustResize">
             <intent-filter tools:ignore="AppLinkUrlError">
@@ -50,7 +50,7 @@
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="fullSensor"
-            android:theme="@style/Theme.Soramitsu.Fearless"
+            android:theme="@style/Theme.NovaFoundation.Nova"
             tools:replace="android:theme,screenOrientation" />
 
         <provider
@@ -64,7 +64,7 @@
         </provider>
 
         <receiver
-            android:name="jp.co.soramitsu.feature_account_impl.presentation.exporting.json.confirm.ShareCompletedReceiver"
+            android:name="io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ShareCompletedReceiver"
             android:enabled="true"
             android:exported="false" />
 

@@ -65,5 +65,14 @@
         <attr name="android:text" />
         <attr name="icon" />
         <attr name="actionIcon" />
+        <attr name="dividerVisible" />
+        <attr name="android:background" />
+    </declare-styleable>
+
+    <declare-styleable name="PrimaryButton">
+        <attr format="enum" name="appearance">
+            <enum name="fill" value="0" />
+            <enum name="outline" value="1" />
+        </attr>
     </declare-styleable>
 </resources>

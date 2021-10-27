@@ -29,7 +29,7 @@
 
     <fragment
         android:id="@+id/splashFragment"
-        android:name="jp.co.soramitsu.splash.presentation.SplashFragment"
+        android:name="io.novafoundation.nova.splash.presentation.SplashFragment"
         tools:layout="@layout/fragment_splash">
 
         <action
@@ -52,7 +52,7 @@
 
     <fragment
         android:id="@+id/pincodeFragment"
-        android:name="jp.co.soramitsu.feature_account_impl.presentation.pincode.PincodeFragment"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.pincode.PincodeFragment"
         android:label="fragment_pincode"
         tools:layout="@layout/fragment_pincode" />
 

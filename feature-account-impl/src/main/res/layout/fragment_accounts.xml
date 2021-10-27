@@ -14,15 +14,15 @@
         android:fitsSystemWindows="true"
         android:orientation="vertical">
 
-        <jp.co.soramitsu.common.view.Toolbar
-            android:id="@+id/fearlessToolbar"
+        <io.novafoundation.nova.common.view.Toolbar
+            android:id="@+id/novaToolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:textRight="@string/common_edit"
-            app:titleText="@string/profile_accounts_title" />
+            app:titleText="@string/profile_accounts_title_2_0" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/accountsList"
@@ -34,14 +34,14 @@
             app:layout_constraintBottom_toTopOf="@+id/addAccount"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/fearlessToolbar"
+            app:layout_constraintTop_toBottomOf="@+id/novaToolbar"
             tools:listitem="@layout/item_account" />
 
     </LinearLayout>
 
-    <jp.co.soramitsu.common.view.PrimaryButton
+    <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/addAccount"
-        style="@style/Widget.Fearless.Button.Primary"
+        style="@style/Widget.Nova.Button.Primary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"

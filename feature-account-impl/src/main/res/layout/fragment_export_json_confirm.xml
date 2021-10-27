@@ -8,7 +8,7 @@
     android:orientation="vertical"
     tools:background="@color/black">
 
-    <jp.co.soramitsu.common.view.Toolbar
+    <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/exportJsonConfirmToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <jp.co.soramitsu.common.view.LabeledTextView
+            <io.novafoundation.nova.common.view.LabeledTextView
                 android:id="@+id/exportJsonConfirmType"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -36,7 +36,7 @@
                 app:label="@string/recovery_source_type"
                 app:message="@string/recovery_json" />
 
-            <jp.co.soramitsu.common.view.LabeledTextView
+            <io.novafoundation.nova.common.view.LabeledTextView
                 android:id="@+id/exportJsonConfirmValue"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -47,7 +47,7 @@
                 app:label="@string/recovery_json"
                 tools:message="{“address”:”Gerfdad...DJWIdjawIdjWd”}" />
 
-            <jp.co.soramitsu.common.view.LabeledTextView
+            <io.novafoundation.nova.common.view.LabeledTextView
                 android:id="@+id/exportJsonConfirmNetworkInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -60,16 +60,16 @@
                 tools:message="Kusama"
                 tools:textIcon="@drawable/ic_ksm_24" />
 
-            <jp.co.soramitsu.feature_account_impl.presentation.view.advanced.AdvancedBlockView
+            <io.novafoundation.nova.feature_account_impl.presentation.view.advanced.AdvancedBlockView
                 android:id="@+id/exportJsonConfirmAdvanced"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
         </LinearLayout>
     </ScrollView>
 
-    <jp.co.soramitsu.common.view.PrimaryButton
+    <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/exportJsonConfirmChangePassword"
-        style="@style/Widget.Fearless.Button.Outline"
+        style="@style/Widget.Nova.Button.Outline"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -77,9 +77,9 @@
         android:layout_marginBottom="16dp"
         android:text="@string/account_export_password_change" />
 
-    <jp.co.soramitsu.common.view.PrimaryButton
+    <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/exportJsonConfirmExport"
-        style="@style/Widget.Fearless.Button.Primary"
+        style="@style/Widget.Nova.Button.Primary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"

@@ -8,13 +8,13 @@
     android:orientation="vertical"
     tools:background="@color/black">
 
-    <jp.co.soramitsu.common.view.Toolbar
+    <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/payoutDetailsToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:titleText="@string/staking_reward_details_title" />
 
-    <jp.co.soramitsu.common.view.LabeledTextView
+    <io.novafoundation.nova.common.view.LabeledTextView
         android:id="@+id/payoutDetailsValidator"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -33,7 +33,7 @@
         android:orientation="horizontal">
 
         <TextView
-            style="@style/TextAppearance.Soramitsu.Body1"
+            style="@style/TextAppearance.NovaFoundation.Body1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/common_date"
@@ -46,7 +46,7 @@
 
         <TextView
             android:id="@+id/payoutDetailsDate"
-            style="@style/TextAppearance.Soramitsu.Body1"
+            style="@style/TextAppearance.NovaFoundation.Body1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/white"
@@ -70,7 +70,7 @@
         android:orientation="horizontal">
 
         <TextView
-            style="@style/TextAppearance.Soramitsu.Body1"
+            style="@style/TextAppearance.NovaFoundation.Body1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/staking_reward_details_era"
@@ -83,7 +83,7 @@
 
         <TextView
             android:id="@+id/payoutDetailsEra"
-            style="@style/TextAppearance.Soramitsu.Body1"
+            style="@style/TextAppearance.NovaFoundation.Body1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/white"
@@ -107,7 +107,7 @@
         android:orientation="horizontal">
 
         <TextView
-            style="@style/TextAppearance.Soramitsu.Body1"
+            style="@style/TextAppearance.NovaFoundation.Body1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/staking_reward"
@@ -120,7 +120,7 @@
 
         <TextView
             android:id="@+id/payoutDetailsReward"
-            style="@style/TextAppearance.Soramitsu.Body1"
+            style="@style/TextAppearance.NovaFoundation.Body1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -129,7 +129,7 @@
 
         <TextView
             android:id="@+id/payoutDetailsRewardFiat"
-            style="@style/TextAppearance.Soramitsu.Body1"
+            style="@style/TextAppearance.NovaFoundation.Body1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/gray2"
@@ -149,9 +149,9 @@
         android:layout_height="0dp"
         android:layout_weight="1" />
 
-    <jp.co.soramitsu.common.view.PrimaryButton
+    <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/payoutDetailsSubmit"
-        style="@style/Widget.Fearless.Button.Primary"
+        style="@style/Widget.Nova.Button.Primary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"

@@ -1,34 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/black"
     android:fitsSystemWindows="true"
     android:orientation="vertical">
 
-    <jp.co.soramitsu.common.view.Toolbar
+    <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:titleText="@string/onboarding_create_account" />
 
-    <jp.co.soramitsu.common.view.LabeledTextView
-        android:id="@+id/networkInput"
+    <io.novafoundation.nova.common.view.LabeledTextView
+        android:id="@+id/createAccountForcedChain"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/x2"
         android:layout_marginTop="@dimen/x1"
         android:layout_marginEnd="@dimen/x2"
-        app:actionIcon="@drawable/ic_pin_white_24"
-        app:label="@string/common_choose_network"
+        app:actionIcon="@null"
+        app:enabled="false"
+        app:label="@string/common_chain"
         tools:message="Kusama"
         tools:textIcon="@drawable/ic_ksm_24" />
 
-    <jp.co.soramitsu.common.view.InputField
+    <io.novafoundation.nova.common.view.InputField
         android:id="@+id/accountNameInput"
-        style="@style/Widget.Fearless.Input.Primary.External"
+        style="@style/Widget.Nova.Input.Primary.External"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/x2"
@@ -38,7 +39,7 @@
         android:hint="@string/username_setup_choose_title" />
 
     <TextView
-        style="@style/TextAppearance.Soramitsu.Body2"
+        style="@style/TextAppearance.NovaFoundation.Body2"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginStart="@dimen/x2"
@@ -47,9 +48,9 @@
         android:text="@string/username_setup_hint"
         android:textColor="@color/white" />
 
-    <jp.co.soramitsu.common.view.PrimaryButton
+    <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/nextBtn"
-        style="@style/Widget.Fearless.Button.Primary"
+        style="@style/Widget.Nova.Button.Primary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/x2"

@@ -4,13 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:background="@drawable/bg_transfers"
+    tools:background="@color/blurColor"
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
+        android:id="@+id/transactionHistoryPuller"
         android:src="@drawable/ic_bottom_sheet_pin"
         android:layout_marginTop="2dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -19,7 +20,7 @@
 
     <TextView
         android:id="@+id/transactionHistoryTitle"
-        style="@style/TextAppearance.Soramitsu.Body0"
+        style="@style/TextAppearance.NovaFoundation.Body0"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -33,9 +34,9 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
-        android:visibility="visible"
+        android:visibility="gone"
         android:overScrollMode="never"
-        app:layoutManager="jp.co.soramitsu.common.view.recyclerview.LinearLayoutManagerFixed"
+        app:layoutManager="io.novafoundation.nova.common.view.recyclerview.LinearLayoutManagerFixed"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -47,15 +48,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_placeholder"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="64dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/transactionHistoryTitle"
-        app:layout_constraintVertical_bias="0.19999999" />
+        app:layout_constraintTop_toBottomOf="@+id/transactionHistoryTitle" />
 
     <TextView
         android:id="@+id/placeholderText"
-        style="@style/TextAppearance.Soramitsu.Body2"
+        style="@style/TextAppearance.NovaFoundation.Body2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="95dp"
@@ -69,7 +69,7 @@
 
     <androidx.constraintlayout.widget.Group
         android:id="@+id/placeholder"
-        android:visibility="gone"
+        android:visibility="visible"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:constraint_referenced_ids="placeholderIcon,placeholderText" />

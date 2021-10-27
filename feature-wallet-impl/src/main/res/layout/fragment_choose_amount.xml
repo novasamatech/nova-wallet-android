@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             android:fitsSystemWindows="true">
 
-            <jp.co.soramitsu.common.view.Toolbar
+            <io.novafoundation.nova.common.view.Toolbar
                 android:id="@+id/chooseAmountToolbar"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -26,9 +26,9 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:titleText="@string/wallet_asset_send" />
 
-            <jp.co.soramitsu.common.view.LabeledTextView
+            <io.novafoundation.nova.common.view.LabeledTextView
                 android:id="@+id/chooseAmountToken"
-                style="@style/TextAppearance.Soramitsu.Body1"
+                style="@style/TextAppearance.NovaFoundation.Body1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -85,7 +85,7 @@
                 app:layout_constraintStart_toStartOf="@+id/chooseAmountBalanceLabel"
                 app:layout_constraintTop_toBottomOf="@+id/chooseAmountBalanceLabel" />
 
-            <jp.co.soramitsu.common.view.LabeledTextView
+            <io.novafoundation.nova.common.view.LabeledTextView
                 android:id="@+id/chooseAmountRecipientView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -109,9 +109,9 @@
                 app:layout_constraintStart_toStartOf="@+id/chooseAmountRecipientView"
                 app:layout_constraintTop_toBottomOf="@+id/chooseAmountRecipientView" />
 
-            <jp.co.soramitsu.common.view.InputField
+            <io.novafoundation.nova.common.view.InputField
                 android:id="@+id/chooseAmountField"
-                style="@style/Widget.Fearless.Input.Primary.External"
+                style="@style/Widget.Nova.Input.Primary.External"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -124,7 +124,7 @@
 
             <TextView
                 android:id="@+id/chooseAmountFeeLabel"
-                style="@style/TextAppearance.Soramitsu.Body1"
+                style="@style/TextAppearance.NovaFoundation.Body1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
@@ -134,7 +134,7 @@
 
             <TextView
                 android:id="@+id/chooseAmountFee"
-                style="@style/TextAppearance.Soramitsu.Body1"
+                style="@style/TextAppearance.NovaFoundation.Body1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="12dp"
@@ -169,9 +169,9 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
-    <jp.co.soramitsu.common.view.PrimaryButton
+    <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/chooseAmountNext"
-        style="@style/Widget.Fearless.Button.Primary"
+        style="@style/Widget.Nova.Button.Primary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"

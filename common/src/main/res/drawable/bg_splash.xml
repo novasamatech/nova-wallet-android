@@ -2,15 +2,11 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android"
     android:opacity="opaque">
 
-    <item android:drawable="@drawable/drawable_background_image" />
+    <item android:drawable="@drawable/novabg_welcome_screen" />
 
     <item
         android:gravity="center"
-        android:drawable="@drawable/drawable_fearless_logo" />
-
-    <item
-        android:bottom="60dp"
-        android:gravity="center_horizontal|bottom"
-        android:drawable="@drawable/drawable_soramitsu_brand" />
+        
+        android:drawable="@drawable/drawable_nova_logo" />
 
 </layer-list>

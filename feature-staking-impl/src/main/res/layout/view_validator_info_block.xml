@@ -9,7 +9,7 @@
 
     <TextView
         android:id="@+id/validatorInfoBlockTitle"
-        style="@style/TextAppearance.Soramitsu.Body2"
+        style="@style/TextAppearance.NovaFoundation.Body2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:drawablePadding="6dp"
@@ -19,7 +19,7 @@
 
     <TextView
         android:id="@+id/validatorInfoBlockBody"
-        style="@style/TextAppearance.Soramitsu.Body0"
+        style="@style/TextAppearance.NovaFoundation.Body0"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
@@ -28,7 +28,7 @@
 
     <TextView
         android:id="@+id/validatorInfoBlockExtra"
-        style="@style/TextAppearance.Soramitsu.Body2"
+        style="@style/TextAppearance.NovaFoundation.Body2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/white_64"

@@ -10,7 +10,7 @@
     android:orientation="vertical">
 
     <TextView
-        style="@style/TextAppearance.Soramitsu.Header1"
+        style="@style/TextAppearance.NovaFoundation.Header1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/x2"
@@ -20,11 +20,11 @@
         android:textColor="@color/white" />
 
 
-    <jp.co.soramitsu.common.view.AccountInfoView
+    <io.novafoundation.nova.common.view.AccountInfoView
         android:id="@+id/accountView"
         android:layout_marginStart="@dimen/x2"
         android:layout_marginEnd="@dimen/x2"
-        app:accountActionIcon="@drawable/ic_more_vertical"
+        app:accountActionIcon="@drawable/ic_info_white_24"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
@@ -33,7 +33,7 @@
         android:layout_height="32dp" />
 
     <TextView
-        style="@style/TextAppearance.Soramitsu.Body1"
+        style="@style/TextAppearance.NovaFoundation.Body1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_primary_list_item"
@@ -48,17 +48,19 @@
         android:paddingTop="@dimen/x1_5"
         android:paddingEnd="@dimen/x2"
         android:paddingBottom="@dimen/x1_5"
-        android:text="@string/profile_accounts_title"
+        android:text="@string/profile_accounts_title_2_0"
         android:textColor="@color/white" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
+        android:visibility="gone"
         android:layout_marginStart="@dimen/x2"
         android:layout_marginEnd="@dimen/x2"
         android:background="@color/dividerGray" />
 
     <LinearLayout
+        android:visibility="gone"
         android:id="@+id/networkWrapper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -72,7 +74,7 @@
         android:paddingBottom="@dimen/x1_5">
 
         <TextView
-            style="@style/TextAppearance.Soramitsu.Body1"
+            style="@style/TextAppearance.NovaFoundation.Body1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -84,7 +86,7 @@
 
         <TextView
             android:id="@+id/selectedNetworkTv"
-            style="@style/TextAppearance.Soramitsu.Body1"
+            style="@style/TextAppearance.NovaFoundation.Body1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:drawableEnd="@drawable/ic_arrow_right_24"
@@ -115,7 +117,7 @@
         android:paddingBottom="@dimen/x1_5">
 
         <TextView
-            style="@style/TextAppearance.Soramitsu.Body1"
+            style="@style/TextAppearance.NovaFoundation.Body1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -127,7 +129,7 @@
 
         <TextView
             android:id="@+id/selectedLanguageTv"
-            style="@style/TextAppearance.Soramitsu.Body1"
+            style="@style/TextAppearance.NovaFoundation.Body1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:drawableEnd="@drawable/ic_arrow_right_24"
@@ -146,7 +148,7 @@
 
     <TextView
         android:id="@+id/changePinCodeTv"
-        style="@style/TextAppearance.Soramitsu.Body1"
+        style="@style/TextAppearance.NovaFoundation.Body1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_primary_list_item"
@@ -172,7 +174,7 @@
 
     <TextView
         android:id="@+id/aboutTv"
-        style="@style/TextAppearance.Soramitsu.Body1"
+        style="@style/TextAppearance.NovaFoundation.Body1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_primary_list_item"

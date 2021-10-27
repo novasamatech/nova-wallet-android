@@ -9,7 +9,7 @@
 
     <TextView
         android:id="@+id/assetActionsSend"
-        style="@style/Widget.Fearless.ActionButton"
+        style="@style/Widget.Nova.ActionButton"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
@@ -25,7 +25,7 @@
 
     <TextView
         android:id="@+id/assetActionsReceive"
-        style="@style/Widget.Fearless.ActionButton"
+        style="@style/Widget.Nova.ActionButton"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
@@ -41,7 +41,7 @@
 
     <TextView
         android:id="@+id/assetActionsBuy"
-        style="@style/Widget.Fearless.ActionButton"
+        style="@style/Widget.Nova.ActionButton"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"

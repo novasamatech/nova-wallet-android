@@ -6,15 +6,15 @@
     android:layout_width="match_parent"
     tools:background="@color/blurColor"
     android:layout_height="@dimen/asset_height"
-    android:layout_marginTop="8dp"
+    android:layout_marginBottom="8dp"
     android:layout_weight="1">
 
     <ImageView
         android:id="@+id/itemAssetImage"
         android:layout_width="@dimen/asset_image_width"
         android:layout_height="0dp"
-        android:paddingStart="16dp"
-        android:paddingEnd="17dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -33,7 +33,7 @@
 
     <TextView
         android:id="@+id/itemAssetNetwork"
-        style="@style/TextAppearance.Soramitsu.Body1"
+        style="@style/TextAppearance.NovaFoundation.Body1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -48,7 +48,7 @@
 
     <TextView
         android:id="@+id/itemAssetToken"
-        style="@style/TextAppearance.Soramitsu.Header3"
+        style="@style/TextAppearance.NovaFoundation.Header3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="3dp"
@@ -62,7 +62,7 @@
 
     <TextView
         android:id="@+id/itemAssetRate"
-        style="@style/TextAppearance.Soramitsu.Body1"
+        style="@style/TextAppearance.NovaFoundation.Body1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
@@ -76,7 +76,7 @@
 
     <TextView
         android:id="@+id/itemAssetRateChange"
-        style="@style/TextAppearance.Soramitsu.Body1"
+        style="@style/TextAppearance.NovaFoundation.Body1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
@@ -89,7 +89,7 @@
 
     <TextView
         android:id="@+id/itemAssetDollarAmount"
-        style="@style/TextAppearance.Soramitsu.Body1"
+        style="@style/TextAppearance.NovaFoundation.Body1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="12dp"
@@ -100,7 +100,7 @@
 
     <TextView
         android:id="@+id/itemAssetBalance"
-        style="@style/TextAppearance.Soramitsu.Header3"
+        style="@style/TextAppearance.NovaFoundation.Header3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="4dp"

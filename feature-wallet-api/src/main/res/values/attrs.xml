@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="AssetSelectorView">
+        <attr name="backgroundStyle" format="enum">
+            <enum name="blurred" value="0"/>
+            <enum name="bordered" value="1"/>
+        </attr>
+        <attr name="actionIcon" />
+    </declare-styleable>
+
+    <declare-styleable name="BalancesView">
+        <attr name="title" />
+    </declare-styleable>
+</resources>
