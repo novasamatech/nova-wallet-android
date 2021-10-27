@@ -118,7 +118,7 @@ buildscript {
         zXingCoreDep = "com.google.zxing:core:$zXingVersion"
         zXingEmbeddedDep = "com.journeyapps:zxing-android-embedded:$zXingEmbeddedVersion"
 
-        fearlessLibDep = "jp.co.soramitsu.fearless-utils:fearless-utils:$fearlessLibVersion"
+        fearlessLibDep = "io.github.nova-wallet:substrate-sdk-android:$fearlessLibVersion"
 
         gifDep = "pl.droidsonroids.gif:android-gif-drawable:$gifVersion"
 
