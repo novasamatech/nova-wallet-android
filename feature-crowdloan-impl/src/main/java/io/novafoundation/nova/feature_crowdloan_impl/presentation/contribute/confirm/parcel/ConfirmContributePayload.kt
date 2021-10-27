@@ -13,6 +13,7 @@ class ConfirmContributePayload(
     val fee: BigDecimal,
     val amount: BigDecimal,
     val bonusPayload: BonusPayload?,
+    val customizationPayload: Parcelable?,
     val metadata: ParachainMetadataParcelModel?,
-    val estimatedRewardDisplay: String?
+    val estimatedRewardDisplay: String?,
 ) : Parcelable

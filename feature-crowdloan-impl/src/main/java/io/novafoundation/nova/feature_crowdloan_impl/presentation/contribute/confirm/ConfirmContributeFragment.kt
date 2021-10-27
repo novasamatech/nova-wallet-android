@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.lifecycleScope
 import coil.ImageLoader
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
@@ -26,6 +27,7 @@ import kotlinx.android.synthetic.main.fragment_contribute_confirm.confirmContrib
 import kotlinx.android.synthetic.main.fragment_contribute_confirm.confirmContributeOriginAcount
 import kotlinx.android.synthetic.main.fragment_contribute_confirm.confirmContributeReward
 import kotlinx.android.synthetic.main.fragment_contribute_confirm.confirmContributeToolbar
+import kotlinx.coroutines.flow.filterNotNull
 import javax.inject.Inject
 
 private const val KEY_PAYLOAD = "KEY_PAYLOAD"
@@ -119,6 +121,10 @@ class ConfirmContributeFragment : BaseFragment<ConfirmContributeViewModel>() {
             confirmContributeBonus.setVisible(it != null)
 
             it?.let(confirmContributeBonus::showValue)
+        }
+
+        viewModel.customizationConfiguration.filterNotNull().observe { (customization, customViewState) ->
+            customization.injectViews(confirmContributeContainer, customViewState, viewLifecycleOwner.lifecycleScope)
         }
     }
 }

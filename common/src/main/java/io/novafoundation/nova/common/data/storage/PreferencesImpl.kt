@@ -1,6 +1,7 @@
 package io.novafoundation.nova.common.data.storage
 
 import android.content.SharedPreferences
+import io.novafoundation.nova.common.utils.safeOffer
 import io.novafoundation.nova.core.model.Language
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
@@ -96,7 +97,7 @@ class PreferencesImpl(
 
         val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
             if (key == field) {
-                offer(getString(field))
+                safeOffer(getString(field))
             }
         }
 

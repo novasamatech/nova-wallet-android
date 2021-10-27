@@ -24,6 +24,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import dev.chrisbanes.insetter.applyInsetter
 
 fun View.updatePadding(
     top: Int = paddingTop,
@@ -145,6 +146,14 @@ fun View.hideSoftKeyboard() {
     inputMethodManager.hideSoftInputFromWindow(windowToken, 0)
 }
 
+fun ViewGroup.addAfter(anchor: View, newViews: List<View>) {
+    val index = indexOfChild(anchor)
+
+    newViews.forEachIndexed { offset, view ->
+        addView(view, index + offset + 1)
+    }
+}
+
 fun RecyclerView.scrollToTopWhenItemsShuffled(lifecycleOwner: LifecycleOwner) {
     val adapterDataObserver = object : RecyclerView.AdapterDataObserver() {
         override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
@@ -212,4 +221,10 @@ inline fun Context.useAttributes(
     block(typedArray)
 
     typedArray.recycle()
+}
+
+fun View.applyBarMargin() = applyInsetter {
+    type(statusBars = true) {
+        margin()
+    }
 }

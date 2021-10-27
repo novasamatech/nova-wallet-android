@@ -12,17 +12,23 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/blur"
-            android:layout_width="match_parent"
-            android:layout_height="112dp"
-            android:background="@color/blurColorLight" />
-
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/balanceDetailContent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             tools:context=".presentation.balance.list.BalanceListFragment">
+
+            <ImageView
+                android:id="@+id/balanceDetailBlur"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:background="@color/blurColorLight"
+                app:layout_constraintBottom_toBottomOf="@+id/balanceDetailBalanceBottomMargin"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
 
             <ImageView
                 android:layout_marginTop="16dp"
@@ -91,17 +97,24 @@
                 tools:text="+25%"
                 tools:textColor="@color/green" />
 
+            <Space
+                android:id="@+id/balanceDetailBalanceBottomMargin"
+                android:layout_width="wrap_content"
+                android:layout_height="8dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/balanceDetailRate" />
+
             <io.novafoundation.nova.feature_wallet_impl.presentation.balance.detail.AssetDetailBalancesView
                 android:id="@+id/balanceDetailsBalances"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 app:title="@string/wallet_your_balance"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="12dp"
                 android:layout_marginEnd="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/balanceDetailRate" />
+                app:layout_constraintTop_toBottomOf="@id/balanceDetailBlur" />
 
             <io.novafoundation.nova.feature_wallet_impl.presentation.balance.assetActions.AssetActionsView
                 android:id="@+id/balanceDetaiActions"

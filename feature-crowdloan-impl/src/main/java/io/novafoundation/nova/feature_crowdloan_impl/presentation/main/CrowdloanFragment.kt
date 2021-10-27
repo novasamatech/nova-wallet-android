@@ -8,17 +8,22 @@ import coil.ImageLoader
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.impl.setupCustomDialogDisplayer
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.common.view.shape.addRipple
+import io.novafoundation.nova.common.view.shape.getBlurDrawable
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.ParaId
 import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.di.CrowdloanFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.setupAssetSelector
+import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanAbout
 import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanAssetSelector
 import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanContainer
 import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanList
 import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanMainDescription
+import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanMyContributions
 import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanPlaceholder
 import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanProgress
 import javax.inject.Inject
@@ -46,8 +51,14 @@ class CrowdloanFragment : BaseFragment<CrowdloanViewModel>(), CrowdloanAdapter.H
             }
         }
 
-        crowdloanList.setHasFixedSize(true)
         crowdloanList.adapter = adapter
+
+        with(requireContext()) {
+            crowdloanAbout.background = getBlurDrawable()
+            crowdloanMyContributions.background = addRipple(getBlurDrawable())
+        }
+
+        crowdloanMyContributions.setOnClickListener { viewModel.myContributionsClicked() }
     }
 
     override fun inject() {
@@ -62,6 +73,7 @@ class CrowdloanFragment : BaseFragment<CrowdloanViewModel>(), CrowdloanAdapter.H
 
     override fun subscribe(viewModel: CrowdloanViewModel) {
         setupAssetSelector(crowdloanAssetSelector, viewModel, imageLoader)
+        setupCustomDialogDisplayer(viewModel)
 
         viewModel.crowdloanModelsFlow.observe { loadingState ->
             crowdloanList.setVisible(loadingState is LoadingState.Loaded && loadingState.data.isNotEmpty())
@@ -71,6 +83,11 @@ class CrowdloanFragment : BaseFragment<CrowdloanViewModel>(), CrowdloanAdapter.H
             if (loadingState is LoadingState.Loaded) {
                 adapter.submitList(loadingState.data)
             }
+        }
+
+        viewModel.myContributionsCount.observe {
+            crowdloanMyContributions.setInProgress(it is LoadingState.Loading)
+            crowdloanMyContributions.setBadgeText((it as? LoadingState.Loaded)?.data)
         }
 
         viewModel.mainDescription.observe(crowdloanMainDescription::setText)

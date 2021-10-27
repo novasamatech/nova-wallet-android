@@ -1,9 +1,7 @@
 package io.novafoundation.nova.splash.presentation
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.splash.SplashRouter
 import kotlinx.coroutines.launch
@@ -12,9 +10,6 @@ class SplashViewModel(
     private val router: SplashRouter,
     private val repository: AccountRepository
 ) : BaseViewModel() {
-
-    private val _removeSplashBackgroundLiveData = MutableLiveData<Event<Unit>>()
-    val removeSplashBackgroundLiveData = _removeSplashBackgroundLiveData
 
     init {
         openInitialDestination()
@@ -31,8 +26,6 @@ class SplashViewModel(
             } else {
                 router.openAddFirstAccount()
             }
-
-            _removeSplashBackgroundLiveData.value = Event(Unit)
         }
     }
 }

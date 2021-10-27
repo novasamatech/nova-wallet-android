@@ -33,6 +33,7 @@ import kotlinx.android.synthetic.main.fragment_contribute.crowdloanContributeRew
 import kotlinx.android.synthetic.main.fragment_contribute.crowdloanContributeTimeLeft
 import kotlinx.android.synthetic.main.fragment_contribute.crowdloanContributeToolbar
 import kotlinx.android.synthetic.main.fragment_contribute.crowdloanContributeUnlockHint
+import kotlinx.coroutines.flow.filterNotNull
 import javax.inject.Inject
 
 private const val KEY_PAYLOAD = "KEY_PAYLOAD"
@@ -138,6 +139,10 @@ class CrowdloanContributeFragment : BaseFragment<CrowdloanContributeViewModel>()
             crowdloanContributeBonus.setVisible(it != null)
 
             crowdloanContributeBonusReward.text = it
+        }
+
+        viewModel.customizationConfiguration.filterNotNull().observe { (customization, customViewState) ->
+            customization.injectViews(crowdloanContributeContainer, customViewState, viewLifecycleOwner.lifecycleScope)
         }
     }
 }

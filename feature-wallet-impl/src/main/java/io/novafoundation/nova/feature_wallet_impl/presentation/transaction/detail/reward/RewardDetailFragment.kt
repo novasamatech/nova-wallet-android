@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.formatDateTime
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.setTextColorRes
+import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.feature_wallet_impl.R
 import io.novafoundation.nova.feature_wallet_impl.di.WalletFeatureComponent
@@ -65,6 +66,8 @@ class RewardDetailFragment : BaseFragment<RewardDetailViewModel>() {
     }
 
     override fun subscribe(viewModel: RewardDetailViewModel) {
+        setupExternalActions(viewModel)
+
         with(viewModel.operation) {
             rewardDetailHash.setMessage(eventId)
             rewardDetailDate.text = time.formatDateTime(requireContext())

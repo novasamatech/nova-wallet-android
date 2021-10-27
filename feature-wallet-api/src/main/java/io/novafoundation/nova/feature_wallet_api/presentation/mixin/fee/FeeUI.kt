@@ -2,14 +2,24 @@ package io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee
 
 import android.widget.ProgressBar
 import android.widget.TextView
+import io.novafoundation.nova.common.base.BaseFragment
+import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_wallet_api.R
+import io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
 
 class FeeViews(
     val progress: ProgressBar,
     val fiat: TextView,
     val token: TextView,
 )
+
+fun <V> BaseFragment<V>.setupFeeLoading(viewModel: V, feeView: FeeView) where V : BaseViewModel, V : FeeLoaderMixin {
+    observeRetries(viewModel)
+
+    viewModel.feeLiveData.observe(feeView::setFeeStatus)
+}
 
 fun displayFeeStatus(
     feeStatus: FeeStatus,

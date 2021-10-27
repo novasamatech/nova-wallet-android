@@ -36,6 +36,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.con
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.BonusPayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.CustomContributeFragment
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.model.CustomContributePayload
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.terms.MoonbeamCrowdloanTermsFragment
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.CrowdloanContributeFragment
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.parcel.ContributePayload
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
@@ -225,7 +226,12 @@ class Navigator :
     }
 
     override fun openContribute(payload: ContributePayload) {
-        navController?.navigate(R.id.action_mainFragment_to_crowdloanContributeFragment, CrowdloanContributeFragment.getBundle(payload))
+        val bundle = CrowdloanContributeFragment.getBundle(payload)
+
+        when (navController?.currentDestination?.id) {
+            R.id.mainFragment -> navController?.navigate(R.id.action_mainFragment_to_crowdloanContributeFragment, bundle)
+            R.id.moonbeamCrowdloanTermsFragment -> navController?.navigate(R.id.action_moonbeamCrowdloanTermsFragment_to_crowdloanContributeFragment, bundle)
+        }
     }
 
     override val customBonusFlow: Flow<BonusPayload?>
@@ -324,6 +330,10 @@ class Navigator :
 
     override fun returnToMain() {
         navController?.navigate(R.id.back_to_main)
+    }
+
+    override fun openMoonbeamFlow(payload: ContributePayload) {
+        navController?.navigate(R.id.action_mainFragment_to_moonbeamCrowdloanTermsFragment, MoonbeamCrowdloanTermsFragment.getBundle(payload))
     }
 
     override fun openValidatorDetails(validatorDetails: ValidatorDetailsParcelModel) {
@@ -439,6 +449,10 @@ class Navigator :
 
     override fun openAddAccount(payload: AddAccountPayload) {
         navController?.navigate(R.id.action_open_onboarding, WelcomeFragment.bundle(payload))
+    }
+
+    override fun openUserContributions() {
+        navController?.navigate(R.id.action_mainFragment_to_userContributionsFragment)
     }
 
     override fun exportMnemonicAction(exportPayload: ExportPayload): DelayedNavigation {

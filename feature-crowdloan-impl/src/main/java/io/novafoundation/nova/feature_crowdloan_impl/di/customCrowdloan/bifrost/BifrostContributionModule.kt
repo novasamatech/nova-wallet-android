@@ -26,26 +26,30 @@ class BifrostContributionModule {
     @FeatureScope
     fun provideBifrostInteractor(
         bifrostApi: BifrostApi,
-        httpExceptionHandler: HttpExceptionHandler
+        httpExceptionHandler: HttpExceptionHandler,
     ) = BifrostContributeInteractor(BuildConfig.BIFROST_NOVA_REFERRAL, bifrostApi, httpExceptionHandler)
 
     @Provides
     @FeatureScope
     fun provideBifrostSubmitter(
-        interactor: BifrostContributeInteractor
+        interactor: BifrostContributeInteractor,
     ) = BifrostContributeSubmitter(interactor)
+
+    @Provides
+    @FeatureScope
+    fun provideBifrostExtraFlow(
+        interactor: BifrostContributeInteractor,
+        resourceManager: ResourceManager,
+    ) = BifrostExtraBonusFlow(interactor, resourceManager)
 
     @Provides
     @FeatureScope
     @IntoSet
     fun provideBifrostFactory(
         submitter: BifrostContributeSubmitter,
-        karuraInteractor: BifrostContributeInteractor,
-        resourceManager: ResourceManager
+        bifrostExtraBonusFlow: BifrostExtraBonusFlow,
     ): CustomContributeFactory = BifrostContributeFactory(
         submitter,
-        karuraInteractor,
-        resourceManager,
-        BuildConfig.BIFROST_TERMS_LINKS
+        bifrostExtraBonusFlow
     )
 }

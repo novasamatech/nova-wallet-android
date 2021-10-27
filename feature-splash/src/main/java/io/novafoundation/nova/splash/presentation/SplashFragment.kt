@@ -33,9 +33,11 @@ class SplashFragment : BaseFragment<SplashViewModel>() {
             .inject(this)
     }
 
-    override fun subscribe(viewModel: SplashViewModel) {
-        viewModel.removeSplashBackgroundLiveData.observeEvent {
-            (activity as? SplashBackgroundHolder)?.removeSplashBackground()
-        }
+    override fun onDestroy() {
+        super.onDestroy()
+
+        (activity as? SplashBackgroundHolder)?.removeSplashBackground()
     }
+
+    override fun subscribe(viewModel: SplashViewModel) {}
 }

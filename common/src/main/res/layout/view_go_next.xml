@@ -20,16 +20,18 @@
 
     <TextView
         android:id="@+id/goNextTitle"
+        android:layout_marginTop="14dp"
+        android:layout_marginBottom="14dp"
         style="@style/TextAppearance.NovaFoundation.Body1"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_marginStart="12dp"
         android:layout_marginEnd="16dp"
         android:textColor="@color/white"
-        app:layout_constraintBottom_toBottomOf="@id/goNextIcon"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/imageView"
         app:layout_constraintStart_toEndOf="@id/goNextIcon"
-        app:layout_constraintTop_toTopOf="@id/goNextIcon"
+        app:layout_constraintTop_toTopOf="parent"
         tools:text="Learn Karura's crowdloan" />
 
     <TextView
@@ -75,7 +77,7 @@
         app:constraint_referenced_ids="goNextProgress,goNextActionImage" />
 
     <View
-        android:id="@+id/view"
+        android:id="@+id/goNextDivider"
         android:layout_width="0dp"
         android:layout_height="1dp"
         android:layout_marginStart="16dp"

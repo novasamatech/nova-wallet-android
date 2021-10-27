@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.karura
+package io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.acala
 
 import io.novafoundation.nova.common.base.BaseException
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
@@ -32,7 +32,10 @@ class AcalaContributeInteractor(
 
             val (chain, chainAsset) = selectedAssetState.chainAndAsset()
 
-            val statement = acalaApi.getStatement(AcalaApi.getBaseUrl(chain)).statement
+            val statement = acalaApi.getStatement(
+                baseUrl = AcalaApi.getBaseUrl(chain),
+                authHeader = AcalaApi.getAuthHeader(chain)
+            ).statement
 
             val chainForAddress = when (chain.genesisHash) {
                 ChainGeneses.ROCOCO_ACALA -> chainRegistry.getChain(ChainGeneses.POLKADOT) // api requires polkadot address even in rococo testnet
@@ -46,7 +49,11 @@ class AcalaContributeInteractor(
                 signature = secretStoreV2.sign(selectedMetaAccount, chain, statement)
             )
 
-            acalaApi.applyForBonus(AcalaApi.getBaseUrl(chain), request)
+            acalaApi.applyForBonus(
+                baseUrl = AcalaApi.getBaseUrl(chain),
+                authHeader = AcalaApi.getAuthHeader(chain),
+                body = request
+            )
         }
     }
 
@@ -54,7 +61,11 @@ class AcalaContributeInteractor(
         val chain = selectedAssetState.chain()
 
         httpExceptionHandler.wrap {
-            acalaApi.isReferralValid(AcalaApi.getBaseUrl(chain), referralCode).result
+            acalaApi.isReferralValid(
+                baseUrl = AcalaApi.getBaseUrl(chain),
+                authHeader = AcalaApi.getAuthHeader(chain),
+                referral = referralCode
+            ).result
         }
     } catch (e: BaseException) {
         if (e.kind == BaseException.Kind.HTTP) {

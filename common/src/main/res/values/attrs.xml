@@ -65,6 +65,8 @@
         <attr name="android:text" />
         <attr name="icon" />
         <attr name="actionIcon" />
+        <attr name="dividerVisible" />
+        <attr name="android:background" />
     </declare-styleable>
 
     <declare-styleable name="PrimaryButton">

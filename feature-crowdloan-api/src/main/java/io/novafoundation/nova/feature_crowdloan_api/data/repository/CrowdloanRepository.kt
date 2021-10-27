@@ -27,6 +27,8 @@ interface CrowdloanRepository {
 
     fun fundInfoFlow(chainId: ChainId, parachainId: ParaId): Flow<FundInfo>
 
+    suspend fun getFundInfo(chainId: ChainId, parachainId: ParaId): FundInfo
+
     suspend fun minContribution(chainId: ChainId): BigInteger
 }
 
@@ -37,5 +39,8 @@ class ParachainMetadata(
     val rewardRate: BigDecimal?,
     val website: String,
     val customFlow: String?,
-    val token: String
+    val token: String,
+    val extras: Map<String, String>,
 )
+
+fun ParachainMetadata.getExtra(key: String) = extras[key] ?: throw IllegalArgumentException("No key $key found in parachain metadata extras for $name")

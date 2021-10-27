@@ -14,54 +14,62 @@
         android:layout_height="wrap_content"
         app:titleText="@string/common_confirm" />
 
-    <io.novafoundation.nova.common.view.LabeledTextView
+    <ScrollView
         android:layout_width="match_parent"
-        android:id="@+id/confirmContributeOriginAcount"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        app:label="@string/common_account"
-        app:actionIcon="@drawable/ic_more_vertical"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp" />
+        android:layout_weight="1"
+        android:layout_height="0dp">
 
-    <io.novafoundation.nova.common.view.AmountView
-        android:layout_width="match_parent"
-        android:id="@+id/confirmContributeAmount"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:enabled="false" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/confirmContributeInjectionParent"
+            android:orientation="vertical">
 
-    <io.novafoundation.nova.common.view.TableCellView
-        android:id="@+id/confirmContributeReward"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        app:title="@string/staking_validator_estimated_reward" />
+            <io.novafoundation.nova.common.view.LabeledTextView
+                android:layout_width="match_parent"
+                android:id="@+id/confirmContributeOriginAcount"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                app:label="@string/common_account"
+                app:actionIcon="@drawable/ic_more_vertical"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp" />
 
-    <io.novafoundation.nova.common.view.TableCellView
-        android:id="@+id/confirmContributeLeasingPeriod"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        app:title="@string/crowdloan_leasing_period" />
+            <io.novafoundation.nova.common.view.AmountView
+                android:layout_width="match_parent"
+                android:id="@+id/confirmContributeAmount"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:layout_marginEnd="16dp"
+                android:enabled="false" />
 
-    <io.novafoundation.nova.common.view.TableCellView
-        android:id="@+id/confirmContributeBonus"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        app:title="@string/common_bonus" />
+            <io.novafoundation.nova.common.view.TableCellView
+                android:id="@+id/confirmContributeReward"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                app:title="@string/staking_validator_estimated_reward" />
 
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+            <io.novafoundation.nova.common.view.TableCellView
+                android:id="@+id/confirmContributeLeasingPeriod"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                app:title="@string/crowdloan_leasing_period" />
+
+            <io.novafoundation.nova.common.view.TableCellView
+                android:id="@+id/confirmContributeBonus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                app:title="@string/common_bonus" />
+        </LinearLayout>
+    </ScrollView>
 
     <LinearLayout
         android:layout_width="match_parent"

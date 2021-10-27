@@ -1,11 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+    <string name="crowdloan_contributions_placeholder">Your contributions\n will appear here</string>
+
+    <string name="crowdloan_active_section_format_v2_0">Active</string>
+    <string name="common_completed_with_count_v2_0">Completed</string>
+
+    <string name="crowdloan_your_contributions">Your contributions</string>
+    <string name="crowdloan_about">About crowdloans</string>
+
+    <string name="crowdloan_moonbeam_encryption_not_supported_title">Cannot contribute with this account</string>
+    <string name="crowdloan_moonbeam_encryption_not_supported_message">Moonbeam crowdloan supports only SR25519 crypto type accounts. Please consider using another account for contribution</string>
+
+    <string name="crowdloan_moonbeam_reward_destination">%s reward destination</string>
+
+    <string name="crowdloan_moonbeam_terms_submit">Submit agreement</string>
+    <string name="crowdloan_terms_conditions_named">%s\'s Terms and Conditions</string>
+
+    <string name="crowdloan_moonbeam_terms_subtitle">You need to submit agreement with Terms &amp; Conditions on the blockchain to proceed. This is required to be done only once for all following Moonbeam contributions</string>
+
+    <string name="crowdloan_moonbeam_region_restriction_title">Your region is not supported</string>
+    <string name="crowdloan_moonbeam_region_restriction_message">This crowdloan isn\'t available in your location.</string>
+
+    <string name="crowdloan_moonbeam_missing_account_title">Moonbeam account is missing</string>
+    <string name="crowdloan_moonbeam_missing_account_message">You should add Moonbeam account to the wallet in order to participate in Moonbeam crowdloan</string>
+
     <string name="wallet_your_balance">Your balance</string>
     <string name="wallet_balance_transferable">Transferable</string>
 
     <string name="accounts_change_chain_secrets">Change account</string>
 
-    <string name="crowdloan_agree_with_policy">Agree with Terms and Conditions</string>
+    <string name="crowdloan_agree_with_policy">Agree to Terms and Conditions</string>
     <string name="crowdloan_privacy_policy">I have read and agree to Terms and Conditions</string>
     <string name="crowdloan_referral_code">Referral code</string>
 
@@ -15,8 +39,8 @@
     <string name="account_invalid_derivation_path_message">Derivation path contains unsupported symbols or has incorrect structure</string>
 
     <string name="import_json_unsupported_crypto_title">Unsupported encryption type</string>
-    <string name="import_json_unsupported_ethereum_crypto_message">Cannot import account for Ethereum-based chain based on secret with Substrate encryption</string>
-    <string name="import_json_unsupported_substrate_crypto_message">Cannot import account for Substrate-based chain based on secret with Ethereum encryption</string>
+    <string name="import_json_unsupported_ethereum_crypto_message">Cannot import account with Substrate secret into the network with Ethereum encryption</string>
+    <string name="import_json_unsupported_substrate_crypto_message">Cannot import account with Ethereum secret into the network with Substrate encryption</string>
     <string name="common_chain">Chain</string>
     <string name="import_json_chains_dont_match">Supplied JSON file was created for different network.</string>
 
@@ -96,6 +120,7 @@ transfers will appear here</string>
     <string name="recovery_json">Restore JSON</string>
     <string name="account_import_password_placeholder">Password</string>
     <string name="recover_json_hint">Paste json or upload file…</string>
+    <string name="recover_json_upload">Upload file</string>
     <string name="import_json_paste">Paste json</string>
     <string name="recovery_passphrase">Mnemonic passphrase</string>
     <string name="account_import_invalid_seed">Seed is invalid. Please, make sure that your input contains 64 hex symbols.</string>

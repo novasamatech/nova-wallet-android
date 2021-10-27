@@ -5,6 +5,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.Contribution
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.FundInfo
+import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.ParaId
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRepository
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ParachainMetadata
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.getContributions
@@ -16,18 +17,17 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import java.math.BigDecimal
-import java.math.BigInteger
 import kotlin.reflect.KClass
 
 class Crowdloan(
     val parachainMetadata: ParachainMetadata?,
-    val parachainId: BigInteger,
+    val parachainId: ParaId,
     val raisedFraction: BigDecimal,
     val state: State,
     val leasePeriodInMillis: Long,
     val leasedUntilInMillis: Long,
     val fundInfo: FundInfo,
-    val myContribution: Contribution?
+    val myContribution: Contribution?,
 ) {
 
     sealed class State {
@@ -57,12 +57,25 @@ class CrowdloanInteractor(
     private val chainStateRepository: ChainStateRepository,
 ) {
 
-    fun crowdloansFlow(chain: Chain): Flow<GroupedCrowdloans> {
+    fun contributedCrowdloansFlow(chain: Chain): Flow<List<Crowdloan>> {
+        return crowdloansFlow(chain)
+            .map { crowdloans -> crowdloans.filter { it.myContribution != null } }
+    }
+
+    fun groupedCrowdloansFlow(chain: Chain): Flow<GroupedCrowdloans> {
+        return crowdloansFlow(chain).map { crowdloans ->
+            crowdloans
+                .groupBy { it.state::class }
+                .toSortedMap(Crowdloan.State.STATE_CLASS_COMPARATOR)
+        }
+    }
+
+    private fun crowdloansFlow(chain: Chain): Flow<List<Crowdloan>> {
         return flow {
             val chainId = chain.id
 
             if (crowdloanRepository.isCrowdloansAvailable(chainId).not()) {
-                emit(emptyMap())
+                emit(emptyList())
 
                 return@flow
             }
@@ -105,8 +118,6 @@ class CrowdloanInteractor(
                         compareByDescending<Crowdloan> { it.fundInfo.raised }
                             .thenBy { it.fundInfo.end }
                     )
-                    .groupBy { it.state::class }
-                    .toSortedMap(Crowdloan.State.STATE_CLASS_COMPARATOR)
             }
 
             emitAll(withBlockUpdates)
