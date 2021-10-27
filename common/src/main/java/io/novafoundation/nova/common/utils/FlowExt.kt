@@ -7,9 +7,12 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.presentation.LoadingState
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -198,5 +201,17 @@ inline fun <T> Flow<T>.observeInLifecycle(
 ) {
     lifecycleCoroutineScope.launchWhenResumed {
         collect(observer)
+    }
+}
+
+// TODO replace with trySendBlocking from stdlib after upgrade to Kotlin 1.5
+// why not offer: https://github.com/Kotlin/kotlinx.coroutines/issues/2550
+@ExperimentalCoroutinesApi
+fun <E> SendChannel<E>.safeOffer(value: E): Boolean {
+    if (isClosedForSend) return false
+    return try {
+        offer(value)
+    } catch (e: CancellationException) {
+        false
     }
 }
