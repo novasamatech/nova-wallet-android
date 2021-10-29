@@ -3,7 +3,7 @@ package io.novafoundation.nova.runtime.multiNetwork.runtime.types
 import retrofit2.http.GET
 import retrofit2.http.Url
 
-private const val DEFAULT_TYPES_URL = "https://raw.githubusercontent.com/valentunn/py-scale-codec/fearless_stable/scalecodec/type_registry/default.json"
+private const val DEFAULT_TYPES_URL = "https://raw.githubusercontent.com/nova-wallet/nova-utils/master/chains/types/default.json"
 
 interface TypesFetcher {
 

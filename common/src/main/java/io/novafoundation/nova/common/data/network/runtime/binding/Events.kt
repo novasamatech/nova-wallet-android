@@ -5,7 +5,7 @@ import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericEvent
 import java.math.BigInteger
 
-class EventRecord<E>(val phase: Phase, val event: E)
+class EventRecord(val phase: Phase, val event: GenericEvent.Instance)
 
 sealed class Phase {
 
@@ -17,10 +17,7 @@ sealed class Phase {
 }
 
 @HelperBinding
-fun <E> bindEventRecord(
-    dynamicInstance: Any?,
-    eventBinder: (GenericEvent.Instance) -> E
-): EventRecord<E> {
+fun bindEventRecord(dynamicInstance: Any?): EventRecord {
     requireType<Struct.Instance>(dynamicInstance)
 
     val phaseDynamic = dynamicInstance.getTyped<DictEnum.Entry<*>>("phase")
@@ -34,7 +31,5 @@ fun <E> bindEventRecord(
 
     val dynamicEvent = dynamicInstance.getTyped<GenericEvent.Instance>("event")
 
-    val event = eventBinder(dynamicEvent)
-
-    return EventRecord(phase, event)
+    return EventRecord(phase, dynamicEvent)
 }
