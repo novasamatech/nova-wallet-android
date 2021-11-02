@@ -77,7 +77,7 @@ class PaymentUpdater(
         val key = try {
             runtime.metadata.system().storage("Account").storageKey(runtime, accountId)
         } catch (e: Exception) {
-            Log.e(LOG_TAG, "Failed to construct account storage key: ${e.message}")
+            Log.e(LOG_TAG, "Failed to construct account storage key: ${e.message} in ${chain.name}")
 
             return emptyFlow()
         }
