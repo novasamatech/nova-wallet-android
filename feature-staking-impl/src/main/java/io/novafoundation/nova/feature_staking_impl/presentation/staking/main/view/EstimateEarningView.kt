@@ -30,22 +30,14 @@ class EstimateEarningView @JvmOverloads constructor(
         with(context) {
             background = addRipple(getBlurDrawable())
         }
-
-//        attrs?.let { applyAttributes(it) }
-    }
-
-    private fun applyAttributes(attributeSet: AttributeSet) {
-        val typedArray = context.obtainStyledAttributes(attributeSet, R.styleable.EstimateEarningView)
-
-        typedArray.recycle()
     }
 
     fun setAssetImage(image: Drawable) {
         estimateEarningAmount.setAssetImage(image)
     }
 
-    fun setAssetImageResource(imageRes: Int) {
-        estimateEarningAmount.setAssetImageResource(imageRes)
+    fun loadAssetImage(imageUrl: String) {
+        estimateEarningAmount.loadAssetImage(imageUrl)
     }
 
     fun setAssetName(name: String) {

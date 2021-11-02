@@ -130,7 +130,7 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
                             observeValidations(stakingState)
 
                             stakingState.assetLiveData.observe {
-                                stakingEstimate.setAssetImageResource(it.tokenIconRes)
+                                stakingEstimate.loadAssetImage(it.imageUrl)
                                 stakingEstimate.setAssetName(it.tokenName)
                                 stakingEstimate.setAssetBalance(it.assetBalance)
                             }

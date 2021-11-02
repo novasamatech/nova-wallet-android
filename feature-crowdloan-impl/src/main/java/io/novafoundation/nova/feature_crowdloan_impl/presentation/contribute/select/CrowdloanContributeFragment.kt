@@ -99,7 +99,7 @@ class CrowdloanContributeFragment : BaseFragment<CrowdloanContributeViewModel>()
         viewModel.assetModelFlow.observe {
             crowdloanContributeAmount.setAssetBalance(it.assetBalance)
             crowdloanContributeAmount.setAssetName(it.tokenName)
-            crowdloanContributeAmount.setAssetImageResource(it.tokenIconRes)
+            crowdloanContributeAmount.loadAssetImage(it.imageUrl)
         }
 
         crowdloanContributeAmount.amountInput.bindTo(viewModel.enteredAmountFlow, lifecycleScope)
