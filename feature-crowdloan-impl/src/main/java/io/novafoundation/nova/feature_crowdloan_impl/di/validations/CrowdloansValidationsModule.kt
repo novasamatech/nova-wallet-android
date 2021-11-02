@@ -4,7 +4,8 @@ import dagger.Module
 
 @Module(
     includes = [
-        ContributeValidationsModule::class
+        ContributeValidationsModule::class,
+        MoonbeamTermsValidationsModule::class
     ]
 )
 class CrowdloansValidationsModule

@@ -7,6 +7,8 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import coil.ImageLoader
+import coil.load
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.setVisible
@@ -48,6 +50,11 @@ class GoNextView @JvmOverloads constructor(
 
     fun setBadgeText(badgeText: String?) {
         goNextBadgeText.setTextOrHide(badgeText)
+    }
+
+    fun loadIcon(iconLink: String, imageLoader: ImageLoader) {
+        icon.load(iconLink, imageLoader)
+        icon.setVisible(true)
     }
 
     fun setIcon(drawable: Drawable?) {
