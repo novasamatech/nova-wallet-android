@@ -71,7 +71,7 @@ class ReferralContributeView @JvmOverloads constructor(
         }
 
         with(viewState.learnBonusesTitle) {
-            referralLearnMore.icon.load(iconLink, imageLoader)
+            referralLearnMore.loadIcon(iconLink, imageLoader)
             referralLearnMore.title.text = text
 
             referralLearnMore.setOnClickListener { viewState.learnMoreClicked() }

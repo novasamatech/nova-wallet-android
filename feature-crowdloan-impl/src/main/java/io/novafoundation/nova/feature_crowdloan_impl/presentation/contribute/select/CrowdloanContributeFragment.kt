@@ -132,7 +132,7 @@ class CrowdloanContributeFragment : BaseFragment<CrowdloanContributeViewModel>()
 
         viewModel.learnCrowdloanModel?.let {
             crowdloanContributeLearnMore.title.text = it.text
-            crowdloanContributeLearnMore.icon.load(it.iconLink, imageLoader)
+            crowdloanContributeLearnMore.loadIcon(it.iconLink, imageLoader)
         }
 
         viewModel.bonusDisplayFlow.observe {
