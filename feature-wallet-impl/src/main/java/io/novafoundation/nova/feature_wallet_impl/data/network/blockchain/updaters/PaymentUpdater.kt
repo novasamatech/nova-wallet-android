@@ -32,6 +32,7 @@ import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.onEach
+import java.lang.Exception
 
 class PaymentUpdaterFactory(
     private val substrateSource: SubstrateRemoteSource,
@@ -73,12 +74,18 @@ class PaymentUpdater(
 
         val runtime = chainRegistry.getRuntime(chainId)
 
-        val key = runtime.metadata.system().storage("Account").storageKey(runtime, accountId)
+        val key = try {
+            runtime.metadata.system().storage("Account").storageKey(runtime, accountId)
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "Failed to construct account storage key: ${e.message} in ${chain.name}")
+
+            return emptyFlow()
+        }
 
         return storageSubscriptionBuilder.subscribe(key)
             .onEach { change ->
                 runCatching { bindAccountInfoOrDefault(change.value, runtime) }
-                    .onFailure { Log.e("RX", "Failed to update balance in ${chain.name}") }
+                    .onFailure { Log.e(LOG_TAG, "Failed to update balance in ${chain.name}") }
                     .onSuccess {
                         assetCache.updateAsset(metaAccount.id, chain.utilityAsset, it)
 

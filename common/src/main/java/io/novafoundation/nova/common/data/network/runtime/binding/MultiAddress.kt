@@ -56,4 +56,10 @@ fun bindMultiAddress(dynamicInstance: DictEnum.Entry<*>): MultiAddress {
     }
 }
 
-fun bindMultiAddressId(dynamicInstance: DictEnum.Entry<*>) = (bindMultiAddress(dynamicInstance) as? MultiAddress.Id)?.value
+fun bindAccountIdentifier(dynamicInstance: Any?) = when (dynamicInstance) {
+    // MultiAddress
+    is DictEnum.Entry<*> -> (bindMultiAddress(dynamicInstance) as MultiAddress.Id).value
+    // GenericAccountId or EthereumAddress
+    is ByteArray -> dynamicInstance
+    else -> incompatible()
+}

@@ -1,10 +1,8 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.bindings
 
-import io.novafoundation.nova.common.data.network.runtime.binding.bindMultiAddressId
+import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountIdentifier
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
-import io.novafoundation.nova.common.data.network.runtime.binding.cast
 import io.novafoundation.nova.common.data.network.runtime.binding.fromHexOrIncompatible
-import io.novafoundation.nova.common.data.network.runtime.binding.incompatible
 import io.novafoundation.nova.common.utils.balances
 import io.novafoundation.nova.common.utils.extrinsicHash
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
@@ -35,8 +33,8 @@ fun bindTransferExtrinsic(scale: String, runtime: RuntimeSnapshot): TransferExtr
 
     if (!isTransferCall) throw notTransfer()
 
-    val senderId = bindMultiAddressId(extrinsicInstance.signature!!.accountIdentifier.cast()) ?: incompatible()
-    val recipientId = bindMultiAddressId(call.arguments["dest"].cast()) ?: incompatible()
+    val senderId = bindAccountIdentifier(extrinsicInstance.signature!!.accountIdentifier)
+    val recipientId = bindAccountIdentifier(call.arguments["dest"])
 
     return TransferExtrinsic(
         senderId = senderId,
