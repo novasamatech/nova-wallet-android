@@ -6,7 +6,6 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.lifecycle.LifecycleCoroutineScope
 import coil.ImageLoader
-import coil.load
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.createSpannable

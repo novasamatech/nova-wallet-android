@@ -4,7 +4,6 @@ import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.TitleAndMessage
 import io.novafoundation.nova.common.mixin.api.DefaultFailure
 import io.novafoundation.nova.common.mixin.api.Validatable
-import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -14,7 +13,7 @@ fun MutableLiveData<Boolean>.progressConsumer(): ProgressConsumer = { value = it
 
 fun MutableStateFlow<Boolean>.progressConsumer(): ProgressConsumer = { value = it }
 
-class ValidationExecutor: Validatable {
+class ValidationExecutor : Validatable {
 
     suspend fun <P, S> requireValid(
         validationSystem: ValidationSystem<P, S>,
