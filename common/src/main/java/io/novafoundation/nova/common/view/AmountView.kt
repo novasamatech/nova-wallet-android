@@ -10,7 +10,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import coil.ImageLoader
 import coil.load
 import io.novafoundation.nova.common.R
-import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
