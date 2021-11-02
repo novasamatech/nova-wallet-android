@@ -171,10 +171,8 @@ class CommonModule {
 
     @Provides
     @ApplicationScope
-    fun provideValidationExecutor(
-        resourceManager: ResourceManager
-    ): ValidationExecutor {
-        return ValidationExecutor(resourceManager)
+    fun provideValidationExecutor(): ValidationExecutor {
+        return ValidationExecutor()
     }
 
     @Provides

@@ -3,21 +3,29 @@ package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.cu
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Browserable
+import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.withFlagSet
+import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.moonbeam.MoonbeamCrowdloanInteractor
+import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.custom.moonbeam.MoonbeamTermsPayload
+import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.custom.moonbeam.MoonbeamTermsValidationSystem
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.parcel.ContributePayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.parcel.mapParachainMetadataFromParcel
+import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
+import io.novafoundation.nova.feature_wallet_api.domain.getCurrentAsset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
 
 sealed class SubmitActionState {
     object Loading : SubmitActionState()
@@ -38,7 +46,13 @@ class MoonbeamCrowdloanTermsViewModel(
     private val feeLoaderMixin: FeeLoaderMixin.Presentation,
     private val resourceManager: ResourceManager,
     private val router: CrowdloanRouter,
-) : BaseViewModel(), FeeLoaderMixin by feeLoaderMixin, Browserable {
+    private val assetUseCase: AssetUseCase,
+    private val validationExecutor: ValidationExecutor,
+    private val validationSystem: MoonbeamTermsValidationSystem,
+) : BaseViewModel(),
+    FeeLoaderMixin by feeLoaderMixin,
+    Validatable by validationExecutor,
+    Browserable {
 
     init {
         loadFee()
@@ -76,14 +90,40 @@ class MoonbeamCrowdloanTermsViewModel(
         router.back()
     }
 
-    fun submitClicked() = launch {
-        submittingInProgressFlow.withFlagSet {
-            interactor.submitAgreement(parachainMetadata.first())
-                .onFailure(::showError)
-                .onSuccess {
-                    router.openContribute(payload)
-                }
+    fun termsLinkClicked() {
+        openBrowserEvent.value = Event(interactor.getTermsLink())
+    }
+
+    fun submitClicked() = requireFee { fee ->
+        submittingInProgressFlow.value = true
+
+        submitAfterValidation(fee)
+    }
+
+    private fun submitAfterValidation(fee: BigDecimal) = launch {
+        val validationPayload = MoonbeamTermsPayload(
+            fee = fee,
+            asset = assetUseCase.getCurrentAsset()
+        )
+
+        validationExecutor.requireValid(
+            validationSystem = validationSystem,
+            payload = validationPayload,
+            validationFailureTransformer = { moonbeamTermsValidationFailure(it, resourceManager) },
+            progressConsumer = submittingInProgressFlow.progressConsumer()
+        ) {
+            submit()
         }
+    }
+
+    private fun submit() = launch {
+        interactor.submitAgreement(parachainMetadata.first())
+            .onFailure(::showError)
+            .onSuccess {
+                router.openContribute(payload)
+            }
+
+        submittingInProgressFlow.value = false
     }
 
     private fun loadFee() = launch {
@@ -96,7 +136,8 @@ class MoonbeamCrowdloanTermsViewModel(
         )
     }
 
-    fun termsLinkClicked() {
-        openBrowserEvent.value = Event(interactor.getTermsLink())
-    }
+    private fun requireFee(block: (BigDecimal) -> Unit) = feeLoaderMixin.requireFee(
+        block,
+        onError = { title, message -> showError(title, message) }
+    )
 }
