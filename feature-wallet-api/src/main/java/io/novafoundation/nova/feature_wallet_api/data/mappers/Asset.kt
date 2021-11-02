@@ -6,7 +6,6 @@ import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetModel
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
 
 fun mapAssetToAssetModel(
@@ -22,13 +21,9 @@ fun mapAssetToAssetModel(
         AssetModel(
             asset.token.configuration.chainId,
             asset.token.configuration.id,
-            token.configuration.icon,
             token.configuration.iconUrl,
             token.configuration.symbol,
             formattedAmount
         )
     }
 }
-
-val Chain.Asset.icon: Int
-    get() = R.drawable.ic_token_dot // TODO wallet - token icon

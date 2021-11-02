@@ -75,7 +75,7 @@ class SetupStakingFragment : BaseFragment<SetupStakingViewModel>() {
         viewModel.assetModelsFlow.observe {
             setupStakingAmountField.setAssetBalance(it.assetBalance)
             setupStakingAmountField.setAssetName(it.tokenName)
-            setupStakingAmountField.setAssetImageResource(it.tokenIconRes)
+            setupStakingAmountField.loadAssetImage(it.imageUrl)
         }
 
         setupStakingAmountField.amountInput.bindTo(viewModel.enteredAmountFlow, lifecycleScope)

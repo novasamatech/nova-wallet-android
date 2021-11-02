@@ -65,7 +65,7 @@ class SelectUnbondFragment : BaseFragment<SelectUnbondViewModel>() {
         viewModel.assetModelFlow.observe {
             unbondAmount.setAssetBalance(it.assetBalance)
             unbondAmount.setAssetName(it.tokenName)
-            unbondAmount.setAssetImageResource(it.tokenIconRes)
+            unbondAmount.loadAssetImage(it.imageUrl)
         }
 
         unbondAmount.amountInput.bindTo(viewModel.enteredAmountFlow, lifecycleScope)

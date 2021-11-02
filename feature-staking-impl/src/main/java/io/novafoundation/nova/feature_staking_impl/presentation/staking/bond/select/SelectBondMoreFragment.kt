@@ -75,7 +75,7 @@ class SelectBondMoreFragment : BaseFragment<SelectBondMoreViewModel>() {
         viewModel.assetModelFlow.observe {
             bondMoreAmount.setAssetBalance(it.assetBalance)
             bondMoreAmount.setAssetName(it.tokenName)
-            bondMoreAmount.setAssetImageResource(it.tokenIconRes)
+            bondMoreAmount.loadAssetImage(it.imageUrl)
         }
 
         bondMoreAmount.amountInput.bindTo(viewModel.enteredAmountFlow, lifecycleScope)

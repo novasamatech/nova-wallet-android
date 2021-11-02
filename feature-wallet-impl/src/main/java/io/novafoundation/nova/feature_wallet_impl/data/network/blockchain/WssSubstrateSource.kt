@@ -3,18 +3,13 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain
 
 import io.novafoundation.nova.common.data.network.runtime.binding.AccountInfo
-import io.novafoundation.nova.common.data.network.runtime.binding.EventRecord
 import io.novafoundation.nova.common.data.network.runtime.binding.ExtrinsicStatusEvent
 import io.novafoundation.nova.common.data.network.runtime.binding.Phase
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountInfo
-import io.novafoundation.nova.common.data.network.runtime.binding.bindExtrinsicStatusEventRecords
+import io.novafoundation.nova.common.data.network.runtime.binding.bindEventRecords
 import io.novafoundation.nova.common.data.network.runtime.binding.bindOrNull
+import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.system
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_wallet_api.domain.model.Transfer
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.bindings.bindTransferExtrinsic
@@ -24,6 +19,12 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.queryNonNull
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericEvent
+import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
+import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
+import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
 import java.math.BigInteger
 
 class WssSubstrateSource(
@@ -74,9 +75,21 @@ class WssSubstrateSource(
             chainId = chainId,
             keyBuilder = { it.metadata.system().storage("Events").storageKey() },
             binding = { scale, runtime ->
-                val statuses = bindExtrinsicStatusEventRecords(scale, runtime)
-                    .filter { it.phase is Phase.ApplyExtrinsic }
-                    .associateBy { (it.phase as Phase.ApplyExtrinsic).extrinsicId.toInt() }
+                val statuses = bindEventRecords(scale, runtime)
+                    .mapNotNull {
+                        val extrinsicStatus = it.event.asExtrinsicStatus()
+                        val phase = it.phase as? Phase.ApplyExtrinsic
+
+                        if (extrinsicStatus != null && phase != null) {
+                            phase.extrinsicId.toInt() to extrinsicStatus
+                        } else {
+                            null
+                        }
+                    }
+                    .associateBy(
+                        keySelector = Pair<Int, ExtrinsicStatusEvent>::first,
+                        valueTransform = Pair<Int, ExtrinsicStatusEvent>::second
+                    )
 
                 buildExtrinsics(runtime, statuses, block.block.extrinsics)
             },
@@ -90,18 +103,26 @@ class WssSubstrateSource(
         }
     }
 
+    private fun GenericEvent.Instance.asExtrinsicStatus(): ExtrinsicStatusEvent? {
+        return if (module.name == Modules.SYSTEM) {
+            when (event.name) {
+                "ExtrinsicFailed" -> ExtrinsicStatusEvent.FAILURE
+                "ExtrinsicSuccess" -> ExtrinsicStatusEvent.SUCCESS
+                else -> null
+            }
+        } else null
+    }
+
     private fun buildExtrinsics(
         runtime: RuntimeSnapshot,
-        statuses: Map<Int, EventRecord<ExtrinsicStatusEvent>>,
+        statuses: Map<Int, ExtrinsicStatusEvent>,
         extrinsicsRaw: List<String>,
     ): List<TransferExtrinsicWithStatus> {
         return extrinsicsRaw.mapIndexed { index, extrinsicScale ->
             val transferExtrinsic = bindOrNull { bindTransferExtrinsic(extrinsicScale, runtime) }
 
             transferExtrinsic?.let {
-                val status = statuses[index]?.event
-
-                TransferExtrinsicWithStatus(transferExtrinsic, status)
+                TransferExtrinsicWithStatus(transferExtrinsic, statuses[index])
             }
         }.filterNotNull()
     }

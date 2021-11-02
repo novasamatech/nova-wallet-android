@@ -95,7 +95,7 @@ class ConfirmStakingFragment : BaseFragment<ConfirmStakingViewModel>() {
         viewModel.assetModelLiveData.observe {
             confirmStakeAmount.setAssetBalance(it.assetBalance)
             confirmStakeAmount.setAssetName(it.tokenName)
-            confirmStakeAmount.setAssetImageResource(it.tokenIconRes)
+            confirmStakeAmount.loadAssetImage(it.imageUrl)
         }
 
         viewModel.feeLiveData.observe {

@@ -77,7 +77,7 @@ class RedeemFragment : BaseFragment<RedeemViewModel>() {
         viewModel.assetModelLiveData.observe {
             redeemAmount.setAssetBalance(it.assetBalance)
             redeemAmount.setAssetName(it.tokenName)
-            redeemAmount.setAssetImageResource(it.tokenIconRes)
+            redeemAmount.loadAssetImage(it.imageUrl)
         }
 
         viewModel.amountLiveData.observe { (amount, fiatAmount) ->

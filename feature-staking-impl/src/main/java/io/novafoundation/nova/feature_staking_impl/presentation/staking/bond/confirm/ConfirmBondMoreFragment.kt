@@ -73,7 +73,7 @@ class ConfirmBondMoreFragment : BaseFragment<ConfirmBondMoreViewModel>() {
         viewModel.assetModelFlow.observe {
             confirmBondMoreAmount.setAssetBalance(it.assetBalance)
             confirmBondMoreAmount.setAssetName(it.tokenName)
-            confirmBondMoreAmount.setAssetImageResource(it.tokenIconRes)
+            confirmBondMoreAmount.loadAssetImage(it.imageUrl)
         }
 
         confirmBondMoreAmount.amountInput.setText(viewModel.amount)

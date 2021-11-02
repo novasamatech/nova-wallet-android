@@ -10,6 +10,10 @@ object FeatureUtils {
         return getHolder(context).getFeature(key)
     }
 
+    fun getCommonApi(context: Context): CommonApi {
+        return getHolder(context).commonApi()
+    }
+
     fun <T> getFeature(activity: Activity, key: Class<*>): T {
         return getHolder(activity.applicationContext).getFeature(key)
     }
