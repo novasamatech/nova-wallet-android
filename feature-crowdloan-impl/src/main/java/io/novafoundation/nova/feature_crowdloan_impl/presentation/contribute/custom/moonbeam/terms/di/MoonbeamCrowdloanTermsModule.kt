@@ -9,10 +9,13 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.moonbeam.MoonbeamCrowdloanInteractor
+import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.custom.moonbeam.MoonbeamTermsValidationSystem
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.terms.MoonbeamCrowdloanTermsViewModel
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.parcel.ContributePayload
+import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 
 @Module(includes = [ViewModelModule::class])
@@ -27,13 +30,19 @@ class MoonbeamCrowdloanTermsModule {
         feeLoaderMixin: FeeLoaderMixin.Presentation,
         resourceManager: ResourceManager,
         router: CrowdloanRouter,
+        assetUseCase: AssetUseCase,
+        validationSystem: MoonbeamTermsValidationSystem,
+        validationExecutor: ValidationExecutor,
     ): ViewModel {
         return MoonbeamCrowdloanTermsViewModel(
             interactor,
             payload,
             feeLoaderMixin,
             resourceManager,
-            router
+            router,
+            assetUseCase,
+            validationExecutor,
+            validationSystem
         )
     }
 

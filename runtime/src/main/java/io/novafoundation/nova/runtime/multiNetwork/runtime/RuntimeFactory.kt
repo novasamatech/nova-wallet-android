@@ -41,8 +41,7 @@ class RuntimeFactory(
     private val gson: Gson,
 ) {
 
-    // Acts as a operation queue due to be single threaded and guarantee of sequential execution
-    private val dispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
+    private val dispatcher = Executors.newCachedThreadPool().asCoroutineDispatcher()
 
     /**
      * @throws BaseTypesNotInCacheException

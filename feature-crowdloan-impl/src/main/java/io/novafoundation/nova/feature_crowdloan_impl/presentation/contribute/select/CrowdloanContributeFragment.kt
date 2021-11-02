@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import coil.ImageLoader
-import coil.load
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -132,7 +131,7 @@ class CrowdloanContributeFragment : BaseFragment<CrowdloanContributeViewModel>()
 
         viewModel.learnCrowdloanModel?.let {
             crowdloanContributeLearnMore.title.text = it.text
-            crowdloanContributeLearnMore.icon.load(it.iconLink, imageLoader)
+            crowdloanContributeLearnMore.loadIcon(it.iconLink, imageLoader)
         }
 
         viewModel.bonusDisplayFlow.observe {

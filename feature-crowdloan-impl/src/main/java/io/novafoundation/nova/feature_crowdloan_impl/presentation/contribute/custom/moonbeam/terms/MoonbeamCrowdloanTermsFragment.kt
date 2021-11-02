@@ -11,6 +11,7 @@ import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
+import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
@@ -74,6 +75,7 @@ class MoonbeamCrowdloanTermsFragment : BaseFragment<MoonbeamCrowdloanTermsViewMo
     override fun subscribe(viewModel: MoonbeamCrowdloanTermsViewModel) {
         setupFeeLoading(viewModel, moonbeamTermsFee)
         observeBrowserEvents(viewModel)
+        observeValidations(viewModel)
 
         moonbeamTermsLink.title.text = viewModel.termsLinkContent.title
         moonbeamTermsLink.icon.load(viewModel.termsLinkContent.iconUrl, imageLoader)

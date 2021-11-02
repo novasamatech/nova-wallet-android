@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.validation.DefaultFailureLevel
 import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
