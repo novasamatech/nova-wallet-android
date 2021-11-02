@@ -61,7 +61,7 @@ class CustomRebondFragment : BaseFragment<CustomRebondViewModel>() {
         viewModel.assetModelFlow.observe {
             rebondAmount.setAssetBalance(it.assetBalance)
             rebondAmount.setAssetName(it.tokenName)
-            rebondAmount.setAssetImageResource(it.tokenIconRes)
+            rebondAmount.loadAssetImage(it.imageUrl)
         }
 
         rebondAmount.amountInput.bindTo(viewModel.enteredAmountFlow, lifecycleScope)

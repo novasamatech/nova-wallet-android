@@ -73,7 +73,7 @@ class ConfirmUnbondFragment : BaseFragment<ConfirmUnbondViewModel>() {
         viewModel.assetModelFlow.observe {
             confirmUnbondAmount.setAssetBalance(it.assetBalance)
             confirmUnbondAmount.setAssetName(it.tokenName)
-            confirmUnbondAmount.setAssetImageResource(it.tokenIconRes)
+            confirmUnbondAmount.loadAssetImage(it.imageUrl)
         }
 
         confirmUnbondAmount.amountInput.setText(viewModel.amount)

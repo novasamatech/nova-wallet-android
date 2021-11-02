@@ -75,7 +75,7 @@ class ConfirmRebondFragment : BaseFragment<ConfirmRebondViewModel>() {
         viewModel.assetModelFlow.observe {
             confirmRebondAmount.setAssetBalance(it.assetBalance)
             confirmRebondAmount.setAssetName(it.tokenName)
-            confirmRebondAmount.setAssetImageResource(it.tokenIconRes)
+            confirmRebondAmount.loadAssetImage(it.imageUrl)
         }
 
         confirmRebondAmount.amountInput.setText(viewModel.amount)

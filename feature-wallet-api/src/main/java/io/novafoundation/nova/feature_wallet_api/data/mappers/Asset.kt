@@ -22,13 +22,9 @@ fun mapAssetToAssetModel(
         AssetModel(
             asset.token.configuration.chainId,
             asset.token.configuration.id,
-            token.configuration.icon,
             token.configuration.iconUrl,
             token.configuration.symbol,
             formattedAmount
         )
     }
 }
-
-val Chain.Asset.icon: Int
-    get() = R.drawable.ic_token_dot // TODO wallet - token icon

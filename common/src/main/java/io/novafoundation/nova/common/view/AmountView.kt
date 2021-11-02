@@ -7,7 +7,11 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.EditText
 import androidx.constraintlayout.widget.ConstraintLayout
+import coil.ImageLoader
+import coil.load
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.di.CommonApi
+import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setTextOrHide
@@ -27,6 +31,8 @@ class AmountView @JvmOverloads constructor(
 
     val amountInput: EditText
         get() = stakingAmountInput
+
+    private val imageLoader: ImageLoader = FeatureUtils.getCommonApi(context).imageLoader()
 
     init {
         View.inflate(context, R.layout.view_staking_amount, this)
@@ -84,8 +90,8 @@ class AmountView @JvmOverloads constructor(
         stakingAssetImage.setImageDrawable(image)
     }
 
-    fun setAssetImageResource(imageRes: Int) {
-        stakingAssetImage.setImageResource(imageRes)
+    fun loadAssetImage(imageUrl: String) {
+        stakingAssetImage.load(imageUrl, imageLoader)
     }
 
     fun setAssetName(name: String) {
