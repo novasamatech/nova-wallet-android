@@ -5,12 +5,12 @@ import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.feature_account_api.data.secrets.sign
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_api.domain.model.addressIn
+import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.karura.AcalaApi
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.karura.VerifyKaruraParticipationRequest
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.runtime.ext.ChainGeneses
-import io.novafoundation.nova.runtime.ext.genesisHash
+import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
@@ -37,13 +37,12 @@ class AcalaContributeInteractor(
                 authHeader = AcalaApi.getAuthHeader(chain)
             ).statement
 
-            val chainForAddress = when (chain.genesisHash) {
-                ChainGeneses.ROCOCO_ACALA -> chainRegistry.getChain(ChainGeneses.POLKADOT) // api requires polkadot address even in rococo testnet
-                else -> chain
-            }
+            val accountIdInCurrentChain = selectedMetaAccount.accountIdIn(chain)!!
+            // api requires polkadot address even in rococo testnet
+            val addressInPolkadot = chainRegistry.getChain(ChainGeneses.POLKADOT).addressOf(accountIdInCurrentChain)
 
             val request = VerifyKaruraParticipationRequest(
-                address = selectedMetaAccount.addressIn(chainForAddress)!!,
+                address = addressInPolkadot,
                 amount = chainAsset.planksFromAmount(amount),
                 referral = referralCode,
                 signature = secretStoreV2.sign(selectedMetaAccount, chain, statement)
