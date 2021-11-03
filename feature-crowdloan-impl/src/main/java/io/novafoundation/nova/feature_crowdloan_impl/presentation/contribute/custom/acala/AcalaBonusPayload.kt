@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.karura
+package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.acala
 
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.referral.ReferralCodePayload
 import kotlinx.android.parcel.Parcelize

@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.data.CrowdloanSharedState
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.karura.AcalaApi
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomContributeFactory
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.acala.AcalaContributeInteractor
-import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.karura.AcalaContributeSubmitter
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.acala.AcalaContributeSubmitter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module

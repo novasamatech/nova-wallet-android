@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.karura
+package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.acala
 
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.acala.AcalaContributeInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.BonusPayload

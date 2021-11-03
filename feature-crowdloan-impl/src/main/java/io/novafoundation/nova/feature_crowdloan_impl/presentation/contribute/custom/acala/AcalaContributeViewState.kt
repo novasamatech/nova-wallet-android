@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.karura
+package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.acala
 
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_crowdloan_impl.BuildConfig
