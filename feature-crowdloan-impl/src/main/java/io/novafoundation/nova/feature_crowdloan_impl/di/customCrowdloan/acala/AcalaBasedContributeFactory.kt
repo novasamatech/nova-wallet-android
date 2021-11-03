@@ -7,8 +7,8 @@ import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomCo
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.ExtraBonusFlow
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.acala.AcalaContributeInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.CustomContributeViewState
-import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.acala.AcalaContributeSubmitter
-import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.acala.AcalaContributeViewState
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.acala.bonus.AcalaContributeSubmitter
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.acala.bonus.AcalaContributeViewState
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.model.CustomContributePayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.referral.ReferralContributeView
 import kotlinx.coroutines.CoroutineScope
