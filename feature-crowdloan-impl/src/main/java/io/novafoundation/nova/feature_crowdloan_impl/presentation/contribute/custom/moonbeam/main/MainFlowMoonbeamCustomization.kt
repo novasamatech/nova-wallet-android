@@ -20,6 +20,7 @@ import io.novafoundation.nova.common.view.LabeledTextView
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ParachainMetadata
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.ConfirmContributeCustomization
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.CrowdloanMainFlowFeatures
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.SelectContributeCustomization
 import kotlinx.android.synthetic.main.fragment_contribute.view.crowdloanContributeDescription
 import kotlinx.android.synthetic.main.fragment_contribute.view.crowdloanContributeScrollableContent
@@ -93,8 +94,8 @@ class SelectContributeMoonbeamCustomization(
         )
     }
 
-    override fun createViewState(coroutineScope: CoroutineScope, parachainMetadata: ParachainMetadata): MoonbeamMainFlowCustomViewState {
-        return viewStateFactory.create(coroutineScope, parachainMetadata)
+    override fun createViewState(features: CrowdloanMainFlowFeatures, parachainMetadata: ParachainMetadata): SelectContributeCustomization.ViewState {
+        return viewStateFactory.create(features.coroutineScope, parachainMetadata)
     }
 }
 

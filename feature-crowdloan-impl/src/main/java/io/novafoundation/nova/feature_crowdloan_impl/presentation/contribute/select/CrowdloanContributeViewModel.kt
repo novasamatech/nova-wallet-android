@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.mixin.api.Validatable
+import io.novafoundation.nova.common.mixin.api.of
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.flowOf
@@ -28,6 +29,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.add
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.confirm.parcel.ConfirmContributePayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.contributeValidationFailure
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.BonusPayload
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.CrowdloanMainFlowFeatures
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.SelectContributeCustomization
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.model.CustomContributePayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.model.CrowdloanDetailsModel
@@ -104,7 +106,13 @@ class CrowdloanContributeViewModel(
 
     val customizationConfiguration: Flow<Pair<SelectContributeCustomization, SelectContributeCustomization.ViewState>?> = flowOf {
         relevantCustomFlowFactory?.selectContributeCustomization?.let {
-            it to it.createViewState(coroutineScope = this, parachainMetadata!!)
+            it to it.createViewState(
+                features = CrowdloanMainFlowFeatures(
+                    coroutineScope = this,
+                    browserable = Browserable.Presentation.of(openBrowserEvent)
+                ),
+                parachainMetadata = parachainMetadata!!
+            )
         }
     }
         .inBackground()

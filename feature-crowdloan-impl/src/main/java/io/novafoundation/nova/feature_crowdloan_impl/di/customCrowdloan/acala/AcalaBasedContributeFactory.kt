@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.ac
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.CustomContributeViewState
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.acala.bonus.AcalaContributeSubmitter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.acala.bonus.AcalaContributeViewState
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.acala.main.confirm.AcalaSelectContributeCustomization
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.model.CustomContributePayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.referral.ReferralContributeView
 import kotlinx.coroutines.CoroutineScope
@@ -37,6 +38,7 @@ abstract class AcalaBasedExtraBonusFlow(
 class AcalaContributeFactory(
     submitter: AcalaContributeSubmitter,
     extraBonusFlow: AcalaExtraBonusFlow,
+    override val selectContributeCustomization: AcalaSelectContributeCustomization,
 ) : AcalaBasedContributeFactory(
     submitter = submitter,
     extraBonusFlow = extraBonusFlow

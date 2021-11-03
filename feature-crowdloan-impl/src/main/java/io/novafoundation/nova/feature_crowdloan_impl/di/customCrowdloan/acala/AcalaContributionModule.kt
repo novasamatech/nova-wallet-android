@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.karura.Aca
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomContributeFactory
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.acala.AcalaContributeInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.acala.bonus.AcalaContributeSubmitter
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.acala.main.confirm.AcalaSelectContributeCustomization
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module
@@ -64,13 +65,19 @@ class AcalaContributionModule {
 
     @Provides
     @FeatureScope
+    fun provideAcalaSelectContributeCustomization(): AcalaSelectContributeCustomization = AcalaSelectContributeCustomization()
+
+    @Provides
+    @FeatureScope
     @IntoSet
     fun provideAcalaFactory(
         submitter: AcalaContributeSubmitter,
         acalaExtraBonusFlow: AcalaExtraBonusFlow,
+        acalaSelectContributeCustomization: AcalaSelectContributeCustomization,
     ): CustomContributeFactory = AcalaContributeFactory(
         submitter = submitter,
-        extraBonusFlow = acalaExtraBonusFlow
+        extraBonusFlow = acalaExtraBonusFlow,
+        selectContributeCustomization = acalaSelectContributeCustomization
     )
 
     @Provides
