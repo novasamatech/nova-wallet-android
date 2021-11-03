@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.selectContribute
+package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.main
 
 import android.content.Context
 import android.os.Parcelable
