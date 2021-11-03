@@ -28,7 +28,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.add
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.confirm.parcel.ConfirmContributePayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.contributeValidationFailure
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.BonusPayload
-import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.MainFlowCustomization
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.SelectContributeCustomization
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.model.CustomContributePayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.model.CrowdloanDetailsModel
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.model.LearnMoreModel
@@ -102,9 +102,9 @@ class CrowdloanContributeViewModel(
         customContributeManager.getFactoryOrNull(it)
     }
 
-    val customizationConfiguration: Flow<Pair<MainFlowCustomization, MainFlowCustomization.ViewState>?> = flowOf {
+    val customizationConfiguration: Flow<Pair<SelectContributeCustomization, SelectContributeCustomization.ViewState>?> = flowOf {
         relevantCustomFlowFactory?.selectContributeCustomization?.let {
-            it to it.createViewState(coroutineScope = this, parachainMetadata)
+            it to it.createViewState(coroutineScope = this, parachainMetadata!!)
         }
     }
         .inBackground()

@@ -26,7 +26,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.add
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.confirm.model.LeasePeriodModel
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.confirm.parcel.ConfirmContributePayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.contributeValidationFailure
-import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.MainFlowCustomization
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.ConfirmContributeCustomization
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.parcel.mapParachainMetadataFromParcel
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapAssetToAssetModel
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapFeeToFeeModel
@@ -92,15 +92,15 @@ class ConfirmContributeViewModel(
         .inBackground()
         .share()
 
-    private val relevantCustomFlowFactory = payload.metadata?.customFlow?.let {
+    private val parachainMetadata = payload.metadata?.let(::mapParachainMetadataFromParcel)
+
+    private val relevantCustomFlowFactory = parachainMetadata?.customFlow?.let {
         customContributeManager.getFactoryOrNull(it)
     }
 
-    private val parachainMetadata = payload.metadata?.let(::mapParachainMetadataFromParcel)
-
-    val customizationConfiguration: Flow<Pair<MainFlowCustomization, MainFlowCustomization.ViewState>?> = flowOf {
+    val customizationConfiguration: Flow<Pair<ConfirmContributeCustomization, ConfirmContributeCustomization.ViewState>?> = flowOf {
         relevantCustomFlowFactory?.confirmContributeCustomization?.let {
-            it to it.createViewState(coroutineScope = this, parachainMetadata)
+            it to it.createViewState(coroutineScope = this, parachainMetadata!!, payload.customizationPayload)
         }
     }
         .inBackground()

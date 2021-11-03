@@ -6,7 +6,7 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ParachainMetadata
 import kotlinx.coroutines.CoroutineScope
 
-interface MainFlowCustomization {
+interface SelectContributeCustomization {
 
     interface ViewState {
 
@@ -15,5 +15,18 @@ interface MainFlowCustomization {
 
     fun injectViews(into: ViewGroup, state: ViewState, scope: LifecycleCoroutineScope)
 
-    fun createViewState(coroutineScope: CoroutineScope, parachainMetadata: ParachainMetadata?): ViewState
+    fun createViewState(coroutineScope: CoroutineScope, parachainMetadata: ParachainMetadata): ViewState
+}
+
+interface ConfirmContributeCustomization {
+
+    interface ViewState
+
+    fun injectViews(into: ViewGroup, state: ViewState, scope: LifecycleCoroutineScope)
+
+    fun createViewState(
+        coroutineScope: CoroutineScope,
+        parachainMetadata: ParachainMetadata,
+        customPayload: Parcelable?,
+    ): ViewState
 }
