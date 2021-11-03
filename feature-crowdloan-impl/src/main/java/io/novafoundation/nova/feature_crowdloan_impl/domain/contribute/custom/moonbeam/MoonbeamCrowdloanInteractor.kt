@@ -12,7 +12,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.domain.model.cryptoTypeIn
-import io.novafoundation.nova.feature_account_api.domain.model.hasChainAccountIn
+import io.novafoundation.nova.feature_account_api.domain.model.hasAccountIn
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ParachainMetadata
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.moonbeam.AgreeRemarkRequest
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.moonbeam.MoonbeamApi
@@ -79,12 +79,13 @@ class MoonbeamCrowdloanInteractor(
             val metaAccount = accountRepository.getSelectedMetaAccount()
 
             val moonbeamChainId = parachainMetadata.moonbeamChainId()
+            val moonbeamChain = chainRegistry.getChain(moonbeamChainId)
 
             val currentChain = selectedChainAssetState.chain()
             val currentAddress = metaAccount.addressIn(currentChain)!!
 
             when {
-                !metaAccount.hasChainAccountIn(moonbeamChainId) -> MoonbeamFlowStatus.NeedsChainAccount(
+                !metaAccount.hasAccountIn(moonbeamChain) -> MoonbeamFlowStatus.NeedsChainAccount(
                     chainId = moonbeamChainId,
                     metaId = metaAccount.id
                 )
