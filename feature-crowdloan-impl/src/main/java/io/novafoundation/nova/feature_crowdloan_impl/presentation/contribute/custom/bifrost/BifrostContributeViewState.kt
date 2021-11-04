@@ -24,7 +24,6 @@ class BifrostContributeViewState(
     override fun createBonusPayload(referralCode: String): ReferralCodePayload {
         return BifrostBonusPayload(
             referralCode,
-            customContributePayload.paraId,
             customContributePayload.parachainMetadata.rewardRate
         )
     }

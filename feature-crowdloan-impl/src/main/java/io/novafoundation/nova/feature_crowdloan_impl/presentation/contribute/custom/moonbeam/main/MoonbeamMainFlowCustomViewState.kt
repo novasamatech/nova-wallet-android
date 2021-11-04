@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.mo
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.ConfirmContributeCustomization
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.SelectContributeCustomization
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
@@ -53,9 +54,6 @@ class MoonbeamMainFlowCustomViewState(
         .inBackground()
         .shareIn(this, started = SharingStarted.Eagerly, replay = 1)
 
-    override suspend fun buildCustomPayload(): Parcelable? {
-        return null
-    }
 
     private suspend fun mapMoonbeamChainDestinationToUi(crossChainRewardDestination: CrossChainRewardDestination): MoonbeamRewardDestinationUi {
         return MoonbeamRewardDestinationUi(
@@ -69,4 +67,6 @@ class MoonbeamMainFlowCustomViewState(
             title = resourceManager.getString(R.string.crowdloan_moonbeam_reward_destination, parachainMetadata.token)
         )
     }
+
+    override val customizationPayloadFlow: Flow<Parcelable?> = kotlinx.coroutines.flow.flowOf(null)
 }

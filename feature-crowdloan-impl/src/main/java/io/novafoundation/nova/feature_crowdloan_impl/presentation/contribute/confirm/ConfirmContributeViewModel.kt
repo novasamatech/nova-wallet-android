@@ -22,7 +22,6 @@ import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.Crowdloan
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.ContributeValidationPayload
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.ContributeValidationSystem
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
-import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.additionalOnChainSubmission
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.confirm.model.LeasePeriodModel
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.confirm.parcel.ConfirmContributePayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.contributeValidationFailure
@@ -170,33 +169,14 @@ class ConfirmContributeViewModel(
 
     private fun sendTransaction() {
         launch {
-            val customSubmissionResult = if (payload.bonusPayload != null) {
-                val metadata = payload.metadata!!
+            val crowdloan = crowdloanFlow.first()
 
-                customContributeManager.getSubmitter(metadata.customFlow!!)
-                    .submitOffChain(payload.bonusPayload, payload.amount)
-            } else {
-                Result.success(Unit)
-            }
-
-            customSubmissionResult.mapCatching {
-                val crowdloan = crowdloanFlow.first()
-
-                val additionalSubmission = relevantCustomFlowFactory?.let {
-                    additionalOnChainSubmission(
-                        bonusPayload = payload.bonusPayload,
-                        crowdloan = crowdloan,
-                        amount = payload.amount,
-                        factory = it
-                    )
-                }
-
-                contributionInteractor.contribute(
-                    crowdloan = crowdloan,
-                    contribution = payload.amount,
-                    additional = additionalSubmission
-                )
-            }
+            contributionInteractor.contribute(
+                crowdloan = crowdloan,
+                contribution = payload.amount,
+                bonusPayload = payload.bonusPayload,
+                customizationPayload = payload.customizationPayload
+            )
                 .onFailure(::showError)
                 .onSuccess {
                     showMessage(resourceManager.getString(R.string.common_transaction_submitted))

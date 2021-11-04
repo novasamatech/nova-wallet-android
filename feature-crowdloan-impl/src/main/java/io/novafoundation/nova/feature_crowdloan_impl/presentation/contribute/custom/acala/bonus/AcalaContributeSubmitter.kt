@@ -1,22 +1,32 @@
 package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.acala.bonus
 
+import android.os.Parcelable
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.acala.AcalaContributeInteractor
+import io.novafoundation.nova.feature_crowdloan_impl.domain.main.Crowdloan
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.BonusPayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.CustomContributeSubmitter
+import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import java.math.BigDecimal
 
 class AcalaContributeSubmitter(
     private val interactor: AcalaContributeInteractor
 ) : CustomContributeSubmitter {
 
-    override suspend fun submitOffChain(
-        payload: BonusPayload?,
+    override suspend fun submitOnChain(
+        crowdloan: Crowdloan,
+        customizationPayload: Parcelable?,
+        bonusPayload: BonusPayload?,
         amount: BigDecimal,
-    ): Result<Unit> {
-        require(payload is AcalaBonusPayload?)
+        extrinsicBuilder: ExtrinsicBuilder,
+    ) {
+        // Do nothing
+    }
 
-        return payload?.let {
-            interactor.registerInBonusProgram(payload.referralCode, amount)
-        } ?: Result.success(Unit)
+    override suspend fun submitOffChain(customizationPayload: Parcelable?, bonusPayload: BonusPayload?, amount: BigDecimal) {
+        require(bonusPayload is AcalaBonusPayload?)
+
+        bonusPayload?.let {
+            interactor.registerInBonusProgram(bonusPayload.referralCode, amount)
+        }
     }
 }

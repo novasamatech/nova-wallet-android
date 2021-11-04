@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select
 
+import android.os.Parcelable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -25,7 +26,6 @@ import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validatio
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.ContributeValidationSystem
 import io.novafoundation.nova.feature_crowdloan_impl.domain.main.Crowdloan
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
-import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.additionalOnChainSubmission
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.confirm.parcel.ConfirmContributePayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.contributeValidationFailure
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.BonusPayload
@@ -48,11 +48,11 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import kotlin.time.ExperimentalTime
@@ -117,6 +117,11 @@ class CrowdloanContributeViewModel(
     }
         .inBackground()
         .share()
+
+    private val customizationPayloadFlow: Flow<Parcelable?> = customizationConfiguration.flatMapLatest {
+        it?.let { (_, viewState) -> viewState.customizationPayloadFlow }
+            ?: kotlinx.coroutines.flow.flowOf(null)
+    }
 
     val enteredAmountFlow = MutableStateFlow("")
 
@@ -252,30 +257,29 @@ class CrowdloanContributeViewModel(
         combine(
             parsedAmountFlow.debounce(DEBOUNCE_DURATION_MILLIS.milliseconds),
             extraBonusFlow,
-            ::Pair
-        )
-            .onEach { (amount, bonusState) ->
-                loadFee(amount, bonusState as? ExtraBonusState.Active)
-            }
+            customizationPayloadFlow,
+        ) { amount, bonusState, customization ->
+            loadFee(amount, bonusState as? ExtraBonusState.Active, customization)
+        }
             .launchIn(viewModelScope)
     }
 
-    private fun loadFee(amount: BigDecimal, bonusActiveState: ExtraBonusState.Active?) {
+    private fun loadFee(
+        amount: BigDecimal,
+        bonusActiveState: ExtraBonusState.Active?,
+        customizationPayload: Parcelable?,
+    ) {
         feeLoaderMixin.loadFee(
             coroutineScope = viewModelScope,
             feeConstructor = {
                 val crowdloan = crowdloanFlow.first()
 
-                val additionalSubmission = relevantCustomFlowFactory?.let {
-                    additionalOnChainSubmission(
-                        bonusPayload = bonusActiveState?.payload,
-                        crowdloan = crowdloan,
-                        amount = amount,
-                        factory = it
-                    )
-                }
-
-                contributionInteractor.estimateFee(crowdloan, amount, additionalSubmission)
+                contributionInteractor.estimateFee(
+                    crowdloan,
+                    amount,
+                    bonusActiveState?.payload,
+                    customizationPayload,
+                )
             },
             onRetryCancelled = ::backClicked
         )
@@ -316,7 +320,7 @@ class CrowdloanContributeViewModel(
         val customizationPayload = customizationConfiguration.first()?.let {
             val (_, customViewState) = it
 
-            customViewState.buildCustomPayload()
+            customViewState.customizationPayloadFlow.first()
         }
 
         val confirmContributePayload = ConfirmContributePayload(
