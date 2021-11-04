@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.acala.main.confirm
+package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.acala.main.select
 
 import android.os.Parcelable
 import io.novafoundation.nova.common.mixin.api.Browserable

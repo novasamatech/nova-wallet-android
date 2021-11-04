@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+    <string name="crowdloan_contribution">Contribution</string>
     <string name="crowdloan_acala_learn_types">Learn more about different contributions to Acala</string>
     <string name="crowdloan_acala_direct">Direct</string>
     <string name="crowdloan_acala_liquid">Liquid</string>

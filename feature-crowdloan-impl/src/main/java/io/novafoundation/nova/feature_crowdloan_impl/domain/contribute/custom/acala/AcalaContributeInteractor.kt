@@ -118,7 +118,7 @@ class AcalaContributeInteractor(
 
             transfer(proxyAccountId, amountInPlanks)
             systemRemarkWithEvent(statement.statement)
-            referralCode?.let { systemRemarkWithEvent(it) }
+            referralCode?.let { systemRemarkWithEvent(referralRemark(it)) }
         }
     }
 
@@ -140,7 +140,7 @@ class AcalaContributeInteractor(
             val fakeAgreementRemark = ByteArray(185) // acala agreement is 185 bytes
             systemRemarkWithEvent(fakeAgreementRemark)
 
-            referralCode?.let { systemRemarkWithEvent(referralCode) }
+            referralCode?.let { systemRemarkWithEvent(referralRemark(referralCode)) }
         }
     }
 
@@ -150,4 +150,6 @@ class AcalaContributeInteractor(
         baseUrl = AcalaApi.getBaseUrl(chain),
         authHeader = AcalaApi.getAuthHeader(chain)
     )
+
+    private fun referralRemark(referralCode: String) = "referrer:${referralCode}"
 }

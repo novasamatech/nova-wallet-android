@@ -14,7 +14,9 @@ import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.acala.Acal
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomContributeFactory
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.acala.AcalaContributeInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.acala.bonus.AcalaContributeSubmitter
-import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.acala.main.confirm.AcalaSelectContributeCustomization
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.acala.main.confirm.AcalaConfirmContributeCustomization
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.acala.main.confirm.AcalaConfirmContributeViewStateFactory
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.acala.main.select.AcalaSelectContributeCustomization
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module
@@ -69,15 +71,29 @@ class AcalaContributionModule {
 
     @Provides
     @FeatureScope
+    fun provideAcalaConfirmContributeViewStateFactory(
+        resourceManager: ResourceManager,
+    ) = AcalaConfirmContributeViewStateFactory(resourceManager)
+
+    @Provides
+    @FeatureScope
+    fun provideAcalaConfirmContributeCustomization(
+        viewStateFactory: AcalaConfirmContributeViewStateFactory,
+    ): AcalaConfirmContributeCustomization = AcalaConfirmContributeCustomization(viewStateFactory)
+
+    @Provides
+    @FeatureScope
     @IntoSet
     fun provideAcalaFactory(
         submitter: AcalaContributeSubmitter,
         acalaExtraBonusFlow: AcalaExtraBonusFlow,
         acalaSelectContributeCustomization: AcalaSelectContributeCustomization,
+        acalaConfirmContributeCustomization: AcalaConfirmContributeCustomization,
     ): CustomContributeFactory = AcalaContributeFactory(
         submitter = submitter,
         extraBonusFlow = acalaExtraBonusFlow,
-        selectContributeCustomization = acalaSelectContributeCustomization
+        selectContributeCustomization = acalaSelectContributeCustomization,
+        confirmContributeCustomization = acalaConfirmContributeCustomization
     )
 
     @Provides

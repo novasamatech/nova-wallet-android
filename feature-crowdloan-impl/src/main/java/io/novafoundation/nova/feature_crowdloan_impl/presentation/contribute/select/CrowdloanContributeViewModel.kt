@@ -52,6 +52,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
@@ -258,18 +259,19 @@ class CrowdloanContributeViewModel(
             parsedAmountFlow.debounce(DEBOUNCE_DURATION_MILLIS.milliseconds),
             extraBonusFlow,
             customizationPayloadFlow,
-        ) { amount, bonusState, customization ->
+            ::Triple
+        ).mapLatest { (amount, bonusState, customization) ->
             loadFee(amount, bonusState as? ExtraBonusState.Active, customization)
         }
             .launchIn(viewModelScope)
     }
 
-    private fun loadFee(
+    private suspend fun loadFee(
         amount: BigDecimal,
         bonusActiveState: ExtraBonusState.Active?,
         customizationPayload: Parcelable?,
     ) {
-        feeLoaderMixin.loadFee(
+        feeLoaderMixin.loadFeeSuspending(
             coroutineScope = viewModelScope,
             feeConstructor = {
                 val crowdloan = crowdloanFlow.first()
