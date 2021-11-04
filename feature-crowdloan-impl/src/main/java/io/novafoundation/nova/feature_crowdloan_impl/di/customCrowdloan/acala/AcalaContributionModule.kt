@@ -10,7 +10,7 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_crowdloan_impl.data.CrowdloanSharedState
-import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.karura.AcalaApi
+import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.acala.AcalaApi
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomContributeFactory
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.acala.AcalaContributeInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.acala.bonus.AcalaContributeSubmitter

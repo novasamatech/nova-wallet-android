@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_crowdloan_impl.data.network.api.karura
+package io.novafoundation.nova.feature_crowdloan_impl.data.network.api.acala
 
 import io.novafoundation.nova.feature_crowdloan_impl.BuildConfig
 import io.novafoundation.nova.runtime.ext.Geneses

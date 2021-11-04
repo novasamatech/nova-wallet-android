@@ -6,9 +6,9 @@ import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.feature_account_api.data.secrets.sign
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
-import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.karura.AcalaApi
-import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.karura.AcalaDirectContributeRequest
-import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.karura.AcalaLiquidContributeRequest
+import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.acala.AcalaApi
+import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.acala.AcalaDirectContributeRequest
+import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.acala.AcalaLiquidContributeRequest
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.transfer
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.runtime.ext.ChainGeneses
