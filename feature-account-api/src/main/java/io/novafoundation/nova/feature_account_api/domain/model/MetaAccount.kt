@@ -69,6 +69,12 @@ class MetaAccount(
     )
 }
 
+fun MetaAccount.hasAccountIn(chain: Chain) = when {
+    hasChainAccountIn(chain.id) -> true
+    chain.isEthereumBased -> ethereumPublicKey != null
+    else -> true
+}
+
 fun MetaAccount.hasChainAccountIn(chainId: ChainId) = chainId in chainAccounts
 
 fun MetaAccount.cryptoTypeIn(chain: Chain): CryptoType {
