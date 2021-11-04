@@ -51,9 +51,16 @@ interface AcalaApi {
     ): AcalaStatement
 
     @POST("//{baseUrl}/contribute")
-    suspend fun applyForBonus(
+    suspend fun directContribute(
         @Header("Authorization") authHeader: String,
         @Path("baseUrl") baseUrl: String,
-        @Body body: VerifyKaruraParticipationRequest,
+        @Body body: AcalaDirectContributeRequest,
+    ): Any?
+
+    @POST("//{baseUrl}/transfer")
+    suspend fun liquidContribute(
+        @Header("Authorization") authHeader: String,
+        @Path("baseUrl") baseUrl: String,
+        @Body body: AcalaLiquidContributeRequest,
     ): Any?
 }

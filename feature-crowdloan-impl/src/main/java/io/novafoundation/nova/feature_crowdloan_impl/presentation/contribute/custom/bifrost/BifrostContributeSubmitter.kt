@@ -12,7 +12,7 @@ class BifrostContributeSubmitter(
     private val interactor: BifrostContributeInteractor
 ) : CustomContributeSubmitter {
 
-    override suspend fun submitOnChain(
+    override suspend fun injectOnChainSubmission(
         crowdloan: Crowdloan,
         customizationPayload: Parcelable?,
         bonusPayload: BonusPayload?,

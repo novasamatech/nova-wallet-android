@@ -145,7 +145,11 @@ class CrowdloanContributeInteractor(
         val submission: OnChainSubmission = {
             contribute(crowdloan.parachainId, contributionInPlanks, privateSignature)
 
-            submitter?.submitOnChain(crowdloan, customizationPayload, bonusPayload, contribution, extrinsicBuilder = this)
+            submitter?.let {
+                val injection = if (toCalculateFee) submitter::injectFeeCalculation else submitter::injectOnChainSubmission
+
+                injection(crowdloan, customizationPayload, bonusPayload, contribution, this)
+            }
         }
 
         finalAction(submission, chain, account)

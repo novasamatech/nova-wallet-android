@@ -12,7 +12,7 @@ class MoonbeamCrowdloanSubmitter(
     private val interactor: MoonbeamCrowdloanInteractor,
 ) : CustomContributeSubmitter {
 
-    override suspend fun submitOnChain(
+    override suspend fun injectOnChainSubmission(
         crowdloan: Crowdloan,
         customizationPayload: Parcelable?,
         bonusPayload: BonusPayload?,
