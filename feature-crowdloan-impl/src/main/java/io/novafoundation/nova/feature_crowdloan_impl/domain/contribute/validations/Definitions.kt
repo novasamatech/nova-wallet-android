@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations
 
 import io.novafoundation.nova.common.validation.Validation
-import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughToPayFeesValidation
 import io.novafoundation.nova.feature_wallet_api.domain.validation.ExistentialDepositValidation
 
@@ -9,5 +8,3 @@ typealias ContributeValidation = Validation<ContributeValidationPayload, Contrib
 
 typealias ContributeEnoughToPayFeesValidation = EnoughToPayFeesValidation<ContributeValidationPayload, ContributeValidationFailure>
 typealias ContributeExistentialDepositValidation = ExistentialDepositValidation<ContributeValidationPayload, ContributeValidationFailure>
-
-typealias ContributeValidationSystem = ValidationSystem<ContributeValidationPayload, ContributeValidationFailure>

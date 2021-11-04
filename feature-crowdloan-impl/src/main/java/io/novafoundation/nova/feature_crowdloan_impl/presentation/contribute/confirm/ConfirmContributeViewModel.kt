@@ -11,7 +11,9 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatAsCurrency
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.common.validation.CompositeValidation
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress
@@ -19,8 +21,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomContributeManager
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.CrowdloanContributeInteractor
+import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.ContributeValidation
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.ContributeValidationPayload
-import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.ContributeValidationSystem
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.confirm.model.LeasePeriodModel
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.confirm.parcel.ConfirmContributePayload
@@ -49,7 +51,7 @@ class ConfirmContributeViewModel(
     addressModelGenerator: AddressIconGenerator,
     private val validationExecutor: ValidationExecutor,
     private val payload: ConfirmContributePayload,
-    private val validationSystem: ContributeValidationSystem,
+    private val validations: Collection<ContributeValidation>,
     private val customContributeManager: CustomContributeManager,
     private val externalActions: ExternalActions.Presentation,
     private val assetSharedState: SingleAssetSharedState,
@@ -132,6 +134,15 @@ class ConfirmContributeViewModel(
         .inBackground()
         .share()
 
+    private val customizedValidationSystem = flowOf {
+        val validations = relevantCustomFlowFactory?.confirmContributeCustomization?.modifyValidations(validations)
+            ?: validations
+
+        ValidationSystem(CompositeValidation(validations))
+    }
+        .inBackground()
+        .share()
+
     fun nextClicked() {
         maybeGoToNext()
     }
@@ -154,11 +165,12 @@ class ConfirmContributeViewModel(
             crowdloan = crowdloanFlow.first(),
             fee = payload.fee,
             asset = assetFlow.first(),
+            customizationPayload = payload.customizationPayload,
             contributionAmount = payload.amount
         )
 
         validationExecutor.requireValid(
-            validationSystem = validationSystem,
+            validationSystem = customizedValidationSystem.first(),
             payload = validationPayload,
             progressConsumer = _showNextProgress.progressConsumer(),
             validationFailureTransformer = { contributeValidationFailure(it, resourceManager) }

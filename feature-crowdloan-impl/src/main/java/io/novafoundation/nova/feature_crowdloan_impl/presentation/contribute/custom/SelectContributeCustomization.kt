@@ -8,17 +8,23 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ParachainMetadata
+import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.ContributeValidation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
-interface SelectContributeCustomization {
+interface ContributeCustomization<V> {
+
+    fun modifyValidations(validations: Collection<ContributeValidation>): Collection<ContributeValidation>
+
+    fun injectViews(into: ViewGroup, state: V, scope: LifecycleCoroutineScope)
+}
+
+interface SelectContributeCustomization : ContributeCustomization<SelectContributeCustomization.ViewState> {
 
     interface ViewState {
 
         val customizationPayloadFlow: Flow<Parcelable?>
     }
-
-    fun injectViews(into: ViewGroup, state: ViewState, scope: LifecycleCoroutineScope)
 
     fun createViewState(
         features: CrowdloanMainFlowFeatures,
@@ -26,11 +32,9 @@ interface SelectContributeCustomization {
     ): ViewState
 }
 
-interface ConfirmContributeCustomization {
+interface ConfirmContributeCustomization : ContributeCustomization<ConfirmContributeCustomization.ViewState> {
 
     interface ViewState
-
-    fun injectViews(into: ViewGroup, state: ViewState, scope: LifecycleCoroutineScope)
 
     fun createViewState(
         coroutineScope: CoroutineScope,

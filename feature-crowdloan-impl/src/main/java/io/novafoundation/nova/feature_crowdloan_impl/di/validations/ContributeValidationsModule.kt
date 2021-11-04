@@ -4,7 +4,6 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.common.validation.CompositeValidation
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRepository
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomContributeManager
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.CapExceededValidation
@@ -12,9 +11,8 @@ import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validatio
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.ContributeExistentialDepositValidation
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.ContributeValidation
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.ContributeValidationFailure
-import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.ContributeValidationSystem
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.CrowdloanNotEndedValidation
-import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.MinContributionValidation
+import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.DefaultMinContributionValidation
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.PublicCrowdloanValidation
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
@@ -37,7 +35,7 @@ class ContributeValidationsModule {
     @FeatureScope
     fun provideMinContributionValidation(
         crowdloanRepository: CrowdloanRepository,
-    ): ContributeValidation = MinContributionValidation(crowdloanRepository)
+    ): ContributeValidation = DefaultMinContributionValidation(crowdloanRepository)
 
     @Provides
     @IntoSet
@@ -72,12 +70,4 @@ class ContributeValidationsModule {
     fun providePublicCrowdloanValidation(
         customContributeManager: CustomContributeManager,
     ): ContributeValidation = PublicCrowdloanValidation(customContributeManager)
-
-    @Provides
-    @FeatureScope
-    fun provideValidationSystem(
-        contributeValidations: @JvmSuppressWildcards Set<ContributeValidation>
-    ) = ContributeValidationSystem(
-        validation = CompositeValidation(contributeValidations.toList())
-    )
 }

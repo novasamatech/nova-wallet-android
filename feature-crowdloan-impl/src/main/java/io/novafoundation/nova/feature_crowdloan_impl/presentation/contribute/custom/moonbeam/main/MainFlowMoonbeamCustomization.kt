@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.LabeledTextView
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ParachainMetadata
 import io.novafoundation.nova.feature_crowdloan_impl.R
+import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.ContributeValidation
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.ConfirmContributeCustomization
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.CrowdloanMainFlowFeatures
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.SelectContributeCustomization
@@ -82,6 +83,10 @@ class SelectContributeMoonbeamCustomization(
     override fun createViewState(features: CrowdloanMainFlowFeatures, parachainMetadata: ParachainMetadata): SelectContributeCustomization.ViewState {
         return viewStateFactory.create(features.coroutineScope, parachainMetadata)
     }
+
+    override fun modifyValidations(validations: Collection<ContributeValidation>): Collection<ContributeValidation> {
+        return validations
+    }
 }
 
 class ConfirmContributeMoonbeamCustomization(
@@ -111,5 +116,9 @@ class ConfirmContributeMoonbeamCustomization(
         customPayload: Parcelable?,
     ): ConfirmContributeCustomization.ViewState {
         return viewStateFactory.create(coroutineScope, parachainMetadata)
+    }
+
+    override fun modifyValidations(validations: Collection<ContributeValidation>): Collection<ContributeValidation> {
+        return validations
     }
 }

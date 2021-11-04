@@ -46,7 +46,7 @@ enum class DefaultFailureLevel(override val value: Int) : ValidationStatus.NotVa
 }
 
 class CompositeValidation<T, S>(
-    val validations: List<Validation<T, S>>
+    val validations: Collection<Validation<T, S>>,
 ) : Validation<T, S> {
 
     override suspend fun validate(value: T): ValidationStatus<S> {

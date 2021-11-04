@@ -16,14 +16,16 @@ import io.novafoundation.nova.common.utils.formatAsCurrency
 import io.novafoundation.nova.common.utils.formatAsPercentage
 import io.novafoundation.nova.common.utils.fractionToPercentage
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.common.validation.CompositeValidation
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomContributeManager
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.hasExtraBonusFlow
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.CrowdloanContributeInteractor
+import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.ContributeValidation
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.ContributeValidationPayload
-import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.ContributeValidationSystem
 import io.novafoundation.nova.feature_crowdloan_impl.domain.main.Crowdloan
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.confirm.parcel.ConfirmContributePayload
@@ -78,8 +80,8 @@ class CrowdloanContributeViewModel(
     private val validationExecutor: ValidationExecutor,
     private val feeLoaderMixin: FeeLoaderMixin.Presentation,
     private val payload: ContributePayload,
-    private val validationSystem: ContributeValidationSystem,
-    private val customContributeManager: CustomContributeManager
+    private val validations: Set<ContributeValidation>,
+    private val customContributeManager: CustomContributeManager,
 ) : BaseViewModel(),
     Validatable by validationExecutor,
     Browserable,
@@ -115,6 +117,15 @@ class CrowdloanContributeViewModel(
                 parachainMetadata = parachainMetadata!!
             )
         }
+    }
+        .inBackground()
+        .share()
+
+    private val customizedValidationSystem = flowOf {
+        val validations = relevantCustomFlowFactory?.selectContributeCustomization?.modifyValidations(validations)
+            ?: validations
+
+        ValidationSystem(CompositeValidation(validations))
     }
         .inBackground()
         .share()
@@ -296,35 +307,37 @@ class CrowdloanContributeViewModel(
         launch {
             val contributionAmount = parsedAmountFlow.firstOrNull() ?: return@launch
 
+            val customizationPayload = customizationConfiguration.first()?.let {
+                val (_, customViewState) = it
+
+                customViewState.customizationPayloadFlow.first()
+            }
+
             val validationPayload = ContributeValidationPayload(
                 crowdloan = crowdloanFlow.first(),
+                customizationPayload = customizationPayload,
                 fee = fee,
                 asset = assetFlow.first(),
                 contributionAmount = contributionAmount
             )
 
             validationExecutor.requireValid(
-                validationSystem = validationSystem,
+                validationSystem = customizedValidationSystem.first(),
                 payload = validationPayload,
                 validationFailureTransformer = { contributeValidationFailure(it, resourceManager) },
                 progressConsumer = _showNextProgress.progressConsumer()
             ) {
                 _showNextProgress.value = false
 
-                openConfirmScreen(it)
+                openConfirmScreen(it, customizationPayload)
             }
         }
     }
 
     private fun openConfirmScreen(
-        validationPayload: ContributeValidationPayload
+        validationPayload: ContributeValidationPayload,
+        customizationPayload: Parcelable?,
     ) = launch {
-        val customizationPayload = customizationConfiguration.first()?.let {
-            val (_, customViewState) = it
-
-            customViewState.customizationPayloadFlow.first()
-        }
-
         val confirmContributePayload = ConfirmContributePayload(
             paraId = payload.paraId,
             fee = validationPayload.fee,
