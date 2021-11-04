@@ -54,7 +54,6 @@ class MoonbeamMainFlowCustomViewState(
         .inBackground()
         .shareIn(this, started = SharingStarted.Eagerly, replay = 1)
 
-
     private suspend fun mapMoonbeamChainDestinationToUi(crossChainRewardDestination: CrossChainRewardDestination): MoonbeamRewardDestinationUi {
         return MoonbeamRewardDestinationUi(
             addressModel = iconGenerator.createAddressModel(
