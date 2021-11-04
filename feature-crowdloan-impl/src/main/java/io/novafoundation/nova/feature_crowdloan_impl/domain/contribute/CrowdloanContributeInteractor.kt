@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_crowdloan_impl.domain.contribute
 
+import android.os.Parcelable
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -14,6 +15,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.data.network.blockhain.extr
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomContributeManager
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.PrivateCrowdloanSignatureProvider.Mode
 import io.novafoundation.nova.feature_crowdloan_impl.domain.main.Crowdloan
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.BonusPayload
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
@@ -71,25 +73,48 @@ class CrowdloanContributeInteractor(
     suspend fun estimateFee(
         crowdloan: Crowdloan,
         contribution: BigDecimal,
-        additional: OnChainSubmission?,
-    ) = formingSubmission(crowdloan, contribution, additional, toCalculateFee = true) { submission, chain, _ ->
+        bonusPayload: BonusPayload?,
+        customizationPayload: Parcelable?,
+    ) = formingSubmission(
+        crowdloan = crowdloan,
+        contribution = contribution,
+        bonusPayload = bonusPayload,
+        customizationPayload = customizationPayload,
+        toCalculateFee = true
+    ) { submission, chain, _ ->
         extrinsicService.estimateFee(chain, submission)
     }
 
     suspend fun contribute(
         crowdloan: Crowdloan,
         contribution: BigDecimal,
-        additional: OnChainSubmission?,
-    ) = formingSubmission(crowdloan, contribution, additional, toCalculateFee = false) { submission, chain, account ->
-        val accountId = account.accountIdIn(chain)!!
+        bonusPayload: BonusPayload?,
+        customizationPayload: Parcelable?,
+    ): Result<String> = runCatching {
+        crowdloan.parachainMetadata?.customFlow?.let {
+            customContributeManager.getFactoryOrNull(it)?.submitter?.submitOffChain(customizationPayload, bonusPayload, contribution)
+        }
 
-        extrinsicService.submitExtrinsic(chain, accountId, submission)
-    }.getOrThrow()
+        val txHash = formingSubmission(
+            crowdloan = crowdloan,
+            contribution = contribution,
+            bonusPayload = bonusPayload,
+            toCalculateFee = false,
+            customizationPayload = customizationPayload
+        ) { submission, chain, account ->
+            val accountId = account.accountIdIn(chain)!!
+
+            extrinsicService.submitExtrinsic(chain, accountId, submission)
+        }.getOrThrow()
+
+        txHash
+    }
 
     private suspend fun <T> formingSubmission(
         crowdloan: Crowdloan,
         contribution: BigDecimal,
-        additional: OnChainSubmission?,
+        bonusPayload: BonusPayload?,
+        customizationPayload: Parcelable?,
         toCalculateFee: Boolean,
         finalAction: suspend (OnChainSubmission, Chain, MetaAccount) -> T,
     ): T = withContext(Dispatchers.Default) {
@@ -112,10 +137,18 @@ class CrowdloanContributeInteractor(
             )
         }
 
+        val submitter = crowdloan.parachainMetadata?.customFlow?.let {
+            customContributeManager.getFactoryOrNull(it)?.submitter
+        }
+
         val submission: OnChainSubmission = {
             contribute(crowdloan.parachainId, contributionInPlanks, privateSignature)
 
-            additional?.invoke(this)
+            submitter?.let {
+                val injection = if (toCalculateFee) submitter::injectFeeCalculation else submitter::injectOnChainSubmission
+
+                injection(crowdloan, customizationPayload, bonusPayload, contribution, this)
+            }
         }
 
         finalAction(submission, chain, account)

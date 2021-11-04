@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain
+package io.novafoundation.nova.feature_wallet_api.data.network.blockhain
 
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.instances.AddressInstanceConstructor

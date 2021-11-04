@@ -1,14 +1,8 @@
 package io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan
 
-import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.CustomContributeSubmitter
-
 class CustomContributeManager(
     private val factories: Set<CustomContributeFactory>
 ) {
-
-    fun getSubmitter(flowType: String): CustomContributeSubmitter {
-        return relevantFactory(flowType).submitter
-    }
 
     fun getFactoryOrNull(flowType: String): CustomContributeFactory? = relevantFactoryOrNull(flowType)
 

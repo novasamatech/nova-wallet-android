@@ -11,7 +11,9 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatAsCurrency
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.common.validation.CompositeValidation
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress
@@ -19,14 +21,13 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomContributeManager
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.CrowdloanContributeInteractor
+import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.ContributeValidation
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.ContributeValidationPayload
-import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.ContributeValidationSystem
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
-import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.additionalOnChainSubmission
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.confirm.model.LeasePeriodModel
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.confirm.parcel.ConfirmContributePayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.contributeValidationFailure
-import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.MainFlowCustomization
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.ConfirmContributeCustomization
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.parcel.mapParachainMetadataFromParcel
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapAssetToAssetModel
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapFeeToFeeModel
@@ -50,7 +51,7 @@ class ConfirmContributeViewModel(
     addressModelGenerator: AddressIconGenerator,
     private val validationExecutor: ValidationExecutor,
     private val payload: ConfirmContributePayload,
-    private val validationSystem: ContributeValidationSystem,
+    private val validations: Collection<ContributeValidation>,
     private val customContributeManager: CustomContributeManager,
     private val externalActions: ExternalActions.Presentation,
     private val assetSharedState: SingleAssetSharedState,
@@ -92,15 +93,15 @@ class ConfirmContributeViewModel(
         .inBackground()
         .share()
 
-    private val relevantCustomFlowFactory = payload.metadata?.customFlow?.let {
+    private val parachainMetadata = payload.metadata?.let(::mapParachainMetadataFromParcel)
+
+    private val relevantCustomFlowFactory = parachainMetadata?.customFlow?.let {
         customContributeManager.getFactoryOrNull(it)
     }
 
-    private val parachainMetadata = payload.metadata?.let(::mapParachainMetadataFromParcel)
-
-    val customizationConfiguration: Flow<Pair<MainFlowCustomization, MainFlowCustomization.ViewState>?> = flowOf {
+    val customizationConfiguration: Flow<Pair<ConfirmContributeCustomization, ConfirmContributeCustomization.ViewState>?> = flowOf {
         relevantCustomFlowFactory?.confirmContributeCustomization?.let {
-            it to it.createViewState(coroutineScope = this, parachainMetadata)
+            it to it.createViewState(coroutineScope = this, parachainMetadata!!, payload.customizationPayload)
         }
     }
         .inBackground()
@@ -133,6 +134,15 @@ class ConfirmContributeViewModel(
         .inBackground()
         .share()
 
+    private val customizedValidationSystem = flowOf {
+        val validations = relevantCustomFlowFactory?.confirmContributeCustomization?.modifyValidations(validations)
+            ?: validations
+
+        ValidationSystem(CompositeValidation(validations))
+    }
+        .inBackground()
+        .share()
+
     fun nextClicked() {
         maybeGoToNext()
     }
@@ -155,11 +165,12 @@ class ConfirmContributeViewModel(
             crowdloan = crowdloanFlow.first(),
             fee = payload.fee,
             asset = assetFlow.first(),
+            customizationPayload = payload.customizationPayload,
             contributionAmount = payload.amount
         )
 
         validationExecutor.requireValid(
-            validationSystem = validationSystem,
+            validationSystem = customizedValidationSystem.first(),
             payload = validationPayload,
             progressConsumer = _showNextProgress.progressConsumer(),
             validationFailureTransformer = { contributeValidationFailure(it, resourceManager) }
@@ -170,33 +181,14 @@ class ConfirmContributeViewModel(
 
     private fun sendTransaction() {
         launch {
-            val customSubmissionResult = if (payload.bonusPayload != null) {
-                val metadata = payload.metadata!!
+            val crowdloan = crowdloanFlow.first()
 
-                customContributeManager.getSubmitter(metadata.customFlow!!)
-                    .submitOffChain(payload.bonusPayload, payload.amount)
-            } else {
-                Result.success(Unit)
-            }
-
-            customSubmissionResult.mapCatching {
-                val crowdloan = crowdloanFlow.first()
-
-                val additionalSubmission = relevantCustomFlowFactory?.let {
-                    additionalOnChainSubmission(
-                        bonusPayload = payload.bonusPayload,
-                        crowdloan = crowdloan,
-                        amount = payload.amount,
-                        factory = it
-                    )
-                }
-
-                contributionInteractor.contribute(
-                    crowdloan = crowdloan,
-                    contribution = payload.amount,
-                    additional = additionalSubmission
-                )
-            }
+            contributionInteractor.contribute(
+                crowdloan = crowdloan,
+                contribution = payload.amount,
+                bonusPayload = payload.bonusPayload,
+                customizationPayload = payload.customizationPayload
+            )
                 .onFailure(::showError)
                 .onSuccess {
                     showMessage(resourceManager.getString(R.string.common_transaction_submitted))

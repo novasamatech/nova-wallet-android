@@ -9,9 +9,11 @@ import io.novafoundation.nova.feature_wallet_api.data.mappers.mapFeeToFeeModel
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -24,26 +26,30 @@ class FeeLoaderProvider(
 
     override val retryEvent = MutableLiveData<Event<RetryPayload>>()
 
-    override fun loadFee(
+    override suspend fun loadFeeSuspending(
         coroutineScope: CoroutineScope,
         feeConstructor: suspend (Token) -> BigInteger,
-        onRetryCancelled: () -> Unit
-    ) {
-        feeLiveData.value = FeeStatus.Loading
+        onRetryCancelled: () -> Unit,
+    ): Unit = withContext(Dispatchers.Default) {
+        feeLiveData.postValue(FeeStatus.Loading)
 
-        coroutineScope.launch(Dispatchers.Default) {
-            val token = tokenUseCase.currentToken()
+        val token = tokenUseCase.currentToken()
 
-            val feeResult = runCatching {
-                feeConstructor(token)
-            }
+        val feeResult = runCatching {
+            feeConstructor(token)
+        }
 
-            val value = if (feeResult.isSuccess) {
-                val feeInPlanks = feeResult.getOrThrow()
-                val fee = token.amountFromPlanks(feeInPlanks)
-                val feeModel = mapFeeToFeeModel(fee, token)
+        val value = if (feeResult.isSuccess) {
+            val feeInPlanks = feeResult.getOrThrow()
+            val fee = token.amountFromPlanks(feeInPlanks)
+            val feeModel = mapFeeToFeeModel(fee, token)
 
-                FeeStatus.Loaded(feeModel)
+            FeeStatus.Loaded(feeModel)
+        } else {
+            val exception = feeResult.exceptionOrNull()
+
+            if (exception is CancellationException) {
+                null
             } else {
                 retryEvent.postValue(
                     Event(
@@ -56,12 +62,22 @@ class FeeLoaderProvider(
                     )
                 )
 
-                feeResult.exceptionOrNull()?.printStackTrace()
+                exception?.printStackTrace()
 
                 FeeStatus.Error
             }
+        }
 
-            feeLiveData.postValue(value)
+        value?.run { feeLiveData.postValue(this) }
+    }
+
+    override fun loadFee(
+        coroutineScope: CoroutineScope,
+        feeConstructor: suspend (Token) -> BigInteger,
+        onRetryCancelled: () -> Unit,
+    ) {
+        coroutineScope.launch {
+            loadFeeSuspending(coroutineScope, feeConstructor, onRetryCancelled)
         }
     }
 

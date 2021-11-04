@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_crowdloan_impl.data.network.api.karura
+package io.novafoundation.nova.feature_crowdloan_impl.data.network.api.acala
 
 import io.novafoundation.nova.feature_crowdloan_impl.BuildConfig
 import io.novafoundation.nova.runtime.ext.Geneses
@@ -51,9 +51,16 @@ interface AcalaApi {
     ): AcalaStatement
 
     @POST("//{baseUrl}/contribute")
-    suspend fun applyForBonus(
+    suspend fun directContribute(
         @Header("Authorization") authHeader: String,
         @Path("baseUrl") baseUrl: String,
-        @Body body: VerifyKaruraParticipationRequest,
+        @Body body: AcalaDirectContributeRequest,
+    ): Any?
+
+    @POST("//{baseUrl}/transfer")
+    suspend fun liquidContribute(
+        @Header("Authorization") authHeader: String,
+        @Path("baseUrl") baseUrl: String,
+        @Body body: AcalaLiquidContributeRequest,
     ): Any?
 }

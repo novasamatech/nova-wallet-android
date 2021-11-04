@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindOrNull
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.system
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.transfer
 import io.novafoundation.nova.feature_wallet_api.domain.model.Transfer
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.bindings.bindTransferExtrinsic
 import io.novafoundation.nova.runtime.ext.accountIdOf
