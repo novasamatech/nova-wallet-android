@@ -17,8 +17,8 @@ import kotlinx.android.synthetic.main.fragment_contribute.view.crowdloanContribu
 
 private const val LEARN_TYPES_LINK = "https://wiki.acala.network/acala/acala-crowdloan/crowdloan-event#3.2-ways-to-participate"
 
-class AcalaSelectContributeCustomization
-    : AcalaMainFlowCustomization<SelectContributeCustomization.ViewState>(),
+class AcalaSelectContributeCustomization :
+    AcalaMainFlowCustomization<SelectContributeCustomization.ViewState>(),
     SelectContributeCustomization {
 
     override fun injectViews(

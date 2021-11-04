@@ -151,5 +151,5 @@ class AcalaContributeInteractor(
         authHeader = AcalaApi.getAuthHeader(chain)
     )
 
-    private fun referralRemark(referralCode: String) = "referrer:${referralCode}"
+    private fun referralRemark(referralCode: String) = "referrer:$referralCode"
 }
