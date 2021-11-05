@@ -50,6 +50,7 @@ class AccountDetailsInteractor(
                 from = if (metaAccount.hasChainAccountIn(chain.id)) From.CHAIN_ACCOUNT else From.META_ACCOUNT
             )
         }
+            .sortedBy { it.hasChainAccount }
             .groupBy(AccountInChain::from)
             .toSortedMap(compareBy(From::ordering))
     }
@@ -68,6 +69,9 @@ class AccountDetailsInteractor(
             AvailableExportType.JSON // always available
         )
     }
+
+    private val AccountInChain.hasChainAccount
+        get() = projection != null
 }
 
 private val From.ordering
