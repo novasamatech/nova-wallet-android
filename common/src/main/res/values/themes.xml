@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.Soramitsu.Fearless" parent="Theme.MaterialComponents.NoActionBar">
+    <style name="Theme.NovaFoundation.Nova" parent="Theme.MaterialComponents.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
 
         <!--        <item name="android:windowTranslucentStatus">true</item>-->
@@ -33,7 +33,7 @@
         <item name="fontRegular">@font/soramitsu_regular</item>
         <!--fonts-->
 
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorAccent">@color/accentBlue</item>
     </style>
 
     <style name="PinkOverlay" parent="ThemeOverlay.AppCompat">

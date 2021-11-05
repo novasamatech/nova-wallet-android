@@ -8,7 +8,7 @@
     android:orientation="vertical"
     tools:background="@color/black">
 
-    <jp.co.soramitsu.common.view.Toolbar
+    <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/transactionDetailToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -27,7 +27,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <jp.co.soramitsu.common.view.LabeledTextView
+            <io.novafoundation.nova.common.view.LabeledTextView
                 android:id="@+id/transactionDetailHash"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -38,7 +38,7 @@
                 app:layout_constraintStart_toStartOf="@+id/transactionDetailDivider4"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <jp.co.soramitsu.common.view.LabeledTextView
+            <io.novafoundation.nova.common.view.LabeledTextView
                 android:id="@+id/transactionDetailFrom"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -51,7 +51,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/transactionDetailHash"
                 tools:textIcon="@color/colorAccent" />
 
-            <jp.co.soramitsu.common.view.LabeledTextView
+            <io.novafoundation.nova.common.view.LabeledTextView
                 android:id="@+id/transactionDetailTo"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -66,7 +66,7 @@
 
             <TextView
                 android:id="@+id/transactionDetailStatusLabel"
-                style="@style/TextAppearance.Soramitsu.Body1"
+                style="@style/TextAppearance.NovaFoundation.Body1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -79,7 +79,7 @@
 
             <TextView
                 android:id="@+id/transactionDetailStatus"
-                style="@style/TextAppearance.Soramitsu.Body1"
+                style="@style/TextAppearance.NovaFoundation.Body1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
@@ -110,7 +110,7 @@
 
             <TextView
                 android:id="@+id/transactionDetailDateLabel"
-                style="@style/TextAppearance.Soramitsu.Body1"
+                style="@style/TextAppearance.NovaFoundation.Body1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -122,7 +122,7 @@
 
             <TextView
                 android:id="@+id/transactionDetailDate"
-                style="@style/TextAppearance.Soramitsu.Body1"
+                style="@style/TextAppearance.NovaFoundation.Body1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintBottom_toBottomOf="@+id/transactionDetailDateLabel"
@@ -142,7 +142,7 @@
 
             <TextView
                 android:id="@+id/transactionDetailAmountLabel"
-                style="@style/TextAppearance.Soramitsu.Body1"
+                style="@style/TextAppearance.NovaFoundation.Body1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -154,7 +154,7 @@
 
             <TextView
                 android:id="@+id/transactionDetailAmount"
-                style="@style/TextAppearance.Soramitsu.Body1"
+                style="@style/TextAppearance.NovaFoundation.Body1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintBottom_toBottomOf="@+id/transactionDetailAmountLabel"
@@ -174,7 +174,7 @@
 
             <TextView
                 android:id="@+id/transactionDetailFeeLabel"
-                style="@style/TextAppearance.Soramitsu.Body1"
+                style="@style/TextAppearance.NovaFoundation.Body1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -186,7 +186,7 @@
 
             <TextView
                 android:id="@+id/transactionDetailFee"
-                style="@style/TextAppearance.Soramitsu.Body1"
+                style="@style/TextAppearance.NovaFoundation.Body1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintBottom_toBottomOf="@+id/transactionDetailFeeLabel"
@@ -228,7 +228,7 @@
 
         <TextView
             android:id="@+id/transactionDetailTotalLabel"
-            style="@style/TextAppearance.Soramitsu.Header5"
+            style="@style/TextAppearance.NovaFoundation.Header5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="15dp"
@@ -239,16 +239,15 @@
 
         <TextView
             android:id="@+id/transactionDetailTotal"
-            style="@style/TextAppearance.Soramitsu.Body1"
+            style="@style/TextAppearance.NovaFoundation.Body1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="@+id/transactionDetailTotalLabel"
             app:layout_constraintEnd_toEndOf="@+id/transactionDetailDivider5"
             tools:text="1.001 KSM" />
 
-        <jp.co.soramitsu.common.view.AccountInfoView
+        <io.novafoundation.nova.common.view.AccountInfoView
             android:id="@+id/transactionDetailRepeat"
-            style="@style/Widget.Fearless.Button.Primary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"

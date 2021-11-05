@@ -7,7 +7,7 @@
     android:fitsSystemWindows="true"
     android:orientation="vertical">
 
-    <jp.co.soramitsu.common.view.Toolbar
+    <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/recommendedValidatorsToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -23,7 +23,7 @@
 
         <TextView
             android:id="@+id/recommendedValidatorsAccounts"
-            style="@style/TextAppearance.Soramitsu.CapsTitle2"
+            style="@style/TextAppearance.NovaFoundation.CapsTitle2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
@@ -32,7 +32,7 @@
             android:textColor="@color/gray1" />
 
         <TextView
-            style="@style/TextAppearance.Soramitsu.CapsTitle2"
+            style="@style/TextAppearance.NovaFoundation.CapsTitle2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
@@ -63,9 +63,9 @@
         tools:itemCount="15"
         tools:listitem="@layout/item_validator" />
 
-    <jp.co.soramitsu.common.view.PrimaryButton
+    <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/recommendedValidatorsNext"
-        style="@style/Widget.Fearless.Button.Primary"
+        style="@style/Widget.Nova.Button.Primary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"

@@ -8,7 +8,7 @@
     android:fitsSystemWindows="true">
 
 
-    <jp.co.soramitsu.common.view.Toolbar
+    <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -18,7 +18,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:titleText="@string/account_confirmation_title" />
 
-    <jp.co.soramitsu.feature_account_impl.presentation.mnemonic.confirm.view.MnemonicContainerView
+    <io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.view.MnemonicContainerView
         android:id="@+id/confirmationMnemonicView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -33,7 +33,7 @@
 
     <TextView
         android:id="@+id/textView2"
-        style="@style/TextAppearance.Soramitsu.Body0"
+        style="@style/TextAppearance.NovaFoundation.Body0"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -44,7 +44,7 @@
         app:layout_constraintStart_toStartOf="@+id/confirmationMnemonicView"
         app:layout_constraintTop_toBottomOf="@+id/confirmationMnemonicView" />
 
-    <jp.co.soramitsu.feature_account_impl.presentation.mnemonic.confirm.view.MnemonicContainerView
+    <io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.view.MnemonicContainerView
         android:id="@+id/wordsMnemonicView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -58,9 +58,9 @@
         app:layout_constraintTop_toBottomOf="@+id/textView2"
         tools:layout_height="144dp" />
 
-    <jp.co.soramitsu.common.view.PrimaryButton
+    <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/conformMnemonicSkip"
-        style="@style/Widget.Fearless.Button.Outline"
+        style="@style/Widget.Nova.Button.Outline"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
@@ -70,9 +70,9 @@
         app:layout_constraintEnd_toEndOf="@+id/nextBtn"
         app:layout_constraintStart_toStartOf="@+id/nextBtn" />
 
-    <jp.co.soramitsu.common.view.PrimaryButton
+    <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/nextBtn"
-        style="@style/Widget.Fearless.Button.Primary"
+        style="@style/Widget.Nova.Button.Primary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"

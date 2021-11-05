@@ -25,7 +25,7 @@
 
     <TextView
         android:id="@+id/accountTitle"
-        style="@style/TextAppearance.Soramitsu.Body1"
+        style="@style/TextAppearance.NovaFoundation.Body1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"

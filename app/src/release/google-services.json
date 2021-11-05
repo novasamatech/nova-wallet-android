@@ -1,34 +1,33 @@
 {
   "project_info": {
-    "project_number": "590490556751",
-    "firebase_url": "https://fearless-216a0.firebaseio.com",
-    "project_id": "fearless-216a0",
-    "storage_bucket": "fearless-216a0.appspot.com"
+    "project_number": "802342409053",
+    "project_id": "nova-wallet-production",
+    "storage_bucket": "nova-wallet-production.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:590490556751:android:45e21c2cc9c0b271becd3a",
+        "mobilesdk_app_id": "1:802342409053:android:36a2e33c10baf1b7378eb4",
         "android_client_info": {
-          "package_name": "jp.co.soramitsu.fearless"
+          "package_name": "io.novafoundation.nova"
         }
       },
       "oauth_client": [
         {
-          "client_id": "590490556751-hbhmr9kb7r2ljav9sorv2v2qg5se2onr.apps.googleusercontent.com",
+          "client_id": "802342409053-rgoughr36c138jfjle5k8glafpkbagli.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBaCE7jPYiJat00jq8VH1OBB7gWTgNYY3o"
+          "current_key": "AIzaSyDV0jNUiEGmb4tOn65m2EAyGV5eJpxhZY0"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "590490556751-hbhmr9kb7r2ljav9sorv2v2qg5se2onr.apps.googleusercontent.com",
+              "client_id": "802342409053-rgoughr36c138jfjle5k8glafpkbagli.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

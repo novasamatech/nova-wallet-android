@@ -3,56 +3,56 @@
 
     <!--Font styles-->
 
-    <style name="TextAppearance.Fearless.Header" parent="TextAppearance.AppCompat.Title">
+    <style name="TextAppearance.Nova.Header" parent="TextAppearance.AppCompat.Title">
         <item name="android:fontFamily">?attr/fontBold</item>
     </style>
 
-    <style name="TextAppearance.Soramitsu.Header1" parent="TextAppearance.Fearless.Header">
+    <style name="TextAppearance.NovaFoundation.Header1" parent="TextAppearance.Nova.Header">
         <item name="android:textSize">?attr/textSizeH1</item>
     </style>
 
-    <style name="TextAppearance.Soramitsu.Header2" parent="TextAppearance.Fearless.Header">
+    <style name="TextAppearance.NovaFoundation.Header2" parent="TextAppearance.Nova.Header">
         <item name="android:textSize">?attr/textSizeH2</item>
     </style>
 
-    <style name="TextAppearance.Soramitsu.Header3" parent="TextAppearance.Fearless.Header">
+    <style name="TextAppearance.NovaFoundation.Header3" parent="TextAppearance.Nova.Header">
         <item name="android:textSize">?attr/textSizeH3</item>
     </style>
 
-    <style name="TextAppearance.Soramitsu.Header4" parent="TextAppearance.Fearless.Header">
+    <style name="TextAppearance.NovaFoundation.Header4" parent="TextAppearance.Nova.Header">
         <item name="android:textSize">?attr/textSizeH4</item>
     </style>
 
-    <style name="TextAppearance.Soramitsu.Header5" parent="TextAppearance.Fearless.Header">
+    <style name="TextAppearance.NovaFoundation.Header5" parent="TextAppearance.Nova.Header">
         <item name="android:textSize">?attr/textSizeH5</item>
     </style>
 
-    <style name="TextAppearance.Soramitsu.CapsTitle1" parent="TextAppearance.Fearless.Header">
+    <style name="TextAppearance.NovaFoundation.CapsTitle1" parent="TextAppearance.Nova.Header">
         <item name="android:textSize">?attr/textSizeCapsTitle1</item>
         <item name="android:textAllCaps">true</item>
     </style>
 
-    <style name="TextAppearance.Soramitsu.CapsTitle2" parent="TextAppearance.Fearless.Header">
+    <style name="TextAppearance.NovaFoundation.CapsTitle2" parent="TextAppearance.Nova.Header">
         <item name="android:textSize">?attr/textSizeCapsTitle2</item>
         <item name="android:textAllCaps">true</item>
     </style>
 
-    <style name="TextAppearance.Soramitsu.Body0" parent="TextAppearance.AppCompat.Body1">
+    <style name="TextAppearance.NovaFoundation.Body0" parent="TextAppearance.AppCompat.Body1">
         <item name="android:fontFamily">?attr/fontRegular</item>
         <item name="android:textSize">?attr/textSizeB0</item>
     </style>
 
-    <style name="TextAppearance.Soramitsu.Body1" parent="TextAppearance.AppCompat.Body1">
+    <style name="TextAppearance.NovaFoundation.Body1" parent="TextAppearance.AppCompat.Body1">
         <item name="android:fontFamily">?attr/fontRegular</item>
         <item name="android:textSize">?attr/textSizeB1</item>
     </style>
 
-    <style name="TextAppearance.Soramitsu.Body2" parent="TextAppearance.AppCompat.Body1">
+    <style name="TextAppearance.NovaFoundation.Body2" parent="TextAppearance.AppCompat.Body1">
         <item name="android:fontFamily">?attr/fontRegular</item>
         <item name="android:textSize">?attr/textSizeB2</item>
     </style>
 
-    <style name="TextAppearance.Soramitsu.Body3" parent="TextAppearance.AppCompat.Body1">
+    <style name="TextAppearance.NovaFoundation.Body3" parent="TextAppearance.AppCompat.Body1">
         <item name="android:fontFamily">?attr/fontSemiBold</item>
         <item name="android:textSize">?attr/textSizeB3</item>
     </style>
@@ -61,7 +61,7 @@
 
     <!-- Buttons -->
 
-    <style name="Widget.Fearless.Button" parent="Widget.AppCompat.Button">
+    <style name="Widget.Nova.Button" parent="Widget.AppCompat.Button">
         <item name="android:textColor">@color/button_text_colors</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:letterSpacing">0.02</item>
@@ -70,21 +70,26 @@
         <item name="android:minHeight">52dp</item>
     </style>
 
-    <style name="Widget.Fearless.Button.Primary">
-        <item name="android:background">@drawable/bg_button_primary_selector</item>
+    <style name="Widget.Nova.Button.Primary">
+        <!--        <item name="android:background">@drawable/bg_button_primary_selector</item>-->
+        <item name="appearance">fill</item>
     </style>
 
-    <style  name="Widget.Fearless.Button.Outline">
-        <item name="android:background">@drawable/bg_button_outline_selector</item>
+    <style name="Widget.Nova.Button.Outline">
+        <item name="appearance">outline</item>
     </style>
 
-    <style name="Widget.Fearless.Puller" parent="">
+    <style name="AccentBlue" parent="">
+        <item name="colorAccent">@color/accentBlue</item>
+    </style>
+
+    <style name="Widget.Nova.Puller" parent="">
         <item name="android:layout_height">2dp</item>
         <item name="android:layout_width">35dp</item>
         <item name="android:background">@drawable/bg_puller</item>
     </style>
 
-    <style name="Widget.Fearless.ActionButton" parent="TextAppearance.AppCompat.Body2">
+    <style name="Widget.Nova.ActionButton" parent="TextAppearance.AppCompat.Body2">
         <item name="android:paddingTop">12dp</item>
         <item name="android:paddingBottom">12dp</item>
         <item name="android:gravity">center</item>
@@ -93,9 +98,9 @@
         <item name="android:drawablePadding">4dp</item>
     </style>
 
-    <style name="Widget.Fearless.Switch" parent="">
+    <style name="Widget.Nova.Switch" parent="">
         <item name="android:background">@drawable/divider_drawable</item>
-        <item name="android:textAppearance">@style/TextAppearance.Soramitsu.Body1</item>
+        <item name="android:textAppearance">@style/TextAppearance.NovaFoundation.Body1</item>
         <item name="android:textColor">@color/gray1</item>
     </style>
 
@@ -103,7 +108,7 @@
 
     <!-- Input -->
 
-    <style name="Widget.Fearless.Input.Primary.External" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
+    <style name="Widget.Nova.Input.Primary.External" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
         <item name="android:textColorHint">@color/colorHint</item>
         <item name="hintTextColor">@color/colorHint</item>
         <item name="boxStrokeWidth">0dp</item>
@@ -111,8 +116,8 @@
         <item name="boxCollapsedPaddingTop">@dimen/x1</item>
     </style>
 
-    <style name="Widget.Fearless.Input.Primary.Internal" parent="Base.Widget.AppCompat.EditText">
-        <item name="android:textAppearance">@style/TextAppearance.Soramitsu.Body1</item>
+    <style name="Widget.Nova.Input.Primary.Internal" parent="Base.Widget.AppCompat.EditText">
+        <item name="android:textAppearance">@style/TextAppearance.NovaFoundation.Body1</item>
         <item name="android:paddingStart">@dimen/x2</item>
         <item name="android:paddingEnd">@dimen/x2</item>
         <item name="android:paddingTop">@dimen/x3</item>
@@ -126,7 +131,7 @@
 
     <!-- Dialog -->
 
-    <style name="Widget.Fearless.ProgressBar" parent="Widget.AppCompat.ProgressBar">
+    <style name="Widget.Nova.ProgressBar" parent="Widget.AppCompat.ProgressBar">
         <item name="android:indeterminate">true</item>
         <item name="android:indeterminateDrawable">@anim/progress_rotate</item>
         <item name="android:indeterminateDuration">1300</item>

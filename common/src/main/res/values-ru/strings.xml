@@ -1,5 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+    <string name="crowdloan_contributions_placeholder">Ваши взносы\n появятся здесь</string>
+
+    <string name="crowdloan_active_section_format_v2_0">Активные</string>
+    <string name="common_completed_with_count_v2_0">Завершённые</string>
+
+    <string name="crowdloan_your_contributions">Мои взносы</string>
+    <string name="crowdloan_about">О краудлоанах</string>
+
+    <string name="crowdloan_moonbeam_encryption_not_supported_title">Используемый аккаунт не поддерживается для взноса</string>
+    <string name="crowdloan_moonbeam_encryption_not_supported_message">
+        Краудлоан Moonbeam поддерживает только аккаунты с крипографией SR25519. Пожалуйста, используйте другой аккаунт для взноса
+    </string>
+
+    <string name="crowdloan_moonbeam_reward_destination">Назначение вознаграждения для %s</string>
+
+    <string name="crowdloan_moonbeam_terms_submit">Подтвердить согласие</string>
+    <string name="crowdloan_terms_conditions_named">%s\'s Условиями использования и Политикой конфиденциальности</string>
+
+    <string name="crowdloan_moonbeam_terms_subtitle">
+        Для участия вам необходимо предоставить своё согласие с Условиями использования и Политикой конфиденциальности он-чейн.
+        Данная процедура выполняется единоразово и распространяется на все последующие взносы в краудлоан Moonbeam
+    </string>
+
+    <string name="crowdloan_moonbeam_region_restriction_title">Ваш регион не поддерживается</string>
+    <string name="crowdloan_moonbeam_region_restriction_message">Данный краудлоан недоступен в вашем регионе.</string>
+
+    <string name="crowdloan_moonbeam_missing_account_title">Необходим аккаунт Moonbeam</string>
+    <string name="crowdloan_moonbeam_missing_account_message">
+        Для участия в краудлоане Moonbeam вам необходимо добавить Moonbeam аккаунт к активному кошельку
+    </string>
+
+    <string name="wallet_your_balance">Ваш баланс</string>
+    <string name="wallet_balance_transferable">Доступно для перевода</string>
+
+    <string name="accounts_change_chain_secrets">Изменить аккаунт</string>
+
+    <string name="crowdloan_agree_with_policy">Согласитесь с Правилами и Условиями</string>
+    <string name="crowdloan_privacy_policy">Я ознакомился и согласен с Правилами и Условиями</string>
+    <string name="crowdloan_referral_code">Реферальный код</string>
+
+    <string name="transaction_details_view_explorer">Открыть в %s</string>
+
+    <string name="account_invalid_derivation_path_title">Некорректный путь деривации</string>
+    <string name="account_invalid_derivation_path_message">Путь деривации содержить неподдерживамые символы или имеет некорретную структуру</string>
+
+    <string name="import_json_unsupported_crypto_title">Неподдерживаемый тип шиврования</string>
+    <string name="import_json_unsupported_ethereum_crypto_message">Не поддерживается импорт аккаунта с Substrate секретом в сеть с Ethereum шифрованием</string>
+    <string name="import_json_unsupported_substrate_crypto_message">Не поддерживается импорт аккаунта с Ethereum секретом в сеть с Substrate шифрованием</string>
+
+    <string name="common_chain">Сеть</string>
+    <string name="import_json_chains_dont_match">Выбранный JSON файл был создан для другой сети.</string>
+
+    <string name="profile_accounts_title_2_0">Кошельки</string>
+    <string name="username_setup_choose_title_2_0">Имя кошелька</string>
+    <string name="account_info_title_2_0">Кошелёк</string>
+
+    <string name="account_shared_secret">Аккаунты с общим секретом</string>
+    <string name="account_custom_secret">Аккаунты с изменённым секретом</string>
+    <string name="wallet_assets">Активы</string>
+
+    <string name="account_no_chain_projection">Аккаунт не найден</string>
+
     <string name="common_details">Подробности</string>
     <string name="common_next">Далее</string>
     <string name="common_cancel">Отмена</string>
@@ -9,8 +71,7 @@
     <string name="common_copy_address">Копировать адрес</string>
     <string name="connection_error_message">Пожалуйста, проверьте подключение к Интернету и повторите попытку.</string>
     <string name="onboarding_restore_account">Восстановить</string>
-    <string name="onboarding_terms_and_conditions_1">Я подтверждаю, что прочитал и согласен с
-Условиями использования и Политикой конфиденциальности</string>
+    <string name="onboarding_terms_and_conditions_1">Я подтверждаю, что прочитал и согласен с Условиями использования и Политикой конфиденциальности</string>
     <string name="onboarding_terms_and_conditions_2">Условиями использования</string>
     <string name="onboarding_privacy_policy">Политикой конфиденциальности</string>
     <string name="pincode_enter_pin_code">Введите PIN-код</string>
@@ -55,6 +116,7 @@
     <string name="recovery_json">JSON для восстановления</string>
     <string name="account_import_password_placeholder">Пароль</string>
     <string name="recover_json_hint">Вставьте json строку или загрузите файл…</string>
+    <string name="recover_json_upload">Загрузите файл</string>
     <string name="import_json_paste">Вставьте json</string>
     <string name="recovery_passphrase">Мнемоническая фраза</string>
     <string name="account_import_invalid_seed">Seed неверный. Пожалуйста, убедитесь, что введенные данные содержат 64 hex символа.</string>
@@ -254,7 +316,7 @@
     <string name="common_module">Модуль</string>
     <string name="wallet_asset_buy_with">Купить с</string>
     <string name="wallet_filters_title">Фильтры</string>
-    <string name="common_apply">Применять</string>
+    <string name="common_apply">Применить</string>
     <string name="common_reset">Сброс</string>
     <string name="wallet_filters_transfers">Переводы</string>
     <string name="wallet_filters_rewards_and_slashes">Вознаграждения и слэши</string>
@@ -347,7 +409,7 @@
     <string name="crodloan_private_crowdloan_title">Приватный краудлоун</string>
     <string name="crodloan_private_crowdloan_message">Приватные краудлоуны пока не поддерживаются</string>
     <string name="common_bonus">Бонус</string>
-    <string name="crowdloan_app_bonus_format">Бонус Fearless Wallet (%s)</string>
+    <string name="crowdloan_app_bonus_format">Бонус Nova Wallet (%s)</string>
     <string name="crowdloan_enter_referral">Введите реферальный код</string>
     <string name="staking_add_controller">Чтобы выполнить это действие, добавьте контроллер аккаунт %s в приложение</string>
     <string name="crowdloan_empty_bonus_title">Получите специальный бонус</string>
@@ -359,7 +421,7 @@
     <string name="staking_select_recommended">Выбрать рекомендованных</string>
     <string name="staking_select_custom">Выбрать самому</string>
     <string name="staking_selected_validators_count_v1.9.1" formatted="false">выбрано %d (макс. %d)</string>
-    <string name="staking_start_change_validators_recommended_subtitle">Алгоритм Fearless Wallet составил список рекомендованных валидаторов, основываясь на критериях:</string>
+    <string name="staking_start_change_validators_recommended_subtitle">Алгоритм Nova Wallet составил список рекомендованных валидаторов, основываясь на критериях:</string>
     <string name="common_not_enough_funds_message">К сожалению, у вас недостаточно средств для оплаты сетевого сбора.</string>
     <string name="choose_amount_error_too_big">К сожалению, у вас недостаточно средств для совершения данной операции</string>
     <string name="staking_custom_validators_list_title">Выберите валидаторов</string>
@@ -412,7 +474,7 @@
     <string name="staking_hint_no_rewards">Во время вывода токены не приносят наград.</string>
     <string name="staking_hint_redeem">После вывода токенов из стейкинга не забудьте их забрать.</string>
     <string name="staking_hint_reward_bond_more">Ваши вознаграждения увеличатся со следующей эры.</string>
-    <string name="staking_hint_unbond_kills_stash">Fearless wallet изменит назначение вознаграждений
+    <string name="staking_hint_unbond_kills_stash">Nova wallet изменит назначение вознаграждений
 на ваш аккаунт, чтобы избежать остатка в стейкинге.</string>
     <string name="staking_custom_validators_settings_sort_apy">Примерное вознаграждение (% APY)</string>
     <string name="common_options_title">Выберите опцию</string>
@@ -425,13 +487,13 @@
     <string name="staking_story_staking_page_2">Стейкинг играет ключевую роль в безопасности и надежности сети. Любой может запустить собственную ноду, но только тот, кто наберёт необходимое количество токенов в стейкинге, будет избран сетью для создания новых блоков и получения наград. Часто валидаторы не имеют необходимого количества токенов, поэтому номинаторы помогают им с помощью своих токенов.</string>
     <string name="staking_story_nominator_title">Кто такой номинатор?</string>
     <string name="staking_story_nominator_page_1">Номинатор получает пассивный доход за удержание своих токенов для безопасности сети. Для этого номинатор должен выбрать валидаторов, с которыми он будет стейкать. Номинатору нужно осторожно подходить к выбору валидаторов. Если выбранный валидатор не будет поддерживать свою ноду в рабочем состоянии или будет пытаться атаковать сеть, то им обоим будет назначен штраф в виде слэша определенной части стейкинга в зависимости от масштаба причиненного ущерба.</string>
-    <string name="staking_story_nominator_page_2">Fearless Wallet помогает номинаторам в выборе валидаторов. Приложение получает данные из сети и составляет список доступных для номинирования валидаторов, имеющих максимальный доход, персонализацию и контакты для связи, а также не имеющих слэшей. Fearless Wallet также заботится о децентрализации, поэтому если один человек или компания запустили несколько валидирующих нод, то только 2 из них будут присутствовать в списке рекомендованных.</string>
+    <string name="staking_story_nominator_page_2">Nova Wallet помогает номинаторам в выборе валидаторов. Приложение получает данные из сети и составляет список доступных для номинирования валидаторов, имеющих максимальный доход, персонализацию и контакты для связи, а также не имеющих слэшей. Nova Wallet также заботится о децентрализации, поэтому если один человек или компания запустили несколько валидирующих нод, то только 2 из них будут присутствовать в списке рекомендованных.</string>
     <string name="staking_story_validator_title">Кто такой валидатор?</string>
     <string name="staking_story_validator_page_1">Валидатор обеспечивает работу ноды блокчейна 24/7 и обязан иметь необходимое количество стейка (общий стейк самого валидатора и его номинаторов), чтобы быть избранным сетью. Валидаторы должны поддерживать производительность и надежность своих нод, за что они получают вознаграждения. Валидатор — это полноценная работа, существуют профильные компании, которые специализируются на валидировании в блокчейн сетях.</string>
     <string name="staking_story_validator_page_2">Любой может стать валидатором и запустить ноду блокчейна, однако это требует определённых технических знаний и ответственности. Сети Polkadot и Kusama запустили программу Thousand Validators Programme (Программа Тысячи Валидаторов), чтобы помочь начинающим. Более того, сеть всегда будет стремиться вознаграждать тех валидаторов, чей суммарный стейк меньше (но достаточен чтобы быть избранным в сети), для поддержки децентрализации.</string>
     <string name="staking_story_reward_title">Получение наград</string>
     <string name="staking_story_reward_page_1">Вознаграждения за стейкинг доступны для выплаты в конце каждой эры (6 часов в Kusama и 24 часа в Polkadot). Сеть хранит ожидаемые вознаграждения в течении 84 эр и в большинстве случаев валидаторы сами выплачивают всем награды. Однако, валидаторы могут забыть это сделать или с ними может что-то случиться, поэтому номинаторы могут выплатить свои награды самостоятельно.</string>
-    <string name="staking_story_reward_page_2">Несмотря на то, что обычно вознаграждения выплачиваются валидаторами, Fearless Wallet помогает узнать о вознаграждениях, срок выплаты которых близок к истечению, с помощью предупреждений. Предупреждения об этом и других важных событиях появятся на главном экране стейкинга.</string>
+    <string name="staking_story_reward_page_2">Несмотря на то, что обычно вознаграждения выплачиваются валидаторами, Nova Wallet помогает узнать о вознаграждениях, срок выплаты которых близок к истечению, с помощью предупреждений. Предупреждения об этом и других важных событиях появятся на главном экране стейкинга.</string>
     <string name="staking_selected_validators_mask">Валидаторы (%d)</string>
     <string name="staking_controller_change_success">Контроллер изменен</string>
     <string name="staking_already_controller_title">Уже контроллер</string>

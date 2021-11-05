@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/drawable_background_image">
+    android:background="@drawable/novabg_welcome_screen">
 
     <ImageView
         android:id="@+id/back"
@@ -23,7 +23,7 @@
         android:id="@+id/logoImg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/drawable_fearless_logo"
+        android:src="@drawable/drawable_nova_logo"
         app:layout_constraintBottom_toTopOf="@id/buttonsView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -40,19 +40,21 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <jp.co.soramitsu.common.view.PrimaryButton
+        <io.novafoundation.nova.common.view.PrimaryButton
             android:id="@+id/createAccountBtn"
-            style="@style/Widget.Fearless.Button.Primary"
+            style="@style/Widget.Nova.Button.Primary"
             android:layout_width="match_parent"
+            android:theme="@style/AccentBlue"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/x1"
             android:text="@string/onboarding_create_account" />
 
-        <jp.co.soramitsu.common.view.PrimaryButton
+        <io.novafoundation.nova.common.view.PrimaryButton
             android:id="@+id/importAccountBtn"
-            style="@style/Widget.Fearless.Button.Primary"
+            style="@style/Widget.Nova.Button.Primary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:theme="@style/AccentBlue"
             android:layout_margin="@dimen/x1"
             android:text="@string/onboarding_restore_account" />
 
@@ -60,7 +62,7 @@
 
     <TextView
         android:id="@+id/termsTv"
-        style="@style/TextAppearance.Soramitsu.Body1"
+        style="@style/TextAppearance.NovaFoundation.Body1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/x2"

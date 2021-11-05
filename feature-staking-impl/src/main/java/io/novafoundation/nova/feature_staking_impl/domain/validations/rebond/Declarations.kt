@@ -1,0 +1,13 @@
+package io.novafoundation.nova.feature_staking_impl.domain.validations.rebond
+
+import io.novafoundation.nova.common.validation.Validation
+import io.novafoundation.nova.common.validation.ValidationSystem
+import io.novafoundation.nova.feature_staking_impl.domain.validations.NotZeroAmountValidation
+import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughToPayFeesValidation
+
+typealias RebondFeeValidation = EnoughToPayFeesValidation<RebondValidationPayload, RebondValidationFailure>
+typealias NotZeroRebondValidation = NotZeroAmountValidation<RebondValidationPayload, RebondValidationFailure>
+
+typealias RebondValidation = Validation<RebondValidationPayload, RebondValidationFailure>
+
+typealias RebondValidationSystem = ValidationSystem<RebondValidationPayload, RebondValidationFailure>

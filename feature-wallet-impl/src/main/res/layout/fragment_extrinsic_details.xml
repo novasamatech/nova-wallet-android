@@ -8,7 +8,7 @@
     android:orientation="vertical"
     tools:background="@color/black">
 
-    <jp.co.soramitsu.common.view.Toolbar
+    <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/extrinsicDetailToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -27,7 +27,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <jp.co.soramitsu.common.view.LabeledTextView
+            <io.novafoundation.nova.common.view.LabeledTextView
                 android:id="@+id/extrinsicDetailHash"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -38,7 +38,7 @@
                 app:layout_constraintStart_toStartOf="@+id/extrinsicDetailDivider4"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <jp.co.soramitsu.common.view.LabeledTextView
+            <io.novafoundation.nova.common.view.LabeledTextView
                 android:id="@+id/extrinsicDetailFrom"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -53,7 +53,7 @@
 
             <TextView
                 android:id="@+id/extrinsicDetailStatusLabel"
-                style="@style/TextAppearance.Soramitsu.Body1"
+                style="@style/TextAppearance.NovaFoundation.Body1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -66,7 +66,7 @@
 
             <TextView
                 android:id="@+id/extrinsicDetailStatus"
-                style="@style/TextAppearance.Soramitsu.Body1"
+                style="@style/TextAppearance.NovaFoundation.Body1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
@@ -97,7 +97,7 @@
 
             <TextView
                 android:id="@+id/extrinsicDetailDateLabel"
-                style="@style/TextAppearance.Soramitsu.Body1"
+                style="@style/TextAppearance.NovaFoundation.Body1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -109,7 +109,7 @@
 
             <TextView
                 android:id="@+id/extrinsicDetailDate"
-                style="@style/TextAppearance.Soramitsu.Body1"
+                style="@style/TextAppearance.NovaFoundation.Body1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintBottom_toBottomOf="@+id/extrinsicDetailDateLabel"
@@ -129,7 +129,7 @@
 
             <TextView
                 android:id="@+id/extrinsicDetailModuleLabel"
-                style="@style/TextAppearance.Soramitsu.Body1"
+                style="@style/TextAppearance.NovaFoundation.Body1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -141,7 +141,7 @@
 
             <TextView
                 android:id="@+id/extrinsicDetailModule"
-                style="@style/TextAppearance.Soramitsu.Body1"
+                style="@style/TextAppearance.NovaFoundation.Body1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintBottom_toBottomOf="@+id/extrinsicDetailModuleLabel"
@@ -161,7 +161,7 @@
 
             <TextView
                 android:id="@+id/extrinsicDetailCallLabel"
-                style="@style/TextAppearance.Soramitsu.Body1"
+                style="@style/TextAppearance.NovaFoundation.Body1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -173,7 +173,7 @@
 
             <TextView
                 android:id="@+id/extrinsicDetailCall"
-                style="@style/TextAppearance.Soramitsu.Body1"
+                style="@style/TextAppearance.NovaFoundation.Body1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintBottom_toBottomOf="@+id/extrinsicDetailCallLabel"
@@ -193,7 +193,7 @@
 
             <TextView
                 android:id="@+id/extrinsicDetailFeeLabel"
-                style="@style/TextAppearance.Soramitsu.Body1"
+                style="@style/TextAppearance.NovaFoundation.Body1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -205,7 +205,7 @@
 
             <TextView
                 android:id="@+id/extrinsicDetailFee"
-                style="@style/TextAppearance.Soramitsu.Body1"
+                style="@style/TextAppearance.NovaFoundation.Body1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintBottom_toBottomOf="@+id/extrinsicDetailFeeLabel"

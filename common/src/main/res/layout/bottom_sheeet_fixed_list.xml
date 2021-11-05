@@ -9,13 +9,13 @@
     tools:layout_height="300dp">
 
     <View
-        style="@style/Widget.Fearless.Puller"
+        style="@style/Widget.Nova.Puller"
         android:layout_marginTop="2dp"
         android:layout_gravity="center_horizontal" />
 
     <TextView
         android:id="@+id/fixedListSheetTitle"
-        style="@style/TextAppearance.Soramitsu.Header3"
+        style="@style/TextAppearance.NovaFoundation.Header3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"

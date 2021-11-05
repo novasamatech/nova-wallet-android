@@ -13,13 +13,13 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <jp.co.soramitsu.common.view.Toolbar
+        <io.novafoundation.nova.common.view.Toolbar
             android:id="@+id/validatorDetailsToolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:titleText="@string/staking_validator_info_title" />
 
-        <jp.co.soramitsu.common.view.AccountInfoView
+        <io.novafoundation.nova.common.view.AccountInfoView
             android:id="@+id/validatorAccountInfo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -28,7 +28,7 @@
 
         <TextView
             android:id="@+id/validatorInfoTitle"
-            style="@style/TextAppearance.Soramitsu.Header4"
+            style="@style/TextAppearance.NovaFoundation.Header4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -40,13 +40,13 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <jp.co.soramitsu.feature_staking_impl.presentation.validators.details.view.ValidatorInfoView
+        <io.novafoundation.nova.feature_staking_impl.presentation.validators.details.view.ValidatorInfoView
             android:id="@+id/validatorInfo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp" />
 
-        <jp.co.soramitsu.feature_staking_impl.presentation.validators.details.view.ValidatorIdentityView
+        <io.novafoundation.nova.feature_staking_impl.presentation.validators.details.view.ValidatorIdentityView
             android:id="@+id/validatorIdentity"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

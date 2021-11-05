@@ -17,7 +17,7 @@
 
         <TextView
             android:id="@+id/estimateEarningTitle"
-            style="@style/TextAppearance.Soramitsu.Header5"
+            style="@style/TextAppearance.NovaFoundation.Header5"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -41,7 +41,7 @@
 
     </LinearLayout>
 
-    <jp.co.soramitsu.feature_staking_impl.presentation.staking.main.view.StakingInfoView
+    <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.StakingInfoView
         android:id="@+id/stakingMonthGain"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -55,7 +55,7 @@
         app:startWithLoading="true"
         app:titleDetail="@string/staking_month_period_title" />
 
-    <jp.co.soramitsu.feature_staking_impl.presentation.staking.main.view.StakingInfoView
+    <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.StakingInfoView
         android:id="@+id/stakingYearGain"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -69,7 +69,7 @@
         app:startWithLoading="true"
         app:titleDetail="@string/staking_year_period_title" />
 
-    <jp.co.soramitsu.common.view.AmountView
+    <io.novafoundation.nova.common.view.AmountView
         android:id="@+id/estimateEarningAmount"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

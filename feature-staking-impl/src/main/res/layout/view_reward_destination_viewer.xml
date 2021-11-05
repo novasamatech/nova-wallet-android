@@ -8,14 +8,14 @@
     tools:parentTag="android.widget.LinearLayout"
     android:layout_height="match_parent">
 
-    <jp.co.soramitsu.common.view.TableCellView
+    <io.novafoundation.nova.common.view.TableCellView
         android:id="@+id/viewRewardDestinationDestination"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         tools:dividerVisible="false"
         app:title="@string/staking_rewards_destination_title" />
 
-    <jp.co.soramitsu.common.view.LabeledTextView
+    <io.novafoundation.nova.common.view.LabeledTextView
         android:id="@+id/viewRewardDestinationPayoutAccount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

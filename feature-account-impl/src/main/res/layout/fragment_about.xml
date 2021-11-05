@@ -10,15 +10,14 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true"
         android:orientation="vertical">
 
         <ImageView
             android:id="@+id/bgIv"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="280dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/about_top_background"
+            android:src="@drawable/novabg_welcome_screen"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
@@ -43,7 +42,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/x2"
-            android:src="@drawable/drawable_fearless_logo"
+            android:src="@drawable/drawable_nova_logo"
             app:layout_constraintBottom_toBottomOf="@+id/bgIv"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -51,7 +50,7 @@
 
         <TextView
             android:id="@+id/textView"
-            style="@style/TextAppearance.Soramitsu.Header1"
+            style="@style/TextAppearance.NovaFoundation.Header1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/x2"
@@ -86,7 +85,7 @@
 
             <TextView
                 android:id="@+id/websiteTitle"
-                style="@style/TextAppearance.Soramitsu.Body1"
+                style="@style/TextAppearance.NovaFoundation.Body1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/x1_5"
@@ -98,7 +97,7 @@
 
             <TextView
                 android:id="@+id/websiteText"
-                style="@style/TextAppearance.Soramitsu.Body2"
+                style="@style/TextAppearance.NovaFoundation.Body2"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/x1_5"
@@ -153,7 +152,7 @@
 
             <TextView
                 android:id="@+id/githubTitle"
-                style="@style/TextAppearance.Soramitsu.Body1"
+                style="@style/TextAppearance.NovaFoundation.Body1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/x1_5"
@@ -165,7 +164,7 @@
 
             <TextView
                 android:id="@+id/githubText"
-                style="@style/TextAppearance.Soramitsu.Body2"
+                style="@style/TextAppearance.NovaFoundation.Body2"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/x1_5"
@@ -220,7 +219,7 @@
 
             <TextView
                 android:id="@+id/telegramTitle"
-                style="@style/TextAppearance.Soramitsu.Body1"
+                style="@style/TextAppearance.NovaFoundation.Body1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/x1_5"
@@ -232,7 +231,7 @@
 
             <TextView
                 android:id="@+id/telegramText"
-                style="@style/TextAppearance.Soramitsu.Body2"
+                style="@style/TextAppearance.NovaFoundation.Body2"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/x1_5"
@@ -287,7 +286,7 @@
 
             <TextView
                 android:id="@+id/emailTitle"
-                style="@style/TextAppearance.Soramitsu.Body1"
+                style="@style/TextAppearance.NovaFoundation.Body1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/x1_5"
@@ -299,7 +298,7 @@
 
             <TextView
                 android:id="@+id/emailText"
-                style="@style/TextAppearance.Soramitsu.Body2"
+                style="@style/TextAppearance.NovaFoundation.Body2"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/x1_5"
@@ -332,7 +331,7 @@
 
         <TextView
             android:id="@+id/termsTv"
-            style="@style/TextAppearance.Soramitsu.Body1"
+            style="@style/TextAppearance.NovaFoundation.Body1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_primary_list_item"
@@ -358,7 +357,7 @@
 
         <TextView
             android:id="@+id/privacyTv"
-            style="@style/TextAppearance.Soramitsu.Body1"
+            style="@style/TextAppearance.NovaFoundation.Body1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_primary_list_item"
