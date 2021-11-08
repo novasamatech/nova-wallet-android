@@ -1,25 +1,25 @@
-package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.bifrost
+package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.astar
 
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_crowdloan_impl.R
-import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.bifrost.BifrostContributeInteractor
+import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.astar.AstarContributeInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.model.CustomContributePayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.referral.DefaultReferralCodePayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.referral.ReferralCodePayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.referral.ReferralContributeViewState
 import java.math.BigDecimal
 
-class BifrostContributeViewState(
-    interactor: BifrostContributeInteractor,
+class AstarContributeViewState(
+    private val interactor: AstarContributeInteractor,
     customContributePayload: CustomContributePayload,
     resourceManager: ResourceManager,
-    termsLink: String,
+    defaultReferralCode: String,
     private val bonusPercentage: BigDecimal,
-    private val bifrostInteractor: BifrostContributeInteractor,
+    termsLink: String,
 ) : ReferralContributeViewState(
     customContributePayload = customContributePayload,
     resourceManager = resourceManager,
-    defaultReferralCode = interactor.novaReferralCode,
+    defaultReferralCode = defaultReferralCode,
     bonusPercentage = bonusPercentage,
     termsUrl = termsLink
 ) {
@@ -28,14 +28,14 @@ class BifrostContributeViewState(
         return DefaultReferralCodePayload(
             rewardTokenSymbol = customContributePayload.parachainMetadata.token,
             referralCode = referralCode,
-            referralBonus = bonusPercentage,
-            rewardRate = customContributePayload.parachainMetadata.rewardRate
+            rewardRate = customContributePayload.parachainMetadata.rewardRate,
+            referralBonus = bonusPercentage
         )
     }
 
     override suspend fun validatePayload(payload: ReferralCodePayload) {
-        if (bifrostInteractor.isCodeValid(payload.referralCode).not()) {
-            throw IllegalArgumentException(resourceManager.getString(R.string.crowdloan_referral_code_invalid))
-        }
+        val isReferralValid = interactor.isReferralCodeValid(payload.referralCode)
+
+        if (!isReferralValid) throw IllegalArgumentException(resourceManager.getString(R.string.crowdloan_astar_wrong_referral))
     }
 }

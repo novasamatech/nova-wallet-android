@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+    <string name="crowdloan_astar_wrong_referral">Astar referral code should be a valid Polkadot address</string>
+
     <string name="crowdloan_missing_bonus_title">You have not applied bonus</string>
     <string name="crowdloan_missing_bonus_message">If you don\'t have referral code, you can apply Nova referral code to receive bonus for your contribution</string>
     <string name="crowdloan_missing_bonus_action">Apply bonus</string>

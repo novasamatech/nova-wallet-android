@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.domain.main.Crowdloan
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.BonusPayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.CustomContributeSubmitter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.acala.main.AcalaCustomizationPayload
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.referral.DefaultReferralCodePayload
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import java.math.BigDecimal
 
@@ -21,7 +22,7 @@ class AcalaContributeSubmitter(
         extrinsicBuilder: ExtrinsicBuilder,
     ) {
         require(customizationPayload is AcalaCustomizationPayload)
-        require(bonusPayload is AcalaBonusPayload?)
+        require(bonusPayload is DefaultReferralCodePayload?)
 
         interactor.injectOnChainSubmission(
             contributionType = customizationPayload.contributionType,
@@ -39,7 +40,7 @@ class AcalaContributeSubmitter(
         extrinsicBuilder: ExtrinsicBuilder,
     ) {
         require(customizationPayload is AcalaCustomizationPayload)
-        require(bonusPayload is AcalaBonusPayload?)
+        require(bonusPayload is DefaultReferralCodePayload?)
 
         interactor.injectFeeCalculation(
             contributionType = customizationPayload.contributionType,
@@ -50,7 +51,7 @@ class AcalaContributeSubmitter(
     }
 
     override suspend fun submitOffChain(customizationPayload: Parcelable?, bonusPayload: BonusPayload?, amount: BigDecimal) {
-        require(bonusPayload is AcalaBonusPayload?)
+        require(bonusPayload is DefaultReferralCodePayload?)
         require(customizationPayload is AcalaCustomizationPayload)
 
         interactor.registerContributionOffChain(

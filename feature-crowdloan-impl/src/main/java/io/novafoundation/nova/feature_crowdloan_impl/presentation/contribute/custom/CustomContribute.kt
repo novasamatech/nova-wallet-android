@@ -32,5 +32,5 @@ abstract class CustomContributeView @JvmOverloads constructor(
 
 interface BonusPayload : Parcelable {
 
-    fun calculateBonus(amount: BigDecimal): BigDecimal?
+    fun bonusText(amount: BigDecimal): String
 }
