@@ -81,9 +81,10 @@ fun contributeValidationFailure(
                         action = { onOpenCustomContribute?.invoke() }
                     ),
                     cancelAction = CustomDialogDisplayer.Payload.DialogAction(
-                        title = resourceManager.getString(R.string.common_continue),
+                        title = resourceManager.getString(R.string.common_skip),
                         action = { validationFlowActions.resumeFlow() }
-                    )
+                    ),
+                    customStyle = R.style.AccentAlertDialogTheme
                 )
             )
         }

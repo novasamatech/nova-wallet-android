@@ -1,5 +1,6 @@
 package io.novafoundation.nova.common.mixin.api
 
+import androidx.annotation.StyleRes
 import androidx.lifecycle.LiveData
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer.Payload.DialogAction
@@ -15,6 +16,7 @@ interface CustomDialogDisplayer {
         val message: String,
         val okAction: DialogAction,
         val cancelAction: DialogAction? = null,
+        @StyleRes val customStyle: Int? = null,
     ) {
 
         class DialogAction(

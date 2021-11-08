@@ -1,5 +1,6 @@
 package io.novafoundation.nova.common.mixin.impl
 
+import android.view.ContextThemeWrapper
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.base.BaseViewModel
@@ -25,7 +26,10 @@ fun <V> BaseFragment<V>.setupCustomDialogDisplayer(
 }
 
 fun BaseFragment<*>.displayDialogFor(payload: CustomDialogDisplayer.Payload) {
-    dialog(requireContext()) {
+    val baseContext = requireContext()
+    val themedContext = payload.customStyle?.let { ContextThemeWrapper(requireContext(), it) } ?: baseContext
+
+    dialog(themedContext) {
         setTitle(payload.title)
         setMessage(payload.message)
 
