@@ -12,7 +12,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.cus
 import kotlinx.coroutines.CoroutineScope
 import java.math.BigDecimal
 
-private const val ASTAR_TERMS_LINK = "https://github.com/PlasmNetwork/crowdloan-app/issues/9"
+private const val ASTAR_TERMS_LINK = "https://docs.google.com/document/d/1vKZrDqSdh706hg0cqJ_NnxfRSlXR2EThVHwoRl0nAkk"
 private const val NOVA_REFERRAL_CODE = "1ChFWeNRLarAPRCTM3bfJmncJbSAbSS9yqjueWz7jX7iTVZ"
 private val ASTAR_BONUS = 0.01.toBigDecimal() // 1%
 
