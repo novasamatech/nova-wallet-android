@@ -318,13 +318,21 @@ class CrowdloanContributeViewModel(
                 customizationPayload = customizationPayload,
                 fee = fee,
                 asset = assetFlow.first(),
+                bonusPayload = router.latestCustomBonus,
                 contributionAmount = contributionAmount
             )
 
             validationExecutor.requireValid(
                 validationSystem = customizedValidationSystem.first(),
                 payload = validationPayload,
-                validationFailureTransformer = { contributeValidationFailure(it, resourceManager) },
+                validationFailureTransformerCustom = { status, actions ->
+                    contributeValidationFailure(
+                        reason = status.reason,
+                        validationFlowActions = actions,
+                        resourceManager = resourceManager,
+                        onOpenCustomContribute = ::bonusClicked
+                    )
+                },
                 progressConsumer = _showNextProgress.progressConsumer()
             ) {
                 _showNextProgress.value = false

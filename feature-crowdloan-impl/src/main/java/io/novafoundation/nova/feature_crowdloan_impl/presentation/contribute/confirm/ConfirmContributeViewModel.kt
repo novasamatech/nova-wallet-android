@@ -166,6 +166,7 @@ class ConfirmContributeViewModel(
             fee = payload.fee,
             asset = assetFlow.first(),
             customizationPayload = payload.customizationPayload,
+            bonusPayload = payload.bonusPayload,
             contributionAmount = payload.amount
         )
 
@@ -173,7 +174,14 @@ class ConfirmContributeViewModel(
             validationSystem = customizedValidationSystem.first(),
             payload = validationPayload,
             progressConsumer = _showNextProgress.progressConsumer(),
-            validationFailureTransformer = { contributeValidationFailure(it, resourceManager) }
+            validationFailureTransformerCustom = { status, actions ->
+                contributeValidationFailure(
+                    reason = status.reason,
+                    validationFlowActions = actions,
+                    resourceManager = resourceManager,
+                    onOpenCustomContribute = null
+                )
+            }
         ) {
             sendTransaction()
         }

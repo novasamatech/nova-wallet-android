@@ -20,18 +20,22 @@ fun <V> BaseFragment<V>.setupCustomDialogDisplayer(
     viewModel: V,
 ) where V : BaseViewModel, V : CustomDialogDisplayer {
     viewModel.showCustomDialog.observeEvent {
-        dialog(requireContext()) {
-            setTitle(it.title)
-            setMessage(it.message)
+        displayDialogFor(it)
+    }
+}
 
-            setPositiveButton(it.okAction.title) { _, _ ->
-                it.okAction.action()
-            }
+fun BaseFragment<*>.displayDialogFor(payload: CustomDialogDisplayer.Payload) {
+    dialog(requireContext()) {
+        setTitle(payload.title)
+        setMessage(payload.message)
 
-            it.cancelAction?.let { negativeAction ->
-                setNegativeButton(negativeAction.title) { _, _ ->
-                    negativeAction.action()
-                }
+        setPositiveButton(payload.okAction.title) { _, _ ->
+            payload.okAction.action()
+        }
+
+        payload.cancelAction?.let { negativeAction ->
+            setNegativeButton(negativeAction.title) { _, _ ->
+                negativeAction.action()
             }
         }
     }

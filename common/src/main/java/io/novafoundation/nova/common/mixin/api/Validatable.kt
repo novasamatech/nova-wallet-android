@@ -4,13 +4,18 @@ import androidx.lifecycle.LiveData
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.validation.ValidationStatus
 
-class DefaultFailure(
-    val level: ValidationStatus.NotValid.Level,
-    val title: String,
-    val message: String,
-    val confirmWarning: Action
-)
+sealed class ValidationFailureUi {
+
+    class Default(
+        val level: ValidationStatus.NotValid.Level,
+        val title: String,
+        val message: String,
+        val confirmWarning: Action,
+    ) : ValidationFailureUi()
+
+    class Custom(val payload: CustomDialogDisplayer.Payload) : ValidationFailureUi()
+}
 
 interface Validatable {
-    val validationFailureEvent: LiveData<Event<DefaultFailure>>
+    val validationFailureEvent: LiveData<Event<ValidationFailureUi>>
 }

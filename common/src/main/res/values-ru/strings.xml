@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+    <string name="crowdloan_missing_bonus_title">Вы не применили бонус</string>
+    <string name="crowdloan_missing_bonus_message">Если у вас нет реферального кода, вы можете применить код Nova, чтобы получить бонус за свой вклад</string>
+    <string name="crowdloan_missing_bonus_action">Применить</string>
+
     <string name="crowdloan_contribution">Тип вклада</string>
     <string name="crowdloan_acala_learn_types">Узнать больше о способах произвести вклад в Acala краудлоун</string>
     <string name="crowdloan_acala_direct">Напрямую</string>
