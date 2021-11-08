@@ -169,9 +169,7 @@ class CrowdloanContributeViewModel(
     ) { contributionState, amount ->
         when (contributionState) {
             is ExtraBonusState.Active -> {
-                val bonus = contributionState.payload.calculateBonus(amount)
-
-                bonus?.formatTokenAmount(contributionState.tokenName)
+                contributionState.payload.bonusText(amount)
             }
 
             is ExtraBonusState.Inactive -> resourceManager.getString(R.string.crowdloan_empty_bonus_title)

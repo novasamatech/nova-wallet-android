@@ -4,6 +4,7 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.acala.AcalaContributionModule
+import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.astar.AstarContributionModule
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.bifrost.BifrostContributionModule
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.moonbeam.MoonbeamContributionModule
 
@@ -11,7 +12,8 @@ import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.moonbeam
     includes = [
         AcalaContributionModule::class,
         BifrostContributionModule::class,
-        MoonbeamContributionModule::class
+        MoonbeamContributionModule::class,
+        AstarContributionModule::class
     ]
 )
 class CustomContributeModule {

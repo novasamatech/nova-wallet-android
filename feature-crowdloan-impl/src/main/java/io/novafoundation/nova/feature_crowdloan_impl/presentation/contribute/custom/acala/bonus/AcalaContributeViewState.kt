@@ -5,6 +5,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.BuildConfig
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.acala.AcalaContributeInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.model.CustomContributePayload
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.referral.DefaultReferralCodePayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.referral.ReferralCodePayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.referral.ReferralContributeViewState
 import java.math.BigDecimal
@@ -24,7 +25,8 @@ class AcalaContributeViewState(
 ) {
 
     override fun createBonusPayload(referralCode: String): ReferralCodePayload {
-        return AcalaBonusPayload(
+        return DefaultReferralCodePayload(
+            rewardTokenSymbol = customContributePayload.parachainMetadata.token,
             referralCode = referralCode,
             rewardRate = customContributePayload.parachainMetadata.rewardRate,
             referralBonus = bonusPercentage
