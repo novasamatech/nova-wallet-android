@@ -94,6 +94,8 @@ fun Chain.isValidAddress(address: String): Boolean {
         if (isEthereumBased) {
             address.fromHex().size == 20
         } else {
+            address.toAccountId() // verify supplied address can be converted to account id
+
             address.addressByte() == addressPrefix.toByte()
         }
     }.getOrDefault(false)
