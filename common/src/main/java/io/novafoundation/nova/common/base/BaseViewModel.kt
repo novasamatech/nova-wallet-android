@@ -7,7 +7,10 @@ import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.asLiveData
 import io.novafoundation.nova.common.validation.ProgressConsumer
+import io.novafoundation.nova.common.validation.TransformedFailure
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.validation.ValidationFlowActions
+import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.ValidationSystem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -64,9 +67,24 @@ open class BaseViewModel : ViewModel(), CoroutineScope {
         validationSystem = validationSystem,
         payload = payload,
         errorDisplayer = ::showError,
-        validationFailureTransformer = validationFailureTransformer,
+        validationFailureTransformerDefault = validationFailureTransformer,
         progressConsumer = progressConsumer,
         autoFixPayload = autoFixPayload,
+        block = block
+    )
+
+    suspend fun <P, S> ValidationExecutor.requireValid(
+        validationSystem: ValidationSystem<P, S>,
+        payload: P,
+        validationFailureTransformerCustom: (ValidationStatus.NotValid<S>, ValidationFlowActions) -> TransformedFailure,
+        progressConsumer: ProgressConsumer? = null,
+        block: (P) -> Unit,
+    ) = requireValid(
+        validationSystem = validationSystem,
+        payload = payload,
+        errorDisplayer = ::showError,
+        validationFailureTransformerCustom = validationFailureTransformerCustom,
+        progressConsumer = progressConsumer,
         block = block
     )
 }

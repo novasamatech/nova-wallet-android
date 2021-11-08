@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_crowdloan_impl.data.CrowdloanSharedState
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomContributeManager
+import io.novafoundation.nova.feature_crowdloan_impl.di.validations.Confirm
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.CrowdloanContributeInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.ContributeValidation
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
@@ -37,7 +38,7 @@ class ConfirmContributeModule {
         payload: ConfirmContributePayload,
         accountUseCase: SelectedAccountUseCase,
         addressIconGenerator: AddressIconGenerator,
-        contributeValidations: @JvmSuppressWildcards Set<ContributeValidation>,
+        @Confirm contributeValidations: @JvmSuppressWildcards Set<ContributeValidation>,
         externalActions: ExternalActions.Presentation,
         customContributeManager: CustomContributeManager,
         singleAssetSharedState: CrowdloanSharedState,
