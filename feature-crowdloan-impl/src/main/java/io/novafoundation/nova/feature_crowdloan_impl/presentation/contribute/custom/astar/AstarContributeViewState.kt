@@ -36,6 +36,6 @@ class AstarContributeViewState(
     override suspend fun validatePayload(payload: ReferralCodePayload) {
         val isReferralValid = interactor.isReferralCodeValid(payload.referralCode)
 
-        if (!isReferralValid) throw IllegalArgumentException(resourceManager.getString(R.string.crowdloan_referral_code_invalid))
+        if (!isReferralValid) throw IllegalArgumentException(resourceManager.getString(R.string.crowdloan_astar_wrong_referral))
     }
 }
