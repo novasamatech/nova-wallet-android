@@ -65,7 +65,6 @@ class ContributeValidationsModule {
         customContributeManager: CustomContributeManager,
     ) = PublicCrowdloanValidation(customContributeManager)
 
-
     @Provides
     @FeatureScope
     fun provideBonusAppliedValidation(
