@@ -25,14 +25,12 @@ class AddAccountRepository(
 ) {
 
     suspend fun addFromMnemonic(
-        accountName: String,
         mnemonic: String,
         encryptionType: CryptoType,
         derivationPath: String,
         addAccountType: AddAccountType
     ): Long = withContext(Dispatchers.Default) {
         addAccount(
-            accountName = accountName,
             derivationPath = derivationPath,
             addAccountType = addAccountType,
             accountSource = AccountSecretsFactory.AccountSource.Mnemonic(encryptionType, mnemonic)
@@ -40,7 +38,6 @@ class AddAccountRepository(
     }
 
     suspend fun addFromSeed(
-        accountName: String,
         seed: String,
         encryptionType: CryptoType,
         derivationPath: String,
@@ -48,7 +45,6 @@ class AddAccountRepository(
     ): Long = withContext(Dispatchers.Default) {
 
         addAccount(
-            accountName = accountName,
             derivationPath = derivationPath,
             addAccountType = addAccountType,
             accountSource = AccountSecretsFactory.AccountSource.Seed(encryptionType, seed)
@@ -56,7 +52,6 @@ class AddAccountRepository(
     }
 
     suspend fun addFromJson(
-        accountName: String,
         json: String,
         password: String,
         derivationPath: String,
@@ -64,7 +59,6 @@ class AddAccountRepository(
     ): Long = withContext(Dispatchers.Default) {
 
         addAccount(
-            accountName = accountName,
             derivationPath = derivationPath,
             addAccountType = addAccountType,
             accountSource = AccountSecretsFactory.AccountSource.Json(json, password)
@@ -75,7 +69,6 @@ class AddAccountRepository(
      * @return id of inserted/modified metaAccount
      */
     private suspend fun addAccount(
-        accountName: String,
         derivationPath: String,
         addAccountType: AddAccountType,
         accountSource: AccountSecretsFactory.AccountSource
@@ -89,7 +82,7 @@ class AddAccountRepository(
 
                 transformingInsertionErrors {
                     accountDataSource.insertMetaAccount(
-                        name = accountName,
+                        name = addAccountType.name,
                         substrateCryptoType = substrateCryptoType,
                         secrets = secrets
                     )

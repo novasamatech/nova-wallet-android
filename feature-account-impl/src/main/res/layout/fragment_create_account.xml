@@ -28,7 +28,7 @@
         tools:textIcon="@drawable/ic_ksm_24" />
 
     <io.novafoundation.nova.common.view.InputField
-        android:id="@+id/accountNameInput"
+        android:id="@+id/createAccountNameField"
         style="@style/Widget.Nova.Input.Primary.External"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -41,12 +41,17 @@
     <TextView
         style="@style/TextAppearance.NovaFoundation.Body2"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/createAccountNameDescription"
         android:layout_marginStart="@dimen/x2"
         android:layout_marginEnd="@dimen/x2"
-        android:layout_weight="1"
         android:text="@string/username_setup_hint"
         android:textColor="@color/white" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 
     <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/nextBtn"

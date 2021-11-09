@@ -115,7 +115,7 @@ class Navigator :
         navController?.navigate(R.id.action_splash_to_pin, bundle)
     }
 
-    override fun openCreateAccount(addAccountPayload: AddAccountPayload) {
+    override fun openCreateAccount(addAccountPayload: AddAccountPayload.MetaAccount) {
         navController?.navigate(R.id.action_welcomeFragment_to_createAccountFragment, CreateAccountFragment.getBundle(addAccountPayload))
     }
 
@@ -164,9 +164,13 @@ class Navigator :
         navController?.navigate(R.id.importAction, ImportAccountFragment.getBundle(addAccountPayload))
     }
 
-    override fun openMnemonicScreen(accountName: String, payload: AddAccountPayload) {
+    override fun openMnemonicScreen(accountName: String?, payload: AddAccountPayload) {
         val bundle = BackupMnemonicFragment.getBundle(accountName, payload)
-        navController?.navigate(R.id.action_createAccountFragment_to_backupMnemonicFragment, bundle)
+
+        when (navController?.currentDestination?.id) {
+            R.id.welcomeFragment -> navController?.navigate(R.id.action_welcomeFragment_to_backupMnemonicFragment, bundle)
+            R.id.createAccountFragment -> navController?.navigate(R.id.action_createAccountFragment_to_backupMnemonicFragment, bundle)
+        }
     }
 
     override fun openSetupStaking() {

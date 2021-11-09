@@ -8,7 +8,6 @@ import io.novafoundation.nova.common.utils.EventObserver
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.nameInputFilters
 import io.novafoundation.nova.common.utils.setVisible
-import io.novafoundation.nova.common.view.InputField
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.importing.source.model.ImportSource
 import io.novafoundation.nova.feature_account_impl.presentation.importing.source.model.JsonImportSource
@@ -23,8 +22,11 @@ class JsonImportView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : ImportSourceView(R.layout.import_source_json, context, attrs, defStyleAttr) {
 
-    override val nameInputView: InputField
-        get() = importJsonUsernameInput
+    override val nameInputViews: ImportAccountNameViews
+        get() = ImportAccountNameViews(
+            nameInput = importJsonUsernameInput,
+            visibilityDependent = emptyList()
+        )
 
     init {
         importJsonUsernameInput.editText!!.filters = nameInputFilters()

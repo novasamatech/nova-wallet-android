@@ -12,9 +12,9 @@ class ConfirmMnemonicPayload(
 ) : Parcelable {
     @Parcelize
     class CreateExtras(
-        val accountName: String,
+        val accountName: String?,
         val cryptoType: CryptoType,
         val addAccountPayload: AddAccountPayload,
-        val derivationPath: String
+        val derivationPath: String,
     ) : Parcelable
 }

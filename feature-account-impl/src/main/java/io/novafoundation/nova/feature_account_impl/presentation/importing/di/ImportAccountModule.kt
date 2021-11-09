@@ -17,8 +17,10 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInter
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_impl.domain.account.add.AddAccountInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.AccountNameChooserMixin
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.CryptoTypeChooserMixin
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.ForcedChainMixin
+import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.impl.AccountNameChooserFactory
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.impl.CryptoTypeChooserFactory
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.impl.ForcedChainMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.importing.FileReader
@@ -46,9 +48,16 @@ class ImportAccountModule {
     @ScreenScope
     fun provideForcedChainMixinFactory(
         chainRegistry: ChainRegistry,
-        payload: AddAccountPayload
+        payload: AddAccountPayload,
     ): MixinFactory<ForcedChainMixin> {
         return ForcedChainMixinFactory(chainRegistry, payload)
+    }
+
+    @Provides
+    fun provideNameChooserMixinFactory(
+        payload: AddAccountPayload,
+    ): MixinFactory<AccountNameChooserMixin.Presentation> {
+        return AccountNameChooserFactory(payload)
     }
 
     @Provides
@@ -65,9 +74,10 @@ class ImportAccountModule {
         resourceManager: ResourceManager,
         forcedChainMixinFactory: MixinFactory<ForcedChainMixin>,
         cryptoChooserMixinFactory: MixinFactory<CryptoTypeChooserMixin>,
+        accountNameChooserFactory: MixinFactory<AccountNameChooserMixin.Presentation>,
         clipboardManager: ClipboardManager,
         fileReader: FileReader,
-        payload: AddAccountPayload
+        payload: AddAccountPayload,
     ): ViewModel {
         return ImportAccountViewModel(
             addAccountInteractor,
@@ -76,6 +86,7 @@ class ImportAccountModule {
             resourceManager,
             forcedChainMixinFactory,
             cryptoChooserMixinFactory,
+            accountNameChooserFactory,
             clipboardManager,
             fileReader,
             payload

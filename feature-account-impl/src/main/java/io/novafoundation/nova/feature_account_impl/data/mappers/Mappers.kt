@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_impl.R
+import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.AccountNameChooserMixin
 import io.novafoundation.nova.feature_account_impl.presentation.node.model.NodeModel
 import io.novafoundation.nova.feature_account_impl.presentation.view.advanced.encryption.model.CryptoTypeModel
 import io.novafoundation.nova.feature_account_impl.presentation.view.advanced.network.model.NetworkModel
@@ -163,9 +164,23 @@ fun mapChainAccountToAccount(
     )
 }
 
-fun mapAddAccountPayloadToAddAccountType(payload: AddAccountPayload): AddAccountType {
+fun mapAddAccountPayloadToAddAccountType(
+    payload: AddAccountPayload,
+    accountNameState: AccountNameChooserMixin.State,
+): AddAccountType {
     return when (payload) {
-        AddAccountPayload.MetaAccount -> AddAccountType.MetaAccount
+        AddAccountPayload.MetaAccount -> {
+            require(accountNameState is AccountNameChooserMixin.State.Input) { "Name input should be present for meta account" }
+
+            AddAccountType.MetaAccount(accountNameState.value)
+        }
         is AddAccountPayload.ChainAccount -> AddAccountType.ChainAccount(payload.chainId, payload.metaId)
     }
+}
+
+fun mapNameChooserStateToOptionalName(state: AccountNameChooserMixin.State) = (state as? AccountNameChooserMixin.State.Input)?.value
+
+fun mapOptionalNameToNameChooserState(name: String?) = when (name) {
+    null -> AccountNameChooserMixin.State.NoInput
+    else -> AccountNameChooserMixin.State.Input(name)
 }

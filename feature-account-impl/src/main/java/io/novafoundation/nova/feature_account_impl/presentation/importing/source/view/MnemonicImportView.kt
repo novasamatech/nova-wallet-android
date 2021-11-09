@@ -5,11 +5,11 @@ import android.util.AttributeSet
 import androidx.lifecycle.LifecycleOwner
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.nameInputFilters
-import io.novafoundation.nova.common.view.InputField
 import io.novafoundation.nova.common.view.shape.getIdleDrawable
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.importing.source.model.ImportSource
 import io.novafoundation.nova.feature_account_impl.presentation.importing.source.model.MnemonicImportSource
+import kotlinx.android.synthetic.main.import_source_mnemonic.view.importMnemnonicUsernameHint
 import kotlinx.android.synthetic.main.import_source_mnemonic.view.importMnemonicContent
 import kotlinx.android.synthetic.main.import_source_mnemonic.view.importMnemonicContentContainer
 import kotlinx.android.synthetic.main.import_source_mnemonic.view.importMnemonicUsernameInput
@@ -20,8 +20,11 @@ class MnemonicImportView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : ImportSourceView(R.layout.import_source_mnemonic, context, attrs, defStyleAttr) {
 
-    override val nameInputView: InputField
-        get() = importMnemonicUsernameInput
+    override val nameInputViews: ImportAccountNameViews
+        get() = ImportAccountNameViews(
+            nameInput = importMnemonicUsernameInput,
+            visibilityDependent = listOf(importMnemnonicUsernameHint)
+        )
 
     init {
         importMnemonicContentContainer.background = context.getIdleDrawable()
