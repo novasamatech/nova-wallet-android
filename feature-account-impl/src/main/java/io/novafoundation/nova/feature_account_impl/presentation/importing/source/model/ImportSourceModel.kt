@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_account_impl.data.mappers.mapCryptoTypeToC
 import io.novafoundation.nova.feature_account_impl.data.secrets.AccountSecretsFactory
 import io.novafoundation.nova.feature_account_impl.domain.account.add.AddAccountInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.common.accountSource.AccountSource
+import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.AccountNameChooserMixin
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.CryptoTypeChooserMixin
 import io.novafoundation.nova.feature_account_impl.presentation.importing.FileReader
 import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedDecodingException.IncorrectPasswordException
@@ -54,7 +55,7 @@ sealed class ImportSource(@StringRes nameRes: Int) : AccountSource(nameRes) {
 private const val PICK_FILE_RESULT_CODE = 101
 
 class JsonImportSource(
-    private val nameLiveData: MutableLiveData<String>,
+    private val accountNameChooserMixin: AccountNameChooserMixin,
     private val cryptoTypeChooserMixin: CryptoTypeChooserMixin,
     private val addAccountInteractor: AddAccountInteractor,
     private val resourceManager: ResourceManager,
@@ -145,7 +146,7 @@ class JsonImportSource(
         val cryptoModel = mapCryptoTypeToCryptoTypeModel(resourceManager, importJsonMetaData.encryptionType)
         cryptoTypeChooserMixin.selectedEncryptionChanged(cryptoModel)
 
-        nameLiveData.value = importJsonMetaData.name
+        importJsonMetaData.name?.let(accountNameChooserMixin::nameChanged)
     }
 
     private fun showShowNetworkWarning(jsonChainId: String?): Boolean {

@@ -12,7 +12,6 @@ class AddAccountInteractor(
 ) {
 
     suspend fun createAccount(
-        accountName: String,
         mnemonic: String,
         encryptionType: CryptoType,
         derivationPath: String,
@@ -20,7 +19,6 @@ class AddAccountInteractor(
     ): Result<Unit> {
         return addAccount(addAccountType) {
             addAccountRepository.addFromMnemonic(
-                accountName,
                 mnemonic,
                 encryptionType,
                 derivationPath,
@@ -30,7 +28,6 @@ class AddAccountInteractor(
     }
 
     suspend fun importFromMnemonic(
-        accountName: String,
         mnemonic: String,
         encryptionType: CryptoType,
         derivationPath: String,
@@ -38,7 +35,6 @@ class AddAccountInteractor(
     ): Result<Unit> {
         return addAccount(addAccountType) {
             addAccountRepository.addFromMnemonic(
-                accountName,
                 mnemonic,
                 encryptionType,
                 derivationPath,
@@ -48,7 +44,6 @@ class AddAccountInteractor(
     }
 
     suspend fun importFromSeed(
-        accountName: String,
         seed: String,
         encryptionType: CryptoType,
         derivationPath: String,
@@ -56,7 +51,6 @@ class AddAccountInteractor(
     ): Result<Unit> {
         return addAccount(addAccountType) {
             addAccountRepository.addFromSeed(
-                accountName,
                 seed,
                 encryptionType,
                 derivationPath,
@@ -68,12 +62,10 @@ class AddAccountInteractor(
     suspend fun importFromJson(
         json: String,
         password: String,
-        name: String,
         addAccountType: AddAccountType
     ): Result<Unit> {
         return addAccount(addAccountType) {
             addAccountRepository.addFromJson(
-                accountName = name,
                 json = json,
                 password = password,
                 derivationPath = "", // TODO consider allowing derivation path for json importing,

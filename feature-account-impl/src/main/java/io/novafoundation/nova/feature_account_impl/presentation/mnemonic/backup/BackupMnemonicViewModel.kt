@@ -23,9 +23,9 @@ import kotlinx.coroutines.withContext
 class BackupMnemonicViewModel(
     private val interactor: AccountInteractor,
     private val router: AccountRouter,
-    private val accountName: String,
+    private val accountName: String?,
     private val addAccountPayload: AddAccountPayload,
-    cryptoTypeChooserMixinFactory: MixinFactory<CryptoTypeChooserMixin>
+    cryptoTypeChooserMixinFactory: MixinFactory<CryptoTypeChooserMixin>,
 ) : BaseViewModel(),
     WithCryptoTypeChooserMixin {
 

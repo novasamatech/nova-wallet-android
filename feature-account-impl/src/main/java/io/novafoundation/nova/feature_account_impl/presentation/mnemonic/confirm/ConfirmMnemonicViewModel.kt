@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.vibration.DeviceVibrator
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapAddAccountPayloadToAddAccountType
+import io.novafoundation.nova.feature_account_impl.data.mappers.mapOptionalNameToNameChooserState
 import io.novafoundation.nova.feature_account_impl.domain.account.add.AddAccountInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import jp.co.soramitsu.fearless_utils.encrypt.junction.BIP32JunctionDecoder
@@ -115,9 +116,10 @@ class ConfirmMnemonicViewModel(
             val mnemonicString = originMnemonic.joinToString(" ")
 
             with(extras) {
-                val addAccountType = mapAddAccountPayloadToAddAccountType(addAccountPayload)
+                val accountNameState = mapOptionalNameToNameChooserState(accountName)
+                val addAccountType = mapAddAccountPayloadToAddAccountType(addAccountPayload, accountNameState)
 
-                addAccountInteractor.createAccount(accountName, mnemonicString, cryptoType, derivationPath, addAccountType)
+                addAccountInteractor.createAccount(mnemonicString, cryptoType, derivationPath, addAccountType)
                     .onSuccess { continueBasedOnCodeStatus() }
                     .onFailure(::showAccountCreationError)
             }

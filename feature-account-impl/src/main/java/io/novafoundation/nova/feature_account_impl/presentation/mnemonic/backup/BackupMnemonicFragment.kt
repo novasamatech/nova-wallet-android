@@ -24,7 +24,7 @@ class BackupMnemonicFragment : BaseFragment<BackupMnemonicViewModel>() {
         private const val KEY_ACCOUNT_NAME = "account_name"
         private const val KEY_ADD_ACCOUNT_PAYLOAD = "BackupMnemonicFragment.addAccountPayload"
 
-        fun getBundle(accountName: String, addAccountPayload: AddAccountPayload): Bundle {
+        fun getBundle(accountName: String?, addAccountPayload: AddAccountPayload): Bundle {
             return Bundle().apply {
                 putString(KEY_ACCOUNT_NAME, accountName)
                 putParcelable(KEY_ADD_ACCOUNT_PAYLOAD, addAccountPayload)

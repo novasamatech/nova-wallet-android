@@ -22,8 +22,10 @@ import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapAddAccountPayloadToAddAccountType
 import io.novafoundation.nova.feature_account_impl.domain.account.add.AddAccountInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.AccountNameChooserMixin
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.CryptoTypeChooserMixin
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.ForcedChainMixin
+import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.WithAccountNameChooserMixin
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.WithCryptoTypeChooserMixin
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.WithForcedChainMixin
 import io.novafoundation.nova.feature_account_impl.presentation.importing.source.model.FileRequester
@@ -44,25 +46,26 @@ class ImportAccountViewModel(
     private val resourceManager: ResourceManager,
     forcedChainMixinFactory: MixinFactory<ForcedChainMixin>,
     cryptoTypeChooserFactory: MixinFactory<CryptoTypeChooserMixin>,
+    accountNameChooserFactory: MixinFactory<AccountNameChooserMixin.Presentation>,
     private val clipboardManager: ClipboardManager,
     private val fileReader: FileReader,
     private val payload: AddAccountPayload,
 ) : BaseViewModel(),
     WithCryptoTypeChooserMixin,
-    WithForcedChainMixin {
+    WithForcedChainMixin,
+    WithAccountNameChooserMixin {
 
     override val forcedChainMixin: ForcedChainMixin = forcedChainMixinFactory.create(scope = this)
     override val cryptoTypeChooserMixin: CryptoTypeChooserMixin = cryptoTypeChooserFactory.create(scope = this)
-
-    val nameLiveData = MutableLiveData<String>()
+    override val accountNameChooser: AccountNameChooserMixin.Presentation = accountNameChooserFactory.create(scope = this)
 
     val sourceTypes = provideSourceType()
 
     private val _selectedSourceTypeLiveData = MutableLiveData<ImportSource>()
 
     val selectedSourceTypeLiveData: LiveData<ImportSource> = _selectedSourceTypeLiveData
-
     private val _showSourceChooserLiveData = MutableLiveData<Event<Payload<ImportSource>>>()
+
     val showSourceSelectorChooserLiveData: LiveData<Event<Payload<ImportSource>>> = _showSourceChooserLiveData
 
     val derivationPathLiveData = MutableLiveData<String>()
@@ -71,8 +74,8 @@ class ImportAccountViewModel(
 
     private val importInProgressLiveData = MutableLiveData(false)
 
-    private val nextButtonEnabledLiveData = sourceTypeValid.combine(nameLiveData) { sourceTypeValid, name ->
-        sourceTypeValid && name.isNotEmpty()
+    private val nextButtonEnabledLiveData = sourceTypeValid.combine(accountNameChooser.nameValid) { sourceTypeValid, nameValid ->
+        sourceTypeValid && nameValid
     }
 
     val nextButtonState = nextButtonEnabledLiveData.combine(importInProgressLiveData) { enabled, inProgress ->
@@ -82,8 +85,8 @@ class ImportAccountViewModel(
             else -> ButtonState.DISABLED
         }
     }
-
     val changeableAdvancedFields = _selectedSourceTypeLiveData.map { it !is JsonImportSource }
+
     val cryptoTypeChooserEnabled = changeableAdvancedFields.combine(cryptoTypeChooserMixin.selectionFrozen.asLiveData()) { changeable, selectionFrozen ->
         changeable && !selectionFrozen
     }
@@ -113,7 +116,7 @@ class ImportAccountViewModel(
 
         val cryptoType = cryptoTypeChooserMixin.selectedEncryptionTypeFlow.first().cryptoType
         val derivationPath = derivationPathLiveData.value.orEmpty()
-        val name = nameLiveData.value!!
+        val name = accountNameChooser.nameState.value!!
 
         viewModelScope.launch {
             import(sourceType, name, derivationPath, cryptoType)
@@ -171,7 +174,7 @@ class ImportAccountViewModel(
         return listOf(
             MnemonicImportSource(),
             JsonImportSource(
-                nameLiveData,
+                accountNameChooser,
                 cryptoTypeChooserMixin,
                 addAccountInteractor,
                 resourceManager,
@@ -186,22 +189,20 @@ class ImportAccountViewModel(
 
     private suspend fun import(
         sourceType: ImportSource,
-        name: String,
+        nameState: AccountNameChooserMixin.State,
         derivationPath: String,
-        cryptoType: CryptoType
+        cryptoType: CryptoType,
     ): Result<Unit> {
-        val addAccountType = mapAddAccountPayloadToAddAccountType(payload)
+        val addAccountType = mapAddAccountPayloadToAddAccountType(payload, nameState)
 
         return when (sourceType) {
             is MnemonicImportSource -> addAccountInteractor.importFromMnemonic(
-                accountName = name,
                 mnemonic = sourceType.mnemonicContentLiveData.value!!,
                 encryptionType = cryptoType,
                 derivationPath = derivationPath,
                 addAccountType = addAccountType
             )
             is RawSeedImportSource -> addAccountInteractor.importFromSeed(
-                accountName = name,
                 seed = sourceType.rawSeedLiveData.value!!,
                 encryptionType = cryptoType,
                 derivationPath = derivationPath,
@@ -210,7 +211,6 @@ class ImportAccountViewModel(
             is JsonImportSource -> addAccountInteractor.importFromJson(
                 json = sourceType.jsonContentLiveData.value!!,
                 password = sourceType.passwordLiveData.value!!,
-                name = name,
                 addAccountType = addAccountType
             )
         }

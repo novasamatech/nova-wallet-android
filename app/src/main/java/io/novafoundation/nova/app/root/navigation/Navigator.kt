@@ -164,7 +164,7 @@ class Navigator :
         navController?.navigate(R.id.importAction, ImportAccountFragment.getBundle(addAccountPayload))
     }
 
-    override fun openMnemonicScreen(accountName: String, payload: AddAccountPayload) {
+    override fun openMnemonicScreen(accountName: String?, payload: AddAccountPayload) {
         val bundle = BackupMnemonicFragment.getBundle(accountName, payload)
         navController?.navigate(R.id.action_createAccountFragment_to_backupMnemonicFragment, bundle)
     }
