@@ -29,7 +29,7 @@ class CreateAccountFragment : BaseFragment<CreateAccountViewModel>() {
 
         private const val PAYLOAD = "CreateAccountFragment.payload"
 
-        fun getBundle(payload: AddAccountPayload): Bundle {
+        fun getBundle(payload: AddAccountPayload.MetaAccount): Bundle {
 
             return Bundle().apply {
                 putParcelable(PAYLOAD, payload)

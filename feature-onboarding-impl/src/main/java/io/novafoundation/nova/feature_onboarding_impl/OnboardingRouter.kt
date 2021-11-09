@@ -4,7 +4,9 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddA
 
 interface OnboardingRouter {
 
-    fun openCreateAccount(addAccountPayload: AddAccountPayload)
+    fun openCreateAccount(addAccountPayload: AddAccountPayload.MetaAccount)
+
+    fun openMnemonicScreen(accountName: String?, payload: AddAccountPayload)
 
     fun openImportAccountScreen(addAccountPayload: AddAccountPayload)
 

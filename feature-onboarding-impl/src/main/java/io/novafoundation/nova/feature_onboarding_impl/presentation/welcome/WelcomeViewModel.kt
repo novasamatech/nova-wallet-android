@@ -21,7 +21,11 @@ class WelcomeViewModel(
     override val openBrowserEvent = MutableLiveData<Event<String>>()
 
     fun createAccountClicked() {
-        router.openCreateAccount(addAccountPayload)
+        when (addAccountPayload) {
+            is AddAccountPayload.MetaAccount -> router.openCreateAccount(addAccountPayload)
+            is AddAccountPayload.ChainAccount -> router.openMnemonicScreen(accountName = null, addAccountPayload)
+        }
+
     }
 
     fun importAccountClicked() {
