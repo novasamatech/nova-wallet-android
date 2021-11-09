@@ -25,7 +25,6 @@ class WelcomeViewModel(
             is AddAccountPayload.MetaAccount -> router.openCreateAccount(addAccountPayload)
             is AddAccountPayload.ChainAccount -> router.openMnemonicScreen(accountName = null, addAccountPayload)
         }
-
     }
 
     fun importAccountClicked() {
