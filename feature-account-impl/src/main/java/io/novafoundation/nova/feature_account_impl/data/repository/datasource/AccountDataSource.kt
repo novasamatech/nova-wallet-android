@@ -48,8 +48,6 @@ interface AccountDataSource : SecretStoreV1 {
     suspend fun selectMetaAccount(metaId: Long)
     suspend fun updateAccountPositions(accountOrdering: List<MetaAccountOrdering>)
 
-    suspend fun getPreferredCryptoType(): CryptoType
-
     fun selectedNodeFlow(): Flow<Node>
 
     suspend fun getSelectedLanguage(): Language

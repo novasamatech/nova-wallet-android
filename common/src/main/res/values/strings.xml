@@ -20,7 +20,7 @@
     <string name="crowdloan_about">About crowdloans</string>
 
     <string name="crowdloan_moonbeam_encryption_not_supported_title">Cannot contribute with this account</string>
-    <string name="crowdloan_moonbeam_encryption_not_supported_message">Moonbeam crowdloan supports only SR25519 crypto type accounts. Please consider using another account for contribution</string>
+    <string name="crowdloan_moonbeam_encryption_not_supported_message">Moonbeam crowdloan supports only SR25519 or ED25519 crypto type accounts. Please consider using another account for contribution</string>
 
     <string name="crowdloan_moonbeam_reward_destination">%s reward destination</string>
 
