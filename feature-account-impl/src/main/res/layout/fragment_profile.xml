@@ -23,6 +23,7 @@
     <io.novafoundation.nova.common.view.AccountInfoView
         android:id="@+id/accountView"
         android:layout_marginStart="@dimen/x2"
+        app:textVisible="false"
         android:layout_marginEnd="@dimen/x2"
         app:accountActionIcon="@drawable/ic_info_white_24"
         android:layout_width="match_parent"

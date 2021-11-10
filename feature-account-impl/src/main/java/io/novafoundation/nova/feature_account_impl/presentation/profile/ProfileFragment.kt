@@ -52,8 +52,6 @@ class ProfileFragment : BaseFragment<ProfileViewModel>() {
     override fun subscribe(viewModel: ProfileViewModel) {
         viewModel.selectedAccountFlow.observe { account ->
             accountView.setTitle(account.name)
-
-            accountView.setText(account.defaultSubstrateAddress)
         }
 
         viewModel.accountIconFlow.observe(accountView::setAccountIcon)
