@@ -30,7 +30,8 @@ class ChainSyncServiceTest {
                 symbol = "TEST",
                 precision = 10,
                 name = "Test",
-                priceId = "test"
+                priceId = "test",
+                staking = "test"
             )
         ),
         nodes = listOf(
@@ -44,7 +45,8 @@ class ChainSyncServiceTest {
         types = null,
         options = emptyList(),
         parentId = null,
-        externalApi = null
+        externalApi = null,
+        explorers = emptyList()
     )
 
     private val LOCAL_CHAIN = mapChainToChainLocal(mapChainRemoteToChain(REMOTE_CHAIN))
