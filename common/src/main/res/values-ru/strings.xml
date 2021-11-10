@@ -21,7 +21,7 @@
 
     <string name="crowdloan_moonbeam_encryption_not_supported_title">Используемый аккаунт не поддерживается для взноса</string>
     <string name="crowdloan_moonbeam_encryption_not_supported_message">
-        Краудлоан Moonbeam поддерживает только аккаунты с крипографией SR25519. Пожалуйста, используйте другой аккаунт для взноса
+        Краудлоан Moonbeam поддерживает только аккаунты с крипографией SR25519 или ED25519. Пожалуйста, используйте другой аккаунт для взноса
     </string>
 
     <string name="crowdloan_moonbeam_reward_destination">Назначение вознаграждения для %s</string>

@@ -40,6 +40,8 @@ import java.math.BigInteger
 
 class VerificationError : Exception()
 
+private val SUPPORTED_CRYPTO_TYPES = setOf(CryptoType.SR25519, CryptoType.ED25519)
+
 class MoonbeamCrowdloanInteractor(
     private val accountRepository: AccountRepository,
     private val extrinsicService: ExtrinsicService,
@@ -90,7 +92,7 @@ class MoonbeamCrowdloanInteractor(
                     metaId = metaAccount.id
                 )
 
-                metaAccount.cryptoTypeIn(currentChain) != CryptoType.SR25519 -> MoonbeamFlowStatus.UnsupportedAccountEncryption
+                metaAccount.cryptoTypeIn(currentChain) !in SUPPORTED_CRYPTO_TYPES -> MoonbeamFlowStatus.UnsupportedAccountEncryption
 
                 else -> when (checkRemark(parachainMetadata, currentAddress)) {
                     null -> MoonbeamFlowStatus.RegionNotSupported
