@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
-import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import kotlinx.android.synthetic.main.fragment_profile.aboutTv
@@ -52,8 +51,6 @@ class ProfileFragment : BaseFragment<ProfileViewModel>() {
     override fun subscribe(viewModel: ProfileViewModel) {
         viewModel.selectedAccountFlow.observe { account ->
             accountView.setTitle(account.name)
-
-            accountView.setText(account.defaultSubstrateAddress)
         }
 
         viewModel.accountIconFlow.observe(accountView::setAccountIcon)
