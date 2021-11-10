@@ -35,7 +35,7 @@ class AccountInteractorImpl(
         if (chainId != null && chainRegistry.getChain(chainId).isEthereumBased) {
             PreferredCryptoType(CryptoType.ECDSA, frozen = true)
         } else {
-            PreferredCryptoType(accountRepository.getPreferredCryptoType(), frozen = false)
+            PreferredCryptoType(CryptoType.SR25519, frozen = false)
         }
     }
 
