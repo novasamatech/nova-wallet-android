@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+    <string name="crowdloan_contribution">Тип вклада</string>
+    <string name="crowdloan_acala_learn_types">Узнать больше о способах произвести вклад в Acala краудлоун</string>
+    <string name="crowdloan_acala_direct">Напрямую</string>
+    <string name="crowdloan_acala_liquid">Liquid вклад</string>
+
     <string name="crowdloan_contributions_placeholder">Ваши взносы\n появятся здесь</string>
 
     <string name="crowdloan_active_section_format_v2_0">Активные</string>

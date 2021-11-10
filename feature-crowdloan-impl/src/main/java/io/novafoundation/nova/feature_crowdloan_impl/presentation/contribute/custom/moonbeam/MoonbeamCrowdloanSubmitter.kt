@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam
 
+import android.os.Parcelable
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.moonbeam.MoonbeamCrowdloanInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.domain.main.Crowdloan
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.BonusPayload
@@ -11,12 +12,21 @@ class MoonbeamCrowdloanSubmitter(
     private val interactor: MoonbeamCrowdloanInteractor,
 ) : CustomContributeSubmitter {
 
-    override suspend fun submitOnChain(
+    override suspend fun injectOnChainSubmission(
         crowdloan: Crowdloan,
-        payload: BonusPayload?,
+        customizationPayload: Parcelable?,
+        bonusPayload: BonusPayload?,
         amount: BigDecimal,
         extrinsicBuilder: ExtrinsicBuilder,
     ) {
         interactor.additionalSubmission(crowdloan, extrinsicBuilder)
+    }
+
+    override suspend fun submitOffChain(
+        customizationPayload: Parcelable?,
+        bonusPayload: BonusPayload?,
+        amount: BigDecimal,
+    ) {
+        // Do nothing
     }
 }

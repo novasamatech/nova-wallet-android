@@ -12,7 +12,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomContributeManager
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.CrowdloanContributeInteractor
-import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.ContributeValidationSystem
+import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.ContributeValidation
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.CrowdloanContributeViewModel
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.parcel.ContributePayload
@@ -33,7 +33,7 @@ class CrowdloanContributeModule {
         validationExecutor: ValidationExecutor,
         feeLoaderMixin: FeeLoaderMixin.Presentation,
         payload: ContributePayload,
-        validationSystem: ContributeValidationSystem,
+        contributeValidations: @JvmSuppressWildcards Set<ContributeValidation>,
         customContributeManager: CustomContributeManager,
     ): ViewModel {
         return CrowdloanContributeViewModel(
@@ -44,7 +44,7 @@ class CrowdloanContributeModule {
             validationExecutor,
             feeLoaderMixin,
             payload,
-            validationSystem,
+            contributeValidations,
             customContributeManager
         )
     }

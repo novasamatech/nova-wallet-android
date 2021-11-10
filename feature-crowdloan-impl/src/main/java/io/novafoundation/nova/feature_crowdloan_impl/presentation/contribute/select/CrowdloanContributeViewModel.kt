@@ -1,11 +1,13 @@
 package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select
 
+import android.os.Parcelable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.mixin.api.Validatable
+import io.novafoundation.nova.common.mixin.api.of
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.flowOf
@@ -14,21 +16,23 @@ import io.novafoundation.nova.common.utils.formatAsCurrency
 import io.novafoundation.nova.common.utils.formatAsPercentage
 import io.novafoundation.nova.common.utils.fractionToPercentage
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.common.validation.CompositeValidation
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomContributeManager
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.hasExtraBonusFlow
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.CrowdloanContributeInteractor
+import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.ContributeValidation
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.ContributeValidationPayload
-import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.ContributeValidationSystem
 import io.novafoundation.nova.feature_crowdloan_impl.domain.main.Crowdloan
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
-import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.additionalOnChainSubmission
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.confirm.parcel.ConfirmContributePayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.contributeValidationFailure
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.BonusPayload
-import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.MainFlowCustomization
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.CrowdloanMainFlowFeatures
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.SelectContributeCustomization
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.model.CustomContributePayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.model.CrowdloanDetailsModel
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.model.LearnMoreModel
@@ -46,11 +50,12 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import kotlin.time.ExperimentalTime
@@ -75,8 +80,8 @@ class CrowdloanContributeViewModel(
     private val validationExecutor: ValidationExecutor,
     private val feeLoaderMixin: FeeLoaderMixin.Presentation,
     private val payload: ContributePayload,
-    private val validationSystem: ContributeValidationSystem,
-    private val customContributeManager: CustomContributeManager
+    private val validations: Set<ContributeValidation>,
+    private val customContributeManager: CustomContributeManager,
 ) : BaseViewModel(),
     Validatable by validationExecutor,
     Browserable,
@@ -102,13 +107,33 @@ class CrowdloanContributeViewModel(
         customContributeManager.getFactoryOrNull(it)
     }
 
-    val customizationConfiguration: Flow<Pair<MainFlowCustomization, MainFlowCustomization.ViewState>?> = flowOf {
+    val customizationConfiguration: Flow<Pair<SelectContributeCustomization, SelectContributeCustomization.ViewState>?> = flowOf {
         relevantCustomFlowFactory?.selectContributeCustomization?.let {
-            it to it.createViewState(coroutineScope = this, parachainMetadata)
+            it to it.createViewState(
+                features = CrowdloanMainFlowFeatures(
+                    coroutineScope = this,
+                    browserable = Browserable.Presentation.of(openBrowserEvent)
+                ),
+                parachainMetadata = parachainMetadata!!
+            )
         }
     }
         .inBackground()
         .share()
+
+    private val customizedValidationSystem = flowOf {
+        val validations = relevantCustomFlowFactory?.selectContributeCustomization?.modifyValidations(validations)
+            ?: validations
+
+        ValidationSystem(CompositeValidation(validations))
+    }
+        .inBackground()
+        .share()
+
+    private val customizationPayloadFlow: Flow<Parcelable?> = customizationConfiguration.flatMapLatest {
+        it?.let { (_, viewState) -> viewState.customizationPayloadFlow }
+            ?: kotlinx.coroutines.flow.flowOf(null)
+    }
 
     val enteredAmountFlow = MutableStateFlow("")
 
@@ -244,30 +269,30 @@ class CrowdloanContributeViewModel(
         combine(
             parsedAmountFlow.debounce(DEBOUNCE_DURATION_MILLIS.milliseconds),
             extraBonusFlow,
-            ::Pair
-        )
-            .onEach { (amount, bonusState) ->
-                loadFee(amount, bonusState as? ExtraBonusState.Active)
-            }
+            customizationPayloadFlow,
+            ::Triple
+        ).mapLatest { (amount, bonusState, customization) ->
+            loadFee(amount, bonusState as? ExtraBonusState.Active, customization)
+        }
             .launchIn(viewModelScope)
     }
 
-    private fun loadFee(amount: BigDecimal, bonusActiveState: ExtraBonusState.Active?) {
-        feeLoaderMixin.loadFee(
+    private suspend fun loadFee(
+        amount: BigDecimal,
+        bonusActiveState: ExtraBonusState.Active?,
+        customizationPayload: Parcelable?,
+    ) {
+        feeLoaderMixin.loadFeeSuspending(
             coroutineScope = viewModelScope,
             feeConstructor = {
                 val crowdloan = crowdloanFlow.first()
 
-                val additionalSubmission = relevantCustomFlowFactory?.let {
-                    additionalOnChainSubmission(
-                        bonusPayload = bonusActiveState?.payload,
-                        crowdloan = crowdloan,
-                        amount = amount,
-                        factory = it
-                    )
-                }
-
-                contributionInteractor.estimateFee(crowdloan, amount, additionalSubmission)
+                contributionInteractor.estimateFee(
+                    crowdloan,
+                    amount,
+                    bonusActiveState?.payload,
+                    customizationPayload,
+                )
             },
             onRetryCancelled = ::backClicked
         )
@@ -282,35 +307,37 @@ class CrowdloanContributeViewModel(
         launch {
             val contributionAmount = parsedAmountFlow.firstOrNull() ?: return@launch
 
+            val customizationPayload = customizationConfiguration.first()?.let {
+                val (_, customViewState) = it
+
+                customViewState.customizationPayloadFlow.first()
+            }
+
             val validationPayload = ContributeValidationPayload(
                 crowdloan = crowdloanFlow.first(),
+                customizationPayload = customizationPayload,
                 fee = fee,
                 asset = assetFlow.first(),
                 contributionAmount = contributionAmount
             )
 
             validationExecutor.requireValid(
-                validationSystem = validationSystem,
+                validationSystem = customizedValidationSystem.first(),
                 payload = validationPayload,
                 validationFailureTransformer = { contributeValidationFailure(it, resourceManager) },
                 progressConsumer = _showNextProgress.progressConsumer()
             ) {
                 _showNextProgress.value = false
 
-                openConfirmScreen(it)
+                openConfirmScreen(it, customizationPayload)
             }
         }
     }
 
     private fun openConfirmScreen(
-        validationPayload: ContributeValidationPayload
+        validationPayload: ContributeValidationPayload,
+        customizationPayload: Parcelable?,
     ) = launch {
-        val customizationPayload = customizationConfiguration.first()?.let {
-            val (_, customViewState) = it
-
-            customViewState.buildCustomPayload()
-        }
-
         val confirmContributePayload = ConfirmContributePayload(
             paraId = payload.paraId,
             fee = validationPayload.fee,

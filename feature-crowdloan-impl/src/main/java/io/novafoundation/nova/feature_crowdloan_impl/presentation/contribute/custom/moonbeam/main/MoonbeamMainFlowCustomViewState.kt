@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.selectContribute
+package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.main
 
 import android.os.Parcelable
 import io.novafoundation.nova.common.address.AddressIconGenerator
@@ -13,8 +13,10 @@ import io.novafoundation.nova.feature_crowdloan_api.data.repository.ParachainMet
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.moonbeam.CrossChainRewardDestination
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.moonbeam.MoonbeamCrowdloanInteractor
-import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.MainFlowCustomization
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.ConfirmContributeCustomization
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.SelectContributeCustomization
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
@@ -43,17 +45,14 @@ class MoonbeamMainFlowCustomViewState(
     private val resourceManager: ResourceManager,
     private val iconGenerator: AddressIconGenerator,
 ) :
-    MainFlowCustomization.ViewState,
+    SelectContributeCustomization.ViewState,
+    ConfirmContributeCustomization.ViewState,
     CoroutineScope by coroutineScope {
 
     val moonbeamRewardDestination = flowOf { interactor.getMoonbeamRewardDestination(parachainMetadata) }
         .map(::mapMoonbeamChainDestinationToUi)
         .inBackground()
         .shareIn(this, started = SharingStarted.Eagerly, replay = 1)
-
-    override suspend fun buildCustomPayload(): Parcelable? {
-        return null
-    }
 
     private suspend fun mapMoonbeamChainDestinationToUi(crossChainRewardDestination: CrossChainRewardDestination): MoonbeamRewardDestinationUi {
         return MoonbeamRewardDestinationUi(
@@ -67,4 +66,6 @@ class MoonbeamMainFlowCustomViewState(
             title = resourceManager.getString(R.string.crowdloan_moonbeam_reward_destination, parachainMetadata.token)
         )
     }
+
+    override val customizationPayloadFlow: Flow<Parcelable?> = kotlinx.coroutines.flow.flowOf(null)
 }

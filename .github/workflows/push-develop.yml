@@ -1,17 +1,5 @@
 name: Develop with deploy debug app
 
-env:
-  ACALA_PROD_AUTH_TOKEN: ${{ secrets.ACALA_PROD_AUTH_TOKEN }}
-  ACALA_TEST_AUTH_TOKEN: ${{ secrets.ACALA_TEST_AUTH_TOKEN }}
-  MOONBEAM_PROD_AUTH_TOKEN: ${{ secrets.MOONBEAM_PROD_AUTH_TOKEN }}
-  MOONBEAM_TEST_AUTH_TOKEN: ${{ secrets.MOONBEAM_TEST_AUTH_TOKEN }}
-  MOONPAY_PRODUCTION_SECRET: ${{ secrets.MOONPAY_PRODUCTION_SECRET }}
-  MOONPAY_TEST_SECRET: ${{ secrets.MOONPAY_TEST_SECRET }}
-
-  CI_KEYSTORE_PASS: ${{ secrets.CI_KEYSTORE_PASS }}
-  CI_KEYSTORE_KEY_ALIAS: ${{ secrets.CI_KEYSTORE_KEY_ALIAS }}
-  CI_KEYSTORE_KEY_PASS: ${{ secrets.CI_KEYSTORE_KEY_PASS }}
-
 on:
   push:
     branches: [develop]
@@ -19,28 +7,25 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/nova-wallet/build_tools:pr-2
+      credentials:
+        username: stepanLav
+        password: ${{ secrets.GITHUB_TOKEN }}
+    env:
+      ACALA_PROD_AUTH_TOKEN: ${{ secrets.ACALA_PROD_AUTH_TOKEN }}
+      ACALA_TEST_AUTH_TOKEN: ${{ secrets.ACALA_TEST_AUTH_TOKEN }}
+      MOONBEAM_PROD_AUTH_TOKEN: ${{ secrets.MOONBEAM_PROD_AUTH_TOKEN }}
+      MOONBEAM_TEST_AUTH_TOKEN: ${{ secrets.MOONBEAM_TEST_AUTH_TOKEN }}
+      MOONPAY_PRODUCTION_SECRET: ${{ secrets.MOONPAY_PRODUCTION_SECRET }}
+      MOONPAY_TEST_SECRET: ${{ secrets.MOONPAY_TEST_SECRET }}
+
+      CI_KEYSTORE_PASS: ${{ secrets.CI_KEYSTORE_PASS }}
+      CI_KEYSTORE_KEY_ALIAS: ${{ secrets.CI_KEYSTORE_KEY_ALIAS }}
+      CI_KEYSTORE_KEY_PASS: ${{ secrets.CI_KEYSTORE_KEY_PASS }}
 
     steps:
       - uses: actions/checkout@v2
-      - name: set up JDK 8
-        uses: actions/setup-java@v2
-        with:
-          java-version: "8"
-          distribution: "adopt"
-          cache: gradle
-
-      - name: Setup Android NDK
-        uses: nttld/setup-ndk@v1
-        with:
-          ndk-version: r21d
-
-      - name: Rename NDK 21 folder to NDK 23
-        run: |
-          rm -rf /usr/local/lib/android/sdk/ndk/23.0.7599858
-          mv /usr/local/lib/android/sdk/ndk/21.4.7075529 /usr/local/lib/android/sdk/ndk/23.0.7599858
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
 
       - name: Run tests
         run: ./gradlew runTest

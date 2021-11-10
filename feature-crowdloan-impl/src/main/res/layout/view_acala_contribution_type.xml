@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_marginTop="12dp"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <RadioButton
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_weight="1"
+        android:id="@+id/acalaContributionTypeDirect"
+        android:background="@drawable/bg_acala_contribution_option"
+        android:button="@drawable/toggle_acala_contribution"
+        android:checked="true"
+        android:includeFontPadding="false"
+        android:text="@string/crowdloan_acala_direct" />
+
+    <RadioButton
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:id="@+id/acalaContributionTypeLiquid"
+        android:background="@drawable/bg_acala_contribution_option"
+        android:button="@drawable/toggle_acala_contribution"
+        android:includeFontPadding="false"
+        android:text="@string/crowdloan_acala_liquid" />
+
+</RadioGroup>

@@ -7,8 +7,10 @@ import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomCo
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.ExtraBonusFlow
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.acala.AcalaContributeInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.CustomContributeViewState
-import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.karura.AcalaContributeSubmitter
-import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.karura.AcalaContributeViewState
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.acala.bonus.AcalaContributeSubmitter
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.acala.bonus.AcalaContributeViewState
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.acala.main.confirm.AcalaConfirmContributeCustomization
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.acala.main.select.AcalaSelectContributeCustomization
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.model.CustomContributePayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.referral.ReferralContributeView
 import kotlinx.coroutines.CoroutineScope
@@ -37,6 +39,8 @@ abstract class AcalaBasedExtraBonusFlow(
 class AcalaContributeFactory(
     submitter: AcalaContributeSubmitter,
     extraBonusFlow: AcalaExtraBonusFlow,
+    override val selectContributeCustomization: AcalaSelectContributeCustomization,
+    override val confirmContributeCustomization: AcalaConfirmContributeCustomization,
 ) : AcalaBasedContributeFactory(
     submitter = submitter,
     extraBonusFlow = extraBonusFlow

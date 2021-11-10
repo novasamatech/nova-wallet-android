@@ -57,7 +57,7 @@ class ExtrinsicService(
 
         extrinsicBuilder.formExtrinsic()
 
-        return extrinsicBuilder.build()
+        return extrinsicBuilder.build(useBatchAll = true)
     }
 
     suspend fun estimateFee(

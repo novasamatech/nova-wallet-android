@@ -4,8 +4,8 @@ import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomCo
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.moonbeam.MoonbeamPrivateSignatureProvider
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.CustomContributeSubmitter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.MoonbeamStartFlowInterceptor
-import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.selectContribute.ConfirmContributeMoonbeamCustomization
-import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.selectContribute.SelectContributeMoonbeamCustomization
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.main.ConfirmContributeMoonbeamCustomization
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.main.SelectContributeMoonbeamCustomization
 
 class MoonbeamContributeFactory(
     override val submitter: CustomContributeSubmitter,

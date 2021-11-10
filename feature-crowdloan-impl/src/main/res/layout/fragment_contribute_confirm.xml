@@ -2,8 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
     android:id="@+id/confirmContributeContainer"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:background="@color/black">
@@ -16,34 +16,39 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_weight="1"
-        android:layout_height="0dp">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
         <LinearLayout
+            android:id="@+id/confirmContributeInjectionParent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/confirmContributeInjectionParent"
             android:orientation="vertical">
 
             <io.novafoundation.nova.common.view.LabeledTextView
-                android:layout_width="match_parent"
                 android:id="@+id/confirmContributeOriginAcount"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                app:label="@string/common_account"
-                app:actionIcon="@drawable/ic_more_vertical"
                 android:layout_marginTop="16dp"
-                android:layout_marginEnd="16dp" />
+                android:layout_marginEnd="16dp"
+                app:actionIcon="@drawable/ic_more_vertical"
+                app:label="@string/common_account" />
 
             <io.novafoundation.nova.common.view.AmountView
-                android:layout_width="match_parent"
                 android:id="@+id/confirmContributeAmount"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
-                android:layout_marginBottom="16dp"
                 android:layout_marginEnd="16dp"
                 android:enabled="false" />
+
+            <Space
+                android:id="@+id/confirmContributeAmountBottomMargin"
+                android:layout_width="match_parent"
+                android:layout_height="16dp" />
+
 
             <io.novafoundation.nova.common.view.TableCellView
                 android:id="@+id/confirmContributeReward"
