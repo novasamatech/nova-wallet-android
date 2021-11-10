@@ -33,5 +33,11 @@ fun setupAccountNameChooserUi(
 
         ui.setVisible(isVisible)
         additionalViewsToControlVisibility.forEach { it.setVisible(isVisible) }
+
+        if (state is AccountNameChooserMixin.State.Input) {
+            if (state.value != ui.content.text.toString()) {
+                ui.content.setText(state.value)
+            }
+        }
     }
 }
