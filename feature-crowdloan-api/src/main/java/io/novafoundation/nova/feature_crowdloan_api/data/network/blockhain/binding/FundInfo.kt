@@ -3,12 +3,12 @@ package io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.bind
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountId
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.cast
-import io.novafoundation.nova.common.data.network.runtime.binding.fromHexOrIncompatible
 import io.novafoundation.nova.common.data.network.runtime.binding.storageReturnType
 import io.novafoundation.nova.common.utils.Modules
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHexOrNull
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.primitives.u32
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.toByteArray
 import java.math.BigInteger
@@ -30,7 +30,7 @@ class FundInfo(
 fun bindFundInfo(scale: String, runtime: RuntimeSnapshot, paraId: ParaId): FundInfo {
     val type = runtime.metadata.storageReturnType(Modules.CROWDLOAN, "Funds")
 
-    val dynamicInstance = type.fromHexOrIncompatible(scale, runtime)
+    val dynamicInstance = (type.fromHexOrNull(runtime, scale) ?: throw IllegalArgumentException("Error: $paraId"))
         .cast<Struct.Instance>()
 
     return FundInfo(

@@ -5,5 +5,5 @@ package io.novafoundation.nova.core.model
 class RuntimeConfiguration(
     val genesisHash: String,
     val erasPerDay: Int,
-    val addressByte: Byte,
+    val addressByte: Short,
 )

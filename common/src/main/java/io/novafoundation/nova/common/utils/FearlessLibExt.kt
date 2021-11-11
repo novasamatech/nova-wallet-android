@@ -23,7 +23,7 @@ import jp.co.soramitsu.fearless_utils.scale.Schema
 import jp.co.soramitsu.fearless_utils.scale.dataType.DataType
 import jp.co.soramitsu.fearless_utils.scale.dataType.uint32
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder
-import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.addressByte
+import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.addressPrefix
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAddress
 import java.io.ByteArrayOutputStream
@@ -31,8 +31,8 @@ import java.io.ByteArrayOutputStream
 val BIP32JunctionDecoder.DEFAULT_DERIVATION_PATH: String
     get() = "//44//60//0/0/0"
 
-val SS58Encoder.DEFAULT_PREFIX: Byte
-    get() = 42.toByte()
+val SS58Encoder.DEFAULT_PREFIX: Short
+    get() = 42.toShort()
 
 fun BIP32JunctionDecoder.default() = decode(DEFAULT_DERIVATION_PATH)
 
@@ -120,7 +120,7 @@ inline fun <K, T> StorageEntry.storageKeys(
     )
 }
 
-fun String.networkType() = Node.NetworkType.findByAddressByte(addressByte())!!
+fun String.networkType() = Node.NetworkType.findByAddressByte(addressPrefix())!!
 
 fun RuntimeMetadata.hasModule(name: String) = moduleOrNull(name) != null
 

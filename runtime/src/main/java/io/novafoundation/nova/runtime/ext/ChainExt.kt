@@ -10,7 +10,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ExplorerTemplateE
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.TypesUsage
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
-import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.addressByte
+import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.addressPrefix
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAddress
 
@@ -34,7 +34,7 @@ fun Chain.addressOf(accountId: ByteArray): String {
     return if (isEthereumBased) {
         accountId.ethereumAddressToHex()
     } else {
-        accountId.toAddress(addressPrefix.toByte())
+        accountId.toAddress(addressPrefix.toShort())
     }
 }
 
@@ -70,7 +70,7 @@ fun Chain.addressFromPublicKey(publicKey: ByteArray): String {
     return if (isEthereumBased) {
         publicKey.ethereumAddressFromPublicKey().ethereumAddressToHex()
     } else {
-        publicKey.toAddress(addressPrefix.toByte())
+        publicKey.toAddress(addressPrefix.toShort())
     }
 }
 
@@ -96,7 +96,7 @@ fun Chain.isValidAddress(address: String): Boolean {
         } else {
             address.toAccountId() // verify supplied address can be converted to account id
 
-            address.addressByte() == addressPrefix.toByte()
+            address.addressPrefix() == addressPrefix.toShort()
         }
     }.getOrDefault(false)
 }
