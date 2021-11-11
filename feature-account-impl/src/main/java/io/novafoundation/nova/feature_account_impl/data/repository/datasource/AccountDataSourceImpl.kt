@@ -50,8 +50,6 @@ import kotlinx.coroutines.withContext
 private const val PREFS_AUTH_TYPE = "auth_type"
 private const val PREFS_PIN_CODE = "pin_code"
 
-private val DEFAULT_CRYPTO_TYPE = CryptoType.SR25519
-
 class AccountDataSourceImpl(
     private val preferences: Preferences,
     private val encryptedPreferences: EncryptedPreferences,
@@ -143,10 +141,6 @@ class AccountDataSourceImpl(
 
     override suspend fun saveSelectedAccount(account: Account) = withContext(Dispatchers.Default) {
         // TODO remove compatibility stub
-    }
-
-    override suspend fun getPreferredCryptoType(): CryptoType {
-        return selectedMetaAccountLocal.first()?.metaAccount?.substrateCryptoType ?: DEFAULT_CRYPTO_TYPE
     }
 
     override fun selectedNodeFlow(): Flow<Node> {
