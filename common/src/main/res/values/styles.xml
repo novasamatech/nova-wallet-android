@@ -169,6 +169,20 @@
         <item name="android:textColor">@color/white</item>
     </style>
 
+    <style name="AccentAlertDialogTheme" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
+        <item name="buttonBarPositiveButtonStyle">@style/AccentDialogPositiveButtonStyle</item>
+        <item name="buttonBarNegativeButtonStyle">@style/AccentDialogNegativeButtonStyle</item>
+    </style>
+    t
+
+    <style name="AccentDialogPositiveButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">?attr/colorAccent</item>
+    </style>
+
+    <style name="AccentDialogNegativeButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/error_red</item>
+    </style>
+
     <!-- Dialog -->
 
 

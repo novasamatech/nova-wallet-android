@@ -19,7 +19,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/usernameHintTv"
+        android:id="@+id/importMnemnonicUsernameHint"
         style="@style/TextAppearance.NovaFoundation.Body2"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -37,7 +37,7 @@
         android:background="@drawable/bg_big_input_shape_selector"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/usernameHintTv">
+        app:layout_constraintTop_toBottomOf="@+id/importMnemnonicUsernameHint">
 
         <TextView
             android:id="@+id/importMnemonicTitle"

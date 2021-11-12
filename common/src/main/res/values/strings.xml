@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+    <string name="crowdloan_astar_wrong_referral">Astar referral code should be a valid Polkadot address</string>
+
+    <string name="crowdloan_missing_bonus_title">You have not applied bonus</string>
+    <string name="crowdloan_missing_bonus_message">If you don\'t have referral code, you can apply Nova referral code to receive bonus for your contribution</string>
+    <string name="crowdloan_missing_bonus_action">Apply bonus</string>
+
     <string name="crowdloan_contribution">Contribution</string>
     <string name="crowdloan_acala_learn_types">Learn more about different contributions to Acala</string>
     <string name="crowdloan_acala_direct">Direct</string>
@@ -14,7 +20,7 @@
     <string name="crowdloan_about">About crowdloans</string>
 
     <string name="crowdloan_moonbeam_encryption_not_supported_title">Cannot contribute with this account</string>
-    <string name="crowdloan_moonbeam_encryption_not_supported_message">Moonbeam crowdloan supports only SR25519 crypto type accounts. Please consider using another account for contribution</string>
+    <string name="crowdloan_moonbeam_encryption_not_supported_message">Moonbeam crowdloan supports only SR25519 or ED25519 crypto type accounts. Please consider using another account for contribution</string>
 
     <string name="crowdloan_moonbeam_reward_destination">%s reward destination</string>
 

@@ -132,10 +132,6 @@ class AccountRepositoryImpl(
         return accountDataSource.updateMetaAccountName(metaId, newName)
     }
 
-    override suspend fun getPreferredCryptoType(): CryptoType {
-        return accountDataSource.getPreferredCryptoType()
-    }
-
     override suspend fun isAccountSelected(): Boolean {
         return accountDataSource.anyAccountSelected()
     }

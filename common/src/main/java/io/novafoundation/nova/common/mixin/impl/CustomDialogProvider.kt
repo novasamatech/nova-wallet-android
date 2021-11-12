@@ -1,5 +1,6 @@
 package io.novafoundation.nova.common.mixin.impl
 
+import android.view.ContextThemeWrapper
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.base.BaseViewModel
@@ -20,18 +21,25 @@ fun <V> BaseFragment<V>.setupCustomDialogDisplayer(
     viewModel: V,
 ) where V : BaseViewModel, V : CustomDialogDisplayer {
     viewModel.showCustomDialog.observeEvent {
-        dialog(requireContext()) {
-            setTitle(it.title)
-            setMessage(it.message)
+        displayDialogFor(it)
+    }
+}
 
-            setPositiveButton(it.okAction.title) { _, _ ->
-                it.okAction.action()
-            }
+fun BaseFragment<*>.displayDialogFor(payload: CustomDialogDisplayer.Payload) {
+    val baseContext = requireContext()
+    val themedContext = payload.customStyle?.let { ContextThemeWrapper(requireContext(), it) } ?: baseContext
 
-            it.cancelAction?.let { negativeAction ->
-                setNegativeButton(negativeAction.title) { _, _ ->
-                    negativeAction.action()
-                }
+    dialog(themedContext) {
+        setTitle(payload.title)
+        setMessage(payload.message)
+
+        setPositiveButton(payload.okAction.title) { _, _ ->
+            payload.okAction.action()
+        }
+
+        payload.cancelAction?.let { negativeAction ->
+            setNegativeButton(negativeAction.title) { _, _ ->
+                negativeAction.action()
             }
         }
     }

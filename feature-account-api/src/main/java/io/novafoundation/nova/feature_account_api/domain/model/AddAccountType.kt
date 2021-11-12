@@ -4,7 +4,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
 sealed class AddAccountType {
 
-    object MetaAccount : AddAccountType()
+    class MetaAccount(val name: String) : AddAccountType()
 
     class ChainAccount(val chainId: ChainId, val metaId: Long) : AddAccountType()
 }

@@ -319,7 +319,7 @@ class WelcomeViewState(
                 validationSystem = validationSystem,
                 payload = payload,
                 errorDisplayer = { it.message?.let(errorDisplayer) },
-                validationFailureTransformer = { welcomeStakingValidationFailure(it, resourceManager) },
+                validationFailureTransformerDefault = { welcomeStakingValidationFailure(it, resourceManager) },
             ) {
                 setupStakingSharedState.set(currentSetupProgress.fullFlow(amount))
 

@@ -20,8 +20,8 @@ interface BackupMnemonicComponent {
 
         fun create(
             @BindsInstance fragment: Fragment,
-            @BindsInstance accountName: String,
-            @BindsInstance addAccountPayload: AddAccountPayload
+            @BindsInstance accountName: String?,
+            @BindsInstance addAccountPayload: AddAccountPayload,
         ): BackupMnemonicComponent
     }
 

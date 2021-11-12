@@ -2,10 +2,10 @@ package io.novafoundation.nova.feature_crowdloan_impl.di.validations
 
 import dagger.Module
 import dagger.Provides
-import dagger.multibindings.IntoSet
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRepository
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomContributeManager
+import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.BonusAppliedValidation
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.CapExceededValidation
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.ContributeEnoughToPayFeesValidation
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.ContributeExistentialDepositValidation
@@ -21,9 +21,8 @@ import io.novafoundation.nova.runtime.repository.ChainStateRepository
 class ContributeValidationsModule {
 
     @Provides
-    @IntoSet
     @FeatureScope
-    fun provideFeesValidation(): ContributeValidation = ContributeEnoughToPayFeesValidation(
+    fun provideFeesValidation() = ContributeEnoughToPayFeesValidation(
         feeExtractor = { it.fee },
         availableBalanceProducer = { it.asset.transferable },
         extraAmountExtractor = { it.contributionAmount },
@@ -31,31 +30,27 @@ class ContributeValidationsModule {
     )
 
     @Provides
-    @IntoSet
     @FeatureScope
     fun provideMinContributionValidation(
         crowdloanRepository: CrowdloanRepository,
-    ): ContributeValidation = DefaultMinContributionValidation(crowdloanRepository)
+    ) = DefaultMinContributionValidation(crowdloanRepository)
 
     @Provides
-    @IntoSet
     @FeatureScope
-    fun provideCapExceededValidation(): ContributeValidation = CapExceededValidation()
+    fun provideCapExceededValidation() = CapExceededValidation()
 
     @Provides
-    @IntoSet
     @FeatureScope
     fun provideCrowdloanNotEndedValidation(
         chainStateRepository: ChainStateRepository,
         crowdloanRepository: CrowdloanRepository,
-    ): ContributeValidation = CrowdloanNotEndedValidation(chainStateRepository, crowdloanRepository)
+    ) = CrowdloanNotEndedValidation(chainStateRepository, crowdloanRepository)
 
     @Provides
-    @IntoSet
     @FeatureScope
     fun provideExistentialWarningValidation(
         walletConstants: WalletConstants,
-    ): ContributeValidation = ContributeExistentialDepositValidation(
+    ) = ContributeExistentialDepositValidation(
         walletConstants = walletConstants,
         totalBalanceProducer = { it.asset.total },
         feeProducer = { it.fee },
@@ -65,9 +60,54 @@ class ContributeValidationsModule {
     )
 
     @Provides
-    @IntoSet
     @FeatureScope
     fun providePublicCrowdloanValidation(
         customContributeManager: CustomContributeManager,
-    ): ContributeValidation = PublicCrowdloanValidation(customContributeManager)
+    ) = PublicCrowdloanValidation(customContributeManager)
+
+    @Provides
+    @FeatureScope
+    fun provideBonusAppliedValidation(
+        customContributeManager: CustomContributeManager,
+    ) = BonusAppliedValidation(customContributeManager)
+
+    @Provides
+    @Select
+    @FeatureScope
+    fun provideSelectContributeValidationSet(
+        feesValidation: ContributeEnoughToPayFeesValidation,
+        minContributionValidation: DefaultMinContributionValidation,
+        capExceededValidation: CapExceededValidation,
+        crowdloanNotEndedValidation: CrowdloanNotEndedValidation,
+        contributeExistentialDepositValidation: ContributeExistentialDepositValidation,
+        publicCrowdloanValidation: PublicCrowdloanValidation,
+        bonusAppliedValidation: BonusAppliedValidation,
+    ): Set<ContributeValidation> = setOf(
+        feesValidation,
+        minContributionValidation,
+        capExceededValidation,
+        crowdloanNotEndedValidation,
+        contributeExistentialDepositValidation,
+        publicCrowdloanValidation,
+        bonusAppliedValidation
+    )
+
+    @Provides
+    @Confirm
+    @FeatureScope
+    fun provideConfirmContributeValidationSet(
+        feesValidation: ContributeEnoughToPayFeesValidation,
+        minContributionValidation: DefaultMinContributionValidation,
+        capExceededValidation: CapExceededValidation,
+        crowdloanNotEndedValidation: CrowdloanNotEndedValidation,
+        contributeExistentialDepositValidation: ContributeExistentialDepositValidation,
+        publicCrowdloanValidation: PublicCrowdloanValidation,
+    ): Set<ContributeValidation> = setOf(
+        feesValidation,
+        minContributionValidation,
+        capExceededValidation,
+        crowdloanNotEndedValidation,
+        contributeExistentialDepositValidation,
+        publicCrowdloanValidation,
+    )
 }

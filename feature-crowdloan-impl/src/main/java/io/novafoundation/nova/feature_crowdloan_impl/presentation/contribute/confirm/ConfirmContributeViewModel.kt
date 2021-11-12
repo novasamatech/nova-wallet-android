@@ -32,7 +32,6 @@ import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.sel
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapAssetToAssetModel
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapFeeToFeeModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
@@ -123,11 +122,7 @@ class ConfirmContributeViewModel(
         .share()
 
     val bonusFlow = flow {
-        val bonusDisplay = payload.bonusPayload?.let {
-            val bonus = it.calculateBonus(payload.amount)
-
-            bonus?.formatTokenAmount(payload.metadata!!.token)
-        }
+        val bonusDisplay = payload.bonusPayload?.bonusText(payload.amount)
 
         emit(bonusDisplay)
     }
@@ -166,6 +161,7 @@ class ConfirmContributeViewModel(
             fee = payload.fee,
             asset = assetFlow.first(),
             customizationPayload = payload.customizationPayload,
+            bonusPayload = payload.bonusPayload,
             contributionAmount = payload.amount
         )
 
@@ -173,7 +169,14 @@ class ConfirmContributeViewModel(
             validationSystem = customizedValidationSystem.first(),
             payload = validationPayload,
             progressConsumer = _showNextProgress.progressConsumer(),
-            validationFailureTransformer = { contributeValidationFailure(it, resourceManager) }
+            validationFailureTransformerCustom = { status, actions ->
+                contributeValidationFailure(
+                    reason = status.reason,
+                    validationFlowActions = actions,
+                    resourceManager = resourceManager,
+                    onOpenCustomContribute = null
+                )
+            }
         ) {
             sendTransaction()
         }

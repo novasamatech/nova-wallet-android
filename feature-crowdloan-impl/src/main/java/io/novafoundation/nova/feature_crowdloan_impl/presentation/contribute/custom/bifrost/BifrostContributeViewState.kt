@@ -4,27 +4,32 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.bifrost.BifrostContributeInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.model.CustomContributePayload
+import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.referral.DefaultReferralCodePayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.referral.ReferralCodePayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.referral.ReferralContributeViewState
+import java.math.BigDecimal
 
 class BifrostContributeViewState(
     interactor: BifrostContributeInteractor,
     customContributePayload: CustomContributePayload,
     resourceManager: ResourceManager,
     termsLink: String,
-    private val bifrostInteractor: BifrostContributeInteractor
+    private val bonusPercentage: BigDecimal,
+    private val bifrostInteractor: BifrostContributeInteractor,
 ) : ReferralContributeViewState(
     customContributePayload = customContributePayload,
     resourceManager = resourceManager,
     defaultReferralCode = interactor.novaReferralCode,
-    bonusPercentage = BIFROST_BONUS_MULTIPLIER,
+    bonusPercentage = bonusPercentage,
     termsUrl = termsLink
 ) {
 
     override fun createBonusPayload(referralCode: String): ReferralCodePayload {
-        return BifrostBonusPayload(
-            referralCode,
-            customContributePayload.parachainMetadata.rewardRate
+        return DefaultReferralCodePayload(
+            rewardTokenSymbol = customContributePayload.parachainMetadata.token,
+            referralCode = referralCode,
+            referralBonus = bonusPercentage,
+            rewardRate = customContributePayload.parachainMetadata.rewardRate
         )
     }
 

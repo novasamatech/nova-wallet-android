@@ -10,14 +10,15 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.hideSoftKeyboard
 import io.novafoundation.nova.common.utils.nameInputFilters
-import io.novafoundation.nova.common.utils.onTextChanged
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
+import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.impl.setupAccountNameChooserUi
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.impl.setupForcedChainUi
-import kotlinx.android.synthetic.main.fragment_create_account.accountNameInput
 import kotlinx.android.synthetic.main.fragment_create_account.createAccountForcedChain
+import kotlinx.android.synthetic.main.fragment_create_account.createAccountNameDescription
+import kotlinx.android.synthetic.main.fragment_create_account.createAccountNameField
 import kotlinx.android.synthetic.main.fragment_create_account.nextBtn
 import kotlinx.android.synthetic.main.fragment_create_account.toolbar
 import javax.inject.Inject
@@ -28,7 +29,7 @@ class CreateAccountFragment : BaseFragment<CreateAccountViewModel>() {
 
         private const val PAYLOAD = "CreateAccountFragment.payload"
 
-        fun getBundle(payload: AddAccountPayload): Bundle {
+        fun getBundle(payload: AddAccountPayload.MetaAccount): Bundle {
 
             return Bundle().apply {
                 putParcelable(PAYLOAD, payload)
@@ -47,15 +48,11 @@ class CreateAccountFragment : BaseFragment<CreateAccountViewModel>() {
         toolbar.setHomeButtonListener { viewModel.homeButtonClicked() }
 
         nextBtn.setOnClickListener {
-            accountNameInput.hideSoftKeyboard()
+            createAccountNameField.hideSoftKeyboard()
             viewModel.nextClicked()
         }
 
-        accountNameInput.content.onTextChanged {
-            viewModel.accountNameChanged(it)
-        }
-
-        accountNameInput.content.filters = nameInputFilters()
+        createAccountNameField.content.filters = nameInputFilters()
     }
 
     override fun inject() {
@@ -75,6 +72,11 @@ class CreateAccountFragment : BaseFragment<CreateAccountViewModel>() {
         }
 
         setupForcedChainUi(viewModel, createAccountForcedChain, imageLoader)
+        setupAccountNameChooserUi(
+            viewModel = viewModel,
+            ui = createAccountNameField,
+            additionalViewsToControlVisibility = listOf(createAccountNameDescription)
+        )
     }
 
     private fun showScreenshotWarningDialog() {
@@ -83,7 +85,7 @@ class CreateAccountFragment : BaseFragment<CreateAccountViewModel>() {
             .setMessage(R.string.common_no_screenshot_message)
             .setPositiveButton(R.string.common_ok) { dialog, _ ->
                 dialog?.dismiss()
-                viewModel.screenshotWarningConfirmed(accountNameInput.content.text.toString())
+                viewModel.screenshotWarningConfirmed()
             }
             .show()
     }

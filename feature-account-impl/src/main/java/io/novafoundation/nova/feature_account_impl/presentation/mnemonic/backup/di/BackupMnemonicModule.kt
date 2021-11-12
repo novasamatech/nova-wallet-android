@@ -41,9 +41,9 @@ class BackupMnemonicModule {
     fun provideViewModel(
         interactor: AccountInteractor,
         router: AccountRouter,
-        accountName: String,
+        accountName: String?,
         addAccountPayload: AddAccountPayload,
-        cryptoTypeChooserMixinFactory: MixinFactory<CryptoTypeChooserMixin>
+        cryptoTypeChooserMixinFactory: MixinFactory<CryptoTypeChooserMixin>,
     ): ViewModel {
         return BackupMnemonicViewModel(
             interactor,

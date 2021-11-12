@@ -41,8 +41,6 @@ interface AccountRepository {
 
     suspend fun updateMetaAccountName(metaId: Long, newName: String)
 
-    suspend fun getPreferredCryptoType(): CryptoType
-
     suspend fun isAccountSelected(): Boolean
 
     suspend fun deleteAccount(metaId: Long)

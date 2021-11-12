@@ -169,9 +169,7 @@ class CrowdloanContributeViewModel(
     ) { contributionState, amount ->
         when (contributionState) {
             is ExtraBonusState.Active -> {
-                val bonus = contributionState.payload.calculateBonus(amount)
-
-                bonus?.formatTokenAmount(contributionState.tokenName)
+                contributionState.payload.bonusText(amount)
             }
 
             is ExtraBonusState.Inactive -> resourceManager.getString(R.string.crowdloan_empty_bonus_title)
@@ -318,13 +316,21 @@ class CrowdloanContributeViewModel(
                 customizationPayload = customizationPayload,
                 fee = fee,
                 asset = assetFlow.first(),
+                bonusPayload = router.latestCustomBonus,
                 contributionAmount = contributionAmount
             )
 
             validationExecutor.requireValid(
                 validationSystem = customizedValidationSystem.first(),
                 payload = validationPayload,
-                validationFailureTransformer = { contributeValidationFailure(it, resourceManager) },
+                validationFailureTransformerCustom = { status, actions ->
+                    contributeValidationFailure(
+                        reason = status.reason,
+                        validationFlowActions = actions,
+                        resourceManager = resourceManager,
+                        onOpenCustomContribute = ::bonusClicked
+                    )
+                },
                 progressConsumer = _showNextProgress.progressConsumer()
             ) {
                 _showNextProgress.value = false

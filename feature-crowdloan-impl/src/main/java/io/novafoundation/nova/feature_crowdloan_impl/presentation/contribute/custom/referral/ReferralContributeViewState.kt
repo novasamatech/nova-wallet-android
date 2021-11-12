@@ -9,7 +9,6 @@ import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.cus
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.CustomContributeViewState
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.model.CustomContributePayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.model.LearnMoreModel
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -54,9 +53,7 @@ abstract class ReferralContributeViewState(
     }
 
     val bonusFlow = bonusPayloadFlow.map {
-        val tokenName = customContributePayload.parachainMetadata.token
-
-        it.calculateBonus(customContributePayload.amount)?.formatTokenAmount(tokenName)
+        it.bonusText(customContributePayload.amount)
     }
 
     init {

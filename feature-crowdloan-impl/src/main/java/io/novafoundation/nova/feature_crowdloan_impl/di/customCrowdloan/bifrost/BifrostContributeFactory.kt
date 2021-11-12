@@ -12,6 +12,8 @@ import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.cus
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.referral.ReferralContributeView
 import kotlinx.coroutines.CoroutineScope
 
+private val BIFROST_BONUS_MULTIPLIER = 0.05.toBigDecimal() // 5%
+
 class BifrostExtraBonusFlow(
     private val interactor: BifrostContributeInteractor,
     private val resourceManager: ResourceManager,
@@ -19,7 +21,14 @@ class BifrostExtraBonusFlow(
 ) : ExtraBonusFlow {
 
     override fun createViewState(scope: CoroutineScope, payload: CustomContributePayload): BifrostContributeViewState {
-        return BifrostContributeViewState(interactor, payload, resourceManager, termsLink, interactor)
+        return BifrostContributeViewState(
+            interactor = interactor,
+            customContributePayload = payload,
+            resourceManager = resourceManager,
+            termsLink = termsLink,
+            bonusPercentage = BIFROST_BONUS_MULTIPLIER,
+            bifrostInteractor = interactor
+        )
     }
 
     override fun createView(context: Context) = ReferralContributeView(context)

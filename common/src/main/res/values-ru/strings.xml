@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+    <string name="crowdloan_astar_wrong_referral">Реферальный код Astar должен являться корректным Polkadot адресом</string>
+
+    <string name="crowdloan_missing_bonus_title">Вы не применили бонус</string>
+    <string name="crowdloan_missing_bonus_message">Если у вас нет реферального кода, вы можете применить код Nova, чтобы получить бонус за свой вклад</string>
+    <string name="crowdloan_missing_bonus_action">Применить</string>
+
     <string name="crowdloan_contribution">Тип вклада</string>
     <string name="crowdloan_acala_learn_types">Узнать больше о способах произвести вклад в Acala краудлоун</string>
     <string name="crowdloan_acala_direct">Напрямую</string>
@@ -15,7 +21,7 @@
 
     <string name="crowdloan_moonbeam_encryption_not_supported_title">Используемый аккаунт не поддерживается для взноса</string>
     <string name="crowdloan_moonbeam_encryption_not_supported_message">
-        Краудлоан Moonbeam поддерживает только аккаунты с крипографией SR25519. Пожалуйста, используйте другой аккаунт для взноса
+        Краудлоан Moonbeam поддерживает только аккаунты с крипографией SR25519 или ED25519. Пожалуйста, используйте другой аккаунт для взноса
     </string>
 
     <string name="crowdloan_moonbeam_reward_destination">Назначение вознаграждения для %s</string>
