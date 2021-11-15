@@ -62,7 +62,7 @@ class RuntimeFactory(
         val typePreset = if (metadataReader.metadataVersion < 14) {
             v13Preset()
         } else {
-            TypesParserV14.parse(metadataReader.metadata[RuntimeMetadataSchemaV14.lookup], v14Preset()).typePreset
+            TypesParserV14.parse(metadataReader.metadata[RuntimeMetadataSchemaV14.lookup], v14Preset())
         }
 
         val (types, baseHash, ownHash) = when (typesUsage) {
@@ -113,9 +113,9 @@ class RuntimeFactory(
 
         val ownTypesTree = fromJson(ownTypesRaw)
 
-        val withoutVersioning = parseBaseDefinitions(ownTypesTree, baseTypes).typePreset
+        val withoutVersioning = parseBaseDefinitions(ownTypesTree, baseTypes)
 
-        val typePreset = parseNetworkVersioning(ownTypesTree, withoutVersioning, runtimeVersion).typePreset
+        val typePreset = parseNetworkVersioning(ownTypesTree, withoutVersioning, runtimeVersion)
 
         return typePreset to ownTypesRaw.md5()
     }
@@ -124,7 +124,7 @@ class RuntimeFactory(
         val baseTypesRaw = runCatching { runtimeFilesCache.getBaseTypes() }
             .getOrElse { throw BaseTypesNotInCacheException }
 
-        val typePreset = parseBaseDefinitions(fromJson(baseTypesRaw), initialPreset).typePreset
+        val typePreset = parseBaseDefinitions(fromJson(baseTypesRaw), initialPreset)
 
         return typePreset to baseTypesRaw.md5()
     }
