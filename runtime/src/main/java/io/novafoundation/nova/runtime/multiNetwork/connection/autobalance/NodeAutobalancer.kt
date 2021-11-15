@@ -30,9 +30,10 @@ class NodeAutobalancer(
 
         combine(
             autobalanceStrategyProvider.strategyFlowFor(chainId),
-            availableNodesFlow,
-            ::Pair
-        )
+            availableNodesFlow
+        ) { first, second ->
+            Pair(first, second)
+        }
             .onEach { (strategy, nodes) -> result.emit(strategy.initialNode(nodes)) }
             .flatMapLatest { (strategy, nodes) ->
                 socketStateFlow

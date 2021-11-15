@@ -35,4 +35,6 @@ dependencies {
 
     api gsonDep
     api fearlessLibDep
+
+    api coroutinesTestDep
 }
