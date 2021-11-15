@@ -125,14 +125,7 @@ class RuntimeProvider(
                 Log.d(this@RuntimeProvider.LOG_TAG, "Constructed runtime for $chainId in ${duration.inSeconds} seconds")
 
                 runtimeFlow.emit(value)
-//                .also {
-//                    Log.e(this@RuntimeProvider.LOG_TAG, "Failed to construct runtime ($chainId): ${it.message}")
-//
-//                    runtimeFlow.emit(it)
-//                }
             }.onFailure {
-                Log.e(this@RuntimeProvider.LOG_TAG, "Failed to construct runtime ($chainId): $it")
-
                 when (it) {
                     ChainInfoNotInCacheException -> runtimeSyncService.cacheNotFound(chainId)
                     BaseTypesNotInCacheException -> baseTypeSynchronizer.cacheNotFound()
