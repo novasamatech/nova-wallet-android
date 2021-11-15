@@ -1,7 +1,7 @@
 buildscript {
     ext {
         // App version
-        versionName = '2.0.2'
+        versionName = '2.0.3'
         versionCode = 5
 
         // SDK and tools
@@ -42,7 +42,7 @@ buildscript {
 
         bouncyCastleVersion = '1.60'
 
-        fearlessLibVersion = '1.1.1'
+        fearlessLibVersion = '1.1.2'
 
         gifVersion = '1.2.19'
 
@@ -87,6 +87,7 @@ buildscript {
 
         coroutinesDep = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
         coroutinesAndroidDep = "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion"
+        coroutinesTestDep = "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion"
 
         // viewModelScope
         viewModelKtxDep = "androidx.lifecycle:lifecycle-viewmodel-ktx:$architectureComponentVersion"

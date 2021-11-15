@@ -11,7 +11,10 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.ChainSyncService
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.ChainFetcher
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
+import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnectionFactory
 import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionPool
+import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.NodeAutobalancer
+import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.AutoBalanceStrategyProvider
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeFilesCache
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeProviderPool
@@ -84,10 +87,29 @@ class ChainRegistryModule {
 
     @Provides
     @ApplicationScope
-    fun provideConnectionPool(
+    fun provideAutoBalanceProvider() = AutoBalanceStrategyProvider()
+
+    @Provides
+    @ApplicationScope
+    fun provideNodeAutoBalancer(
+        autoBalanceStrategyProvider: AutoBalanceStrategyProvider,
+    ) = NodeAutobalancer(autoBalanceStrategyProvider)
+
+    @Provides
+    @ApplicationScope
+    fun provideChainConnectionFactory(
         socketProvider: Provider<SocketService>,
-        externalRequirementsFlow: MutableStateFlow<ChainConnection.ExternalRequirement>
-    ) = ConnectionPool(socketProvider, externalRequirementsFlow)
+        externalRequirementsFlow: MutableStateFlow<ChainConnection.ExternalRequirement>,
+        nodeAutobalancer: NodeAutobalancer,
+    ) = ChainConnectionFactory(
+        externalRequirementsFlow,
+        nodeAutobalancer,
+        socketProvider
+    )
+
+    @Provides
+    @ApplicationScope
+    fun provideConnectionPool(chainConnectionFactory: ChainConnectionFactory) = ConnectionPool(chainConnectionFactory)
 
     @Provides
     @ApplicationScope
