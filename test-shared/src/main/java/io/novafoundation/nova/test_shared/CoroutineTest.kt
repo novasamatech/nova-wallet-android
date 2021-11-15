@@ -16,4 +16,3 @@ abstract class CoroutineTest {
         test(testScope)
     }
 }
-
