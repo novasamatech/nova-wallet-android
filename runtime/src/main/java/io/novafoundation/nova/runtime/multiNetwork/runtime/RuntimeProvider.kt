@@ -19,12 +19,14 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
 
 class RuntimeProvider(
     private val runtimeFactory: RuntimeFactory,
     private val runtimeSyncService: RuntimeSyncService,
     private val baseTypeSynchronizer: BaseTypeSynchronizer,
-    chain: Chain
+    chain: Chain,
 ) : CoroutineScope by CoroutineScope(Dispatchers.Default) {
 
     private val chainId = chain.id
@@ -110,6 +112,7 @@ class RuntimeProvider(
         }
     }
 
+    @OptIn(ExperimentalTime::class)
     private fun constructNewRuntime(typesUsage: TypesUsage) {
         currentConstructionJob?.cancel()
 
@@ -117,14 +120,24 @@ class RuntimeProvider(
             invalidateRuntime()
 
             runCatching {
-                runtimeFactory.constructRuntime(chainId, typesUsage).also {
-                    runtimeFlow.emit(it)
-                }
+                val (value, duration) = measureTimedValue { runtimeFactory.constructRuntime(chainId, typesUsage) }
+
+                Log.d(this@RuntimeProvider.LOG_TAG, "Constructed runtime for $chainId in ${duration.inSeconds} seconds")
+
+                runtimeFlow.emit(value)
+//                .also {
+//                    Log.e(this@RuntimeProvider.LOG_TAG, "Failed to construct runtime ($chainId): ${it.message}")
+//
+//                    runtimeFlow.emit(it)
+//                }
             }.onFailure {
+                Log.e(this@RuntimeProvider.LOG_TAG, "Failed to construct runtime ($chainId): $it")
+
                 when (it) {
                     ChainInfoNotInCacheException -> runtimeSyncService.cacheNotFound(chainId)
                     BaseTypesNotInCacheException -> baseTypeSynchronizer.cacheNotFound()
-                    NoRuntimeVersionException -> {} // pass
+                    NoRuntimeVersionException -> {
+                    } // pass
                     else -> Log.e(this@RuntimeProvider.LOG_TAG, "Failed to construct runtime ($chainId): ${it.message}")
                 }
             }
