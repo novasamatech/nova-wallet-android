@@ -96,7 +96,7 @@ class RuntimeProvider(
     }
 
     private fun considerReconstructingRuntime(newBaseTypesHash: String) {
-        Log.d(LOG_TAG, "Got new base type hash: ${chainId}$")
+        Log.d(LOG_TAG, "Got new base type hash: $chainId$")
 
         launch {
             currentConstructionJob?.join()
