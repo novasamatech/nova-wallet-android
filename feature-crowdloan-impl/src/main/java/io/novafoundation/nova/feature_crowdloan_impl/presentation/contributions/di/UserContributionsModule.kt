@@ -9,8 +9,9 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_crowdloan_impl.data.CrowdloanSharedState
-import io.novafoundation.nova.feature_crowdloan_impl.domain.main.CrowdloanInteractor
+import io.novafoundation.nova.feature_crowdloan_impl.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contributions.UserContributionsViewModel
 
@@ -21,16 +22,18 @@ class UserContributionsModule {
     @IntoMap
     @ViewModelKey(UserContributionsViewModel::class)
     fun provideViewModel(
-        interactor: CrowdloanInteractor,
+        interactor: ContributionsInteractor,
         iconGenerator: AddressIconGenerator,
         crowdloanSharedState: CrowdloanSharedState,
+        resourceManager: ResourceManager,
         router: CrowdloanRouter,
     ): ViewModel {
         return UserContributionsViewModel(
             interactor,
             iconGenerator,
-            router,
-            crowdloanSharedState
+            crowdloanSharedState,
+            resourceManager,
+            router
         )
     }
 

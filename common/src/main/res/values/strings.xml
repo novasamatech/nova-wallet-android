@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+    <string name="crowdloan_contributions_with_source">%s (via %s)</string>
     <string name="crowdloan_astar_wrong_referral">Astar referral code should be a valid Polkadot address</string>
 
     <string name="crowdloan_missing_bonus_title">You have not applied bonus</string>

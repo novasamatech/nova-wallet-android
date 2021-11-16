@@ -6,7 +6,7 @@ import coil.ImageLoader
 import coil.load
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.createAddressIcon
-import io.novafoundation.nova.feature_crowdloan_impl.domain.main.Crowdloan
+import io.novafoundation.nova.feature_crowdloan_api.data.repository.ParachainMetadata
 
 sealed class Icon {
 
@@ -23,12 +23,12 @@ fun ImageView.setIcon(icon: Icon, imageLoader: ImageLoader) {
 }
 
 suspend fun generateCrowdloanIcon(
-    crowdloan: Crowdloan,
+    parachainMetadata: ParachainMetadata?,
     depositorAddress: String,
     iconGenerator: AddressIconGenerator,
 ): Icon {
-    return if (crowdloan.parachainMetadata != null) {
-        Icon.FromLink(crowdloan.parachainMetadata.iconLink)
+    return if (parachainMetadata != null) {
+        Icon.FromLink(parachainMetadata.iconLink)
     } else {
         val icon = iconGenerator.createAddressIcon(depositorAddress, AddressIconGenerator.SIZE_BIG)
 

@@ -66,22 +66,22 @@ class CrowdloanViewModel(
     private val selectedChain = crowdloanSharedState.selectedChainFlow()
         .share()
 
-    private val groupedCrowdloansFlow = selectedChain.withLoading {
-        interactor.groupedCrowdloansFlow(it)
+    private val crowdloansFlow = selectedChain.withLoading {
+        interactor.crowdloansFlow(it)
     }
         .inBackground()
         .share()
 
-    private val crowdloansFlow = groupedCrowdloansFlow
-        .mapLoading { it.toValueList() }
+    private val crowdloansListFlow = crowdloansFlow
+        .mapLoading { it.crowdloanList.toValueList() }
         .inBackground()
         .share()
 
-    val crowdloanModelsFlow = groupedCrowdloansFlow.mapLoading { groupedCrowdloans ->
+    val crowdloanModelsFlow = crowdloansFlow.mapLoading { groupedCrowdloans ->
         val asset = assetSelectorMixin.selectedAssetFlow.first()
         val chain = crowdloanSharedState.chain()
 
-        groupedCrowdloans
+        groupedCrowdloans.crowdloanList
             .mapKeys { (statusClass, values) -> mapCrowdloanStatusToUi(statusClass, values.size) }
             .mapValues { (_, crowdloans) -> crowdloans.map { mapCrowdloanToCrowdloanModel(chain, it, asset) } }
             .toListWithHeaders()
@@ -89,9 +89,7 @@ class CrowdloanViewModel(
         .inBackground()
         .share()
 
-    val myContributionsCount = crowdloansFlow.mapLoading { crowdloans ->
-        crowdloans.count { it.myContribution != null }.toString()
-    }
+    val myContributionsCount = crowdloansFlow.mapLoading { crowdloans -> crowdloans.contributionsCount.format() }
         .inBackground()
         .share()
 
@@ -143,7 +141,7 @@ class CrowdloanViewModel(
             parachainId = crowdloan.parachainId,
             title = crowdloan.parachainMetadata?.name ?: crowdloan.parachainId.toString(),
             description = crowdloan.parachainMetadata?.description ?: depositorAddress,
-            icon = generateCrowdloanIcon(crowdloan, depositorAddress, iconGenerator),
+            icon = generateCrowdloanIcon(crowdloan.parachainMetadata, depositorAddress, iconGenerator),
             raised = CrowdloanModel.Raised(
                 value = resourceManager.getString(R.string.crownloans_raised_format, raisedDisplay, capDisplay),
                 percentage = raisedPercentage.toInt(),
@@ -155,7 +153,7 @@ class CrowdloanViewModel(
 
     fun crowdloanClicked(paraId: ParaId) {
         launch {
-            val crowdloans = crowdloansFlow.first() as? LoadingState.Loaded ?: return@launch
+            val crowdloans = crowdloansListFlow.first() as? LoadingState.Loaded ?: return@launch
             val crowdloan = crowdloans.data.firstOrNull { it.parachainId == paraId } ?: return@launch
 
             val payload = ContributePayload(

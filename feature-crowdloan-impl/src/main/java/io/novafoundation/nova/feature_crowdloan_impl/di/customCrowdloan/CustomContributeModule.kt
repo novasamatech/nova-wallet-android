@@ -7,13 +7,15 @@ import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.acala.Ac
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.astar.AstarContributionModule
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.bifrost.BifrostContributionModule
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.moonbeam.MoonbeamContributionModule
+import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.parallel.ParallelContributionModule
 
 @Module(
     includes = [
         AcalaContributionModule::class,
         BifrostContributionModule::class,
         MoonbeamContributionModule::class,
-        AstarContributionModule::class
+        AstarContributionModule::class,
+        ParallelContributionModule::class
     ]
 )
 class CustomContributeModule {
