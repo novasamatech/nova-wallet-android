@@ -13,7 +13,8 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
@@ -25,19 +26,23 @@ class ChainConnectionFactory(
     private val socketServiceProvider: Provider<SocketService>,
 ) {
 
-    fun create(chain: Chain): ChainConnection {
-        return ChainConnection(
+    suspend fun create(chain: Chain): ChainConnection {
+        val connection = ChainConnection(
             socketService = socketServiceProvider.get(),
             externalRequirementFlow = externalRequirementFlow,
             nodeAutobalancer = nodeAutobalancer,
             chain = chain
         )
+
+        connection.setup()
+
+        return connection
     }
 }
 
-class ChainConnection(
+class ChainConnection internal constructor(
     val socketService: SocketService,
-    externalRequirementFlow: Flow<ExternalRequirement>,
+    private val externalRequirementFlow: Flow<ExternalRequirement>,
     nodeAutobalancer: NodeAutobalancer,
     private val chain: Chain,
 ) : CoroutineScope by CoroutineScope(Dispatchers.Default) {
@@ -50,6 +55,7 @@ class ChainConnection(
         .stateIn(scope = this, started = SharingStarted.Eagerly, initialValue = State.Disconnected)
 
     private val availableNodes = MutableStateFlow(chain.nodes)
+
     private val currentNode = nodeAutobalancer.balancingNodeFlow(
         chainId = chain.id,
         socketStateFlow = state,
@@ -57,7 +63,7 @@ class ChainConnection(
         scope = this
     )
 
-    init {
+    suspend fun setup() {
         externalRequirementFlow.onEach {
             if (it == ExternalRequirement.ALLOWED) {
                 socketService.resume()
@@ -67,13 +73,15 @@ class ChainConnection(
         }
             .launchIn(this)
 
-        setupAutobalancing()
+        observeCurrentNode()
     }
 
-    private fun setupAutobalancing() {
+    private suspend fun observeCurrentNode() {
+        socketService.start(currentNode.first().url, remainPaused = true)
+
         currentNode
-            .distinctUntilChanged()
-            .onEach { newNode -> socketService.startOrSwitchTo(newNode) }
+            .filter { actualUrl() != it.url }
+            .onEach { newNode -> socketService.switchUrl(newNode.url) }
             .onEach { Log.d(this@ChainConnection.LOG_TAG, "Switching node in ${chain.name} to ${it.name} (${it.url})") }
             .launchIn(this)
     }
@@ -88,13 +96,13 @@ class ChainConnection(
         socketService.stop()
     }
 
-    private fun SocketService.startOrSwitchTo(node: Chain.Node) {
-        val url = node.url
-
-        if (started()) {
-            switchUrl(url)
-        } else {
-            start(url, remainPaused = true)
+    private suspend fun actualUrl(): String? {
+        return when (val stateSnapshot = state.first()) {
+            is State.WaitingForReconnect -> stateSnapshot.url
+            is State.Connecting -> stateSnapshot.url
+            is State.Connected -> stateSnapshot.url
+            State.Disconnected -> null
+            is State.Paused -> stateSnapshot.url
         }
     }
 }
