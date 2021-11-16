@@ -76,8 +76,6 @@ class RuntimeProvider(
     }
 
     private fun considerReconstructingRuntime(runtimeSyncResult: SyncResult) {
-        Log.d(LOG_TAG, "Got new runtime sync result: ${runtimeSyncResult.chainId}")
-
         launch {
             currentConstructionJob?.join()
 
@@ -96,8 +94,6 @@ class RuntimeProvider(
     }
 
     private fun considerReconstructingRuntime(newBaseTypesHash: String) {
-        Log.d(LOG_TAG, "Got new base type hash: $chainId$")
-
         launch {
             currentConstructionJob?.join()
 
