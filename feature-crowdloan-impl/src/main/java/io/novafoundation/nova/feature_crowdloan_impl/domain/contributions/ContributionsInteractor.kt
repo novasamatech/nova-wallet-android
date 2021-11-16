@@ -3,13 +3,13 @@ package io.novafoundation.nova.feature_crowdloan_impl.domain.contributions
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRepository
-import io.novafoundation.nova.feature_crowdloan_impl.data.source.contribution.ContributionSource
+import io.novafoundation.nova.feature_crowdloan_api.data.repository.getContributions
+import io.novafoundation.nova.feature_crowdloan_impl.data.source.contribution.ExternalContributionSource
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
-import java.math.BigInteger
 
 class ContributionsInteractor(
-    private val source: ContributionSource,
+    private val externalContributionSource: ExternalContributionSource,
     private val crowdloanRepository: CrowdloanRepository,
     private val accountRepository: AccountRepository,
     private val selectedAssetState: SingleAssetSharedState,
@@ -18,6 +18,7 @@ class ContributionsInteractor(
     suspend fun getUserContributions(): List<Contribution> {
         val chain = selectedAssetState.chain()
         val metaAccount = accountRepository.getSelectedMetaAccount()
+        val accountId = metaAccount.accountIdIn(chain)!!
 
         if (crowdloanRepository.isCrowdloansAvailable(chain.id).not()) {
             return emptyList()
@@ -29,12 +30,23 @@ class ContributionsInteractor(
 
         val fundInfos = crowdloanRepository.allFundInfos(chain.id)
 
-        return source.getContributions(
+        val directContributions = crowdloanRepository.getContributions(chain.id, accountId, fundInfos)
+            .mapNotNull { (paraId, directContribution) ->
+                directContribution?.let {
+                    Contribution(
+                        amount = it.amount,
+                        paraId = paraId,
+                        fundInfo = fundInfos.getValue(paraId),
+                        sourceName = null,
+                        parachainMetadata = parachainMetadatas[paraId]
+                    )
+                }
+            }
+
+        val externalContributions = externalContributionSource.getContributions(
             chain = chain,
-            accountId = metaAccount.accountIdIn(chain)!!,
-            funds = fundInfos
+            accountId = accountId
         )
-            .filter { it.amount > BigInteger.ZERO }
             .map {
                 Contribution(
                     amount = it.amount,
@@ -44,5 +56,7 @@ class ContributionsInteractor(
                     paraId = it.paraId
                 )
             }
+
+        return directContributions + externalContributions
     }
 }

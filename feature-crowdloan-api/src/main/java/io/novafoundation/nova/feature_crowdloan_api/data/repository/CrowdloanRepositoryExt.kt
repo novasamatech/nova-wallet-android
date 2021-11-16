@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_crowdloan_api.data.repository
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.DirectContribution
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.FundInfo
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.ParaId
-import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.TrieIndex
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.Dispatchers
@@ -14,10 +13,10 @@ import kotlinx.coroutines.withContext
 suspend fun CrowdloanRepository.getContributions(
     chainId: ChainId,
     accountId: AccountId,
-    keys: Map<ParaId, TrieIndex>,
+    keys: Map<ParaId, FundInfo>,
 ): Map<ParaId, DirectContribution?> = withContext(Dispatchers.Default) {
-    keys.map { (paraId, trieIndex) ->
-        async { paraId to getContribution(chainId, accountId, paraId, trieIndex) }
+    keys.map { (paraId, fundInfo) ->
+        async { paraId to getContribution(chainId, accountId, paraId, fundInfo.trieIndex) }
     }
         .awaitAll()
         .toMap()

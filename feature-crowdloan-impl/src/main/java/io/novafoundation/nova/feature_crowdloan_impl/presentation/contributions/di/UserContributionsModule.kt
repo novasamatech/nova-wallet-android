@@ -15,7 +15,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.domain.contributions.Contri
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contributions.UserContributionsViewModel
 
-@Module(includes = [ViewModelModule::class, ContributionsModule::class])
+@Module(includes = [ViewModelModule::class])
 class UserContributionsModule {
 
     @Provides

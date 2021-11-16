@@ -1,60 +1,52 @@
-package io.novafoundation.nova.feature_crowdloan_impl.presentation.contributions.di
+package io.novafoundation.nova.feature_crowdloan_impl.di.contributions
 
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
-import io.novafoundation.nova.common.di.scope.ScreenScope
+import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRepository
 import io.novafoundation.nova.feature_crowdloan_impl.data.CrowdloanSharedState
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.acala.AcalaApi
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.parallel.ParallelApi
 import io.novafoundation.nova.feature_crowdloan_impl.data.repository.contributions.source.CompositeContributionsSource
-import io.novafoundation.nova.feature_crowdloan_impl.data.repository.contributions.source.DirectContributionsSource
 import io.novafoundation.nova.feature_crowdloan_impl.data.repository.contributions.source.LiquidAcalaContributionSource
 import io.novafoundation.nova.feature_crowdloan_impl.data.repository.contributions.source.ParallelContributionSource
-import io.novafoundation.nova.feature_crowdloan_impl.data.source.contribution.ContributionSource
+import io.novafoundation.nova.feature_crowdloan_impl.data.source.contribution.ExternalContributionSource
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contributions.ContributionsInteractor
 
 @Module
 class ContributionsModule {
 
     @Provides
-    @ScreenScope
-    @IntoSet
-    fun directSource(
-        crowdloanRepository: CrowdloanRepository,
-    ): ContributionSource = DirectContributionsSource(crowdloanRepository)
-
-    @Provides
-    @ScreenScope
+    @FeatureScope
     @IntoSet
     fun acalaLiquidSource(
         acalaApi: AcalaApi,
-    ): ContributionSource = LiquidAcalaContributionSource(acalaApi)
+    ): ExternalContributionSource = LiquidAcalaContributionSource(acalaApi)
 
     @Provides
-    @ScreenScope
+    @FeatureScope
     @IntoSet
     fun parallelSource(
         parallelApi: ParallelApi,
-    ): ContributionSource = ParallelContributionSource(parallelApi)
+    ): ExternalContributionSource = ParallelContributionSource(parallelApi)
 
     @Provides
-    @ScreenScope
+    @FeatureScope
     fun compositeSource(
-        childSources: Set<@JvmSuppressWildcards ContributionSource>,
-    ): ContributionSource = CompositeContributionsSource(childSources)
+        childSources: Set<@JvmSuppressWildcards ExternalContributionSource>,
+    ): ExternalContributionSource = CompositeContributionsSource(childSources)
 
     @Provides
-    @ScreenScope
+    @FeatureScope
     fun provideContributionsInteractor(
-        source: ContributionSource,
+        externalContributionsSource: ExternalContributionSource,
         crowdloanRepository: CrowdloanRepository,
         accountRepository: AccountRepository,
         crowdloanSharedState: CrowdloanSharedState,
     ) = ContributionsInteractor(
-        source = source,
+        externalContributionSource = externalContributionsSource,
         crowdloanRepository = crowdloanRepository,
         accountRepository = accountRepository,
         selectedAssetState = crowdloanSharedState
