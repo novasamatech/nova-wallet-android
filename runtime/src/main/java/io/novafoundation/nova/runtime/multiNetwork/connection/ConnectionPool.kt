@@ -9,7 +9,7 @@ class ConnectionPool(private val chainConnectionFactory: ChainConnectionFactory)
 
     fun getConnection(chainId: String): ChainConnection = pool.getValue(chainId)
 
-    fun setupConnection(chain: Chain): ChainConnection {
+    suspend fun setupConnection(chain: Chain): ChainConnection {
         val connection = pool.getOrPut(chain.id) {
             chainConnectionFactory.create(chain)
         }
