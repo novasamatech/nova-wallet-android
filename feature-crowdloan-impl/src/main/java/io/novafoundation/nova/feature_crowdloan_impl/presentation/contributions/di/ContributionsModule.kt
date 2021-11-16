@@ -8,9 +8,11 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRepository
 import io.novafoundation.nova.feature_crowdloan_impl.data.CrowdloanSharedState
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.acala.AcalaApi
+import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.parallel.ParallelApi
 import io.novafoundation.nova.feature_crowdloan_impl.data.repository.contributions.source.CompositeContributionsSource
 import io.novafoundation.nova.feature_crowdloan_impl.data.repository.contributions.source.DirectContributionsSource
 import io.novafoundation.nova.feature_crowdloan_impl.data.repository.contributions.source.LiquidAcalaContributionSource
+import io.novafoundation.nova.feature_crowdloan_impl.data.repository.contributions.source.ParallelContributionSource
 import io.novafoundation.nova.feature_crowdloan_impl.data.source.contribution.ContributionSource
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contributions.ContributionsInteractor
 
@@ -30,6 +32,13 @@ class ContributionsModule {
     fun acalaLiquidSource(
         acalaApi: AcalaApi,
     ): ContributionSource = LiquidAcalaContributionSource(acalaApi)
+
+    @Provides
+    @ScreenScope
+    @IntoSet
+    fun parallelSource(
+        parallelApi: ParallelApi,
+    ): ContributionSource = ParallelContributionSource(parallelApi)
 
     @Provides
     @ScreenScope
