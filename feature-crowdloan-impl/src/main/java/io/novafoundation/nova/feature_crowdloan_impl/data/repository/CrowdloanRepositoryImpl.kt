@@ -7,7 +7,7 @@ import io.novafoundation.nova.common.utils.numberConstant
 import io.novafoundation.nova.common.utils.slots
 import io.novafoundation.nova.common.utils.storageKeys
 import io.novafoundation.nova.common.utils.u32ArgumentFromStorageKey
-import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.Contribution
+import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.DirectContribution
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.FundInfo
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.LeaseEntry
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.ParaId
@@ -114,7 +114,7 @@ class CrowdloanRepositoryImpl(
         accountId: AccountId,
         paraId: ParaId,
         trieIndex: BigInteger,
-    ): Contribution? {
+    ): DirectContribution? {
         return remoteStorage.queryChildState(
             storageKeyBuilder = { accountId.toHexString(withPrefix = true) },
             childKeyBuilder = {

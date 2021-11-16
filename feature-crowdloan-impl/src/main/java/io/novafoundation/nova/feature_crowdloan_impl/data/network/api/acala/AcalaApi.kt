@@ -2,8 +2,10 @@ package io.novafoundation.nova.feature_crowdloan_impl.data.network.api.acala
 
 import io.novafoundation.nova.feature_crowdloan_impl.BuildConfig
 import io.novafoundation.nova.runtime.ext.Geneses
+import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.genesisHash
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -63,4 +65,12 @@ interface AcalaApi {
         @Path("baseUrl") baseUrl: String,
         @Body body: AcalaLiquidContributeRequest,
     ): Any?
+
+    @GET("//{baseUrl}/contribution/{address}")
+    suspend fun getContributions(
+        @Path("baseUrl") baseUrl: String,
+        @Path("address") address: String,
+    ): AcalaContribution
 }
+
+suspend fun AcalaApi.getContributions(chain: Chain, accountId: AccountId) = getContributions(AcalaApi.getBaseUrl(chain), chain.addressOf(accountId))

@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_crowdloan_impl.domain.main
 import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
-import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.Contribution
+import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.DirectContribution
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.FundInfo
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.ParaId
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRepository
@@ -27,7 +27,7 @@ class Crowdloan(
     val leasePeriodInMillis: Long,
     val leasedUntilInMillis: Long,
     val fundInfo: FundInfo,
-    val myContribution: Contribution?,
+    val myContribution: DirectContribution?,
 ) {
 
     sealed class State {

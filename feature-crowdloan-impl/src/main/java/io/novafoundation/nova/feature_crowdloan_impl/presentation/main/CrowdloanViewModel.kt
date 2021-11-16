@@ -143,7 +143,7 @@ class CrowdloanViewModel(
             parachainId = crowdloan.parachainId,
             title = crowdloan.parachainMetadata?.name ?: crowdloan.parachainId.toString(),
             description = crowdloan.parachainMetadata?.description ?: depositorAddress,
-            icon = generateCrowdloanIcon(crowdloan, depositorAddress, iconGenerator),
+            icon = generateCrowdloanIcon(crowdloan.parachainMetadata, depositorAddress, iconGenerator),
             raised = CrowdloanModel.Raised(
                 value = resourceManager.getString(R.string.crownloans_raised_format, raisedDisplay, capDisplay),
                 percentage = raisedPercentage.toInt(),

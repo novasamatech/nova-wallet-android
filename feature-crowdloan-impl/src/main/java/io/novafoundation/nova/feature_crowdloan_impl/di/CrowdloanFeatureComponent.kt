@@ -26,7 +26,7 @@ import io.novafoundation.nova.runtime.di.RuntimeApi
     modules = [
         CrowdloanFeatureModule::class,
         CrowdloanUpdatersModule::class,
-        CrowdloansValidationsModule::class
+        CrowdloansValidationsModule::class,
     ]
 )
 @FeatureScope
