@@ -6,11 +6,14 @@ import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRep
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.getContributions
 import io.novafoundation.nova.feature_crowdloan_impl.data.source.contribution.ContributionSource
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
 class DirectContributionsSource(
     private val crowdloanRepository: CrowdloanRepository,
 ) : ContributionSource {
+
+    override val supportedChains: Set<ChainId>? = null
 
     override suspend fun getContributions(
         chain: Chain,

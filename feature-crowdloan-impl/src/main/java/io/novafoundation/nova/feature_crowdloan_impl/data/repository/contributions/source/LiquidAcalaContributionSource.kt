@@ -7,12 +7,15 @@ import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.bindi
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.acala.AcalaApi
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.acala.getContributions
 import io.novafoundation.nova.feature_crowdloan_impl.data.source.contribution.ContributionSource
+import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
 class LiquidAcalaContributionSource(
     private val acalaApi: AcalaApi,
 ) : ContributionSource {
+
+    override val supportedChains = setOf(Chain.Geneses.POLKADOT)
 
     override suspend fun getContributions(
         chain: Chain,
