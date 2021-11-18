@@ -25,12 +25,6 @@ android {
           keyAlias System.env.CI_KEYSTORE_KEY_ALIAS ?: ""
           keyPassword System.env.CI_KEYSTORE_KEY_PASS ?: ""
       }
-      release {
-          storeFile file(".//nova.jks")
-          storePassword readSecret("RELEASE_KEYSTORE_PASS")
-          keyAlias readSecret("RELEASE_KEYSTORE_KEY_ALIAS")
-          keyPassword readSecret("RELEASE_KEYSTORE_KEY_PASS")
-      }
     }
     buildTypes {
         debug {
