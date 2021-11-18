@@ -6,6 +6,7 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'com.google.firebase.appdistribution'
 apply plugin: "com.github.triplet.play"
 apply from: "../scripts/versions.gradle"
+apply from: "../scripts/secrets.gradle"
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
@@ -24,6 +25,12 @@ android {
           keyAlias System.env.CI_KEYSTORE_KEY_ALIAS ?: ""
           keyPassword System.env.CI_KEYSTORE_KEY_PASS ?: ""
       }
+      release {
+          storeFile file(".//nova.jks")
+          storePassword readSecret("RELEASE_KEYSTORE_PASS")
+          keyAlias readSecret("RELEASE_KEYSTORE_KEY_ALIAS")
+          keyPassword readSecret("RELEASE_KEYSTORE_KEY_PASS")
+      }
     }
     buildTypes {
         debug {
@@ -34,6 +41,13 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.debug
+        }
+        releaseGithub {
+            initWith buildTypes.release
+            matchingFallbacks = ['release']
+
+            applicationIdSuffix '.github'
+            versionNameSuffix '-github'
         }
         develop {
             signingConfig signingConfigs.ci
@@ -47,6 +61,12 @@ android {
               releaseNotes = localReleaseNotes
               groups = localFirebaseGroup
             }
+        }
+    }
+
+    sourceSets {
+        releaseGithub {
+            res.srcDirs = ['src/release/res']
         }
     }
 
@@ -66,6 +86,17 @@ android {
 
         jvmTarget = '1.8'
     }
+}
+
+task bindReleaseGithubGoogleServicesToRelease(type: Copy) {
+    description = 'Switches to RELEASE google-services.json'
+    from "src/release"
+    include "google-services.json"
+    into "src/releaseGithub"
+}
+
+afterEvaluate {
+    processReleaseGithubGoogleServices.dependsOn bindReleaseGithubGoogleServicesToRelease
 }
 
 play {
