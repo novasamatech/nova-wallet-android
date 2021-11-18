@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:id="@+id/selectRewardDestinationContainer"
     android:orientation="vertical"
-    android:theme="@style/PinkOverlay"
     tools:background="@color/black">
 
     <io.novafoundation.nova.common.view.Toolbar

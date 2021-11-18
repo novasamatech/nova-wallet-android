@@ -36,10 +36,6 @@
         <item name="colorAccent">@color/accentBlue</item>
     </style>
 
-    <style name="PinkOverlay" parent="ThemeOverlay.AppCompat">
-        <item name="colorPrimary">@color/colorAccent</item>
-    </style>
-
     <style name="WhiteOverlay" parent="ThemeOverlay.AppCompat">
         <item name="colorPrimary">@color/white</item>
     </style>
