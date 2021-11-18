@@ -7,7 +7,7 @@ import android.util.StateSet
 import android.view.View
 import android.widget.Checkable
 import androidx.constraintlayout.widget.ConstraintLayout
-import io.novafoundation.nova.common.utils.getPrimaryColor
+import io.novafoundation.nova.common.utils.getColorFromAttr
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawableFromColors
@@ -89,7 +89,7 @@ class RewardDestinationView @JvmOverloads constructor(
     }
 
     private fun stateDrawable() = StateListDrawable().apply {
-        addState(CheckedStateSet, context.getRoundedCornerDrawableFromColors(strokeColor = context.getPrimaryColor()))
+        addState(CheckedStateSet, context.getRoundedCornerDrawableFromColors(strokeColor = context.getColorFromAttr(R.attr.colorAccent)))
         addState(StateSet.WILD_CARD, context.getRoundedCornerDrawable(strokeColorRes = RCommon.color.gray2))
     }
 }
