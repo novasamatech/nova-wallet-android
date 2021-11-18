@@ -50,7 +50,7 @@ private object ContributionPayloadGenerator : PayloadGenerator<ContributionModel
 private object ContributionCallback : DiffUtil.ItemCallback<ContributionModel>() {
 
     override fun areItemsTheSame(oldItem: ContributionModel, newItem: ContributionModel): Boolean {
-        return oldItem.name == newItem.name
+        return oldItem.title == newItem.title
     }
 
     override fun areContentsTheSame(oldItem: ContributionModel, newItem: ContributionModel): Boolean {
@@ -71,7 +71,7 @@ class ContributionHolder(
         item: ContributionModel,
     ) = with(containerView) {
         itemContributionIcon.setIcon(item.icon, imageLoader)
-        itemContributionName.text = item.name
+        itemContributionName.text = item.title
 
         bindAmount(item)
     }

@@ -116,7 +116,7 @@
         android:paddingBottom="12dp"
         android:text="@string/common_learn_more"
         app:drawableEndCompat="@drawable/ic_arrow_top_right_white_16"
-        app:drawableStartCompat="@drawable/ic_fearless" />
+        app:drawableStartCompat="@drawable/ic_nova" />
 
     <Space
         android:layout_width="match_parent"

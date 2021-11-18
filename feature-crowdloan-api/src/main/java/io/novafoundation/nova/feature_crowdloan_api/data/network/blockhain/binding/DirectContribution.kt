@@ -8,17 +8,17 @@ import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHex
 import java.math.BigInteger
 
-class Contribution(
+class DirectContribution(
     val amount: BigInteger,
-    val memo: String
+    val memo: String,
 )
 
-fun bindContribution(scale: String, runtime: RuntimeSnapshot): Contribution {
+fun bindContribution(scale: String, runtime: RuntimeSnapshot): DirectContribution {
     val type = runtime.typeRegistry["(Balance, Vec<u8>)"] ?: incompatible()
 
     val dynamicInstance = type.fromHex(runtime, scale).cast<List<*>>()
 
-    return Contribution(
+    return DirectContribution(
         amount = bindNumber(dynamicInstance[0]),
         memo = bindString(dynamicInstance[1])
     )

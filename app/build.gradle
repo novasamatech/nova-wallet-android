@@ -6,6 +6,7 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'com.google.firebase.appdistribution'
 apply plugin: "com.github.triplet.play"
 apply from: "../scripts/versions.gradle"
+apply from: "../scripts/secrets.gradle"
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
@@ -35,6 +36,13 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.debug
         }
+        releaseGithub {
+            initWith buildTypes.release
+            matchingFallbacks = ['release']
+
+            applicationIdSuffix '.github'
+            versionNameSuffix '-github'
+        }
         develop {
             signingConfig signingConfigs.ci
             matchingFallbacks = ['debug']
@@ -47,6 +55,12 @@ android {
               releaseNotes = localReleaseNotes
               groups = localFirebaseGroup
             }
+        }
+    }
+
+    sourceSets {
+        releaseGithub {
+            res.srcDirs = ['src/release/res']
         }
     }
 
@@ -66,6 +80,17 @@ android {
 
         jvmTarget = '1.8'
     }
+}
+
+task bindReleaseGithubGoogleServicesToRelease(type: Copy) {
+    description = 'Switches to RELEASE google-services.json'
+    from "src/release"
+    include "google-services.json"
+    into "src/releaseGithub"
+}
+
+afterEvaluate {
+    processReleaseGithubGoogleServices.dependsOn bindReleaseGithubGoogleServicesToRelease
 }
 
 play {

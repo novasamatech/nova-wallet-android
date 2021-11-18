@@ -64,6 +64,5 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="22dp"
-        tools:text="@string/common_continue"
-        android:theme="@style/PinkOverlay" />
+        tools:text="@string/common_continue" />
 </LinearLayout>

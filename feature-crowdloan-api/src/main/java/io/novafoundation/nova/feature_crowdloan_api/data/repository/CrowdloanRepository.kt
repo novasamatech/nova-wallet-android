@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_crowdloan_api.data.repository
 
-import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.Contribution
+import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.DirectContribution
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.FundInfo
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.ParaId
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.TrieIndex
@@ -21,7 +21,7 @@ interface CrowdloanRepository {
 
     suspend fun getParachainMetadata(chain: Chain): Map<ParaId, ParachainMetadata>
 
-    suspend fun getContribution(chainId: ChainId, accountId: AccountId, paraId: ParaId, trieIndex: TrieIndex): Contribution?
+    suspend fun getContribution(chainId: ChainId, accountId: AccountId, paraId: ParaId, trieIndex: TrieIndex): DirectContribution?
 
     suspend fun blocksPerLeasePeriod(chainId: ChainId): BigInteger
 

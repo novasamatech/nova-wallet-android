@@ -30,8 +30,7 @@ class FundInfo(
 fun bindFundInfo(scale: String, runtime: RuntimeSnapshot, paraId: ParaId): FundInfo {
     val type = runtime.metadata.storageReturnType(Modules.CROWDLOAN, "Funds")
 
-    val dynamicInstance = type.fromHexOrIncompatible(scale, runtime)
-        .cast<Struct.Instance>()
+    val dynamicInstance = type.fromHexOrIncompatible(scale, runtime).cast<Struct.Instance>()
 
     return FundInfo(
         depositor = bindAccountId(dynamicInstance["depositor"]),

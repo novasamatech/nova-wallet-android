@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_crowdloan_impl.domain.contribute
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
-import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.Contribution
+import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.DirectContribution
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.FundInfo
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ParachainMetadata
 import io.novafoundation.nova.feature_crowdloan_impl.domain.common.leaseIndexFromBlock
@@ -16,8 +16,8 @@ fun mapFundInfoToCrowdloan(
     currentBlockNumber: BlockNumber,
     expectedBlockTimeInMillis: BigInteger,
     blocksPerLeasePeriod: BigInteger,
-    contribution: Contribution?,
-    hasWonAuction: Boolean
+    contribution: DirectContribution?,
+    hasWonAuction: Boolean,
 ): Crowdloan {
     val leasePeriodInMillis = leasePeriodInMillis(blocksPerLeasePeriod, currentBlockNumber, fundInfo.lastSlot, expectedBlockTimeInMillis)
 

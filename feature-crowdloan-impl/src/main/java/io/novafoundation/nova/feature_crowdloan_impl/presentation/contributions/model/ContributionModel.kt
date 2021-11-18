@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_crowdloan_impl.presentation.contributions
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.model.Icon
 
 data class ContributionModel(
-    val name: String,
+    val title: String,
     val amount: String,
     val icon: Icon,
 )

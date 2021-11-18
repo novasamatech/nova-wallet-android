@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
+import io.novafoundation.nova.feature_crowdloan_impl.di.contributions.ContributionsModule
 import io.novafoundation.nova.feature_crowdloan_impl.di.validations.CrowdloansValidationsModule
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.confirm.di.ConfirmContributeComponent
@@ -26,7 +27,8 @@ import io.novafoundation.nova.runtime.di.RuntimeApi
     modules = [
         CrowdloanFeatureModule::class,
         CrowdloanUpdatersModule::class,
-        CrowdloansValidationsModule::class
+        CrowdloansValidationsModule::class,
+        ContributionsModule::class
     ]
 )
 @FeatureScope
