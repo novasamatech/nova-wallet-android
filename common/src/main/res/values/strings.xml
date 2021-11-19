@@ -149,7 +149,7 @@ transfers will appear here</string>
     <string name="pincode_biometry_dialog_title">Biometry</string>
     <string name="common_edit">Edit</string>
     <string name="common_done">Done</string>
-    <string name="accounts_add_account">Add account</string>
+    <string name="accounts_add_wallet">Add wallet</string>
     <string name="account_add_already_exists_message">Account already exists. Please, try another one.</string>
     <string name="about_website">Official Website</string>
     <string name="about_github">Github Source Code</string>
