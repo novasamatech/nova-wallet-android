@@ -80,10 +80,6 @@ fun BigDecimal.formatFractionAsPercentage(): String {
     return fractionToPercentage().formatAsPercentage()
 }
 
-fun BigDecimal.formatAsFieldAmount(): String {
-    return defaultFullFormatter.format(this)
-}
-
 fun Long.formatDaysSinceEpoch(context: Context): String? {
     val currentDays = System.currentTimeMillis().daysFromMillis()
     val diff = currentDays - this
