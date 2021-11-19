@@ -82,5 +82,4 @@ class ShimmeringAmountView @JvmOverloads constructor(
     }
 }
 
-
 fun ShimmeringAmountView.showValue(amountModel: AmountModel) = showValue(amountModel.token, amountModel.fiat)
