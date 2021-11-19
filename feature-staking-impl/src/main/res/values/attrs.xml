@@ -9,6 +9,11 @@
         <attr name="titleDetail" format="string" />
     </declare-styleable>
 
+    <declare-styleable name="NetworkInfoCellView">
+        <attr name="title" />
+        <attr name="useSecondaryValue" format="boolean" />
+    </declare-styleable>
+
     <declare-styleable name="RewardDestinationView">
         <attr name="android:checked" />
         <attr name="targetName" format="string" />

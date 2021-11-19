@@ -43,7 +43,7 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         return inflater.inflate(R.layout.fragment_staking, container, false)
     }
@@ -165,27 +165,11 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
             when (state) {
                 is LoadingState.Loading<*> -> stakingNetworkInfo.showLoading()
 
-                is LoadingState.Loaded<StakingNetworkInfoModel> -> {
-                    with(state.data) {
-                        stakingNetworkInfo.hideLoading()
-                        stakingNetworkInfo.setTotalStake(totalStake)
-                        stakingNetworkInfo.setNominatorsCount(nominatorsCount)
-                        stakingNetworkInfo.setMinimumStake(minimumStake)
-                        stakingNetworkInfo.setLockupPeriod(lockupPeriod)
-                        if (totalStakeFiat == null) {
-                            stakingNetworkInfo.hideTotalStakeFiat()
-                        } else {
-                            stakingNetworkInfo.showTotalStakeFiat()
-                            stakingNetworkInfo.setTotalStakeFiat(totalStakeFiat)
-                        }
-
-                        if (minimumStakeFiat == null) {
-                            stakingNetworkInfo.hideMinimumStakeFiat()
-                        } else {
-                            stakingNetworkInfo.showMinimumStakeFiat()
-                            stakingNetworkInfo.setMinimumStakeFiat(minimumStakeFiat)
-                        }
-                    }
+                is LoadingState.Loaded<StakingNetworkInfoModel> -> with(state.data) {
+                    stakingNetworkInfo.setTotalStake(totalStake, totalStakeFiat)
+                    stakingNetworkInfo.setNominatorsCount(nominatorsCount)
+                    stakingNetworkInfo.setMinimumStake(minimumStake, minimumStakeFiat)
+                    stakingNetworkInfo.setLockupPeriod(lockupPeriod)
                 }
             }
         }
@@ -202,7 +186,7 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
     @ExperimentalTime
     private fun <S> StakeSummaryView.bindStakeSummary(
         stakingViewState: StakeViewState<S>,
-        mapStatus: (StakeSummaryModel<S>) -> StakeSummaryView.Status
+        mapStatus: (StakeSummaryModel<S>) -> StakeSummaryView.Status,
     ) {
         setStatusClickListener {
             stakingViewState.statusClicked()

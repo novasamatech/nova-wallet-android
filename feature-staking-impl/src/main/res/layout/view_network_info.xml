@@ -38,11 +38,14 @@
             android:overScrollMode="never"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            android:orientation="horizontal"
+            tools:listitem="@layout/item_staking_story"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.StakingInfoView
+        <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.NetworkInfoCellView
             android:id="@+id/totalStakeView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -51,10 +54,10 @@
             app:layout_constraintEnd_toStartOf="@id/minimumStakeView"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/stakingStoriesList"
-            app:titleText="@string/staking_total_staked"
+            app:title="@string/staking_total_staked"
             app:startWithLoading="true" />
 
-        <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.StakingInfoView
+        <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.NetworkInfoCellView
             android:id="@+id/minimumStakeView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -63,34 +66,32 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/totalStakeView"
             app:layout_constraintTop_toBottomOf="@id/stakingStoriesList"
-            app:titleText="@string/staking_main_minimum_stake_title"
+            app:title="@string/staking_main_minimum_stake_title"
             app:startWithLoading="true" />
 
-        <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.StakingInfoView
+        <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.NetworkInfoCellView
             android:id="@+id/activeNominatorsView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="24dp"
-            app:includeExtraBlock="false"
+            app:useSecondaryValue="false"
             app:layout_constraintEnd_toStartOf="@id/minimumStakeView"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/totalStakeView"
-            app:titleText="@string/staking_main_active_nominators_title"
-            app:startWithLoading="true" />
+            app:title="@string/staking_main_active_nominators_title" />
 
-        <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.StakingInfoView
+        <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.NetworkInfoCellView
             android:id="@+id/lockUpPeriodView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:layout_marginEnd="16dp"
-            app:includeExtraBlock="false"
+            app:useSecondaryValue="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/totalStakeView"
             app:layout_constraintTop_toBottomOf="@id/totalStakeView"
-            app:titleText="@string/staking_unbonding_period_v1_9_0"
-            app:startWithLoading="true" />
+            app:title="@string/staking_unbonding_period_v1_9_0" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
