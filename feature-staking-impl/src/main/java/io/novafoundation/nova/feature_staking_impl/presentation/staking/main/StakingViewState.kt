@@ -23,6 +23,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.model.ValidatorStatus
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculator
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.calculateMaxPeriodReturns
+import io.novafoundation.nova.feature_staking_impl.domain.rewards.maxCompoundAPY
 import io.novafoundation.nova.feature_staking_impl.domain.validations.welcome.WelcomeStakingValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.validations.welcome.WelcomeStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -265,7 +266,7 @@ class WelcomeViewState(
 
         ReturnsModel(
             monthlyPercentage = rewardCalculator.calculateMaxPeriodReturns(PERIOD_MONTH).formatFractionAsPercentage(),
-            yearlyPercentage = rewardCalculator.calculateMaxPeriodReturns(PERIOD_YEAR).formatFractionAsPercentage()
+            yearlyPercentage = rewardCalculator.maxCompoundAPY().formatFractionAsPercentage()
         )
     }
         .withLoading()
@@ -277,7 +278,7 @@ class WelcomeViewState(
             val rewardCalculator = rewardCalculator()
 
             val payload = StakingRewardEstimationBottomSheet.Payload(
-                max = rewardCalculator.maxAPY.formatFractionAsPercentage(),
+                max = rewardCalculator.maxCompoundAPY().formatFractionAsPercentage(),
                 average = rewardCalculator.expectedAPY.formatFractionAsPercentage()
             )
 

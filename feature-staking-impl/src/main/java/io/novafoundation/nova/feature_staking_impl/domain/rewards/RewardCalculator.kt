@@ -19,6 +19,8 @@ private val INTEREST_IDEAL = INFLATION_IDEAL / STAKED_PORTION_IDEAL
 
 private const val DECAY_RATE = 0.05
 
+private val IGNORED_COMMISSION_THRESHOLD = 1.toBigDecimal()
+
 const val DAYS_IN_YEAR = 365
 
 class PeriodReturns(
@@ -28,7 +30,7 @@ class PeriodReturns(
 
 class RewardCalculator(
     val validators: List<RewardCalculationTarget>,
-    val totalIssuance: BigInteger
+    val totalIssuance: BigInteger,
 ) {
 
     private val totalStaked = validators.sumByBigInteger(RewardCalculationTarget::totalStake).toDouble()
@@ -50,7 +52,10 @@ class RewardCalculator(
     private val _maxAPY = apyByValidator.values.maxOrNull() ?: 0.0
 
     private fun calculateExpectedAPY(): Double {
-        val medianCommission = validators.map { it.commission.toDouble() }.median()
+        val medianCommission = validators
+            .filter { it.commission < IGNORED_COMMISSION_THRESHOLD }
+            .map { it.commission.toDouble() }
+            .median()
 
         return averageValidatorRewardPercentage * (1 - medianCommission)
     }
@@ -69,7 +74,6 @@ class RewardCalculator(
         }
     }
 
-    val maxAPY = _maxAPY.toBigDecimal()
     val expectedAPY = _expectedAPY.toBigDecimal()
 
     fun getApyFor(targetIdHex: String): BigDecimal {
@@ -128,6 +132,8 @@ class RewardCalculator(
         return dailyPercentage * days
     }
 }
+
+suspend fun RewardCalculator.maxCompoundAPY() = calculateMaxPeriodReturns(DAYS_IN_YEAR)
 
 suspend fun RewardCalculator.calculateMaxPeriodReturns(
     days: Int,
