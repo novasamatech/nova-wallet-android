@@ -23,7 +23,7 @@ class ChainAccountActionsSheet(
         super.onCreate(savedInstanceState)
 
         val changeTitleRes = if (payload.type is ExternalActions.Type.None) {
-            R.string.accounts_add_wallet
+            R.string.accounts_add_account
         } else {
             R.string.accounts_change_chain_secrets
         }
