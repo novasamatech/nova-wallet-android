@@ -42,7 +42,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.StakingInfoView
+        <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.ShimmeringAmountView
             android:id="@+id/stakeTotalStakedView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -50,10 +50,9 @@
             android:layout_marginTop="9dp"
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
-            app:startWithLoading="true"
-            app:titleText="@string/staking_main_stake_balance_staked" />
+            app:title="@string/staking_main_stake_balance_staked" />
 
-        <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.StakingInfoView
+        <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.ShimmeringAmountView
             android:id="@+id/stakeTotalRewardsView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -61,8 +60,7 @@
             android:layout_marginTop="9dp"
             android:layout_marginEnd="16dp"
             android:layout_weight="1"
-            app:startWithLoading="true"
-            app:titleText="@string/staking_total_rewards_v1.9.0" />
+            app:title="@string/staking_total_rewards_v1.9.0" />
     </LinearLayout>
 
     <View

@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.domain.rewards
 
-import io.novafoundation.nova.common.utils.fractionToPercentage
 import io.novafoundation.nova.common.utils.median
 import io.novafoundation.nova.common.utils.sumByBigInteger
 import kotlinx.coroutines.Dispatchers
@@ -20,16 +19,18 @@ private val INTEREST_IDEAL = INFLATION_IDEAL / STAKED_PORTION_IDEAL
 
 private const val DECAY_RATE = 0.05
 
+private val IGNORED_COMMISSION_THRESHOLD = 1.toBigDecimal()
+
 const val DAYS_IN_YEAR = 365
 
 class PeriodReturns(
     val gainAmount: BigDecimal,
-    val gainPercentage: BigDecimal
+    val gainFraction: BigDecimal,
 )
 
 class RewardCalculator(
     val validators: List<RewardCalculationTarget>,
-    val totalIssuance: BigInteger
+    val totalIssuance: BigInteger,
 ) {
 
     private val totalStaked = validators.sumByBigInteger(RewardCalculationTarget::totalStake).toDouble()
@@ -47,10 +48,14 @@ class RewardCalculator(
         valueTransform = ::calculateValidatorAPY
     )
 
-    private val expectedAPY = calculateExpectedAPY()
+    private val _expectedAPY = calculateExpectedAPY()
+    private val _maxAPY = apyByValidator.values.maxOrNull() ?: 0.0
 
     private fun calculateExpectedAPY(): Double {
-        val medianCommission = validators.map { it.commission.toDouble() }.median()
+        val medianCommission = validators
+            .filter { it.commission < IGNORED_COMMISSION_THRESHOLD }
+            .map { it.commission.toDouble() }
+            .median()
 
         return averageValidatorRewardPercentage * (1 - medianCommission)
     }
@@ -69,14 +74,10 @@ class RewardCalculator(
         }
     }
 
-    private val maxAPY = apyByValidator.values.maxOrNull() ?: 0.0
-
-    suspend fun calculateMaxAPY() = calculateReturns(amount = BigDecimal.ONE, DAYS_IN_YEAR, isCompound = true).gainPercentage
-
-    fun calculateAvgAPY() = expectedAPY.toBigDecimal().fractionToPercentage()
+    val expectedAPY = _expectedAPY.toBigDecimal()
 
     fun getApyFor(targetIdHex: String): BigDecimal {
-        val apy = apyByValidator[targetIdHex] ?: expectedAPY
+        val apy = apyByValidator[targetIdHex] ?: _expectedAPY
 
         return apy.toBigDecimal()
     }
@@ -84,9 +85,9 @@ class RewardCalculator(
     suspend fun calculateReturns(
         amount: BigDecimal,
         days: Int,
-        isCompound: Boolean
+        isCompound: Boolean,
     ) = withContext(Dispatchers.Default) {
-        val dailyPercentage = maxAPY / DAYS_IN_YEAR
+        val dailyPercentage = _maxAPY / DAYS_IN_YEAR
 
         calculateReward(amount.toDouble(), days, dailyPercentage, isCompound)
     }
@@ -109,29 +110,35 @@ class RewardCalculator(
         dailyPercentage: Double,
         isCompound: Boolean
     ): PeriodReturns {
-        val gainAmount = if (isCompound) {
-            calculateCompoundReward(amount, days, dailyPercentage)
+        val gainPercentage = if (isCompound) {
+            calculateCompoundPercentage(days, dailyPercentage)
         } else {
-            calculateSimpleReward(amount, days, dailyPercentage)
-        }.toBigDecimal()
-
-        val gainPercentage = if (amount == 0.0) {
-            BigDecimal.ZERO
-        } else {
-            (gainAmount / amount.toBigDecimal()).fractionToPercentage()
+            calculateSimplePercentage(days, dailyPercentage)
         }
 
+        val gainAmount = gainPercentage * amount
+
         return PeriodReturns(
-            gainAmount = gainAmount,
-            gainPercentage = gainPercentage
+            gainAmount = gainAmount.toBigDecimal(),
+            gainFraction = gainPercentage.toBigDecimal()
         )
     }
 
-    private fun calculateSimpleReward(amount: Double, days: Int, dailyPercentage: Double): Double {
-        return amount * dailyPercentage * days
+    private fun calculateCompoundPercentage(days: Int, dailyPercentage: Double): Double {
+        return (1 + dailyPercentage).pow(days) - 1
     }
 
-    private fun calculateCompoundReward(amount: Double, days: Int, dailyPercentage: Double): Double {
-        return amount * ((1 + dailyPercentage).pow(days)) - amount
+    private fun calculateSimplePercentage(days: Int, dailyPercentage: Double): Double {
+        return dailyPercentage * days
     }
 }
+
+suspend fun RewardCalculator.maxCompoundAPY() = calculateMaxPeriodReturns(DAYS_IN_YEAR)
+
+suspend fun RewardCalculator.calculateMaxPeriodReturns(
+    days: Int,
+) = calculateReturns(
+    amount = BigDecimal.ONE,
+    days = days,
+    isCompound = true,
+).gainFraction

@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
-import androidx.recyclerview.widget.LinearLayoutManager
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.view.shape.getBlurDrawable
@@ -51,7 +50,7 @@ class NetworkInfoView @JvmOverloads constructor(
 
         applyAttributes(attrs)
 
-        stakingStoriesList.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        stakingStoriesList.setHasFixedSize(true)
         stakingStoriesList.adapter = storiesAdapter
 
         stakingNetworkInfoTitle.setOnClickListener { changeExpandableState() }
@@ -83,51 +82,20 @@ class NetworkInfoView @JvmOverloads constructor(
         lockUpPeriodView.showLoading()
     }
 
-    fun hideLoading() {
-        totalStakeView.hideLoading()
-        minimumStakeView.hideLoading()
-        activeNominatorsView.hideLoading()
-        lockUpPeriodView.hideLoading()
-    }
-
-    fun setTotalStake(totalStake: String) {
-        totalStakeView.setBody(totalStake)
+    fun setTotalStake(inTokens: String, inFiat: String?) {
+        totalStakeView.showValue(inTokens, inFiat)
     }
 
     fun setNominatorsCount(nominatorsCount: String) {
-        activeNominatorsView.setBody(nominatorsCount)
+        activeNominatorsView.showValue(nominatorsCount)
     }
 
-    fun setMinimumStake(minimumStake: String) {
-        minimumStakeView.setBody(minimumStake)
+    fun setMinimumStake(inTokens: String, inFiat: String?) {
+        minimumStakeView.showValue(inTokens, inFiat)
     }
 
     fun setLockupPeriod(period: String) {
-        lockUpPeriodView.setBody(period)
-    }
-
-    fun setTotalStakeFiat(totalStake: String) {
-        totalStakeView.setExtraBlockValueText(totalStake)
-    }
-
-    fun showTotalStakeFiat() {
-        totalStakeView.showWholeExtraBlock()
-    }
-
-    fun hideTotalStakeFiat() {
-        totalStakeView.makeExtraBlockInvisible()
-    }
-
-    fun setMinimumStakeFiat(minimumStake: String) {
-        minimumStakeView.setExtraBlockValueText(minimumStake)
-    }
-
-    fun showMinimumStakeFiat() {
-        minimumStakeView.showWholeExtraBlock()
-    }
-
-    fun hideMinimumStakeFiat() {
-        minimumStakeView.makeExtraBlockInvisible()
+        lockUpPeriodView.showValue(period)
     }
 
     override fun storyClicked(story: StakingStoryModel) {

@@ -13,6 +13,8 @@ import io.novafoundation.nova.common.view.shape.getBlurDrawable
 import io.novafoundation.nova.common.view.startTimer
 import io.novafoundation.nova.common.view.stopTimer
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.showValue
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import kotlinx.android.synthetic.main.view_stake_summary.view.stakeMoreActions
 import kotlinx.android.synthetic.main.view_stake_summary.view.stakeSummaryStatus
 import kotlinx.android.synthetic.main.view_stake_summary.view.stakeSummaryStatusHelper
@@ -62,41 +64,17 @@ class StakeSummaryView @JvmOverloads constructor(
         }
     }
 
-    fun hideLoading() {
-        stakeTotalStakedView.hideLoading()
-        stakeTotalRewardsView.hideLoading()
+    fun showLoading() {
+        stakeTotalStakedView.showLoading()
+        stakeTotalRewardsView.showLoading()
     }
 
-    fun setTotalStaked(inTokens: String) {
-        stakeTotalStakedView.setBody(inTokens)
+    fun showTotalStaked(amountModel: AmountModel) {
+        stakeTotalStakedView.showValue(amountModel)
     }
 
-    fun showTotalStakedFiat() {
-        stakeTotalStakedView.showWholeExtraBlock()
-    }
-
-    fun hideTotalStakeFiat() {
-        stakeTotalStakedView.makeExtraBlockInvisible()
-    }
-
-    fun setTotalStakedFiat(totalStake: String) {
-        stakeTotalStakedView.setExtraBlockValueText(totalStake)
-    }
-
-    fun setTotalRewards(inTokens: String) {
-        stakeTotalRewardsView.setBody(inTokens)
-    }
-
-    fun showTotalRewardsFiat() {
-        stakeTotalRewardsView.showWholeExtraBlock()
-    }
-
-    fun hideTotalRewardsFiat() {
-        stakeTotalRewardsView.makeExtraBlockInvisible()
-    }
-
-    fun setTotalRewardsFiat(totalRewards: String) {
-        stakeTotalRewardsView.setExtraBlockValueText(totalRewards)
+    fun showTotalRewards(amountModel: AmountModel) {
+        stakeTotalRewardsView.showValue(amountModel)
     }
 
     fun setStatusClickListener(listener: OnClickListener) {
