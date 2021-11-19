@@ -57,8 +57,6 @@ class StakingViewStateFactory(
     )
 
     fun createWelcomeViewState(
-        currentAssetFlow: Flow<Asset>,
-        accountStakingState: StakingState.NonStash,
         scope: CoroutineScope,
         errorDisplayer: (String) -> Unit
     ) = WelcomeViewState(
@@ -66,8 +64,6 @@ class StakingViewStateFactory(
         rewardCalculatorFactory,
         resourceManager,
         router,
-        accountStakingState,
-        currentAssetFlow,
         scope,
         errorDisplayer,
         welcomeStakingValidationSystem,

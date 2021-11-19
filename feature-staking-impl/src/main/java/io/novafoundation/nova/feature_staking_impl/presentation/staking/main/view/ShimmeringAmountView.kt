@@ -6,15 +6,16 @@ import android.view.View
 import android.widget.LinearLayout
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
-import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.common.utils.setShimmerVisible
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import kotlinx.android.synthetic.main.view_network_info_cell.view.networkInfoCellPrimaryShimmer
 import kotlinx.android.synthetic.main.view_network_info_cell.view.networkInfoCellPrimaryValue
 import kotlinx.android.synthetic.main.view_network_info_cell.view.networkInfoCellSecondaryShimmer
 import kotlinx.android.synthetic.main.view_network_info_cell.view.networkInfoCellSecondaryValue
 import kotlinx.android.synthetic.main.view_network_info_cell.view.networkInfoCellTitle
 
-class NetworkInfoCellView @JvmOverloads constructor(
+class ShimmeringAmountView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
@@ -31,19 +32,19 @@ class NetworkInfoCellView @JvmOverloads constructor(
     }
 
     private fun applyAttributes(attributeSet: AttributeSet) {
-        val typedArray = context.obtainStyledAttributes(attributeSet, R.styleable.NetworkInfoCellView)
+        val typedArray = context.obtainStyledAttributes(attributeSet, R.styleable.ShimmeringAmountView)
 
-        val title = typedArray.getString(R.styleable.NetworkInfoCellView_title)
+        val title = typedArray.getString(R.styleable.ShimmeringAmountView_title)
         title?.let { setTitle(title) }
 
-        usesSecondaryValue = typedArray.getBoolean(R.styleable.NetworkInfoCellView_useSecondaryValue, true)
+        usesSecondaryValue = typedArray.getBoolean(R.styleable.ShimmeringAmountView_useSecondaryValue, true)
         initSecondaryValue()
 
         typedArray.recycle()
     }
 
     private fun initSecondaryValue() {
-        networkInfoCellSecondaryShimmer.setVisible(usesSecondaryValue)
+        networkInfoCellSecondaryShimmer.setShimmerVisible(usesSecondaryValue)
     }
 
     fun setTitle(title: String) {
@@ -52,7 +53,7 @@ class NetworkInfoCellView @JvmOverloads constructor(
 
     fun showLoading() {
         if (usesSecondaryValue) {
-            networkInfoCellSecondaryShimmer.makeVisible()
+            networkInfoCellSecondaryShimmer.setShimmerVisible(true)
         }
         networkInfoCellSecondaryValue.makeGone()
 
@@ -68,8 +69,8 @@ class NetworkInfoCellView @JvmOverloads constructor(
             throw IllegalArgumentException("Cannot set secondary value when it is not used")
         }
 
-        networkInfoCellSecondaryShimmer.makeGone()
-        networkInfoCellPrimaryShimmer.makeGone()
+        networkInfoCellSecondaryShimmer.setShimmerVisible(false)
+        networkInfoCellPrimaryShimmer.setShimmerVisible(false)
 
         secondary?.let {
             networkInfoCellSecondaryValue.makeVisible()
@@ -80,3 +81,6 @@ class NetworkInfoCellView @JvmOverloads constructor(
         networkInfoCellPrimaryValue.text = primary
     }
 }
+
+
+fun ShimmeringAmountView.showValue(amountModel: AmountModel) = showValue(amountModel.token, amountModel.fiat)

@@ -7,9 +7,8 @@ import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
-import io.novafoundation.nova.common.utils.asLiveData
-import io.novafoundation.nova.common.utils.formatAsCurrency
-import io.novafoundation.nova.common.utils.formatAsPercentage
+import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.formatFractionAsPercentage
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.common.validation.ValidationExecutor
@@ -23,28 +22,23 @@ import io.novafoundation.nova.feature_staking_impl.domain.model.StashNoneStatus
 import io.novafoundation.nova.feature_staking_impl.domain.model.ValidatorStatus
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculator
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculatorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.rewards.calculateMaxPeriodReturns
 import io.novafoundation.nova.feature_staking_impl.domain.validations.welcome.WelcomeStakingValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.validations.welcome.WelcomeStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
-import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapPeriodReturnsToRewardEstimation
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.model.RewardEstimation
-import io.novafoundation.nova.feature_wallet_api.data.mappers.mapAssetToAssetModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 
@@ -54,17 +48,15 @@ private const val PERIOD_MONTH = 30
 private const val PERIOD_YEAR = 365
 
 class ReturnsModel(
-    val monthly: RewardEstimation,
-    val yearly: RewardEstimation,
+    val monthlyPercentage: String,
+    val yearlyPercentage: String,
 )
 
 class StakeSummaryModel<S>(
     val status: S,
-    val totalStaked: String,
-    val totalStakedFiat: String?,
-    val totalRewards: String,
-    val totalRewardsFiat: String?,
-    val currentEraDisplay: String
+    val totalStaked: AmountModel,
+    val totalRewards: AmountModel,
+    val currentEraDisplay: String,
 )
 
 typealias NominatorSummaryModel = StakeSummaryModel<NominatorStatus>
@@ -143,15 +135,10 @@ sealed class StakeViewState<S>(
             summaryFlowProvider(stakeState),
             currentAssetFlow
         ) { summary, asset ->
-            val token = asset.token
-            val tokenType = token.configuration
-
             StakeSummaryModel(
                 status = summary.status,
-                totalStaked = summary.totalStaked.formatTokenAmount(tokenType),
-                totalStakedFiat = token.fiatAmount(summary.totalStaked).formatAsCurrency(),
-                totalRewards = summary.totalReward.formatTokenAmount(tokenType),
-                totalRewardsFiat = token.fiatAmount(summary.totalReward).formatAsCurrency(),
+                totalStaked = mapAmountToAmountModel(summary.totalStaked, asset),
+                totalRewards = mapAmountToAmountModel(summary.totalReward, asset),
                 currentEraDisplay = resourceManager.getString(R.string.staking_era_title, summary.currentEra)
             )
         }
@@ -260,8 +247,6 @@ class WelcomeViewState(
     private val rewardCalculatorFactory: RewardCalculatorFactory,
     private val resourceManager: ResourceManager,
     private val router: StakingRouter,
-    private val accountStakingState: StakingState.NonStash,
-    private val currentAssetFlow: Flow<Asset>,
     private val scope: CoroutineScope,
     private val errorDisplayer: (String) -> Unit,
     private val validationSystem: WelcomeStakingValidationSystem,
@@ -270,40 +255,30 @@ class WelcomeViewState(
 
     private val currentSetupProgress = setupStakingSharedState.get<SetupStakingProcess.Initial>()
 
-    val enteredAmountFlow = MutableStateFlow(currentSetupProgress.defaultAmount.toString())
-
-    private val parsedAmountFlow = enteredAmountFlow.mapNotNull { it.toBigDecimalOrNull() }
-
-    val assetLiveData = currentAssetFlow.map { mapAssetToAssetModel(it, resourceManager) }.asLiveData(scope)
-
-    val amountFiat = parsedAmountFlow.combine(currentAssetFlow) { amount, asset -> asset.token.fiatAmount(amount).formatAsCurrency() }
-        .asLiveData(scope)
-
     private val rewardCalculator = scope.async { rewardCalculatorFactory.create() }
 
     private val _showRewardEstimationEvent = MutableLiveData<Event<StakingRewardEstimationBottomSheet.Payload>>()
     val showRewardEstimationEvent: LiveData<Event<StakingRewardEstimationBottomSheet.Payload>> = _showRewardEstimationEvent
 
-    val returns: LiveData<ReturnsModel> = currentAssetFlow.combine(parsedAmountFlow) { asset, amount ->
-        val monthly = rewardCalculator().calculateReturns(amount, PERIOD_MONTH, true)
-        val yearly = rewardCalculator().calculateReturns(amount, PERIOD_YEAR, true)
+    val returns = flowOf {
+        val rewardCalculator = rewardCalculator()
 
-        val monthlyEstimation = mapPeriodReturnsToRewardEstimation(monthly, asset.token, resourceManager)
-        val yearlyEstimation = mapPeriodReturnsToRewardEstimation(yearly, asset.token, resourceManager)
-
-        ReturnsModel(monthlyEstimation, yearlyEstimation)
-    }.asLiveData(scope)
+        ReturnsModel(
+            monthlyPercentage = rewardCalculator.calculateMaxPeriodReturns(PERIOD_MONTH).formatFractionAsPercentage(),
+            yearlyPercentage = rewardCalculator.calculateMaxPeriodReturns(PERIOD_YEAR).formatFractionAsPercentage()
+        )
+    }
+        .withLoading()
+        .inBackground()
+        .shareIn(scope, SharingStarted.Eagerly, replay = 1)
 
     fun infoActionClicked() {
         scope.launch {
             val rewardCalculator = rewardCalculator()
 
-            val maxAPY = rewardCalculator.calculateMaxAPY()
-            val avgAPY = rewardCalculator.calculateAvgAPY()
-
             val payload = StakingRewardEstimationBottomSheet.Payload(
-                maxAPY.formatAsPercentage(),
-                avgAPY.formatAsPercentage()
+                max = rewardCalculator.maxAPY.formatFractionAsPercentage(),
+                average = rewardCalculator.expectedAPY.formatFractionAsPercentage()
             )
 
             _showRewardEstimationEvent.value = Event(payload)
@@ -313,7 +288,6 @@ class WelcomeViewState(
     fun nextClicked() {
         scope.launch {
             val payload = WelcomeStakingValidationPayload()
-            val amount = parsedAmountFlow.first()
 
             validationExecutor.requireValid(
                 validationSystem = validationSystem,
@@ -321,7 +295,7 @@ class WelcomeViewState(
                 errorDisplayer = { it.message?.let(errorDisplayer) },
                 validationFailureTransformerDefault = { welcomeStakingValidationFailure(it, resourceManager) },
             ) {
-                setupStakingSharedState.set(currentSetupProgress.fullFlow(amount))
+                setupStakingSharedState.set(currentSetupProgress.fullFlow())
 
                 router.openSetupStaking()
             }

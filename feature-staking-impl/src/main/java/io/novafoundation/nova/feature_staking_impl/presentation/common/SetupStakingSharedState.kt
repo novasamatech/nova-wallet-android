@@ -10,23 +10,21 @@ sealed class SetupStakingProcess {
 
     object Initial : SetupStakingProcess() {
 
-        val defaultAmount = 10.toBigDecimal()
-
-        fun fullFlow(amount: BigDecimal) = Stash(amount)
+        fun fullFlow() = Stash
 
         fun existingStashFlow() = Validators(Validators.Payload.ExistingStash)
 
         fun changeValidatorsFlow() = Validators(Validators.Payload.Validators)
     }
 
-    class Stash(val amount: BigDecimal) : SetupStakingProcess() {
+    object Stash : SetupStakingProcess() {
 
         fun previous() = Initial
 
         fun next(
             newAmount: BigDecimal,
             rewardDestination: RewardDestination,
-            currentAccountAddress: String
+            currentAccountAddress: String,
         ) = Validators(Validators.Payload.Full(newAmount, rewardDestination, currentAccountAddress))
     }
 
@@ -48,7 +46,7 @@ sealed class SetupStakingProcess {
         }
 
         fun previous() = when (payload) {
-            is Payload.Full -> Stash(payload.amount)
+            is Payload.Full -> Stash
             else -> Initial
         }
 

@@ -24,6 +24,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.facebook.shimmer.ShimmerFrameLayout
 import dev.chrisbanes.insetter.applyInsetter
 
 fun View.updatePadding(
@@ -73,6 +74,12 @@ fun View.updateTopMargin(newMargin: Int) {
     (layoutParams as? MarginLayoutParams)?.let {
         it.setMargins(it.leftMargin, newMargin, it.rightMargin, it.bottomMargin)
     }
+}
+
+fun ShimmerFrameLayout.setShimmerVisible(visible: Boolean) {
+    if (visible) startShimmer() else stopShimmer()
+
+    setVisible(visible)
 }
 
 private fun TextView.setCompoundDrawable(

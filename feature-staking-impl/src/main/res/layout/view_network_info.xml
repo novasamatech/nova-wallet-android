@@ -45,7 +45,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.NetworkInfoCellView
+        <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.ShimmeringAmountView
             android:id="@+id/totalStakeView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -54,10 +54,9 @@
             app:layout_constraintEnd_toStartOf="@id/minimumStakeView"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/stakingStoriesList"
-            app:title="@string/staking_total_staked"
-            app:startWithLoading="true" />
+            app:title="@string/staking_total_staked" />
 
-        <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.NetworkInfoCellView
+        <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.ShimmeringAmountView
             android:id="@+id/minimumStakeView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -66,10 +65,9 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/totalStakeView"
             app:layout_constraintTop_toBottomOf="@id/stakingStoriesList"
-            app:title="@string/staking_main_minimum_stake_title"
-            app:startWithLoading="true" />
+            app:title="@string/staking_main_minimum_stake_title" />
 
-        <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.NetworkInfoCellView
+        <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.ShimmeringAmountView
             android:id="@+id/activeNominatorsView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -81,7 +79,7 @@
             app:layout_constraintTop_toBottomOf="@id/totalStakeView"
             app:title="@string/staking_main_active_nominators_title" />
 
-        <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.NetworkInfoCellView
+        <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.ShimmeringAmountView
             android:id="@+id/lockUpPeriodView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

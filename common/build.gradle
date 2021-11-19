@@ -94,6 +94,8 @@ dependencies {
     api coilDep
     api coilSvg
 
+    implementation shimmerDep
+
     testImplementation jUnitDep
     testImplementation mockitoDep
     testImplementation project(':test-shared')

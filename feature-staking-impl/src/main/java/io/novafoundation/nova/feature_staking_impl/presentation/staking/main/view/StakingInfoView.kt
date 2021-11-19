@@ -5,11 +5,12 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
 import io.novafoundation.nova.common.utils.makeGone
-import io.novafoundation.nova.common.utils.makeInvisible
 import io.novafoundation.nova.common.utils.makeVisible
-import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.common.utils.setShimmerVisible
 import io.novafoundation.nova.feature_staking_impl.R
-import kotlinx.android.synthetic.main.view_staking_info.view.*
+import kotlinx.android.synthetic.main.view_staking_info.view.stakingInfoGain
+import kotlinx.android.synthetic.main.view_staking_info.view.stakingInfoGainShimmer
+import kotlinx.android.synthetic.main.view_staking_info.view.stakingInfoTitle
 
 class StakingInfoView @JvmOverloads constructor(
     context: Context,
@@ -28,24 +29,8 @@ class StakingInfoView @JvmOverloads constructor(
     private fun applyAttributes(attributeSet: AttributeSet) {
         val typedArray = context.obtainStyledAttributes(attributeSet, R.styleable.StakingInfoView)
 
-        val title = typedArray.getString(R.styleable.StakingInfoView_titleText)
+        val title = typedArray.getString(R.styleable.StakingInfoView_title)
         title?.let { setTitle(title) }
-
-        val showTitle = typedArray.getBoolean(R.styleable.StakingInfoView_showTitle, true)
-        setTitleVisibility(showTitle)
-
-        val titleDetailText = typedArray.getString(R.styleable.StakingInfoView_titleDetail)
-        titleDetailText?.let { setTitleDetail(titleDetailText) }
-
-        val includeExtraBlock = typedArray.getBoolean(R.styleable.StakingInfoView_includeExtraBlock, true)
-        if (includeExtraBlock) {
-            showWholeExtraBlock()
-        } else {
-            hideWholeExtraBlock()
-        }
-
-        val startWithLoading = typedArray.getBoolean(R.styleable.StakingInfoView_startWithLoading, false)
-        if (startWithLoading) showLoading()
 
         typedArray.recycle()
     }
@@ -54,59 +39,15 @@ class StakingInfoView @JvmOverloads constructor(
         stakingInfoTitle.text = title
     }
 
-    fun setTitleVisibility(isVisible: Boolean) {
-        stakingInfoTitle.setVisible(isVisible)
-    }
-
-    fun setTitleDetail(titleDetail: String) {
-        stakingInfoTitleDetail.text = titleDetail
-    }
-
-    fun setBody(body: String) {
-        stakingInfoBody.text = body
-    }
-
-    fun setExtraBlockValueText(text: String) {
-        stakingInfoExtraBlockValue.text = text
-    }
-
-    fun showExtraBlockValue() {
-        stakingInfoExtraBlockValue.makeVisible()
-    }
-
-    fun hideExtraBlockValue() {
-        stakingInfoExtraBlockValue.makeGone()
-    }
-
-    fun setExtraBlockAdditionalText(text: String) {
-        stakingInfoExtraTitleDetailView.makeVisible()
-
-        stakingInfoExtraBlockAdditional.text = text
-    }
-
-    fun showWholeExtraBlock() {
-        stakingInfoExtraBlock.makeVisible()
-    }
-
-    fun hideWholeExtraBlock() {
-        stakingInfoExtraBlock.makeGone()
-    }
-
-    fun makeExtraBlockInvisible() {
-        stakingInfoExtraBlock.makeInvisible()
-    }
-
     fun showLoading() {
-        stakingInfoBodyShimmer.makeVisible()
-        stakingInfoBody.makeGone()
-        stakingInfoExtraBlockValue.makeGone()
-        stakingInfoExtraBlockShimmer.makeVisible()
+        stakingInfoGainShimmer.setShimmerVisible(true)
+        stakingInfoGain.makeGone()
     }
 
-    fun hideLoading() {
-        stakingInfoBody.makeVisible()
-        stakingInfoBodyShimmer.makeGone()
-        stakingInfoExtraBlockValue.makeVisible()
-        stakingInfoExtraBlockShimmer.makeGone()
+    fun showGain(gain: String) {
+        stakingInfoGainShimmer.setShimmerVisible(false)
+        stakingInfoGain.makeVisible()
+
+        stakingInfoGain.text = gain
     }
 }

@@ -24,6 +24,9 @@
         <item name="textSizeB1">@dimen/text_size_b1</item>
         <item name="textSizeB2">@dimen/text_size_b2</item>
         <item name="textSizeB3">@dimen/text_size_b3</item>
+
+
+        <item name="textSizeTitle3">@dimen/text_size_title3</item>
         <!--text sizes-->
 
         <!--fonts-->
