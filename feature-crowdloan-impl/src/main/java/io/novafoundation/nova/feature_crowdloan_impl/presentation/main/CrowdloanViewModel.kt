@@ -14,14 +14,13 @@ import io.novafoundation.nova.common.utils.format
 import io.novafoundation.nova.common.utils.formatAsPercentage
 import io.novafoundation.nova.common.utils.fractionToPercentage
 import io.novafoundation.nova.common.utils.inBackground
-import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.ParaId
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.data.CrowdloanSharedState
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomContributeManager
 import io.novafoundation.nova.feature_crowdloan_impl.domain.main.Crowdloan
-import io.novafoundation.nova.feature_crowdloan_impl.domain.main.CrowdloanInteractor
+import io.novafoundation.nova.feature_crowdloan_impl.domain.main.statefull.StatefulCrowdloanMixin
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.parcel.ContributePayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.parcel.mapParachainMetadataToParcel
@@ -36,7 +35,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelecto
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.chain
-import io.novafoundation.nova.runtime.state.selectedChainFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -44,14 +42,14 @@ import kotlinx.coroutines.launch
 import kotlin.reflect.KClass
 
 class CrowdloanViewModel(
-    private val interactor: CrowdloanInteractor,
     private val iconGenerator: AddressIconGenerator,
     private val resourceManager: ResourceManager,
     private val crowdloanSharedState: CrowdloanSharedState,
     private val router: CrowdloanRouter,
     private val customContributeManager: CustomContributeManager,
-    private val crowdloanUpdateSystem: UpdateSystem,
+    crowdloanUpdateSystem: UpdateSystem,
     assetSelectorFactory: MixinFactory<AssetSelectorMixin.Presentation>,
+    statefulCrowdloanMixinFactory: StatefulCrowdloanMixin.Factory,
     customDialogDisplayer: CustomDialogDisplayer,
 ) : BaseViewModel(),
     WithAssetSelector,
@@ -63,25 +61,18 @@ class CrowdloanViewModel(
         resourceManager.getString(R.string.crowdloan_main_description, it.token.configuration.symbol)
     }
 
-    private val selectedChain = crowdloanSharedState.selectedChainFlow()
-        .share()
+    private val crowdloansMixin = statefulCrowdloanMixinFactory.create(scope = this)
 
-    private val crowdloansFlow = selectedChain.withLoading {
-        interactor.crowdloansFlow(it)
-    }
+    private val crowdloansListFlow = crowdloansMixin.groupedCrowdloansFlow
+        .mapLoading { it.toValueList() }
         .inBackground()
         .share()
 
-    private val crowdloansListFlow = crowdloansFlow
-        .mapLoading { it.crowdloanList.toValueList() }
-        .inBackground()
-        .share()
-
-    val crowdloanModelsFlow = crowdloansFlow.mapLoading { groupedCrowdloans ->
+    val crowdloanModelsFlow = crowdloansMixin.groupedCrowdloansFlow.mapLoading { groupedCrowdloans ->
         val asset = assetSelectorMixin.selectedAssetFlow.first()
         val chain = crowdloanSharedState.chain()
 
-        groupedCrowdloans.crowdloanList
+        groupedCrowdloans
             .mapKeys { (statusClass, values) -> mapCrowdloanStatusToUi(statusClass, values.size) }
             .mapValues { (_, crowdloans) -> crowdloans.map { mapCrowdloanToCrowdloanModel(chain, it, asset) } }
             .toListWithHeaders()
@@ -89,7 +80,8 @@ class CrowdloanViewModel(
         .inBackground()
         .share()
 
-    val myContributionsCount = crowdloansFlow.mapLoading { crowdloans -> crowdloans.contributionsCount.format() }
+    val myContributionsCount = crowdloansMixin.allUserContributions
+        .mapLoading { it.format() }
         .inBackground()
         .share()
 
