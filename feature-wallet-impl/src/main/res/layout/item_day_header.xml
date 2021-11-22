@@ -4,7 +4,7 @@
     android:id="@+id/itemDayHeader"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:fontFamily="@font/soramitsu_bold"
+    android:fontFamily="?attr/fontBold"
     android:includeFontPadding="false"
     android:paddingStart="@dimen/x2"
     android:paddingTop="@dimen/x1"
