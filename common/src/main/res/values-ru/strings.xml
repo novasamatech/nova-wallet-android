@@ -273,8 +273,8 @@
     <string name="runtime_update_failure_title">Ошибка обновления среды выполнения</string>
     <string name="runtime_update_failure_description">Не удалось обновить информацию о среде выполнения блокчейна. Некоторые функции могут не работать.</string>
     <string name="staking_title">Стейкинг</string>
-    <string name="staking_month_period_title">ежемесячно</string>
-    <string name="staking_year_period_title">ежегодно</string>
+    <string name="staking_month_period_title">Eжемесячно</string>
+    <string name="staking_year_period_title">Eжегодно</string>
     <string name="staking_recommended_title">Валидаторы</string>
     <string name="staking_recommended_section_title">Рекомендованные валидаторы</string>
     <string name="staking_recommended_feature_1">Самые доходные</string>

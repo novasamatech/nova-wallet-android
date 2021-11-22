@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_wallet_api.presentation.model
 
 import io.novafoundation.nova.common.utils.formatAsCurrency
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import java.math.BigDecimal
@@ -22,10 +23,8 @@ fun mapAmountToAmountModel(
 
 fun mapAmountToAmountModel(
     amount: BigDecimal,
-    asset: Asset
+    token: Token,
 ): AmountModel {
-    val token = asset.token
-
     val fiatAmount = token.fiatAmount(amount)
 
     return AmountModel(
@@ -33,3 +32,8 @@ fun mapAmountToAmountModel(
         fiat = fiatAmount.formatAsCurrency()
     )
 }
+
+fun mapAmountToAmountModel(
+    amount: BigDecimal,
+    asset: Asset,
+): AmountModel = mapAmountToAmountModel(amount, asset.token)

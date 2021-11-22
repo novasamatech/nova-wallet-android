@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.mappers
 import androidx.annotation.StringRes
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatAsCurrency
-import io.novafoundation.nova.common.utils.formatAsPercentage
+import io.novafoundation.nova.common.utils.formatFractionAsPercentage
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.PeriodReturns
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.model.RewardEstimation
@@ -23,7 +23,7 @@ fun mapPeriodReturnsToRewardEstimation(
     rewardSuffix: RewardSuffix = RewardSuffix.None,
 ): RewardEstimation {
 
-    val gainFormatted = periodReturns.gainPercentage.formatAsPercentage()
+    val gainFormatted = periodReturns.gainFraction.formatFractionAsPercentage()
     val gainWithSuffix = rewardSuffix.suffixResourceId?.let { resourceManager.getString(it, gainFormatted) } ?: gainFormatted
 
     return RewardEstimation(

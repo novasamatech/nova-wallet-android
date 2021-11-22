@@ -30,8 +30,6 @@ class RewardCalculatorFactory(
             RewardCalculationTarget(
                 accountIdHex = accountIdHex,
                 totalStake = exposure.total,
-                nominatorStakes = exposure.others,
-                ownStake = exposure.own,
                 commission = validatorPrefs.commission
             )
         }

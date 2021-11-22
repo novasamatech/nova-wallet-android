@@ -3,6 +3,14 @@
 
     <!--Font styles-->
 
+    <style name="TextAppearance.NovaFoundation.Title" parent="TextAppearance.AppCompat.Title">
+        <item name="android:fontFamily">?attr/fontRegular</item>
+    </style>
+
+    <style name="TextAppearance.NovaFoundation.Title3" parent="TextAppearance.NovaFoundation.Title">
+        <item name="android:textSize">?attr/textSizeTitle3</item>
+    </style>
+
     <style name="TextAppearance.Nova.Header" parent="TextAppearance.AppCompat.Title">
         <item name="android:fontFamily">?attr/fontBold</item>
     </style>
