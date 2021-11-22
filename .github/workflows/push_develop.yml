@@ -27,11 +27,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Build with Gradle
-        run: ./gradlew assembleDebug
-
       - name: Run tests
         run: ./gradlew runTest
+
+      - name: Build with Gradle
+        run: ./gradlew assembleDebug
 
       - uses: actions/upload-artifact@v2
         with:
