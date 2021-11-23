@@ -9,9 +9,15 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
+import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
+import io.novafoundation.nova.feature_wallet_api.domain.implementations.FixedTokenUseCase
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletInteractor
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderProvider
 import io.novafoundation.nova.feature_wallet_impl.presentation.AssetPayload
 import io.novafoundation.nova.feature_wallet_impl.presentation.WalletRouter
 import io.novafoundation.nova.feature_wallet_impl.presentation.send.TransferValidityChecks
@@ -29,6 +35,27 @@ class ChooseAmountModule {
     }
 
     @Provides
+    fun provideFixedTokenUseCase(
+        assetPayload: AssetPayload,
+        chainRegistry: ChainRegistry,
+        tokenRepository: TokenRepository,
+    ): TokenUseCase = FixedTokenUseCase(
+        tokenRepository = tokenRepository,
+        chainId = assetPayload.chainId,
+        chainRegistry = chainRegistry,
+        chainAssetId = assetPayload.chainAssetId
+    )
+
+    @Provides
+    fun provideFeeLoaderMixin(
+        resourceManager: ResourceManager,
+        tokenUseCase: TokenUseCase,
+    ): FeeLoaderMixin.Presentation = FeeLoaderProvider(
+        resourceManager,
+        tokenUseCase
+    )
+
+    @Provides
     @IntoMap
     @ViewModelKey(ChooseAmountViewModel::class)
     fun provideViewModel(
@@ -38,29 +65,33 @@ class ChooseAmountModule {
         externalActions: ExternalActions.Presentation,
         transferValidityChecks: TransferValidityChecks.Presentation,
         recipientAddress: String,
-        walletConstants: WalletConstants,
         assetPayload: AssetPayload,
         chainRegistry: ChainRegistry,
-        phishingWarning: PhishingWarningMixin
+        phishingWarning: PhishingWarningMixin,
+        feeLoaderMixin: FeeLoaderMixin.Presentation,
+        resourceManager: ResourceManager,
+        amountChooserMixinFactory: AmountChooserMixin.Factory,
     ): ViewModel {
         return ChooseAmountViewModel(
-            interactor,
-            router,
-            addressModelGenerator,
-            externalActions,
-            transferValidityChecks,
-            walletConstants,
-            recipientAddress,
-            assetPayload,
-            chainRegistry,
-            phishingWarning
+            interactor = interactor,
+            router = router,
+            addressIconGenerator = addressModelGenerator,
+            externalActions = externalActions,
+            transferValidityChecks = transferValidityChecks,
+            recipientAddress = recipientAddress,
+            assetPayload = assetPayload,
+            chainRegistry = chainRegistry,
+            feeLoaderMixin = feeLoaderMixin,
+            resourceManager = resourceManager,
+            phishingAddress = phishingWarning,
+            amountChooserMixinFactory = amountChooserMixinFactory
         )
     }
 
     @Provides
     fun provideViewModelCreator(
         fragment: Fragment,
-        viewModelFactory: ViewModelProvider.Factory
+        viewModelFactory: ViewModelProvider.Factory,
     ): ChooseAmountViewModel {
         return ViewModelProvider(fragment, viewModelFactory).get(ChooseAmountViewModel::class.java)
     }

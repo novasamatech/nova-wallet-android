@@ -235,3 +235,11 @@ fun View.applyBarMargin() = applyInsetter {
         margin()
     }
 }
+
+fun View.applyStatusBarInsets(consume: Boolean = true) = applyInsetter {
+    type(statusBars = true) {
+        padding()
+    }
+
+    consume(true)
+}

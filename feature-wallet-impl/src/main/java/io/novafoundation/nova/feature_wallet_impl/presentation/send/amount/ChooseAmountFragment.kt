@@ -2,32 +2,25 @@ package io.novafoundation.nova.feature_wallet_impl.presentation.send.amount
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AlertDialog
 import coil.ImageLoader
-import coil.load
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.onTextChanged
-import io.novafoundation.nova.common.utils.setTextColorRes
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 import io.novafoundation.nova.feature_wallet_impl.R
 import io.novafoundation.nova.feature_wallet_impl.di.WalletFeatureComponent
 import io.novafoundation.nova.feature_wallet_impl.presentation.AssetPayload
-import io.novafoundation.nova.feature_wallet_impl.presentation.send.BalanceDetailsBottomSheet
 import io.novafoundation.nova.feature_wallet_impl.presentation.send.observeTransferChecks
 import io.novafoundation.nova.feature_wallet_impl.presentation.send.phishing.observePhishingCheck
-import kotlinx.android.synthetic.main.fragment_choose_amount.chooseAmountBalance
-import kotlinx.android.synthetic.main.fragment_choose_amount.chooseAmountBalanceLabel
+import kotlinx.android.synthetic.main.fragment_choose_amount.chooseAmountContainer
 import kotlinx.android.synthetic.main.fragment_choose_amount.chooseAmountFee
-import kotlinx.android.synthetic.main.fragment_choose_amount.chooseAmountFeeProgress
-import kotlinx.android.synthetic.main.fragment_choose_amount.chooseAmountField
+import kotlinx.android.synthetic.main.fragment_choose_amount.chooseAmountInput
 import kotlinx.android.synthetic.main.fragment_choose_amount.chooseAmountNext
 import kotlinx.android.synthetic.main.fragment_choose_amount.chooseAmountRecipientView
-import kotlinx.android.synthetic.main.fragment_choose_amount.chooseAmountToken
 import kotlinx.android.synthetic.main.fragment_choose_amount.chooseAmountToolbar
 import javax.inject.Inject
 
@@ -53,15 +46,15 @@ class ChooseAmountFragment : BaseFragment<ChooseAmountViewModel>() {
     ) = layoutInflater.inflate(R.layout.fragment_choose_amount, container, false)
 
     override fun initViews() {
+        chooseAmountContainer.applyStatusBarInsets()
+
         chooseAmountNext.prepareForProgress(viewLifecycleOwner)
 
-        chooseAmountRecipientView.setActionClickListener { viewModel.recipientAddressClicked() }
+        chooseAmountRecipientView.setWholeClickListener { viewModel.recipientAddressClicked() }
 
         chooseAmountToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         chooseAmountNext.setOnClickListener { viewModel.nextClicked() }
-
-        chooseAmountBalanceLabel.setOnClickListener { viewModel.availableBalanceClicked() }
     }
 
     override fun inject() {
@@ -75,56 +68,18 @@ class ChooseAmountFragment : BaseFragment<ChooseAmountViewModel>() {
     }
 
     override fun subscribe(viewModel: ChooseAmountViewModel) {
-        setupExternalActions(viewModel)
-
         observeTransferChecks(viewModel, viewModel::warningConfirmed)
+        observePhishingCheck(viewModel)
+        setupExternalActions(viewModel)
+        setupFeeLoading(viewModel, chooseAmountFee)
+        setupAmountChooser(viewModel, chooseAmountInput)
 
-        viewModel.feeLiveData.observe {
-            chooseAmountFee.text = it?.feeAmount?.formatTokenAmount(it.type) ?: getString(R.string.common_error_general_title)
-        }
-
-        viewModel.feeLoadingLiveData.observe { loading ->
-            val textColorRes = if (loading) R.color.gray3 else R.color.white
-            chooseAmountFee.setTextColorRes(textColorRes)
-
-            chooseAmountFeeProgress.visibility = if (loading) View.VISIBLE else View.GONE
-        }
-
-        viewModel.recipientModelLiveData.observe {
+        viewModel.recipientModelFlow.observe {
             chooseAmountRecipientView.setMessage(it.address)
 
             chooseAmountRecipientView.setTextIcon(it.image)
         }
 
-        viewModel.assetLiveData.observe {
-            chooseAmountBalance.text = it.available.formatTokenAmount(it.token.configuration)
-
-            chooseAmountToken.textIconView.load(it.token.configuration.iconUrl, imageLoader)
-            chooseAmountToken.setMessage(it.token.configuration.symbol)
-        }
-
-        viewModel.feeErrorLiveData.observeEvent {
-            showRetry(it)
-        }
-
         viewModel.continueButtonStateLiveData.observe(chooseAmountNext::setState)
-
-        viewModel.showBalanceDetailsEvent.observeEvent {
-            BalanceDetailsBottomSheet(requireContext(), it).show()
-        }
-
-        observePhishingCheck(viewModel)
-
-        chooseAmountField.content.onTextChanged(viewModel::amountChanged)
-    }
-
-    private fun showRetry(reason: RetryReason) {
-        AlertDialog.Builder(requireActivity())
-            .setTitle(R.string.choose_amount_network_error)
-            .setMessage(reason.reasonRes)
-            .setCancelable(false)
-            .setPositiveButton(R.string.common_retry) { _, _ -> viewModel.retry(reason) }
-            .setNegativeButton(R.string.common_cancel) { _, _ -> viewModel.backClicked() }
-            .show()
     }
 }

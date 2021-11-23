@@ -37,6 +37,8 @@ dependencies {
     implementation androidDep
     implementation constraintDep
 
+    implementation lifeCycleKtxDep
+
     api project(':core-api')
     api project(':core-db')
 

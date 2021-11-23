@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_wallet_impl.domain
 
 import io.novafoundation.nova.common.data.model.CursorPage
 import io.novafoundation.nova.common.interfaces.FileProvider
-import jp.co.soramitsu.fearless_utils.encrypt.qr.QrSharing
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.NotValidTransferStatus
@@ -10,7 +9,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFi
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.domain.model.Fee
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.OperationsPageChange
 import io.novafoundation.nova.feature_wallet_api.domain.model.RecipientSearchResult
@@ -21,6 +19,7 @@ import io.novafoundation.nova.runtime.ext.isValidAddress
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
+import jp.co.soramitsu.fearless_utils.encrypt.qr.QrSharing
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
@@ -31,6 +30,7 @@ import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.math.BigDecimal
+import java.math.BigInteger
 
 class WalletInteractorImpl(
     private val walletRepository: WalletRepository,
@@ -162,7 +162,7 @@ class WalletInteractorImpl(
         return /*walletRepository.isAccountIdFromPhishingList(address)*/ false
     }
 
-    override suspend fun getTransferFee(transfer: Transfer): Fee {
+    override suspend fun getTransferFee(transfer: Transfer): BigInteger {
         val chain = chainRegistry.getChain(transfer.chainAsset.chainId)
 
         return walletRepository.getTransferFee(chain, transfer)
@@ -177,7 +177,7 @@ class WalletInteractorImpl(
         val chain = chainRegistry.getChain(transfer.chainAsset.chainId)
         val accountId = metaAccount.accountIdIn(chain)!!
 
-        val validityStatus = walletRepository.checkTransferValidity(accountId, chain, transfer)
+        val validityStatus = walletRepository.checkTransferValidity(accountId, chain, transfer, fee)
 
         if (validityStatus.level > maxAllowedLevel) {
             return@withContext Result.failure(NotValidTransferStatus(validityStatus))
@@ -188,13 +188,16 @@ class WalletInteractorImpl(
         }
     }
 
-    override suspend fun checkTransferValidityStatus(transfer: Transfer): Result<TransferValidityStatus> {
+    override suspend fun checkTransferValidityStatus(
+        transfer: Transfer,
+        estimatedFee: BigDecimal,
+    ): Result<TransferValidityStatus> {
         return runCatching {
             val metaAccount = accountRepository.getSelectedMetaAccount()
             val chain = chainRegistry.getChain(transfer.chainAsset.chainId)
             val accountId = metaAccount.accountIdIn(chain)!!
 
-            walletRepository.checkTransferValidity(accountId, chain, transfer)
+            walletRepository.checkTransferValidity(accountId, chain, transfer, estimatedFee)
         }
     }
 

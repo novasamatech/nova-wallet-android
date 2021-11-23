@@ -24,7 +24,7 @@ interface FeeLoaderMixin : Retriable {
     interface Presentation : FeeLoaderMixin {
 
         suspend fun loadFeeSuspending(
-            coroutineScope: CoroutineScope,
+            retryScope: CoroutineScope,
             feeConstructor: suspend (Token) -> BigInteger,
             onRetryCancelled: () -> Unit,
         )

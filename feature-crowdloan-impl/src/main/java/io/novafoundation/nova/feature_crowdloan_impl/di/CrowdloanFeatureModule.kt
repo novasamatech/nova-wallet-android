@@ -21,7 +21,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.domain.main.CrowdloanIntera
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.AssetUseCaseImpl
-import io.novafoundation.nova.feature_wallet_api.domain.implementations.TokenUseCaseImpl
+import io.novafoundation.nova.feature_wallet_api.domain.implementations.SharedStateTokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorFactory
@@ -69,7 +69,7 @@ class CrowdloanFeatureModule {
     fun provideTokenUseCase(
         tokenRepository: TokenRepository,
         sharedState: CrowdloanSharedState,
-    ): TokenUseCase = TokenUseCaseImpl(
+    ): TokenUseCase = SharedStateTokenUseCase(
         tokenRepository,
         sharedState
     )

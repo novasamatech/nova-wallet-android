@@ -14,9 +14,6 @@ import io.novafoundation.nova.core_db.model.AssetWithToken
 import io.novafoundation.nova.core_db.model.OperationLocal
 import io.novafoundation.nova.core_db.model.PhishingAddressLocal
 import io.novafoundation.nova.core_db.model.TokenLocal
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.findMetaAccountOrThrow
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
@@ -24,14 +21,12 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFi
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.domain.model.Fee
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.Transfer
 import io.novafoundation.nova.feature_wallet_api.domain.model.TransferValidityStatus
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_impl.data.mappers.mapAssetLocalToAsset
-import io.novafoundation.nova.feature_wallet_impl.data.mappers.mapFeeRemoteToFee
 import io.novafoundation.nova.feature_wallet_impl.data.mappers.mapNodeToOperation
 import io.novafoundation.nova.feature_wallet_impl.data.mappers.mapOperationLocalToOperation
 import io.novafoundation.nova.feature_wallet_impl.data.mappers.mapOperationToOperationLocalDb
@@ -47,6 +42,9 @@ import io.novafoundation.nova.runtime.ext.historySupported
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import jp.co.soramitsu.fearless_utils.extensions.toHexString
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -57,6 +55,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
+import java.math.BigInteger
 
 class WalletRepositoryImpl(
     private val substrateSource: SubstrateRemoteSource,
@@ -227,10 +226,8 @@ class WalletRepositoryImpl(
         return operationDao.getContacts(query, chain.addressOf(accountId), chain.id).toSet()
     }
 
-    override suspend fun getTransferFee(chain: Chain, transfer: Transfer): Fee {
-        val fee = substrateSource.getTransferFee(chain, transfer)
-
-        return mapFeeRemoteToFee(fee, transfer)
+    override suspend fun getTransferFee(chain: Chain, transfer: Transfer): BigInteger {
+        return substrateSource.getTransferFee(chain, transfer)
     }
 
     override suspend fun performTransfer(
@@ -257,9 +254,8 @@ class WalletRepositoryImpl(
         accountId: AccountId,
         chain: Chain,
         transfer: Transfer,
+        estimatedFee: BigDecimal,
     ): TransferValidityStatus {
-        val feeResponse = getTransferFee(chain, transfer)
-
         val chainAsset = transfer.chainAsset
 
         val recipientInfo = substrateSource.getAccountInfo(chain.id, chain.accountIdOf(transfer.recipient))
@@ -272,7 +268,7 @@ class WalletRepositoryImpl(
         val existentialDepositInPlanks = walletConstants.existentialDeposit(chain.id)
         val existentialDeposit = chainAsset.amountFromPlanks(existentialDepositInPlanks)
 
-        return transfer.validityStatus(asset.transferable, asset.total, feeResponse.feeAmount, totalRecipientBalance, existentialDeposit)
+        return transfer.validityStatus(asset.transferable, asset.total, estimatedFee, totalRecipientBalance, existentialDeposit)
     }
 
     // TODO adapt for ethereum chains

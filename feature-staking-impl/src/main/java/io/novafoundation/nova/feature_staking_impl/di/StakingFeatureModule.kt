@@ -54,7 +54,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.rewardDes
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.AssetUseCaseImpl
-import io.novafoundation.nova.feature_wallet_api.domain.implementations.TokenUseCaseImpl
+import io.novafoundation.nova.feature_wallet_api.domain.implementations.SharedStateTokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
@@ -99,7 +99,7 @@ class StakingFeatureModule {
     fun provideTokenUseCase(
         tokenRepository: TokenRepository,
         sharedState: StakingSharedState,
-    ): TokenUseCase = TokenUseCaseImpl(
+    ): TokenUseCase = SharedStateTokenUseCase(
         tokenRepository,
         sharedState
     )

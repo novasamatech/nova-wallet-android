@@ -22,6 +22,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstan
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.BuyTokenRegistry
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserProviderFactory
 import io.novafoundation.nova.feature_wallet_impl.BuildConfig
 import io.novafoundation.nova.feature_wallet_impl.data.buyToken.MoonPayProvider
 import io.novafoundation.nova.feature_wallet_impl.data.buyToken.RampProvider
@@ -68,7 +70,7 @@ class WalletFeatureModule {
     fun provideAssetCache(
         tokenDao: TokenDao,
         assetDao: AssetDao,
-        accountRepository: AccountRepository
+        accountRepository: AccountRepository,
     ): AssetCache {
         return AssetCache(tokenDao, accountRepository, assetDao)
     }
@@ -207,4 +209,8 @@ class WalletFeatureModule {
     fun provideWalletConstants(
         chainRegistry: ChainRegistry,
     ): WalletConstants = RuntimeWalletConstants(chainRegistry)
+
+    @Provides
+    @FeatureScope
+    fun provideAmountChooserFactory(): AmountChooserMixin.Factory = AmountChooserProviderFactory()
 }
