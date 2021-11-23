@@ -104,7 +104,7 @@ class CrowdloanContributeFragment : BaseFragment<CrowdloanContributeViewModel>()
         crowdloanContributeAmount.amountInput.bindTo(viewModel.enteredAmountFlow, lifecycleScope)
 
         viewModel.enteredFiatAmountFlow.observe {
-            it.let(crowdloanContributeAmount::setAssetBalanceDollarAmount)
+            it.let(crowdloanContributeAmount::setFiatAmount)
         }
 
         viewModel.feeLiveData.observe(crowdloanContributeFee::setFeeStatus)

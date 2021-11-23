@@ -18,6 +18,8 @@ fun BaseFragment<*>.setupAmountChooser(
     amountView.amountInput.bindTo(withChooser.amountChooserMixin.amountInput, lifecycleScope)
 
     withChooser.amountChooserMixin.assetModel.observe(amountView::setAssetModel)
+
+    withChooser.amountChooserMixin.fiatAmount.observe(amountView::setFiatAmount)
 }
 
 fun AmountView.setAssetModel(assetModel: AssetModel) {

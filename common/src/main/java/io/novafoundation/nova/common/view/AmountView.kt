@@ -101,7 +101,7 @@ class AmountView @JvmOverloads constructor(
         stakingAssetBalance.text = balance
     }
 
-    fun setAssetBalanceDollarAmount(dollarAmount: String?) {
+    fun setFiatAmount(dollarAmount: String?) {
         stakingAssetDollarAmount.setTextOrHide(dollarAmount)
     }
 
