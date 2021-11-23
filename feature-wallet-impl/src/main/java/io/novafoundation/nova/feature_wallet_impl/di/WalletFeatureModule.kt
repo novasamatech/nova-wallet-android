@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.interfaces.FileProvider
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.core_db.dao.AssetDao
 import io.novafoundation.nova.core_db.dao.OperationDao
@@ -24,6 +25,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletReposit
 import io.novafoundation.nova.feature_wallet_api.domain.model.BuyTokenRegistry
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserProviderFactory
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderProviderFactory
 import io.novafoundation.nova.feature_wallet_impl.BuildConfig
 import io.novafoundation.nova.feature_wallet_impl.data.buyToken.MoonPayProvider
 import io.novafoundation.nova.feature_wallet_impl.data.buyToken.RampProvider
@@ -213,4 +216,10 @@ class WalletFeatureModule {
     @Provides
     @FeatureScope
     fun provideAmountChooserFactory(): AmountChooserMixin.Factory = AmountChooserProviderFactory()
+
+    @Provides
+    @FeatureScope
+    fun provideFeeLoaderMixinFactory(resourceManager: ResourceManager): FeeLoaderMixin.Factory {
+        return FeeLoaderProviderFactory(resourceManager)
+    }
 }

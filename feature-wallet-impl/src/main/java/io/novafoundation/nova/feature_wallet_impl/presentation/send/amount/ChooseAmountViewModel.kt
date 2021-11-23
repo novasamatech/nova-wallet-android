@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.view.ButtonState
+import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapAssetToAssetModel
@@ -22,6 +23,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.TransferValiditySt
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.WithAmountChooser
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.requireFee
 import io.novafoundation.nova.feature_wallet_impl.presentation.AssetPayload
 import io.novafoundation.nova.feature_wallet_impl.presentation.WalletRouter
@@ -40,8 +43,6 @@ import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import kotlin.time.ExperimentalTime
 
-private const val AVATAR_SIZE_DP = 24
-
 class ChooseAmountViewModel(
     private val interactor: WalletInteractor,
     private val router: WalletRouter,
@@ -51,7 +52,8 @@ class ChooseAmountViewModel(
     private val recipientAddress: String,
     private val assetPayload: AssetPayload,
     private val chainRegistry: ChainRegistry,
-    private val feeLoaderMixin: FeeLoaderMixin.Presentation,
+    private val feeLoaderMixinFactory: FeeLoaderMixin.Factory,
+    private val addressDisplayUseCase: AddressDisplayUseCase,
     private val resourceManager: ResourceManager,
     private val phishingAddress: PhishingWarningMixin,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
@@ -59,7 +61,7 @@ class ChooseAmountViewModel(
     ExternalActions by externalActions,
     TransferValidityChecks by transferValidityChecks,
     PhishingWarningMixin by phishingAddress,
-    FeeLoaderMixin by feeLoaderMixin,
+    WithFeeLoaderMixin,
     WithAmountChooser,
     PhishingWarningPresentation {
 
@@ -74,6 +76,8 @@ class ChooseAmountViewModel(
     private val assetFlow = interactor.assetFlow(assetPayload.chainId, assetPayload.chainAssetId)
         .inBackground()
         .share()
+
+    override val feeLoaderMixin: FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(assetFlow)
 
     override val amountChooserMixin: AmountChooserMixin.Presentation = amountChooserMixinFactory.create(
         scope = this,
@@ -148,7 +152,7 @@ class ChooseAmountViewModel(
 
 
     private suspend fun generateAddressModel(address: String): AddressModel {
-        return addressIconGenerator.createAddressModel(chain(), address, AVATAR_SIZE_DP)
+        return addressIconGenerator.createAddressModel(chain(), address, AddressIconGenerator.SIZE_MEDIUM, addressDisplayUseCase)
     }
 
     private fun checkEnoughFunds(fee: BigDecimal) {

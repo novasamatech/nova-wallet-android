@@ -33,3 +33,7 @@ interface AmountChooserMixin {
         ): Presentation
     }
 }
+
+fun AmountChooserMixin.Presentation.setAmount(amount: BigDecimal) {
+    amountInput.value = amount.toPlainString()
+}

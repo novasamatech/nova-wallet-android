@@ -10,14 +10,11 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
-import io.novafoundation.nova.feature_wallet_api.domain.implementations.FixedTokenUseCase
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletInteractor
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderProvider
 import io.novafoundation.nova.feature_wallet_impl.presentation.AssetPayload
 import io.novafoundation.nova.feature_wallet_impl.presentation.WalletRouter
 import io.novafoundation.nova.feature_wallet_impl.presentation.send.TransferValidityChecks
@@ -35,27 +32,6 @@ class ChooseAmountModule {
     }
 
     @Provides
-    fun provideFixedTokenUseCase(
-        assetPayload: AssetPayload,
-        chainRegistry: ChainRegistry,
-        tokenRepository: TokenRepository,
-    ): TokenUseCase = FixedTokenUseCase(
-        tokenRepository = tokenRepository,
-        chainId = assetPayload.chainId,
-        chainRegistry = chainRegistry,
-        chainAssetId = assetPayload.chainAssetId
-    )
-
-    @Provides
-    fun provideFeeLoaderMixin(
-        resourceManager: ResourceManager,
-        tokenUseCase: TokenUseCase,
-    ): FeeLoaderMixin.Presentation = FeeLoaderProvider(
-        resourceManager,
-        tokenUseCase
-    )
-
-    @Provides
     @IntoMap
     @ViewModelKey(ChooseAmountViewModel::class)
     fun provideViewModel(
@@ -68,7 +44,8 @@ class ChooseAmountModule {
         assetPayload: AssetPayload,
         chainRegistry: ChainRegistry,
         phishingWarning: PhishingWarningMixin,
-        feeLoaderMixin: FeeLoaderMixin.Presentation,
+        feeLoaderMixinFactory: FeeLoaderMixin.Factory,
+        addressDisplayUseCase: AddressDisplayUseCase,
         resourceManager: ResourceManager,
         amountChooserMixinFactory: AmountChooserMixin.Factory,
     ): ViewModel {
@@ -81,10 +58,11 @@ class ChooseAmountModule {
             recipientAddress = recipientAddress,
             assetPayload = assetPayload,
             chainRegistry = chainRegistry,
-            feeLoaderMixin = feeLoaderMixin,
+            feeLoaderMixinFactory = feeLoaderMixinFactory,
             resourceManager = resourceManager,
             phishingAddress = phishingWarning,
-            amountChooserMixinFactory = amountChooserMixinFactory
+            amountChooserMixinFactory = amountChooserMixinFactory,
+            addressDisplayUseCase = addressDisplayUseCase
         )
     }
 

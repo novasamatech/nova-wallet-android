@@ -61,7 +61,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletReposit
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderProvider
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -107,12 +107,9 @@ class StakingFeatureModule {
     @Provides
     @FeatureScope
     fun provideFeeLoaderMixin(
-        resourceManager: ResourceManager,
+        feeLoaderMixinFactory: FeeLoaderMixin.Factory,
         tokenUseCase: TokenUseCase,
-    ): FeeLoaderMixin.Presentation = FeeLoaderProvider(
-        resourceManager,
-        tokenUseCase
-    )
+    ): FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(tokenUseCase)
 
     @Provides
     @FeatureScope

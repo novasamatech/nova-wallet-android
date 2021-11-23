@@ -7,6 +7,7 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.view.setAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
@@ -74,11 +75,7 @@ class ChooseAmountFragment : BaseFragment<ChooseAmountViewModel>() {
         setupFeeLoading(viewModel, chooseAmountFee)
         setupAmountChooser(viewModel, chooseAmountInput)
 
-        viewModel.recipientModelFlow.observe {
-            chooseAmountRecipientView.setMessage(it.address)
-
-            chooseAmountRecipientView.setTextIcon(it.image)
-        }
+        viewModel.recipientModelFlow.observe(chooseAmountRecipientView::setAddressModel)
 
         viewModel.continueButtonStateLiveData.observe(chooseAmountNext::setState)
     }
