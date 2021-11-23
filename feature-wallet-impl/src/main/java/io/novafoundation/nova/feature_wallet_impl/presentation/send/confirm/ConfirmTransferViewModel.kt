@@ -38,7 +38,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
 
-
 class ConfirmTransferViewModel(
     private val interactor: WalletInteractor,
     private val router: WalletRouter,

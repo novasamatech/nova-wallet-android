@@ -114,7 +114,6 @@ class ChooseAmountViewModel(
         externalActions.showExternalActions(ExternalActions.Type.Address(recipientAddress), chain())
     }
 
-
     fun warningConfirmed() {
         openConfirmationScreen()
     }
@@ -149,7 +148,6 @@ class ChooseAmountViewModel(
             onRetryCancelled = ::backClicked
         )
     }
-
 
     private suspend fun generateAddressModel(address: String): AddressModel {
         return addressIconGenerator.createAddressModel(chain(), address, AddressIconGenerator.SIZE_MEDIUM, addressDisplayUseCase)

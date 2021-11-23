@@ -63,4 +63,3 @@ class AmountChooserProvider(
         .inBackground()
         .share()
 }
-
