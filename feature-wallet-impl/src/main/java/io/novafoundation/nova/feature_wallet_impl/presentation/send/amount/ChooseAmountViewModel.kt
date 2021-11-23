@@ -35,7 +35,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import kotlin.time.ExperimentalTime
@@ -130,7 +130,7 @@ class ChooseAmountViewModel(
     @OptIn(ExperimentalTime::class)
     private fun listenFee() {
         amountChooserMixin.backPressuredAmount
-            .onEach { loadFee(it) }
+            .mapLatest(::loadFee)
             .launchIn(viewModelScope)
     }
 
