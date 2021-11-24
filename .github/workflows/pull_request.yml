@@ -1,8 +1,6 @@
 name: Pull request
 
-on: #[pull_request]
-  push:
-    branches: [develop]
+on: [pull_request]
 
 jobs:
   build:
