@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
-    <string name="about_version_template">Nova Wallet v%s</string>
+    <string name="about_version_template" translatable="false">Nova Wallet v%s</string>
     <string name="about_website_v2_2_0">Website</string>
-    <string name="about_github_v2_2_0">Github</string>
-    <string name="about_telegram_v2_2_0">Telegram</string>
+    <string name="about_github_v2_2_0" translatable="false">Github</string>
+    <string name="about_telegram_v2_2_0" translatable="false">Telegram</string>
     <string name="about_terms_v2_2_0">Terms &amp; Conditions</string>
 
-    <string name="about_twitter">Twitter</string>
+    <string name="about_twitter" translatable="false">Twitter</string>
     <string name="about_rate_app">Rate us</string>
 
     <string name="crowdloan_contributions_with_source">%s (via %s)</string>

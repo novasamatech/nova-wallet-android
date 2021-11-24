@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+    <string name="about_website_v2_2_0">Сайт</string>
+    <string name="about_terms_v2_2_0">Условия использования</string>
+    <string name="about_rate_app">Оценить нас</string>
+
     <string name="crowdloan_contributions_with_source">%s (через %s)</string>
 
     <string name="crowdloan_astar_wrong_referral">Реферальный код Astar должен являться корректным Polkadot адресом</string>
