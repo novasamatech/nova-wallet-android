@@ -4,6 +4,8 @@ buildscript {
         versionName = '2.1.0'
         versionCode = 6
 
+        applicationId = "io.novafoundation.nova"
+
         // SDK and tools
         compileSdkVersion = 30
         minSdkVersion = 24

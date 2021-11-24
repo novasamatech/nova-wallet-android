@@ -11,7 +11,7 @@ apply from: "../scripts/secrets.gradle"
 android {
     compileSdkVersion rootProject.compileSdkVersion
     defaultConfig {
-        applicationId "io.novafoundation.nova"
+        applicationId rootProject.applicationId
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
         versionCode computeVersionCode()

@@ -27,6 +27,7 @@
 
 
         <item name="textSizeTitle3">@dimen/text_size_title3</item>
+        <item name="textSizeSubHeadline">@dimen/text_size_subheadline</item>
         <!--text sizes-->
 
         <!--fonts-->

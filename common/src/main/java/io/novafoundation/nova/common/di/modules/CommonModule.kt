@@ -27,9 +27,11 @@ import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.mixin.impl.CustomDialogProvider
+import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.LanguagesHolder
+import io.novafoundation.nova.common.resources.OSAppVersionProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.resources.ResourceManagerImpl
 import io.novafoundation.nova.common.utils.QrCodeGenerator
@@ -90,7 +92,7 @@ class CommonModule {
     @ApplicationScope
     fun provideEncryptedPreferences(
         preferences: Preferences,
-        encryptionUtil: EncryptionUtil
+        encryptionUtil: EncryptionUtil,
     ): EncryptedPreferences {
         return EncryptedPreferencesImpl(preferences, encryptionUtil)
     }
@@ -130,13 +132,13 @@ class CommonModule {
     @ApplicationScope
     fun provideAddressModelCreator(
         resourceManager: ResourceManager,
-        iconGenerator: IconGenerator
+        iconGenerator: IconGenerator,
     ): AddressIconGenerator = StatelessAddressIconGenerator(iconGenerator, resourceManager)
 
     @Provides
     @Caching
     fun provideCachingAddressModelCreator(
-        delegate: AddressIconGenerator
+        delegate: AddressIconGenerator,
     ): AddressIconGenerator = CachingAddressIconGenerator(delegate)
 
     @Provides
@@ -158,7 +160,7 @@ class CommonModule {
     @Provides
     @ApplicationScope
     fun provideContentResolver(
-        context: Context
+        context: Context,
     ): ContentResolver {
         return context.contentResolver
     }
@@ -190,4 +192,10 @@ class CommonModule {
     @Provides
     @ApplicationScope
     fun provideCustomDialogDisplayer(): CustomDialogDisplayer.Presentation = CustomDialogProvider()
+
+    @Provides
+    @ApplicationScope
+    fun provideAppVersionsProvider(context: Context): AppVersionProvider {
+        return OSAppVersionProvider(context)
+    }
 }

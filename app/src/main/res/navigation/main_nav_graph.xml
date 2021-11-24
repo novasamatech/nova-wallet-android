@@ -106,14 +106,6 @@
         tools:layout="@layout/fragment_main">
 
         <action
-            android:id="@+id/action_profileFragment_to_aboutFragment"
-            app:destination="@id/aboutFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-
-        <action
             android:id="@+id/action_mainFragment_to_nodesFragment"
             app:destination="@id/nodesFragment"
             app:enterAnim="@anim/fragment_open_enter"
@@ -216,12 +208,6 @@
             android:id="@+id/action_mainFragment_to_userContributionsFragment"
             app:destination="@id/userContributionsFragment" />
     </fragment>
-
-    <fragment
-        android:id="@+id/aboutFragment"
-        android:name="io.novafoundation.nova.feature_account_impl.presentation.about.AboutFragment"
-        android:label="fragment_about"
-        tools:layout="@layout/fragment_about" />
 
     <fragment
         android:id="@+id/accountsFragment"
