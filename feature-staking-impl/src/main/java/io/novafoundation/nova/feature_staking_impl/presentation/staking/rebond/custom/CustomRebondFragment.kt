@@ -67,7 +67,7 @@ class CustomRebondFragment : BaseFragment<CustomRebondViewModel>() {
         rebondAmount.amountInput.bindTo(viewModel.enteredAmountFlow, lifecycleScope)
 
         viewModel.amountFiatFLow.observe {
-            it.let(rebondAmount::setAssetBalanceDollarAmount)
+            it.let(rebondAmount::setFiatAmount)
         }
 
         viewModel.feeLiveData.observe(rebondFee::setFeeStatus)

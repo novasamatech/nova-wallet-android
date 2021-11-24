@@ -235,3 +235,13 @@ fun View.applyBarMargin() = applyInsetter {
         margin()
     }
 }
+
+fun View.applyStatusBarInsets(consume: Boolean = true) = applyInsetter {
+    type(statusBars = true) {
+        padding()
+    }
+
+    consume(true)
+}
+
+fun View.setBackgroundColorRes(@ColorRes colorRes: Int) = setBackgroundColor(context.getColor(colorRes))

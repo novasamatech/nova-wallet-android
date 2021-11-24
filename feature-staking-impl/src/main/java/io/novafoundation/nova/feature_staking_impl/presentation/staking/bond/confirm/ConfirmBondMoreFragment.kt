@@ -79,7 +79,7 @@ class ConfirmBondMoreFragment : BaseFragment<ConfirmBondMoreViewModel>() {
         confirmBondMoreAmount.amountInput.setText(viewModel.amount)
 
         viewModel.amountFiatFLow.observe {
-            it.let(confirmBondMoreAmount::setAssetBalanceDollarAmount)
+            it.let(confirmBondMoreAmount::setFiatAmount)
         }
 
         viewModel.feeStatusLiveData.observe(confirmBondMoreFee::setFeeStatus)

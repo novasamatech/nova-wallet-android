@@ -21,13 +21,13 @@ import io.novafoundation.nova.feature_crowdloan_impl.domain.main.CrowdloanIntera
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.AssetUseCaseImpl
-import io.novafoundation.nova.feature_wallet_api.domain.implementations.TokenUseCaseImpl
+import io.novafoundation.nova.feature_wallet_api.domain.implementations.SharedStateTokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderProvider
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
@@ -69,7 +69,7 @@ class CrowdloanFeatureModule {
     fun provideTokenUseCase(
         tokenRepository: TokenRepository,
         sharedState: CrowdloanSharedState,
-    ): TokenUseCase = TokenUseCaseImpl(
+    ): TokenUseCase = SharedStateTokenUseCase(
         tokenRepository,
         sharedState
     )
@@ -77,12 +77,9 @@ class CrowdloanFeatureModule {
     @Provides
     @FeatureScope
     fun provideFeeLoaderMixin(
-        resourceManager: ResourceManager,
+        feeLoaderMixinFactory: FeeLoaderMixin.Factory,
         tokenUseCase: TokenUseCase,
-    ): FeeLoaderMixin.Presentation = FeeLoaderProvider(
-        resourceManager,
-        tokenUseCase
-    )
+    ): FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(tokenUseCase)
 
     @Provides
     @FeatureScope

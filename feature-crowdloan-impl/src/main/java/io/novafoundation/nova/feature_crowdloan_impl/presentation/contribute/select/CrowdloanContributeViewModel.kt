@@ -281,7 +281,7 @@ class CrowdloanContributeViewModel(
         customizationPayload: Parcelable?,
     ) {
         feeLoaderMixin.loadFeeSuspending(
-            coroutineScope = viewModelScope,
+            retryScope = viewModelScope,
             feeConstructor = {
                 val crowdloan = crowdloanFlow.first()
 

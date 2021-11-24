@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenReposito
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.BuyTokenRegistry
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 
 interface WalletFeatureApi {
 
@@ -21,4 +22,6 @@ interface WalletFeatureApi {
 
     @Wallet
     fun provideWalletUpdateSystem(): UpdateSystem
+
+    fun provideFeeLoaderMixinFactory(): FeeLoaderMixin.Factory
 }
