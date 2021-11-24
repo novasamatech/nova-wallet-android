@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <font-family xmlns:app="http://schemas.android.com/apk/res-auto">
     <font
-        app:font="@font/soramitsu_bold"
+        app:font="@font/public_sans_bold"
         app:fontStyle="normal"
         app:fontWeight="400" />
     <font
-        app:font="@font/soramitsu_semibold"
+        app:font="@font/public_sans_semi_bold"
         app:fontStyle="normal"
         app:fontWeight="400" />
     <font
-        app:font="@font/soramitsu_regular"
+        app:font="@font/public_sans_regular"
         app:fontStyle="normal"
         app:fontWeight="400" />
     <font
-        app:font="@font/soramitsu_extrabold"
+        app:font="@font/public_sans_extra_bold"
         app:fontStyle="normal"
         app:fontWeight="400" />
 </font-family>
