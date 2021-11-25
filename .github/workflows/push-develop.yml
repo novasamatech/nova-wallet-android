@@ -1,8 +1,8 @@
 name: Develop with deploy debug app
 
-on:
-  push:
-    branches: [develop]
+on: [pull_request]
+  # push:
+  #   branches: [develop]
 
 jobs:
   build:
