@@ -37,9 +37,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/x2"
-        android:layout_marginTop="@dimen/x2"
+        android:layout_marginTop="24dp"
         android:layout_marginEnd="@dimen/x2"
-        android:layout_marginBottom="@dimen/x1"
         android:hint="@string/account_wallet_nickname" />
 
     <TextView
@@ -49,6 +48,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/x2"
         android:layout_marginEnd="@dimen/x2"
+        android:layout_marginTop="12dp"
         android:text="@string/account_create_name_examples"
         android:textColor="@color/black1" />
 
