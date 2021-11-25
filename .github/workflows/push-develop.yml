@@ -27,6 +27,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Bump version
+        uses: chkfung/android-version-actions@v1.1
+        with:
+          gradlePath: app/build.gradle
+          versionCode: ${{github.run_number}}
+
       - name: Run tests
         run: ./gradlew runTest
 
