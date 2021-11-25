@@ -15,9 +15,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddA
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.impl.setupAccountNameChooserUi
-import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.impl.setupForcedChainUi
-import kotlinx.android.synthetic.main.fragment_create_account.createAccountForcedChain
-import kotlinx.android.synthetic.main.fragment_create_account.createAccountNameDescription
 import kotlinx.android.synthetic.main.fragment_create_account.createAccountNameField
 import kotlinx.android.synthetic.main.fragment_create_account.nextBtn
 import kotlinx.android.synthetic.main.fragment_create_account.toolbar
@@ -71,12 +68,7 @@ class CreateAccountFragment : BaseFragment<CreateAccountViewModel>() {
             showScreenshotWarningDialog()
         }
 
-        setupForcedChainUi(viewModel, createAccountForcedChain, imageLoader)
-        setupAccountNameChooserUi(
-            viewModel = viewModel,
-            ui = createAccountNameField,
-            additionalViewsToControlVisibility = listOf(createAccountNameDescription)
-        )
+        setupAccountNameChooserUi(viewModel, ui = createAccountNameField)
     }
 
     private fun showScreenshotWarningDialog() {
