@@ -27,6 +27,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Bump version
+        uses: chkfung/android-version-actions@v1.1
+        with:
+          gradlePath: app/build.gradle
+          versionCode: ${{github.run_number}}
+
       - name: Run tests
         run: ./gradlew runTest
 
@@ -43,6 +49,7 @@ jobs:
     needs: build
 
     steps:
+      - uses: actions/checkout@v2
       - name: Download built artifact
         uses: actions/download-artifact@v2
         with:
@@ -56,6 +63,7 @@ jobs:
         with:
           appId: ${{ secrets.ANDROID_DEV_FIREBASE_APP_ID }}
           token: ${{ secrets.ANDROID_DEV_FIREBASE_TOKEN }}
+          releaseNotes: ${{ github.event.head_commit.message }}
           groups: dev-team
           file: app/app-debug.apk
 
@@ -71,5 +79,6 @@ jobs:
         with:
           appId: ${{ secrets.ANDROID_DEV_FIREBASE_APP_ID }}
           token: ${{ secrets.ANDROID_DEV_FIREBASE_TOKEN }}
+          releaseNotes: ${{ github.event.head_commit.message }}
           groups: dev-team
           file: app/app-debug.apk
