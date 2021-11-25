@@ -33,8 +33,8 @@ jobs:
           gradlePath: app/build.gradle
           versionCode: ${{github.run_number}}
 
-      - name: Run tests
-        run: ./gradlew runTest
+      # - name: Run tests
+      #   run: ./gradlew runTest
 
       - name: Build with Gradle
         run: ./gradlew assembleDebug
@@ -55,6 +55,9 @@ jobs:
           name: apk
           path: app
 
+      - name: Create Release notes
+        run: echo "RELEASE_NOTES=$(git log -1 --pretty=short)" >> $GITHUB_ENV
+
       - name: Upload artifact to Firebase App Distribution
         id: upload
         continue-on-error: true
@@ -62,6 +65,7 @@ jobs:
         with:
           appId: ${{ secrets.ANDROID_DEV_FIREBASE_APP_ID }}
           token: ${{ secrets.ANDROID_DEV_FIREBASE_TOKEN }}
+          releaseNotes: ${{ env.RELEASE_NOTES }}
           groups: dev-team
           file: app/app-debug.apk
 
@@ -77,6 +81,6 @@ jobs:
         with:
           appId: ${{ secrets.ANDROID_DEV_FIREBASE_APP_ID }}
           token: ${{ secrets.ANDROID_DEV_FIREBASE_TOKEN }}
-          releaseNotes: '${GITHUB_SHA::6} ${{ github.event.head_commit.message }}'
+          releaseNotes: ${{ env.RELEASE_NOTES }}
           groups: dev-team
           file: app/app-debug.apk
