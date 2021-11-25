@@ -22,6 +22,7 @@
     <attr name="textSizeB3" format="reference" />
 
     <attr name="textSizeTitle3" format="reference" />
+    <attr name="textSizeSubHeadline" format="reference" />
 
     <!--text sizes-->
 

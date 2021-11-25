@@ -19,8 +19,6 @@ interface AccountRouter : SecureRouter {
 
     fun openConfirmMnemonicOnCreate(confirmMnemonicPayload: ConfirmMnemonicPayload)
 
-    fun openAboutScreen()
-
     fun back()
 
     fun openAccounts(accountChosenNavDirection: AccountChosenNavDirection)

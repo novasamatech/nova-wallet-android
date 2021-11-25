@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.di.modules.Caching
+import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.LanguagesHolder
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -72,4 +73,6 @@ interface AccountFeatureDependencies {
     fun rpcCalls(): RpcCalls
 
     fun imageLoader(): ImageLoader
+
+    fun appVersionProvider(): AppVersionProvider
 }
