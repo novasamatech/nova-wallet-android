@@ -11,10 +11,7 @@ import io.novafoundation.nova.common.mixin.api.of
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.flowOf
-import io.novafoundation.nova.common.utils.format
 import io.novafoundation.nova.common.utils.formatAsCurrency
-import io.novafoundation.nova.common.utils.formatAsPercentage
-import io.novafoundation.nova.common.utils.fractionToPercentage
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.validation.CompositeValidation
 import io.novafoundation.nova.common.validation.ValidationExecutor
@@ -26,7 +23,6 @@ import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.hasExtra
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.CrowdloanContributeInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.ContributeValidation
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.ContributeValidationPayload
-import io.novafoundation.nova.feature_crowdloan_impl.domain.main.Crowdloan
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.confirm.parcel.ConfirmContributePayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.contributeValidationFailure
@@ -40,7 +36,6 @@ import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.sel
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.parcel.mapParachainMetadataFromParcel
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapAssetToAssetModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
-import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import kotlinx.coroutines.flow.Flow
@@ -215,23 +210,10 @@ class CrowdloanContributeViewModel(
         .inBackground()
         .share()
 
-    val crowdloanDetailModelFlow = crowdloanFlow.combine(assetFlow) { crowdloan, asset ->
-        val token = asset.token
-
-        val raisedDisplay = token.amountFromPlanks(crowdloan.fundInfo.raised).format()
-        val capDisplay = token.amountFromPlanks(crowdloan.fundInfo.cap).formatTokenAmount(token.configuration)
-
-        val timeLeft = when (val state = crowdloan.state) {
-            Crowdloan.State.Finished -> resourceManager.getString(R.string.transaction_status_completed)
-            is Crowdloan.State.Active -> resourceManager.formatDuration(state.remainingTimeInMillis)
-        }
-
+    val crowdloanDetailModelFlow = crowdloanFlow.map { crowdloan ->
         CrowdloanDetailsModel(
             leasePeriod = resourceManager.formatDuration(crowdloan.leasePeriodInMillis),
-            leasedUntil = resourceManager.formatDate(crowdloan.leasedUntilInMillis),
-            raised = resourceManager.getString(R.string.crowdloan_raised_amount, raisedDisplay, capDisplay),
-            timeLeft = timeLeft,
-            raisedPercentage = crowdloan.raisedFraction.fractionToPercentage().formatAsPercentage()
+            leasedUntil = resourceManager.formatDate(crowdloan.leasedUntilInMillis)
         )
     }
         .inBackground()
@@ -281,7 +263,7 @@ class CrowdloanContributeViewModel(
         customizationPayload: Parcelable?,
     ) {
         feeLoaderMixin.loadFeeSuspending(
-            coroutineScope = viewModelScope,
+            retryScope = viewModelScope,
             feeConstructor = {
                 val crowdloan = crowdloanFlow.first()
 

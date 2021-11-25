@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -78,4 +79,6 @@ interface CrowdloanFeatureDependencies {
     fun secretStoreV2(): SecretStoreV2
 
     fun customDialogDisplayer(): CustomDialogDisplayer.Presentation
+
+    fun feeLoaderMixinFactory(): FeeLoaderMixin.Factory
 }

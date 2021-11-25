@@ -15,10 +15,21 @@ class FeeViews(
     val token: TextView,
 )
 
+interface WithFeeLoaderMixin {
+
+    val feeLoaderMixin: FeeLoaderMixin
+}
+
 fun <V> BaseFragment<V>.setupFeeLoading(viewModel: V, feeView: FeeView) where V : BaseViewModel, V : FeeLoaderMixin {
     observeRetries(viewModel)
 
     viewModel.feeLiveData.observe(feeView::setFeeStatus)
+}
+
+fun BaseFragment<*>.setupFeeLoading(withFeeLoaderMixin: WithFeeLoaderMixin, feeView: FeeView) {
+    observeRetries(withFeeLoaderMixin.feeLoaderMixin)
+
+    withFeeLoaderMixin.feeLoaderMixin.feeLiveData.observe(feeView::setFeeStatus)
 }
 
 fun displayFeeStatus(

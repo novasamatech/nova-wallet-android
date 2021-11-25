@@ -1,12 +1,14 @@
 package io.novafoundation.nova.feature_account_api.presenatation.account
 
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.runtime.ext.accountIdOf
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-// TODO adopt for meta account logic
 class AddressDisplayUseCase(
-    private val accountRepository: AccountRepository
+    private val accountRepository: AccountRepository,
 ) {
 
     class Identifier(private val addressToName: Map<String, String?>) {
@@ -16,8 +18,14 @@ class AddressDisplayUseCase(
         }
     }
 
+    @Deprecated("Does not work with Meta Accounts. Use `invoke(chain: Chain, address: String)` instead")
+    // TODO remove
     suspend operator fun invoke(address: String): String? {
         return accountRepository.getAccountOrNull(address)?.name
+    }
+
+    suspend fun invoke(accountId: AccountId): String? {
+        return accountRepository.findMetaAccount(accountId)?.name
     }
 
     suspend fun createIdentifier(): Identifier = withContext(Dispatchers.Default) {
@@ -28,4 +36,8 @@ class AddressDisplayUseCase(
 
         Identifier(accounts)
     }
+}
+
+suspend operator fun AddressDisplayUseCase.invoke(chain: Chain, address: String): String? {
+    return invoke(chain.accountIdOf(address))
 }

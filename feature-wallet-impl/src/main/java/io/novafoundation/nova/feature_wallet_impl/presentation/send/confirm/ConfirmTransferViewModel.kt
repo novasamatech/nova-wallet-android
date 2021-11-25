@@ -1,61 +1,102 @@
 package io.novafoundation.nova.feature_wallet_impl.presentation.send.confirm
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
-import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
-import io.novafoundation.nova.common.utils.map
 import io.novafoundation.nova.common.utils.requireException
 import io.novafoundation.nova.common.view.ButtonState
+import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.domain.model.addressIn
+import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_wallet_api.data.mappers.mapAssetToAssetModel
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.NotValidTransferStatus
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.model.Transfer
 import io.novafoundation.nova.feature_wallet_api.domain.model.TransferValidityLevel
 import io.novafoundation.nova.feature_wallet_api.domain.model.TransferValidityStatus
-import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
-import io.novafoundation.nova.feature_wallet_impl.data.mappers.mapAssetToAssetModel
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.WithAmountChooser
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmount
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_impl.presentation.WalletRouter
-import io.novafoundation.nova.feature_wallet_impl.presentation.send.BalanceDetailsBottomSheet
 import io.novafoundation.nova.feature_wallet_impl.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_wallet_impl.presentation.send.TransferValidityChecks
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
-
-private const val ICON_IN_DP = 24
 
 class ConfirmTransferViewModel(
     private val interactor: WalletInteractor,
     private val router: WalletRouter,
     private val addressIconGenerator: AddressIconGenerator,
     private val externalActions: ExternalActions.Presentation,
-    private val walletConstants: WalletConstants,
     private val transferValidityChecks: TransferValidityChecks.Presentation,
     private val chainRegistry: ChainRegistry,
+    private val selectedAccountUseCase: SelectedAccountUseCase,
+    private val addressDisplayUseCase: AddressDisplayUseCase,
+    private val resourceManager: ResourceManager,
+    feeLoaderMixinFactory: FeeLoaderMixin.Factory,
+    amountChooserMixinFactory: AmountChooserMixin.Factory,
     val transferDraft: TransferDraft,
 ) : BaseViewModel(),
     ExternalActions by externalActions,
+    WithFeeLoaderMixin,
+    WithAmountChooser,
     TransferValidityChecks by transferValidityChecks {
 
     private val chain by lazyAsync { chainRegistry.getChain(transferDraft.assetPayload.chainId) }
 
-    private val _showBalanceDetailsEvent = MutableLiveData<Event<BalanceDetailsBottomSheet.Payload>>()
-    val showBalanceDetailsEvent: LiveData<Event<BalanceDetailsBottomSheet.Payload>> = _showBalanceDetailsEvent
+    private val assetFlow = interactor.assetFlow(transferDraft.assetPayload.chainId, transferDraft.assetPayload.chainAssetId)
+        .inBackground()
+        .share()
 
-    val recipientModel = liveData { emit(getAddressIcon()) }
+    override val feeLoaderMixin: FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(assetFlow)
+    override val amountChooserMixin: AmountChooserMixin.Presentation = amountChooserMixinFactory.create(
+        scope = this,
+        assetFlow = assetFlow,
+        assetUiMapper = { mapAssetToAssetModel(it, resourceManager) }
+    )
 
-    private val _transferSubmittingLiveData = MutableLiveData(false)
+    private val currentAccount = selectedAccountUseCase.selectedMetaAccountFlow()
+        .inBackground()
+        .share()
+
+    val recipientModel = flowOf {
+        addressIconGenerator.createAddressModel(
+            chain = chain(),
+            sizeInDp = AddressIconGenerator.SIZE_MEDIUM,
+            address = transferDraft.recipientAddress,
+            addressDisplayUseCase = addressDisplayUseCase
+        )
+    }
+        .inBackground()
+        .share()
+
+    val senderModel = currentAccount.mapLatest {
+        addressIconGenerator.createAddressModel(
+            chain = chain(),
+            sizeInDp = AddressIconGenerator.SIZE_MEDIUM,
+            address = it.addressIn(chain())!!,
+            addressDisplayUseCase = addressDisplayUseCase
+        )
+    }
+        .inBackground()
+        .share()
+
+    private val _transferSubmittingLiveData = MutableStateFlow(false)
 
     val sendButtonStateLiveData = _transferSubmittingLiveData.map { submitting ->
         if (submitting) {
@@ -65,28 +106,24 @@ class ConfirmTransferViewModel(
         }
     }
 
-    val assetLiveData = interactor.assetFlow(transferDraft.assetPayload.chainId, transferDraft.assetPayload.chainAssetId)
-        .map(::mapAssetToAssetModel)
-        .inBackground()
-        .asLiveData()
+    init {
+        setInitialState()
+    }
 
     fun backClicked() {
         router.back()
     }
 
-    fun copyRecipientAddressClicked() = launch {
-        externalActions.showExternalActions(ExternalActions.Type.Address(transferDraft.recipientAddress), chain())
+    fun recipientAddressClicked() = launch {
+        showExternalActions(transferDraft.recipientAddress)
     }
 
-    fun availableBalanceClicked() {
-        val assetModel = assetLiveData.value ?: return
+    fun senderAddressClicked() = launch {
+        showExternalActions(senderModel.first().address)
+    }
 
-        launch {
-            val amountInPlanks = walletConstants.existentialDeposit(assetModel.token.configuration.chainId)
-            val existentialDeposit = assetModel.token.configuration.amountFromPlanks(amountInPlanks)
-
-            _showBalanceDetailsEvent.value = Event(BalanceDetailsBottomSheet.Payload(assetModel, transferDraft, existentialDeposit))
-        }
+    private suspend fun showExternalActions(address: String) {
+        externalActions.showExternalActions(ExternalActions.Type.Address(address), chain())
     }
 
     fun submitClicked() {
@@ -101,8 +138,14 @@ class ConfirmTransferViewModel(
         router.back()
     }
 
-    private fun performTransfer(suppressWarnings: Boolean) {
-        val chainAsset = assetLiveData.value?.token?.configuration ?: return
+    private fun setInitialState() = launch {
+        feeLoaderMixin.setFee(transferDraft.fee)
+
+        amountChooserMixin.setAmount(transferDraft.amount)
+    }
+
+    private fun performTransfer(suppressWarnings: Boolean) = launch {
+        val chainAsset = assetFlow.first().token.configuration
         val maxAllowedStatusLevel = if (suppressWarnings) TransferValidityLevel.Warning else TransferValidityLevel.Ok
 
         _transferSubmittingLiveData.value = true
@@ -131,10 +174,6 @@ class ConfirmTransferViewModel(
             is TransferValidityLevel.Warning.Status -> transferValidityChecks.showTransferWarning(status)
             is TransferValidityLevel.Error.Status -> transferValidityChecks.showTransferError(status)
         }
-    }
-
-    private suspend fun getAddressIcon(): AddressModel {
-        return addressIconGenerator.createAddressModel(chain(), transferDraft.recipientAddress, ICON_IN_DP)
     }
 
     private fun createTransfer(token: Chain.Asset): Transfer {

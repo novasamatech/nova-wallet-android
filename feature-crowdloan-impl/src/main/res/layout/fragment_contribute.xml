@@ -136,32 +136,10 @@
                 android:layout_marginEnd="16dp"
                 android:background="@color/dividerGray" />
 
-            <TextView
-                style="@style/TextAppearance.NovaFoundation.Header4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="24dp"
-                android:text="@string/crowdloan_info" />
-
-            <io.novafoundation.nova.common.view.TableCellView
-                android:id="@+id/crowdloanContributeRaised"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                app:title="@string/crowdloan_raised" />
-
-            <io.novafoundation.nova.common.view.TableCellView
-                android:id="@+id/crowdloanContributeTimeLeft"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                app:title="@string/common_time_left" />
-
             <io.novafoundation.nova.common.view.GoNextView
                 android:layout_width="match_parent"
+                tools:icon="?attr/colorAccent"
+                tools:text="Learn more about crowdloan"
                 app:actionIcon="@drawable/ic_arrow_top_right_white_16"
                 android:id="@+id/crowdloanContributeLearnMore"
                 android:layout_height="wrap_content" />

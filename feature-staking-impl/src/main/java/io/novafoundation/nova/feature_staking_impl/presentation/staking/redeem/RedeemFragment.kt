@@ -82,7 +82,7 @@ class RedeemFragment : BaseFragment<RedeemViewModel>() {
 
         viewModel.amountLiveData.observe { (amount, fiatAmount) ->
             redeemAmount.amountInput.setText(amount)
-            fiatAmount.let(redeemAmount::setAssetBalanceDollarAmount)
+            fiatAmount.let(redeemAmount::setFiatAmount)
         }
 
         viewModel.originAddressModelLiveData.observe {
