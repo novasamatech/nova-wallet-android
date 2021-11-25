@@ -13,21 +13,10 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddA
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.create.CreateAccountViewModel
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.AccountNameChooserMixin
-import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.ForcedChainMixin
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.impl.AccountNameChooserFactory
-import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.impl.ForcedChainMixinFactory
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
 class CreateAccountModule {
-
-    @Provides
-    fun provideForcedChainMixinFactory(
-        chainRegistry: ChainRegistry,
-        payload: AddAccountPayload,
-    ): MixinFactory<ForcedChainMixin> {
-        return ForcedChainMixinFactory(chainRegistry, payload)
-    }
 
     @Provides
     fun provideNameChooserMixinFactory(
@@ -42,10 +31,9 @@ class CreateAccountModule {
     fun provideViewModel(
         router: AccountRouter,
         payload: AddAccountPayload,
-        forcedChainMixinFactory: MixinFactory<ForcedChainMixin>,
         accountNameChooserFactory: MixinFactory<AccountNameChooserMixin.Presentation>,
     ): ViewModel {
-        return CreateAccountViewModel(router, payload, forcedChainMixinFactory, accountNameChooserFactory)
+        return CreateAccountViewModel(router, payload, accountNameChooserFactory)
     }
 
     @Provides

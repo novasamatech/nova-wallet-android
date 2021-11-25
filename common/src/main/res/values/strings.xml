@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+    <string name="account_create_name_title">Create wallet nickname</string>
+    <string name="account_create_name_subtitle">This nickname will be displayed only for you and stored locally on your mobile device. </string>
+    <string name="account_wallet_nickname">Wallet nickname</string>
+    <string name="account_create_name_examples">Example: Savings, Investments, Crowdloans, Staking.</string>
+
     <string name="about_version_template" translatable="false">Nova Wallet v%s</string>
     <string name="about_website_v2_2_0">Website</string>
     <string name="about_github_v2_2_0" translatable="false">Github</string>

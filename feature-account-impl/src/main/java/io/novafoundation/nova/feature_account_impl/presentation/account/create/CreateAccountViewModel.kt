@@ -9,20 +9,15 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddA
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapNameChooserStateToOptionalName
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.AccountNameChooserMixin
-import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.ForcedChainMixin
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.WithAccountNameChooserMixin
-import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.WithForcedChainMixin
 
 class CreateAccountViewModel(
     private val router: AccountRouter,
     private val payload: AddAccountPayload,
-    forcedChainMixinFactory: MixinFactory<ForcedChainMixin>,
     accountNameChooserFactory: MixinFactory<AccountNameChooserMixin.Presentation>,
 ) : BaseViewModel(),
-    WithForcedChainMixin,
     WithAccountNameChooserMixin {
 
-    override val forcedChainMixin: ForcedChainMixin = forcedChainMixinFactory.create(scope = this)
     override val accountNameChooser: AccountNameChooserMixin.Presentation = accountNameChooserFactory.create(scope = this)
 
     val nextButtonEnabledLiveData = accountNameChooser.nameValid
