@@ -44,6 +44,6 @@ jobs:
         with:
           appId: ${{ secrets.ANDROID_DEV_FIREBASE_APP_ID }}
           token: ${{ secrets.ANDROID_DEV_FIREBASE_TOKEN }}
-          releaseNotes: "$(git log -1 --pretty=short)"
+          releaseNotes: '${GITHUB_SHA::6} ${{ github.event.head_commit.message }}'
           groups: dev-team
           file: app/build/outputs/apk/debug/app-debug.apk
