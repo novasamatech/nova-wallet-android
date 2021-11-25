@@ -156,10 +156,6 @@ class Navigator :
         )
     }
 
-    override fun openAboutScreen() {
-        navController?.navigate(R.id.action_profileFragment_to_aboutFragment)
-    }
-
     override fun openImportAccountScreen(addAccountPayload: AddAccountPayload) {
         navController?.navigate(R.id.importAction, ImportAccountFragment.getBundle(addAccountPayload))
     }

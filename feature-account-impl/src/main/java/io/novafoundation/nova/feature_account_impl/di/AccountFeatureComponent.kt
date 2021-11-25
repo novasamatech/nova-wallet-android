@@ -7,7 +7,6 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.about.di.AboutComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.create.di.CreateAccountComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.di.AccountDetailsComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.edit.di.AccountEditComponent
@@ -25,7 +24,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.node.add.di.AddN
 import io.novafoundation.nova.feature_account_impl.presentation.node.details.di.NodeDetailsComponent
 import io.novafoundation.nova.feature_account_impl.presentation.node.list.di.NodesComponent
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.di.PinCodeComponent
-import io.novafoundation.nova.feature_account_impl.presentation.profile.di.ProfileComponent
+import io.novafoundation.nova.feature_account_impl.presentation.settings.di.SettingsComponent
 import io.novafoundation.nova.runtime.di.RuntimeApi
 
 @Component(
@@ -42,13 +41,11 @@ interface AccountFeatureComponent : AccountFeatureApi {
 
     fun createAccountComponentFactory(): CreateAccountComponent.Factory
 
-    fun aboutComponentFactory(): AboutComponent.Factory
-
     fun importAccountComponentFactory(): ImportAccountComponent.Factory
 
     fun backupMnemonicComponentFactory(): BackupMnemonicComponent.Factory
 
-    fun profileComponentFactory(): ProfileComponent.Factory
+    fun profileComponentFactory(): SettingsComponent.Factory
 
     fun pincodeComponentFactory(): PinCodeComponent.Factory
 

@@ -19,6 +19,7 @@ import io.novafoundation.nova.common.di.modules.Caching
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
+import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.LanguagesHolder
@@ -96,4 +97,6 @@ interface CommonApi {
     fun secretStoreV2(): SecretStoreV2
 
     fun customDialogDisplayer(): CustomDialogDisplayer.Presentation
+
+    fun appVersionsProvider(): AppVersionProvider
 }

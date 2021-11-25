@@ -3,11 +3,25 @@
 
     <!--Font styles-->
 
-    <style name="TextAppearance.NovaFoundation.Title" parent="TextAppearance.AppCompat.Title">
+    <style name="TextAppearance.NovaFoundation.Caps" parent="TextAppearance.NovaFoundation.Regular">
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:letterSpacing">0.05</item>
+    </style>
+
+    <style name="TextAppearance.NovaFoundation.Footnote" parent="TextAppearance.NovaFoundation.Regular">
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="TextAppearance.NovaFoundation.SubHeadline" parent="TextAppearance.NovaFoundation.Regular">
+        <item name="android:textSize">?attr/textSizeSubHeadline</item>
+    </style>
+
+    <style name="TextAppearance.NovaFoundation.Regular" parent="TextAppearance.AppCompat.Title">
         <item name="android:fontFamily">?attr/fontRegular</item>
     </style>
 
-    <style name="TextAppearance.NovaFoundation.Title3" parent="TextAppearance.NovaFoundation.Title">
+    <style name="TextAppearance.NovaFoundation.Title3" parent="TextAppearance.NovaFoundation.Regular">
         <item name="android:textSize">?attr/textSizeTitle3</item>
     </style>
 
