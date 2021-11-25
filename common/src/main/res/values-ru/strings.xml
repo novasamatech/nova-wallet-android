@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+    <string name="account_create_name_title">Назовите кошелёк</string>
+    <string name="account_create_name_subtitle">Имя хранится только на вашем мобильном устройстве и показывается только вам.</string>
+    <string name="account_wallet_nickname">Имя кошелька</string>
+    <string name="account_create_name_examples">Примеры: Сбережения, Инвестиции, Краудлоуны, Стейкинг.</string>
+
     <string name="about_website_v2_2_0">Сайт</string>
     <string name="about_terms_v2_2_0">Условия использования</string>
     <string name="about_rate_app">Оценить нас</string>
