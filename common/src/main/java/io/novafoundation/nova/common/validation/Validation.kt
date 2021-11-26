@@ -63,6 +63,8 @@ class ValidationSystem<T, S>(
     private val validation: Validation<T, S>
 ) {
 
+    companion object;
+
     suspend fun validate(
         value: T,
         ignoreUntil: ValidationStatus.NotValid.Level? = null
@@ -81,6 +83,10 @@ class ValidationSystem<T, S>(
             }
         }
     }
+}
+
+fun <T, S> ValidationSystem.Companion.from(validations: Collection<Validation<T, S>>): ValidationSystem<T, S> {
+    return ValidationSystem(CompositeValidation(validations))
 }
 
 suspend fun <S> ValidationSystem<Unit, S>.validate(

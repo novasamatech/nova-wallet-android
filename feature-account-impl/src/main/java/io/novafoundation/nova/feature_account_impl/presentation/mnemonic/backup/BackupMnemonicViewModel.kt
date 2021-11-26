@@ -1,14 +1,13 @@
 package io.novafoundation.nova.feature_account_impl.presentation.mnemonic.backup
 
-import androidx.lifecycle.liveData
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.mixin.MixinFactory
+import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
+import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.AdvancedEncryptionCommunicator
-import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.CryptoTypeChooserMixin
-import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.WithCryptoTypeChooserMixin
+import io.novafoundation.nova.feature_account_impl.presentation.AdvancedEncryptionRequester
+import io.novafoundation.nova.feature_account_impl.presentation.lastResponseOrDefault
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.ConfirmMnemonicPayload
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.ConfirmMnemonicPayload.CreateExtras
 import io.novafoundation.nova.feature_account_impl.presentation.view.mnemonic.MnemonicWordModel
@@ -23,42 +22,31 @@ class BackupMnemonicViewModel(
     private val router: AccountRouter,
     private val accountName: String?,
     private val addAccountPayload: AddAccountPayload,
-    private val advancedEncryptionCommunicator: AdvancedEncryptionCommunicator,
-    cryptoTypeChooserMixinFactory: MixinFactory<CryptoTypeChooserMixin>,
-) : BaseViewModel(),
-    WithCryptoTypeChooserMixin {
+    private val advancedEncryptionInteractor: AdvancedEncryptionInteractor,
+    private val advancedEncryptionRequester: AdvancedEncryptionRequester
+) : BaseViewModel() {
 
-    val mnemonicLiveData = liveData {
-        emit(generateMnemonic())
-    }
-
-    override val cryptoTypeChooserMixin = cryptoTypeChooserMixinFactory.create(scope = this)
+    val mnemonicFlow = flowOf { generateMnemonic() }
 
     fun homeButtonClicked() {
         router.back()
     }
 
     fun optionsClicked() {
-        val request = AdvancedEncryptionCommunicator.Request()
-
-        advancedEncryptionCommunicator.openRequest(request)
+        advancedEncryptionRequester.openRequest(addAccountPayload)
     }
 
 
-    fun nextClicked(derivationPath: String) = launch {
-        val cryptoTypeModel = cryptoTypeChooserMixin.selectedEncryptionTypeFlow.first()
-
-        val mnemonicWords = mnemonicLiveData.value ?: return@launch
-
-        val mnemonic = mnemonicWords.map(MnemonicWordModel::word)
+    fun nextClicked() = launch {
+        val advancedEncryptionResponse = advancedEncryptionRequester.lastResponseOrDefault(addAccountPayload, advancedEncryptionInteractor)
+        val mnemonic = mnemonicFlow.first().map(MnemonicWordModel::word)
 
         val payload = ConfirmMnemonicPayload(
-            mnemonic,
+            mnemonic = mnemonic,
             CreateExtras(
-                accountName,
-                cryptoTypeModel.cryptoType,
-                addAccountPayload,
-                derivationPath
+                accountName = accountName,
+                addAccountPayload = addAccountPayload,
+                advancedEncryptionPayload = advancedEncryptionResponse
             )
         )
 

@@ -10,7 +10,6 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
-import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.impl.setupCryptoTypeChooserUi
 import kotlinx.android.synthetic.main.fragment_backup_mnemonic.*
 
 class BackupMnemonicFragment : BaseFragment<BackupMnemonicViewModel>() {
@@ -46,7 +45,7 @@ class BackupMnemonicFragment : BaseFragment<BackupMnemonicViewModel>() {
         }
 
         nextBtn.setOnClickListener {
-            viewModel.nextClicked(advancedBlockView.getDerivationPath())
+            viewModel.nextClicked()
         }
     }
 
@@ -62,9 +61,7 @@ class BackupMnemonicFragment : BaseFragment<BackupMnemonicViewModel>() {
     }
 
     override fun subscribe(viewModel: BackupMnemonicViewModel) {
-        setupCryptoTypeChooserUi(viewModel, advancedBlockView)
-
-        viewModel.mnemonicLiveData.observe {
+        viewModel.mnemonicFlow.observe {
             backupMnemonicViewer.submitList(it)
         }
     }

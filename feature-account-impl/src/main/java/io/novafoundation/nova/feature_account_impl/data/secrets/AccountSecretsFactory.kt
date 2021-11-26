@@ -6,8 +6,8 @@ import io.novafoundation.nova.common.data.secrets.v2.ChainAccountSecrets
 import io.novafoundation.nova.common.data.secrets.v2.MetaAccountSecrets
 import io.novafoundation.nova.common.data.secrets.v2.mapKeypairStructToKeypair
 import io.novafoundation.nova.common.utils.castOrNull
-import io.novafoundation.nova.common.utils.default
 import io.novafoundation.nova.common.utils.deriveSeed32
+import io.novafoundation.nova.common.utils.nullIfEmpty
 import io.novafoundation.nova.core.model.CryptoType
 import jp.co.soramitsu.fearless_utils.encrypt.MultiChainEncryption
 import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedDecoder
@@ -48,7 +48,7 @@ class AccountSecretsFactory(
     data class Result<S : Schema<S>>(val secrets: EncodableStruct<S>, val cryptoType: CryptoType)
 
     suspend fun chainAccountSecrets(
-        derivationPath: String,
+        derivationPath: String?,
         accountSource: AccountSource,
         isEthereum: Boolean,
     ): Result<ChainAccountSecrets> = withContext(Dispatchers.Default) {
@@ -105,7 +105,8 @@ class AccountSecretsFactory(
     }
 
     suspend fun metaAccountSecrets(
-        substrateDerivationPath: String,
+        substrateDerivationPath: String?,
+        ethereumDerivationPath: String?,
         accountSource: AccountSource,
     ): Result<MetaAccountSecrets> = withContext(Dispatchers.Default) {
         val (substrateSecrets, substrateCryptoType) = chainAccountSecrets(
@@ -115,11 +116,11 @@ class AccountSecretsFactory(
         )
 
         val ethereumKeypair = accountSource.castOrNull<AccountSource.Mnemonic>()?.let {
-            val ethereumDerivationPath = BIP32JunctionDecoder.default()
+            val decodedEthereumDerivationPath = ethereumDerivationPath?.nullIfEmpty()?.let(BIP32JunctionDecoder::decode)
 
-            val seed = deriveSeed(it.mnemonic, password = ethereumDerivationPath.password, ethereum = true).seed
+            val seed = deriveSeed(it.mnemonic, password = decodedEthereumDerivationPath?.password, ethereum = true).seed
 
-            EthereumKeypairFactory.generate(seed = seed, junctions = ethereumDerivationPath.junctions)
+            EthereumKeypairFactory.generate(seed = seed, junctions = decodedEthereumDerivationPath?.junctions.orEmpty())
         }
 
         val secrets = MetaAccountSecrets(
@@ -128,7 +129,7 @@ class AccountSecretsFactory(
             substrateKeyPair = mapKeypairStructToKeypair(substrateSecrets[ChainAccountSecrets.Keypair]),
             substrateDerivationPath = substrateDerivationPath,
             ethereumKeypair = ethereumKeypair,
-            ethereumDerivationPath = null
+            ethereumDerivationPath = ethereumDerivationPath
         )
 
         Result(secrets = secrets, cryptoType = substrateCryptoType)
@@ -142,9 +143,9 @@ class AccountSecretsFactory(
         }
     }
 
-    private fun decodeDerivationPath(derivationPath: String, ethereum: Boolean): JunctionDecoder.DecodeResult? {
+    private fun decodeDerivationPath(derivationPath: String?, ethereum: Boolean): JunctionDecoder.DecodeResult? {
         return when {
-            derivationPath.isEmpty() -> null
+            derivationPath.isNullOrEmpty() -> null
             ethereum -> BIP32JunctionDecoder.decode(derivationPath)
             else -> SubstrateJunctionDecoder.decode(derivationPath)
         }

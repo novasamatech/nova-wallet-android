@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_account_impl.data.repository
 
 import android.database.sqlite.SQLiteConstraintException
 import io.novafoundation.nova.common.data.mappers.mapEncryptionToCryptoType
-import io.novafoundation.nova.common.utils.DEFAULT_DERIVATION_PATH
 import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountAlreadyExistsException
@@ -10,9 +9,9 @@ import io.novafoundation.nova.feature_account_api.domain.model.AddAccountType
 import io.novafoundation.nova.feature_account_api.domain.model.ImportJsonMetaData
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSource
 import io.novafoundation.nova.feature_account_impl.data.secrets.AccountSecretsFactory
+import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryption
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedDecoder
-import jp.co.soramitsu.fearless_utils.encrypt.junction.BIP32JunctionDecoder
 import jp.co.soramitsu.fearless_utils.encrypt.model.NetworkTypeIdentifier
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -26,57 +25,73 @@ class AddAccountRepository(
 
     suspend fun addFromMnemonic(
         mnemonic: String,
-        encryptionType: CryptoType,
-        derivationPath: String,
+        advancedEncryption: AdvancedEncryption,
         addAccountType: AddAccountType
     ): Long = withContext(Dispatchers.Default) {
         addAccount(
-            derivationPath = derivationPath,
+            derivationPaths = advancedEncryption.derivationPaths,
             addAccountType = addAccountType,
-            accountSource = AccountSecretsFactory.AccountSource.Mnemonic(encryptionType, mnemonic)
+            accountSource = AccountSecretsFactory.AccountSource.Mnemonic(
+                cryptoType = pickCryptoType(addAccountType, advancedEncryption),
+                mnemonic = mnemonic
+            )
         )
     }
 
     suspend fun addFromSeed(
         seed: String,
-        encryptionType: CryptoType,
-        derivationPath: String,
+        advancedEncryption: AdvancedEncryption,
         addAccountType: AddAccountType
     ): Long = withContext(Dispatchers.Default) {
 
         addAccount(
-            derivationPath = derivationPath,
+            derivationPaths = advancedEncryption.derivationPaths,
             addAccountType = addAccountType,
-            accountSource = AccountSecretsFactory.AccountSource.Seed(encryptionType, seed)
+            accountSource = AccountSecretsFactory.AccountSource.Seed(
+                cryptoType = pickCryptoType(addAccountType, advancedEncryption),
+                seed = seed
+            )
         )
     }
 
     suspend fun addFromJson(
         json: String,
         password: String,
-        derivationPath: String,
         addAccountType: AddAccountType
     ): Long = withContext(Dispatchers.Default) {
 
         addAccount(
-            derivationPath = derivationPath,
+            derivationPaths = AdvancedEncryption.DerivationPaths.empty(),
             addAccountType = addAccountType,
             accountSource = AccountSecretsFactory.AccountSource.Json(json, password)
         )
+    }
+
+    private suspend fun pickCryptoType(addAccountType: AddAccountType, advancedEncryption: AdvancedEncryption): CryptoType {
+        val cryptoType = if (addAccountType is AddAccountType.ChainAccount && chainRegistry.getChain(addAccountType.chainId).isEthereumBased) {
+            advancedEncryption.ethereumCryptoType
+        } else {
+            advancedEncryption.substrateCryptoType
+        }
+
+        requireNotNull(cryptoType) { "Expected crypto type was null" }
+
+        return cryptoType
     }
 
     /**
      * @return id of inserted/modified metaAccount
      */
     private suspend fun addAccount(
-        derivationPath: String,
+        derivationPaths: AdvancedEncryption.DerivationPaths,
         addAccountType: AddAccountType,
         accountSource: AccountSecretsFactory.AccountSource
     ): Long {
         return when (addAccountType) {
             is AddAccountType.MetaAccount -> {
                 val (secrets, substrateCryptoType) = accountSecretsFactory.metaAccountSecrets(
-                    substrateDerivationPath = derivationPath,
+                    substrateDerivationPath = derivationPaths.substrate,
+                    ethereumDerivationPath = derivationPaths.ethereum,
                     accountSource = accountSource
                 )
 
@@ -92,14 +107,10 @@ class AddAccountRepository(
             is AddAccountType.ChainAccount -> {
                 val chain = chainRegistry.getChain(addAccountType.chainId)
 
-                val derivationPathOrDefault = if (derivationPath.isEmpty() && chain.isEthereumBased) {
-                    BIP32JunctionDecoder.DEFAULT_DERIVATION_PATH
-                } else {
-                    derivationPath
-                }
+                val derivationPath = if (chain.isEthereumBased) derivationPaths.ethereum else derivationPaths.substrate
 
                 val (secrets, cryptoType) = accountSecretsFactory.chainAccountSecrets(
-                    derivationPath = derivationPathOrDefault,
+                    derivationPath = derivationPath!!,
                     accountSource = accountSource,
                     isEthereum = chain.isEthereumBased
                 )

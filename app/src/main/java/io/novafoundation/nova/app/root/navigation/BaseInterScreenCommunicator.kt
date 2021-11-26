@@ -13,11 +13,17 @@ abstract class BaseInterScreenCommunicator<I : Parcelable, O : Parcelable>(
 
     private val liveDataKey = UUID.randomUUID().toString()
 
-    private val navController: NavController
+    protected val navController: NavController
         get() = navigationHolder.navController!!
 
+    // from requester - retrieve from current entry
     override val latestResponse: O?
         get() = navController.currentBackStackEntry!!.savedStateHandle
+            .get(liveDataKey)
+
+    // from requester - retrieve from previous (requester) entry
+    override val lastState: O?
+        get() = navController.previousBackStackEntry!!.savedStateHandle
             .get(liveDataKey)
 
     override val responseFlow: Flow<O>
@@ -27,8 +33,8 @@ abstract class BaseInterScreenCommunicator<I : Parcelable, O : Parcelable>(
 
     abstract override fun openRequest(request: I)
 
-    override fun respond(respond: O) {
+    override fun respond(response: O) {
         // previousBackStackEntry since we want to report to previous screen
-        navController.previousBackStackEntry!!.savedStateHandle.set(liveDataKey, respond)
+        navController.previousBackStackEntry!!.savedStateHandle.set(liveDataKey, response)
     }
 }

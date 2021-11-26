@@ -15,5 +15,7 @@ interface InterScreenRequester<I, O> {
 
 interface InterScreenResponder<I, O> {
 
-    fun respond(respond: O)
+    val lastState: O?
+
+    fun respond(response: O)
 }
