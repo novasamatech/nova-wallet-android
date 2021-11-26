@@ -1,14 +1,12 @@
 package io.novafoundation.nova.feature_account_impl.presentation.mnemonic.backup
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.MixinFactory
-import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_impl.presentation.AdvancedEncryptionCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.CryptoTypeChooserMixin
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.WithCryptoTypeChooserMixin
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.ConfirmMnemonicPayload
@@ -25,6 +23,7 @@ class BackupMnemonicViewModel(
     private val router: AccountRouter,
     private val accountName: String?,
     private val addAccountPayload: AddAccountPayload,
+    private val advancedEncryptionCommunicator: AdvancedEncryptionCommunicator,
     cryptoTypeChooserMixinFactory: MixinFactory<CryptoTypeChooserMixin>,
 ) : BaseViewModel(),
     WithCryptoTypeChooserMixin {
@@ -33,18 +32,18 @@ class BackupMnemonicViewModel(
         emit(generateMnemonic())
     }
 
-    private val _showInfoEvent = MutableLiveData<Event<Unit>>()
-    val showInfoEvent: LiveData<Event<Unit>> = _showInfoEvent
-
     override val cryptoTypeChooserMixin = cryptoTypeChooserMixinFactory.create(scope = this)
 
     fun homeButtonClicked() {
         router.back()
     }
 
-    fun infoClicked() {
-        _showInfoEvent.value = Event(Unit)
+    fun optionsClicked() {
+        val request = AdvancedEncryptionCommunicator.Request()
+
+        advancedEncryptionCommunicator.openRequest(request)
     }
+
 
     fun nextClicked(derivationPath: String) = launch {
         val cryptoTypeModel = cryptoTypeChooserMixin.selectedEncryptionTypeFlow.first()

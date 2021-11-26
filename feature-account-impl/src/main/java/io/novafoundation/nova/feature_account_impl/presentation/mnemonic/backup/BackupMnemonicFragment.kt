@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
@@ -12,10 +11,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddA
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.impl.setupCryptoTypeChooserUi
-import kotlinx.android.synthetic.main.fragment_backup_mnemonic.advancedBlockView
-import kotlinx.android.synthetic.main.fragment_backup_mnemonic.backupMnemonicViewer
-import kotlinx.android.synthetic.main.fragment_backup_mnemonic.nextBtn
-import kotlinx.android.synthetic.main.fragment_backup_mnemonic.toolbar
+import kotlinx.android.synthetic.main.fragment_backup_mnemonic.*
 
 class BackupMnemonicFragment : BaseFragment<BackupMnemonicViewModel>() {
 
@@ -46,7 +42,7 @@ class BackupMnemonicFragment : BaseFragment<BackupMnemonicViewModel>() {
         }
 
         toolbar.setRightActionClickListener {
-            viewModel.infoClicked()
+            viewModel.optionsClicked()
         }
 
         nextBtn.setOnClickListener {
@@ -71,17 +67,5 @@ class BackupMnemonicFragment : BaseFragment<BackupMnemonicViewModel>() {
         viewModel.mnemonicLiveData.observe {
             backupMnemonicViewer.submitList(it)
         }
-
-        viewModel.showInfoEvent.observeEvent {
-            showMnemonicInfoDialog()
-        }
-    }
-
-    private fun showMnemonicInfoDialog() {
-        MaterialAlertDialogBuilder(context, R.style.AlertDialogTheme)
-            .setTitle(R.string.common_info)
-            .setMessage(R.string.account_creation_info)
-            .setPositiveButton(R.string.common_ok) { dialog, _ -> dialog?.dismiss() }
-            .show()
     }
 }

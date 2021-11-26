@@ -23,7 +23,7 @@ import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import jp.co.soramitsu.fearless_utils.icon.IconGenerator
-import java.util.Random
+import java.util.*
 
 interface AccountFeatureDependencies {
 

@@ -7,7 +7,7 @@ import androidx.navigation.fragment.NavHostFragment
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.di.RootApi
 import io.novafoundation.nova.app.root.di.RootComponent
-import io.novafoundation.nova.app.root.navigation.Navigator
+import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.common.base.BaseActivity
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.EventObserver
@@ -15,14 +15,13 @@ import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.showToast
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.splash.presentation.SplashBackgroundHolder
-import kotlinx.android.synthetic.main.activity_root.mainView
-import kotlinx.android.synthetic.main.activity_root.rootNetworkBar
+import kotlinx.android.synthetic.main.activity_root.*
 import javax.inject.Inject
 
 class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
 
     @Inject
-    lateinit var navigator: Navigator
+    lateinit var navigationHolder: NavigationHolder
 
     override fun inject() {
         FeatureUtils.getFeature<RootComponent>(this, RootApi::class.java)
@@ -42,7 +41,7 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        navigator.attach(navController, this)
+        navigationHolder.attach(navController, this)
 
         rootNetworkBar.setOnApplyWindowInsetsListener { view, insets ->
             view.updatePadding(top = insets.systemWindowInsetTop)
@@ -58,7 +57,7 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
     override fun onDestroy() {
         super.onDestroy()
 
-        navigator.detach()
+        navigationHolder.detach()
     }
 
     override fun layoutResource(): Int {
@@ -107,8 +106,6 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
         viewModel.noticeLanguageLanguage()
 
         recreate()
-
-//        restartAfterLanguageChange(this)
     }
 
     private fun processIntent(intent: Intent) {

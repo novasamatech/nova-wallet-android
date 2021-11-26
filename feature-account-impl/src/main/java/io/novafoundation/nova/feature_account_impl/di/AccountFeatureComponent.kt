@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_impl.presentation.AdvancedEncryptionCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.account.create.di.CreateAccountComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.di.AccountDetailsComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.edit.di.AccountEditComponent
@@ -29,7 +30,7 @@ import io.novafoundation.nova.runtime.di.RuntimeApi
 
 @Component(
     dependencies = [
-        AccountFeatureDependencies::class
+        AccountFeatureDependencies::class,
     ],
     modules = [
         AccountFeatureModule::class,
@@ -80,6 +81,7 @@ interface AccountFeatureComponent : AccountFeatureApi {
 
         fun create(
             @BindsInstance accountRouter: AccountRouter,
+            @BindsInstance advancedEncryptionCommunicator: AdvancedEncryptionCommunicator,
             deps: AccountFeatureDependencies
         ): AccountFeatureComponent
     }
