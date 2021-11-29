@@ -3,6 +3,10 @@
 
     <!--Font styles-->
 
+    <style name="TextAppearance.NovaFoundation.Caption1" parent="TextAppearance.NovaFoundation.Regular">
+        <item name="android:textSize">12sp</item>
+    </style>
+
     <style name="TextAppearance.NovaFoundation.Caps" parent="TextAppearance.NovaFoundation.Regular">
         <item name="android:textAllCaps">true</item>
         <item name="android:textSize">11sp</item>

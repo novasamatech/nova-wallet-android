@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+    <string name="common_i_understand">I understand</string>
+    <string name="account_mnemonic_show_warning">We are going to show your mnemonic. Make sure no one can see your screen and do not take screenshots — they can be collected by third-party malware</string>
+    <string name="common_attention">Attention!</string>
+    <string name="account_backup_mnemonic_title">Write down the phrase and store it in a safe place</string>
+    <string name="account_backup_mnemonic_caption">Please make sure to write down your phrase correctly and legibly.</string>
+
     <string name="account_derivation_path_invalid_title">Invalid format</string>
     <string name="account_derivation_path_invalid_substrate">
         Please, check that input is a mix of //’hard’ and /’soft’ where ‘hard’ and ‘soft’ can be any sequence of characters not including /.
@@ -140,8 +146,6 @@ transfers will appear here</string>
     <string name="onboarding_create_account">Create account</string>
     <string name="username_setup_choose_title">Name</string>
     <string name="username_setup_hint">This name will be displayed only for you and stored locally on your mobile device.</string>
-    <string name="common_no_screenshot_title">Do not take screenshots</string>
-    <string name="common_no_screenshot_message">Do not take screenshots, which may be collected by third-party malware</string>
     <string name="common_ok">OK</string>
     <string name="account_create_title">Backup mnemonic</string>
     <string name="account_create_details">Use non digital way to backup, such as writing it down on paper.</string>

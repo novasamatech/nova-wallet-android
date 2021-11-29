@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import coil.ImageLoader
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.hideSoftKeyboard
@@ -64,21 +63,6 @@ class CreateAccountFragment : BaseFragment<CreateAccountViewModel>() {
             nextBtn.isEnabled = it
         }
 
-        viewModel.showScreenshotsWarningEvent.observeEvent {
-            showScreenshotWarningDialog()
-        }
-
         setupAccountNameChooserUi(viewModel, ui = createAccountNameField)
-    }
-
-    private fun showScreenshotWarningDialog() {
-        MaterialAlertDialogBuilder(context, R.style.AlertDialogTheme)
-            .setTitle(R.string.common_no_screenshot_title)
-            .setMessage(R.string.common_no_screenshot_message)
-            .setPositiveButton(R.string.common_ok) { dialog, _ ->
-                dialog?.dismiss()
-                viewModel.screenshotWarningConfirmed()
-            }
-            .show()
     }
 }

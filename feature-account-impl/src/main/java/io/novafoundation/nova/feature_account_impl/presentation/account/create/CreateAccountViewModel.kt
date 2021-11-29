@@ -1,10 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.presentation.account.create
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.MixinFactory
-import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapNameChooserStateToOptionalName
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -22,18 +19,11 @@ class CreateAccountViewModel(
 
     val nextButtonEnabledLiveData = accountNameChooser.nameValid
 
-    private val _showScreenshotsWarningEvent = MutableLiveData<Event<Unit>>()
-    val showScreenshotsWarningEvent: LiveData<Event<Unit>> = _showScreenshotsWarningEvent
-
     fun homeButtonClicked() {
         router.back()
     }
 
     fun nextClicked() {
-        _showScreenshotsWarningEvent.value = Event(Unit)
-    }
-
-    fun screenshotWarningConfirmed() {
         val nameState = accountNameChooser.nameState.value!!
 
         router.openMnemonicScreen(mapNameChooserStateToOptionalName(nameState), payload)

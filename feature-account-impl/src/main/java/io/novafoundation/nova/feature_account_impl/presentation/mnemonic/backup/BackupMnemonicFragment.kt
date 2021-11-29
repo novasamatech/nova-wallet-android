@@ -1,16 +1,20 @@
 package io.novafoundation.nova.feature_account_impl.presentation.mnemonic.backup
 
 import android.os.Bundle
+import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.view.dialog.dialog
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
-import kotlinx.android.synthetic.main.fragment_backup_mnemonic.*
+import kotlinx.android.synthetic.main.fragment_backup_mnemonic.backupMnemonicContinue
+import kotlinx.android.synthetic.main.fragment_backup_mnemonic.backupMnemonicPhrase
+import kotlinx.android.synthetic.main.fragment_backup_mnemonic.backupMnemonicToolbar
 
 class BackupMnemonicFragment : BaseFragment<BackupMnemonicViewModel>() {
 
@@ -36,17 +40,10 @@ class BackupMnemonicFragment : BaseFragment<BackupMnemonicViewModel>() {
     }
 
     override fun initViews() {
-        toolbar.setHomeButtonListener {
-            viewModel.homeButtonClicked()
-        }
+        backupMnemonicToolbar.setHomeButtonListener { viewModel.homeButtonClicked() }
+        backupMnemonicToolbar.setRightActionClickListener { viewModel.optionsClicked() }
 
-        toolbar.setRightActionClickListener {
-            viewModel.optionsClicked()
-        }
-
-        nextBtn.setOnClickListener {
-            viewModel.nextClicked()
-        }
+        backupMnemonicContinue.setOnClickListener { viewModel.nextClicked() }
     }
 
     override fun inject() {
@@ -61,8 +58,20 @@ class BackupMnemonicFragment : BaseFragment<BackupMnemonicViewModel>() {
     }
 
     override fun subscribe(viewModel: BackupMnemonicViewModel) {
-        viewModel.mnemonicFlow.observe {
-            backupMnemonicViewer.submitList(it)
+        viewModel.showMnemonicWarningDialog.observeEvent {
+            showMnemonicWarning()
         }
+
+        viewModel.mnemonicDisplay.observe {
+            backupMnemonicPhrase.setMessage(it.orEmpty())
+        }
+    }
+
+    private fun showMnemonicWarning() = dialog(ContextThemeWrapper(requireContext(), R.style.AccentAlertDialogTheme)) {
+        setTitle(R.string.common_attention)
+        setMessage(R.string.account_mnemonic_show_warning)
+
+        setPositiveButton(R.string.common_i_understand) { _, _ -> viewModel.warningAccepted() }
+        setNegativeButton(R.string.common_cancel) { _, _ -> viewModel.warningDeclined() }
     }
 }

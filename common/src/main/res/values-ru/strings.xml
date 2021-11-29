@@ -115,8 +115,6 @@
     <string name="onboarding_create_account">Создать аккаунт</string>
     <string name="username_setup_choose_title">Имя</string>
     <string name="username_setup_hint">Данное имя будет отображаться только для вас и храниться только на вашем мобильном устройстве.</string>
-    <string name="common_no_screenshot_title">Не делайте скриншоты</string>
-    <string name="common_no_screenshot_message">Не делайте скриншоты, которые могут быть собраны сторонними вредоносными программами</string>
     <string name="common_ok">OK</string>
     <string name="account_create_title">Мнемоника</string>
     <string name="account_create_details">Используйте нецифровой носитель для сохранения, например, выпишите слова на бумагу.</string>
