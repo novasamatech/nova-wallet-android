@@ -16,10 +16,10 @@ fun mapAdvancedEncryptionValidationFailureToUi(
 ): TitleAndMessage {
 
     return when (failure) {
-        SUBSTRATE_DERIVATION_PATH -> resourceManager.getString(R.string.account_derivation_path_invalid_title) to
-            resourceManager.getString(R.string.account_derivation_path_invalid_substrate)
+        SUBSTRATE_DERIVATION_PATH -> resourceManager.getString(R.string.account_derivation_path_substrate_invalid_title) to
+            resourceManager.getString(R.string.account_invalid_derivation_path_message_v2_2_0)
 
-        ETHEREUM_DERIVATION_PATH -> resourceManager.getString(R.string.account_derivation_path_invalid_title) to
-            resourceManager.getString(R.string.account_derivation_path_invalid_ethereum)
+        ETHEREUM_DERIVATION_PATH -> resourceManager.getString(R.string.account_derivation_path_ethereum_invalid_title) to
+            resourceManager.getString(R.string.account_invalid_derivation_path_message_v2_2_0)
     }
 }

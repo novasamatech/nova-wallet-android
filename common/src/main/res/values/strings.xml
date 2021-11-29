@@ -6,17 +6,10 @@
     <string name="account_backup_mnemonic_title">Write down the phrase and store it in a safe place</string>
     <string name="account_backup_mnemonic_caption">Please make sure to write down your phrase correctly and legibly.</string>
 
-    <string name="account_derivation_path_invalid_title">Invalid format</string>
-    <string name="account_derivation_path_invalid_substrate">
-        Please, check that input is a mix of //’hard’ and /’soft’ where ‘hard’ and ‘soft’ can be any sequence of characters not including /.
-        The path can end up with ///’password’.\n\n
-        For example: //1/soramitsu///mypass.
-    </string>
-    <string name="account_derivation_path_invalid_ethereum">
-        Please, check that input is a mix of //’hard’ and /’soft’ where ’hard’ and ’soft’ can be any sequence of digits not including /.
-        The path can end up with ///’password’.\n\n
-        For example, //44//60//0/0/0///mypass.
-    </string>
+    <string name="account_derivation_path_substrate_invalid_title">Invalid Substrate derivation path</string>
+    <string name="account_derivation_path_ethereum_invalid_title">Invalid Ethereum derivation path</string>
+
+    <string name="account_invalid_derivation_path_message_v2_2_0">Your derivation path contains unsupported symbols or has incorrect structure</string>
 
     <string name="account_substrate_crypto_type">Substrate keypair crypto type</string>
     <string name="account_substrate_derivation_path">Substrate secret derivation path</string>
@@ -25,6 +18,7 @@
 
     <string name="account_create_name_title">Create wallet nickname</string>
     <string name="account_create_name_subtitle">This nickname will be displayed only for you and stored locally on your mobile device. </string>
+
     <string name="account_wallet_nickname">Wallet nickname</string>
     <string name="account_create_name_examples">Example: Savings, Investments, Crowdloans, Staking.</string>
 
