@@ -17,12 +17,14 @@ sealed class DerivationPathValidation(
     override suspend fun validate(value: AdvancedEncryptionValidationPayload): ValidationStatus<AdvancedEncryptionValidationFailure> {
         val isValid = valueExtractor(value)
             .fold(
-                ifEnabled = { runCatching { junctionDecoder.decode(it) }.isSuccess },
+                ifEnabled = { it.isEmpty() || checkCanDecode(it) },
                 ifDisabled = true
             )
 
         return validOrError(isValid) { failure }
     }
+
+    private fun checkCanDecode(derivationPath: String): Boolean = runCatching { junctionDecoder.decode(derivationPath) }.isSuccess
 }
 
 class SubstrateDerivationPathValidation : DerivationPathValidation(

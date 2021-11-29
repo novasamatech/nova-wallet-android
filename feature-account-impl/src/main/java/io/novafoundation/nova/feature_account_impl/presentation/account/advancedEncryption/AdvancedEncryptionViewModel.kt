@@ -44,7 +44,6 @@ class AdvancedEncryptionViewModel(
 
     private val encryptionTypes = getCryptoTypeModels()
 
-
     private val _substrateCryptoTypeInput = singleReplaySharedFlow<Input<CryptoTypeModel>>()
     val substrateCryptoTypeInput: Flow<Input<CryptoTypeModel>> = _substrateCryptoTypeInput
 
