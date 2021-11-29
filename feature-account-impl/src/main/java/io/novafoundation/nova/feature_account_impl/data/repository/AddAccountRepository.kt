@@ -110,7 +110,7 @@ class AddAccountRepository(
                 val derivationPath = if (chain.isEthereumBased) derivationPaths.ethereum else derivationPaths.substrate
 
                 val (secrets, cryptoType) = accountSecretsFactory.chainAccountSecrets(
-                    derivationPath = derivationPath!!,
+                    derivationPath = derivationPath,
                     accountSource = accountSource,
                     isEthereum = chain.isEthereumBased
                 )
