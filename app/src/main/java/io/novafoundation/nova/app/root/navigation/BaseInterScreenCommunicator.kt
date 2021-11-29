@@ -21,7 +21,7 @@ abstract class BaseInterScreenCommunicator<I : Parcelable, O : Parcelable>(
         get() = navController.currentBackStackEntry!!.savedStateHandle
             .get(liveDataKey)
 
-    // from requester - retrieve from previous (requester) entry
+    // from responder - retrieve from previous (requester) entry
     override val lastState: O?
         get() = navController.previousBackStackEntry!!.savedStateHandle
             .get(liveDataKey)
