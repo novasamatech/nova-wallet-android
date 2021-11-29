@@ -4,16 +4,16 @@ import com.google.gson.Gson
 import io.novafoundation.nova.common.utils.md5
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
-import jp.co.soramitsu.fearless_utils.runtime.metadata.GetMetadataRequest
-import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
-import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.RuntimeRequest
-import jp.co.soramitsu.fearless_utils.wsrpc.response.RpcResponse
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.TypesFetcher
 import io.novafoundation.nova.test_shared.any
 import io.novafoundation.nova.test_shared.eq
 import io.novafoundation.nova.test_shared.whenever
+import jp.co.soramitsu.fearless_utils.runtime.metadata.GetMetadataRequest
+import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
+import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.RuntimeRequest
+import jp.co.soramitsu.fearless_utils.wsrpc.response.RpcResponse
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.first
@@ -63,6 +63,9 @@ class RuntimeSyncServiceTest {
         whenever(socket.jsonMapper).thenReturn(Gson())
         whenever(typesFetcher.getTypes(any())).thenReturn(TEST_TYPES)
         socketAnswersRequest(GetMetadataRequest, "Stub")
+
+        // defaults
+        metadataCacheExists(true)
 
 
         service = RuntimeSyncService(typesFetcher, runtimeFilesCache, chainDao)
@@ -209,6 +212,25 @@ class RuntimeSyncServiceTest {
         }
     }
 
+    @Test(timeout = 100)
+    fun `should always sync chain info when cache is not found`() {
+        runBlocking {
+            metadataCacheExists(false)
+            chainDaoReturnsSyncedRuntimeInfo()
+
+            whenever(testChain.types).thenReturn(Chain.Types("testUrl", overridesCommon = false))
+            service.registerChain(chain = testChain, connection = testConnection)
+
+            assertFalse(service.isSyncing(testChain.id)) // guarantee test correctness
+
+            service.cacheNotFound(testChain.id)
+
+            val syncResult = service.awaitSync(testChain.id)
+            assertNotNull(syncResult.metadataHash)
+            assertNotNull(syncResult.typesHash)
+        }
+    }
+
     @Test
     fun `should not sync the same version of metadata`() {
         runBlocking {
@@ -237,6 +259,10 @@ class RuntimeSyncServiceTest {
     }
 
     private suspend fun RuntimeSyncService.awaitSync(chainId: String) = syncResultFlow(chainId).first()
+
+    private suspend fun metadataCacheExists(exists: Boolean) {
+        whenever(runtimeFilesCache.hasChainMetadata(any())).thenReturn(exists)
+    }
 
     private fun socketAnswersRequest(request: RuntimeRequest, response: Any?) {
         whenever(socket.executeRequest(eq(request), deliveryType = any(), callback = any())).thenAnswer {

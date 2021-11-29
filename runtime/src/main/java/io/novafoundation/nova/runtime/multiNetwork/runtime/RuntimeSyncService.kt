@@ -108,7 +108,9 @@ class RuntimeSyncService(
 
         val runtimeInfo = chainDao.runtimeInfo(chainId) ?: return
 
-        val metadataHash = if (runtimeInfo.shouldSyncMetadata()) {
+        val shouldSync = runtimeInfo.shouldSyncMetadata() || runtimeFilesCache.hasChainMetadata(chainId).not()
+
+        val metadataHash = if (shouldSync) {
             val runtimeMetadata = syncInfo.connection.socketService.executeAsync(GetMetadataRequest, mapper = pojo<String>().nonNull())
 
             runtimeFilesCache.saveChainMetadata(chainId, runtimeMetadata)

@@ -127,9 +127,19 @@ class RuntimeProvider(
                 runtimeFlow.emit(value)
             }.onFailure {
                 when (it) {
-                    ChainInfoNotInCacheException -> runtimeSyncService.cacheNotFound(chainId)
-                    BaseTypesNotInCacheException -> baseTypeSynchronizer.cacheNotFound()
+                    ChainInfoNotInCacheException -> {
+                        runtimeSyncService.cacheNotFound(chainId)
+
+                        Log.w(this@RuntimeProvider.LOG_TAG, "Runtime cache was not found for $chainId")
+                    }
+                    BaseTypesNotInCacheException -> {
+                        baseTypeSynchronizer.cacheNotFound()
+
+                        Log.w(this@RuntimeProvider.LOG_TAG, "Base types cache were not found")
+                    }
                     NoRuntimeVersionException -> {
+                        Log.w(this@RuntimeProvider.LOG_TAG, "Runtime version for $chainId was not found in database")
+
                     } // pass
                     else -> Log.e(this@RuntimeProvider.LOG_TAG, "Failed to construct runtime ($chainId): ${it.message}")
                 }

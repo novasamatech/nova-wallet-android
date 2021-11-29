@@ -3,6 +3,7 @@ package io.novafoundation.nova.runtime.multiNetwork.runtime
 import io.novafoundation.nova.common.interfaces.FileProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.File
 
 private const val DEFAULT_FILE_NAME = "default"
 
@@ -41,19 +42,25 @@ class RuntimeFilesCache(
         writeToCacheFile(fileName, metadata)
     }
 
+    suspend fun hasChainMetadata(chainId: String): Boolean {
+        val fileName = METADATA_FILE_MASK.format(chainId)
+
+        return getCacheFile(fileName).exists()
+    }
+
     private suspend fun writeToCacheFile(name: String, content: String) {
         return withContext(Dispatchers.IO) {
-            val file = fileProvider.getFileInInternalCacheStorage(name)
-
-            file.writeText(content)
+            getCacheFile(name).writeText(content)
         }
     }
 
     private suspend fun readCacheFile(name: String): String {
         return withContext(Dispatchers.IO) {
-            val file = fileProvider.getFileInInternalCacheStorage(name)
-
-            file.readText()
+            getCacheFile(name).readText()
         }
+    }
+
+    private suspend fun getCacheFile(name: String): File {
+        return fileProvider.getFileInInternalCacheStorage(name)
     }
 }
