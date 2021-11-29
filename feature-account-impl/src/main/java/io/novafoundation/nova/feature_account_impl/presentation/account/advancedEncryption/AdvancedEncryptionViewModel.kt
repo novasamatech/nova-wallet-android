@@ -5,7 +5,12 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
-import io.novafoundation.nova.common.utils.input.*
+import io.novafoundation.nova.common.utils.input.Input
+import io.novafoundation.nova.common.utils.input.ifModifiable
+import io.novafoundation.nova.common.utils.input.map
+import io.novafoundation.nova.common.utils.input.modifyIfNotNull
+import io.novafoundation.nova.common.utils.input.modifyInput
+import io.novafoundation.nova.common.utils.input.valueOrNull
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
@@ -61,10 +66,17 @@ class AdvancedEncryptionViewModel(
     private fun loadInitialState() = launch {
         val initialState = interactor.getInitialInputState(payload.chainIdOrNull)
 
-        _substrateCryptoTypeInput.emit(initialState.substrateCryptoType.map(::encryptionTypeToUi))
-        _substrateDerivationPathInput.emit(initialState.substrateDerivationPath)
-        _ethereumCryptoTypeInput.emit(initialState.ethereumCryptoType.map(::encryptionTypeToUi))
-        _ethereumDerivationPathInput.emit(initialState.ethereumDerivationPath)
+        val latestState = advancedEncryptionResponder.lastState
+
+        val initialSubstrateType = initialState.substrateCryptoType.modifyIfNotNull(latestState?.substrateCryptoType)
+        val initialSubstrateDerivationPath = initialState.substrateDerivationPath.modifyIfNotNull(latestState?.substrateDerivationPath)
+        val initialEthereumType = initialState.ethereumCryptoType.modifyIfNotNull(latestState?.ethereumCryptoType)
+        val initialEthereumDerivationPath = initialState.ethereumDerivationPath.modifyIfNotNull(latestState?.ethereumDerivationPath)
+
+        _substrateCryptoTypeInput.emit(initialSubstrateType.map(::encryptionTypeToUi))
+        _substrateDerivationPathInput.emit(initialSubstrateDerivationPath)
+        _ethereumCryptoTypeInput.emit(initialEthereumType.map(::encryptionTypeToUi))
+        _ethereumDerivationPathInput.emit(initialEthereumDerivationPath)
     }
 
     fun substrateDerivationPathChanged(new: String) = _substrateDerivationPathInput.modifyInputAsync(new)
@@ -132,4 +144,5 @@ class AdvancedEncryptionViewModel(
     }
 
     private fun encryptionTypeToUi(encryptionType: CryptoType): CryptoTypeModel = mapCryptoTypeToCryptoTypeModel(resourceManager, encryptionType)
+
 }

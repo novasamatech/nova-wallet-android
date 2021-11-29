@@ -24,7 +24,13 @@ fun <I, R> Input<I>.map(modification: (I) -> R): Input<R> = when (this) {
     Input.Disabled -> Input.Disabled
 }
 
-fun <I> Input<I>.modify(new: I): Input<I> = map { new }
+fun <I> Input<I>.modify(new: I): Input<I> = when (this) {
+    is Input.Enabled.Modifiable -> Input.Enabled.Modifiable(new)
+    is Input.Enabled.UnModifiable -> this
+    Input.Disabled -> this
+}
+
+fun <I> Input<I>.modifyIfNotNull(new: I?): Input<I> = new?.let { modify(it) } ?: this
 
 fun <I, R> Input<I>.fold(
     ifEnabled: (I) -> R,
