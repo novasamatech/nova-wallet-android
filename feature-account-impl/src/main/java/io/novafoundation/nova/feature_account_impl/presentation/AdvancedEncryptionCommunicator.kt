@@ -19,7 +19,6 @@ suspend fun AdvancedEncryptionRequester.lastResponseOrDefault(addAccountPayload:
 
 interface AdvancedEncryptionResponder : InterScreenResponder<AddAccountPayload, Response>
 
-
 interface AdvancedEncryptionCommunicator : AdvancedEncryptionRequester, AdvancedEncryptionResponder {
 
     @Parcelize

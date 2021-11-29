@@ -5,7 +5,7 @@ import androidx.lifecycle.asFlow
 import androidx.navigation.NavController
 import io.novafoundation.nova.common.navigation.InterScreenCommunicator
 import kotlinx.coroutines.flow.Flow
-import java.util.*
+import java.util.UUID
 
 abstract class BaseInterScreenCommunicator<I : Parcelable, O : Parcelable>(
     private val navigationHolder: NavigationHolder,

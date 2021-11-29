@@ -215,5 +215,4 @@ class AccountFeatureModule {
         accountRepository: AccountRepository,
         chainRegistry: ChainRegistry,
     ) = AdvancedEncryptionInteractor(accountRepository, chainRegistry)
-
 }

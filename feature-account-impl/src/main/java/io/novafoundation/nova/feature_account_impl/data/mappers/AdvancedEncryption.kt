@@ -5,7 +5,6 @@ import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryp
 import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInput
 import io.novafoundation.nova.feature_account_impl.presentation.AdvancedEncryptionCommunicator
 
-
 fun mapAdvancedEncryptionStateToResponse(
     input: AdvancedEncryptionInput
 ): AdvancedEncryptionCommunicator.Response {

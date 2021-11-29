@@ -21,5 +21,4 @@ class AccountNavigationModule {
     @ApplicationScope
     @Provides
     fun provideAccountRouter(navigator: Navigator): AccountRouter = navigator
-
 }

@@ -11,7 +11,6 @@ fun <V> BaseFragment<V>.setupCryptoTypeChooserUi(
     ignoreSelectionFrozen: Boolean = false
 ) where V : BaseViewModel, V : WithCryptoTypeChooserMixin {
 
-
     viewModel.cryptoTypeChooserMixin.selectedEncryptionTypeFlow.observe {
         ui.setEncryption(it.name)
     }
@@ -26,4 +25,3 @@ fun <V> BaseFragment<V>.setupCryptoTypeChooserUi(
         }
     }
 }
-

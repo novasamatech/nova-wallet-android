@@ -40,7 +40,6 @@ fun <I, R> Input<I>.fold(
     Input.Disabled -> ifDisabled
 }
 
-
 inline fun <I> Input<I>.ifModifiable(action: (I) -> Unit) {
     (this as? Input.Enabled.Modifiable)?.let { action(it.value) }
 }

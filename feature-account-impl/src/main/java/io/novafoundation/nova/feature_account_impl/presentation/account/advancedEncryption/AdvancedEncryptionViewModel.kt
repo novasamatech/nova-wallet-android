@@ -143,5 +143,4 @@ class AdvancedEncryptionViewModel(
     }
 
     private fun encryptionTypeToUi(encryptionType: CryptoType): CryptoTypeModel = mapCryptoTypeToCryptoTypeModel(resourceManager, encryptionType)
-
 }
