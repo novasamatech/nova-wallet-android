@@ -35,7 +35,7 @@ class AddAccountInteractor(
         return addAccount(addAccountType) {
             addAccountRepository.addFromMnemonic(
                 mnemonic,
-                // TODO
+                // TODO redesign import mnemonic
                 AdvancedEncryption(
                     derivationPaths = AdvancedEncryption.DerivationPaths(
                         substrate = derivationPath,
@@ -58,7 +58,7 @@ class AddAccountInteractor(
         return addAccount(addAccountType) {
             addAccountRepository.addFromSeed(
                 seed,
-                // TODO
+                // TODO redesign import seed
                 AdvancedEncryption(
                     derivationPaths = AdvancedEncryption.DerivationPaths(
                         substrate = derivationPath,

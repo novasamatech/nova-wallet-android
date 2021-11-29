@@ -86,6 +86,7 @@ interface AccountRepository {
 
     /**
      * @throws NovaException
+     * @throws NovaException
      */
     suspend fun getNetworkName(nodeHost: String): String
 
