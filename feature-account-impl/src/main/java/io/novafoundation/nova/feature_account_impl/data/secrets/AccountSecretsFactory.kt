@@ -7,7 +7,6 @@ import io.novafoundation.nova.common.data.secrets.v2.MetaAccountSecrets
 import io.novafoundation.nova.common.data.secrets.v2.mapKeypairStructToKeypair
 import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.common.utils.deriveSeed32
-import io.novafoundation.nova.common.utils.nullIfEmpty
 import io.novafoundation.nova.core.model.CryptoType
 import jp.co.soramitsu.fearless_utils.encrypt.MultiChainEncryption
 import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedDecoder
@@ -116,7 +115,7 @@ class AccountSecretsFactory(
         )
 
         val ethereumKeypair = accountSource.castOrNull<AccountSource.Mnemonic>()?.let {
-            val decodedEthereumDerivationPath = ethereumDerivationPath?.nullIfEmpty()?.let(BIP32JunctionDecoder::decode)
+            val decodedEthereumDerivationPath = decodeDerivationPath(ethereumDerivationPath, ethereum = true)
 
             val seed = deriveSeed(it.mnemonic, password = decodedEthereumDerivationPath?.password, ethereum = true).seed
 
