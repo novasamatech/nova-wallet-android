@@ -75,7 +75,7 @@ class CrowdloanAdapter(
 
 private object CrowdloanDiffCallback : BaseGroupedDiffCallback<CrowdloanStatusModel, CrowdloanModel>(CrowdloanStatusModel::class.java) {
 
-    override fun getChildChangePayload(oldItem: CrowdloanModel, newItem: CrowdloanModel): Any {
+    override fun getChildChangePayload(oldItem: CrowdloanModel, newItem: CrowdloanModel): Any? {
         return CrowdloanPayloadGenerator.diff(oldItem, newItem)
     }
 

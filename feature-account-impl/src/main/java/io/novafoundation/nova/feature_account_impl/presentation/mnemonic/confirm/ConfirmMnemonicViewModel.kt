@@ -6,7 +6,9 @@ import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
-import io.novafoundation.nova.common.utils.map
+import io.novafoundation.nova.common.utils.added
+import io.novafoundation.nova.common.utils.modified
+import io.novafoundation.nova.common.utils.removed
 import io.novafoundation.nova.common.utils.sendEvent
 import io.novafoundation.nova.common.vibration.DeviceVibrator
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
@@ -18,6 +20,10 @@ import io.novafoundation.nova.feature_account_impl.domain.account.add.AddAccount
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import jp.co.soramitsu.fearless_utils.encrypt.junction.BIP32JunctionDecoder
 import jp.co.soramitsu.fearless_utils.encrypt.junction.JunctionDecoder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class ConfirmMnemonicViewModel(
@@ -26,26 +32,25 @@ class ConfirmMnemonicViewModel(
     private val router: AccountRouter,
     private val deviceVibrator: DeviceVibrator,
     private val resourceManager: ResourceManager,
+    private val config: ConfirmMnemonicConfig,
     private val payload: ConfirmMnemonicPayload
 ) : BaseViewModel() {
 
     private val originMnemonic = payload.mnemonic
 
-    val shuffledMnemonic = originMnemonic.shuffled()
+    private val shuffledMnemonic = originMnemonic.shuffled()
 
-    private val confirmationMnemonicWords = MutableLiveData<List<String>>(emptyList())
+    private val _sourceWords = MutableStateFlow(initialSourceWords())
+    val sourceWords: Flow<List<MnemonicWord>> = _sourceWords
 
-    private val _resetConfirmationEvent = MutableLiveData<Event<Unit>>()
-    val resetConfirmationEvent: LiveData<Event<Unit>> = _resetConfirmationEvent
+    private val _destinationWords = MutableStateFlow<List<MnemonicWord>>(emptyList())
+    val destinationWords: Flow<List<MnemonicWord>> = _destinationWords
 
-    private val _removeLastWordFromConfirmationEvent = MutableLiveData<Event<Unit>>()
-    val removeLastWordFromConfirmationEvent: LiveData<Event<Unit>> = _removeLastWordFromConfirmationEvent
-
-    val nextButtonEnableLiveData: LiveData<Boolean> = confirmationMnemonicWords.map {
+    val nextButtonEnabled = destinationWords.map {
         originMnemonic.size == it.size
     }
 
-    val skipVisible = payload.createExtras != null
+    val skipVisible = payload.createExtras != null && config.allowShowingSkip
 
     private val _matchingMnemonicErrorAnimationEvent = MutableLiveData<Event<Unit>>()
     val matchingMnemonicErrorAnimationEvent: LiveData<Event<Unit>> = _matchingMnemonicErrorAnimationEvent
@@ -54,47 +59,60 @@ class ConfirmMnemonicViewModel(
         router.back()
     }
 
-    fun resetConfirmationClicked() {
-        reset()
+    fun sourceWordClicked(sourceWord: MnemonicWord) {
+        val markedAsRemoved = sourceWord.copy(removed = true)
+
+        val destinationWordsSnapshot = _destinationWords.value
+        val destinationWord = sourceWord.copy(
+            indexDisplay = (destinationWordsSnapshot.size + 1).toString()
+        )
+
+        _sourceWords.value = _sourceWords.value.modified(markedAsRemoved, markedAsRemoved.byMyId())
+        _destinationWords.value = destinationWordsSnapshot.added(destinationWord)
     }
 
-    private fun reset() {
-        confirmationMnemonicWords.value = mutableListOf()
-        _resetConfirmationEvent.sendEvent()
+    fun destinationWordClicked(destinationWord: MnemonicWord) = launch(Dispatchers.Default) {
+        val sourceWord = _sourceWords.value.first { it.content == destinationWord.content }
+        val modifiedSourceWord = sourceWord.copy(removed = false)
+
+        _sourceWords.value = _sourceWords.value.modified(modifiedSourceWord, modifiedSourceWord.byMyId())
+        _destinationWords.value = _destinationWords.value.removed(destinationWord.byMyId()).fixIndices()
     }
 
-    fun addWordToConfirmMnemonic(word: String) {
-        confirmationMnemonicWords.value?.let {
-            val wordList = mutableListOf<String>().apply {
-                addAll(it)
-                add(word)
-            }
-            confirmationMnemonicWords.value = wordList
+    fun reset() {
+        _destinationWords.value = emptyList()
+        _sourceWords.value = initialSourceWords()
+    }
+
+    fun skipClicked() {
+        proceed()
+    }
+
+    fun continueClicked() {
+        val mnemonicFromDestination = _destinationWords.value.map(MnemonicWord::content)
+
+        if (mnemonicFromDestination == sourceWords) {
+            proceed()
+        } else {
+            deviceVibrator.makeShortVibration()
+            _matchingMnemonicErrorAnimationEvent.sendEvent()
         }
     }
 
-    fun removeLastWordFromConfirmation() {
-        confirmationMnemonicWords.value?.let {
-            if (it.isEmpty()) {
-                return
-            }
-            val wordList = mutableListOf<String>().apply {
-                addAll(it.subList(0, it.size - 1))
-            }
-            confirmationMnemonicWords.value = wordList
+    private fun List<MnemonicWord>.fixIndices(): List<MnemonicWord> {
+        return mapIndexed { index, word ->
+            word.copy(indexDisplay = (index + 1).toString())
         }
-
-        _removeLastWordFromConfirmationEvent.sendEvent()
     }
 
-    fun nextButtonClicked() {
-        confirmationMnemonicWords.value?.let { enteredWords ->
-            if (originMnemonic == enteredWords) {
-                proceed()
-            } else {
-                deviceVibrator.makeShortVibration()
-                _matchingMnemonicErrorAnimationEvent.sendEvent()
-            }
+    private fun initialSourceWords(): List<MnemonicWord> {
+        return shuffledMnemonic.mapIndexed { index, word ->
+            MnemonicWord(
+                id = index,
+                content = word,
+                indexDisplay = null, // source does not have indexing
+                removed = false
+            )
         }
     }
 
@@ -111,6 +129,8 @@ class ConfirmMnemonicViewModel(
     private fun finishConfirmGame() {
         router.back()
     }
+
+    private fun MnemonicWord.byMyId(): (MnemonicWord) -> Boolean = { it.id == id }
 
     private fun createAccount(extras: ConfirmMnemonicPayload.CreateExtras) {
         viewModelScope.launch {
@@ -155,7 +175,4 @@ class ConfirmMnemonicViewModel(
         }
     }
 
-    fun skipClicked() {
-        proceed()
-    }
 }

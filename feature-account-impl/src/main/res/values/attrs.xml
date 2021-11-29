@@ -19,4 +19,9 @@
         <attr name="settingValue" format="string" />
         <attr name="icon" />
     </declare-styleable>
+
+    <declare-styleable name="MnemonicContainerView">
+
+        <attr name="showBackground" format="boolean" />
+    </declare-styleable>
 </resources>

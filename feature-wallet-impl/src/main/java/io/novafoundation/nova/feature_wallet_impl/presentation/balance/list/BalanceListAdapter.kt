@@ -125,7 +125,7 @@ private object AssetDiffCallback : DiffUtil.ItemCallback<AssetModel>() {
         return oldItem == newItem
     }
 
-    override fun getChangePayload(oldItem: AssetModel, newItem: AssetModel): Any {
+    override fun getChangePayload(oldItem: AssetModel, newItem: AssetModel): Any? {
         return AssetPayloadGenerator.diff(oldItem, newItem)
     }
 }

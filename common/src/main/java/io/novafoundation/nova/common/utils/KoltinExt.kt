@@ -102,3 +102,24 @@ fun String.formatNamed(values: Map<String, String>): String {
 inline fun <T> T?.defaultOnNull(lazyProducer: () -> T): T {
     return this ?: lazyProducer()
 }
+
+
+fun <T> List<T>.modified(modification: T, condition: (T) -> Boolean): List<T> {
+    return modified(indexOfFirst(condition), modification)
+}
+
+fun <T> List<T>.removed(condition: (T) -> Boolean): List<T> {
+    return toMutableList().apply { removeAll(condition) }
+}
+
+fun <T> List<T>.added(toAdd: T): List<T> {
+    return toMutableList().apply { add(toAdd) }
+}
+
+fun <T> List<T>.modified(index: Int, modification: T): List<T> {
+    val newList = this.toMutableList()
+
+    newList[index] = modification
+
+    return newList
+}
