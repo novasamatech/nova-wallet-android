@@ -16,7 +16,7 @@ class ImportAccountNameViews(
     val visibilityDependent: List<View>,
 )
 
-abstract class ImportSourceView @JvmOverloads constructor(
+abstract class ImportSourceView<S : ImportSource> @JvmOverloads constructor(
     @LayoutRes layoutId: Int,
     context: Context,
     attrs: AttributeSet? = null,
@@ -27,9 +27,11 @@ abstract class ImportSourceView @JvmOverloads constructor(
 
     init {
         View.inflate(context, layoutId, this)
+
+        orientation = VERTICAL
     }
 
-    abstract fun observeSource(source: ImportSource, lifecycleOwner: LifecycleOwner)
+    abstract fun observeSource(source: S, lifecycleOwner: LifecycleOwner)
 
     fun observeCommon(viewModel: ImportAccountViewModel, lifecycleOwner: LifecycleOwner) {
         setupAccountNameChooserUi(viewModel, nameInputViews.nameInput, lifecycleOwner, nameInputViews.visibilityDependent)

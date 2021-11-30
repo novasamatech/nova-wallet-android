@@ -15,11 +15,11 @@ import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
+import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportType
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountDetailsInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountInChain
-import io.novafoundation.nova.feature_account_impl.domain.account.details.AvailableExportType
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportSource
@@ -157,12 +157,12 @@ class AccountDetailsViewModel(
     }
 
     private fun mapAvailableExportTypeToUI(
-        availableExportType: AvailableExportType
+        availableExportType: ImportType
     ): ExportSource {
         return when (availableExportType) {
-            AvailableExportType.MNEMONC -> ExportSource.Mnemonic
-            AvailableExportType.SEED -> ExportSource.Seed
-            AvailableExportType.JSON -> ExportSource.Json
+            ImportType.MNEMONIC -> ExportSource.Mnemonic
+            ImportType.SEED -> ExportSource.Seed
+            ImportType.JSON -> ExportSource.Json
         }
     }
 }

@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:textColor="@color/black1"
-        tools:text="@string/account_import_mnemonic_subtitle" />
+        android:text="@string/account_import_mnemonic_subtitle" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/importMnemonicContentContainer"
@@ -62,7 +62,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:textColor="@color/black1"
-        tools:text="@string/account_import_mnemonic_hint" />
+        android:text="@string/account_import_mnemonic_hint" />
 
     <io.novafoundation.nova.common.view.InputField
         android:id="@+id/importMnemonicUsernameInput"
@@ -70,8 +70,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:hint="@string/account_wallet_nickname"
-        android:visibility="visible" />
+        android:hint="@string/account_wallet_nickname" />
 
     <TextView
         android:id="@+id/importMnemnonicUsernameHint"

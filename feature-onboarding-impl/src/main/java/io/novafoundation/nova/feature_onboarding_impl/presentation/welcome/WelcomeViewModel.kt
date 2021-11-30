@@ -7,6 +7,8 @@ import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
+import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportAccountPayload
+import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportType
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
 
 class WelcomeViewModel(
@@ -28,7 +30,7 @@ class WelcomeViewModel(
     }
 
     fun importAccountClicked() {
-        router.openImportAccountScreen(addAccountPayload)
+        router.openImportAccountScreen(ImportAccountPayload(ImportType.JSON, addAccountPayload))
     }
 
     fun termsClicked() {

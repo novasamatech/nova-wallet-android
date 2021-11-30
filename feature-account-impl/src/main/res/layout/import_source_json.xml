@@ -8,13 +8,14 @@
     tools:background="@color/black"
     tools:parentTag="android.widget.LinearLayout">
 
-    <io.novafoundation.nova.common.view.InputField
-        android:id="@+id/importJsonContent"
-        style="@style/Widget.Nova.Input.Primary.External"
+    <io.novafoundation.nova.common.view.LabeledTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/importJsonContent"
+        app:actionIcon="@drawable/ic_file_upload"
         android:layout_marginTop="24dp"
-        android:hint="@string/recovery_json" />
+        app:message="@string/recover_json_hint"
+        app:label="@string/recovery_json" />
 
     <TextView
         android:id="@+id/importJsonNoNetworkInfo"

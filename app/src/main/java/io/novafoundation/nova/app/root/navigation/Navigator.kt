@@ -10,6 +10,7 @@ import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.common.navigation.DelayedNavigation
 import io.novafoundation.nova.common.utils.postToUiThread
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
+import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportAccountPayload
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.create.CreateAccountFragment
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.AccountDetailsFragment
@@ -147,8 +148,8 @@ class Navigator(
         )
     }
 
-    override fun openImportAccountScreen(addAccountPayload: AddAccountPayload) {
-        navController?.navigate(R.id.importAction, ImportAccountFragment.getBundle(addAccountPayload))
+    override fun openImportAccountScreen(payload: ImportAccountPayload) {
+        navController?.navigate(R.id.importAction, ImportAccountFragment.getBundle(payload))
     }
 
     override fun openMnemonicScreen(accountName: String?, payload: AddAccountPayload) {
