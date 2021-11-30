@@ -42,12 +42,6 @@ class RuntimeFilesCache(
         writeToCacheFile(fileName, metadata)
     }
 
-    suspend fun hasChainMetadata(chainId: String): Boolean {
-        val fileName = METADATA_FILE_MASK.format(chainId)
-
-        return getCacheFile(fileName).exists()
-    }
-
     private suspend fun writeToCacheFile(name: String, content: String) {
         return withContext(Dispatchers.IO) {
             getCacheFile(name).writeText(content)

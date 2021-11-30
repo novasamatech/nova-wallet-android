@@ -64,10 +64,6 @@ class RuntimeSyncServiceTest {
         whenever(typesFetcher.getTypes(any())).thenReturn(TEST_TYPES)
         socketAnswersRequest(GetMetadataRequest, "Stub")
 
-        // defaults
-        metadataCacheExists(true)
-
-
         service = RuntimeSyncService(typesFetcher, runtimeFilesCache, chainDao)
     }
 
@@ -212,10 +208,9 @@ class RuntimeSyncServiceTest {
         }
     }
 
-    @Test(timeout = 100)
+    @Test
     fun `should always sync chain info when cache is not found`() {
         runBlocking {
-            metadataCacheExists(false)
             chainDaoReturnsSyncedRuntimeInfo()
 
             whenever(testChain.types).thenReturn(Chain.Types("testUrl", overridesCommon = false))
@@ -259,10 +254,6 @@ class RuntimeSyncServiceTest {
     }
 
     private suspend fun RuntimeSyncService.awaitSync(chainId: String) = syncResultFlow(chainId).first()
-
-    private suspend fun metadataCacheExists(exists: Boolean) {
-        whenever(runtimeFilesCache.hasChainMetadata(any())).thenReturn(exists)
-    }
 
     private fun socketAnswersRequest(request: RuntimeRequest, response: Any?) {
         whenever(socket.executeRequest(eq(request), deliveryType = any(), callback = any())).thenAnswer {
