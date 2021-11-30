@@ -4,16 +4,16 @@ import com.google.gson.Gson
 import io.novafoundation.nova.common.utils.md5
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
-import jp.co.soramitsu.fearless_utils.runtime.metadata.GetMetadataRequest
-import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
-import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.RuntimeRequest
-import jp.co.soramitsu.fearless_utils.wsrpc.response.RpcResponse
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.TypesFetcher
 import io.novafoundation.nova.test_shared.any
 import io.novafoundation.nova.test_shared.eq
 import io.novafoundation.nova.test_shared.whenever
+import jp.co.soramitsu.fearless_utils.runtime.metadata.GetMetadataRequest
+import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
+import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.RuntimeRequest
+import jp.co.soramitsu.fearless_utils.wsrpc.response.RpcResponse
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.first
@@ -63,7 +63,6 @@ class RuntimeSyncServiceTest {
         whenever(socket.jsonMapper).thenReturn(Gson())
         whenever(typesFetcher.getTypes(any())).thenReturn(TEST_TYPES)
         socketAnswersRequest(GetMetadataRequest, "Stub")
-
 
         service = RuntimeSyncService(typesFetcher, runtimeFilesCache, chainDao)
     }
@@ -206,6 +205,24 @@ class RuntimeSyncServiceTest {
             val syncResult = service.awaitSync(testChain.id)
 
             assertNotNull(syncResult.metadataHash)
+        }
+    }
+
+    @Test
+    fun `should always sync chain info when cache is not found`() {
+        runBlocking {
+            chainDaoReturnsSyncedRuntimeInfo()
+
+            whenever(testChain.types).thenReturn(Chain.Types("testUrl", overridesCommon = false))
+            service.registerChain(chain = testChain, connection = testConnection)
+
+            assertFalse(service.isSyncing(testChain.id)) // guarantee test correctness
+
+            service.cacheNotFound(testChain.id)
+
+            val syncResult = service.awaitSync(testChain.id)
+            assertNotNull(syncResult.metadataHash)
+            assertNotNull(syncResult.typesHash)
         }
     }
 
