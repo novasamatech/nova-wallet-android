@@ -103,7 +103,6 @@ inline fun <T> T?.defaultOnNull(lazyProducer: () -> T): T {
     return this ?: lazyProducer()
 }
 
-
 fun <T> List<T>.modified(modification: T, condition: (T) -> Boolean): List<T> {
     return modified(indexOfFirst(condition), modification)
 }

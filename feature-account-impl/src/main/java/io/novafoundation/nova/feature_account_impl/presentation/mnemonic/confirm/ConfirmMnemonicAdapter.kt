@@ -15,7 +15,6 @@ import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_confirm_mnemonic_word.view.itemConfirmMnemonicIndex
 import kotlinx.android.synthetic.main.item_confirm_mnemonic_word.view.itemConfirmMnemonicWord
 
-
 class ConfirmMnemonicAdapter(
     private val itemHandler: ItemHandler
 ) : ListAdapter<MnemonicWord, ConfirmMnemonicAdapter.ConfirmMnemonicAdapterHolder>(DiffCallback) {
