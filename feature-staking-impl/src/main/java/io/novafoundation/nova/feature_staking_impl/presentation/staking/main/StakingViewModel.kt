@@ -241,8 +241,6 @@ class StakingViewModel(
         )
 
         is StakingState.NonStash -> stakingViewStateFactory.createWelcomeViewState(
-            assetSelectorMixin.selectedAssetFlow,
-            accountStakingState,
             stakingStateScope,
             ::showError
         )

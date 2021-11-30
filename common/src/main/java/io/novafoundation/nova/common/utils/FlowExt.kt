@@ -122,7 +122,7 @@ fun <T> singleReplaySharedFlow() = MutableSharedFlow<T>(replay = 1, onBufferOver
 
 fun <T> Flow<T>.inBackground() = flowOn(Dispatchers.Default)
 
-fun EditText.bindTo(flow: MutableStateFlow<String>, scope: CoroutineScope) {
+fun EditText.bindTo(flow: MutableSharedFlow<String>, scope: CoroutineScope) {
     scope.launch {
         flow.collect { input ->
             if (text.toString() != input) {

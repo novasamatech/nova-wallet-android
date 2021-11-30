@@ -149,6 +149,7 @@ transfers will appear here</string>
     <string name="pincode_biometry_dialog_title">Biometry</string>
     <string name="common_edit">Edit</string>
     <string name="common_done">Done</string>
+    <string name="accounts_add_wallet">Add wallet</string>
     <string name="accounts_add_account">Add account</string>
     <string name="account_add_already_exists_message">Account already exists. Please, try another one.</string>
     <string name="about_website">Official Website</string>
@@ -275,8 +276,8 @@ Derivation path: %s</string>
     <string name="runtime_update_failure_title">Runtime update failure</string>
     <string name="runtime_update_failure_description">Failed to update information about blockchain runtime. Some functionality may not work.</string>
     <string name="staking_title">Staking</string>
-    <string name="staking_month_period_title">monthly</string>
-    <string name="staking_year_period_title">yearly</string>
+    <string name="staking_month_period_title">Monthly</string>
+    <string name="staking_year_period_title">Yearly</string>
     <string name="staking_recommended_title">Validators</string>
     <string name="staking_recommended_section_title">Recommended validators</string>
     <string name="staking_recommended_feature_1">Most profitable</string>

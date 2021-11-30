@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_staking_impl.domain
 
 import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.sumByBigInteger
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
@@ -44,6 +43,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.chainAsset
+import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine

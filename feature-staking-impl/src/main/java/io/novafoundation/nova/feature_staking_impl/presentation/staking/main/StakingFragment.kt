@@ -4,14 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.lifecycleScope
 import coil.ImageLoader
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.presentation.LoadingState
-import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setVisible
@@ -32,7 +30,6 @@ import kotlinx.android.synthetic.main.fragment_staking.stakingContainer
 import kotlinx.android.synthetic.main.fragment_staking.stakingEstimate
 import kotlinx.android.synthetic.main.fragment_staking.stakingNetworkInfo
 import kotlinx.android.synthetic.main.fragment_staking.stakingStakeSummary
-import kotlinx.android.synthetic.main.fragment_staking.startStakingBtn
 import javax.inject.Inject
 import kotlin.time.ExperimentalTime
 
@@ -43,7 +40,7 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         return inflater.inflate(R.layout.fragment_staking, container, false)
     }
@@ -54,8 +51,6 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
                 padding()
             }
         }
-
-        stakingEstimate.hideAssetBalanceDollarAmount()
 
         stakingAvatar.setOnClickListener {
             viewModel.avatarClicked()
@@ -102,14 +97,12 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
         viewModel.stakingViewStateFlow.observe { loadingState ->
             when (loadingState) {
                 is LoadingState.Loading -> {
-                    startStakingBtn.setVisible(false)
                     stakingEstimate.setVisible(false)
                     stakingStakeSummary.setVisible(false)
                 }
                 is LoadingState.Loaded -> {
                     val stakingState = loadingState.data
 
-                    startStakingBtn.setVisible(stakingState is WelcomeViewState)
                     stakingEstimate.setVisible(stakingState is WelcomeViewState)
                     stakingStakeSummary.setVisible(stakingState is StakeViewState<*>)
 
@@ -129,26 +122,18 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
                         is WelcomeViewState -> {
                             observeValidations(stakingState)
 
-                            stakingState.assetLiveData.observe {
-                                stakingEstimate.loadAssetImage(it.imageUrl)
-                                stakingEstimate.setAssetName(it.tokenName)
-                                stakingEstimate.setAssetBalance(it.assetBalance)
+                            stakingState.returns.observe { rewardsState ->
+                                when (rewardsState) {
+                                    is LoadingState.Loaded -> {
+                                        val rewards = rewardsState.data
+
+                                        stakingEstimate.showGains(rewards.monthlyPercentage, rewards.yearlyPercentage)
+                                    }
+                                    is LoadingState.Loading -> stakingEstimate.showLoading()
+                                }
                             }
 
-                            stakingState.amountFiat.observe { amountFiat ->
-                                stakingEstimate.showAssetBalanceDollarAmount()
-                                stakingEstimate.setAssetBalanceDollarAmount(amountFiat)
-                            }
-
-                            stakingState.returns.observe { rewards ->
-                                stakingEstimate.hideReturnsLoading()
-                                stakingEstimate.populateMonthEstimation(rewards.monthly)
-                                stakingEstimate.populateYearEstimation(rewards.yearly)
-                            }
-
-                            stakingEstimate.amountInput.bindTo(stakingState.enteredAmountFlow, viewLifecycleOwner.lifecycleScope)
-
-                            startStakingBtn.setOnClickListener { stakingState.nextClicked() }
+                            stakingEstimate.startStakingButton.setOnClickListener { stakingState.nextClicked() }
 
                             stakingEstimate.infoActions.setOnClickListener { stakingState.infoActionClicked() }
 
@@ -165,27 +150,11 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
             when (state) {
                 is LoadingState.Loading<*> -> stakingNetworkInfo.showLoading()
 
-                is LoadingState.Loaded<StakingNetworkInfoModel> -> {
-                    with(state.data) {
-                        stakingNetworkInfo.hideLoading()
-                        stakingNetworkInfo.setTotalStake(totalStake)
-                        stakingNetworkInfo.setNominatorsCount(nominatorsCount)
-                        stakingNetworkInfo.setMinimumStake(minimumStake)
-                        stakingNetworkInfo.setLockupPeriod(lockupPeriod)
-                        if (totalStakeFiat == null) {
-                            stakingNetworkInfo.hideTotalStakeFiat()
-                        } else {
-                            stakingNetworkInfo.showTotalStakeFiat()
-                            stakingNetworkInfo.setTotalStakeFiat(totalStakeFiat)
-                        }
-
-                        if (minimumStakeFiat == null) {
-                            stakingNetworkInfo.hideMinimumStakeFiat()
-                        } else {
-                            stakingNetworkInfo.showMinimumStakeFiat()
-                            stakingNetworkInfo.setMinimumStakeFiat(minimumStakeFiat)
-                        }
-                    }
+                is LoadingState.Loaded<StakingNetworkInfoModel> -> with(state.data) {
+                    stakingNetworkInfo.setTotalStake(totalStake, totalStakeFiat)
+                    stakingNetworkInfo.setNominatorsCount(nominatorsCount)
+                    stakingNetworkInfo.setMinimumStake(minimumStake, minimumStakeFiat)
+                    stakingNetworkInfo.setLockupPeriod(lockupPeriod)
                 }
             }
         }
@@ -202,7 +171,7 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
     @ExperimentalTime
     private fun <S> StakeSummaryView.bindStakeSummary(
         stakingViewState: StakeViewState<S>,
-        mapStatus: (StakeSummaryModel<S>) -> StakeSummaryView.Status
+        mapStatus: (StakeSummaryModel<S>) -> StakeSummaryView.Status,
     ) {
         setStatusClickListener {
             stakingViewState.statusClicked()
@@ -227,25 +196,11 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
                 is LoadingState.Loaded<StakeSummaryModel<S>> -> {
                     val summary = summaryState.data
 
-                    hideLoading()
                     setElectionStatus(mapStatus(summary))
-                    setTotalStaked(summary.totalStaked)
-                    setTotalRewards(summary.totalRewards)
-
-                    if (summary.totalStakedFiat == null) {
-                        hideTotalStakeFiat()
-                    } else {
-                        showTotalStakedFiat()
-                        setTotalStakedFiat(summary.totalStakedFiat)
-                    }
-
-                    if (summary.totalRewardsFiat == null) {
-                        hideTotalRewardsFiat()
-                    } else {
-                        showTotalRewardsFiat()
-                        setTotalRewardsFiat(summary.totalRewardsFiat)
-                    }
+                    showTotalRewards(summary.totalRewards)
+                    showTotalStaked(summary.totalStaked)
                 }
+                is LoadingState.Loading -> showLoading()
             }
         }
     }

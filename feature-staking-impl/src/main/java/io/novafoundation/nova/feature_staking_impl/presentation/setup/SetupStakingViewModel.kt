@@ -27,7 +27,7 @@ import io.novafoundation.nova.feature_wallet_api.data.mappers.mapAssetToAssetMod
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
@@ -35,6 +35,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
@@ -67,12 +68,13 @@ class SetupStakingViewModel(
         .map { mapAssetToAssetModel(it, resourceManager) }
         .flowOn(Dispatchers.Default)
 
-    val enteredAmountFlow = MutableStateFlow(currentProcessState.amount.toString())
+    val enteredAmountFlow = MutableSharedFlow<String>(replay = 1)
 
     private val parsedAmountFlow = enteredAmountFlow.mapNotNull { it.toBigDecimalOrNull() }
+        .onStart { emit(BigDecimal.ZERO) }
+        .share()
 
     val enteredFiatAmountFlow = assetFlow.combine(parsedAmountFlow) { asset, amount ->
-
         asset.token.fiatAmount(amount).formatAsCurrency()
     }
         .flowOn(Dispatchers.Default)
