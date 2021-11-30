@@ -7,7 +7,6 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.app.root.domain.RootInteractor
-import io.novafoundation.nova.app.root.navigation.Navigator
 import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.app.root.presentation.RootViewModel
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
@@ -23,9 +22,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
     ]
 )
 class RootActivityModule {
-
-    @Provides
-    fun provideRootRouter(navigator: Navigator): RootRouter = navigator
 
     @Provides
     @IntoMap

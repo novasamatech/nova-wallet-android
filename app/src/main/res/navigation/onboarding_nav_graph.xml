@@ -30,11 +30,11 @@
 
         <action
             android:id="@+id/action_welcomeFragment_to_backupMnemonicFragment"
+            app:destination="@id/backupMnemonicFragment"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit"
-            app:destination="@id/backupMnemonicFragment" />
+            app:popExitAnim="@anim/fragment_close_exit" />
 
     </fragment>
 
@@ -68,10 +68,10 @@
             app:destination="@id/pincodeFragment"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
-            app:popUpTo="@id/welcomeFragment"
-            app:popUpToInclusive="true"
             app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit">
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@id/welcomeFragment"
+            app:popUpToInclusive="true">
 
         </action>
 
@@ -105,11 +105,11 @@
             android:id="@+id/action_confirmMnemonicFragment_to_pincodeFragment"
             app:destination="@id/pincodeFragment"
             app:enterAnim="@anim/fragment_open_enter"
-            app:popUpTo="@id/welcomeFragment"
-            app:popUpToInclusive="true"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit">
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@id/welcomeFragment"
+            app:popUpToInclusive="true">
 
         </action>
 
@@ -122,5 +122,20 @@
         tools:layout="@layout/fragment_pincode">
 
     </fragment>
+
+    <fragment
+        android:id="@+id/advancedEncryptionFragment"
+        tools:layout="@layout/fragment_advanced_encryption"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionFragment"
+        android:label="AdvancedEncryptionFragment" />
+
+    <action
+        android:id="@+id/action_open_advancedEncryptionFragment"
+        app:destination="@+id/advancedEncryptionFragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
 
 </navigation>

@@ -176,12 +176,8 @@ class AccountRepositoryImpl(
         return accountDataSource.getPinCode()
     }
 
-    override suspend fun generateMnemonic(): List<String> {
-        return withContext(Dispatchers.Default) {
-            val generationResult = MnemonicCreator.randomMnemonic(Mnemonic.Length.TWELVE)
-
-            generationResult.wordList
-        }
+    override suspend fun generateMnemonic(): Mnemonic {
+        return MnemonicCreator.randomMnemonic(Mnemonic.Length.TWELVE)
     }
 
     override suspend fun isBiometricEnabled(): Boolean {

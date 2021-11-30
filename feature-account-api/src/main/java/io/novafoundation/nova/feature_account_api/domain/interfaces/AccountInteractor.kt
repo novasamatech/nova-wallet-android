@@ -8,11 +8,12 @@ import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.PreferredCryptoType
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.Mnemonic
 import kotlinx.coroutines.flow.Flow
 
 interface AccountInteractor {
 
-    suspend fun generateMnemonic(): List<String>
+    suspend fun generateMnemonic(): Mnemonic
 
     fun getCryptoTypes(): List<CryptoType>
 

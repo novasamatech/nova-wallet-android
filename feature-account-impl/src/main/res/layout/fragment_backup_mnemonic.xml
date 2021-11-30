@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black"
@@ -8,44 +9,61 @@
     android:orientation="vertical">
 
     <io.novafoundation.nova.common.view.Toolbar
-        android:id="@+id/toolbar"
+        android:id="@+id/backupMnemonicToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:iconRight="@drawable/ic_info_white_24"
-        app:titleText="@string/account_create_title" />
+        app:dividerVisible="false"
+        app:iconRight="@drawable/ic_options" />
 
-    <ScrollView
-        android:id="@+id/scrollView"
+    <TextView
+        style="@style/TextAppearance.NovaFoundation.Header2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/account_backup_mnemonic_title" />
+
+    <TextView
+        style="@style/TextAppearance.NovaFoundation.SubHeadline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/account_create_details"
+        android:textColor="@color/black1" />
+
+    <io.novafoundation.nova.common.view.LabeledTextView
+        android:id="@+id/backupMnemonicPhrase"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="16dp"
+        android:singleLine="false"
+        app:enabled="false"
+        app:label="@string/recovery_passphrase"
+        tools:message="@tools:sample/lorem[12]" />
+
+
+    <TextView
+        style="@style/TextAppearance.NovaFoundation.Caption1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/account_backup_mnemonic_caption"
+        android:textColor="@color/black1" />
+
+    <Space
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:overScrollMode="never">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <io.novafoundation.nova.feature_account_impl.presentation.view.mnemonic.MnemonicViewer
-                android:id="@+id/backupMnemonicViewer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="16dp" />
-
-            <io.novafoundation.nova.feature_account_impl.presentation.view.advanced.AdvancedBlockView
-                android:id="@+id/advancedBlockView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/x3" />
-
-        </LinearLayout>
-
-    </ScrollView>
+        android:layout_weight="1" />
 
     <io.novafoundation.nova.common.view.PrimaryButton
-        android:id="@+id/nextBtn"
+        android:id="@+id/backupMnemonicContinue"
         style="@style/Widget.Nova.Button.Primary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -53,6 +71,6 @@
         android:layout_marginTop="@dimen/x3"
         android:layout_marginEnd="@dimen/x2"
         android:layout_marginBottom="@dimen/x3"
-        android:text="@string/common_next" />
+        android:text="@string/common_continue" />
 
 </LinearLayout>

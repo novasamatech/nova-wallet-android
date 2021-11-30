@@ -13,7 +13,9 @@ import io.novafoundation.nova.common.mixin.MixinFactory
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
+import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_impl.presentation.AdvancedEncryptionCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.CryptoTypeChooserMixin
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.impl.CryptoTypeChooserFactory
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.backup.BackupMnemonicViewModel
@@ -43,14 +45,16 @@ class BackupMnemonicModule {
         router: AccountRouter,
         accountName: String?,
         addAccountPayload: AddAccountPayload,
-        cryptoTypeChooserMixinFactory: MixinFactory<CryptoTypeChooserMixin>,
+        advancedEncryptionCommunicator: AdvancedEncryptionCommunicator,
+        advancedEncryptionInteractor: AdvancedEncryptionInteractor,
     ): ViewModel {
         return BackupMnemonicViewModel(
             interactor,
             router,
             accountName,
             addAccountPayload,
-            cryptoTypeChooserMixinFactory
+            advancedEncryptionInteractor,
+            advancedEncryptionCommunicator,
         )
     }
 

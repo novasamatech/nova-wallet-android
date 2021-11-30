@@ -12,3 +12,6 @@ sealed class AddAccountPayload : Parcelable {
     @Parcelize
     class ChainAccount(val chainId: ChainId, val metaId: Long) : AddAccountPayload()
 }
+
+val AddAccountPayload.chainIdOrNull
+    get() = (this as? AddAccountPayload.ChainAccount)?.chainId

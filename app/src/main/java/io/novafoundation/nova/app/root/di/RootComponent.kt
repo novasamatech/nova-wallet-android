@@ -2,7 +2,8 @@ package io.novafoundation.nova.app.root.di
 
 import dagger.BindsInstance
 import dagger.Component
-import io.novafoundation.nova.app.root.navigation.Navigator
+import io.novafoundation.nova.app.root.navigation.NavigationHolder
+import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.app.root.presentation.di.RootActivityComponent
 import io.novafoundation.nova.app.root.presentation.main.di.MainFragmentComponent
 import io.novafoundation.nova.common.di.CommonApi
@@ -32,7 +33,8 @@ interface RootComponent {
     @Component.Factory
     interface Factory {
         fun create(
-            @BindsInstance navigator: Navigator,
+            @BindsInstance navigationHolder: NavigationHolder,
+            @BindsInstance rootRouter: RootRouter,
             deps: RootDependencies
         ): RootComponent
     }

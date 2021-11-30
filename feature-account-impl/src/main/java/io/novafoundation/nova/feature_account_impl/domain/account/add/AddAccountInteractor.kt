@@ -5,6 +5,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.model.AddAccountType
 import io.novafoundation.nova.feature_account_api.domain.model.ImportJsonMetaData
 import io.novafoundation.nova.feature_account_impl.data.repository.AddAccountRepository
+import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryption
 
 class AddAccountInteractor(
     private val addAccountRepository: AddAccountRepository,
@@ -13,15 +14,13 @@ class AddAccountInteractor(
 
     suspend fun createAccount(
         mnemonic: String,
-        encryptionType: CryptoType,
-        derivationPath: String,
+        advancedEncryption: AdvancedEncryption,
         addAccountType: AddAccountType
     ): Result<Unit> {
         return addAccount(addAccountType) {
             addAccountRepository.addFromMnemonic(
                 mnemonic,
-                encryptionType,
-                derivationPath,
+                advancedEncryption,
                 addAccountType
             )
         }
@@ -36,8 +35,15 @@ class AddAccountInteractor(
         return addAccount(addAccountType) {
             addAccountRepository.addFromMnemonic(
                 mnemonic,
-                encryptionType,
-                derivationPath,
+                // TODO redesign import mnemonic
+                AdvancedEncryption(
+                    derivationPaths = AdvancedEncryption.DerivationPaths(
+                        substrate = derivationPath,
+                        ethereum = null
+                    ),
+                    substrateCryptoType = encryptionType,
+                    ethereumCryptoType = null
+                ),
                 addAccountType
             )
         }
@@ -52,8 +58,15 @@ class AddAccountInteractor(
         return addAccount(addAccountType) {
             addAccountRepository.addFromSeed(
                 seed,
-                encryptionType,
-                derivationPath,
+                // TODO redesign import seed
+                AdvancedEncryption(
+                    derivationPaths = AdvancedEncryption.DerivationPaths(
+                        substrate = derivationPath,
+                        ethereum = null
+                    ),
+                    substrateCryptoType = encryptionType,
+                    ethereumCryptoType = null
+                ),
                 addAccountType
             )
         }
@@ -68,7 +81,6 @@ class AddAccountInteractor(
             addAccountRepository.addFromJson(
                 json = json,
                 password = password,
-                derivationPath = "", // TODO consider allowing derivation path for json importing,
                 addAccountType = addAccountType
             )
         }

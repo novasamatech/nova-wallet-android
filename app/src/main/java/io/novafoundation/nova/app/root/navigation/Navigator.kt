@@ -1,7 +1,6 @@
 package io.novafoundation.nova.app.root.navigation
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.asFlow
 import androidx.navigation.NavController
@@ -83,7 +82,9 @@ import kotlinx.coroutines.flow.Flow
 @Parcelize
 class NavComponentDelayedNavigation(val globalActionId: Int, val extras: Bundle? = null) : DelayedNavigation
 
-class Navigator :
+class Navigator(
+    private val navigationHolder: NavigationHolder,
+) :
     SplashRouter,
     OnboardingRouter,
     AccountRouter,
@@ -92,18 +93,8 @@ class Navigator :
     StakingRouter,
     CrowdloanRouter {
 
-    private var navController: NavController? = null
-    private var activity: AppCompatActivity? = null
-
-    fun attach(navController: NavController, activity: AppCompatActivity) {
-        this.navController = navController
-        this.activity = activity
-    }
-
-    fun detach() {
-        navController = null
-        activity = null
-    }
+    private val navController: NavController?
+        get() = navigationHolder.navController
 
     override fun openAddFirstAccount() {
         navController?.navigate(R.id.action_splash_to_onboarding, WelcomeFragment.bundle(false))
@@ -259,7 +250,7 @@ class Navigator :
         val popped = navController!!.popBackStack()
 
         if (!popped) {
-            activity!!.finish()
+            navigationHolder.activity!!.finish()
         }
     }
 

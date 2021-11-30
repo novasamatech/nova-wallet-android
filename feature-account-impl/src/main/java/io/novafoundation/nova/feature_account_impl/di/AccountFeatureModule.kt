@@ -34,6 +34,7 @@ import io.novafoundation.nova.feature_account_impl.data.secrets.AccountSecretsFa
 import io.novafoundation.nova.feature_account_impl.domain.AccountInteractorImpl
 import io.novafoundation.nova.feature_account_impl.domain.NodeHostValidator
 import io.novafoundation.nova.feature_account_impl.domain.account.add.AddAccountInteractor
+import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountDetailsInteractor
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -207,4 +208,11 @@ class AccountFeatureModule {
         addAccountRepository: AddAccountRepository,
         accountRepository: AccountRepository,
     ) = AddAccountInteractor(addAccountRepository, accountRepository)
+
+    @Provides
+    @FeatureScope
+    fun provideInteractor(
+        accountRepository: AccountRepository,
+        chainRegistry: ChainRegistry,
+    ) = AdvancedEncryptionInteractor(accountRepository, chainRegistry)
 }
