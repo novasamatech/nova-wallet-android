@@ -9,7 +9,6 @@ import java.io.File
 import java.util.UUID
 import androidx.core.content.FileProvider as AndroidFileProvider
 
-
 class FileProviderImpl(
     private val context: Context
 ) : FileProvider {
