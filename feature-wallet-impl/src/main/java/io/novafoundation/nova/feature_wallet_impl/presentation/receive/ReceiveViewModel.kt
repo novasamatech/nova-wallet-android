@@ -70,7 +70,7 @@ class ReceiveViewModel(
     val toolbarTitle = flowOf {
         val (_, chainAsset) = chainWithAssetAsync()
 
-        resourceManager.getString(R.string.wallet_asset_receive_token, chainAsset.name)
+        resourceManager.getString(R.string.wallet_asset_receive_token, chainAsset.symbol)
     }
         .inBackground()
         .share()
