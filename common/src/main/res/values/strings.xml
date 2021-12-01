@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+    <string name="account_mnmonic_length_variants">12, 15, 18, 21 or 24-word phrase</string>
+    <string name="account_private_key">Private key</string>
+    <string name="account_json_file">JSON file</string>
+    <string name="account_select_secret_source">Select your secret type</string>
+
     <string name="account_import_seed_hex_symbols">64 hex symbols</string>
 
     <string name="account_import_mnemonic_title">Enter the words in the right order</string>

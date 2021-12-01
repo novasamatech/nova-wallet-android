@@ -34,6 +34,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
@@ -96,7 +97,7 @@ class JsonImportSource(
     }
 
     override suspend fun performImport(addAccountType: AddAccountType): Result<Unit> {
-        return addAccountInteractor.importFromJson(jsonContentFlow.value, passwordFlow.value, addAccountType)
+        return addAccountInteractor.importFromJson(jsonContentFlow.first(), passwordFlow.value, addAccountType)
     }
 
     override fun handleError(throwable: Throwable): ImportError? {
@@ -142,9 +143,9 @@ class JsonImportSource(
     }
 
     private fun jsonReceived(newJson: String) {
-        jsonContentFlow.value = newJson
-
         scope.launch {
+            jsonContentFlow.emit(newJson)
+
             val result = addAccountInteractor.extractJsonMetadata(newJson)
 
             if (result.isSuccess) {

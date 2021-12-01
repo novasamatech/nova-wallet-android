@@ -36,6 +36,8 @@ import io.novafoundation.nova.feature_account_impl.domain.NodeHostValidator
 import io.novafoundation.nova.feature_account_impl.domain.account.add.AddAccountInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountDetailsInteractor
+import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.importType.ImportTypeChooserMixin
+import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.importType.ImportTypeChooserProvider
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
@@ -215,4 +217,7 @@ class AccountFeatureModule {
         accountRepository: AccountRepository,
         chainRegistry: ChainRegistry,
     ) = AdvancedEncryptionInteractor(accountRepository, chainRegistry)
+
+    @Provides
+    fun provideImportTypeChooserMixin(): ImportTypeChooserMixin.Presentation = ImportTypeChooserProvider()
 }

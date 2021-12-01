@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.importType.ImportTypeChooserMixin
 
 interface AccountFeatureApi {
 
@@ -20,4 +21,6 @@ interface AccountFeatureApi {
     fun accountUseCase(): SelectedAccountUseCase
 
     fun extrinsicService(): ExtrinsicService
+
+    fun importTypeChooserMixin(): ImportTypeChooserMixin.Presentation
 }
