@@ -80,6 +80,10 @@ class Toolbar @JvmOverloads constructor(
         rightText.text = action
     }
 
+    fun setRightIconVisible(visible: Boolean) {
+        rightImg.setVisible(visible)
+    }
+
     fun setTitle(title: String?) {
         titleTv.text = title
     }

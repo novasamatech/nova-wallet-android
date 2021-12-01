@@ -1,5 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+    <string name="account_mnmonic_length_variants">12, 15, 18, 21 or 24-word phrase</string>
+    <string name="account_private_key">Private key</string>
+    <string name="account_json_file">JSON file</string>
+    <string name="account_select_secret_source">Select your secret type</string>
+
+    <string name="account_import_seed_hex_symbols">64 hex symbols</string>
+
+    <string name="account_import_mnemonic_title">Enter the words in the right order</string>
+    <string name="account_import_mnemonic_subtitle">Write words separately with one space, no commas or other signs.</string>
+    <string name="account_import_mnemonic_hint">Typically 12-word phrase (but may be 15, 18, 21 or 24)</string>
+
+    <string name="account_import_seed_title">Enter your raw seed</string>
+    <string name="account_import_seed_hint" translatable="false">0xAB</string>
+
+    <string name="account_import_json_title">Paste your Restore JSON</string>
+
     <string name="account_confirm_mnemonic_title">Let’s double check it</string>
     <string name="account_confirm_mnemonic_subtitle">Select the words in the right order.</string>
 

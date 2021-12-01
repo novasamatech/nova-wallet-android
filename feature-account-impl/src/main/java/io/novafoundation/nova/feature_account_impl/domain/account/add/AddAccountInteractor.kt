@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_account_impl.domain.account.add
 
-import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.AddAccountType
 import io.novafoundation.nova.feature_account_api.domain.model.ImportJsonMetaData
@@ -28,22 +27,13 @@ class AddAccountInteractor(
 
     suspend fun importFromMnemonic(
         mnemonic: String,
-        encryptionType: CryptoType,
-        derivationPath: String,
+        advancedEncryption: AdvancedEncryption,
         addAccountType: AddAccountType
     ): Result<Unit> {
         return addAccount(addAccountType) {
             addAccountRepository.addFromMnemonic(
                 mnemonic,
-                // TODO redesign import mnemonic
-                AdvancedEncryption(
-                    derivationPaths = AdvancedEncryption.DerivationPaths(
-                        substrate = derivationPath,
-                        ethereum = null
-                    ),
-                    substrateCryptoType = encryptionType,
-                    ethereumCryptoType = null
-                ),
+                advancedEncryption,
                 addAccountType
             )
         }
@@ -51,22 +41,13 @@ class AddAccountInteractor(
 
     suspend fun importFromSeed(
         seed: String,
-        encryptionType: CryptoType,
-        derivationPath: String,
+        advancedEncryption: AdvancedEncryption,
         addAccountType: AddAccountType
     ): Result<Unit> {
         return addAccount(addAccountType) {
             addAccountRepository.addFromSeed(
                 seed,
-                // TODO redesign import seed
-                AdvancedEncryption(
-                    derivationPaths = AdvancedEncryption.DerivationPaths(
-                        substrate = derivationPath,
-                        ethereum = null
-                    ),
-                    substrateCryptoType = encryptionType,
-                    ethereumCryptoType = null
-                ),
+                advancedEncryption,
                 addAccountType
             )
         }

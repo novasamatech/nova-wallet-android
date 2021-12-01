@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.navigation.DelayedNavigation
 import io.novafoundation.nova.common.navigation.PinRequired
 import io.novafoundation.nova.common.navigation.SecureRouter
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
+import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportAccountPayload
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.AccountChosenNavDirection
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ExportJsonConfirmPayload
@@ -51,6 +52,8 @@ interface AccountRouter : SecureRouter {
     fun openConfirmMnemonicOnExport(mnemonic: List<String>)
 
     fun openExportJsonConfirm(payload: ExportJsonConfirmPayload)
+
+    fun openImportAccountScreen(payload: ImportAccountPayload)
 
     fun returnToWallet()
 

@@ -4,59 +4,49 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:orientation="vertical"
     tools:background="@color/black"
-    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+    tools:parentTag="android.widget.LinearLayout">
 
     <io.novafoundation.nova.common.view.LabeledTextView
-        android:id="@+id/importJsonContent"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/importJsonContent"
         app:actionIcon="@drawable/ic_file_upload"
-        app:label="@string/recovery_json"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:message="@string/recover_json_hint" />
+        android:layout_marginTop="24dp"
+        app:message="@string/recover_json_hint"
+        app:label="@string/recovery_json" />
 
     <TextView
         android:id="@+id/importJsonNoNetworkInfo"
         style="@style/TextAppearance.NovaFoundation.Body1"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:drawableStart="@drawable/ic_alert_triangle_yellow_24"
         android:drawablePadding="8dp"
         android:gravity="center_vertical"
         android:includeFontPadding="false"
         android:text="@string/import_json_chains_dont_match"
         android:textColor="@color/gray1"
         android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/importJsonContent"
+        app:drawableStartCompat="@drawable/ic_alert_triangle_yellow_24"
         tools:visibility="visible" />
-
-
-    <io.novafoundation.nova.common.view.InputField
-        android:id="@+id/importJsonUsernameInput"
-        style="@style/Widget.Nova.Input.Primary.External"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/x2"
-        android:hint="@string/username_setup_choose_title"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/importJsonNoNetworkInfo" />
 
     <io.novafoundation.nova.common.view.InputField
         android:id="@+id/importJsonPasswordInput"
         style="@style/Widget.Nova.Input.Primary.External"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/x2"
         android:hint="@string/account_import_password_placeholder"
-        android:inputType="textPassword"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/importJsonUsernameInput" />
+        android:inputType="textPassword" />
+
+    <io.novafoundation.nova.common.view.InputField
+        android:id="@+id/importJsonUsernameInput"
+        style="@style/Widget.Nova.Input.Primary.External"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/x2"
+        android:hint="@string/account_wallet_nickname" />
+
 </merge>

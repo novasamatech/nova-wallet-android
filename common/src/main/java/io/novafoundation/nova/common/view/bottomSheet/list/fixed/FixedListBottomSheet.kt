@@ -11,6 +11,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.setDrawableStart
+import io.novafoundation.nova.common.utils.setVisible
+import kotlinx.android.synthetic.main.bottom_sheeet_fixed_list.fixedListSheetDivider
 import kotlinx.android.synthetic.main.bottom_sheeet_fixed_list.fixedListSheetItemContainer
 import kotlinx.android.synthetic.main.bottom_sheeet_fixed_list.fixedListSheetTitle
 import kotlinx.android.synthetic.main.item_sheet_iconic_label.view.itemExternalActionContent
@@ -59,6 +61,10 @@ abstract class FixedListBottomSheet(context: Context) : BottomSheetDialog(contex
 
             dismiss()
         }
+    }
+
+    protected fun setTitleDividerVisible(visible: Boolean) {
+        fixedListSheetDivider.setVisible(visible, falseState = View.INVISIBLE)
     }
 }
 

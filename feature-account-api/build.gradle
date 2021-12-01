@@ -34,6 +34,8 @@ dependencies {
     implementation androidDep
     implementation materialDep
 
+    implementation constraintDep
+
     api fearlessLibDep
 
     api project(':core-api')
