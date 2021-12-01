@@ -48,6 +48,8 @@
             android:layout_marginBottom="8dp"
             android:background="@null"
             android:gravity="top"
+            android:hint="@string/account_import_seed_hint"
+            android:textColorHint="@color/black3"
             android:inputType="textMultiLine|textVisiblePassword"
             android:minLines="5"
             android:padding="0dp"

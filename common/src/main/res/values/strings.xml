@@ -12,6 +12,8 @@
     <string name="account_import_mnemonic_hint">Typically 12-word phrase (but may be 15, 18, 21 or 24)</string>
 
     <string name="account_import_seed_title">Enter your raw seed</string>
+    <string name="account_import_seed_hint" translatable="false">0xAB</string>
+
     <string name="account_import_json_title">Paste your Restore JSON</string>
 
     <string name="account_confirm_mnemonic_title">Let’s double check it</string>
