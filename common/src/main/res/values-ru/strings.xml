@@ -230,7 +230,6 @@
     <string name="connection_delete_confirm">Удалить</string>
     <string name="network_status_connecting">Подключение…</string>
     <string name="wallet_balance_frozen_template">Заморожено %s</string>
-    <string name="wallet_receive_description">Поделитесь этим QR-кодом с отправителем</string>
     <string name="wallet_send_existential_warning_title">Перевод удалит аккаунт</string>
     <string name="search_header_my_accounts">мои аккаунты</string>
     <string name="wallet_receive_share_message" formatted="false">Мой %s адрес для получения %s:</string>

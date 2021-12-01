@@ -27,7 +27,7 @@ enum class ButtonState(val viewEnabled: Boolean) {
 class PrimaryButton @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyle: Int = 0
+    defStyle: Int = 0,
 ) : AppCompatTextView(context, attrs, defStyle) {
 
     enum class Appearance {

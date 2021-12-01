@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.domain
 
 import io.novafoundation.nova.common.data.model.CursorPage
-import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.NotValidTransferStatus
@@ -28,7 +27,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.withContext
-import java.io.File
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -36,7 +34,6 @@ class WalletInteractorImpl(
     private val walletRepository: WalletRepository,
     private val accountRepository: AccountRepository,
     private val chainRegistry: ChainRegistry,
-    private val fileProvider: FileProvider,
 ) : WalletInteractor {
 
     override fun assetsFlow(): Flow<List<Asset>> {
@@ -198,26 +195,6 @@ class WalletInteractorImpl(
             val accountId = metaAccount.accountIdIn(chain)!!
 
             walletRepository.checkTransferValidity(accountId, chain, transfer, estimatedFee)
-        }
-    }
-
-    override suspend fun getQrCodeSharingString(chainId: ChainId): String = withContext(Dispatchers.Default) {
-        val chain = chainRegistry.getChain(chainId)
-        val account = accountRepository.getSelectedMetaAccount()
-
-        accountRepository.createQrAccountContent(chain, account)
-    }
-
-    // TODO just create file, screens can retrieve asset with getCurrentAsset()
-    override suspend fun createFileInTempStorageAndRetrieveAsset(
-        chainId: ChainId,
-        chainAssetId: Int,
-        fileName: String,
-    ): Result<Pair<File, Asset>> {
-        return runCatching {
-            val file = fileProvider.getFileInExternalCacheStorage(fileName)
-
-            file to getCurrentAsset(chainId, chainAssetId)
         }
     }
 

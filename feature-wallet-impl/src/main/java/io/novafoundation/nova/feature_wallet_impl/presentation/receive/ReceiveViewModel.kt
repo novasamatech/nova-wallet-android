@@ -12,28 +12,26 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
-import io.novafoundation.nova.common.utils.requireException
-import io.novafoundation.nova.common.utils.requireValue
-import io.novafoundation.nova.common.utils.write
+import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletInteractor
 import io.novafoundation.nova.feature_wallet_impl.R
+import io.novafoundation.nova.feature_wallet_impl.domain.receive.ReceiveInteractor
 import io.novafoundation.nova.feature_wallet_impl.presentation.AssetPayload
 import io.novafoundation.nova.feature_wallet_impl.presentation.WalletRouter
 import io.novafoundation.nova.feature_wallet_impl.presentation.receive.model.QrSharingPayload
+import io.novafoundation.nova.feature_wallet_impl.presentation.receive.model.TokenReceiver
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-private const val QR_TEMP_IMAGE_NAME = "address.png"
-
 class ReceiveViewModel(
-    private val interactor: WalletInteractor,
+    private val interactor: ReceiveInteractor,
     private val qrCodeGenerator: QrCodeGenerator,
     private val addressIconGenerator: AddressIconGenerator,
     private val resourceManager: ResourceManager,
@@ -44,8 +42,8 @@ class ReceiveViewModel(
     private val router: WalletRouter,
 ) : BaseViewModel(), ExternalActions by externalActions {
 
-    val chain by lazyAsync {
-        chainRegistry.getChain(assetPayload.chainId)
+    private val chainWithAssetAsync by lazyAsync {
+        chainRegistry.chainWithAsset(assetPayload.chainId, assetPayload.chainAssetId)
     }
 
     val qrBitmapFlow = flowOf {
@@ -56,12 +54,24 @@ class ReceiveViewModel(
         .inBackground()
         .share()
 
-    val accountAddressModelFlow = selectedAccountUseCase.selectedMetaAccountFlow()
+    val receiver = selectedAccountUseCase.selectedMetaAccountFlow()
         .map {
-            val address = it.addressIn(chain())!!
+            val (chain, _) = chainWithAssetAsync()
+            val address = it.addressIn(chain)!!
 
-            addressIconGenerator.createAddressModel(chain(), address, AddressIconGenerator.SIZE_BIG, it.name)
+            TokenReceiver(
+                addressModel = addressIconGenerator.createAddressModel(chain, address, AddressIconGenerator.SIZE_BIG, it.name),
+                chain = mapChainToUi(chain),
+            )
         }
+        .inBackground()
+        .share()
+
+    val toolbarTitle = flowOf {
+        val (_, chainAsset) = chainWithAssetAsync()
+
+        resourceManager.getString(R.string.wallet_asset_receive_token, chainAsset.name)
+    }
         .inBackground()
         .share()
 
@@ -69,9 +79,10 @@ class ReceiveViewModel(
     val shareEvent: LiveData<Event<QrSharingPayload>> = _shareEvent
 
     fun recipientClicked() = launch {
-        val accountAddress = accountAddressModelFlow.first().address
+        val accountAddress = receiver.first().addressModel.address
+        val (chain, _) = chainWithAssetAsync()
 
-        externalActions.showExternalActions(ExternalActions.Type.Address(accountAddress), chain())
+        externalActions.showExternalActions(ExternalActions.Type.Address(accountAddress), chain)
     }
 
     fun backClicked() {
@@ -80,26 +91,21 @@ class ReceiveViewModel(
 
     fun shareButtonClicked() = launch {
         val qrBitmap = qrBitmapFlow.first()
-        val address = accountAddressModelFlow.first().address
+        val address = receiver.first().addressModel.address
+        val (chain, chainAsset) = chainWithAssetAsync()
 
         viewModelScope.launch {
-            val result = interactor.createFileInTempStorageAndRetrieveAsset(assetPayload.chainId, assetPayload.chainAssetId, QR_TEMP_IMAGE_NAME)
+            interactor.generateTempQrFile(qrBitmap)
+                .onSuccess { fileUri ->
+                    val message = generateShareMessage(chain, chainAsset, address)
 
-            if (result.isSuccess) {
-                val (file, asset) = result.requireValue()
-
-                file.write(qrBitmap)
-
-                val message = generateMessage(chain(), asset.token.configuration, address)
-
-                _shareEvent.value = Event(QrSharingPayload(file, message))
-            } else {
-                showError(result.requireException())
-            }
+                    _shareEvent.value = Event(QrSharingPayload(fileUri, message))
+                }
+                .onFailure(::showError)
         }
     }
 
-    private fun generateMessage(chain: Chain, tokenType: Chain.Asset, address: String): String {
+    private fun generateShareMessage(chain: Chain, tokenType: Chain.Asset, address: String): String {
         return resourceManager.getString(R.string.wallet_receive_share_message).format(
             chain.name,
             tokenType.symbol

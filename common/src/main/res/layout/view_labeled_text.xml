@@ -10,7 +10,7 @@
     <ImageView
         android:id="@+id/labeledTextPrimaryIcon"
         android:layout_height="24dp"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="16dp"
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
