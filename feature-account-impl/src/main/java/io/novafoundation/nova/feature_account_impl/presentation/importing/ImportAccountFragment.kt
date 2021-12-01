@@ -74,6 +74,8 @@ class ImportAccountFragment : BaseFragment<ImportAccountViewModel>() {
 
         observeFeatures(viewModel.importSource)
 
+        importAccountToolbar.setRightIconVisible(viewModel.importSource.encryptionOptionsAvailable)
+
         viewModel.nextButtonState.observe(importAccountContinue::setState)
     }
 
