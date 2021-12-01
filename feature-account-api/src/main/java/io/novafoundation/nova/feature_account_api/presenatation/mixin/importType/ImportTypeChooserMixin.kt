@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.common.mixin.importType
+package io.novafoundation.nova.feature_account_api.presenatation.mixin.importType
 
 import androidx.lifecycle.LiveData
 import io.novafoundation.nova.common.utils.Event

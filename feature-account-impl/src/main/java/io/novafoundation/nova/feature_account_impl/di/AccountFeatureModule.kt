@@ -23,6 +23,8 @@ import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateS
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActionsProvider
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserProvider
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSource
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSourceImpl
 import io.novafoundation.nova.feature_account_impl.data.repository.AccountRepositoryImpl
@@ -36,8 +38,6 @@ import io.novafoundation.nova.feature_account_impl.domain.NodeHostValidator
 import io.novafoundation.nova.feature_account_impl.domain.account.add.AddAccountInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountDetailsInteractor
-import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.importType.ImportTypeChooserMixin
-import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.importType.ImportTypeChooserProvider
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls

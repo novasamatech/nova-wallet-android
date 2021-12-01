@@ -67,7 +67,8 @@ class JsonImportSource(
     private val fileReader: FileReader,
     private val scope: CoroutineScope,
     private val payload: AddAccountPayload,
-) : ImportSource(R.string.account_import_json_title), FileRequester,
+) : ImportSource(R.string.account_import_json_title),
+    FileRequester,
     WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(scope) {
 
     override val encryptionOptionsAvailable: Boolean = false
