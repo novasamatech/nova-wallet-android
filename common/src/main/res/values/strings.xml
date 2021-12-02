@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+    <string name="wallet_receive_share_qr">Share QR code</string>
+    <string name="wallet_receive_description_v_2_2_0">Let sender scan this QR code</string>
+    <string name="wallet_asset_receive_token">Receive %s</string>
+
     <string name="account_mnmonic_length_variants">12, 15, 18, 21 or 24-word phrase</string>
     <string name="account_private_key">Private key</string>
     <string name="account_json_file">JSON file</string>
@@ -274,7 +278,6 @@ from the right network</string>
     <string name="connection_delete_confirm">Delete</string>
     <string name="network_status_connecting">Connecting…</string>
     <string name="wallet_balance_frozen_template">Frozen %s</string>
-    <string name="wallet_receive_description">Share this QR to sender</string>
     <string name="wallet_send_existential_warning_title">Transfer will remove account</string>
     <string name="search_header_my_accounts">my accounts</string>
     <string name="wallet_receive_share_message" formatted="false">My %s address to receive %s:</string>

@@ -10,7 +10,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.TransferValidityLe
 import io.novafoundation.nova.feature_wallet_api.domain.model.TransferValidityStatus
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.flow.Flow
-import java.io.File
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -61,14 +60,6 @@ interface WalletInteractor {
         transfer: Transfer,
         estimatedFee: BigDecimal,
     ): Result<TransferValidityStatus>
-
-    suspend fun getQrCodeSharingString(chainId: ChainId): String
-
-    suspend fun createFileInTempStorageAndRetrieveAsset(
-        chainId: ChainId,
-        chainAssetId: Int,
-        fileName: String,
-    ): Result<Pair<File, Asset>>
 
     suspend fun getRecipientFromQrCodeContent(content: String): Result<String>
 }
