@@ -89,11 +89,10 @@ class ConfirmMnemonicViewModel(
         proceed()
     }
 
-    fun continueClicked() = launch {
+    fun continueClicked() {
         val mnemonicFromDestination = _destinationWords.value.map(MnemonicWord::content)
-        val expectedResult = originMnemonic
 
-        if (mnemonicFromDestination == expectedResult) {
+        if (mnemonicFromDestination == originMnemonic) {
             proceed()
         } else {
             deviceVibrator.makeShortVibration()
