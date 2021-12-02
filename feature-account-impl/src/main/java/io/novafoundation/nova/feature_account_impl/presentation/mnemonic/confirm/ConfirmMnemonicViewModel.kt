@@ -23,6 +23,7 @@ import jp.co.soramitsu.fearless_utils.encrypt.junction.JunctionDecoder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -88,10 +89,11 @@ class ConfirmMnemonicViewModel(
         proceed()
     }
 
-    fun continueClicked() {
+    fun continueClicked() = launch {
         val mnemonicFromDestination = _destinationWords.value.map(MnemonicWord::content)
+        val expectedResult = originMnemonic
 
-        if (mnemonicFromDestination == sourceWords) {
+        if (mnemonicFromDestination == expectedResult) {
             proceed()
         } else {
             deviceVibrator.makeShortVibration()
