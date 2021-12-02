@@ -42,19 +42,19 @@
 
         <io.novafoundation.nova.common.view.PrimaryButton
             android:id="@+id/createAccountBtn"
-            style="@style/Widget.Nova.Button.Primary"
+            style="@style/Widget.Nova.Button.Iconic"
             android:layout_width="match_parent"
-            android:theme="@style/AccentBlue"
             android:layout_height="wrap_content"
+            android:drawableEnd="@drawable/ic_add_circle"
             android:layout_margin="@dimen/x1"
             android:text="@string/onboarding_create_account" />
 
         <io.novafoundation.nova.common.view.PrimaryButton
             android:id="@+id/importAccountBtn"
-            style="@style/Widget.Nova.Button.Primary"
+            style="@style/Widget.Nova.Button.Iconic"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:theme="@style/AccentBlue"
+            android:drawableEnd="@drawable/ic_key"
             android:layout_margin="@dimen/x1"
             android:text="@string/onboarding_restore_account" />
 
