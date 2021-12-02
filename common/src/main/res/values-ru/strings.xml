@@ -96,7 +96,6 @@
     <string name="onboarding_terms_and_conditions_1">Я подтверждаю, что прочитал и согласен с Условиями использования и Политикой конфиденциальности</string>
     <string name="onboarding_terms_and_conditions_2">Условиями использования</string>
     <string name="onboarding_privacy_policy">Политикой конфиденциальности</string>
-    <string name="pincode_enter_pin_code">Введите PIN-код</string>
     <string name="pincode_confirm_your_pin_code">Подтвердите свой PIN-код</string>
     <string name="pincode_title_create">Установите свой PIN-код</string>
     <string name="tabbar_wallet_title">Кошелёк</string>

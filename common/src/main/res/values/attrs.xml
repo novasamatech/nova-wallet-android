@@ -2,6 +2,7 @@
 <resources>
 
     <!--fonts-->
+    <attr name="fontExtraLight" format="reference" />
     <attr name="fontSemiBold" format="reference" />
     <attr name="fontBold" format="reference" />
     <attr name="fontExtraBold" format="reference" />

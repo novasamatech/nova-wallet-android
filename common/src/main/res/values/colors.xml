@@ -46,4 +46,6 @@
     <color name="error_red">#FF3B30</color>
 
     <color name="accentBlue">#409DF3</color>
+
+    <color name="pms_black">#2D2926</color>
 </resources>

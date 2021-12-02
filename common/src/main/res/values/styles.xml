@@ -13,6 +13,10 @@
         <item name="android:letterSpacing">0.05</item>
     </style>
 
+    <style name="TextAppearance.NovaFoundation.Regular.Title3">
+        <item name="android:textSize">20sp</item>
+    </style>
+
     <style name="TextAppearance.NovaFoundation.Footnote" parent="TextAppearance.NovaFoundation.Regular">
         <item name="android:textSize">13sp</item>
     </style>
