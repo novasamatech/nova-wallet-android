@@ -35,6 +35,7 @@
         <item name="fontBold">@font/public_sans_bold</item>
         <item name="fontExtraBold">@font/public_sans_extra_bold</item>
         <item name="fontRegular">@font/public_sans_regular</item>
+        <item name="fontExtraLight">@font/public_sans_extra_light</item>
         <!--fonts-->
 
         <item name="colorAccent">@color/accentBlue</item>

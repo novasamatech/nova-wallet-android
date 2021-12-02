@@ -63,6 +63,8 @@ class PinCodeView @JvmOverloads constructor(
         btnDelete.setOnClickListener(pinCodeDeleteClickListener)
 
         fingerprintBtn.setOnClickListener(pinCodeFingerprintClickListener)
+
+        updateProgress()
     }
 
     fun changeFingerPrintButtonVisibility(isVisible: Boolean) {
@@ -110,6 +112,8 @@ class PinCodeView @JvmOverloads constructor(
     private fun updateProgress() {
         val currentProgress = inputCode.length
         dotsProgressView.setProgress(currentProgress)
+
+        btnDelete.isEnabled = currentProgress != 0
     }
 
     private fun shakeDotsAnimation() {

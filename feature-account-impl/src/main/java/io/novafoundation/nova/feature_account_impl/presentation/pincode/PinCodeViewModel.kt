@@ -123,7 +123,7 @@ class PinCodeViewModel(
     }
 
     private fun backToCreateFromConfirmation() {
-        _resetInputEvent.value = Event(resourceManager.getString(R.string.pincode_enter_pin_code))
+        _resetInputEvent.value = Event(resourceManager.getString(R.string.pincode_enter_pin_code_v2_2_0))
 
         if (pinCodeAction is PinCodeAction.Create) {
             _homeButtonVisibilityLiveData.value = pinCodeAction.toolbarConfiguration.backVisible

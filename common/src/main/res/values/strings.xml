@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+    <string name="pincode_enter_pin_code_v2_2_0">Enter PIN code</string>
+
     <string name="wallet_receive_share_qr">Share QR code</string>
     <string name="wallet_receive_description_v_2_2_0">Let sender scan this QR code</string>
     <string name="wallet_asset_receive_token">Receive %s</string>
@@ -144,7 +146,6 @@
 Terms and Conditions and Privacy Policy</string>
     <string name="onboarding_terms_and_conditions_2">Terms and Conditions</string>
     <string name="onboarding_privacy_policy">Privacy Policy</string>
-    <string name="pincode_enter_pin_code">Enter pin code</string>
     <string name="pincode_confirm_your_pin_code">Confirm your pin code</string>
     <string name="pincode_title_create">Set your pin code</string>
     <string name="tabbar_wallet_title">Wallet</string>
