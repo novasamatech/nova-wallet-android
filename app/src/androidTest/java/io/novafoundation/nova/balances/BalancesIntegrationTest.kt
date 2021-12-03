@@ -1,12 +1,10 @@
 package io.novafoundation.nova.balances
 
 import android.content.Context
-import android.util.Log
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountInfo
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.system
 import io.novafoundation.nova.runtime.di.RuntimeApi
 import io.novafoundation.nova.runtime.di.RuntimeComponent
@@ -73,9 +71,6 @@ class BalancesIntegrationTest {
                     )
                 }
             }.exceptionOrNull()
-
-            println("Done for ${chain.name}: ${if (exception == null) "Success" else "Failure"}")
-            Log.d(this@BalancesIntegrationTest.LOG_TAG, "Done for ${chain.name}: ${if (exception == null) "Success" else "${exception.message}"}")
 
             exception?.let { it to chain }
         }
