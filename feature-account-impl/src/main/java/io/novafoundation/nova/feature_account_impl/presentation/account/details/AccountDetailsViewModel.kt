@@ -1,28 +1,24 @@
 package io.novafoundation.nova.feature_account_impl.presentation.account.details
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.list.headers.TextHeader
 import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
-import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportType
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountDetailsInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountInChain
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
-import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportSource
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.Dispatchers
@@ -39,11 +35,6 @@ import kotlin.time.seconds
 
 private const val UPDATE_NAME_INTERVAL_SECONDS = 1L
 
-class ExportChooserPayload(
-    val chain: Chain,
-    val dynamicListPayload: DynamicListBottomSheet.Payload<ExportSource>
-)
-
 class AccountDetailsViewModel(
     private val interactor: AccountDetailsInteractor,
     private val accountRouter: AccountRouter,
@@ -52,14 +43,14 @@ class AccountDetailsViewModel(
     private val metaId: Long,
     private val externalActions: ExternalActions.Presentation,
     private val chainRegistry: ChainRegistry,
-) : BaseViewModel(), ExternalActions by externalActions {
+    private val importTypeChooserMixin: ImportTypeChooserMixin.Presentation
+) : BaseViewModel(),
+    ExternalActions by externalActions,
+    ImportTypeChooserMixin by importTypeChooserMixin {
 
     val accountNameFlow: MutableStateFlow<String> = MutableStateFlow("")
 
     private val metaAccount = async(Dispatchers.Default) { interactor.getMetaAccount(metaId) }
-
-    private val _showExportSourceChooser = MutableLiveData<Event<ExportChooserPayload>>()
-    val showExportSourceChooser: LiveData<Event<ExportChooserPayload>> = _showExportSourceChooser
 
     val chainAccountProjections = flowOf { interactor.getChainProjections(metaAccount()) }
         .map { groupedList ->
@@ -129,24 +120,22 @@ class AccountDetailsViewModel(
     fun exportClicked(inChain: Chain) = launch {
         viewModelScope.launch {
             val sources = interactor.availableExportTypes(metaAccount(), inChain)
-                .map(::mapAvailableExportTypeToUI)
 
-            _showExportSourceChooser.value = Event(
-                ExportChooserPayload(
-                    chain = inChain,
-                    dynamicListPayload = DynamicListBottomSheet.Payload(sources)
-                )
+            val payload = ImportTypeChooserMixin.Payload(
+                allowedTypes = sources,
+                onChosen = { exportTypeChosen(it, inChain) }
             )
+            importTypeChooserMixin.showChooser(payload)
         }
     }
 
-    fun exportTypeChosen(exportSource: ExportSource, chain: Chain) {
+    private fun exportTypeChosen(type: ImportType, chain: Chain) {
         val exportPayload = ExportPayload(metaId, chain.id)
 
-        val navigationAction = when (exportSource) {
-            ExportSource.Mnemonic -> accountRouter.exportMnemonicAction(exportPayload)
-            ExportSource.Json -> accountRouter.exportJsonPasswordAction(exportPayload)
-            ExportSource.Seed -> accountRouter.exportSeedAction(exportPayload)
+        val navigationAction = when (type) {
+            ImportType.MNEMONIC -> accountRouter.exportMnemonicAction(exportPayload)
+            ImportType.SEED -> accountRouter.exportSeedAction(exportPayload)
+            ImportType.JSON -> accountRouter.exportJsonPasswordAction(exportPayload)
         }
 
         accountRouter.withPinCodeCheckRequired(navigationAction)
@@ -154,15 +143,5 @@ class AccountDetailsViewModel(
 
     fun changeChainAccountClicked(inChain: Chain) {
         accountRouter.openAddAccount(AddAccountPayload.ChainAccount(inChain.id, metaId))
-    }
-
-    private fun mapAvailableExportTypeToUI(
-        availableExportType: ImportType
-    ): ExportSource {
-        return when (availableExportType) {
-            ImportType.MNEMONIC -> ExportSource.Mnemonic
-            ImportType.SEED -> ExportSource.Seed
-            ImportType.JSON -> ExportSource.Json
-        }
     }
 }

@@ -12,9 +12,9 @@ import io.novafoundation.nova.common.utils.nameInputFilters
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.actions.copyAddressClicked
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.setupImportTypeChooser
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
-import io.novafoundation.nova.feature_account_impl.presentation.common.accountSource.SourceTypeChooserBottomSheetDialog
 import kotlinx.android.synthetic.main.fragment_account_details.accountDetailsChainAccounts
 import kotlinx.android.synthetic.main.fragment_account_details.accountDetailsNameField
 import kotlinx.android.synthetic.main.fragment_account_details.accountDetailsToolbar
@@ -78,14 +78,7 @@ class AccountDetailsFragment : BaseFragment<AccountDetailsViewModel>(), ChainAcc
                 onExport = viewModel::exportClicked
             )
         }
-
-        viewModel.showExportSourceChooser.observeEvent { payload ->
-            SourceTypeChooserBottomSheetDialog(
-                context = requireContext(),
-                payload = payload.dynamicListPayload,
-                onClicked = { viewModel.exportTypeChosen(it, payload.chain) }
-            ).show()
-        }
+        setupImportTypeChooser(viewModel)
 
         accountDetailsNameField.content.bindTo(viewModel.accountNameFlow, viewLifecycleOwner.lifecycleScope)
 

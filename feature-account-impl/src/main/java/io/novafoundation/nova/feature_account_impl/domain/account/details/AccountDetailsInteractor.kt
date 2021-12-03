@@ -59,12 +59,12 @@ class AccountDetailsInteractor(
     suspend fun availableExportTypes(
         metaAccount: MetaAccount,
         chain: Chain,
-    ): List<ImportType> = withContext(Dispatchers.Default) {
-        val accountId = metaAccount.accountIdIn(chain) ?: return@withContext emptyList()
+    ): Set<ImportType> = withContext(Dispatchers.Default) {
+        val accountId = metaAccount.accountIdIn(chain) ?: return@withContext emptySet()
 
         val secrets = secretStoreV2.getAccountSecrets(metaAccount.id, accountId)
 
-        listOfNotNull(
+        setOfNotNull(
             ImportType.MNEMONIC.takeIf { secrets.entropy() != null },
             ImportType.SEED.takeIf { secrets.seed() != null },
             ImportType.JSON // always available
