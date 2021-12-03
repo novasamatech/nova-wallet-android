@@ -74,7 +74,6 @@ class ChainConnection internal constructor(
             }
         }
             .launchIn(this)
-
     }
 
     private suspend fun observeCurrentNode() {
