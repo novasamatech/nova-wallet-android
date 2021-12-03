@@ -26,3 +26,5 @@ class EventObserver<T>(private val onEventUnhandledContent: (T) -> Unit) : Obser
         }
     }
 }
+
+fun <T> T.event(): Event<T> = Event(this)

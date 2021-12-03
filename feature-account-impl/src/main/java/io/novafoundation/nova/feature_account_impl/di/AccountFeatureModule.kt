@@ -38,6 +38,9 @@ import io.novafoundation.nova.feature_account_impl.domain.NodeHostValidator
 import io.novafoundation.nova.feature_account_impl.domain.account.add.AddAccountInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountDetailsInteractor
+import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherMixin
+import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherProvider
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
@@ -220,4 +223,15 @@ class AccountFeatureModule {
 
     @Provides
     fun provideImportTypeChooserMixin(): ImportTypeChooserMixin.Presentation = ImportTypeChooserProvider()
+
+    @Provides
+    fun provideAddAccountLauncherMixin(
+        importTypeChooserMixin: ImportTypeChooserMixin.Presentation,
+        resourceManager: ResourceManager,
+        router: AccountRouter,
+    ): AddAccountLauncherMixin.Presentation = AddAccountLauncherProvider(
+        importTypeChooserMixin = importTypeChooserMixin,
+        resourceManager = resourceManager,
+        router = router
+    )
 }

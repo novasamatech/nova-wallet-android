@@ -21,22 +21,23 @@
 
 
         <action
-            android:id="@+id/importAction"
-            app:destination="@id/importAccountFragment"
+            android:id="@+id/action_welcomeFragment_to_import_nav_graph"
+            app:destination="@id/import_nav_graph"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+
 
         <action
-            android:id="@+id/action_welcomeFragment_to_backupMnemonicFragment"
-            app:destination="@id/backupMnemonicFragment"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-
+            app:popExitAnim="@anim/fragment_close_exit"
+            android:id="@+id/action_welcomeFragment_to_mnemonic_nav_graph"
+            app:destination="@id/mnemonic_nav_graph" />
     </fragment>
+
 
     <fragment
         android:id="@+id/createAccountFragment"
@@ -45,97 +46,17 @@
         tools:layout="@layout/fragment_create_account">
 
         <action
-            android:id="@+id/action_createAccountFragment_to_backupMnemonicFragment"
-            app:destination="@id/backupMnemonicFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit">
-
-        </action>
-
-    </fragment>
-
-
-    <fragment
-        android:id="@+id/importAccountFragment"
-        android:name="io.novafoundation.nova.feature_account_impl.presentation.importing.ImportAccountFragment"
-        android:label="fragment_import"
-        tools:layout="@layout/fragment_import_account">
-
-        <action
-            android:id="@+id/action_importAccountFragment_to_pincodeFragment"
-            app:destination="@id/pincodeFragment"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit"
-            app:popUpTo="@id/welcomeFragment"
-            app:popUpToInclusive="true">
-
-        </action>
+            android:id="@+id/action_createAccountFragment_to_mnemonic_nav_graph"
+            app:destination="@id/mnemonic_nav_graph" />
 
     </fragment>
 
-    <fragment
-        android:id="@+id/backupMnemonicFragment"
-        android:name="io.novafoundation.nova.feature_account_impl.presentation.mnemonic.backup.BackupMnemonicFragment"
-        android:label="fragment_backup_mnemonic"
-        tools:layout="@layout/fragment_backup_mnemonic">
+    <include app:graph="@navigation/mnemonic_nav_graph" />
 
-        <action
-            android:id="@+id/action_backupMnemonicFragment_to_confirmMnemonicFragment"
-            app:destination="@id/confirmMnemonicFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit">
-
-        </action>
-
-    </fragment>
-
-    <fragment
-        android:id="@+id/confirmMnemonicFragment"
-        android:name="io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.ConfirmMnemonicFragment"
-        android:label="fragment_confirm_mnemonic"
-        tools:layout="@layout/fragment_confirm_mnemonic">
-
-        <action
-            android:id="@+id/action_confirmMnemonicFragment_to_pincodeFragment"
-            app:destination="@id/pincodeFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit"
-            app:popUpTo="@id/welcomeFragment"
-            app:popUpToInclusive="true">
-
-        </action>
-
-    </fragment>
-
-    <fragment
-        android:id="@+id/pincodeFragment"
-        android:name="io.novafoundation.nova.feature_account_impl.presentation.pincode.PincodeFragment"
-        android:label="fragment_pincode"
-        tools:layout="@layout/fragment_pincode">
-
-    </fragment>
-
-    <fragment
-        android:id="@+id/advancedEncryptionFragment"
-        tools:layout="@layout/fragment_advanced_encryption"
-        android:name="io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionFragment"
-        android:label="AdvancedEncryptionFragment" />
-
-    <action
-        android:id="@+id/action_open_advancedEncryptionFragment"
-        app:destination="@+id/advancedEncryptionFragment"
-        app:enterAnim="@anim/fragment_open_enter"
-        app:exitAnim="@anim/fragment_open_exit"
-        app:popEnterAnim="@anim/fragment_close_enter"
-        app:popExitAnim="@anim/fragment_close_exit" />
-
+    <include app:graph="@navigation/import_nav_graph" />
 
 </navigation>

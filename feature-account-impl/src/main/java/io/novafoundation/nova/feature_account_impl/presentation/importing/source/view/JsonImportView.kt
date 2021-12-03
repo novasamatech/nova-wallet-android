@@ -37,7 +37,7 @@ class JsonImportView @JvmOverloads constructor(
 
         source.jsonContentFlow.observe(scope, importJsonContent::setMessage)
 
-        importJsonContent.setOnClickListener { source.jsonClicked() }
+        importJsonContent.setWholeClickListener { source.jsonClicked() }
 
         source.showJsonInputOptionsEvent.observe(
             lifecycleOwner,

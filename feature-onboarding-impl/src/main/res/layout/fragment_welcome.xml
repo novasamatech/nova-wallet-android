@@ -47,7 +47,7 @@
             android:layout_height="wrap_content"
             android:drawableEnd="@drawable/ic_add_circle"
             android:layout_margin="@dimen/x1"
-            android:text="@string/onboarding_create_account_v2_2_0" />
+            android:text="@string/onboarding_create_wallet" />
 
         <io.novafoundation.nova.common.view.PrimaryButton
             android:id="@+id/importAccountBtn"
@@ -56,7 +56,7 @@
             android:layout_height="wrap_content"
             android:drawableEnd="@drawable/ic_key"
             android:layout_margin="@dimen/x1"
-            android:text="@string/onboarding_restore_account_v2_2_0" />
+            android:text="@string/onboarding_restore_wallet" />
 
     </LinearLayout>
 

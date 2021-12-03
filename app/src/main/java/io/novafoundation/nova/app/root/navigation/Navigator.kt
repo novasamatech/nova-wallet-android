@@ -149,16 +149,24 @@ class Navigator(
     }
 
     override fun openImportAccountScreen(payload: ImportAccountPayload) {
-        navController?.navigate(R.id.importAction, ImportAccountFragment.getBundle(payload))
+        val destination = when (val currentDestinationId = navController?.currentDestination?.id) {
+            R.id.welcomeFragment -> R.id.action_welcomeFragment_to_import_nav_graph
+            R.id.accountDetailsFragment -> R.id.action_accountDetailsFragment_to_import_nav_graph
+            else -> throw IllegalArgumentException("Unknown current destination to open import account screen: $currentDestinationId")
+        }
+
+        navController?.navigate(destination, ImportAccountFragment.getBundle(payload))
     }
 
     override fun openMnemonicScreen(accountName: String?, payload: AddAccountPayload) {
-        val bundle = BackupMnemonicFragment.getBundle(accountName, payload)
-
-        when (navController?.currentDestination?.id) {
-            R.id.welcomeFragment -> navController?.navigate(R.id.action_welcomeFragment_to_backupMnemonicFragment, bundle)
-            R.id.createAccountFragment -> navController?.navigate(R.id.action_createAccountFragment_to_backupMnemonicFragment, bundle)
+        val destination = when (val currentDestinationId = navController?.currentDestination?.id) {
+            R.id.welcomeFragment -> R.id.action_welcomeFragment_to_mnemonic_nav_graph
+            R.id.createAccountFragment -> R.id.action_createAccountFragment_to_mnemonic_nav_graph
+            R.id.accountDetailsFragment -> R.id.action_accountDetailsFragment_to_mnemonic_nav_graph
+            else -> throw IllegalArgumentException("Unknown current destination to open mnemonic screen: $currentDestinationId")
         }
+
+        navController?.navigate(destination, BackupMnemonicFragment.getBundle(accountName, payload))
     }
 
     override fun openSetupStaking() {

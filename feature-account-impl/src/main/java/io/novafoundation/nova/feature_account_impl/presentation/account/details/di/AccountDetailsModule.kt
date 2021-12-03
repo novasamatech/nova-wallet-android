@@ -12,9 +12,11 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountDetailsInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.AccountDetailsViewModel
+import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherMixin
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
@@ -31,6 +33,8 @@ class AccountDetailsModule {
         metaId: Long,
         externalActions: ExternalActions.Presentation,
         chainRegistry: ChainRegistry,
+        importTypeChooserMixin: ImportTypeChooserMixin.Presentation,
+        addAccountLauncherMixin: AddAccountLauncherMixin.Presentation,
     ): ViewModel {
         return AccountDetailsViewModel(
             interactor,
@@ -40,6 +44,8 @@ class AccountDetailsModule {
             metaId,
             externalActions,
             chainRegistry,
+            importTypeChooserMixin,
+            addAccountLauncherMixin
         )
     }
 
