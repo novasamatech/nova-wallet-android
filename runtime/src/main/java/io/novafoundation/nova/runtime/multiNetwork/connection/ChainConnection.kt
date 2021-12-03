@@ -64,6 +64,8 @@ class ChainConnection internal constructor(
     )
 
     suspend fun setup() {
+        observeCurrentNode()
+
         externalRequirementFlow.onEach {
             if (it == ExternalRequirement.ALLOWED) {
                 socketService.resume()
@@ -73,7 +75,6 @@ class ChainConnection internal constructor(
         }
             .launchIn(this)
 
-        observeCurrentNode()
     }
 
     private suspend fun observeCurrentNode() {
