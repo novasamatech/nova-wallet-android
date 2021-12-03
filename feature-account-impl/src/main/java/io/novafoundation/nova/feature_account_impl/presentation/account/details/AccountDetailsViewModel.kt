@@ -10,7 +10,6 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
-import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportType
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
@@ -18,6 +17,8 @@ import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountDetailsInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountInChain
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherMixin
+import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherMixin.Presentation.Mode
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -43,10 +44,12 @@ class AccountDetailsViewModel(
     private val metaId: Long,
     private val externalActions: ExternalActions.Presentation,
     private val chainRegistry: ChainRegistry,
-    private val importTypeChooserMixin: ImportTypeChooserMixin.Presentation
+    private val importTypeChooserMixin: ImportTypeChooserMixin.Presentation,
+    private val addAccountLauncherMixin: AddAccountLauncherMixin.Presentation,
 ) : BaseViewModel(),
     ExternalActions by externalActions,
-    ImportTypeChooserMixin by importTypeChooserMixin {
+    ImportTypeChooserMixin by importTypeChooserMixin,
+    AddAccountLauncherMixin by addAccountLauncherMixin {
 
     val accountNameFlow: MutableStateFlow<String> = MutableStateFlow("")
 
@@ -108,13 +111,13 @@ class AccountDetailsViewModel(
     fun chainAccountClicked(item: AccountInChainUi) = launch {
         val chain = chainRegistry.getChain(item.chainUi.id)
 
-        val type = if (item.address != null) {
-            ExternalActions.Type.Address(item.address)
-        } else {
-            ExternalActions.Type.None(item.addressOrHint)
-        }
+        if (item.address != null) {
+            val type = ExternalActions.Type.Address(item.address)
 
-        externalActions.showExternalActions(type, chain)
+            externalActions.showExternalActions(type, chain)
+        } else {
+            addAccountLauncherMixin.initiateLaunch(chain, metaId, Mode.ADD)
+        }
     }
 
     fun exportClicked(inChain: Chain) = launch {
@@ -142,6 +145,6 @@ class AccountDetailsViewModel(
     }
 
     fun changeChainAccountClicked(inChain: Chain) {
-        accountRouter.openAddAccount(AddAccountPayload.ChainAccount(inChain.id, metaId))
+        addAccountLauncherMixin.initiateLaunch(inChain, metaId, Mode.CHANGE)
     }
 }

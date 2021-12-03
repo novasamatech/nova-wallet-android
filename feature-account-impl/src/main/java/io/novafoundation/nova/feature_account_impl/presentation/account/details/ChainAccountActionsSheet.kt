@@ -22,13 +22,7 @@ class ChainAccountActionsSheet(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val changeTitleRes = if (payload.type is ExternalActions.Type.None) {
-            R.string.accounts_add_account
-        } else {
-            R.string.accounts_change_chain_secrets
-        }
-
-        item(R.drawable.ic_edit, changeTitleRes) {
+        item(R.drawable.ic_edit, R.string.accounts_change_chain_secrets) {
             onChange(payload.chain)
         }
 

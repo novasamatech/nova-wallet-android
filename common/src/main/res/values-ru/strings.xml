@@ -151,7 +151,6 @@
     <string name="common_edit">Редактировать</string>
     <string name="common_done">Готово</string>
     <string name="accounts_add_wallet">Добавить кошелёк</string>
-    <string name="accounts_add_account">Добавить аккаунт</string>
     <string name="account_add_already_exists_message">Аккаунт уже существует. Пожалуйста, попробуйте другой.</string>
     <string name="about_website">Официальный сайт</string>
     <string name="about_github">Исходный код на Github</string>
