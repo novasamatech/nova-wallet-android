@@ -3,13 +3,15 @@ package io.novafoundation.nova.feature_account_impl.presentation.mnemonic.backup
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.sendEvent
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
-import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
+import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInteractor
+import io.novafoundation.nova.feature_account_impl.domain.account.export.mnemonic.ExportMnemonicInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.AdvancedEncryptionRequester
 import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionPayload
@@ -24,14 +26,20 @@ import kotlinx.coroutines.launch
 
 class BackupMnemonicViewModel(
     private val interactor: AccountInteractor,
+    private val exportMnemonicInteractor: ExportMnemonicInteractor,
     private val router: AccountRouter,
-    private val accountName: String?,
-    private val addAccountPayload: AddAccountPayload,
+    private val payload: BackupMnemonicPayload,
     private val advancedEncryptionInteractor: AdvancedEncryptionInteractor,
+    private val resourceManager: ResourceManager,
     private val advancedEncryptionRequester: AdvancedEncryptionRequester
 ) : BaseViewModel() {
 
-    private val mnemonicFlow = flowOf { interactor.generateMnemonic() }
+    private val mnemonicFlow = flowOf {
+        when (payload) {
+            is BackupMnemonicPayload.Confirm -> exportMnemonicInteractor.getMnemonic(payload.metaAccountId, payload.chainId)
+            is BackupMnemonicPayload.Create -> interactor.generateMnemonic()
+        }
+    }
         .inBackground()
         .share()
 
@@ -43,10 +51,20 @@ class BackupMnemonicViewModel(
     val mnemonicDisplay = combine(
         mnemonicFlow,
         warningAcceptedFlow
-    ) { mnemonc, warningAccepted ->
-        mnemonc.spacedWords()
-            .takeIf { warningAccepted }
+    ) { mnemonic, warningAccepted ->
+        mnemonic.spacedWords().takeIf { warningAccepted }
     }
+
+    val continueText = flowOf {
+        val stringRes = when (payload) {
+            is BackupMnemonicPayload.Confirm -> R.string.account_verify_mnemonic
+            is BackupMnemonicPayload.Create -> R.string.common_continue
+        }
+
+        resourceManager.getString(stringRes)
+    }
+        .inBackground()
+        .share()
 
     init {
         _showMnemonicWarningDialog.sendEvent()
@@ -57,7 +75,12 @@ class BackupMnemonicViewModel(
     }
 
     fun optionsClicked() {
-        advancedEncryptionRequester.openRequest(AdvancedEncryptionPayload.Change(addAccountPayload))
+        val advancedEncryptionPayload = when (payload) {
+            is BackupMnemonicPayload.Confirm -> AdvancedEncryptionPayload.View(payload.metaAccountId, payload.chainId)
+            is BackupMnemonicPayload.Create -> AdvancedEncryptionPayload.Change(payload.addAccountPayload)
+        }
+
+        advancedEncryptionRequester.openRequest(advancedEncryptionPayload)
     }
 
     fun warningAccepted() {
@@ -69,16 +92,19 @@ class BackupMnemonicViewModel(
     }
 
     fun nextClicked() = launch {
-        val advancedEncryptionResponse = advancedEncryptionRequester.lastResponseOrDefault(addAccountPayload, advancedEncryptionInteractor)
-        val mnemonic = mnemonicFlow.first()
+        val createExtras = (payload as? BackupMnemonicPayload.Create)?.let {
+            val advancedEncryptionResponse = advancedEncryptionRequester.lastResponseOrDefault(it.addAccountPayload, advancedEncryptionInteractor)
 
-        val payload = ConfirmMnemonicPayload(
-            mnemonic = mnemonic.wordList,
             CreateExtras(
-                accountName = accountName,
-                addAccountPayload = addAccountPayload,
+                accountName = it.newWalletName,
+                addAccountPayload = it.addAccountPayload,
                 advancedEncryptionPayload = advancedEncryptionResponse
             )
+        }
+
+        val payload = ConfirmMnemonicPayload(
+            mnemonic = mnemonicFlow.first().wordList,
+            createExtras = createExtras
         )
 
         router.openConfirmMnemonicOnCreate(payload)

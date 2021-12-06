@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+    <string name="account_verify_mnemonic">Verify mnemonic</string>
+
     <string name="accounts_change_chain_account">Change %s account</string>
     <string name="accounts_add_chain_account">Add %s account</string>
 
@@ -198,7 +200,6 @@ transfers will appear here</string>
     <string name="account_import_invalid_seed">Seed is invalid. Please, make sure that your input contains 64 hex symbols.</string>
     <string name="account_import_invalid_keystore">Invalid restore json. Please, make sure that input contains valid json.</string>
     <string name="import_json_invalid_password">Please, check password correctness and try again.</string>
-    <string name="account_confirmation_title">Confirm mnemonic</string>
     <string name="account_confirmation_details">Choose words in the right order</string>
     <string name="pincode_create_top_title">Create pin code</string>
     <string name="pincode_fingerprint_error">You are not authorized. Try another finger.</string>

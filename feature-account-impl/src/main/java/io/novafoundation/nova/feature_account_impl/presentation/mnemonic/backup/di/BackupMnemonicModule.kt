@@ -14,10 +14,12 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInteractor
+import io.novafoundation.nova.feature_account_impl.domain.account.export.mnemonic.ExportMnemonicInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.AdvancedEncryptionCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.CryptoTypeChooserMixin
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.impl.CryptoTypeChooserFactory
+import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.backup.BackupMnemonicPayload
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.backup.BackupMnemonicViewModel
 
 @Module(includes = [ViewModelModule::class])
@@ -43,17 +45,19 @@ class BackupMnemonicModule {
     fun provideViewModel(
         interactor: AccountInteractor,
         router: AccountRouter,
-        accountName: String?,
-        addAccountPayload: AddAccountPayload,
+        exportMnemonicInteractor: ExportMnemonicInteractor,
+        payload: BackupMnemonicPayload,
+        resourceManager: ResourceManager,
         advancedEncryptionCommunicator: AdvancedEncryptionCommunicator,
         advancedEncryptionInteractor: AdvancedEncryptionInteractor,
     ): ViewModel {
         return BackupMnemonicViewModel(
             interactor,
+            exportMnemonicInteractor,
             router,
-            accountName,
-            addAccountPayload,
+            payload,
             advancedEncryptionInteractor,
+            resourceManager,
             advancedEncryptionCommunicator,
         )
     }
