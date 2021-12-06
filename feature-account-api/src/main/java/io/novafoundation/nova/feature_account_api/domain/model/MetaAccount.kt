@@ -127,3 +127,5 @@ fun MetaAccount.multiChainEncryptionIn(chain: Chain): MultiChainEncryption {
         }
     }
 }
+
+fun MetaAccount.chainAccountFor(chainId: ChainId) = chainAccounts.getValue(chainId)

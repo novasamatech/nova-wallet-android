@@ -218,8 +218,9 @@ class AccountFeatureModule {
     @FeatureScope
     fun provideInteractor(
         accountRepository: AccountRepository,
+        secretStoreV2: SecretStoreV2,
         chainRegistry: ChainRegistry,
-    ) = AdvancedEncryptionInteractor(accountRepository, chainRegistry)
+    ) = AdvancedEncryptionInteractor(accountRepository, secretStoreV2, chainRegistry)
 
     @Provides
     fun provideImportTypeChooserMixin(): ImportTypeChooserMixin.Presentation = ImportTypeChooserProvider()

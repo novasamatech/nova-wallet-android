@@ -9,7 +9,6 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.view.dialog.dialog
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
-import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import kotlinx.android.synthetic.main.fragment_backup_mnemonic.backupMnemonicContinue
@@ -20,13 +19,11 @@ class BackupMnemonicFragment : BaseFragment<BackupMnemonicViewModel>() {
 
     companion object {
 
-        private const val KEY_ACCOUNT_NAME = "account_name"
-        private const val KEY_ADD_ACCOUNT_PAYLOAD = "BackupMnemonicFragment.addAccountPayload"
+        private const val KEY_ADD_ACCOUNT_PAYLOAD = "BackupMnemonicFragment.payload"
 
-        fun getBundle(accountName: String?, addAccountPayload: AddAccountPayload): Bundle {
+        fun getBundle(payload: BackupMnemonicPayload): Bundle {
             return Bundle().apply {
-                putString(KEY_ACCOUNT_NAME, accountName)
-                putParcelable(KEY_ADD_ACCOUNT_PAYLOAD, addAccountPayload)
+                putParcelable(KEY_ADD_ACCOUNT_PAYLOAD, payload)
             }
         }
     }
@@ -51,13 +48,14 @@ class BackupMnemonicFragment : BaseFragment<BackupMnemonicViewModel>() {
             .backupMnemonicComponentFactory()
             .create(
                 fragment = this,
-                accountName = argument(KEY_ACCOUNT_NAME),
-                addAccountPayload = argument(KEY_ADD_ACCOUNT_PAYLOAD)
+                payload = argument(KEY_ADD_ACCOUNT_PAYLOAD)
             )
             .inject(this)
     }
 
     override fun subscribe(viewModel: BackupMnemonicViewModel) {
+        viewModel.continueText.observe(backupMnemonicContinue::setText)
+
         viewModel.showMnemonicWarningDialog.observeEvent {
             showMnemonicWarning()
         }

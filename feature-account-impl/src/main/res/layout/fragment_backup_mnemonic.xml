@@ -42,6 +42,7 @@
         android:layout_marginTop="20dp"
         android:layout_marginEnd="16dp"
         android:singleLine="false"
+        app:messageStyle="@style/Widget.Nova.Text.Mnemonic"
         app:enabled="false"
         app:label="@string/recovery_passphrase"
         tools:message="@tools:sample/lorem[12]" />

@@ -15,8 +15,6 @@ import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
 import io.novafoundation.nova.core.model.CryptoType
-import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
-import io.novafoundation.nova.feature_account_api.presenatation.account.add.chainIdOrNull
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapCryptoTypeToCryptoTypeModel
 import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.valiadtion.AdvancedEncryptionValidationPayload
@@ -33,7 +31,7 @@ import kotlinx.coroutines.launch
 
 class AdvancedEncryptionViewModel(
     private val router: AccountRouter,
-    private val payload: AddAccountPayload,
+    private val payload: AdvancedEncryptionPayload,
     private val interactor: AdvancedEncryptionInteractor,
     private val resourceManager: ResourceManager,
     private val validationSystem: AdvancedEncryptionValidationSystem,
@@ -58,12 +56,14 @@ class AdvancedEncryptionViewModel(
 
     val showSubstrateEncryptionTypeChooserEvent = MutableLiveData<Event<DynamicListBottomSheet.Payload<CryptoTypeModel>>>()
 
+    val applyVisible = payload is AdvancedEncryptionPayload.Change
+
     init {
         loadInitialState()
     }
 
     private fun loadInitialState() = launch {
-        val initialState = interactor.getInitialInputState(payload.chainIdOrNull)
+        val initialState = interactor.getInitialInputState(payload)
 
         val latestState = advancedEncryptionResponder.lastState
 

@@ -79,3 +79,12 @@ fun ChainAccountSecrets(
     }
     secrets[DerivationPath] = derivationPath
 }
+
+val EncodableStruct<MetaAccountSecrets>.substrateDerivationPath
+    get() = get(MetaAccountSecrets.SubstrateDerivationPath)
+
+val EncodableStruct<MetaAccountSecrets>.ethereumDerivationPath
+    get() = get(MetaAccountSecrets.EthereumDerivationPath)
+
+val EncodableStruct<ChainAccountSecrets>.derivationPath
+    get() = get(ChainAccountSecrets.DerivationPath)

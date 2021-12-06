@@ -72,10 +72,6 @@
         app:popUpTo="@+id/accountDetailsFragment" />
 
     <action
-        android:id="@+id/action_export_mnemonic"
-        app:destination="@id/exportMnemonicFragment" />
-
-    <action
         android:id="@+id/action_export_seed"
         app:destination="@id/exportSeedFragment" />
 
@@ -209,6 +205,7 @@
             app:destination="@id/userContributionsFragment" />
     </fragment>
 
+
     <fragment
         android:id="@+id/accountsFragment"
         android:name="io.novafoundation.nova.feature_account_impl.presentation.account.list.AccountListFragment"
@@ -299,6 +296,14 @@
     <include app:graph="@navigation/mnemonic_nav_graph" />
 
     <include app:graph="@navigation/import_nav_graph" />
+
+    <action
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit"
+        android:id="@+id/action_open_mnemonic_nav_graph"
+        app:destination="@id/mnemonic_nav_graph" />
 
     <fragment
         android:id="@+id/editAccountsFragment"
@@ -414,25 +419,18 @@
     </fragment>
 
     <fragment
-        android:id="@+id/exportMnemonicFragment"
-        android:name="io.novafoundation.nova.feature_account_impl.presentation.exporting.mnemonic.ExportMnemonicFragment"
-        android:label="ExportMnemonicFragment"
-        tools:layout="@layout/fragment_export_mnemonic">
+        android:id="@+id/advancedEncryptionFragment"
+        tools:layout="@layout/fragment_advanced_encryption"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionFragment"
+        android:label="AdvancedEncryptionFragment" />
 
-        <action
-            android:id="@+id/action_exportMnemonicFragment_to_confirmExportMnemonicFragment"
-            app:destination="@id/confirmExportMnemonicFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/confirmExportMnemonicFragment"
-        android:name="io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.ConfirmMnemonicFragment"
-        android:label="ConfirmMnemonicFragment"
-        tools:layout="@layout/fragment_confirm_mnemonic" />
+    <action
+        android:id="@+id/action_open_advancedEncryptionFragment"
+        app:destination="@+id/advancedEncryptionFragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
 
     <fragment
         android:id="@+id/exportSeedFragment"
