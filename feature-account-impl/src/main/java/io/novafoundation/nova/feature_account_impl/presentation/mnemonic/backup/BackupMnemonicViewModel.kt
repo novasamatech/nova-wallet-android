@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddA
 import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.AdvancedEncryptionRequester
+import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionPayload
 import io.novafoundation.nova.feature_account_impl.presentation.lastResponseOrDefault
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.ConfirmMnemonicPayload
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.ConfirmMnemonicPayload.CreateExtras
@@ -54,7 +55,7 @@ class BackupMnemonicViewModel(
     }
 
     fun optionsClicked() {
-        advancedEncryptionRequester.openRequest(addAccountPayload)
+        advancedEncryptionRequester.openRequest(AdvancedEncryptionPayload.Change(addAccountPayload))
     }
 
     fun warningAccepted() {

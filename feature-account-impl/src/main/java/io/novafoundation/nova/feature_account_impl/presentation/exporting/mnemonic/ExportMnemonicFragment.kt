@@ -36,6 +36,7 @@ class ExportMnemonicFragment : ExportFragment<ExportMnemonicViewModel>() {
 
     override fun initViews() {
         exportMnemonicToolbar.setHomeButtonListener { viewModel.back() }
+        exportMnemonicToolbar.setRightActionClickListener { viewModel.optionsClicked() }
 
         configureAdvancedBlock()
 

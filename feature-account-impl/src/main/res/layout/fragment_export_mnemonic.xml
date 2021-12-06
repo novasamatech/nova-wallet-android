@@ -11,6 +11,7 @@
     <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/exportMnemonicToolbar"
         android:layout_width="match_parent"
+        app:iconRight="@drawable/ic_options"
         android:layout_height="wrap_content"
         app:titleText="Export account" />
 

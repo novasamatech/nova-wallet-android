@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.export.mnemonic.ExportMnemonicInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_impl.presentation.AdvancedEncryptionCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.mnemonic.ExportMnemonicViewModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -28,11 +29,13 @@ class ExportMnemonicModule {
         accountInteractor: AccountInteractor,
         chainRegistry: ChainRegistry,
         interactor: ExportMnemonicInteractor,
+        advancedEncryptionCommunicator: AdvancedEncryptionCommunicator,
         payload: ExportPayload
     ): ViewModel {
         return ExportMnemonicViewModel(
             router,
             interactor,
+            advancedEncryptionCommunicator,
             resourceManager,
             chainRegistry,
             accountInteractor,

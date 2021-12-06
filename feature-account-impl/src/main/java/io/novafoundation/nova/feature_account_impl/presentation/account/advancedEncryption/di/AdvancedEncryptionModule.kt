@@ -10,11 +10,11 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
-import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.valiadtion.AdvancedEncryptionValidationSystem
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.AdvancedEncryptionCommunicator
+import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionPayload
 import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionViewModel
 
 @Module(includes = [ViewModelModule::class, ValidationsModule::class])
@@ -25,7 +25,7 @@ class AdvancedEncryptionModule {
     @ViewModelKey(AdvancedEncryptionViewModel::class)
     fun provideViewModel(
         router: AccountRouter,
-        payload: AddAccountPayload,
+        payload: AdvancedEncryptionPayload,
         interactor: AdvancedEncryptionInteractor,
         resourceManager: ResourceManager,
         validationSystem: AdvancedEncryptionValidationSystem,
