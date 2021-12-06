@@ -54,6 +54,11 @@ class LabeledTextView @JvmOverloads constructor(
             val message = typedArray.getString(R.styleable.LabeledTextView_message)
             message?.let(::setMessage)
 
+            val messageStyle = typedArray.getResourceId(R.styleable.LabeledTextView_messageStyle, 0)
+            if (messageStyle != 0) {
+                labeledTextText.setTextAppearance(messageStyle)
+            }
+
             val textIcon = typedArray.getDrawable(R.styleable.LabeledTextView_textIcon)
             textIcon?.let(::setTextIcon)
 

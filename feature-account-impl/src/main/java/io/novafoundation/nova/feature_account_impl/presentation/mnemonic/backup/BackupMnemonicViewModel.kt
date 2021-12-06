@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryp
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.AdvancedEncryptionRequester
 import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionPayload
+import io.novafoundation.nova.feature_account_impl.presentation.common.mnemonic.spacedWords
 import io.novafoundation.nova.feature_account_impl.presentation.lastResponseOrDefault
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.ConfirmMnemonicPayload
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.ConfirmMnemonicPayload.CreateExtras
@@ -37,13 +38,14 @@ class BackupMnemonicViewModel(
     private val _showMnemonicWarningDialog = MutableLiveData<Event<Unit>>()
     val showMnemonicWarningDialog: LiveData<Event<Unit>> = _showMnemonicWarningDialog
 
-    private val warningAccepted = MutableStateFlow(false)
+    private val warningAcceptedFlow = MutableStateFlow(false)
 
     val mnemonicDisplay = combine(
         mnemonicFlow,
-        warningAccepted
+        warningAcceptedFlow
     ) { mnemonc, warningAccepted ->
-        mnemonc.words.takeIf { warningAccepted }
+        mnemonc.spacedWords()
+            .takeIf { warningAccepted }
     }
 
     init {
@@ -59,7 +61,7 @@ class BackupMnemonicViewModel(
     }
 
     fun warningAccepted() {
-        warningAccepted.value = true
+        warningAcceptedFlow.value = true
     }
 
     fun warningDeclined() {
