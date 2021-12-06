@@ -2,8 +2,6 @@ package io.novafoundation.nova.balances
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import coil.request.SuccessResult
 import io.novafoundation.nova.common.data.network.runtime.binding.AccountInfo
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountInfo
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -20,19 +18,14 @@ import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import retrofit2.Call
-import retrofit2.http.*
 import kotlin.time.ExperimentalTime
 import kotlin.time.seconds
-import retrofit2.http.GET
-
-
 
 
 @RunWith(Parameterized::class)
 class BalancesIntegrationTest(val chain_id: String, val chain_name: String) {
 
-    companion object {
+    companion object  {
         @JvmStatic
         @Parameterized.Parameters(name= "Getting balance for {1} network")
         fun data() : Collection<Array<Any>> {
@@ -74,28 +67,14 @@ class BalancesIntegrationTest(val chain_id: String, val chain_name: String) {
 
         val errorMessage = chains.find { it.id == chain_id }?.let { it -> testBalancesInChainAsync(it) }
 
-//        if (errorMessages.isNotEmpty()) {
-//            val overallMessage = errorMessages.joinToString(separator = "\n")
-//
-//            throw Exception("Failed to fetch balances in all networks: \n ${overallMessage}}")
-//        }
-
         assertEquals(kotlin.Result.success(null), errorMessage)
-//        val errorMessages_2 = chains.map { chain -> testBalancesInChainAsync(chain) }
-//            .awaitAll()
-//            .filterNotNull()
-//            .map { (error, chain) ->
-//                "${chain.name}: ${error.message} (${(error.javaClass.simpleName)})"
-//            }
-
-        // TODO maybe pass exceptions to bot?
     }
 
     @OptIn(ExperimentalTime::class)
     private suspend fun CoroutineScope.testBalancesInChainAsync(chain: Chain): Result<AccountInfo?> {
         return coroutineScope {
             runCatching {
-                withTimeout(20.seconds) {
+                withTimeout(60.seconds) {
                     remoteStorage.query(
                         chainId = chain.id,
                         keyBuilder = { it.metadata.system().storage("Account").storageKey(it, chain.sampleAccountId()) },
