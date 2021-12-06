@@ -80,7 +80,6 @@ fun ChainAccountSecrets(
     secrets[DerivationPath] = derivationPath
 }
 
-
 val EncodableStruct<MetaAccountSecrets>.substrateDerivationPath
     get() = get(MetaAccountSecrets.SubstrateDerivationPath)
 
