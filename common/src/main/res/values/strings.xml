@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+    <string name="common_input_error_set_password">Set a password…</string>
+
+    <string name="account_export_json_password_title">Set a new password</string>
+    <string name="account_export_json_password_subtitle">This is necessary to encrypt the data and save the JSON file.</string>
+
     <string name="account_verify_mnemonic">Verify mnemonic</string>
 
     <string name="accounts_change_chain_account">Change %s account</string>
@@ -296,7 +301,6 @@ from the right network</string>
     <string name="import_seed_invalid_message">Please, make sure that your input contains 64 hex symbols.</string>
     <string name="mnemonic_error_try_another_one">Please, try another one.</string>
     <string name="account_export_action">Export</string>
-    <string name="export_json_password_explanation">Password is required to encrypt your account and store as Restore JSON. Please, create password to continue operation.</string>
     <string name="export_json_password_new">Set password</string>
     <string name="export_json_password_confirm">Confirm password</string>
     <string name="export_json_password_match_error">Password do not match</string>

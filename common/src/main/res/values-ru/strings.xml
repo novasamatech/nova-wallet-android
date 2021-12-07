@@ -235,7 +235,6 @@
     <string name="import_seed_invalid_message">Пожалуйста, убедитесь, что введенные данные содержат 64 hex символа.</string>
     <string name="mnemonic_error_try_another_one">Пожалуйста, попробуйте другую.</string>
     <string name="account_export_action">Экспортировать</string>
-    <string name="export_json_password_explanation">Пароль необходим для шифрования вашей учетной записи и сохранения как Recovery JSON. Пожалуйста, придумайте пароль для продолжения работы.</string>
     <string name="export_json_password_new">Новый пароль</string>
     <string name="export_json_password_confirm">Подтверждение пароля</string>
     <string name="export_json_password_match_error">Неверный пароль</string>

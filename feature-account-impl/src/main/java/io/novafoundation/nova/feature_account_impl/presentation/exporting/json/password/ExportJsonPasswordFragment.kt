@@ -4,19 +4,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.lifecycleScope
 import coil.ImageLoader
-import coil.load
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.setDrawableStart
-import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.common.utils.bindTo
+import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
 import kotlinx.android.synthetic.main.fragment_export_json_password.exportJsonPasswordConfirmField
-import kotlinx.android.synthetic.main.fragment_export_json_password.exportJsonPasswordMatchingError
-import kotlinx.android.synthetic.main.fragment_export_json_password.exportJsonPasswordNetworkInput
 import kotlinx.android.synthetic.main.fragment_export_json_password.exportJsonPasswordNewField
 import kotlinx.android.synthetic.main.fragment_export_json_password.exportJsonPasswordNext
 import kotlinx.android.synthetic.main.fragment_export_json_password.exportJsonPasswordToolbar
@@ -46,9 +44,7 @@ class ExportJsonPasswordFragment : BaseFragment<ExportJsonPasswordViewModel>() {
 
         exportJsonPasswordNext.setOnClickListener { viewModel.nextClicked() }
 
-        exportJsonPasswordMatchingError.setDrawableStart(R.drawable.ic_red_cross, widthInDp = 24, paddingInDp = 8)
-
-        exportJsonPasswordNetworkInput.isEnabled = false
+        exportJsonPasswordNext.prepareForProgress(viewLifecycleOwner)
     }
 
     override fun inject() {
@@ -59,18 +55,9 @@ class ExportJsonPasswordFragment : BaseFragment<ExportJsonPasswordViewModel>() {
     }
 
     override fun subscribe(viewModel: ExportJsonPasswordViewModel) {
-        exportJsonPasswordNewField.content.bindTo(viewModel.passwordLiveData)
-        exportJsonPasswordConfirmField.content.bindTo(viewModel.passwordConfirmationLiveData)
+        exportJsonPasswordNewField.content.bindTo(viewModel.passwordFlow, lifecycleScope)
+        exportJsonPasswordConfirmField.content.bindTo(viewModel.passwordConfirmationFlow, lifecycleScope)
 
-        viewModel.nextEnabled.observe(exportJsonPasswordNext::setEnabled)
-
-        viewModel.showDoNotMatchingErrorLiveData.observe {
-            exportJsonPasswordMatchingError.setVisible(it, falseState = View.INVISIBLE)
-        }
-
-        viewModel.chainFlow.observe {
-            exportJsonPasswordNetworkInput.textIconView.load(it.icon, imageLoader)
-            exportJsonPasswordNetworkInput.setMessage(it.name)
-        }
+        viewModel.nextButtonState.observe(exportJsonPasswordNext::setState)
     }
 }

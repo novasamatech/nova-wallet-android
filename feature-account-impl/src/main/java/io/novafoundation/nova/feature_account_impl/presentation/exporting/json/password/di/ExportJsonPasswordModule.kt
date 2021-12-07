@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_impl.domain.account.export.json.ExportJsonInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
@@ -24,9 +25,10 @@ class ExportJsonPasswordModule {
         router: AccountRouter,
         accountInteractor: ExportJsonInteractor,
         chainRegistry: ChainRegistry,
+        resourceManager: ResourceManager,
         payload: ExportPayload
     ): ViewModel {
-        return ExportJsonPasswordViewModel(router, accountInteractor, chainRegistry, payload)
+        return ExportJsonPasswordViewModel(router, accountInteractor, resourceManager, chainRegistry, payload)
     }
 
     @Provides
