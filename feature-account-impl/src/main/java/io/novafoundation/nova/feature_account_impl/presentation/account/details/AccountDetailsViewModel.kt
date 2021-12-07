@@ -10,7 +10,7 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
-import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportType
+import io.novafoundation.nova.feature_account_api.presenatation.account.add.SecretType
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
 import io.novafoundation.nova.feature_account_impl.R
@@ -132,13 +132,13 @@ class AccountDetailsViewModel(
         }
     }
 
-    private fun exportTypeChosen(type: ImportType, chain: Chain) {
+    private fun exportTypeChosen(type: SecretType, chain: Chain) {
         val exportPayload = ExportPayload(metaId, chain.id)
 
         val navigationAction = when (type) {
-            ImportType.MNEMONIC -> accountRouter.exportMnemonicAction(exportPayload)
-            ImportType.SEED -> accountRouter.exportSeedAction(exportPayload)
-            ImportType.JSON -> accountRouter.exportJsonPasswordAction(exportPayload)
+            SecretType.MNEMONIC -> accountRouter.exportMnemonicAction(exportPayload)
+            SecretType.SEED -> accountRouter.exportSeedAction(exportPayload)
+            SecretType.JSON -> accountRouter.exportJsonPasswordAction(exportPayload)
         }
 
         accountRouter.withPinCodeCheckRequired(navigationAction)

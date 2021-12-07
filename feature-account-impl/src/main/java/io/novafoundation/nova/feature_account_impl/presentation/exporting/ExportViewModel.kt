@@ -9,7 +9,6 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
-import io.novafoundation.nova.common.utils.sendEvent
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.model.cryptoTypeIn
@@ -19,10 +18,9 @@ import kotlinx.coroutines.flow.map
 
 abstract class ExportViewModel(
     protected val accountInteractor: AccountInteractor,
-    protected val exportPayload: ExportPayload,
+    val exportPayload: ExportPayload,
     protected val resourceManager: ResourceManager,
     private val chainRegistry: ChainRegistry,
-    val exportSource: ExportSource
 ) : BaseViewModel() {
 
     protected val chain by lazyAsync {
@@ -48,18 +46,7 @@ abstract class ExportViewModel(
         .share()
         .inBackground()
 
-    private val _showSecurityWarningEvent = MutableLiveData<Event<Unit>>()
-    val showSecurityWarningEvent = _showSecurityWarningEvent
-
-    protected fun showSecurityWarning() {
-        _showSecurityWarningEvent.sendEvent()
-    }
-
     protected fun exportText(text: String) {
         _exportEvent.value = Event(text)
-    }
-
-    open fun securityWarningConfirmed() {
-        // optional override
     }
 }

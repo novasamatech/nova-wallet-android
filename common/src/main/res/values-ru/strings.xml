@@ -249,11 +249,6 @@
 Мнемоника: %s</string>
     <string name="common_confirm">Подтвердить</string>
     <string name="common_confirmed">Подтверждено</string>
-    <string name="export_seed_without_derivation" formatted="false">Сеть: %s
-Сид: %s</string>
-    <string name="export_seed_with_derivation" formatted="false">Сеть: %s
-Сид: %s
-Путь деривации: %s</string>
     <string name="pincode_changed_message">PIN-код успешно изменен</string>
     <string name="account_import_json_no_network">JSON не содержит информации о сети. Пожалуйста, укажите её в блоке дополнительных ниже.</string>
     <string name="common_address">Адрес</string>

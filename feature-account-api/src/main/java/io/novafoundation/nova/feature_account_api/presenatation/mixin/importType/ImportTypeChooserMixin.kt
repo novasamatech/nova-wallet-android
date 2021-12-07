@@ -2,13 +2,13 @@ package io.novafoundation.nova.feature_account_api.presenatation.mixin.importTyp
 
 import androidx.lifecycle.LiveData
 import io.novafoundation.nova.common.utils.Event
-import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportType
+import io.novafoundation.nova.feature_account_api.presenatation.account.add.SecretType
 
 interface ImportTypeChooserMixin {
 
     class Payload(
-        val allowedTypes: Set<ImportType> = ImportType.values().toSet(),
-        val onChosen: (ImportType) -> Unit
+        val allowedTypes: Set<SecretType> = SecretType.values().toSet(),
+        val onChosen: (SecretType) -> Unit
     )
 
     val showChooserEvent: LiveData<Event<Payload>>

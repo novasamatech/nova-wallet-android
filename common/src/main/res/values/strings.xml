@@ -22,7 +22,7 @@
     <string name="account_json_file">JSON file</string>
     <string name="account_select_secret_source">Select your secret type</string>
 
-    <string name="account_import_seed_hex_symbols">64 hex symbols</string>
+    <string name="account_seed_hex_symbols">64 hex symbols</string>
 
     <string name="account_import_mnemonic_title">Enter the words in the right order</string>
     <string name="account_import_mnemonic_subtitle">Write words separately with one space, no commas or other signs.</string>
@@ -39,8 +39,8 @@
     <string name="common_i_understand">I understand</string>
     <string name="account_mnemonic_show_warning">We are going to show your mnemonic. Make sure no one can see your screen and do not take screenshots — they can be collected by third-party malware</string>
     <string name="common_attention">Attention!</string>
-    <string name="account_backup_mnemonic_title">Write down the phrase and store it in a safe place</string>
-    <string name="account_backup_mnemonic_caption">Please make sure to write down your phrase correctly and legibly.</string>
+    <string name="account_backup_secret_title">Write down the phrase and store it in a safe place</string>
+    <string name="account_backup_secret_caption">Please make sure to write down your phrase correctly and legibly.</string>
 
     <string name="account_derivation_path_substrate_invalid_title">Invalid Substrate derivation path</string>
     <string name="account_derivation_path_ethereum_invalid_title">Invalid Ethereum derivation path</string>
@@ -310,11 +310,6 @@ Derivation path: %s</string>
 Mnemonic: %s</string>
     <string name="common_confirm">Confirm</string>
     <string name="common_confirmed">Confirmed</string>
-    <string name="export_seed_without_derivation" formatted="false">Network: %s
-Seed: %s</string>
-    <string name="export_seed_with_derivation" formatted="false">Network: %s
-Seed: %s
-Derivation path: %s</string>
     <string name="pincode_changed_message">Pin code has been successfully changed</string>
     <string name="account_import_json_no_network">JSON contains no network information. Please specify it below.</string>
     <string name="common_address">Address</string>
