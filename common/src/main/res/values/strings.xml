@@ -296,8 +296,6 @@ from the right network</string>
     <string name="import_seed_invalid_message">Please, make sure that your input contains 64 hex symbols.</string>
     <string name="mnemonic_error_try_another_one">Please, try another one.</string>
     <string name="account_export_action">Export</string>
-    <string name="account_export_warning_message">Sharing or copying your secret is a high risk operation, don’t send it to anyone. Would you like to proceed with sharing/copying process?</string>
-    <string name="account_export_warning_title">Be careful</string>
     <string name="export_json_password_explanation">Password is required to encrypt your account and store as Restore JSON. Please, create password to continue operation.</string>
     <string name="export_json_password_new">Set password</string>
     <string name="export_json_password_confirm">Confirm password</string>
