@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+    <string name="account_export_json_title">Save your secret and store it in a safe place</string>
+
+    <string name="common_input_error_set_password">Set a password…</string>
+
+    <string name="account_export_json_password_title">Set a new password</string>
+    <string name="account_export_json_password_subtitle">This is necessary to encrypt the data and save the JSON file.</string>
+
+    <string name="account_export_seed_title">Write down your secret and store it in a safe place</string>
+
     <string name="account_verify_mnemonic">Verify mnemonic</string>
 
     <string name="accounts_change_chain_account">Change %s account</string>
@@ -39,7 +48,7 @@
     <string name="common_i_understand">I understand</string>
     <string name="account_mnemonic_show_warning">We are going to show your mnemonic. Make sure no one can see your screen and do not take screenshots — they can be collected by third-party malware</string>
     <string name="common_attention">Attention!</string>
-    <string name="account_backup_secret_title">Write down the phrase and store it in a safe place</string>
+    <string name="account_backup_mnemonic_title">Write down the phrase and store it in a safe place</string>
     <string name="account_backup_secret_caption">Please make sure to write down your phrase correctly and legibly.</string>
 
     <string name="account_derivation_path_substrate_invalid_title">Invalid Substrate derivation path</string>
@@ -296,10 +305,9 @@ from the right network</string>
     <string name="import_seed_invalid_message">Please, make sure that your input contains 64 hex symbols.</string>
     <string name="mnemonic_error_try_another_one">Please, try another one.</string>
     <string name="account_export_action">Export</string>
-    <string name="export_json_password_explanation">Password is required to encrypt your account and store as Restore JSON. Please, create password to continue operation.</string>
     <string name="export_json_password_new">Set password</string>
     <string name="export_json_password_confirm">Confirm password</string>
-    <string name="export_json_password_match_error">Password do not match</string>
+    <string name="export_json_password_match_error">Passwords do not match</string>
     <string name="account_export_password_change">Change password</string>
     <string name="export_mnemonic_with_derivation" formatted="false">Network: %s
 Mnemonic: %s

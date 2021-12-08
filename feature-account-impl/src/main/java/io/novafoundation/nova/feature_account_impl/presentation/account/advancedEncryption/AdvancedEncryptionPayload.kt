@@ -11,5 +11,9 @@ sealed class AdvancedEncryptionPayload : Parcelable {
     class Change(val addAccountPayload: AddAccountPayload) : AdvancedEncryptionPayload()
 
     @Parcelize
-    class View(val metaAccountId: Long, val chainId: ChainId) : AdvancedEncryptionPayload()
+    class View(
+        val metaAccountId: Long,
+        val chainId: ChainId,
+        val hideDerivationPaths: Boolean = false
+    ) : AdvancedEncryptionPayload()
 }
