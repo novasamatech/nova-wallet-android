@@ -23,7 +23,6 @@
         android:layout_gravity="bottom"
         android:background="@color/gray4"
         app:menu="@menu/bottom_navigations"
-        app:itemIconTint="@drawable/bottom_navigation_tint_color_selector"
         app:itemTextAppearanceActive="@style/BottomNavigationView"
         app:itemTextAppearanceInactive="@style/BottomNavigationView"
         app:itemTextColor="@drawable/bottom_navigation_tint_color_selector"
