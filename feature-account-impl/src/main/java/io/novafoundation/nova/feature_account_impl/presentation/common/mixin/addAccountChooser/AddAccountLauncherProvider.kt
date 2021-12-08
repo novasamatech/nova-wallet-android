@@ -7,7 +7,7 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportAccountPayload
-import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportType
+import io.novafoundation.nova.feature_account_api.presenatation.account.add.SecretType
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -33,8 +33,8 @@ class AddAccountLauncherProvider(
         importTypeChooserMixin.showChooser(payload)
     }
 
-    private fun importTypeSelected(chainAccountPayload: AddAccountPayload.ChainAccount, importType: ImportType) {
-        router.openImportAccountScreen(ImportAccountPayload(importType, chainAccountPayload))
+    private fun importTypeSelected(chainAccountPayload: AddAccountPayload.ChainAccount, secretType: SecretType) {
+        router.openImportAccountScreen(ImportAccountPayload(secretType, chainAccountPayload))
     }
 
     override fun initiateLaunch(chain: Chain, metaAccountId: Long, mode: Mode) {

@@ -3,8 +3,6 @@ package io.novafoundation.nova.feature_account_impl.presentation.exporting
 import android.app.PendingIntent
 import android.content.Intent
 import androidx.annotation.CallSuper
-import androidx.appcompat.app.AlertDialog
-import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ShareCompletedReceiver
 
@@ -12,10 +10,6 @@ abstract class ExportFragment<V : ExportViewModel> : BaseFragment<V>() {
 
     @CallSuper
     override fun subscribe(viewModel: V) {
-        viewModel.showSecurityWarningEvent.observeEvent {
-            showSecurityWarning()
-        }
-
         viewModel.exportEvent.observeEvent(::shareTextWithCallback)
     }
 
@@ -33,14 +27,5 @@ abstract class ExportFragment<V : ExportViewModel> : BaseFragment<V>() {
         val chooser = Intent.createChooser(intent, title, pendingIntent.intentSender)
 
         startActivity(chooser)
-    }
-
-    private fun showSecurityWarning() {
-        AlertDialog.Builder(requireActivity())
-            .setTitle(R.string.account_export_warning_title)
-            .setMessage(R.string.account_export_warning_message)
-            .setPositiveButton(R.string.common_ok) { _, _ -> viewModel.securityWarningConfirmed() }
-            .setNegativeButton(R.string.common_cancel, null)
-            .show()
     }
 }

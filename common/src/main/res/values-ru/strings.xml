@@ -235,8 +235,6 @@
     <string name="import_seed_invalid_message">Пожалуйста, убедитесь, что введенные данные содержат 64 hex символа.</string>
     <string name="mnemonic_error_try_another_one">Пожалуйста, попробуйте другую.</string>
     <string name="account_export_action">Экспортировать</string>
-    <string name="account_export_warning_message">Передача или копирование вашего секрета - операция с высоким риском, не отправляйте ее никому. Хотите продолжить процесс обмена / копирования?</string>
-    <string name="account_export_warning_title">Будьте осторожны</string>
     <string name="export_json_password_explanation">Пароль необходим для шифрования вашей учетной записи и сохранения как Recovery JSON. Пожалуйста, придумайте пароль для продолжения работы.</string>
     <string name="export_json_password_new">Новый пароль</string>
     <string name="export_json_password_confirm">Подтверждение пароля</string>
@@ -249,11 +247,6 @@
 Мнемоника: %s</string>
     <string name="common_confirm">Подтвердить</string>
     <string name="common_confirmed">Подтверждено</string>
-    <string name="export_seed_without_derivation" formatted="false">Сеть: %s
-Сид: %s</string>
-    <string name="export_seed_with_derivation" formatted="false">Сеть: %s
-Сид: %s
-Путь деривации: %s</string>
     <string name="pincode_changed_message">PIN-код успешно изменен</string>
     <string name="account_import_json_no_network">JSON не содержит информации о сети. Пожалуйста, укажите её в блоке дополнительных ниже.</string>
     <string name="common_address">Адрес</string>

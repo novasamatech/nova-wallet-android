@@ -40,7 +40,7 @@ class ImportAccountViewModel(
     override val accountNameChooser: AccountNameChooserMixin.Presentation = accountNameChooserFactory.create(scope = this)
 
     val importSource = importSourceFactory.create(
-        importType = payload.type,
+        secretType = payload.type,
         scope = this,
         payload = payload.addAccountPayload,
         accountNameChooserMixin = accountNameChooser

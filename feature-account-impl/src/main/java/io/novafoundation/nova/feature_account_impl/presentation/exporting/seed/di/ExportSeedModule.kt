@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.export.seed.ExportSeedInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_impl.presentation.AdvancedEncryptionCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.seed.ExportSeedViewModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -26,6 +27,7 @@ class ExportSeedModule {
         router: AccountRouter,
         resourceManager: ResourceManager,
         accountInteractor: AccountInteractor,
+        advancedEncryptionCommunicator: AdvancedEncryptionCommunicator,
         interactor: ExportSeedInteractor,
         chainRegistry: ChainRegistry,
         payload: ExportPayload,
@@ -33,6 +35,7 @@ class ExportSeedModule {
         return ExportSeedViewModel(
             router,
             interactor,
+            advancedEncryptionCommunicator,
             resourceManager,
             accountInteractor,
             chainRegistry,

@@ -5,6 +5,6 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 class ImportAccountPayload(
-    val type: ImportType,
+    val type: SecretType,
     val addAccountPayload: AddAccountPayload,
 ) : Parcelable
