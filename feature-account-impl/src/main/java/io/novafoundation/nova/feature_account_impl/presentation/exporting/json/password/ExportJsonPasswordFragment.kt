@@ -8,6 +8,7 @@ import androidx.lifecycle.lifecycleScope
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
@@ -59,5 +60,7 @@ class ExportJsonPasswordFragment : BaseFragment<ExportJsonPasswordViewModel>() {
         exportJsonPasswordConfirmField.content.bindTo(viewModel.passwordConfirmationFlow, lifecycleScope)
 
         viewModel.nextButtonState.observe(exportJsonPasswordNext::setState)
+
+        observeValidations(viewModel)
     }
 }

@@ -237,7 +237,7 @@
     <string name="account_export_action">Экспортировать</string>
     <string name="export_json_password_new">Новый пароль</string>
     <string name="export_json_password_confirm">Подтверждение пароля</string>
-    <string name="export_json_password_match_error">Неверный пароль</string>
+    <string name="export_json_password_match_error">Пароли не совпадают</string>
     <string name="account_export_password_change">Сменить пароль</string>
     <string name="export_mnemonic_with_derivation" formatted="false">Сеть: %s
 Мнемоника: %s

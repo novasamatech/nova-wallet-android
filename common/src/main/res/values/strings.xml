@@ -303,7 +303,7 @@ from the right network</string>
     <string name="account_export_action">Export</string>
     <string name="export_json_password_new">Set password</string>
     <string name="export_json_password_confirm">Confirm password</string>
-    <string name="export_json_password_match_error">Password do not match</string>
+    <string name="export_json_password_match_error">Passwords do not match</string>
     <string name="account_export_password_change">Change password</string>
     <string name="export_mnemonic_with_derivation" formatted="false">Network: %s
 Mnemonic: %s
