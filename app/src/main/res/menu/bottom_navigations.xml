@@ -6,7 +6,7 @@
         android:id="@+id/walletFragment"
         android:enabled="true"
         android:icon="@drawable/bottom_assets"
-        android:title="@string/tabbar_wallet_title"
+        android:title="@string/wallet_assets"
         app:showAsAction="ifRoom" />
 
     <item
