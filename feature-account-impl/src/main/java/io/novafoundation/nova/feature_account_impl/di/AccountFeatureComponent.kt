@@ -16,7 +16,6 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.list.di.
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ShareCompletedReceiver
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.di.ExportJsonConfirmComponent
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.password.di.ExportJsonPasswordComponent
-import io.novafoundation.nova.feature_account_impl.presentation.exporting.mnemonic.di.ExportMnemonicComponent
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.seed.di.ExportSeedComponent
 import io.novafoundation.nova.feature_account_impl.presentation.importing.di.ImportAccountComponent
 import io.novafoundation.nova.feature_account_impl.presentation.language.di.LanguagesComponent
@@ -68,8 +67,6 @@ interface AccountFeatureComponent : AccountFeatureApi {
     fun languagesComponentFactory(): LanguagesComponent.Factory
 
     fun addNodeComponentFactory(): AddNodeComponent.Factory
-
-    fun exportMnemonicFactory(): ExportMnemonicComponent.Factory
 
     fun exportSeedFactory(): ExportSeedComponent.Factory
 

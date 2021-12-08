@@ -6,15 +6,15 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import io.novafoundation.nova.common.view.bottomSheet.list.fixed.FixedListBottomSheet
 import io.novafoundation.nova.feature_account_api.R
-import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportType
+import io.novafoundation.nova.feature_account_api.presenatation.account.add.SecretType
 import kotlinx.android.synthetic.main.item_source_type.view.itemSourceTypeIcon
 import kotlinx.android.synthetic.main.item_source_type.view.itemSourceTypeSubtitle
 import kotlinx.android.synthetic.main.item_source_type.view.itemSourceTypeTitle
 
 class ImportTypeChooserBottomSheet(
     context: Context,
-    private val onChosen: (ImportType) -> Unit,
-    private val allowedSources: Set<ImportType>
+    private val onChosen: (SecretType) -> Unit,
+    private val allowedSources: Set<SecretType>
 ) : FixedListBottomSheet(context) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,21 +24,21 @@ class ImportTypeChooserBottomSheet(
         setTitleDividerVisible(false)
 
         item(
-            type = ImportType.MNEMONIC,
+            type = SecretType.MNEMONIC,
             title = R.string.recovery_passphrase,
             subtitle = R.string.account_mnmonic_length_variants,
             icon = R.drawable.ic_text_phrase
         )
 
         item(
-            type = ImportType.SEED,
+            type = SecretType.SEED,
             title = R.string.recovery_raw_seed,
             subtitle = R.string.account_private_key,
             icon = R.drawable.ic_text_0x
         )
 
         item(
-            type = ImportType.JSON,
+            type = SecretType.JSON,
             title = R.string.recovery_json,
             subtitle = R.string.account_json_file,
             icon = R.drawable.ic_file_text
@@ -46,7 +46,7 @@ class ImportTypeChooserBottomSheet(
     }
 
     private fun item(
-        type: ImportType,
+        type: SecretType,
         @StringRes title: Int,
         @StringRes subtitle: Int,
         @DrawableRes icon: Int

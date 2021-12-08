@@ -88,6 +88,12 @@ suspend fun SecretStoreV2.getChainAccountKeypair(
     mapKeypairStructToKeypair(keypairStruct)
 }
 
+val AccountSecrets.isMetaAccountSecrets
+    get() = isLeft
+
+val AccountSecrets.isChainAccountSecrets
+    get() = isRight
+
 suspend fun SecretStoreV2.getMetaAccountKeypair(
     metaId: Long,
     isEthereum: Boolean,

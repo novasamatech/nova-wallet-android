@@ -25,4 +25,8 @@
 
         <item name="android:textColor">@color/white_64</item>
     </style>
+
+    <style name="Widget.Nova.Text.Mnemonic" parent="TextAppearance.AppCompat.Body1">
+        <item name="lineHeight">22sp</item>
+    </style>
 </resources>

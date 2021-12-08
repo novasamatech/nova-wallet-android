@@ -12,17 +12,23 @@ import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.input.Input
 import io.novafoundation.nova.common.utils.onTextChanged
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.useInputValue
 import io.novafoundation.nova.common.view.InputField
 import io.novafoundation.nova.common.view.LabeledTextView
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
-import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.view.advanced.encryption.EncryptionTypeChooserBottomSheetDialog
 import io.novafoundation.nova.feature_account_impl.presentation.view.advanced.encryption.model.CryptoTypeModel
-import kotlinx.android.synthetic.main.fragment_advanced_encryption.*
+import kotlinx.android.synthetic.main.fragment_advanced_encryption.advancedEncryptionApply
+import kotlinx.android.synthetic.main.fragment_advanced_encryption.advancedEncryptionContainer
+import kotlinx.android.synthetic.main.fragment_advanced_encryption.advancedEncryptionEthereumCryptoType
+import kotlinx.android.synthetic.main.fragment_advanced_encryption.advancedEncryptionEthereumDerivationPath
+import kotlinx.android.synthetic.main.fragment_advanced_encryption.advancedEncryptionSubstrateCryptoType
+import kotlinx.android.synthetic.main.fragment_advanced_encryption.advancedEncryptionSubstrateDerivationPath
+import kotlinx.android.synthetic.main.fragment_advanced_encryption.advancedEncryptionToolbar
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -32,7 +38,7 @@ class AdvancedEncryptionFragment : BaseFragment<AdvancedEncryptionViewModel>() {
 
         private const val PAYLOAD = "CreateAccountFragment.payload"
 
-        fun getBundle(payload: AddAccountPayload): Bundle {
+        fun getBundle(payload: AdvancedEncryptionPayload): Bundle {
 
             return Bundle().apply {
                 putParcelable(PAYLOAD, payload)
@@ -69,6 +75,8 @@ class AdvancedEncryptionFragment : BaseFragment<AdvancedEncryptionViewModel>() {
 
     override fun subscribe(viewModel: AdvancedEncryptionViewModel) {
         observeValidations(viewModel)
+
+        advancedEncryptionApply.setVisible(viewModel.applyVisible)
 
         viewModel.substrateCryptoTypeInput.bindTo(advancedEncryptionSubstrateCryptoType)
         viewModel.substrateDerivationPathInput.bindTo(

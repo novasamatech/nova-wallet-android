@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_account_impl.presentation.importing.sourc
 
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
-import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportType
+import io.novafoundation.nova.feature_account_api.presenatation.account.add.SecretType
 import io.novafoundation.nova.feature_account_impl.domain.account.add.AddAccountInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AdvancedEncryptionRequester
@@ -23,25 +23,25 @@ class ImportSourceFactory(
 ) {
 
     fun create(
-        importType: ImportType,
+        secretType: SecretType,
         scope: CoroutineScope,
         payload: AddAccountPayload,
         accountNameChooserMixin: AccountNameChooserMixin,
     ): ImportSource {
-        return when (importType) {
-            ImportType.MNEMONIC -> MnemonicImportSource(
+        return when (secretType) {
+            SecretType.MNEMONIC -> MnemonicImportSource(
                 addAccountInteractor = addAccountInteractor,
                 addAccountPayload = payload,
                 advancedEncryptionInteractor = advancedEncryptionInteractor,
                 advancedEncryptionCommunicator = advancedEncryptionRequester
             )
-            ImportType.SEED -> RawSeedImportSource(
+            SecretType.SEED -> RawSeedImportSource(
                 addAccountInteractor = addAccountInteractor,
                 addAccountPayload = payload,
                 advancedEncryptionInteractor = advancedEncryptionInteractor,
                 advancedEncryptionCommunicator = advancedEncryptionRequester
             )
-            ImportType.JSON -> JsonImportSource(
+            SecretType.JSON -> JsonImportSource(
                 accountNameChooserMixin = accountNameChooserMixin,
                 addAccountInteractor = addAccountInteractor,
                 clipboardManager = clipboardManager,

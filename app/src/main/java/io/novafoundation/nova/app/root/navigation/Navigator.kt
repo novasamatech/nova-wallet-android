@@ -20,10 +20,10 @@ import io.novafoundation.nova.feature_account_impl.presentation.exporting.Export
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ExportJsonConfirmFragment
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ExportJsonConfirmPayload
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.password.ExportJsonPasswordFragment
-import io.novafoundation.nova.feature_account_impl.presentation.exporting.mnemonic.ExportMnemonicFragment
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.seed.ExportSeedFragment
 import io.novafoundation.nova.feature_account_impl.presentation.importing.ImportAccountFragment
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.backup.BackupMnemonicFragment
+import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.backup.BackupMnemonicPayload
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.ConfirmMnemonicFragment
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.ConfirmMnemonicPayload
 import io.novafoundation.nova.feature_account_impl.presentation.node.details.NodeDetailsFragment
@@ -158,7 +158,7 @@ class Navigator(
         navController?.navigate(destination, ImportAccountFragment.getBundle(payload))
     }
 
-    override fun openMnemonicScreen(accountName: String?, payload: AddAccountPayload) {
+    override fun openMnemonicScreen(accountName: String?, addAccountPayload: AddAccountPayload) {
         val destination = when (val currentDestinationId = navController?.currentDestination?.id) {
             R.id.welcomeFragment -> R.id.action_welcomeFragment_to_mnemonic_nav_graph
             R.id.createAccountFragment -> R.id.action_createAccountFragment_to_mnemonic_nav_graph
@@ -166,7 +166,8 @@ class Navigator(
             else -> throw IllegalArgumentException("Unknown current destination to open mnemonic screen: $currentDestinationId")
         }
 
-        navController?.navigate(destination, BackupMnemonicFragment.getBundle(accountName, payload))
+        val payload = BackupMnemonicPayload.Create(accountName, addAccountPayload)
+        navController?.navigate(destination, BackupMnemonicFragment.getBundle(payload))
     }
 
     override fun openSetupStaking() {
@@ -456,9 +457,10 @@ class Navigator(
     }
 
     override fun exportMnemonicAction(exportPayload: ExportPayload): DelayedNavigation {
-        val extras = ExportMnemonicFragment.getBundle(exportPayload)
+        val payload = BackupMnemonicPayload.Confirm(exportPayload.chainId, exportPayload.metaId)
+        val extras = BackupMnemonicFragment.getBundle(payload)
 
-        return NavComponentDelayedNavigation(R.id.action_export_mnemonic, extras)
+        return NavComponentDelayedNavigation(R.id.action_open_mnemonic_nav_graph, extras)
     }
 
     override fun exportSeedAction(exportPayload: ExportPayload): DelayedNavigation {
@@ -471,12 +473,6 @@ class Navigator(
         val extras = ExportJsonPasswordFragment.getBundle(exportPayload)
 
         return NavComponentDelayedNavigation(R.id.action_export_json, extras)
-    }
-
-    override fun openConfirmMnemonicOnExport(mnemonic: List<String>) {
-        val extras = ConfirmMnemonicFragment.getBundle(ConfirmMnemonicPayload(mnemonic, null))
-
-        navController?.navigate(R.id.action_exportMnemonicFragment_to_confirmExportMnemonicFragment, extras)
     }
 
     override fun openExportJsonConfirm(payload: ExportJsonConfirmPayload) {

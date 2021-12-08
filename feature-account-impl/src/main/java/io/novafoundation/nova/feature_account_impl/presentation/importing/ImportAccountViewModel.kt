@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapAddAccountPayloadToAddAccountType
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.AdvancedEncryptionRequester
+import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionPayload
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.AccountNameChooserMixin
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.WithAccountNameChooserMixin
 import io.novafoundation.nova.feature_account_impl.presentation.importing.source.ImportSourceFactory
@@ -39,7 +40,7 @@ class ImportAccountViewModel(
     override val accountNameChooser: AccountNameChooserMixin.Presentation = accountNameChooserFactory.create(scope = this)
 
     val importSource = importSourceFactory.create(
-        importType = payload.type,
+        secretType = payload.type,
         scope = this,
         payload = payload.addAccountPayload,
         accountNameChooserMixin = accountNameChooser
@@ -65,7 +66,7 @@ class ImportAccountViewModel(
     }
 
     fun optionsClicked() {
-        advancedEncryptionRequester.openRequest(payload.addAccountPayload)
+        advancedEncryptionRequester.openRequest(AdvancedEncryptionPayload.Change(payload.addAccountPayload))
     }
 
     fun nextClicked() = launch {

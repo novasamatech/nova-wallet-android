@@ -49,8 +49,6 @@ interface AccountRouter : SecureRouter {
     @PinRequired
     fun exportJsonPasswordAction(exportPayload: ExportPayload): DelayedNavigation
 
-    fun openConfirmMnemonicOnExport(mnemonic: List<String>)
-
     fun openExportJsonConfirm(payload: ExportJsonConfirmPayload)
 
     fun openImportAccountScreen(payload: ImportAccountPayload)

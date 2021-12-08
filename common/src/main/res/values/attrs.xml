@@ -44,6 +44,8 @@
         <attr name="textIcon" format="reference|color" />
         <attr name="enabled" format="boolean" />
         <attr name="android:singleLine" />
+
+        <attr format="reference" name="messageStyle" />
     </declare-styleable>
 
     <declare-styleable name="AccountInfoView">
