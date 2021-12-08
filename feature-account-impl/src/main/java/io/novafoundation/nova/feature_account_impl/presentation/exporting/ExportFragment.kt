@@ -22,7 +22,7 @@ abstract class ExportFragment<V : ExportViewModel> : BaseFragment<V>() {
 
         val receiver = Intent(requireContext(), ShareCompletedReceiver::class.java)
 
-        val pendingIntent = PendingIntent.getBroadcast(requireContext(), 0, receiver, PendingIntent.FLAG_UPDATE_CURRENT)
+        val pendingIntent = PendingIntent.getBroadcast(requireContext(), 0, receiver, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
         val chooser = Intent.createChooser(intent, title, pendingIntent.intentSender)
 

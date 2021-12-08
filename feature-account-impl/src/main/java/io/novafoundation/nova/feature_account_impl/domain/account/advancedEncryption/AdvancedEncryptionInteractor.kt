@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.data.secrets.v2.ethereumDerivationPath
 import io.novafoundation.nova.common.data.secrets.v2.substrateDerivationPath
 import io.novafoundation.nova.common.utils.DEFAULT_DERIVATION_PATH
 import io.novafoundation.nova.common.utils.fold
+import io.novafoundation.nova.common.utils.input.Input
 import io.novafoundation.nova.common.utils.input.disabledInput
 import io.novafoundation.nova.common.utils.input.modifiableInput
 import io.novafoundation.nova.common.utils.input.unmodifiableInput
@@ -29,6 +30,8 @@ private val ETHEREUM_ENCRYPTION = mapEncryptionToCryptoType(MultiChainEncryption
 private const val DEFAULT_SUBSTRATE_DERIVATION_PATH = ""
 private val ETHEREUM_DEFAULT_DERIVATION_PATH = BIP32JunctionDecoder.DEFAULT_DERIVATION_PATH
 
+private typealias DerivationPathModifier = String?.() -> Input<String>
+
 class AdvancedEncryptionInteractor(
     private val accountRepository: AccountRepository,
     private val secretStoreV2: SecretStoreV2,
@@ -42,15 +45,21 @@ class AdvancedEncryptionInteractor(
     suspend fun getInitialInputState(payload: AdvancedEncryptionPayload): AdvancedEncryptionInput {
         return when (payload) {
             is AdvancedEncryptionPayload.Change -> getChangeInitialInputState(payload.addAccountPayload.chainIdOrNull)
-            is AdvancedEncryptionPayload.View -> getViewInitialInputState(payload.metaAccountId, payload.chainId)
+            is AdvancedEncryptionPayload.View -> getViewInitialInputState(payload.metaAccountId, payload.chainId, payload.hideDerivationPaths)
         }
     }
 
-    private suspend fun getViewInitialInputState(metaAccountId: Long, chainId: ChainId): AdvancedEncryptionInput {
+    private suspend fun getViewInitialInputState(
+        metaAccountId: Long,
+        chainId: ChainId,
+        hideDerivationPaths: Boolean
+    ): AdvancedEncryptionInput {
         val chain = chainRegistry.getChain(chainId)
         val metaAccount = accountRepository.getMetaAccount(metaAccountId)
 
         val accountSecrets = secretStoreV2.getAccountSecrets(metaAccount, chain)
+
+        val derivationPathModifier = derivationPathModifier(hideDerivationPaths)
 
         return accountSecrets.fold(
             left = { metaAccountSecrets ->
@@ -59,12 +68,12 @@ class AdvancedEncryptionInteractor(
                         substrateCryptoType = disabledInput(),
                         substrateDerivationPath = disabledInput(),
                         ethereumCryptoType = ETHEREUM_ENCRYPTION.asReadOnlyInput(),
-                        ethereumDerivationPath = metaAccountSecrets.ethereumDerivationPath.asReadOnlyStringInput()
+                        ethereumDerivationPath = metaAccountSecrets.ethereumDerivationPath.derivationPathModifier()
                     )
                 } else {
                     AdvancedEncryptionInput(
                         substrateCryptoType = metaAccount.substrateCryptoType.asReadOnlyInput(),
-                        substrateDerivationPath = metaAccountSecrets.substrateDerivationPath.asReadOnlyStringInput(),
+                        substrateDerivationPath = metaAccountSecrets.substrateDerivationPath.derivationPathModifier(),
                         ethereumCryptoType = disabledInput(),
                         ethereumDerivationPath = disabledInput()
                     )
@@ -76,14 +85,14 @@ class AdvancedEncryptionInteractor(
                         substrateCryptoType = disabledInput(),
                         substrateDerivationPath = disabledInput(),
                         ethereumCryptoType = ETHEREUM_ENCRYPTION.asReadOnlyInput(),
-                        ethereumDerivationPath = chainAccountSecrets.derivationPath.asReadOnlyStringInput()
+                        ethereumDerivationPath = chainAccountSecrets.derivationPath.derivationPathModifier()
                     )
                 } else {
                     val chainAccount = metaAccount.chainAccountFor(chainId)
 
                     AdvancedEncryptionInput(
                         substrateCryptoType = chainAccount.cryptoType.asReadOnlyInput(),
-                        substrateDerivationPath = chainAccountSecrets.derivationPath.asReadOnlyStringInput(),
+                        substrateDerivationPath = chainAccountSecrets.derivationPath.derivationPathModifier(),
                         ethereumCryptoType = disabledInput(),
                         ethereumDerivationPath = disabledInput()
                     )
@@ -117,6 +126,16 @@ class AdvancedEncryptionInteractor(
             ethereumCryptoType = ETHEREUM_ENCRYPTION.unmodifiableInput(),
             ethereumDerivationPath = ETHEREUM_DEFAULT_DERIVATION_PATH.modifiableInput()
         )
+    }
+
+    private fun <T> Input<T>.hideIf(condition: Boolean) = if (condition) {
+        Input.Disabled
+    } else {
+        this
+    }
+
+    private fun derivationPathModifier(hideDerivationPaths: Boolean): DerivationPathModifier = {
+        asReadOnlyInput().hideIf(hideDerivationPaths)
     }
 
     private fun <T> T?.asReadOnlyInput() = this?.unmodifiableInput() ?: disabledInput()
