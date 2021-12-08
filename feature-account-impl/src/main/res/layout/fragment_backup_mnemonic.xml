@@ -22,7 +22,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:text="@string/account_backup_mnemonic_title" />
+        android:text="@string/account_backup_secret_title" />
 
     <TextView
         style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
