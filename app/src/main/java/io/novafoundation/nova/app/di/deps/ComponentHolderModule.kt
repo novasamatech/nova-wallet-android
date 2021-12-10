@@ -16,6 +16,8 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureHolder
 import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
 import io.novafoundation.nova.feature_crowdloan_impl.di.CrowdloanFeatureHolder
+import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
+import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureHolder
 import io.novafoundation.nova.feature_onboarding_api.di.OnboardingFeatureApi
 import io.novafoundation.nova.feature_onboarding_impl.di.OnboardingFeatureHolder
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
@@ -51,6 +53,12 @@ interface ComponentHolderModule {
     @ClassKey(OnboardingFeatureApi::class)
     @IntoMap
     fun provideOnboardingFeature(onboardingFeatureHolder: OnboardingFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(DAppFeatureApi::class)
+    @IntoMap
+    fun provideDAppFeature(dAppFeatureHolder: DAppFeatureHolder): FeatureApiHolder
 
     @ApplicationScope
     @Binds

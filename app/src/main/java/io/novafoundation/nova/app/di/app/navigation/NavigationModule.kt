@@ -14,7 +14,8 @@ import io.novafoundation.nova.splash.SplashRouter
 
 @Module(
     includes = [
-        AccountNavigationModule::class
+        AccountNavigationModule::class,
+        DAppNavigationModule::class
     ]
 )
 class NavigationModule {
