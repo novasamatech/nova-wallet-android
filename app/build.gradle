@@ -122,6 +122,9 @@ dependencies {
     implementation project(':feature-crowdloan-api')
     implementation project(':feature-crowdloan-impl')
 
+    implementation project(':feature-dapp-api')
+    implementation project(':feature-dapp-impl')
+
     implementation kotlinDep
 
     implementation androidDep
