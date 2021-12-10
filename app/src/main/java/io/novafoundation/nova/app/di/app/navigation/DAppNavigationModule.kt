@@ -16,5 +16,5 @@ class DAppNavigationModule {
 
     @ApplicationScope
     @Provides
-    fun provideAccountRouter(navigationHolder: NavigationHolder): DAppRouter = DAppNavigator(navigationHolder)
+    fun provideRouter(navigationHolder: NavigationHolder): DAppRouter = DAppNavigator(navigationHolder)
 }
