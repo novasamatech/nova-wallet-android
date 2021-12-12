@@ -51,8 +51,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="@string/staking_select_recommended"
-        app:actionIcon="@drawable/ic_arrow_right_24"
-        app:icon="@drawable/ic_security_shield_ok_24"
+        app:actionIcon="@drawable/ic_chevron_right"
+        app:icon="@drawable/ic_validators_outline"
         app:inProgress="true" />
 
     <TextView
@@ -79,8 +79,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        app:actionIcon="@drawable/ic_arrow_right_24"
+        app:actionIcon="@drawable/ic_chevron_right"
         android:text="@string/staking_select_custom"
-        app:icon="@drawable/ic_dotted_list_24"
+        app:icon="@drawable/ic_bullet_list"
         app:inProgress="true" />
 </LinearLayout>

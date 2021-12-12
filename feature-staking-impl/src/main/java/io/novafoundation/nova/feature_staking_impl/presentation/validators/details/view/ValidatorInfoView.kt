@@ -20,7 +20,7 @@ import kotlinx.android.synthetic.main.view_validator_info.view.validatorTotalSta
 sealed class Error(@StringRes val errorDescription: Int, @DrawableRes val errorIcon: Int) {
     object OversubscribedUnpaid : Error(R.string.staking_validator_my_oversubscribed_message, R.drawable.ic_warning_filled)
     object OversubscribedPaid : Error(R.string.staking_validator_other_oversubscribed_message, R.drawable.ic_warning_filled)
-    object Slashed : Error(R.string.staking_validator_slashed_desc, R.drawable.ic_status_error_16)
+    object Slashed : Error(R.string.staking_validator_slashed_desc, R.drawable.ic_red_cross)
 }
 
 class ValidatorInfoView @JvmOverloads constructor(

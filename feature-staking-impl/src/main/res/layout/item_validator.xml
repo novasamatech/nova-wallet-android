@@ -14,7 +14,7 @@
         android:layout_gravity="center_vertical"
         android:layout_marginStart="16dp"
         android:id="@+id/itemValidatorActionIcon"
-        android:src="@drawable/ic_checkmark_white_24" />
+        android:src="@drawable/ic_checkmark" />
 
     <ImageView
         android:id="@+id/itemValidatorIcon"
@@ -71,5 +71,5 @@
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:layout_gravity="center_vertical"
-        android:src="@drawable/ic_info_white_24" />
+        android:src="@drawable/ic_info_24" />
 </LinearLayout>

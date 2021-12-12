@@ -12,7 +12,7 @@
         android:id="@+id/searchRecipientToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:homeButtonIcon="@drawable/ic_arrow_back_24dp"
+        app:homeButtonIcon="@drawable/ic_arrow_back"
         app:iconRight="@drawable/ic_scan_qr"
         app:titleText="@string/wallet_asset_send" />
 

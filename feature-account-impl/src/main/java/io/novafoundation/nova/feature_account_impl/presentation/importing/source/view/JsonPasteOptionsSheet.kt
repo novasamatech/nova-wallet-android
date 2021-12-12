@@ -17,7 +17,7 @@ class JsonPasteOptionsSheet(
 
         setTitle(R.string.recovery_json)
 
-        item(icon = R.drawable.ic_copy_24, titleRes = R.string.import_json_paste) {
+        item(icon = R.drawable.ic_copy, titleRes = R.string.import_json_paste) {
             onPaste()
         }
 

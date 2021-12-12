@@ -19,7 +19,7 @@
         android:id="@+id/viewRewardDestinationPayoutAccount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:actionIcon="@drawable/ic_more_vertical"
+        app:actionIcon="@drawable/ic_more"
         app:enabled="false"
         app:label="@string/staking_setup_reward_payout_account" />
 </merge>

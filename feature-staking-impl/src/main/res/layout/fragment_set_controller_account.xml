@@ -33,7 +33,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        app:actionIcon="@drawable/ic_more_vertical"
+        app:actionIcon="@drawable/ic_more"
         app:label="@string/staking_stash_account" />
 
     <LinearLayout
@@ -67,7 +67,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        app:actionIcon="@drawable/ic_chevron_down_white"
+        app:actionIcon="@drawable/ic_chevron_down"
         app:label="@string/staking_controller_account" />
 
     <LinearLayout
@@ -115,7 +115,7 @@
         android:paddingEnd="16dp"
         android:paddingBottom="12dp"
         android:text="@string/common_learn_more"
-        app:drawableEndCompat="@drawable/ic_arrow_top_right_white_16"
+        app:drawableEndCompat="@drawable/ic_chevron_right"
         app:drawableStartCompat="@drawable/ic_nova" />
 
     <Space
@@ -136,7 +136,7 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_alert_triangle_yellow_24" />
+            android:src="@drawable/ic_warning_filled" />
 
         <TextView
             style="@style/TextAppearance.NovaFoundation.Body2"

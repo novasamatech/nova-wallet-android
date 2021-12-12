@@ -12,6 +12,6 @@
     android:text="@string/crowdloan_acala_learn_types"
     app:drawableStartCompat="@drawable/ic_info_16"
     app:drawableTint="?attr/colorAccent"
-    app:drawableEndCompat="@drawable/ic_chevron_right_12">
+    app:drawableEndCompat="@drawable/ic_chevron_right">
 
 </TextView>

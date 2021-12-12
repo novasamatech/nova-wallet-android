@@ -55,7 +55,7 @@
             android:clickable="true"
             android:focusable="true"
             android:padding="@dimen/x1"
-            android:src="@drawable/ic_copy_24"
+            android:src="@drawable/ic_copy"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

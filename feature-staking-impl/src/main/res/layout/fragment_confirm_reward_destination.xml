@@ -18,7 +18,7 @@
         android:id="@+id/confirmRewardDestinationOriginAccount"
         android:layout_width="match_parent"
         app:label="@string/account_info_title"
-        app:actionIcon="@drawable/ic_more_vertical"
+        app:actionIcon="@drawable/ic_more"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"

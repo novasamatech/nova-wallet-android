@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_primary_list_item"
-    android:drawableStart="@drawable/ic_copy_24"
+    android:drawableStart="@drawable/ic_copy"
     android:padding="18dp"
     android:paddingStart="20dp"
     android:paddingEnd="20dp"

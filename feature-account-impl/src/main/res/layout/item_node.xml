@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:src="@drawable/ic_checkmark_white_24"
+        android:src="@drawable/ic_checkmark"
         app:layout_constraintBottom_toBottomOf="@+id/nodeIcon"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/nodeIcon" />

@@ -29,9 +29,9 @@ class ManageStakingBottomSheet(
 //        manageItem(R.drawable.ic_dotted_list_24, R.string.staking_unstaking_requests)
         manageItem(R.drawable.ic_pending_reward, R.string.staking_reward_payouts_title, ManageStakeAction.PAYOUTS)
         manageItem(R.drawable.ic_finance_wallet_24, R.string.staking_rewards_destination_title, ManageStakeAction.REWARD_DESTINATION)
-        manageItem(R.drawable.ic_security_shield_ok_24, R.string.staking_your_validators, ManageStakeAction.VALIDATORS)
+        manageItem(R.drawable.ic_validators_outline, R.string.staking_your_validators, ManageStakeAction.VALIDATORS)
 
-        manageItem(R.drawable.ic_profile_24, R.string.staking_controller_account, ManageStakeAction.CONTROLLER)
+        manageItem(R.drawable.ic_people_outline, R.string.staking_controller_account, ManageStakeAction.CONTROLLER)
     }
 
     private inline fun manageItem(

@@ -53,11 +53,11 @@ class SelectCustomValidatorsFragment : BaseFragment<SelectCustomValidatorsViewMo
         selectCustomValidatorsToolbar.setHomeButtonListener { viewModel.backClicked() }
         onBackPressed { viewModel.backClicked() }
 
-        selectCustomValidatorsToolbar.addCustomAction(R.drawable.ic_basic_filterlist_24) {
+        selectCustomValidatorsToolbar.addCustomAction(R.drawable.ic_filter) {
             viewModel.settingsClicked()
         }
 
-        selectCustomValidatorsToolbar.addCustomAction(R.drawable.ic_basic_search_24) {
+        selectCustomValidatorsToolbar.addCustomAction(R.drawable.ic_search) {
             viewModel.searchClicked()
         }
 
