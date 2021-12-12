@@ -1,3 +1,6 @@
 package io.novafoundation.nova.feature_dapp_impl
 
-interface DAppRouter
+interface DAppRouter {
+
+    fun openChangeAccount()
+}

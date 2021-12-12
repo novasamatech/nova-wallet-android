@@ -401,11 +401,7 @@ class Navigator(
         navController?.navigate(R.id.action_mainFragment_to_languagesFragment)
     }
 
-    override fun openChangeAccountFromWallet() {
-        openAccounts(AccountChosenNavDirection.BACK)
-    }
-
-    override fun openChangeAccountFromStaking() {
+    override fun openChangeAccount() {
         openAccounts(AccountChosenNavDirection.BACK)
     }
 

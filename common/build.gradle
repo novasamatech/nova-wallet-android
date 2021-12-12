@@ -91,7 +91,7 @@ dependencies {
 
     implementation wsDep
 
-    implementation insetterDep
+    api insetterDep
 
     api coilDep
     api coilSvg

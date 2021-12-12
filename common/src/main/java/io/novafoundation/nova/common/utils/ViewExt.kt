@@ -243,7 +243,7 @@ fun View.applyStatusBarInsets(consume: Boolean = true) = applyInsetter {
         padding()
     }
 
-    consume(true)
+    consume(consume)
 }
 
 fun View.setBackgroundColorRes(@ColorRes colorRes: Int) = setBackgroundColor(context.getColor(colorRes))

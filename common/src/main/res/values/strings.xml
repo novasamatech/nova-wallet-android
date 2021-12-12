@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+    <string name="common_explore">Explore</string>
+
+    <string name="dapp_dapps">DApps</string>
+    <string name="dapp_main_welcome_title">Welcome\nto DApp portal</string>
+    <string name="dapp_main_welcome_subtitle">Connect to the Polkadot &amp; Kusama\necosystem web applications using\naccounts in Nova Wallet</string>
+
     <string name="account_export_json_title">Save your secret and store it in a safe place</string>
 
     <string name="common_input_error_set_password">Set a password…</string>
