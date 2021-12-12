@@ -32,7 +32,7 @@
             android:layout_gravity="center_vertical"
             android:layout_marginEnd="11dp"
             android:padding="8dp"
-            android:src="@drawable/ic_dots_horizontal_24"
+            android:src="@drawable/ic_more"
             app:tint="@color/actions_color" />
     </LinearLayout>
 
@@ -117,7 +117,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginEnd="9dp"
-            android:src="@drawable/ic_arrow_right_24"
+            android:src="@drawable/ic_chevron_right"
             app:layout_constraintBottom_toBottomOf="@+id/stakeSummaryStatusHelper"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/stakeSummaryStatusHelper"

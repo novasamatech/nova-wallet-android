@@ -120,7 +120,7 @@ class ValidatorViewHolder(override val containerView: View) : RecyclerView.ViewH
             else -> {
                 itemValidatorActionIcon.setOnClickListener(null)
 
-                itemValidatorActionIcon.setImageResource(R.drawable.ic_checkmark_white_24)
+                itemValidatorActionIcon.setImageResource(R.drawable.ic_checkmark)
                 itemValidatorActionIcon.setVisible(validatorModel.isChecked, falseState = View.INVISIBLE)
             }
         }

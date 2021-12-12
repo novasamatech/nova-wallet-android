@@ -35,7 +35,7 @@
         app:textIcon="@color/colorAccent"
         app:label="@string/staking_setup_reward_payout_account"
         android:id="@+id/rewardDestinationChooserPayoutTarget"
-        app:actionIcon="@drawable/ic_more_vertical"
+        app:actionIcon="@drawable/ic_more"
         tools:message="Valentun"
         android:layout_marginTop="12dp" />
 
@@ -53,7 +53,7 @@
         android:paddingBottom="12dp"
         android:text="@string/staking_rewards_learn_more"
         app:drawableStartCompat="@drawable/ic_nova"
-        app:drawableEndCompat="@drawable/ic_arrow_top_right_white_16" />
+        app:drawableEndCompat="@drawable/ic_chevron_right" />
 
     <View
         android:layout_width="match_parent"

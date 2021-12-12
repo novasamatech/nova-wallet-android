@@ -25,7 +25,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
-        app:actionIcon="@drawable/ic_more_vertical"
+        app:actionIcon="@drawable/ic_more"
         app:label="@string/choose_amount_to"
         app:layout_constraintEnd_toEndOf="@+id/chooseAmountDivider1"
         app:layout_constraintStart_toStartOf="@+id/chooseAmountDivider1"

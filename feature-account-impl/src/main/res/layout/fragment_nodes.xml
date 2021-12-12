@@ -35,7 +35,7 @@
         android:layout_height="wrap_content"
         android:background="@color/gray4"
         android:drawableStart="@drawable/ic_plus_accent_24"
-        android:drawableEnd="@drawable/ic_arrow_right_24"
+        android:drawableEnd="@drawable/ic_chevron_right"
         android:drawablePadding="16dp"
         android:padding="16dp"
         android:text="@string/connections_add_connection"

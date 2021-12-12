@@ -111,7 +111,7 @@ class NetworkInfoView @JvmOverloads constructor(
     }
 
     private fun collapse() {
-        stakingNetworkInfoTitle.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_chevron_down_white, 0)
+        stakingNetworkInfoTitle.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_chevron_down, 0)
         currentState = State.COLLAPSED
         stakingNetworkCollapsibleView.animate()
             .setDuration(ANIMATION_DURATION)
@@ -120,7 +120,7 @@ class NetworkInfoView @JvmOverloads constructor(
     }
 
     private fun expand() {
-        stakingNetworkInfoTitle.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_chevron_up_white, 0)
+        stakingNetworkInfoTitle.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_chevron_up, 0)
         stakingNetworkCollapsibleView.makeVisible()
         currentState = State.EXPANDED
         stakingNetworkCollapsibleView.animate()

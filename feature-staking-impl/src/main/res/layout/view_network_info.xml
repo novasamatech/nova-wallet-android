@@ -20,7 +20,7 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Kusama network"
         tools:textColor="@color/white"
-        app:drawableEndCompat="@drawable/ic_chevron_up_white" />
+        app:drawableEndCompat="@drawable/ic_chevron_up" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/stakingNetworkCollapsibleView"

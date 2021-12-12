@@ -29,7 +29,7 @@
         android:text="@string/import_json_chains_dont_match"
         android:textColor="@color/gray1"
         android:visibility="gone"
-        app:drawableStartCompat="@drawable/ic_alert_triangle_yellow_24"
+        app:drawableStartCompat="@drawable/ic_warning_filled"
         tools:visibility="visible" />
 
     <io.novafoundation.nova.common.view.InputField

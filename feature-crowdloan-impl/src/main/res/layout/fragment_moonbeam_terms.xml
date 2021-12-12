@@ -30,7 +30,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        app:actionIcon="@drawable/ic_arrow_top_right_white_16"
+        app:actionIcon="@drawable/ic_chevron_right"
         app:dividerVisible="false"
         tools:text="Moonbeam’s Terms &amp; Conditions" />
 

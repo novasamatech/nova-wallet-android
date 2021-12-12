@@ -20,7 +20,7 @@
             android:id="@+id/itemSheetBuyProviderImage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:src="@drawable/ic_profile_24"
+            tools:src="@drawable/ic_people_outline"
             tools:tint="@color/white" />
 
         <TextView
@@ -40,7 +40,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:src="@drawable/ic_arrow_top_right_white_16" />
+            android:src="@drawable/ic_chevron_right" />
     </LinearLayout>
 
     <View
