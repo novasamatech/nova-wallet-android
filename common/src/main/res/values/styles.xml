@@ -3,6 +3,23 @@
 
     <!--Font styles-->
 
+    <style name="TextAppearance.NovaFoundation.Bold.LargeTitle">
+        <item name="android:textSize">34sp</item>
+    </style>
+
+    <style name="TextAppearance.NovaFoundation.Bold.Title2">
+        <item name="android:textSize">22sp</item>
+    </style>
+
+    <style name="TextAppearance.NovaFoundation.Bold.Title3">
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="TextAppearance.NovaFoundation.Regular.Body">
+        <item name="android:textSize">17sp</item>
+        <item name="lineHeight">22sp</item>
+    </style>
+
     <style name="TextAppearance.NovaFoundation.Caption1" parent="TextAppearance.NovaFoundation.Regular">
         <item name="android:textSize">12sp</item>
     </style>
@@ -23,6 +40,7 @@
 
     <style name="TextAppearance.NovaFoundation.Footnote" parent="TextAppearance.NovaFoundation.Regular">
         <item name="android:textSize">13sp</item>
+        <item name="lineHeight">18sp</item>
     </style>
 
     <style name="TextAppearance.NovaFoundation.Regular.SubHeadline">
