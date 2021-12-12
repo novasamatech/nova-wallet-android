@@ -35,7 +35,7 @@ open class ExternalActionsSheet(
                 .forEach { explorer ->
                     val title = context.getString(R.string.transaction_details_view_explorer, explorer.name)
 
-                    item(R.drawable.ic_language, title) {
+                    item(R.drawable.ic_globe_outline, title) {
                         onViewExternal(explorer, payload.type)
                     }
                 }
