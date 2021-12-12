@@ -17,6 +17,13 @@
         app:showAsAction="ifRoom" />
 
     <item
+        android:id="@+id/dAppsFragment"
+        android:enabled="true"
+        android:icon="@drawable/bottom_dapps"
+        android:title="@string/dapp_dapps"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/stakingFragment"
         android:enabled="true"
         android:icon="@drawable/bottom_staking"

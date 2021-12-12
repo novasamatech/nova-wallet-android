@@ -138,7 +138,7 @@ class StakingViewModel(
     }
 
     fun avatarClicked() {
-        router.openChangeAccountFromStaking()
+        router.openChangeAccount()
     }
 
     private fun mapAlertToAlertModel(alert: Alert): AlertModel {
