@@ -66,16 +66,24 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp" />
 
-        <io.novafoundation.nova.feature_staking_impl.presentation.view.StakeSummaryView
-            android:id="@+id/stakingStakeSummary"
+        <!--        <io.novafoundation.nova.feature_staking_impl.presentation.view.StakeSummaryView-->
+<!--            android:id="@+id/stakingStakeSummary"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginStart="16dp"-->
+<!--            android:layout_marginTop="8dp"-->
+<!--            android:layout_marginEnd="16dp"-->
+<!--            android:visibility="gone"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            tools:visibility="visible" />-->
+
+        <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.UserRewardsView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:id="@+id/stakingUserRewards"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            tools:visibility="visible" />
+            android:layout_marginEnd="16dp" />
 
         <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.EstimateEarningView
             android:id="@+id/stakingEstimate"

@@ -29,7 +29,7 @@ import kotlinx.android.synthetic.main.fragment_staking.stakingAvatar
 import kotlinx.android.synthetic.main.fragment_staking.stakingContainer
 import kotlinx.android.synthetic.main.fragment_staking.stakingEstimate
 import kotlinx.android.synthetic.main.fragment_staking.stakingNetworkInfo
-import kotlinx.android.synthetic.main.fragment_staking.stakingStakeSummary
+import kotlinx.android.synthetic.main.fragment_staking.stakingUserRewards
 import javax.inject.Inject
 import kotlin.time.ExperimentalTime
 
@@ -98,26 +98,21 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
             when (loadingState) {
                 is LoadingState.Loading -> {
                     stakingEstimate.setVisible(false)
-                    stakingStakeSummary.setVisible(false)
+                    stakingUserRewards.setVisible(false)
                 }
+
                 is LoadingState.Loaded -> {
                     val stakingState = loadingState.data
 
                     stakingEstimate.setVisible(stakingState is WelcomeViewState)
-                    stakingStakeSummary.setVisible(stakingState is StakeViewState<*>)
+                    stakingUserRewards.setVisible(stakingState is StakeViewState<*>)
 
                     when (stakingState) {
-                        is NominatorViewState -> {
-                            stakingStakeSummary.bindStakeSummary(stakingState, ::mapNominatorStatus)
-                        }
+                        is NominatorViewState -> bindStashViews(stakingState, ::mapNominatorStatus)
 
-                        is ValidatorViewState -> {
-                            stakingStakeSummary.bindStakeSummary(stakingState, ::mapValidatorStatus)
-                        }
+                        is ValidatorViewState -> bindStashViews(stakingState, ::mapValidatorStatus)
 
-                        is StashNoneViewState -> {
-                            stakingStakeSummary.bindStakeSummary(stakingState, ::mapStashNoneStatus)
-                        }
+                        is StashNoneViewState -> bindStashViews(stakingState, ::mapStashNoneStatus)
 
                         is WelcomeViewState -> {
                             observeValidations(stakingState)
@@ -129,6 +124,7 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
 
                                         stakingEstimate.showGains(rewards.monthlyPercentage, rewards.yearlyPercentage)
                                     }
+
                                     is LoadingState.Loading -> stakingEstimate.showLoading()
                                 }
                             }
@@ -168,6 +164,26 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
         }
     }
 
+    private fun <S> bindStashViews(
+        stakingViewState: StakeViewState<S>,
+        mapStatus: (StakeSummaryModel<S>) -> StakeSummaryView.Status,
+    ) {
+        bindUserRewards(stakingViewState)
+
+//        stakingStakeSummary.bindStakeSummary(stakingViewState, mapStatus)
+    }
+
+    private fun bindUserRewards(
+        stakingViewState: StakeViewState<*>
+    ) {
+        stakingViewState.userRewardsFlow.observe {
+            when(it) {
+                is LoadingState.Loaded -> stakingUserRewards.showValue(it.data)
+                is LoadingState.Loading -> stakingUserRewards.showLoading()
+            }
+        }
+    }
+
     @ExperimentalTime
     private fun <S> StakeSummaryView.bindStakeSummary(
         stakingViewState: StakeViewState<S>,
@@ -191,18 +207,18 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
             ManageStakingBottomSheet(requireContext(), it, stakingViewState::manageActionChosen).show()
         }
 
-        stakingViewState.stakeSummaryFlow.observe { summaryState ->
-            when (summaryState) {
-                is LoadingState.Loaded<StakeSummaryModel<S>> -> {
-                    val summary = summaryState.data
-
-                    setElectionStatus(mapStatus(summary))
-                    showTotalRewards(summary.totalRewards)
-                    showTotalStaked(summary.totalStaked)
-                }
-                is LoadingState.Loading -> showLoading()
-            }
-        }
+//        stakingViewState.stakeSummaryFlow.observe { summaryState ->
+//            when (summaryState) {
+//                is LoadingState.Loaded<StakeSummaryModel<S>> -> {
+//                    val summary = summaryState.data
+//
+//                    setElectionStatus(mapStatus(summary))
+//                    showTotalRewards(summary.totalRewards)
+//                    showTotalStaked(summary.totalStaked)
+//                }
+//                is LoadingState.Loading -> showLoading()
+//            }
+//        }
     }
 
     private fun showStatusAlert(title: String, message: String) {

@@ -5,7 +5,6 @@ import java.math.BigDecimal
 class StakeSummary<S>(
     val status: S,
     val totalStaked: BigDecimal,
-    val totalReward: BigDecimal,
     val currentEra: Int,
 )
 

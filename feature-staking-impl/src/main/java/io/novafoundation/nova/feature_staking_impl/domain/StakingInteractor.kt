@@ -175,6 +175,8 @@ class StakingInteractor(
         }
     }
 
+    fun observeUserRewards(state: StakingState.Stash) = stakingRewardsRepository.totalRewardFlow(state.stashAddress)
+
     suspend fun observeNetworkInfoState(chainId: ChainId): Flow<NetworkInfo> = withContext(Dispatchers.Default) {
         val lockupPeriod = getLockupPeriodInDays(chainId)
 
@@ -336,9 +338,8 @@ class StakingInteractor(
 
         combine(
             stakingRepository.observeActiveEraIndex(chainId),
-            walletRepository.assetFlow(state.accountId, chainAsset),
-            stakingRewardsRepository.totalRewardFlow(state.stashAddress)
-        ) { activeEraIndex, asset, totalReward ->
+            walletRepository.assetFlow(state.accountId, chainAsset)
+        ) { activeEraIndex, asset ->
             val totalStaked = asset.bonded
 
             val eraStakers = stakingRepository.getActiveElectedValidatorsExposures(chainId)
@@ -351,7 +352,6 @@ class StakingInteractor(
             StakeSummary(
                 status = status,
                 totalStaked = totalStaked,
-                totalReward = asset.token.amountFromPlanks(totalReward),
                 currentEra = activeEraIndex.toInt(),
             )
         }
