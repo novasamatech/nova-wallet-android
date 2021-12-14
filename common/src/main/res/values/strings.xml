@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+    <string name="settings_email">Email</string>
+    <string name="settings_youtube" translatable="false">Youtube</string>
+    <string name="settings_support">support &amp; Feedback</string>
+
+    <string name="settings_general">General</string>
+    <string name="settings_preferences">General</string>
+    <string name="settings_security">Security</string>
+    <string name="settings_community">Community</string>
+
     <string name="common_unlimited">Unlimited</string>
     <string name="staking_staking_period">Staking period</string>
     <string name="staking_about">About staking</string>

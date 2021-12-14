@@ -8,6 +8,8 @@ class AppLinksProvider(
     val rateApp: String,
     val website: String,
     val github: String,
+    val email: String,
+    val youtube: String,
 
     val payoutsLearnMore: String,
     val twitterAccountTemplate: String,
