@@ -3,8 +3,18 @@
 
     <!--Font styles-->
 
+    <style name="TextAppearance.NovaFoundation.Bold.Caps">
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:letterSpacing">0.05</item>
+    </style>
+
     <style name="TextAppearance.NovaFoundation.Bold.LargeTitle">
         <item name="android:textSize">34sp</item>
+    </style>
+
+    <style name="TextAppearance.NovaFoundation.Bold.Title1">
+        <item name="android:textSize">28sp</item>
     </style>
 
     <style name="TextAppearance.NovaFoundation.Bold.Title2">

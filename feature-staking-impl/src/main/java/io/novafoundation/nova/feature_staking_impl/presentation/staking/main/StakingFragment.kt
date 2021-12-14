@@ -5,11 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import coil.ImageLoader
-import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.presentation.LoadingState
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setVisible
@@ -30,6 +30,7 @@ import kotlinx.android.synthetic.main.fragment_staking.stakingContainer
 import kotlinx.android.synthetic.main.fragment_staking.stakingEstimate
 import kotlinx.android.synthetic.main.fragment_staking.stakingNetworkInfo
 import kotlinx.android.synthetic.main.fragment_staking.stakingStakeSummary
+import kotlinx.android.synthetic.main.fragment_staking.stakingUserRewards
 import javax.inject.Inject
 import kotlin.time.ExperimentalTime
 
@@ -46,17 +47,11 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
     }
 
     override fun initViews() {
-        stakingContainer.applyInsetter {
-            type(statusBars = true) {
-                padding()
-            }
-        }
+        stakingContainer.applyStatusBarInsets()
 
         stakingAvatar.setOnClickListener {
             viewModel.avatarClicked()
         }
-
-        stakingNetworkInfo.storyItemHandler = viewModel::storyClicked
     }
 
     override fun inject() {
@@ -98,26 +93,25 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
             when (loadingState) {
                 is LoadingState.Loading -> {
                     stakingEstimate.setVisible(false)
+                    stakingUserRewards.setVisible(false)
                     stakingStakeSummary.setVisible(false)
                 }
+
                 is LoadingState.Loaded -> {
                     val stakingState = loadingState.data
 
                     stakingEstimate.setVisible(stakingState is WelcomeViewState)
+                    stakingUserRewards.setVisible(stakingState is StakeViewState<*>)
                     stakingStakeSummary.setVisible(stakingState is StakeViewState<*>)
 
+                    stakingNetworkInfo.setExpanded(stakingState is WelcomeViewState)
+
                     when (stakingState) {
-                        is NominatorViewState -> {
-                            stakingStakeSummary.bindStakeSummary(stakingState, ::mapNominatorStatus)
-                        }
+                        is NominatorViewState -> bindStashViews(stakingState, ::mapNominatorStatus)
 
-                        is ValidatorViewState -> {
-                            stakingStakeSummary.bindStakeSummary(stakingState, ::mapValidatorStatus)
-                        }
+                        is ValidatorViewState -> bindStashViews(stakingState, ::mapValidatorStatus)
 
-                        is StashNoneViewState -> {
-                            stakingStakeSummary.bindStakeSummary(stakingState, ::mapStashNoneStatus)
-                        }
+                        is StashNoneViewState -> bindStashViews(stakingState, ::mapStashNoneStatus)
 
                         is WelcomeViewState -> {
                             observeValidations(stakingState)
@@ -129,6 +123,7 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
 
                                         stakingEstimate.showGains(rewards.monthlyPercentage, rewards.yearlyPercentage)
                                     }
+
                                     is LoadingState.Loading -> stakingEstimate.showLoading()
                                 }
                             }
@@ -151,24 +146,42 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
                 is LoadingState.Loading<*> -> stakingNetworkInfo.showLoading()
 
                 is LoadingState.Loaded<StakingNetworkInfoModel> -> with(state.data) {
-                    stakingNetworkInfo.setTotalStake(totalStake, totalStakeFiat)
-                    stakingNetworkInfo.setNominatorsCount(nominatorsCount)
-                    stakingNetworkInfo.setMinimumStake(minimumStake, minimumStakeFiat)
-                    stakingNetworkInfo.setLockupPeriod(lockupPeriod)
+                    with(stakingNetworkInfo) {
+                        setTotalStaked(totalStaked)
+                        setNominatorsCount(activeNominators)
+                        setMinimumStake(minimumStake)
+                        setUnstakingPeriod(unstakingPeriod)
+                        setStakingPeriod(stakingPeriod)
+                    }
                 }
             }
         }
-
-        viewModel.stories.observe(stakingNetworkInfo::submitStories)
-
-        viewModel.networkInfoTitle.observe(stakingNetworkInfo::setTitle)
 
         viewModel.currentAddressModelLiveData.observe {
             stakingAvatar.setImageDrawable(it.image)
         }
     }
 
-    @ExperimentalTime
+    private fun <S> bindStashViews(
+        stakingViewState: StakeViewState<S>,
+        mapStatus: (StakeSummaryModel<S>) -> StakeSummaryView.Status,
+    ) {
+        bindUserRewards(stakingViewState)
+
+        stakingStakeSummary.bindStakeSummary(stakingViewState, mapStatus)
+    }
+
+    private fun bindUserRewards(
+        stakingViewState: StakeViewState<*>
+    ) {
+        stakingViewState.userRewardsFlow.observe {
+            when (it) {
+                is LoadingState.Loaded -> stakingUserRewards.showValue(it.data)
+                is LoadingState.Loading -> stakingUserRewards.showLoading()
+            }
+        }
+    }
+
     private fun <S> StakeSummaryView.bindStakeSummary(
         stakingViewState: StakeViewState<S>,
         mapStatus: (StakeSummaryModel<S>) -> StakeSummaryView.Status,
@@ -196,9 +209,8 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
                 is LoadingState.Loaded<StakeSummaryModel<S>> -> {
                     val summary = summaryState.data
 
-                    setElectionStatus(mapStatus(summary))
-                    showTotalRewards(summary.totalRewards)
-                    showTotalStaked(summary.totalStaked)
+                    showStakeAmount(summary.totalStaked)
+                    showStakeStatus(mapStatus(summary))
                 }
                 is LoadingState.Loading -> showLoading()
             }
@@ -214,22 +226,22 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
 
     private fun mapNominatorStatus(summary: NominatorSummaryModel): StakeSummaryView.Status {
         return when (summary.status) {
-            is NominatorStatus.Inactive -> StakeSummaryView.Status.Inactive(summary.currentEraDisplay)
-            NominatorStatus.Active -> StakeSummaryView.Status.Active(summary.currentEraDisplay)
+            is NominatorStatus.Inactive -> StakeSummaryView.Status.Inactive
+            NominatorStatus.Active -> StakeSummaryView.Status.Active
             is NominatorStatus.Waiting -> StakeSummaryView.Status.Waiting(summary.status.timeLeft)
         }
     }
 
     private fun mapValidatorStatus(summary: ValidatorSummaryModel): StakeSummaryView.Status {
         return when (summary.status) {
-            ValidatorStatus.INACTIVE -> StakeSummaryView.Status.Inactive(summary.currentEraDisplay)
-            ValidatorStatus.ACTIVE -> StakeSummaryView.Status.Active(summary.currentEraDisplay)
+            ValidatorStatus.INACTIVE -> StakeSummaryView.Status.Inactive
+            ValidatorStatus.ACTIVE -> StakeSummaryView.Status.Active
         }
     }
 
     private fun mapStashNoneStatus(summary: StashNoneSummaryModel): StakeSummaryView.Status {
         return when (summary.status) {
-            StashNoneStatus.INACTIVE -> StakeSummaryView.Status.Inactive(summary.currentEraDisplay)
+            StashNoneStatus.INACTIVE -> StakeSummaryView.Status.Inactive
         }
     }
 }

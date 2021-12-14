@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatFractionAsPercentage
 import io.novafoundation.nova.common.utils.inBackground
@@ -33,7 +34,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
@@ -46,7 +46,6 @@ import kotlinx.coroutines.launch
 sealed class StakingViewState
 
 private const val PERIOD_MONTH = 30
-private const val PERIOD_YEAR = 365
 
 class ReturnsModel(
     val monthlyPercentage: String,
@@ -56,8 +55,6 @@ class ReturnsModel(
 class StakeSummaryModel<S>(
     val status: S,
     val totalStaked: AmountModel,
-    val totalRewards: AmountModel,
-    val currentEraDisplay: String,
 )
 
 typealias NominatorSummaryModel = StakeSummaryModel<NominatorStatus>
@@ -68,6 +65,7 @@ enum class ManageStakeAction {
     PAYOUTS, BALANCE, CONTROLLER, VALIDATORS, REWARD_DESTINATION
 }
 
+@Suppress("LeakingThis")
 sealed class StakeViewState<S>(
     private val stakeState: StakingState.Stash,
     protected val currentAssetFlow: Flow<Asset>,
@@ -79,7 +77,8 @@ sealed class StakeViewState<S>(
     protected val summaryFlowProvider: suspend (StakingState.Stash) -> Flow<StakeSummary<S>>,
     protected val statusMessageProvider: (S) -> TitleAndMessage,
     private val availableManageActions: Set<ManageStakeAction>
-) : StakingViewState() {
+) : StakingViewState(),
+    WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(scope) {
 
     init {
         syncStakingRewards()
@@ -106,10 +105,20 @@ sealed class StakeViewState<S>(
         _showManageActionsEvent.value = Event(ManageStakingBottomSheet.Payload(availableManageActions))
     }
 
+    val userRewardsFlow = combine(
+        stakingInteractor.observeUserRewards(stakeState),
+        currentAssetFlow
+    ) { totalRewards, currentAsset ->
+        mapAmountToAmountModel(totalRewards, currentAsset)
+    }
+        .withLoading()
+        .inBackground()
+        .share()
+
     val stakeSummaryFlow = flow { emitAll(summaryFlow()) }
         .withLoading()
         .inBackground()
-        .shareIn(scope, SharingStarted.Eagerly, replay = 1)
+        .share()
 
     private val _showStatusAlertEvent = MutableLiveData<Event<Pair<String, String>>>()
     val showStatusAlertEvent: LiveData<Event<Pair<String, String>>> = _showStatusAlertEvent
@@ -130,7 +139,6 @@ sealed class StakeViewState<S>(
         }
     }
 
-    @ExperimentalCoroutinesApi
     private suspend fun summaryFlow(): Flow<StakeSummaryModel<S>> {
         return combine(
             summaryFlowProvider(stakeState),
@@ -139,8 +147,6 @@ sealed class StakeViewState<S>(
             StakeSummaryModel(
                 status = summary.status,
                 totalStaked = mapAmountToAmountModel(summary.totalStaked, asset),
-                totalRewards = mapAmountToAmountModel(summary.totalReward, asset),
-                currentEraDisplay = resourceManager.getString(R.string.staking_era_title, summary.currentEra)
             )
         }
     }
@@ -166,7 +172,7 @@ class ValidatorViewState(
     resourceManager, scope, router, errorDisplayer,
     summaryFlowProvider = { stakingInteractor.observeValidatorSummary(validatorState) },
     statusMessageProvider = { getValidatorStatusTitleAndMessage(resourceManager, it) },
-    availableManageActions = ManageStakeAction.values().toSet() - ManageStakeAction.VALIDATORS
+    availableManageActions = ManageStakeAction.values().toSet() - ManageStakeAction.VALIDATORS,
 )
 
 private fun getValidatorStatusTitleAndMessage(

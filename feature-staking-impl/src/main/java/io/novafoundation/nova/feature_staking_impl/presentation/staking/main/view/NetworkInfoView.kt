@@ -8,36 +8,30 @@ import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.view.shape.getBlurDrawable
 import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.StakingStoriesAdapter
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.model.StakingStoryModel
-import kotlinx.android.synthetic.main.view_network_info.view.activeNominatorsView
-import kotlinx.android.synthetic.main.view_network_info.view.lockUpPeriodView
-import kotlinx.android.synthetic.main.view_network_info.view.minimumStakeView
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
+import kotlinx.android.synthetic.main.view_network_info.view.stakingAboutActiveNominators
+import kotlinx.android.synthetic.main.view_network_info.view.stakingAboutMinimumStake
+import kotlinx.android.synthetic.main.view_network_info.view.stakingAboutStakingPeriod
+import kotlinx.android.synthetic.main.view_network_info.view.stakingAboutTotalStake
+import kotlinx.android.synthetic.main.view_network_info.view.stakingAboutUnstakingPeriod
 import kotlinx.android.synthetic.main.view_network_info.view.stakingNetworkCollapsibleView
 import kotlinx.android.synthetic.main.view_network_info.view.stakingNetworkInfoTitle
-import kotlinx.android.synthetic.main.view_network_info.view.stakingStoriesList
-import kotlinx.android.synthetic.main.view_network_info.view.totalStakeView
+
+private const val ANIMATION_DURATION = 220L
 
 class NetworkInfoView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0
-) : LinearLayout(context, attrs, defStyle), StakingStoriesAdapter.StoryItemHandler {
-
-    companion object {
-        private const val ANIMATION_DURATION = 220L
-    }
+) : LinearLayout(context, attrs, defStyle) {
 
     enum class State {
         EXPANDED,
         COLLAPSED
     }
 
-    var storyItemHandler: (StakingStoryModel) -> Unit = {}
-
-    private val storiesAdapter = StakingStoriesAdapter(this)
-
-    private var currentState = State.EXPANDED
+    private var currentState = State.COLLAPSED
 
     init {
         View.inflate(context, R.layout.view_network_info, this)
@@ -48,58 +42,47 @@ class NetworkInfoView @JvmOverloads constructor(
 
         orientation = VERTICAL
 
-        applyAttributes(attrs)
-
-        stakingStoriesList.setHasFixedSize(true)
-        stakingStoriesList.adapter = storiesAdapter
-
         stakingNetworkInfoTitle.setOnClickListener { changeExpandableState() }
-    }
-
-    private fun applyAttributes(attrs: AttributeSet?) {
-        attrs?.let {
-            val typedArray = context.obtainStyledAttributes(attrs, R.styleable.NetworkInfoView)
-
-            val isExpanded = typedArray.getBoolean(R.styleable.NetworkInfoView_expanded, true)
-            if (isExpanded) expand() else collapse()
-
-            typedArray.recycle()
-        }
     }
 
     fun setTitle(title: String) {
         stakingNetworkInfoTitle.text = title
     }
 
-    fun submitStories(stories: List<StakingStoryModel>) {
-        storiesAdapter.submitList(stories)
-    }
-
     fun showLoading() {
-        totalStakeView.showLoading()
-        minimumStakeView.showLoading()
-        activeNominatorsView.showLoading()
-        lockUpPeriodView.showLoading()
+        stakingAboutTotalStake.showProgress()
+        stakingAboutMinimumStake.showProgress()
+        stakingAboutActiveNominators.showProgress()
+        stakingAboutStakingPeriod.showProgress()
+        stakingAboutUnstakingPeriod.showProgress()
     }
 
-    fun setTotalStake(inTokens: String, inFiat: String?) {
-        totalStakeView.showValue(inTokens, inFiat)
+    fun setTotalStaked(amountModel: AmountModel) {
+        stakingAboutTotalStake.showAmount(amountModel)
+    }
+
+    fun setMinimumStake(amountModel: AmountModel) {
+        stakingAboutMinimumStake.showAmount(amountModel)
     }
 
     fun setNominatorsCount(nominatorsCount: String) {
-        activeNominatorsView.showValue(nominatorsCount)
+        stakingAboutActiveNominators.showValue(nominatorsCount)
     }
 
-    fun setMinimumStake(inTokens: String, inFiat: String?) {
-        minimumStakeView.showValue(inTokens, inFiat)
+    fun setStakingPeriod(period: String) {
+        stakingAboutStakingPeriod.showValue(period)
     }
 
-    fun setLockupPeriod(period: String) {
-        lockUpPeriodView.showValue(period)
+    fun setUnstakingPeriod(period: String) {
+        stakingAboutUnstakingPeriod.showValue(period)
     }
 
-    override fun storyClicked(story: StakingStoryModel) {
-        storyItemHandler(story)
+    fun setExpanded(expanded: Boolean) {
+        if (expanded) {
+            expand()
+        } else {
+            collapse()
+        }
     }
 
     private fun changeExpandableState() {
@@ -111,6 +94,8 @@ class NetworkInfoView @JvmOverloads constructor(
     }
 
     private fun collapse() {
+        if (currentState == State.COLLAPSED) return
+
         stakingNetworkInfoTitle.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_chevron_down, 0)
         currentState = State.COLLAPSED
         stakingNetworkCollapsibleView.animate()
@@ -120,6 +105,8 @@ class NetworkInfoView @JvmOverloads constructor(
     }
 
     private fun expand() {
+        if (currentState == State.EXPANDED) return
+
         stakingNetworkInfoTitle.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_chevron_up, 0)
         stakingNetworkCollapsibleView.makeVisible()
         currentState = State.EXPANDED

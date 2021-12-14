@@ -8,7 +8,7 @@ class StakingRewardsRepository(
     private val stakingRewardsDataSource: StakingRewardsDataSource,
 ) {
 
-    suspend fun totalRewardFlow(accountAddress: String): Flow<TotalReward> {
+    fun totalRewardFlow(accountAddress: String): Flow<TotalReward> {
         return stakingRewardsDataSource.totalRewardsFlow(accountAddress)
     }
 
