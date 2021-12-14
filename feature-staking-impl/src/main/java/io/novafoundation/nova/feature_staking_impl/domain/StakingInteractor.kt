@@ -17,7 +17,6 @@ import io.novafoundation.nova.feature_staking_api.domain.model.IndividualExposur
 import io.novafoundation.nova.feature_staking_api.domain.model.RewardDestination
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingAccount
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingState
-import io.novafoundation.nova.feature_staking_api.domain.model.StakingStory
 import io.novafoundation.nova.feature_staking_api.domain.model.isUnbondingIn
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.mappers.mapAccountToStakingAccount
@@ -38,7 +37,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.model.ValidatorStatus
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
@@ -204,10 +202,6 @@ class StakingInteractor(
         val chainId = stakingSharedState.chainId()
 
         HOURS_IN_DAY / stakingRepository.erasPerDay(chainId)
-    }
-
-    fun stakingStoriesFlow(): Flow<List<StakingStory>> {
-        return stakingRepository.stakingStoriesFlow()
     }
 
     fun selectionStateFlow() = combineToPair(

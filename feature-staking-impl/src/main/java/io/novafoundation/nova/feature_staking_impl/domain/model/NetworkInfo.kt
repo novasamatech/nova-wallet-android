@@ -12,5 +12,5 @@ data class NetworkInfo(
 
 sealed class StakingPeriod {
 
-    object Unlimited: StakingPeriod()
+    object Unlimited : StakingPeriod()
 }

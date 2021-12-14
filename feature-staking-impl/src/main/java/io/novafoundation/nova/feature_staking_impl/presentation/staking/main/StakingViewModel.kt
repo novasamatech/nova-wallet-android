@@ -34,7 +34,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.balance.
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.select.SelectBondMorePayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.di.StakingViewStateFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.model.StakingNetworkInfoModel
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.model.StakingStoryModel
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.redeem.RedeemPayload
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
@@ -246,7 +245,7 @@ class StakingViewModel(
         val unstakingPeriod = resourceManager.getQuantityString(R.plurals.staking_main_lockup_period_value, networkInfo.lockupPeriodInDays)
             .format(networkInfo.lockupPeriodInDays)
 
-        val stakingPeriod = when(networkInfo.stakingPeriod) {
+        val stakingPeriod = when (networkInfo.stakingPeriod) {
             StakingPeriod.Unlimited -> resourceManager.getString(R.string.common_unlimited)
         }
 

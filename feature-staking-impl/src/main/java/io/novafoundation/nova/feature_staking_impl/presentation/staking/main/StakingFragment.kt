@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import coil.ImageLoader
-import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
@@ -174,7 +173,7 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
         stakingViewState: StakeViewState<*>
     ) {
         stakingViewState.userRewardsFlow.observe {
-            when(it) {
+            when (it) {
                 is LoadingState.Loaded -> stakingUserRewards.showValue(it.data)
                 is LoadingState.Loading -> stakingUserRewards.showLoading()
             }

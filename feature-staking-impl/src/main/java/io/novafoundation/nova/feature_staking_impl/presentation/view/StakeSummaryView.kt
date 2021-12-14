@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_staking_impl.presentation.view
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
-import android.widget.LinearLayout
 import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -52,7 +51,6 @@ class StakeSummaryView @JvmOverloads constructor(
         }
     }
 
-
     fun showStakeStatus(status: Status) {
         stakeSummaryStatusShimmer.makeGone()
 
@@ -85,7 +83,6 @@ class StakeSummaryView @JvmOverloads constructor(
         stakeSummaryTokenStake.text = amountModel.token
         stakeSummaryFiatStake.text = amountModel.fiat
     }
-
 
     fun showLoading() {
         stakeSummaryShimmerGroup.makeVisible()
