@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.presentation.settings
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
@@ -8,6 +9,7 @@ import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
@@ -54,6 +56,9 @@ class SettingsViewModel(
 
     override val openBrowserEvent = MutableLiveData<Event<String>>()
 
+    private val _openEmailEvent = MutableLiveData<Event<String>>()
+    val openEmailEvent: LiveData<Event<String>> = _openEmailEvent
+
     fun walletsClicked() {
         router.openAccounts(AccountChosenNavDirection.MAIN)
     }
@@ -98,11 +103,19 @@ class SettingsViewModel(
         openLink(appLinksProvider.privacyUrl)
     }
 
+    fun emailClicked() {
+        _openEmailEvent.value = appLinksProvider.email.event()
+    }
+
+    fun openYoutube() {
+        openLink(appLinksProvider.youtube)
+    }
+
     fun accountActionsClicked() = launch {
         router.openAccountDetails(selectedAccountFlow.first().id)
     }
 
     private fun openLink(link: String) {
-        openBrowserEvent.value = Event(link)
+        openBrowserEvent.value = link.event()
     }
 }

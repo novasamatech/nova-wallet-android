@@ -20,6 +20,7 @@ android {
         buildConfigField "String", "TWITTER_URL", "\"https://twitter.com/novawalletapp\""
         buildConfigField "String", "RATE_URL", "\"market://details?id=${rootProject.applicationId}\""
         buildConfigField "String", "EMAIL", "\"support@novawallet.io\""
+        buildConfigField "String", "YOUTUBE_URL", "\"https://www.youtube.com/channel/UChoQr3YPETJKKVvhQ0AfV6A\""
 
         buildConfigField "String", "TWITTER_ACCOUNT_TEMPLATE", "\"https://twitter.com/%s\""
 

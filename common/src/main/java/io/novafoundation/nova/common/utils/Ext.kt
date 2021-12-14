@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.annotation.ColorInt
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
+import io.novafoundation.nova.common.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -45,7 +46,10 @@ fun Context.showBrowser(link: String) {
     startActivity(intent)
 }
 
-fun Context.createSendEmailIntent(targetEmail: String, title: String) {
+fun Context.sendEmailIntent(
+    targetEmail: String,
+    title: String = getString(R.string.common_email_chooser_title)
+) {
     val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
         putExtra(Intent.EXTRA_EMAIL, targetEmail)
         type = "message/rfc822"

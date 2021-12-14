@@ -45,7 +45,9 @@ class NetworkModule {
             twitter = BuildConfig.TWITTER_URL,
             rateApp = BuildConfig.RATE_URL,
             website = BuildConfig.WEBSITE_URL,
-            github = BuildConfig.GITHUB_URL
+            github = BuildConfig.GITHUB_URL,
+            email = BuildConfig.EMAIL,
+            youtube = BuildConfig.YOUTUBE_URL
         )
     }
 

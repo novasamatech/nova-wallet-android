@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.createSendEmailIntent
+import io.novafoundation.nova.common.utils.sendEmailIntent
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
@@ -116,7 +116,7 @@ class ValidatorDetailsFragment : BaseFragment<ValidatorDetailsViewModel>() {
         }
 
         viewModel.openEmailEvent.observeEvent {
-            requireContext().createSendEmailIntent(it, getString(R.string.common_email_chooser_title))
+            requireContext().sendEmailIntent(it)
         }
 
         viewModel.totalStakeEvent.observeEvent {
