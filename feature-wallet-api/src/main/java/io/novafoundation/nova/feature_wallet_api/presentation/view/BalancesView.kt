@@ -64,6 +64,6 @@ abstract class BalancesView @JvmOverloads constructor(
     }
 }
 
-fun TableCellView.setAmount(amountModel: AmountModel) {
+fun TableCellView.showAmount(amountModel: AmountModel) {
     showValue(amountModel.token, amountModel.fiat)
 }

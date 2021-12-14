@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+    <string name="common_unlimited">Unlimited</string>
+    <string name="staking_staking_period">Staking period</string>
+    <string name="staking_about">About staking</string>
     <string name="staking_nominator_status_waiting_format">waiting for the next era (%s)</string>
     <string name="staking_your_rewards">Your rewards</string>
 

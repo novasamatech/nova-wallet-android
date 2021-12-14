@@ -68,7 +68,7 @@
         android:layout_width="0dp"
         android:layout_height="1dp"
         android:layout_marginTop="7dp"
-        android:background="@color/gray3"
+        android:background="@color/white_16"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

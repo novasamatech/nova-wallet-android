@@ -31,6 +31,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.model.NominatorStatus
 import io.novafoundation.nova.feature_staking_impl.domain.model.PendingPayout
 import io.novafoundation.nova.feature_staking_impl.domain.model.PendingPayoutsStatistics
 import io.novafoundation.nova.feature_staking_impl.domain.model.StakeSummary
+import io.novafoundation.nova.feature_staking_impl.domain.model.StakingPeriod
 import io.novafoundation.nova.feature_staking_impl.domain.model.StashNoneStatus
 import io.novafoundation.nova.feature_staking_impl.domain.model.Unbonding
 import io.novafoundation.nova.feature_staking_impl.domain.model.ValidatorStatus
@@ -189,6 +190,7 @@ class StakingInteractor(
                 lockupPeriodInDays = lockupPeriod,
                 minimumStake = minimumStake(exposures, minimumNominatorBond),
                 totalStake = totalStake(exposures),
+                stakingPeriod = StakingPeriod.Unlimited,
                 nominatorsCount = activeNominators(chainId, exposures),
             )
         }

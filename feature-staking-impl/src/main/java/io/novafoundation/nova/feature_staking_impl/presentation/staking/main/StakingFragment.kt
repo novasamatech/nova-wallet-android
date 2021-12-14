@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.presentation.LoadingState
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setVisible
@@ -47,17 +48,11 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
     }
 
     override fun initViews() {
-        stakingContainer.applyInsetter {
-            type(statusBars = true) {
-                padding()
-            }
-        }
+        stakingContainer.applyStatusBarInsets()
 
         stakingAvatar.setOnClickListener {
             viewModel.avatarClicked()
         }
-
-        stakingNetworkInfo.storyItemHandler = viewModel::storyClicked
     }
 
     override fun inject() {
@@ -150,17 +145,16 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
                 is LoadingState.Loading<*> -> stakingNetworkInfo.showLoading()
 
                 is LoadingState.Loaded<StakingNetworkInfoModel> -> with(state.data) {
-                    stakingNetworkInfo.setTotalStake(totalStake, totalStakeFiat)
-                    stakingNetworkInfo.setNominatorsCount(nominatorsCount)
-                    stakingNetworkInfo.setMinimumStake(minimumStake, minimumStakeFiat)
-                    stakingNetworkInfo.setLockupPeriod(lockupPeriod)
+                    with(stakingNetworkInfo) {
+                        setTotalStaked(totalStaked)
+                        setNominatorsCount(activeNominators)
+                        setMinimumStake(minimumStake)
+                        setUnstakingPeriod(unstakingPeriod)
+                        setStakingPeriod(stakingPeriod)
+                    }
                 }
             }
         }
-
-        viewModel.stories.observe(stakingNetworkInfo::submitStories)
-
-        viewModel.networkInfoTitle.observe(stakingNetworkInfo::setTitle)
 
         viewModel.currentAddressModelLiveData.observe {
             stakingAvatar.setImageDrawable(it.image)
