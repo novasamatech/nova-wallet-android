@@ -6,11 +6,11 @@
     android:layout_height="match_parent">
 
     <LinearLayout
+        android:id="@+id/stakingContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/stakingContainer"
-        android:paddingBottom="24dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingBottom="24dp">
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -41,13 +41,13 @@
         </FrameLayout>
 
         <io.novafoundation.nova.feature_wallet_api.presentation.view.AssetSelectorView
+            android:id="@+id/stakingAssetSelector"
             android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
-            android:id="@+id/stakingAssetSelector"
             android:layout_marginEnd="16dp"
-            app:backgroundStyle="blurred"
-            android:layout_height="wrap_content" />
+            app:backgroundStyle="blurred" />
 
         <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.NetworkInfoView
             android:id="@+id/stakingNetworkInfo"
@@ -66,24 +66,24 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp" />
 
-        <!--        <io.novafoundation.nova.feature_staking_impl.presentation.view.StakeSummaryView-->
-<!--            android:id="@+id/stakingStakeSummary"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginStart="16dp"-->
-<!--            android:layout_marginTop="8dp"-->
-<!--            android:layout_marginEnd="16dp"-->
-<!--            android:visibility="gone"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            tools:visibility="visible" />-->
-
         <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.UserRewardsView
+            android:id="@+id/stakingUserRewards"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/stakingUserRewards"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp" />
+
+        <io.novafoundation.nova.feature_staking_impl.presentation.view.StakeSummaryView
+            android:id="@+id/stakingStakeSummary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:visibility="visible" />
 
         <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.EstimateEarningView
             android:id="@+id/stakingEstimate"

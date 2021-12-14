@@ -29,6 +29,7 @@ import kotlinx.android.synthetic.main.fragment_staking.stakingAvatar
 import kotlinx.android.synthetic.main.fragment_staking.stakingContainer
 import kotlinx.android.synthetic.main.fragment_staking.stakingEstimate
 import kotlinx.android.synthetic.main.fragment_staking.stakingNetworkInfo
+import kotlinx.android.synthetic.main.fragment_staking.stakingStakeSummary
 import kotlinx.android.synthetic.main.fragment_staking.stakingUserRewards
 import javax.inject.Inject
 import kotlin.time.ExperimentalTime
@@ -99,6 +100,7 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
                 is LoadingState.Loading -> {
                     stakingEstimate.setVisible(false)
                     stakingUserRewards.setVisible(false)
+                    stakingStakeSummary.setVisible(false)
                 }
 
                 is LoadingState.Loaded -> {
@@ -106,6 +108,7 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
 
                     stakingEstimate.setVisible(stakingState is WelcomeViewState)
                     stakingUserRewards.setVisible(stakingState is StakeViewState<*>)
+                    stakingStakeSummary.setVisible(stakingState is StakeViewState<*>)
 
                     when (stakingState) {
                         is NominatorViewState -> bindStashViews(stakingState, ::mapNominatorStatus)
@@ -170,7 +173,7 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
     ) {
         bindUserRewards(stakingViewState)
 
-//        stakingStakeSummary.bindStakeSummary(stakingViewState, mapStatus)
+        stakingStakeSummary.bindStakeSummary(stakingViewState, mapStatus)
     }
 
     private fun bindUserRewards(
@@ -184,7 +187,6 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
         }
     }
 
-    @ExperimentalTime
     private fun <S> StakeSummaryView.bindStakeSummary(
         stakingViewState: StakeViewState<S>,
         mapStatus: (StakeSummaryModel<S>) -> StakeSummaryView.Status,
@@ -207,18 +209,17 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
             ManageStakingBottomSheet(requireContext(), it, stakingViewState::manageActionChosen).show()
         }
 
-//        stakingViewState.stakeSummaryFlow.observe { summaryState ->
-//            when (summaryState) {
-//                is LoadingState.Loaded<StakeSummaryModel<S>> -> {
-//                    val summary = summaryState.data
-//
-//                    setElectionStatus(mapStatus(summary))
-//                    showTotalRewards(summary.totalRewards)
-//                    showTotalStaked(summary.totalStaked)
-//                }
-//                is LoadingState.Loading -> showLoading()
-//            }
-//        }
+        stakingViewState.stakeSummaryFlow.observe { summaryState ->
+            when (summaryState) {
+                is LoadingState.Loaded<StakeSummaryModel<S>> -> {
+                    val summary = summaryState.data
+
+                    showStakeAmount(summary.totalStaked)
+                    showStakeStatus(mapStatus(summary))
+                }
+                is LoadingState.Loading -> showLoading()
+            }
+        }
     }
 
     private fun showStatusAlert(title: String, message: String) {
@@ -230,22 +231,22 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
 
     private fun mapNominatorStatus(summary: NominatorSummaryModel): StakeSummaryView.Status {
         return when (summary.status) {
-            is NominatorStatus.Inactive -> StakeSummaryView.Status.Inactive(summary.currentEraDisplay)
-            NominatorStatus.Active -> StakeSummaryView.Status.Active(summary.currentEraDisplay)
+            is NominatorStatus.Inactive -> StakeSummaryView.Status.Inactive
+            NominatorStatus.Active -> StakeSummaryView.Status.Active
             is NominatorStatus.Waiting -> StakeSummaryView.Status.Waiting(summary.status.timeLeft)
         }
     }
 
     private fun mapValidatorStatus(summary: ValidatorSummaryModel): StakeSummaryView.Status {
         return when (summary.status) {
-            ValidatorStatus.INACTIVE -> StakeSummaryView.Status.Inactive(summary.currentEraDisplay)
-            ValidatorStatus.ACTIVE -> StakeSummaryView.Status.Active(summary.currentEraDisplay)
+            ValidatorStatus.INACTIVE -> StakeSummaryView.Status.Inactive
+            ValidatorStatus.ACTIVE -> StakeSummaryView.Status.Active
         }
     }
 
     private fun mapStashNoneStatus(summary: StashNoneSummaryModel): StakeSummaryView.Status {
         return when (summary.status) {
-            StashNoneStatus.INACTIVE -> StakeSummaryView.Status.Inactive(summary.currentEraDisplay)
+            StashNoneStatus.INACTIVE -> StakeSummaryView.Status.Inactive
         }
     }
 }

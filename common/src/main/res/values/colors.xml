@@ -13,7 +13,7 @@
     <color name="gray4">#181818</color>
     <color name="gray_disabled">#D0D0D0</color>
     <color name="colorGreyText">#888888</color>
-    <color name="green">#0ED33B</color>
+    <color name="green">#00FF19</color>
     <color name="dividerGray">#444444</color>
     <color name="bottomSheetBackground">#80838383</color>
     <color name="red">#F00004</color>
@@ -32,6 +32,7 @@
     <color name="white_48">#7AFFFFFF</color>
     <color name="white_50">#80FFFFFF</color>
     <color name="white_64">#A6FFFFFF</color>
+    <color name="white_80">#CCFFFFFF</color>
 
     <color name="black_24">#3D000000</color>
     <color name="black_48">#7A000000</color>

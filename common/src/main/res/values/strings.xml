@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+    <string name="staking_nominator_status_waiting_format">waiting for the next era (%s)</string>
     <string name="staking_your_rewards">Your rewards</string>
 
     <string name="common_explore">Explore</string>

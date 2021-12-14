@@ -5,7 +5,6 @@ import java.math.BigDecimal
 class StakeSummary<S>(
     val status: S,
     val totalStaked: BigDecimal,
-    val currentEra: Int,
 )
 
 sealed class NominatorStatus {

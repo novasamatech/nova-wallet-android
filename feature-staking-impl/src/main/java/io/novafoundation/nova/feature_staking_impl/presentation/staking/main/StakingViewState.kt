@@ -48,7 +48,6 @@ import java.math.BigInteger
 sealed class StakingViewState
 
 private const val PERIOD_MONTH = 30
-private const val PERIOD_YEAR = 365
 
 class ReturnsModel(
     val monthlyPercentage: String,
@@ -58,7 +57,6 @@ class ReturnsModel(
 class StakeSummaryModel<S>(
     val status: S,
     val totalStaked: AmountModel,
-    val currentEraDisplay: String,
 )
 
 typealias NominatorSummaryModel = StakeSummaryModel<NominatorStatus>
@@ -151,7 +149,6 @@ sealed class StakeViewState<S>(
             StakeSummaryModel(
                 status = summary.status,
                 totalStaked = mapAmountToAmountModel(summary.totalStaked, asset),
-                currentEraDisplay = resourceManager.getString(R.string.staking_era_title, summary.currentEra)
             )
         }
     }

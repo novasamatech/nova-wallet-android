@@ -351,8 +351,7 @@ class StakingInteractor(
 
             StakeSummary(
                 status = status,
-                totalStaked = totalStaked,
-                currentEra = activeEraIndex.toInt(),
+                totalStaked = totalStaked
             )
         }
     }
