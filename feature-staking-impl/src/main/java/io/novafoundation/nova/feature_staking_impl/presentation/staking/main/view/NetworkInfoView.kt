@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view
 
+import android.animation.LayoutTransition
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
@@ -31,7 +32,7 @@ class NetworkInfoView @JvmOverloads constructor(
         COLLAPSED
     }
 
-    private var currentState = State.EXPANDED
+    private var currentState = State.COLLAPSED
 
     init {
         View.inflate(context, R.layout.view_network_info, this)
@@ -42,20 +43,7 @@ class NetworkInfoView @JvmOverloads constructor(
 
         orientation = VERTICAL
 
-        applyAttributes(attrs)
-
         stakingNetworkInfoTitle.setOnClickListener { changeExpandableState() }
-    }
-
-    private fun applyAttributes(attrs: AttributeSet?) {
-        attrs?.let {
-            val typedArray = context.obtainStyledAttributes(attrs, R.styleable.NetworkInfoView)
-
-            val isExpanded = typedArray.getBoolean(R.styleable.NetworkInfoView_expanded, true)
-            if (isExpanded) expand() else collapse()
-
-            typedArray.recycle()
-        }
     }
 
     fun setTitle(title: String) {
@@ -90,6 +78,14 @@ class NetworkInfoView @JvmOverloads constructor(
         stakingAboutUnstakingPeriod.showValue(period)
     }
 
+    fun setExpanded(expanded: Boolean) {
+        if (expanded) {
+            expand()
+        } else {
+            collapse()
+        }
+    }
+
     private fun changeExpandableState() {
         if (State.EXPANDED == currentState) {
             collapse()
@@ -99,6 +95,8 @@ class NetworkInfoView @JvmOverloads constructor(
     }
 
     private fun collapse() {
+        if (currentState == State.COLLAPSED) return
+
         stakingNetworkInfoTitle.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_chevron_down, 0)
         currentState = State.COLLAPSED
         stakingNetworkCollapsibleView.animate()
@@ -108,6 +106,8 @@ class NetworkInfoView @JvmOverloads constructor(
     }
 
     private fun expand() {
+        if (currentState == State.EXPANDED) return
+
         stakingNetworkInfoTitle.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_chevron_up, 0)
         stakingNetworkCollapsibleView.makeVisible()
         currentState = State.EXPANDED

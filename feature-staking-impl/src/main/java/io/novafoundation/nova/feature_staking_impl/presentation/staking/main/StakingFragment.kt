@@ -104,6 +104,8 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
                     stakingUserRewards.setVisible(stakingState is StakeViewState<*>)
                     stakingStakeSummary.setVisible(stakingState is StakeViewState<*>)
 
+                    stakingNetworkInfo.setExpanded(stakingState is WelcomeViewState)
+
                     when (stakingState) {
                         is NominatorViewState -> bindStashViews(stakingState, ::mapNominatorStatus)
 
