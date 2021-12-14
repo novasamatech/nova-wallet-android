@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view
 
-import android.animation.LayoutTransition
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
