@@ -39,12 +39,12 @@ buildscript {
         navControllerVersion = '2.3.1'
 
         junitVersion = '4.12'
-        mockitoVersion = '2.23.0'
+        mockitoVersion = '3.12.4'
         robolectricVersion = '4.1'
 
         bouncyCastleVersion = '1.60'
 
-        fearlessLibVersion = '1.1.5'
+        fearlessLibVersion = '1.1.6'
 
         gifVersion = '1.2.19'
 
