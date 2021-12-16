@@ -28,6 +28,7 @@ import java.util.concurrent.TimeUnit
 
 private const val HTTP_CACHE = "http_cache"
 private const val CACHE_SIZE = 50L * 1024L * 1024L // 50 MiB
+private const val TIMEOUT_SECONDS = 20L
 
 @Module
 class NetworkModule {
@@ -57,9 +58,9 @@ class NetworkModule {
         context: Context
     ): OkHttpClient {
         val builder = OkHttpClient.Builder()
-            .connectTimeout(10, TimeUnit.SECONDS)
-            .writeTimeout(10, TimeUnit.SECONDS)
-            .readTimeout(10, TimeUnit.SECONDS)
+            .connectTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .writeTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .readTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
             .cache(Cache(File(context.cacheDir, HTTP_CACHE), CACHE_SIZE))
             .retryOnConnectionFailure(true)
             .addInterceptor(TimeHeaderInterceptor())
