@@ -36,14 +36,13 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToA
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-sealed class StakingViewState
+sealed class StakingViewState(coroutineScope: CoroutineScope) : WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(coroutineScope)
 
 private const val PERIOD_MONTH = 30
 
@@ -77,8 +76,7 @@ sealed class StakeViewState<S>(
     protected val summaryFlowProvider: suspend (StakingState.Stash) -> Flow<StakeSummary<S>>,
     protected val statusMessageProvider: (S) -> TitleAndMessage,
     private val availableManageActions: Set<ManageStakeAction>
-) : StakingViewState(),
-    WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(scope) {
+) : StakingViewState(scope) {
 
     init {
         syncStakingRewards()
@@ -257,8 +255,9 @@ class WelcomeViewState(
     private val scope: CoroutineScope,
     private val errorDisplayer: (String) -> Unit,
     private val validationSystem: WelcomeStakingValidationSystem,
-    private val validationExecutor: ValidationExecutor
-) : StakingViewState(), Validatable by validationExecutor {
+    private val validationExecutor: ValidationExecutor,
+    currentAssetFlow: Flow<Asset>,
+) : StakingViewState(scope), Validatable by validationExecutor {
 
     private val currentSetupProgress = setupStakingSharedState.get<SetupStakingProcess.Initial>()
 
@@ -266,6 +265,12 @@ class WelcomeViewState(
 
     private val _showRewardEstimationEvent = MutableLiveData<Event<StakingRewardEstimationBottomSheet.Payload>>()
     val showRewardEstimationEvent: LiveData<Event<StakingRewardEstimationBottomSheet.Payload>> = _showRewardEstimationEvent
+
+    val estimateEarningsTitle = currentAssetFlow.map {
+        resourceManager.getString(R.string.staking_estimate_earning_title_v2_2_0, it.token.configuration.symbol)
+    }
+        .inBackground()
+        .share()
 
     val returns = flowOf {
         val rewardCalculator = rewardCalculator()
@@ -277,7 +282,7 @@ class WelcomeViewState(
     }
         .withLoading()
         .inBackground()
-        .shareIn(scope, SharingStarted.Eagerly, replay = 1)
+        .share()
 
     fun infoActionClicked() {
         scope.launch {

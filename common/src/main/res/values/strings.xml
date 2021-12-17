@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+    <string name="staking_estimate_earning_title_v2_2_0">Estimated %s earnings</string>
     <string name="settings_email">Email</string>
     <string name="settings_youtube" translatable="false">Youtube</string>
     <string name="settings_support">support &amp; Feedback</string>
@@ -559,7 +560,6 @@ Mnemonic: %s</string>
     <string name="staking_validator_my_oversubscribed_message">Oversubscribed. You will not receive rewards from the validator in this era.</string>
     <string name="staking_validator_other_oversubscribed_message">Oversubscribed. Only the top staked nominators are paid rewards.</string>
     <string name="history_v1.9.0">History</string>
-    <string name="staking_estimate_earning_title_v1.9.0">Estimated earnings</string>
     <string name="staking_main_stake_balance_staked">Staked</string>
     <string name="staking_pending_rewards_info">Validators payout the rewards every 2–5 days. However, you can payout them by yourself, especially if rewards are close to expiring, but you will pay the fee.</string>
     <string name="staking_custom_validators_update_list">Update your list</string>

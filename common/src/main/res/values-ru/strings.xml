@@ -472,7 +472,6 @@
     <string name="staking_validator_my_oversubscribed_message">Превышен лимит номинаторов для валидатора. В этой эре вы не получите награду от этого валидатора.</string>
     <string name="staking_validator_other_oversubscribed_message">Превышен лимит номинаторов для валидатора. Только номинаторы с наибольшим стейком получат награду.</string>
     <string name="history_v1.9.0">История</string>
-    <string name="staking_estimate_earning_title_v1.9.0">Расчёт доходности</string>
     <string name="staking_main_stake_balance_staked">Застейкано</string>
     <string name="staking_pending_rewards_info">Валидаторы выплачивают вознаграждения каждые 2–5 дней. Однако, вы можете инициировать выплату самостоятельно, особенно, если срок вознаграждения истекает. В этом случае придётся заплатить комиссию.</string>
     <string name="staking_custom_validators_update_list">Обновить свой список</string>
