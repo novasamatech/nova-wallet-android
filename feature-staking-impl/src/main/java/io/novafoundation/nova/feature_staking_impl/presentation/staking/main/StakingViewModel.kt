@@ -136,6 +136,7 @@ class StakingViewModel(
                     AlertModel.Type.CallToAction { router.openCurrentValidators() }
                 )
             }
+
             is Alert.RedeemTokens -> {
                 AlertModel(
                     WARNING_ICON,
@@ -144,6 +145,7 @@ class StakingViewModel(
                     AlertModel.Type.CallToAction(::redeemAlertClicked)
                 )
             }
+
             is Alert.BondMoreTokens -> {
                 val existentialDepositDisplay = formatAlertTokenAmount(alert.minimalStake, alert.token)
 
@@ -154,6 +156,7 @@ class StakingViewModel(
                     AlertModel.Type.CallToAction(::bondMoreAlertClicked)
                 )
             }
+
             is Alert.WaitingForNextEra -> AlertModel(
                 WAITING_ICON,
                 resourceManager.getString(R.string.staking_nominator_status_alert_waiting_message),
@@ -227,7 +230,8 @@ class StakingViewModel(
 
         is StakingState.NonStash -> stakingViewStateFactory.createWelcomeViewState(
             stakingStateScope,
-            ::showError
+            ::showError,
+            assetSelectorMixin.selectedAssetFlow,
         )
 
         is StakingState.Stash.Validator -> stakingViewStateFactory.createValidatorViewState(

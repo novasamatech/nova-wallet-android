@@ -116,6 +116,8 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
                         is WelcomeViewState -> {
                             observeValidations(stakingState)
 
+                            stakingState.estimateEarningsTitle.observe(stakingEstimate::setTitle)
+
                             stakingState.returns.observe { rewardsState ->
                                 when (rewardsState) {
                                     is LoadingState.Loaded -> {

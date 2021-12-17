@@ -12,8 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="7dp">
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:id="@+id/estimateEarningTitle"
@@ -21,22 +20,23 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
+            android:layout_marginTop="14dp"
+            android:layout_marginBottom="14dp"
             android:layout_weight="1"
             android:includeFontPadding="false"
-            android:text="@string/staking_estimate_earning_title_v1.9.0"
             android:textColor="@color/white"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:layout_gravity="center"/>
+            tools:text="@string/staking_estimate_earning_title_v2_2_0" />
 
         <ImageView
             android:id="@+id/stakeMoreActions"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginEnd="11dp"
-            android:padding="8dp"
-            android:src="@drawable/ic_info_16"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="12dp"
+            android:src="@drawable/ic_info_24"
             app:tint="@color/white_64" />
 
     </LinearLayout>
@@ -46,12 +46,12 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        app:title="@string/staking_month_period_title"
-        android:layout_marginTop="9dp"
         app:layout_constraintEnd_toStartOf="@id/stakingYearGain"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        app:title="@string/staking_month_period_title" />
 
     <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.StakingInfoView
         android:id="@+id/stakingYearGain"
@@ -59,11 +59,11 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="16dp"
-        app:title="@string/staking_year_period_title"
         app:layout_constraintBottom_toBottomOf="@+id/stakingMonthGain"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/stakingMonthGain"
-        app:layout_constraintTop_toTopOf="@+id/stakingMonthGain" />
+        app:layout_constraintTop_toTopOf="@+id/stakingMonthGain"
+        app:title="@string/staking_year_period_title" />
 
 
     <io.novafoundation.nova.common.view.PrimaryButton
@@ -74,11 +74,11 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="16dp"
-        app:layout_constraintTop_toBottomOf="@id/stakingYearGain"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginBottom="24dp"
-        android:text="@string/staking_start_title" />
+        android:text="@string/staking_start_title"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/stakingYearGain" />
 
 </merge>
