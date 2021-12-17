@@ -21,7 +21,7 @@ fun mainStakingValidationFailure(
     reason: StakeActionsValidationFailure,
     resourceManager: ResourceManager
 ): TitleAndMessage = with(resourceManager) {
-    when(reason) {
+    when (reason) {
         is StakeActionsValidationFailure.ControllerRequired -> {
             getString(R.string.common_error_general_title) to
                 getString(R.string.staking_add_controller, reason.controllerAddress)

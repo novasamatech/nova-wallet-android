@@ -68,7 +68,6 @@ typealias NominatorSummaryModel = StakeSummaryModel<NominatorStatus>
 typealias ValidatorSummaryModel = StakeSummaryModel<ValidatorStatus>
 typealias StashNoneSummaryModel = StakeSummaryModel<StashNoneStatus>
 
-
 @Suppress("LeakingThis")
 sealed class StakeViewState<S>(
     private val stakeState: StakingState.Stash,
