@@ -17,10 +17,12 @@ import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.alerts.AlertsInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.main.ManageStakeAction
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.validations.balance.ManageStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.validations.balance.SYSTEM_MANAGE_STAKING_BOND_MORE
 import io.novafoundation.nova.feature_staking_impl.domain.validations.balance.SYSTEM_MANAGE_STAKING_REDEEM
+import io.novafoundation.nova.feature_staking_impl.domain.validations.main.StakeActionsValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.validations.welcome.WelcomeStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
@@ -40,7 +42,8 @@ class StakingModule {
         rewardCalculatorFactory: RewardCalculatorFactory,
         router: StakingRouter,
         welcomeStakingValidationSystem: WelcomeStakingValidationSystem,
-        validationExecutor: ValidationExecutor
+        validationExecutor: ValidationExecutor,
+        stakeActionsValidations: Map<@JvmSuppressWildcards ManageStakeAction, StakeActionsValidationSystem>
     ) = StakingViewStateFactory(
         interactor,
         setupStakingSharedState,
@@ -48,6 +51,7 @@ class StakingModule {
         router,
         rewardCalculatorFactory,
         welcomeStakingValidationSystem,
+        stakeActionsValidations,
         validationExecutor
     )
 

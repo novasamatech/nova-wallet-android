@@ -1,0 +1,5 @@
+package io.novafoundation.nova.feature_staking_impl.domain.validations.main
+
+import io.novafoundation.nova.common.validation.ValidationSystem
+
+typealias StakeActionsValidationSystem = ValidationSystem<StakeActionsValidationPayload, StakeActionsValidationFailure>
