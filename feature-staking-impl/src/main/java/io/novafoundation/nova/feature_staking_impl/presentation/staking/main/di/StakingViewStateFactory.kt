@@ -4,7 +4,9 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingState
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.main.ManageStakeAction
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculatorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.validations.main.StakeActionsValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.validations.welcome.WelcomeStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
@@ -23,6 +25,7 @@ class StakingViewStateFactory(
     private val router: StakingRouter,
     private val rewardCalculatorFactory: RewardCalculatorFactory,
     private val welcomeStakingValidationSystem: WelcomeStakingValidationSystem,
+    private val stakeActionsValidations: Map<ManageStakeAction, StakeActionsValidationSystem>,
     private val validationExecutor: ValidationExecutor
 ) {
 
@@ -38,7 +41,9 @@ class StakingViewStateFactory(
         scope = scope,
         router = router,
         errorDisplayer = errorDisplayer,
-        resourceManager = resourceManager
+        resourceManager = resourceManager,
+        stakeActionsValidations = stakeActionsValidations,
+        validationExecutor = validationExecutor
     )
 
     fun createStashNoneState(
@@ -53,7 +58,9 @@ class StakingViewStateFactory(
         resourceManager = resourceManager,
         scope = scope,
         router = router,
-        errorDisplayer = errorDisplayer
+        errorDisplayer = errorDisplayer,
+        stakeActionsValidations = stakeActionsValidations,
+        validationExecutor = validationExecutor
     )
 
     fun createWelcomeViewState(
@@ -61,15 +68,15 @@ class StakingViewStateFactory(
         errorDisplayer: (String) -> Unit,
         currentAssetFlow: Flow<Asset>,
     ) = WelcomeViewState(
-        setupStakingSharedState,
-        rewardCalculatorFactory,
-        resourceManager,
-        router,
-        scope,
-        errorDisplayer,
-        welcomeStakingValidationSystem,
-        validationExecutor,
-        currentAssetFlow
+        setupStakingSharedState = setupStakingSharedState,
+        rewardCalculatorFactory = rewardCalculatorFactory,
+        resourceManager = resourceManager,
+        router = router,
+        scope = scope,
+        errorDisplayer = errorDisplayer,
+        validationSystem = welcomeStakingValidationSystem,
+        validationExecutor = validationExecutor,
+        currentAssetFlow = currentAssetFlow,
     )
 
     fun createNominatorViewState(
@@ -84,6 +91,8 @@ class StakingViewStateFactory(
         scope = scope,
         router = router,
         errorDisplayer = errorDisplayer,
-        resourceManager = resourceManager
+        resourceManager = resourceManager,
+        stakeActionsValidations = stakeActionsValidations,
+        validationExecutor = validationExecutor
     )
 }

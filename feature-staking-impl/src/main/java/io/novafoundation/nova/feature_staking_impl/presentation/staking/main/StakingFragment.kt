@@ -106,6 +106,8 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
 
                     stakingNetworkInfo.setExpanded(stakingState is WelcomeViewState)
 
+                    observeValidations(stakingState)
+
                     when (stakingState) {
                         is NominatorViewState -> bindStashViews(stakingState, ::mapNominatorStatus)
 
@@ -114,7 +116,6 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
                         is StashNoneViewState -> bindStashViews(stakingState, ::mapStashNoneStatus)
 
                         is WelcomeViewState -> {
-                            observeValidations(stakingState)
 
                             stakingState.estimateEarningsTitle.observe(stakingEstimate::setTitle)
 
