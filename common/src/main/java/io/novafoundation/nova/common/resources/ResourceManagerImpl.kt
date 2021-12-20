@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.common.utils.daysFromMillis
 import io.novafoundation.nova.common.utils.formatDateTime
 import io.novafoundation.nova.common.utils.getDrawableCompat
+import io.novafoundation.nova.common.utils.readText
 import kotlin.time.ExperimentalTime
 import kotlin.time.milliseconds
 
@@ -15,6 +16,13 @@ import kotlin.time.milliseconds
 class ResourceManagerImpl(
     private val contextManager: ContextManager
 ) : ResourceManager {
+
+    override fun loadRawString(res: Int): String {
+        return contextManager.getContext().resources
+            .openRawResource(res)
+            .readText()
+    }
+
     override fun getString(res: Int): String {
         return contextManager.getContext().getString(res)
     }
