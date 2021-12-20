@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_dapp_impl.web3
 
 import android.webkit.WebView
+import androidx.annotation.CallSuper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -20,7 +21,8 @@ interface Web3Extension<REQUEST : Web3Extension.Request<*>> {
 
 abstract class WebViewWeb3Extension<R : Web3Extension.Request<*>>(
     scope: CoroutineScope,
-    webViewWeb3JavaScriptInterface: WebViewWeb3JavaScriptListener
+    webViewWeb3JavaScriptInterface: WebViewWeb3JavaScriptInterface,
+    private val webViewHolder: WebViewHolder
 ) : Web3Extension<R>,
     CoroutineScope by scope,
     Web3JavascriptListener {
@@ -40,5 +42,8 @@ abstract class WebViewWeb3Extension<R : Web3Extension.Request<*>>(
 
     abstract override fun onNewMessage(message: Any?)
 
-    abstract fun inject(into: WebView)
+    @CallSuper
+    open fun inject(into: WebView) {
+        webViewHolder.set(into)
+    }
 }

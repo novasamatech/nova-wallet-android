@@ -7,16 +7,39 @@ import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.web3.Web3Extension
 import io.novafoundation.nova.feature_dapp_impl.web3.Web3JavascriptResponder
+import io.novafoundation.nova.feature_dapp_impl.web3.WebViewHolder
 import io.novafoundation.nova.feature_dapp_impl.web3.WebViewWeb3Extension
-import io.novafoundation.nova.feature_dapp_impl.web3.WebViewWeb3JavaScriptListener
+import io.novafoundation.nova.feature_dapp_impl.web3.WebViewWeb3JavaScriptInterface
 import kotlinx.coroutines.CoroutineScope
+
+// should be in tact with javascript_interface_bridge.js
+private const val JAVASCRIPT_INTERFACE_NAME = "Nova"
+
+class PolkadotJsExtensionFactory(
+    private val resourceManager: ResourceManager,
+    private val web3JavascriptResponder: Web3JavascriptResponder,
+    private val webViewWeb3JavaScriptInterface: WebViewWeb3JavaScriptInterface,
+    private val webViewHolder: WebViewHolder,
+) {
+
+    fun create(scope: CoroutineScope): PolkadotJsExtension {
+        return PolkadotJsExtension(
+            web3JavascriptResponder = web3JavascriptResponder,
+            resourceManager = resourceManager,
+            webViewWeb3JavaScriptInterface = webViewWeb3JavaScriptInterface,
+            scope = scope,
+            webViewHolder = webViewHolder
+        )
+    }
+}
 
 class PolkadotJsExtension(
     private val web3JavascriptResponder: Web3JavascriptResponder,
     private val resourceManager: ResourceManager,
-    webViewWeb3JavaScriptListener: WebViewWeb3JavaScriptListener,
+    private val webViewWeb3JavaScriptInterface: WebViewWeb3JavaScriptInterface,
+    webViewHolder: WebViewHolder,
     scope: CoroutineScope,
-) : WebViewWeb3Extension<PolkadotJsExtension.Request<*>>(scope, webViewWeb3JavaScriptListener) {
+) : WebViewWeb3Extension<PolkadotJsExtension.Request<*>>(scope, webViewWeb3JavaScriptInterface, webViewHolder) {
 
     sealed class Request<R>(
         private val web3JavascriptResponder: Web3JavascriptResponder,
@@ -73,10 +96,13 @@ class PolkadotJsExtension(
     }
 
     override fun inject(into: WebView) {
+        super.inject(into)
+
         val mainScript = resourceManager.loadRawString(R.raw.nova_min)
         val javascriptInterfaceBridge = resourceManager.loadRawString(R.raw.javascript_interface_bridge)
 
         into.evaluateJavascript(mainScript, null)
         into.evaluateJavascript(javascriptInterfaceBridge, null)
+        into.addJavascriptInterface(webViewWeb3JavaScriptInterface, JAVASCRIPT_INTERFACE_NAME)
     }
 }

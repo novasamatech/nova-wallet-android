@@ -7,7 +7,7 @@ interface Web3JavascriptListener {
     fun onNewMessage(message: Any?)
 }
 
-class WebViewWeb3JavaScriptListener : Web3JavascriptListener {
+class WebViewWeb3JavaScriptInterface : Web3JavascriptListener {
 
     private val observers = mutableListOf<Web3JavascriptListener>()
 

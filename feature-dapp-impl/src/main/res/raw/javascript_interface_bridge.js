@@ -5,6 +5,7 @@ window.addEventListener("message", ({ data, source }) => {
       }
 
       if (data.origin === "dapp-request") {
-        Android.onNewMessage(data)
+      // should be in tact with PolkadotJsExtension.kt
+        Nova.onNewMessage(data)
       }
     });
