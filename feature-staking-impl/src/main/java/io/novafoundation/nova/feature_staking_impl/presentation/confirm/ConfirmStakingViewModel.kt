@@ -139,8 +139,14 @@ class ConfirmStakingViewModel(
 
     val eraHoursLength = flow {
         val hours = interactor.getEraHoursLength()
-        emit(resourceManager.getString(R.string.staking_hint_rewards_format_v2_2_0, resourceManager.getQuantityString(R.plurals.common_hours_format, hours, hours)))
-    }.inBackground()
+        emit(
+            resourceManager.getString(
+                R.string.staking_hint_rewards_format_v2_2_0,
+                resourceManager.getQuantityString(R.plurals.common_hours_format, hours, hours)
+            )
+        )
+    }
+        .inBackground()
         .share()
 
     val rewardDestinationLiveData = flowOf(payload)
