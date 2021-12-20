@@ -3,10 +3,10 @@
     <string name="staking_estimate_earning_title_v2_2_0">Estimated %s earnings</string>
     <string name="settings_email">Email</string>
     <string name="settings_youtube" translatable="false">Youtube</string>
-    <string name="settings_support">support &amp; Feedback</string>
+    <string name="settings_support">Support &amp; Feedback</string>
 
     <string name="settings_general">General</string>
-    <string name="settings_preferences">General</string>
+    <string name="settings_preferences">Preferences</string>
     <string name="settings_security">Security</string>
     <string name="settings_community">Community</string>
 
@@ -31,7 +31,7 @@
 
     <string name="account_export_seed_title">Write down your secret and store it in a safe place</string>
 
-    <string name="account_verify_mnemonic">Verify mnemonic</string>
+    <string name="account_confirm_mnemonic">Confirm mnemonic</string>
 
     <string name="accounts_change_chain_account">Change %s account</string>
     <string name="accounts_add_chain_account">Add %s account</string>
@@ -62,13 +62,13 @@
     <string name="account_import_seed_title">Enter your raw seed</string>
     <string name="account_import_seed_hint" translatable="false">0xAB</string>
 
-    <string name="account_import_json_title">Paste your Restore JSON</string>
+    <string name="account_import_json_title">Provide your Restore JSON</string>
 
     <string name="account_confirm_mnemonic_title">Let’s double check it</string>
     <string name="account_confirm_mnemonic_subtitle">Select the words in the right order.</string>
 
     <string name="common_i_understand">I understand</string>
-    <string name="account_mnemonic_show_warning">We are going to show your mnemonic. Make sure no one can see your screen and do not take screenshots — they can be collected by third-party malware</string>
+    <string name="common_no_screenshot_message_v2_2_0">We are going to show your mnemonic. Make sure no one can see your screen and do not take screenshots — they can be collected by third-party malware</string>
     <string name="common_attention">Attention!</string>
     <string name="account_backup_mnemonic_title">Write down the phrase and store it in a safe place</string>
     <string name="account_backup_secret_caption">Please make sure to write down your phrase correctly and legibly.</string>
