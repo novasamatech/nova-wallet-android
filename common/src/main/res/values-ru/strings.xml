@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
-    <string name="account_create_name_title">Назовите кошелёк</string>
-    <string name="account_create_name_subtitle">Имя хранится только на вашем мобильном устройстве и показывается только вам.</string>
+    <string name="account_create_name_title_v2_2_0">Назовите кошелёк</string>
+    <string name="account_create_name_subtitle_v2_2_0">Имя хранится только на вашем мобильном устройстве и показывается только вам.</string>
     <string name="account_wallet_nickname">Имя кошелька</string>
-    <string name="account_create_name_examples">Примеры: Сбережения, Инвестиции, Краудлоуны, Стейкинг.</string>
+    <string name="wallet_nickname_create_caption_v2_2_0">Примеры: Сбережения, Инвестиции, Краудлоуны, Стейкинг.</string>
 
     <string name="about_website_v2_2_0">Сайт</string>
     <string name="about_terms_v2_2_0">Условия использования</string>
@@ -65,7 +65,7 @@
     <string name="transaction_details_view_explorer">Открыть в %s</string>
 
     <string name="account_invalid_derivation_path_title">Некорректный путь деривации</string>
-    <string name="account_invalid_derivation_path_message">Путь деривации содержить неподдерживамые символы или имеет некорретную структуру</string>
+    <string name="account_invalid_derivation_path_message_v2_2_0">Путь деривации содержить неподдерживамые символы или имеет некорретную структуру</string>
 
     <string name="import_json_unsupported_crypto_title">Неподдерживаемый тип шиврования</string>
     <string name="import_json_unsupported_ethereum_crypto_message">Не поддерживается импорт аккаунта с Substrate секретом в сеть с Ethereum шифрованием</string>
@@ -75,7 +75,6 @@
     <string name="import_json_chains_dont_match">Выбранный JSON файл был создан для другой сети.</string>
 
     <string name="profile_accounts_title_2_0">Кошельки</string>
-    <string name="username_setup_choose_title_2_0">Имя кошелька</string>
     <string name="account_info_title_2_0">Кошелёк</string>
 
     <string name="account_shared_secret">Аккаунты с общим секретом</string>
@@ -91,15 +90,15 @@
     <string name="common_use">Использовать</string>
     <string name="common_error_general_title">Ошибка</string>
     <string name="common_copy_address">Копировать адрес</string>
-    <string name="connection_error_message">Пожалуйста, проверьте подключение к Интернету и повторите попытку.</string>
-    <string name="onboarding_terms_and_conditions_1">Я подтверждаю, что прочитал и согласен с Условиями использования и Политикой конфиденциальности</string>
+    <string name="connection_error_message_v2_2_0">Пожалуйста, проверьте подключение к Интернету и повторите попытку.</string>
+    <string name="onboarding_terms_and_conditions_1_v2_2_0">Я подтверждаю, что прочитал и согласен с Условиями использования и Политикой конфиденциальности</string>
     <string name="onboarding_terms_and_conditions_2">Условиями использования</string>
     <string name="onboarding_privacy_policy">Политикой конфиденциальности</string>
     <string name="pincode_confirm_your_pin_code">Подтвердите свой PIN-код</string>
     <string name="pincode_title_create">Установите свой PIN-код</string>
     <string name="tabbar_wallet_title">Кошелёк</string>
     <string name="tabbar_staking_title">Стейкинг</string>
-    <string name="transfers_empty">Входящие и исходящие
+    <string name="transfers_empty_v2_2_0">Входящие и исходящие
 транзакции будут отображаться здесь</string>
     <string name="profile_settings_title">Настройки</string>
     <string name="profile_language_title">Язык</string>
@@ -110,11 +109,11 @@
     <string name="about_terms">Условия использования</string>
     <string name="language_title">Язык</string>
     <string name="connection_management_title">Сети</string>
-    <string name="username_setup_choose_title">Имя</string>
+    <string name="username_setup_choose_title_v2_2_0">Имя</string>
     <string name="username_setup_hint">Данное имя будет отображаться только для вас и храниться только на вашем мобильном устройстве.</string>
     <string name="common_ok">OK</string>
     <string name="account_create_title">Мнемоника</string>
-    <string name="account_create_details">Используйте нецифровой носитель для сохранения, например, выпишите слова на бумагу.</string>
+    <string name="account_create_details_v2_2_0">Используйте нецифровой носитель для сохранения, например, выпишите слова на бумагу.</string>
     <string name="common_advanced">Продвинутый</string>
     <string name="common_crypto_type">Тип ключевой пары</string>
     <string name="common_secret_derivation_path">Последовательность для вывода секрета</string>
@@ -187,8 +186,8 @@
     <string name="common_amount">Сумма</string>
     <string name="wallet_send_confirm_transfer">Подтвердить</string>
     <string name="choose_amount_available_balance">Свободный баланс</string>
-    <string name="search_recipient_welcome">Здесь появятся ваши аккаунты и контакты, которым вы отправляли переводы</string>
-    <string name="wallet_search_empty_title">Убедитесь, что адрес
+    <string name="search_recipient_welcome_v2_2_0">Здесь появятся ваши аккаунты и контакты, которым вы отправляли переводы</string>
+    <string name="wallet_search_empty_title_v2_2_0">Убедитесь, что адрес
 из правильной сети</string>
     <string name="search_recipient_hint">Адрес аккаунта или имя аккаунта</string>
     <string name="wallet_balance_available">Доступно</string>
@@ -217,7 +216,7 @@
     <string name="wallet_balance_details_title">Детали баланса</string>
     <string name="wallet_balance_details_total">Общий баланс</string>
     <string name="wallet_balance_details_total_after">Общий после перевода</string>
-    <string name="wallet_send_existential_warning_message">Ваш перевод удалит аккаунт, так как общий баланс станет ниже минимального.</string>
+    <string name="wallet_send_existential_warning_message_v2_2_0">Ваш перевод удалит аккаунт, так как общий баланс станет ниже минимального.</string>
     <string name="common_warning">Предупреждение</string>
     <string name="common_unknown">Неизвестно</string>
     <string name="connection_delete_title">Удалить сеть?</string>
@@ -233,7 +232,7 @@
     <string name="import_json_invalid_password_title">Ошибка дешифрования</string>
     <string name="import_seed_invalid_title">Сид неверный</string>
     <string name="import_seed_invalid_message">Пожалуйста, убедитесь, что введенные данные содержат 64 hex символа.</string>
-    <string name="mnemonic_error_try_another_one">Пожалуйста, попробуйте другую.</string>
+    <string name="mnemonic_error_try_another_one_v2_2_0">Пожалуйста, попробуйте другую.</string>
     <string name="account_export_action">Экспортировать</string>
     <string name="export_json_password_new">Новый пароль</string>
     <string name="export_json_password_confirm">Подтверждение пароля</string>
@@ -258,10 +257,10 @@
     <string name="wallet_send_phishing_warning_title">Предупреждение о мошенничестве</string>
     <string name="staking_start_title">Начать стейкинг</string>
     <string name="network_fee">Комиссия сети</string>
-    <string name="staking_setup_restake">Увеличения стейка</string>
-    <string name="staking_payout">Выплаты</string>
+    <string name="staking_setup_restake_v2_2_0">Увеличения стейка</string>
+    <string name="staking_payout_v2_2_0">Выплаты</string>
     <string name="staking_setup_reward_payout_account">Аккаунт для выплат</string>
-    <string name="common_learn_more">Узнать больше</string>
+    <string name="common_learn_more_v2_2_0">Узнать больше</string>
     <string name="staking_recommended_validators_apy">Вознаграждения (APY)</string>
     <string name="runtime_update_failure_title">Ошибка обновления среды выполнения</string>
     <string name="runtime_update_failure_description">Не удалось обновить информацию о среде выполнения блокчейна. Некоторые функции могут не работать.</string>
@@ -313,7 +312,7 @@
     <string name="staking_nominator_status_alert_no_validators">Ни один из ваших валидаторов не был избран сетью.</string>
     <string name="staking_nominator_status_alert_low_stake">Ваш стейк меньше минимального стейка для получения вознаграждений.</string>
     <string name="staking_manage_title">Управление</string>
-    <string name="staking_reward_payouts_title">Ожидаемые вознаграждения</string>
+    <string name="staking_reward_payouts_title_v2_2_0">Ожидаемые вознаграждения</string>
     <string name="staking_reward_payouts_payout_all">Выплатить все (%s)</string>
     <string name="staking_reward_details_title">Детали награды</string>
     <string name="staking_reward_details_era">Эра</string>
@@ -330,14 +329,14 @@
     <string name="wallet_filters_extrinsics">Прочие транзакции</string>
     <string name="wallet_filters_header">Показывать</string>
     <string name="common_available_format">Доступно: %s</string>
-    <string name="staking_rewards_learn_more">Подробнее о вознаграждениях</string>
+    <string name="staking_rewards_learn_more_v2_2_0">Подробнее о вознаграждениях</string>
     <plurals name="staking_payouts_days_left">
         <item quantity="one">%d день</item>
         <item quantity="few">%d дня</item>
         <item quantity="many">%d дней</item>
         <item quantity="other">%d дней</item>
     </plurals>
-    <string name="staking_reward_payouts_empty_rewards">Прекрасно! Все вознаграждения выплачены.</string>
+    <string name="staking_reward_payouts_empty_rewards_v2_2_0">Прекрасно! Все вознаграждения выплачены.</string>
     <string name="staking_reward_details_validator">Валидатор</string>
     <string name="common_not_enough_funds_title">Недостаточный баланс</string>
     <string name="common_confirmation_title">Уверены ли вы?</string>
@@ -346,7 +345,7 @@
     <string name="staking_unbonding_limit_reached_title">Достигнут лимит запросов на вывод из стейка</string>
     <string name="staking_redeem">Забрать</string>
     <string name="common_balance">Баланс</string>
-    <string name="staking_balance_title">Баланс стейкинга</string>
+    <string name="staking_balance_title_v2_2_0">Баланс стейкинга</string>
     <string name="make_payout_transaction_sent">Транзакция на выплату отправлена</string>
     <string name="staking_zero_bond_error">Сумма должна быть больше нуля</string>
     <string name="common_transaction_submitted">Транзакция отправлена</string>
@@ -373,9 +372,9 @@
     <string name="staking_reward_info_avg">Средний APY</string>
     <string name="staking_alert_title">Предупреждения</string>
     <string name="staking_recommended_feature_5">Лимит 2 валидатора на персонализацию</string>
-    <string name="staking_set_separate_account_controller">Установите отдельный аккаунт как контроллер, чтобы увеличить безопасность управления стейкингом.</string>
-    <string name="staking_stash_can_hint">С помощью стэш аккаунта можно застейкать больше и установить контроллер аккаунт</string>
-    <string name="staking_controller_can_hint">Контроллер аккаунт может вывести из стейка, забрать, вернуть в стейк, сменить назначение вознаграждений и валидаторов.</string>
+    <string name="staking_set_separate_account_controller_v2_2_0">Установите отдельный аккаунт как контроллер, чтобы увеличить безопасность управления стейкингом.</string>
+    <string name="staking_stash_can_hint_v2_2_0">С помощью стэш аккаунта можно застейкать больше и установить контроллер аккаунт</string>
+    <string name="staking_controller_can_hint_v2_2_0">Контроллер аккаунт может вывести из стейка, забрать, вернуть в стейк, сменить назначение вознаграждений и валидаторов.</string>
     <string name="staking_switch_account_to_stash">Для установки контроллер аккаунта смените аккаунт на стэш.</string>
     <string name="staking_alert_bond_more_message">В настоящее время стейкинг неактивен. \n Текущая минимальная ставка %s .</string>
     <string name="staking_alert_change_validators">Смените своих валидаторов.</string>
@@ -385,17 +384,17 @@
     <string name="staking_your_stake">Ваш стейк</string>
     <string name="staking_controller_account_zero_balance">Мы обнаружили, что на этом аккаунте нет свободных токенов. Вы уверены, что хотите сменить контроллер?</string>
     <string name="wallet_send_balance_minimal">Минимальный баланс</string>
-    <string name="staking_your_allocated_description">Ваш стейк распределяется между этими валидаторами.</string>
-    <string name="staking_your_not_allocated_description">Другие, которые активны без вашего стейка.</string>
-    <string name="staking_your_inactive_description">Валидаторы, которые не были избраны в этой эре.</string>
+    <string name="staking_your_allocated_description_v2_2_0">Ваш стейк распределяется между этими валидаторами.</string>
+    <string name="staking_your_not_allocated_description_v2_2_0">Другие, которые активны без вашего стейка.</string>
+    <string name="staking_your_inactive_description_v2_2_0">Валидаторы, которые не были избраны в этой эре.</string>
     <string name="crowdloan_crowdloan">Краудлоуны</string>
-    <string name="crowdloan_main_description">Выберите парачейны для внесения своего вклада %s. Вы получите вознаграждение, если парачейн приобретет слот до конца аукциона.</string>
+    <string name="crowdloan_main_description_v2_2_0">Выберите парачейны для внесения своего вклада %s. Вы получите вознаграждение, если парачейн приобретет слот до конца аукциона.</string>
     <string name="crownloans_raised_format" formatted="false">Собрано: %s из %s</string>
     <string name="crowdloan_active_section_format">Активные (%s)</string>
     <string name="common_completed_with_count">Завершённые (%s)</string>
-    <string name="crowdloan_empty_message">Информация о краудлоунах появится здесь.</string>
+    <string name="crowdloan_empty_message_v2_2_0">Информация о краудлоунах появится здесь.</string>
     <string name="common_left">%s осталось</string>
-    <string name="common_existential_warning_message">Операция удалит учетную запись из хранилища блоков, так как это сделает общий баланс ниже минимального.</string>
+    <string name="common_existential_warning_message_v2_2_0">Операция удалит учетную запись из хранилища блоков, так как это сделает общий баланс ниже минимального.</string>
     <string name="common_existential_warning_title">Операция удалит аккаунт</string>
     <string name="crowdloan_ended_message">Невозможно внести вклад в выбранный краудлоун, поскольку он уже завершён.</string>
     <string name="crowdloan_ended_title">Краудлоун завершён</string>
@@ -404,7 +403,7 @@
     <string name="crowdloan_cap_reached_title">Превышена максимальная сумма краудлоуна</string>
     <string name="crowdloan_too_small_contribution_message">Минимально допустимая сумма вклада составляет %s .</string>
     <string name="crowdloan_too_small_contribution_title">Сумма вклада </string>
-    <string name="crowdloan_learn">О краудлоуне %s</string>
+    <string name="crowdloan_learn_v2_2_0">О краудлоуне %s</string>
     <string name="common_time_left">Оставшееся время</string>
     <string name="crowdloan_contribute_title">Внести вклад в краудлоун</string>
     <string name="crowdloan_unlock_hint">Ваши %s токены будут возвращены обратно после срока лизинга парачейна.</string>
@@ -424,11 +423,11 @@
     <string name="staking_start_change_validators_custom_title">Стейкинг с выбранными валидаторами</string>
     <string name="common_applied">Применено</string>
     <string name="crowdloan_referral_code_invalid">Реферальный код недействителен. Пожалуйста, попробуйте другой.</string>
-    <string name="staking_start_change_validators_custom_subtitle">Вы должны доверять своим валидаторам, чтобы они действовали грамотно и честно. Принятие решения исключительно на основе их текущей прибыльности может привести к снижению прибыли или даже потере средств.</string>
+    <string name="staking_start_change_validators_custom_subtitle_v2_2_0">Вы должны доверять своим валидаторам, чтобы они действовали грамотно и честно. Принятие решения исключительно на основе их текущей прибыльности может привести к снижению прибыли или даже потере средств.</string>
     <string name="staking_select_recommended">Выбрать рекомендованных</string>
     <string name="staking_select_custom">Выбрать самому</string>
     <string name="staking_selected_validators_count_v1.9.1" formatted="false">выбрано %d (макс. %d)</string>
-    <string name="staking_start_change_validators_recommended_subtitle">Алгоритм Nova Wallet составил список рекомендованных валидаторов, основываясь на критериях:</string>
+    <string name="staking_start_change_validators_recommended_subtitle_v2_2_0">Алгоритм Nova Wallet составил список рекомендованных валидаторов, основываясь на критериях:</string>
     <string name="common_not_enough_funds_message">К сожалению, у вас недостаточно средств для оплаты сетевого сбора.</string>
     <string name="choose_amount_error_too_big">К сожалению, у вас недостаточно средств для совершения данной операции</string>
     <string name="staking_custom_validators_list_title">Выберите валидаторов</string>
@@ -465,21 +464,21 @@
     <string name="staking_unbonding_period_v1_9_0">Время вывода</string>
     <string name="wallet_balance_bonded">Застейкано</string>
     <string name="staking_total_rewards_v1.9.0">Заработано</string>
-    <string name="staking_setup_reward_destination_section_title">Использовать вознаграждения для</string>
+    <string name="staking_setup_reward_destination_section_title_v2_2_0">Использовать вознаграждения для</string>
     <string name="staking_bond_more_v1_9_0">Застейкать ещё</string>
     <string name="staking_unbond_v1_9_0">Вывод из стейка</string>
-    <string name="staking_unbonding_empty_list_v1_9_0">Операции по выводу из стейка появятся здесь</string>
+    <string name="staking_unbonding_empty_list_v2_2_0">Операции по выводу из стейка появятся здесь</string>
     <string name="staking_validator_my_oversubscribed_message">Превышен лимит номинаторов для валидатора. В этой эре вы не получите награду от этого валидатора.</string>
     <string name="staking_validator_other_oversubscribed_message">Превышен лимит номинаторов для валидатора. Только номинаторы с наибольшим стейком получат награду.</string>
     <string name="history_v1.9.0">История</string>
     <string name="staking_main_stake_balance_staked">Застейкано</string>
-    <string name="staking_pending_rewards_info">Валидаторы выплачивают вознаграждения каждые 2–5 дней. Однако, вы можете инициировать выплату самостоятельно, особенно, если срок вознаграждения истекает. В этом случае придётся заплатить комиссию.</string>
+    <string name="staking_pending_rewards_info_v2_2_0">Валидаторы выплачивают вознаграждения каждые 2–5 дней. Однако, вы можете инициировать выплату самостоятельно, особенно, если срок вознаграждения истекает. В этом случае придётся заплатить комиссию.</string>
     <string name="staking_custom_validators_update_list">Обновить свой список</string>
-    <string name="staking_hint_rewards_format">Застейканые токены приносят награду каждую эру (%s).</string>
-    <string name="staking_hint_unstake_format">Для вывода токенов из стейкинга потребуется %s.</string>
-    <string name="staking_hint_no_rewards">Во время вывода токены не приносят наград.</string>
-    <string name="staking_hint_redeem">После вывода токенов из стейкинга не забудьте их забрать.</string>
-    <string name="staking_hint_reward_bond_more">Ваши вознаграждения увеличатся со следующей эры.</string>
+    <string name="staking_hint_rewards_format_v2_2_0">Застейканые токены приносят награду каждую эру (%s).</string>
+    <string name="staking_hint_unstake_format_v2_2_0">Для вывода токенов из стейкинга потребуется %s.</string>
+    <string name="staking_hint_no_rewards_v2_2_0">Во время вывода токены не приносят наград.</string>
+    <string name="staking_hint_redeem_v2_2_0">После вывода токенов из стейкинга не забудьте их забрать.</string>
+    <string name="staking_hint_reward_bond_more_v2_2_0">Ваши вознаграждения увеличатся со следующей эры.</string>
     <string name="staking_hint_unbond_kills_stash">Nova wallet изменит назначение вознаграждений
 на ваш аккаунт, чтобы избежать остатка в стейкинге.</string>
     <string name="staking_custom_validators_settings_sort_apy">Примерное вознаграждение (% APY)</string>

@@ -27,7 +27,7 @@ class HttpExceptionHandler(
 
                 BaseException.httpError(errorCode, resourceManager.getString(R.string.common_undefined_error_message))
             }
-            is IOException -> BaseException.networkError(resourceManager.getString(R.string.connection_error_message), exception)
+            is IOException -> BaseException.networkError(resourceManager.getString(R.string.connection_error_message_v2_2_0), exception)
             else -> BaseException.unexpectedError(exception)
         }
     }

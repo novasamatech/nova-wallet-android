@@ -58,7 +58,7 @@ class CrowdloanViewModel(
     override val assetSelectorMixin = assetSelectorFactory.create(scope = this)
 
     val mainDescription = assetSelectorMixin.selectedAssetFlow.map {
-        resourceManager.getString(R.string.crowdloan_main_description, it.token.configuration.symbol)
+        resourceManager.getString(R.string.crowdloan_main_description_v2_2_0, it.token.configuration.symbol)
     }
 
     private val crowdloansMixin = statefulCrowdloanMixinFactory.create(scope = this)

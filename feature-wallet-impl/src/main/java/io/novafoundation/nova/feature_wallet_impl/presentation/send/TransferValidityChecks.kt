@@ -72,7 +72,7 @@ private fun BaseFragment<*>.showTransferWarning(
 ) {
     val (title, message) = when (status) {
         TransferValidityLevel.Warning.Status.WillRemoveAccount -> {
-            R.string.wallet_send_existential_warning_title to R.string.wallet_send_existential_warning_message
+            R.string.wallet_send_existential_warning_title to R.string.wallet_send_existential_warning_message_v2_2_0
         }
     }
 

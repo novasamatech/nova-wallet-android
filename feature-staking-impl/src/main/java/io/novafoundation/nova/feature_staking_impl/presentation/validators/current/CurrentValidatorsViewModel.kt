@@ -115,7 +115,7 @@ class CurrentValidatorsViewModel(
                 ),
                 R.color.green
             ),
-            resourceManager.getString(R.string.staking_your_allocated_description)
+            resourceManager.getString(R.string.staking_your_allocated_description_v2_2_0)
         )
 
         is NominatedValidator.Status.Group.Inactive -> NominatedValidatorStatusModel(
@@ -123,12 +123,12 @@ class CurrentValidatorsViewModel(
                 resourceManager.getString(R.string.staking_your_not_elected_format, statusGroup.numberOfValidators),
                 R.color.black1
             ),
-            resourceManager.getString(R.string.staking_your_inactive_description)
+            resourceManager.getString(R.string.staking_your_inactive_description_v2_2_0)
         )
 
         is NominatedValidator.Status.Group.Elected -> NominatedValidatorStatusModel(
             null,
-            resourceManager.getString(R.string.staking_your_not_allocated_description)
+            resourceManager.getString(R.string.staking_your_not_allocated_description_v2_2_0)
         )
 
         is NominatedValidator.Status.Group.WaitingForNextEra -> NominatedValidatorStatusModel(

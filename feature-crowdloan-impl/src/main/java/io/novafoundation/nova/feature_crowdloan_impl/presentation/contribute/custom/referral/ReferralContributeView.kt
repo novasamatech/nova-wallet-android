@@ -78,7 +78,7 @@ class ReferralContributeView @JvmOverloads constructor(
 
         referralNovaBonusApply.setOnClickListener { viewState.applyNovaCode() }
 
-        referralPrivacyText.text = createSpannable(context.getString(R.string.onboarding_terms_and_conditions_1)) {
+        referralPrivacyText.text = createSpannable(context.getString(R.string.onboarding_terms_and_conditions_1_v2_2_0)) {
             clickable(context.getString(R.string.onboarding_terms_and_conditions_2)) {
                 viewState.termsClicked()
             }

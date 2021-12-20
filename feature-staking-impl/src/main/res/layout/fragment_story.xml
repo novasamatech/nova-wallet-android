@@ -57,7 +57,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            android:text="@string/common_learn_more" />
+            android:text="@string/common_learn_more_v2_2_0" />
 
     </LinearLayout>
 

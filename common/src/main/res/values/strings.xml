@@ -1,6 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+    <string name="staking_setup_reward_destination_section_title_v2_2_0">Select your rewards type</string>
+    <string name="staking_balance_title_v2_2_0">Balance</string>
+    <string name="staking_payout_v2_2_0">Transferable rewards</string>
+    <string name="staking_setup_restake_v2_2_0">Restake rewards</string>
+    <string name="staking_reward_payouts_title_v2_2_0">Unpaid rewards</string>
+    <string name="common_learn_more_v2_2_0">Find out more about</string>
+    <string name="crowdloan_learn_v2_2_0">%s\'s crowdloan website</string>
+    <string name="staking_stash_can_hint_v2_2_0">Stash is used to: stake more and set the controller</string>
+    <string name="staking_controller_can_hint_v2_2_0">Controller is used to: unstake, redeem, return to stake, change validators and set rewards destination</string>
+    <string name="staking_set_separate_account_controller_v2_2_0">Select another account as a controller to improve staking security by delegating staking management operations to it</string>
+    <string name="staking_hint_unstake_format_v2_2_0">To unstake tokens you will have to wait for the unstaking period (%s)</string>
+    <string name="staking_hint_rewards_format_v2_2_0">Tokens in stake produce rewards each era (%s)</string>
+    <string name="staking_start_change_validators_custom_subtitle_v2_2_0">Choose your validators carefully, as they should act proficiently and honest. Basing your decision purely on the profitability could lead to reduced rewards or even loss of stake</string>
+    <string name="staking_start_change_validators_recommended_subtitle_v2_2_0">Nova Wallet created a list of recommended validators based on blockchain data and with the following criteria:</string>
+    <string name="staking_your_inactive_description_v2_2_0">Validators without enough stake to be elected</string>
+    <string name="staking_your_not_allocated_description_v2_2_0">Active validators without your stake assignment</string>
+    <string name="staking_your_allocated_description_v2_2_0">Your stake is assigned to next validators</string>
+    <string name="staking_reward_payouts_empty_rewards_v2_2_0">Awesome! You have no unpaid rewards</string>
+    <string name="staking_pending_rewards_info_v2_2_0">Rewards are paid every 2–3 days by validators. You can payout them by yourself, when they are close to expire, but you will pay the fee</string>
+    <string name="staking_hint_redeem_v2_2_0">After unstaking period don\'t forget to redeem your tokens</string>
+    <string name="staking_hint_no_rewards_v2_2_0">During unstaking period tokens produce no rewards</string>
+    <string name="staking_hint_reward_bond_more_v2_2_0">You will get increased rewards starting from next era</string>
+    <string name="staking_unbonding_empty_list_v2_2_0">Unstaking transactions will be displayed here</string>
+    <string name="staking_rewards_learn_more_v2_2_0">More about rewards</string>
+
+    <string name="wallet_receive_description_v2_2_0">Let sender scan this QR code</string>
+
+    <string name="onboarding_terms_and_conditions_1_v2_2_0">By continuing, you agree to our \nTerms and Conditions and Privacy Policy</string>
+    <string name="account_invalid_derivation_path_message_v2_2_0">Your derivation path contains unsupported symbols or has incorrect structure</string>
+    <string name="connection_error_message_v2_2_0">Please, check your connection or try again later</string>
+    <string name="username_setup_choose_title_v2_2_0">Wallet name</string>
+    <string name="account_create_name_title_v2_2_0">Create wallet name</string>
+    <string name="wallet_send_existential_warning_message_v2_2_0">Your account will be removed from blockchain after transfer cause it makes total balance lower than minimal</string>
+    <string name="common_existential_warning_message_v2_2_0">Your account will be removed from blockchain after this operation cause it makes total balance lower than minimal</string>
+    <string name="crowdloan_empty_message_v2_2_0">Crowdloans will be displayed here</string>
+    <string name="crowdloan_main_description_v2_2_0">Choose parachains to contribute your %s. You\'ll get back your contributed tokens, and if parachain wins a slot, you\'ll receive rewards after the end of the auction</string>
+    <string name="search_recipient_welcome_v2_2_0">Search results will be displayed here</string>
+    <string name="account_create_details_v2_2_0">Do not use clipboard or screenshots on your mobile device, try to find secure methods for backup (e.g. paper)</string>
+    <string name="wallet_nickname_create_caption_v2_2_0">Name examples: Main account, My validator, Dotsama crowdloans, etc.</string>
+    <string name="mnemonic_error_try_another_one_v2_2_0">Invalid mnemonic passphrase, please check one more time the words order</string>
+    <string name="account_create_name_subtitle_v2_2_0">Name will be used only locally in this application. You can edit it later</string>
+    <string name="transfers_empty_v2_2_0">Your operations will be displayed here</string>
+    <string name="wallet_search_empty_title_v2_2_0">Address format is invalid.\nMake sure that address\nbelongs to the right network</string>
+
     <string name="staking_estimate_earning_title_v2_2_0">Estimated %s earnings</string>
+
     <string name="settings_email">Email</string>
     <string name="settings_youtube" translatable="false">Youtube</string>
     <string name="settings_support">Support &amp; Feedback</string>
@@ -45,7 +90,6 @@
     <string name="pincode_enter_pin_code_v2_2_0">Enter PIN code</string>
 
     <string name="wallet_receive_share_qr">Share QR code</string>
-    <string name="wallet_receive_description_v_2_2_0">Let sender scan this QR code</string>
     <string name="wallet_asset_receive_token">Receive %s</string>
 
     <string name="account_mnmonic_length_variants">12, 15, 18, 21 or 24-word phrase</string>
@@ -76,18 +120,12 @@
     <string name="account_derivation_path_substrate_invalid_title">Invalid Substrate derivation path</string>
     <string name="account_derivation_path_ethereum_invalid_title">Invalid Ethereum derivation path</string>
 
-    <string name="account_invalid_derivation_path_message_v2_2_0">Your derivation path contains unsupported symbols or has incorrect structure</string>
-
     <string name="account_substrate_crypto_type">Substrate keypair crypto type</string>
     <string name="account_substrate_derivation_path">Substrate secret derivation path</string>
     <string name="account_ethereum_crypto_type">Ethereum keypair crypto type</string>
     <string name="account_ethereum_derivation_path">Ethereum secret derivation path</string>
 
-    <string name="account_create_name_title">Create wallet nickname</string>
-    <string name="account_create_name_subtitle">This nickname will be displayed only for you and stored locally on your mobile device. </string>
-
     <string name="account_wallet_nickname">Wallet nickname</string>
-    <string name="account_create_name_examples">Example: Savings, Investments, Crowdloans, Staking.</string>
 
     <string name="about_version_template" translatable="false">Nova Wallet v%s</string>
     <string name="about_website_v2_2_0">Website</string>
@@ -146,7 +184,6 @@
     <string name="transaction_details_view_explorer">View in %s</string>
 
     <string name="account_invalid_derivation_path_title">Invalid derivation path</string>
-    <string name="account_invalid_derivation_path_message">Derivation path contains unsupported symbols or has incorrect structure</string>
 
     <string name="import_json_unsupported_crypto_title">Unsupported encryption type</string>
     <string name="import_json_unsupported_ethereum_crypto_message">Cannot import account with Substrate secret into the network with Ethereum encryption</string>
@@ -155,7 +192,6 @@
     <string name="import_json_chains_dont_match">Supplied JSON file was created for different network.</string>
 
     <string name="profile_accounts_title_2_0">Wallets</string>
-    <string name="username_setup_choose_title_2_0">Wallet nickname</string>
     <string name="account_info_title_2_0">Wallet</string>
 
     <string name="account_shared_secret">Accounts with a shared secret</string>
@@ -182,17 +218,12 @@
     <string name="common_use">Use</string>
     <string name="common_error_general_title">Error</string>
     <string name="common_copy_address">Copy address</string>
-    <string name="connection_error_message">Please, check internet connection and try again later.</string>
-    <string name="onboarding_terms_and_conditions_1">I have read and agreed to
-Terms and Conditions and Privacy Policy</string>
     <string name="onboarding_terms_and_conditions_2">Terms and Conditions</string>
     <string name="onboarding_privacy_policy">Privacy Policy</string>
     <string name="pincode_confirm_your_pin_code">Confirm your pin code</string>
     <string name="pincode_title_create">Set your pin code</string>
     <string name="tabbar_wallet_title">Wallet</string>
     <string name="tabbar_staking_title">Staking</string>
-    <string name="transfers_empty">Incoming and outgoing
-transfers will appear here</string>
     <string name="profile_settings_title">Settings</string>
     <string name="profile_language_title">Language</string>
     <string name="about_version">App version</string>
@@ -202,11 +233,9 @@ transfers will appear here</string>
     <string name="about_terms">Terms and conditions</string>
     <string name="language_title">Language</string>
     <string name="connection_management_title">Networks</string>
-    <string name="username_setup_choose_title">Name</string>
     <string name="username_setup_hint">This name will be displayed only for you and stored locally on your mobile device.</string>
     <string name="common_ok">OK</string>
     <string name="account_create_title">Backup mnemonic</string>
-    <string name="account_create_details">Use non digital way to backup, such as writing it down on paper.</string>
     <string name="common_advanced">Advanced</string>
     <string name="common_crypto_type">Keypair crypto type</string>
     <string name="common_secret_derivation_path">Secret derivation path</string>
@@ -279,9 +308,6 @@ transfers will appear here</string>
     <string name="common_amount">Amount</string>
     <string name="wallet_send_confirm_transfer">Confirm transfer</string>
     <string name="choose_amount_available_balance">Available balance</string>
-    <string name="search_recipient_welcome">Your accounts and contacts to who you were sending transfers will appear here</string>
-    <string name="wallet_search_empty_title">Make sure that the address is
-from the right network</string>
     <string name="search_recipient_hint">Account address or account name</string>
     <string name="wallet_balance_available">Available</string>
     <string name="wallet_send_total_title">Total</string>
@@ -309,7 +335,6 @@ from the right network</string>
     <string name="wallet_balance_details_title">Balance details</string>
     <string name="wallet_balance_details_total">Total balance</string>
     <string name="wallet_balance_details_total_after">Total after transfer</string>
-    <string name="wallet_send_existential_warning_message">Your transfer will remove account from blockstore since it will make total balance lower than minimal balance.</string>
     <string name="common_warning">Warning</string>
     <string name="common_unknown">Unknown</string>
     <string name="connection_delete_title">Delete network?</string>
@@ -325,7 +350,6 @@ from the right network</string>
     <string name="import_json_invalid_password_title">Keystore decryption failed</string>
     <string name="import_seed_invalid_title">Seed is invalid</string>
     <string name="import_seed_invalid_message">Please, make sure that your input contains 64 hex symbols.</string>
-    <string name="mnemonic_error_try_another_one">Please, try another one.</string>
     <string name="account_export_action">Export</string>
     <string name="export_json_password_new">Set password</string>
     <string name="export_json_password_confirm">Confirm password</string>
@@ -350,10 +374,7 @@ Mnemonic: %s</string>
     <string name="wallet_send_phishing_warning_title">Scam alert</string>
     <string name="staking_start_title">Start staking</string>
     <string name="network_fee">Network fee</string>
-    <string name="staking_setup_restake">Restake</string>
-    <string name="staking_payout">Payout</string>
     <string name="staking_setup_reward_payout_account">Payout account</string>
-    <string name="common_learn_more">Learn more</string>
     <string name="staking_recommended_validators_apy">Estimated reward (APY)</string>
     <string name="runtime_update_failure_title">Runtime update failure</string>
     <string name="runtime_update_failure_description">Failed to update information about blockchain runtime. Some functionality may not work.</string>
@@ -403,7 +424,6 @@ Mnemonic: %s</string>
     <string name="staking_nominator_status_alert_no_validators">None of your validators have been elected by network.</string>
     <string name="staking_nominator_status_alert_low_stake">Your staked amount is less than the minimum stake to get a reward.</string>
     <string name="staking_manage_title">Manage</string>
-    <string name="staking_reward_payouts_title">Pending rewards</string>
     <string name="staking_reward_payouts_payout_all">Payout all (%s)</string>
     <string name="staking_reward_details_title">Reward details</string>
     <string name="staking_reward_details_era">Era</string>
@@ -420,12 +440,10 @@ Mnemonic: %s</string>
     <string name="wallet_filters_extrinsics">Other transactions</string>
     <string name="wallet_filters_header">Show</string>
     <string name="common_available_format">Available: %s</string>
-    <string name="staking_rewards_learn_more">Learn more about rewards</string>
     <plurals name="staking_payouts_days_left">
         <item quantity="one">%d day left</item>
         <item quantity="other">%d days left</item>
     </plurals>
-    <string name="staking_reward_payouts_empty_rewards">Perfect! All rewards are paid.</string>
     <string name="staking_reward_details_validator">Validator</string>
     <string name="common_not_enough_funds_title">Insufficient balance</string>
     <string name="common_confirmation_title">Are you sure?</string>
@@ -434,7 +452,6 @@ Mnemonic: %s</string>
     <string name="staking_unbonding_limit_reached_title">Unstaking requests limit reached</string>
     <string name="staking_redeem">Redeem</string>
     <string name="common_balance">Balance</string>
-    <string name="staking_balance_title">Staking balance</string>
     <string name="make_payout_transaction_sent">Payout transaction sent</string>
     <string name="staking_zero_bond_error">Amount must be positive</string>
     <string name="common_transaction_submitted">Transaction submitted</string>
@@ -461,9 +478,6 @@ Mnemonic: %s</string>
     <string name="staking_reward_info_avg">Average APY</string>
     <string name="staking_alert_title">Alerts</string>
     <string name="staking_recommended_feature_5">Limit of 2 validators per identity</string>
-    <string name="staking_set_separate_account_controller">Set a separate account as a controller to increase staking management security.</string>
-    <string name="staking_stash_can_hint">Stash can bond more and set the controller.</string>
-    <string name="staking_controller_can_hint">Controller can unstake, redeem, return to stake, change rewards destination and validators.</string>
     <string name="staking_switch_account_to_stash">Switch your account to stash to set the controller.</string>
     <string name="staking_alert_bond_more_message">Staking is currently inactive.\nCurrent minimal stake is %s.</string>
     <string name="staking_alert_change_validators">Change your validators.</string>
@@ -473,17 +487,11 @@ Mnemonic: %s</string>
     <string name="staking_your_stake">Your stake</string>
     <string name="staking_controller_account_zero_balance">We found that this account has no free tokens, are you sure that you want to change the controller?</string>
     <string name="wallet_send_balance_minimal">Minimal balance</string>
-    <string name="staking_your_allocated_description">Your stake is allocated to the following validators.</string>
-    <string name="staking_your_not_allocated_description">Others, who are active without your stake allocation.</string>
-    <string name="staking_your_inactive_description">Validators who were not elected in this era.</string>
     <string name="crowdloan_crowdloan">Crowdloans</string>
-    <string name="crowdloan_main_description">Select parachains to contribute your %s. You will receive rewards if the parachain acquires a slot by the end of the auction.</string>
     <string name="crownloans_raised_format" formatted="false">Raised: %s of %s</string>
     <string name="crowdloan_active_section_format">Active (%s)</string>
     <string name="common_completed_with_count">Completed (%s)</string>
-    <string name="crowdloan_empty_message">Information about crowdloans\n will appear here</string>
     <string name="common_left">%s left</string>
-    <string name="common_existential_warning_message">Operation will remove account from blockstore since it will make total balance lower than minimal balance.</string>
     <string name="common_existential_warning_title">Operation will remove account</string>
     <string name="crowdloan_ended_message">Cannot contribute to selected crowdloan since it is already ended.</string>
     <string name="crowdloan_ended_title">Crowdloan is ended</string>
@@ -492,7 +500,6 @@ Mnemonic: %s</string>
     <string name="crowdloan_cap_reached_title">Crowdloan cap exceeded</string>
     <string name="crowdloan_too_small_contribution_message">The minimum allowed amount to contribute is %s.</string>
     <string name="crowdloan_too_small_contribution_title">Contribution amount is too small</string>
-    <string name="crowdloan_learn">Learn %s\'s crowdloan</string>
     <string name="common_time_left">Time left</string>
     <string name="crowdloan_contribute_title">Contribute to crowdloan</string>
     <string name="crowdloan_unlock_hint">Your %s tokens will be returned after the leasing period.</string>
@@ -512,11 +519,9 @@ Mnemonic: %s</string>
     <string name="staking_start_change_validators_custom_title">Stake with your validators</string>
     <string name="common_applied">Applied</string>
     <string name="crowdloan_referral_code_invalid">Referral code is invalid. Please, try another one</string>
-    <string name="staking_start_change_validators_custom_subtitle">You should trust your nominations to act competently and honest, basing your decision purely on their current profitability could lead to reduced profits or even loss of funds.</string>
     <string name="staking_select_recommended">Select recommended</string>
     <string name="staking_select_custom">Select by yourself</string>
     <string name="staking_selected_validators_count_v1.9.1" formatted="false">selected %d (max %d)</string>
-    <string name="staking_start_change_validators_recommended_subtitle">Nova algorithm selected a list of recommended validators based on the criteria:</string>
     <string name="common_not_enough_funds_message">Sorry, you don\'t have enough funds to pay the network fee.</string>
     <string name="choose_amount_error_too_big">Sorry, you don\'t have enough funds to spend specified amount</string>
     <string name="staking_custom_validators_list_title">Select validators</string>
@@ -553,21 +558,13 @@ Mnemonic: %s</string>
     <string name="staking_unbonding_period_v1_9_0">Unstaking period</string>
     <string name="wallet_balance_bonded">Staked</string>
     <string name="staking_total_rewards_v1.9.0">Rewarded</string>
-    <string name="staking_setup_reward_destination_section_title">How to use your rewards?</string>
     <string name="staking_bond_more_v1_9_0">Stake more</string>
     <string name="staking_unbond_v1_9_0">Unstake</string>
-    <string name="staking_unbonding_empty_list_v1_9_0">Unstaking transactions will appear here</string>
     <string name="staking_validator_my_oversubscribed_message">Oversubscribed. You will not receive rewards from the validator in this era.</string>
     <string name="staking_validator_other_oversubscribed_message">Oversubscribed. Only the top staked nominators are paid rewards.</string>
     <string name="history_v1.9.0">History</string>
     <string name="staking_main_stake_balance_staked">Staked</string>
-    <string name="staking_pending_rewards_info">Validators payout the rewards every 2–5 days. However, you can payout them by yourself, especially if rewards are close to expiring, but you will pay the fee.</string>
     <string name="staking_custom_validators_update_list">Update your list</string>
-    <string name="staking_hint_rewards_format">Staked tokens generate rewards each era (%s).</string>
-    <string name="staking_hint_unstake_format">If you want to unstake tokens, you will have to wait for the unstaking period (%s).</string>
-    <string name="staking_hint_no_rewards">Tokens in unstaking period generate no rewards.</string>
-    <string name="staking_hint_redeem">After unstaking period you will need to redeem your tokens.</string>
-    <string name="staking_hint_reward_bond_more">Your rewards will be increased starting from the next era.</string>
     <string name="staking_hint_unbond_kills_stash">Nova wallet will change rewards destination
 to your account to avoid remaining stake.</string>
     <string name="staking_custom_validators_settings_sort_apy">Estimated rewards (% APY)</string>

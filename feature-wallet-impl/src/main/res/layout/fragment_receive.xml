@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="48dp"
-            android:text="@string/wallet_receive_description_v_2_2_0"
+            android:text="@string/wallet_receive_description_v2_2_0"
             android:textColor="@color/white" />
 
         <ImageView

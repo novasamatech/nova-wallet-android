@@ -15,14 +15,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:titleText="@string/staking_reward_payouts_title" />
+        app:titleText="@string/staking_reward_payouts_title_v2_2_0" />
 
     <TextView
         style="@style/TextAppearance.NovaFoundation.Body2"
         android:id="@+id/payoutInstructionTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/staking_pending_rewards_info"
+        android:text="@string/staking_pending_rewards_info_v2_2_0"
         android:textColor="@color/black1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -98,7 +98,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="@string/staking_reward_payouts_empty_rewards"
+        android:text="@string/staking_reward_payouts_empty_rewards_v2_2_0"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"

@@ -24,7 +24,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
-        android:hint="@string/username_setup_choose_title" />
+        android:hint="@string/username_setup_choose_title_v2_2_0" />
 
     <io.novafoundation.nova.common.view.InputField
         android:id="@+id/nodeHostField"
