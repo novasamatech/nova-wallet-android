@@ -93,11 +93,11 @@ class CrowdloanViewModel(
     private fun mapCrowdloanStatusToUi(statusClass: KClass<out Crowdloan.State>, statusCount: Int): CrowdloanStatusModel {
         return when (statusClass) {
             Crowdloan.State.Finished::class -> CrowdloanStatusModel(
-                status = resourceManager.getString(R.string.common_completed_with_count_v2_0),
+                status = resourceManager.getString(R.string.crowdloan_completed_section),
                 count = statusCount.toString()
             )
             Crowdloan.State.Active::class -> CrowdloanStatusModel(
-                status = resourceManager.getString(R.string.crowdloan_active_section_format_v2_0),
+                status = resourceManager.getString(R.string.crowdloan_active_section),
                 count = statusCount.toString()
             )
             else -> throw IllegalArgumentException("Unsupported crowdloan status type: ${statusClass.simpleName}")

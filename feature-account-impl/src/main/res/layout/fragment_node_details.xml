@@ -23,7 +23,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
-        android:hint="@string/username_setup_choose_title_v2_2_0" />
+        android:hint="@string/account_wallet_nickname" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
