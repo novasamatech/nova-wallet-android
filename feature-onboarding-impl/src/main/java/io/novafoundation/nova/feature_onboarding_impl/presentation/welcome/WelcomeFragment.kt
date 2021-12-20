@@ -49,7 +49,7 @@ class WelcomeFragment : BaseFragment<WelcomeViewModel>() {
 
     override fun initViews() {
         configureTermsAndPrivacy(
-            getString(R.string.onboarding_terms_and_conditions_1),
+            getString(R.string.onboarding_terms_and_conditions_1_v2_2_0),
             getString(R.string.onboarding_terms_and_conditions_2),
             getString(R.string.onboarding_privacy_policy)
         )

@@ -58,7 +58,7 @@ class CrowdloanViewModel(
     override val assetSelectorMixin = assetSelectorFactory.create(scope = this)
 
     val mainDescription = assetSelectorMixin.selectedAssetFlow.map {
-        resourceManager.getString(R.string.crowdloan_main_description, it.token.configuration.symbol)
+        resourceManager.getString(R.string.crowdloan_main_description_v2_2_0, it.token.configuration.symbol)
     }
 
     private val crowdloansMixin = statefulCrowdloanMixinFactory.create(scope = this)
@@ -93,11 +93,11 @@ class CrowdloanViewModel(
     private fun mapCrowdloanStatusToUi(statusClass: KClass<out Crowdloan.State>, statusCount: Int): CrowdloanStatusModel {
         return when (statusClass) {
             Crowdloan.State.Finished::class -> CrowdloanStatusModel(
-                status = resourceManager.getString(R.string.common_completed_with_count_v2_0),
+                status = resourceManager.getString(R.string.crowdloan_completed_section),
                 count = statusCount.toString()
             )
             Crowdloan.State.Active::class -> CrowdloanStatusModel(
-                status = resourceManager.getString(R.string.crowdloan_active_section_format_v2_0),
+                status = resourceManager.getString(R.string.crowdloan_active_section),
                 count = statusCount.toString()
             )
             else -> throw IllegalArgumentException("Unsupported crowdloan status type: ${statusClass.simpleName}")

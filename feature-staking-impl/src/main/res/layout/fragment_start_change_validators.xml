@@ -30,7 +30,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
-        android:text="@string/staking_start_change_validators_recommended_subtitle"
+        android:text="@string/staking_start_change_validators_recommended_subtitle_v2_2_0"
         android:textColor="@color/black1" />
 
     <TextView
@@ -71,7 +71,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
-        android:text="@string/staking_start_change_validators_custom_subtitle"
+        android:text="@string/staking_start_change_validators_custom_subtitle_v2_2_0"
         android:textColor="@color/black1" />
 
     <io.novafoundation.nova.common.view.GoNextView

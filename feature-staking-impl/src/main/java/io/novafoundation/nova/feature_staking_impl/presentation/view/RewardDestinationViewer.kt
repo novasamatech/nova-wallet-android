@@ -28,10 +28,10 @@ class RewardDestinationViewer @JvmOverloads constructor(
 
         when (rewardDestinationModel) {
             is RewardDestinationModel.Restake -> {
-                viewRewardDestinationDestination.showValue(context.getString(R.string.staking_setup_restake))
+                viewRewardDestinationDestination.showValue(context.getString(R.string.staking_setup_restake_v2_2_0))
             }
             is RewardDestinationModel.Payout -> {
-                viewRewardDestinationDestination.showValue(context.getString(R.string.staking_payout))
+                viewRewardDestinationDestination.showValue(context.getString(R.string.staking_payout_v2_2_0))
                 viewRewardDestinationPayoutAccount.setMessage(rewardDestinationModel.destination.nameOrAddress)
                 viewRewardDestinationPayoutAccount.setTextIcon(rewardDestinationModel.destination.image)
             }

@@ -99,7 +99,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="25dp"
-                android:text="@string/staking_setup_reward_destination_section_title"
+                android:text="@string/staking_setup_reward_destination_section_title_v2_2_0"
                 android:textColor="@color/white" />
 
             <io.novafoundation.nova.feature_staking_impl.presentation.view.RewardDestinationChooserView

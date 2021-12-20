@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        app:targetName="@string/staking_setup_restake"
+        app:targetName="@string/staking_setup_restake_v2_2_0"
         android:layout_marginTop="12dp"
         android:layout_marginEnd="16dp"
         android:id="@+id/rewardDestinationChooserRestake"
@@ -22,7 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        app:targetName="@string/staking_payout"
+        app:targetName="@string/staking_payout_v2_2_0"
         android:id="@+id/rewardDestinationChooserPayout"
         android:layout_marginTop="12dp"
         android:layout_marginEnd="16dp" />
@@ -51,7 +51,7 @@
         android:paddingTop="12dp"
         android:layout_marginEnd="16dp"
         android:paddingBottom="12dp"
-        android:text="@string/staking_rewards_learn_more"
+        android:text="@string/staking_rewards_learn_more_v2_2_0"
         app:drawableStartCompat="@drawable/ic_nova"
         app:drawableEndCompat="@drawable/ic_chevron_right" />
 

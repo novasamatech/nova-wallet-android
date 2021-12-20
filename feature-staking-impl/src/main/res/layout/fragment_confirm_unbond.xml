@@ -43,7 +43,7 @@
         android:drawablePadding="8dp"
         android:gravity="left|center"
         android:includeFontPadding="false"
-        android:text="@string/staking_hint_no_rewards"
+        android:text="@string/staking_hint_no_rewards_v2_2_0"
         android:textColor="@color/white"
         app:drawableLeftCompat="@drawable/ic_no_reward_24" />
 
@@ -70,7 +70,7 @@
         android:drawablePadding="8dp"
         android:gravity="left|center"
         android:includeFontPadding="false"
-        android:text="@string/staking_hint_redeem"
+        android:text="@string/staking_hint_redeem_v2_2_0"
         android:textColor="@color/white"
         app:drawableLeftCompat="@drawable/ic_arrows_circle_arrow_right_24" />
 

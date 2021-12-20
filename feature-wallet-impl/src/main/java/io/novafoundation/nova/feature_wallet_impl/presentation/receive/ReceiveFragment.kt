@@ -89,6 +89,6 @@ class ReceiveFragment : BaseFragment<ReceiveViewModel>() {
             putExtra(Intent.EXTRA_TEXT, qrSharingPayload.shareMessage)
         }
 
-        startActivity(Intent.createChooser(intent, getString(R.string.wallet_receive_description_v_2_2_0)))
+        startActivity(Intent.createChooser(intent, getString(R.string.wallet_receive_description_v2_2_0)))
     }
 }

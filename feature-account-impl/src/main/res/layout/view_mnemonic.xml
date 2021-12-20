@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:includeFontPadding="false"
-        android:text="@string/account_create_details"
+        android:text="@string/account_create_details_v2_2_0"
         android:textColor="@color/colorHint"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/mnemonicViewerAlertIcon"

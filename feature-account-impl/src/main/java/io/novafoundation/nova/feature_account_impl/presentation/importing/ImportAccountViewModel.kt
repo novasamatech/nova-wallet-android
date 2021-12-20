@@ -109,7 +109,7 @@ class ImportAccountViewModel(
                 )
                 is JunctionDecoder.DecodingError, is BIP32JunctionDecoder.DecodingError -> ImportError(
                     titleRes = R.string.account_invalid_derivation_path_title,
-                    messageRes = R.string.account_invalid_derivation_path_message
+                    messageRes = R.string.account_invalid_derivation_path_message_v2_2_0
                 )
                 else -> ImportError()
             }

@@ -199,7 +199,7 @@ class MnemonicImportSource(
         return when (throwable) {
             is Bip39Exception -> ImportError(
                 titleRes = R.string.import_mnemonic_invalid_title,
-                messageRes = R.string.mnemonic_error_try_another_one
+                messageRes = R.string.mnemonic_error_try_another_one_v2_2_0
             )
             else -> null
         }

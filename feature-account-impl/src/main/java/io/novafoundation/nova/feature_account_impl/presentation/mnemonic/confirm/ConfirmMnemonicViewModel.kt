@@ -23,7 +23,6 @@ import jp.co.soramitsu.fearless_utils.encrypt.junction.JunctionDecoder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -153,7 +152,7 @@ class ConfirmMnemonicViewModel(
         val (title, message) = when (throwable) {
             is JunctionDecoder.DecodingError, is BIP32JunctionDecoder.DecodingError -> {
                 resourceManager.getString(R.string.account_invalid_derivation_path_title) to
-                    resourceManager.getString(R.string.account_invalid_derivation_path_message)
+                    resourceManager.getString(R.string.account_invalid_derivation_path_message_v2_2_0)
             }
             else -> {
                 resourceManager.getString(R.string.common_error_general_title) to
