@@ -415,7 +415,7 @@
   <string name="staking_reward_payouts_title">Pending rewards</string>
   <string name="staking_reward_payouts_title_v2_2_0">Unpaid rewards</string>
   <string name="staking_rewards_apy">Rewards (APY)</string>
-  <string name="staking_rewards_destination_title">Rewards destination</string>
+  <string name="staking_rewards_destination_title_v2_0_0">Rewards destination</string>
   <string name="staking_rewards_learn_more">Learn more about rewards</string>
   <string name="staking_rewards_learn_more_v2_2_0">More about rewards</string>
   <string name="staking_select_custom">Select by yourself</string>

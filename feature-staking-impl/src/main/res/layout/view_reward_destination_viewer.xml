@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         tools:dividerVisible="false"
-        app:title="@string/staking_rewards_destination_title" />
+        app:title="@string/staking_rewards_destination_title_v2_0_0" />
 
     <io.novafoundation.nova.common.view.LabeledTextView
         android:id="@+id/viewRewardDestinationPayoutAccount"

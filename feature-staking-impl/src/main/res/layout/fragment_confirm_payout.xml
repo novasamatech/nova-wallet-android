@@ -32,7 +32,7 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         app:actionIcon="@drawable/ic_more"
-        app:label="@string/staking_rewards_destination_title" />
+        app:label="@string/staking_rewards_destination_title_v2_0_0" />
 
     <LinearLayout
         android:layout_width="match_parent"
