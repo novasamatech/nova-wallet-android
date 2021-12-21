@@ -3,8 +3,8 @@ package io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs
 import android.graphics.Bitmap
 import android.util.Base64
 import android.util.Log
-import android.view.KeyEvent
 import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.google.gson.Gson
@@ -21,6 +21,9 @@ import kotlinx.coroutines.CoroutineScope
 
 // should be in tact with javascript_interface_bridge.js
 private const val JAVASCRIPT_INTERFACE_NAME = "Nova"
+
+private const val PROVIDER_SCRIPT_NAME = "nova-wallet-provider"
+private const val LISTENER_SCRIPT_NAME = "nova-wallet-listener"
 
 class PolkadotJsExtensionFactory(
     private val resourceManager: ResourceManager,
@@ -75,49 +78,37 @@ class PolkadotJsExtension(
 
         into.addJavascriptInterface(webViewWeb3JavaScriptInterface, JAVASCRIPT_INTERFACE_NAME)
 
-        val mainScript = resourceManager.loadRawString(R.raw.nova_min)
-        val javascriptInterfaceBridge = resourceManager.loadRawString(R.raw.javascript_interface_bridge)
+        val providerScript = resourceManager.loadRawString(R.raw.nova_min)
+        val listenerScript = resourceManager.loadRawString(R.raw.javascript_interface_bridge)
 
         into.webViewClient = object : WebViewClient() {
-            var redirect: Boolean = false
-
-            override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-                redirect = false
-            }
-
-            override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-                redirect = true
-
-                return false
-            }
-
-            override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
-                redirect = true
-
-                return super.shouldOverrideUrlLoading(view, url)
-            }
-
             override fun onPageFinished(view: WebView?, url: String?) {
-                if (!redirect) {
-                    into.injectJavaScript(mainScript, atStart = true)
-                    into.injectJavaScript(javascriptInterfaceBridge, atStart = false)
-                }
+                    into.injectJavaScriptOnce(providerScript, PROVIDER_SCRIPT_NAME, appendToStart = true)
+                    into.injectJavaScriptOnce(listenerScript, LISTENER_SCRIPT_NAME, appendToStart = false)
             }
         }
     }
 }
 
-private fun WebView.injectJavaScript(js: String, atStart: Boolean) {
+private fun WebView.injectJavaScriptOnce(
+    js: String,
+    scriptId: String,
+    appendToStart: Boolean
+) {
     val encoded: String = Base64.encodeToString(js.encodeToByteArray(), Base64.NO_WRAP)
-    val method = if (atStart) "prepend" else "appendChild"
+    val method = if (appendToStart) "prepend" else "appendChild"
 
     evaluateJavascript(
         """
-                var parent = document.getElementsByTagName('body').item(0);
-                var script = document.createElement('script');
-                script.type = 'text/javascript';
-                script.innerHTML = window.atob('$encoded');
-                parent.$method(script)
+        var parent = document.getElementsByTagName('body').item(0);
+        var prevScripts = parent.getElementsByClassName("$scriptId")
+        if (prevScripts.length== 0) {
+            var script = document.createElement('script');                 
+            script.type = 'text/javascript';
+            script.innerHTML = window.atob('$encoded');
+            script.className = "$scriptId";
+            parent.$method(script);
+        }
 """.trimIndent(), null
     )
 }
