@@ -45,6 +45,6 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:drawableTop="@drawable/ic_arrows_circle_arrow_right_24"
+        android:drawableTop="@drawable/ic_redeem"
         android:text="@string/staking_redeem" />
 </merge>

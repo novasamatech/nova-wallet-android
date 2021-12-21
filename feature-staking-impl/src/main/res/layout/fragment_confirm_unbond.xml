@@ -45,7 +45,7 @@
         android:includeFontPadding="false"
         android:text="@string/staking_hint_no_rewards_v2_2_0"
         android:textColor="@color/white"
-        app:drawableLeftCompat="@drawable/ic_no_reward_24" />
+        app:drawableLeftCompat="@drawable/ic_nova" />
 
     <TextView
         style="@style/TextAppearance.NovaFoundation.Body2"
@@ -59,7 +59,7 @@
         android:includeFontPadding="false"
         android:text="@string/staking_hint_unbond_kills_stash"
         android:textColor="@color/white"
-        app:drawableLeftCompat="@drawable/ic_finance_wallet_24" />
+        app:drawableLeftCompat="@drawable/ic_nova" />
 
     <TextView
         style="@style/TextAppearance.NovaFoundation.Body2"
@@ -72,7 +72,7 @@
         android:includeFontPadding="false"
         android:text="@string/staking_hint_redeem_v2_2_0"
         android:textColor="@color/white"
-        app:drawableLeftCompat="@drawable/ic_arrows_circle_arrow_right_24" />
+        app:drawableLeftCompat="@drawable/ic_nova" />
 
     <Space
         android:layout_width="match_parent"
