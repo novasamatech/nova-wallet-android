@@ -1,18 +1,12 @@
 package io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs
 
 import android.util.Log
-import android.webkit.WebView
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.novafoundation.nova.common.utils.LOG_TAG
-import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.web3.Web3Responder
-import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3Controller
-import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewHolder
-import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewWeb3JavaScriptInterface
-import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewScriptInjector
-import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewScriptInjector.*
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewWeb3Extension
+import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewWeb3JavaScriptInterface
 import kotlinx.coroutines.CoroutineScope
 
 class PolkadotJsExtensionFactory(

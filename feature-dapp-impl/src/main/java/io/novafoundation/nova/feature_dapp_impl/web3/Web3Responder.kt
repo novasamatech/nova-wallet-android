@@ -6,5 +6,3 @@ interface Web3Responder {
 
     fun respondError(id: String, error: Throwable)
 }
-
-
