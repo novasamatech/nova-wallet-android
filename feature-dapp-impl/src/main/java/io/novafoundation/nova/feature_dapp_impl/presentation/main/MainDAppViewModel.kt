@@ -6,7 +6,6 @@ import io.novafoundation.nova.common.address.createAddressIcon
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.utils.Event
-import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress

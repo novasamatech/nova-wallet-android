@@ -1,11 +1,10 @@
-package io.novafoundation.nova.feature_dapp_impl.web3
+package io.novafoundation.nova.feature_dapp_impl.web3.webview
 
 import android.util.Log
 import android.webkit.JavascriptInterface
 import io.novafoundation.nova.common.utils.LOG_TAG
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-
 
 class WebViewWeb3JavaScriptInterface {
 

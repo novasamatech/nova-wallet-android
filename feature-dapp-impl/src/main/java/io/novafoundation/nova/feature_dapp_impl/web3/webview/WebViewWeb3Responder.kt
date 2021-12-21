@@ -1,15 +1,10 @@
-package io.novafoundation.nova.feature_dapp_impl.web3
+package io.novafoundation.nova.feature_dapp_impl.web3.webview
 
-interface Web3JavascriptResponder {
+import io.novafoundation.nova.feature_dapp_impl.web3.Web3Responder
 
-    fun respondResult(id: String, result: String)
-    
-    fun respondError(id: String, error: Throwable)
-}
-
-class WebViewWeb3JavascriptResponder(
+class WebViewWeb3Responder(
     private val webViewHolder: WebViewHolder
-): Web3JavascriptResponder {
+) : Web3Responder {
 
     override fun respondResult(id: String, result: String) {
         webViewHolder.webView?.evaluateJavascript(success(id, result), null)

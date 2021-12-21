@@ -1,10 +1,10 @@
 package io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs
 
 import io.novafoundation.nova.feature_dapp_impl.web3.Web3Extension
-import io.novafoundation.nova.feature_dapp_impl.web3.Web3JavascriptResponder
+import io.novafoundation.nova.feature_dapp_impl.web3.Web3Responder
 
 sealed class PolkadotJsExtensionRequest<R>(
-    private val web3JavascriptResponder: Web3JavascriptResponder,
+    private val web3Responder: Web3Responder,
     private val identifier: Identifier
 ) : Web3Extension.Request<R> {
 
@@ -15,17 +15,17 @@ sealed class PolkadotJsExtensionRequest<R>(
     abstract fun serializeResponse(response: R): String
 
     override fun reject(error: Throwable) {
-        web3JavascriptResponder.respondError(identifier.id, error)
+        web3Responder.respondError(identifier.id, error)
     }
 
     override fun accept(response: R) {
-        web3JavascriptResponder.respondResult(identifier.id, serializeResponse(response))
+        web3Responder.respondResult(identifier.id, serializeResponse(response))
     }
 
     class AuthorizeTab(
-        web3JavascriptResponder: Web3JavascriptResponder,
+        web3Responder: Web3Responder,
         val url: String
-    ) : PolkadotJsExtensionRequest<AuthorizeTab.Response>(web3JavascriptResponder, Identifier.AUTHORIZE_TAB) {
+    ) : PolkadotJsExtensionRequest<AuthorizeTab.Response>(web3Responder, Identifier.AUTHORIZE_TAB) {
 
         class Response(val authorized: Boolean)
 

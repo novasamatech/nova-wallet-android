@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_dapp_impl.web3
+package io.novafoundation.nova.feature_dapp_impl.web3.webview
 
 import android.webkit.WebView
 

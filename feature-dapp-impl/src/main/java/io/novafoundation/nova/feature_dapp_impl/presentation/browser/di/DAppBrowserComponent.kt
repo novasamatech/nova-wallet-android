@@ -5,7 +5,6 @@ import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.DAppBrowserFragment
-import io.novafoundation.nova.feature_dapp_impl.presentation.main.MainDAppFragment
 
 @Subcomponent(
     modules = [

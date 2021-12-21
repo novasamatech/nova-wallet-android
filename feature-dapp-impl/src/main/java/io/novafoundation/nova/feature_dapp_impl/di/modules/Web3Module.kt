@@ -5,11 +5,14 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.feature_dapp_impl.web3.Web3JavascriptResponder
-import io.novafoundation.nova.feature_dapp_impl.web3.WebViewHolder
-import io.novafoundation.nova.feature_dapp_impl.web3.WebViewWeb3JavaScriptInterface
-import io.novafoundation.nova.feature_dapp_impl.web3.WebViewWeb3JavascriptResponder
+import io.novafoundation.nova.feature_dapp_impl.web3.Web3Responder
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionFactory
+import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsWeb3Controller
+import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3WebViewClientFactory
+import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewHolder
+import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewScriptInjector
+import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewWeb3JavaScriptInterface
+import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewWeb3Responder
 
 @Module
 class Web3Module {
@@ -20,8 +23,8 @@ class Web3Module {
 
     @Provides
     @FeatureScope
-    fun provideWeb3JavascriptResponder(webViewHolder: WebViewHolder): Web3JavascriptResponder {
-        return WebViewWeb3JavascriptResponder(webViewHolder)
+    fun provideWeb3JavascriptResponder(webViewHolder: WebViewHolder): Web3Responder {
+        return WebViewWeb3Responder(webViewHolder)
     }
 
     @Provides
@@ -30,19 +33,38 @@ class Web3Module {
 
     @Provides
     @FeatureScope
-    fun providePolkadotJsFactory(
+    fun provideScriptInjector(
         resourceManager: ResourceManager,
-        web3JavascriptResponder: Web3JavascriptResponder,
         web3JavaScriptInterface: WebViewWeb3JavaScriptInterface,
-        webViewHolder: WebViewHolder,
+    ) = WebViewScriptInjector(web3JavaScriptInterface, resourceManager)
+
+    @Provides
+    @FeatureScope
+    fun providePolkadotJsWeb3Controller(
+        webViewScriptInjector: WebViewScriptInjector
+    ) = PolkadotJsWeb3Controller(webViewScriptInjector)
+
+    @Provides
+    @FeatureScope
+    fun provideWeb3ClientFactory(
+        polkadotJsWeb3Controller: PolkadotJsWeb3Controller,
+    ) = Web3WebViewClientFactory(
+        controllers = listOf(
+            polkadotJsWeb3Controller
+        )
+    )
+
+    @Provides
+    @FeatureScope
+    fun providePolkadotJsFactory(
+        web3Responder: Web3Responder,
+        web3JavaScriptInterface: WebViewWeb3JavaScriptInterface,
         gson: Gson
     ): PolkadotJsExtensionFactory {
         return PolkadotJsExtensionFactory(
-            resourceManager = resourceManager,
-            web3JavascriptResponder = web3JavascriptResponder,
             webViewWeb3JavaScriptInterface = web3JavaScriptInterface,
-            webViewHolder = webViewHolder,
-            gson = gson
+            gson = gson,
+            web3Responder = web3Responder
         )
     }
 }
