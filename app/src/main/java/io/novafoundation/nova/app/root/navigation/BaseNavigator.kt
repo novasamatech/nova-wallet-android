@@ -7,7 +7,7 @@ abstract class BaseNavigator(
     private val navigationHolder: NavigationHolder
 ) {
 
-    fun performNavigation(@IdRes actionId: Int, args: Bundle) {
+    fun performNavigation(@IdRes actionId: Int, args: Bundle? = null) {
         val navController = navigationHolder.navController
 
         navController?.currentDestination?.getAction(actionId)?.let {

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_dapp_impl.di.modules
 
+import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
@@ -33,13 +34,15 @@ class Web3Module {
         resourceManager: ResourceManager,
         web3JavascriptResponder: Web3JavascriptResponder,
         web3JavaScriptInterface: WebViewWeb3JavaScriptInterface,
-        webViewHolder: WebViewHolder
+        webViewHolder: WebViewHolder,
+        gson: Gson
     ): PolkadotJsExtensionFactory {
         return PolkadotJsExtensionFactory(
             resourceManager = resourceManager,
             web3JavascriptResponder = web3JavascriptResponder,
             webViewWeb3JavaScriptInterface = web3JavaScriptInterface,
-            webViewHolder = webViewHolder
+            webViewHolder = webViewHolder,
+            gson = gson
         )
     }
 }

@@ -33,9 +33,11 @@ class MainDAppViewModel(
 
     // TODO urls are hardcoded since this is placeholder for future work as the part of dapp tasks
     fun subIdClicked() = launch {
-        val defaultAddress = selectedAccountUseCase.getSelectedMetaAccount().defaultSubstrateAddress
-        val subIdUrl = "https://sub.id/#/$defaultAddress"
-
-        openBrowserEvent.value = subIdUrl.event()
+//        val defaultAddress = selectedAccountUseCase.getSelectedMetaAccount().defaultSubstrateAddress
+//        val subIdUrl = "https://sub.id/#/$defaultAddress"
+//
+//        openBrowserEvent.value = subIdUrl.event()
+//
+        router.openDAppBrowser()
     }
 }

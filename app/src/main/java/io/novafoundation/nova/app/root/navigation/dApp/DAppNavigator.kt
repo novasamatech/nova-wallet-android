@@ -15,4 +15,6 @@ class DAppNavigator(
         actionId = R.id.action_open_accounts,
         args = AccountListFragment.getBundle(AccountChosenNavDirection.BACK)
     )
+
+    override fun openDAppBrowser() = performNavigation(R.id.action_mainFragment_to_dappBrowserFragment)
 }

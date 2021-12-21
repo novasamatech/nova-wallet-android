@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.di.DAppBrowserComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.di.MainDAppComponent
 import io.novafoundation.nova.feature_onboarding_api.di.OnboardingFeatureApi
 
@@ -21,6 +22,8 @@ import io.novafoundation.nova.feature_onboarding_api.di.OnboardingFeatureApi
 interface DAppFeatureComponent : OnboardingFeatureApi {
 
     fun mainComponentFactory(): MainDAppComponent.Factory
+
+    fun browserComponentFactory(): DAppBrowserComponent.Factory
 
     @Component.Factory
     interface Factory {

@@ -51,6 +51,8 @@ dependencies {
 
     implementation coroutinesDep
 
+    implementation gsonDep
+
     implementation daggerDep
     kapt daggerKapt
 

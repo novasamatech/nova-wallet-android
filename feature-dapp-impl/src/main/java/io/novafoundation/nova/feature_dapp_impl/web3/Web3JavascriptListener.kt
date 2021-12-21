@@ -1,26 +1,21 @@
 package io.novafoundation.nova.feature_dapp_impl.web3
 
+import android.util.Log
 import android.webkit.JavascriptInterface
+import io.novafoundation.nova.common.utils.LOG_TAG
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 
-interface Web3JavascriptListener {
 
-    fun onNewMessage(message: Any?)
-}
+class WebViewWeb3JavaScriptInterface {
 
-class WebViewWeb3JavaScriptInterface : Web3JavascriptListener {
-
-    private val observers = mutableListOf<Web3JavascriptListener>()
-
-    fun addObserver(observer: Web3JavascriptListener) {
-        observers.add(observer)
-    }
-
-    fun removeObserver(observer: Web3JavascriptListener) {
-        observers.remove(observer)
-    }
+    private val _messages = MutableSharedFlow<String>(extraBufferCapacity = 10)
+    val messages: Flow<String> = _messages
 
     @JavascriptInterface
-    override fun onNewMessage(message: Any?) {
-        observers.onEach { it.onNewMessage(message) }
+    fun onNewMessage(message: String) {
+        Log.d(LOG_TAG, message)
+
+        _messages.tryEmit(message)
     }
 }

@@ -1,4 +1,6 @@
 window.addEventListener("message", ({ data, source }) => {
+      console.log(`Got extensionRequest: {data}`)
+
       // only allow messages from our window, by the loader
       if (source !== window) {
         return;
@@ -6,6 +8,6 @@ window.addEventListener("message", ({ data, source }) => {
 
       if (data.origin === "dapp-request") {
       // should be in tact with PolkadotJsExtension.kt
-        Nova.onNewMessage(data)
+        Nova.onNewMessage(JSON.stringify(data))
       }
     });

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_dapp_impl.di
 
+import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -17,4 +18,6 @@ interface DAppFeatureDependencies {
     fun selectedAccountUseCase(): SelectedAccountUseCase
 
     fun addressIconGenerator(): AddressIconGenerator
+
+    fun gson(): Gson
 }
