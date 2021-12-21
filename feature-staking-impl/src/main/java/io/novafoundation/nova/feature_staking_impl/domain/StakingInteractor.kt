@@ -127,9 +127,9 @@ class StakingInteractor(
         }
     }
 
-    suspend fun syncStakingRewards(accountAddress: String) = withContext(Dispatchers.IO) {
+    suspend fun syncStakingRewards(stakingState: StakingState.Stash) = withContext(Dispatchers.IO) {
         runCatching {
-            stakingRewardsRepository.sync(accountAddress)
+            stakingRewardsRepository.sync(stakingState.stashAddress, stakingState.chain)
         }
     }
 
