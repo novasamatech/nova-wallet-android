@@ -6,9 +6,12 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.DappBrowserInteractor
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.DAppBrowserViewModel
@@ -35,12 +38,19 @@ class DAppBrowserModule {
     fun provideViewModel(
         router: DAppRouter,
         polkadotJsExtensionFactory: PolkadotJsExtensionFactory,
-        interactor: DappBrowserInteractor
+        interactor: DappBrowserInteractor,
+        resourceManager: ResourceManager,
+        addressIconGenerator: AddressIconGenerator,
+        selectedAccountUseCase: SelectedAccountUseCase
+
     ): ViewModel {
         return DAppBrowserViewModel(
             router = router,
             polkadotJsExtensionFactory = polkadotJsExtensionFactory,
-            interactor = interactor
+            interactor = interactor,
+            resourceManager = resourceManager,
+            addressIconGenerator = addressIconGenerator,
+            selectedAccountUseCase = selectedAccountUseCase
         )
     }
 }

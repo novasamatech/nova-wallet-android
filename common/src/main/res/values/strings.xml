@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="dapp_confirm_authorize_title_format">Allow “%s” to access your account addresses?</string>
+  <string name="dapp_dapp">DApp</string>
+  <string name="dapp_confirm_authorize_subtitle">Approve this request if you trust the application</string>
+  <string name="common_reject">Reject</string>
+  <string name="common_allow">Allow</string>
+
   <string name="about_contact_us">Contact Us</string>
   <string name="about_github_v2_2_0">Github</string>
   <string name="about_privacy">Privacy policy</string>
