@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 interface DAppFeatureDependencies {
 
@@ -20,4 +21,6 @@ interface DAppFeatureDependencies {
     fun addressIconGenerator(): AddressIconGenerator
 
     fun gson(): Gson
+
+    fun chainRegistry(): ChainRegistry
 }
