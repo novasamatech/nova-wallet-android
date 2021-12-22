@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.di.DAppBrowserComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.di.MainDAppComponent
 import io.novafoundation.nova.feature_onboarding_api.di.OnboardingFeatureApi
+import io.novafoundation.nova.runtime.di.RuntimeApi
 
 @Component(
     dependencies = [
@@ -37,7 +38,8 @@ interface DAppFeatureComponent : OnboardingFeatureApi {
     @Component(
         dependencies = [
             CommonApi::class,
-            AccountFeatureApi::class
+            AccountFeatureApi::class,
+            RuntimeApi::class
         ]
     )
     interface DAppFeatureDependenciesComponent : DAppFeatureDependencies

@@ -7,11 +7,15 @@ class WebViewWeb3Responder(
 ) : Web3Responder {
 
     override fun respondResult(id: String, result: String) {
-        webViewHolder.webView?.evaluateJavascript(success(id, result), null)
+        evaluateJs(success(id, result))
     }
 
     override fun respondError(id: String, error: Throwable) {
-        webViewHolder.webView?.evaluateJavascript(failure(id, error), null)
+        evaluateJs(failure(id, error))
+    }
+
+    private fun evaluateJs(js: String) = webViewHolder.webView?.post {
+        webViewHolder.webView?.evaluateJavascript(js, null)
     }
 
     private fun success(id: String, result: String) = "window.walletExtension.onAppResponse(\"$id\", $result, null)"

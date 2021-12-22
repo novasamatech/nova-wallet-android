@@ -1,7 +1,10 @@
 package io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs
 
+import com.google.gson.Gson
 import io.novafoundation.nova.feature_dapp_impl.web3.Web3Extension
 import io.novafoundation.nova.feature_dapp_impl.web3.Web3Responder
+import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.InjectedAccount
+import jp.co.soramitsu.fearless_utils.encrypt.EncryptionType
 
 sealed class PolkadotJsExtensionRequest<R>(
     private val web3Responder: Web3Responder,
@@ -9,7 +12,8 @@ sealed class PolkadotJsExtensionRequest<R>(
 ) : Web3Extension.Request<R> {
 
     enum class Identifier(val id: String) {
-        AUTHORIZE_TAB("pub(authorize.tab)")
+        AUTHORIZE_TAB("pub(authorize.tab)"),
+        ACCOUNT_LIST("pub(accounts.list)")
     }
 
     abstract fun serializeResponse(response: R): String
@@ -31,6 +35,18 @@ sealed class PolkadotJsExtensionRequest<R>(
 
         override fun serializeResponse(response: Response): String {
             return response.authorized.toString()
+        }
+    }
+
+    class AccountList(
+        private val web3Responder: Web3Responder,
+        private val gson: Gson,
+    ): PolkadotJsExtensionRequest<AccountList.Response>(web3Responder, Identifier.ACCOUNT_LIST) {
+
+        class Response(val accounts: List<InjectedAccount>)
+
+        override fun serializeResponse(response: Response): String {
+            return gson.toJson(response.accounts)
         }
     }
 }

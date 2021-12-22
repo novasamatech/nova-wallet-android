@@ -42,6 +42,7 @@ dependencies {
     implementation project(':feature-account-api')
     implementation project(':feature-wallet-api')
     implementation project(':feature-dapp-api')
+    implementation project(':runtime')
 
     implementation kotlinDep
 

@@ -47,6 +47,8 @@ class PolkadotJsExtension(
                     url = url
                 )
             }
+            PolkadotJsExtensionRequest.Identifier.ACCOUNT_LIST.id ->
+                PolkadotJsExtensionRequest.AccountList(web3Responder, gson)
             else -> null
         }
     }
