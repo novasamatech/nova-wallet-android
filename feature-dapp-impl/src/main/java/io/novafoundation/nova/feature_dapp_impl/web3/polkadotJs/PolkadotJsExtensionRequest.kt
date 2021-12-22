@@ -4,7 +4,6 @@ import com.google.gson.Gson
 import io.novafoundation.nova.feature_dapp_impl.web3.Web3Extension
 import io.novafoundation.nova.feature_dapp_impl.web3.Web3Responder
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.InjectedAccount
-import jp.co.soramitsu.fearless_utils.encrypt.EncryptionType
 
 sealed class PolkadotJsExtensionRequest<R>(
     private val web3Responder: Web3Responder,
@@ -41,7 +40,7 @@ sealed class PolkadotJsExtensionRequest<R>(
     class AccountList(
         private val web3Responder: Web3Responder,
         private val gson: Gson,
-    ): PolkadotJsExtensionRequest<AccountList.Response>(web3Responder, Identifier.ACCOUNT_LIST) {
+    ) : PolkadotJsExtensionRequest<AccountList.Response>(web3Responder, Identifier.ACCOUNT_LIST) {
 
         class Response(val accounts: List<InjectedAccount>)
 

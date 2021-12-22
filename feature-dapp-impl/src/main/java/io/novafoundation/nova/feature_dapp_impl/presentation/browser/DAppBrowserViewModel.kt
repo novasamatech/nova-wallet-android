@@ -5,7 +5,8 @@ import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.DappBrowserInteractor
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionFactory
-import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.*
+import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.AccountList
+import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.AuthorizeTab
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -34,7 +35,7 @@ class DAppBrowserViewModel(
     }
 
     private suspend fun supplyAccountList(request: AccountList) {
-       val injectedAccounts = interactor.getInjectedAccounts()
+        val injectedAccounts = interactor.getInjectedAccounts()
 
         request.accept(AccountList.Response(injectedAccounts))
     }
