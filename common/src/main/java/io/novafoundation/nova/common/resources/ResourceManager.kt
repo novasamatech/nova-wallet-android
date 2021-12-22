@@ -2,9 +2,12 @@ package io.novafoundation.nova.common.resources
 
 import android.graphics.drawable.Drawable
 import androidx.annotation.DrawableRes
+import androidx.annotation.RawRes
 import io.novafoundation.nova.common.R
 
 interface ResourceManager {
+
+    fun loadRawString(@RawRes res: Int): String
 
     fun getString(res: Int): String
 
