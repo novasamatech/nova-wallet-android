@@ -23,7 +23,7 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:includeFontPadding="false"
-        android:text="@string/staking_set_separate_account_controller"
+        android:text="@string/staking_set_separate_account_controller_v2_2_0"
         android:textColor="@android:color/white" />
 
     <io.novafoundation.nova.common.view.LabeledTextView
@@ -33,7 +33,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        app:actionIcon="@drawable/ic_more_vertical"
+        app:actionIcon="@drawable/ic_more"
         app:label="@string/staking_stash_account" />
 
     <LinearLayout
@@ -56,7 +56,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:includeFontPadding="false"
-            android:text="@string/staking_stash_can_hint"
+            android:text="@string/staking_stash_can_hint_v2_2_0"
             android:textColor="@color/black1" />
     </LinearLayout>
 
@@ -67,7 +67,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        app:actionIcon="@drawable/ic_chevron_down_white"
+        app:actionIcon="@drawable/ic_chevron_down"
         app:label="@string/staking_controller_account" />
 
     <LinearLayout
@@ -90,7 +90,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:includeFontPadding="false"
-            android:text="@string/staking_controller_can_hint"
+            android:text="@string/staking_controller_can_hint_v2_2_0"
             android:textColor="@color/black1" />
     </LinearLayout>
 
@@ -114,8 +114,8 @@
         android:paddingTop="12dp"
         android:paddingEnd="16dp"
         android:paddingBottom="12dp"
-        android:text="@string/common_learn_more"
-        app:drawableEndCompat="@drawable/ic_arrow_top_right_white_16"
+        android:text="@string/common_learn_more_v2_2_0"
+        app:drawableEndCompat="@drawable/ic_chevron_right"
         app:drawableStartCompat="@drawable/ic_nova" />
 
     <Space
@@ -136,7 +136,7 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_alert_triangle_yellow_24" />
+            android:src="@drawable/ic_warning_filled" />
 
         <TextView
             style="@style/TextAppearance.NovaFoundation.Body2"

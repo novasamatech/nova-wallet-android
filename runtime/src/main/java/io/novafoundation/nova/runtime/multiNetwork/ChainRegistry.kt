@@ -91,6 +91,12 @@ suspend fun ChainRegistry.chainWithAsset(chainId: String, assetId: Int): Pair<Ch
     return chain to chain.assetsById.getValue(assetId)
 }
 
+suspend fun ChainRegistry.asset(chainId: String, assetId: Int): Chain.Asset {
+    val chain = chainsById.first().getValue(chainId)
+
+    return chain.assetsById.getValue(assetId)
+}
+
 suspend fun ChainRegistry.getRuntime(chainId: String) = getRuntimeProvider(chainId).get()
 
 suspend fun ChainRegistry.getSocket(chainId: String) = getConnection(chainId).socketService

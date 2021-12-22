@@ -1,199 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
+    android:id="@+id/confirmTransferContainer"
+    android:orientation="vertical"
     tools:background="@color/black">
 
     <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/confirmTransferToolbar"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:dividerVisible="false"
         app:titleText="@string/wallet_send_confirm_transfer" />
 
     <io.novafoundation.nova.common.view.LabeledTextView
-        android:id="@+id/confirmTransferToken"
-        style="@style/TextAppearance.NovaFoundation.Body1"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        app:enabled="false"
-        app:label="@string/choose_amount_asset"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/confirmTransferToolbar"
-        app:message="Kusama"
-        app:textIcon="@drawable/ic_token_ksm" />
-
-    <TextView
-        android:id="@+id/confirmTransferBalanceLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="17dp"
-        android:drawableStart="@drawable/ic_info_16"
-        android:drawablePadding="4dp"
-        android:fontFamily="@font/soramitsu_bold"
-        android:gravity="center_vertical"
-        android:text="@string/choose_amount_available_balance"
-        android:textAllCaps="true"
-        android:textColor="@color/white"
-        android:textSize="@dimen/text_size_b3"
-        app:layout_constraintStart_toStartOf="@+id/confirmTransferToken"
-        app:layout_constraintTop_toBottomOf="@+id/confirmTransferToken" />
-
-    <TextView
-        android:id="@+id/confirmTransferBalance"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:fontFamily="@font/soramitsu_bold"
-        android:gravity="center_vertical"
-        android:textAllCaps="true"
-        android:textColor="@color/green"
-        android:textSize="@dimen/text_size_b3"
-        app:layout_constraintBottom_toBottomOf="@+id/confirmTransferBalanceLabel"
-        app:layout_constraintStart_toEndOf="@+id/confirmTransferBalanceLabel"
-        app:layout_constraintTop_toTopOf="@+id/confirmTransferBalanceLabel"
-        tools:text="200.643 KSM" />
-
-    <View
-        android:id="@+id/confirmTransferDivider1"
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:layout_marginTop="18dp"
-        android:background="@color/dividerGray"
-        app:layout_constraintEnd_toEndOf="@+id/confirmTransferToken"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/confirmTransferBalanceLabel"
-        app:layout_constraintTop_toBottomOf="@+id/confirmTransferBalanceLabel" />
-
-    <io.novafoundation.nova.common.view.LabeledTextView
-        android:id="@+id/confirmTransferRecipientView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        app:actionIcon="@drawable/ic_more_vertical"
-        app:enabled="false"
-        app:label="@string/choose_amount_to"
-        app:layout_constraintEnd_toEndOf="@id/confirmTransferDivider1"
-        app:layout_constraintStart_toStartOf="@+id/confirmTransferDivider1"
-        app:layout_constraintTop_toBottomOf="@+id/confirmTransferDivider1" />
-
-    <View
-        android:id="@+id/confirmTransferDivider2"
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:layout_marginTop="16dp"
-        android:background="@color/dividerGray"
-        app:layout_constraintEnd_toEndOf="@+id/confirmTransferRecipientView"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/confirmTransferRecipientView"
-        app:layout_constraintTop_toBottomOf="@+id/confirmTransferRecipientView" />
-
-    <io.novafoundation.nova.common.view.LabeledTextView
-        android:id="@+id/confirmTransferAmount"
-        style="@style/Widget.Nova.Input.Primary.External"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        app:enabled="false"
-        app:label="@string/common_amount"
-        app:layout_constraintEnd_toEndOf="@+id/confirmTransferRecipientView"
-        app:layout_constraintStart_toStartOf="@+id/confirmTransferRecipientView"
-        app:layout_constraintTop_toBottomOf="@+id/confirmTransferDivider2"
-        tools:message="0" />
-
-    <TextView
-        android:id="@+id/confirmTransferFeeLabel"
-        style="@style/TextAppearance.NovaFoundation.Body1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="@string/choose_amount_fee"
-        app:layout_constraintStart_toStartOf="@+id/confirmTransferAmount"
-        app:layout_constraintTop_toBottomOf="@+id/confirmTransferAmount" />
-
-    <TextView
-        android:id="@+id/confirmTransferFee"
-        style="@style/TextAppearance.NovaFoundation.Body1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="@+id/confirmTransferFeeLabel"
-        app:layout_constraintEnd_toEndOf="@+id/confirmTransferAmount"
-        app:layout_constraintTop_toTopOf="@+id/confirmTransferFeeLabel"
-        tools:text="0.001 KSM" />
-
-    <View
-        android:id="@+id/confirmTransferDivider3"
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:layout_marginTop="15dp"
-        android:background="@color/gray3"
-        app:layout_constraintEnd_toEndOf="@+id/confirmTransferToken"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/confirmTransferBalanceLabel"
-        app:layout_constraintTop_toBottomOf="@+id/confirmTransferFeeLabel" />
-
-    <View
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="@color/gray4"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/confirmTransferTotalLabel" />
-
-
-    <View
-        android:id="@+id/confirmTransferDivider4"
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:layout_marginBottom="22dp"
-        android:background="@color/gray3"
-        app:layout_constraintBottom_toTopOf="@+id/confirmTransferSubmit"
-        app:layout_constraintEnd_toEndOf="@+id/confirmTransferToken"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/confirmTransferBalanceLabel" />
-
-    <TextView
-        android:id="@+id/confirmTransferTotalLabel"
-        style="@style/TextAppearance.NovaFoundation.Header5"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="15dp"
-        android:paddingTop="15dp"
-        android:text="@string/wallet_send_total_title"
-        app:layout_constraintBottom_toTopOf="@+id/confirmTransferDivider4"
-        app:layout_constraintStart_toStartOf="@+id/confirmTransferDivider4" />
-
-    <TextView
-        android:id="@+id/confirmTransferTotal"
-        style="@style/TextAppearance.NovaFoundation.Body1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="@+id/confirmTransferTotalLabel"
-        app:layout_constraintEnd_toEndOf="@+id/confirmTransferAmount"
-        tools:text="1.001 KSM" />
-
-    <io.novafoundation.nova.common.view.PrimaryButton
-        android:id="@+id/confirmTransferSubmit"
-        style="@style/Widget.Nova.Button.Primary"
+        android:id="@+id/confirmTransferFrom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="24dp"
-        android:text="@string/wallet_send_confirm_transfer"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:actionIcon="@drawable/ic_more"
+        app:label="@string/transaction_details_from" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <io.novafoundation.nova.common.view.LabeledTextView
+        android:id="@+id/confirmTransferTo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        app:actionIcon="@drawable/ic_more"
+        app:label="@string/choose_amount_to" />
+
+    <io.novafoundation.nova.common.view.AmountView
+        android:id="@+id/confirmTransferAmount"
+        android:layout_width="match_parent"
+        android:layout_marginStart="16dp"
+        android:enabled="false"
+        android:layout_marginEnd="16dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <io.novafoundation.nova.feature_wallet_api.presentation.view.ConfirmTransactionView
+        android:id="@+id/confirmTransferConfirm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>

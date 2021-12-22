@@ -1,5 +1,6 @@
 package io.novafoundation.nova.app.root.di
 
+import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.app.root.navigation.Navigator
 import io.novafoundation.nova.common.di.FeatureApiHolder
 import io.novafoundation.nova.common.di.FeatureContainer
@@ -14,6 +15,7 @@ import javax.inject.Inject
 
 @ApplicationScope
 class RootFeatureHolder @Inject constructor(
+    private val navigationHolder: NavigationHolder,
     private val navigator: Navigator,
     featureContainer: FeatureContainer
 ) : FeatureApiHolder(featureContainer) {
@@ -28,7 +30,8 @@ class RootFeatureHolder @Inject constructor(
             .crowdloanFeatureApi(getFeature(CrowdloanFeatureApi::class.java))
             .runtimeApi(getFeature(RuntimeApi::class.java))
             .build()
+
         return DaggerRootComponent.factory()
-            .create(navigator, rootFeatureDependencies)
+            .create(navigationHolder, navigator, rootFeatureDependencies)
     }
 }

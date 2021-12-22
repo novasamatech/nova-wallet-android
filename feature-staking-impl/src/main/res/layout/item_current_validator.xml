@@ -68,7 +68,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
-        android:src="@drawable/ic_info_white_24"
+        android:src="@drawable/ic_info_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -90,7 +90,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/itemCurrentValidatorInfo"
         app:layout_constraintEnd_toStartOf="@+id/itemCurrentValidatorInfo"
         app:layout_constraintTop_toTopOf="@+id/itemCurrentValidatorInfo"
-        app:srcCompat="@drawable/ic_status_error_16"
+        app:srcCompat="@drawable/ic_red_cross"
         android:layout_marginEnd="12dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

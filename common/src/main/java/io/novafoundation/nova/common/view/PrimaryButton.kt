@@ -9,6 +9,7 @@ import com.github.razir.progressbutton.hideProgress
 import com.github.razir.progressbutton.isProgressActive
 import com.github.razir.progressbutton.showProgress
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.utils.getColorFromAttr
 import io.novafoundation.nova.common.utils.getEnum
 import io.novafoundation.nova.common.utils.useAttributes
@@ -27,7 +28,7 @@ enum class ButtonState(val viewEnabled: Boolean) {
 class PrimaryButton @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyle: Int = 0
+    defStyle: Int = 0,
 ) : AppCompatTextView(context, attrs, defStyle) {
 
     enum class Appearance {
@@ -113,4 +114,20 @@ class PrimaryButton @JvmOverloads constructor(
 
 fun PrimaryButton.setProgress(show: Boolean) {
     setState(if (show) ButtonState.PROGRESS else ButtonState.NORMAL)
+}
+
+fun PrimaryButton.setState(descriptiveButtonState: DescriptiveButtonState) {
+    when (descriptiveButtonState) {
+        is DescriptiveButtonState.Disabled -> {
+            setState(ButtonState.DISABLED)
+            text = descriptiveButtonState.reason
+        }
+        is DescriptiveButtonState.Enabled -> {
+            setState(ButtonState.NORMAL)
+            text = descriptiveButtonState.action
+        }
+        DescriptiveButtonState.Loading -> {
+            setState(ButtonState.PROGRESS)
+        }
+    }
 }

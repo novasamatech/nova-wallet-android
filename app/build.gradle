@@ -11,7 +11,7 @@ apply from: "../scripts/secrets.gradle"
 android {
     compileSdkVersion rootProject.compileSdkVersion
     defaultConfig {
-        applicationId "io.novafoundation.nova"
+        applicationId rootProject.applicationId
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
         versionCode computeVersionCode()
@@ -35,6 +35,9 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.debug
+
+            versionNameSuffix '-market'
+            applicationIdSuffix '.market'
         }
         releaseGithub {
             initWith buildTypes.release
@@ -121,6 +124,9 @@ dependencies {
 
     implementation project(':feature-crowdloan-api')
     implementation project(':feature-crowdloan-impl')
+
+    implementation project(':feature-dapp-api')
+    implementation project(':feature-dapp-impl')
 
     implementation kotlinDep
 

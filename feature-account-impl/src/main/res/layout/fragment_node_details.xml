@@ -23,7 +23,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
-        android:hint="@string/username_setup_choose_title" />
+        android:hint="@string/account_wallet_nickname" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -55,7 +55,7 @@
             android:clickable="true"
             android:focusable="true"
             android:padding="@dimen/x1"
-            android:src="@drawable/ic_copy_24"
+            android:src="@drawable/ic_copy"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

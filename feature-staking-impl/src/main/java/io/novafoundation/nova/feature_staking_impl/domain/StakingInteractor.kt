@@ -17,7 +17,6 @@ import io.novafoundation.nova.feature_staking_api.domain.model.IndividualExposur
 import io.novafoundation.nova.feature_staking_api.domain.model.RewardDestination
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingAccount
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingState
-import io.novafoundation.nova.feature_staking_api.domain.model.StakingStory
 import io.novafoundation.nova.feature_staking_api.domain.model.isUnbondingIn
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.mappers.mapAccountToStakingAccount
@@ -31,13 +30,13 @@ import io.novafoundation.nova.feature_staking_impl.domain.model.NominatorStatus
 import io.novafoundation.nova.feature_staking_impl.domain.model.PendingPayout
 import io.novafoundation.nova.feature_staking_impl.domain.model.PendingPayoutsStatistics
 import io.novafoundation.nova.feature_staking_impl.domain.model.StakeSummary
+import io.novafoundation.nova.feature_staking_impl.domain.model.StakingPeriod
 import io.novafoundation.nova.feature_staking_impl.domain.model.StashNoneStatus
 import io.novafoundation.nova.feature_staking_impl.domain.model.Unbonding
 import io.novafoundation.nova.feature_staking_impl.domain.model.ValidatorStatus
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
@@ -128,9 +127,9 @@ class StakingInteractor(
         }
     }
 
-    suspend fun syncStakingRewards(accountAddress: String) = withContext(Dispatchers.IO) {
+    suspend fun syncStakingRewards(stakingState: StakingState.Stash) = withContext(Dispatchers.IO) {
         runCatching {
-            stakingRewardsRepository.sync(accountAddress)
+            stakingRewardsRepository.sync(stakingState.stashAddress, stakingState.chain)
         }
     }
 
@@ -175,6 +174,8 @@ class StakingInteractor(
         }
     }
 
+    fun observeUserRewards(state: StakingState.Stash) = stakingRewardsRepository.totalRewardFlow(state.stashAddress)
+
     suspend fun observeNetworkInfoState(chainId: ChainId): Flow<NetworkInfo> = withContext(Dispatchers.Default) {
         val lockupPeriod = getLockupPeriodInDays(chainId)
 
@@ -187,6 +188,7 @@ class StakingInteractor(
                 lockupPeriodInDays = lockupPeriod,
                 minimumStake = minimumStake(exposures, minimumNominatorBond),
                 totalStake = totalStake(exposures),
+                stakingPeriod = StakingPeriod.Unlimited,
                 nominatorsCount = activeNominators(chainId, exposures),
             )
         }
@@ -200,10 +202,6 @@ class StakingInteractor(
         val chainId = stakingSharedState.chainId()
 
         HOURS_IN_DAY / stakingRepository.erasPerDay(chainId)
-    }
-
-    fun stakingStoriesFlow(): Flow<List<StakingStory>> {
-        return stakingRepository.stakingStoriesFlow()
     }
 
     fun selectionStateFlow() = combineToPair(
@@ -336,9 +334,8 @@ class StakingInteractor(
 
         combine(
             stakingRepository.observeActiveEraIndex(chainId),
-            walletRepository.assetFlow(state.accountId, chainAsset),
-            stakingRewardsRepository.totalRewardFlow(state.stashAddress)
-        ) { activeEraIndex, asset, totalReward ->
+            walletRepository.assetFlow(state.accountId, chainAsset)
+        ) { activeEraIndex, asset ->
             val totalStaked = asset.bonded
 
             val eraStakers = stakingRepository.getActiveElectedValidatorsExposures(chainId)
@@ -350,9 +347,7 @@ class StakingInteractor(
 
             StakeSummary(
                 status = status,
-                totalStaked = totalStaked,
-                totalReward = asset.token.amountFromPlanks(totalReward),
-                currentEra = activeEraIndex.toInt(),
+                totalStaked = totalStaked
             )
         }
     }

@@ -11,9 +11,11 @@ import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.di.modules.Caching
+import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.LanguagesHolder
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.vibration.DeviceVibrator
 import io.novafoundation.nova.core_db.dao.AccountDao
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
@@ -72,4 +74,8 @@ interface AccountFeatureDependencies {
     fun rpcCalls(): RpcCalls
 
     fun imageLoader(): ImageLoader
+
+    fun appVersionProvider(): AppVersionProvider
+
+    fun validationExecutor(): ValidationExecutor
 }

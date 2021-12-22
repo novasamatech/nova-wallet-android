@@ -67,6 +67,7 @@ class MainFragment : BaseFragment<MainViewModel>() {
         bottomNavigationView.setOnNavigationItemSelectedListener { item ->
             onNavDestinationSelected(item, navController!!)
         }
+        bottomNavigationView.itemIconTintList = null
 
         requireActivity().onBackPressedDispatcher.addCallback(backCallback)
 

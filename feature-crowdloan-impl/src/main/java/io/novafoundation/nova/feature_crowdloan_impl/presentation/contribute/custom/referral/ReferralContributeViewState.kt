@@ -45,7 +45,7 @@ abstract class ReferralContributeViewState(
 
     val learnBonusesTitle = LearnMoreModel(
         iconLink = customContributePayload.parachainMetadata.iconLink,
-        text = resourceManager.getString(R.string.crowdloan_learn, customContributePayload.parachainMetadata.name)
+        text = resourceManager.getString(R.string.crowdloan_learn_v2_2_0, customContributePayload.parachainMetadata.name)
     )
 
     private val bonusPayloadFlow = enteredReferralCodeFlow.map {

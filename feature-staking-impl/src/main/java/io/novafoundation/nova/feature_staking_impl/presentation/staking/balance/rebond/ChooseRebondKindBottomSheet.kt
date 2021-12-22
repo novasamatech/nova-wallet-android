@@ -16,15 +16,15 @@ class ChooseRebondKindBottomSheet(
 
         setTitle(R.string.wallet_balance_unbonding_v1_9_0)
 
-        item(R.drawable.ic_stacking_24, R.string.staking_rebond_all) {
+        item(R.drawable.ic_staking_outline, R.string.staking_rebond_all) {
             actionListener(RebondKind.ALL)
         }
 
-        item(R.drawable.ic_stacking_24, R.string.staking_rebond_last) {
+        item(R.drawable.ic_staking_outline, R.string.staking_rebond_last) {
             actionListener(RebondKind.LAST)
         }
 
-        item(R.drawable.ic_stacking_24, R.string.staking_rebond) {
+        item(R.drawable.ic_staking_outline, R.string.staking_rebond) {
             actionListener(RebondKind.CUSTOM)
         }
     }

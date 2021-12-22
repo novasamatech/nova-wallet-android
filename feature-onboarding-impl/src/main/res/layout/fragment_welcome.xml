@@ -16,7 +16,7 @@
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_arrow_back_24dp"
+        app:srcCompat="@drawable/ic_arrow_back"
         tools:visibility="visible" />
 
     <ImageView
@@ -42,21 +42,21 @@
 
         <io.novafoundation.nova.common.view.PrimaryButton
             android:id="@+id/createAccountBtn"
-            style="@style/Widget.Nova.Button.Primary"
+            style="@style/Widget.Nova.Button.Iconic"
             android:layout_width="match_parent"
-            android:theme="@style/AccentBlue"
             android:layout_height="wrap_content"
+            android:drawableEnd="@drawable/ic_add_circle"
             android:layout_margin="@dimen/x1"
-            android:text="@string/onboarding_create_account" />
+            android:text="@string/onboarding_create_wallet" />
 
         <io.novafoundation.nova.common.view.PrimaryButton
             android:id="@+id/importAccountBtn"
-            style="@style/Widget.Nova.Button.Primary"
+            style="@style/Widget.Nova.Button.Iconic"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:theme="@style/AccentBlue"
+            android:drawableEnd="@drawable/ic_key"
             android:layout_margin="@dimen/x1"
-            android:text="@string/onboarding_restore_account" />
+            android:text="@string/onboarding_restore_wallet" />
 
     </LinearLayout>
 
@@ -69,7 +69,7 @@
         android:layout_marginEnd="@dimen/x2"
         android:layout_marginBottom="40dp"
         android:gravity="center"
-        android:text="@string/onboarding_terms_and_conditions_1"
+        android:text="@string/onboarding_terms_and_conditions_1_v2_2_0"
         android:textColor="@color/white"
         android:textColorLink="@color/colorAccent"
         app:layout_constraintBottom_toBottomOf="parent"

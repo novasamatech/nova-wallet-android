@@ -9,21 +9,48 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:homeButtonVisible="false"
         app:dividerVisible="false"
+        app:homeButtonVisible="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <io.novafoundation.nova.feature_account_impl.presentation.pincode.view.PinCodeView
-        android:id="@+id/pinCodeView"
+    <TextView
+        android:id="@+id/pinCodeTitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.Title3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="@dimen/x1"
+        android:layout_marginEnd="@dimen/x1"
+        android:text="@string/pincode_enter_pin_code_v2_2_0"
+        app:layout_constraintBottom_toTopOf="@+id/pincodeProgress"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <io.novafoundation.nova.feature_account_impl.presentation.pincode.view.DotsProgressView
+        android:id="@+id/pincodeProgress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:layout_marginTop="24dp"
+        app:layout_constraintBottom_toTopOf="@id/pinCodeNumbers"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pinCodeTitle" />
+
+    <io.novafoundation.nova.feature_account_impl.presentation.pincode.view.PinCodeView
+        android:id="@+id/pinCodeNumbers"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar"
-        app:layout_constraintVertical_bias="0.55" />
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

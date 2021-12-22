@@ -9,23 +9,24 @@
     android:fitsSystemWindows="true">
 
     <io.novafoundation.nova.common.view.Toolbar
-        android:id="@+id/toolbar"
+        android:id="@+id/importAccountToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:dividerVisible="false"
+        app:iconRight="@drawable/ic_options"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:titleText="@string/onboarding_restore_account" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:overScrollMode="never"
-        app:layout_constraintBottom_toTopOf="@id/nextBtn"
+        app:layout_constraintBottom_toTopOf="@id/importAccountContinue"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar">
+        app:layout_constraintTop_toBottomOf="@id/importAccountToolbar">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -35,53 +36,32 @@
             android:fitsSystemWindows="true"
             android:orientation="vertical">
 
-
-            <io.novafoundation.nova.common.view.LabeledTextView
-                android:id="@+id/importForcedChain"
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
+                android:id="@+id/importAccountTitle"
                 android:layout_height="wrap_content"
+                tools:text="@string/account_import_mnemonic_title"
                 android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:layout_marginTop="16dp"
-                android:layout_marginEnd="16dp"
-                app:enabled="false"
-                app:label="@string/common_chain"
-                tools:message="Kusama"
-                tools:textIcon="@drawable/ic_ksm_24" />
-
-            <io.novafoundation.nova.common.view.LabeledTextView
-                android:id="@+id/sourceTypeInput"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="@dimen/x2"
-                android:layout_marginEnd="16dp"
-                app:actionIcon="@drawable/ic_pin_white_24"
-                app:label="@string/recovery_source_type"
-                tools:message="Mnemonic" />
+                style="@style/TextAppearance.NovaFoundation.Header2" />
 
             <FrameLayout
-                android:id="@+id/sourceTypeContainer"
+                android:id="@+id/importAccountSourceContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="@dimen/x2"
                 android:layout_marginEnd="16dp"
                 android:animateLayoutChanges="true"
                 tools:background="@drawable/bg_big_input_shape"
                 tools:layout_height="200dp" />
-
-            <io.novafoundation.nova.feature_account_impl.presentation.view.advanced.AdvancedBlockView
-                android:id="@+id/advancedBlockView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/x2" />
 
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
 
     <io.novafoundation.nova.common.view.PrimaryButton
-        android:id="@+id/nextBtn"
+        android:id="@+id/importAccountContinue"
         style="@style/Widget.Nova.Button.Primary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -90,7 +70,7 @@
         android:layout_marginEnd="@dimen/x2"
         android:layout_marginBottom="@dimen/x3"
         android:enabled="false"
-        android:text="@string/common_next"
+        android:text="@string/common_continue"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

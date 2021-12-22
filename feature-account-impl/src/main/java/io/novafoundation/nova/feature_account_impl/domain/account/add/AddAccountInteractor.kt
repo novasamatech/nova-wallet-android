@@ -1,10 +1,10 @@
 package io.novafoundation.nova.feature_account_impl.domain.account.add
 
-import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.AddAccountType
 import io.novafoundation.nova.feature_account_api.domain.model.ImportJsonMetaData
 import io.novafoundation.nova.feature_account_impl.data.repository.AddAccountRepository
+import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryption
 
 class AddAccountInteractor(
     private val addAccountRepository: AddAccountRepository,
@@ -13,15 +13,13 @@ class AddAccountInteractor(
 
     suspend fun createAccount(
         mnemonic: String,
-        encryptionType: CryptoType,
-        derivationPath: String,
+        advancedEncryption: AdvancedEncryption,
         addAccountType: AddAccountType
     ): Result<Unit> {
         return addAccount(addAccountType) {
             addAccountRepository.addFromMnemonic(
                 mnemonic,
-                encryptionType,
-                derivationPath,
+                advancedEncryption,
                 addAccountType
             )
         }
@@ -29,15 +27,13 @@ class AddAccountInteractor(
 
     suspend fun importFromMnemonic(
         mnemonic: String,
-        encryptionType: CryptoType,
-        derivationPath: String,
+        advancedEncryption: AdvancedEncryption,
         addAccountType: AddAccountType
     ): Result<Unit> {
         return addAccount(addAccountType) {
             addAccountRepository.addFromMnemonic(
                 mnemonic,
-                encryptionType,
-                derivationPath,
+                advancedEncryption,
                 addAccountType
             )
         }
@@ -45,15 +41,13 @@ class AddAccountInteractor(
 
     suspend fun importFromSeed(
         seed: String,
-        encryptionType: CryptoType,
-        derivationPath: String,
+        advancedEncryption: AdvancedEncryption,
         addAccountType: AddAccountType
     ): Result<Unit> {
         return addAccount(addAccountType) {
             addAccountRepository.addFromSeed(
                 seed,
-                encryptionType,
-                derivationPath,
+                advancedEncryption,
                 addAccountType
             )
         }
@@ -68,7 +62,6 @@ class AddAccountInteractor(
             addAccountRepository.addFromJson(
                 json = json,
                 password = password,
-                derivationPath = "", // TODO consider allowing derivation path for json importing,
                 addAccountType = addAccountType
             )
         }

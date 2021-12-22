@@ -78,4 +78,5 @@ dependencies {
     implementation gsonDep
 
     implementation insetterDep
+    implementation flexBoxDep
 }

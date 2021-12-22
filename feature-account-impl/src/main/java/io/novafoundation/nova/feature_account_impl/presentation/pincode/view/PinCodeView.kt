@@ -19,9 +19,7 @@ import kotlinx.android.synthetic.main.pincode_view.view.btn7
 import kotlinx.android.synthetic.main.pincode_view.view.btn8
 import kotlinx.android.synthetic.main.pincode_view.view.btn9
 import kotlinx.android.synthetic.main.pincode_view.view.btnDelete
-import kotlinx.android.synthetic.main.pincode_view.view.dotsProgressView
 import kotlinx.android.synthetic.main.pincode_view.view.fingerprintBtn
-import kotlinx.android.synthetic.main.pincode_view.view.pinCodeTitleTv
 
 class PinCodeView @JvmOverloads constructor(
     context: Context,
@@ -46,8 +44,12 @@ class PinCodeView @JvmOverloads constructor(
 
     private var inputCode: String = ""
 
+    private var progressView: DotsProgressView? = null
+
     init {
         View.inflate(context, R.layout.pincode_view, this)
+
+        orientation = VERTICAL
 
         btn1.setOnClickListener(pinCodeNumberClickListener)
         btn2.setOnClickListener(pinCodeNumberClickListener)
@@ -63,6 +65,8 @@ class PinCodeView @JvmOverloads constructor(
         btnDelete.setOnClickListener(pinCodeDeleteClickListener)
 
         fingerprintBtn.setOnClickListener(pinCodeFingerprintClickListener)
+
+        updateProgress()
     }
 
     fun changeFingerPrintButtonVisibility(isVisible: Boolean) {
@@ -73,12 +77,14 @@ class PinCodeView @JvmOverloads constructor(
         }
     }
 
-    fun setTitle(title: String) {
-        pinCodeTitleTv.text = title
-    }
-
     fun resetInput() {
         inputCode = ""
+        updateProgress()
+    }
+
+    fun bindProgressView(view: DotsProgressView) {
+        progressView = view
+
         updateProgress()
     }
 
@@ -109,11 +115,13 @@ class PinCodeView @JvmOverloads constructor(
 
     private fun updateProgress() {
         val currentProgress = inputCode.length
-        dotsProgressView.setProgress(currentProgress)
+        progressView?.setProgress(currentProgress)
+
+        btnDelete.isEnabled = currentProgress != 0
     }
 
     private fun shakeDotsAnimation() {
         val animation = AnimationUtils.loadAnimation(context, R.anim.shake)
-        dotsProgressView.startAnimation(animation)
+        progressView?.startAnimation(animation)
     }
 }

@@ -3,8 +3,8 @@ package io.novafoundation.nova.feature_account_impl.presentation.importing.sourc
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import android.widget.LinearLayout
 import androidx.annotation.LayoutRes
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.LifecycleOwner
 import io.novafoundation.nova.common.view.InputField
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.impl.setupAccountNameChooserUi
@@ -16,20 +16,22 @@ class ImportAccountNameViews(
     val visibilityDependent: List<View>,
 )
 
-abstract class ImportSourceView @JvmOverloads constructor(
+abstract class ImportSourceView<S : ImportSource> @JvmOverloads constructor(
     @LayoutRes layoutId: Int,
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : ConstraintLayout(context, attrs, defStyleAttr) {
+) : LinearLayout(context, attrs, defStyleAttr) {
 
     protected abstract val nameInputViews: ImportAccountNameViews
 
     init {
         View.inflate(context, layoutId, this)
+
+        orientation = VERTICAL
     }
 
-    abstract fun observeSource(source: ImportSource, lifecycleOwner: LifecycleOwner)
+    abstract fun observeSource(source: S, lifecycleOwner: LifecycleOwner)
 
     fun observeCommon(viewModel: ImportAccountViewModel, lifecycleOwner: LifecycleOwner) {
         setupAccountNameChooserUi(viewModel, nameInputViews.nameInput, lifecycleOwner, nameInputViews.visibilityDependent)

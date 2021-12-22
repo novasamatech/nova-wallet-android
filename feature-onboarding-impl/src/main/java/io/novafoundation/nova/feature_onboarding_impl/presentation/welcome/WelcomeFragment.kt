@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.utils.createSpannable
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.setupImportTypeChooser
 import io.novafoundation.nova.feature_onboarding_api.di.OnboardingFeatureApi
 import io.novafoundation.nova.feature_onboarding_impl.R
 import io.novafoundation.nova.feature_onboarding_impl.di.OnboardingFeatureComponent
@@ -48,7 +49,7 @@ class WelcomeFragment : BaseFragment<WelcomeViewModel>() {
 
     override fun initViews() {
         configureTermsAndPrivacy(
-            getString(R.string.onboarding_terms_and_conditions_1),
+            getString(R.string.onboarding_terms_and_conditions_1_v2_2_0),
             getString(R.string.onboarding_terms_and_conditions_2),
             getString(R.string.onboarding_privacy_policy)
         )
@@ -89,5 +90,6 @@ class WelcomeFragment : BaseFragment<WelcomeViewModel>() {
         viewModel.shouldShowBackLiveData.observe(back::setVisible)
 
         observeBrowserEvents(viewModel)
+        setupImportTypeChooser(viewModel)
     }
 }

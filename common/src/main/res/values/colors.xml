@@ -13,32 +13,43 @@
     <color name="gray4">#181818</color>
     <color name="gray_disabled">#D0D0D0</color>
     <color name="colorGreyText">#888888</color>
-    <color name="green">#0ED33B</color>
+    <color name="green">#00FF19</color>
     <color name="dividerGray">#444444</color>
     <color name="bottomSheetBackground">#80838383</color>
-    <color name="red">#F00004</color>
     <color name="blurColorDark">#B3000000</color>
     <color name="blurColor">#8C000000</color>
     <color name="blurColorLight">#66000000</color>
 
+    <color name="white_8">#14FFFFFF</color>
     <color name="white_10">#1AFFFFFF</color>
+    <color name="white_12">#1FFFFFFF</color>
     <color name="white_16">#29FFFFFF</color>
     <color name="white_20">#33FFFFFF</color>
-    <color name="white_30">#4DFFFFFF</color>
     <color name="white_24">#3DFFFFFF</color>
+    <color name="white_30">#4DFFFFFF</color>
+    <color name="white_32">#52FFFFFF</color>
     <color name="white_40">#66FFFFFF</color>
+    <color name="white_48">#7AFFFFFF</color>
     <color name="white_50">#80FFFFFF</color>
     <color name="white_64">#A6FFFFFF</color>
+    <color name="white_80">#CCFFFFFF</color>
+
+    <color name="black_24">#3D000000</color>
+    <color name="black_48">#7A000000</color>
 
     <color name="black1">@color/gray1</color>
     <color name="black2">@color/gray2</color>
     <color name="black3">@color/gray3</color>
     <color name="black4">@color/gray4</color>
 
+    <color name="settings_group_background">#1D1D20</color>
+
     <color name="account_icon_light">#eeeeee</color>
     <color name="account_icon_dark">@color/black</color>
 
-    <color name="error_red">#FF3B30</color>
+    <color name="red">#FF285C</color>
 
     <color name="accentBlue">#409DF3</color>
+
+    <color name="pms_black">#2D2926</color>
 </resources>

@@ -24,7 +24,7 @@ open class ExternalActionsSheet(
         setTitle(payload.type.primaryValue)
 
         payload.copyLabelRes?.let {
-            item(R.drawable.ic_copy_24, it) {
+            item(R.drawable.ic_copy, it) {
                 onCopy(payload.type.primaryValue)
             }
         }
@@ -35,7 +35,7 @@ open class ExternalActionsSheet(
                 .forEach { explorer ->
                     val title = context.getString(R.string.transaction_details_view_explorer, explorer.name)
 
-                    item(R.drawable.ic_globe_24, title) {
+                    item(R.drawable.ic_globe_outline, title) {
                         onViewExternal(explorer, payload.type)
                     }
                 }

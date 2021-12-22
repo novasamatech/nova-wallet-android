@@ -7,8 +7,14 @@ typealias DiffCheck<T, V> = (T) -> V
 
 open class PayloadGenerator<T>(private vararg val checks: DiffCheck<T, *>) {
 
-    fun diff(first: T, second: T): List<DiffCheck<T, *>> {
-        return checks.filter { check -> check(first) != check(second) }
+    fun diff(first: T, second: T): List<DiffCheck<T, *>>? {
+        val foundMatches = checks.filter { check -> check(first) != check(second) }
+
+        return if (foundMatches.isEmpty()) {
+            null
+        } else {
+            foundMatches
+        }
     }
 }
 

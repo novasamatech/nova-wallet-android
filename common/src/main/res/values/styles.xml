@@ -3,11 +3,69 @@
 
     <!--Font styles-->
 
-    <style name="TextAppearance.NovaFoundation.Title" parent="TextAppearance.AppCompat.Title">
+    <style name="TextAppearance.NovaFoundation.Bold.Caps">
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:letterSpacing">0.05</item>
+    </style>
+
+    <style name="TextAppearance.NovaFoundation.Bold.LargeTitle">
+        <item name="android:textSize">34sp</item>
+    </style>
+
+    <style name="TextAppearance.NovaFoundation.Bold.Title1">
+        <item name="android:textSize">28sp</item>
+    </style>
+
+    <style name="TextAppearance.NovaFoundation.Bold.Title2">
+        <item name="android:textSize">22sp</item>
+    </style>
+
+    <style name="TextAppearance.NovaFoundation.Bold.Title3">
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="TextAppearance.NovaFoundation.Regular.Body">
+        <item name="android:textSize">17sp</item>
+        <item name="lineHeight">22sp</item>
+    </style>
+
+    <style name="TextAppearance.NovaFoundation.Caption1" parent="TextAppearance.NovaFoundation.Regular">
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="TextAppearance.NovaFoundation.Caps" parent="TextAppearance.NovaFoundation.Regular">
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:letterSpacing">0.05</item>
+    </style>
+
+    <style name="TextAppearance.NovaFoundation.Regular.Title3">
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="TextAppearance.NovaFoundation.Bold.SubHeadline">
+        <item name="android:textSize">?attr/textSizeSubHeadline</item>
+    </style>
+
+    <style name="TextAppearance.NovaFoundation.Footnote" parent="TextAppearance.NovaFoundation.Regular">
+        <item name="android:textSize">13sp</item>
+        <item name="lineHeight">18sp</item>
+    </style>
+
+    <style name="TextAppearance.NovaFoundation.Regular.SubHeadline">
+        <item name="android:textSize">?attr/textSizeSubHeadline</item>
+    </style>
+
+    <style name="TextAppearance.NovaFoundation.Regular" parent="TextAppearance.AppCompat.Title">
         <item name="android:fontFamily">?attr/fontRegular</item>
     </style>
 
-    <style name="TextAppearance.NovaFoundation.Title3" parent="TextAppearance.NovaFoundation.Title">
+    <style name="TextAppearance.NovaFoundation.Bold" parent="TextAppearance.AppCompat.Title">
+        <item name="android:fontFamily">?attr/fontBold</item>
+    </style>
+
+    <style name="TextAppearance.NovaFoundation.Title3" parent="TextAppearance.NovaFoundation.Regular">
         <item name="android:textSize">?attr/textSizeTitle3</item>
     </style>
 
@@ -76,6 +134,13 @@
         <item name="android:textSize">?attr/textSizeB1</item>
         <item name="android:fontFamily">?attr/fontBold</item>
         <item name="android:minHeight">52dp</item>
+    </style>
+
+    <style name="Widget.Nova.Button.Iconic">
+        <item name="android:gravity">start|center_vertical</item>
+        <item name="android:paddingStart">24dp</item>
+        <item name="android:paddingEnd">24dp</item>
+        <item name="android:textSize">?attr/textSizeSubHeadline</item>
     </style>
 
     <style name="Widget.Nova.Button.Primary">
@@ -188,7 +253,7 @@
     </style>
 
     <style name="AccentDialogNegativeButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
-        <item name="android:textColor">@color/error_red</item>
+        <item name="android:textColor">@color/red</item>
     </style>
 
     <!-- Dialog -->
@@ -197,7 +262,7 @@
     <!--   Bottom Navigation -->
     <style name="BottomNavigationView" parent="@style/TextAppearance.AppCompat.Caption">
         <item name="android:textSize">10sp</item>
-        <item name="android:fontFamily">@font/soramitsu_semibold</item>
+        <item name="android:fontFamily">?attr/fontSemiBold</item>
     </style>
 
 </resources>

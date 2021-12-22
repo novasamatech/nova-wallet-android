@@ -23,7 +23,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="17dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="25dp"
             android:text="@string/crowdloan_crowdloan" />
 
 
@@ -34,7 +34,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
-            app:actionIcon="@drawable/ic_chevron_down_white"
+            app:actionIcon="@drawable/ic_chevron_down"
             app:backgroundStyle="blurred"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -78,7 +78,7 @@
             app:layout_constraintEnd_toEndOf="@id/crowdloanAboutTitle"
             app:layout_constraintStart_toStartOf="@id/crowdloanAboutTitle"
             app:layout_constraintTop_toBottomOf="@id/crowdloanAboutTitle"
-            tools:text="@string/crowdloan_main_description" />
+            tools:text="@string/crowdloan_main_description_v2_2_0" />
 
         <io.novafoundation.nova.common.view.GoNextView
             android:id="@+id/crowdloanMyContributions"
@@ -88,7 +88,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
             android:text="@string/crowdloan_your_contributions"
-            app:actionIcon="@drawable/ic_arrow_right_24"
+            app:actionIcon="@drawable/ic_chevron_right"
             app:dividerVisible="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -122,7 +122,7 @@
             android:layout_marginTop="64dp"
             android:drawablePadding="18dp"
             android:gravity="center"
-            android:text="@string/crowdloan_empty_message"
+            android:text="@string/crowdloan_empty_message_v2_2_0"
             app:drawableTopCompat="@drawable/ic_placeholder"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

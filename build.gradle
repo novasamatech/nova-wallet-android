@@ -1,8 +1,10 @@
 buildscript {
     ext {
         // App version
-        versionName = '2.1.1'
-        versionCode = 7
+        versionName = '2.2.0'
+        versionCode = 8
+
+        applicationId = "io.novafoundation.nova"
 
         // SDK and tools
         compileSdkVersion = 30
@@ -37,12 +39,12 @@ buildscript {
         navControllerVersion = '2.3.1'
 
         junitVersion = '4.12'
-        mockitoVersion = '2.23.0'
+        mockitoVersion = '3.12.4'
         robolectricVersion = '4.1'
 
         bouncyCastleVersion = '1.60'
 
-        fearlessLibVersion = '1.1.5'
+        fearlessLibVersion = '1.1.6'
 
         gifVersion = '1.2.19'
 
@@ -66,6 +68,8 @@ buildscript {
 
         coilVersion = '1.2.1'
 
+        flexBoxVersion = "3.0.0"
+
         coilDep = "io.coil-kt:coil:$coilVersion"
         coilSvg = "io.coil-kt:coil-svg:$coilVersion"
 
@@ -78,6 +82,8 @@ buildscript {
         recyclerViewDep = "androidx.recyclerview:recyclerview:$supportVersion"
         constraintDep = "androidx.constraintlayout:constraintlayout:$constraintVersion"
         materialDep = "com.google.android.material:material:$supportVersion"
+
+        flexBoxDep = "com.google.android.flexbox:flexbox:$flexBoxVersion"
 
         daggerDep = "com.google.dagger:dagger:$daggerVersion"
         daggerKapt = "com.google.dagger:dagger-compiler:$daggerVersion"

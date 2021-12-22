@@ -27,9 +27,7 @@ import kotlinx.android.synthetic.main.fragment_contribute.crowdloanContributeCon
 import kotlinx.android.synthetic.main.fragment_contribute.crowdloanContributeFee
 import kotlinx.android.synthetic.main.fragment_contribute.crowdloanContributeLearnMore
 import kotlinx.android.synthetic.main.fragment_contribute.crowdloanContributeLeasingPeriod
-import kotlinx.android.synthetic.main.fragment_contribute.crowdloanContributeRaised
 import kotlinx.android.synthetic.main.fragment_contribute.crowdloanContributeReward
-import kotlinx.android.synthetic.main.fragment_contribute.crowdloanContributeTimeLeft
 import kotlinx.android.synthetic.main.fragment_contribute.crowdloanContributeToolbar
 import kotlinx.android.synthetic.main.fragment_contribute.crowdloanContributeUnlockHint
 import kotlinx.coroutines.flow.filterNotNull
@@ -104,7 +102,7 @@ class CrowdloanContributeFragment : BaseFragment<CrowdloanContributeViewModel>()
         crowdloanContributeAmount.amountInput.bindTo(viewModel.enteredAmountFlow, lifecycleScope)
 
         viewModel.enteredFiatAmountFlow.observe {
-            it.let(crowdloanContributeAmount::setAssetBalanceDollarAmount)
+            it.let(crowdloanContributeAmount::setFiatAmount)
         }
 
         viewModel.feeLiveData.observe(crowdloanContributeFee::setFeeStatus)
@@ -121,8 +119,6 @@ class CrowdloanContributeFragment : BaseFragment<CrowdloanContributeViewModel>()
 
         viewModel.crowdloanDetailModelFlow.observe {
             crowdloanContributeLeasingPeriod.showValue(it.leasePeriod, it.leasedUntil)
-            crowdloanContributeTimeLeft.showValue(it.timeLeft)
-            crowdloanContributeRaised.showValue(it.raised, it.raisedPercentage)
         }
 
         crowdloanContributeToolbar.setTitle(viewModel.title)

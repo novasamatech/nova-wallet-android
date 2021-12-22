@@ -14,6 +14,8 @@
 
     <dimen name="text_size_title3">20sp</dimen>
 
+    <dimen name="text_size_subheadline">15sp</dimen>
+
     <dimen name="text_size_caps_title_1">12dp</dimen>
     <dimen name="text_size_caps_title_2">12dp</dimen>
 
@@ -26,4 +28,6 @@
     <dimen name="element_chooser_padding">16dp</dimen>
 
     <dimen name="avatar_size">40dp</dimen>
+
+    <dimen name="border_radius">12dp</dimen>
 </resources>

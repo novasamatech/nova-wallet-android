@@ -8,13 +8,19 @@
     <fragment
         android:id="@+id/profileFragment"
         tools:layout="@layout/fragment_profile"
-        android:name="io.novafoundation.nova.feature_account_impl.presentation.profile.ProfileFragment"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.settings.SettingsFragment"
         android:label="ProfileFragment" />
 
     <fragment
         android:id="@+id/crowdloanFragment"
         tools:layout="@layout/fragment_crowdloans"
         android:name="io.novafoundation.nova.feature_crowdloan_impl.presentation.main.CrowdloanFragment"
+        android:label="CrowdloanFragment" />
+
+    <fragment
+        android:id="@+id/dAppsFragment"
+        tools:layout="@layout/fragment_dapp_main"
+        android:name="io.novafoundation.nova.feature_dapp_impl.presentation.main.MainDAppFragment"
         android:label="CrowdloanFragment" />
 
     <fragment

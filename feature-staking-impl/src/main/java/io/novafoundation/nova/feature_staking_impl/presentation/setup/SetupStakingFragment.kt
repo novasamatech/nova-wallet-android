@@ -81,7 +81,7 @@ class SetupStakingFragment : BaseFragment<SetupStakingViewModel>() {
         setupStakingAmountField.amountInput.bindTo(viewModel.enteredAmountFlow, lifecycleScope)
 
         viewModel.enteredFiatAmountFlow.observe {
-            it.let(setupStakingAmountField::setAssetBalanceDollarAmount)
+            it.let(setupStakingAmountField::setFiatAmount)
         }
 
         viewModel.feeLiveData.observe {

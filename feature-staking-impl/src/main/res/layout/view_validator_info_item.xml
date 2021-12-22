@@ -61,7 +61,7 @@
         android:drawablePadding="9dp"
         android:text="Validator is slashed for misbehaves (e.g. goes offline, attacks the network, or runs modified software) in the network."
         android:visibility="gone"
-        app:drawableStartCompat="@drawable/ic_status_error_16"
+        app:drawableStartCompat="@drawable/ic_red_cross"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/validatorIdentityBody" />

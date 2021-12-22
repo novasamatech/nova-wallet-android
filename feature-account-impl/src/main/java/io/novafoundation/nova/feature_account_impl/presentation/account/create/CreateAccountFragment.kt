@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import coil.ImageLoader
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.hideSoftKeyboard
@@ -15,9 +14,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddA
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.impl.setupAccountNameChooserUi
-import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.impl.setupForcedChainUi
-import kotlinx.android.synthetic.main.fragment_create_account.createAccountForcedChain
-import kotlinx.android.synthetic.main.fragment_create_account.createAccountNameDescription
 import kotlinx.android.synthetic.main.fragment_create_account.createAccountNameField
 import kotlinx.android.synthetic.main.fragment_create_account.nextBtn
 import kotlinx.android.synthetic.main.fragment_create_account.toolbar
@@ -67,26 +63,6 @@ class CreateAccountFragment : BaseFragment<CreateAccountViewModel>() {
             nextBtn.isEnabled = it
         }
 
-        viewModel.showScreenshotsWarningEvent.observeEvent {
-            showScreenshotWarningDialog()
-        }
-
-        setupForcedChainUi(viewModel, createAccountForcedChain, imageLoader)
-        setupAccountNameChooserUi(
-            viewModel = viewModel,
-            ui = createAccountNameField,
-            additionalViewsToControlVisibility = listOf(createAccountNameDescription)
-        )
-    }
-
-    private fun showScreenshotWarningDialog() {
-        MaterialAlertDialogBuilder(context, R.style.AlertDialogTheme)
-            .setTitle(R.string.common_no_screenshot_title)
-            .setMessage(R.string.common_no_screenshot_message)
-            .setPositiveButton(R.string.common_ok) { dialog, _ ->
-                dialog?.dismiss()
-                viewModel.screenshotWarningConfirmed()
-            }
-            .show()
+        setupAccountNameChooserUi(viewModel, ui = createAccountNameField)
     }
 }

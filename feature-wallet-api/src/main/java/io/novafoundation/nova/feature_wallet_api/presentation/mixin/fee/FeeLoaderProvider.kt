@@ -6,20 +6,30 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapFeeToFeeModel
-import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import java.math.BigInteger
 
+class FeeLoaderProviderFactory(
+    private val resourceManager: ResourceManager,
+) : FeeLoaderMixin.Factory {
+
+    override fun create(tokenFlow: Flow<Token>): FeeLoaderMixin.Presentation {
+        return FeeLoaderProvider(resourceManager, tokenFlow)
+    }
+}
+
 class FeeLoaderProvider(
     private val resourceManager: ResourceManager,
-    private val tokenUseCase: TokenUseCase,
+    private val tokenFlow: Flow<Token>,
 ) : FeeLoaderMixin.Presentation {
 
     override val feeLiveData = MutableLiveData<FeeStatus>()
@@ -27,13 +37,13 @@ class FeeLoaderProvider(
     override val retryEvent = MutableLiveData<Event<RetryPayload>>()
 
     override suspend fun loadFeeSuspending(
-        coroutineScope: CoroutineScope,
+        retryScope: CoroutineScope,
         feeConstructor: suspend (Token) -> BigInteger,
         onRetryCancelled: () -> Unit,
     ): Unit = withContext(Dispatchers.Default) {
         feeLiveData.postValue(FeeStatus.Loading)
 
-        val token = tokenUseCase.currentToken()
+        val token = tokenFlow.first()
 
         val feeResult = runCatching {
             feeConstructor(token)
@@ -56,7 +66,7 @@ class FeeLoaderProvider(
                         RetryPayload(
                             title = resourceManager.getString(R.string.choose_amount_network_error),
                             message = resourceManager.getString(R.string.choose_amount_error_fee),
-                            onRetry = { loadFee(coroutineScope, feeConstructor, onRetryCancelled) },
+                            onRetry = { loadFee(retryScope, feeConstructor, onRetryCancelled) },
                             onCancel = onRetryCancelled
                         )
                     )
@@ -81,9 +91,16 @@ class FeeLoaderProvider(
         }
     }
 
+    override suspend fun setFee(fee: BigDecimal) {
+        val token = tokenFlow.first()
+        val feeModel = mapFeeToFeeModel(fee, token)
+
+        feeLiveData.postValue(FeeStatus.Loaded(feeModel))
+    }
+
     override fun requireFee(
         block: (BigDecimal) -> Unit,
-        onError: (title: String, message: String) -> Unit
+        onError: (title: String, message: String) -> Unit,
     ) {
         val feeStatus = feeLiveData.value
 

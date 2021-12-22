@@ -5,16 +5,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportFragment
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
-import io.novafoundation.nova.feature_account_impl.presentation.view.advanced.AdvancedBlockView.FieldState
-import kotlinx.android.synthetic.main.fragment_export_seed.exportSeedAdvanced
-import kotlinx.android.synthetic.main.fragment_export_seed.exportSeedExport
+import kotlinx.android.synthetic.main.fragment_export_seed.exportSeedContentContainer
 import kotlinx.android.synthetic.main.fragment_export_seed.exportSeedToolbar
-import kotlinx.android.synthetic.main.fragment_export_seed.exportSeedType
 import kotlinx.android.synthetic.main.fragment_export_seed.exportSeedValue
 
 private const val PAYLOAD_KEY = "PAYLOAD_KEY"
@@ -36,15 +34,9 @@ class ExportSeedFragment : ExportFragment<ExportSeedViewModel>() {
     override fun initViews() {
         exportSeedToolbar.setHomeButtonListener { viewModel.back() }
 
-        configureAdvancedBlock()
+        exportSeedToolbar.setRightActionClickListener { viewModel.optionsClicked() }
 
-        exportSeedExport.setOnClickListener { viewModel.exportClicked() }
-    }
-
-    private fun configureAdvancedBlock() {
-        with(exportSeedAdvanced) {
-            configure(FieldState.DISABLED)
-        }
+        exportSeedContentContainer.background = requireContext().getRoundedCornerDrawable(fillColorRes = R.color.white_16)
     }
 
     override fun inject() {
@@ -57,22 +49,6 @@ class ExportSeedFragment : ExportFragment<ExportSeedViewModel>() {
     override fun subscribe(viewModel: ExportSeedViewModel) {
         super.subscribe(viewModel)
 
-        exportSeedType.setMessage(viewModel.exportSource.nameRes)
-
-        viewModel.exportingSecretFlow.observe {
-            val state = if (it.derivationPath.isNullOrBlank()) FieldState.HIDDEN else FieldState.DISABLED
-
-            with(exportSeedAdvanced) {
-                configure(derivationPathField, state)
-
-                setDerivationPath(it.derivationPath)
-            }
-
-            exportSeedValue.setMessage(it.secret)
-        }
-
-        viewModel.cryptoTypeFlow.observe {
-            exportSeedAdvanced.setEncryption(it.name)
-        }
+        viewModel.seedFlow.observe(exportSeedValue::setText)
     }
 }

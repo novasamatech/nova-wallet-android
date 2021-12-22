@@ -2,6 +2,7 @@
 <resources>
 
     <!--fonts-->
+    <attr name="fontExtraLight" format="reference" />
     <attr name="fontSemiBold" format="reference" />
     <attr name="fontBold" format="reference" />
     <attr name="fontExtraBold" format="reference" />
@@ -22,6 +23,7 @@
     <attr name="textSizeB3" format="reference" />
 
     <attr name="textSizeTitle3" format="reference" />
+    <attr name="textSizeSubHeadline" format="reference" />
 
     <!--text sizes-->
 
@@ -42,6 +44,8 @@
         <attr name="textIcon" format="reference|color" />
         <attr name="enabled" format="boolean" />
         <attr name="android:singleLine" />
+
+        <attr format="reference" name="messageStyle" />
     </declare-styleable>
 
     <declare-styleable name="AccountInfoView">

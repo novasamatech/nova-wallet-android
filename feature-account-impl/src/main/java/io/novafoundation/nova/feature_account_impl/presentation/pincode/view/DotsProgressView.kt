@@ -37,7 +37,8 @@ class DotsProgressView @JvmOverloads constructor(
         for (i in 0 until MAX_PROGRESS) {
             val circle = View(context)
             val params = LayoutParams(itemSize, itemSize)
-            params.setMargins(itemMargin, 0, itemMargin, 0)
+            // divide by 2 since margins from adjacent views are combined
+            params.setMargins(itemMargin / 2, 0, itemMargin / 2, 0)
             circle.layoutParams = params
             addView(circle)
             circles[i] = circle

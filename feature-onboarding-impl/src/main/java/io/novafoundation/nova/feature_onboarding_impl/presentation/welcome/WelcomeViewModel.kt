@@ -7,14 +7,19 @@ import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
+import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportAccountPayload
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
 
 class WelcomeViewModel(
     shouldShowBack: Boolean,
     private val router: OnboardingRouter,
     private val appLinksProvider: AppLinksProvider,
-    private val addAccountPayload: AddAccountPayload
-) : BaseViewModel(), Browserable {
+    private val addAccountPayload: AddAccountPayload,
+    private val importTypeChooserMixin: ImportTypeChooserMixin.Presentation,
+) : BaseViewModel(),
+    ImportTypeChooserMixin by importTypeChooserMixin,
+    Browserable {
 
     val shouldShowBackLiveData: LiveData<Boolean> = MutableLiveData(shouldShowBack)
 
@@ -28,7 +33,11 @@ class WelcomeViewModel(
     }
 
     fun importAccountClicked() {
-        router.openImportAccountScreen(addAccountPayload)
+        val payload = ImportTypeChooserMixin.Payload(
+            onChosen = { router.openImportAccountScreen(ImportAccountPayload(it, addAccountPayload)) }
+        )
+
+        importTypeChooserMixin.showChooser(payload)
     }
 
     fun termsClicked() {

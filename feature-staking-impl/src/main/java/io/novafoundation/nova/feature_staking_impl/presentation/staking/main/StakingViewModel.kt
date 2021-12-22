@@ -20,12 +20,12 @@ import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingState
-import io.novafoundation.nova.feature_staking_api.domain.model.StakingStory
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.alerts.Alert
 import io.novafoundation.nova.feature_staking_impl.domain.alerts.AlertsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.model.NetworkInfo
+import io.novafoundation.nova.feature_staking_impl.domain.model.StakingPeriod
 import io.novafoundation.nova.feature_staking_impl.domain.validations.balance.ManageStakingValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.validations.balance.ManageStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -34,14 +34,13 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.balance.
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.select.SelectBondMorePayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.di.StakingViewStateFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.model.StakingNetworkInfoModel
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.model.StakingStoryModel
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.redeem.RedeemPayload
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
-import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.WithAssetSelector
+import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.selectedChainFlow
 import kotlinx.coroutines.cancelChildren
@@ -70,9 +69,9 @@ class StakingViewModel(
     private val redeemValidationSystem: ManageStakingValidationSystem,
     private val bondMoreValidationSystem: ManageStakingValidationSystem,
     private val validationExecutor: ValidationExecutor,
-    private val stakingUpdateSystem: UpdateSystem,
-    private val assetSelectorMixinFactory: MixinFactory<AssetSelectorMixin.Presentation>,
-    private val selectedAssetState: SingleAssetSharedState,
+    stakingUpdateSystem: UpdateSystem,
+    assetSelectorMixinFactory: MixinFactory<AssetSelectorMixin.Presentation>,
+    selectedAssetState: SingleAssetSharedState,
 ) : BaseViewModel(),
     WithAssetSelector,
     Validatable by validationExecutor {
@@ -108,21 +107,7 @@ class StakingViewModel(
         .inBackground()
         .asLiveData()
 
-    val stories = interactor.stakingStoriesFlow()
-        .map { it.map(::transformStories) }
-        .asLiveData()
-
     val currentAddressModelLiveData = currentAddressModelFlow().asLiveData()
-
-    val networkInfoTitle = selectedChain
-        .map { it.name }
-        .share()
-
-    fun storyClicked(story: StakingStoryModel) {
-        if (story.elements.isNotEmpty()) {
-            router.openStory(story)
-        }
-    }
 
     val alertsFlow = loadingStakingState
         .flatMapLoading {
@@ -138,7 +123,7 @@ class StakingViewModel(
     }
 
     fun avatarClicked() {
-        router.openChangeAccountFromStaking()
+        router.openChangeAccount()
     }
 
     private fun mapAlertToAlertModel(alert: Alert): AlertModel {
@@ -151,6 +136,7 @@ class StakingViewModel(
                     AlertModel.Type.CallToAction { router.openCurrentValidators() }
                 )
             }
+
             is Alert.RedeemTokens -> {
                 AlertModel(
                     WARNING_ICON,
@@ -159,6 +145,7 @@ class StakingViewModel(
                     AlertModel.Type.CallToAction(::redeemAlertClicked)
                 )
             }
+
             is Alert.BondMoreTokens -> {
                 val existentialDepositDisplay = formatAlertTokenAmount(alert.minimalStake, alert.token)
 
@@ -169,6 +156,7 @@ class StakingViewModel(
                     AlertModel.Type.CallToAction(::bondMoreAlertClicked)
                 )
             }
+
             is Alert.WaitingForNextEra -> AlertModel(
                 WAITING_ICON,
                 resourceManager.getString(R.string.staking_nominator_status_alert_waiting_message),
@@ -242,7 +230,8 @@ class StakingViewModel(
 
         is StakingState.NonStash -> stakingViewStateFactory.createWelcomeViewState(
             stakingStateScope,
-            ::showError
+            ::showError,
+            assetSelectorMixin.selectedAssetFlow,
         )
 
         is StakingState.Stash.Validator -> stakingViewStateFactory.createValidatorViewState(
@@ -253,33 +242,24 @@ class StakingViewModel(
         )
     }
 
-    private fun transformStories(story: StakingStory): StakingStoryModel = with(story) {
-        val elements = elements.map { StakingStoryModel.Element(it.titleRes, it.bodyRes, it.url) }
-        StakingStoryModel(titleRes, iconSymbol, elements)
-    }
-
     private fun transformNetworkInfo(asset: Asset, networkInfo: NetworkInfo): StakingNetworkInfoModel {
-        val totalStake = asset.token.amountFromPlanks(networkInfo.totalStake)
-        val totalStakeFormatted = totalStake.formatTokenAmount(asset.token.configuration)
+        val totalStaked = mapAmountToAmountModel(networkInfo.totalStake, asset)
+        val minimumStake = mapAmountToAmountModel(networkInfo.minimumStake, asset)
 
-        val totalStakeFiat = asset.token.fiatAmount(totalStake).formatAsCurrency()
-
-        val minimumStake = asset.token.amountFromPlanks(networkInfo.minimumStake)
-        val minimumStakeFormatted = minimumStake.formatTokenAmount(asset.token.configuration)
-
-        val minimumStakeFiat = asset.token.fiatAmount(minimumStake).formatAsCurrency()
-
-        val lockupPeriod = resourceManager.getQuantityString(R.plurals.staking_main_lockup_period_value, networkInfo.lockupPeriodInDays)
+        val unstakingPeriod = resourceManager.getQuantityString(R.plurals.staking_main_lockup_period_value, networkInfo.lockupPeriodInDays)
             .format(networkInfo.lockupPeriodInDays)
+
+        val stakingPeriod = when (networkInfo.stakingPeriod) {
+            StakingPeriod.Unlimited -> resourceManager.getString(R.string.common_unlimited)
+        }
 
         return with(networkInfo) {
             StakingNetworkInfoModel(
-                lockupPeriod,
-                minimumStakeFormatted,
-                minimumStakeFiat,
-                totalStakeFormatted,
-                totalStakeFiat,
-                nominatorsCount.format()
+                totalStaked = totalStaked,
+                minimumStake = minimumStake,
+                activeNominators = nominatorsCount.format(),
+                stakingPeriod = stakingPeriod,
+                unstakingPeriod = unstakingPeriod
             )
         }
     }

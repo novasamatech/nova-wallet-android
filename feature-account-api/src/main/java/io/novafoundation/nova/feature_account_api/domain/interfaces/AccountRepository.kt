@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.Mnemonic
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 
@@ -59,7 +60,7 @@ interface AccountRepository {
 
     suspend fun getPinCode(): String?
 
-    suspend fun generateMnemonic(): List<String>
+    suspend fun generateMnemonic(): Mnemonic
 
     suspend fun isBiometricEnabled(): Boolean
 
@@ -84,6 +85,7 @@ interface AccountRepository {
     suspend fun checkNodeExists(nodeHost: String): Boolean
 
     /**
+     * @throws NovaException
      * @throws NovaException
      */
     suspend fun getNetworkName(nodeHost: String): String

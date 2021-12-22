@@ -23,6 +23,8 @@ import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateS
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActionsProvider
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserProvider
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSource
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSourceImpl
 import io.novafoundation.nova.feature_account_impl.data.repository.AccountRepositoryImpl
@@ -34,7 +36,11 @@ import io.novafoundation.nova.feature_account_impl.data.secrets.AccountSecretsFa
 import io.novafoundation.nova.feature_account_impl.domain.AccountInteractorImpl
 import io.novafoundation.nova.feature_account_impl.domain.NodeHostValidator
 import io.novafoundation.nova.feature_account_impl.domain.account.add.AddAccountInteractor
+import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountDetailsInteractor
+import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherMixin
+import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherProvider
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
@@ -207,4 +213,26 @@ class AccountFeatureModule {
         addAccountRepository: AddAccountRepository,
         accountRepository: AccountRepository,
     ) = AddAccountInteractor(addAccountRepository, accountRepository)
+
+    @Provides
+    @FeatureScope
+    fun provideInteractor(
+        accountRepository: AccountRepository,
+        secretStoreV2: SecretStoreV2,
+        chainRegistry: ChainRegistry,
+    ) = AdvancedEncryptionInteractor(accountRepository, secretStoreV2, chainRegistry)
+
+    @Provides
+    fun provideImportTypeChooserMixin(): ImportTypeChooserMixin.Presentation = ImportTypeChooserProvider()
+
+    @Provides
+    fun provideAddAccountLauncherMixin(
+        importTypeChooserMixin: ImportTypeChooserMixin.Presentation,
+        resourceManager: ResourceManager,
+        router: AccountRouter,
+    ): AddAccountLauncherMixin.Presentation = AddAccountLauncherProvider(
+        importTypeChooserMixin = importTypeChooserMixin,
+        resourceManager = resourceManager,
+        router = router
+    )
 }

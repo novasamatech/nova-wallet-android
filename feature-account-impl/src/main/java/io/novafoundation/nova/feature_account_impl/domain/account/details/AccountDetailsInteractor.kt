@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.domain.model.hasChainAccountIn
+import io.novafoundation.nova.feature_account_api.presenatation.account.add.SecretType
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountInChain.From
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -58,15 +59,15 @@ class AccountDetailsInteractor(
     suspend fun availableExportTypes(
         metaAccount: MetaAccount,
         chain: Chain,
-    ): List<AvailableExportType> = withContext(Dispatchers.Default) {
-        val accountId = metaAccount.accountIdIn(chain) ?: return@withContext emptyList()
+    ): Set<SecretType> = withContext(Dispatchers.Default) {
+        val accountId = metaAccount.accountIdIn(chain) ?: return@withContext emptySet()
 
         val secrets = secretStoreV2.getAccountSecrets(metaAccount.id, accountId)
 
-        listOfNotNull(
-            AvailableExportType.MNEMONC.takeIf { secrets.entropy() != null },
-            AvailableExportType.SEED.takeIf { secrets.seed() != null },
-            AvailableExportType.JSON // always available
+        setOfNotNull(
+            SecretType.MNEMONIC.takeIf { secrets.entropy() != null },
+            SecretType.SEED.takeIf { secrets.seed() != null },
+            SecretType.JSON // always available
         )
     }
 

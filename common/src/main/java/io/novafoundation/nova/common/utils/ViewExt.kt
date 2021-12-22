@@ -21,11 +21,14 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.LayoutRes
 import androidx.annotation.StyleableRes
 import androidx.core.content.ContextCompat
+import androidx.core.widget.TextViewCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.shimmer.ShimmerFrameLayout
 import dev.chrisbanes.insetter.applyInsetter
+import io.novafoundation.nova.common.utils.input.Input
+import io.novafoundation.nova.common.utils.input.valueOrNull
 
 fun View.updatePadding(
     top: Int = paddingTop,
@@ -201,7 +204,7 @@ fun RecyclerView.findFirstVisiblePosition(): Int {
 fun TextView.setCompoundDrawableTint(@ColorRes tintRes: Int) {
     val tintColor = context.getColor(tintRes)
 
-    compoundDrawableTintList = ColorStateList.valueOf(tintColor)
+    TextViewCompat.setCompoundDrawableTintList(this, ColorStateList.valueOf(tintColor))
 }
 
 fun TextView.setTextOrHide(newText: String?) {
@@ -234,4 +237,21 @@ fun View.applyBarMargin() = applyInsetter {
     type(statusBars = true) {
         margin()
     }
+}
+
+fun View.applyStatusBarInsets(consume: Boolean = true) = applyInsetter {
+    type(statusBars = true) {
+        padding()
+    }
+
+    consume(consume)
+}
+
+fun View.setBackgroundColorRes(@ColorRes colorRes: Int) = setBackgroundColor(context.getColor(colorRes))
+
+fun <I> View.useInputValue(input: Input<I>, onValue: (I) -> Unit) {
+    setVisible(input is Input.Enabled)
+    isEnabled = input is Input.Enabled.Modifiable
+
+    input.valueOrNull?.let(onValue)
 }

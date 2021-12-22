@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="Theme.NovaFoundation.Nova" parent="Theme.MaterialComponents.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
@@ -27,16 +27,20 @@
 
 
         <item name="textSizeTitle3">@dimen/text_size_title3</item>
+        <item name="textSizeSubHeadline">@dimen/text_size_subheadline</item>
         <!--text sizes-->
 
         <!--fonts-->
-        <item name="fontSemiBold">@font/soramitsu_semibold</item>
-        <item name="fontBold">@font/soramitsu_bold</item>
-        <item name="fontExtraBold">@font/soramitsu_extrabold</item>
-        <item name="fontRegular">@font/soramitsu_regular</item>
+        <item name="fontSemiBold">@font/public_sans_semi_bold</item>
+        <item name="fontBold">@font/public_sans_bold</item>
+        <item name="fontExtraBold">@font/public_sans_extra_bold</item>
+        <item name="fontRegular">@font/public_sans_regular</item>
+        <item name="fontExtraLight">@font/public_sans_extra_light</item>
         <!--fonts-->
 
         <item name="colorAccent">@color/accentBlue</item>
+
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
     </style>
 
     <style name="WhiteOverlay" parent="ThemeOverlay.AppCompat">

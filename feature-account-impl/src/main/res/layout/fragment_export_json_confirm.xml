@@ -12,70 +12,33 @@
         android:id="@+id/exportJsonConfirmToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:titleText="Export account" />
+        app:dividerVisible="false"
+        app:iconRight="@drawable/ic_options" />
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginBottom="24dp"
-        android:layout_weight="1">
+    <TextView
+        style="@style/TextAppearance.NovaFoundation.Header2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/account_export_json_title" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <io.novafoundation.nova.common.view.LabeledTextView
-                android:id="@+id/exportJsonConfirmType"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="16dp"
-                app:enabled="false"
-                app:label="@string/recovery_source_type"
-                app:message="@string/recovery_json" />
-
-            <io.novafoundation.nova.common.view.LabeledTextView
-                android:id="@+id/exportJsonConfirmValue"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="16dp"
-                app:enabled="false"
-                app:label="@string/recovery_json"
-                tools:message="{“address”:”Gerfdad...DJWIdjawIdjWd”}" />
-
-            <io.novafoundation.nova.common.view.LabeledTextView
-                android:id="@+id/exportJsonConfirmNetworkInput"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="16dp"
-                app:actionIcon="@drawable/ic_pin_white_24"
-                app:label="@string/common_choose_network"
-                app:enabled="false"
-                tools:message="Kusama"
-                tools:textIcon="@drawable/ic_ksm_24" />
-
-            <io.novafoundation.nova.feature_account_impl.presentation.view.advanced.AdvancedBlockView
-                android:id="@+id/exportJsonConfirmAdvanced"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-    </ScrollView>
-
-    <io.novafoundation.nova.common.view.PrimaryButton
-        android:id="@+id/exportJsonConfirmChangePassword"
-        style="@style/Widget.Nova.Button.Outline"
+    <io.novafoundation.nova.common.view.LabeledTextView
+        android:id="@+id/exportJsonConfirmValue"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:text="@string/account_export_password_change" />
+        app:enabled="false"
+        app:label="@string/recovery_json"
+        tools:message="{“address”:”Gerfdad...DJWIdjawIdjWd”}" />
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 
     <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/exportJsonConfirmExport"

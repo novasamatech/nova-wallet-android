@@ -3,13 +3,13 @@ package io.novafoundation.nova.feature_account_impl.presentation.importing.sourc
 import android.content.Context
 import android.util.AttributeSet
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.Observer
+import androidx.lifecycle.coroutineScope
 import io.novafoundation.nova.common.utils.EventObserver
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.nameInputFilters
+import io.novafoundation.nova.common.utils.observe
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_account_impl.R
-import io.novafoundation.nova.feature_account_impl.presentation.importing.source.model.ImportSource
 import io.novafoundation.nova.feature_account_impl.presentation.importing.source.model.JsonImportSource
 import kotlinx.android.synthetic.main.import_source_json.view.importJsonContent
 import kotlinx.android.synthetic.main.import_source_json.view.importJsonNoNetworkInfo
@@ -20,7 +20,7 @@ class JsonImportView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
-) : ImportSourceView(R.layout.import_source_json, context, attrs, defStyleAttr) {
+) : ImportSourceView<JsonImportSource>(R.layout.import_source_json, context, attrs, defStyleAttr) {
 
     override val nameInputViews: ImportAccountNameViews
         get() = ImportAccountNameViews(
@@ -32,10 +32,12 @@ class JsonImportView @JvmOverloads constructor(
         importJsonUsernameInput.editText!!.filters = nameInputFilters()
     }
 
-    override fun observeSource(source: ImportSource, lifecycleOwner: LifecycleOwner) {
-        require(source is JsonImportSource)
+    override fun observeSource(source: JsonImportSource, lifecycleOwner: LifecycleOwner) {
+        val scope = lifecycleOwner.lifecycle.coroutineScope
 
-        source.jsonContentLiveData.observe(lifecycleOwner, Observer(importJsonContent::setMessage))
+        source.jsonContentFlow.observe(scope, importJsonContent::setMessage)
+
+        importJsonContent.setWholeClickListener { source.jsonClicked() }
 
         source.showJsonInputOptionsEvent.observe(
             lifecycleOwner,
@@ -44,17 +46,13 @@ class JsonImportView @JvmOverloads constructor(
             }
         )
 
-        importJsonPasswordInput.content.bindTo(source.passwordLiveData, lifecycleOwner)
-
-        importJsonContent.setActionClickListener {
-            source.chooseFileClicked()
-        }
+        importJsonPasswordInput.content.bindTo(source.passwordFlow, scope)
 
         importJsonContent.setOnClickListener {
             source.jsonClicked()
         }
 
-        source.showNetworkWarningLiveData.observe(lifecycleOwner) {
+        source.showNetworkWarningFlow.observe(scope) {
             importJsonNoNetworkInfo.setVisible(it)
         }
     }

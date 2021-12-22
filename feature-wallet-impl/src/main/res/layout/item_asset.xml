@@ -52,7 +52,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="3dp"
-        android:fontFamily="@font/soramitsu_bold"
+        android:fontFamily="?attr/fontBold"
         android:includeFontPadding="false"
         android:textColor="@color/white_50"
         app:layout_constraintBottom_toTopOf="@+id/itemAssetRate"

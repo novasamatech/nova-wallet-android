@@ -5,7 +5,7 @@
         android:right="16dp">
 
         <shape android:shape="rectangle">
-            <solid android:color="@color/dividerGray" />
+            <solid android:color="@color/white_8" />
             <size android:height="1dp" />
         </shape>
     </item>

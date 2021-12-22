@@ -7,7 +7,8 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.about.di.AboutComponent
+import io.novafoundation.nova.feature_account_impl.presentation.AdvancedEncryptionCommunicator
+import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.di.AdvancedEncryptionComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.create.di.CreateAccountComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.di.AccountDetailsComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.edit.di.AccountEditComponent
@@ -15,7 +16,6 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.list.di.
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ShareCompletedReceiver
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.di.ExportJsonConfirmComponent
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.password.di.ExportJsonPasswordComponent
-import io.novafoundation.nova.feature_account_impl.presentation.exporting.mnemonic.di.ExportMnemonicComponent
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.seed.di.ExportSeedComponent
 import io.novafoundation.nova.feature_account_impl.presentation.importing.di.ImportAccountComponent
 import io.novafoundation.nova.feature_account_impl.presentation.language.di.LanguagesComponent
@@ -25,12 +25,12 @@ import io.novafoundation.nova.feature_account_impl.presentation.node.add.di.AddN
 import io.novafoundation.nova.feature_account_impl.presentation.node.details.di.NodeDetailsComponent
 import io.novafoundation.nova.feature_account_impl.presentation.node.list.di.NodesComponent
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.di.PinCodeComponent
-import io.novafoundation.nova.feature_account_impl.presentation.profile.di.ProfileComponent
+import io.novafoundation.nova.feature_account_impl.presentation.settings.di.SettingsComponent
 import io.novafoundation.nova.runtime.di.RuntimeApi
 
 @Component(
     dependencies = [
-        AccountFeatureDependencies::class
+        AccountFeatureDependencies::class,
     ],
     modules = [
         AccountFeatureModule::class,
@@ -42,13 +42,13 @@ interface AccountFeatureComponent : AccountFeatureApi {
 
     fun createAccountComponentFactory(): CreateAccountComponent.Factory
 
-    fun aboutComponentFactory(): AboutComponent.Factory
+    fun advancedEncryptionComponentFactory(): AdvancedEncryptionComponent.Factory
 
     fun importAccountComponentFactory(): ImportAccountComponent.Factory
 
     fun backupMnemonicComponentFactory(): BackupMnemonicComponent.Factory
 
-    fun profileComponentFactory(): ProfileComponent.Factory
+    fun profileComponentFactory(): SettingsComponent.Factory
 
     fun pincodeComponentFactory(): PinCodeComponent.Factory
 
@@ -68,8 +68,6 @@ interface AccountFeatureComponent : AccountFeatureApi {
 
     fun addNodeComponentFactory(): AddNodeComponent.Factory
 
-    fun exportMnemonicFactory(): ExportMnemonicComponent.Factory
-
     fun exportSeedFactory(): ExportSeedComponent.Factory
 
     fun exportJsonPasswordFactory(): ExportJsonPasswordComponent.Factory
@@ -83,6 +81,7 @@ interface AccountFeatureComponent : AccountFeatureApi {
 
         fun create(
             @BindsInstance accountRouter: AccountRouter,
+            @BindsInstance advancedEncryptionCommunicator: AdvancedEncryptionCommunicator,
             deps: AccountFeatureDependencies
         ): AccountFeatureComponent
     }

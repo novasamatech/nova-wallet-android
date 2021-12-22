@@ -10,7 +10,7 @@
     <ImageView
         android:id="@+id/labeledTextPrimaryIcon"
         android:layout_height="24dp"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="16dp"
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -80,6 +80,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/ic_copy_24" />
+        tools:src="@drawable/ic_copy" />
 
 </merge>

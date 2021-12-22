@@ -14,50 +14,40 @@ import io.novafoundation.nova.common.mixin.MixinFactory
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
-import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
+import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportAccountPayload
 import io.novafoundation.nova.feature_account_impl.domain.account.add.AddAccountInteractor
+import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_impl.presentation.AdvancedEncryptionCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.AccountNameChooserMixin
-import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.CryptoTypeChooserMixin
-import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.ForcedChainMixin
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.impl.AccountNameChooserFactory
-import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.impl.CryptoTypeChooserFactory
-import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.impl.ForcedChainMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.importing.FileReader
 import io.novafoundation.nova.feature_account_impl.presentation.importing.ImportAccountViewModel
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.feature_account_impl.presentation.importing.source.ImportSourceFactory
 
 @Module(includes = [ViewModelModule::class])
 class ImportAccountModule {
 
     @Provides
-    @ScreenScope
-    fun provideCryptoChooserMixinFactory(
-        interactor: AccountInteractor,
-        addAccountPayload: AddAccountPayload,
-        resourceManager: ResourceManager,
-    ): MixinFactory<CryptoTypeChooserMixin> {
-        return CryptoTypeChooserFactory(
-            interactor,
-            addAccountPayload,
-            resourceManager
-        )
-    }
-
-    @Provides
-    @ScreenScope
-    fun provideForcedChainMixinFactory(
-        chainRegistry: ChainRegistry,
-        payload: AddAccountPayload,
-    ): MixinFactory<ForcedChainMixin> {
-        return ForcedChainMixinFactory(chainRegistry, payload)
-    }
+    fun provideImportSourceFactory(
+        addAccountInteractor: AddAccountInteractor,
+        clipboardManager: ClipboardManager,
+        advancedEncryptionRequester: AdvancedEncryptionCommunicator,
+        fileReader: FileReader,
+        advancedEncryptionInteractor: AdvancedEncryptionInteractor,
+    ) = ImportSourceFactory(
+        addAccountInteractor = addAccountInteractor,
+        clipboardManager = clipboardManager,
+        advancedEncryptionInteractor = advancedEncryptionInteractor,
+        advancedEncryptionRequester = advancedEncryptionRequester,
+        fileReader = fileReader
+    )
 
     @Provides
     fun provideNameChooserMixinFactory(
-        payload: AddAccountPayload,
+        payload: ImportAccountPayload,
     ): MixinFactory<AccountNameChooserMixin.Presentation> {
-        return AccountNameChooserFactory(payload)
+        return AccountNameChooserFactory(payload.addAccountPayload)
     }
 
     @Provides
@@ -69,27 +59,21 @@ class ImportAccountModule {
     @ViewModelKey(ImportAccountViewModel::class)
     fun provideViewModel(
         interactor: AccountInteractor,
-        addAccountInteractor: AddAccountInteractor,
         router: AccountRouter,
         resourceManager: ResourceManager,
-        forcedChainMixinFactory: MixinFactory<ForcedChainMixin>,
-        cryptoChooserMixinFactory: MixinFactory<CryptoTypeChooserMixin>,
         accountNameChooserFactory: MixinFactory<AccountNameChooserMixin.Presentation>,
-        clipboardManager: ClipboardManager,
-        fileReader: FileReader,
-        payload: AddAccountPayload,
+        advancedEncryptionRequester: AdvancedEncryptionCommunicator,
+        importSourceFactory: ImportSourceFactory,
+        payload: ImportAccountPayload,
     ): ViewModel {
         return ImportAccountViewModel(
-            addAccountInteractor,
             interactor,
             router,
             resourceManager,
-            forcedChainMixinFactory,
-            cryptoChooserMixinFactory,
             accountNameChooserFactory,
-            clipboardManager,
-            fileReader,
-            payload
+            advancedEncryptionRequester,
+            payload,
+            importSourceFactory
         )
     }
 

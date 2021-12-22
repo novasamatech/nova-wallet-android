@@ -6,11 +6,11 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Retriable
 import io.novafoundation.nova.common.view.dialog.retryDialog
 
-fun <T> BaseFragment<T>.observeRetries(
-    viewModel: T,
-    context: Context = requireContext()
-) where T : BaseViewModel, T : Retriable {
-    viewModel.retryEvent.observeEvent {
+fun BaseFragment<*>.observeRetries(
+    retriable: Retriable,
+    context: Context = requireContext(),
+) {
+    retriable.retryEvent.observeEvent {
         retryDialog(
             context = context,
             onRetry = it.onRetry,
@@ -20,4 +20,11 @@ fun <T> BaseFragment<T>.observeRetries(
             setMessage(it.message)
         }
     }
+}
+
+fun <T> BaseFragment<T>.observeRetries(
+    viewModel: T,
+    context: Context = requireContext(),
+) where T : BaseViewModel, T : Retriable {
+    observeRetries(retriable = viewModel, context)
 }

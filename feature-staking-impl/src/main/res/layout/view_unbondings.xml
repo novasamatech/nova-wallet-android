@@ -26,7 +26,7 @@
         android:layout_marginTop="6dp"
         android:padding="8dp"
         android:layout_marginEnd="8dp"
-        android:src="@drawable/ic_dots_horizontal_24"
+        android:src="@drawable/ic_more"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:tint="@color/actions_color" />
@@ -51,7 +51,7 @@
         android:layout_marginTop="15dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:text="@string/staking_unbonding_empty_list_v1_9_0"
+        android:text="@string/staking_unbonding_empty_list_v2_2_0"
         android:textColor="@color/white_64"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
