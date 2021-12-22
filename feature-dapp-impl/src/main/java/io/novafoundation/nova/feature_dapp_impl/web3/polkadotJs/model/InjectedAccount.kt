@@ -6,12 +6,12 @@ class InjectedAccount internal constructor(
     val address: String,
     val genesisHash: String?,
     val name: String?,
-    val type: String
+    val type: String?
 )
 
 fun InjectedAccount(
     address: String,
     genesisHash: String?,
     name: String?,
-    encryption: EncryptionType
-) = InjectedAccount(address, genesisHash, name, encryption.rawName)
+    encryption: EncryptionType?
+) = InjectedAccount(address, genesisHash, name, encryption?.rawName)
