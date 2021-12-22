@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Widget.Nova.DappIcon.Confirm" parent="">
+        <item name="android:layout_width">88dp</item>
+        <item name="android:layout_height">88dp</item>
+        <item name="android:background">@drawable/dapp_confirm_background</item>
+        <item name="android:padding">16dp</item>
+    </style>
+</resources>

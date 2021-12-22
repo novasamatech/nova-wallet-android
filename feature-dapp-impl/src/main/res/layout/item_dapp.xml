@@ -36,7 +36,7 @@
 
     <TextView
         android:id="@+id/itemDAppSubtitle"
-        style="@style/TextAppearance.NovaFoundation.Footnote"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"

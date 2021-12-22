@@ -7,12 +7,14 @@ import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.InjectedAc
 
 sealed class PolkadotJsExtensionRequest<R>(
     private val web3Responder: Web3Responder,
+    val url: String,
     private val identifier: Identifier
 ) : Web3Extension.Request<R> {
 
     enum class Identifier(val id: String) {
         AUTHORIZE_TAB("pub(authorize.tab)"),
-        ACCOUNT_LIST("pub(accounts.list)")
+        ACCOUNT_LIST("pub(accounts.list)"),
+        SIGN_EXTRINSIC("pub(extrinsic.sign)")
     }
 
     abstract fun serializeResponse(response: R): String
@@ -27,8 +29,8 @@ sealed class PolkadotJsExtensionRequest<R>(
 
     class AuthorizeTab(
         web3Responder: Web3Responder,
-        val url: String
-    ) : PolkadotJsExtensionRequest<AuthorizeTab.Response>(web3Responder, Identifier.AUTHORIZE_TAB) {
+        url: String
+    ) : PolkadotJsExtensionRequest<AuthorizeTab.Response>(web3Responder, url, Identifier.AUTHORIZE_TAB) {
 
         class Response(val authorized: Boolean)
 
@@ -38,9 +40,10 @@ sealed class PolkadotJsExtensionRequest<R>(
     }
 
     class AccountList(
-        private val web3Responder: Web3Responder,
+        web3Responder: Web3Responder,
+        url: String,
         private val gson: Gson,
-    ) : PolkadotJsExtensionRequest<AccountList.Response>(web3Responder, Identifier.ACCOUNT_LIST) {
+    ) : PolkadotJsExtensionRequest<AccountList.Response>(web3Responder, url, Identifier.ACCOUNT_LIST) {
 
         class Response(val accounts: List<InjectedAccount>)
 

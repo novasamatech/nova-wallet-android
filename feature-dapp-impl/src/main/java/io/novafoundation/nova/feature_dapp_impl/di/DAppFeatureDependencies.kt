@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_dapp_impl.di
 
+import coil.ImageLoader
 import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.network.AppLinksProvider
@@ -23,4 +24,6 @@ interface DAppFeatureDependencies {
     fun gson(): Gson
 
     fun chainRegistry(): ChainRegistry
+
+    fun imageLoader(): ImageLoader
 }

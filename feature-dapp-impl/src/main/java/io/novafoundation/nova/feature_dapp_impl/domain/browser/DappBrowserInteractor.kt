@@ -3,15 +3,25 @@ package io.novafoundation.nova.feature_dapp_impl.domain.browser
 import io.novafoundation.nova.common.data.mappers.mapCryptoTypeToEncryption
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress
+import io.novafoundation.nova.feature_dapp_impl.util.UrlNormalizer
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.InjectedAccount
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.genesisHash
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class DappBrowserInteractor(
     private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository
 ) {
+
+    suspend fun getDAppInfo(dAppUrl: String): DAppInfo = withContext(Dispatchers.Default) {
+        DAppInfo(
+            baseUrl = UrlNormalizer.normalizeUrl(dAppUrl),
+            metadata = null // TODO whitelist task
+        )
+    }
 
     @OptIn(ExperimentalStdlibApi::class)
     suspend fun getInjectedAccounts(): List<InjectedAccount> {

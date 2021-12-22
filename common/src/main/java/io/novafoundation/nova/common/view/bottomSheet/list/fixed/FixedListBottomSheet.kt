@@ -1,6 +1,7 @@
 package io.novafoundation.nova.common.view.bottomSheet.list.fixed
 
 import android.content.Context
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
 import androidx.annotation.CallSuper
@@ -9,6 +10,7 @@ import androidx.annotation.LayoutRes
 import androidx.annotation.StringRes
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.utils.DialogExtensions
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.utils.setVisible
@@ -17,11 +19,15 @@ import kotlinx.android.synthetic.main.bottom_sheeet_fixed_list.fixedListSheetIte
 import kotlinx.android.synthetic.main.bottom_sheeet_fixed_list.fixedListSheetTitle
 import kotlinx.android.synthetic.main.item_sheet_iconic_label.view.itemExternalActionContent
 
-abstract class FixedListBottomSheet(context: Context) : BottomSheetDialog(context, R.style.BottomSheetDialog) {
+abstract class FixedListBottomSheet(context: Context) :
+    BottomSheetDialog(context, R.style.BottomSheetDialog), DialogExtensions {
 
     init {
         setContentView(R.layout.bottom_sheeet_fixed_list)
     }
+
+    final override val dialogInterface: DialogInterface
+        get() = this
 
     @CallSuper
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,14 +59,6 @@ abstract class FixedListBottomSheet(context: Context) : BottomSheetDialog(contex
         builder.invoke(view)
 
         fixedListSheetItemContainer.addView(view)
-    }
-
-    inline fun View.setDismissingClickListener(crossinline listener: (View) -> Unit) {
-        setOnClickListener {
-            listener.invoke(it)
-
-            dismiss()
-        }
     }
 
     protected fun setTitleDividerVisible(visible: Boolean) {

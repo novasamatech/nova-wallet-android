@@ -1,42 +1,141 @@
 package io.novafoundation.nova.feature_dapp_impl.presentation.browser
 
+import androidx.lifecycle.MutableLiveData
+import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.address.createAddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
+import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.DappBrowserInteractor
+import io.novafoundation.nova.feature_dapp_impl.web3.Web3Session.AuthorizationState
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionFactory
+import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.AccountList
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.AuthorizeTab
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
+
+object NotAuthorizedException : Exception("Rejected by user")
+
+enum class ConfirmationState {
+    ALLOWED, REJECTED, CANCELLED
+}
 
 class DAppBrowserViewModel(
     private val router: DAppRouter,
     private val polkadotJsExtensionFactory: PolkadotJsExtensionFactory,
-    private val interactor: DappBrowserInteractor
+    private val interactor: DappBrowserInteractor,
+    private val resourceManager: ResourceManager,
+    private val addressIconGenerator: AddressIconGenerator,
+    private val selectedAccountUseCase: SelectedAccountUseCase,
 ) : BaseViewModel() {
 
     private val polkadotJsExtension = polkadotJsExtensionFactory.create(scope = this)
 
+    private val _showConfirmationSheet = MutableLiveData<Event<DappPendingConfirmation<*>>>()
+    val showConfirmationSheet = _showConfirmationSheet
+
+    private val selectedAccount = selectedAccountUseCase.selectedMetaAccountFlow()
+        .share()
+
     init {
         polkadotJsExtension.requestsFlow
-            .onEach {
-                when (it) {
-                    is AuthorizeTab -> authorizeTab(it)
-                    is AccountList -> supplyAccountList(it)
-                }
-            }
+            .onEach(::handleDAppRequest)
             .inBackground()
             .launchIn(this)
     }
 
-    private fun authorizeTab(request: AuthorizeTab) {
-        request.accept(AuthorizeTab.Response(authorized = true))
+    private suspend fun handleDAppRequest(request: PolkadotJsExtensionRequest<*>) {
+        val authorizationState = polkadotJsExtension.session.authorizationStateFor(request.url)
+
+        when (request) {
+            is AuthorizeTab -> authorizeTab(request, authorizationState)
+            is AccountList -> supplyAccountList(request, authorizationState)
+        }
     }
 
-    private suspend fun supplyAccountList(request: AccountList) {
+    private suspend fun authorizeTab(request: AuthorizeTab, authorizationState: AuthorizationState) {
+        when (authorizationState) {
+            // user already accepted - no need to ask second time
+            AuthorizationState.ALLOWED -> request.accept(AuthorizeTab.Response(true))
+            // first time dapp request authorization during this session
+            AuthorizationState.NONE -> authorizeTabWithConfirmation(request)
+            // user rejected this dapp - automatically reject next authorization requests
+            AuthorizationState.REJECTED -> request.reject(NotAuthorizedException)
+        }
+    }
+
+    private suspend fun authorizeTabWithConfirmation(request: AuthorizeTab) {
+        val dappInfo = interactor.getDAppInfo(request.url)
+
+        val dAppIdentifier = dappInfo.metadata?.name ?: dappInfo.baseUrl
+
+        val metaAccount = selectedAccount.first()
+
+        val action = DappPendingConfirmation.Action.Authorize(
+            title = resourceManager.getString(R.string.dapp_confirm_authorize_title_format, dAppIdentifier),
+            dAppIconUrl = dappInfo.metadata?.iconLink,
+            dAppUrl = dappInfo.baseUrl,
+            walletAddressModel = addressIconGenerator.createAddressModel(
+                accountAddress = metaAccount.defaultSubstrateAddress,
+                sizeInDp = AddressIconGenerator.SIZE_MEDIUM,
+                accountName = metaAccount.name
+            )
+        )
+
+        val confirmationState = awaitConfirmation(action)
+
+        val authorizationState = mapConfirmationStateToAuthorizationState(confirmationState)
+
+        polkadotJsExtension.session.updateAuthorizationState(request.url, authorizationState)
+
+        request.accept(AuthorizeTab.Response(authorizationState == AuthorizationState.ALLOWED))
+    }
+
+    private suspend fun supplyAccountList(
+        request: AccountList,
+        authorizationState: AuthorizationState
+    ) = respondIfAllowed(request, authorizationState) {
         val injectedAccounts = interactor.getInjectedAccounts()
 
-        request.accept(AccountList.Response(injectedAccounts))
+        AccountList.Response(injectedAccounts)
+    }
+
+    private suspend fun awaitConfirmation(action: DappPendingConfirmation.Action) = suspendCoroutine<ConfirmationState> {
+        val confirmation = DappPendingConfirmation(
+            onConfirm = { it.resume(ConfirmationState.ALLOWED) },
+            onDeny = { it.resume(ConfirmationState.REJECTED) },
+            onCancel = { it.resume(ConfirmationState.CANCELLED) },
+            action = action
+        )
+
+        _showConfirmationSheet.postValue(confirmation.event())
+    }
+
+    private fun mapConfirmationStateToAuthorizationState(
+        confirmationState: ConfirmationState
+    ): AuthorizationState = when (confirmationState) {
+        ConfirmationState.ALLOWED -> AuthorizationState.ALLOWED
+        ConfirmationState.REJECTED -> AuthorizationState.REJECTED
+        ConfirmationState.CANCELLED -> AuthorizationState.NONE
+    }
+
+    private suspend fun <T> respondIfAllowed(
+        request: PolkadotJsExtensionRequest<T>,
+        authorizationState: AuthorizationState,
+        responseConstructor: suspend () -> T
+    ) = if (authorizationState == AuthorizationState.ALLOWED) {
+        request.accept(responseConstructor())
+    } else {
+        request.reject(NotAuthorizedException)
     }
 }
