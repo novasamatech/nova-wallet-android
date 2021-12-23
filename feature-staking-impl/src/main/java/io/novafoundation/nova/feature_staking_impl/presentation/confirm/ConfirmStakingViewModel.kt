@@ -130,7 +130,7 @@ class ConfirmStakingViewModel(
         val lockupPeriod = interactor.getLockupPeriodInDays()
         emit(
             resourceManager.getString(
-                R.string.staking_hint_unstake_format,
+                R.string.staking_hint_unstake_format_v2_2_0,
                 resourceManager.getQuantityString(R.plurals.staking_main_lockup_period_value, lockupPeriod, lockupPeriod)
             )
         )
@@ -139,8 +139,14 @@ class ConfirmStakingViewModel(
 
     val eraHoursLength = flow {
         val hours = interactor.getEraHoursLength()
-        emit(resourceManager.getString(R.string.staking_hint_rewards_format, resourceManager.getQuantityString(R.plurals.common_hours_format, hours, hours)))
-    }.inBackground()
+        emit(
+            resourceManager.getString(
+                R.string.staking_hint_rewards_format_v2_2_0,
+                resourceManager.getQuantityString(R.plurals.common_hours_format, hours, hours)
+            )
+        )
+    }
+        .inBackground()
         .share()
 
     val rewardDestinationLiveData = flowOf(payload)

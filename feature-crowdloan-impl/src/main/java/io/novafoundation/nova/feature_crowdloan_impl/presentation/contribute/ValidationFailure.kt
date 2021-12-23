@@ -25,7 +25,8 @@ fun contributeValidationFailure(
 
         ContributeValidationFailure.ExistentialDepositCrossed -> {
             TransformedFailure.Default(
-                resourceManager.getString(R.string.common_existential_warning_title) to resourceManager.getString(R.string.common_existential_warning_message)
+                resourceManager.getString(R.string.common_existential_warning_title) to
+                    resourceManager.getString(R.string.common_existential_warning_message_v2_2_0)
             )
         }
 

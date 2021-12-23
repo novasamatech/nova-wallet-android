@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.view.PrimaryButton
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getBlurDrawable
 import io.novafoundation.nova.feature_staking_impl.R
+import kotlinx.android.synthetic.main.view_estimate_earning.view.estimateEarningTitle
 import kotlinx.android.synthetic.main.view_estimate_earning.view.stakeMoreActions
 import kotlinx.android.synthetic.main.view_estimate_earning.view.stakingMonthGain
 import kotlinx.android.synthetic.main.view_estimate_earning.view.stakingYearGain
@@ -25,6 +26,10 @@ class EstimateEarningView @JvmOverloads constructor(
         with(context) {
             background = addRipple(getBlurDrawable())
         }
+    }
+
+    fun setTitle(title: String) {
+        estimateEarningTitle.text = title
     }
 
     fun showLoading() {

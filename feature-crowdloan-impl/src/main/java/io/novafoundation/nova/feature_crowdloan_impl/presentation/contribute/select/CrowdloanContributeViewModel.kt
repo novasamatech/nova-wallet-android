@@ -193,7 +193,7 @@ class CrowdloanContributeViewModel(
 
     val learnCrowdloanModel = payload.parachainMetadata?.let {
         LearnMoreModel(
-            text = resourceManager.getString(R.string.crowdloan_learn, it.name),
+            text = resourceManager.getString(R.string.crowdloan_learn_v2_2_0, it.name),
             iconLink = it.iconLink
         )
     }

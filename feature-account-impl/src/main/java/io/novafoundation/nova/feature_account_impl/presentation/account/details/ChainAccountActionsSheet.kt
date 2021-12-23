@@ -22,7 +22,7 @@ class ChainAccountActionsSheet(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        item(R.drawable.ic_edit, R.string.accounts_change_chain_secrets) {
+        item(R.drawable.ic_staking_operations, R.string.accounts_change_chain_secrets) {
             onChange(payload.chain)
         }
 

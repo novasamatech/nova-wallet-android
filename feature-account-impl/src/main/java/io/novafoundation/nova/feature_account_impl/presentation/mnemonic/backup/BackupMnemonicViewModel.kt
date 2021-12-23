@@ -57,7 +57,7 @@ class BackupMnemonicViewModel(
 
     val continueText = flowOf {
         val stringRes = when (payload) {
-            is BackupMnemonicPayload.Confirm -> R.string.account_verify_mnemonic
+            is BackupMnemonicPayload.Confirm -> R.string.account_confirm_mnemonic
             is BackupMnemonicPayload.Create -> R.string.common_continue
         }
 

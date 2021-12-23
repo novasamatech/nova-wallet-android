@@ -3,6 +3,8 @@ package io.novafoundation.nova.common.view
 import android.os.CountDownTimer
 import android.widget.CompoundButton
 import android.widget.TextView
+import androidx.annotation.PluralsRes
+import androidx.annotation.StringRes
 import androidx.lifecycle.LifecycleCoroutineScope
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.bindTo
@@ -12,8 +14,14 @@ import kotlin.time.milliseconds
 
 private val TIMER_TAG = R.string.common_time_left
 
-@ExperimentalTime
-fun TextView.startTimer(millis: Long, timeLeftTimestamp: Long? = null, onFinish: ((view: TextView) -> Unit)? = null) {
+@OptIn(ExperimentalTime::class)
+fun TextView.startTimer(
+    millis: Long,
+    timeLeftTimestamp: Long? = null,
+    @PluralsRes daysPlurals: Int = R.plurals.staking_payouts_days_left,
+    @StringRes customMessageFormat: Int? = null,
+    onFinish: ((view: TextView) -> Unit)? = null
+) {
     val deltaTime = if (timeLeftTimestamp != null) System.currentTimeMillis() - timeLeftTimestamp else 0L
 
     val currentTimer = getTag(TIMER_TAG)
@@ -26,10 +34,17 @@ fun TextView.startTimer(millis: Long, timeLeftTimestamp: Long? = null, onFinish:
         override fun onTick(millisUntilFinished: Long) {
             val days = millisUntilFinished.milliseconds.inDays.toInt()
 
-            this@startTimer.text = if (days > 0)
-                resources.getQuantityString(R.plurals.staking_payouts_days_left, days, days)
-            else
+            val formattedTime = if (days > 0) {
+                resources.getQuantityString(daysPlurals, days, days)
+            } else {
                 millisUntilFinished.formatTime()
+            }
+
+            val message = customMessageFormat?.let {
+                resources.getString(customMessageFormat, formattedTime)
+            } ?: formattedTime
+
+            this@startTimer.text = message
         }
 
         override fun onFinish() {
@@ -44,6 +59,7 @@ fun TextView.startTimer(millis: Long, timeLeftTimestamp: Long? = null, onFinish:
             setTag(TIMER_TAG, null)
         }
     }
+
     newTimer.start()
 
     setTag(TIMER_TAG, newTimer)

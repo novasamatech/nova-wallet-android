@@ -56,7 +56,7 @@ class EditAccountHolder(view: View, dragHelper: ItemTouchHelper) : GroupedListHo
             accountTitle.text = accountModel.name
             accountIcon.setImageDrawable(accountModel.picture.value)
 
-            val iconRes = if (accountModel.isSelected) R.drawable.ic_checkmark_white_24 else R.drawable.ic_delete_symbol
+            val iconRes = if (accountModel.isSelected) R.drawable.ic_checkmark else R.drawable.ic_delete_symbol
             accountDelete.setImageResource(iconRes)
 
             accountDelete.setOnClickListener { handler.deleteClicked(accountModel) }

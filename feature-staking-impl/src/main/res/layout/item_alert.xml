@@ -54,7 +54,7 @@
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/imageView"
-        app:srcCompat="@drawable/ic_arrow_right_24"
+        app:srcCompat="@drawable/ic_chevron_right"
         tools:visibility="visible" />
 
     <View

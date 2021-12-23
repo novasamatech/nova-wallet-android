@@ -28,4 +28,6 @@
     <dimen name="element_chooser_padding">16dp</dimen>
 
     <dimen name="avatar_size">40dp</dimen>
+
+    <dimen name="border_radius">12dp</dimen>
 </resources>

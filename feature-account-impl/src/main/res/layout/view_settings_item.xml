@@ -49,6 +49,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginEnd="20dp"
-        android:src="@drawable/ic_chevron_right_16"
+        android:src="@drawable/ic_chevron_right"
         app:tint="@color/white_64" />
 </merge>

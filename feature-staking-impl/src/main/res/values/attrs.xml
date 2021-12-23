@@ -27,9 +27,6 @@
         <attr name="validatorInfoItemDescriptionText" format="string" />
         <attr name="validatorInfoItemDescriptionVisibility" format="boolean" />
     </declare-styleable>
-    <declare-styleable name="NetworkInfoView">
-        <attr name="expanded" format="boolean" />
-    </declare-styleable>
 
     <declare-styleable name="StakingBalanceItemView">
         <attr name="title" format="string" />

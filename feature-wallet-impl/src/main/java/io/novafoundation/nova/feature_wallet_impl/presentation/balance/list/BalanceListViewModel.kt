@@ -59,7 +59,7 @@ class BalanceListViewModel(
     }
 
     fun avatarClicked() {
-        router.openChangeAccountFromWallet()
+        router.openChangeAccount()
     }
 
     private fun currentAddressModelFlow(): Flow<AddressModel> {

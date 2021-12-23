@@ -13,7 +13,7 @@ import io.novafoundation.nova.common.utils.applyBarMargin
 import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
-import io.novafoundation.nova.feature_wallet_api.presentation.view.setAmount
+import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
 import io.novafoundation.nova.feature_wallet_impl.R
 import io.novafoundation.nova.feature_wallet_impl.di.WalletFeatureComponent
 import io.novafoundation.nova.feature_wallet_impl.presentation.AssetPayload
@@ -122,9 +122,9 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
             balanceDetailRateChange.setTextColorRes(asset.token.rateChangeColorRes)
             balanceDetailRateChange.text = asset.token.recentRateChange
 
-            balanceDetailsBalances.total.setAmount(asset.total)
-            balanceDetailsBalances.transferable.setAmount(asset.transferable)
-            balanceDetailsBalances.locked.setAmount(asset.locked)
+            balanceDetailsBalances.total.showAmount(asset.total)
+            balanceDetailsBalances.transferable.showAmount(asset.transferable)
+            balanceDetailsBalances.locked.showAmount(asset.locked)
         }
 
         viewModel.hideRefreshEvent.observeEvent {

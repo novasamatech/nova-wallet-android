@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         app:dividerVisible="false"
         app:homeButtonIcon="@drawable/ic_close"
-        app:titleText="@string/account_info_title_2_0" />
+        app:titleText="@string/wallet_chain_management_title" />
 
     <io.novafoundation.nova.common.view.InputField
         android:id="@+id/accountDetailsNameField"
@@ -24,7 +24,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
-        android:hint="@string/username_setup_choose_title_2_0" />
+        android:hint="@string/account_wallet_nickname" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"

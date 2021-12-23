@@ -11,7 +11,7 @@
         android:id="@+id/mnemonicViewerAlertIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_alert_triangle_yellow_24"
+        android:src="@drawable/ic_warning_filled"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:includeFontPadding="false"
-        android:text="@string/account_create_details"
+        android:text="@string/account_create_details_v2_2_0"
         android:textColor="@color/colorHint"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/mnemonicViewerAlertIcon"

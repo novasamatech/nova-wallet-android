@@ -18,6 +18,12 @@
         android:label="CrowdloanFragment" />
 
     <fragment
+        android:id="@+id/dAppsFragment"
+        tools:layout="@layout/fragment_dapp_main"
+        android:name="io.novafoundation.nova.feature_dapp_impl.presentation.main.MainDAppFragment"
+        android:label="CrowdloanFragment" />
+
+    <fragment
         android:id="@+id/stakingFragment"
         tools:layout="@layout/fragment_staking"
         android:name="io.novafoundation.nova.feature_staking_impl.presentation.staking.main.StakingFragment"

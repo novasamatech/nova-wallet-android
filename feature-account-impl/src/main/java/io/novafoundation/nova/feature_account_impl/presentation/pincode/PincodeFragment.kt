@@ -13,7 +13,9 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.fingerprint.FingerprintWrapper
-import kotlinx.android.synthetic.main.fragment_pincode.pinCodeView
+import kotlinx.android.synthetic.main.fragment_pincode.pinCodeNumbers
+import kotlinx.android.synthetic.main.fragment_pincode.pinCodeTitle
+import kotlinx.android.synthetic.main.fragment_pincode.pincodeProgress
 import kotlinx.android.synthetic.main.fragment_pincode.toolbar
 import javax.inject.Inject
 
@@ -57,10 +59,12 @@ class PincodeFragment : BaseFragment<PinCodeViewModel>() {
 
         viewModel.fingerprintScannerAvailable(fingerprintWrapper.isAuthReady())
 
-        with(pinCodeView) {
+        with(pinCodeNumbers) {
             pinCodeEnteredListener = { viewModel.pinCodeEntered(it) }
             fingerprintClickListener = { fingerprintWrapper.toggleScanner() }
         }
+
+        pinCodeNumbers.bindProgressView(pincodeProgress)
     }
 
     override fun subscribe(viewModel: PinCodeViewModel) {
@@ -79,7 +83,7 @@ class PincodeFragment : BaseFragment<PinCodeViewModel>() {
         }
 
         viewModel.showFingerPrintEvent.observeEvent {
-            pinCodeView.changeFingerPrintButtonVisibility(fingerprintWrapper.isAuthReady())
+            pinCodeNumbers.changeFingerPrintButtonVisibility(fingerprintWrapper.isAuthReady())
         }
 
         viewModel.fingerPrintErrorEvent.observeEvent {
@@ -89,12 +93,12 @@ class PincodeFragment : BaseFragment<PinCodeViewModel>() {
         viewModel.homeButtonVisibilityLiveData.observe(toolbar::setHomeButtonVisibility)
 
         viewModel.matchingPincodeErrorEvent.observeEvent {
-            pinCodeView.pinCodeMatchingError()
+            pinCodeNumbers.pinCodeMatchingError()
         }
 
         viewModel.resetInputEvent.observeEvent {
-            pinCodeView.resetInput()
-            pinCodeView.setTitle(it)
+            pinCodeNumbers.resetInput()
+            pinCodeTitle.text = it
         }
 
         viewModel.startAuth()

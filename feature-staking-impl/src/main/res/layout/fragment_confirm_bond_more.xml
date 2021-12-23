@@ -21,7 +21,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        app:actionIcon="@drawable/ic_more_vertical"
+        app:actionIcon="@drawable/ic_more"
         app:label="@string/account_info_title" />
 
     <io.novafoundation.nova.common.view.AmountView
@@ -43,9 +43,9 @@
         android:drawablePadding="8dp"
         android:gravity="left|center"
         android:includeFontPadding="false"
-        android:text="@string/staking_hint_reward_bond_more"
+        android:text="@string/staking_hint_reward_bond_more_v2_2_0"
         android:textColor="@color/white"
-        app:drawableLeftCompat="@drawable/ic_reward_24" />
+        app:drawableLeftCompat="@drawable/ic_nova" />
 
     <Space
         android:layout_width="match_parent"

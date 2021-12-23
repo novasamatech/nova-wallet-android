@@ -105,7 +105,7 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_basic_circle_star_24" />
+                    android:src="@drawable/ic_nova" />
 
                 <TextView
                     style="@style/TextAppearance.NovaFoundation.Body1"
@@ -126,7 +126,7 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_arrow_right_24" />
+                    android:src="@drawable/ic_chevron_right" />
             </LinearLayout>
 
             <View
@@ -140,7 +140,7 @@
                 android:layout_width="match_parent"
                 tools:icon="?attr/colorAccent"
                 tools:text="Learn more about crowdloan"
-                app:actionIcon="@drawable/ic_arrow_top_right_white_16"
+                app:actionIcon="@drawable/ic_chevron_right"
                 android:id="@+id/crowdloanContributeLearnMore"
                 android:layout_height="wrap_content" />
         </LinearLayout>

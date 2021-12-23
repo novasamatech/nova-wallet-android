@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatFractionAsPercentage
 import io.novafoundation.nova.common.utils.inBackground
@@ -15,6 +16,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.main.ManageStakeAction
 import io.novafoundation.nova.feature_staking_impl.domain.model.NominatorStatus
 import io.novafoundation.nova.feature_staking_impl.domain.model.NominatorStatus.Inactive.Reason
 import io.novafoundation.nova.feature_staking_impl.domain.model.StakeSummary
@@ -24,6 +26,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculat
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.calculateMaxPeriodReturns
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.maxCompoundAPY
+import io.novafoundation.nova.feature_staking_impl.domain.validations.main.StakeActionsValidationPayload
+import io.novafoundation.nova.feature_staking_impl.domain.validations.main.StakeActionsValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.validations.welcome.WelcomeStakingValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.validations.welcome.WelcomeStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -33,20 +37,22 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-sealed class StakingViewState
+sealed class StakingViewState(
+    coroutineScope: CoroutineScope,
+    validationExecutor: ValidationExecutor
+) :
+    WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(coroutineScope),
+    Validatable by validationExecutor
 
 private const val PERIOD_MONTH = 30
-private const val PERIOD_YEAR = 365
 
 class ReturnsModel(
     val monthlyPercentage: String,
@@ -56,18 +62,13 @@ class ReturnsModel(
 class StakeSummaryModel<S>(
     val status: S,
     val totalStaked: AmountModel,
-    val totalRewards: AmountModel,
-    val currentEraDisplay: String,
 )
 
 typealias NominatorSummaryModel = StakeSummaryModel<NominatorStatus>
 typealias ValidatorSummaryModel = StakeSummaryModel<ValidatorStatus>
 typealias StashNoneSummaryModel = StakeSummaryModel<StashNoneStatus>
 
-enum class ManageStakeAction {
-    PAYOUTS, BALANCE, CONTROLLER, VALIDATORS, REWARD_DESTINATION
-}
-
+@Suppress("LeakingThis")
 sealed class StakeViewState<S>(
     private val stakeState: StakingState.Stash,
     protected val currentAssetFlow: Flow<Asset>,
@@ -78,8 +79,10 @@ sealed class StakeViewState<S>(
     protected val errorDisplayer: (Throwable) -> Unit,
     protected val summaryFlowProvider: suspend (StakingState.Stash) -> Flow<StakeSummary<S>>,
     protected val statusMessageProvider: (S) -> TitleAndMessage,
-    private val availableManageActions: Set<ManageStakeAction>
-) : StakingViewState() {
+    private val validationExecutor: ValidationExecutor,
+    private val availableManageActions: Set<ManageStakeAction>,
+    private val stakeActionsValidations: Map<ManageStakeAction, StakeActionsValidationSystem>
+) : StakingViewState(scope, validationExecutor) {
 
     init {
         syncStakingRewards()
@@ -93,12 +96,23 @@ sealed class StakeViewState<S>(
     fun manageActionChosen(action: ManageStakeAction) {
         if (action !in availableManageActions) return
 
-        when (action) {
-            ManageStakeAction.PAYOUTS -> router.openPayouts()
-            ManageStakeAction.BALANCE -> router.openStakingBalance()
-            ManageStakeAction.CONTROLLER -> router.openControllerAccount()
-            ManageStakeAction.VALIDATORS -> router.openCurrentValidators()
-            ManageStakeAction.REWARD_DESTINATION -> router.openChangeRewardDestination()
+        val validationSystem = stakeActionsValidations[action]
+
+        if (validationSystem != null) {
+            val payload = StakeActionsValidationPayload(stakeState)
+
+            scope.launch {
+                validationExecutor.requireValid(
+                    validationSystem = validationSystem,
+                    payload = payload,
+                    errorDisplayer = errorDisplayer,
+                    validationFailureTransformerDefault = { mainStakingValidationFailure(it, resourceManager) },
+                ) {
+                    navigateToAction(action)
+                }
+            }
+        } else {
+            navigateToAction(action)
         }
     }
 
@@ -106,10 +120,20 @@ sealed class StakeViewState<S>(
         _showManageActionsEvent.value = Event(ManageStakingBottomSheet.Payload(availableManageActions))
     }
 
+    val userRewardsFlow = combine(
+        stakingInteractor.observeUserRewards(stakeState),
+        currentAssetFlow
+    ) { totalRewards, currentAsset ->
+        mapAmountToAmountModel(totalRewards, currentAsset)
+    }
+        .withLoading()
+        .inBackground()
+        .share()
+
     val stakeSummaryFlow = flow { emitAll(summaryFlow()) }
         .withLoading()
         .inBackground()
-        .shareIn(scope, SharingStarted.Eagerly, replay = 1)
+        .share()
 
     private val _showStatusAlertEvent = MutableLiveData<Event<Pair<String, String>>>()
     val showStatusAlertEvent: LiveData<Event<Pair<String, String>>> = _showStatusAlertEvent
@@ -122,15 +146,24 @@ sealed class StakeViewState<S>(
         _showStatusAlertEvent.value = Event(titleAndMessage)
     }
 
+    private fun navigateToAction(action: ManageStakeAction) {
+        when (action) {
+            ManageStakeAction.PAYOUTS -> router.openPayouts()
+            ManageStakeAction.BALANCE -> router.openStakingBalance()
+            ManageStakeAction.CONTROLLER -> router.openControllerAccount()
+            ManageStakeAction.VALIDATORS -> router.openCurrentValidators()
+            ManageStakeAction.REWARD_DESTINATION -> router.openChangeRewardDestination()
+        }
+    }
+
     private fun syncStakingRewards() {
         scope.launch {
-            val syncResult = stakingInteractor.syncStakingRewards(stakeState.stashAddress)
+            val syncResult = stakingInteractor.syncStakingRewards(stakeState)
 
             syncResult.exceptionOrNull()?.let { errorDisplayer(it) }
         }
     }
 
-    @ExperimentalCoroutinesApi
     private suspend fun summaryFlow(): Flow<StakeSummaryModel<S>> {
         return combine(
             summaryFlowProvider(stakeState),
@@ -139,8 +172,6 @@ sealed class StakeViewState<S>(
             StakeSummaryModel(
                 status = summary.status,
                 totalStaked = mapAmountToAmountModel(summary.totalStaked, asset),
-                totalRewards = mapAmountToAmountModel(summary.totalReward, asset),
-                currentEraDisplay = resourceManager.getString(R.string.staking_era_title, summary.currentEra)
             )
         }
     }
@@ -161,12 +192,16 @@ class ValidatorViewState(
     scope: CoroutineScope,
     router: StakingRouter,
     errorDisplayer: (Throwable) -> Unit,
+    stakeActionsValidations: Map<ManageStakeAction, StakeActionsValidationSystem>,
+    validationExecutor: ValidationExecutor,
 ) : StakeViewState<ValidatorStatus>(
     validatorState, currentAssetFlow, stakingInteractor,
     resourceManager, scope, router, errorDisplayer,
     summaryFlowProvider = { stakingInteractor.observeValidatorSummary(validatorState) },
     statusMessageProvider = { getValidatorStatusTitleAndMessage(resourceManager, it) },
-    availableManageActions = ManageStakeAction.values().toSet() - ManageStakeAction.VALIDATORS
+    availableManageActions = ManageStakeAction.values().toSet() - ManageStakeAction.VALIDATORS,
+    validationExecutor = validationExecutor,
+    stakeActionsValidations = stakeActionsValidations
 )
 
 private fun getValidatorStatusTitleAndMessage(
@@ -190,12 +225,16 @@ class StashNoneViewState(
     scope: CoroutineScope,
     router: StakingRouter,
     errorDisplayer: (Throwable) -> Unit,
+    validationExecutor: ValidationExecutor,
+    stakeActionsValidations: Map<ManageStakeAction, StakeActionsValidationSystem>,
 ) : StakeViewState<StashNoneStatus>(
     stashState, currentAssetFlow, stakingInteractor,
     resourceManager, scope, router, errorDisplayer,
     summaryFlowProvider = { stakingInteractor.observeStashSummary(stashState) },
     statusMessageProvider = { getStashStatusTitleAndMessage(resourceManager, it) },
-    availableManageActions = ManageStakeAction.values().toSet() - ManageStakeAction.PAYOUTS
+    availableManageActions = ManageStakeAction.values().toSet() - ManageStakeAction.PAYOUTS,
+    validationExecutor = validationExecutor,
+    stakeActionsValidations = stakeActionsValidations
 )
 
 private fun getStashStatusTitleAndMessage(
@@ -217,12 +256,16 @@ class NominatorViewState(
     scope: CoroutineScope,
     router: StakingRouter,
     errorDisplayer: (Throwable) -> Unit,
+    validationExecutor: ValidationExecutor,
+    stakeActionsValidations: Map<ManageStakeAction, StakeActionsValidationSystem>,
 ) : StakeViewState<NominatorStatus>(
     nominatorState, currentAssetFlow, stakingInteractor,
     resourceManager, scope, router, errorDisplayer,
     summaryFlowProvider = { stakingInteractor.observeNominatorSummary(nominatorState) },
     statusMessageProvider = { getNominatorStatusTitleAndMessage(resourceManager, it) },
-    availableManageActions = ManageStakeAction.values().toSet()
+    availableManageActions = ManageStakeAction.values().toSet(),
+    validationExecutor = validationExecutor,
+    stakeActionsValidations = stakeActionsValidations
 )
 
 private fun getNominatorStatusTitleAndMessage(
@@ -251,8 +294,9 @@ class WelcomeViewState(
     private val scope: CoroutineScope,
     private val errorDisplayer: (String) -> Unit,
     private val validationSystem: WelcomeStakingValidationSystem,
-    private val validationExecutor: ValidationExecutor
-) : StakingViewState(), Validatable by validationExecutor {
+    private val validationExecutor: ValidationExecutor,
+    currentAssetFlow: Flow<Asset>,
+) : StakingViewState(scope, validationExecutor) {
 
     private val currentSetupProgress = setupStakingSharedState.get<SetupStakingProcess.Initial>()
 
@@ -260,6 +304,12 @@ class WelcomeViewState(
 
     private val _showRewardEstimationEvent = MutableLiveData<Event<StakingRewardEstimationBottomSheet.Payload>>()
     val showRewardEstimationEvent: LiveData<Event<StakingRewardEstimationBottomSheet.Payload>> = _showRewardEstimationEvent
+
+    val estimateEarningsTitle = currentAssetFlow.map {
+        resourceManager.getString(R.string.staking_estimate_earning_title_v2_2_0, it.token.configuration.symbol)
+    }
+        .inBackground()
+        .share()
 
     val returns = flowOf {
         val rewardCalculator = rewardCalculator()
@@ -271,7 +321,7 @@ class WelcomeViewState(
     }
         .withLoading()
         .inBackground()
-        .shareIn(scope, SharingStarted.Eagerly, replay = 1)
+        .share()
 
     fun infoActionClicked() {
         scope.launch {

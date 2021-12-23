@@ -10,3 +10,5 @@ include ':app', ':test-shared', ':common', ':feature-splash', 'core-db', 'core-a
 include ':runtime'
 include ':feature-account-api'
 include ':feature-account-impl'
+include ':feature-dapp-api'
+include ':feature-dapp-impl'

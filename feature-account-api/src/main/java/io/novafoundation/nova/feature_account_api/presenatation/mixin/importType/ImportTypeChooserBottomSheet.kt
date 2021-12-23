@@ -41,7 +41,7 @@ class ImportTypeChooserBottomSheet(
             type = SecretType.JSON,
             title = R.string.recovery_json,
             subtitle = R.string.account_json_file,
-            icon = R.drawable.ic_file_text
+            icon = R.drawable.ic_document
         )
     }
 
