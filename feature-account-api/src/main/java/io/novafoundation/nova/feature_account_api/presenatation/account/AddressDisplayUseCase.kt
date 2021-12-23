@@ -24,7 +24,7 @@ class AddressDisplayUseCase(
         return accountRepository.getAccountOrNull(address)?.name
     }
 
-    suspend fun invoke(accountId: AccountId): String? {
+    suspend operator fun invoke(accountId: AccountId): String? {
         return accountRepository.findMetaAccount(accountId)?.name
     }
 

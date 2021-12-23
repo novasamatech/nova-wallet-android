@@ -120,7 +120,7 @@ class PayoutsListViewModel(
                 validatorTitle = validatorInfo.identityName ?: validatorInfo.address,
                 timeLeft = timeLeft,
                 createdAt = createdAt,
-                daysLeftColor = if (closeToExpire) R.color.error_red else R.color.white_64,
+                daysLeftColor = if (closeToExpire) R.color.red else R.color.white_64,
                 amount = amount.formatTokenChange(token.configuration, isIncome = true),
                 amountFiat = token.fiatAmount(amount).formatAsCurrency()
             )

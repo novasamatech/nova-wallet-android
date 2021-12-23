@@ -270,7 +270,7 @@
     </style>
 
     <style name="AccentDialogNegativeButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
-        <item name="android:textColor">@color/error_red</item>
+        <item name="android:textColor">@color/red</item>
     </style>
 
     <!-- Dialog -->
