@@ -32,10 +32,6 @@ android {
 
         jvmTarget = '1.8'
     }
-
-    sourceSets {
-
-    }
 }
 
 task actualizeJsScripts(type: Exec) {
