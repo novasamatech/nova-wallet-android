@@ -66,6 +66,7 @@ class DAppSignExtrinsicViewModel(
 
     fun rejectClicked() {
         responder.respond(Response.Rejected(payload.requestId))
+        router.back()
     }
 
     fun acceptClicked() = launch {

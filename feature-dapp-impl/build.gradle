@@ -32,6 +32,23 @@ android {
 
         jvmTarget = '1.8'
     }
+
+    sourceSets {
+
+    }
+}
+
+task actualizeJsScripts(type: Exec) {
+    workingDir "$rootDir/nova-wallet-dapp-js"
+
+    commandLine "yarn", "build"
+
+    doLast {
+        copy {
+            from "$rootDir/nova-wallet-dapp-js/dist/nova_min.js"
+            into "$rootDir/feature-dapp-impl/src/main/res/raw"
+        }
+    }
 }
 
 dependencies {
