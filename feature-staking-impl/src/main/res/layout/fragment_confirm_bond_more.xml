@@ -45,7 +45,7 @@
         android:includeFontPadding="false"
         android:text="@string/staking_hint_reward_bond_more_v2_2_0"
         android:textColor="@color/white"
-        app:drawableLeftCompat="@drawable/ic_reward_24" />
+        app:drawableLeftCompat="@drawable/ic_nova" />
 
     <Space
         android:layout_width="match_parent"
