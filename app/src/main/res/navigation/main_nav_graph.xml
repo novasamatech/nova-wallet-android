@@ -209,8 +209,8 @@
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit"
-            android:id="@+id/action_mainFragment_to_dappBrowserFragment"
-            app:destination="@id/DAppBrowserFragment" />
+            android:id="@+id/action_mainFragment_to_dappBrowserGraph"
+            app:destination="@id/dapp_browser_graph" />
     </fragment>
 
 
@@ -892,10 +892,7 @@
         android:name="io.novafoundation.nova.feature_crowdloan_impl.presentation.contributions.UserContributionsFragment"
         android:label="UserContributionsFragment" />
 
-    <fragment
-        android:id="@+id/DAppBrowserFragment"
-        tools:layout="@layout/fragment_dapp_browser"
-        android:name="io.novafoundation.nova.feature_dapp_impl.presentation.browser.DAppBrowserFragment"
-        android:label="DAppBrowserFragment" />
+    <include app:graph="@navigation/dapp_browser_graph" />
+
 
 </navigation>

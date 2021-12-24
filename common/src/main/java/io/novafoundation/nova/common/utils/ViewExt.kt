@@ -21,6 +21,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.LayoutRes
 import androidx.annotation.StyleableRes
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.updateBounds
 import androidx.core.widget.TextViewCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -102,14 +103,11 @@ private fun TextView.setCompoundDrawable(
 
     tint?.let { drawable.mutate().setTint(context.getColor(it)) }
 
-    val widthInPx = widthInDp?.dp(context) ?: drawable.intrinsicWidth
-    val heightInPx = heightInDp?.dp(context) ?: drawable.intrinsicHeight
-    val paddingInPx = paddingInDp.dp(context)
-
-    drawable.setBounds(0, 0, widthInPx, heightInPx)
+    drawable.updateDimensions(context, widthInDp, heightInDp)
 
     applier(drawable)
 
+    val paddingInPx = paddingInDp.dp(context)
     compoundDrawablePadding = paddingInPx
 }
 
@@ -135,6 +133,30 @@ fun TextView.setDrawableStart(
     setCompoundDrawable(drawableRes, widthInDp, heightInDp, tint, paddingInDp) {
         setCompoundDrawablesRelative(it, null, null, null)
     }
+}
+
+fun TextView.setDrawableStart(
+    drawable: Drawable,
+    paddingInDp: Int,
+    widthInDp: Int? = null,
+    heightInDp: Int? = widthInDp,
+) {
+    compoundDrawablePadding = paddingInDp.dp(context)
+
+    drawable.updateDimensions(context, widthInDp, heightInDp)
+
+    setCompoundDrawablesRelative(drawable, null, null, null)
+}
+
+private fun Drawable.updateDimensions(
+    context: Context,
+    widthInDp: Int?,
+    heightInDp: Int?
+) {
+    val widthInPx = widthInDp?.dp(context) ?: intrinsicWidth
+    val heightInPx = heightInDp?.dp(context) ?: intrinsicHeight
+
+    setBounds(0, 0, widthInPx, heightInPx)
 }
 
 inline fun View.doOnGlobalLayout(crossinline action: () -> Unit) {
@@ -215,6 +237,8 @@ fun TextView.setTextOrHide(newText: String?) {
         setVisible(false)
     }
 }
+
+inline fun <T: View> T.postToSelf(crossinline action: T.() -> Unit) = with(this) { post { action() } }
 
 inline fun <reified T : Enum<T>> TypedArray.getEnum(index: Int, default: T) =
     getInt(index, /*defValue*/-1).let {

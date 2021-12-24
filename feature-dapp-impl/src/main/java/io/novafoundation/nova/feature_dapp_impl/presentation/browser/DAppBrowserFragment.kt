@@ -58,8 +58,8 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
     override fun subscribe(viewModel: DAppBrowserViewModel) {
         dappBrowserWebView.injectWeb3(web3WebViewClientFactory)
 
-        dappBrowserWebView.loadUrl("https://singular.rmrk.app")
-//        dappBrowserWebView.loadUrl("https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fwestend.api.onfinality.io%2Fpublic-ws#/accounts")
+//        dappBrowserWebView.loadUrl("https://singular.rmrk.app")
+        dappBrowserWebView.loadUrl("https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fwestend.api.onfinality.io%2Fpublic-ws#/accounts")
 
         viewModel.showConfirmationSheet.observeEvent {
             when (it.action) {

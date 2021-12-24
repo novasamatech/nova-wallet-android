@@ -2,13 +2,14 @@ package io.novafoundation.nova.common.mixin.impl
 
 import android.content.Context
 import io.novafoundation.nova.common.base.BaseFragment
+import io.novafoundation.nova.common.base.BaseFragmentMixin
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Retriable
 import io.novafoundation.nova.common.view.dialog.retryDialog
 
-fun BaseFragment<*>.observeRetries(
+fun BaseFragmentMixin<*>.observeRetries(
     retriable: Retriable,
-    context: Context = requireContext(),
+    context: Context = fragment.requireContext(),
 ) {
     retriable.retryEvent.observeEvent {
         retryDialog(
@@ -22,9 +23,9 @@ fun BaseFragment<*>.observeRetries(
     }
 }
 
-fun <T> BaseFragment<T>.observeRetries(
+fun <T> BaseFragmentMixin<T>.observeRetries(
     viewModel: T,
-    context: Context = requireContext(),
+    context: Context = fragment.requireContext(),
 ) where T : BaseViewModel, T : Retriable {
     observeRetries(retriable = viewModel, context)
 }

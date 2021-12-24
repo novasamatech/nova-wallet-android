@@ -1,26 +1,34 @@
 package io.novafoundation.nova.feature_dapp_impl.domain.browser
 
 import io.novafoundation.nova.common.data.mappers.mapCryptoTypeToEncryption
+import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress
 import io.novafoundation.nova.feature_dapp_impl.util.UrlNormalizer
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.InjectedAccount
+import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.SignerPayloadJSON
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.genesisHash
+import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
+import io.novafoundation.nova.runtime.extrinsic.rawData
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.getRuntime
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHex
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.math.BigInteger
 
 class DappBrowserInteractor(
     private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository
 ) {
 
-    suspend fun getDAppInfo(dAppUrl: String): DAppInfo = withContext(Dispatchers.Default) {
-        DAppInfo(
-            baseUrl = UrlNormalizer.normalizeUrl(dAppUrl),
-            metadata = null // TODO whitelist task
-        )
+    suspend fun callRawData(signerPayload: SignerPayloadJSON): String = withContext(Dispatchers.Default) {
+        val runtime = chainRegistry.getRuntime(signerPayload.genesisHash.removeHexPrefix())
+        val call = GenericCall.fromHex(runtime, signerPayload.method)
+
+        call.rawData()
     }
 
     @OptIn(ExperimentalStdlibApi::class)

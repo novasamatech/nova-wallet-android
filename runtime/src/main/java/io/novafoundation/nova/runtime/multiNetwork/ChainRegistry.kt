@@ -3,6 +3,7 @@ package io.novafoundation.nova.runtime.multiNetwork
 import io.novafoundation.nova.common.utils.diffed
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.mapList
+import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.runtime.multiNetwork.chain.ChainSyncService
 import io.novafoundation.nova.runtime.multiNetwork.chain.mapChainLocalToChain
@@ -78,11 +79,11 @@ class ChainRegistry(
         baseTypeSynchronizer.sync()
     }
 
-    fun getConnection(chainId: String) = connectionPool.getConnection(chainId)
+    fun getConnection(chainId: String) = connectionPool.getConnection(chainId.removeHexPrefix())
 
-    fun getRuntimeProvider(chainId: String) = runtimeProviderPool.getRuntimeProvider(chainId)
+    fun getRuntimeProvider(chainId: String) = runtimeProviderPool.getRuntimeProvider(chainId.removeHexPrefix())
 
-    suspend fun getChain(chainId: String): Chain = chainsById.first().getValue(chainId)
+    suspend fun getChain(chainId: String): Chain = chainsById.first().getValue(chainId.removeHexPrefix())
 }
 
 suspend fun ChainRegistry.chainWithAsset(chainId: String, assetId: Int): Pair<Chain, Chain.Asset> {

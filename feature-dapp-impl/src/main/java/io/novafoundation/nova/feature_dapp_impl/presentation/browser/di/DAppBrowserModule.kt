@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
+import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.DappBrowserInteractor
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.DAppBrowserViewModel
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionFactory
@@ -40,6 +41,7 @@ class DAppBrowserModule {
         polkadotJsExtensionFactory: PolkadotJsExtensionFactory,
         interactor: DappBrowserInteractor,
         resourceManager: ResourceManager,
+        commonInteractor: DappInteractor,
         addressIconGenerator: AddressIconGenerator,
         selectedAccountUseCase: SelectedAccountUseCase
 
@@ -50,7 +52,8 @@ class DAppBrowserModule {
             interactor = interactor,
             resourceManager = resourceManager,
             addressIconGenerator = addressIconGenerator,
-            selectedAccountUseCase = selectedAccountUseCase
+            selectedAccountUseCase = selectedAccountUseCase,
+            commonInteractor = commonInteractor
         )
     }
 }

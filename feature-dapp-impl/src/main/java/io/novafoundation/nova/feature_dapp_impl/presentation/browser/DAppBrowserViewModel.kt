@@ -12,15 +12,20 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.R
+import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.DappBrowserInteractor
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignExtrinsicPayload
 import io.novafoundation.nova.feature_dapp_impl.web3.Web3Session.AuthorizationState
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.AccountList
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.AuthorizeTab
+import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.SignExtrinsic
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -34,6 +39,7 @@ class DAppBrowserViewModel(
     private val router: DAppRouter,
     private val polkadotJsExtensionFactory: PolkadotJsExtensionFactory,
     private val interactor: DappBrowserInteractor,
+    private val commonInteractor: DappInteractor,
     private val resourceManager: ResourceManager,
     private val addressIconGenerator: AddressIconGenerator,
     private val selectedAccountUseCase: SelectedAccountUseCase,
@@ -60,7 +66,21 @@ class DAppBrowserViewModel(
         when (request) {
             is AuthorizeTab -> authorizeTab(request, authorizationState)
             is AccountList -> supplyAccountList(request, authorizationState)
+            is SignExtrinsic -> signExtrinsicIfAllowed(request, authorizationState)
         }
+    }
+
+    private suspend fun signExtrinsicIfAllowed(request: SignExtrinsic, authorizationState: AuthorizationState) {
+        when (authorizationState) {
+            // request user confirmation if dapp is authorized
+            AuthorizationState.ALLOWED -> signExtrinsicWithConfirmation(request)
+            // reject otherwise
+            else -> request.reject(NotAuthorizedException)
+        }
+    }
+
+    private suspend fun signExtrinsicWithConfirmation(request: SignExtrinsic) = withContext(Dispatchers.Main) {
+        router.openConfirmSignExtrinsic(mapSignExtrinsicRequestToPayload(request))
     }
 
     private suspend fun authorizeTab(request: AuthorizeTab, authorizationState: AuthorizationState) {
@@ -75,7 +95,7 @@ class DAppBrowserViewModel(
     }
 
     private suspend fun authorizeTabWithConfirmation(request: AuthorizeTab) {
-        val dappInfo = interactor.getDAppInfo(request.url)
+        val dappInfo = commonInteractor.getDAppInfo(request.url)
 
         val dAppIdentifier = dappInfo.metadata?.name ?: dappInfo.baseUrl
 
@@ -138,4 +158,10 @@ class DAppBrowserViewModel(
     } else {
         request.reject(NotAuthorizedException)
     }
+
+    private fun mapSignExtrinsicRequestToPayload(request: SignExtrinsic) = DAppSignExtrinsicPayload(
+        requestId = request.requestId,
+        signerPayloadJSON = request.signerPayload,
+        dappUrl = request.url
+    )
 }
