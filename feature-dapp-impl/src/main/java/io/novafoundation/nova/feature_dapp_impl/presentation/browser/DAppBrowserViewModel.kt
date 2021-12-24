@@ -14,13 +14,17 @@ import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.DappBrowserInteractor
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignExtrinsicCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignExtrinsicPayload
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignExtrinsicRequester
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.awaitConfirmation
 import io.novafoundation.nova.feature_dapp_impl.web3.Web3Session.AuthorizationState
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.AccountList
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.AuthorizeTab
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.SignExtrinsic
+import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.SignerResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
@@ -30,6 +34,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 object NotAuthorizedException : Exception("Rejected by user")
+object SigningFailedException : Exception("Signing failed")
 
 enum class ConfirmationState {
     ALLOWED, REJECTED, CANCELLED
@@ -37,6 +42,7 @@ enum class ConfirmationState {
 
 class DAppBrowserViewModel(
     private val router: DAppRouter,
+    private val signExtrinsicRequester: DAppSignExtrinsicRequester,
     private val polkadotJsExtensionFactory: PolkadotJsExtensionFactory,
     private val interactor: DappBrowserInteractor,
     private val commonInteractor: DappInteractor,
@@ -79,8 +85,20 @@ class DAppBrowserViewModel(
         }
     }
 
-    private suspend fun signExtrinsicWithConfirmation(request: SignExtrinsic) = withContext(Dispatchers.Main) {
-        router.openConfirmSignExtrinsic(mapSignExtrinsicRequestToPayload(request))
+    private suspend fun signExtrinsicWithConfirmation(request: SignExtrinsic) {
+        val response = withContext(Dispatchers.Main) {
+            signExtrinsicRequester.awaitConfirmation(mapSignExtrinsicRequestToPayload(request))
+        }
+
+        when(response) {
+            is DAppSignExtrinsicCommunicator.Response.Rejected -> request.reject(NotAuthorizedException)
+            is DAppSignExtrinsicCommunicator.Response.Signed -> request.accept(SignerResult(response.requestId, response.signature))
+            is DAppSignExtrinsicCommunicator.Response.SigningFailed -> {
+                showError(resourceManager.getString(R.string.dapp_sign_extrinsic_failed))
+
+                request.reject(SigningFailedException)
+            }
+        }
     }
 
     private suspend fun authorizeTab(request: AuthorizeTab, authorizationState: AuthorizationState) {

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="dapp_sign_extrinsic_failed">Failed to sign requested operation</string>
   <string name="common_network">Network</string>
   <string name="common_account_address">Account address</string>
   <string name="dapp_confirm_authorize_title_format">Allow “%s” to access your account addresses?</string>

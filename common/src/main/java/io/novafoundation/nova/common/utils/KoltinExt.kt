@@ -49,6 +49,9 @@ inline fun <K, V, R> Map<K, V>.mapValuesNotNull(crossinline mapper: (Map.Entry<K
         .filterValues { it != null } as Map<K, R>
 }
 
+fun String.bigIntegerFromHex() = removeHexPrefix().toBigInteger(16)
+fun String.intFromHex() = removeHexPrefix().toInt(16)
+
 /**
  * Complexity: O(n * log(n))
  */

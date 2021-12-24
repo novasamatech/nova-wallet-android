@@ -13,6 +13,7 @@ import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.rawData
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
+import jp.co.soramitsu.fearless_utils.extensions.requireHexPrefix
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHex
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
 import kotlinx.coroutines.Dispatchers
@@ -23,13 +24,6 @@ class DappBrowserInteractor(
     private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository
 ) {
-
-    suspend fun callRawData(signerPayload: SignerPayloadJSON): String = withContext(Dispatchers.Default) {
-        val runtime = chainRegistry.getRuntime(signerPayload.genesisHash.removeHexPrefix())
-        val call = GenericCall.fromHex(runtime, signerPayload.method)
-
-        call.rawData()
-    }
 
     @OptIn(ExperimentalStdlibApi::class)
     suspend fun getInjectedAccounts(): List<InjectedAccount> {
@@ -50,7 +44,7 @@ class DappBrowserInteractor(
 
             InjectedAccount(
                 address = chain.addressOf(chainAccount.accountId),
-                genesisHash = chain.genesisHash,
+                genesisHash = chain.genesisHash.requireHexPrefix(),
                 name = "${metaAccount.name} (${chain.name})",
                 encryption = mapCryptoTypeToEncryption(chainAccount.cryptoType)
             )

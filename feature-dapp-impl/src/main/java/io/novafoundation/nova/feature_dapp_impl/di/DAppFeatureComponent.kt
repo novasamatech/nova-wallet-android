@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.di.DAppBrowserComponent
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignExtrinsicCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.di.DAppSignExtrinsicComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.di.MainDAppComponent
 import io.novafoundation.nova.feature_onboarding_api.di.OnboardingFeatureApi
@@ -35,6 +36,7 @@ interface DAppFeatureComponent : OnboardingFeatureApi {
 
         fun create(
             @BindsInstance router: DAppRouter,
+            @BindsInstance signExtrinsicCommunicator: DAppSignExtrinsicCommunicator,
             deps: DAppFeatureDependencies
         ): DAppFeatureComponent
     }

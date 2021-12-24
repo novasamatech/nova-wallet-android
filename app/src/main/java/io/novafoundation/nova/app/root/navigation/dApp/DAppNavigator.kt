@@ -20,9 +20,4 @@ class DAppNavigator(
     )
 
     override fun openDAppBrowser() = performNavigation(R.id.action_mainFragment_to_dappBrowserGraph)
-
-    override fun openConfirmSignExtrinsic(payload: DAppSignExtrinsicPayload) = performNavigation(
-        actionId = R.id.action_DAppBrowserFragment_to_ConfirmSignExtrinsicFragment,
-        args = DAppSignExtrinsicFragment.getBundle(payload)
-    )
 }

@@ -7,6 +7,10 @@ abstract class BaseNavigator(
     private val navigationHolder: NavigationHolder
 ) {
 
+    fun back() {
+        navigationHolder.executeBack()
+    }
+
     fun performNavigation(@IdRes actionId: Int, args: Bundle? = null) {
         val navController = navigationHolder.navController
 

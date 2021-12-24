@@ -7,15 +7,19 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.signExtrinsic.DappSignExtrinsicInteractor
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignExtrinsicCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignExtrinsicPayload
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignExtrinsicResponder
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignExtrinsicViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.GenesisHashUtilityTokenUseCase
@@ -39,7 +43,9 @@ class DAppSignExtrinsicModule {
     fun provideInteractor(
         chainRegistry: ChainRegistry,
         extrinsicService: ExtrinsicService,
-    ) = DappSignExtrinsicInteractor(extrinsicService, chainRegistry)
+        accountRepository: AccountRepository,
+        secretStoreV2: SecretStoreV2,
+    ) = DappSignExtrinsicInteractor(extrinsicService, accountRepository, chainRegistry, secretStoreV2)
 
     @Provides
     @ScreenScope
@@ -59,7 +65,8 @@ class DAppSignExtrinsicModule {
         commonInteractor: DappInteractor,
         payload: DAppSignExtrinsicPayload,
         tokenUseCase: TokenUseCase,
-        selectedAccountUseCase: SelectedAccountUseCase
+        selectedAccountUseCase: SelectedAccountUseCase,
+        communicator: DAppSignExtrinsicCommunicator
     ): ViewModel {
         return DAppSignExtrinsicViewModel(
             router = router,
@@ -70,7 +77,8 @@ class DAppSignExtrinsicModule {
             feeLoaderMixinFactory = feeLoaderMixinFactory,
             payload = payload,
             tokenUseCase = tokenUseCase,
-            commonInteractor = commonInteractor
+            commonInteractor = commonInteractor,
+            responder = communicator
         )
     }
 }

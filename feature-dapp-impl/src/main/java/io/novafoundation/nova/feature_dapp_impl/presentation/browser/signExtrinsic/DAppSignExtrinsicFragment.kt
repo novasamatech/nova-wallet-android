@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic
 
+import android.content.DialogInterface
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -17,8 +18,9 @@ import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.showDAppIcon
-import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.SignerPayloadJSON
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
+import kotlinx.android.synthetic.main.bottom_sheet_confirm_dapp_action.confirmDAppActionAllow
+import kotlinx.android.synthetic.main.bottom_sheet_confirm_dapp_action.confirmDAppActionReject
 import kotlinx.android.synthetic.main.bottom_sheet_confirm_dapp_action.confirmInnerContent
 import kotlinx.android.synthetic.main.bottom_sheet_confirm_sign_extrinsic.confirmSignExtinsicAccount
 import kotlinx.android.synthetic.main.bottom_sheet_confirm_sign_extrinsic.confirmSignExtinsicFee
@@ -49,6 +51,13 @@ class DAppSignExtrinsicFragment : BaseBottomSheetFragment<DAppSignExtrinsicViewM
 
     override fun initViews() {
         confirmInnerContent.inflateChild(R.layout.bottom_sheet_confirm_sign_extrinsic, attachToRoot = true)
+
+        confirmDAppActionAllow.setOnClickListener { viewModel.acceptClicked() }
+        confirmDAppActionReject.setOnClickListener { viewModel.rejectClicked() }
+    }
+
+    override fun onCancel(dialog: DialogInterface) {
+        viewModel.cancelled()
     }
 
     override fun inject() {
@@ -67,12 +76,14 @@ class DAppSignExtrinsicFragment : BaseBottomSheetFragment<DAppSignExtrinsicViewM
             }
         }
 
-        viewModel.addressModel.observe {
-            confirmSignExtinsicWallet.valuePrimary.setDrawableStart(it.image, paddingInDp = 8)
-            confirmSignExtinsicWallet.postToSelf { showValue(it.name!!) }
-
+        viewModel.requestedAccountModel.observe {
             confirmSignExtinsicAccount.valuePrimary.setDrawableStart(it.image, paddingInDp = 8)
-            confirmSignExtinsicAccount.postToSelf { showValue(it.address) }
+            confirmSignExtinsicAccount.postToSelf { showValue(it.nameOrAddress) }
+        }
+
+        viewModel.walletModel.observe {
+            confirmSignExtinsicWallet.valuePrimary.setDrawableStart(it.image, paddingInDp = 8)
+            confirmSignExtinsicWallet.postToSelf { showValue(it.nameOrAddress) }
         }
 
         viewModel.dAppInfo.observe {
