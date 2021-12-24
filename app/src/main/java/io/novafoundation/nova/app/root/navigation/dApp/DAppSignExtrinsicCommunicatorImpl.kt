@@ -4,12 +4,12 @@ import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.BaseInterScreenCommunicator
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignExtrinsicCommunicator
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignExtrinsicCommunicator.*
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignExtrinsicCommunicator.Response
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignExtrinsicFragment
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignExtrinsicPayload
 
-class DAppSignExtrinsicCommunicatorImpl(navigationHolder: NavigationHolder)
-    : BaseInterScreenCommunicator<DAppSignExtrinsicPayload, Response>(navigationHolder),
+class DAppSignExtrinsicCommunicatorImpl(navigationHolder: NavigationHolder) :
+    BaseInterScreenCommunicator<DAppSignExtrinsicPayload, Response>(navigationHolder),
     DAppSignExtrinsicCommunicator {
 
     override fun openRequest(request: DAppSignExtrinsicPayload) {

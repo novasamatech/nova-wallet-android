@@ -9,4 +9,4 @@ class DAppSignExtrinsicPayload(
     val requestId: String,
     val signerPayloadJSON: SignerPayloadJSON,
     val dappUrl: String
-): Parcelable
+) : Parcelable

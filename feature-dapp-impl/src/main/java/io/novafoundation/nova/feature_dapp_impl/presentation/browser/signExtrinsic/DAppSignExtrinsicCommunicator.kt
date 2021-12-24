@@ -25,7 +25,7 @@ interface DAppSignExtrinsicCommunicator : DAppSignExtrinsicRequester, DAppSignEx
         class Signed(override val requestId: String, val signature: String) : Response()
 
         @Parcelize
-        class SigningFailed(override val requestId: String): Response()
+        class SigningFailed(override val requestId: String) : Response()
     }
 }
 

@@ -90,7 +90,7 @@ class DAppBrowserViewModel(
             signExtrinsicRequester.awaitConfirmation(mapSignExtrinsicRequestToPayload(request))
         }
 
-        when(response) {
+        when (response) {
             is DAppSignExtrinsicCommunicator.Response.Rejected -> request.reject(NotAuthorizedException)
             is DAppSignExtrinsicCommunicator.Response.Signed -> request.accept(SignerResult(response.requestId, response.signature))
             is DAppSignExtrinsicCommunicator.Response.SigningFailed -> {

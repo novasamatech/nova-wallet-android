@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee
 
 import android.widget.ProgressBar
 import android.widget.TextView
-import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.base.BaseFragmentMixin
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.impl.observeRetries

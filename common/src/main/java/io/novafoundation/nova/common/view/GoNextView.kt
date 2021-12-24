@@ -18,7 +18,6 @@ import kotlinx.android.synthetic.main.view_go_next.view.goNextDivider
 import kotlinx.android.synthetic.main.view_go_next.view.goNextIcon
 import kotlinx.android.synthetic.main.view_go_next.view.goNextProgress
 import kotlinx.android.synthetic.main.view_go_next.view.goNextTitle
-import kotlinx.android.synthetic.main.view_labeled_text.view.labeledTextText
 
 class GoNextView @JvmOverloads constructor(
     context: Context,

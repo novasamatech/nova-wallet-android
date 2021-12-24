@@ -22,7 +22,6 @@ class NavigationHolder {
     }
 }
 
-
 fun NavigationHolder.executeBack() {
     val popped = navController!!.popBackStack()
 

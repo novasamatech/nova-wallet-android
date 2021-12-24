@@ -60,7 +60,7 @@ class GenesisHashUtilityTokenUseCase(
     private val genesisHash: String,
     private val chainRegistry: ChainRegistry,
     private val tokenRepository: TokenRepository,
-): TokenUseCase {
+) : TokenUseCase {
 
     override suspend fun currentToken(): Token {
         return tokenRepository.getToken(getChainAsset())

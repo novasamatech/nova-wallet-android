@@ -1,7 +1,6 @@
 package io.novafoundation.nova.common.mixin.impl
 
 import android.content.Context
-import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.base.BaseFragmentMixin
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Retriable

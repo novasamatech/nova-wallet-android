@@ -16,8 +16,7 @@ private val callSerializerGson = GsonBuilder()
     .setPrettyPrinting()
     .create()
 
-
-private class GenericCallAdapter: JsonSerializer<GenericCall.Instance> {
+private class GenericCallAdapter : JsonSerializer<GenericCall.Instance> {
 
     override fun serialize(src: GenericCall.Instance, typeOfSrc: Type, context: JsonSerializationContext): JsonElement {
         return JsonObject().apply {

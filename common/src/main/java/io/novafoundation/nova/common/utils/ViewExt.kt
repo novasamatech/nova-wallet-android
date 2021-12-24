@@ -21,7 +21,6 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.LayoutRes
 import androidx.annotation.StyleableRes
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.updateBounds
 import androidx.core.widget.TextViewCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -238,7 +237,7 @@ fun TextView.setTextOrHide(newText: String?) {
     }
 }
 
-inline fun <T: View> T.postToSelf(crossinline action: T.() -> Unit) = with(this) { post { action() } }
+inline fun <T : View> T.postToSelf(crossinline action: T.() -> Unit) = with(this) { post { action() } }
 
 inline fun <reified T : Enum<T>> TypedArray.getEnum(index: Int, default: T) =
     getInt(index, /*defValue*/-1).let {

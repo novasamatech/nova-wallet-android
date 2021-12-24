@@ -257,7 +257,7 @@ class Navigator(
     }
 
     override fun back() {
-       navigationHolder.executeBack()
+        navigationHolder.executeBack()
     }
 
     override fun openCustomRebond() {
