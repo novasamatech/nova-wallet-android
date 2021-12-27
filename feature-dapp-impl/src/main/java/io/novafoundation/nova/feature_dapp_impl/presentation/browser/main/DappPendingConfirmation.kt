@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_dapp_impl.presentation.browser
+package io.novafoundation.nova.feature_dapp_impl.presentation.browser.main
 
 import io.novafoundation.nova.common.address.AddressModel
 

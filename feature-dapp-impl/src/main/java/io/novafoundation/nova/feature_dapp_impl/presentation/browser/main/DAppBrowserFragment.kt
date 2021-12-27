@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_dapp_impl.presentation.browser
+package io.novafoundation.nova.feature_dapp_impl.presentation.browser.main
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,8 +10,8 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.DappPendingConfirmation.Action
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.confirm.ConfirmAuthorizeBottomSheet
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DappPendingConfirmation.Action
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.sheets.ConfirmAuthorizeBottomSheet
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3WebViewClientFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewHolder
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.injectWeb3
@@ -58,9 +58,6 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
     override fun subscribe(viewModel: DAppBrowserViewModel) {
         dappBrowserWebView.injectWeb3(web3WebViewClientFactory)
 
-//        dappBrowserWebView.loadUrl("https://singular.rmrk.app")
-        dappBrowserWebView.loadUrl("https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fwestend.api.onfinality.io%2Fpublic-ws#/accounts")
-
         viewModel.showConfirmationSheet.observeEvent {
             when (it.action) {
                 is Action.Authorize -> {
@@ -70,6 +67,8 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
                 is Action.SignExtrinsic -> {} // TODO
             }
         }
+
+        viewModel.loadUrlEvent.observeEvent(dappBrowserWebView::loadUrl)
     }
 
     private fun showConfirmAuthorizeSheet(pendingConfirmation: DappPendingConfirmation<Action.Authorize>) {

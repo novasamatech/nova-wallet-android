@@ -2,22 +2,37 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    app:startDestination="@id/DAppBrowserFragment"
-    android:id="@+id/dapp_browser_graph">
+    android:id="@+id/dapp_browser_graph"
+    app:startDestination="@id/DAppBrowserFragment">
 
     <fragment
         android:id="@+id/DAppBrowserFragment"
-        tools:layout="@layout/fragment_dapp_browser"
-        android:name="io.novafoundation.nova.feature_dapp_impl.presentation.browser.DAppBrowserFragment"
-        android:label="DAppBrowserFragment" >
+        android:name="io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBrowserFragment"
+        android:label="DAppBrowserFragment"
+        tools:layout="@layout/fragment_dapp_browser">
 
         <action
             android:id="@+id/action_DAppBrowserFragment_to_ConfirmSignExtrinsicFragment"
             app:destination="@id/ConfirmSignExtrinsicFragment" />
     </fragment>
 
-    <dialog android:id="@+id/ConfirmSignExtrinsicFragment"
-        tools:layout="@layout/bottom_sheet_confirm_sign_extrinsic"
+    <dialog
+        android:id="@+id/ConfirmSignExtrinsicFragment"
         android:name="io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignExtrinsicFragment"
-        android:label="ConfirmSignExtrinsicFragment" />
+        android:label="ConfirmSignExtrinsicFragment"
+        tools:layout="@layout/bottom_sheet_confirm_sign_extrinsic">
+        <action
+            android:id="@+id/action_ConfirmSignExtrinsicFragment_to_extrinsicDetailsFragment"
+            app:destination="@id/extrinsicDetailsFragment" />
+    </dialog>
+
+    <dialog
+        android:id="@+id/extrinsicDetailsFragment"
+        android:name="io.novafoundation.nova.feature_dapp_impl.presentation.browser.extrinsicDetails.DappExtrinsicDetailsFragment"
+        android:label="ExtrinsicDetailsFragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit"
+        tools:layout="@layout/fragment_dapp_extrinsic_details" />
 </navigation>

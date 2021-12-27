@@ -6,6 +6,7 @@ import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.AccountChosenNavDirection
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.AccountListFragment
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.extrinsicDetails.DappExtrinsicDetailsFragment
 
 class DAppNavigator(
     navigationHolder: NavigationHolder,
@@ -17,4 +18,9 @@ class DAppNavigator(
     )
 
     override fun openDAppBrowser() = performNavigation(R.id.action_mainFragment_to_dappBrowserGraph)
+
+    override fun openExtrinsicDetails(extrinsicContent: String) = performNavigation(
+        actionId = R.id.action_ConfirmSignExtrinsicFragment_to_extrinsicDetailsFragment,
+        args = DappExtrinsicDetailsFragment.getBundle(extrinsicContent)
+    )
 }
