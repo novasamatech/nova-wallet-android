@@ -5,4 +5,6 @@ interface DAppRouter {
     fun openChangeAccount()
 
     fun openDAppBrowser()
+
+    fun back()
 }

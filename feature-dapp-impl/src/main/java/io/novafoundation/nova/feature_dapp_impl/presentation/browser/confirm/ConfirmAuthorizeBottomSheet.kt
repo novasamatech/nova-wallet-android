@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_dapp_impl.presentation.browser.confirm
 import android.content.Context
 import android.os.Bundle
 import coil.ImageLoader
-import io.novafoundation.nova.common.utils.dp
+import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.DappPendingConfirmation
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.DappPendingConfirmation.Action
@@ -29,8 +29,7 @@ class ConfirmAuthorizeBottomSheet(
         confirmAuthorizeDappIcon.showDAppIcon(action.dAppIconUrl, imageLoader)
 
         with(confirmAuthorizeDappWallet) {
-            valuePrimary.compoundDrawablePadding = 8.dp(context)
-            valuePrimary.setCompoundDrawablesWithIntrinsicBounds(action.walletAddressModel.image, null, null, null)
+            valuePrimary.setDrawableStart(action.walletAddressModel.image, paddingInDp = 8)
 
             // post to prevent secondaryValue not to hide due to early show
             post { showValue(action.walletAddressModel.nameOrAddress) }

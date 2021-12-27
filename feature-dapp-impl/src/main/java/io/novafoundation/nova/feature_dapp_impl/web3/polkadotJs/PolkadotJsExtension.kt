@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.feature_dapp_impl.web3.InMemoryWeb3Session
 import io.novafoundation.nova.feature_dapp_impl.web3.Web3Responder
 import io.novafoundation.nova.feature_dapp_impl.web3.Web3Session
+import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.mapRawPayloadToSignerPayloadJSON
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewWeb3Extension
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewWeb3JavaScriptInterface
 import kotlinx.coroutines.CoroutineScope
@@ -43,6 +44,7 @@ class PolkadotJsExtension(
         val parsedMessage = gson.fromJson<Map<String, Any?>>(message, typeToken.type)
 
         val url = parsedMessage["url"] as? String ?: return null
+        val requestId = parsedMessage["id"] as? String ?: return null
 
         return when (parsedMessage["msgType"]) {
             PolkadotJsExtensionRequest.Identifier.AUTHORIZE_TAB.id ->
@@ -50,6 +52,14 @@ class PolkadotJsExtension(
 
             PolkadotJsExtensionRequest.Identifier.ACCOUNT_LIST.id ->
                 PolkadotJsExtensionRequest.AccountList(web3Responder, url, gson)
+
+            PolkadotJsExtensionRequest.Identifier.SIGN_EXTRINSIC.id -> {
+                val maybePayload = mapRawPayloadToSignerPayloadJSON(parsedMessage["request"], gson)
+
+                maybePayload?.let {
+                    PolkadotJsExtensionRequest.SignExtrinsic(web3Responder, url, requestId, maybePayload, gson)
+                }
+            }
 
             else -> null
         }

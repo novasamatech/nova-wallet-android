@@ -3,8 +3,10 @@ package io.novafoundation.nova.feature_wallet_api.domain.implementations
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
+import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chainAsset
@@ -51,5 +53,26 @@ class FixedTokenUseCase(
 
             emitAll(tokenRepository.observeToken(chainAsset))
         }
+    }
+}
+
+class GenesisHashUtilityTokenUseCase(
+    private val genesisHash: String,
+    private val chainRegistry: ChainRegistry,
+    private val tokenRepository: TokenRepository,
+) : TokenUseCase {
+
+    override suspend fun currentToken(): Token {
+        return tokenRepository.getToken(getChainAsset())
+    }
+
+    override fun currentTokenFlow(): Flow<Token> {
+        return flow {
+            emitAll(tokenRepository.observeToken(getChainAsset()))
+        }
+    }
+
+    private suspend fun getChainAsset(): Chain.Asset {
+        return chainRegistry.getChain(genesisHash).utilityAsset
     }
 }

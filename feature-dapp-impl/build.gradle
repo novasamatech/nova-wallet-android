@@ -34,6 +34,19 @@ android {
     }
 }
 
+task actualizeJsScripts(type: Exec) {
+    workingDir "$rootDir/nova-wallet-dapp-js"
+
+    commandLine "yarn", "build"
+
+    doLast {
+        copy {
+            from "$rootDir/nova-wallet-dapp-js/dist/nova_min.js"
+            into "$rootDir/feature-dapp-impl/src/main/res/raw"
+        }
+    }
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':core-db')

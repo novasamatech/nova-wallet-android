@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.cryptoTypeIn
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import jp.co.soramitsu.fearless_utils.encrypt.keypair.Keypair
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
@@ -71,6 +72,10 @@ class ExtrinsicService(
         val extrinsic = extrinsicBuilder.build()
 
         return rpcCalls.getExtrinsicFee(chain.id, extrinsic)
+    }
+
+    suspend fun estimateFee(chainId: ChainId, extrinsic: String): BigInteger {
+        return rpcCalls.getExtrinsicFee(chainId, extrinsic)
     }
 
     private suspend fun SecretStoreV2.getKeypairFor(

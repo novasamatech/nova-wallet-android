@@ -257,11 +257,7 @@ class Navigator(
     }
 
     override fun back() {
-        val popped = navController!!.popBackStack()
-
-        if (!popped) {
-            navigationHolder.activity!!.finish()
-        }
+        navigationHolder.executeBack()
     }
 
     override fun openCustomRebond() {

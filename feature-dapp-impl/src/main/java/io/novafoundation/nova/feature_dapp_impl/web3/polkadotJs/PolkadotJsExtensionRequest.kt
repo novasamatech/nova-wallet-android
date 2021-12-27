@@ -4,6 +4,8 @@ import com.google.gson.Gson
 import io.novafoundation.nova.feature_dapp_impl.web3.Web3Extension
 import io.novafoundation.nova.feature_dapp_impl.web3.Web3Responder
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.InjectedAccount
+import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.SignerPayloadJSON
+import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.SignerResult
 
 sealed class PolkadotJsExtensionRequest<R>(
     private val web3Responder: Web3Responder,
@@ -49,6 +51,19 @@ sealed class PolkadotJsExtensionRequest<R>(
 
         override fun serializeResponse(response: Response): String {
             return gson.toJson(response.accounts)
+        }
+    }
+
+    class SignExtrinsic(
+        web3Responder: Web3Responder,
+        url: String,
+        val requestId: String,
+        val signerPayload: SignerPayloadJSON,
+        private val gson: Gson,
+    ) : PolkadotJsExtensionRequest<SignerResult>(web3Responder, url, Identifier.SIGN_EXTRINSIC) {
+
+        override fun serializeResponse(response: SignerResult): String {
+            return gson.toJson(response)
         }
     }
 }

@@ -6,4 +6,8 @@
         <item name="android:background">@drawable/dapp_confirm_background</item>
         <item name="android:padding">16dp</item>
     </style>
+
+    <style name="GoNextTransactionDetailsTextAppearance">
+        <item name="android:textColor">@color/white_64</item>
+    </style>
 </resources>

@@ -3,9 +3,10 @@ package io.novafoundation.nova.common.base
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import javax.inject.Inject
 
-abstract class BaseFragment<T : BaseViewModel> : Fragment(), BaseFragmentMixin<T> {
+abstract class BaseBottomSheetFragment<T : BaseViewModel> : BottomSheetDialogFragment(), BaseFragmentMixin<T> {
 
     @Inject override lateinit var viewModel: T
 
