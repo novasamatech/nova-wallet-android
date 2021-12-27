@@ -10,8 +10,10 @@ import io.novafoundation.nova.feature_account_api.domain.model.multiChainEncrypt
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.SignerPayloadJSON
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
+import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHex
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.EraType
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
@@ -31,50 +33,63 @@ class DappSignExtrinsicInteractor(
 
     suspend fun buildSignature(signerPayload: SignerPayloadJSON): Result<String> = withContext(Dispatchers.Default) {
         kotlin.runCatching {
-            val call = decodeCall(signerPayload)
-
-            // assumption - extension has access only to selected meta account
-            val metaAccount = accountRepository.getSelectedMetaAccount()
-            val chain = chainRegistry.getChain(signerPayload.genesisHash)
-            val accountId = chain.accountIdOf(signerPayload.address)
-
-            val keypair = secretStoreV2.getKeypair(metaAccount, chain, accountId)
-            val runtime = chainRegistry.getRuntime(chain.id)
-
-            val extrinsicBuilder = ExtrinsicBuilder(
-                runtime = runtime,
-                keypair = keypair,
-                nonce = signerPayload.nonce.bigIntegerFromHex(),
-                runtimeVersion = RuntimeVersion(
-                    specVersion = signerPayload.specVersion.intFromHex(),
-                    transactionVersion = signerPayload.transactionVersion.intFromHex()
-                ),
-                genesisHash = signerPayload.genesisHash.fromHex(),
-                multiChainEncryption = metaAccount.multiChainEncryptionIn(chain),
-                accountIdentifier = AddressInstanceConstructor.constructInstance(runtime.typeRegistry, accountId),
-                blockHash = signerPayload.blockHash.fromHex(),
-                era = EraType.fromHex(runtime, signerPayload.era),
-                tip = signerPayload.tip.bigIntegerFromHex()
-            )
-
-            extrinsicBuilder.call(call)
-
-            extrinsicBuilder.buildSignature()
+            signerPayload.toExtrinsicBuilder().buildSignature()
         }
     }
 
     suspend fun calculateFee(signerPayload: SignerPayloadJSON): BigInteger = withContext(Dispatchers.Default) {
-        val call = decodeCall(signerPayload)
-        val chain = chainRegistry.getChain(signerPayload.genesisHash)
+        val extrinsic = signerPayload.toExtrinsicBuilder().build()
 
-        extrinsicService.estimateFee(chain) {
-            call(call)
+        extrinsicService.estimateFee(signerPayload.chain().id, extrinsic)
+    }
+
+    private suspend fun SignerPayloadJSON.toExtrinsicBuilder(): ExtrinsicBuilder {
+        val chain = chain()
+        val runtime = chainRegistry.getRuntime(genesisHash)
+        val parsedExtrinsic = parseDAppExtrinsic(runtime, this)
+
+        // assumption - extension has access only to selected meta account
+        val metaAccount = accountRepository.getSelectedMetaAccount()
+        val accountId = chain.accountIdOf(address)
+
+        val keypair = secretStoreV2.getKeypair(metaAccount, chain, accountId)
+
+        return with(parsedExtrinsic) {
+            ExtrinsicBuilder(
+                runtime = runtime,
+                keypair = keypair,
+                nonce = nonce,
+                runtimeVersion = RuntimeVersion(
+                    specVersion = specVersion,
+                    transactionVersion = transactionVersion
+                ),
+                genesisHash = genesisHash,
+                multiChainEncryption = metaAccount.multiChainEncryptionIn(chain),
+                accountIdentifier = AddressInstanceConstructor.constructInstance(runtime.typeRegistry, accountId),
+                blockHash = blockHash,
+                era = era,
+                tip = tip
+            ).also { it.call(call) }
         }
     }
 
-    private suspend fun decodeCall(signerPayload: SignerPayloadJSON): GenericCall.Instance {
-        val runtime = chainRegistry.getRuntime(signerPayload.genesisHash)
+    private suspend fun SignerPayloadJSON.chain(): Chain {
+        return chainRegistry.getChain(genesisHash)
+    }
 
-        return GenericCall.fromHex(runtime, signerPayload.method)
+    private fun parseDAppExtrinsic(runtime: RuntimeSnapshot, payloadJSON: SignerPayloadJSON): DAppParsedExtrinsic {
+        return with(payloadJSON) {
+            DAppParsedExtrinsic(
+                address = address,
+                nonce = nonce.bigIntegerFromHex(),
+                specVersion = specVersion.intFromHex(),
+                transactionVersion = transactionVersion.intFromHex(),
+                genesisHash = genesisHash.fromHex(),
+                blockHash = blockHash.fromHex(),
+                era = EraType.fromHex(runtime, era),
+                tip = tip.bigIntegerFromHex(),
+                call = GenericCall.fromHex(runtime, method)
+            )
+        }
     }
 }
