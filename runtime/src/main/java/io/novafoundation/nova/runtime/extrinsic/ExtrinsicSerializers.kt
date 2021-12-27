@@ -10,12 +10,6 @@ import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
 import java.lang.reflect.Type
 
-private val callSerializerGson = GsonBuilder()
-    .registerTypeHierarchyAdapter(ByteArray::class.java, ByteArrayHexAdapter())
-    .registerTypeHierarchyAdapter(GenericCall.Instance::class.java, GenericCallAdapter())
-    .setPrettyPrinting()
-    .create()
-
 private class GenericCallAdapter : JsonSerializer<GenericCall.Instance> {
 
     override fun serialize(src: GenericCall.Instance, typeOfSrc: Type, context: JsonSerializationContext): JsonElement {
@@ -34,6 +28,11 @@ private class ByteArrayHexAdapter : JsonSerializer<ByteArray> {
     }
 }
 
-fun GenericCall.Instance.rawData(): String {
-    return callSerializerGson.toJson(this)
+object ExtrinsicSerializers {
+
+    fun gson() = GsonBuilder()
+        .registerTypeHierarchyAdapter(ByteArray::class.java, ByteArrayHexAdapter())
+        .registerTypeHierarchyAdapter(GenericCall.Instance::class.java, GenericCallAdapter())
+        .setPrettyPrinting()
+        .create()
 }

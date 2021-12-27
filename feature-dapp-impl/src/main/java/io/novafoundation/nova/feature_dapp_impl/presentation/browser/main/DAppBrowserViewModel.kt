@@ -1,5 +1,6 @@
-package io.novafoundation.nova.feature_dapp_impl.presentation.browser
+package io.novafoundation.nova.feature_dapp_impl.presentation.browser.main
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.createAddressModel
@@ -59,11 +60,16 @@ class DAppBrowserViewModel(
     private val selectedAccount = selectedAccountUseCase.selectedMetaAccountFlow()
         .share()
 
+    private val _loadUrlEvent = MutableLiveData<Event<String>>()
+    val loadUrlEvent: LiveData<Event<String>> = _loadUrlEvent
+
     init {
         polkadotJsExtension.requestsFlow
             .onEach(::handleDAppRequest)
             .inBackground()
             .launchIn(this)
+
+        _loadUrlEvent.value = "https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fwestend.api.onfinality.io%2Fpublic-ws#/accounts".event()
     }
 
     private suspend fun handleDAppRequest(request: PolkadotJsExtensionRequest<*>) {
@@ -91,7 +97,9 @@ class DAppBrowserViewModel(
         }
 
         when (response) {
-            is DAppSignExtrinsicCommunicator.Response.Rejected -> request.reject(NotAuthorizedException)
+            is DAppSignExtrinsicCommunicator.Response.Rejected -> request.reject(
+                NotAuthorizedException
+            )
             is DAppSignExtrinsicCommunicator.Response.Signed -> request.accept(SignerResult(response.requestId, response.signature))
             is DAppSignExtrinsicCommunicator.Response.SigningFailed -> {
                 showError(resourceManager.getString(R.string.dapp_sign_extrinsic_failed))
@@ -120,7 +128,10 @@ class DAppBrowserViewModel(
         val metaAccount = selectedAccount.first()
 
         val action = DappPendingConfirmation.Action.Authorize(
-            title = resourceManager.getString(R.string.dapp_confirm_authorize_title_format, dAppIdentifier),
+            title = resourceManager.getString(
+                R.string.dapp_confirm_authorize_title_format,
+                dAppIdentifier
+            ),
             dAppIconUrl = dappInfo.metadata?.iconLink,
             dAppUrl = dappInfo.baseUrl,
             walletAddressModel = addressIconGenerator.createAddressModel(

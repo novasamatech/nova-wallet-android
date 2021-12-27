@@ -6,5 +6,7 @@ interface DAppRouter {
 
     fun openDAppBrowser()
 
+    fun openExtrinsicDetails(extrinsicContent: String)
+
     fun back()
 }

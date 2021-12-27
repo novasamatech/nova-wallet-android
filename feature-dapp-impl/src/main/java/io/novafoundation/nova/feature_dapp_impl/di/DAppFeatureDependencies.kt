@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.runtime.di.ExtrinsicSerialization
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 interface DAppFeatureDependencies {
@@ -38,4 +39,7 @@ interface DAppFeatureDependencies {
     fun tokenRepository(): TokenRepository
 
     fun secretStoreV2(): SecretStoreV2
+
+    @ExtrinsicSerialization
+    fun extrinsicGson(): Gson
 }

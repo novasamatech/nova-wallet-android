@@ -23,6 +23,7 @@ import kotlinx.android.synthetic.main.bottom_sheet_confirm_dapp_action.confirmDA
 import kotlinx.android.synthetic.main.bottom_sheet_confirm_dapp_action.confirmDAppActionReject
 import kotlinx.android.synthetic.main.bottom_sheet_confirm_dapp_action.confirmInnerContent
 import kotlinx.android.synthetic.main.bottom_sheet_confirm_sign_extrinsic.confirmSignExtinsicAccount
+import kotlinx.android.synthetic.main.bottom_sheet_confirm_sign_extrinsic.confirmSignExtinsicDetails
 import kotlinx.android.synthetic.main.bottom_sheet_confirm_sign_extrinsic.confirmSignExtinsicFee
 import kotlinx.android.synthetic.main.bottom_sheet_confirm_sign_extrinsic.confirmSignExtinsicIcon
 import kotlinx.android.synthetic.main.bottom_sheet_confirm_sign_extrinsic.confirmSignExtinsicNetwork
@@ -54,6 +55,8 @@ class DAppSignExtrinsicFragment : BaseBottomSheetFragment<DAppSignExtrinsicViewM
 
         confirmDAppActionAllow.setOnClickListener { viewModel.acceptClicked() }
         confirmDAppActionReject.setOnClickListener { viewModel.rejectClicked() }
+
+        confirmSignExtinsicDetails.setOnClickListener { viewModel.detailsClicked() }
     }
 
     override fun onCancel(dialog: DialogInterface) {

@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrin
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
@@ -24,6 +25,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.GenesisHashUtilityTokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.runtime.di.ExtrinsicSerialization
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
@@ -44,7 +46,8 @@ class DAppSignExtrinsicModule {
         extrinsicService: ExtrinsicService,
         accountRepository: AccountRepository,
         secretStoreV2: SecretStoreV2,
-    ) = DappSignExtrinsicInteractor(extrinsicService, accountRepository, chainRegistry, secretStoreV2)
+        @ExtrinsicSerialization extrinsicGson: Gson
+    ) = DappSignExtrinsicInteractor(extrinsicService, accountRepository, chainRegistry, secretStoreV2, extrinsicGson)
 
     @Provides
     @ScreenScope

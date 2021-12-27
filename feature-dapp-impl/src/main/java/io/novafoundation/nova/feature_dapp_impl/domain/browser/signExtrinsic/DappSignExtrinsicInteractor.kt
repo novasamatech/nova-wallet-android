@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_dapp_impl.domain.browser.signExtrinsic
 
+import com.google.gson.Gson
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.utils.bigIntegerFromHex
 import io.novafoundation.nova.common.utils.intFromHex
@@ -28,13 +29,21 @@ class DappSignExtrinsicInteractor(
     private val extrinsicService: ExtrinsicService,
     private val accountRepository: AccountRepository,
     private val chainRegistry: ChainRegistry,
-    private val secretStoreV2: SecretStoreV2
+    private val secretStoreV2: SecretStoreV2,
+    private val extrinsicGson: Gson,
 ) {
 
     suspend fun buildSignature(signerPayload: SignerPayloadJSON): Result<String> = withContext(Dispatchers.Default) {
         kotlin.runCatching {
             signerPayload.toExtrinsicBuilder().buildSignature()
         }
+    }
+
+    suspend fun readableExtrinsicContent(signerPayload: SignerPayloadJSON): String = withContext(Dispatchers.Default) {
+        val runtime = chainRegistry.getRuntime(signerPayload.chain().id)
+        val parsedExtrinsic = parseDAppExtrinsic(runtime, signerPayload)
+
+        extrinsicGson.toJson(parsedExtrinsic)
     }
 
     suspend fun calculateFee(signerPayload: SignerPayloadJSON): BigInteger = withContext(Dispatchers.Default) {

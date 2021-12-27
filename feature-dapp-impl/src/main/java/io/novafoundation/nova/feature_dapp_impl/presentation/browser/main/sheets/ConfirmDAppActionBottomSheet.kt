@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_dapp_impl.presentation.browser.confirm
+package io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.sheets
 
 import android.content.Context
 import android.content.DialogInterface
@@ -9,7 +9,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import io.novafoundation.nova.common.utils.DialogExtensions
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_dapp_impl.R
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.DappPendingConfirmation
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DappPendingConfirmation
 import kotlinx.android.synthetic.main.bottom_sheet_confirm_dapp_action.confirmDAppActionAllow
 import kotlinx.android.synthetic.main.bottom_sheet_confirm_dapp_action.confirmDAppActionReject
 import kotlinx.android.synthetic.main.bottom_sheet_confirm_dapp_action.confirmInnerContent

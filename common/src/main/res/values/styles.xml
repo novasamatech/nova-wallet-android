@@ -54,7 +54,7 @@
         <item name="lineHeight">22sp</item>
     </style>
 
-    <style name="TextAppearance.NovaFoundation.Caption1" parent="TextAppearance.NovaFoundation.Regular">
+    <style name="TextAppearance.NovaFoundation.Regular.Caption1">
         <item name="android:textSize">12sp</item>
     </style>
 

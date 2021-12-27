@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.StorageDao
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
+import io.novafoundation.nova.runtime.extrinsic.ExtrinsicSerializers
 import io.novafoundation.nova.runtime.extrinsic.MortalityConstructor
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
@@ -76,4 +77,9 @@ class RuntimeModule {
     fun provideSubstrateCalls(
         chainRegistry: ChainRegistry
     ) = RpcCalls(chainRegistry)
+
+    @Provides
+    @ApplicationScope
+    @ExtrinsicSerialization
+    fun provideExtrinsicGson() = ExtrinsicSerializers.gson()
 }

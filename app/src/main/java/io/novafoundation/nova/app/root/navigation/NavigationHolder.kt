@@ -2,6 +2,7 @@ package io.novafoundation.nova.app.root.navigation
 
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
+import androidx.navigation.plusAssign
 
 class NavigationHolder {
 

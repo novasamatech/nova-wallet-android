@@ -1,12 +1,12 @@
-package io.novafoundation.nova.feature_dapp_impl.presentation.browser.confirm
+package io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.sheets
 
 import android.content.Context
 import android.os.Bundle
 import coil.ImageLoader
 import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.feature_dapp_impl.R
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.DappPendingConfirmation
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.DappPendingConfirmation.Action
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DappPendingConfirmation
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DappPendingConfirmation.Action
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.showDAppIcon
 import kotlinx.android.synthetic.main.bottom_sheet_confirm_authorize.confirmAuthorizeDappDApp
 import kotlinx.android.synthetic.main.bottom_sheet_confirm_authorize.confirmAuthorizeDappIcon

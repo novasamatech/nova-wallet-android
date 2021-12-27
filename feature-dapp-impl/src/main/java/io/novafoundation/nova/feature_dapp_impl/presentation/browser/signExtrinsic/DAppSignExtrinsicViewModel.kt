@@ -89,4 +89,12 @@ class DAppSignExtrinsicViewModel(
         feeConstructor = { interactor.calculateFee(payload.signerPayloadJSON) },
         onRetryCancelled = {}
     )
+
+    fun detailsClicked() {
+        launch {
+            val extrinsicContent = interactor.readableExtrinsicContent(payload.signerPayloadJSON)
+
+            router.openExtrinsicDetails(extrinsicContent)
+        }
+    }
 }
