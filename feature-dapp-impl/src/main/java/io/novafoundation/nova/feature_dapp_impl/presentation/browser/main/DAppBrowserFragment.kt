@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_dapp_impl.presentation.browser.main
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
