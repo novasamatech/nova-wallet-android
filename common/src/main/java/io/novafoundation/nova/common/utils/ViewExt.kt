@@ -26,6 +26,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.shimmer.ShimmerFrameLayout
+import com.google.android.material.tabs.TabLayout
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.utils.input.Input
 import io.novafoundation.nova.common.utils.input.valueOrNull
@@ -277,4 +278,16 @@ fun <I> View.useInputValue(input: Input<I>, onValue: (I) -> Unit) {
     isEnabled = input is Input.Enabled.Modifiable
 
     input.valueOrNull?.let(onValue)
+}
+
+inline fun TabLayout.onTabSelected(crossinline listener: (position: Int) -> Unit) {
+    addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+        override fun onTabSelected(tab: TabLayout.Tab) {
+            listener(tab.position)
+        }
+
+        override fun onTabUnselected(tab: TabLayout.Tab) {}
+
+        override fun onTabReselected(tab: TabLayout.Tab) {}
+    })
 }

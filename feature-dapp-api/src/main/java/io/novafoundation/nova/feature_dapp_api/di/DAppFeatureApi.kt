@@ -1,3 +1,8 @@
 package io.novafoundation.nova.feature_dapp_api.di
 
-interface DAppFeatureApi
+import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
+
+interface DAppFeatureApi {
+
+    val dappMetadataRepository: DAppMetadataRepository
+}

@@ -1,7 +1,5 @@
 package io.novafoundation.nova.feature_dapp_impl.util
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.net.URL
 
 object UrlNormalizer {
@@ -9,9 +7,9 @@ object UrlNormalizer {
     /**
      * @return normalized url in a form of protocol://host
      */
-    suspend fun normalizeUrl(url: String) = withContext(Dispatchers.Default) {
+    fun normalizeUrl(url: String): String {
         val parsedUrl = URL(url)
 
-        "${parsedUrl.protocol}://${parsedUrl.host}"
+        return "${parsedUrl.protocol}://${parsedUrl.host}"
     }
 }

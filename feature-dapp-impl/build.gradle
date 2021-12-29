@@ -13,6 +13,7 @@ android {
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
+        buildConfigField "String", "DAPP_METADATAS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/dapps/dapps.json\""
     }
 
     buildTypes {
@@ -72,6 +73,8 @@ dependencies {
 
     implementation lifecycleDep
     kapt lifecycleKapt
+
+    implementation retrofitDep
 
     testImplementation jUnitDep
     testImplementation mockitoDep

@@ -2,9 +2,9 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/dappMainContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/dappMainContainer"
     tools:background="@drawable/drawable_background_image">
 
     <TextView
@@ -20,10 +20,10 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
+        android:id="@+id/dappMainIcon"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginTop="25dp"
-        android:id="@+id/dappMainIcon"
         android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -35,12 +35,12 @@
         android:layout_height="0dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:scaleType="fitXY"
         android:layout_marginEnd="16dp"
         android:adjustViewBounds="true"
+        android:scaleType="fitXY"
         android:src="@drawable/bg_dapp_welcome"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="@+id/dappMainWelcomeBottomMargin"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dappMainTitle" />
 
@@ -83,27 +83,15 @@
         app:layout_constraintStart_toStartOf="@id/dappMainWelcomeSubtitle"
         app:layout_constraintTop_toBottomOf="@+id/dappMainWelcomeSubtitle" />
 
-    <TextView
-        android:id="@+id/dappMainExplore"
-        style="@style/TextAppearance.NovaFoundation.Bold.Title2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"
-        android:text="@string/common_explore"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dappMainWelcomeGroup" />
-
-    <include
-        layout="@layout/item_dapp"
-        android:id="@+id/dappMainSubId"
+    <io.novafoundation.nova.feature_dapp_impl.presentation.main.view.CategorizedDappsView
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:id="@+id/dappMainCategorizedDapps"
+        android:layout_marginTop="12dp"
         android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dappMainExplore" />
+        app:layout_constraintTop_toBottomOf="@id/dappMainWelcomeGroup" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

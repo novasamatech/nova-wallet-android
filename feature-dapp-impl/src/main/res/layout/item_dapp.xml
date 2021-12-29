@@ -1,25 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/bg_primary_list_item"
     tools:background="@color/black_48">
 
     <ImageView
         android:id="@+id/itemDAppIcon"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:layout_marginStart="12dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="12dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:background="@drawable/dapp_icon_background"
         android:padding="10dp"
-        android:src="@drawable/ic_sub_id"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.0"
+        tools:src="@drawable/ic_sub_id" />
 
     <TextView
         android:id="@+id/itemDAppTitle"
@@ -27,12 +28,13 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
-        android:layout_marginTop="14dp"
-        android:layout_marginEnd="28dp"
-        android:text="Sub.ID"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:includeFontPadding="false"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintEnd_toStartOf="@+id/imageView2"
         app:layout_constraintStart_toEndOf="@id/itemDAppIcon"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Astar" />
 
     <TextView
         android:id="@+id/itemDAppSubtitle"
@@ -41,13 +43,24 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
         android:layout_marginTop="2dp"
-        android:layout_marginEnd="19dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="14dp"
-        android:text="One place to see all your Substrate addresses and balances"
         android:textColor="@color/white_64"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/imageView2"
         app:layout_constraintStart_toEndOf="@id/itemDAppIcon"
-        app:layout_constraintTop_toBottomOf="@id/itemDAppTitle" />
+        app:layout_constraintTop_toBottomOf="@id/itemDAppTitle"
+        tools:text="Staking" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/ic_chevron_right"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/white_32" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
