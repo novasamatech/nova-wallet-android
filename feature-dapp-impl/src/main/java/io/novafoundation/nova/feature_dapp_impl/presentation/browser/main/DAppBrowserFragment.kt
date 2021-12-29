@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -19,6 +20,13 @@ import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserWebView
 import javax.inject.Inject
 
 class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
+
+    companion object {
+
+        private const val PAYLOAD = "DAppBrowserFragment.Payload"
+
+        fun getBundle(initialUrl: String) = bundleOf(PAYLOAD to initialUrl)
+    }
 
     @Inject
     lateinit var web3WebViewClientFactory: Web3WebViewClientFactory
@@ -50,7 +58,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
     override fun inject() {
         FeatureUtils.getFeature<DAppFeatureComponent>(this, DAppFeatureApi::class.java)
             .browserComponentFactory()
-            .create(this)
+            .create(this, argument(PAYLOAD))
             .inject(this)
     }
 

@@ -50,6 +50,7 @@ class DAppBrowserViewModel(
     private val resourceManager: ResourceManager,
     private val addressIconGenerator: AddressIconGenerator,
     private val selectedAccountUseCase: SelectedAccountUseCase,
+    initialUrl: String
 ) : BaseViewModel() {
 
     private val polkadotJsExtension = polkadotJsExtensionFactory.create(scope = this)
@@ -69,7 +70,7 @@ class DAppBrowserViewModel(
             .inBackground()
             .launchIn(this)
 
-        _loadUrlEvent.value = "https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fwestend.api.onfinality.io%2Fpublic-ws#/accounts".event()
+        _loadUrlEvent.value = initialUrl.event()
     }
 
     private suspend fun handleDAppRequest(request: PolkadotJsExtensionRequest<*>) {

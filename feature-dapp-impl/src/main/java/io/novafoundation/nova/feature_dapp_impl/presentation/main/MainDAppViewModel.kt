@@ -76,7 +76,7 @@ class MainDAppViewModel(
     }
 
     fun dappClicked(dapp: DappModel) {
-        showMessage(dapp.baseUrl)
+        router.openDAppBrowser(dapp.url)
     }
 
     private fun syncDApps() = launch {
@@ -88,7 +88,7 @@ class MainDAppViewModel(
             name = name,
             description = categories.joinToString { it.name },
             iconUrl = iconLink,
-            baseUrl = baseUrl,
+            url = url,
         )
     }
 }

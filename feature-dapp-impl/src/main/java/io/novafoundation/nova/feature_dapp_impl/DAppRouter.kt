@@ -4,7 +4,7 @@ interface DAppRouter {
 
     fun openChangeAccount()
 
-    fun openDAppBrowser()
+    fun openDAppBrowser(initialUrl: String)
 
     fun openExtrinsicDetails(extrinsicContent: String)
 

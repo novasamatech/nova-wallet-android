@@ -18,7 +18,8 @@ interface DAppBrowserComponent {
     interface Factory {
 
         fun create(
-            @BindsInstance fragment: Fragment
+            @BindsInstance fragment: Fragment,
+            @BindsInstance initialUrl: String
         ): DAppBrowserComponent
     }
 

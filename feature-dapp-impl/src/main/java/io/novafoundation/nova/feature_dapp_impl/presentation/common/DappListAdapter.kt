@@ -36,7 +36,7 @@ class DappListAdapter(
 private object DappDiffCallback : DiffUtil.ItemCallback<DappModel>() {
 
     override fun areItemsTheSame(oldItem: DappModel, newItem: DappModel): Boolean {
-        return oldItem.baseUrl == newItem.baseUrl
+        return oldItem.url == newItem.url
     }
 
     override fun areContentsTheSame(oldItem: DappModel, newItem: DappModel): Boolean {
