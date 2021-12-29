@@ -13,13 +13,15 @@ android {
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-        buildConfigField "String", "DAPP_METADATAS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/dapps/dapps.json\""
+        buildConfigField "String", "DAPP_METADATAS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/dapps/dapps_dev.json\""
     }
 
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            buildConfigField "String", "DAPP_METADATAS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/dapps/dapps.json\""
         }
     }
 
