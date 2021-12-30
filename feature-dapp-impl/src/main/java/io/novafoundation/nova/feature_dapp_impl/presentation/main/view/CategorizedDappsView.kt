@@ -4,6 +4,8 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import coil.ImageLoader
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.makeGone
@@ -59,6 +61,8 @@ class CategorizedDappsView @JvmOverloads constructor(
 
     fun setSelectedCategory(position: Int) {
         categoriesAdapter.setSelectedCategory(position)
+
+        scrollToCenter(position)
     }
 
     fun setOnCategoryChangedListener(listener: (position: Int) -> Unit) {
@@ -100,4 +104,16 @@ class CategorizedDappsView @JvmOverloads constructor(
     override fun onItemClicked(position: Int) {
         onCategoryClickListener?.invoke(position)
     }
+
+    private fun scrollToCenter(position: Int) {
+        categorizedDappsCategories.findViewHolderForAdapterPosition(position)?.let {
+            val itemToScroll: Int = categorizedDappsCategories.getChildLayoutPosition(it.itemView)
+            val centerOfScreen: Int = categorizedDappsCategories.width / 2 - it.itemView.width / 2
+
+            categorizedDappsCategories.linearLayoutManager.scrollToPositionWithOffset(itemToScroll, centerOfScreen)
+        }
+    }
+
+    private val RecyclerView.linearLayoutManager: LinearLayoutManager
+        get() = layoutManager as LinearLayoutManager
 }

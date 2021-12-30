@@ -26,7 +26,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.shimmer.ShimmerFrameLayout
-import com.google.android.material.tabs.TabLayout
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.utils.input.Input
 import io.novafoundation.nova.common.utils.input.valueOrNull
