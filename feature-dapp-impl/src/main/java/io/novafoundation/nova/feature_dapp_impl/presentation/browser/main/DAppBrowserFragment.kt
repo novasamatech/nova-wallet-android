@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.sheets
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3WebViewClientFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewHolder
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.injectWeb3
+import io.novafoundation.nova.feature_dapp_impl.web3.webview.uninjectWeb3
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserWebView
 import javax.inject.Inject
 
@@ -51,6 +52,8 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+
+        dappBrowserWebView.uninjectWeb3()
 
         webViewHolder.release()
     }
