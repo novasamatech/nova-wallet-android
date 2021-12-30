@@ -23,7 +23,10 @@ class DappInteractor(
     @OptIn(ExperimentalStdlibApi::class)
     suspend fun getDAppMetadatasByCategory(): GroupedList<DappCategory, DappMetadata> {
         val allDApps = dAppMetadataRepository.getDAppMetadatas()
+            .sortedBy { it.name }
+
         val allCategories = allDApps.flatMap { it.categories }
+            .sortedBy { it.name }
 
         // Regrouping in O(Categories * Dapps)
         // Complexity should be fine for expected amount of dApps
