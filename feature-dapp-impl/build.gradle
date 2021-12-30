@@ -66,6 +66,8 @@ dependencies {
     implementation materialDep
     implementation constraintDep
 
+    implementation shimmerDep
+
     implementation coroutinesDep
 
     implementation gsonDep

@@ -18,7 +18,7 @@
             android:layout_width="72dp"
             android:layout_height="12dp"
             android:layout_gravity="center"
-            android:background="@drawable/bg_grey_solid_rounded" />
+            android:background="@drawable/bg_shimerring" />
 
     </com.facebook.shimmer.ShimmerFrameLayout>
 

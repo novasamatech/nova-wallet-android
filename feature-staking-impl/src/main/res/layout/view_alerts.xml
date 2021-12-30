@@ -44,13 +44,13 @@
             <View
                 android:layout_width="160dp"
                 android:layout_height="14dp"
-                android:background="@drawable/bg_grey_solid_rounded" />
+                android:background="@drawable/bg_shimerring" />
 
             <View
                 android:layout_width="130dp"
                 android:layout_height="12dp"
                 android:layout_marginTop="8dp"
-                android:background="@drawable/bg_grey_solid_rounded" />
+                android:background="@drawable/bg_shimerring" />
         </LinearLayout>
 
     </com.facebook.shimmer.ShimmerFrameLayout>

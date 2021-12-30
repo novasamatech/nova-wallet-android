@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_dapp_impl.domain
 
 import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.retryUntilDone
 import io.novafoundation.nova.feature_dapp_api.data.model.DappCategory
 import io.novafoundation.nova.feature_dapp_api.data.model.DappMetadata
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
@@ -17,7 +18,7 @@ class DappInteractor(
 ) {
 
     suspend fun syncDAppMetadatas() = withContext(Dispatchers.Default) {
-        dAppMetadataRepository.syncDAppMetadatas()
+        retryUntilDone { dAppMetadataRepository.syncDAppMetadatas() }
     }
 
     @OptIn(ExperimentalStdlibApi::class)

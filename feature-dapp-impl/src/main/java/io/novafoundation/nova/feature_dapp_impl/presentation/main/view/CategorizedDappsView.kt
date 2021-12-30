@@ -6,6 +6,8 @@ import android.view.View
 import android.widget.LinearLayout
 import coil.ImageLoader
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.makeGone
+import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_dapp_api.data.model.DappCategory
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
@@ -15,6 +17,8 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.common.DappListAdap
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.DappModel
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.DappCategoriesAdapter
 import kotlinx.android.synthetic.main.view_categorized_dapps.view.categorizedDappsCategories
+import kotlinx.android.synthetic.main.view_categorized_dapps.view.categorizedDappsCategoriesShimmer
+import kotlinx.android.synthetic.main.view_categorized_dapps.view.categorizedDappsDappsShimmer
 import kotlinx.android.synthetic.main.view_categorized_dapps.view.categorizedDappsList
 import javax.inject.Inject
 
@@ -51,10 +55,8 @@ class CategorizedDappsView @JvmOverloads constructor(
         categorizedDappsList.adapter = dappListAdapter
         categorizedDappsCategories.adapter = categoriesAdapter
         clipToOutline = true // for round corners
-    }
 
-    fun setCategories(categories: List<DappCategory>) {
-        categoriesAdapter.submitList(categories)
+
     }
 
     fun setSelectedCategory(position: Int) {
@@ -69,8 +71,28 @@ class CategorizedDappsView @JvmOverloads constructor(
         onDappClickListener = listener
     }
 
+    fun showCategories(categories: List<DappCategory>) {
+        categorizedDappsCategoriesShimmer.makeGone()
+        categorizedDappsCategories.makeVisible()
+
+        categoriesAdapter.submitList(categories)
+    }
+
     fun showDapps(dapps: List<DappModel>) {
+        categorizedDappsDappsShimmer.makeGone()
+        categorizedDappsList.makeVisible()
+
         dappListAdapter.submitList(dapps)
+    }
+
+    fun showDappsShimmering() {
+        categorizedDappsDappsShimmer.makeVisible()
+        categorizedDappsList.makeGone()
+    }
+
+    fun showCategoriesShimmering() {
+        categorizedDappsCategoriesShimmer.makeVisible()
+        categorizedDappsCategories.makeGone()
     }
 
     override fun onItemClicked(item: DappModel) {

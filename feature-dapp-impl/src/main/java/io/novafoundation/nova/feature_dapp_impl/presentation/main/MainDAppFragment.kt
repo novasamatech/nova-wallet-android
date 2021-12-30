@@ -54,14 +54,14 @@ class MainDAppFragment : BaseFragment<MainDAppViewModel>() {
         viewModel.shownDappsFlow.observe { state ->
             when (state) {
                 is LoadingState.Loaded -> dappMainCategorizedDapps.showDapps(state.data)
-                is LoadingState.Loading -> {}
+                is LoadingState.Loading -> dappMainCategorizedDapps.showDappsShimmering()
             }
         }
 
         viewModel.categoriesStateFlow.observe { state ->
             when (state) {
-                is LoadingState.Loaded -> dappMainCategorizedDapps.setCategories(state.data)
-                is LoadingState.Loading -> {}
+                is LoadingState.Loaded -> dappMainCategorizedDapps.showCategories(state.data)
+                is LoadingState.Loading -> dappMainCategorizedDapps.showCategoriesShimmering()
             }
         }
 
