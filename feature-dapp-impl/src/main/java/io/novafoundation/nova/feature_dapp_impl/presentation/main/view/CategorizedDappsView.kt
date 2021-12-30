@@ -55,8 +55,6 @@ class CategorizedDappsView @JvmOverloads constructor(
         categorizedDappsList.adapter = dappListAdapter
         categorizedDappsCategories.adapter = categoriesAdapter
         clipToOutline = true // for round corners
-
-
     }
 
     fun setSelectedCategory(position: Int) {
