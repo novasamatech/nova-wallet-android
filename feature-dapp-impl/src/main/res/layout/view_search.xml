@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    tools:background="@color/white_8"
+    tools:parentTag="android.widget.LinearLayout">
+
+    <EditText
+        android:id="@+id/searchContent"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="@null"
+        android:hint="@string/dapp_search_hint"
+        android:includeFontPadding="false"
+        android:paddingStart="12dp"
+        android:paddingTop="9dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="9dp"
+        android:singleLine="true"
+        android:textColorHint="@color/white_32" />
+
+    <ImageView
+        android:id="@+id/searchClear"
+        android:layout_width="20dp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:layout_height="20dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginEnd="8dp"
+        android:src="@drawable/ic_close_circle" />
+</merge>

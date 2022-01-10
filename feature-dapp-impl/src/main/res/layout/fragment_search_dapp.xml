@@ -3,14 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
+    android:id="@+id/searchDappSearhContainer"
     tools:background="@color/black">
 
     <LinearLayout
         android:id="@+id/searchDappSearhGroup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/top_bar_dapps"
+        android:background="@color/bar_bg_64"
         android:orientation="horizontal">
 
         <io.novafoundation.nova.feature_dapp_impl.presentation.search.SearchView
@@ -20,12 +22,14 @@
             android:id="@+id/searhDappQuery"
             android:layout_marginStart="16dp"
             android:layout_marginBottom="6dp"
+            android:layout_marginTop="6dp"
             android:layout_weight="1" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingStart="16dp"
+            android:layout_gravity="center_vertical"
             android:paddingTop="12dp"
             android:paddingEnd="16dp"
             android:paddingBottom="12dp"
@@ -38,7 +42,10 @@
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:paddingBottom="24dp"
+        android:clipToPadding="false"
         android:layout_weight="1"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         android:id="@+id/searchDappList"
         tools:listitem="@layout/item_dapp" />
 </LinearLayout>

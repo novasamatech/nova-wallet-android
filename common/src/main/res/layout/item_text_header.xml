@@ -7,7 +7,7 @@
     android:paddingStart="16dp"
     android:paddingTop="9dp"
     android:paddingBottom="10dp"
-    android:id="@+id/searchCategory"
+    android:id="@+id/textHeader"
     android:textColor="@color/black1"
     tools:background="@color/black"
     tools:text="@tools:sample/lorem[2]">

@@ -19,9 +19,14 @@ class DAppNavigator(
     )
 
     override fun openDAppBrowser(initialUrl: String) = performNavigation(
-        actionId = R.id.action_mainFragment_to_dappBrowserGraph,
+        cases = arrayOf(
+            R.id.mainFragment to R.id.action_mainFragment_to_dappBrowserGraph,
+            R.id.dappSearchFragment to R.id.action_dappSearchFragment_to_dapp_browser_graph,
+        ),
         args = DAppBrowserFragment.getBundle(initialUrl)
     )
+
+    override fun openDappSearch() = performNavigation(R.id.action_mainFragment_to_dappSearchGraph)
 
     override fun openExtrinsicDetails(extrinsicContent: String) = performNavigation(
         actionId = R.id.action_ConfirmSignExtrinsicFragment_to_extrinsicDetailsFragment,

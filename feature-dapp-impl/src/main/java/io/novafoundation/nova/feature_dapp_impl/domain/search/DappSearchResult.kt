@@ -6,7 +6,7 @@ sealed class DappSearchResult {
 
     class Url(val url: String): DappSearchResult()
 
-    class Search(val query: String): DappSearchResult()
+    class Search(val query: String, val searchUrl: String) : DappSearchResult()
 
     class Dapp(val metadata: DappMetadata): DappSearchResult()
 }

@@ -198,6 +198,10 @@
 
     <!-- Input -->
 
+    <style name="Widget.Nova.Input.EditText" parent="@android:style/Widget.EditText">
+        <item name="android:textCursorDrawable">@null</item>
+    </style>
+
     <style name="Widget.Nova.Input.Primary.External" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
         <item name="android:textColorHint">@color/colorHint</item>
         <item name="hintTextColor">@color/colorHint</item>

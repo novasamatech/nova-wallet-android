@@ -17,16 +17,22 @@ class SearchDappInteractor(
         val dappsGroupContent = allDapps.filter { query.isEmpty() || query.lowercase() in it.name.lowercase() }
             .map(DappSearchResult::Dapp)
 
-        val searchGroupContent = listOf(
-            if (Urls.isValidWebUrl(query)) DappSearchResult.Url(query) else DappSearchResult.Search(query)
-        )
+        val searchGroupContent = when {
+            query.isEmpty() -> null
+            Urls.isValidWebUrl(query) -> DappSearchResult.Url(query)
+            else -> DappSearchResult.Search(query, searchUrlFor(query))
+        }
 
         buildMap {
+            searchGroupContent?.let {
+                put(DappSearchGroup.SEARCH, listOf(searchGroupContent))
+            }
+
             if (dappsGroupContent.isNotEmpty()) {
                 put(DappSearchGroup.DAPPS, dappsGroupContent)
             }
-
-            put(DappSearchGroup.SEARCH, searchGroupContent)
         }
     }
+
+    private fun searchUrlFor(query: String): String = "https://duckduckgo.com/?q=$query"
 }

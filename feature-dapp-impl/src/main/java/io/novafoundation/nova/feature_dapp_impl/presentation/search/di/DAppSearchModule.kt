@@ -6,29 +6,39 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.extrinsicDetails.DAppExtrinsicDetailsViewModel
+import io.novafoundation.nova.feature_dapp_impl.domain.search.SearchDappInteractor
+import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchViewModel
 
 @Module(includes = [ViewModelModule::class])
 class DAppSearchModule {
 
     @Provides
-    internal fun provideViewModel(fragment: Fragment, factory: ViewModelProvider.Factory): DAppExtrinsicDetailsViewModel {
-        return ViewModelProvider(fragment, factory).get(DAppExtrinsicDetailsViewModel::class.java)
+    @ScreenScope
+    fun provideInteractor(dAppMetadataRepository: DAppMetadataRepository) = SearchDappInteractor(dAppMetadataRepository)
+
+    @Provides
+    internal fun provideViewModel(fragment: Fragment, factory: ViewModelProvider.Factory): DAppSearchViewModel {
+        return ViewModelProvider(fragment, factory).get(DAppSearchViewModel::class.java)
     }
 
     @Provides
     @IntoMap
-    @ViewModelKey(DAppExtrinsicDetailsViewModel::class)
+    @ViewModelKey(DAppSearchViewModel::class)
     fun provideViewModel(
         router: DAppRouter,
-        extrinsicContent: String
+        resourceManager: ResourceManager,
+        interactor: SearchDappInteractor,
     ): ViewModel {
-        return DAppExtrinsicDetailsViewModel(
+        return DAppSearchViewModel(
             router = router,
-            extrinsicContent = extrinsicContent
+            resourceManager = resourceManager,
+            interactor = interactor
         )
     }
 }

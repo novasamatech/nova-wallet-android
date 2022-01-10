@@ -11,7 +11,6 @@ import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress
-import io.novafoundation.nova.feature_dapp_api.data.model.DappMetadata
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.data.mappers.mapDappMetadataToDappModel
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
@@ -82,5 +81,9 @@ class MainDAppViewModel(
 
     private fun syncDApps() = launch {
         dappInteractor.syncDAppMetadatas()
+    }
+
+    fun searchClicked() {
+        router.openDappSearch()
     }
 }

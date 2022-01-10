@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_dapp_impl.presentation.search
 
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.list.headers.TextHeader
+import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
@@ -14,10 +15,8 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.search.model.DappSe
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.mapLatest
 import kotlin.time.ExperimentalTime
-import kotlin.time.milliseconds
 
 @OptIn(ExperimentalTime::class, FlowPreview::class, ExperimentalCoroutinesApi::class)
 class DAppSearchViewModel(
@@ -29,11 +28,11 @@ class DAppSearchViewModel(
     val query = MutableStateFlow("")
 
     val searchResults = query
-        .debounce(500.milliseconds)
         .mapLatest {
             interactor.searchDapps(it)
                 .mapKeys { (searchGroup, _) -> mapSearchGroupToTextHeader(searchGroup) }
                 .mapValues { (_, groupItems) -> groupItems.map(::mapSearchResultToSearchModel) }
+                .toListWithHeaders()
         }
         .inBackground()
         .share()
@@ -69,6 +68,14 @@ class DAppSearchViewModel(
                 title = searchResult.url,
                 searchResult = searchResult
             )
+        }
+    }
+
+    fun searchResultClicked(searchResult: DappSearchResult) {
+        when (searchResult) {
+            is DappSearchResult.Dapp -> router.openDAppBrowser(searchResult.metadata.url)
+            is DappSearchResult.Search -> router.openDAppBrowser(searchResult.searchUrl)
+            is DappSearchResult.Url -> router.openDAppBrowser(searchResult.url)
         }
     }
 }

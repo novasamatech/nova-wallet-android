@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <WebView
+    <io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3WebView
         android:id="@+id/dappBrowserWebView"
         android:layout_width="0dp"
         android:layout_height="0dp"
