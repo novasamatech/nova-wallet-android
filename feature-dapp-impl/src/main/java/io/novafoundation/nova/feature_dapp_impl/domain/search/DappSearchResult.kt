@@ -4,9 +4,9 @@ import io.novafoundation.nova.feature_dapp_api.data.model.DappMetadata
 
 sealed class DappSearchResult {
 
-    class Url(val url: String): DappSearchResult()
+    class Url(val url: String) : DappSearchResult()
 
     class Search(val query: String, val searchUrl: String) : DappSearchResult()
 
-    class Dapp(val metadata: DappMetadata): DappSearchResult()
+    class Dapp(val metadata: DappMetadata) : DappSearchResult()
 }

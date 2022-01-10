@@ -20,7 +20,6 @@ import kotlinx.android.synthetic.main.item_dapp.view.itemDAppSubtitle
 import kotlinx.android.synthetic.main.item_dapp.view.itemDAppTitle
 import kotlinx.android.synthetic.main.item_dapp_search_category.view.searchCategory
 
-
 class SearchDappAdapter(
     private val imageLoader: ImageLoader,
     private val handler: Handler
@@ -61,7 +60,6 @@ class SearchDappAdapter(
         (holder as? SearchHolder)?.unbind()
     }
 }
-
 
 private object DiffCallback : BaseGroupedDiffCallback<TextHeader, DappSearchModel>(TextHeader::class.java) {
 

@@ -24,7 +24,6 @@ import kotlinx.android.synthetic.main.fragment_search_dapp.searchDappSearhGroup
 import kotlinx.android.synthetic.main.fragment_search_dapp.searhDappQuery
 import javax.inject.Inject
 
-
 class DappSearchFragment : BaseBottomSheetFragment<DAppSearchViewModel>(), SearchDappAdapter.Handler {
 
     @Inject
