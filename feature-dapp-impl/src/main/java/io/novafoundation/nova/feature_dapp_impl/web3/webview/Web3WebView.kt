@@ -1,8 +1,6 @@
 package io.novafoundation.nova.feature_dapp_impl.web3.webview
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.util.AttributeSet
 import android.webkit.WebSettings
 import android.webkit.WebView
 import io.novafoundation.nova.common.BuildConfig
@@ -32,25 +30,4 @@ fun WebView.injectWeb3(
 
 fun WebView.uninjectWeb3() {
     settings.javaScriptEnabled = false
-}
-
-@OptIn(ExperimentalStdlibApi::class)
-private val ADDITIONAL_HEADERS = buildMap<String, String> {
-    put("Connection", "close")
-    put("Content-Type", "text/plain")
-    put("Access-Control-Allow-Origin", "*")
-    put("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT, OPTIONS")
-    put("Access-Control-Max-Age", "600")
-    put("Access-Control-Allow-Credentials", "true")
-    put("Access-Control-Allow-Headers", "accept, authorization, Content-Type")
-}
-
-class Web3WebView @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
-) : WebView(context, attrs) {
-
-    override fun loadUrl(url: String) {
-        super.loadUrl(url, ADDITIONAL_HEADERS)
-    }
 }
