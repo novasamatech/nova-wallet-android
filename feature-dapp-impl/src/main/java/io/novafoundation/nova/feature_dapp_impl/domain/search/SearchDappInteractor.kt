@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_dapp_impl.domain.search
 
 import io.novafoundation.nova.common.list.GroupedList
+import io.novafoundation.nova.feature_dapp_api.data.model.DappMetadata
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_dapp_impl.util.Urls
 import kotlinx.coroutines.Dispatchers
@@ -15,6 +16,7 @@ class SearchDappInteractor(
         val allDapps = dAppMetadataRepository.getDAppMetadatas()
 
         val dappsGroupContent = allDapps.filter { query.isEmpty() || query.lowercase() in it.name.lowercase() }
+            .sortedBy(DappMetadata::name)
             .map(DappSearchResult::Dapp)
 
         val searchGroupContent = when {
