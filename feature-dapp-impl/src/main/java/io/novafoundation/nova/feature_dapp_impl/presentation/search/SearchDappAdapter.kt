@@ -73,7 +73,7 @@ private object DiffCallback : BaseGroupedDiffCallback<TextHeader, DappSearchMode
 
     override fun areChildItemsTheSame(oldItem: DappSearchModel, newItem: DappSearchModel): Boolean {
         return when {
-            oldItem.searchResult is DappSearchResult.Search && newItem.searchResult is DappSearchResult.Search -> true
+            isSingletonItem(oldItem) && isSingletonItem(newItem) -> true
             else -> oldItem.title == newItem.title
         }
     }
@@ -84,6 +84,12 @@ private object DiffCallback : BaseGroupedDiffCallback<TextHeader, DappSearchMode
 
     override fun getChildChangePayload(oldItem: DappSearchModel, newItem: DappSearchModel): Any? {
         return SearchDappPayloadGenerator.diff(oldItem, newItem)
+    }
+
+    private fun isSingletonItem(item: DappSearchModel) = when (item.searchResult) {
+        is DappSearchResult.Search -> true
+        is DappSearchResult.Url -> true
+        is DappSearchResult.Dapp -> false
     }
 }
 
