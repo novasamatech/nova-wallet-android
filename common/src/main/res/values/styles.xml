@@ -45,7 +45,7 @@
 
     <!-- Regular -->
 
-    <style name="TextAppearance.NovaFoundation.Regular" parent="TextAppearance.AppCompat.Title">
+    <style name="TextAppearance.NovaFoundation.Regular" parent="">
         <item name="android:fontFamily">?attr/fontRegular</item>
     </style>
 

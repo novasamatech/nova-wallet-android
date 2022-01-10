@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress
 import io.novafoundation.nova.feature_dapp_api.data.model.DappMetadata
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
+import io.novafoundation.nova.feature_dapp_impl.data.mappers.mapDappMetadataToDappModel
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.DappModel
 import kotlinx.coroutines.flow.Flow
@@ -81,14 +82,5 @@ class MainDAppViewModel(
 
     private fun syncDApps() = launch {
         dappInteractor.syncDAppMetadatas()
-    }
-
-    private fun mapDappMetadataToDappModel(dappMetadata: DappMetadata) = with(dappMetadata) {
-        DappModel(
-            name = name,
-            description = categories.joinToString { it.name },
-            iconUrl = iconLink,
-            url = url,
-        )
     }
 }

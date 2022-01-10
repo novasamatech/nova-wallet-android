@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_dapp_api.data.model.DappMetadata
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.DAppInfo
-import io.novafoundation.nova.feature_dapp_impl.util.UrlNormalizer
+import io.novafoundation.nova.feature_dapp_impl.util.Urls
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -47,7 +47,7 @@ class DappInteractor(
     }
 
     suspend fun getDAppInfo(dAppUrl: String): DAppInfo {
-        val baseUrl = UrlNormalizer.normalizeUrl(dAppUrl)
+        val baseUrl = Urls.normalizeUrl(dAppUrl)
 
         return withContext(Dispatchers.Default) {
             DAppInfo(

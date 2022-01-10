@@ -1,8 +1,9 @@
 package io.novafoundation.nova.feature_dapp_impl.util
 
+import android.util.Patterns
 import java.net.URL
 
-object UrlNormalizer {
+object Urls {
 
     /**
      * @return normalized url in a form of protocol://host
@@ -11,5 +12,9 @@ object UrlNormalizer {
         val parsedUrl = URL(url)
 
         return "${parsedUrl.protocol}://${parsedUrl.host}"
+    }
+
+    fun isValidWebUrl(url: String): Boolean {
+        return Patterns.WEB_URL.matcher(url).matches()
     }
 }
