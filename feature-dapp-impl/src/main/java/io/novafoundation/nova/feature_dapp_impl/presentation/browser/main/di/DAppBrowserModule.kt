@@ -46,6 +46,7 @@ class DAppBrowserModule {
         addressIconGenerator: AddressIconGenerator,
         selectedAccountUseCase: SelectedAccountUseCase,
         signExtrinsicRequester: DAppSignExtrinsicCommunicator,
+        initialUrl: String
     ): ViewModel {
         return DAppBrowserViewModel(
             router = router,
@@ -55,7 +56,8 @@ class DAppBrowserModule {
             addressIconGenerator = addressIconGenerator,
             selectedAccountUseCase = selectedAccountUseCase,
             commonInteractor = commonInteractor,
-            signExtrinsicRequester = signExtrinsicRequester
+            signExtrinsicRequester = signExtrinsicRequester,
+            initialUrl = initialUrl
         )
     }
 }

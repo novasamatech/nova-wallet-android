@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/itemDappCategory"
+    style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="8dp"
+    android:background="@drawable/dapp_tab_background"
+    android:includeFontPadding="false"
+    android:paddingStart="12dp"
+    android:paddingTop="9dp"
+    android:paddingEnd="12dp"
+    android:paddingBottom="9dp"
+    android:textColor="@color/dapp_tab_text_color"
+    tools:background="@color/white_64"
+    tools:text="All" />

@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.di.DAp
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignExtrinsicCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.di.DAppSignExtrinsicComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.di.MainDAppComponent
+import io.novafoundation.nova.feature_dapp_impl.presentation.main.view.CategorizedDappsView
 import io.novafoundation.nova.feature_onboarding_api.di.OnboardingFeatureApi
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
@@ -26,6 +27,8 @@ import io.novafoundation.nova.runtime.di.RuntimeApi
 @FeatureScope
 interface DAppFeatureComponent : OnboardingFeatureApi {
 
+    // Screens
+
     fun mainComponentFactory(): MainDAppComponent.Factory
 
     fun browserComponentFactory(): DAppBrowserComponent.Factory
@@ -33,6 +36,10 @@ interface DAppFeatureComponent : OnboardingFeatureApi {
     fun signExtrinsicComponentFactory(): DAppSignExtrinsicComponent.Factory
 
     fun extrinsicDetailsComponentFactory(): DAppExtrinsicDetailsComponent.Factory
+
+    // Views
+
+    fun inject(view: CategorizedDappsView)
 
     @Component.Factory
     interface Factory {

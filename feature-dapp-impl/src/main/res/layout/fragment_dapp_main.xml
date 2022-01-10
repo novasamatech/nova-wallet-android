@@ -1,109 +1,106 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:overScrollMode="never"
+    android:scrollbars="none"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/dappMainContainer"
-    tools:background="@drawable/drawable_background_image">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/dappMainTitle"
-        style="@style/TextAppearance.NovaFoundation.Bold.LargeTitle"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/dappMainContainer"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="17dp"
-        android:layout_marginTop="25dp"
-        android:includeFontPadding="false"
-        android:text="@string/dapp_dapps"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        tools:background="@drawable/drawable_background_image">
 
-    <ImageView
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginTop="25dp"
-        android:id="@+id/dappMainIcon"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:background="?attr/colorAccent" />
+        <TextView
+            android:id="@+id/dappMainTitle"
+            style="@style/TextAppearance.NovaFoundation.Bold.LargeTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="17dp"
+            android:layout_marginTop="25dp"
+            android:includeFontPadding="false"
+            android:text="@string/dapp_dapps"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/dappMainWelcomeGroup"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:scaleType="fitXY"
-        android:layout_marginEnd="16dp"
-        android:adjustViewBounds="true"
-        android:src="@drawable/bg_dapp_welcome"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="@+id/dappMainWelcomeBottomMargin"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dappMainTitle" />
+        <ImageView
+            android:id="@+id/dappMainIcon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="25dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:background="?attr/colorAccent" />
 
-    <TextView
-        android:id="@+id/dappMainWelcomeTitle"
-        style="@style/TextAppearance.NovaFoundation.Bold.Title2"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="24dp"
-        android:gravity="center"
-        android:text="@string/dapp_main_welcome_title"
-        app:layout_constraintEnd_toEndOf="@id/dappMainWelcomeGroup"
-        app:layout_constraintStart_toStartOf="@id/dappMainWelcomeGroup"
-        app:layout_constraintTop_toTopOf="@id/dappMainWelcomeGroup" />
+        <ImageView
+            android:id="@+id/dappMainWelcomeGroup"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:adjustViewBounds="true"
+            android:scaleType="fitXY"
+            android:src="@drawable/bg_dapp_welcome"
+            app:layout_constraintBottom_toBottomOf="@+id/dappMainWelcomeBottomMargin"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/dappMainTitle" />
 
-    <TextView
-        android:id="@+id/dappMainWelcomeSubtitle"
-        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="24dp"
-        android:gravity="center"
-        android:text="@string/dapp_main_welcome_subtitle"
-        android:textColor="@color/white_64"
-        app:layout_constraintEnd_toEndOf="@id/dappMainWelcomeGroup"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="@id/dappMainWelcomeGroup"
-        app:layout_constraintTop_toBottomOf="@+id/dappMainWelcomeTitle"
-        app:layout_constraintVertical_bias="0.0"
-        app:layout_goneMarginBottom="24dp" />
+        <TextView
+            android:id="@+id/dappMainWelcomeTitle"
+            style="@style/TextAppearance.NovaFoundation.Bold.Title2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="24dp"
+            android:gravity="center"
+            android:text="@string/dapp_main_welcome_title"
+            app:layout_constraintEnd_toEndOf="@id/dappMainWelcomeGroup"
+            app:layout_constraintStart_toStartOf="@id/dappMainWelcomeGroup"
+            app:layout_constraintTop_toTopOf="@id/dappMainWelcomeGroup" />
 
-    <Space
-        android:id="@+id/dappMainWelcomeBottomMargin"
-        android:layout_width="wrap_content"
-        android:layout_height="24dp"
-        app:layout_constraintStart_toStartOf="@id/dappMainWelcomeSubtitle"
-        app:layout_constraintTop_toBottomOf="@+id/dappMainWelcomeSubtitle" />
+        <TextView
+            android:id="@+id/dappMainWelcomeSubtitle"
+            style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="24dp"
+            android:gravity="center"
+            android:text="@string/dapp_main_welcome_subtitle"
+            android:textColor="@color/white_64"
+            app:layout_constraintEnd_toEndOf="@id/dappMainWelcomeGroup"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="@id/dappMainWelcomeGroup"
+            app:layout_constraintTop_toBottomOf="@+id/dappMainWelcomeTitle"
+            app:layout_constraintVertical_bias="0.0"
+            app:layout_goneMarginBottom="24dp" />
 
-    <TextView
-        android:id="@+id/dappMainExplore"
-        style="@style/TextAppearance.NovaFoundation.Bold.Title2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"
-        android:text="@string/common_explore"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dappMainWelcomeGroup" />
+        <Space
+            android:id="@+id/dappMainWelcomeBottomMargin"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            app:layout_constraintStart_toStartOf="@id/dappMainWelcomeSubtitle"
+            app:layout_constraintTop_toBottomOf="@+id/dappMainWelcomeSubtitle" />
 
-    <include
-        layout="@layout/item_dapp"
-        android:id="@+id/dappMainSubId"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dappMainExplore" />
+        <io.novafoundation.nova.feature_dapp_impl.presentation.main.view.CategorizedDappsView
+            android:id="@+id/dappMainCategorizedDapps"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="24dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/dappMainWelcomeGroup" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>

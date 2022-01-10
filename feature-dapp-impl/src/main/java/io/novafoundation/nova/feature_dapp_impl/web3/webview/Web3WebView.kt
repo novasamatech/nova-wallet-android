@@ -27,3 +27,7 @@ fun WebView.injectWeb3(
 
     settings.userAgentString = settings.userAgentString + "NovaWallet(Platform=Android)"
 }
+
+fun WebView.uninjectWeb3() {
+    settings.javaScriptEnabled = false
+}

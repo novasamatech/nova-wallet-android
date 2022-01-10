@@ -4,6 +4,7 @@ import coil.ImageLoader
 import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.network.AppLinksProvider
+import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
@@ -42,4 +43,6 @@ interface DAppFeatureDependencies {
 
     @ExtrinsicSerialization
     fun extrinsicGson(): Gson
+
+    fun apiCreator(): NetworkApiCreator
 }
