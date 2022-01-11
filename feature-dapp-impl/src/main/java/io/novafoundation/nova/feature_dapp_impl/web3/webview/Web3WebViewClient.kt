@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_dapp_impl.web3.webview
 
+import android.graphics.Bitmap
 import android.webkit.WebView
 import android.webkit.WebViewClient
 
@@ -26,7 +27,18 @@ class Web3WebViewClient(
         controllers.forEach { it.initialInject(webView) }
     }
 
+    override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
+        tryInject(view, url)
+    }
+
     override fun onPageFinished(view: WebView, url: String) {
+        tryInject(view, url)
+    }
+
+    // we try to inject both at `onPageStarted` and `onPageFinished` since
+    // since both of them are not sufficient by their own
+    // (several dapps tries to detect extension before onPageFinished, some others does not have document ready at `onPageStarted`)
+    private fun tryInject(view: WebView, url: String) {
         controllers.forEach { it.injectForPage(view, url) }
     }
 }

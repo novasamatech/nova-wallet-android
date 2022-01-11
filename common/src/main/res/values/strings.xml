@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="dapp_search_hint">Search by name or enter URL</string>
   <string name="common_all">All</string>
   <string name="dapp_sign_extrinsic_details_subtitle">Make sure the operation is correct</string>
   <string name="dapp_sign_extrinsic_failed">Failed to sign requested operation</string>

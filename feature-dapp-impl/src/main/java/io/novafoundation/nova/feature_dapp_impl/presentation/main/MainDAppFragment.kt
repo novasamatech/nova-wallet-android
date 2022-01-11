@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
 import kotlinx.android.synthetic.main.fragment_dapp_main.dappMainCategorizedDapps
 import kotlinx.android.synthetic.main.fragment_dapp_main.dappMainContainer
 import kotlinx.android.synthetic.main.fragment_dapp_main.dappMainIcon
+import kotlinx.android.synthetic.main.fragment_dapp_main.dappMainSearch
 
 class MainDAppFragment : BaseFragment<MainDAppViewModel>() {
 
@@ -36,6 +37,10 @@ class MainDAppFragment : BaseFragment<MainDAppViewModel>() {
         }
         dappMainCategorizedDapps.setOnDappClickedListener {
             viewModel.dappClicked(it)
+        }
+
+        dappMainSearch.setOnClickListener {
+            viewModel.searchClicked()
         }
     }
 

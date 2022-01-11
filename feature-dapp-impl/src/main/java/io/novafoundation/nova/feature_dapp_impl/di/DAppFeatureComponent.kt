@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrins
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.di.DAppSignExtrinsicComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.di.MainDAppComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.view.CategorizedDappsView
+import io.novafoundation.nova.feature_dapp_impl.presentation.search.di.DAppSearchComponent
 import io.novafoundation.nova.feature_onboarding_api.di.OnboardingFeatureApi
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
@@ -36,6 +37,8 @@ interface DAppFeatureComponent : OnboardingFeatureApi {
     fun signExtrinsicComponentFactory(): DAppSignExtrinsicComponent.Factory
 
     fun extrinsicDetailsComponentFactory(): DAppExtrinsicDetailsComponent.Factory
+
+    fun dAppSearchComponentFactory(): DAppSearchComponent.Factory
 
     // Views
 

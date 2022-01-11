@@ -78,6 +78,10 @@ dependencies {
     implementation lifecycleDep
     kapt lifecycleKapt
 
+    implementation viewModelKtxDep
+    implementation liveDataKtxDep
+    implementation lifeCycleKtxDep
+
     implementation retrofitDep
 
     testImplementation jUnitDep

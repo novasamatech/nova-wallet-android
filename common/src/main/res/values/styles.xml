@@ -45,7 +45,7 @@
 
     <!-- Regular -->
 
-    <style name="TextAppearance.NovaFoundation.Regular" parent="TextAppearance.AppCompat.Title">
+    <style name="TextAppearance.NovaFoundation.Regular" parent="">
         <item name="android:fontFamily">?attr/fontRegular</item>
     </style>
 
@@ -197,6 +197,10 @@
     <!-- Buttons -->
 
     <!-- Input -->
+
+    <style name="Widget.Nova.Input.EditText" parent="@android:style/Widget.EditText">
+        <item name="android:textCursorDrawable">@null</item>
+    </style>
 
     <style name="Widget.Nova.Input.Primary.External" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
         <item name="android:textColorHint">@color/colorHint</item>
