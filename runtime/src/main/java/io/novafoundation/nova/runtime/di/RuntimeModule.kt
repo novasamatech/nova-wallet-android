@@ -5,11 +5,14 @@ import dagger.Provides
 import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.core.storage.StorageCache
+import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.dao.StorageDao
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicSerializers
 import io.novafoundation.nova.runtime.extrinsic.MortalityConstructor
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.DbRuntimeVersionsRepository
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RuntimeVersionsRepository
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.storage.DbStorageCache
@@ -82,4 +85,10 @@ class RuntimeModule {
     @ApplicationScope
     @ExtrinsicSerialization
     fun provideExtrinsicGson() = ExtrinsicSerializers.gson()
+
+    @Provides
+    @ApplicationScope
+    fun provideRuntimeVersionsRepository(
+        chainDao: ChainDao
+    ): RuntimeVersionsRepository = DbRuntimeVersionsRepository(chainDao)
 }

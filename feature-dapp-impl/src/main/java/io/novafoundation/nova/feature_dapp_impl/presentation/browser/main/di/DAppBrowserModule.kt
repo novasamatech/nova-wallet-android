@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBr
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignExtrinsicCommunicator
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RuntimeVersionsRepository
 
 @Module(includes = [ViewModelModule::class])
 class DAppBrowserModule {
@@ -28,8 +29,9 @@ class DAppBrowserModule {
     @ScreenScope
     fun provideInteractor(
         chainRegistry: ChainRegistry,
-        accountRepository: AccountRepository
-    ) = DappBrowserInteractor(chainRegistry, accountRepository)
+        accountRepository: AccountRepository,
+        runtimeVersionsRepository: RuntimeVersionsRepository,
+    ) = DappBrowserInteractor(chainRegistry, accountRepository, runtimeVersionsRepository)
 
     @Provides
     internal fun provideViewModel(fragment: Fragment, factory: ViewModelProvider.Factory): DAppBrowserViewModel {

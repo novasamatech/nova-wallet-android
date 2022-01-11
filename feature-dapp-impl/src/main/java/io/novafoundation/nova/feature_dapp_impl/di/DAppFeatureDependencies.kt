@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenReposito
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.runtime.di.ExtrinsicSerialization
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RuntimeVersionsRepository
 
 interface DAppFeatureDependencies {
 
@@ -45,4 +46,6 @@ interface DAppFeatureDependencies {
     fun extrinsicGson(): Gson
 
     fun apiCreator(): NetworkApiCreator
+
+    fun runtimeVersionsRepository(): RuntimeVersionsRepository
 }

@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtens
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.Single.AuthorizeTab
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.Single.ListAccounts
+import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.Single.ListMetadata
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.Single.SignExtrinsic
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.Subscription.SubscribeAccounts
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.SignerResult
@@ -83,6 +84,7 @@ class DAppBrowserViewModel(
             is ListAccounts -> supplyAccountList(request, authorizationState)
             is SignExtrinsic -> signExtrinsicIfAllowed(request, authorizationState)
             is SubscribeAccounts -> supplyAccountListSubscription(request, authorizationState)
+            is ListMetadata -> suppleKnownMetadatas(request, authorizationState)
         }
     }
 
@@ -150,6 +152,13 @@ class DAppBrowserViewModel(
         polkadotJsExtension.session.updateAuthorizationState(request.url, authorizationState)
 
         request.accept(AuthorizeTab.Response(authorizationState == AuthorizationState.ALLOWED))
+    }
+
+    private suspend fun suppleKnownMetadatas(
+        request: ListMetadata,
+        authorizationState: AuthorizationState
+    ) = respondIfAllowed(request, authorizationState) {
+        interactor.getKnownInjectedMetadatas()
     }
 
     private suspend fun supplyAccountList(

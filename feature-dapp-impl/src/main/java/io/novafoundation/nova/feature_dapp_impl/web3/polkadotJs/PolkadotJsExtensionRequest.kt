@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_dapp_impl.web3.Web3Extension
 import io.novafoundation.nova.feature_dapp_impl.web3.Web3Responder
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.InjectedAccount
+import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.InjectedMetadataKnown
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.SignerPayloadJSON
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.SignerResult
 import kotlinx.coroutines.CoroutineScope
@@ -27,7 +28,8 @@ sealed class PolkadotJsExtensionRequest<R>(
         AUTHORIZE_TAB("pub(authorize.tab)"),
         LIST_ACCOUNTS("pub(accounts.list)"),
         SIGN_EXTRINSIC("pub(extrinsic.sign)"),
-        SUBSCRIBE_ACCOUNTS("pub(accounts.subscribe)")
+        SUBSCRIBE_ACCOUNTS("pub(accounts.subscribe)"),
+        LIST_METADATA("pub(metadata.list)")
     }
 
     sealed class Single<R>(
@@ -74,6 +76,17 @@ sealed class PolkadotJsExtensionRequest<R>(
         ) : Single<SignerResult>(web3Responder, url, Identifier.SIGN_EXTRINSIC) {
 
             override fun serializeResponse(response: SignerResult): String {
+                return gson.toJson(response)
+            }
+        }
+
+        class ListMetadata(
+            web3Responder: Web3Responder,
+            url: String,
+            private val gson: Gson,
+        ) : Single<List<InjectedMetadataKnown>>(web3Responder, url, Identifier.LIST_METADATA) {
+
+            override fun serializeResponse(response: List<InjectedMetadataKnown>): String {
                 return gson.toJson(response)
             }
         }
