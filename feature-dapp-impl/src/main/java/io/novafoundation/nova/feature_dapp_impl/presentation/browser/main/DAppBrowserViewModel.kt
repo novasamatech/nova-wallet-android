@@ -22,12 +22,14 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrins
 import io.novafoundation.nova.feature_dapp_impl.web3.Web3Session.AuthorizationState
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest
-import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.AccountList
-import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.AuthorizeTab
-import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.SignExtrinsic
+import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.Single.AuthorizeTab
+import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.Single.ListAccounts
+import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.Single.SignExtrinsic
+import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.Subscription.SubscribeAccounts
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.SignerResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
@@ -78,8 +80,9 @@ class DAppBrowserViewModel(
 
         when (request) {
             is AuthorizeTab -> authorizeTab(request, authorizationState)
-            is AccountList -> supplyAccountList(request, authorizationState)
+            is ListAccounts -> supplyAccountList(request, authorizationState)
             is SignExtrinsic -> signExtrinsicIfAllowed(request, authorizationState)
+            is SubscribeAccounts -> supplyAccountListSubscription(request, authorizationState)
         }
     }
 
@@ -98,9 +101,7 @@ class DAppBrowserViewModel(
         }
 
         when (response) {
-            is DAppSignExtrinsicCommunicator.Response.Rejected -> request.reject(
-                NotAuthorizedException
-            )
+            is DAppSignExtrinsicCommunicator.Response.Rejected -> request.reject(NotAuthorizedException)
             is DAppSignExtrinsicCommunicator.Response.Signed -> request.accept(SignerResult(response.requestId, response.signature))
             is DAppSignExtrinsicCommunicator.Response.SigningFailed -> {
                 showError(resourceManager.getString(R.string.dapp_sign_extrinsic_failed))
@@ -152,12 +153,17 @@ class DAppBrowserViewModel(
     }
 
     private suspend fun supplyAccountList(
-        request: AccountList,
+        request: ListAccounts,
         authorizationState: AuthorizationState
     ) = respondIfAllowed(request, authorizationState) {
-        val injectedAccounts = interactor.getInjectedAccounts()
+        interactor.getInjectedAccounts()
+    }
 
-        AccountList.Response(injectedAccounts)
+    private suspend fun supplyAccountListSubscription(
+        request: SubscribeAccounts,
+        authorizationState: AuthorizationState
+    ) = respondIfAllowed(request, authorizationState) {
+        flowOf(interactor.getInjectedAccounts())
     }
 
     private suspend fun awaitConfirmation(action: DappPendingConfirmation.Action) = suspendCoroutine<ConfirmationState> {

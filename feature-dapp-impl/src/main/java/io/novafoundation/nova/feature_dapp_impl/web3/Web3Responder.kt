@@ -4,5 +4,7 @@ interface Web3Responder {
 
     fun respondResult(id: String, result: String)
 
+    fun respondSubscription(id: String, result: String)
+
     fun respondError(id: String, error: Throwable)
 }
