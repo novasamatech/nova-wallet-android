@@ -34,7 +34,7 @@ sealed class PolkadotJsExtensionRequest<R>(
         web3Responder: Web3Responder,
         url: String,
         identifier: Identifier
-    ): PolkadotJsExtensionRequest<R>(web3Responder, identifier, url) {
+    ) : PolkadotJsExtensionRequest<R>(web3Responder, identifier, url) {
 
         abstract fun serializeResponse(response: R): String
 
@@ -85,7 +85,7 @@ sealed class PolkadotJsExtensionRequest<R>(
         web3Responder: Web3Responder,
         url: String,
         identifier: Identifier
-    ): PolkadotJsExtensionRequest<Flow<R>>(web3Responder, identifier, url) {
+    ) : PolkadotJsExtensionRequest<Flow<R>>(web3Responder, identifier, url) {
 
         abstract fun serializeSubscriptionResponse(response: R): String
 
@@ -105,7 +105,7 @@ sealed class PolkadotJsExtensionRequest<R>(
             web3Responder: Web3Responder,
             url: String,
             private val gson: Gson,
-        ): Subscription<List<InjectedAccount>>(scope, requestId, web3Responder, url, Identifier.SUBSCRIBE_ACCOUNTS) {
+        ) : Subscription<List<InjectedAccount>>(scope, requestId, web3Responder, url, Identifier.SUBSCRIBE_ACCOUNTS) {
 
             override fun serializeSubscriptionResponse(response: List<InjectedAccount>): String {
                 return gson.toJson(response)
