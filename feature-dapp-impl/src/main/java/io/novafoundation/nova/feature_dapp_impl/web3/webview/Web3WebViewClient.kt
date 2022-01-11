@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_dapp_impl.web3.webview
 
+import android.graphics.Bitmap
 import android.webkit.WebView
 import android.webkit.WebViewClient
 
@@ -26,7 +27,7 @@ class Web3WebViewClient(
         controllers.forEach { it.initialInject(webView) }
     }
 
-    override fun onPageFinished(view: WebView, url: String) {
+    override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
         controllers.forEach { it.injectForPage(view, url) }
     }
 }
