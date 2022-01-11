@@ -29,7 +29,8 @@ sealed class PolkadotJsExtensionRequest<R>(
         LIST_ACCOUNTS("pub(accounts.list)"),
         SIGN_EXTRINSIC("pub(extrinsic.sign)"),
         SUBSCRIBE_ACCOUNTS("pub(accounts.subscribe)"),
-        LIST_METADATA("pub(metadata.list)")
+        LIST_METADATA("pub(metadata.list)"),
+        PROVIDE_METADATA("pub(metadata.provide)")
     }
 
     sealed class Single<R>(
@@ -88,6 +89,16 @@ sealed class PolkadotJsExtensionRequest<R>(
 
             override fun serializeResponse(response: List<InjectedMetadataKnown>): String {
                 return gson.toJson(response)
+            }
+        }
+
+        class ProvideMetadata(
+            web3Responder: Web3Responder,
+            url: String,
+        ) : Single<Boolean>(web3Responder, url, Identifier.PROVIDE_METADATA) {
+
+            override fun serializeResponse(response: Boolean): String {
+                return response.toString()
             }
         }
     }
