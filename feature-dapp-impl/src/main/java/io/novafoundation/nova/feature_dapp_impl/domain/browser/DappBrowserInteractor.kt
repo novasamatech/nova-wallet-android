@@ -4,14 +4,17 @@ import io.novafoundation.nova.common.data.mappers.mapCryptoTypeToEncryption
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.InjectedAccount
+import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.InjectedMetadataKnown
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.genesisHash
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RuntimeVersionsRepository
 import jp.co.soramitsu.fearless_utils.extensions.requireHexPrefix
 
 class DappBrowserInteractor(
     private val chainRegistry: ChainRegistry,
-    private val accountRepository: AccountRepository
+    private val accountRepository: AccountRepository,
+    private val runtimeVersionsRepository: RuntimeVersionsRepository,
 ) {
 
     @OptIn(ExperimentalStdlibApi::class)
@@ -42,6 +45,15 @@ class DappBrowserInteractor(
         return buildList {
             add(defaultAccount)
             addAll(customAccounts)
+        }
+    }
+
+    suspend fun getKnownInjectedMetadatas(): List<InjectedMetadataKnown> {
+        return runtimeVersionsRepository.getAllRuntimeVersions().map {
+            InjectedMetadataKnown(
+                genesisHash = it.chainId.requireHexPrefix(),
+                specVersion = it.specVersion
+            )
         }
     }
 }

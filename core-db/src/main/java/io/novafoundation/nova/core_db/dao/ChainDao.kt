@@ -58,6 +58,9 @@ abstract class ChainDao {
     @Query("SELECT * FROM chain_runtimes WHERE chainId = :chainId")
     abstract suspend fun runtimeInfo(chainId: String): ChainRuntimeInfoLocal?
 
+    @Query("SELECT * FROM chain_runtimes")
+    abstract suspend fun allRuntimeInfos(): List<ChainRuntimeInfoLocal>
+
     @Query("UPDATE chain_runtimes SET syncedVersion = :syncedVersion WHERE chainId = :chainId")
     abstract suspend fun updateSyncedRuntimeVersion(chainId: String, syncedVersion: Int)
 

@@ -64,6 +64,12 @@ class PolkadotJsExtension(
             PolkadotJsExtensionRequest.Identifier.SUBSCRIBE_ACCOUNTS.id ->
                 PolkadotJsExtensionRequest.Subscription.SubscribeAccounts(scope = this, requestId, web3Responder, url, gson)
 
+            PolkadotJsExtensionRequest.Identifier.LIST_METADATA.id ->
+                PolkadotJsExtensionRequest.Single.ListMetadata(web3Responder, url, gson)
+
+            PolkadotJsExtensionRequest.Identifier.PROVIDE_METADATA.id ->
+                PolkadotJsExtensionRequest.Single.ProvideMetadata(web3Responder, url)
+
             else -> null
         }
     }
