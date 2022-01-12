@@ -6,10 +6,12 @@ import android.graphics.drawable.Drawable
 import android.os.Handler
 import android.os.Looper
 import android.util.TypedValue
+import android.view.ContextThemeWrapper
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import androidx.annotation.StyleRes
 import androidx.core.content.ContextCompat
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.view.shape.addRipple
@@ -54,6 +56,8 @@ fun Context.getColorFromAttr(
 
 @ColorInt
 fun Context.getPrimaryColor() = getColorFromAttr(R.attr.colorPrimary)
+
+fun Context.themed(@StyleRes themeId: Int): Context = ContextThemeWrapper(this, themeId)
 
 interface WithContextExtensions {
 

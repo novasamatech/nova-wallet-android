@@ -1,16 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:orientation="vertical"
+    tools:background="@color/black">
+
+    <LinearLayout
+        android:id="@+id/dappBrowserAddressBarGroup"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@color/bar_bg_64"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/dappBrowserClose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:src="@drawable/ic_close"
+            app:tint="@color/actions_color" />
+
+        <io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.view.AddressBarView
+            android:id="@+id/dappBrowserAddressBar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="6dp"
+            android:layout_weight="1" />
+    </LinearLayout>
+
 
     <WebView
         android:id="@+id/dappBrowserWebView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dappBrowserAddressBarGroup" />
+
+    <View
+        android:id="@+id/view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="-11dp"
+        android:background="@color/gray3"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/dappBrowserBottomBarTopMargin" />
+
+    <Space
+        android:id="@+id/dappBrowserBottomBarTopMargin"
+        android:layout_width="wrap_content"
+        android:layout_height="11dp"
+        app:layout_constraintBottom_toTopOf="@id/dappBrowserBack"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/dappBrowserBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
+        android:layout_marginBottom="11dp"
+        android:src="@drawable/ic_chevron_left"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/dappBrowserForward"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
+        app:layout_constraintStart_toStartOf="parent"
+        app:tint="@color/actions_color" />
+
+    <ImageView
+        android:id="@+id/dappBrowserForward"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_chevron_right"
+        app:layout_constraintBottom_toBottomOf="@+id/dappBrowserBack"
+        app:layout_constraintEnd_toStartOf="@+id/dappBrowserRefresh"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/dappBrowserBack"
+        app:layout_constraintTop_toTopOf="@+id/dappBrowserBack"
+        app:tint="@color/actions_color" />
+
+    <ImageView
+        android:id="@+id/dappBrowserRefresh"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="25dp"
+        android:src="@drawable/ic_refresh"
+        app:layout_constraintBottom_toBottomOf="@+id/dappBrowserForward"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/dappBrowserForward"
+        app:layout_constraintTop_toTopOf="@+id/dappBrowserForward"
+        app:tint="@color/actions_color" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

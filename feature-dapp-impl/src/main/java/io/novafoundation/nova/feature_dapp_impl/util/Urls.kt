@@ -18,3 +18,6 @@ object Urls {
         return Patterns.WEB_URL.matcher(url).matches()
     }
 }
+
+val URL.isSecure
+    get() = protocol == "https"

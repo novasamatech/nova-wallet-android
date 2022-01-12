@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.BuildConfig
 @SuppressLint("SetJavaScriptEnabled")
 fun WebView.injectWeb3(
     web3ClientFactory: Web3WebViewClientFactory,
+    onPageChanged: OnPageChangedListener,
 ) {
     settings.javaScriptEnabled = true
     settings.cacheMode = WebSettings.LOAD_DEFAULT
@@ -18,7 +19,7 @@ fun WebView.injectWeb3(
     settings.domStorageEnabled = true
     settings.javaScriptCanOpenWindowsAutomatically = true
 
-    val web3Client = web3ClientFactory.create(this)
+    val web3Client = web3ClientFactory.create(this, onPageChanged)
     web3Client.initialInject()
 
     webViewClient = web3Client
