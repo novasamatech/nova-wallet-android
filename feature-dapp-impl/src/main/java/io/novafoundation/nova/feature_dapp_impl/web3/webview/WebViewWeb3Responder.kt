@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_dapp_impl.web3.webview
 
+import android.util.Log
+import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.feature_dapp_impl.web3.Web3Responder
 
 class WebViewWeb3Responder(
@@ -7,7 +9,11 @@ class WebViewWeb3Responder(
 ) : Web3Responder {
 
     override fun respondResult(id: String, result: String) {
-        evaluateJs(success(id, result))
+        evaluateJs(successResponse(id, result))
+    }
+
+    override fun respondSubscription(id: String, result: String) {
+        evaluateJs(successSubscription(id, result))
     }
 
     override fun respondError(id: String, error: Throwable) {
@@ -16,9 +22,17 @@ class WebViewWeb3Responder(
 
     private fun evaluateJs(js: String) = webViewHolder.webView?.post {
         webViewHolder.webView?.evaluateJavascript(js, null)
+
+        log(js)
     }
 
-    private fun success(id: String, result: String) = "window.walletExtension.onAppResponse(\"$id\", $result, null)"
+    private fun log(message: String) {
+        Log.d(LOG_TAG, message)
+    }
+
+    private fun successResponse(id: String, result: String) = "window.walletExtension.onAppResponse(\"$id\", $result, null)"
+
+    private fun successSubscription(id: String, result: String) = "window.walletExtension.onAppSubscription(\"$id\", $result, null)"
 
     private fun failure(id: String, error: Throwable) = "window.walletExtension.onAppResponse(\"$id\", null, new Error(\"${error.message.orEmpty()}\"))"
 }

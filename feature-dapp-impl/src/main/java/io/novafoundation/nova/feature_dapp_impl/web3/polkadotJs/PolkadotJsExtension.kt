@@ -48,18 +48,21 @@ class PolkadotJsExtension(
 
         return when (parsedMessage["msgType"]) {
             PolkadotJsExtensionRequest.Identifier.AUTHORIZE_TAB.id ->
-                PolkadotJsExtensionRequest.AuthorizeTab(web3Responder, url)
+                PolkadotJsExtensionRequest.Single.AuthorizeTab(web3Responder, url)
 
-            PolkadotJsExtensionRequest.Identifier.ACCOUNT_LIST.id ->
-                PolkadotJsExtensionRequest.AccountList(web3Responder, url, gson)
+            PolkadotJsExtensionRequest.Identifier.LIST_ACCOUNTS.id ->
+                PolkadotJsExtensionRequest.Single.ListAccounts(web3Responder, url, gson)
 
             PolkadotJsExtensionRequest.Identifier.SIGN_EXTRINSIC.id -> {
                 val maybePayload = mapRawPayloadToSignerPayloadJSON(parsedMessage["request"], gson)
 
                 maybePayload?.let {
-                    PolkadotJsExtensionRequest.SignExtrinsic(web3Responder, url, requestId, maybePayload, gson)
+                    PolkadotJsExtensionRequest.Single.SignExtrinsic(web3Responder, url, requestId, maybePayload, gson)
                 }
             }
+
+            PolkadotJsExtensionRequest.Identifier.SUBSCRIBE_ACCOUNTS.id ->
+                PolkadotJsExtensionRequest.Subscription.SubscribeAccounts(scope = this, requestId, web3Responder, url, gson)
 
             else -> null
         }
