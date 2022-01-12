@@ -32,7 +32,7 @@ class WebViewWeb3Responder(
 
     private fun successResponse(id: String, result: String) = "window.walletExtension.onAppResponse(\"$id\", $result, null)"
 
-    private fun successSubscription(id: String, result: String) = "window.walletExtension.onAppSubscription(\"$id\", $result, null)"
+    private fun successSubscription(id: String, result: String) = "window.walletExtension.onAppSubscription(\"$id\", $result)"
 
     private fun failure(id: String, error: Throwable) = "window.walletExtension.onAppResponse(\"$id\", null, new Error(\"${error.message.orEmpty()}\"))"
 }
