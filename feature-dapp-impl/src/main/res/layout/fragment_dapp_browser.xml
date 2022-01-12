@@ -23,8 +23,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            app:tint="@color/actions_color"
-            android:src="@drawable/ic_arrow_back" />
+            android:src="@drawable/ic_close"
+            app:tint="@color/actions_color" />
 
         <io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.view.AddressBarView
             android:id="@+id/dappBrowserAddressBar"
@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="6dp"
-            android:layout_marginEnd="56dp"
+            android:layout_marginEnd="16dp"
             android:layout_marginBottom="6dp"
             android:layout_weight="1" />
     </LinearLayout>
@@ -70,11 +70,13 @@
         android:id="@+id/dappBrowserBack"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
         android:layout_marginBottom="11dp"
         android:src="@drawable/ic_chevron_left"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/dappBrowserForward"
         app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="parent"
         app:tint="@color/actions_color" />
 
@@ -94,6 +96,7 @@
         android:id="@+id/dappBrowserRefresh"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="25dp"
         android:src="@drawable/ic_refresh"
         app:layout_constraintBottom_toBottomOf="@+id/dappBrowserForward"
         app:layout_constraintEnd_toEndOf="parent"
