@@ -15,12 +15,20 @@ class Web3WebViewClientFactory(
     private val controllers: List<Web3Controller>,
 ) {
 
-    fun create(webView: WebView) = Web3WebViewClient(controllers, webView)
+    fun create(
+        webView: WebView,
+        onPageChangedListener: OnPageChangedListener
+    ): Web3WebViewClient {
+        return Web3WebViewClient(controllers, webView, onPageChangedListener)
+    }
 }
+
+typealias OnPageChangedListener = (url: String) -> Unit
 
 class Web3WebViewClient(
     private val controllers: List<Web3Controller>,
     private val webView: WebView,
+    private val onPageChangedListener: OnPageChangedListener
 ) : WebViewClient() {
 
     fun initialInject() {
@@ -33,6 +41,10 @@ class Web3WebViewClient(
 
     override fun onPageFinished(view: WebView, url: String) {
         tryInject(view, url)
+    }
+
+    override fun doUpdateVisitedHistory(view: WebView, url: String, isReload: Boolean) {
+        onPageChangedListener(url)
     }
 
     // we try to inject both at `onPageStarted` and `onPageFinished` since

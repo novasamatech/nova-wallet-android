@@ -9,11 +9,13 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
+import io.novafoundation.nova.feature_dapp_impl.domain.browser.BrowserPage
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.DappBrowserInteractor
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignExtrinsicCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignExtrinsicPayload
@@ -30,10 +32,12 @@ import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtens
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.Subscription.SubscribeAccounts
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.SignerResult
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -54,19 +58,22 @@ class DAppBrowserViewModel(
     private val resourceManager: ResourceManager,
     private val addressIconGenerator: AddressIconGenerator,
     private val selectedAccountUseCase: SelectedAccountUseCase,
-    initialUrl: String
+    private val initialUrl: String
 ) : BaseViewModel() {
 
     private val polkadotJsExtension = polkadotJsExtensionFactory.create(scope = this)
 
-    private val _showConfirmationSheet = MutableLiveData<Event<DappPendingConfirmation<*>>>()
-    val showConfirmationSheet = _showConfirmationSheet
+    private val _showConfirmationDialog = MutableLiveData<Event<DappPendingConfirmation<*>>>()
+    val showConfirmationSheet = _showConfirmationDialog
 
     private val selectedAccount = selectedAccountUseCase.selectedMetaAccountFlow()
         .share()
 
     private val _loadUrlEvent = MutableLiveData<Event<String>>()
     val loadUrlEvent: LiveData<Event<String>> = _loadUrlEvent
+
+    private val _currentPage = singleReplaySharedFlow<BrowserPage>()
+    val currentPage: Flow<BrowserPage> = _currentPage
 
     init {
         polkadotJsExtension.requestsFlow
@@ -75,6 +82,20 @@ class DAppBrowserViewModel(
             .launchIn(this)
 
         _loadUrlEvent.value = initialUrl.event()
+
+        updatePageDisplay(initialUrl)
+    }
+
+    fun onPageChanged(url: String) {
+        updatePageDisplay(url)
+    }
+
+    fun closeClicked() = launch {
+        val confirmationState = awaitConfirmation(DappPendingConfirmation.Action.CloseScreen)
+
+        if (confirmationState == ConfirmationState.ALLOWED) {
+            router.back()
+        }
     }
 
     private suspend fun handleDAppRequest(request: PolkadotJsExtensionRequest<*>) {
@@ -192,7 +213,7 @@ class DAppBrowserViewModel(
             action = action
         )
 
-        _showConfirmationSheet.postValue(confirmation.event())
+        _showConfirmationDialog.postValue(confirmation.event())
     }
 
     private fun mapConfirmationStateToAuthorizationState(
@@ -211,6 +232,10 @@ class DAppBrowserViewModel(
         request.accept(responseConstructor())
     } else {
         request.reject(NotAuthorizedException)
+    }
+
+    private fun updatePageDisplay(url: String) = launch {
+        _currentPage.emit(interactor.browserPageFor(url))
     }
 
     private fun mapSignExtrinsicRequestToPayload(request: SignExtrinsic) = DAppSignExtrinsicPayload(

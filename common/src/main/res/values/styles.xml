@@ -267,7 +267,11 @@
         <item name="buttonBarPositiveButtonStyle">@style/AccentDialogPositiveButtonStyle</item>
         <item name="buttonBarNegativeButtonStyle">@style/AccentDialogNegativeButtonStyle</item>
     </style>
-    t
+
+    <style name="AccentAlertDialogTheme.Reversed">
+        <item name="buttonBarPositiveButtonStyle">@style/AccentDialogNegativeButtonStyle</item>
+        <item name="buttonBarNegativeButtonStyle">@style/AccentDialogPositiveButtonStyle</item>
+    </style>
 
     <style name="AccentDialogPositiveButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
         <item name="android:textColor">?attr/colorAccent</item>

@@ -10,13 +10,13 @@ class DappPendingConfirmation<A : DappPendingConfirmation.Action>(
 ) {
 
     sealed class Action {
-        class SignExtrinsic : Action()
-
         class Authorize(
             val title: String,
             val dAppIconUrl: String?,
             val dAppUrl: String,
             val walletAddressModel: AddressModel
         ) : Action()
+
+        object CloseScreen : Action()
     }
 }
