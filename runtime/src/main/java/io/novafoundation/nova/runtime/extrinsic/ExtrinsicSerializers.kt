@@ -7,6 +7,7 @@ import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Extrinsic
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
 import java.lang.reflect.Type
 
@@ -28,11 +29,22 @@ private class ByteArrayHexAdapter : JsonSerializer<ByteArray> {
     }
 }
 
+private class CallRepresentationAdapter : JsonSerializer<Extrinsic.EncodingInstance.CallRepresentation> {
+
+    override fun serialize(src: Extrinsic.EncodingInstance.CallRepresentation, typeOfSrc: Type, context: JsonSerializationContext): JsonElement {
+        return when (src) {
+            is Extrinsic.EncodingInstance.CallRepresentation.Instance -> context.serialize(src.call)
+            is Extrinsic.EncodingInstance.CallRepresentation.Bytes -> context.serialize(src.bytes)
+        }
+    }
+}
+
 object ExtrinsicSerializers {
 
     fun gson() = GsonBuilder()
         .registerTypeHierarchyAdapter(ByteArray::class.java, ByteArrayHexAdapter())
         .registerTypeHierarchyAdapter(GenericCall.Instance::class.java, GenericCallAdapter())
+        .registerTypeHierarchyAdapter(Extrinsic.EncodingInstance.CallRepresentation::class.java, CallRepresentationAdapter())
         .setPrettyPrinting()
         .create()
 }

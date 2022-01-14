@@ -17,6 +17,7 @@ import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHex
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.EraType
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Extrinsic.EncodingInstance.CallRepresentation
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.instances.AddressInstanceConstructor
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
@@ -34,8 +35,14 @@ class DappSignExtrinsicInteractor(
 ) {
 
     suspend fun buildSignature(signerPayload: SignerPayloadJSON): Result<String> = withContext(Dispatchers.Default) {
-        kotlin.runCatching {
-            signerPayload.toExtrinsicBuilder().buildSignature()
+        runCatching {
+            val runtime = chainRegistry.getRuntime(signerPayload.chain().id)
+            val extrinsicBuilder = signerPayload.toExtrinsicBuilderWithoutCall()
+
+            when (val callRepresentation = signerPayload.callRepresentation(runtime)) {
+                is CallRepresentation.Instance -> extrinsicBuilder.call(callRepresentation.call).buildSignature()
+                is CallRepresentation.Bytes -> extrinsicBuilder.buildSignature(rawCallBytes = callRepresentation.bytes)
+            }
         }
     }
 
@@ -47,12 +54,18 @@ class DappSignExtrinsicInteractor(
     }
 
     suspend fun calculateFee(signerPayload: SignerPayloadJSON): BigInteger = withContext(Dispatchers.Default) {
-        val extrinsic = signerPayload.toExtrinsicBuilder().build()
+        val extrinsicBuilder = signerPayload.toExtrinsicBuilderWithoutCall()
+        val runtime = chainRegistry.getRuntime(signerPayload.chain().id)
+
+        val extrinsic = when (val callRepresentation = signerPayload.callRepresentation(runtime)) {
+            is CallRepresentation.Instance -> extrinsicBuilder.call(callRepresentation.call).build()
+            is CallRepresentation.Bytes -> extrinsicBuilder.build(rawCallBytes = callRepresentation.bytes)
+        }
 
         extrinsicService.estimateFee(signerPayload.chain().id, extrinsic)
     }
 
-    private suspend fun SignerPayloadJSON.toExtrinsicBuilder(): ExtrinsicBuilder {
+    private suspend fun SignerPayloadJSON.toExtrinsicBuilderWithoutCall(): ExtrinsicBuilder {
         val chain = chain()
         val runtime = chainRegistry.getRuntime(genesisHash)
         val parsedExtrinsic = parseDAppExtrinsic(runtime, this)
@@ -78,9 +91,13 @@ class DappSignExtrinsicInteractor(
                 blockHash = blockHash,
                 era = era,
                 tip = tip
-            ).also { it.call(call) }
+            )
         }
     }
+
+    private fun SignerPayloadJSON.callRepresentation(runtime: RuntimeSnapshot): CallRepresentation = runCatching {
+        CallRepresentation.Instance(GenericCall.fromHex(runtime, method))
+    }.getOrDefault(CallRepresentation.Bytes(method.fromHex()))
 
     private suspend fun SignerPayloadJSON.chain(): Chain {
         return chainRegistry.getChain(genesisHash)
@@ -97,7 +114,7 @@ class DappSignExtrinsicInteractor(
                 blockHash = blockHash.fromHex(),
                 era = EraType.fromHex(runtime, era),
                 tip = tip.bigIntegerFromHex(),
-                call = GenericCall.fromHex(runtime, method)
+                call = callRepresentation(runtime)
             )
         }
     }

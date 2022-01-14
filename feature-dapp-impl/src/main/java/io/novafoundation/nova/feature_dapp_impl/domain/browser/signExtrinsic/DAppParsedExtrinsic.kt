@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_dapp_impl.domain.browser.signExtrinsic
 
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Era
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Extrinsic
 import java.math.BigInteger
 
 class DAppParsedExtrinsic(
@@ -13,5 +13,5 @@ class DAppParsedExtrinsic(
     val era: Era,
     val blockHash: ByteArray,
     val tip: BigInteger,
-    val call: GenericCall.Instance
+    val call: Extrinsic.EncodingInstance.CallRepresentation
 )

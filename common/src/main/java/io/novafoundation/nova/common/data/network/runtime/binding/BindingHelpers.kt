@@ -1,6 +1,7 @@
 package io.novafoundation.nova.common.data.network.runtime.binding
 
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.RuntimeType
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.Type
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHexOrNull
@@ -49,4 +50,4 @@ fun RuntimeMetadata.storageReturnType(moduleName: String, storageName: String): 
     return module(moduleName).storage(storageName).returnType()
 }
 
-fun <T> Type<T>.fromHexOrIncompatible(scale: String, runtime: RuntimeSnapshot) = fromHexOrNull(runtime, scale) ?: incompatible()
+fun <D> RuntimeType<*, D>.fromHexOrIncompatible(scale: String, runtime: RuntimeSnapshot) = fromHexOrNull(runtime, scale) ?: incompatible()
