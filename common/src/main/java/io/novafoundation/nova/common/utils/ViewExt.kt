@@ -65,9 +65,9 @@ inline fun EditText.onDoneClicked(crossinline listener: () -> Unit) {
     }
 }
 
-fun ViewGroup.inflateChild(@LayoutRes id: Int): View {
+fun ViewGroup.inflateChild(@LayoutRes id: Int, attachToRoot: Boolean = false): View {
     return LayoutInflater.from(context).run {
-        inflate(id, this@inflateChild, false)
+        inflate(id, this@inflateChild, attachToRoot)
     }
 }
 
@@ -102,14 +102,11 @@ private fun TextView.setCompoundDrawable(
 
     tint?.let { drawable.mutate().setTint(context.getColor(it)) }
 
-    val widthInPx = widthInDp?.dp(context) ?: drawable.intrinsicWidth
-    val heightInPx = heightInDp?.dp(context) ?: drawable.intrinsicHeight
-    val paddingInPx = paddingInDp.dp(context)
-
-    drawable.setBounds(0, 0, widthInPx, heightInPx)
+    drawable.updateDimensions(context, widthInDp, heightInDp)
 
     applier(drawable)
 
+    val paddingInPx = paddingInDp.dp(context)
     compoundDrawablePadding = paddingInPx
 }
 
@@ -137,6 +134,30 @@ fun TextView.setDrawableStart(
     }
 }
 
+fun TextView.setDrawableStart(
+    drawable: Drawable,
+    paddingInDp: Int,
+    widthInDp: Int? = null,
+    heightInDp: Int? = widthInDp,
+) {
+    compoundDrawablePadding = paddingInDp.dp(context)
+
+    drawable.updateDimensions(context, widthInDp, heightInDp)
+
+    setCompoundDrawablesRelative(drawable, null, null, null)
+}
+
+private fun Drawable.updateDimensions(
+    context: Context,
+    widthInDp: Int?,
+    heightInDp: Int?
+) {
+    val widthInPx = widthInDp?.dp(context) ?: intrinsicWidth
+    val heightInPx = heightInDp?.dp(context) ?: intrinsicHeight
+
+    setBounds(0, 0, widthInPx, heightInPx)
+}
+
 inline fun View.doOnGlobalLayout(crossinline action: () -> Unit) {
     viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
         override fun onGlobalLayout() {
@@ -154,6 +175,12 @@ fun View.setVisible(visible: Boolean, falseState: Int = View.GONE) {
 fun View.hideSoftKeyboard() {
     val inputMethodManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     inputMethodManager.hideSoftInputFromWindow(windowToken, 0)
+}
+
+fun View.showSoftKeyboard() {
+    val inputMethodManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+
+    inputMethodManager.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
 }
 
 fun ViewGroup.addAfter(anchor: View, newViews: List<View>) {
@@ -215,6 +242,8 @@ fun TextView.setTextOrHide(newText: String?) {
         setVisible(false)
     }
 }
+
+inline fun <T : View> T.postToSelf(crossinline action: T.() -> Unit) = with(this) { post { action() } }
 
 inline fun <reified T : Enum<T>> TypedArray.getEnum(index: Int, default: T) =
     getInt(index, /*defValue*/-1).let {

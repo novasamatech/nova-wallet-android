@@ -49,3 +49,9 @@ fun <T1, T2, R> combineLoading(
         LoadingState.Loading()
     }
 }
+
+val <T> LoadingState<T>.dataOrNull: T?
+    get() = when (this) {
+        is LoadingState.Loaded -> this.data
+        else -> null
+    }

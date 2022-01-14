@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    tools:background="@color/black4">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="2dp"
+        android:src="@drawable/ic_bottom_sheet_pin" />
+
+    <FrameLayout
+        android:id="@+id/confirmInnerContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:layout_height="300dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:orientation="horizontal">
+
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/confirmDAppActionReject"
+            style="@style/Widget.Nova.Button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_weight="1"
+            android:text="@string/common_reject"
+            android:theme="@style/NegativeAccent" />
+
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/confirmDAppActionAllow"
+            style="@style/Widget.Nova.Button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_weight="1"
+            android:text="@string/common_allow"
+            android:theme="@style/AccentBlue" />
+    </LinearLayout>
+</LinearLayout>

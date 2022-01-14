@@ -6,6 +6,8 @@ import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.AccountChosenNavDirection
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.AccountListFragment
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.extrinsicDetails.DappExtrinsicDetailsFragment
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBrowserFragment
 
 class DAppNavigator(
     navigationHolder: NavigationHolder,
@@ -14,5 +16,20 @@ class DAppNavigator(
     override fun openChangeAccount() = performNavigation(
         actionId = R.id.action_open_accounts,
         args = AccountListFragment.getBundle(AccountChosenNavDirection.BACK)
+    )
+
+    override fun openDAppBrowser(initialUrl: String) = performNavigation(
+        cases = arrayOf(
+            R.id.mainFragment to R.id.action_mainFragment_to_dappBrowserGraph,
+            R.id.dappSearchFragment to R.id.action_dappSearchFragment_to_dapp_browser_graph,
+        ),
+        args = DAppBrowserFragment.getBundle(initialUrl)
+    )
+
+    override fun openDappSearch() = performNavigation(R.id.action_mainFragment_to_dappSearchGraph)
+
+    override fun openExtrinsicDetails(extrinsicContent: String) = performNavigation(
+        actionId = R.id.action_ConfirmSignExtrinsicFragment_to_extrinsicDetailsFragment,
+        args = DappExtrinsicDetailsFragment.getBundle(extrinsicContent)
     )
 }

@@ -13,12 +13,15 @@ android {
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
+        buildConfigField "String", "DAPP_METADATAS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/dapps/dapps_dev.json\""
     }
 
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            buildConfigField "String", "DAPP_METADATAS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/dapps/dapps.json\""
         }
     }
 
@@ -34,6 +37,19 @@ android {
     }
 }
 
+task actualizeJsScripts(type: Exec) {
+    workingDir "$rootDir/nova-wallet-dapp-js"
+
+    commandLine "yarn", "build"
+
+    doLast {
+        copy {
+            from "$rootDir/nova-wallet-dapp-js/dist/nova_min.js"
+            into "$rootDir/feature-dapp-impl/src/main/res/raw"
+        }
+    }
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':core-db')
@@ -42,6 +58,7 @@ dependencies {
     implementation project(':feature-account-api')
     implementation project(':feature-wallet-api')
     implementation project(':feature-dapp-api')
+    implementation project(':runtime')
 
     implementation kotlinDep
 
@@ -49,13 +66,23 @@ dependencies {
     implementation materialDep
     implementation constraintDep
 
+    implementation shimmerDep
+
     implementation coroutinesDep
+
+    implementation gsonDep
 
     implementation daggerDep
     kapt daggerKapt
 
     implementation lifecycleDep
     kapt lifecycleKapt
+
+    implementation viewModelKtxDep
+    implementation liveDataKtxDep
+    implementation lifeCycleKtxDep
+
+    implementation retrofitDep
 
     testImplementation jUnitDep
     testImplementation mockitoDep

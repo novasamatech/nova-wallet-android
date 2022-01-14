@@ -2,14 +2,20 @@ package io.novafoundation.nova.common.utils
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.os.Handler
 import android.os.Looper
 import android.util.TypedValue
+import android.view.ContextThemeWrapper
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import androidx.annotation.StyleRes
 import androidx.core.content.ContextCompat
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.view.shape.addRipple
+import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 
 fun Context.getDrawableCompat(@DrawableRes drawableRes: Int) =
     ContextCompat.getDrawable(this, drawableRes)!!
@@ -50,3 +56,20 @@ fun Context.getColorFromAttr(
 
 @ColorInt
 fun Context.getPrimaryColor() = getColorFromAttr(R.attr.colorPrimary)
+
+fun Context.themed(@StyleRes themeId: Int): Context = ContextThemeWrapper(this, themeId)
+
+interface WithContextExtensions {
+
+    val providedContext: Context
+
+    val Int.dp: Int
+        get() = dp(providedContext)
+
+    fun addRipple(to: Drawable) = providedContext.addRipple(to)
+
+    fun getRoundedCornerDrawable(
+        @ColorRes fillColorRes: Int = R.color.black,
+        @ColorRes strokeColorRes: Int? = null,
+    ) = providedContext.getRoundedCornerDrawable(fillColorRes, strokeColorRes)
+}

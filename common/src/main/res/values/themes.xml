@@ -41,6 +41,10 @@
         <item name="colorAccent">@color/accentBlue</item>
 
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+
+        <item name="editTextStyle">@style/Widget.Nova.Input.EditText</item>
+
+        <item name="bottomSheetDialogTheme">@style/BottomSheetDialog</item>
     </style>
 
     <style name="WhiteOverlay" parent="ThemeOverlay.AppCompat">

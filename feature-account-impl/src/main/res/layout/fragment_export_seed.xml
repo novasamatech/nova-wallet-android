@@ -83,7 +83,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
-        style="@style/TextAppearance.NovaFoundation.Caption1"
+        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"

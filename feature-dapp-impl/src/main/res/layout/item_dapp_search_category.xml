@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="16dp"
+    android:paddingTop="16dp"
+    android:paddingBottom="8dp"
+    android:id="@+id/searchCategory"
+    android:textColor="@color/white_64"
+    tools:background="@color/black"
+    tools:text="DApps">
+
+</TextView>
