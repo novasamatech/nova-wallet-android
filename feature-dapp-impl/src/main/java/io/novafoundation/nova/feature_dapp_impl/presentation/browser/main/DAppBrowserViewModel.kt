@@ -142,8 +142,8 @@ class DAppBrowserViewModel(
             AuthorizationState.ALLOWED -> request.accept(AuthorizeTab.Response(true))
             // first time dapp request authorization during this session
             AuthorizationState.NONE -> authorizeTabWithConfirmation(request)
-            // user rejected this dapp - automatically reject next authorization requests
-            AuthorizationState.REJECTED -> request.reject(NotAuthorizedException)
+            // user rejected this dapp previosuly - ask for authorization one more time
+            AuthorizationState.REJECTED -> authorizeTabWithConfirmation(request)
         }
     }
 
