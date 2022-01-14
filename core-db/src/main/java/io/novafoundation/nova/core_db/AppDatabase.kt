@@ -14,6 +14,7 @@ import io.novafoundation.nova.core_db.dao.AccountDao
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.dao.AssetDao
 import io.novafoundation.nova.core_db.dao.ChainDao
+import io.novafoundation.nova.core_db.dao.DappAuthorizationDao
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.dao.NodeDao
 import io.novafoundation.nova.core_db.dao.OperationDao
@@ -21,9 +22,11 @@ import io.novafoundation.nova.core_db.dao.PhishingAddressDao
 import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.core_db.dao.StorageDao
 import io.novafoundation.nova.core_db.dao.TokenDao
+import io.novafoundation.nova.core_db.migrations.AddDAppAuthorizations_1_2
 import io.novafoundation.nova.core_db.model.AccountLocal
 import io.novafoundation.nova.core_db.model.AccountStakingLocal
 import io.novafoundation.nova.core_db.model.AssetLocal
+import io.novafoundation.nova.core_db.model.DappAuthorizationLocal
 import io.novafoundation.nova.core_db.model.NodeLocal
 import io.novafoundation.nova.core_db.model.OperationLocal
 import io.novafoundation.nova.core_db.model.PhishingAddressLocal
@@ -39,7 +42,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
 import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
 
 @Database(
-    version = 1,
+    version = 2,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -57,8 +60,10 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
         ChainRuntimeInfoLocal::class,
         ChainExplorerLocal::class,
         MetaAccountLocal::class,
-        ChainAccountLocal::class
-    ]
+        ChainAccountLocal::class,
+
+        DappAuthorizationLocal::class
+    ],
 )
 @TypeConverters(
     LongMathConverters::class,
@@ -83,6 +88,7 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java, "app.db"
                 )
+                    .addMigrations(AddDAppAuthorizations_1_2)
                     .fallbackToDestructiveMigration()
                     .build()
             }
@@ -111,4 +117,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun chainDao(): ChainDao
 
     abstract fun metaAccountDao(): MetaAccountDao
+
+    abstract fun dAppAuthorizationDao(): DappAuthorizationDao
 }

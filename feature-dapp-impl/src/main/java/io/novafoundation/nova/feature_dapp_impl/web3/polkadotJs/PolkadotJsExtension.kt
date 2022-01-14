@@ -4,11 +4,10 @@ import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.novafoundation.nova.common.utils.LOG_TAG
-import io.novafoundation.nova.feature_dapp_impl.web3.InMemoryWeb3Session
 import io.novafoundation.nova.feature_dapp_impl.web3.Web3Responder
-import io.novafoundation.nova.feature_dapp_impl.web3.Web3Session
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.mapRawPayloadToSignerPayloadJSON
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.mapRawPayloadToSignerPayloadRaw
+import io.novafoundation.nova.feature_dapp_impl.web3.session.Web3Session
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewWeb3Extension
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewWeb3JavaScriptInterface
 import kotlinx.coroutines.CoroutineScope
@@ -16,6 +15,7 @@ import kotlinx.coroutines.CoroutineScope
 class PolkadotJsExtensionFactory(
     private val web3Responder: Web3Responder,
     private val webViewWeb3JavaScriptInterface: WebViewWeb3JavaScriptInterface,
+    private val web3Session: Web3Session,
     private val gson: Gson,
 ) {
 
@@ -25,7 +25,7 @@ class PolkadotJsExtensionFactory(
             scope = scope,
             gson = gson,
             web3Responder = web3Responder,
-            session = InMemoryWeb3Session()
+            session = web3Session
         )
     }
 }

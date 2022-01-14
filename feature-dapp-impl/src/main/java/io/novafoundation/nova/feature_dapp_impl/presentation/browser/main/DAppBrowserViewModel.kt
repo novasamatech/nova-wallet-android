@@ -21,7 +21,6 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrins
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignRequester
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.awaitConfirmation
-import io.novafoundation.nova.feature_dapp_impl.web3.Web3Session.AuthorizationState
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.Single.AuthorizeTab
@@ -31,6 +30,7 @@ import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtens
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.Single.Sign
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.Subscription.SubscribeAccounts
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.SignerResult
+import io.novafoundation.nova.feature_dapp_impl.web3.session.Web3Session.AuthorizationState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
