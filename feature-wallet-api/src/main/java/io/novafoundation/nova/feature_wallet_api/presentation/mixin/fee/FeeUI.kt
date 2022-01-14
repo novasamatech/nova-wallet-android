@@ -5,6 +5,7 @@ import android.widget.TextView
 import io.novafoundation.nova.common.base.BaseFragmentMixin
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.impl.observeRetries
+import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
@@ -17,7 +18,7 @@ class FeeViews(
 
 interface WithFeeLoaderMixin {
 
-    val feeLoaderMixin: FeeLoaderMixin
+    val feeLoaderMixin: FeeLoaderMixin?
 }
 
 fun <V> BaseFragmentMixin<V>.setupFeeLoading(viewModel: V, feeView: FeeView) where V : BaseViewModel, V : FeeLoaderMixin {
@@ -27,9 +28,15 @@ fun <V> BaseFragmentMixin<V>.setupFeeLoading(viewModel: V, feeView: FeeView) whe
 }
 
 fun BaseFragmentMixin<*>.setupFeeLoading(withFeeLoaderMixin: WithFeeLoaderMixin, feeView: FeeView) {
-    observeRetries(withFeeLoaderMixin.feeLoaderMixin)
+    val mixin = withFeeLoaderMixin.feeLoaderMixin
 
-    withFeeLoaderMixin.feeLoaderMixin.feeLiveData.observe(feeView::setFeeStatus)
+    if (mixin != null) {
+        observeRetries(mixin)
+
+        mixin.feeLiveData.observe(feeView::setFeeStatus)
+    } else {
+        feeView.makeGone()
+    }
 }
 
 fun displayFeeStatus(

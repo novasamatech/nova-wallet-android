@@ -17,9 +17,9 @@ import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.BrowserPage
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.DappBrowserInteractor
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignExtrinsicCommunicator
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignExtrinsicPayload
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignExtrinsicRequester
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignPayload
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignRequester
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.awaitConfirmation
 import io.novafoundation.nova.feature_dapp_impl.web3.Web3Session.AuthorizationState
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionFactory
@@ -28,7 +28,7 @@ import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtens
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.Single.ListAccounts
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.Single.ListMetadata
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.Single.ProvideMetadata
-import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.Single.SignExtrinsic
+import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.Single.Sign
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.Subscription.SubscribeAccounts
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.SignerResult
 import kotlinx.coroutines.Dispatchers
@@ -51,7 +51,7 @@ enum class ConfirmationState {
 
 class DAppBrowserViewModel(
     private val router: DAppRouter,
-    private val signExtrinsicRequester: DAppSignExtrinsicRequester,
+    private val signRequester: DAppSignRequester,
     private val polkadotJsExtensionFactory: PolkadotJsExtensionFactory,
     private val interactor: DappBrowserInteractor,
     private val commonInteractor: DappInteractor,
@@ -104,14 +104,14 @@ class DAppBrowserViewModel(
         when (request) {
             is AuthorizeTab -> authorizeTab(request, authorizationState)
             is ListAccounts -> supplyAccountList(request, authorizationState)
-            is SignExtrinsic -> signExtrinsicIfAllowed(request, authorizationState)
+            is Sign -> signExtrinsicIfAllowed(request, authorizationState)
             is SubscribeAccounts -> supplyAccountListSubscription(request, authorizationState)
             is ListMetadata -> suppleKnownMetadatas(request, authorizationState)
             is ProvideMetadata -> handleProvideMetadata(request, authorizationState)
         }
     }
 
-    private suspend fun signExtrinsicIfAllowed(request: SignExtrinsic, authorizationState: AuthorizationState) {
+    private suspend fun signExtrinsicIfAllowed(request: Sign, authorizationState: AuthorizationState) {
         when (authorizationState) {
             // request user confirmation if dapp is authorized
             AuthorizationState.ALLOWED -> signExtrinsicWithConfirmation(request)
@@ -120,15 +120,15 @@ class DAppBrowserViewModel(
         }
     }
 
-    private suspend fun signExtrinsicWithConfirmation(request: SignExtrinsic) {
+    private suspend fun signExtrinsicWithConfirmation(request: Sign) {
         val response = withContext(Dispatchers.Main) {
-            signExtrinsicRequester.awaitConfirmation(mapSignExtrinsicRequestToPayload(request))
+            signRequester.awaitConfirmation(mapSignExtrinsicRequestToPayload(request))
         }
 
         when (response) {
-            is DAppSignExtrinsicCommunicator.Response.Rejected -> request.reject(NotAuthorizedException)
-            is DAppSignExtrinsicCommunicator.Response.Signed -> request.accept(SignerResult(response.requestId, response.signature))
-            is DAppSignExtrinsicCommunicator.Response.SigningFailed -> {
+            is DAppSignCommunicator.Response.Rejected -> request.reject(NotAuthorizedException)
+            is DAppSignCommunicator.Response.Signed -> request.accept(SignerResult(response.requestId, response.signature))
+            is DAppSignCommunicator.Response.SigningFailed -> {
                 showError(resourceManager.getString(R.string.dapp_sign_extrinsic_failed))
 
                 request.reject(SigningFailedException)
@@ -238,9 +238,9 @@ class DAppBrowserViewModel(
         _currentPage.emit(interactor.browserPageFor(url))
     }
 
-    private fun mapSignExtrinsicRequestToPayload(request: SignExtrinsic) = DAppSignExtrinsicPayload(
+    private fun mapSignExtrinsicRequestToPayload(request: Sign) = DAppSignPayload(
         requestId = request.requestId,
-        signerPayloadJSON = request.signerPayload,
+        signerPayload = request.signerPayload,
         dappUrl = request.url
     )
 }

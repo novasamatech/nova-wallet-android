@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_dapp_impl.web3.InMemoryWeb3Session
 import io.novafoundation.nova.feature_dapp_impl.web3.Web3Responder
 import io.novafoundation.nova.feature_dapp_impl.web3.Web3Session
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.mapRawPayloadToSignerPayloadJSON
+import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.mapRawPayloadToSignerPayloadRaw
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewWeb3Extension
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewWeb3JavaScriptInterface
 import kotlinx.coroutines.CoroutineScope
@@ -57,7 +58,15 @@ class PolkadotJsExtension(
                 val maybePayload = mapRawPayloadToSignerPayloadJSON(parsedMessage["request"], gson)
 
                 maybePayload?.let {
-                    PolkadotJsExtensionRequest.Single.SignExtrinsic(web3Responder, url, requestId, maybePayload, gson)
+                    PolkadotJsExtensionRequest.Single.Sign.Extrinsic(web3Responder, url, requestId, maybePayload, gson)
+                }
+            }
+
+            PolkadotJsExtensionRequest.Identifier.SIGN_BYTES.id -> {
+                val maybePayload = mapRawPayloadToSignerPayloadRaw(parsedMessage["request"], gson)
+
+                maybePayload?.let {
+                    PolkadotJsExtensionRequest.Single.Sign.Bytes(web3Responder, url, requestId, maybePayload, gson)
                 }
             }
 

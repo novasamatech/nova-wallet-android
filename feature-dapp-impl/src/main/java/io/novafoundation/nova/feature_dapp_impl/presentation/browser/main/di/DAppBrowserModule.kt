@@ -17,7 +17,7 @@ import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.DappBrowserInteractor
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBrowserViewModel
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignExtrinsicCommunicator
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RuntimeVersionsRepository
@@ -49,7 +49,7 @@ class DAppBrowserModule {
         commonInteractor: DappInteractor,
         addressIconGenerator: AddressIconGenerator,
         selectedAccountUseCase: SelectedAccountUseCase,
-        signExtrinsicRequester: DAppSignExtrinsicCommunicator,
+        signRequester: DAppSignCommunicator,
         initialUrl: String
     ): ViewModel {
         return DAppBrowserViewModel(
@@ -60,7 +60,7 @@ class DAppBrowserModule {
             addressIconGenerator = addressIconGenerator,
             selectedAccountUseCase = selectedAccountUseCase,
             commonInteractor = commonInteractor,
-            signExtrinsicRequester = signExtrinsicRequester,
+            signRequester = signRequester,
             initialUrl = initialUrl
         )
     }

@@ -5,23 +5,23 @@ import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignExtrinsicFragment
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignExtrinsicPayload
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignPayload
 
 @Subcomponent(
     modules = [
-        DAppSignExtrinsicModule::class
+        DAppSignModule::class
     ]
 )
 @ScreenScope
-interface DAppSignExtrinsicComponent {
+interface DAppSignComponent {
 
     @Subcomponent.Factory
     interface Factory {
 
         fun create(
             @BindsInstance fragment: Fragment,
-            @BindsInstance payload: DAppSignExtrinsicPayload,
-        ): DAppSignExtrinsicComponent
+            @BindsInstance payload: DAppSignPayload,
+        ): DAppSignComponent
     }
 
     fun inject(fragment: DAppSignExtrinsicFragment)

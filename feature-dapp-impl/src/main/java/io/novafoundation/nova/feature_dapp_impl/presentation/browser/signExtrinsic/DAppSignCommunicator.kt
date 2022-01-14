@@ -3,16 +3,16 @@ package io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrin
 import android.os.Parcelable
 import io.novafoundation.nova.common.navigation.InterScreenRequester
 import io.novafoundation.nova.common.navigation.InterScreenResponder
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignExtrinsicCommunicator.Response
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator.Response
 import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 
-interface DAppSignExtrinsicRequester : InterScreenRequester<DAppSignExtrinsicPayload, Response>
+interface DAppSignRequester : InterScreenRequester<DAppSignPayload, Response>
 
-interface DAppSignExtrinsicResponder : InterScreenResponder<DAppSignExtrinsicPayload, Response>
+interface DAppSignResponder : InterScreenResponder<DAppSignPayload, Response>
 
-interface DAppSignExtrinsicCommunicator : DAppSignExtrinsicRequester, DAppSignExtrinsicResponder {
+interface DAppSignCommunicator : DAppSignRequester, DAppSignResponder {
 
     sealed class Response : Parcelable {
 
@@ -29,7 +29,7 @@ interface DAppSignExtrinsicCommunicator : DAppSignExtrinsicRequester, DAppSignEx
     }
 }
 
-suspend fun DAppSignExtrinsicRequester.awaitConfirmation(request: DAppSignExtrinsicPayload): Response {
+suspend fun DAppSignRequester.awaitConfirmation(request: DAppSignPayload): Response {
     val responsesForRequest = responseFlow.filter { it.requestId == request.requestId }
 
     openRequest(request)
