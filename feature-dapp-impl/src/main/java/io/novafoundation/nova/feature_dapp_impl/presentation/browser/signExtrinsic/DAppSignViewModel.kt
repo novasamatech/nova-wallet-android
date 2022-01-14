@@ -97,7 +97,6 @@ class DAppSignViewModel(
         }
     }
 
-
     fun detailsClicked() {
         launch {
             val extrinsicContent = interactor.readableSignContent(payload.signerPayload)

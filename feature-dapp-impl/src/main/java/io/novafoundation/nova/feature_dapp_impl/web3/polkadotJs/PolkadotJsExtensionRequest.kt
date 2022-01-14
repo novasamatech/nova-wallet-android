@@ -99,7 +99,6 @@ sealed class PolkadotJsExtensionRequest<R>(
             ) : Sign(web3Responder, url, requestId, signerPayload, gson, Identifier.SIGN_BYTES)
         }
 
-
         class ListMetadata(
             web3Responder: Web3Responder,
             url: String,

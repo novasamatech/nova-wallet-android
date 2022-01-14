@@ -55,5 +55,3 @@ fun mapRawPayloadToSignerPayloadRaw(
         gson.fromJson(tree, SignerPayload.Raw::class.java)
     }.getOrNull()
 }
-
-

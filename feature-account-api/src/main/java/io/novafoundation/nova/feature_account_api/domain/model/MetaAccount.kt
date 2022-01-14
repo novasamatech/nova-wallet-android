@@ -144,7 +144,6 @@ fun MetaAccount.multiChainEncryptionFor(accountId: ByteArray): MultiChainEncrypt
             val encryptionType = mapCryptoTypeToEncryption(cryptoType)
 
             MultiChainEncryption.Substrate(encryptionType)
-
         }
     }
 }
