@@ -12,6 +12,7 @@ import coil.request.ImageRequest
 import io.novafoundation.nova.common.base.BaseBottomSheetFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.postToSelf
 import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
@@ -32,11 +33,11 @@ import javax.inject.Inject
 
 private const val PAYLOAD_KEY = "DAppSignExtrinsicFragment.Payload"
 
-class DAppSignExtrinsicFragment : BaseBottomSheetFragment<DAppSignExtrinsicViewModel>() {
+class DAppSignExtrinsicFragment : BaseBottomSheetFragment<DAppSignViewModel>() {
 
     companion object {
 
-        fun getBundle(payload: DAppSignExtrinsicPayload) = bundleOf(PAYLOAD_KEY to payload)
+        fun getBundle(payload: DAppSignPayload) = bundleOf(PAYLOAD_KEY to payload)
     }
 
     @Inject
@@ -71,11 +72,15 @@ class DAppSignExtrinsicFragment : BaseBottomSheetFragment<DAppSignExtrinsicViewM
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun subscribe(viewModel: DAppSignExtrinsicViewModel) {
-        viewModel.chainUi.observe { chainUi ->
-            confirmSignExtinsicNetwork.postToSelf { showValue(chainUi.name) }
-            loadImage(chainUi.icon)?.let {
-                confirmSignExtinsicNetwork.valuePrimary.setDrawableStart(it, paddingInDp = 8, widthInDp = 24)
+    override fun subscribe(viewModel: DAppSignViewModel) {
+        viewModel.maybeChainUi.observe { chainUi ->
+            if (chainUi != null) {
+                confirmSignExtinsicNetwork.postToSelf { showValue(chainUi.name) }
+                loadImage(chainUi.icon)?.let {
+                    confirmSignExtinsicNetwork.valuePrimary.setDrawableStart(it, paddingInDp = 8, widthInDp = 24)
+                }
+            } else {
+                confirmSignExtinsicNetwork.makeGone()
             }
         }
 

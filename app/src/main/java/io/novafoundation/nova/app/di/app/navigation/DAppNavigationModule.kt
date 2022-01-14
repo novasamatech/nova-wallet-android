@@ -4,10 +4,10 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.app.root.navigation.dApp.DAppNavigator
-import io.novafoundation.nova.app.root.navigation.dApp.DAppSignExtrinsicCommunicatorImpl
+import io.novafoundation.nova.app.root.navigation.dApp.DAppSignCommunicatorImpl
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignExtrinsicCommunicator
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator
 
 @Module
 class DAppNavigationModule {
@@ -18,7 +18,7 @@ class DAppNavigationModule {
 
     @ApplicationScope
     @Provides
-    fun provideSignExtrinsicCommunicator(navigationHolder: NavigationHolder): DAppSignExtrinsicCommunicator {
-        return DAppSignExtrinsicCommunicatorImpl(navigationHolder)
+    fun provideSignExtrinsicCommunicator(navigationHolder: NavigationHolder): DAppSignCommunicator {
+        return DAppSignCommunicatorImpl(navigationHolder)
     }
 }

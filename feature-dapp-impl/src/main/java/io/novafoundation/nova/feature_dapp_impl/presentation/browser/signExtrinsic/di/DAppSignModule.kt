@@ -18,9 +18,10 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.signExtrinsic.DappSignExtrinsicInteractor
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignExtrinsicCommunicator
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignExtrinsicPayload
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignExtrinsicViewModel
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignPayload
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignViewModel
+import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.maybeSignExtrinsic
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.GenesisHashUtilityTokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
@@ -29,15 +30,17 @@ import io.novafoundation.nova.runtime.di.ExtrinsicSerialization
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
-class DAppSignExtrinsicModule {
+class DAppSignModule {
 
     @Provides
     @ScreenScope
     fun provideTokenUseCase(
-        payload: DAppSignExtrinsicPayload,
+        payload: DAppSignPayload,
         chainRegistry: ChainRegistry,
         tokenRepository: TokenRepository
-    ): TokenUseCase = GenesisHashUtilityTokenUseCase(payload.signerPayloadJSON.genesisHash, chainRegistry, tokenRepository)
+    ): TokenUseCase? = payload.signerPayload.maybeSignExtrinsic()?.let {
+        GenesisHashUtilityTokenUseCase(it.genesisHash, chainRegistry, tokenRepository)
+    }
 
     @Provides
     @ScreenScope
@@ -51,13 +54,13 @@ class DAppSignExtrinsicModule {
 
     @Provides
     @ScreenScope
-    internal fun provideViewModel(fragment: Fragment, factory: ViewModelProvider.Factory): DAppSignExtrinsicViewModel {
-        return ViewModelProvider(fragment, factory).get(DAppSignExtrinsicViewModel::class.java)
+    internal fun provideViewModel(fragment: Fragment, factory: ViewModelProvider.Factory): DAppSignViewModel {
+        return ViewModelProvider(fragment, factory).get(DAppSignViewModel::class.java)
     }
 
     @Provides
     @IntoMap
-    @ViewModelKey(DAppSignExtrinsicViewModel::class)
+    @ViewModelKey(DAppSignViewModel::class)
     fun provideViewModel(
         router: DAppRouter,
         addressIconGenerator: AddressIconGenerator,
@@ -65,12 +68,12 @@ class DAppSignExtrinsicModule {
         chainRegistry: ChainRegistry,
         feeLoaderMixinFactory: FeeLoaderMixin.Factory,
         commonInteractor: DappInteractor,
-        payload: DAppSignExtrinsicPayload,
-        tokenUseCase: TokenUseCase,
+        payload: DAppSignPayload,
+        tokenUseCase: TokenUseCase?,
         selectedAccountUseCase: SelectedAccountUseCase,
-        communicator: DAppSignExtrinsicCommunicator
+        communicator: DAppSignCommunicator
     ): ViewModel {
-        return DAppSignExtrinsicViewModel(
+        return DAppSignViewModel(
             router = router,
             addressIconGenerator = addressIconGenerator,
             selectedAccountUseCase = selectedAccountUseCase,
@@ -84,3 +87,4 @@ class DAppSignExtrinsicModule {
         )
     }
 }
+

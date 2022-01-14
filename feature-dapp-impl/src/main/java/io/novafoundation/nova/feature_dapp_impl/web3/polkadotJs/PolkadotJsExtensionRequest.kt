@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_dapp_impl.web3.Web3Extension
 import io.novafoundation.nova.feature_dapp_impl.web3.Web3Responder
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.InjectedAccount
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.InjectedMetadataKnown
-import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.SignerPayloadJSON
+import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.SignerPayload
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.SignerResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -30,7 +30,8 @@ sealed class PolkadotJsExtensionRequest<R>(
         SIGN_EXTRINSIC("pub(extrinsic.sign)"),
         SUBSCRIBE_ACCOUNTS("pub(accounts.subscribe)"),
         LIST_METADATA("pub(metadata.list)"),
-        PROVIDE_METADATA("pub(metadata.provide)")
+        PROVIDE_METADATA("pub(metadata.provide)"),
+        SIGN_BYTES("pub(bytes.sign)"),
     }
 
     sealed class Single<R>(
@@ -68,18 +69,36 @@ sealed class PolkadotJsExtensionRequest<R>(
             }
         }
 
-        class SignExtrinsic(
+        sealed class Sign(
             web3Responder: Web3Responder,
             url: String,
             val requestId: String,
-            val signerPayload: SignerPayloadJSON,
+            val signerPayload: SignerPayload,
             private val gson: Gson,
-        ) : Single<SignerResult>(web3Responder, url, Identifier.SIGN_EXTRINSIC) {
+            identifier: Identifier,
+        ) : Single<SignerResult>(web3Responder, url, identifier) {
 
             override fun serializeResponse(response: SignerResult): String {
                 return gson.toJson(response)
             }
+
+            class Extrinsic(
+                web3Responder: Web3Responder,
+                url: String,
+                requestId: String,
+                signerPayload: SignerPayload.Json,
+                gson: Gson,
+            ) : Sign(web3Responder, url, requestId, signerPayload, gson, Identifier.SIGN_EXTRINSIC)
+
+            class Bytes(
+                web3Responder: Web3Responder,
+                url: String,
+                requestId: String,
+                signerPayload: SignerPayload.Raw,
+                gson: Gson,
+            ) : Sign(web3Responder, url, requestId, signerPayload, gson, Identifier.SIGN_BYTES)
         }
+
 
         class ListMetadata(
             web3Responder: Web3Responder,

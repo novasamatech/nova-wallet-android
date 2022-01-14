@@ -9,8 +9,8 @@ import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.extrinsicDetails.di.DAppExtrinsicDetailsComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.di.DAppBrowserComponent
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignExtrinsicCommunicator
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.di.DAppSignExtrinsicComponent
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.di.DAppSignComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.di.MainDAppComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.view.CategorizedDappsView
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.di.DAppSearchComponent
@@ -34,7 +34,7 @@ interface DAppFeatureComponent : DAppFeatureApi {
 
     fun browserComponentFactory(): DAppBrowserComponent.Factory
 
-    fun signExtrinsicComponentFactory(): DAppSignExtrinsicComponent.Factory
+    fun signExtrinsicComponentFactory(): DAppSignComponent.Factory
 
     fun extrinsicDetailsComponentFactory(): DAppExtrinsicDetailsComponent.Factory
 
@@ -49,7 +49,7 @@ interface DAppFeatureComponent : DAppFeatureApi {
 
         fun create(
             @BindsInstance router: DAppRouter,
-            @BindsInstance signExtrinsicCommunicator: DAppSignExtrinsicCommunicator,
+            @BindsInstance signCommunicator: DAppSignCommunicator,
             deps: DAppFeatureDependencies
         ): DAppFeatureComponent
     }
