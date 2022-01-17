@@ -21,7 +21,7 @@ class SearchDappInteractor(
 
         val searchGroupContent = when {
             query.isEmpty() -> null
-            Urls.isValidWebUrl(query) -> DappSearchResult.Url(query)
+            Urls.isValidWebUrl(query) -> DappSearchResult.Url(Urls.ensureHttpsProtocol(query))
             else -> DappSearchResult.Search(query, searchUrlFor(query))
         }
 
