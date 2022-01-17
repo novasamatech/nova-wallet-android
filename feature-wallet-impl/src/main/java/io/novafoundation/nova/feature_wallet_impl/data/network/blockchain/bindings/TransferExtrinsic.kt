@@ -23,7 +23,7 @@ private val TRANSFER_CALL_NAMES = listOf("transfer", "transfer_keep_alive")
 fun notTransfer(): Nothing = throw IllegalArgumentException("Extrinsic is not a transfer extrinsic")
 
 fun bindTransferExtrinsic(scale: String, runtime: RuntimeSnapshot): TransferExtrinsic {
-    val extrinsicInstance = Extrinsic.fromHexOrIncompatible(scale, runtime)
+    val extrinsicInstance = Extrinsic.Default.fromHexOrIncompatible(scale, runtime)
     val call = extrinsicInstance.call
 
     val transferModule = runtime.metadata.balances()

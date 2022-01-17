@@ -46,7 +46,12 @@ fun <T> List<T>.second() = get(1)
 @Suppress("UNCHECKED_CAST")
 inline fun <K, V, R> Map<K, V>.mapValuesNotNull(crossinline mapper: (Map.Entry<K, V>) -> R?): Map<K, R> {
     return mapValues(mapper)
-        .filterValues { it != null } as Map<K, R>
+        .filterNotNull()
+}
+
+@Suppress("UNCHECKED_CAST")
+inline fun <K, V> Map<K, V?>.filterNotNull(): Map<K, V> {
+    return filterValues { it != null } as Map<K, V>
 }
 
 fun String.bigIntegerFromHex() = removeHexPrefix().toBigInteger(16)
