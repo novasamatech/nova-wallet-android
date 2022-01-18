@@ -128,4 +128,24 @@ fun MetaAccount.multiChainEncryptionIn(chain: Chain): MultiChainEncryption {
     }
 }
 
+/**
+ * Returns [MultiChainEncryption] for given [accountId] inside this meta account
+ * @throws NoSuchElementException in case no matching [accountId] found inside meta account
+ */
+fun MetaAccount.multiChainEncryptionFor(accountId: ByteArray): MultiChainEncryption {
+    return when {
+        ethereumPublicKey.contentEquals(accountId) -> MultiChainEncryption.Ethereum
+        else -> {
+            val cryptoType = when {
+                substrateAccountId.contentEquals(accountId) -> substrateCryptoType
+                else -> chainAccounts.values.first { it.accountId.contentEquals(accountId) }.cryptoType
+            }
+
+            val encryptionType = mapCryptoTypeToEncryption(cryptoType)
+
+            MultiChainEncryption.Substrate(encryptionType)
+        }
+    }
+}
+
 fun MetaAccount.chainAccountFor(chainId: ChainId) = chainAccounts.getValue(chainId)

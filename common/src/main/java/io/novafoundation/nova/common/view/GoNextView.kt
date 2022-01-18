@@ -83,6 +83,11 @@ class GoNextView @JvmOverloads constructor(
         val backgroundDrawable = typedArray.getDrawable(R.styleable.GoNextView_android_background)
         if (backgroundDrawable != null) background = backgroundDrawable else setBackgroundResource(R.drawable.bg_primary_list_item)
 
+        val textAppearance = typedArray.getResourceId(R.styleable.GoNextView_android_textAppearance, 0)
+        if (textAppearance != 0) {
+            title.setTextAppearance(textAppearance)
+        }
+
         typedArray.recycle()
     }
 }

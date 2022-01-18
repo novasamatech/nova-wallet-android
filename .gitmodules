@@ -1,0 +1,3 @@
+[submodule "nova-wallet-dapp-js"]
+	path = nova-wallet-dapp-js
+	url = git@github.com:nova-wallet/nova-wallet-dapp-js.git

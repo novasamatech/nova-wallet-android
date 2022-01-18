@@ -9,6 +9,7 @@ import io.novafoundation.nova.core_db.dao.AccountDao
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.dao.AssetDao
 import io.novafoundation.nova.core_db.dao.ChainDao
+import io.novafoundation.nova.core_db.dao.DappAuthorizationDao
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.dao.NodeDao
 import io.novafoundation.nova.core_db.dao.OperationDao
@@ -92,5 +93,11 @@ class DbModule {
     @ApplicationScope
     fun provideMetaAccountDao(appDatabase: AppDatabase): MetaAccountDao {
         return appDatabase.metaAccountDao()
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideDappAuthorizationDao(appDatabase: AppDatabase): DappAuthorizationDao {
+        return appDatabase.dAppAuthorizationDao()
     }
 }

@@ -7,7 +7,31 @@ abstract class BaseNavigator(
     private val navigationHolder: NavigationHolder
 ) {
 
-    fun performNavigation(@IdRes actionId: Int, args: Bundle) {
+    fun back() {
+        navigationHolder.executeBack()
+    }
+
+    /**
+     * Performs conditional navigation based on current destination
+     * @param cases - array of pairs (currentDestination, navigationAction)
+     */
+    fun performNavigation(
+        cases: Array<Pair<Int, Int>>,
+        args: Bundle?
+    ) {
+        val navController = navigationHolder.navController
+
+        navController?.currentDestination?.let { currentDestination ->
+            val (_, case) = cases.find { (startDestination, _) -> startDestination == currentDestination.id }
+                ?: throw IllegalArgumentException("Unknown case for ${currentDestination.label}")
+
+            currentDestination.getAction(case)?.let {
+                navController.navigate(case, args)
+            }
+        }
+    }
+
+    fun performNavigation(@IdRes actionId: Int, args: Bundle? = null) {
         val navController = navigationHolder.navController
 
         navController?.currentDestination?.getAction(actionId)?.let {

@@ -40,7 +40,7 @@ open class BaseViewModel : ViewModel(), CoroutineScope {
     }
 
     fun showError(text: String) {
-        _errorLiveData.value = Event(text)
+        _errorLiveData.postValue(Event(text))
     }
 
     fun showError(throwable: Throwable) {

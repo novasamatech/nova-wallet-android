@@ -31,7 +31,7 @@
     <color name="white_40">#66FFFFFF</color>
     <color name="white_48">#7AFFFFFF</color>
     <color name="white_50">#80FFFFFF</color>
-    <color name="white_64">#A6FFFFFF</color>
+    <color name="white_64">#A8FFFFFF</color>
     <color name="white_80">#CCFFFFFF</color>
 
     <color name="black_24">#3D000000</color>
@@ -48,6 +48,8 @@
     <color name="account_icon_dark">@color/black</color>
 
     <color name="red">#FF285C</color>
+
+    <color name="bar_bg_64">#A8252528</color>
 
     <color name="accentBlue">#409DF3</color>
 

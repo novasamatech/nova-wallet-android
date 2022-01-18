@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
+import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.MainDAppViewModel
 
 @Module(includes = [ViewModelModule::class])
@@ -27,12 +28,14 @@ class MainDAppModule {
     fun provideViewModel(
         addressIconGenerator: AddressIconGenerator,
         selectedAccountUseCase: SelectedAccountUseCase,
-        router: DAppRouter
+        router: DAppRouter,
+        dappInteractor: DappInteractor
     ): ViewModel {
         return MainDAppViewModel(
             router = router,
             addressIconGenerator = addressIconGenerator,
-            selectedAccountUseCase = selectedAccountUseCase
+            selectedAccountUseCase = selectedAccountUseCase,
+            dappInteractor = dappInteractor
         )
     }
 }
