@@ -1,5 +1,7 @@
 package io.novafoundation.nova.runtime.multiNetwork.chain.model
 
+import java.math.BigInteger
+
 typealias ChainId = String
 typealias StringTemplate = String
 
@@ -39,8 +41,17 @@ data class Chain(
         val symbol: String,
         val precision: Int,
         val staking: StakingType,
+        val type: Type,
         val name: String,
     ) {
+
+        sealed class Type {
+            object Native : Type()
+
+            data class Statemine(val id: BigInteger) : Type()
+
+            object Unsupported : Type()
+        }
 
         enum class StakingType {
             UNSUPPORTED, RELAYCHAIN

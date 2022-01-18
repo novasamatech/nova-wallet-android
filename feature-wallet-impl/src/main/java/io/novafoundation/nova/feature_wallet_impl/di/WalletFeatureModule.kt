@@ -32,7 +32,8 @@ import io.novafoundation.nova.feature_wallet_impl.data.buyToken.RampProvider
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.SubstrateRemoteSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.WssSubstrateSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.BalancesUpdateSystem
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.PaymentUpdaterFactory
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.balance.PaymentUpdaterFactory
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.balance.source.BalanceSourceProvider
 import io.novafoundation.nova.feature_wallet_impl.data.network.coingecko.CoingeckoApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.phishing.PhishingApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
@@ -178,16 +179,12 @@ class WalletFeatureModule {
     @Provides
     @FeatureScope
     fun providePaymentUpdaterFactory(
-        remoteSource: SubstrateRemoteSource,
-        assetCache: AssetCache,
         operationDao: OperationDao,
+        balanceSourceProvider: BalanceSourceProvider,
         accountUpdateScope: AccountUpdateScope,
-        chainRegistry: ChainRegistry,
     ) = PaymentUpdaterFactory(
-        remoteSource,
-        assetCache,
         operationDao,
-        chainRegistry,
+        balanceSourceProvider,
         accountUpdateScope
     )
 

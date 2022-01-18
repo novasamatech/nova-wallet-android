@@ -94,6 +94,8 @@ fun RuntimeMetadata.system() = module(Modules.SYSTEM)
 
 fun RuntimeMetadata.balances() = module(Modules.BALANCES)
 
+fun RuntimeMetadata.assets() = module(Modules.ASSETS)
+
 fun RuntimeMetadata.crowdloan() = module(Modules.CROWDLOAN)
 
 fun RuntimeMetadata.babe() = module(Modules.BABE)
@@ -146,4 +148,6 @@ object Modules {
     const val TIMESTAMP = "Timestamp"
     const val SLOTS = "Slots"
     const val SESSION = "Session"
+
+    const val ASSETS = "Assets"
 }

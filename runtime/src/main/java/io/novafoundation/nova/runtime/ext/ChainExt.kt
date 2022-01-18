@@ -38,6 +38,8 @@ fun Chain.addressOf(accountId: ByteArray): String {
     }
 }
 
+fun Chain.pairWithAssets(): List<Pair<Chain, Chain.Asset>> = assets.map { asset -> this to asset }
+
 fun Chain.accountIdOf(address: String): ByteArray {
     return if (isEthereumBased) {
         address.fromHex()

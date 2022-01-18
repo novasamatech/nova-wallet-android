@@ -1,5 +1,6 @@
 package io.novafoundation.nova.runtime.multiNetwork
 
+import com.google.gson.Gson
 import io.novafoundation.nova.common.utils.diffed
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.mapList
@@ -38,10 +39,11 @@ class ChainRegistry(
     private val chainSyncService: ChainSyncService,
     private val baseTypeSynchronizer: BaseTypeSynchronizer,
     private val runtimeSyncService: RuntimeSyncService,
+    private val gson: Gson
 ) : CoroutineScope by CoroutineScope(Dispatchers.Default) {
 
     val currentChains = chainDao.joinChainInfoFlow()
-        .mapList(::mapChainLocalToChain)
+        .mapList { mapChainLocalToChain(it, gson) }
         .diffed()
         .map { (removed, addedOrModified, all) ->
             removed.forEach {
