@@ -1,5 +1,8 @@
 package io.novafoundation.nova.runtime.multiNetwork.chain
 
+import com.google.gson.Gson
+import io.novafoundation.nova.common.utils.asGsonParsedNumber
+import io.novafoundation.nova.common.utils.parseArbitraryObject
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 import io.novafoundation.nova.core_db.model.chain.ChainExplorerLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
@@ -54,6 +57,35 @@ private fun mapSectionToSectionLocal(sectionLocal: Chain.ExternalApi.Section?) =
     )
 }
 
+private const val ASSET_NATIVE = "native"
+private const val ASSET_STATEMINE = "statemine"
+private const val ASSET_UNSUPPORTED = "unsupported"
+
+private const val STATEMINE_EXTRAS_ID = "assetId"
+
+private fun mapChainAssetTypeFromRaw(type: String?, typeExtras: Map<String, Any?>?): Chain.Asset.Type = when(type) {
+    null, ASSET_NATIVE -> Chain.Asset.Type.Native
+    ASSET_STATEMINE -> {
+        val id = typeExtras?.get(STATEMINE_EXTRAS_ID)?.asGsonParsedNumber()
+
+        if (id != null) {
+            Chain.Asset.Type.Statemine(id)
+        } else {
+            Chain.Asset.Type.Unsupported
+        }
+    }
+    else -> Chain.Asset.Type.Unsupported
+}
+
+private fun mapChainAssetTypeToRaw(type: Chain.Asset.Type): Pair<String, Map<String, Any?>?> = when(type) {
+    is Chain.Asset.Type.Native -> ASSET_NATIVE to null
+    is Chain.Asset.Type.Statemine -> ASSET_STATEMINE to mapOf(
+        STATEMINE_EXTRAS_ID to type.id
+    )
+    Chain.Asset.Type.Unsupported -> ASSET_UNSUPPORTED to null
+}
+
+
 fun mapChainRemoteToChain(
     chainRemote: ChainRemote,
 ): Chain {
@@ -66,14 +98,15 @@ fun mapChainRemoteToChain(
 
     val assets = chainRemote.assets.map {
         Chain.Asset(
-            iconUrl = chainRemote.icon,
+            iconUrl = it.icon ?: chainRemote.icon,
             chainId = chainRemote.chainId,
             id = it.assetId,
             symbol = it.symbol,
             precision = it.precision,
             name = it.name ?: chainRemote.name,
             priceId = it.priceId,
-            staking = mapStakingStringToStakingType(it.staking)
+            staking = mapStakingStringToStakingType(it.staking),
+            type = mapChainAssetTypeFromRaw(it.type, it.typeExtras)
         )
     }
 
@@ -122,7 +155,7 @@ fun mapChainRemoteToChain(
     }
 }
 
-fun mapChainLocalToChain(chainLocal: JoinedChainInfo): Chain {
+fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
     val nodes = chainLocal.nodes.map {
         Chain.Node(
             url = it.url,
@@ -131,6 +164,8 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo): Chain {
     }
 
     val assets = chainLocal.assets.map {
+        val typeExtrasParsed = it.typeExtras?.let(gson::parseArbitraryObject)
+
         Chain.Asset(
             iconUrl = chainLocal.chain.icon,
             id = it.id,
@@ -139,7 +174,8 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo): Chain {
             name = it.name,
             chainId = it.chainId,
             priceId = it.priceId,
-            staking = mapStakingTypeFromLocal(it.staking)
+            staking = mapStakingTypeFromLocal(it.staking),
+            type = mapChainAssetTypeFromRaw(it.type, typeExtrasParsed)
         )
     }
 
@@ -186,7 +222,7 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo): Chain {
     }
 }
 
-fun mapChainToChainLocal(chain: Chain): JoinedChainInfo {
+fun mapChainToChainLocal(chain: Chain, gson: Gson): JoinedChainInfo {
     val nodes = chain.nodes.map {
         ChainNodeLocal(
             url = it.url,
@@ -196,6 +232,8 @@ fun mapChainToChainLocal(chain: Chain): JoinedChainInfo {
     }
 
     val assets = chain.assets.map {
+        val (type, typeExtras) = mapChainAssetTypeToRaw(it.type)
+
         ChainAssetLocal(
             id = it.id,
             symbol = it.symbol,
@@ -203,7 +241,9 @@ fun mapChainToChainLocal(chain: Chain): JoinedChainInfo {
             chainId = chain.id,
             name = it.name,
             priceId = it.priceId,
-            staking = mapStakingTypeToLocal(it.staking)
+            staking = mapStakingTypeToLocal(it.staking),
+            type = type,
+            typeExtras = gson.toJson(typeExtras)
         )
     }
 

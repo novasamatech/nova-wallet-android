@@ -4,6 +4,7 @@ import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.novafoundation.nova.common.utils.LOG_TAG
+import io.novafoundation.nova.common.utils.parseArbitraryObject
 import io.novafoundation.nova.feature_dapp_impl.web3.Web3Responder
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.mapRawPayloadToSignerPayloadJSON
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.mapRawPayloadToSignerPayloadRaw
@@ -41,8 +42,7 @@ class PolkadotJsExtension(
     override suspend fun messageToRequest(message: String): PolkadotJsExtensionRequest<*>? {
         Log.d(LOG_TAG, message)
 
-        val typeToken = object : TypeToken<Map<String, Any?>>() {}
-        val parsedMessage = gson.fromJson<Map<String, Any?>>(message, typeToken.type)
+        val parsedMessage = gson.parseArbitraryObject(message)!!
 
         val url = parsedMessage["url"] as? String ?: return null
         val requestId = parsedMessage["id"] as? String ?: return null
