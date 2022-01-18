@@ -166,7 +166,7 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
         val typeExtrasParsed = it.typeExtras?.let(gson::parseArbitraryObject)
 
         Chain.Asset(
-            iconUrl = chainLocal.chain.icon,
+            iconUrl = it.icon ?: chainLocal.chain.icon,
             id = it.id,
             symbol = it.symbol,
             precision = it.precision,
@@ -242,7 +242,8 @@ fun mapChainToChainLocal(chain: Chain, gson: Gson): JoinedChainInfo {
             priceId = it.priceId,
             staking = mapStakingTypeToLocal(it.staking),
             type = type,
-            typeExtras = gson.toJson(typeExtras)
+            typeExtras = gson.toJson(typeExtras),
+            icon = it.iconUrl
         )
     }
 
