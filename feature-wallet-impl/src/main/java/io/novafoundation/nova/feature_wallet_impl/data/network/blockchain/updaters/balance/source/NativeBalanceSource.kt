@@ -65,4 +65,3 @@ class NativeBalanceSource(
         return substrateRemoteSource.fetchAccountTransfersInBlock(chain.id, blockHash, accountId)
     }
 }
-

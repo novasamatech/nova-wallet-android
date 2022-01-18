@@ -47,7 +47,7 @@ class StatemineBalanceSource(
             subscriptionBuilder.subscribe(assetAccountKey),
             isFrozenFlow
         ) { balanceStorageChange, isAssetFrozen ->
-            val assetAccount = balanceStorageChange.value?.let { bindAssetAccount(it, runtime)  } ?: AssetAccount.empty()
+            val assetAccount = balanceStorageChange.value?.let { bindAssetAccount(it, runtime) } ?: AssetAccount.empty()
 
             updateAssetBalance(metaAccount.id, chainAsset, isAssetFrozen, assetAccount)
 

@@ -26,6 +26,6 @@ class UnsupportedBalanceSource : BalanceSource {
         blockHash: String,
         accountId: AccountId
     ): Result<List<TransferExtrinsicWithStatus>> {
-       return Result.success(emptyList())
+        return Result.success(emptyList())
     }
 }

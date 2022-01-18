@@ -9,7 +9,7 @@ class BalanceSourceProvider(
 ) {
 
     fun provideFor(asset: Chain.Asset): BalanceSource {
-        return when(asset.type) {
+        return when (asset.type) {
             is Chain.Asset.Type.Native -> nativeBalanceSource
             is Chain.Asset.Type.Statemine -> statemineBalanceSource
             Chain.Asset.Type.Unsupported -> unsupportedBalanceSource

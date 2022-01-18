@@ -63,7 +63,7 @@ private const val ASSET_UNSUPPORTED = "unsupported"
 
 private const val STATEMINE_EXTRAS_ID = "assetId"
 
-private fun mapChainAssetTypeFromRaw(type: String?, typeExtras: Map<String, Any?>?): Chain.Asset.Type = when(type) {
+private fun mapChainAssetTypeFromRaw(type: String?, typeExtras: Map<String, Any?>?): Chain.Asset.Type = when (type) {
     null, ASSET_NATIVE -> Chain.Asset.Type.Native
     ASSET_STATEMINE -> {
         val id = typeExtras?.get(STATEMINE_EXTRAS_ID)?.asGsonParsedNumber()
@@ -77,14 +77,13 @@ private fun mapChainAssetTypeFromRaw(type: String?, typeExtras: Map<String, Any?
     else -> Chain.Asset.Type.Unsupported
 }
 
-private fun mapChainAssetTypeToRaw(type: Chain.Asset.Type): Pair<String, Map<String, Any?>?> = when(type) {
+private fun mapChainAssetTypeToRaw(type: Chain.Asset.Type): Pair<String, Map<String, Any?>?> = when (type) {
     is Chain.Asset.Type.Native -> ASSET_NATIVE to null
     is Chain.Asset.Type.Statemine -> ASSET_STATEMINE to mapOf(
         STATEMINE_EXTRAS_ID to type.id
     )
     Chain.Asset.Type.Unsupported -> ASSET_UNSUPPORTED to null
 }
-
 
 fun mapChainRemoteToChain(
     chainRemote: ChainRemote,

@@ -192,9 +192,9 @@ class WalletFeatureModule {
     @Wallet
     @FeatureScope
     fun provideFeatureUpdaters(
-            chainRegistry: ChainRegistry,
-            paymentUpdaterFactory: PaymentUpdaterFactory,
-            accountUpdateScope: AccountUpdateScope,
+        chainRegistry: ChainRegistry,
+        paymentUpdaterFactory: PaymentUpdaterFactory,
+        accountUpdateScope: AccountUpdateScope,
     ): UpdateSystem = BalancesUpdateSystem(
         chainRegistry,
         paymentUpdaterFactory,

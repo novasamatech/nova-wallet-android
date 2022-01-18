@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs
 
 import android.util.Log
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.parseArbitraryObject
 import io.novafoundation.nova.feature_dapp_impl.web3.Web3Responder

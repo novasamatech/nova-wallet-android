@@ -46,11 +46,11 @@ data class Chain(
     ) {
 
         sealed class Type {
-            object Native: Type()
+            object Native : Type()
 
-            data class Statemine(val id: BigInteger): Type()
+            data class Statemine(val id: BigInteger) : Type()
 
-            object Unsupported: Type()
+            object Unsupported : Type()
         }
 
         enum class StakingType {

@@ -4,7 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.math.BigInteger
 
-fun Any?.asGsonParsedNumber(): BigInteger? = when(this) {
+fun Any?.asGsonParsedNumber(): BigInteger? = when (this) {
     // gson parses integers as double when type is not specified
     is Double -> toLong().toBigInteger()
     is Long -> toBigInteger()
