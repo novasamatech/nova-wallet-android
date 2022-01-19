@@ -7,7 +7,8 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
-import io.novafoundation.nova.feature_wallet_impl.di.modules.BalanceSourceModule
+import io.novafoundation.nova.feature_wallet_impl.di.modules.AssetsModule
+import io.novafoundation.nova.feature_wallet_impl.di.modules.SendModule
 import io.novafoundation.nova.feature_wallet_impl.presentation.WalletRouter
 import io.novafoundation.nova.feature_wallet_impl.presentation.balance.detail.di.BalanceDetailComponent
 import io.novafoundation.nova.feature_wallet_impl.presentation.balance.list.di.BalanceListComponent
@@ -28,7 +29,8 @@ import io.novafoundation.nova.runtime.di.RuntimeApi
     ],
     modules = [
         WalletFeatureModule::class,
-        BalanceSourceModule::class,
+        AssetsModule::class,
+        SendModule::class,
         TransactionHistoryFilterModule::class
     ]
 )

@@ -10,14 +10,16 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletInteractor
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_impl.domain.send.SendInteractor
 import io.novafoundation.nova.feature_wallet_impl.presentation.AssetPayload
 import io.novafoundation.nova.feature_wallet_impl.presentation.WalletRouter
-import io.novafoundation.nova.feature_wallet_impl.presentation.send.TransferValidityChecks
 import io.novafoundation.nova.feature_wallet_impl.presentation.send.amount.ChooseAmountViewModel
 import io.novafoundation.nova.feature_wallet_impl.presentation.send.phishing.warning.api.PhishingWarningMixin
 import io.novafoundation.nova.feature_wallet_impl.presentation.send.phishing.warning.impl.PhishingWarningProvider
@@ -27,23 +29,19 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 class ChooseAmountModule {
 
     @Provides
-    fun providePhishingAddressMixin(interactor: WalletInteractor): PhishingWarningMixin {
-        return PhishingWarningProvider(interactor)
-    }
-
-    @Provides
     @IntoMap
     @ViewModelKey(ChooseAmountViewModel::class)
     fun provideViewModel(
         interactor: WalletInteractor,
+        sendInteractor: SendInteractor,
+        validationExecutor: ValidationExecutor,
+        selectedAccountUseCase: SelectedAccountUseCase,
         router: WalletRouter,
         addressModelGenerator: AddressIconGenerator,
         externalActions: ExternalActions.Presentation,
-        transferValidityChecks: TransferValidityChecks.Presentation,
         recipientAddress: String,
         assetPayload: AssetPayload,
         chainRegistry: ChainRegistry,
-        phishingWarning: PhishingWarningMixin,
         feeLoaderMixinFactory: FeeLoaderMixin.Factory,
         addressDisplayUseCase: AddressDisplayUseCase,
         resourceManager: ResourceManager,
@@ -54,15 +52,16 @@ class ChooseAmountModule {
             router = router,
             addressIconGenerator = addressModelGenerator,
             externalActions = externalActions,
-            transferValidityChecks = transferValidityChecks,
             recipientAddress = recipientAddress,
             assetPayload = assetPayload,
             chainRegistry = chainRegistry,
             feeLoaderMixinFactory = feeLoaderMixinFactory,
             resourceManager = resourceManager,
-            phishingAddress = phishingWarning,
             amountChooserMixinFactory = amountChooserMixinFactory,
-            addressDisplayUseCase = addressDisplayUseCase
+            addressDisplayUseCase = addressDisplayUseCase,
+            sendInteractor = sendInteractor,
+            validationExecutor = validationExecutor,
+            selectedAccountUseCase = selectedAccountUseCase
         )
     }
 

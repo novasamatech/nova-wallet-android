@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.icon.cre
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.model.WalletAccount
 import io.novafoundation.nova.feature_wallet_impl.R
+import io.novafoundation.nova.feature_wallet_impl.domain.send.SendInteractor
 import io.novafoundation.nova.feature_wallet_impl.presentation.AssetPayload
 import io.novafoundation.nova.feature_wallet_impl.presentation.WalletRouter
 import io.novafoundation.nova.feature_wallet_impl.presentation.send.phishing.warning.api.PhishingWarningMixin
@@ -42,10 +43,9 @@ enum class State {
 }
 
 private const val INITIAL_QUERY = ""
-private const val DEBOUNCE_DURATION = 300L
 
 class ChooseRecipientViewModel(
-    private val interactor: WalletInteractor,
+    private val sendInteractor: SendInteractor,
     private val router: WalletRouter,
     private val resourceManager: ResourceManager,
     private val addressIconGenerator: AddressIconGenerator,
@@ -112,7 +112,7 @@ class ChooseRecipientViewModel(
         val input = searchEvents.value
 
         viewModelScope.launch {
-            val valid = interactor.validateSendAddress(payload.chainId, input)
+            val valid = sendInteractor.validateSendAddress(payload.chainId, input)
 
             if (valid) recipientSelected(input)
         }
@@ -124,7 +124,7 @@ class ChooseRecipientViewModel(
 
     fun qrCodeScanned(content: String) {
         viewModelScope.launch {
-            val result = interactor.getRecipientFromQrCodeContent(content)
+            val result = sendInteractor.getRecipientFromQrCodeContent(content)
 
             if (result.isSuccess) {
                 _decodeAddressResult.value = Event(result.requireValue())
@@ -154,8 +154,8 @@ class ChooseRecipientViewModel(
     }
 
     private suspend fun formSearchResults(address: String): List<Any> = withContext(Dispatchers.Default) {
-        val isValidAddress = interactor.validateSendAddress(payload.chainId, address)
-        val searchResult = interactor.getRecipients(address, payload.chainId)
+        val isValidAddress = sendInteractor.validateSendAddress(payload.chainId, address)
+        val searchResult = sendInteractor.getRecipients(address, payload.chainId)
 
         val resultWithHeader = maybeAppendResultHeader(isValidAddress, address)
         val myAccountsWithHeader = generateAccountModelsWithHeader(R.string.search_header_my_accounts, searchResult.myAccounts)

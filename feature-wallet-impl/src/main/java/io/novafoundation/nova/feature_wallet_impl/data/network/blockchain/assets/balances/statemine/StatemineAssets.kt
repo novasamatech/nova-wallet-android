@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.bindings
+package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.statemine
 
 import io.novafoundation.nova.common.data.network.runtime.binding.UseCaseBinding
 import io.novafoundation.nova.common.data.network.runtime.binding.bindBoolean

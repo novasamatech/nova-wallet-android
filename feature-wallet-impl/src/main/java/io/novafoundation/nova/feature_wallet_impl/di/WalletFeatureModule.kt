@@ -31,9 +31,9 @@ import io.novafoundation.nova.feature_wallet_impl.data.buyToken.MoonPayProvider
 import io.novafoundation.nova.feature_wallet_impl.data.buyToken.RampProvider
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.SubstrateRemoteSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.WssSubstrateSource
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.BalanceSourceProvider
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.BalancesUpdateSystem
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.balance.PaymentUpdaterFactory
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.balance.source.BalanceSourceProvider
 import io.novafoundation.nova.feature_wallet_impl.data.network.coingecko.CoingeckoApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.phishing.PhishingApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
@@ -44,8 +44,6 @@ import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorSto
 import io.novafoundation.nova.feature_wallet_impl.domain.WalletInteractorImpl
 import io.novafoundation.nova.feature_wallet_impl.presentation.balance.assetActions.buy.BuyMixin
 import io.novafoundation.nova.feature_wallet_impl.presentation.balance.assetActions.buy.BuyMixinProvider
-import io.novafoundation.nova.feature_wallet_impl.presentation.send.TransferValidityChecks
-import io.novafoundation.nova.feature_wallet_impl.presentation.send.TransferValidityChecksProvider
 import io.novafoundation.nova.feature_wallet_impl.presentation.transaction.filter.HistoryFiltersProvider
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -171,10 +169,6 @@ class WalletFeatureModule {
     fun provideBuyMixin(
         buyTokenRegistry: BuyTokenRegistry,
     ): BuyMixin.Presentation = BuyMixinProvider(buyTokenRegistry)
-
-    @Provides
-    @FeatureScope
-    fun provideTransferChecks(): TransferValidityChecks.Presentation = TransferValidityChecksProvider()
 
     @Provides
     @FeatureScope

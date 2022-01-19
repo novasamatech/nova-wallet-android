@@ -9,7 +9,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.acala.AcalaApi
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.acala.AcalaDirectContributeRequest
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.acala.AcalaLiquidContributeRequest
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.transfer
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.nativeTransfer
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.ext.accountIdOf
@@ -116,7 +116,7 @@ class AcalaContributeInteractor(
             val statement = httpExceptionHandler.wrap { getStatement(chain) }
             val proxyAccountId = chain.accountIdOf(statement.proxyAddress)
 
-            transfer(proxyAccountId, amountInPlanks)
+            nativeTransfer(proxyAccountId, amountInPlanks)
             systemRemarkWithEvent(statement.statement)
             referralCode?.let { systemRemarkWithEvent(referralRemark(it)) }
         }
@@ -135,7 +135,7 @@ class AcalaContributeInteractor(
             val amountInPlanks = chainAsset.planksFromAmount(amount)
 
             val fakeDestination = ByteArray(32)
-            transfer(accountId = fakeDestination, amount = amountInPlanks)
+            nativeTransfer(accountId = fakeDestination, amount = amountInPlanks)
 
             val fakeAgreementRemark = ByteArray(185) // acala agreement is 185 bytes
             systemRemarkWithEvent(fakeAgreementRemark)

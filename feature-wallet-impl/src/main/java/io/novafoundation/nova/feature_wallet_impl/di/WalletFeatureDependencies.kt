@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.QrCodeGenerator
+import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.core_db.dao.AssetDao
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.dao.PhishingAddressDao
@@ -96,4 +97,6 @@ interface WalletFeatureDependencies {
     fun imageLoader(): ImageLoader
 
     fun selectedAccountUseCase(): SelectedAccountUseCase
+
+    fun validationExecutor(): ValidationExecutor
 }

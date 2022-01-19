@@ -11,11 +11,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindOrNull
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.system
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.transfer
-import io.novafoundation.nova.feature_wallet_api.domain.model.Transfer
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.bindings.bindTransferExtrinsic
-import io.novafoundation.nova.runtime.ext.accountIdOf
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.utility.bindTransferExtrinsic
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
@@ -23,10 +19,8 @@ import io.novafoundation.nova.runtime.storage.source.queryNonNull
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericEvent
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
-import java.math.BigInteger
 
 class WssSubstrateSource(
     private val rpcCalls: RpcCalls,
@@ -47,22 +41,6 @@ class WssSubstrateSource(
                 scale?.let { bindAccountInfo(it, runtime) } ?: AccountInfo.empty()
             }
         )
-    }
-
-    override suspend fun getTransferFee(chain: Chain, transfer: Transfer): BigInteger {
-        return extrinsicService.estimateFee(chain) {
-            transfer(chain, transfer)
-        }
-    }
-
-    override suspend fun performTransfer(
-        accountId: AccountId,
-        chain: Chain,
-        transfer: Transfer,
-    ): String {
-        return extrinsicService.submitExtrinsic(chain, accountId) {
-            transfer(chain, transfer)
-        }.getOrThrow()
     }
 
     override suspend fun fetchAccountTransfersInBlock(
@@ -126,12 +104,5 @@ class WssSubstrateSource(
                 TransferExtrinsicWithStatus(transferExtrinsic, statuses[index])
             }
         }.filterNotNull()
-    }
-
-    private fun ExtrinsicBuilder.transfer(chain: Chain, transfer: Transfer): ExtrinsicBuilder {
-        return transfer(
-            accountId = chain.accountIdOf(transfer.recipient),
-            amount = transfer.amountInPlanks
-        )
     }
 }

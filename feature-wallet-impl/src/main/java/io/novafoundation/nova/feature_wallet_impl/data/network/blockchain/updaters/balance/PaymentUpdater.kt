@@ -12,9 +12,9 @@ import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_impl.data.mappers.mapOperationStatusToOperationLocalStatus
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.bindings.TransferExtrinsic
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.balance.source.BalanceSource
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.balance.source.BalanceSourceProvider
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.BalanceSource
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.BalanceSourceProvider
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.utility.TransferExtrinsic
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId

@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.balance.source
+package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.statemine
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.common.utils.assets
@@ -6,13 +6,15 @@ import io.novafoundation.nova.core.updater.SubscriptionBuilder
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.TransferExtrinsicWithStatus
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.bindings.AssetAccount
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.bindings.bindAssetAccount
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.bindings.bindAssetDetails
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.BalanceSource
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.utility.NativeBalanceSource
+import io.novafoundation.nova.runtime.ext.requireStatemine
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
+import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
 import kotlinx.coroutines.flow.Flow
@@ -23,7 +25,32 @@ import java.math.BigInteger
 class StatemineBalanceSource(
     private val chainRegistry: ChainRegistry,
     private val assetCache: AssetCache,
+    private val remoteStorage: StorageDataSource,
 ) : BalanceSource {
+
+    override suspend fun existentialDeposit(chain: Chain, chainAsset: Chain.Asset): BigInteger {
+        val statemineType = chainAsset.requireStatemine()
+
+        val assetDetails = remoteStorage.query(
+            chainId = chain.id,
+            keyBuilder = { it.metadata.assets().storage("Asset").storageKey(it, statemineType.id) },
+            binding = { scale, runtime -> bindAssetDetails(scale!!, runtime) }
+        )
+
+        return assetDetails.minimumBalance
+    }
+
+    override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {
+        val statemineType = chainAsset.requireStatemine()
+
+        val assetAccount = remoteStorage.query(
+            chainId = chain.id,
+            keyBuilder = { it.metadata.assets().storage("Account").storageKey(it, statemineType.id, accountId) },
+            binding = { scale, runtime->  bindAssetAccountOrEmpty(scale, runtime) }
+        )
+
+        return assetAccount.balance
+    }
 
     override suspend fun startSyncingBalance(
         chain: Chain,
@@ -32,8 +59,7 @@ class StatemineBalanceSource(
         accountId: AccountId,
         subscriptionBuilder: SubscriptionBuilder
     ): Flow<BlockHash> {
-        val statemineType = chainAsset.type
-        require(statemineType is Chain.Asset.Type.Statemine)
+        val statemineType = chainAsset.requireStatemine()
 
         val runtime = chainRegistry.getRuntime(chain.id)
 
@@ -47,7 +73,7 @@ class StatemineBalanceSource(
             subscriptionBuilder.subscribe(assetAccountKey),
             isFrozenFlow
         ) { balanceStorageChange, isAssetFrozen ->
-            val assetAccount = balanceStorageChange.value?.let { bindAssetAccount(it, runtime) } ?: AssetAccount.empty()
+            val assetAccount = bindAssetAccountOrEmpty(balanceStorageChange.value, runtime)
 
             updateAssetBalance(metaAccount.id, chainAsset, isAssetFrozen, assetAccount)
 
@@ -62,6 +88,10 @@ class StatemineBalanceSource(
     ): Result<List<TransferExtrinsicWithStatus>> {
         // TODO statemine realtime transfer history
         return Result.success(emptyList())
+    }
+
+    private fun bindAssetAccountOrEmpty(scale: String?, runtime: RuntimeSnapshot): AssetAccount {
+        return scale?.let { bindAssetAccount(it, runtime) } ?: AssetAccount.empty()
     }
 
     private suspend fun updateAssetBalance(
