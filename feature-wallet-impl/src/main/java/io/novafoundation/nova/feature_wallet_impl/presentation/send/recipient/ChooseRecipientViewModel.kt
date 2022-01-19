@@ -16,7 +16,6 @@ import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.utils.requireValue
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAddressModel
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.model.WalletAccount
 import io.novafoundation.nova.feature_wallet_impl.R
 import io.novafoundation.nova.feature_wallet_impl.domain.send.SendInteractor

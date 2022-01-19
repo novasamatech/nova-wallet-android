@@ -13,22 +13,22 @@ typealias AssetTransfersValidation = Validation<AssetTransferPayload, AssetTrans
 sealed class AssetTransferValidationFailure {
 
     sealed class WillRemoveAccount : AssetTransferValidationFailure() {
-        object WillBurnDust: WillRemoveAccount()
+        object WillBurnDust : WillRemoveAccount()
 
-        class WillTransferDust(val dust: BigDecimal): WillRemoveAccount()
+        class WillTransferDust(val dust: BigDecimal) : WillRemoveAccount()
     }
 
-    sealed class DeadRecipient: AssetTransferValidationFailure() {
+    sealed class DeadRecipient : AssetTransferValidationFailure() {
 
         object InUsedAsset : DeadRecipient()
 
-        class InCommissionAsset(val commissionAsset: Chain.Asset): DeadRecipient()
+        class InCommissionAsset(val commissionAsset: Chain.Asset) : DeadRecipient()
     }
 
-    sealed class NotEnoughFunds: AssetTransferValidationFailure() {
-        object InUsedAsset: NotEnoughFunds()
+    sealed class NotEnoughFunds : AssetTransferValidationFailure() {
+        object InUsedAsset : NotEnoughFunds()
 
-        class InCommissionAsset(val commissionAsset: Chain.Asset): NotEnoughFunds()
+        class InCommissionAsset(val commissionAsset: Chain.Asset) : NotEnoughFunds()
     }
 }
 

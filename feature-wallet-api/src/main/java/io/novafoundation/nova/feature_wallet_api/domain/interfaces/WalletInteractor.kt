@@ -7,7 +7,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.OperationsPageChan
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.flow.Flow
 
-
 interface WalletInteractor {
 
     fun assetsFlow(): Flow<List<Asset>>

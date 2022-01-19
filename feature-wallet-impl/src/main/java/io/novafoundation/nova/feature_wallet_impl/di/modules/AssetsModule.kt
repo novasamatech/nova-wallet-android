@@ -15,7 +15,8 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets
     includes = [
         NativeAssetsModule::class,
         StatemineAssetsModule::class
-    ])
+    ]
+)
 class AssetsModule {
 
     @Provides

@@ -7,7 +7,6 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.TransferExtrinsicWithStatus
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.BalanceSource
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.utility.NativeBalanceSource
 import io.novafoundation.nova.runtime.ext.requireStatemine
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -46,7 +45,7 @@ class StatemineBalanceSource(
         val assetAccount = remoteStorage.query(
             chainId = chain.id,
             keyBuilder = { it.metadata.assets().storage("Account").storageKey(it, statemineType.id, accountId) },
-            binding = { scale, runtime->  bindAssetAccountOrEmpty(scale, runtime) }
+            binding = { scale, runtime -> bindAssetAccountOrEmpty(scale, runtime) }
         )
 
         return assetAccount.balance

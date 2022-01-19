@@ -3,14 +3,10 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.asset
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.common.validation.validOrError
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.BalanceSource
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure.*
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidation
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.amountInPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.domain.validation.AmountProducer
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PlanksProducer
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.BalanceSourceProvider
 import java.math.BigInteger
@@ -19,8 +15,8 @@ class DeadRecipientValidation(
     private val balanceSourceProvider: BalanceSourceProvider,
     private val addingAmount: PlanksProducer<AssetTransferPayload>,
     private val assetToCheck: (AssetTransferPayload) -> Asset,
-    private val failure: (AssetTransferPayload) -> DeadRecipient,
-): AssetTransfersValidation {
+    private val failure: (AssetTransferPayload) -> AssetTransferValidationFailure.DeadRecipient,
+) : AssetTransfersValidation {
 
     override suspend fun validate(value: AssetTransferPayload): ValidationStatus<AssetTransferValidationFailure> {
         val chain = value.transfer.chain
@@ -39,7 +35,7 @@ class DeadRecipientValidation(
 
 fun ValidationSystemBuilder<AssetTransferPayload, AssetTransferValidationFailure>.notDeadRecipient(
     balanceSourceProvider: BalanceSourceProvider,
-    failure: (AssetTransferPayload) -> DeadRecipient,
+    failure: (AssetTransferPayload) -> AssetTransferValidationFailure.DeadRecipient,
     assetToCheck: (AssetTransferPayload) -> Asset,
     addingAmount: PlanksProducer<AssetTransferPayload> = { BigInteger.ZERO },
 ) = validate(

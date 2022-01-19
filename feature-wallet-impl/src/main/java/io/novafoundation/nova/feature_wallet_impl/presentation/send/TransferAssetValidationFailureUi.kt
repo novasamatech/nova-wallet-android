@@ -9,7 +9,7 @@ fun mapAssetTransferValidationFailureToUI(
     resourceManager: ResourceManager,
     failure: AssetTransferValidationFailure
 ): TitleAndMessage {
-    return when(failure) {
+    return when (failure) {
         is AssetTransferValidationFailure.DeadRecipient.InCommissionAsset -> {
             resourceManager.getString(R.string.wallet_send_dead_recipient_commission_asset_title) to
                 resourceManager.getString(R.string.wallet_send_dead_recipient_commission_asset_message, failure.commissionAsset.symbol)

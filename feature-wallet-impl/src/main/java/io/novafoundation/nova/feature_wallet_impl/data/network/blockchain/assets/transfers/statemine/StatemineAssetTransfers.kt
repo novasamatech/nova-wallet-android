@@ -6,7 +6,6 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure.*
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfers
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystem
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.amountInPlanks
@@ -15,7 +14,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.doNotCrossExi
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.BalanceSourceProvider
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.statemine.StatemineBalanceSource
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.utility.NativeBalanceSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.notDeadRecipient
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
@@ -34,7 +32,7 @@ class StatemineAssetTransfers(
         sufficientBalance(
             fee = { it.fee },
             available = { it.commissionAsset.transferable },
-            error = { NotEnoughFunds.InCommissionAsset(commissionAsset = it.commissionAsset.token.configuration) }
+            error = { AssetTransferValidationFailure.NotEnoughFunds.InCommissionAsset(commissionAsset = it.commissionAsset.token.configuration) }
         )
 
         // sender has enough balance of used asset to transfer
@@ -42,7 +40,7 @@ class StatemineAssetTransfers(
         sufficientBalance(
             amount = { it.transfer.amount },
             available = { it.usedAsset.transferable },
-            error = { NotEnoughFunds.InUsedAsset }
+            error = { AssetTransferValidationFailure.NotEnoughFunds.InUsedAsset }
         )
 
         // recipient has balance > ED in transferring token
@@ -50,14 +48,14 @@ class StatemineAssetTransfers(
             balanceSourceProvider = balanceSourceProvider,
             assetToCheck = { it.usedAsset },
             addingAmount = { it.transfer.amountInPlanks },
-            failure = { DeadRecipient.InUsedAsset }
+            failure = { AssetTransferValidationFailure.DeadRecipient.InUsedAsset }
         )
 
         // recipient has balance > ED in commission token
         notDeadRecipient(
             balanceSourceProvider = balanceSourceProvider,
             assetToCheck = { it.commissionAsset },
-            failure = { DeadRecipient.InCommissionAsset(commissionAsset = it.commissionAsset.token.configuration) }
+            failure = { AssetTransferValidationFailure.DeadRecipient.InCommissionAsset(commissionAsset = it.commissionAsset.token.configuration) }
         )
 
         // sender wont cross ED
@@ -69,7 +67,7 @@ class StatemineAssetTransfers(
 
                 it.transfer.chainAsset.amountFromPlanks(inPlanks)
             },
-            error = WillRemoveAccount::WillTransferDust
+            error = AssetTransferValidationFailure.WillRemoveAccount::WillTransferDust
         )
     }
 

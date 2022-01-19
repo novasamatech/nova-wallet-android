@@ -161,7 +161,7 @@ class ChooseAmountViewModel(
     private fun autoFixValidationPayload(
         payload: AssetTransferPayload,
         failureReason: AssetTransferValidationFailure
-    ) = when(failureReason) {
+    ) = when (failureReason) {
         is WillRemoveAccount.WillTransferDust -> payload.copy(
             transfer = payload.transfer.copy(
                 amount = payload.transfer.amount + failureReason.dust
