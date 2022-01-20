@@ -5,6 +5,9 @@ import java.net.URL
 
 object Urls {
 
+    const val HTTP_PREFIX = "http://"
+    const val HTTPS_PREFIX = "https://"
+
     /**
      * @return normalized url in a form of protocol://host
      */
@@ -16,6 +19,14 @@ object Urls {
 
     fun isValidWebUrl(url: String): Boolean {
         return Patterns.WEB_URL.matcher(url).matches()
+    }
+
+    fun ensureHttpsProtocol(url: String): String {
+        return when {
+            url.startsWith(HTTPS_PREFIX) -> url
+            url.startsWith(HTTP_PREFIX) -> url.replace(HTTP_PREFIX, HTTPS_PREFIX)
+            else -> "$HTTPS_PREFIX$url"
+        }
     }
 }
 

@@ -55,6 +55,7 @@ class DAppSignExtrinsicFragment : BaseBottomSheetFragment<DAppSignViewModel>() {
         confirmInnerContent.inflateChild(R.layout.bottom_sheet_confirm_sign_extrinsic, attachToRoot = true)
 
         confirmDAppActionAllow.setOnClickListener { viewModel.acceptClicked() }
+        confirmDAppActionAllow.setText(R.string.common_confirm)
         confirmDAppActionReject.setOnClickListener { viewModel.rejectClicked() }
 
         confirmSignExtinsicDetails.setOnClickListener { viewModel.detailsClicked() }
