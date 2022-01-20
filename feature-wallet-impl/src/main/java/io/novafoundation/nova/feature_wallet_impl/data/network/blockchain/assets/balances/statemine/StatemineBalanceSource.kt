@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountIdentifier
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.utils.assets
-import io.novafoundation.nova.common.utils.instanceOf
+import io.novafoundation.nova.common.utils.oneOf
 import io.novafoundation.nova.core.updater.SubscriptionBuilder
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
@@ -140,6 +140,11 @@ class StatemineBalanceSource(
     }
 
     private fun GenericCall.Instance.isTransfer(runtime: RuntimeSnapshot): Boolean {
-        return instanceOf(runtime.metadata.assets().call("transfer"))
+        val assets = runtime.metadata.assets()
+
+        return oneOf(
+            assets.call("transfer"),
+            assets.call("transfer_keep_alive"),
+        )
     }
 }
