@@ -105,7 +105,6 @@ class WalletRepositoryImpl(
 
         val syncingPriceIdsToSymbols = chains.flatMap(Chain::assets)
             .filter { it.priceId != null }
-            .distinctBy { it.priceId + it.symbol }
             .groupBy(
                 keySelector = { it.priceId!! },
                 valueTransform = { it.symbol }
