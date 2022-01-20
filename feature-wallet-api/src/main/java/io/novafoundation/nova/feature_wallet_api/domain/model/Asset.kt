@@ -4,34 +4,46 @@ import java.math.BigInteger
 
 class Asset(
     val token: Token,
+
+    // Non-reserved part of the balance. There may still be restrictions on
+    // this, but it is the total pool what may in principle be transferred,
+    // reserved.
     val freeInPlanks: BigInteger,
+
+    // Balance which is reserved and may not be used at all.
+    // This balance is a 'reserve' balance that different subsystems use in
+    // order to set aside tokens that are still 'owned' by the account
+    // holder, but which are suspendable
     val reservedInPlanks: BigInteger,
-    val miscFrozenInPlanks: BigInteger,
-    val feeFrozenInPlanks: BigInteger,
+
+    /// The amount that `free` may not drop below when withdrawing.
+    val frozenInPlanks: BigInteger,
+
+    // TODO move to runtime storage
     val bondedInPlanks: BigInteger,
     val redeemableInPlanks: BigInteger,
     val unbondingInPlanks: BigInteger
 ) {
-    val free = token.amountFromPlanks(freeInPlanks)
+
+    // Non-reserved plus reserved
+    val totalInPlanks = freeInPlanks + reservedInPlanks
+    // Free without its min threshold, represented by frozen
+    val transferableInPlanks = freeInPlanks - frozenInPlanks
+
+    // balance that cannot be used for transfers (non-transferable) for any reason
+    val lockedInPlanks = totalInPlanks - transferableInPlanks
+
+    // TODO maybe move to extension fields?
+    //  Check affect on performance, if those fields will be recalculated on each usage
+    val total = token.amountFromPlanks(totalInPlanks)
     val reserved = token.amountFromPlanks(reservedInPlanks)
-    val miscFrozen = token.amountFromPlanks(miscFrozenInPlanks)
-    val feeFrozen = token.amountFromPlanks(feeFrozenInPlanks)
+    val locked = token.amountFromPlanks(lockedInPlanks)
+    val transferable = token.amountFromPlanks(transferableInPlanks)
 
-    val locked = miscFrozen.max(feeFrozen)
-    val frozen = locked + reserved
-
-    val total = token.amountFromPlanks(calculateTotalBalance(freeInPlanks, reservedInPlanks))
-
-    val transferable = free - locked
-
+    // TODO move to runtime storage
     val bonded = token.amountFromPlanks(bondedInPlanks)
     val redeemable = token.amountFromPlanks(redeemableInPlanks)
     val unbonding = token.amountFromPlanks(unbondingInPlanks)
 
     val dollarAmount = token.fiatAmount(total)
 }
-
-fun calculateTotalBalance(
-    freeInPlanks: BigInteger,
-    reservedInPlanks: BigInteger
-) = freeInPlanks + reservedInPlanks
