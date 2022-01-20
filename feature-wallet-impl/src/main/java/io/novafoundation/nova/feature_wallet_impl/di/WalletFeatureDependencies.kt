@@ -27,6 +27,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import jp.co.soramitsu.fearless_utils.encrypt.Signer
@@ -99,4 +100,6 @@ interface WalletFeatureDependencies {
     fun selectedAccountUseCase(): SelectedAccountUseCase
 
     fun validationExecutor(): ValidationExecutor
+
+    fun eventsRepository(): EventsRepository
 }

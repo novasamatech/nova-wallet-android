@@ -1,19 +1,28 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.statemine
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
+import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountIdentifier
+import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.utils.assets
+import io.novafoundation.nova.common.utils.instanceOf
 import io.novafoundation.nova.core.updater.SubscriptionBuilder
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.TransferExtrinsicWithStatus
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.BalanceSource
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.TransferExtrinsic
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.filterOwn
+import io.novafoundation.nova.runtime.ext.findAssetByStatemineId
 import io.novafoundation.nova.runtime.ext.requireStatemine
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.status
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
+import jp.co.soramitsu.fearless_utils.runtime.metadata.call
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
 import kotlinx.coroutines.flow.Flow
@@ -24,6 +33,7 @@ import java.math.BigInteger
 class StatemineBalanceSource(
     private val chainRegistry: ChainRegistry,
     private val assetCache: AssetCache,
+    private val eventsRepository: EventsRepository,
     private val remoteStorage: StorageDataSource,
 ) : BalanceSource {
 
@@ -84,9 +94,26 @@ class StatemineBalanceSource(
         chain: Chain,
         blockHash: String,
         accountId: AccountId
-    ): Result<List<TransferExtrinsicWithStatus>> {
-        // TODO statemine realtime transfer history
-        return Result.success(emptyList())
+    ): Result<List<TransferExtrinsic>> = runCatching {
+        val runtime = chainRegistry.getRuntime(chain.id)
+        val extrinsicsWithEvents = eventsRepository.getExtrinsicsWithEvents(chain.id, blockHash)
+
+        extrinsicsWithEvents.filter { it.extrinsic.call.isTransfer(runtime) }
+            .mapNotNull { extrinsicWithEvents ->
+                val extrinsic = extrinsicWithEvents.extrinsic
+                val chainAsset = chain.findAssetByStatemineId(bindNumber(extrinsic.call.arguments["id"]))
+
+                chainAsset?.let {
+                    TransferExtrinsic(
+                        senderId = bindAccountIdentifier(extrinsic.signature!!.accountIdentifier),
+                        recipientId = bindAccountIdentifier(extrinsic.call.arguments["target"]),
+                        amountInPlanks = bindNumber(extrinsic.call.arguments["amount"]),
+                        hash = extrinsicWithEvents.extrinsicHash,
+                        chainAsset = chainAsset,
+                        status = extrinsicWithEvents.status()
+                    )
+                }
+            }.filterOwn(accountId)
     }
 
     private fun bindAssetAccountOrEmpty(scale: String?, runtime: RuntimeSnapshot): AssetAccount {
@@ -110,5 +137,9 @@ class StatemineBalanceSource(
                 freeInPlanks = assetAccount.balance
             )
         }
+    }
+
+    private fun GenericCall.Instance.isTransfer(runtime: RuntimeSnapshot): Boolean {
+        return instanceOf(runtime.metadata.assets().call("transfer"))
     }
 }

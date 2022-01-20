@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.utility.NativeBalanceSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.utility.NativeAssetTransfers
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 
 @Module
 class NativeAssetsModule {
@@ -19,8 +20,9 @@ class NativeAssetsModule {
     fun provideNativeBalanceSource(
         chainRegistry: ChainRegistry,
         assetCache: AssetCache,
+        eventsRepository: EventsRepository,
         substrateRemoteSource: SubstrateRemoteSource,
-    ) = NativeBalanceSource(chainRegistry, assetCache, substrateRemoteSource)
+    ) = NativeBalanceSource(chainRegistry, assetCache, eventsRepository, substrateRemoteSource)
 
     @Provides
     @FeatureScope

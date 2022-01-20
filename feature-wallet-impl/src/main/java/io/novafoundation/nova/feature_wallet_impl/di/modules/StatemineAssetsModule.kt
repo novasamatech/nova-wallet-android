@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.statemine.StatemineAssetTransfers
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
@@ -21,8 +22,9 @@ class StatemineAssetsModule {
     fun provideStatemineBalanceSource(
         chainRegistry: ChainRegistry,
         assetCache: AssetCache,
+        eventsRepository: EventsRepository,
         @Named(REMOTE_STORAGE_SOURCE) remoteStorage: StorageDataSource
-    ) = StatemineBalanceSource(chainRegistry, assetCache, remoteStorage)
+    ) = StatemineBalanceSource(chainRegistry, assetCache, eventsRepository, remoteStorage)
 
     @Provides
     @FeatureScope

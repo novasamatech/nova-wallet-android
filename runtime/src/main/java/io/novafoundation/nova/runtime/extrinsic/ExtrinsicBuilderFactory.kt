@@ -69,7 +69,7 @@ class ExtrinsicBuilderFactory(
             blockHash = mortality.blockHash.fromHex(),
             era = mortality.era,
             multiChainEncryption = multiChainEncryption,
-            customSignedExtensions = CustomSignedExtensions.create(runtime),
+            customSignedExtensions = CustomSignedExtensions.extensionsWithValues(runtime),
             accountIdentifier = AddressInstanceConstructor.constructInstance(runtime.typeRegistry, accountId)
         )
     }
