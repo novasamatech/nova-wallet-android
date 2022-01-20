@@ -4,11 +4,12 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 val ChangeAsset_3_4 = object : Migration(3, 4) {
-    
+
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL("DROP TABLE assets")
-        
-        database.execSQL("""
+
+        database.execSQL(
+            """
             CREATE TABLE IF NOT EXISTS `assets` (
                 `tokenSymbol` TEXT NOT NULL,
                 `chainId` TEXT NOT NULL,
@@ -21,7 +22,8 @@ val ChangeAsset_3_4 = object : Migration(3, 4) {
                 `unbondingInPlanks` TEXT NOT NULL,
                 PRIMARY KEY(`tokenSymbol`, `chainId`, `metaId`)
             )
-        """.trimIndent())
+            """.trimIndent()
+        )
 
         database.execSQL("CREATE INDEX IF NOT EXISTS `index_assets_metaId` ON `assets` (`metaId`)")
     }

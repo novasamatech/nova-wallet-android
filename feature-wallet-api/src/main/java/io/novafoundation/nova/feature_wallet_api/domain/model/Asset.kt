@@ -16,7 +16,7 @@ class Asset(
     // holder, but which are suspendable
     val reservedInPlanks: BigInteger,
 
-    /// The amount that `free` may not drop below when withdrawing.
+    // / The amount that `free` may not drop below when withdrawing.
     val frozenInPlanks: BigInteger,
 
     // TODO move to runtime storage
