@@ -50,7 +50,7 @@ data class Chain(
 
             data class Statemine(val id: BigInteger) : Type()
 
-            data class Orml(val currencyIdScale: String, val currencyIdType: String): Type()
+            data class Orml(val currencyIdScale: String, val currencyIdType: String) : Type()
 
             object Unsupported : Type()
         }

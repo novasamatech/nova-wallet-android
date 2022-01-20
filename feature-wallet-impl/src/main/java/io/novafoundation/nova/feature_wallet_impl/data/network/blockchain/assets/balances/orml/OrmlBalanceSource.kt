@@ -70,7 +70,6 @@ class OrmlBalanceSource(
         )
     }
 
-
     private fun bindOrmlAccountDataOrEmpty(scale: String?, runtime: RuntimeSnapshot): OrmlAccountData {
         return scale?.let { bindOrmlAccountData(it, runtime) } ?: OrmlAccountData.empty()
     }

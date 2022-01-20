@@ -19,7 +19,7 @@ class OrmlAccountData(
 
     companion object {
 
-        fun empty() : OrmlAccountData {
+        fun empty(): OrmlAccountData {
             return OrmlAccountData(
                 free = BigInteger.ZERO,
                 reserved = BigInteger.ZERO,
