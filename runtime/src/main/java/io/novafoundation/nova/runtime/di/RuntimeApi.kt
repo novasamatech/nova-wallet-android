@@ -6,6 +6,7 @@ import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.ChainSyncService
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RuntimeVersionsRepository
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
@@ -44,4 +45,6 @@ interface RuntimeApi {
     fun extrinsicGson(): Gson
 
     fun runtimeVersionsRepository(): RuntimeVersionsRepository
+
+    fun eventsRepository(): EventsRepository
 }

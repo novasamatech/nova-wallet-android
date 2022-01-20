@@ -13,6 +13,7 @@ import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.addressPrefix
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAddress
+import java.math.BigInteger
 
 val Chain.typesUsage: TypesUsage
     get() = when {
@@ -37,6 +38,8 @@ fun Chain.addressOf(accountId: ByteArray): String {
         accountId.toAddress(addressPrefix.toShort())
     }
 }
+
+fun Chain.pairWithAssets(): List<Pair<Chain, Chain.Asset>> = assets.map { asset -> this to asset }
 
 fun Chain.accountIdOf(address: String): ByteArray {
     return if (isEthereumBased) {
@@ -137,3 +140,17 @@ object ChainGeneses {
 
 val Chain.Companion.Geneses
     get() = ChainGeneses
+
+fun Chain.Asset.requireStatemine(): Chain.Asset.Type.Statemine {
+    require(type is Chain.Asset.Type.Statemine)
+
+    return type
+}
+
+fun Chain.findAssetByStatemineId(statemineAssetId: BigInteger): Chain.Asset? {
+    return assets.find {
+        if (it.type !is Chain.Asset.Type.Statemine) return@find false
+
+        it.type.id == statemineAssetId
+    }
+}

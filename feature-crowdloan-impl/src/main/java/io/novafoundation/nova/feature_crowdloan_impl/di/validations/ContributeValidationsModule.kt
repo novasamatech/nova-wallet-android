@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validatio
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.DefaultMinContributionValidation
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.PublicCrowdloanValidation
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
+import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 
 @Module
@@ -51,11 +52,14 @@ class ContributeValidationsModule {
     fun provideExistentialWarningValidation(
         walletConstants: WalletConstants,
     ) = ContributeExistentialDepositValidation(
-        walletConstants = walletConstants,
         totalBalanceProducer = { it.asset.total },
         feeProducer = { it.fee },
         extraAmountProducer = { it.contributionAmount },
-        tokenProducer = { it.asset.token },
+        existentialDeposit = {
+            val inPlanks = walletConstants.existentialDeposit(it.asset.token.configuration.chainId)
+
+            it.asset.token.amountFromPlanks(inPlanks)
+        },
         errorProducer = { ContributeValidationFailure.ExistentialDepositCrossed },
     )
 

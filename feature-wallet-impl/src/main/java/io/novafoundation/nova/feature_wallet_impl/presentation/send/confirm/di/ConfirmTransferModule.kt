@@ -10,15 +10,16 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletInteractor
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_impl.domain.send.SendInteractor
 import io.novafoundation.nova.feature_wallet_impl.presentation.WalletRouter
 import io.novafoundation.nova.feature_wallet_impl.presentation.send.TransferDraft
-import io.novafoundation.nova.feature_wallet_impl.presentation.send.TransferValidityChecks
 import io.novafoundation.nova.feature_wallet_impl.presentation.send.confirm.ConfirmTransferViewModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -30,10 +31,11 @@ class ConfirmTransferModule {
     @ViewModelKey(ConfirmTransferViewModel::class)
     fun provideViewModel(
         interactor: WalletInteractor,
+        sendInteractor: SendInteractor,
+        validationExecutor: ValidationExecutor,
         router: WalletRouter,
         addressIconGenerator: AddressIconGenerator,
         externalActions: ExternalActions.Presentation,
-        transferValidityChecks: TransferValidityChecks.Presentation,
         selectedAccountUseCase: SelectedAccountUseCase,
         addressDisplayUseCase: AddressDisplayUseCase,
         feeLoaderMixinFactory: FeeLoaderMixin.Factory,
@@ -44,14 +46,15 @@ class ConfirmTransferModule {
     ): ViewModel {
         return ConfirmTransferViewModel(
             interactor,
+            sendInteractor,
             router,
             addressIconGenerator,
             externalActions,
-            transferValidityChecks,
             chainRegistry,
             selectedAccountUseCase,
             addressDisplayUseCase,
             resourceManager,
+            validationExecutor,
             feeLoaderMixinFactory,
             amountChooserMixinFactory,
             transferDraft

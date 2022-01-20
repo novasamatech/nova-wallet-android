@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.QrCodeGenerator
+import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.core_db.dao.AssetDao
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.dao.PhishingAddressDao
@@ -26,6 +27,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import jp.co.soramitsu.fearless_utils.encrypt.Signer
@@ -96,4 +98,8 @@ interface WalletFeatureDependencies {
     fun imageLoader(): ImageLoader
 
     fun selectedAccountUseCase(): SelectedAccountUseCase
+
+    fun validationExecutor(): ValidationExecutor
+
+    fun eventsRepository(): EventsRepository
 }
