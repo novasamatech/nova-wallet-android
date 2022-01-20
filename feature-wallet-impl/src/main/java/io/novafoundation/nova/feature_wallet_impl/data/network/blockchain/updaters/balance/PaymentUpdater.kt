@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updat
 
 import android.util.Log
 import io.novafoundation.nova.common.utils.LOG_TAG
-import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.core.updater.SubscriptionBuilder
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.core_db.dao.OperationDao
@@ -44,7 +43,7 @@ class PaymentUpdater(
     private val chain: Chain,
 ) : Updater {
 
-    override val requiredModules: List<String> = listOf(Modules.SYSTEM)
+    override val requiredModules: List<String> = emptyList()
 
     override suspend fun listenForUpdates(storageSubscriptionBuilder: SubscriptionBuilder): Flow<Updater.SideEffect> {
         val metaAccount = scope.getAccount()
