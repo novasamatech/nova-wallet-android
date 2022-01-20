@@ -1,5 +1,7 @@
-package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.balance.source
+package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances
 
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.utility.NativeBalanceSource
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.statemine.StatemineBalanceSource
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 class BalanceSourceProvider(

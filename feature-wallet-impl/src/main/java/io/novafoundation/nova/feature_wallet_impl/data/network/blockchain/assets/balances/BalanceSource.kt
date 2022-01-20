@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.balance.source
+package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.core.updater.SubscriptionBuilder
@@ -7,25 +7,32 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.Transf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
+import java.math.BigInteger
 
-class UnsupportedBalanceSource : BalanceSource {
+interface BalanceSource {
 
-    override suspend fun startSyncingBalance(
+    suspend fun existentialDeposit(
+        chain: Chain,
+        chainAsset: Chain.Asset
+    ): BigInteger
+
+    suspend fun queryTotalBalance(
+        chain: Chain,
+        chainAsset: Chain.Asset,
+        accountId: AccountId
+    ): BigInteger
+
+    suspend fun startSyncingBalance(
         chain: Chain,
         chainAsset: Chain.Asset,
         metaAccount: MetaAccount,
         accountId: AccountId,
         subscriptionBuilder: SubscriptionBuilder
-    ): Flow<BlockHash> {
-        return emptyFlow()
-    }
+    ): Flow<BlockHash>
 
-    override suspend fun fetchOperationsForBalanceChange(
+    suspend fun fetchOperationsForBalanceChange(
         chain: Chain,
         blockHash: String,
         accountId: AccountId
-    ): Result<List<TransferExtrinsicWithStatus>> {
-        return Result.success(emptyList())
-    }
+    ): Result<List<TransferExtrinsicWithStatus>>
 }

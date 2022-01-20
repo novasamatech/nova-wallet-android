@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.setAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
@@ -15,14 +16,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFee
 import io.novafoundation.nova.feature_wallet_impl.R
 import io.novafoundation.nova.feature_wallet_impl.di.WalletFeatureComponent
 import io.novafoundation.nova.feature_wallet_impl.presentation.AssetPayload
-import io.novafoundation.nova.feature_wallet_impl.presentation.send.observeTransferChecks
-import io.novafoundation.nova.feature_wallet_impl.presentation.send.phishing.observePhishingCheck
-import kotlinx.android.synthetic.main.fragment_choose_amount.chooseAmountContainer
-import kotlinx.android.synthetic.main.fragment_choose_amount.chooseAmountFee
-import kotlinx.android.synthetic.main.fragment_choose_amount.chooseAmountInput
-import kotlinx.android.synthetic.main.fragment_choose_amount.chooseAmountNext
-import kotlinx.android.synthetic.main.fragment_choose_amount.chooseAmountRecipientView
-import kotlinx.android.synthetic.main.fragment_choose_amount.chooseAmountToolbar
+import kotlinx.android.synthetic.main.fragment_choose_amount.*
 import javax.inject.Inject
 
 private const val KEY_ADDRESS = "KEY_ADDRESS"
@@ -38,7 +32,8 @@ class ChooseAmountFragment : BaseFragment<ChooseAmountViewModel>() {
         }
     }
 
-    @Inject lateinit var imageLoader: ImageLoader
+    @Inject
+    lateinit var imageLoader: ImageLoader
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -69,8 +64,7 @@ class ChooseAmountFragment : BaseFragment<ChooseAmountViewModel>() {
     }
 
     override fun subscribe(viewModel: ChooseAmountViewModel) {
-        observeTransferChecks(viewModel, viewModel::warningConfirmed)
-        observePhishingCheck(viewModel)
+        observeValidations(viewModel)
         setupExternalActions(viewModel)
         setupFeeLoading(viewModel, chooseAmountFee)
         setupAmountChooser(viewModel, chooseAmountInput)

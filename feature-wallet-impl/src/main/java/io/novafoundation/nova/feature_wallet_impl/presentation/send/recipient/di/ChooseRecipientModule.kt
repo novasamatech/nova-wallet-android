@@ -11,7 +11,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletInteractor
+import io.novafoundation.nova.feature_wallet_impl.domain.send.SendInteractor
 import io.novafoundation.nova.feature_wallet_impl.presentation.AssetPayload
 import io.novafoundation.nova.feature_wallet_impl.presentation.WalletRouter
 import io.novafoundation.nova.feature_wallet_impl.presentation.send.phishing.warning.api.PhishingWarningMixin
@@ -24,7 +24,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 class ChooseRecipientModule {
 
     @Provides
-    fun providePhishingAddressMixin(interactor: WalletInteractor): PhishingWarningMixin {
+    fun providePhishingAddressMixin(interactor: SendInteractor): PhishingWarningMixin {
         return PhishingWarningProvider(interactor)
     }
 
@@ -32,7 +32,7 @@ class ChooseRecipientModule {
     @IntoMap
     @ViewModelKey(ChooseRecipientViewModel::class)
     fun provideViewModel(
-        interactor: WalletInteractor,
+        sendInteractor: SendInteractor,
         router: WalletRouter,
         resourceManager: ResourceManager,
         addressIconGenerator: AddressIconGenerator,
@@ -42,7 +42,7 @@ class ChooseRecipientModule {
         phishingWarning: PhishingWarningMixin
     ): ViewModel {
         return ChooseRecipientViewModel(
-            interactor,
+            sendInteractor,
             router,
             resourceManager,
             addressIconGenerator,

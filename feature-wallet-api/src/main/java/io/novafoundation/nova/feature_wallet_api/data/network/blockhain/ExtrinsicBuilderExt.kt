@@ -5,7 +5,7 @@ import jp.co.soramitsu.fearless_utils.runtime.definitions.types.instances.Addres
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import java.math.BigInteger
 
-fun ExtrinsicBuilder.transfer(accountId: AccountId, amount: BigInteger, keepAlive: Boolean = false): ExtrinsicBuilder {
+fun ExtrinsicBuilder.nativeTransfer(accountId: AccountId, amount: BigInteger, keepAlive: Boolean = false): ExtrinsicBuilder {
     val callName = if (keepAlive) "transfer_keep_alive" else "transfer"
 
     return call(

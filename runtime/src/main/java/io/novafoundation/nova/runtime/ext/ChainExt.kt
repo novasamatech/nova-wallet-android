@@ -139,3 +139,9 @@ object ChainGeneses {
 
 val Chain.Companion.Geneses
     get() = ChainGeneses
+
+fun Chain.Asset.requireStatemine(): Chain.Asset.Type.Statemine {
+    require(type is Chain.Asset.Type.Statemine)
+
+    return type
+}
