@@ -105,8 +105,8 @@ class WalletRepositoryImpl(
 
         val syncingPriceIdsToSymbols = chains.flatMap(Chain::assets)
             .filter { it.priceId != null }
-            .distinctBy { it.priceId }
-            .associateBy(
+            .distinctBy { it.priceId + it.symbol }
+            .groupBy(
                 keySelector = { it.priceId!! },
                 valueTransform = { it.symbol }
             )
@@ -114,10 +114,12 @@ class WalletRepositoryImpl(
         if (syncingPriceIdsToSymbols.isNotEmpty()) {
             val priceStats = getAssetPriceCoingecko(syncingPriceIdsToSymbols.keys)
 
-            val updatedTokens = priceStats.mapNotNull { (priceId, tokenStats) ->
-                syncingPriceIdsToSymbols[priceId]?.let { symbol ->
-                    TokenLocal(symbol, tokenStats.price, tokenStats.rateChange)
-                }
+            val updatedTokens = priceStats.flatMap { (priceId, tokenStats) ->
+                syncingPriceIdsToSymbols[priceId]?.let { symbols ->
+                    symbols.map { symbol ->
+                        TokenLocal(symbol, tokenStats.price, tokenStats.rateChange)
+                    }
+                } ?: emptyList()
             }
 
             assetCache.insertTokens(updatedTokens)

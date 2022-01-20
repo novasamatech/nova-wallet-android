@@ -147,6 +147,12 @@ fun Chain.Asset.requireStatemine(): Chain.Asset.Type.Statemine {
     return type
 }
 
+fun Chain.Asset.requireOrml(): Chain.Asset.Type.Orml {
+    require(type is Chain.Asset.Type.Orml)
+
+    return type
+}
+
 fun Chain.findAssetByStatemineId(statemineAssetId: BigInteger): Chain.Asset? {
     return assets.find {
         if (it.type !is Chain.Asset.Type.Statemine) return@find false
