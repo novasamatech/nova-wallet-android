@@ -123,7 +123,7 @@ class DappSignExtrinsicInteractor(
                 ),
                 genesisHash = genesisHash,
                 multiChainEncryption = metaAccount.multiChainEncryptionIn(chain),
-                customSignedExtensions = CustomSignedExtensions.create(runtime),
+                customSignedExtensions = CustomSignedExtensions.extensionsWithValues(runtime),
                 accountIdentifier = AddressInstanceConstructor.constructInstance(runtime.typeRegistry, accountId),
                 blockHash = blockHash,
                 era = era,

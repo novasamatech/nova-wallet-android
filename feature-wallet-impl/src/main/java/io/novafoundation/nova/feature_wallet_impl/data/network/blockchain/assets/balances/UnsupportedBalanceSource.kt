@@ -3,12 +3,10 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.asset
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.core.updater.SubscriptionBuilder
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.TransferExtrinsicWithStatus
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
-import java.lang.UnsupportedOperationException
 import java.math.BigInteger
 
 class UnsupportedBalanceSource : BalanceSource {
@@ -35,7 +33,7 @@ class UnsupportedBalanceSource : BalanceSource {
         chain: Chain,
         blockHash: String,
         accountId: AccountId
-    ): Result<List<TransferExtrinsicWithStatus>> {
+    ): Result<List<TransferExtrinsic>> {
         return Result.success(emptyList())
     }
 }

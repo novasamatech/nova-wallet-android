@@ -2,6 +2,8 @@ package io.novafoundation.nova.runtime.extrinsic
 
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Extrinsic
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.create
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.SignedExtension
 import java.math.BigInteger
 
@@ -24,8 +26,16 @@ object CustomSignedExtensions {
         abstract fun createPayload(): Any?
     }
 
-    fun create(runtime: RuntimeSnapshot): List<SignedExtension> {
+    fun extensions(runtime: RuntimeSnapshot): List<SignedExtension> {
         return CustomExtension.values().mapNotNull { constructSignedExtra(runtime, it) }
+    }
+
+    fun extensionsWithValues(runtime: RuntimeSnapshot): Map<SignedExtension, Any?> {
+        return CustomExtension.values().mapNotNull { customExtension ->
+            constructSignedExtra(runtime, customExtension)?.let { signedExtension ->
+                signedExtension to customExtension.createPayload()
+            }
+        }.toMap()
     }
 
     private fun constructSignedExtra(
@@ -33,7 +43,9 @@ object CustomSignedExtensions {
         customExtension: CustomExtension,
     ): SignedExtension? {
         return runtime.typeRegistry[customExtension.typeName]?.let { signedExtraType ->
-            SignedExtension(customExtension.extensionName, signedExtraType, customExtension.createPayload())
+            SignedExtension(customExtension.extensionName, signedExtraType)
         }
     }
 }
+
+fun Extrinsic.Companion.create(runtime: RuntimeSnapshot) = Extrinsic.create(CustomSignedExtensions.extensions(runtime))

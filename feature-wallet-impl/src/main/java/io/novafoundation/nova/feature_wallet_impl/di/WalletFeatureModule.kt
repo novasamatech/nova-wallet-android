@@ -12,7 +12,6 @@ import io.novafoundation.nova.core_db.dao.AssetDao
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.dao.PhishingAddressDao
 import io.novafoundation.nova.core_db.dao.TokenDao
-import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
@@ -47,7 +46,6 @@ import io.novafoundation.nova.feature_wallet_impl.presentation.balance.assetActi
 import io.novafoundation.nova.feature_wallet_impl.presentation.transaction.filter.HistoryFiltersProvider
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
@@ -89,13 +87,9 @@ class WalletFeatureModule {
     @Provides
     @FeatureScope
     fun provideSubstrateSource(
-        rpcCalls: RpcCalls,
         @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
-        extrinsicService: ExtrinsicService,
     ): SubstrateRemoteSource = WssSubstrateSource(
-        rpcCalls,
         remoteStorageSource,
-        extrinsicService
     )
 
     @Provides
