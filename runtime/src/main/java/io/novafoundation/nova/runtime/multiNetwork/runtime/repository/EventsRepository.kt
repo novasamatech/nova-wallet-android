@@ -19,8 +19,6 @@ import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Generic
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
 
-
-
 interface EventsRepository {
 
     /**
@@ -40,7 +38,7 @@ class RemoteEventsRepository(
     private val rpcCalls: RpcCalls,
     private val chainRegistry: ChainRegistry,
     private val remoteStorageSource: StorageDataSource
-): EventsRepository {
+) : EventsRepository {
 
     override suspend fun getEventsInBlock(chainId: ChainId, blockHash: BlockHash?): List<EventRecord> {
         return remoteStorageSource.queryNonNull(
