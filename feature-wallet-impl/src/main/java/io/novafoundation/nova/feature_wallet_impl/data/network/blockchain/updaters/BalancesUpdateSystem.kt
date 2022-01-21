@@ -33,26 +33,26 @@ class BalancesUpdateSystem(
             val chains = chainRegistry.currentChains.first()
 
             val mergedFlow = chains.map { chain ->
-                    flow {
-                        val updater = paymentUpdaterFactory.create(chain)
-                        val socket = chainRegistry.getSocket(chain.id)
+                flow {
+                    val updater = paymentUpdaterFactory.create(chain)
+                    val socket = chainRegistry.getSocket(chain.id)
 
-                        val subscriptionBuilder = StorageSubscriptionBuilder.create(socket)
+                    val subscriptionBuilder = StorageSubscriptionBuilder.create(socket)
 
-                        kotlin.runCatching {
-                            updater.listenForUpdates(subscriptionBuilder)
-                                .catch { logError(chain, it) }
-                        }.onSuccess { updaterFlow ->
-                            val cancellable = socket.subscribeUsing(subscriptionBuilder.build())
+                    kotlin.runCatching {
+                        updater.listenForUpdates(subscriptionBuilder)
+                            .catch { logError(chain, it) }
+                    }.onSuccess { updaterFlow ->
+                        val cancellable = socket.subscribeUsing(subscriptionBuilder.build())
 
-                            updaterFlow.onCompletion { cancellable.cancel() }
+                        updaterFlow.onCompletion { cancellable.cancel() }
 
-                            emitAll(updaterFlow)
-                        }.onFailure {
-                            logError(chain, it)
-                        }
+                        emitAll(updaterFlow)
+                    }.onFailure {
+                        logError(chain, it)
                     }
-                }.merge()
+                }
+            }.merge()
 
             mergedFlow
         }.flowOn(Dispatchers.Default)
