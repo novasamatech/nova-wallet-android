@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.statemine.StatemineBalanceSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.utility.NativeBalanceSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.AssetTransfersProvider
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.orml.OrmlAssetTransfers
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.statemine.StatemineAssetTransfers
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.utility.NativeAssetTransfers
 
@@ -39,5 +40,6 @@ class AssetsModule {
     fun provideAssetTransfersProvider(
         nativeAssetTransfers: NativeAssetTransfers,
         statemineAssetTransfers: StatemineAssetTransfers,
-    ) = AssetTransfersProvider(nativeAssetTransfers, statemineAssetTransfers)
+        ormlAssetTransfers: OrmlAssetTransfers,
+    ) = AssetTransfersProvider(nativeAssetTransfers, statemineAssetTransfers, ormlAssetTransfers)
 }

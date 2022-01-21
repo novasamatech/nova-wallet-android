@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletInteractor
+import io.novafoundation.nova.feature_wallet_impl.domain.send.SendInteractor
 import io.novafoundation.nova.feature_wallet_impl.presentation.AssetPayload
 import io.novafoundation.nova.feature_wallet_impl.presentation.WalletRouter
 import io.novafoundation.nova.feature_wallet_impl.presentation.balance.assetActions.buy.BuyMixin
@@ -55,12 +56,13 @@ class BalanceDetailModule {
     @ViewModelKey(BalanceDetailViewModel::class)
     fun provideViewModel(
         interactor: WalletInteractor,
+        sendInteractor: SendInteractor,
         router: WalletRouter,
         transactionHistoryMixin: TransactionHistoryMixin,
         buyMixin: BuyMixin.Presentation,
         assetPayload: AssetPayload
     ): ViewModel {
-        return BalanceDetailViewModel(interactor, router, assetPayload, buyMixin, transactionHistoryMixin)
+        return BalanceDetailViewModel(interactor, sendInteractor, router, assetPayload, buyMixin, transactionHistoryMixin)
     }
 
     @Provides

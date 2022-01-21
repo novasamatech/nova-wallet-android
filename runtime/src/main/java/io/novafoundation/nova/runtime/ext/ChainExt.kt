@@ -10,6 +10,8 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ExplorerTemplateE
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.TypesUsage
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
+import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHex
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.addressPrefix
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAddress
@@ -149,6 +151,15 @@ fun Chain.Asset.requireOrml(): Chain.Asset.Type.Orml {
     require(type is Chain.Asset.Type.Orml)
 
     return type
+}
+
+fun Chain.Asset.ormlCurrencyId(runtime: RuntimeSnapshot): Any? {
+    val ormlType = requireOrml()
+
+    val currencyIdType = runtime.typeRegistry[ormlType.currencyIdType]
+        ?: error("Cannot find type $ormlType.currencyIdType")
+
+    return currencyIdType.fromHex(runtime, ormlType.currencyIdScale)
 }
 
 fun Chain.findAssetByStatemineId(statemineAssetId: BigInteger): Chain.Asset? {

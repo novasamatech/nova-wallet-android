@@ -80,6 +80,8 @@ class SendInteractor(
 
     fun validationSystemFor(asset: Chain.Asset) = assetTransfersProvider.provideFor(asset).validationSystem
 
+    suspend fun areTransfersEnabled(asset: Chain.Asset) = assetTransfersProvider.provideFor(asset).areTransfersEnabled(asset)
+
     private fun getAssetTransfers(transfer: AssetTransfer) =
         assetTransfersProvider.provideFor(transfer.chainAsset)
 }

@@ -27,8 +27,8 @@ class NativeAssetsModule {
     @Provides
     @FeatureScope
     fun provideNativeAssetTransfers(
-        nativeBalanceSource: NativeBalanceSource,
+        chainRegistry: ChainRegistry,
         balanceSourceProvider: BalanceSourceProvider,
         extrinsicService: ExtrinsicService
-    ) = NativeAssetTransfers(nativeBalanceSource, balanceSourceProvider, extrinsicService)
+    ) = NativeAssetTransfers(chainRegistry, balanceSourceProvider, extrinsicService)
 }

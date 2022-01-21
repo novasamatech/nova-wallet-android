@@ -21,4 +21,6 @@ interface AssetTransfers {
     suspend fun calculateFee(transfer: AssetTransfer): BigInteger
 
     suspend fun performTransfer(transfer: AssetTransfer): Result<String>
+
+    suspend fun areTransfersEnabled(chainAsset: Chain.Asset): Boolean
 }
