@@ -11,6 +11,12 @@
         <item name="android:textSize">20sp</item>
     </style>
 
+    <style name="TextAppearance.NovaFoundation.SemiBold.Caps">
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:letterSpacing">0.06</item>
+    </style>
+
     <!-- Bold -->
 
     <style name="TextAppearance.NovaFoundation.Bold" parent="TextAppearance.AppCompat.Title">
