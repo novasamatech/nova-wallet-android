@@ -60,7 +60,7 @@ class NativeBalanceSource(
         metaAccount: MetaAccount,
         accountId: AccountId,
         subscriptionBuilder: SubscriptionBuilder
-    ): Flow<BlockHash> {
+    ): Flow<BlockHash?> {
         val runtime = chainRegistry.getRuntime(chain.id)
 
         val key = try {
@@ -73,13 +73,10 @@ class NativeBalanceSource(
 
         return subscriptionBuilder.subscribe(key)
             .map { change ->
-                runCatching { bindAccountInfoOrDefault(change.value, runtime) }
-                    .onFailure { Log.e(LOG_TAG, "Failed to update balance in ${chain.name}") }
-                    .onSuccess {
-                        assetCache.updateAsset(metaAccount.id, chain.utilityAsset, it)
-                    }
+                val accountInfo = bindAccountInfoOrDefault(change.value, runtime)
+                val assetChanged = assetCache.updateAsset(metaAccount.id, chain.utilityAsset, accountInfo)
 
-                change.block
+                change.block.takeIf { assetChanged }
             }
     }
 

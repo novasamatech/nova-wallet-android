@@ -39,7 +39,7 @@ class OrmlBalanceSource(
         metaAccount: MetaAccount,
         accountId: AccountId,
         subscriptionBuilder: SubscriptionBuilder
-    ): Flow<BlockHash> {
+    ): Flow<BlockHash?> {
         val runtime = chainRegistry.getRuntime(chain.id)
 
         val key = runtime.metadata.tokens().storage("Accounts").storageKey(runtime, accountId, chainAsset.currencyId(runtime))
@@ -48,9 +48,9 @@ class OrmlBalanceSource(
             .map {
                 val ormlAccountData = bindOrmlAccountDataOrEmpty(it.value, runtime)
 
-                updateAssetBalance(metaAccount.id, chainAsset, ormlAccountData)
+                val assetChanged = updateAssetBalance(metaAccount.id, chainAsset, ormlAccountData)
 
-                it.block
+                it.block.takeIf { assetChanged }
             }
     }
 

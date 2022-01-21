@@ -67,7 +67,7 @@ class StatemineBalanceSource(
         metaAccount: MetaAccount,
         accountId: AccountId,
         subscriptionBuilder: SubscriptionBuilder
-    ): Flow<BlockHash> {
+    ): Flow<BlockHash?> {
         val statemineType = chainAsset.requireStatemine()
 
         val runtime = chainRegistry.getRuntime(chain.id)
@@ -83,10 +83,9 @@ class StatemineBalanceSource(
             isFrozenFlow
         ) { balanceStorageChange, isAssetFrozen ->
             val assetAccount = bindAssetAccountOrEmpty(balanceStorageChange.value, runtime)
+            val assetChanged = updateAssetBalance(metaAccount.id, chainAsset, isAssetFrozen, assetAccount)
 
-            updateAssetBalance(metaAccount.id, chainAsset, isAssetFrozen, assetAccount)
-
-            balanceStorageChange.block
+            balanceStorageChange.block.takeIf { assetChanged }
         }
     }
 

@@ -17,6 +17,7 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.ExtrinsicS
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 
@@ -55,6 +56,8 @@ class PaymentUpdater(
 
             balanceSource
                 .startSyncingBalance(chain, chainAsset, metaAccount, accountId, storageSubscriptionBuilder)
+                .filterNotNull()
+                .onEach { Log.d(LOG_TAG, "Starting block fetching for ${chain.name}.${chainAsset.name}") }
                 .onEach { blockHash -> balanceSource.fetchTransfers(chainAsset, blockHash, accountId) }
         }
 
