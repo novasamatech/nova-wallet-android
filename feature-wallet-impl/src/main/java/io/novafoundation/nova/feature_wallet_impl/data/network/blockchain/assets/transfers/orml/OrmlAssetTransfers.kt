@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.BalanceSourceProvider
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.BaseAssetTransfers
 import io.novafoundation.nova.runtime.ext.ormlCurrencyId
+import io.novafoundation.nova.runtime.ext.requireOrml
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
@@ -30,7 +31,12 @@ class OrmlAssetTransfers(
         )
     }
 
-    override val transferFunction: Pair<String, String> = Modules.TOKENS to "transfer"
+    override val transferFunction: Pair<String, String> = Modules.CURRENCIES to "transfer"
+
+    override suspend fun areTransfersEnabled(chainAsset: Chain.Asset): Boolean {
+        // flag from chains json AND existence of module & function in runtime metadata
+        return chainAsset.requireOrml().transfersEnabled && super.areTransfersEnabled(chainAsset)
+    }
 
     override val validationSystem: AssetTransfersValidationSystem = defaultValidationSystem(
         removeAccountBehavior = { WillRemoveAccount.WillBurnDust }
@@ -42,7 +48,7 @@ class OrmlAssetTransfers(
         amount: BigInteger
     ) {
         call(
-            moduleName = Modules.TOKENS,
+            moduleName = Modules.CURRENCIES,
             callName = "transfer",
             arguments = mapOf(
                 "dest" to AddressInstanceConstructor.constructInstance(runtime.typeRegistry, target),

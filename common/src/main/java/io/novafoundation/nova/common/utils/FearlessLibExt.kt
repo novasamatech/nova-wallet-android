@@ -157,4 +157,5 @@ object Modules {
 
     const val ASSETS = "Assets"
     const val TOKENS = "Tokens"
+    const val CURRENCIES = "Currencies"
 }

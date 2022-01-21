@@ -66,29 +66,33 @@ private const val STATEMINE_EXTRAS_ID = "assetId"
 
 private const val ORML_EXTRAS_CURRENCY_ID_SCALE = "currencyIdScale"
 private const val ORML_EXTRAS_CURRENCY_TYPE = "currencyIdType"
+private const val ORML_EXTRAS_EXISTENTIAL_DEPOSIT = "existentialDeposit"
+private const val ORML_EXTRAS_TRANSFERS_ENABLED = "transfersEnabled"
 
-private fun mapChainAssetTypeFromRaw(type: String?, typeExtras: Map<String, Any?>?): Chain.Asset.Type = when (type) {
-    null, ASSET_NATIVE -> Chain.Asset.Type.Native
-    ASSET_STATEMINE -> {
-        val id = typeExtras?.get(STATEMINE_EXTRAS_ID)?.asGsonParsedNumber()
+private const val ORML_TRANSFERS_ENABLED_DEFAULT = true
 
-        if (id != null) {
-            Chain.Asset.Type.Statemine(id)
-        } else {
-            Chain.Asset.Type.Unsupported
+private inline fun unsupportedOnError(creator: () -> Chain.Asset.Type): Chain.Asset.Type {
+    return runCatching(creator).getOrDefault(Chain.Asset.Type.Unsupported)
+}
+
+private fun mapChainAssetTypeFromRaw(type: String?, typeExtras: Map<String, Any?>?): Chain.Asset.Type = unsupportedOnError {
+    when (type) {
+        null, ASSET_NATIVE -> Chain.Asset.Type.Native
+        ASSET_STATEMINE -> {
+            val id = typeExtras?.get(STATEMINE_EXTRAS_ID)?.asGsonParsedNumber()
+
+            Chain.Asset.Type.Statemine(id!!)
         }
-    }
-    ASSET_ORML -> {
-        val currencyIdScale = typeExtras?.get(ORML_EXTRAS_CURRENCY_ID_SCALE) as? String
-        val currencyIdType = typeExtras?.get(ORML_EXTRAS_CURRENCY_TYPE) as? String
-
-        if (currencyIdScale != null && currencyIdType != null) {
-            Chain.Asset.Type.Orml(currencyIdScale, currencyIdType)
-        } else {
-            Chain.Asset.Type.Unsupported
+        ASSET_ORML -> {
+            Chain.Asset.Type.Orml(
+                currencyIdScale = typeExtras!![ORML_EXTRAS_CURRENCY_ID_SCALE] as String,
+                currencyIdType = typeExtras[ORML_EXTRAS_CURRENCY_TYPE] as String,
+                existentialDeposit = (typeExtras[ORML_EXTRAS_EXISTENTIAL_DEPOSIT] as String).toBigInteger(),
+                transfersEnabled = typeExtras[ORML_EXTRAS_TRANSFERS_ENABLED] as Boolean? ?: ORML_TRANSFERS_ENABLED_DEFAULT,
+            )
         }
+        else -> Chain.Asset.Type.Unsupported
     }
-    else -> Chain.Asset.Type.Unsupported
 }
 
 private fun mapChainAssetTypeToRaw(type: Chain.Asset.Type): Pair<String, Map<String, Any?>?> = when (type) {
@@ -98,7 +102,9 @@ private fun mapChainAssetTypeToRaw(type: Chain.Asset.Type): Pair<String, Map<Str
     )
     is Chain.Asset.Type.Orml -> ASSET_ORML to mapOf(
         ORML_EXTRAS_CURRENCY_ID_SCALE to type.currencyIdScale,
-        ORML_EXTRAS_CURRENCY_TYPE to type.currencyIdType
+        ORML_EXTRAS_CURRENCY_TYPE to type.currencyIdType,
+        ORML_EXTRAS_EXISTENTIAL_DEPOSIT to type.existentialDeposit.toString(),
+        ORML_EXTRAS_TRANSFERS_ENABLED to type.transfersEnabled
     )
     Chain.Asset.Type.Unsupported -> ASSET_UNSUPPORTED to null
 }
