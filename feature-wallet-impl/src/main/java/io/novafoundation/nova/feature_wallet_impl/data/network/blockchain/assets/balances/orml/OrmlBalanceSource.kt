@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.filterOwn
 import io.novafoundation.nova.runtime.ext.findAssetByOrmlCurrencyId
 import io.novafoundation.nova.runtime.ext.ormlCurrencyId
+import io.novafoundation.nova.runtime.ext.requireOrml
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
@@ -38,7 +39,7 @@ class OrmlBalanceSource(
 ) : BalanceSource {
 
     override suspend fun existentialDeposit(chain: Chain, chainAsset: Chain.Asset): BigInteger {
-        return BigInteger.ZERO // TODO
+        return chainAsset.requireOrml().existentialDeposit
     }
 
     override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {
