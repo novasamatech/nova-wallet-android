@@ -126,17 +126,16 @@ class StatemineBalanceSource(
         isAssetFrozen: Boolean,
         assetAccount: AssetAccount
     ) = assetCache.updateAsset(metaId, chainAsset) {
-        if (isAssetFrozen || assetAccount.isFrozen) {
-            it.copy(
-                miscFrozenInPlanks = assetAccount.balance,
-                freeInPlanks = BigInteger.ZERO
-            )
+        val frozenBalance = if (isAssetFrozen || assetAccount.isFrozen) {
+            assetAccount.balance
         } else {
-            it.copy(
-                miscFrozenInPlanks = BigInteger.ZERO,
-                freeInPlanks = assetAccount.balance
-            )
+            BigInteger.ZERO
         }
+
+        it.copy(
+            frozenInPlanks = frozenBalance,
+            freeInPlanks = assetAccount.balance
+        )
     }
 
     private fun GenericCall.Instance.isTransfer(runtime: RuntimeSnapshot): Boolean {

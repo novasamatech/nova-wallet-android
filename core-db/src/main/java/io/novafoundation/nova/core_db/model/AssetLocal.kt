@@ -12,10 +12,12 @@ data class AssetLocal(
     val tokenSymbol: String,
     val chainId: String,
     @ColumnInfo(index = true) val metaId: Long,
+
     val freeInPlanks: BigInteger,
+    val frozenInPlanks: BigInteger,
     val reservedInPlanks: BigInteger,
-    val miscFrozenInPlanks: BigInteger,
-    val feeFrozenInPlanks: BigInteger,
+
+    // TODO move to runtime storage
     val bondedInPlanks: BigInteger,
     val redeemableInPlanks: BigInteger,
     val unbondingInPlanks: BigInteger,
@@ -31,8 +33,7 @@ data class AssetLocal(
             metaId = metaId,
             freeInPlanks = BigInteger.ZERO,
             reservedInPlanks = BigInteger.ZERO,
-            miscFrozenInPlanks = BigInteger.ZERO,
-            feeFrozenInPlanks = BigInteger.ZERO,
+            frozenInPlanks = BigInteger.ZERO,
             bondedInPlanks = BigInteger.ZERO,
             redeemableInPlanks = BigInteger.ZERO,
             unbondingInPlanks = BigInteger.ZERO

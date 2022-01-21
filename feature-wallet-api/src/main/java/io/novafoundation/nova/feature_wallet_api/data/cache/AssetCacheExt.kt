@@ -11,22 +11,23 @@ suspend fun AssetCache.updateAsset(
     metaId: Long,
     chainAsset: Chain.Asset,
     accountInfo: AccountInfo,
-) = updateAsset(metaId, chainAsset, accountInfoUpdater(accountInfo))
+) = updateAsset(metaId, chainAsset, nativeBalanceUpdater(accountInfo))
 
 suspend fun AssetCache.updateAsset(
     accountId: AccountId,
     chainAsset: Chain.Asset,
     accountInfo: AccountInfo,
-) = updateAsset(accountId, chainAsset, accountInfoUpdater(accountInfo))
+) = updateAsset(accountId, chainAsset, nativeBalanceUpdater(accountInfo))
 
-private fun accountInfoUpdater(accountInfo: AccountInfo) = { asset: AssetLocal ->
+private fun nativeBalanceUpdater(accountInfo: AccountInfo) = { asset: AssetLocal ->
     val data = accountInfo.data
+
+    val frozen = data.miscFrozen.max(data.feeFrozen)
 
     asset.copy(
         freeInPlanks = data.free,
-        reservedInPlanks = data.reserved,
-        miscFrozenInPlanks = data.miscFrozen,
-        feeFrozenInPlanks = data.feeFrozen
+        frozenInPlanks = frozen,
+        reservedInPlanks = accountInfo.data.reserved
     )
 }
 

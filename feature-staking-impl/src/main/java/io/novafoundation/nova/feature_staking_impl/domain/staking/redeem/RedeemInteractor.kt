@@ -28,7 +28,7 @@ class RedeemInteractor(
                 withdrawUnbonded(getSlashingSpansNumber(stakingState))
             }.map {
                 RedeemConsequences(
-                    willKillStash = asset.redeemable == asset.locked
+                    willKillStash = asset.redeemable == asset.bonded
                 )
             }
         }

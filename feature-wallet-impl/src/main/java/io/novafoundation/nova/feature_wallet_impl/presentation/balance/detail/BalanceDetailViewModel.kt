@@ -37,8 +37,8 @@ class BalanceDetailViewModel(
     private val _hideRefreshEvent = MutableLiveData<Event<Unit>>()
     val hideRefreshEvent: LiveData<Event<Unit>> = _hideRefreshEvent
 
-    private val _showFrozenDetailsEvent = MutableLiveData<Event<AssetModel>>()
-    val showFrozenDetailsEvent: LiveData<Event<AssetModel>> = _showFrozenDetailsEvent
+    private val _showLockedDetailsEvent = MutableLiveData<Event<AssetModel>>()
+    val showFrozenDetailsEvent: LiveData<Event<AssetModel>> = _showLockedDetailsEvent
 
     private val assetFlow = interactor.assetFlow(assetPayload.chainId, assetPayload.chainAssetId)
         .inBackground()
@@ -104,8 +104,8 @@ class BalanceDetailViewModel(
         }
     }
 
-    fun frozenInfoClicked() = launch {
-        _showFrozenDetailsEvent.value = Event(assetModel.first())
+    fun lockedInfoClicked() = launch {
+        _showLockedDetailsEvent.value = Event(assetModel.first())
     }
 
     private fun mapAssetToUi(asset: Asset): AssetDetailsModel {
@@ -113,7 +113,7 @@ class BalanceDetailViewModel(
             token = mapTokenToTokenModel(asset.token),
             total = mapAmountToAmountModel(asset.total, asset),
             transferable = mapAmountToAmountModel(asset.transferable, asset),
-            locked = mapAmountToAmountModel(asset.frozen, asset)
+            locked = mapAmountToAmountModel(asset.locked, asset)
         )
     }
 }

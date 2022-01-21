@@ -7,7 +7,7 @@ import io.novafoundation.nova.feature_wallet_impl.R
 import io.novafoundation.nova.feature_wallet_impl.presentation.common.currencyItem
 import io.novafoundation.nova.feature_wallet_impl.presentation.model.AssetModel
 
-class FrozenTokensBottomSheet(
+class LockedTokensBottomSheet(
     context: Context,
     private val payload: AssetModel
 ) : FixedListBottomSheet(context) {
@@ -15,7 +15,7 @@ class FrozenTokensBottomSheet(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val title = context.getString(R.string.wallet_balance_frozen_template, payload.token.configuration.symbol)
+        val title = context.getString(R.string.wallet_balance_locked_template, payload.token.configuration.symbol)
         setTitle(title)
 
         currencyItem(R.string.wallet_balance_locked, payload.locked)

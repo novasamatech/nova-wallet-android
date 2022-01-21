@@ -549,7 +549,7 @@
   <string name="wallet_balance_details_total">Общий баланс</string>
   <string name="wallet_balance_details_total_after">Общий после перевода</string>
   <string name="wallet_balance_frozen">Заморожено</string>
-  <string name="wallet_balance_frozen_template">Заморожено %s</string>
+  <string name="wallet_balance_locked_template">Заблокировано %s</string>
   <string name="wallet_balance_locked">Заблокировано</string>
   <string name="wallet_balance_redeemable">Можно забрать</string>
   <string name="wallet_balance_reserved">Зарезервировано</string>
