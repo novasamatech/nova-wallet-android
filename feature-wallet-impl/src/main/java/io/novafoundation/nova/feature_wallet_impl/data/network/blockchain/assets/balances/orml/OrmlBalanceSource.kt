@@ -34,7 +34,7 @@ class OrmlBalanceSource(
         val ormlAccountData = storageSource.query(
             chainId = chain.id,
             keyBuilder = { it.ormlBalanceKey(accountId, chainAsset) },
-            binding = { scale, runtime ->  bindOrmlAccountDataOrEmpty(scale, runtime) }
+            binding = { scale, runtime -> bindOrmlAccountDataOrEmpty(scale, runtime) }
         )
 
         return ormlAccountData.free + ormlAccountData.reserved
@@ -75,7 +75,7 @@ class OrmlBalanceSource(
         )
     }
 
-    private fun RuntimeSnapshot.ormlBalanceKey(accountId: AccountId, chainAsset: Chain.Asset) : String {
+    private fun RuntimeSnapshot.ormlBalanceKey(accountId: AccountId, chainAsset: Chain.Asset): String {
         return metadata.tokens().storage("Accounts").storageKey(this, accountId, chainAsset.ormlCurrencyId(this))
     }
 
