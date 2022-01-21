@@ -10,16 +10,12 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.formatAsCurrency
 import io.novafoundation.nova.common.utils.hideKeyboard
+import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.feature_wallet_impl.R
 import io.novafoundation.nova.feature_wallet_impl.di.WalletFeatureComponent
 import io.novafoundation.nova.feature_wallet_impl.presentation.model.AssetModel
-import kotlinx.android.synthetic.main.fragment_balance_list.balanceListAssets
-import kotlinx.android.synthetic.main.fragment_balance_list.balanceListAvatar
-import kotlinx.android.synthetic.main.fragment_balance_list.balanceListContent
-import kotlinx.android.synthetic.main.fragment_balance_list.balanceListTotalAmount
-import kotlinx.android.synthetic.main.fragment_balance_list.balanceListTotalTitle
-import kotlinx.android.synthetic.main.fragment_balance_list.walletContainer
+import kotlinx.android.synthetic.main.fragment_balance_list.*
 import javax.inject.Inject
 
 class BalanceListFragment : BaseFragment<BalanceListViewModel>(), BalanceListAdapter.ItemAssetHandler {
@@ -71,7 +67,7 @@ class BalanceListFragment : BaseFragment<BalanceListViewModel>(), BalanceListAda
         viewModel.sync()
 
         viewModel.balancesFlow.observe {
-            adapter.submitList(it.assetModels)
+            adapter.submitListPreservingViewPoint(it.assetModels, balanceListAssets)
 
             balanceListTotalAmount.text = it.totalBalance.formatAsCurrency()
         }
