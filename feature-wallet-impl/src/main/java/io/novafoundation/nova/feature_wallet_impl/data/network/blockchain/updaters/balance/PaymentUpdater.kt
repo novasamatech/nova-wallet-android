@@ -79,7 +79,7 @@ class PaymentUpdater(
 
                 operationDao.insertAll(localOperations)
             }.onFailure {
-                Log.e(LOG_TAG, "Failed to retrieve transactions from block (${chain.name}.#${chainAsset.name}): ${it.message}")
+                Log.e(LOG_TAG, "Failed to retrieve transactions from block (${chain.name}.${chainAsset.name}): ${it.message}")
             }
     }
 
