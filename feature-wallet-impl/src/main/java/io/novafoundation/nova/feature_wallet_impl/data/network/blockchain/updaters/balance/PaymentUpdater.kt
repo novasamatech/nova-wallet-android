@@ -58,7 +58,7 @@ class PaymentUpdater(
                 .startSyncingBalance(chain, chainAsset, metaAccount, accountId, storageSubscriptionBuilder)
                 .filterNotNull()
                 .onEach { Log.d(LOG_TAG, "Starting block fetching for ${chain.name}.${chainAsset.name}") }
-                .onEach { blockHash -> balanceSource.fetchTransfers(chainAsset, blockHash, accountId) }
+                .onEach { blockHash -> balanceSource.syncOperationsForBalanceChange(chainAsset, blockHash, accountId) }
         }
 
         val chainSyncingFlow = if (assetSyncs.size == 1) {
@@ -72,7 +72,7 @@ class PaymentUpdater(
             .noSideAffects()
     }
 
-    private suspend fun BalanceSource.fetchTransfers(chainAsset: Chain.Asset, blockHash: String, accountId: AccountId) {
+    private suspend fun BalanceSource.syncOperationsForBalanceChange(chainAsset: Chain.Asset, blockHash: String, accountId: AccountId) {
         fetchOperationsForBalanceChange(chain, blockHash, accountId)
             .onSuccess { blockTransfers ->
                 val localOperations = blockTransfers.map { transfer -> createTransferOperationLocal(chainAsset, transfer, accountId) }

@@ -98,6 +98,7 @@ fun RuntimeMetadata.balances() = module(Modules.BALANCES)
 
 fun RuntimeMetadata.assets() = module(Modules.ASSETS)
 fun RuntimeMetadata.tokens() = module(Modules.TOKENS)
+fun RuntimeMetadata.currencies() = module(Modules.CURRENCIES)
 
 fun RuntimeMetadata.crowdloan() = module(Modules.CROWDLOAN)
 
