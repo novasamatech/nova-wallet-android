@@ -59,9 +59,13 @@ private fun mapSectionToSectionLocal(sectionLocal: Chain.ExternalApi.Section?) =
 
 private const val ASSET_NATIVE = "native"
 private const val ASSET_STATEMINE = "statemine"
+private const val ASSET_ORML = "orml"
 private const val ASSET_UNSUPPORTED = "unsupported"
 
 private const val STATEMINE_EXTRAS_ID = "assetId"
+
+private const val ORML_EXTRAS_CURRENCY_ID_SCALE = "currencyIdScale"
+private const val ORML_EXTRAS_CURRENCY_TYPE = "currencyIdType"
 
 private fun mapChainAssetTypeFromRaw(type: String?, typeExtras: Map<String, Any?>?): Chain.Asset.Type = when (type) {
     null, ASSET_NATIVE -> Chain.Asset.Type.Native
@@ -74,6 +78,16 @@ private fun mapChainAssetTypeFromRaw(type: String?, typeExtras: Map<String, Any?
             Chain.Asset.Type.Unsupported
         }
     }
+    ASSET_ORML -> {
+        val currencyIdScale = typeExtras?.get(ORML_EXTRAS_CURRENCY_ID_SCALE) as? String
+        val currencyIdType = typeExtras?.get(ORML_EXTRAS_CURRENCY_TYPE) as? String
+
+        if (currencyIdScale != null && currencyIdType != null) {
+            Chain.Asset.Type.Orml(currencyIdScale, currencyIdType)
+        } else {
+            Chain.Asset.Type.Unsupported
+        }
+    }
     else -> Chain.Asset.Type.Unsupported
 }
 
@@ -81,6 +95,10 @@ private fun mapChainAssetTypeToRaw(type: Chain.Asset.Type): Pair<String, Map<Str
     is Chain.Asset.Type.Native -> ASSET_NATIVE to null
     is Chain.Asset.Type.Statemine -> ASSET_STATEMINE to mapOf(
         STATEMINE_EXTRAS_ID to type.id
+    )
+    is Chain.Asset.Type.Orml -> ASSET_ORML to mapOf(
+        ORML_EXTRAS_CURRENCY_ID_SCALE to type.currencyIdScale,
+        ORML_EXTRAS_CURRENCY_TYPE to type.currencyIdType
     )
     Chain.Asset.Type.Unsupported -> ASSET_UNSUPPORTED to null
 }

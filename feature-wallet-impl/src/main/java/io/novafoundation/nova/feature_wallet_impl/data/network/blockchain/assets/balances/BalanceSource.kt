@@ -21,13 +21,16 @@ interface BalanceSource {
         accountId: AccountId
     ): BigInteger
 
+    /**
+     * @return emits hash of the blocks where changes occurred. If no change were detected based on the upstream event - should emit null
+     */
     suspend fun startSyncingBalance(
         chain: Chain,
         chainAsset: Chain.Asset,
         metaAccount: MetaAccount,
         accountId: AccountId,
         subscriptionBuilder: SubscriptionBuilder
-    ): Flow<BlockHash>
+    ): Flow<BlockHash?>
 
     suspend fun fetchOperationsForBalanceChange(
         chain: Chain,

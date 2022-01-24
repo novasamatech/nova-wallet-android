@@ -39,8 +39,6 @@ fun Chain.addressOf(accountId: ByteArray): String {
     }
 }
 
-fun Chain.pairWithAssets(): List<Pair<Chain, Chain.Asset>> = assets.map { asset -> this to asset }
-
 fun Chain.accountIdOf(address: String): ByteArray {
     return if (isEthereumBased) {
         address.fromHex()
@@ -143,6 +141,12 @@ val Chain.Companion.Geneses
 
 fun Chain.Asset.requireStatemine(): Chain.Asset.Type.Statemine {
     require(type is Chain.Asset.Type.Statemine)
+
+    return type
+}
+
+fun Chain.Asset.requireOrml(): Chain.Asset.Type.Orml {
+    require(type is Chain.Asset.Type.Orml)
 
     return type
 }

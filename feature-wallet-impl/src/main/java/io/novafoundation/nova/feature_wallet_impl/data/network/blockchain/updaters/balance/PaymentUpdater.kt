@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updat
 
 import android.util.Log
 import io.novafoundation.nova.common.utils.LOG_TAG
-import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.core.updater.SubscriptionBuilder
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.core_db.dao.OperationDao
@@ -18,57 +17,74 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.ExtrinsicS
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 
 class PaymentUpdaterFactory(
     private val operationDao: OperationDao,
-    private val balaneSourceProvider: BalanceSourceProvider,
+    private val balanceSourceProvider: BalanceSourceProvider,
     private val scope: AccountUpdateScope,
 ) {
 
-    fun create(chain: Chain, chainAsset: Chain.Asset): PaymentUpdater {
+    fun create(chain: Chain): PaymentUpdater {
         return PaymentUpdater(
             operationDao = operationDao,
-            balanceSource = balaneSourceProvider.provideFor(chainAsset),
+            balanceSourceProvider = balanceSourceProvider,
             scope = scope,
             chain = chain,
-            chainAsset = chainAsset
         )
     }
 }
 
 class PaymentUpdater(
     private val operationDao: OperationDao,
-    private val balanceSource: BalanceSource,
+    private val balanceSourceProvider: BalanceSourceProvider,
     override val scope: AccountUpdateScope,
     private val chain: Chain,
-    private val chainAsset: Chain.Asset
 ) : Updater {
 
-    override val requiredModules: List<String> = listOf(Modules.SYSTEM)
+    override val requiredModules: List<String> = emptyList()
 
     override suspend fun listenForUpdates(storageSubscriptionBuilder: SubscriptionBuilder): Flow<Updater.SideEffect> {
         val metaAccount = scope.getAccount()
 
         val accountId = metaAccount.accountIdIn(chain) ?: return emptyFlow()
 
-        return balanceSource.startSyncingBalance(chain, chainAsset, metaAccount, accountId, storageSubscriptionBuilder)
-            .onEach { blockHash -> fetchTransfers(blockHash, accountId) }
+        val assetSyncs = chain.assets.map { chainAsset ->
+            val balanceSource = balanceSourceProvider.provideFor(chainAsset)
+
+            balanceSource
+                .startSyncingBalance(chain, chainAsset, metaAccount, accountId, storageSubscriptionBuilder)
+                .filterNotNull()
+                .onEach { Log.d(LOG_TAG, "Starting block fetching for ${chain.name}.${chainAsset.name}") }
+                .onEach { blockHash -> balanceSource.fetchTransfers(chainAsset, blockHash, accountId) }
+        }
+
+        val chainSyncingFlow = if (assetSyncs.size == 1) {
+            // skip unnecessary flows merges
+            assetSyncs.first()
+        } else {
+            assetSyncs.merge()
+        }
+
+        return chainSyncingFlow
             .noSideAffects()
     }
 
-    private suspend fun fetchTransfers(blockHash: String, accountId: AccountId) {
-        balanceSource.fetchOperationsForBalanceChange(chain, blockHash, accountId)
+    private suspend fun BalanceSource.fetchTransfers(chainAsset: Chain.Asset, blockHash: String, accountId: AccountId) {
+        fetchOperationsForBalanceChange(chain, blockHash, accountId)
             .onSuccess { blockTransfers ->
-                val localOperations = blockTransfers.map { createTransferOperationLocal(it, accountId) }
+                val localOperations = blockTransfers.map { transfer -> createTransferOperationLocal(chainAsset, transfer, accountId) }
 
                 operationDao.insertAll(localOperations)
             }.onFailure {
-                Log.e(LOG_TAG, "Failed to retrieve transactions from block (${chain.name}.${chainAsset.symbol}): ${it.message}")
+                Log.e(LOG_TAG, "Failed to retrieve transactions from block (${chain.name}.#${chainAsset.name}): ${it.message}")
             }
     }
 
     private suspend fun createTransferOperationLocal(
+        chainAsset: Chain.Asset,
         extrinsic: TransferExtrinsic,
         accountId: ByteArray,
     ): OperationLocal {

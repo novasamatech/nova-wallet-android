@@ -13,6 +13,7 @@ class AssetTransfersProvider(
     fun provideFor(chainAsset: Chain.Asset): AssetTransfers = when (chainAsset.type) {
         Chain.Asset.Type.Native -> nativeAssetTransfers
         is Chain.Asset.Type.Statemine -> statemineAssetTransfers
+        is Chain.Asset.Type.Orml -> TODO("Orml transfers")
         Chain.Asset.Type.Unsupported -> throw UnsupportedOperationException("Unsupported asset")
     }
 }

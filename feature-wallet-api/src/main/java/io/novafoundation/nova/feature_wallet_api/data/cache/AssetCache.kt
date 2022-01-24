@@ -21,11 +21,14 @@ class AssetCache(
 
     private val assetUpdateMutex = Mutex()
 
+    /**
+     * @return true if asset was changed. false if it remained the same
+     */
     suspend fun updateAsset(
         metaId: Long,
         chainAsset: Chain.Asset,
         builder: (local: AssetLocal) -> AssetLocal,
-    ) = withContext(Dispatchers.IO) {
+    ): Boolean = withContext(Dispatchers.IO) {
         val symbol = chainAsset.symbol
         val chainId = chainAsset.chainId
 
@@ -37,32 +40,24 @@ class AssetCache(
             val newAsset = builder.invoke(cachedAsset)
 
             assetDao.insertAsset(newAsset)
+
+            cachedAsset != newAsset
         }
     }
 
+    /**
+     * @see updateAsset
+     */
     suspend fun updateAsset(
         accountId: AccountId,
         chainAsset: Chain.Asset,
         builder: (local: AssetLocal) -> AssetLocal,
-    ) = withContext(Dispatchers.IO) {
+    ): Boolean = withContext(Dispatchers.IO) {
         val applicableMetaAccount = accountRepository.findMetaAccount(accountId)
 
         applicableMetaAccount?.let {
             updateAsset(it.id, chainAsset, builder)
-        }
-    }
-
-    suspend fun updateToken(
-        symbol: String,
-        builder: (local: TokenLocal) -> TokenLocal,
-    ) = withContext(Dispatchers.IO) {
-        assetUpdateMutex.withLock {
-            val tokenLocal = tokenDao.getToken(symbol) ?: TokenLocal.createEmpty(symbol)
-
-            val newToken = builder.invoke(tokenLocal)
-
-            tokenDao.insertToken(newToken)
-        }
+        } ?: false
     }
 
     suspend fun insertTokens(tokens: List<TokenLocal>) = tokenDao.insertTokens(tokens)
