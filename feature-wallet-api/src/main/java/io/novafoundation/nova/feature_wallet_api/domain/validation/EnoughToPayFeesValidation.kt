@@ -25,7 +25,7 @@ class EnoughToPayFeesValidation<P, E>(
         val available = availableBalanceProducer(value)
         val amount = extraAmountExtractor(value)
 
-        return if (fee + amount < available) {
+        return if (fee + amount <= available) {
             ValidationStatus.Valid()
         } else {
             ValidationStatus.NotValid(DefaultFailureLevel.ERROR, errorProducer(value))

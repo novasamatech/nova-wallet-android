@@ -7,13 +7,13 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.BalanceSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.TransferExtrinsic
-import io.novafoundation.nova.runtime.ext.requireOrml
+import io.novafoundation.nova.runtime.ext.ormlCurrencyId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
+import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHex
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
 import kotlinx.coroutines.flow.Flow
@@ -22,6 +22,7 @@ import java.math.BigInteger
 
 class OrmlBalanceSource(
     private val assetCache: AssetCache,
+    private val storageSource: StorageDataSource,
     private val chainRegistry: ChainRegistry,
 ) : BalanceSource {
 
@@ -30,7 +31,13 @@ class OrmlBalanceSource(
     }
 
     override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {
-        return BigInteger.ZERO // TODO
+        val ormlAccountData = storageSource.query(
+            chainId = chain.id,
+            keyBuilder = { it.ormlBalanceKey(accountId, chainAsset) },
+            binding = { scale, runtime -> bindOrmlAccountDataOrEmpty(scale, runtime) }
+        )
+
+        return ormlAccountData.free + ormlAccountData.reserved
     }
 
     override suspend fun startSyncingBalance(
@@ -42,9 +49,7 @@ class OrmlBalanceSource(
     ): Flow<BlockHash?> {
         val runtime = chainRegistry.getRuntime(chain.id)
 
-        val key = runtime.metadata.tokens().storage("Accounts").storageKey(runtime, accountId, chainAsset.currencyId(runtime))
-
-        return subscriptionBuilder.subscribe(key)
+        return subscriptionBuilder.subscribe(runtime.ormlBalanceKey(accountId, chainAsset))
             .map {
                 val ormlAccountData = bindOrmlAccountDataOrEmpty(it.value, runtime)
 
@@ -70,16 +75,11 @@ class OrmlBalanceSource(
         )
     }
 
-    private fun bindOrmlAccountDataOrEmpty(scale: String?, runtime: RuntimeSnapshot): OrmlAccountData {
-        return scale?.let { bindOrmlAccountData(it, runtime) } ?: OrmlAccountData.empty()
+    private fun RuntimeSnapshot.ormlBalanceKey(accountId: AccountId, chainAsset: Chain.Asset): String {
+        return metadata.tokens().storage("Accounts").storageKey(this, accountId, chainAsset.ormlCurrencyId(this))
     }
 
-    private fun Chain.Asset.currencyId(runtime: RuntimeSnapshot): Any? {
-        val ormlConfig = requireOrml()
-
-        val currencyIdType = runtime.typeRegistry[ormlConfig.currencyIdType]
-            ?: error("Cannot find type ${ormlConfig.currencyIdType}")
-
-        return currencyIdType.fromHex(runtime, ormlConfig.currencyIdScale)
+    private fun bindOrmlAccountDataOrEmpty(scale: String?, runtime: RuntimeSnapshot): OrmlAccountData {
+        return scale?.let { bindOrmlAccountData(it, runtime) } ?: OrmlAccountData.empty()
     }
 }

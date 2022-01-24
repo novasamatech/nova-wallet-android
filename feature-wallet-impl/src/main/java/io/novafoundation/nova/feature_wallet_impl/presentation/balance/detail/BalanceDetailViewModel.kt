@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.feature_wallet_impl.data.mappers.mapAssetToAssetModel
 import io.novafoundation.nova.feature_wallet_impl.data.mappers.mapTokenToTokenModel
+import io.novafoundation.nova.feature_wallet_impl.domain.send.SendInteractor
 import io.novafoundation.nova.feature_wallet_impl.presentation.AssetPayload
 import io.novafoundation.nova.feature_wallet_impl.presentation.WalletRouter
 import io.novafoundation.nova.feature_wallet_impl.presentation.balance.assetActions.buy.BuyMixin
@@ -26,6 +27,7 @@ import kotlinx.coroutines.launch
 
 class BalanceDetailViewModel(
     private val interactor: WalletInteractor,
+    private val sendInteractor: SendInteractor,
     private val router: WalletRouter,
     private val assetPayload: AssetPayload,
     private val buyMixin: BuyMixin.Presentation,
@@ -55,6 +57,12 @@ class BalanceDetailViewModel(
         .share()
 
     val buyEnabled = buyMixin.isBuyEnabled(assetPayload.chainId, assetPayload.chainAssetId)
+
+    val sendEnabled = assetFlow.map {
+        sendInteractor.areTransfersEnabled(it.token.configuration)
+    }
+        .inBackground()
+        .share()
 
     override fun onCleared() {
         super.onCleared()

@@ -4,17 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/itemAssetContainer"
     android:layout_width="match_parent"
-    tools:background="@color/blurColor"
     android:layout_height="@dimen/asset_height"
     android:layout_marginBottom="8dp"
-    android:layout_weight="1">
+    android:layout_weight="1"
+    tools:background="@color/blurColor">
 
     <ImageView
         android:id="@+id/itemAssetImage"
-        android:layout_width="@dimen/asset_image_width"
-        android:layout_height="0dp"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -24,22 +23,22 @@
         android:id="@+id/itemAssetDivider"
         android:layout_width="1dp"
         android:layout_height="0dp"
+        android:layout_marginStart="7dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
-        android:background="@color/white_10"
+        android:background="@color/white_16"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/itemAssetImage"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/itemAssetNetwork"
-        style="@style/TextAppearance.NovaFoundation.Body1"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Caps"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="12dp"
         android:layout_marginTop="6dp"
-        android:includeFontPadding="false"
-        android:textColor="@color/white"
+        android:textColor="@color/white_64"
         app:layout_constraintBottom_toTopOf="@+id/itemAssetToken"
         app:layout_constraintStart_toEndOf="@id/itemAssetDivider"
         app:layout_constraintTop_toTopOf="parent"
@@ -48,13 +47,11 @@
 
     <TextView
         android:id="@+id/itemAssetToken"
-        style="@style/TextAppearance.NovaFoundation.Header3"
+        style="@style/TextAppearance.NovaFoundation.Bold.Title2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="3dp"
-        android:fontFamily="?attr/fontBold"
-        android:includeFontPadding="false"
-        android:textColor="@color/white_50"
+        android:layout_marginTop="1dp"
+        android:textColor="@color/white"
         app:layout_constraintBottom_toTopOf="@+id/itemAssetRate"
         app:layout_constraintStart_toStartOf="@+id/itemAssetNetwork"
         app:layout_constraintTop_toBottomOf="@+id/itemAssetNetwork"
@@ -62,13 +59,12 @@
 
     <TextView
         android:id="@+id/itemAssetRate"
-        style="@style/TextAppearance.NovaFoundation.Body1"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="8dp"
-        android:includeFontPadding="false"
-        android:textColor="@color/white"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="7dp"
+        android:textColor="@color/white_64"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@+id/itemAssetToken"
         app:layout_constraintTop_toBottomOf="@+id/itemAssetToken"
@@ -76,11 +72,10 @@
 
     <TextView
         android:id="@+id/itemAssetRateChange"
-        style="@style/TextAppearance.NovaFoundation.Body1"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:includeFontPadding="false"
+        android:layout_marginStart="5dp"
         android:textColor="@color/green"
         app:layout_constraintBottom_toBottomOf="@+id/itemAssetRate"
         app:layout_constraintStart_toEndOf="@+id/itemAssetRate"
@@ -89,21 +84,21 @@
 
     <TextView
         android:id="@+id/itemAssetDollarAmount"
-        style="@style/TextAppearance.NovaFoundation.Body1"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="12dp"
-        android:textColor="@color/white_50"
+        android:layout_marginEnd="16dp"
+        android:textColor="@color/white_64"
         app:layout_constraintBottom_toBottomOf="@+id/itemAssetRateChange"
         app:layout_constraintEnd_toEndOf="parent"
         tools:text="$1,000.05" />
 
     <TextView
         android:id="@+id/itemAssetBalance"
-        style="@style/TextAppearance.NovaFoundation.Header3"
+        style="@style/TextAppearance.NovaFoundation.Bold.Title2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
+        android:layout_marginBottom="2dp"
         app:layout_constraintBottom_toTopOf="@+id/itemAssetDollarAmount"
         app:layout_constraintEnd_toEndOf="@+id/itemAssetDollarAmount"
         tools:text="120.0849" />

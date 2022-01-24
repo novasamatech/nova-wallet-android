@@ -29,8 +29,8 @@ class StatemineAssetsModule {
     @Provides
     @FeatureScope
     fun provideStatemineAssetTransfers(
-        statemineBalanceSource: StatemineBalanceSource,
+        chainRegistry: ChainRegistry,
         balanceSourceProvider: BalanceSourceProvider,
         extrinsicService: ExtrinsicService
-    ) = StatemineAssetTransfers(statemineBalanceSource, balanceSourceProvider, extrinsicService)
+    ) = StatemineAssetTransfers(chainRegistry, balanceSourceProvider, extrinsicService)
 }

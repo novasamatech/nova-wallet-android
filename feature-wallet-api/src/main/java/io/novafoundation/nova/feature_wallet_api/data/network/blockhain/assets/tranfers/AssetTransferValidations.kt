@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
+import java.math.BigInteger
 
 typealias AssetTransfersValidationSystem = ValidationSystem<AssetTransferPayload, AssetTransferValidationFailure>
 typealias AssetTransfersValidation = Validation<AssetTransferPayload, AssetTransferValidationFailure>
@@ -39,8 +40,22 @@ data class AssetTransferPayload(
     val usedAsset: Asset
 )
 
-val AssetTransferPayload.feeInPlanks
-    get() = transfer.chainAsset.planksFromAmount(fee)
+val AssetTransferPayload.sendingCommissionAsset
+    get() = usedAsset.token.configuration == commissionAsset.token.configuration
+
+val AssetTransferPayload.feeInUsedAsset: BigDecimal
+    get() = if (sendingCommissionAsset) {
+        fee
+    } else {
+        BigDecimal.ZERO
+    }
+
+val AssetTransferPayload.amountInCommissionAsset: BigInteger
+    get() = if (sendingCommissionAsset) {
+        transfer.amountInPlanks
+    } else {
+        BigInteger.ZERO
+    }
 
 val AssetTransfer.amountInPlanks
     get() = chainAsset.planksFromAmount(amount)
