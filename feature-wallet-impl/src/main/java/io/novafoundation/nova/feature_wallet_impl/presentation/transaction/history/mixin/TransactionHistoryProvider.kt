@@ -92,7 +92,7 @@ class TransactionHistoryProvider(
             val clickedOperation = operations.first { it.id == transactionModel.id }
 
             withContext(Dispatchers.Main) {
-                when (val payload = mapOperationToParcel(clickedOperation, resourceManager)) {
+                when (val payload = mapOperationToParcel(clickedOperation, chainRegistry, resourceManager)) {
                     is OperationParcelizeModel.Transfer -> {
                         router.openTransferDetail(payload)
                     }
