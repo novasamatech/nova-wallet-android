@@ -159,7 +159,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
     private fun attachBackCallback() {
         backCallback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                viewModel.closeClicked()
+                backClicked()
             }
         }
 
