@@ -26,11 +26,6 @@ abstract class BaseInterScreenCommunicator<I : Parcelable, O : Parcelable>(
         get() = navController.previousBackStackEntry!!.savedStateHandle
             .get(liveDataKey)
 
-    // from requester
-    override fun clearResponse() {
-        navController.currentBackStackEntry!!.savedStateHandle.remove<O>(liveDataKey)
-    }
-
     override val responseFlow: Flow<O>
         get() = navController.currentBackStackEntry!!.savedStateHandle
             .getLiveData<O>(liveDataKey)
