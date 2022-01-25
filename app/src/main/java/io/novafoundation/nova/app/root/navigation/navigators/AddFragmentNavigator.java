@@ -26,6 +26,14 @@ import java.util.Map;
 
 import io.novafoundation.nova.app.R;
 
+/**
+ * This is an improved version (aka copy-paste with fixes) of
+ * {@link androidx.navigation.fragment.FragmentNavigator} which allows not only to replace old
+ * fragment with new one, but also add new and hide old one.
+ * The difference with original implementation from google library is in navigate() method (
+ * <code>if (destination.shouldUseAdd) ...</code> )and in modified Destination subclass
+ * which includes <code>shouldUseAdd</code> flag
+ */
 @Navigator.Name("fragment")
 public class AddFragmentNavigator extends Navigator<AddFragmentNavigator.Destination> {
     private static final String TAG = "FragmentNavigator";
