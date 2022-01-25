@@ -1,10 +1,14 @@
 package io.novafoundation.nova.feature_dapp_impl.presentation.search
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.list.headers.TextHeader
 import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.common.utils.sendEvent
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.data.mappers.mapDappCategoriesToDescription
@@ -22,10 +26,15 @@ import kotlin.time.ExperimentalTime
 class DAppSearchViewModel(
     private val router: DAppRouter,
     private val resourceManager: ResourceManager,
-    private val interactor: SearchDappInteractor
+    private val interactor: SearchDappInteractor,
+    private val payload: SearchPayload,
+    private val dAppSearchResponder: DAppSearchResponder,
 ) : BaseViewModel() {
 
-    val query = MutableStateFlow("")
+    val query = MutableStateFlow(payload.initialUrl.orEmpty())
+
+    private val _selectQueryTextEvent = MutableLiveData<Event<Unit>>()
+    val selectQueryTextEvent: LiveData<Event<Unit>> = _selectQueryTextEvent
 
     val searchResults = query
         .mapLatest {
@@ -37,7 +46,17 @@ class DAppSearchViewModel(
         .inBackground()
         .share()
 
+    init {
+        if (!payload.initialUrl.isNullOrEmpty()) {
+            _selectQueryTextEvent.sendEvent()
+        }
+    }
+
     fun cancelClicked() {
+        if (shouldReportResult()) {
+            dAppSearchResponder.respond(DAppSearchCommunicator.Response(newUrl = null))
+        }
+
         router.back()
     }
 
@@ -72,10 +91,19 @@ class DAppSearchViewModel(
     }
 
     fun searchResultClicked(searchResult: DappSearchResult) {
-        when (searchResult) {
-            is DappSearchResult.Dapp -> router.openDAppBrowser(searchResult.metadata.url)
-            is DappSearchResult.Search -> router.openDAppBrowser(searchResult.searchUrl)
-            is DappSearchResult.Url -> router.openDAppBrowser(searchResult.url)
+        val newUrl = when (searchResult) {
+            is DappSearchResult.Dapp -> searchResult.metadata.url
+            is DappSearchResult.Search -> searchResult.searchUrl
+            is DappSearchResult.Url -> searchResult.url
+        }
+
+        if (shouldReportResult()) {
+            dAppSearchResponder.respond(DAppSearchCommunicator.Response(newUrl))
+            router.back()
+        } else {
+            router.openDAppBrowser(newUrl)
         }
     }
+
+    private fun shouldReportResult() = payload.initialUrl != null
 }

@@ -10,6 +10,8 @@ interface InterScreenRequester<I, O> {
 
     val responseFlow: Flow<O>
 
+    fun clearResponse()
+
     fun openRequest(request: I)
 }
 

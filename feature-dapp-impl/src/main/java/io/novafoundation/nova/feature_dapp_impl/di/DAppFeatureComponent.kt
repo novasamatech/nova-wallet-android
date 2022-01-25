@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrins
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.di.DAppSignComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.di.MainDAppComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.view.CategorizedDappsView
+import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.di.DAppSearchComponent
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
@@ -51,6 +52,7 @@ interface DAppFeatureComponent : DAppFeatureApi {
         fun create(
             @BindsInstance router: DAppRouter,
             @BindsInstance signCommunicator: DAppSignCommunicator,
+            @BindsInstance searchCommunicator: DAppSearchCommunicator,
             deps: DAppFeatureDependencies
         ): DAppFeatureComponent
     }

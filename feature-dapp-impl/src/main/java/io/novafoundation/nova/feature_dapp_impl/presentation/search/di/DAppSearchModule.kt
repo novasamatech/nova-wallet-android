@@ -13,7 +13,9 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.domain.search.SearchDappInteractor
+import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchViewModel
+import io.novafoundation.nova.feature_dapp_impl.presentation.search.SearchPayload
 
 @Module(includes = [ViewModelModule::class])
 class DAppSearchModule {
@@ -34,11 +36,15 @@ class DAppSearchModule {
         router: DAppRouter,
         resourceManager: ResourceManager,
         interactor: SearchDappInteractor,
+        searchResponder: DAppSearchCommunicator,
+        payload: SearchPayload
     ): ViewModel {
         return DAppSearchViewModel(
             router = router,
             resourceManager = resourceManager,
-            interactor = interactor
+            interactor = interactor,
+            dAppSearchResponder = searchResponder,
+            payload = payload
         )
     }
 }
