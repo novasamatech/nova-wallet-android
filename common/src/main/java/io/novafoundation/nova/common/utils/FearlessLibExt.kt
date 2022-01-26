@@ -98,7 +98,9 @@ fun RuntimeMetadata.balances() = module(Modules.BALANCES)
 
 fun RuntimeMetadata.assets() = module(Modules.ASSETS)
 fun RuntimeMetadata.tokens() = module(Modules.TOKENS)
+fun RuntimeMetadata.tokensOrNull() = moduleOrNull(Modules.TOKENS)
 fun RuntimeMetadata.currencies() = module(Modules.CURRENCIES)
+fun RuntimeMetadata.currenciesOrNull() = moduleOrNull(Modules.CURRENCIES)
 
 fun RuntimeMetadata.crowdloan() = module(Modules.CROWDLOAN)
 
@@ -110,6 +112,10 @@ fun RuntimeMetadata.timestampOrNull() = moduleOrNull(Modules.TIMESTAMP)
 fun RuntimeMetadata.slots() = module(Modules.SLOTS)
 
 fun RuntimeMetadata.session() = module(Modules.SESSION)
+
+fun RuntimeMetadata.firstExistingModule(vararg options: String): String {
+    return options.first(::hasModule)
+}
 
 fun <T> StorageEntry.storageKeys(runtime: RuntimeSnapshot, singleMapArguments: Collection<T>): Map<String, T> {
     return singleMapArguments.associateBy { storageKey(runtime, it) }

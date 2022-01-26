@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.orml
 
 import io.novafoundation.nova.common.utils.Modules
+import io.novafoundation.nova.common.utils.firstExistingModule
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure.WillRemoveAccount
@@ -31,7 +32,10 @@ class OrmlAssetTransfers(
         )
     }
 
-    override val transferFunction: Pair<String, String> = Modules.CURRENCIES to "transfer"
+    override val transferFunctions = listOf(
+        Modules.CURRENCIES to "transfer",
+        Modules.TOKENS to "transfer"
+    )
 
     override suspend fun areTransfersEnabled(chainAsset: Chain.Asset): Boolean {
         // flag from chains json AND existence of module & function in runtime metadata
@@ -48,7 +52,7 @@ class OrmlAssetTransfers(
         amount: BigInteger
     ) {
         call(
-            moduleName = Modules.CURRENCIES,
+            moduleName = runtime.metadata.firstExistingModule(Modules.CURRENCIES, Modules.TOKENS),
             callName = "transfer",
             arguments = mapOf(
                 "dest" to AddressInstanceConstructor.constructInstance(runtime.typeRegistry, target),
