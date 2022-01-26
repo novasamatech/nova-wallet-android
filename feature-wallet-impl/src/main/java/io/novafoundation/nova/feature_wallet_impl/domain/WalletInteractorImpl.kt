@@ -37,7 +37,7 @@ class WalletInteractorImpl(
                 val chains = chainRegistry.chainsById.first()
 
                 val fiatByChain = assets.groupBy { it.token.configuration.chainId }
-                    .mapValues { (_, assets) -> assets.sumByBigDecimal { it.token.fiatAmount(it.total)  } }
+                    .mapValues { (_, assets) -> assets.sumByBigDecimal { it.token.fiatAmount(it.total) } }
 
                 assets.sortedWith(
                     compareByDescending<Asset> { fiatByChain.getValue(it.token.configuration.chainId) }
