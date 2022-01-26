@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.core.os.bundleOf
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
@@ -20,13 +21,7 @@ import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3WebViewClientFa
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewHolder
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.injectWeb3
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.uninjectWeb3
-import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserAddressBar
-import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserAddressBarGroup
-import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserBack
-import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserClose
-import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserForward
-import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserRefresh
-import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserWebView
+import kotlinx.android.synthetic.main.fragment_dapp_browser.*
 import javax.inject.Inject
 
 class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
@@ -47,6 +42,8 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
     @Inject
     lateinit var imageLoader: ImageLoader
 
+    var backCallback: OnBackPressedCallback? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -63,7 +60,11 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
         dappBrowserClose.setOnClickListener { viewModel.closeClicked() }
 
         dappBrowserBack.setOnClickListener { backClicked() }
-        onBackPressed(::backClicked)
+        attachBackCallback()
+
+        dappBrowserAddressBar.setOnClickListener {
+            viewModel.openSearch()
+        }
 
         dappBrowserForward.setOnClickListener { forwardClicked() }
         dappBrowserRefresh.setOnClickListener { refreshClicked() }
@@ -72,9 +73,18 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
     override fun onDestroyView() {
         super.onDestroyView()
 
+        detachBackCallback()
         dappBrowserWebView.uninjectWeb3()
 
         webViewHolder.release()
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        if (hidden) {
+            detachBackCallback()
+        } else {
+            attachBackCallback()
+        }
     }
 
     override fun inject() {
@@ -144,5 +154,20 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
 
     private fun refreshClicked() {
         dappBrowserWebView.reload()
+    }
+
+    private fun attachBackCallback() {
+        backCallback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                backClicked()
+            }
+        }
+
+        requireActivity().onBackPressedDispatcher.addCallback(backCallback!!)
+    }
+
+    private fun detachBackCallback() {
+        backCallback?.remove()
+        backCallback = null
     }
 }

@@ -21,6 +21,8 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrins
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignRequester
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.awaitConfirmation
+import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchRequester
+import io.novafoundation.nova.feature_dapp_impl.presentation.search.SearchPayload
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.Single.AuthorizeTab
@@ -57,8 +59,9 @@ class DAppBrowserViewModel(
     private val commonInteractor: DappInteractor,
     private val resourceManager: ResourceManager,
     private val addressIconGenerator: AddressIconGenerator,
+    private val dAppSearchRequester: DAppSearchRequester,
+    private val initialUrl: String,
     private val selectedAccountUseCase: SelectedAccountUseCase,
-    private val initialUrl: String
 ) : BaseViewModel() {
 
     private val polkadotJsExtension = polkadotJsExtensionFactory.create(scope = this)
@@ -81,9 +84,11 @@ class DAppBrowserViewModel(
             .inBackground()
             .launchIn(this)
 
-        _loadUrlEvent.value = initialUrl.event()
+        dAppSearchRequester.responseFlow
+            .onEach { it.newUrl?.let(::forceLoad) }
+            .launchIn(this)
 
-        updatePageDisplay(initialUrl)
+        forceLoad(initialUrl)
     }
 
     fun onPageChanged(url: String) {
@@ -96,6 +101,12 @@ class DAppBrowserViewModel(
         if (confirmationState == ConfirmationState.ALLOWED) {
             router.back()
         }
+    }
+
+    fun openSearch() = launch {
+        val currentPage = currentPage.first()
+
+        dAppSearchRequester.openRequest(SearchPayload(initialUrl = currentPage.display))
     }
 
     private suspend fun handleDAppRequest(request: PolkadotJsExtensionRequest<*>) {
@@ -203,6 +214,12 @@ class DAppBrowserViewModel(
         authorizationState: AuthorizationState
     ) = respondIfAllowed(request, authorizationState) {
         flowOf(interactor.getInjectedAccounts())
+    }
+
+    private fun forceLoad(url: String) {
+        _loadUrlEvent.value = url.event()
+
+        updatePageDisplay(url)
     }
 
     private suspend fun awaitConfirmation(action: DappPendingConfirmation.Action) = suspendCoroutine<ConfirmationState> {
