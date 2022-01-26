@@ -25,7 +25,7 @@ class StatemineAssetTransfers(
         removeAccountBehavior = WillRemoveAccount::WillTransferDust
     )
 
-    override val transferFunction: Pair<String, String> = Modules.ASSETS to "transfer"
+    override val transferFunctions = listOf(Modules.ASSETS to "transfer")
 
     override fun ExtrinsicBuilder.transfer(transfer: AssetTransfer) {
         val chainAssetType = transfer.chainAsset.type

@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_wallet_impl.domain
 
 import io.novafoundation.nova.common.data.model.CursorPage
+import io.novafoundation.nova.common.utils.sumByBigDecimal
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
@@ -35,10 +36,13 @@ class WalletInteractorImpl(
             .map { assets ->
                 val chains = chainRegistry.chainsById.first()
 
+                val fiatByChain = assets.groupBy { it.token.configuration.chainId }
+                    .mapValues { (_, assets) -> assets.sumByBigDecimal { it.token.fiatAmount(it.total) } }
+
                 assets.sortedWith(
-                    compareByDescending<Asset> { it.token.fiatAmount(it.total) }
-                        .thenByDescending { it.total }
+                    compareByDescending<Asset> { fiatByChain.getValue(it.token.configuration.chainId) }
                         .thenBy { chains.getValue(it.token.configuration.chainId).name }
+                        .thenByDescending { it.token.fiatAmount(it.total) }
                         .thenBy { it.token.configuration.id }
                 )
             }

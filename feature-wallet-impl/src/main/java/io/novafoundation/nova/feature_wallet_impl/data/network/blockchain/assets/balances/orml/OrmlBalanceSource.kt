@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.asset
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountIdentifier
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
-import io.novafoundation.nova.common.utils.currencies
+import io.novafoundation.nova.common.utils.currenciesOrNull
 import io.novafoundation.nova.common.utils.instanceOf
 import io.novafoundation.nova.common.utils.tokens
 import io.novafoundation.nova.core.updater.SubscriptionBuilder
@@ -25,6 +25,7 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
 import jp.co.soramitsu.fearless_utils.runtime.metadata.call
+import jp.co.soramitsu.fearless_utils.runtime.metadata.callOrNull
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
 import kotlinx.coroutines.flow.Flow
@@ -111,9 +112,10 @@ class OrmlBalanceSource(
     }
 
     private fun GenericCall.Instance.isTransfer(runtime: RuntimeSnapshot): Boolean {
-        val assets = runtime.metadata.currencies()
+        val transferCall = runtime.metadata.currenciesOrNull()?.callOrNull("transfer")
+            ?: runtime.metadata.tokens().call("transfer")
 
-        return instanceOf(assets.call("transfer"))
+        return instanceOf(transferCall)
     }
 
     private fun RuntimeSnapshot.ormlBalanceKey(accountId: AccountId, chainAsset: Chain.Asset): String {

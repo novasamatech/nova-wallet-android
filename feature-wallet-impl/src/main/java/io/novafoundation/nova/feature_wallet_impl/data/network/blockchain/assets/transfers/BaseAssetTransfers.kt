@@ -39,9 +39,10 @@ abstract class BaseAssetTransfers(
     protected abstract fun ExtrinsicBuilder.transfer(transfer: AssetTransfer)
 
     /**
-     * (Module, Function)
+     * Format: [(Module, Function)]
+     * Tranfers will be enabled if at least one function exists
      */
-    protected abstract val transferFunction: Pair<String, String>
+    protected abstract val transferFunctions: List<Pair<String, String>>
 
     override suspend fun performTransfer(transfer: AssetTransfer): Result<String> {
         val senderAccountId = transfer.sender.accountIdIn(transfer.chain)!!
@@ -58,11 +59,11 @@ abstract class BaseAssetTransfers(
     }
 
     override suspend fun areTransfersEnabled(chainAsset: Chain.Asset): Boolean {
-        val (module, function) = transferFunction
-
         val runtime = chainRegistry.getRuntime(chainAsset.chainId)
 
-        return runtime.metadata.moduleOrNull(module)?.callOrNull(function) != null
+        return transferFunctions.any { (module, function) ->
+            runtime.metadata.moduleOrNull(module)?.callOrNull(function) != null
+        }
     }
 
     private suspend fun existentialDepositFor(transfer: AssetTransfer): BigDecimal {
