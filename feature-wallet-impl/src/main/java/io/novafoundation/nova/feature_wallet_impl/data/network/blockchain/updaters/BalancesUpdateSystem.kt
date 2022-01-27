@@ -59,6 +59,6 @@ class BalancesUpdateSystem(
     }
 
     private fun logError(chain: Chain, error: Throwable) {
-        Log.e(LOG_TAG, "Failed to subscribe to balances in ${chain.name}: ${error.message}")
+        Log.e(LOG_TAG, "Failed to subscribe to balances in ${chain.name}: ${error.message}", error)
     }
 }

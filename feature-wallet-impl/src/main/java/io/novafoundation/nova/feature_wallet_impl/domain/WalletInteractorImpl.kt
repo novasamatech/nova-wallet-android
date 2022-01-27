@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_wallet_impl.domain
 
 import io.novafoundation.nova.common.data.model.CursorPage
+import io.novafoundation.nova.common.utils.sumByBigDecimal
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
@@ -9,7 +10,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletReposit
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.OperationsPageChange
-import io.novafoundation.nova.runtime.ext.utilityAsset
+import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
@@ -35,10 +36,13 @@ class WalletInteractorImpl(
             .map { assets ->
                 val chains = chainRegistry.chainsById.first()
 
+                val fiatByChain = assets.groupBy { it.token.configuration.chainId }
+                    .mapValues { (_, assets) -> assets.sumByBigDecimal { it.token.fiatAmount(it.total) } }
+
                 assets.sortedWith(
-                    compareByDescending<Asset> { it.token.fiatAmount(it.total) }
-                        .thenByDescending { it.total }
+                    compareByDescending<Asset> { fiatByChain.getValue(it.token.configuration.chainId) }
                         .thenBy { chains.getValue(it.token.configuration.chainId).name }
+                        .thenByDescending { it.token.fiatAmount(it.total) }
                         .thenBy { it.token.configuration.id }
                 )
             }
@@ -58,11 +62,11 @@ class WalletInteractorImpl(
         }
     }
 
-    override fun utilityAssetFlow(chainId: ChainId): Flow<Asset> {
+    override fun commissionAssetFlow(chainId: ChainId): Flow<Asset> {
         return accountRepository.selectedMetaAccountFlow().flatMapLatest { metaAccount ->
             val chain = chainRegistry.getChain(chainId)
 
-            walletRepository.assetFlow(metaAccount.id, chain.utilityAsset)
+            walletRepository.assetFlow(metaAccount.id, chain.commissionAsset)
         }
     }
 

@@ -29,5 +29,5 @@ class NativeAssetTransfers(
         )
     }
 
-    override val transferFunction: Pair<String, String> = Modules.BALANCES to "transfer"
+    override val transferFunctions = listOf(Modules.BALANCES to "transfer")
 }
