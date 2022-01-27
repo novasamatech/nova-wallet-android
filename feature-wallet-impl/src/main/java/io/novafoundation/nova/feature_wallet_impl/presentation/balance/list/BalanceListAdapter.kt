@@ -13,12 +13,10 @@ import io.novafoundation.nova.common.utils.format
 import io.novafoundation.nova.common.utils.formatAsCurrency
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.setTextColorRes
-import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_wallet_impl.R
 import io.novafoundation.nova.feature_wallet_impl.presentation.model.AssetModel
-import io.novafoundation.nova.runtime.ext.isUtilityAsset
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_asset.view.*
 import java.math.BigDecimal
@@ -76,9 +74,7 @@ class AssetViewHolder(
     fun bind(asset: AssetModel, itemHandler: BalanceListAdapter.ItemAssetHandler) = with(containerView) {
         itemAssetImage.load(asset.token.configuration.iconUrl, imageLoader)
 
-        val shouldShowNetwork = asset.token.configuration.isUtilityAsset.not()
-
-        itemAssetNetwork.setTextOrHide(asset.token.configuration.name)
+        itemAssetNetwork.text = asset.token.configuration.name
 
         bindDollarInfo(asset)
 
