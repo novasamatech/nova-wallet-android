@@ -131,7 +131,7 @@ class WalletInteractorImpl(
         }
     }
 
-    private fun balancesFromAssets(assets: List<Asset>) : Balances {
+    private fun balancesFromAssets(assets: List<Asset>): Balances {
         val (totalFiat, lockedFiat) = assets.fold(BigDecimal.ZERO to BigDecimal.ZERO) { (total, locked), asset ->
             val assetTotalFiat = asset.token.fiatAmount(asset.total)
             val assetLockedFiat = asset.token.fiatAmount(asset.locked)
