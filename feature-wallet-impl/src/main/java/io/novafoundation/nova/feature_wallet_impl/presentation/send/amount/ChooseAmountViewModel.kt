@@ -85,7 +85,7 @@ class ChooseAmountViewModel(
         .inBackground()
         .share()
 
-    private val commissionAssetFlow = interactor.utilityAssetFlow(assetPayload.chainId)
+    private val commissionAssetFlow = interactor.commissionAssetFlow(assetPayload.chainId)
         .inBackground()
         .share()
 

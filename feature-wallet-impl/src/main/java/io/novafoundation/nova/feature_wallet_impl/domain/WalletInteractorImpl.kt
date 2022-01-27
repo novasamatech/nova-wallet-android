@@ -10,7 +10,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletReposit
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.OperationsPageChange
-import io.novafoundation.nova.runtime.ext.utilityAsset
+import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
@@ -62,11 +62,11 @@ class WalletInteractorImpl(
         }
     }
 
-    override fun utilityAssetFlow(chainId: ChainId): Flow<Asset> {
+    override fun commissionAssetFlow(chainId: ChainId): Flow<Asset> {
         return accountRepository.selectedMetaAccountFlow().flatMapLatest { metaAccount ->
             val chain = chainRegistry.getChain(chainId)
 
-            walletRepository.assetFlow(metaAccount.id, chain.utilityAsset)
+            walletRepository.assetFlow(metaAccount.id, chain.commissionAsset)
         }
     }
 

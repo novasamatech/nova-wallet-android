@@ -37,6 +37,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.phishing.Phishing
 import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
 import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
 import io.novafoundation.nova.runtime.ext.addressOf
+import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.ext.historySupported
 import io.novafoundation.nova.runtime.ext.isUtilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -285,7 +286,7 @@ class WalletRepositoryImpl(
             amount = transfer.amountInPlanks,
             senderAddress = senderAddress,
             receiverAddress = transfer.chain.addressOf(transfer.recipient),
-            fee = transfer.chainAsset.planksFromAmount(fee),
+            fee = transfer.chain.commissionAsset.planksFromAmount(fee),
             status = OperationLocal.Status.PENDING,
             source = source
         )
