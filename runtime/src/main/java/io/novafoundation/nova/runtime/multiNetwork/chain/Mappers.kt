@@ -98,7 +98,7 @@ private fun mapChainAssetTypeFromRaw(type: String?, typeExtras: Map<String, Any?
 private fun mapChainAssetTypeToRaw(type: Chain.Asset.Type): Pair<String, Map<String, Any?>?> = when (type) {
     is Chain.Asset.Type.Native -> ASSET_NATIVE to null
     is Chain.Asset.Type.Statemine -> ASSET_STATEMINE to mapOf(
-        STATEMINE_EXTRAS_ID to type.id
+        STATEMINE_EXTRAS_ID to type.id.toString()
     )
     is Chain.Asset.Type.Orml -> ASSET_ORML to mapOf(
         ORML_EXTRAS_CURRENCY_ID_SCALE to type.currencyIdScale,
