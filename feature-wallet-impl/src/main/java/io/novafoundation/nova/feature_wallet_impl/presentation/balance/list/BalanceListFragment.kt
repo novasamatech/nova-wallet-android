@@ -8,7 +8,6 @@ import coil.ImageLoader
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.formatAsCurrency
 import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
@@ -66,10 +65,12 @@ class BalanceListFragment : BaseFragment<BalanceListViewModel>(), BalanceListAda
     override fun subscribe(viewModel: BalanceListViewModel) {
         viewModel.sync()
 
-        viewModel.balancesFlow.observe {
-            adapter.submitListPreservingViewPoint(it.assetModels, balanceListAssets)
+        viewModel.assetsFlow.observe {
+            adapter.submitListPreservingViewPoint(it, balanceListAssets)
+        }
 
-            balanceListTotalAmount.text = it.totalBalance.formatAsCurrency()
+        viewModel.totalBalanceFlow.observe {
+            balanceListTotalBalance.showTotalBalance(it)
         }
 
         viewModel.currentAddressModelLiveData.observe {

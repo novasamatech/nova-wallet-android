@@ -71,5 +71,6 @@ interface WithContextExtensions {
     fun getRoundedCornerDrawable(
         @ColorRes fillColorRes: Int = R.color.black,
         @ColorRes strokeColorRes: Int? = null,
-    ) = providedContext.getRoundedCornerDrawable(fillColorRes, strokeColorRes)
+        cornerSizeDp: Int = 10,
+    ) = providedContext.getRoundedCornerDrawable(fillColorRes, strokeColorRes, cornerSizeDp)
 }
