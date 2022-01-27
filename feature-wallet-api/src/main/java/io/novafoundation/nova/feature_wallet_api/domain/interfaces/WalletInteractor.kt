@@ -15,7 +15,7 @@ interface WalletInteractor {
 
     fun assetFlow(chainId: ChainId, chainAssetId: Int): Flow<Asset>
 
-    fun utilityAssetFlow(chainId: ChainId): Flow<Asset>
+    fun commissionAssetFlow(chainId: ChainId): Flow<Asset>
 
     suspend fun getCurrentAsset(chainId: ChainId, chainAssetId: Int): Asset
 

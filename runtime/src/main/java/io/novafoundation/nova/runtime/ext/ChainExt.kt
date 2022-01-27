@@ -30,6 +30,9 @@ val Chain.typesUsage: TypesUsage
 val Chain.utilityAsset
     get() = assets.first(Chain.Asset::isUtilityAsset)
 
+val Chain.commissionAsset
+    get() = utilityAsset
+
 val Chain.Asset.isUtilityAsset: Boolean
     get() = id == 0
 
