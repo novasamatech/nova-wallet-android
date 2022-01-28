@@ -34,6 +34,10 @@ class AssetGroupingDecoration(
 
             val adapterPosition = viewHolder.adapterPosition
 
+            if (adapterPosition == RecyclerView.NO_POSITION) {
+                return@forEachIndexed
+            }
+
             val currentChainId = adapter.currentList[adapterPosition].token.configuration.chainId
             val nextChainId = adapter.currentList.getOrNull(adapterPosition + 1)?.token?.configuration?.chainId
 
