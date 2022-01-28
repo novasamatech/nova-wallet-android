@@ -8,12 +8,15 @@ import coil.ImageLoader
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.formatAsCurrency
 import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
+import io.novafoundation.nova.common.view.shape.addRipple
+import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.feature_wallet_impl.R
 import io.novafoundation.nova.feature_wallet_impl.di.WalletFeatureComponent
+import io.novafoundation.nova.feature_wallet_impl.presentation.balance.list.view.AssetGroupingDecoration
+import io.novafoundation.nova.feature_wallet_impl.presentation.balance.list.view.BalanceListAdapter
 import io.novafoundation.nova.feature_wallet_impl.presentation.model.AssetModel
 import kotlinx.android.synthetic.main.fragment_balance_list.*
 import javax.inject.Inject
@@ -44,6 +47,11 @@ class BalanceListFragment : BaseFragment<BalanceListViewModel>(), BalanceListAda
         adapter = BalanceListAdapter(imageLoader, this)
         balanceListAssets.adapter = adapter
 
+        val groupBackground = with(requireContext()) {
+            addRipple(getRoundedCornerDrawable(R.color.blurColor))
+        }
+        balanceListAssets.addItemDecoration(AssetGroupingDecoration(groupBackground, requireContext()))
+
         walletContainer.setOnRefreshListener {
             viewModel.sync()
         }
@@ -66,10 +74,12 @@ class BalanceListFragment : BaseFragment<BalanceListViewModel>(), BalanceListAda
     override fun subscribe(viewModel: BalanceListViewModel) {
         viewModel.sync()
 
-        viewModel.balancesFlow.observe {
-            adapter.submitListPreservingViewPoint(it.assetModels, balanceListAssets)
+        viewModel.assetsFlow.observe {
+            adapter.submitListPreservingViewPoint(it, balanceListAssets)
+        }
 
-            balanceListTotalAmount.text = it.totalBalance.formatAsCurrency()
+        viewModel.totalBalanceFlow.observe {
+            balanceListTotalBalance.showTotalBalance(it)
         }
 
         viewModel.currentAddressModelLiveData.observe {

@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.address.createAddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.formatAsCurrency
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress
@@ -15,7 +16,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletInterac
 import io.novafoundation.nova.feature_wallet_impl.data.mappers.mapAssetToAssetModel
 import io.novafoundation.nova.feature_wallet_impl.presentation.AssetPayload
 import io.novafoundation.nova.feature_wallet_impl.presentation.WalletRouter
-import io.novafoundation.nova.feature_wallet_impl.presentation.balance.list.model.BalanceModel
+import io.novafoundation.nova.feature_wallet_impl.presentation.balance.list.model.TotalBalanceModel
 import io.novafoundation.nova.feature_wallet_impl.presentation.model.AssetModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -35,7 +36,22 @@ class BalanceListViewModel(
 
     val currentAddressModelLiveData = currentAddressModelFlow().asLiveData()
 
-    val balancesFlow = balanceFlow()
+    private val balancesFlow = interactor.balancesFlow()
+        .inBackground()
+        .share()
+
+    val assetsFlow = balancesFlow.map {
+        it.assets.map(::mapAssetToAssetModel)
+    }
+        .inBackground()
+        .share()
+
+    val totalBalanceFlow = balancesFlow.map {
+        TotalBalanceModel(
+            totalBalanceFiat = it.totalBalanceFiat.formatAsCurrency(),
+            lockedBalanceFiat = it.lockedBalanceFiat.formatAsCurrency()
+        )
+    }
         .inBackground()
         .share()
 
@@ -65,14 +81,5 @@ class BalanceListViewModel(
     private fun currentAddressModelFlow(): Flow<AddressModel> {
         return selectedAccountUseCase.selectedMetaAccountFlow()
             .map { addressIconGenerator.createAddressModel(it.defaultSubstrateAddress, CURRENT_ICON_SIZE, it.name) }
-    }
-
-    private fun balanceFlow(): Flow<BalanceModel> {
-        return interactor.assetsFlow()
-            .map {
-                val assetModels = it.map(::mapAssetToAssetModel)
-
-                BalanceModel(assetModels)
-            }
     }
 }

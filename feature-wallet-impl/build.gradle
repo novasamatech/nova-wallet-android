@@ -97,6 +97,8 @@ dependencies {
 
     implementation insetterDep
 
+    implementation shimmerDep
+
     androidTestImplementation androidTestRunnerDep
     androidTestImplementation androidTestRulesDep
     androidTestImplementation androidJunitDep

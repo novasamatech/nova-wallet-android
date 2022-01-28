@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFi
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.domain.model.Balances
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.OperationsPageChange
 import io.novafoundation.nova.runtime.ext.commissionAsset
@@ -22,6 +23,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.withContext
+import java.math.BigDecimal
 
 class WalletInteractorImpl(
     private val walletRepository: WalletRepository,
@@ -29,7 +31,7 @@ class WalletInteractorImpl(
     private val chainRegistry: ChainRegistry,
 ) : WalletInteractor {
 
-    override fun assetsFlow(): Flow<List<Asset>> {
+    override fun balancesFlow(): Flow<Balances> {
         return accountRepository.selectedMetaAccountFlow()
             .flatMapLatest { walletRepository.assetsFlow(it.id) }
             .filter { it.isNotEmpty() }
@@ -39,12 +41,14 @@ class WalletInteractorImpl(
                 val fiatByChain = assets.groupBy { it.token.configuration.chainId }
                     .mapValues { (_, assets) -> assets.sumByBigDecimal { it.token.fiatAmount(it.total) } }
 
-                assets.sortedWith(
+                val assets = assets.sortedWith(
                     compareByDescending<Asset> { fiatByChain.getValue(it.token.configuration.chainId) }
                         .thenBy { chains.getValue(it.token.configuration.chainId).name }
                         .thenByDescending { it.token.fiatAmount(it.total) }
                         .thenBy { it.token.configuration.id }
                 )
+
+                balancesFromAssets(assets)
             }
     }
 
@@ -125,5 +129,20 @@ class WalletInteractorImpl(
                 chainAsset
             )
         }
+    }
+
+    private fun balancesFromAssets(assets: List<Asset>): Balances {
+        val (totalFiat, lockedFiat) = assets.fold(BigDecimal.ZERO to BigDecimal.ZERO) { (total, locked), asset ->
+            val assetTotalFiat = asset.token.fiatAmount(asset.total)
+            val assetLockedFiat = asset.token.fiatAmount(asset.locked)
+
+            (total + assetTotalFiat) to (locked + assetLockedFiat)
+        }
+
+        return Balances(
+            assets = assets,
+            totalBalanceFiat = totalFiat,
+            lockedBalanceFiat = lockedFiat
+        )
     }
 }
