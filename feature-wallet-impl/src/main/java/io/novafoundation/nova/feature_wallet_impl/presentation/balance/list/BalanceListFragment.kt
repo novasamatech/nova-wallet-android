@@ -10,9 +10,13 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
+import io.novafoundation.nova.common.view.shape.addRipple
+import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.feature_wallet_impl.R
 import io.novafoundation.nova.feature_wallet_impl.di.WalletFeatureComponent
+import io.novafoundation.nova.feature_wallet_impl.presentation.balance.list.view.AssetGroupingDecoration
+import io.novafoundation.nova.feature_wallet_impl.presentation.balance.list.view.BalanceListAdapter
 import io.novafoundation.nova.feature_wallet_impl.presentation.model.AssetModel
 import kotlinx.android.synthetic.main.fragment_balance_list.*
 import javax.inject.Inject
@@ -42,6 +46,11 @@ class BalanceListFragment : BaseFragment<BalanceListViewModel>(), BalanceListAda
 
         adapter = BalanceListAdapter(imageLoader, this)
         balanceListAssets.adapter = adapter
+
+        val groupBackground = with(requireContext()) {
+            addRipple(getRoundedCornerDrawable(R.color.blurColor))
+        }
+        balanceListAssets.addItemDecoration(AssetGroupingDecoration(groupBackground, requireContext()))
 
         walletContainer.setOnRefreshListener {
             viewModel.sync()

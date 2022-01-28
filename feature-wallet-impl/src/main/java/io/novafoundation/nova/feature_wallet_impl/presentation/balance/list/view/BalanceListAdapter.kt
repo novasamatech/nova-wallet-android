@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_wallet_impl.presentation.balance.list
+package io.novafoundation.nova.feature_wallet_impl.presentation.balance.list.view
 
 import android.view.View
 import android.view.ViewGroup
@@ -13,7 +13,6 @@ import io.novafoundation.nova.common.utils.format
 import io.novafoundation.nova.common.utils.formatAsCurrency
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.setTextColorRes
-import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_wallet_impl.R
 import io.novafoundation.nova.feature_wallet_impl.presentation.model.AssetModel
@@ -64,9 +63,6 @@ class AssetViewHolder(
 ) : RecyclerView.ViewHolder(containerView), LayoutContainer {
     init {
         with(containerView) {
-            itemAssetContainer.background = with(context) {
-                addRipple(getRoundedCornerDrawable(R.color.blurColor))
-            }
             itemAssetNetwork.background = context.getRoundedCornerDrawable(R.color.white_16, cornerSizeInDp = 3)
         }
     }
