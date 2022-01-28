@@ -20,9 +20,7 @@
         android:gravity="center_vertical"
         android:includeFontPadding="false"
         android:text="@string/wallet_balance_details_total"
-        android:textColor="@color/white_64"
-        app:drawableEndCompat="@drawable/ic_info_16"
-        app:drawableTint="@color/white_48" />
+        android:textColor="@color/white_64" />
 
     <TextView
         android:id="@+id/viewAssetsTotalBalanceTotal"

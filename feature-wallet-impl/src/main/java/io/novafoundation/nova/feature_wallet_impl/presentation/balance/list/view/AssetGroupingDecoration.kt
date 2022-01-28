@@ -18,7 +18,7 @@ class AssetGroupingDecoration(
 ) : RecyclerView.ItemDecoration() {
 
     private val bounds = Rect()
-    private val groupIntraSpacing = 8.dp(context)
+    private val groupOuterSpacing = 8.dp(context)
     private val groupInnerSpacing = 4.dp(context)
 
     override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
@@ -44,7 +44,7 @@ class AssetGroupingDecoration(
 
             if (currentChainId != nextChainId) {
                 parent.getDecoratedBoundsWithMargins(view, bounds)
-                val groupBottom = bounds.bottom + view.translationY.roundToInt() - groupIntraSpacing
+                val groupBottom = bounds.bottom + view.translationY.roundToInt() - groupOuterSpacing
 
                 background.setBounds(bounds.left, groupTop, bounds.right, groupBottom)
                 background.draw(c)
@@ -71,7 +71,7 @@ class AssetGroupingDecoration(
         val nextChainId = adapter.currentList.getOrNull(adapterPosition + 1)?.token?.configuration?.chainId
 
         val top = if (previousChainId != currentChainId) groupInnerSpacing else 0
-        val bottom = if (nextChainId != currentChainId) groupInnerSpacing + groupIntraSpacing else 0
+        val bottom = if (nextChainId != currentChainId) groupInnerSpacing + groupOuterSpacing else 0
 
         outRect.set(0, top, 0, bottom)
     }
