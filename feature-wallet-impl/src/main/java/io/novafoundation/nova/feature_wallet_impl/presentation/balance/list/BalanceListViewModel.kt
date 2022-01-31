@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_wallet_impl.presentation.WalletRouter
 import io.novafoundation.nova.feature_wallet_impl.presentation.balance.list.model.TotalBalanceModel
 import io.novafoundation.nova.feature_wallet_impl.presentation.model.AssetModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -34,7 +35,9 @@ class BalanceListViewModel(
     private val _hideRefreshEvent = MutableLiveData<Event<Unit>>()
     val hideRefreshEvent: LiveData<Event<Unit>> = _hideRefreshEvent
 
-    val currentAddressModelLiveData = currentAddressModelFlow().asLiveData()
+    val currentAddressModelFlow = currentAddressModelFlow()
+        .inBackground()
+        .share()
 
     private val balancesFlow = interactor.balancesFlow()
         .inBackground()
@@ -43,6 +46,7 @@ class BalanceListViewModel(
     val assetsFlow = balancesFlow.map {
         it.assets.map(::mapAssetToAssetModel)
     }
+        .distinctUntilChanged()
         .inBackground()
         .share()
 
