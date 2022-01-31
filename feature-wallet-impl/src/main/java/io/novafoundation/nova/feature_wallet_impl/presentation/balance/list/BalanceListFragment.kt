@@ -4,28 +4,40 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.ConcatAdapter
 import coil.ImageLoader
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.hideKeyboard
-import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.feature_wallet_impl.R
 import io.novafoundation.nova.feature_wallet_impl.di.WalletFeatureComponent
 import io.novafoundation.nova.feature_wallet_impl.presentation.balance.list.view.AssetGroupingDecoration
+import io.novafoundation.nova.feature_wallet_impl.presentation.balance.list.view.AssetsHeaderAdapter
 import io.novafoundation.nova.feature_wallet_impl.presentation.balance.list.view.BalanceListAdapter
 import io.novafoundation.nova.feature_wallet_impl.presentation.model.AssetModel
-import kotlinx.android.synthetic.main.fragment_balance_list.*
+import kotlinx.android.synthetic.main.fragment_balance_list.balanceListAssets
+import kotlinx.android.synthetic.main.fragment_balance_list.walletContainer
 import javax.inject.Inject
 
-class BalanceListFragment : BaseFragment<BalanceListViewModel>(), BalanceListAdapter.ItemAssetHandler {
+class BalanceListFragment : BaseFragment<BalanceListViewModel>(), BalanceListAdapter.ItemAssetHandler, AssetsHeaderAdapter.Handler {
 
     @Inject protected lateinit var imageLoader: ImageLoader
 
-    private lateinit var adapter: BalanceListAdapter
+    private val assetsAdapter by lazy(LazyThreadSafetyMode.NONE) {
+        BalanceListAdapter(imageLoader, this)
+    }
+
+    private val headerAdapter by lazy(LazyThreadSafetyMode.NONE) {
+        AssetsHeaderAdapter(this)
+    }
+
+    private val adapter by lazy(LazyThreadSafetyMode.NONE) {
+        ConcatAdapter(headerAdapter, assetsAdapter)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,7 +48,7 @@ class BalanceListFragment : BaseFragment<BalanceListViewModel>(), BalanceListAda
     }
 
     override fun initViews() {
-        balanceListContent.applyInsetter {
+        balanceListAssets.applyInsetter {
             type(statusBars = true) {
                 padding()
             }
@@ -44,20 +56,23 @@ class BalanceListFragment : BaseFragment<BalanceListViewModel>(), BalanceListAda
 
         hideKeyboard()
 
-        adapter = BalanceListAdapter(imageLoader, this)
+        balanceListAssets.setHasFixedSize(true)
         balanceListAssets.adapter = adapter
 
         val groupBackground = with(requireContext()) {
             addRipple(getRoundedCornerDrawable(R.color.blurColor))
         }
-        balanceListAssets.addItemDecoration(AssetGroupingDecoration(groupBackground, requireContext()))
+        val decoration = AssetGroupingDecoration(
+            background = groupBackground,
+            assetsAdapter = assetsAdapter,
+            context = requireContext(),
+        )
+        balanceListAssets.addItemDecoration(decoration)
+        // modification animations only harm here
+        balanceListAssets.itemAnimator = null
 
         walletContainer.setOnRefreshListener {
             viewModel.sync()
-        }
-
-        balanceListAvatar.setOnClickListener {
-            viewModel.avatarClicked()
         }
     }
 
@@ -75,17 +90,12 @@ class BalanceListFragment : BaseFragment<BalanceListViewModel>(), BalanceListAda
         viewModel.sync()
 
         viewModel.assetsFlow.observe {
-            adapter.submitListPreservingViewPoint(it, balanceListAssets)
+            assetsAdapter.submitList(it)
         }
 
-        viewModel.totalBalanceFlow.observe {
-            balanceListTotalBalance.showTotalBalance(it)
-        }
+        viewModel.totalBalanceFlow.observe(headerAdapter::setTotalBalance)
 
-        viewModel.currentAddressModelLiveData.observe {
-            balanceListTotalTitle.text = it.name
-            balanceListAvatar.setImageDrawable(it.image)
-        }
+        viewModel.currentAddressModelFlow.observe(headerAdapter::setAddress)
 
         viewModel.hideRefreshEvent.observeEvent {
             walletContainer.isRefreshing = false
@@ -94,5 +104,9 @@ class BalanceListFragment : BaseFragment<BalanceListViewModel>(), BalanceListAda
 
     override fun assetClicked(asset: AssetModel) {
         viewModel.assetClicked(asset)
+    }
+
+    override fun avatarClicked() {
+        viewModel.avatarClicked()
     }
 }
