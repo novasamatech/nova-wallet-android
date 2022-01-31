@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_wallet_impl.presentation.balance.list
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,7 +11,6 @@ import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.hideKeyboard
-import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
@@ -67,9 +67,10 @@ class BalanceListFragment : BaseFragment<BalanceListViewModel>(), BalanceListAda
             background = groupBackground,
             assetsAdapter = assetsAdapter,
             context = requireContext(),
-            isApplicable = { globalPosition -> globalPosition > headerAdapter.itemCount - 1 }
         )
         balanceListAssets.addItemDecoration(decoration)
+        // modification animations only harm here
+        balanceListAssets.itemAnimator = null
 
         walletContainer.setOnRefreshListener {
             viewModel.sync()
@@ -90,7 +91,9 @@ class BalanceListFragment : BaseFragment<BalanceListViewModel>(), BalanceListAda
         viewModel.sync()
 
         viewModel.assetsFlow.observe {
-            assetsAdapter.submitListPreservingViewPoint(it, balanceListAssets)
+            Log.d("RX", "Assets update")
+
+            assetsAdapter.submitList(it)
         }
 
         viewModel.totalBalanceFlow.observe(headerAdapter::setTotalBalance)

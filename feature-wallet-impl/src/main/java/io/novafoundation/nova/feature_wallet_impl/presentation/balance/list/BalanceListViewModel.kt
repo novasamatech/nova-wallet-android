@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_wallet_impl.presentation.WalletRouter
 import io.novafoundation.nova.feature_wallet_impl.presentation.balance.list.model.TotalBalanceModel
 import io.novafoundation.nova.feature_wallet_impl.presentation.model.AssetModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -45,6 +46,7 @@ class BalanceListViewModel(
     val assetsFlow = balancesFlow.map {
         it.assets.map(::mapAssetToAssetModel)
     }
+        .distinctUntilChanged()
         .inBackground()
         .share()
 

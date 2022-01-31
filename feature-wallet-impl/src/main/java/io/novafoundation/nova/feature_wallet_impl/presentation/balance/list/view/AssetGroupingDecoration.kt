@@ -15,13 +15,15 @@ import kotlin.math.roundToInt
 class AssetGroupingDecoration(
     private val background: Drawable,
     private val assetsAdapter: ListAdapter<AssetModel, *>,
-    private val context: Context,
-    private val isApplicable: (globalAdapterPosition: Int) -> Boolean
+    context: Context,
 ) : RecyclerView.ItemDecoration() {
 
     private val bounds = Rect()
     private val groupOuterSpacing = 8.dp(context)
     private val groupInnerSpacing = 4.dp(context)
+
+    // used to hide rounded corners for the last group to simulate effect of not-closed group
+    private val finalGroupExtraPadding = 20.dp(context)
 
     override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
         if (assetsAdapter.itemCount == 0) return
@@ -44,6 +46,7 @@ class AssetGroupingDecoration(
             }
 
             when {
+                // if group changed
                 currentChainId != nextChainId -> {
                     parent.getDecoratedBoundsWithMargins(view, bounds)
                     val groupBottom = bounds.bottom + view.translationY.roundToInt() - groupOuterSpacing
@@ -58,10 +61,11 @@ class AssetGroupingDecoration(
                         groupTop = bounds.top + view.translationY.roundToInt()
                     }
                 }
+                // draw last group
                 index == parent.childCount - 1 -> {
                     parent.getDecoratedBoundsWithMargins(view, bounds)
 
-                    val groupBottom = bounds.bottom + view.translationY.roundToInt() + 20.dp(context)
+                    val groupBottom = bounds.bottom + view.translationY.roundToInt() + finalGroupExtraPadding
                     background.setBounds(bounds.left, groupTop, bounds.right, groupBottom)
                     background.draw(c)
                 }
@@ -91,6 +95,6 @@ class AssetGroupingDecoration(
     }
 
     private fun shouldSkip(viewHolder: RecyclerView.ViewHolder): Boolean {
-        return viewHolder.bindingAdapterPosition == RecyclerView.NO_POSITION || !isApplicable(viewHolder.absoluteAdapterPosition)
+        return viewHolder.bindingAdapterPosition == RecyclerView.NO_POSITION || viewHolder !is AssetViewHolder
     }
 }
