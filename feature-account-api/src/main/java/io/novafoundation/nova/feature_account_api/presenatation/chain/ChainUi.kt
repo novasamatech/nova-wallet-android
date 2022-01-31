@@ -9,7 +9,7 @@ data class ChainUi(
 
 @Suppress("ArrayInDataClass", "EqualsOrHashCode")
 data class GradientUi(
-    val angle: Float,
+    val angle: Int,
     val colors: IntArray,
     val positions: FloatArray
 ) {
@@ -19,5 +19,3 @@ data class GradientUi(
             positions.contentEquals(other.positions)
     }
 }
-
-

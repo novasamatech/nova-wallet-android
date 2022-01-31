@@ -12,6 +12,10 @@ private val PERCENTAGE_MULTIPLIER = 100.toBigDecimal()
 
 fun BigDecimal.fractionToPercentage() = this * PERCENTAGE_MULTIPLIER
 
+fun Float.percentageToFraction() = this / 100f
+
+infix fun Int.floorMod(divisor: Int) = Math.floorMod(this, divisor)
+
 val BigDecimal.isNonNegative: Boolean
     get() = signum() >= 0
 

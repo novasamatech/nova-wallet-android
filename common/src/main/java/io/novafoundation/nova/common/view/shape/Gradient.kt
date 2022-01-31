@@ -8,12 +8,11 @@ import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.RoundRectShape
 import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.common.utils.quantize
-import kotlin.math.roundToInt
 
 fun Context.gradientDrawable(
     colors: IntArray,
     offsets: FloatArray,
-    angle: Float,
+    angle: Int,
     cornerRadiusDp: Int
 ): Drawable {
     val gradientFactory: ShapeDrawable.ShaderFactory = object : ShapeDrawable.ShaderFactory() {
@@ -31,7 +30,7 @@ fun Context.gradientDrawable(
 }
 
 private fun gradientDirectionCoordinates(
-    angle: Float,
+    angle: Int,
     width: Float,
     height: Float
 ): List<Float> {
@@ -41,7 +40,7 @@ private fun gradientDirectionCoordinates(
     val y1: Float
 
     // Adopted from GradientDrawable since it does not allow to supply positions on pre-Q (<29) devices
-    when (angle.roundToInt().quantize(45)) {
+    when (angle.quantize(45)) {
         270 -> {
             x0 = 0f
             y0 = 0f

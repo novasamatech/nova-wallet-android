@@ -31,18 +31,18 @@ object ChainGradientParser {
             Chain.Gradient(
                 angle = degreeRaw.toFloat(),
                 colors = colors,
-                positions = positions
+                positionsPercent = positions
             )
         }.getOrThrow()
     }
 
     fun encode(gradient: Chain.Gradient?): String? = gradient?.let {
-        gradient.colors.zip(gradient.positions).joinToString(
+        gradient.colors.zip(gradient.positionsPercent).joinToString(
             prefix = "linear-gradient(${gradient.angle}deg, ",
             separator = ", ",
             postfix = ")"
         ) { (color, position) ->
-            "$color ${position}%"
+            "$color $position%"
         }
     }
 }

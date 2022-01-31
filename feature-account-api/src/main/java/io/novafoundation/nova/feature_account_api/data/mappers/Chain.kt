@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_account_api.data.mappers
 
 import android.graphics.Color
+import io.novafoundation.nova.common.utils.floorMod
+import io.novafoundation.nova.common.utils.percentageToFraction
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.feature_account_api.presenatation.chain.GradientUi
 import io.novafoundation.nova.runtime.multiNetwork.ChainGradientParser
@@ -20,7 +22,23 @@ fun mapChainToUi(chain: Chain): ChainUi = with(chain) {
 }
 
 private fun mapGradientToUi(gradient: Chain.Gradient) = GradientUi(
-    angle = gradient.angle,
+    angle = cssAngleToAndroid(gradient.angle.toInt()),
     colors = gradient.colors.map(Color::parseColor).toIntArray(),
-    positions = gradient.positions.toFloatArray()
+    positions = gradient.positionsPercent.map(Float::percentageToFraction).toFloatArray()
 )
+
+/**
+ * Given the following coordinate system
+ *          N
+ *          |
+ *          |
+ *          |
+ * W--------  --------- E
+ *          |
+ *          |
+ *          |
+ *          S
+ * Css starts from N clockwise
+ * Android starts from E counter-clockwise
+ */
+fun cssAngleToAndroid(angle: Int) = (-angle + 90) floorMod 360

@@ -47,7 +47,7 @@ class WalletInteractorImpl(
                 val assetsByChain = assets.groupBy { chains.getValue(it.token.configuration.chainId) }
                     .mapValues { (_, assets) ->
                         assets.sortedWith(
-                            compareByDescending<Asset> {  it.token.fiatAmount(it.total)  }
+                            compareByDescending<Asset> { it.token.fiatAmount(it.total) }
                                 .thenBy { it.token.configuration.symbol }
                         )
                     }.mapKeys { (chain, assets) ->
@@ -143,19 +143,20 @@ class WalletInteractorImpl(
 
     private fun balancesFromAssets(
         assets: List<Asset>,
-        groupedAssets: GroupedList<AssetGroup, Asset>)
-    : Balances {
-        val (totalFiat, lockedFiat) = assets.fold(BigDecimal.ZERO to BigDecimal.ZERO) { (total, locked), asset ->
-            val assetTotalFiat = asset.token.fiatAmount(asset.total)
-            val assetLockedFiat = asset.token.fiatAmount(asset.locked)
+        groupedAssets: GroupedList<AssetGroup, Asset>
+    ):
+        Balances {
+            val (totalFiat, lockedFiat) = assets.fold(BigDecimal.ZERO to BigDecimal.ZERO) { (total, locked), asset ->
+                val assetTotalFiat = asset.token.fiatAmount(asset.total)
+                val assetLockedFiat = asset.token.fiatAmount(asset.locked)
 
-            (total + assetTotalFiat) to (locked + assetLockedFiat)
+                (total + assetTotalFiat) to (locked + assetLockedFiat)
+            }
+
+            return Balances(
+                assets = groupedAssets,
+                totalBalanceFiat = totalFiat,
+                lockedBalanceFiat = lockedFiat
+            )
         }
-
-        return Balances(
-            assets = groupedAssets,
-            totalBalanceFiat = totalFiat,
-            lockedBalanceFiat = lockedFiat
-        )
-    }
 }

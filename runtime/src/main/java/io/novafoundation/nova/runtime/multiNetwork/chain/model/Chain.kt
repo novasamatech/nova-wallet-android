@@ -93,7 +93,7 @@ data class Chain(
     data class Gradient(
         val angle: Float,
         val colors: List<String>,
-        val positions: List<Float>
+        val positionsPercent: List<Float>
     )
 }
 

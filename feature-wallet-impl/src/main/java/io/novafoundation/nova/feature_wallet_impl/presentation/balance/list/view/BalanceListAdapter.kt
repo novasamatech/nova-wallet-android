@@ -81,7 +81,7 @@ class BalanceListAdapter(
 class AssetGroupViewHolder(
     containerView: View,
     private val imageLoader: ImageLoader
-): GroupedListHolder(containerView) {
+) : GroupedListHolder(containerView) {
     init {
         with(containerView) {
             itemAssetGroupLabel.background = context.getRoundedCornerDrawable(R.color.white_16, cornerSizeInDp = 8)
@@ -143,14 +143,14 @@ class AssetViewHolder(
     }
 }
 
-private object DiffCallback: BaseGroupedDiffCallback<AssetGroupUi, AssetModel>(AssetGroupUi::class.java) {
+private object DiffCallback : BaseGroupedDiffCallback<AssetGroupUi, AssetModel>(AssetGroupUi::class.java) {
 
     override fun areGroupItemsTheSame(oldItem: AssetGroupUi, newItem: AssetGroupUi): Boolean {
         return oldItem.chainUi.id == newItem.chainUi.id
     }
 
     override fun areGroupContentsTheSame(oldItem: AssetGroupUi, newItem: AssetGroupUi): Boolean {
-       return oldItem == newItem
+        return oldItem == newItem
     }
 
     override fun areChildItemsTheSame(oldItem: AssetModel, newItem: AssetModel): Boolean {
@@ -158,7 +158,7 @@ private object DiffCallback: BaseGroupedDiffCallback<AssetGroupUi, AssetModel>(A
     }
 
     override fun areChildContentsTheSame(oldItem: AssetModel, newItem: AssetModel): Boolean {
-        return  oldItem == newItem
+        return oldItem == newItem
     }
 
     override fun getChildChangePayload(oldItem: AssetModel, newItem: AssetModel): Any? {
