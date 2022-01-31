@@ -21,25 +21,6 @@
         app:layout_constraintTop_toTopOf="@+id/itemAssetToken"
         tools:src="@drawable/ic_token_ksm" />
 
-
-    <TextView
-        android:id="@+id/itemAssetNetwork"
-        style="@style/TextAppearance.NovaFoundation.SemiBold.Caps"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/white_64"
-        android:paddingTop="1.5dp"
-        android:paddingBottom="1.5dp"
-        android:paddingStart="4dp"
-        android:paddingEnd="4dp"
-        android:layout_marginStart="4dp"
-        app:layout_constraintBottom_toBottomOf="@+id/itemAssetToken"
-        app:layout_constraintStart_toEndOf="@+id/itemAssetToken"
-        app:layout_constraintTop_toTopOf="@+id/itemAssetToken"
-        app:layout_constraintVertical_chainStyle="packed"
-        tools:background="@color/white_16"
-        tools:text="Kusama" />
-
     <TextView
         android:id="@+id/itemAssetToken"
         style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
