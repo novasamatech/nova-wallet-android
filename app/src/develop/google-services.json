@@ -43,9 +43,9 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:171267697857:android:084200d083841ad6267840",
+        "mobilesdk_app_id": "1:171267697857:android:a456988f1af9a191267840",
         "android_client_info": {
-          "package_name": "io.novafoundation.nova.develop"
+          "package_name": "io.novafoundation.nova.dev"
         }
       },
       "oauth_client": [
