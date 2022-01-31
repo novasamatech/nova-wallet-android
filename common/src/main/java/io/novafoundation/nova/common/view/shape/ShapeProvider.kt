@@ -121,7 +121,6 @@ private fun Context.cornerDrawableFromColors(
     return MaterialShapeDrawable(shapeBuilder(cornerSizePx)).apply {
         setFillColor(ColorStateList.valueOf(fillColor))
 
-        colorFilter
         strokeColor?.let {
             setStroke(strokeSizePx, it)
         }

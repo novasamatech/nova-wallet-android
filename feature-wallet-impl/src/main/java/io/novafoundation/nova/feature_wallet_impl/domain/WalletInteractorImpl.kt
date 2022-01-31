@@ -41,8 +41,8 @@ class WalletInteractorImpl(
                 val chains = chainRegistry.chainsById.first()
 
                 val assetGroupComparator = compareByDescending(AssetGroup::groupBalanceFiat)
-                    .thenByDescending { it.zeroBalance } // non-zero balances  first
-                    .thenBy { it.chain.name } //
+                    .thenByDescending { it.zeroBalance } // non-zero balances first
+                    .thenBy { it.chain.name } // SortedMap will collapse keys that are equal according to the comparator - need another field to compare by
 
                 val assetsByChain = assets.groupBy { chains.getValue(it.token.configuration.chainId) }
                     .mapValues { (_, assets) ->

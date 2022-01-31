@@ -19,7 +19,6 @@ object ChainGradientParser {
         if (definition == null) return null
 
         return runCatching {
-
             val (_, degreeRaw, colorsAndPositionsRaw) = MAIN_REGEX.find(definition)!!.groupValues
             val colorsAndPositions = COLORS_REGEX.findAll(colorsAndPositionsRaw).map { match ->
                 match.groupValues[1] to match.groupValues[2]
