@@ -43,6 +43,8 @@ fun InputStream.readText() = bufferedReader().use { it.readText() }
 
 fun <T> List<T>.second() = get(1)
 
+fun Int.quantize(factor: Int) = this - this % factor
+
 @Suppress("UNCHECKED_CAST")
 inline fun <K, V, R> Map<K, V>.mapValuesNotNull(crossinline mapper: (Map.Entry<K, V>) -> R?): Map<K, R> {
     return mapValues(mapper)

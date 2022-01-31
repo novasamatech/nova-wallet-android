@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.utils.formatAsCurrency
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
+import io.novafoundation.nova.common.view.shape.gradientDrawable
 import io.novafoundation.nova.feature_wallet_impl.R
 import io.novafoundation.nova.feature_wallet_impl.presentation.balance.list.model.AssetGroupUi
 import io.novafoundation.nova.feature_wallet_impl.presentation.model.AssetModel
@@ -88,9 +89,17 @@ class AssetGroupViewHolder(
     }
 
     fun bind(assetGroup: AssetGroupUi) = with(containerView) {
+
         itemAssetGroupLabel.text = assetGroup.chainUi.name
         itemAssetGroupBalance.text = assetGroup.groupBalanceFiat
+
         itemAssetGroupLabelIcon.load(assetGroup.chainUi.icon, imageLoader)
+        itemAssetGroupLabelIcon.background = context.gradientDrawable(
+            colors = assetGroup.chainUi.gradient.colors,
+            offsets = assetGroup.chainUi.gradient.positions,
+            angle = assetGroup.chainUi.gradient.angle,
+            cornerRadiusDp = 8
+        )
     }
 }
 

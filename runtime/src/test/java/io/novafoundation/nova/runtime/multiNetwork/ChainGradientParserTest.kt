@@ -7,10 +7,10 @@ import org.junit.Test
 class ChainGradientParserTest {
 
     private val tests = listOf(
-        "linear-gradient(135.7deg, #F2A007 19.29%, #A56B00 100.0%);" to
+        "linear-gradient(135.7deg, #F2A007 19.29%, #A56B00 100.0%)" to
             Chain.Gradient(
                 angle = 135.7f,
-                colors = listOf("F2A007".toInt(16), "A56B00".toInt(16)),
+                colors = listOf("#F2A007", "#A56B00"),
                 positions = listOf("19.29".toFloat(), "100".toFloat())
             )
     )
