@@ -1,8 +1,9 @@
 name: Build test and deploy develop apk
 
 on:
-  push:
-    branches: [develop]
+[pull_request]
+  # push:
+  #   branches: [develop]
 
 jobs:
   build:
@@ -37,12 +38,12 @@ jobs:
         run: ./gradlew runTest
 
       - name: Build with Gradle
-        run: ./gradlew assembleDebug
+        run: ./gradlew assembleDevelop
 
       - uses: actions/upload-artifact@v2
         with:
           name: apk
-          path: app/build/outputs/apk/debug/
+          path: app/build/outputs/apk/develop/
 
   upload:
     runs-on: ubuntu-latest
@@ -65,7 +66,7 @@ jobs:
           token: ${{ secrets.ANDROID_DEV_FIREBASE_TOKEN }}
           releaseNotes: ${{ github.event.head_commit.message }}
           groups: dev-team
-          file: app/app-debug.apk
+          file: app/app-develop.apk
 
       - name: Sleep for 60 seconds
         uses: whatnick/wait-action@master
@@ -81,4 +82,4 @@ jobs:
           token: ${{ secrets.ANDROID_DEV_FIREBASE_TOKEN }}
           releaseNotes: ${{ github.event.head_commit.message }}
           groups: dev-team
-          file: app/app-debug.apk
+          file: app/app-develop.apk

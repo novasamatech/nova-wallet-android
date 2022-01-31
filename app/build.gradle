@@ -20,7 +20,7 @@ android {
     }
     signingConfigs {
       ci {
-          storeFile file("debug_key.jks")
+          storeFile file("develop_key.jks")
           storePassword System.env.CI_KEYSTORE_PASS ?: ""
           keyAlias System.env.CI_KEYSTORE_KEY_ALIAS ?: ""
           keyPassword System.env.CI_KEYSTORE_KEY_PASS ?: ""
@@ -30,8 +30,6 @@ android {
         debug {
             applicationIdSuffix '.debug'
             versionNameSuffix '-debug'
-            signingConfig signingConfigs.ci
-            matchingFallbacks = ['debug']
         }
         release {
             minifyEnabled false
