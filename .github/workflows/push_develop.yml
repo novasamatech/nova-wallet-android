@@ -1,10 +1,8 @@
 name: Build test and deploy develop apk
 
 on:
-  [pull_request]
-  # push:
-  #   branches: [develop]
-  
+  push:
+    branches: [develop]
 
 jobs:
   build:
