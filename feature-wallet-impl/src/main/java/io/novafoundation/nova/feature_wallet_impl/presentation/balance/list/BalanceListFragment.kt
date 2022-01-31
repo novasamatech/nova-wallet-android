@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.presentation.balance.list
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -91,8 +90,6 @@ class BalanceListFragment : BaseFragment<BalanceListViewModel>(), BalanceListAda
         viewModel.sync()
 
         viewModel.assetsFlow.observe {
-            Log.d("RX", "Assets update")
-
             assetsAdapter.submitList(it)
         }
 
