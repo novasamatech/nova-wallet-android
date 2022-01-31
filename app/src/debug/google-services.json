@@ -40,42 +40,6 @@
           ]
         }
       }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:171267697857:android:3f2a01bd323948c5267840",
-        "android_client_info": {
-          "package_name": "io.novasolution.nova.debug"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "171267697857-m8ualu05e8trer0rpc5or4i6i8qjsrsl.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyBVjHJ5scX6GEKAhjKtLDvfPEGZcoLXty8"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "171267697857-m8ualu05e8trer0rpc5or4i6i8qjsrsl.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "171267697857-r9i2v9goejmkti198fnasft5anm7vdfk.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "io.novawallet.nova"
-              }
-            }
-          ]
-        }
-      }
     }
   ],
   "configuration_version": "1"

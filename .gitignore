@@ -13,3 +13,4 @@ app/*.apk
 /coverage
 
 *.jks
+!develop_key.jks
