@@ -14,7 +14,9 @@ import kotlin.math.roundToInt
 
 class AssetGroupingDecoration(
     private val background: Drawable,
-    private val context: Context
+    private val assetsAdapter: ListAdapter<AssetModel, *>,
+    private val context: Context,
+    private val isApplicable: (globalAdapterPosition: Int) -> Boolean
 ) : RecyclerView.ItemDecoration() {
 
     private val bounds = Rect()
@@ -22,42 +24,46 @@ class AssetGroupingDecoration(
     private val groupInnerSpacing = 4.dp(context)
 
     override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
-        val adapter = (parent.adapter as ListAdapter<AssetModel, *>)
-
-        if (adapter.itemCount == 0) return
+        if (assetsAdapter.itemCount == 0) return
 
         var groupTop = -1
 
         parent.children.forEachIndexed { index, view ->
-
             val viewHolder = parent.getChildViewHolder(view)
 
-            val adapterPosition = viewHolder.adapterPosition
+            if (shouldSkip(viewHolder)) return@forEachIndexed
 
-            if (adapterPosition == RecyclerView.NO_POSITION) {
-                return@forEachIndexed
-            }
+            val bindingPosition = viewHolder.bindingAdapterPosition
 
-            val currentChainId = adapter.currentList[adapterPosition].token.configuration.chainId
-            val nextChainId = adapter.currentList.getOrNull(adapterPosition + 1)?.token?.configuration?.chainId
+            val currentChainId = assetsAdapter.currentList[bindingPosition].token.configuration.chainId
+            val nextChainId = assetsAdapter.currentList.getOrNull(bindingPosition + 1)?.token?.configuration?.chainId
 
             if (groupTop == -1) {
                 parent.getDecoratedBoundsWithMargins(view, bounds)
                 groupTop = bounds.top + view.translationY.roundToInt()
             }
 
-            if (currentChainId != nextChainId) {
-                parent.getDecoratedBoundsWithMargins(view, bounds)
-                val groupBottom = bounds.bottom + view.translationY.roundToInt() - groupOuterSpacing
+            when {
+                currentChainId != nextChainId -> {
+                    parent.getDecoratedBoundsWithMargins(view, bounds)
+                    val groupBottom = bounds.bottom + view.translationY.roundToInt() - groupOuterSpacing
 
-                background.setBounds(bounds.left, groupTop, bounds.right, groupBottom)
-                background.draw(c)
+                    background.setBounds(bounds.left, groupTop, bounds.right, groupBottom)
+                    background.draw(c)
 
-                if (index + 1 < parent.childCount) {
-                    val nextView = parent.getChildAt(index + 1)
-                    parent.getDecoratedBoundsWithMargins(nextView, bounds)
+                    if (index + 1 < parent.childCount) {
+                        val nextView = parent.getChildAt(index + 1)
+                        parent.getDecoratedBoundsWithMargins(nextView, bounds)
 
-                    groupTop = bounds.top + view.translationY.roundToInt()
+                        groupTop = bounds.top + view.translationY.roundToInt()
+                    }
+                }
+                index == parent.childCount - 1 -> {
+                    parent.getDecoratedBoundsWithMargins(view, bounds)
+
+                    val groupBottom = bounds.bottom + view.translationY.roundToInt() + 20.dp(context)
+                    background.setBounds(bounds.left, groupTop, bounds.right, groupBottom)
+                    background.draw(c)
                 }
             }
         }
@@ -66,17 +72,25 @@ class AssetGroupingDecoration(
     override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
         val viewHolder = parent.getChildViewHolder(view)
 
-        val adapterPosition = viewHolder.adapterPosition
+        if (shouldSkip(viewHolder)) {
+            outRect.set(0, 0, 0, 0)
 
-        val adapter = (parent.adapter as ListAdapter<AssetModel, *>)
+            return
+        }
 
-        val previousChainId = adapter.currentList.getOrNull(adapterPosition - 1)?.token?.configuration?.chainId
-        val currentChainId = adapter.currentList[adapterPosition].token.configuration.chainId
-        val nextChainId = adapter.currentList.getOrNull(adapterPosition + 1)?.token?.configuration?.chainId
+        val adapterPosition = viewHolder.bindingAdapterPosition
+
+        val previousChainId = assetsAdapter.currentList.getOrNull(adapterPosition - 1)?.token?.configuration?.chainId
+        val currentChainId = assetsAdapter.currentList[adapterPosition].token.configuration.chainId
+        val nextChainId = assetsAdapter.currentList.getOrNull(adapterPosition + 1)?.token?.configuration?.chainId
 
         val top = if (previousChainId != currentChainId) groupInnerSpacing else 0
         val bottom = if (nextChainId != currentChainId) groupInnerSpacing + groupOuterSpacing else 0
 
         outRect.set(0, top, 0, bottom)
+    }
+
+    private fun shouldSkip(viewHolder: RecyclerView.ViewHolder): Boolean {
+        return viewHolder.bindingAdapterPosition == RecyclerView.NO_POSITION || !isApplicable(viewHolder.absoluteAdapterPosition)
     }
 }

@@ -34,7 +34,9 @@ class BalanceListViewModel(
     private val _hideRefreshEvent = MutableLiveData<Event<Unit>>()
     val hideRefreshEvent: LiveData<Event<Unit>> = _hideRefreshEvent
 
-    val currentAddressModelLiveData = currentAddressModelFlow().asLiveData()
+    val currentAddressModelFlow = currentAddressModelFlow()
+        .inBackground()
+        .share()
 
     private val balancesFlow = interactor.balancesFlow()
         .inBackground()

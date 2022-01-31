@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.content.res.TypedArray
 import android.graphics.drawable.Drawable
+import android.os.Parcelable
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.AttributeSet
@@ -22,6 +23,9 @@ import androidx.annotation.LayoutRes
 import androidx.annotation.StyleableRes
 import androidx.core.content.ContextCompat
 import androidx.core.widget.TextViewCompat
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
@@ -220,6 +224,22 @@ fun RecyclerView.enableShowingNewlyAddedTopElements(): RecyclerView.AdapterDataO
     adapter?.registerAdapterDataObserver(adapterDataObserver)
 
     return adapterDataObserver
+}
+
+fun Fragment.savingPosition(recyclerView: () -> RecyclerView) {
+    var state: Parcelable? = null
+
+    val observer: LifecycleObserver = object : DefaultLifecycleObserver {
+        override fun onCreate(owner: LifecycleOwner) {
+            state?.let(recyclerView().layoutManager!!::onRestoreInstanceState)
+        }
+
+        override fun onDestroy(owner: LifecycleOwner) {
+            state = recyclerView().layoutManager!!.onSaveInstanceState()
+        }
+    }
+
+    viewLifecycleOwner.lifecycle.addObserver(observer)
 }
 
 private fun RecyclerView.wasAtBeginningBeforeInsertion(insertedCount: Int) =
