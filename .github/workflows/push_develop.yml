@@ -62,7 +62,7 @@ jobs:
         continue-on-error: true
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
-          appId: ${{ secrets.ANDROID_DEV_FIREBASE_APP_ID }}
+          appId: ${{ secrets.ANDROID_DEVELOP_FIREBASE_APP_ID }}
           token: ${{ secrets.ANDROID_DEV_FIREBASE_TOKEN }}
           releaseNotes: ${{ github.event.head_commit.message }}
           groups: dev-team
@@ -78,7 +78,7 @@ jobs:
         if: steps.upload.outcome=='failure'
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
-          appId: ${{ secrets.ANDROID_DEV_FIREBASE_APP_ID }}
+          appId: ${{ secrets.ANDROID_DEVELOP_FIREBASE_APP_ID }}
           token: ${{ secrets.ANDROID_DEV_FIREBASE_TOKEN }}
           releaseNotes: ${{ github.event.head_commit.message }}
           groups: dev-team
