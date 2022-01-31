@@ -28,7 +28,7 @@ class AssetGroupingDecoration(
     override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
         if (assetsAdapter.itemCount == 0) return
 
-        var groupTop = -1
+        var groupTop: Int? = null
 
         parent.children.forEachIndexed { index, view ->
             val viewHolder = parent.getChildViewHolder(view)
@@ -40,7 +40,7 @@ class AssetGroupingDecoration(
             val currentType = assetsAdapter.getItemViewType(bindingPosition)
             val nextType = assetsAdapter.getItemViewTypeOrNull(bindingPosition + 1)
 
-            if (groupTop == -1) {
+            if (groupTop == null) {
                 parent.getDecoratedBoundsWithMargins(view, bounds)
                 groupTop = bounds.top + view.translationY.roundToInt()
             }
@@ -51,7 +51,7 @@ class AssetGroupingDecoration(
                     parent.getDecoratedBoundsWithMargins(view, bounds)
                     val groupBottom = bounds.bottom + view.translationY.roundToInt() - groupOuterSpacing
 
-                    background.setBounds(bounds.left, groupTop, bounds.right, groupBottom)
+                    background.setBounds(bounds.left, groupTop!!, bounds.right, groupBottom)
                     background.draw(c)
 
                     if (index + 1 < parent.childCount) {
@@ -66,7 +66,7 @@ class AssetGroupingDecoration(
                     parent.getDecoratedBoundsWithMargins(view, bounds)
 
                     val groupBottom = bounds.bottom + view.translationY.roundToInt() + finalGroupExtraPadding
-                    background.setBounds(bounds.left, groupTop, bounds.right, groupBottom)
+                    background.setBounds(bounds.left, groupTop!!, bounds.right, groupBottom)
                     background.draw(c)
                 }
             }
