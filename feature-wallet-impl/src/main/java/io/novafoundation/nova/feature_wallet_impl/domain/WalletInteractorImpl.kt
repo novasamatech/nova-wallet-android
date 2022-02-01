@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_wallet_impl.domain
 
 import io.novafoundation.nova.common.data.model.CursorPage
 import io.novafoundation.nova.common.list.GroupedList
+import io.novafoundation.nova.common.utils.applyFilters
 import io.novafoundation.nova.common.utils.sumByBigDecimal
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
@@ -13,13 +14,14 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.AssetGroup
 import io.novafoundation.nova.feature_wallet_api.domain.model.Balances
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.OperationsPageChange
+import io.novafoundation.nova.feature_wallet_impl.data.repository.assetFilters.AssetFiltersRepository
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -30,13 +32,20 @@ import java.math.BigDecimal
 class WalletInteractorImpl(
     private val walletRepository: WalletRepository,
     private val accountRepository: AccountRepository,
+    private val assetFiltersRepository: AssetFiltersRepository,
     private val chainRegistry: ChainRegistry,
 ) : WalletInteractor {
 
     override fun balancesFlow(): Flow<Balances> {
-        return accountRepository.selectedMetaAccountFlow()
+        val assetsFlow = accountRepository.selectedMetaAccountFlow()
             .flatMapLatest { walletRepository.assetsFlow(it.id) }
-            .filter { it.isNotEmpty() }
+
+        return combine(
+            assetsFlow,
+            assetFiltersRepository.assetFiltersFlow()
+        ) { assets, filters ->
+            assets.applyFilters(filters)
+        }
             .map { assets ->
                 val chains = chainRegistry.chainsById.first()
 

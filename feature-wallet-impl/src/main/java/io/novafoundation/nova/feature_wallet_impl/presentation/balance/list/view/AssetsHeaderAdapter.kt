@@ -5,16 +5,21 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.view.shape.addRipple
+import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_wallet_impl.R
 import io.novafoundation.nova.feature_wallet_impl.presentation.balance.list.model.TotalBalanceModel
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListAvatar
+import kotlinx.android.synthetic.main.item_asset_header.view.balanceListManage
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListTotalBalance
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListTotalTitle
 
 class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<HeaderHolder>() {
 
     interface Handler {
+
+        fun manageClicked()
 
         fun avatarClicked()
     }
@@ -70,7 +75,14 @@ class HeaderHolder(
 ) : RecyclerView.ViewHolder(containerView), LayoutContainer {
 
     init {
-        containerView.balanceListAvatar.setOnClickListener { handler.avatarClicked() }
+        with(containerView) {
+            balanceListManage.background = with(context) {
+                addRipple(getRoundedCornerDrawable(R.color.black_48, cornerSizeInDp = 20))
+            }
+
+            balanceListManage.setOnClickListener { handler.manageClicked() }
+            balanceListAvatar.setOnClickListener { handler.avatarClicked() }
+        }
     }
 
     fun bind(

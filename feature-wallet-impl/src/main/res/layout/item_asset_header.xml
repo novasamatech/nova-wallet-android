@@ -46,4 +46,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/balanceListTotalBalance" />
 
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="12dp"
+        android:paddingTop="6dp"
+        android:id="@+id/balanceListManage"
+        android:paddingEnd="12dp"
+        android:paddingBottom="6dp"
+        android:src="@drawable/ic_options"
+        app:layout_constraintBottom_toBottomOf="@+id/balanceListAssetTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/balanceListAssetTitle"
+        app:tint="@color/white_64"
+        tools:background="@color/black_48" />
 </androidx.constraintlayout.widget.ConstraintLayout>

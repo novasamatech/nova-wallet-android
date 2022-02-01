@@ -405,6 +405,10 @@ class Navigator(
         navController?.navigate(R.id.action_open_receive, ReceiveFragment.getBundle(assetPayload))
     }
 
+    override fun openAssetFilters() {
+        navController?.navigate(R.id.action_mainFragment_to_assetFiltersFragment)
+    }
+
     override fun returnToWallet() {
         // to achieve smooth animation
         postToUiThread {
