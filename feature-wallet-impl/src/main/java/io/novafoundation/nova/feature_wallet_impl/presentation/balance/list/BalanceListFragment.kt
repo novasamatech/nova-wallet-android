@@ -23,7 +23,8 @@ import kotlinx.android.synthetic.main.fragment_balance_list.balanceListAssets
 import kotlinx.android.synthetic.main.fragment_balance_list.walletContainer
 import javax.inject.Inject
 
-class BalanceListFragment : BaseFragment<BalanceListViewModel>(),
+class BalanceListFragment :
+    BaseFragment<BalanceListViewModel>(),
     BalanceListAdapter.ItemAssetHandler,
     AssetsHeaderAdapter.Handler {
 

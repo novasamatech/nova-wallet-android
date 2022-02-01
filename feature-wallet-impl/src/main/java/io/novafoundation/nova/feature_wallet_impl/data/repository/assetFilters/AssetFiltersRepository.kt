@@ -40,5 +40,4 @@ class PreferencesAssetAssetFiltersRepository(
 
         preferences.putString(PREF_ASSET_FILTERS, encoded)
     }
-
 }
