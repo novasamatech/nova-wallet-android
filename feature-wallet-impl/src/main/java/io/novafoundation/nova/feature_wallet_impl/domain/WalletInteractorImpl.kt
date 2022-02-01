@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_wallet_impl.domain
 
 import io.novafoundation.nova.common.data.model.CursorPage
+import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.common.utils.sumByBigDecimal
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
@@ -8,6 +9,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFi
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.domain.model.AssetGroup
 import io.novafoundation.nova.feature_wallet_api.domain.model.Balances
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.OperationsPageChange
@@ -38,17 +40,25 @@ class WalletInteractorImpl(
             .map { assets ->
                 val chains = chainRegistry.chainsById.first()
 
-                val fiatByChain = assets.groupBy { it.token.configuration.chainId }
-                    .mapValues { (_, assets) -> assets.sumByBigDecimal { it.token.fiatAmount(it.total) } }
+                val assetGroupComparator = compareByDescending(AssetGroup::groupBalanceFiat)
+                    .thenByDescending { it.zeroBalance } // non-zero balances first
+                    .thenBy { it.chain.name } // SortedMap will collapse keys that are equal according to the comparator - need another field to compare by
 
-                val assets = assets.sortedWith(
-                    compareByDescending<Asset> { fiatByChain.getValue(it.token.configuration.chainId) }
-                        .thenBy { chains.getValue(it.token.configuration.chainId).name }
-                        .thenByDescending { it.token.fiatAmount(it.total) }
-                        .thenBy { it.token.configuration.id }
-                )
+                val assetsByChain = assets.groupBy { chains.getValue(it.token.configuration.chainId) }
+                    .mapValues { (_, assets) ->
+                        assets.sortedWith(
+                            compareByDescending<Asset> { it.token.fiatAmount(it.total) }
+                                .thenBy { it.token.configuration.symbol }
+                        )
+                    }.mapKeys { (chain, assets) ->
+                        AssetGroup(
+                            chain = chain,
+                            groupBalanceFiat = assets.sumByBigDecimal { it.token.fiatAmount(it.total) },
+                            zeroBalance = assets.any { it.total > BigDecimal.ZERO }
+                        )
+                    }.toSortedMap(assetGroupComparator)
 
-                balancesFromAssets(assets)
+                balancesFromAssets(assets, assetsByChain)
             }
     }
 
@@ -131,18 +141,22 @@ class WalletInteractorImpl(
         }
     }
 
-    private fun balancesFromAssets(assets: List<Asset>): Balances {
-        val (totalFiat, lockedFiat) = assets.fold(BigDecimal.ZERO to BigDecimal.ZERO) { (total, locked), asset ->
-            val assetTotalFiat = asset.token.fiatAmount(asset.total)
-            val assetLockedFiat = asset.token.fiatAmount(asset.locked)
+    private fun balancesFromAssets(
+        assets: List<Asset>,
+        groupedAssets: GroupedList<AssetGroup, Asset>
+    ):
+        Balances {
+            val (totalFiat, lockedFiat) = assets.fold(BigDecimal.ZERO to BigDecimal.ZERO) { (total, locked), asset ->
+                val assetTotalFiat = asset.token.fiatAmount(asset.total)
+                val assetLockedFiat = asset.token.fiatAmount(asset.locked)
 
-            (total + assetTotalFiat) to (locked + assetLockedFiat)
+                (total + assetTotalFiat) to (locked + assetLockedFiat)
+            }
+
+            return Balances(
+                assets = groupedAssets,
+                totalBalanceFiat = totalFiat,
+                lockedBalanceFiat = lockedFiat
+            )
         }
-
-        return Balances(
-            assets = assets,
-            totalBalanceFiat = totalFiat,
-            lockedBalanceFiat = lockedFiat
-        )
-    }
 }

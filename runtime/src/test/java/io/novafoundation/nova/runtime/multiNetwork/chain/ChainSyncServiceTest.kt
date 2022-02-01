@@ -50,7 +50,8 @@ class ChainSyncServiceTest {
         options = emptyList(),
         parentId = null,
         externalApi = null,
-        explorers = emptyList()
+        explorers = emptyList(),
+        color = null
     )
 
     private val gson = Gson()

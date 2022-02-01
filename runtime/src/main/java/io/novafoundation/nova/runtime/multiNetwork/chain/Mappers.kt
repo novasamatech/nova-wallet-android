@@ -8,6 +8,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainExplorerLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.JoinedChainInfo
+import io.novafoundation.nova.runtime.multiNetwork.ChainGradientParser
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainExternalApiRemote
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainRemote
@@ -164,6 +165,7 @@ fun mapChainRemoteToChain(
             id = chainId,
             parentId = parentId,
             name = name,
+            color = ChainGradientParser.parse(color),
             assets = assets,
             types = types,
             nodes = nodes,
@@ -231,6 +233,7 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
             id = id,
             parentId = parentId,
             name = name,
+            color = ChainGradientParser.parse(color),
             assets = assets,
             types = types,
             nodes = nodes,
@@ -300,6 +303,7 @@ fun mapChainToChainLocal(chain: Chain, gson: Gson): JoinedChainInfo {
         ChainLocal(
             id = id,
             parentId = parentId,
+            color = ChainGradientParser.encode(color),
             name = name,
             types = types,
             icon = icon,

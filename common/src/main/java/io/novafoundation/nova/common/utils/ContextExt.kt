@@ -37,9 +37,11 @@ inline fun postToUiThread(crossinline action: () -> Unit) {
 }
 
 fun Int.dp(context: Context): Int {
-    val inPx = context.resources.displayMetrics.density * this
+    return dpF(context).toInt()
+}
 
-    return inPx.toInt()
+fun Int.dpF(context: Context): Float {
+    return context.resources.displayMetrics.density * this
 }
 
 fun Context.readAssetFile(name: String) = assets.open(name).readText()

@@ -10,6 +10,7 @@ typealias ExplorerTemplateExtractor = (Chain.Explorer) -> StringTemplate?
 data class Chain(
     val id: ChainId,
     val name: String,
+    val color: Gradient?,
     val assets: List<Asset>,
     val nodes: List<Node>,
     val explorers: List<Explorer>,
@@ -88,6 +89,12 @@ data class Chain(
             }
         }
     }
+
+    data class Gradient(
+        val angle: Float,
+        val colors: List<String>,
+        val positionsPercent: List<Float>
+    )
 }
 
 enum class TypesUsage {

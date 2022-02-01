@@ -7,11 +7,13 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.extensions.LayoutContainer
 
-private const val TYPE_GROUP = 1
-private const val TYPE_CHILD = 2
-
 abstract class GroupedListAdapter<GROUP, CHILD>(private val diffCallback: BaseGroupedDiffCallback<GROUP, CHILD>) :
     ListAdapter<Any, GroupedListHolder>(diffCallback) {
+
+    companion object {
+        const val TYPE_GROUP = 1
+        const val TYPE_CHILD = 2
+    }
 
     abstract fun createGroupViewHolder(parent: ViewGroup): GroupedListHolder
 

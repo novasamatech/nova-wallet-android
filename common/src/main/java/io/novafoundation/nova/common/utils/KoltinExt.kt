@@ -12,6 +12,10 @@ private val PERCENTAGE_MULTIPLIER = 100.toBigDecimal()
 
 fun BigDecimal.fractionToPercentage() = this * PERCENTAGE_MULTIPLIER
 
+fun Float.percentageToFraction() = this / 100f
+
+infix fun Int.floorMod(divisor: Int) = Math.floorMod(this, divisor)
+
 val BigDecimal.isNonNegative: Boolean
     get() = signum() >= 0
 
@@ -42,6 +46,8 @@ fun <T> Result<T>.requireValue() = getOrThrow()!!
 fun InputStream.readText() = bufferedReader().use { it.readText() }
 
 fun <T> List<T>.second() = get(1)
+
+fun Int.quantize(factor: Int) = this - this % factor
 
 @Suppress("UNCHECKED_CAST")
 inline fun <K, V, R> Map<K, V>.mapValuesNotNull(crossinline mapper: (Map.Entry<K, V>) -> R?): Map<K, R> {
