@@ -37,12 +37,12 @@ jobs:
         run: ./gradlew runTest
 
       - name: Build with Gradle
-        run: ./gradlew assembleDebug
+        run: ./gradlew assembleDevelop
 
       - uses: actions/upload-artifact@v2
         with:
           name: apk
-          path: app/build/outputs/apk/debug/
+          path: app/build/outputs/apk/develop/
 
   upload:
     runs-on: ubuntu-latest
@@ -61,11 +61,11 @@ jobs:
         continue-on-error: true
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
-          appId: ${{ secrets.ANDROID_DEV_FIREBASE_APP_ID }}
+          appId: ${{ secrets.ANDROID_DEVELOP_FIREBASE_APP_ID }}
           token: ${{ secrets.ANDROID_DEV_FIREBASE_TOKEN }}
           releaseNotes: ${{ github.event.head_commit.message }}
           groups: dev-team
-          file: app/app-debug.apk
+          file: app/app-develop.apk
 
       - name: Sleep for 60 seconds
         uses: whatnick/wait-action@master
@@ -77,8 +77,8 @@ jobs:
         if: steps.upload.outcome=='failure'
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
-          appId: ${{ secrets.ANDROID_DEV_FIREBASE_APP_ID }}
+          appId: ${{ secrets.ANDROID_DEVELOP_FIREBASE_APP_ID }}
           token: ${{ secrets.ANDROID_DEV_FIREBASE_TOKEN }}
           releaseNotes: ${{ github.event.head_commit.message }}
           groups: dev-team
-          file: app/app-debug.apk
+          file: app/app-develop.apk
