@@ -83,4 +83,8 @@
             <enum name="outline" value="1" />
         </attr>
     </declare-styleable>
+
+    <declare-styleable name="PlaceholderView">
+        <attr name="android:text" />
+    </declare-styleable>
 </resources>

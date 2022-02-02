@@ -19,11 +19,11 @@ class AssetFiltersViewModel(
         .inBackground()
         .share()
 
+    val filtersEnabledMap = createFilterEnabledMap()
+
     init {
         applyInitialState()
     }
-
-    val filtersEnabledMap = createFilterEnabledMap()
 
     fun backClicked() {
         router.back()

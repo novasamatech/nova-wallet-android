@@ -39,8 +39,9 @@
         style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_goneMarginBottom="20dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/balanceListAssetPlaceholder"
         android:layout_marginTop="28dp"
         android:text="@string/wallet_assets"
         app:layout_constraintStart_toStartOf="parent"
@@ -60,4 +61,13 @@
         app:layout_constraintTop_toTopOf="@+id/balanceListAssetTitle"
         app:tint="@color/white_64"
         tools:background="@color/black_48" />
+
+    <io.novafoundation.nova.common.view.PlaceholderView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/balanceListAssetPlaceholder"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="@string/wallet_assets_empty" />
 </androidx.constraintlayout.widget.ConstraintLayout>
