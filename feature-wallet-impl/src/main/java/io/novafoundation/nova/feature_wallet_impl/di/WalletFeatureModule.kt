@@ -40,7 +40,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.repository.RuntimeWalletC
 import io.novafoundation.nova.feature_wallet_impl.data.repository.TokenRepositoryImpl
 import io.novafoundation.nova.feature_wallet_impl.data.repository.WalletRepositoryImpl
 import io.novafoundation.nova.feature_wallet_impl.data.repository.assetFilters.AssetFiltersRepository
-import io.novafoundation.nova.feature_wallet_impl.data.repository.assetFilters.PreferencesAssetAssetFiltersRepository
+import io.novafoundation.nova.feature_wallet_impl.data.repository.assetFilters.PreferencesAssetFiltersRepository
 import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
 import io.novafoundation.nova.feature_wallet_impl.domain.WalletInteractorImpl
 import io.novafoundation.nova.feature_wallet_impl.presentation.balance.assetActions.buy.BuyMixin
@@ -141,7 +141,7 @@ class WalletFeatureModule {
     @Provides
     @FeatureScope
     fun provideAssetFiltersRepository(preferences: Preferences): AssetFiltersRepository {
-        return PreferencesAssetAssetFiltersRepository(preferences)
+        return PreferencesAssetFiltersRepository(preferences)
     }
 
     @Provides

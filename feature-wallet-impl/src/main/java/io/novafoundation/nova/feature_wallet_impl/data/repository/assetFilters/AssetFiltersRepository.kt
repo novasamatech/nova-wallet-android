@@ -17,7 +17,7 @@ interface AssetFiltersRepository {
 
 private const val PREF_ASSET_FILTERS = "ASSET_FILTERS"
 
-class PreferencesAssetAssetFiltersRepository(
+class PreferencesAssetFiltersRepository(
     private val preferences: Preferences
 ) : AssetFiltersRepository {
 
