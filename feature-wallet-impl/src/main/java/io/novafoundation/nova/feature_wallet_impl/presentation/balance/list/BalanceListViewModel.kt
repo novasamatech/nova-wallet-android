@@ -59,6 +59,7 @@ class BalanceListViewModel(
 
     val totalBalanceFlow = balancesFlow.map {
         TotalBalanceModel(
+            shouldShowPlaceholder = it.assets.isEmpty(),
             totalBalanceFiat = it.totalBalanceFiat.formatAsCurrency(),
             lockedBalanceFiat = it.lockedBalanceFiat.formatAsCurrency()
         )

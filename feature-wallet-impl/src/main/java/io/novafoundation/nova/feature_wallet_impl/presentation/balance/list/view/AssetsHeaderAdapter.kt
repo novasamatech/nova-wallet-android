@@ -5,11 +5,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_wallet_impl.R
 import io.novafoundation.nova.feature_wallet_impl.presentation.balance.list.model.TotalBalanceModel
 import kotlinx.android.extensions.LayoutContainer
+import kotlinx.android.synthetic.main.item_asset_header.view.balanceListAssetPlaceholder
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListAvatar
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListManage
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListTotalBalance
@@ -95,7 +97,10 @@ class HeaderHolder(
     }
 
     fun bindTotalBalance(totalBalance: TotalBalanceModel?) = totalBalance?.let {
-        containerView.balanceListTotalBalance.showTotalBalance(totalBalance)
+        with(containerView) {
+            balanceListTotalBalance.showTotalBalance(totalBalance)
+            balanceListAssetPlaceholder.setVisible(it.shouldShowPlaceholder)
+        }
     }
 
     fun bindAddress(addressModel: AddressModel?) = addressModel?.let {
