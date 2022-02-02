@@ -94,7 +94,9 @@ class BalanceListFragment :
         viewModel.sync()
 
         viewModel.assetsFlow.observe {
-            assetsAdapter.submitList(it)
+            assetsAdapter.submitList(it) {
+                balanceListAssets.invalidateItemDecorations()
+            }
         }
 
         viewModel.totalBalanceFlow.observe(headerAdapter::setTotalBalance)
