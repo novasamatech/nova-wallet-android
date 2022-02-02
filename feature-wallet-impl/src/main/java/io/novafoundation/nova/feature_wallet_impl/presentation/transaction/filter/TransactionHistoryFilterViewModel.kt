@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_wallet_impl.presentation.transaction.filt
 
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.utils.checkEnabled
 import io.novafoundation.nova.common.utils.filterToSet
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
@@ -66,6 +67,4 @@ class TransactionHistoryFilterViewModel(
             router.back()
         }
     }
-
-    private fun <T> Map<out T, MutableStateFlow<Boolean>>.checkEnabled(key: T) = get(key)?.value ?: false
 }

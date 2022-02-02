@@ -89,6 +89,10 @@ class BalanceListViewModel(
         router.openChangeAccount()
     }
 
+    fun manageClicked() {
+        router.openAssetFilters()
+    }
+
     private fun mapAssetGroupToUi(assetGroup: AssetGroup) = AssetGroupUi(
         chainUi = mapChainToUi(assetGroup.chain),
         groupBalanceFiat = assetGroup.groupBalanceFiat.formatAsCurrency()

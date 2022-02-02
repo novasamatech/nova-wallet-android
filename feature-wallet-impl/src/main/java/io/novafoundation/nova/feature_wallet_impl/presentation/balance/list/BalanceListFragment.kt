@@ -23,9 +23,13 @@ import kotlinx.android.synthetic.main.fragment_balance_list.balanceListAssets
 import kotlinx.android.synthetic.main.fragment_balance_list.walletContainer
 import javax.inject.Inject
 
-class BalanceListFragment : BaseFragment<BalanceListViewModel>(), BalanceListAdapter.ItemAssetHandler, AssetsHeaderAdapter.Handler {
+class BalanceListFragment :
+    BaseFragment<BalanceListViewModel>(),
+    BalanceListAdapter.ItemAssetHandler,
+    AssetsHeaderAdapter.Handler {
 
-    @Inject protected lateinit var imageLoader: ImageLoader
+    @Inject
+    protected lateinit var imageLoader: ImageLoader
 
     private val assetsAdapter by lazy(LazyThreadSafetyMode.NONE) {
         BalanceListAdapter(imageLoader, this)
@@ -104,6 +108,10 @@ class BalanceListFragment : BaseFragment<BalanceListViewModel>(), BalanceListAda
 
     override fun assetClicked(asset: AssetModel) {
         viewModel.assetClicked(asset)
+    }
+
+    override fun manageClicked() {
+        viewModel.manageClicked()
     }
 
     override fun avatarClicked() {

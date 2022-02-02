@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_wallet_impl.di.modules.AssetsModule
 import io.novafoundation.nova.feature_wallet_impl.di.modules.SendModule
 import io.novafoundation.nova.feature_wallet_impl.presentation.WalletRouter
 import io.novafoundation.nova.feature_wallet_impl.presentation.balance.detail.di.BalanceDetailComponent
+import io.novafoundation.nova.feature_wallet_impl.presentation.balance.filters.di.AssetFiltersComponent
 import io.novafoundation.nova.feature_wallet_impl.presentation.balance.list.di.BalanceListComponent
 import io.novafoundation.nova.feature_wallet_impl.presentation.receive.di.ReceiveComponent
 import io.novafoundation.nova.feature_wallet_impl.presentation.send.amount.di.ChooseAmountComponent
@@ -56,6 +57,8 @@ interface WalletFeatureComponent : WalletFeatureApi {
     fun extrinsicDetailComponentFactory(): ExtrinsicDetailComponent.Factory
 
     fun receiveComponentFactory(): ReceiveComponent.Factory
+
+    fun assetFiltersComponentFactory(): AssetFiltersComponent.Factory
 
     @Component.Factory
     interface Factory {

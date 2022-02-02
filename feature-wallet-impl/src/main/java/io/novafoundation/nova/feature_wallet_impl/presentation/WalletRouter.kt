@@ -29,4 +29,6 @@ interface WalletRouter {
     fun openChangeAccount()
 
     fun openReceive(assetPayload: AssetPayload)
+
+    fun openAssetFilters()
 }
