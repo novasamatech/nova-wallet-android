@@ -9,7 +9,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainGradientParser
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 private val DEFAULT_GRADIENT by lazy {
-    ChainGradientParser.parse("linear-gradient(135deg, #F2A007 19.29%, #A56B00 100%)")!!
+    ChainGradientParser.parse("linear-gradient(315deg, #434852 0%, #787F92 100%)")!!
 }
 
 fun mapChainToUi(chain: Chain): ChainUi = with(chain) {
