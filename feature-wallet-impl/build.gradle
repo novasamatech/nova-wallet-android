@@ -101,5 +101,8 @@ dependencies {
 
     implementation insetterDep
 
-    implementation beaconDep
+    implementation beaconCore
+    implementation beaconWallet
+    implementation beaconSubstrate
+    implementation beaconP2pMatrix
 }

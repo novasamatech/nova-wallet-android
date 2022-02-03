@@ -4,10 +4,10 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import it.airgap.beaconsdk.data.beacon.P2pPeer
-import it.airgap.beaconsdk.message.BeaconRequest
-import it.airgap.beaconsdk.message.PermissionBeaconRequest
-import it.airgap.beaconsdk.message.SignPayloadBeaconRequest
+import it.airgap.beaconsdk.blockchain.substrate.message.request.SignSubstrateRequest
+import it.airgap.beaconsdk.core.data.P2pPeer
+import it.airgap.beaconsdk.core.message.BeaconRequest
+import it.airgap.beaconsdk.core.message.PermissionBeaconRequest
 import jp.co.soramitsu.common.address.AddressIconGenerator
 import jp.co.soramitsu.common.base.BaseViewModel
 import jp.co.soramitsu.common.resources.ResourceManager
@@ -160,7 +160,7 @@ class BeaconViewModel(
                         stateMachine.transition(BeaconStateMachine.Event.ReceivedPermissionsRequest(it))
                     }
 
-                    is SignPayloadBeaconRequest -> {
+                    is SignSubstrateRequest -> {
                         stateMachine.transition(BeaconStateMachine.Event.ReceivedSigningRequest(it))
                     }
                 }

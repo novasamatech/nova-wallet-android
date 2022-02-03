@@ -66,7 +66,7 @@ buildscript {
 
         coilVersion = '1.2.1'
 
-        beaconVersion = "1.0.2"
+        beaconVersion = "3.0.1-beta01"
 
         coilDep = "io.coil-kt:coil:$coilVersion"
         coilSvg = "io.coil-kt:coil-svg:$coilVersion"
@@ -138,7 +138,10 @@ buildscript {
 
         progressButtonDep = "com.github.razir.progressbutton:progressbutton:$progressButtonsVersion"
 
-        beaconDep = "com.github.airgap-it:beacon-android-sdk:$beaconVersion"
+        beaconCore = "com.github.airgap-it.beacon-android-sdk:core:$beaconVersion"
+        beaconWallet = "com.github.airgap-it.beacon-android-sdk:client-wallet:$beaconVersion"
+        beaconSubstrate = "com.github.airgap-it.beacon-android-sdk:blockchain-substrate:$beaconVersion"
+        beaconP2pMatrix = "com.github.airgap-it.beacon-android-sdk:transport-p2p-matrix:$beaconVersion"
     }
 
     repositories {

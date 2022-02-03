@@ -133,7 +133,6 @@ dependencies {
     implementation insetterDep
 
     implementation liveDataKtxDep
-    implementation beaconDep
 }
 
 task printVersion {

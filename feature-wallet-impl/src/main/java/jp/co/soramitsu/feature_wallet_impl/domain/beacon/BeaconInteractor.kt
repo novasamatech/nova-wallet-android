@@ -2,7 +2,19 @@ package jp.co.soramitsu.feature_wallet_impl.domain.beacon
 
 import android.net.Uri
 import com.google.gson.Gson
+import it.airgap.beaconsdk.blockchain.substrate.message.request.SignSubstrateRequest
+import it.airgap.beaconsdk.blockchain.substrate.message.response.PermissionSubstrateResponse
+import it.airgap.beaconsdk.blockchain.substrate.message.response.SignSubstrateResponse
+import it.airgap.beaconsdk.blockchain.substrate.substrate
 import it.airgap.beaconsdk.client.BeaconClient
+import it.airgap.beaconsdk.client.wallet.BeaconWalletClient
+import it.airgap.beaconsdk.core.data.BeaconError
+import it.airgap.beaconsdk.core.data.P2P
+import it.airgap.beaconsdk.core.data.P2pPeer
+import it.airgap.beaconsdk.core.message.BeaconRequest
+import it.airgap.beaconsdk.core.message.ErrorBeaconResponse
+import it.airgap.beaconsdk.core.message.PermissionBeaconRequest
+import it.airgap.beaconsdk.core.message.PermissionBeaconResponse
 import it.airgap.beaconsdk.data.beacon.BeaconError
 import it.airgap.beaconsdk.data.beacon.P2pPeer
 import it.airgap.beaconsdk.message.BeaconRequest
@@ -11,6 +23,7 @@ import it.airgap.beaconsdk.message.PermissionBeaconRequest
 import it.airgap.beaconsdk.message.PermissionBeaconResponse
 import it.airgap.beaconsdk.message.SignPayloadBeaconRequest
 import it.airgap.beaconsdk.message.SignPayloadBeaconResponse
+import it.airgap.beaconsdk.transport.p2p.matrix.p2pMatrix
 import jp.co.soramitsu.common.data.network.runtime.binding.bindNumber
 import jp.co.soramitsu.common.utils.Base58Ext.fromBase58Check
 import jp.co.soramitsu.common.utils.SuspendableProperty
@@ -47,7 +60,11 @@ class BeaconInteractor(
 ) {
 
     private val beaconClient by lazy {
-        GlobalScope.async { BeaconClient("Fearless Wallet") }
+        GlobalScope.async {
+            BeaconWalletClient("Nova Wallet", listOf(substrate())) {
+                addConnections(P2P(p2pMatrix()))
+            }
+        }
     }
 
     private suspend fun beaconClient() = beaconClient.await()
@@ -79,7 +96,7 @@ class BeaconInteractor(
     }
 
     suspend fun reportSignDeclined(
-        request: SignPayloadBeaconRequest
+        request: SignSubstrateRequest
     ) {
         beaconClient().respond(ErrorBeaconResponse.from(request, BeaconError.Aborted))
     }
@@ -91,12 +108,12 @@ class BeaconInteractor(
     }
 
     suspend fun signPayload(
-        request: SignPayloadBeaconRequest
+        request: SignSubstrateRequest
     ) {
         val signature = accountRepository.signWithCurrentAccount(request.payload.fromHex())
         val signatureHex = signature.toHexString(withPrefix = true)
 
-        beaconClient().respond(SignPayloadBeaconResponse.from(request, request.signingType, signatureHex))
+        beaconClient().respond(SignSubstrateResponse.Broadcast(request, request.signingType, signatureHex))
     }
 
     suspend fun allowPermissions(
@@ -104,7 +121,7 @@ class BeaconInteractor(
     ) {
         val address = accountRepository.getSelectedAccount().address
         val publicKey = address.toAccountId().toHexString()
-        val response = PermissionBeaconResponse.from(forRequest, publicKey)
+        val response = PermissionSubstrateResponse(forRequest, publicKey)
 
         beaconClient().respond(response)
     }
