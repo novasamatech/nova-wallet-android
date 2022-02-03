@@ -44,7 +44,8 @@ class AssetsTotalBalanceView @JvmOverloads constructor(
         viewAssetsTotalBalanceTotal.setVisible(true)
         viewAssetsTotalBalanceTotal.text = totalBalance.totalBalanceFiat
 
-        viewAssetsTotalBalanceLocked.setVisible(true)
-        viewAssetsTotalBalanceLocked.text = totalBalance.lockedBalanceFiat
+        // TODO uncomment when total locked balance will include funds locked in crowdloans
+//        viewAssetsTotalBalanceLocked.setVisible(true)
+//        viewAssetsTotalBalanceLocked.text = totalBalance.lockedBalanceFiat
     }
 }
