@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.validation.ExistentialDepositError
 import io.novafoundation.nova.feature_wallet_api.domain.validation.doNotCrossExistentialDeposit
+import io.novafoundation.nova.feature_wallet_api.domain.validation.enoughTotalToStayAboveED
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.BalanceSourceProvider
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.notDeadRecipient
@@ -66,18 +67,24 @@ abstract class BaseAssetTransfers(
         }
     }
 
-    private suspend fun existentialDepositFor(transfer: AssetTransfer): BigDecimal {
-        val inPlanks = balanceSourceProvider.provideFor(transfer.chainAsset)
-            .existentialDeposit(transfer.chain, transfer.chainAsset)
+    private suspend fun existentialDepositForUsedAsset(transfer: AssetTransfer): BigDecimal {
+       return existentialDeposit(transfer.chain, transfer.chainAsset)
+    }
 
-        return transfer.chainAsset.amountFromPlanks(inPlanks)
+    private suspend fun existentialDeposit(chain: Chain, asset: Chain.Asset): BigDecimal {
+        val inPlanks = balanceSourceProvider.provideFor(asset)
+            .existentialDeposit(chain, asset)
+
+        return asset.amountFromPlanks(inPlanks)
     }
 
     protected fun defaultValidationSystem(
         removeAccountBehavior: ExistentialDepositError<WillRemoveAccount>
     ): AssetTransfersValidationSystem = ValidationSystem {
-        sufficientBalanceForCommission()
+        sufficientTransferableBalanceToPayFee()
         sufficientBalanceInUsedAsset()
+
+        sufficientCommissionBalanceToStayAboveED()
 
         notDeadRecipientInUsedAsset()
         notDeadRecipientInCommissionAsset()
@@ -106,9 +113,16 @@ abstract class BaseAssetTransfers(
         failure = { AssetTransferValidationFailure.DeadRecipient.InCommissionAsset(commissionAsset = it.commissionAsset.token.configuration) }
     )
 
-    protected fun AssetTransfersValidationSystemBuilder.sufficientBalanceForCommission() = sufficientBalance(
+    protected fun AssetTransfersValidationSystemBuilder.sufficientTransferableBalanceToPayFee() = sufficientBalance(
         fee = { it.fee },
         available = { it.commissionAsset.transferable },
+        error = { AssetTransferValidationFailure.NotEnoughFunds.InCommissionAsset(commissionAsset = it.commissionAsset.token.configuration) }
+    )
+
+    protected fun AssetTransfersValidationSystemBuilder.sufficientCommissionBalanceToStayAboveED() = enoughTotalToStayAboveED(
+        fee = { it.fee },
+        total = { it.commissionAsset.total },
+        existentialDeposit = { existentialDeposit(it.transfer.chain, it.commissionAsset.token.configuration) },
         error = { AssetTransferValidationFailure.NotEnoughFunds.InCommissionAsset(commissionAsset = it.commissionAsset.token.configuration) }
     )
 
@@ -118,7 +132,7 @@ abstract class BaseAssetTransfers(
         totalBalance = { it.usedAsset.total },
         fee = { it.feeInUsedAsset },
         extraAmount = { it.transfer.amount },
-        existentialDeposit = { existentialDepositFor(it.transfer) },
+        existentialDeposit = { existentialDepositForUsedAsset(it.transfer) },
         error = error
     )
 }
