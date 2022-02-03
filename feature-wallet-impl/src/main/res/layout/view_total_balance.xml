@@ -28,6 +28,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
+        android:layout_marginBottom="16dp"
         android:gravity="center_vertical"
         android:visibility="gone"
         tools:text="$214.66"
@@ -50,8 +51,7 @@
         app:drawableStartCompat="@drawable/ic_lock"
         app:drawableTint="@color/white_64"
         tools:background="@color/white_16"
-        tools:text="$214.66"
-        tools:visibility="visible" />
+        tools:text="$214.66" />
 
     <com.facebook.shimmer.ShimmerFrameLayout
         android:id="@+id/viewAssetsTotalBalanceShimmer"
@@ -76,6 +76,7 @@
                 android:layout_width="80dp"
                 android:layout_height="18dp"
                 android:layout_marginTop="12dp"
+                android:visibility="gone"
                 android:background="@drawable/bg_shimerring" />
         </LinearLayout>
     </com.facebook.shimmer.ShimmerFrameLayout>
