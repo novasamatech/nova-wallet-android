@@ -68,7 +68,7 @@ abstract class BaseAssetTransfers(
     }
 
     private suspend fun existentialDepositForUsedAsset(transfer: AssetTransfer): BigDecimal {
-       return existentialDeposit(transfer.chain, transfer.chainAsset)
+        return existentialDeposit(transfer.chain, transfer.chainAsset)
     }
 
     private suspend fun existentialDeposit(chain: Chain, asset: Chain.Asset): BigDecimal {
