@@ -7,7 +7,6 @@
   <string name="wallet_send_dead_recipient_commission_asset_title">Recipient is not able to accept transfer</string>
   <string name="wallet_send_dead_recipient_commission_asset_message">Your transfer will fail since the destination account does not have enough %s to accept other token transfers</string>
 
-  <string name="wallet_send_insufficient_balance_title">Insufficient balance</string>
   <string name="wallet_send_insufficient_balance_commission">You don\'t have enough %s to pay fees</string>
 
   <string name="dapp_browser_close_warning_message">Are you sure you want to close this screen?\nYour changes will not be applied.</string>

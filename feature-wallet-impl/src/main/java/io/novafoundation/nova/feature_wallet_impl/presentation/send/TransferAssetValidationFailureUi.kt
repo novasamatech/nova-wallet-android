@@ -19,11 +19,11 @@ fun mapAssetTransferValidationFailureToUI(
                 resourceManager.getString(R.string.wallet_send_dead_recipient_message)
         }
         AssetTransferValidationFailure.NotEnoughFunds.InUsedAsset -> {
-            resourceManager.getString(R.string.wallet_send_insufficient_balance_title) to
+            resourceManager.getString(R.string.common_not_enough_funds_title) to
                 resourceManager.getString(R.string.choose_amount_error_too_big)
         }
         is AssetTransferValidationFailure.NotEnoughFunds.InCommissionAsset -> {
-            resourceManager.getString(R.string.wallet_send_insufficient_balance_title) to
+            resourceManager.getString(R.string.common_not_enough_funds_title) to
                 resourceManager.getString(R.string.wallet_send_insufficient_balance_commission, failure.commissionAsset.symbol)
         }
         AssetTransferValidationFailure.WillRemoveAccount.WillBurnDust -> {
