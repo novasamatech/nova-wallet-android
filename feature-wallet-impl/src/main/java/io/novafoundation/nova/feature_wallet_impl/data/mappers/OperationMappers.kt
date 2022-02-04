@@ -192,11 +192,6 @@ fun mapNodeToOperation(
     )
 }
 
-private val Chain.Asset.extrinsicIcon
-    get() = when (this) {
-        else -> R.drawable.ic_extrinsic_polkadot // TODO wallet - extrinsicIcon
-    }
-
 private fun Chain.Asset.formatPlanks(planks: BigInteger, negative: Boolean): String {
     val amount = amountFromPlanks(planks)
 
@@ -295,7 +290,7 @@ suspend fun mapOperationToOperationModel(
                     amountColorRes = amountColor,
                     header = operationType.formattedCall(),
                     statusAppearance = statusAppearance,
-                    operationIcon = resourceManager.getDrawable(chainAsset.extrinsicIcon),
+                    operationIcon = resourceManager.getDrawable(R.drawable.ic_code),
                     subHeader = operationType.formattedModule()
                 )
             }
