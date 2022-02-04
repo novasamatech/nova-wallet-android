@@ -38,7 +38,8 @@ class ChainRegistryModule {
     fun provideChainSyncService(
         dao: ChainDao,
         chainFetcher: ChainFetcher,
-    ) = ChainSyncService(dao, chainFetcher)
+        gson: Gson
+    ) = ChainSyncService(dao, chainFetcher, gson)
 
     @Provides
     @ApplicationScope
@@ -132,6 +133,7 @@ class ChainRegistryModule {
         chainSyncService: ChainSyncService,
         baseTypeSynchronizer: BaseTypeSynchronizer,
         runtimeSyncService: RuntimeSyncService,
+        gson: Gson
     ) = ChainRegistry(
         runtimeProviderPool,
         chainConnectionPool,
@@ -139,6 +141,7 @@ class ChainRegistryModule {
         chainDao,
         chainSyncService,
         baseTypeSynchronizer,
-        runtimeSyncService
+        runtimeSyncService,
+        gson
     )
 }

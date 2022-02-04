@@ -8,7 +8,6 @@ data class AssetModel(
     val dollarAmount: BigDecimal?,
     val locked: BigDecimal,
     val bonded: BigDecimal,
-    val frozen: BigDecimal,
     val reserved: BigDecimal,
     val redeemable: BigDecimal,
     val unbonding: BigDecimal,

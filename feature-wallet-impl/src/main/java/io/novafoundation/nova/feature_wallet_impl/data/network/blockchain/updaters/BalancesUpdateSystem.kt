@@ -6,7 +6,9 @@ import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.balance.PaymentUpdaterFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getSocket
 import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.storage.subscribeUsing
 import kotlinx.coroutines.Dispatchers
@@ -32,24 +34,31 @@ class BalancesUpdateSystem(
 
             val mergedFlow = chains.map { chain ->
                 flow {
-                    val updater = paymentUpdaterFactory.create(chain.id)
+                    val updater = paymentUpdaterFactory.create(chain)
                     val socket = chainRegistry.getSocket(chain.id)
 
                     val subscriptionBuilder = StorageSubscriptionBuilder.create(socket)
 
-                    val updaterFlow = updater.listenForUpdates(subscriptionBuilder)
-                        .catch { Log.e(this@BalancesUpdateSystem.LOG_TAG, "Failed to subscribe to balances in ${chain.name}: ${it.message}") }
-                        .flowOn(Dispatchers.Default)
+                    kotlin.runCatching {
+                        updater.listenForUpdates(subscriptionBuilder)
+                            .catch { logError(chain, it) }
+                    }.onSuccess { updaterFlow ->
+                        val cancellable = socket.subscribeUsing(subscriptionBuilder.build())
 
-                    val cancellable = socket.subscribeUsing(subscriptionBuilder.build())
+                        updaterFlow.onCompletion { cancellable.cancel() }
 
-                    updaterFlow.onCompletion { cancellable.cancel() }
-
-                    emitAll(updaterFlow)
+                        emitAll(updaterFlow)
+                    }.onFailure {
+                        logError(chain, it)
+                    }
                 }
             }.merge()
 
             mergedFlow
         }.flowOn(Dispatchers.Default)
+    }
+
+    private fun logError(chain: Chain, error: Throwable) {
+        Log.e(LOG_TAG, "Failed to subscribe to balances in ${chain.name}: ${error.message}", error)
     }
 }

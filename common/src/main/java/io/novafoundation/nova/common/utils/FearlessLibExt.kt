@@ -12,8 +12,10 @@ import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.hash.Hasher.blake2b256
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
 import jp.co.soramitsu.fearless_utils.runtime.metadata.RuntimeMetadata
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module
+import jp.co.soramitsu.fearless_utils.runtime.metadata.module.MetadataFunction
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module.Module
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module.StorageEntry
 import jp.co.soramitsu.fearless_utils.runtime.metadata.moduleOrNull
@@ -94,6 +96,12 @@ fun RuntimeMetadata.system() = module(Modules.SYSTEM)
 
 fun RuntimeMetadata.balances() = module(Modules.BALANCES)
 
+fun RuntimeMetadata.assets() = module(Modules.ASSETS)
+fun RuntimeMetadata.tokens() = module(Modules.TOKENS)
+fun RuntimeMetadata.tokensOrNull() = moduleOrNull(Modules.TOKENS)
+fun RuntimeMetadata.currencies() = module(Modules.CURRENCIES)
+fun RuntimeMetadata.currenciesOrNull() = moduleOrNull(Modules.CURRENCIES)
+
 fun RuntimeMetadata.crowdloan() = module(Modules.CROWDLOAN)
 
 fun RuntimeMetadata.babe() = module(Modules.BABE)
@@ -104,6 +112,10 @@ fun RuntimeMetadata.timestampOrNull() = moduleOrNull(Modules.TIMESTAMP)
 fun RuntimeMetadata.slots() = module(Modules.SLOTS)
 
 fun RuntimeMetadata.session() = module(Modules.SESSION)
+
+fun RuntimeMetadata.firstExistingModule(vararg options: String): String {
+    return options.first(::hasModule)
+}
 
 fun <T> StorageEntry.storageKeys(runtime: RuntimeSnapshot, singleMapArguments: Collection<T>): Map<String, T> {
     return singleMapArguments.associateBy { storageKey(runtime, it) }
@@ -137,6 +149,9 @@ private fun cropSeedTo32Bytes(seedResult: SeedFactory.Result): SeedFactory.Resul
     return SeedFactory.Result(seed = seedResult.seed.copyOfRange(0, 32), seedResult.mnemonic)
 }
 
+fun GenericCall.Instance.oneOf(vararg functionCandidates: MetadataFunction): Boolean = functionCandidates.any { function == it }
+fun GenericCall.Instance.instanceOf(functionCandidate: MetadataFunction): Boolean = function == functionCandidate
+
 object Modules {
     const val STAKING = "Staking"
     const val BALANCES = "Balances"
@@ -146,4 +161,8 @@ object Modules {
     const val TIMESTAMP = "Timestamp"
     const val SLOTS = "Slots"
     const val SESSION = "Session"
+
+    const val ASSETS = "Assets"
+    const val TOKENS = "Tokens"
+    const val CURRENCIES = "Currencies"
 }

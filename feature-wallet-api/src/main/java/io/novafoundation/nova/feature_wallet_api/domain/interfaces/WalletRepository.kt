@@ -1,10 +1,9 @@
 package io.novafoundation.nova.feature_wallet_api.domain.interfaces
 
 import io.novafoundation.nova.common.data.model.CursorPage
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
-import io.novafoundation.nova.feature_wallet_api.domain.model.Transfer
-import io.novafoundation.nova.feature_wallet_api.domain.model.TransferValidityStatus
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
@@ -64,24 +63,11 @@ interface WalletRepository {
         query: String
     ): Set<String>
 
-    suspend fun getTransferFee(
-        chain: Chain,
-        transfer: Transfer,
-    ): BigInteger
-
-    suspend fun performTransfer(
-        accountId: AccountId,
-        chain: Chain,
-        transfer: Transfer,
+    suspend fun insertPendingTransfer(
+        hash: String,
+        assetTransfer: AssetTransfer,
         fee: BigDecimal
     )
-
-    suspend fun checkTransferValidity(
-        accountId: AccountId,
-        chain: Chain,
-        transfer: Transfer,
-        estimatedFee: BigDecimal,
-    ): TransferValidityStatus
 
     suspend fun updatePhishingAddresses()
 

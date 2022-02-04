@@ -3,6 +3,7 @@ package io.novafoundation.nova
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.google.gson.Gson
 import dagger.Component
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.di.CommonApi
@@ -24,7 +25,7 @@ import javax.inject.Inject
 )
 interface TestAppComponent {
 
-    fun inject(test: io.novafoundation.nova.ChainSyncServiceIntegrationTest)
+    fun inject(test: ChainSyncServiceIntegrationTest)
 }
 
 @RunWith(AndroidJUnit4::class)
@@ -50,7 +51,7 @@ class ChainSyncServiceIntegrationTest {
             .build()
             .chainDao()
 
-        chainSyncService = ChainSyncService(chainDao, networkApiCreator.create(ChainFetcher::class.java))
+        chainSyncService = ChainSyncService(chainDao, networkApiCreator.create(ChainFetcher::class.java), Gson())
     }
 
     @Test

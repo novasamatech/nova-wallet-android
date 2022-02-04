@@ -1,5 +1,6 @@
 package io.novafoundation.nova.runtime.multiNetwork.chain
 
+import com.google.gson.Gson
 import io.novafoundation.nova.common.utils.retryUntilDone
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.model.chain.JoinedChainInfo
@@ -11,6 +12,7 @@ import kotlinx.coroutines.withContext
 class ChainSyncService(
     private val dao: ChainDao,
     private val chainFetcher: ChainFetcher,
+    private val gson: Gson
 ) {
 
     suspend fun syncUp() = withContext(Dispatchers.Default) {
@@ -18,7 +20,7 @@ class ChainSyncService(
 
         val remoteChains = retryUntilDone { chainFetcher.getChains() }.map(::mapChainRemoteToChain)
 
-        val localChains = localChainsJoinedInfo.map(::mapChainLocalToChain)
+        val localChains = localChainsJoinedInfo.map { mapChainLocalToChain(it, gson) }
 
         val remoteMapping = remoteChains.associateBy(Chain::id)
         val localMapping = localChains.associateBy(Chain::id)
@@ -31,7 +33,7 @@ class ChainSyncService(
                 localVersion != remoteChain -> remoteChain // updated
                 else -> null // same
             }
-        }.map(::mapChainToChainLocal)
+        }.map { mapChainToChainLocal(it, gson) }
 
         val removed = localChainsJoinedInfo.filter { it.chain.id !in remoteMapping }
             .map(JoinedChainInfo::chain)

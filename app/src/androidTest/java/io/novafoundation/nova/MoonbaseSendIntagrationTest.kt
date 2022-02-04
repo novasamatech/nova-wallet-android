@@ -6,7 +6,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.default
 import io.novafoundation.nova.core.model.CryptoType
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.transfer
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.nativeTransfer
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.runtime.di.RuntimeApi
 import io.novafoundation.nova.runtime.di.RuntimeComponent
@@ -57,7 +57,7 @@ class MoonbaseSendIntagrationTest {
         val accountId = chain.accountIdOf("0x5eC0aa4d0dFF013E30978f954ca81779e8966d3A")
 
         val extrinsic = extrinsicBuilderFactory.create(chain, keypair, CryptoType.ECDSA)
-            .transfer(accountId, chain.utilityAsset.planksFromAmount(BigDecimal.ONE), keepAlive = true)
+            .nativeTransfer(accountId, chain.utilityAsset.planksFromAmount(BigDecimal.ONE), keepAlive = true)
             .build()
 
         val hash = rpcCalls.submitExtrinsic(chain.id, extrinsic)

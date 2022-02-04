@@ -14,6 +14,8 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.model.response.Su
 import io.novafoundation.nova.feature_wallet_impl.presentation.model.OperationModel
 import io.novafoundation.nova.feature_wallet_impl.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_wallet_impl.presentation.model.OperationStatusAppearance
+import io.novafoundation.nova.runtime.ext.utilityAsset
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger
 import kotlin.time.ExperimentalTime
@@ -190,11 +192,6 @@ fun mapNodeToOperation(
     )
 }
 
-private val Chain.Asset.extrinsicIcon
-    get() = when (this) {
-        else -> R.drawable.ic_extrinsic_polkadot // TODO wallet - extrinsicIcon
-    }
-
 private fun Chain.Asset.formatPlanks(planks: BigInteger, negative: Boolean): String {
     val amount = amountFromPlanks(planks)
 
@@ -293,7 +290,7 @@ suspend fun mapOperationToOperationModel(
                     amountColorRes = amountColor,
                     header = operationType.formattedCall(),
                     statusAppearance = statusAppearance,
-                    operationIcon = resourceManager.getDrawable(chainAsset.extrinsicIcon),
+                    operationIcon = resourceManager.getDrawable(R.drawable.ic_code),
                     subHeader = operationType.formattedModule()
                 )
             }
@@ -301,21 +298,28 @@ suspend fun mapOperationToOperationModel(
     }
 }
 
-fun mapOperationToParcel(
+suspend fun mapOperationToParcel(
     operation: Operation,
+    chainRegistry: ChainRegistry,
     resourceManager: ResourceManager,
 ): OperationParcelizeModel {
     with(operation) {
         return when (val operationType = operation.type) {
             is Operation.Type.Transfer -> {
+                val chain = chainRegistry.getChain(chainAsset.chainId)
+                val commissionAsset = chain.utilityAsset
 
                 val feeOrZero = operationType.fee ?: BigInteger.ZERO
 
                 val feeFormatted = operationType.fee?.let {
-                    chainAsset.formatPlanks(it, negative = true)
+                    commissionAsset.formatPlanks(it, negative = true)
                 } ?: resourceManager.getString(R.string.common_unknown)
 
-                val total = operationType.amount + feeOrZero
+                val total = if (commissionAsset == chainAsset) {
+                    operationType.amount + feeOrZero
+                } else {
+                    operationType.amount
+                }
 
                 OperationParcelizeModel.Transfer(
                     chainId = operation.chainAsset.chainId,

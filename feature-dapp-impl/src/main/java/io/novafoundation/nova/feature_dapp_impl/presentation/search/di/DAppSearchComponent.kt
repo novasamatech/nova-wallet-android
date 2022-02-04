@@ -5,6 +5,7 @@ import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DappSearchFragment
+import io.novafoundation.nova.feature_dapp_impl.presentation.search.SearchPayload
 
 @Subcomponent(
     modules = [
@@ -19,6 +20,7 @@ interface DAppSearchComponent {
 
         fun create(
             @BindsInstance fragment: Fragment,
+            @BindsInstance payload: SearchPayload,
         ): DAppSearchComponent
     }
 

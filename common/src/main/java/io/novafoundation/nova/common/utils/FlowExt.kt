@@ -215,3 +215,5 @@ fun <E> SendChannel<E>.safeOffer(value: E): Boolean {
         false
     }
 }
+
+fun <T> Map<out T, MutableStateFlow<Boolean>>.checkEnabled(key: T) = get(key)?.value ?: false

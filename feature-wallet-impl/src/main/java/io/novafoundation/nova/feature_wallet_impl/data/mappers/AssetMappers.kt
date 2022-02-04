@@ -52,10 +52,9 @@ fun mapAssetLocalToAsset(
     return with(assetLocal) {
         Asset(
             token = mapTokenLocalToToken(token, chainAsset),
+            frozenInPlanks = asset.frozenInPlanks,
             freeInPlanks = asset.freeInPlanks,
             reservedInPlanks = asset.reservedInPlanks,
-            feeFrozenInPlanks = asset.feeFrozenInPlanks,
-            miscFrozenInPlanks = asset.miscFrozenInPlanks,
             bondedInPlanks = asset.bondedInPlanks,
             unbondingInPlanks = asset.unbondingInPlanks,
             redeemableInPlanks = asset.redeemableInPlanks
@@ -72,7 +71,6 @@ fun mapAssetToAssetModel(asset: Asset): AssetModel {
             locked = locked,
             available = transferable,
             reserved = reserved,
-            frozen = frozen,
             redeemable = redeemable,
             unbonding = unbonding,
             dollarAmount = dollarAmount

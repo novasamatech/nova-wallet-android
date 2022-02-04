@@ -12,6 +12,8 @@ import io.novafoundation.nova.runtime.extrinsic.ExtrinsicSerializers
 import io.novafoundation.nova.runtime.extrinsic.MortalityConstructor
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.DbRuntimeVersionsRepository
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RemoteEventsRepository
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RuntimeVersionsRepository
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
@@ -91,4 +93,12 @@ class RuntimeModule {
     fun provideRuntimeVersionsRepository(
         chainDao: ChainDao
     ): RuntimeVersionsRepository = DbRuntimeVersionsRepository(chainDao)
+
+    @Provides
+    @ApplicationScope
+    fun provideEventsRepository(
+        rpcCalls: RpcCalls,
+        chainRegistry: ChainRegistry,
+        @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource
+    ): EventsRepository = RemoteEventsRepository(rpcCalls, chainRegistry, remoteStorageSource)
 }

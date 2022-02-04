@@ -1,5 +1,7 @@
 package io.novafoundation.nova.runtime.multiNetwork.chain.model
 
+import java.math.BigInteger
+
 typealias ChainId = String
 typealias StringTemplate = String
 
@@ -8,6 +10,7 @@ typealias ExplorerTemplateExtractor = (Chain.Explorer) -> StringTemplate?
 data class Chain(
     val id: ChainId,
     val name: String,
+    val color: Gradient?,
     val assets: List<Asset>,
     val nodes: List<Node>,
     val explorers: List<Explorer>,
@@ -39,8 +42,24 @@ data class Chain(
         val symbol: String,
         val precision: Int,
         val staking: StakingType,
+        val type: Type,
         val name: String,
     ) {
+
+        sealed class Type {
+            object Native : Type()
+
+            data class Statemine(val id: BigInteger) : Type()
+
+            data class Orml(
+                val currencyIdScale: String,
+                val currencyIdType: String,
+                val existentialDeposit: BigInteger,
+                val transfersEnabled: Boolean,
+            ) : Type()
+
+            object Unsupported : Type()
+        }
 
         enum class StakingType {
             UNSUPPORTED, RELAYCHAIN
@@ -70,6 +89,12 @@ data class Chain(
             }
         }
     }
+
+    data class Gradient(
+        val angle: Float,
+        val colors: List<String>,
+        val positionsPercent: List<Float>
+    )
 }
 
 enum class TypesUsage {

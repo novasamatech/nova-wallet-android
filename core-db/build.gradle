@@ -66,5 +66,5 @@ dependencies {
     androidTestImplementation androidJunitDep
 
     androidTestImplementation roomTestsDep
-    androidTestImplementation project(':test-shared')
+    testImplementation project(':test-shared')
 }

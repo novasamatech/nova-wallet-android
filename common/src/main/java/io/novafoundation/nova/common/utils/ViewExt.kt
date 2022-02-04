@@ -24,6 +24,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.TextViewCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.shimmer.ShimmerFrameLayout
 import dev.chrisbanes.insetter.applyInsetter
@@ -283,4 +284,12 @@ fun <I> View.useInputValue(input: Input<I>, onValue: (I) -> Unit) {
     isEnabled = input is Input.Enabled.Modifiable
 
     input.valueOrNull?.let(onValue)
+}
+
+fun <T> ListAdapter<T, *>.submitListPreservingViewPoint(data: List<T>, into: RecyclerView) {
+    val recyclerViewState = into.layoutManager!!.onSaveInstanceState()
+
+    submitList(data) {
+        into.layoutManager!!.onRestoreInstanceState(recyclerViewState)
+    }
 }

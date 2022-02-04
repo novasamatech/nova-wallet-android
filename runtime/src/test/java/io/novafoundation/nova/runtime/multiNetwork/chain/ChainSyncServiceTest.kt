@@ -1,5 +1,6 @@
 package io.novafoundation.nova.runtime.multiNetwork.chain
 
+import com.google.gson.Gson
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.JoinedChainInfo
@@ -31,7 +32,10 @@ class ChainSyncServiceTest {
                 precision = 10,
                 name = "Test",
                 priceId = "test",
-                staking = "test"
+                staking = "test",
+                type = null,
+                typeExtras = null,
+                icon = null,
             )
         ),
         nodes = listOf(
@@ -46,10 +50,13 @@ class ChainSyncServiceTest {
         options = emptyList(),
         parentId = null,
         externalApi = null,
-        explorers = emptyList()
+        explorers = emptyList(),
+        color = null
     )
 
-    private val LOCAL_CHAIN = mapChainToChainLocal(mapChainRemoteToChain(REMOTE_CHAIN))
+    private val gson = Gson()
+
+    private val LOCAL_CHAIN = mapChainToChainLocal(mapChainRemoteToChain(REMOTE_CHAIN), gson)
 
     @Mock
     lateinit var dao: ChainDao
@@ -61,7 +68,7 @@ class ChainSyncServiceTest {
 
     @Before
     fun setup() {
-        chainSyncService = ChainSyncService(dao, chainFetcher)
+        chainSyncService = ChainSyncService(dao, chainFetcher, gson)
     }
 
     @Test

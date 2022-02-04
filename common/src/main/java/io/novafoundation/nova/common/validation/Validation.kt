@@ -19,9 +19,9 @@ fun <S> validOrWarning(
 }
 
 fun <S> validOrError(
-    condition: Boolean,
+    isValid: Boolean,
     lazyReason: () -> S,
-): ValidationStatus<S> = if (condition) {
+): ValidationStatus<S> = if (isValid) {
     ValidationStatus.Valid()
 } else {
     ValidationStatus.NotValid(DefaultFailureLevel.ERROR, lazyReason())

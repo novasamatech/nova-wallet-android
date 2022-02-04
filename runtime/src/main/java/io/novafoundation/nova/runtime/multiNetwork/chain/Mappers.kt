@@ -1,10 +1,14 @@
 package io.novafoundation.nova.runtime.multiNetwork.chain
 
+import com.google.gson.Gson
+import io.novafoundation.nova.common.utils.asGsonParsedNumber
+import io.novafoundation.nova.common.utils.parseArbitraryObject
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 import io.novafoundation.nova.core_db.model.chain.ChainExplorerLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.JoinedChainInfo
+import io.novafoundation.nova.runtime.multiNetwork.ChainGradientParser
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainExternalApiRemote
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainRemote
@@ -54,6 +58,58 @@ private fun mapSectionToSectionLocal(sectionLocal: Chain.ExternalApi.Section?) =
     )
 }
 
+private const val ASSET_NATIVE = "native"
+private const val ASSET_STATEMINE = "statemine"
+private const val ASSET_ORML = "orml"
+private const val ASSET_UNSUPPORTED = "unsupported"
+
+private const val STATEMINE_EXTRAS_ID = "assetId"
+
+private const val ORML_EXTRAS_CURRENCY_ID_SCALE = "currencyIdScale"
+private const val ORML_EXTRAS_CURRENCY_TYPE = "currencyIdType"
+private const val ORML_EXTRAS_EXISTENTIAL_DEPOSIT = "existentialDeposit"
+private const val ORML_EXTRAS_TRANSFERS_ENABLED = "transfersEnabled"
+
+private const val ORML_TRANSFERS_ENABLED_DEFAULT = true
+
+private inline fun unsupportedOnError(creator: () -> Chain.Asset.Type): Chain.Asset.Type {
+    return runCatching(creator).getOrDefault(Chain.Asset.Type.Unsupported)
+}
+
+private fun mapChainAssetTypeFromRaw(type: String?, typeExtras: Map<String, Any?>?): Chain.Asset.Type = unsupportedOnError {
+    when (type) {
+        null, ASSET_NATIVE -> Chain.Asset.Type.Native
+        ASSET_STATEMINE -> {
+            val id = typeExtras?.get(STATEMINE_EXTRAS_ID)?.asGsonParsedNumber()
+
+            Chain.Asset.Type.Statemine(id!!)
+        }
+        ASSET_ORML -> {
+            Chain.Asset.Type.Orml(
+                currencyIdScale = typeExtras!![ORML_EXTRAS_CURRENCY_ID_SCALE] as String,
+                currencyIdType = typeExtras[ORML_EXTRAS_CURRENCY_TYPE] as String,
+                existentialDeposit = (typeExtras[ORML_EXTRAS_EXISTENTIAL_DEPOSIT] as String).toBigInteger(),
+                transfersEnabled = typeExtras[ORML_EXTRAS_TRANSFERS_ENABLED] as Boolean? ?: ORML_TRANSFERS_ENABLED_DEFAULT,
+            )
+        }
+        else -> Chain.Asset.Type.Unsupported
+    }
+}
+
+private fun mapChainAssetTypeToRaw(type: Chain.Asset.Type): Pair<String, Map<String, Any?>?> = when (type) {
+    is Chain.Asset.Type.Native -> ASSET_NATIVE to null
+    is Chain.Asset.Type.Statemine -> ASSET_STATEMINE to mapOf(
+        STATEMINE_EXTRAS_ID to type.id.toString()
+    )
+    is Chain.Asset.Type.Orml -> ASSET_ORML to mapOf(
+        ORML_EXTRAS_CURRENCY_ID_SCALE to type.currencyIdScale,
+        ORML_EXTRAS_CURRENCY_TYPE to type.currencyIdType,
+        ORML_EXTRAS_EXISTENTIAL_DEPOSIT to type.existentialDeposit.toString(),
+        ORML_EXTRAS_TRANSFERS_ENABLED to type.transfersEnabled
+    )
+    Chain.Asset.Type.Unsupported -> ASSET_UNSUPPORTED to null
+}
+
 fun mapChainRemoteToChain(
     chainRemote: ChainRemote,
 ): Chain {
@@ -66,14 +122,15 @@ fun mapChainRemoteToChain(
 
     val assets = chainRemote.assets.map {
         Chain.Asset(
-            iconUrl = chainRemote.icon,
+            iconUrl = it.icon ?: chainRemote.icon,
             chainId = chainRemote.chainId,
             id = it.assetId,
             symbol = it.symbol,
             precision = it.precision,
             name = it.name ?: chainRemote.name,
             priceId = it.priceId,
-            staking = mapStakingStringToStakingType(it.staking)
+            staking = mapStakingStringToStakingType(it.staking),
+            type = mapChainAssetTypeFromRaw(it.type, it.typeExtras)
         )
     }
 
@@ -108,6 +165,7 @@ fun mapChainRemoteToChain(
             id = chainId,
             parentId = parentId,
             name = name,
+            color = ChainGradientParser.parse(color),
             assets = assets,
             types = types,
             nodes = nodes,
@@ -122,7 +180,7 @@ fun mapChainRemoteToChain(
     }
 }
 
-fun mapChainLocalToChain(chainLocal: JoinedChainInfo): Chain {
+fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
     val nodes = chainLocal.nodes.map {
         Chain.Node(
             url = it.url,
@@ -131,15 +189,18 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo): Chain {
     }
 
     val assets = chainLocal.assets.map {
+        val typeExtrasParsed = it.typeExtras?.let(gson::parseArbitraryObject)
+
         Chain.Asset(
-            iconUrl = chainLocal.chain.icon,
+            iconUrl = it.icon ?: chainLocal.chain.icon,
             id = it.id,
             symbol = it.symbol,
             precision = it.precision,
             name = it.name,
             chainId = it.chainId,
             priceId = it.priceId,
-            staking = mapStakingTypeFromLocal(it.staking)
+            staking = mapStakingTypeFromLocal(it.staking),
+            type = mapChainAssetTypeFromRaw(it.type, typeExtrasParsed)
         )
     }
 
@@ -172,6 +233,7 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo): Chain {
             id = id,
             parentId = parentId,
             name = name,
+            color = ChainGradientParser.parse(color),
             assets = assets,
             types = types,
             nodes = nodes,
@@ -186,7 +248,7 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo): Chain {
     }
 }
 
-fun mapChainToChainLocal(chain: Chain): JoinedChainInfo {
+fun mapChainToChainLocal(chain: Chain, gson: Gson): JoinedChainInfo {
     val nodes = chain.nodes.map {
         ChainNodeLocal(
             url = it.url,
@@ -196,6 +258,8 @@ fun mapChainToChainLocal(chain: Chain): JoinedChainInfo {
     }
 
     val assets = chain.assets.map {
+        val (type, typeExtras) = mapChainAssetTypeToRaw(it.type)
+
         ChainAssetLocal(
             id = it.id,
             symbol = it.symbol,
@@ -203,7 +267,10 @@ fun mapChainToChainLocal(chain: Chain): JoinedChainInfo {
             chainId = chain.id,
             name = it.name,
             priceId = it.priceId,
-            staking = mapStakingTypeToLocal(it.staking)
+            staking = mapStakingTypeToLocal(it.staking),
+            type = type,
+            typeExtras = gson.toJson(typeExtras),
+            icon = it.iconUrl
         )
     }
 
@@ -236,6 +303,7 @@ fun mapChainToChainLocal(chain: Chain): JoinedChainInfo {
         ChainLocal(
             id = id,
             parentId = parentId,
+            color = ChainGradientParser.encode(color),
             name = name,
             types = types,
             icon = icon,

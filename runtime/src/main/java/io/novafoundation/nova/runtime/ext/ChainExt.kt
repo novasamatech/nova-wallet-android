@@ -1,18 +1,24 @@
 package io.novafoundation.nova.runtime.ext
 
 import io.novafoundation.nova.common.data.network.runtime.binding.MultiAddress
+import io.novafoundation.nova.common.data.network.runtime.binding.bindOrNull
 import io.novafoundation.nova.common.utils.ethereumAddressFromPublicKey
 import io.novafoundation.nova.common.utils.ethereumAddressToHex
 import io.novafoundation.nova.common.utils.formatNamed
 import io.novafoundation.nova.common.utils.substrateAccountId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Type
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ExplorerTemplateExtractor
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.TypesUsage
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
+import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHex
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.toHexUntyped
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.addressPrefix
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAddress
+import java.math.BigInteger
 
 val Chain.typesUsage: TypesUsage
     get() = when {
@@ -23,6 +29,9 @@ val Chain.typesUsage: TypesUsage
 
 val Chain.utilityAsset
     get() = assets.first(Chain.Asset::isUtilityAsset)
+
+val Chain.commissionAsset
+    get() = utilityAsset
 
 val Chain.Asset.isUtilityAsset: Boolean
     get() = id == 0
@@ -137,3 +146,43 @@ object ChainGeneses {
 
 val Chain.Companion.Geneses
     get() = ChainGeneses
+
+fun Chain.Asset.requireStatemine(): Type.Statemine {
+    require(type is Type.Statemine)
+
+    return type
+}
+
+fun Chain.Asset.requireOrml(): Type.Orml {
+    require(type is Type.Orml)
+
+    return type
+}
+
+fun Chain.Asset.ormlCurrencyId(runtime: RuntimeSnapshot): Any? {
+    val ormlType = requireOrml()
+
+    val currencyIdType = runtime.typeRegistry[ormlType.currencyIdType]
+        ?: error("Cannot find type $ormlType.currencyIdType")
+
+    return currencyIdType.fromHex(runtime, ormlType.currencyIdScale)
+}
+
+fun Chain.findAssetByStatemineId(statemineAssetId: BigInteger): Chain.Asset? {
+    return assets.find {
+        if (it.type !is Type.Statemine) return@find false
+
+        it.type.id == statemineAssetId
+    }
+}
+
+fun Chain.findAssetByOrmlCurrencyId(runtime: RuntimeSnapshot, currencyId: Any?): Chain.Asset? {
+    return assets.find { asset ->
+        if (asset.type !is Type.Orml) return@find false
+        val currencyType = runtime.typeRegistry[asset.type.currencyIdType] ?: return@find false
+
+        val currencyIdScale = bindOrNull { currencyType.toHexUntyped(runtime, currencyId) } ?: return@find false
+
+        currencyIdScale == asset.type.currencyIdScale
+    }
+}

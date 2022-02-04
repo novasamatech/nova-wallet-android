@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.model.multiChainEncryptionIn
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.SignerPayload
 import io.novafoundation.nova.runtime.ext.accountIdOf
+import io.novafoundation.nova.runtime.extrinsic.CustomSignedExtensions
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
@@ -122,6 +123,7 @@ class DappSignExtrinsicInteractor(
                 ),
                 genesisHash = genesisHash,
                 multiChainEncryption = metaAccount.multiChainEncryptionIn(chain),
+                customSignedExtensions = CustomSignedExtensions.extensionsWithValues(runtime),
                 accountIdentifier = AddressInstanceConstructor.constructInstance(runtime.typeRegistry, accountId),
                 blockHash = blockHash,
                 era = era,

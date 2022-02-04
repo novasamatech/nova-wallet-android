@@ -16,15 +16,15 @@ import io.novafoundation.nova.core_db.model.PhishingAddressLocal
 import io.novafoundation.nova.core_db.model.TokenLocal
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.findMetaAccountOrThrow
+import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.amountInPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
-import io.novafoundation.nova.feature_wallet_api.domain.model.Transfer
-import io.novafoundation.nova.feature_wallet_api.domain.model.TransferValidityStatus
-import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_impl.data.mappers.mapAssetLocalToAsset
 import io.novafoundation.nova.feature_wallet_impl.data.mappers.mapNodeToOperation
@@ -36,9 +36,10 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.model.request.Sub
 import io.novafoundation.nova.feature_wallet_impl.data.network.phishing.PhishingApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
 import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
-import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.addressOf
+import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.ext.historySupported
+import io.novafoundation.nova.runtime.ext.isUtilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -55,7 +56,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
-import java.math.BigInteger
 
 class WalletRepositoryImpl(
     private val substrateSource: SubstrateRemoteSource,
@@ -107,8 +107,7 @@ class WalletRepositoryImpl(
 
         val syncingPriceIdsToSymbols = chains.flatMap(Chain::assets)
             .filter { it.priceId != null }
-            .distinctBy { it.priceId }
-            .associateBy(
+            .groupBy(
                 keySelector = { it.priceId!! },
                 valueTransform = { it.symbol }
             )
@@ -116,10 +115,12 @@ class WalletRepositoryImpl(
         if (syncingPriceIdsToSymbols.isNotEmpty()) {
             val priceStats = getAssetPriceCoingecko(syncingPriceIdsToSymbols.keys)
 
-            val updatedTokens = priceStats.mapNotNull { (priceId, tokenStats) ->
-                syncingPriceIdsToSymbols[priceId]?.let { symbol ->
-                    TokenLocal(symbol, tokenStats.price, tokenStats.rateChange)
-                }
+            val updatedTokens = priceStats.flatMap { (priceId, tokenStats) ->
+                syncingPriceIdsToSymbols[priceId]?.let { symbols ->
+                    symbols.map { symbol ->
+                        TokenLocal(symbol, tokenStats.price, tokenStats.rateChange)
+                    }
+                } ?: emptyList()
             }
 
             assetCache.insertTokens(updatedTokens)
@@ -178,6 +179,10 @@ class WalletRepositoryImpl(
         chainAsset: Chain.Asset,
     ): CursorPage<Operation> {
         return withContext(Dispatchers.Default) {
+            if (!isHistorySupported(chain, chainAsset)) {
+                return@withContext CursorPage(nextCursor = null, items = emptyList())
+            }
+
             val response = walletOperationsApi.getOperationsHistory(
                 url = chain.externalApi!!.history!!.url, // TODO external api is optional
                 SubqueryHistoryRequest(
@@ -208,7 +213,8 @@ class WalletRepositoryImpl(
                 mapOperationLocalToOperation(it, chainAsset)
             }
             .mapLatest { operations ->
-                val cursor = if (chain.historySupported) {
+                // TODO force allow history for utility assets only since SubQuery projects are not yet ready for multi-asset
+                val cursor = if (chain.historySupported && chainAsset.isUtilityAsset) {
                     cursorStorage.awaitCursor(chain.id, chainAsset.id, accountId)
                 } else {
                     null
@@ -218,6 +224,8 @@ class WalletRepositoryImpl(
             }
     }
 
+    private fun isHistorySupported(chain: Chain, chainAsset: Chain.Asset) = chain.historySupported && chainAsset.isUtilityAsset
+
     override suspend fun getContacts(
         accountId: AccountId,
         chain: Chain,
@@ -226,49 +234,19 @@ class WalletRepositoryImpl(
         return operationDao.getContacts(query, chain.addressOf(accountId), chain.id).toSet()
     }
 
-    override suspend fun getTransferFee(chain: Chain, transfer: Transfer): BigInteger {
-        return substrateSource.getTransferFee(chain, transfer)
-    }
-
-    override suspend fun performTransfer(
-        accountId: AccountId,
-        chain: Chain,
-        transfer: Transfer,
-        fee: BigDecimal,
+    override suspend fun insertPendingTransfer(
+        hash: String,
+        assetTransfer: AssetTransfer,
+        fee: BigDecimal
     ) {
-        val operationHash = substrateSource.performTransfer(accountId, chain, transfer)
-        val accountAddress = chain.addressOf(accountId)
-
         val operation = createOperation(
-            operationHash,
-            transfer,
-            accountAddress,
+            hash,
+            assetTransfer,
             fee,
             OperationLocal.Source.APP
         )
 
         operationDao.insert(operation)
-    }
-
-    override suspend fun checkTransferValidity(
-        accountId: AccountId,
-        chain: Chain,
-        transfer: Transfer,
-        estimatedFee: BigDecimal,
-    ): TransferValidityStatus {
-        val chainAsset = transfer.chainAsset
-
-        val recipientInfo = substrateSource.getAccountInfo(chain.id, chain.accountIdOf(transfer.recipient))
-        val totalRecipientBalanceInPlanks = recipientInfo.totalBalance
-        val totalRecipientBalance = chainAsset.amountFromPlanks(totalRecipientBalanceInPlanks)
-
-        val assetLocal = getAsset(accountId, chainAsset.chainId, chainAsset.symbol)!!
-        val asset = mapAssetLocalToAsset(assetLocal, chainAsset)
-
-        val existentialDepositInPlanks = walletConstants.existentialDeposit(chain.id)
-        val existentialDeposit = chainAsset.amountFromPlanks(existentialDepositInPlanks)
-
-        return transfer.validityStatus(asset.transferable, asset.total, estimatedFee, totalRecipientBalance, existentialDeposit)
     }
 
     // TODO adapt for ethereum chains
@@ -294,23 +272,25 @@ class WalletRepositoryImpl(
 
     private fun createOperation(
         hash: String,
-        transfer: Transfer,
-        senderAddress: String,
+        transfer: AssetTransfer,
         fee: BigDecimal,
         source: OperationLocal.Source,
-    ) =
-        OperationLocal.manualTransfer(
+    ): OperationLocal {
+        val senderAddress = transfer.sender.addressIn(transfer.chain)!!
+
+        return OperationLocal.manualTransfer(
             hash = hash,
             address = senderAddress,
             chainAssetId = transfer.chainAsset.id,
             chainId = transfer.chainAsset.chainId,
             amount = transfer.amountInPlanks,
             senderAddress = senderAddress,
-            receiverAddress = transfer.recipient,
-            fee = transfer.chainAsset.planksFromAmount(fee),
+            receiverAddress = transfer.chain.addressOf(transfer.recipient),
+            fee = transfer.chain.commissionAsset.planksFromAmount(fee),
             status = OperationLocal.Status.PENDING,
             source = source
         )
+    }
 
     private suspend fun getAssetPriceCoingecko(priceIds: Set<String>): Map<String, PriceInfo> {
         return apiCall { coingeckoApi.getAssetPrice(priceIds.asQueryParam(), currency = "usd", includeRateChange = true) }

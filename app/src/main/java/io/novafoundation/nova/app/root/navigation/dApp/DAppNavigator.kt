@@ -8,6 +8,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.list.Acc
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.extrinsicDetails.DappExtrinsicDetailsFragment
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBrowserFragment
+import io.novafoundation.nova.feature_dapp_impl.presentation.search.DappSearchFragment
+import io.novafoundation.nova.feature_dapp_impl.presentation.search.SearchPayload
 
 class DAppNavigator(
     navigationHolder: NavigationHolder,
@@ -26,7 +28,10 @@ class DAppNavigator(
         args = DAppBrowserFragment.getBundle(initialUrl)
     )
 
-    override fun openDappSearch() = performNavigation(R.id.action_mainFragment_to_dappSearchGraph)
+    override fun openDappSearch() = performNavigation(
+        actionId = R.id.action_mainFragment_to_dappSearchGraph,
+        args = DappSearchFragment.getBundle(SearchPayload(initialUrl = null))
+    )
 
     override fun openExtrinsicDetails(extrinsicContent: String) = performNavigation(
         actionId = R.id.action_ConfirmSignExtrinsicFragment_to_extrinsicDetailsFragment,

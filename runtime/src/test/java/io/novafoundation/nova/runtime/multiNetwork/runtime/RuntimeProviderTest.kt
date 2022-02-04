@@ -70,7 +70,7 @@ class RuntimeProviderTest {
 
             verify(runtimeFactory, times(1)).constructRuntime(eq(chain.id), any())
 
-            val returnedRuntime = withTimeout(timeMillis = 10) {
+            val returnedRuntime = withTimeout(timeMillis = 50) {
                 runtimeProvider.get()
             }
 

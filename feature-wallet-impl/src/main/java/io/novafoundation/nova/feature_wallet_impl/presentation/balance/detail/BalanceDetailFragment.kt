@@ -20,16 +20,7 @@ import io.novafoundation.nova.feature_wallet_impl.presentation.AssetPayload
 import io.novafoundation.nova.feature_wallet_impl.presentation.balance.assetActions.buy.setupBuyIntegration
 import io.novafoundation.nova.feature_wallet_impl.presentation.model.AssetModel
 import io.novafoundation.nova.feature_wallet_impl.presentation.transaction.history.showState
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetaiActions
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailBack
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailContainer
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailContent
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailRate
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailRateChange
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailTokenIcon
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailTokenName
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailsBalances
-import kotlinx.android.synthetic.main.fragment_balance_detail.transfersContainer
+import kotlinx.android.synthetic.main.fragment_balance_detail.*
 import javax.inject.Inject
 
 private const val KEY_TOKEN = "KEY_TOKEN"
@@ -90,7 +81,7 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
         }
 
         balanceDetailsBalances.locked.setOnClickListener {
-            viewModel.frozenInfoClicked()
+            viewModel.lockedInfoClicked()
         }
     }
 
@@ -131,9 +122,11 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
             balanceDetailContainer.isRefreshing = false
         }
 
-        viewModel.showFrozenDetailsEvent.observeEvent(::showFrozenDetails)
+        viewModel.showFrozenDetailsEvent.observeEvent(::showLockedDetails)
 
         balanceDetaiActions.buy.isEnabled = viewModel.buyEnabled
+
+        viewModel.sendEnabled.observe(balanceDetaiActions.send::setEnabled)
     }
 
     private fun setRefreshEnabled(bottomSheetState: Int) {
@@ -141,7 +134,7 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
         balanceDetailContainer.isEnabled = bottomSheetCollapsed
     }
 
-    private fun showFrozenDetails(model: AssetModel) {
-        FrozenTokensBottomSheet(requireContext(), model).show()
+    private fun showLockedDetails(model: AssetModel) {
+        LockedTokensBottomSheet(requireContext(), model).show()
     }
 }
