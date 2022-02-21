@@ -11,7 +11,7 @@ class RemoteStorageQueryContext(
     private val socketService: SocketService,
     at: BlockHash?,
     runtime: RuntimeSnapshot
-): BaseStorageQueryContext(runtime, at) {
+) : BaseStorageQueryContext(runtime, at) {
 
     override suspend fun queryKeysByPrefix(prefix: String): List<String> {
         return bulkRetriever.retrieveAllKeys(socketService, prefix)

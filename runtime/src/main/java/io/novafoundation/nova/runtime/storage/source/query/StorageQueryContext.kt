@@ -44,7 +44,7 @@ interface StorageQueryContext {
         binding: (String?, K) -> V
     ): Map<K, V> = entries(
         keysArguments = keysArguments.wrapSingleArgumentKeys(),
-        keyExtractor = { it.component1<Any?>() as K  },
+        keyExtractor = { it.component1<Any?>() as K },
         binding = binding
     )
 }
