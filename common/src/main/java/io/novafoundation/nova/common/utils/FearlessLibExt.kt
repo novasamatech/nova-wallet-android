@@ -20,11 +20,9 @@ import jp.co.soramitsu.fearless_utils.runtime.metadata.module.Module
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module.StorageEntry
 import jp.co.soramitsu.fearless_utils.runtime.metadata.moduleOrNull
 import jp.co.soramitsu.fearless_utils.runtime.metadata.splitKey
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
 import jp.co.soramitsu.fearless_utils.scale.EncodableStruct
 import jp.co.soramitsu.fearless_utils.scale.Schema
 import jp.co.soramitsu.fearless_utils.scale.dataType.DataType
-import jp.co.soramitsu.fearless_utils.scale.dataType.uint32
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.addressPrefix
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
@@ -122,31 +120,9 @@ fun StorageEntry.splitKeyToComponents(runtime: RuntimeSnapshot, key: String): Co
     return ComponentHolder(splitKey(runtime, key))
 }
 
-@Deprecated("Use more optimized version from library")
-fun <T> StorageEntry.storageKeys(runtime: RuntimeSnapshot, singleMapArguments: Collection<T>): Map<String, T> {
-    return singleMapArguments.associateBy { storageKey(runtime, it) }
-}
-
-@Deprecated("Use more optimized version from library")
-inline fun <K, T> StorageEntry.storageKeys(
-    runtime: RuntimeSnapshot,
-    singleMapArguments: Collection<T>,
-    argumentTransform: (T) -> K,
-): Map<String, K> {
-    return singleMapArguments.associateBy(
-        keySelector = { storageKey(runtime, it) },
-        valueTransform = { argumentTransform(it) }
-    )
-}
-
 fun String.networkType() = Node.NetworkType.findByAddressByte(addressPrefix())!!
 
 fun RuntimeMetadata.hasModule(name: String) = moduleOrNull(name) != null
-
-private const val HEX_SYMBOLS_PER_BYTE = 2
-private const val UINT_32_BYTES = 4
-
-fun String.u32ArgumentFromStorageKey() = uint32.fromHex(takeLast(HEX_SYMBOLS_PER_BYTE * UINT_32_BYTES)).toLong().toBigInteger()
 
 fun SeedFactory.createSeed32(length: Mnemonic.Length, password: String?) = cropSeedTo32Bytes(createSeed(length, password))
 
