@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.utils.crowdloan
 import io.novafoundation.nova.common.utils.hasModule
 import io.novafoundation.nova.common.utils.numberConstant
 import io.novafoundation.nova.common.utils.slots
-import io.novafoundation.nova.common.utils.storageKeys
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.DirectContribution
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.FundInfo
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.LeaseEntry
@@ -56,14 +55,16 @@ class CrowdloanRepositoryImpl(
     }
 
     override suspend fun getWinnerInfo(chainId: ChainId, funds: Map<ParaId, FundInfo>): Map<ParaId, Boolean> {
-        return remoteStorage.queryKeys(
-            keysBuilder = { it.metadata.slots().storage("Leases").storageKeys(it, funds.keys) },
-            binding = { scale, runtimeSnapshot -> scale?.let { bindLeases(it, runtimeSnapshot) } },
-            chainId = chainId
-        ).mapValues { (paraId, leases) ->
-            val fund = funds.getValue(paraId)
+        return remoteStorage.query(chainId) {
+            runtime.metadata.slots().storage("Leases").singleArgumentEntries(
+                keysArguments = funds.keys,
+                binding = { scale, paraId ->
+                    val leases = scale?.let { bindLeases(it, runtime) }
+                    val fund = funds.getValue(paraId)
 
-            leases?.let { isWinner(leases, fund.bidderAccountId) } ?: false
+                    leases?.let { isWinner(leases, fund.bidderAccountId) } ?: false
+                }
+            )
         }
     }
 

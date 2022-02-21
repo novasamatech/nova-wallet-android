@@ -10,7 +10,6 @@ import io.novafoundation.nova.common.utils.hasModule
 import io.novafoundation.nova.common.utils.numberConstant
 import io.novafoundation.nova.common.utils.session
 import io.novafoundation.nova.common.utils.staking
-import io.novafoundation.nova.common.utils.storageKeys
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.model.AccountStakingLocal
 import io.novafoundation.nova.feature_staking_api.domain.api.AccountIdMap
@@ -48,6 +47,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.observeNonNull
+import io.novafoundation.nova.runtime.storage.source.query.wrapSingleArgumentKeys
 import io.novafoundation.nova.runtime.storage.source.queryNonNull
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
@@ -172,48 +172,35 @@ class StakingRepositoryImpl(
         chainId: ChainId,
         accountIdsHex: List<String>,
     ): AccountIdMap<ValidatorPrefs?> {
-        return remoteStorage.queryKeys(
-            keysBuilder = { runtime ->
-                val storage = runtime.metadata.staking().storage("Validators")
-
-                accountIdsHex.associateBy { accountIdHex -> storage.storageKey(runtime, accountIdHex.fromHex()) }
-            },
-            binding = { scale, runtime ->
-                scale?.let { bindValidatorPrefs(scale, runtime) }
-            },
-            chainId = chainId
-        )
+        return remoteStorage.query(chainId) {
+            runtime.metadata.staking().storage("Validators").entries(
+                keysArguments = accountIdsHex.map(String::fromHex).wrapSingleArgumentKeys(),
+                keyExtractor = { (accountId: AccountId) -> accountId.toHexString() },
+                binding = { scale, _ -> scale?.let { bindValidatorPrefs(scale, runtime) } }
+            )
+        }
     }
 
     override suspend fun getSlashes(chainId: ChainId, accountIdsHex: List<String>): AccountIdMap<Boolean> = withContext(Dispatchers.Default) {
-        val runtime = runtimeFor(chainId)
+        remoteStorage.query(chainId) {
+            val storage = runtime.metadata.staking().storage("SlashingSpans")
+            val returnType = storage.type.value!!
 
-        val storage = runtime.metadata.staking().storage("SlashingSpans")
+            val activeEraIndex = getActiveEraIndex(chainId)
 
-        val activeEraIndex = getActiveEraIndex(chainId)
+            val slashDeferDurationConstant = runtime.metadata.staking().constant("SlashDeferDuration")
+            val slashDeferDuration = bindSlashDeferDuration(slashDeferDurationConstant, runtime)
 
-        val returnType = storage.type.value!!
+            runtime.metadata.staking().storage("SlashingSpans").entries(
+                keysArguments = accountIdsHex.map(String::fromHex).wrapSingleArgumentKeys(),
+                keyExtractor = { (accountId: AccountId) -> accountId.toHexString() },
+                binding = { scale, _ ->
+                    val span = scale?.let { bindSlashingSpans(it, runtime, returnType) }
 
-        val slashDeferDurationConstant = runtime.metadata.staking().constant("SlashDeferDuration")
-        val slashDeferDuration = bindSlashDeferDuration(slashDeferDurationConstant, runtime)
-
-        val accountIds = accountIdsHex.map { it.fromHex() }
-
-        remoteStorage.queryKeys(
-            keysBuilder = {
-                storage.storageKeys(
-                    runtime = runtime,
-                    singleMapArguments = accountIds,
-                    argumentTransform = { it.toHexString() }
-                )
-            },
-            binding = { scale, _ ->
-                val span = scale?.let { bindSlashingSpans(it, runtime, returnType) }
-
-                isSlashed(span, activeEraIndex, slashDeferDuration)
-            },
-            chainId = chainId
-        )
+                    isSlashed(span, activeEraIndex, slashDeferDuration)
+                }
+            )
+        }
     }
 
     override suspend fun getSlashingSpan(chainId: ChainId, accountId: AccountId): SlashingSpans? {
