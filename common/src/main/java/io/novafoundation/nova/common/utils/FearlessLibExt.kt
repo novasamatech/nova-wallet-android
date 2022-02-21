@@ -19,6 +19,7 @@ import jp.co.soramitsu.fearless_utils.runtime.metadata.module.MetadataFunction
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module.Module
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module.StorageEntry
 import jp.co.soramitsu.fearless_utils.runtime.metadata.moduleOrNull
+import jp.co.soramitsu.fearless_utils.runtime.metadata.splitKey
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
 import jp.co.soramitsu.fearless_utils.scale.EncodableStruct
 import jp.co.soramitsu.fearless_utils.scale.Schema
@@ -101,8 +102,8 @@ fun RuntimeMetadata.tokens() = module(Modules.TOKENS)
 fun RuntimeMetadata.tokensOrNull() = moduleOrNull(Modules.TOKENS)
 fun RuntimeMetadata.currencies() = module(Modules.CURRENCIES)
 fun RuntimeMetadata.currenciesOrNull() = moduleOrNull(Modules.CURRENCIES)
-
 fun RuntimeMetadata.crowdloan() = module(Modules.CROWDLOAN)
+fun RuntimeMetadata.uniques() = module(Modules.UNIQUES)
 
 fun RuntimeMetadata.babe() = module(Modules.BABE)
 fun RuntimeMetadata.babeOrNull() = moduleOrNull(Modules.BABE)
@@ -117,10 +118,16 @@ fun RuntimeMetadata.firstExistingModule(vararg options: String): String {
     return options.first(::hasModule)
 }
 
+fun StorageEntry.splitKeyToComponents(runtime: RuntimeSnapshot, key: String): ComponentHolder {
+    return ComponentHolder(splitKey(runtime, key))
+}
+
+@Deprecated("Use more optimized version from library")
 fun <T> StorageEntry.storageKeys(runtime: RuntimeSnapshot, singleMapArguments: Collection<T>): Map<String, T> {
     return singleMapArguments.associateBy { storageKey(runtime, it) }
 }
 
+@Deprecated("Use more optimized version from library")
 inline fun <K, T> StorageEntry.storageKeys(
     runtime: RuntimeSnapshot,
     singleMapArguments: Collection<T>,
@@ -165,4 +172,6 @@ object Modules {
     const val ASSETS = "Assets"
     const val TOKENS = "Tokens"
     const val CURRENCIES = "Currencies"
+
+    const val UNIQUES = "Uniques"
 }

@@ -6,12 +6,34 @@ import io.novafoundation.nova.common.data.network.rpc.retrieveAllValues
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.common.data.network.runtime.calls.GetChildStateRequest
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.getSocket
+import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
+import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
 import jp.co.soramitsu.fearless_utils.wsrpc.executeAsync
 import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.storage.SubscribeStorageRequest
 import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.storage.storageChange
 import jp.co.soramitsu.fearless_utils.wsrpc.subscriptionFlow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+
+class RemoteStorageQueryContext(
+    private val bulkRetriever: BulkRetriever,
+    private val socketService: SocketService,
+    runtime: RuntimeSnapshot
+): BaseStorageQueryContext(runtime) {
+
+    override suspend fun queryKeysByPrefix(prefix: String): List<String> {
+        return bulkRetriever.retrieveAllKeys(socketService, prefix)
+    }
+
+    override suspend fun queryEntriesByPrefix(prefix: String): Map<String, String?> {
+        return bulkRetriever.retrieveAllValues(socketService, prefix)
+    }
+
+    override suspend fun queryKeys(keys: List<String>, at: BlockHash?): Map<String, String?> {
+        return bulkRetriever.queryKeys(socketService, keys, at)
+    }
+}
 
 class RemoteStorageSource(
     chainRegistry: ChainRegistry,
@@ -31,15 +53,15 @@ class RemoteStorageSource(
             .map { it.storageChange().getSingleChange() }
     }
 
-    override suspend fun queryByPrefix(prefix: String, chainId: String): Map<String, String?> {
-        return bulkRetriever.retrieveAllValues(getSocketService(chainId), prefix)
-    }
-
     override suspend fun queryChildState(storageKey: String, childKey: String, chainId: String): String? {
         val response = getSocketService(chainId).executeAsync(GetChildStateRequest(storageKey, childKey))
 
         return response.result as? String?
     }
 
-    private fun getSocketService(chainId: String) = chainRegistry.getConnection(chainId).socketService
+    override suspend fun createQueryContext(chainId: String, runtime: RuntimeSnapshot): StorageQueryContext {
+        return RemoteStorageQueryContext(bulkRetriever, getSocketService(chainId), runtime)
+    }
+
+    private fun getSocketService(chainId: String) = chainRegistry.getSocket(chainId)
 }

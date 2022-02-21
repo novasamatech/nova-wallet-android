@@ -13,13 +13,6 @@ import io.novafoundation.nova.common.utils.staking
 import io.novafoundation.nova.common.utils.storageKeys
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.model.AccountStakingLocal
-import jp.co.soramitsu.fearless_utils.extensions.fromHex
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storageOrNull
-import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
 import io.novafoundation.nova.feature_staking_api.domain.api.AccountIdMap
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.domain.model.EraIndex
@@ -56,6 +49,13 @@ import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.observeNonNull
 import io.novafoundation.nova.runtime.storage.source.queryNonNull
+import jp.co.soramitsu.fearless_utils.extensions.fromHex
+import jp.co.soramitsu.fearless_utils.extensions.toHexString
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
+import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
+import jp.co.soramitsu.fearless_utils.runtime.metadata.storageOrNull
+import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -160,12 +160,13 @@ class StakingRepositoryImpl(
         getElectedValidatorsExposure(chainId, it)
     }
 
-    override suspend fun getElectedValidatorsExposure(chainId: ChainId, eraIndex: EraIndex) = localStorage.queryByPrefix(
-        chainId = chainId,
-        prefixKeyBuilder = { it.metadata.staking().storage("ErasStakers").storageKey(it, eraIndex) },
-        keyExtractor = { it.accountIdFromMapKey() },
-        binding = { scale, runtime, _ -> bindExposure(scale!!, runtime) }
-    )
+    override suspend fun getElectedValidatorsExposure(chainId: ChainId, eraIndex: EraIndex) = localStorage.query(chainId) {
+        runtime.metadata.staking().storage("ErasStakers").entries(
+            eraIndex,
+            keyExtractor = { (_: BigInteger, accountId: ByteArray) -> accountId.toHexString() },
+            binding = { scale, _ -> bindExposure(scale!!, runtime) }
+        )
+    }
 
     override suspend fun getValidatorPrefs(
         chainId: ChainId,
