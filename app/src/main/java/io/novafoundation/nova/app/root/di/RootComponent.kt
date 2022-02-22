@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
+import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
@@ -45,6 +46,7 @@ interface RootComponent {
             WalletFeatureApi::class,
             StakingFeatureApi::class,
             CrowdloanFeatureApi::class,
+            AssetsFeatureApi::class,
             DbApi::class,
             CommonApi::class,
             RuntimeApi::class

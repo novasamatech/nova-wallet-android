@@ -4,7 +4,7 @@ import androidx.lifecycle.lifecycleScope
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.view.AmountView
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetModel
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetSelectorModel
 
 interface WithAmountChooser {
 
@@ -22,7 +22,7 @@ fun BaseFragment<*>.setupAmountChooser(
     withChooser.amountChooserMixin.fiatAmount.observe(amountView::setFiatAmount)
 }
 
-fun AmountView.setAssetModel(assetModel: AssetModel) {
+fun AmountView.setAssetModel(assetModel: AssetSelectorModel) {
     setAssetBalance(assetModel.assetBalance)
     setAssetName(assetModel.tokenName)
     loadAssetImage(assetModel.imageUrl)

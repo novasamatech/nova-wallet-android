@@ -18,16 +18,11 @@ import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.di.Wallet
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
-import io.novafoundation.nova.feature_wallet_api.domain.model.BuyTokenRegistry
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderProviderFactory
-import io.novafoundation.nova.feature_wallet_impl.BuildConfig
-import io.novafoundation.nova.feature_wallet_impl.data.buyToken.MoonPayProvider
-import io.novafoundation.nova.feature_wallet_impl.data.buyToken.RampProvider
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.SubstrateRemoteSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.WssSubstrateSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.BalanceSourceProvider
@@ -39,13 +34,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQuery
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RuntimeWalletConstants
 import io.novafoundation.nova.feature_wallet_impl.data.repository.TokenRepositoryImpl
 import io.novafoundation.nova.feature_wallet_impl.data.repository.WalletRepositoryImpl
-import io.novafoundation.nova.feature_wallet_impl.data.repository.assetFilters.AssetFiltersRepository
-import io.novafoundation.nova.feature_wallet_impl.data.repository.assetFilters.PreferencesAssetFiltersRepository
 import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
-import io.novafoundation.nova.feature_wallet_impl.domain.WalletInteractorImpl
-import io.novafoundation.nova.feature_wallet_impl.presentation.balance.assetActions.buy.BuyMixin
-import io.novafoundation.nova.feature_wallet_impl.presentation.balance.assetActions.buy.BuyMixinProvider
-import io.novafoundation.nova.feature_wallet_impl.presentation.transaction.filter.HistoryFiltersProvider
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
@@ -81,10 +70,6 @@ class WalletFeatureModule {
     fun providePhishingApi(networkApiCreator: NetworkApiCreator): PhishingApi {
         return networkApiCreator.create(PhishingApi::class.java)
     }
-
-    @Provides
-    @FeatureScope
-    fun provideHistoryFiltersProvider() = HistoryFiltersProvider()
 
     @Provides
     @FeatureScope
@@ -137,42 +122,6 @@ class WalletFeatureModule {
         chainRegistry,
         tokenDao
     )
-
-    @Provides
-    @FeatureScope
-    fun provideAssetFiltersRepository(preferences: Preferences): AssetFiltersRepository {
-        return PreferencesAssetFiltersRepository(preferences)
-    }
-
-    @Provides
-    @FeatureScope
-    fun provideWalletInteractor(
-        walletRepository: WalletRepository,
-        accountRepository: AccountRepository,
-        assetFiltersRepository: AssetFiltersRepository,
-        chainRegistry: ChainRegistry,
-    ): WalletInteractor = WalletInteractorImpl(
-        walletRepository,
-        accountRepository,
-        assetFiltersRepository,
-        chainRegistry
-    )
-
-    @Provides
-    @FeatureScope
-    fun provideBuyTokenIntegration(): BuyTokenRegistry {
-        return BuyTokenRegistry(
-            availableProviders = listOf(
-                RampProvider(host = BuildConfig.RAMP_HOST, apiToken = BuildConfig.RAMP_TOKEN),
-                MoonPayProvider(host = BuildConfig.MOONPAY_HOST, publicKey = BuildConfig.MOONPAY_PUBLIC_KEY, privateKey = BuildConfig.MOONPAY_PRIVATE_KEY)
-            )
-        )
-    }
-
-    @Provides
-    fun provideBuyMixin(
-        buyTokenRegistry: BuyTokenRegistry,
-    ): BuyMixin.Presentation = BuyMixinProvider(buyTokenRegistry)
 
     @Provides
     @FeatureScope
