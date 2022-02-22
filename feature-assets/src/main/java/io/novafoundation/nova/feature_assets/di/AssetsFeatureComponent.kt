@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.RewardDetailComponent
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.TransactionDetailComponent
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.di.TransactionHistoryFilterComponent
+import io.novafoundation.nova.feature_nft_api.NftFeatureApi
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 
@@ -68,6 +69,7 @@ interface AssetsFeatureComponent : AssetsFeatureApi {
             CommonApi::class,
             DbApi::class,
             RuntimeApi::class,
+            NftFeatureApi::class,
             WalletFeatureApi::class,
             AccountFeatureApi::class
         ]

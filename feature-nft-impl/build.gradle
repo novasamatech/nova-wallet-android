@@ -13,24 +13,10 @@ android {
         targetSdkVersion rootProject.targetSdkVersion
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
-        buildConfigField "String", "RAMP_TOKEN", "\"4bk3yhfrg99fer764bo7egrqmxbfene7gbrpwmp3\""
-        buildConfigField "String", "RAMP_HOST", "\"ri-widget-staging.firebaseapp.com\""
-
-        buildConfigField "String", "MOONPAY_PRIVATE_KEY", readSecret("MOONPAY_TEST_SECRET")
-        buildConfigField "String", "MOONPAY_HOST", "\"buy-staging.moonpay.com\""
-        buildConfigField "String", "MOONPAY_PUBLIC_KEY", "\"pk_test_DMRuyL6Nf1qc9OzjPBmCFBeCGkFwiZs0\""
     }
 
     buildTypes {
         release {
-            buildConfigField "String", "RAMP_TOKEN", "\"3quzr4e6wdyccndec8jzjebzar5kxxzfy2f3us5k\""
-            buildConfigField "String", "RAMP_HOST", "\"buy.ramp.network\""
-
-            buildConfigField "String", "MOONPAY_PRIVATE_KEY", readSecret("MOONPAY_PRODUCTION_SECRET")
-            buildConfigField "String", "MOONPAY_PUBLIC_KEY", "\"pk_live_Boi6Rl107p7XuJWBL8GJRzGWlmUSoxbz\""
-            buildConfigField "String", "MOONPAY_HOST", "\"buy.moonpay.com\""
-
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -60,10 +46,7 @@ dependencies {
 
     implementation androidDep
     implementation materialDep
-    implementation cardViewDep
     implementation constraintDep
-
-    implementation permissionsDep
 
     implementation coroutinesDep
     implementation coroutinesAndroidDep
@@ -72,7 +55,6 @@ dependencies {
     implementation lifeCycleKtxDep
 
     implementation daggerDep
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     kapt daggerKapt
 
     implementation roomDep
@@ -81,8 +63,6 @@ dependencies {
     implementation lifecycleDep
     kapt lifecycleKapt
 
-    implementation bouncyCastleDep
-
     testImplementation jUnitDep
     testImplementation mockitoDep
 
@@ -90,11 +70,6 @@ dependencies {
 
     implementation gsonDep
     implementation retrofitDep
-
-    implementation wsDep
-
-    implementation zXingCoreDep
-    implementation zXingEmbeddedDep
 
     implementation insetterDep
 
