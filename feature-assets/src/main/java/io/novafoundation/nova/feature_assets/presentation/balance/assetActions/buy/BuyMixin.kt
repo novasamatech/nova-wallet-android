@@ -12,14 +12,14 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
 interface BuyMixin {
     class IntegrationPayload(
-            val provider: BuyTokenRegistry.Provider<*>,
-            val chainAsset: Chain.Asset,
-            val address: String,
+        val provider: BuyTokenRegistry.Provider<*>,
+        val chainAsset: Chain.Asset,
+        val address: String,
     )
 
     class ProviderChooserPayload(
-            val providers: List<BuyTokenRegistry.Provider<*>>,
-            val chainAsset: Chain.Asset,
+        val providers: List<BuyTokenRegistry.Provider<*>>,
+        val chainAsset: Chain.Asset,
     )
 
     val showProviderChooserEvent: LiveData<Event<ProviderChooserPayload>>
@@ -27,8 +27,8 @@ interface BuyMixin {
     val integrateWithBuyProviderEvent: LiveData<Event<IntegrationPayload>>
 
     fun providerChosen(
-            provider: BuyTokenRegistry.Provider<*>,
-            chainAsset: Chain.Asset
+        provider: BuyTokenRegistry.Provider<*>,
+        chainAsset: Chain.Asset
     )
 
     interface Presentation : BuyMixin {

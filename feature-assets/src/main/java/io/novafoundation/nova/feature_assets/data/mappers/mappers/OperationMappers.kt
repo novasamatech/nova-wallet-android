@@ -23,7 +23,6 @@ private val Operation.Type.operationStatus
         is Operation.Type.Transfer -> status
     }
 
-
 private fun Chain.Asset.formatPlanks(planks: BigInteger, negative: Boolean): String {
     val amount = amountFromPlanks(planks)
 

@@ -59,7 +59,6 @@ class AssetsFeatureModule {
         buyTokenRegistry: BuyTokenRegistry,
     ): BuyMixin.Presentation = BuyMixinProvider(buyTokenRegistry)
 
-
     @Provides
     @FeatureScope
     fun provideHistoryFiltersProvider() = HistoryFiltersProvider()

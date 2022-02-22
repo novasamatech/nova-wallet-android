@@ -29,7 +29,6 @@ fun mapTokenToTokenModel(token: Token): TokenModel {
     }
 }
 
-
 fun mapAssetToAssetModel(asset: Asset): AssetModel {
     return with(asset) {
         AssetModel(
