@@ -55,15 +55,15 @@ class DbStorageCache(
         return storageDao.filterKeysInCache(chainId, keys)
     }
 
-    override suspend fun getEntries(keyPrefix: String, chainId: String): List<StorageEntry> {
-        return observeEntries(keyPrefix, chainId).first()
-    }
-
     override suspend fun getEntries(fullKeys: List<String>, chainId: String): List<StorageEntry> {
         return storageDao.observeEntries(chainId, fullKeys)
             .filter { it.size == fullKeys.size }
             .mapList { mapStorageEntryFromLocal(it) }
             .first()
+    }
+
+    override suspend fun getKeys(keyPrefix: String, chainId: String): List<String> {
+        return storageDao.getKeys(chainId, keyPrefix)
     }
 }
 

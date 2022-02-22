@@ -31,6 +31,9 @@ abstract class StorageDao {
     @Query(SELECT_PREFIX_KEY_QUERY)
     abstract fun observeEntries(chainId: String, keyPrefix: String): Flow<List<StorageEntryLocal>>
 
+    @Query("SELECT storageKey from storage WHERE chainId = :chainId  AND storageKey LIKE :keyPrefix || '%'")
+    abstract suspend fun getKeys(chainId: String, keyPrefix: String): List<String>
+
     @Query("SELECT * from storage WHERE chainId = :chainId AND storageKey in (:fullKeys)")
     abstract fun observeEntries(chainId: String, fullKeys: List<String>): Flow<List<StorageEntryLocal>>
 
