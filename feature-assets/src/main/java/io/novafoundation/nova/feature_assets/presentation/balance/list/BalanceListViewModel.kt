@@ -27,7 +27,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 
@@ -90,7 +90,7 @@ class BalanceListViewModel(
         fullSync()
 
         selectedMetaAccount
-            .onEach { syncWith(accountChangeSyncActions, it) }
+            .mapLatest { syncWith(accountChangeSyncActions, it) }
             .launchIn(this)
     }
 
@@ -119,14 +119,12 @@ class BalanceListViewModel(
         router.openAssetFilters()
     }
 
-    private fun syncWith(syncActions: List<SyncAction>, metaAccount: MetaAccount) = launch {
-        if (syncActions.size == 1) {
-            val syncAction = syncActions.first()
-            syncAction(metaAccount)
-        } else {
-            val syncJobs = syncActions.map { async { it(metaAccount) } }
-            syncJobs.joinAll()
-        }
+    private suspend fun syncWith(syncActions: List<SyncAction>, metaAccount: MetaAccount) = if (syncActions.size == 1) {
+        val syncAction = syncActions.first()
+        syncAction(metaAccount)
+    } else {
+        val syncJobs = syncActions.map { async { it(metaAccount) } }
+        syncJobs.joinAll()
     }
 
     private fun mapAssetGroupToUi(assetGroup: AssetGroup) = AssetGroupUi(

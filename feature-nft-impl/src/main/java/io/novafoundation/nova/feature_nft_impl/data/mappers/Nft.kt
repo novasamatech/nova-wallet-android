@@ -14,7 +14,7 @@ fun mapNftLocalToNft(
 ): Nft? {
     val chain = chainsById[nftLocal.chainId] ?: return null
 
-    val type = when(nftLocal.type) {
+    val type = when (nftLocal.type) {
         NftLocal.Type.UNIQUES -> Nft.Type.Uniques(
             instanceId = nftLocal.instanceId!!.toBigInteger(),
             collectionId = nftLocal.collectionId!!.toBigInteger(),
@@ -23,19 +23,21 @@ fun mapNftLocalToNft(
             instanceId = nftLocal.instanceId!!,
             collectionId = nftLocal.collectionId!!
         )
+        NftLocal.Type.RMRK2 -> Nft.Type.Rmrk2(
+            collectionId = nftLocal.collectionId!!
+        )
     }
 
     val metadata = when {
         nftLocal.metadata == null -> null // not present
-        nftLocal.name == null -> Nft.Metadata.Loadable(nftLocal.metadata!!) // not loaded
-        else -> Nft.Metadata.Loaded(
+        nftLocal.wholeMetadataLoaded -> Nft.Metadata.Loaded(
             name = nftLocal.name!!,
             label = nftLocal.label,
             media = nftLocal.media,
             price = nftLocal.price
-        ) // loaded
+        )
+        else -> Nft.Metadata.Loadable(nftLocal.metadata!!)
     }
-
 
     return Nft(
         chain = chain,

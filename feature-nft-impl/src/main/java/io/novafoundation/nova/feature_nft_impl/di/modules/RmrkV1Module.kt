@@ -14,7 +14,7 @@ class RmrkV1Module {
     @Provides
     @FeatureScope
     fun provideApi(networkApiCreator: NetworkApiCreator): RmrkV1Api {
-        return networkApiCreator.create(RmrkV1Api::class.java)
+        return networkApiCreator.create(RmrkV1Api::class.java, RmrkV1Api.BASE_URL)
     }
 
     @Provides

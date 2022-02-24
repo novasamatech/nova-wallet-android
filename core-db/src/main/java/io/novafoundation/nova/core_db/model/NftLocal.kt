@@ -17,19 +17,19 @@ class NftLocal(
     val collectionId: String?,
     val instanceId: String?,
     val metadata: ByteArray?,
+    val wholeMetadataLoaded: Boolean,
     // --- metadata fields ---
     // name is always be present. null in case it is not loaded (nft is partially loaded)
     val name: String? = null,
     val label: String? = null,
     val media: String? = null,
-    val price: BigInteger? = null,
     // --- metadata fields ---
-
+    val price: BigInteger? = null,
     val type: Type
 ): Identifiable {
 
     enum class Type {
-        UNIQUES, RMRK1
+        UNIQUES, RMRK1, RMRK2
     }
 
     override fun equals(other: Any?): Boolean {

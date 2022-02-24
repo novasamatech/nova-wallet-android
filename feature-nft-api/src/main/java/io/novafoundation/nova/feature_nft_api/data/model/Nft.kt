@@ -23,10 +23,12 @@ class Nft(
         class Loadable(val rawPointer: ByteArray) : Metadata()
     }
 
-    sealed class Type(){
+    sealed class Type {
 
         class Uniques(val instanceId: BigInteger, val collectionId: BigInteger) : Type()
 
         class Rmrk1(val instanceId: String, val collectionId: String) : Type()
+
+        class Rmrk2(val collectionId: String) : Type()
     }
 }

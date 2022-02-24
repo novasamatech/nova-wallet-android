@@ -14,6 +14,7 @@ val AddNfts_5_6 = object : Migration(5, 6) {
             `collectionId` TEXT,
             `instanceId` TEXT,
             `metadata` BLOB,
+            `wholeMetadataLoaded` INTEGER NOT NULL,
             `name` TEXT,
             `label` TEXT,
             `media` TEXT,

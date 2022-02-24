@@ -3,7 +3,8 @@ package io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV1.net
 import com.google.gson.annotations.SerializedName
 import java.math.BigInteger
 
-class RmrkV1nftRemote(
+class RmrkV1NftRemote(
+    val id: String,
     @SerializedName("forsale")
     val price: BigInteger?,
     val collectionId: String,

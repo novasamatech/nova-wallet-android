@@ -64,7 +64,8 @@ class UniquesNftProvider(
                     collectionId = collectionId.toString(),
                     instanceId = instanceId.toString(),
                     metadata = metadata,
-                    type = NftLocal.Type.UNIQUES
+                    type = NftLocal.Type.UNIQUES,
+                    wholeMetadataLoaded = false
                 )
             }
         }
