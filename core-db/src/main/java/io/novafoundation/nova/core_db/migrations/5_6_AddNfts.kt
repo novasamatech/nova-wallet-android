@@ -6,7 +6,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 val AddNfts_5_6 = object : Migration(5, 6) {
 
     override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("""
+        database.execSQL(
+            """
             CREATE TABLE IF NOT EXISTS `nfts` (
             `identifier` TEXT NOT NULL,
             `metaId` INTEGER NOT NULL,

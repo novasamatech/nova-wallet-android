@@ -26,7 +26,7 @@ class NftLocal(
     // --- metadata fields ---
     val price: BigInteger? = null,
     val type: Type
-): Identifiable {
+) : Identifiable {
 
     enum class Type {
         UNIQUES, RMRK1, RMRK2
@@ -36,7 +36,7 @@ class NftLocal(
         return other is NftLocal &&
             identifier == other.identifier &&
             // metadata is either direct data or a link to immutable distributed storage
-            metadata.optionalContentEquals(other.metadata)
-            && price == other.price
+            metadata.optionalContentEquals(other.metadata) &&
+            price == other.price
     }
 }

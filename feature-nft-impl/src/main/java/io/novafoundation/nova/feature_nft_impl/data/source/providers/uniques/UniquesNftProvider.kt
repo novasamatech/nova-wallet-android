@@ -19,7 +19,7 @@ import java.math.BigInteger
 class UniquesNftProvider(
     private val remoteStorage: StorageDataSource,
     private val nftDao: NftDao,
-): NftProvider {
+) : NftProvider {
 
     override suspend fun initialNftsSync(chain: Chain, metaAccount: MetaAccount) {
         val accountId = metaAccount.accountIdIn(chain)!!

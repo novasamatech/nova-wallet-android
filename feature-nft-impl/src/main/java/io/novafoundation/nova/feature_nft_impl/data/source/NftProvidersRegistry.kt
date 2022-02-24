@@ -14,7 +14,7 @@ class NftProvidersRegistry(
 ) {
 
     fun get(chain: Chain): List<NftProvider> {
-        return when(chain.genesisHash) {
+        return when (chain.genesisHash) {
             Chain.Geneses.STATEMINE -> listOf(uniquesNftSource)
             Chain.Geneses.KUSAMA -> listOf(rmrkV1NftProvider, rmrkV2NftProvider)
             else -> emptyList()

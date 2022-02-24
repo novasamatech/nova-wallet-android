@@ -17,6 +17,5 @@ class UniquesModule {
     fun provideUniquesNftProvider(
         @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
         nftDao: NftDao
-    )= UniquesNftProvider(remoteStorageSource, nftDao)
-
+    ) = UniquesNftProvider(remoteStorageSource, nftDao)
 }
