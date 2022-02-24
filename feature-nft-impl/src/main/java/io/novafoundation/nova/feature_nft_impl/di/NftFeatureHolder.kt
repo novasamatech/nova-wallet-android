@@ -1,32 +1,31 @@
-package io.novafoundation.nova.feature_assets.di
+package io.novafoundation.nova.feature_nft_impl.di
 
 import io.novafoundation.nova.common.di.FeatureApiHolder
 import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
-import io.novafoundation.nova.feature_assets.presentation.WalletRouter
-import io.novafoundation.nova.feature_nft_api.NftFeatureApi
+import io.novafoundation.nova.feature_nft_impl.NftRouter
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 import javax.inject.Inject
 
 @ApplicationScope
-class AssetsFeatureHolder @Inject constructor(
+class NftFeatureHolder @Inject constructor(
     featureContainer: FeatureContainer,
-    private val router: WalletRouter
+    private val router: NftRouter,
 ) : FeatureApiHolder(featureContainer) {
 
     override fun initializeDependencies(): Any {
-        val dependencies = DaggerAssetsFeatureComponent_AssetsFeatureDependenciesComponent.builder()
+        val dApp = DaggerNftFeatureComponent_NftFeatureDependenciesComponent.builder()
             .commonApi(commonApi())
             .dbApi(getFeature(DbApi::class.java))
-            .nftFeatureApi(getFeature(NftFeatureApi::class.java))
+            .accountFeatureApi(getFeature(AccountFeatureApi::class.java))
             .walletFeatureApi(getFeature(WalletFeatureApi::class.java))
             .runtimeApi(getFeature(RuntimeApi::class.java))
-            .accountFeatureApi(getFeature(AccountFeatureApi::class.java))
             .build()
-        return DaggerAssetsFeatureComponent.factory()
-            .create(router, dependencies)
+
+        return DaggerNftFeatureComponent.factory()
+            .create(router, dApp)
     }
 }
