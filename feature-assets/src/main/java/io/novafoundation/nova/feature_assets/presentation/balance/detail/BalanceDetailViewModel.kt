@@ -83,12 +83,7 @@ class BalanceDetailViewModel(
             val deferredAssetSync = async { interactor.syncAssetsRates() }
             val deferredTransactionsSync = async { transactionHistoryMixin.syncFirstOperationsPage() }
 
-            val results = awaitAll(deferredAssetSync, deferredTransactionsSync)
-
-            val firstError = results.mapNotNull { it.exceptionOrNull() }
-                .firstOrNull()
-
-            firstError?.let(::showError)
+            awaitAll(deferredAssetSync, deferredTransactionsSync)
 
             _hideRefreshEvent.value = Event(Unit)
         }

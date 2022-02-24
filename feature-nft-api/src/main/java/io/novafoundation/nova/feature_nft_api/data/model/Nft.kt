@@ -7,7 +7,7 @@ import java.math.BigInteger
 class Nft(
     val chain: Chain,
     val owner: AccountId,
-    val metadata: Metadata,
+    val metadata: Metadata?,
     val type: Type,
 ) {
 
@@ -23,7 +23,7 @@ class Nft(
         class Loadable(val rawPointer: ByteArray) : Metadata()
     }
 
-    sealed class Type {
+    sealed class Type(){
 
         class Uniques(val instanceId: BigInteger, val collectionId: BigInteger) : Type()
 
