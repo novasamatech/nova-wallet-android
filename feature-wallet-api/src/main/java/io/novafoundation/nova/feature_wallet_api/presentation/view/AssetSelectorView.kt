@@ -13,7 +13,7 @@ import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getBlurDrawable
 import io.novafoundation.nova.common.view.shape.getIdleDrawable
 import io.novafoundation.nova.feature_wallet_api.R
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetModel
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetSelectorModel
 import kotlinx.android.synthetic.main.view_asset_selector.view.assetSelectorAction
 import kotlinx.android.synthetic.main.view_asset_selector.view.assetSelectorBalance
 import kotlinx.android.synthetic.main.view_asset_selector.view.assetSelectorIcon
@@ -65,7 +65,7 @@ class AssetSelectorView @JvmOverloads constructor(
 
     fun setState(
         imageLoader: ImageLoader,
-        assetModel: AssetModel
+        assetModel: AssetSelectorModel
     ) {
         with(assetModel) {
             assetSelectorBalance.text = assetBalance

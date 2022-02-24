@@ -347,26 +347,26 @@
 
     <fragment
         android:id="@+id/balanceDetailFragment"
-        android:name="io.novafoundation.nova.feature_wallet_impl.presentation.balance.detail.BalanceDetailFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.balance.detail.BalanceDetailFragment"
         android:label="BalanceDetailFragment"
         tools:layout="@layout/fragment_balance_detail" />
 
 
     <fragment
         android:id="@+id/transferDetailFragment"
-        android:name="io.novafoundation.nova.feature_wallet_impl.presentation.transaction.detail.transfer.TransferDetailFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.transaction.detail.transfer.TransferDetailFragment"
         android:label="TransferDetailFragment"
         tools:layout="@layout/fragment_transfer_details" />
 
     <fragment
         android:id="@+id/extrinsicDetailFragment"
-        android:name="io.novafoundation.nova.feature_wallet_impl.presentation.transaction.detail.extrinsic.ExtrinsicDetailFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.transaction.detail.extrinsic.ExtrinsicDetailFragment"
         android:label="ExtrinsicDetailFragment"
         tools:layout="@layout/fragment_extrinsic_details" />
 
     <fragment
         android:id="@+id/rewardDetailFragment"
-        android:name="io.novafoundation.nova.feature_wallet_impl.presentation.transaction.detail.reward.RewardDetailFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.transaction.detail.reward.RewardDetailFragment"
         android:label="RewardDetailFragment"
         tools:layout="@layout/fragment_reward_slash_details" />
 
@@ -380,7 +380,7 @@
 
     <fragment
         android:id="@+id/chooseRecipientFragment"
-        android:name="io.novafoundation.nova.feature_wallet_impl.presentation.send.recipient.ChooseRecipientFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.send.recipient.ChooseRecipientFragment"
         android:label="ChooseRecipientFragment"
         tools:layout="@layout/fragment_choose_recipient">
 
@@ -395,13 +395,13 @@
 
     <fragment
         android:id="@+id/receiveFragment"
-        android:name="io.novafoundation.nova.feature_wallet_impl.presentation.receive.ReceiveFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.receive.ReceiveFragment"
         android:label="ReceiveFragment"
         tools:layout="@layout/fragment_receive" />
 
     <fragment
         android:id="@+id/chooseAmountFragment"
-        android:name="io.novafoundation.nova.feature_wallet_impl.presentation.send.amount.ChooseAmountFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.send.amount.ChooseAmountFragment"
         android:label="ChooseAmountFragment"
         tools:layout="@layout/fragment_choose_amount">
 
@@ -424,12 +424,12 @@
 
     <fragment
         android:id="@+id/transactionHistoryFilterFragment"
-        android:name="io.novafoundation.nova.feature_wallet_impl.presentation.transaction.filter.TransactionHistoryFilterFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.transaction.filter.TransactionHistoryFilterFragment"
         android:label="TransactionHistoryFilterFragment"/>
 
     <fragment
         android:id="@+id/confirmTransferFragment"
-        android:name="io.novafoundation.nova.feature_wallet_impl.presentation.send.confirm.ConfirmTransferFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.send.confirm.ConfirmTransferFragment"
         android:label="ConfirmTransferFragment"
         tools:layout="@layout/fragment_confirm_transfer">
 
@@ -915,6 +915,6 @@
 
     <fragment
         android:id="@+id/assetFiltersFragment"
-        android:name="io.novafoundation.nova.feature_wallet_impl.presentation.balance.filters.AssetFiltersFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.balance.filters.AssetFiltersFragment"
         android:label="AssetFiltersFragment" />
 </navigation>

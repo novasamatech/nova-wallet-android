@@ -5,14 +5,12 @@ import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
-import io.novafoundation.nova.feature_wallet_impl.presentation.WalletRouter
 import io.novafoundation.nova.runtime.di.RuntimeApi
 import javax.inject.Inject
 
 @ApplicationScope
 class WalletFeatureHolder @Inject constructor(
     featureContainer: FeatureContainer,
-    private val router: WalletRouter
 ) : FeatureApiHolder(featureContainer) {
 
     override fun initializeDependencies(): Any {
@@ -23,6 +21,6 @@ class WalletFeatureHolder @Inject constructor(
             .accountFeatureApi(getFeature(AccountFeatureApi::class.java))
             .build()
         return DaggerWalletFeatureComponent.factory()
-            .create(router, dependencies)
+            .create(dependencies)
     }
 }
