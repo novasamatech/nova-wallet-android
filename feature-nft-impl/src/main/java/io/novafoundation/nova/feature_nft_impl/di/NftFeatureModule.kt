@@ -7,27 +7,26 @@ import io.novafoundation.nova.core_db.dao.NftDao
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_nft_impl.data.repository.NftRepositoryImpl
 import io.novafoundation.nova.feature_nft_impl.data.source.NftProvidersRegistry
-import io.novafoundation.nova.feature_nft_impl.data.source.providers.UniquesNftProvider
-import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
+import io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV1.RmrkV1NftProvider
+import io.novafoundation.nova.feature_nft_impl.data.source.providers.uniques.UniquesNftProvider
+import io.novafoundation.nova.feature_nft_impl.di.modules.RmrkV1Module
+import io.novafoundation.nova.feature_nft_impl.di.modules.UniquesModule
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import javax.inject.Named
 
-@Module
+@Module(
+    includes = [
+        UniquesModule::class,
+        RmrkV1Module::class
+    ]
+)
 class NftFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideUniquesNftProvider(
-        @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
-        nftDao: NftDao
-    )= UniquesNftProvider(remoteStorageSource, nftDao)
-
-    @Provides
-    @FeatureScope
     fun provideNftProviderRegistry(
-       uniquesNftProvider: UniquesNftProvider
-    )= NftProvidersRegistry(uniquesNftProvider)
+        uniquesNftProvider: UniquesNftProvider,
+        rmrkV1NftProvider: RmrkV1NftProvider,
+    ) = NftProvidersRegistry(uniquesNftProvider, rmrkV1NftProvider)
 
     @Provides
     @FeatureScope

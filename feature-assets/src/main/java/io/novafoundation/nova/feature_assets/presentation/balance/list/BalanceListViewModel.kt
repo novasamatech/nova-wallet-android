@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.AssetGroup
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.joinAll
@@ -86,8 +87,11 @@ class BalanceListViewModel(
         .share()
 
     init {
+        fullSync()
+
         selectedMetaAccount
             .onEach { syncWith(accountChangeSyncActions, it) }
+            .launchIn(this)
     }
 
     fun fullSync() {

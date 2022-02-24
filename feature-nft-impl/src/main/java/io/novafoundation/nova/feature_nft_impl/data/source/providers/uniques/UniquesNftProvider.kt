@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_nft_impl.data.source.providers
+package io.novafoundation.nova.feature_nft_impl.data.source.providers.uniques
 
 import io.novafoundation.nova.common.data.network.runtime.binding.cast
 import io.novafoundation.nova.common.data.network.runtime.binding.getTyped

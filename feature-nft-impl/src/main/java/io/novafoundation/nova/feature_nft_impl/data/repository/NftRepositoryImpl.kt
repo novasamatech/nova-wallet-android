@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_nft_impl.data.repository
 
+import android.util.Log
 import io.novafoundation.nova.core_db.dao.NftDao
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
@@ -14,6 +15,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+
+private const val NFT_TAG = "NFT"
 
 class NftRepositoryImpl(
     private val nftProvidersRegistry: NftProvidersRegistry,
@@ -39,8 +42,11 @@ class NftRepositoryImpl(
             nftProvidersRegistry.get(chain).map { nftProvider ->
                 // launch separate job per each nftProvider
                 launch {
+                    // prevent whole sync from failing if some particular provider fails
                     runCatching {
                         nftProvider.initialNftsSync(chain, metaAccount)
+                    }.onFailure {
+                        Log.e(NFT_TAG, "Failed to sync nfts in ${chain.name} using ${nftProvider::class.simpleName}", it)
                     }
                 }
             }
