@@ -7,20 +7,32 @@ import java.math.BigInteger
 class Nft(
     val chain: Chain,
     val owner: AccountId,
-    val metadata: Metadata?,
+    val metadataRaw: ByteArray?,
+    val details: Details,
     val type: Type,
 ) {
 
-    sealed class Metadata {
+    sealed class Details {
 
         class Loaded(
-            val name: String,
-            val label: String?,
-            val media: String?,
             val price: BigInteger?,
-        ) : Metadata()
+            val issuance: Issuance,
+            val metadata: Metadata?
+        ) : Details()
 
-        class Loadable(val rawPointer: ByteArray) : Metadata()
+        object Loadable : Details()
+    }
+
+    class Metadata(
+        val name: String,
+        val label: String?,
+        val media: String?,
+    )
+
+    sealed class Issuance {
+        class Unlimited(val edition: String) : Issuance()
+
+        class Limited(val max: Int, val edition: Int): Issuance()
     }
 
     sealed class Type {

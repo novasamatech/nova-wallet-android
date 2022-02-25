@@ -31,7 +31,9 @@ class RmrkV2NftProvider(
                 media = it.image,
                 price = it.price,
                 type = NftLocal.Type.RMRK2,
-                wholeMetadataLoaded = it.image != null
+                issuanceTotal = null,
+                issuanceMyEdition = it.edition,
+                wholeDetailsLoaded = it.image != null // null in case of items, will require metadata fetch from ipfs on full sync
             )
         }
 

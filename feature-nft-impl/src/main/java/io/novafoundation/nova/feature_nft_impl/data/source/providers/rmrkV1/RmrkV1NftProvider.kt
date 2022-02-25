@@ -31,7 +31,12 @@ class RmrkV1NftProvider(
                 media = it.metadataImage,
                 price = it.price,
                 type = NftLocal.Type.RMRK1,
-                wholeMetadataLoaded = true
+                issuanceMyEdition = it.edition,
+
+                // to load at full sync
+                issuanceTotal = null,
+
+                wholeDetailsLoaded = false
             )
         }
 

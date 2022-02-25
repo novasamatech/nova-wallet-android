@@ -12,6 +12,8 @@ class RmrkV2NftRemote(
     val name: String,
     @SerializedName("metadata_description")
     val description: String,
+    @SerializedName("sn")
+    val edition: String,
     val image: String?,
     val metadata: String,
 )

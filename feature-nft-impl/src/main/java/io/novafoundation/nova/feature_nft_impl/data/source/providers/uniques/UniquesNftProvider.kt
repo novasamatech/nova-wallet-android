@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_nft_impl.data.source.providers.uniques
 
+import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.cast
 import io.novafoundation.nova.common.data.network.runtime.binding.getTyped
 import io.novafoundation.nova.common.utils.uniques
@@ -34,8 +35,10 @@ class UniquesNftProvider(
 
             val classMetadataStorage = runtime.metadata.uniques().storage("ClassMetadataOf")
             val instanceMetadataStorage = runtime.metadata.uniques().storage("InstanceMetadataOf")
+            val classStorage = runtime.metadata.uniques().storage("Class")
 
             val multiQueryResults = multi {
+                classStorage.querySingleArgKeys(classesIds)
                 classMetadataStorage.querySingleArgKeys(classesIds)
                 instanceMetadataStorage.queryKeys(classesWithInstances)
             }
@@ -44,6 +47,12 @@ class UniquesNftProvider(
                 .mapKeys { (keyComponents, _) -> keyComponents.component1<BigInteger>() }
                 .mapValues { (_, parsedValue) ->
                     parsedValue?.cast<Struct.Instance>()?.getTyped<ByteArray>("data")
+                }
+
+            val totalIssuances = multiQueryResults.getValue(classStorage)
+                .mapKeys { (keyComponents, _) -> keyComponents.component1<BigInteger>() }
+                .mapValues { (_, parsedValue) ->
+                    bindNumber(parsedValue.cast<Struct.Instance>()["instances"])
                 }
 
             val instancesMetadatas = multiQueryResults.getValue(instanceMetadataStorage)
@@ -65,7 +74,16 @@ class UniquesNftProvider(
                     instanceId = instanceId.toString(),
                     metadata = metadata,
                     type = NftLocal.Type.UNIQUES,
-                    wholeMetadataLoaded = false
+                    issuanceTotal = totalIssuances.getValue(collectionId).toInt(),
+                    issuanceMyEdition = instanceId.toString(),
+                    price = null,
+
+                    // to load at full sync
+                    name = null,
+                    label = null,
+                    media = null,
+
+                    wholeDetailsLoaded = false
                 )
             }
         }

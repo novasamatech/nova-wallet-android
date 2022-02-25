@@ -10,6 +10,8 @@ class RmrkV1NftRemote(
     val collectionId: String,
     val instance: String,
     val name: String,
+    @SerializedName("sn")
+    val edition: String,
     val metadata: String,
     @SerializedName("metadata_image")
     val metadataImage: String
