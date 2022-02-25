@@ -12,7 +12,14 @@ class RmrkV1NftRemote(
     val name: String,
     @SerializedName("sn")
     val edition: String,
-    val metadata: String,
-    @SerializedName("metadata_image")
-    val metadataImage: String
+    val metadata: String
+)
+
+class RmrkV1CollectionRemote(
+    val max: Int
+)
+
+class RmrkV1NftMetadataRemote(
+    val image: String,
+    val description: String
 )

@@ -103,7 +103,7 @@ class UniquesNftProvider(
         }
 
         val metadataLink = nft.metadataRaw!!.decodeToString().adoptFileStorageLinkToHttps()
-        val metadata = ipfsApi.getIpfsContent(metadataLink)
+        val metadata = ipfsApi.getIpfsMetadata(metadataLink)
 
         nftDao.updateNft(nft.identifier) { local ->
             local.copy(

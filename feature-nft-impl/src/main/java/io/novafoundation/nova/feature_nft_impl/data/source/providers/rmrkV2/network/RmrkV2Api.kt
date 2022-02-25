@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV2.net
 
 import retrofit2.http.GET
 import retrofit2.http.Path
+import retrofit2.http.Url
 
 interface RmrkV2Api {
 
@@ -14,4 +15,7 @@ interface RmrkV2Api {
 
     @GET("account-items/{address}")
     suspend fun getItems(@Path("address") address: String): List<RmrkV2NftRemote>
+
+    @GET
+    suspend fun getIpfsMetadata(@Url url: String): RmrkV2NftMetadataRemote
 }

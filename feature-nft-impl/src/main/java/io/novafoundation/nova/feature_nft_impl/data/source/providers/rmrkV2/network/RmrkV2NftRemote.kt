@@ -17,3 +17,7 @@ class RmrkV2NftRemote(
     val image: String?,
     val metadata: String,
 )
+
+class RmrkV2NftMetadataRemote(
+    val image: String
+)

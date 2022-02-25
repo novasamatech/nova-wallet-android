@@ -5,13 +5,13 @@ import androidx.test.core.app.ApplicationProvider
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_nft_api.NftFeatureApi
-import io.novafoundation.nova.feature_nft_api.data.model.Nft
 import io.novafoundation.nova.feature_nft_api.data.model.isFullySynced
 import io.novafoundation.nova.runtime.di.RuntimeApi
 import io.novafoundation.nova.runtime.di.RuntimeComponent
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.runBlocking
@@ -37,7 +37,7 @@ class NftFullSyncIntegrationTest {
     private val externalRequirementFlow = runtimeApi.externalRequirementFlow()
 
     @Test
-    fun testUniquesIntegration(): Unit = runBlocking {
+    fun testFullSyncIntegration(): Unit = runBlocking {
         externalRequirementFlow.emit(ChainConnection.ExternalRequirement.ALLOWED)
 
         val metaAccount = accountApi.accountUseCase().getSelectedMetaAccount()
@@ -47,10 +47,14 @@ class NftFullSyncIntegrationTest {
         nftRepository.initialNftSync(metaAccount)
 
         nftRepository.allNftFlow(metaAccount)
-            .map { nfts -> nfts.filter { it.type is Nft.Type.Uniques  && !it.isFullySynced } }
+            .map { nfts -> nfts.filter { !it.isFullySynced } }
             .takeWhile { it.isNotEmpty() }
             .onEach { unsyncedNfts ->
                 unsyncedNfts.forEach { nftRepository.fullNftSync(it) }
-            }.launchIn(this)
+            }
+            .onCompletion {
+                print("Full sync done")
+            }
+            .launchIn(this)
     }
 }

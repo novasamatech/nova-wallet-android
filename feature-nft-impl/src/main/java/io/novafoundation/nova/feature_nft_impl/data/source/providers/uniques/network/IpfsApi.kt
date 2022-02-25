@@ -6,5 +6,5 @@ import retrofit2.http.Url
 interface IpfsApi {
 
     @GET
-    suspend fun getIpfsContent(@Url url: String): UniquesMetadata
+    suspend fun getIpfsMetadata(@Url url: String): UniquesMetadata
 }
