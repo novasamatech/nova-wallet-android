@@ -8,7 +8,10 @@ import io.novafoundation.nova.core_db.dao.NftDao
 import io.novafoundation.nova.core_db.model.NftLocal
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
+import io.novafoundation.nova.feature_nft_api.data.model.Nft
+import io.novafoundation.nova.feature_nft_impl.data.network.distributed.FileStorageAdapter.adoptFileStorageLinkToHttps
 import io.novafoundation.nova.feature_nft_impl.data.source.NftProvider
+import io.novafoundation.nova.feature_nft_impl.data.source.providers.uniques.network.IpfsApi
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
@@ -20,6 +23,7 @@ import java.math.BigInteger
 class UniquesNftProvider(
     private val remoteStorage: StorageDataSource,
     private val nftDao: NftDao,
+    private val ipfsApi: IpfsApi,
 ) : NftProvider {
 
     override suspend fun initialNftsSync(chain: Chain, metaAccount: MetaAccount) {
@@ -89,6 +93,26 @@ class UniquesNftProvider(
         }
 
         nftDao.insertNftsDiff(NftLocal.Type.UNIQUES, metaAccount.id, newNfts)
+    }
+
+    override suspend fun nftFullSync(nft: Nft) {
+        if (nft.metadataRaw == null) {
+            nftDao.markFullSynced(nft.identifier)
+
+            return
+        }
+
+        val metadataLink = nft.metadataRaw!!.decodeToString().adoptFileStorageLinkToHttps()
+        val metadata = ipfsApi.getIpfsContent(metadataLink)
+
+        nftDao.updateNft(nft.identifier) { local ->
+            local.copy(
+                name = metadata.name!!,
+                media = metadata.image?.adoptFileStorageLinkToHttps(),
+                label = metadata.description,
+                wholeDetailsLoaded = true
+            )
+        }
     }
 
     private fun identifier(chainId: ChainId, collectionId: BigInteger, instanceId: BigInteger): String {

@@ -56,6 +56,7 @@ fun mapNftLocalToNft(
     }
 
     return Nft(
+        identifier = nftLocal.identifier,
         chain = chain,
         owner = metaAccount.accountIdIn(chain)!!,
         metadataRaw = nftLocal.metadata,

@@ -27,7 +27,13 @@ abstract class NftDao {
     protected abstract suspend fun insertNfts(nfts: List<NftLocal>)
 
     @Update
-    abstract suspend fun updateNft(nft: NftLocal)
+    protected abstract suspend fun updateNft(nft: NftLocal)
+
+    @Query("SELECT * FROM nfts WHERE identifier = :nftIdentifier")
+    protected abstract suspend fun getNft(nftIdentifier: String): NftLocal
+
+    @Query("UPDATE nfts SET wholeDetailsLoaded = 1 WHERE identifier = :nftIdentifier")
+    abstract suspend fun markFullSynced(nftIdentifier: String)
 
     @Transaction
     open suspend fun insertNftsDiff(nftType: NftLocal.Type, metaId: Long, newNfts: List<NftLocal>) {
@@ -37,5 +43,14 @@ abstract class NftDao {
 
         deleteNfts(diff.removed)
         insertNfts(diff.newOrUpdated)
+    }
+
+    @Transaction
+    open suspend fun updateNft(nftIdentifier: String, update: (NftLocal) -> NftLocal) {
+        val nft = getNft(nftIdentifier)
+
+        val updated = update(nft)
+
+        updateNft(updated)
     }
 }

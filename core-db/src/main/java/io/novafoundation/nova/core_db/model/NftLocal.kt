@@ -8,7 +8,7 @@ import io.novafoundation.nova.common.utils.optionalContentEquals
 import java.math.BigInteger
 
 @Entity(tableName = "nfts")
-class NftLocal(
+data class NftLocal(
     @PrimaryKey
     override val identifier: String,
     @ColumnInfo(index = true)

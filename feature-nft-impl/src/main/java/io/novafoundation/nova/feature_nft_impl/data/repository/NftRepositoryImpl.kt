@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_nft_impl.data.mappers.mapNftLocalToNft
+import io.novafoundation.nova.feature_nft_impl.data.source.JobOrchestrator
 import io.novafoundation.nova.feature_nft_impl.data.source.NftProvidersRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.Dispatchers
@@ -21,6 +22,7 @@ private const val NFT_TAG = "NFT"
 class NftRepositoryImpl(
     private val nftProvidersRegistry: NftProvidersRegistry,
     private val chainRegistry: ChainRegistry,
+    private val jobOrchestrator: JobOrchestrator,
     private val nftDao: NftDao,
 ) : NftRepository {
 
@@ -55,7 +57,13 @@ class NftRepositoryImpl(
         syncJobs.joinAll()
     }
 
-    override suspend fun fullNftSync(nft: Nft) {
-        TODO("Not yet implemented")
+    override suspend fun fullNftSync(nft: Nft) = withContext(Dispatchers.IO) {
+       jobOrchestrator.runUniqueJob(nft.identifier) {
+           runCatching {
+               nftProvidersRegistry.get(nft).nftFullSync(nft)
+           }.onFailure {
+               Log.e(NFT_TAG, "Failed to fully sync nft ${nft.identifier} in ${nft.chain.name} with type ${nft.type::class.simpleName}", it)
+           }
+       }
     }
 }

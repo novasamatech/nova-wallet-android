@@ -10,13 +10,21 @@ class FileStorageAdapterTest {
     fun `should adapt ipfs to http`() {
         runTest(
             initial = "ipfs://ipfs/bafkreig7jn6iwz4fo3mwkl3ndljbrf7ot4mwyvpmzrj4vm2nvwzw6dysb4",
-            expected = "${FileStorage.IPFS.defaultHttpsGateway}/ipfs/bafkreig7jn6iwz4fo3mwkl3ndljbrf7ot4mwyvpmzrj4vm2nvwzw6dysb4"
+            expected = "${FileStorage.IPFS.defaultHttpsGateway}bafkreig7jn6iwz4fo3mwkl3ndljbrf7ot4mwyvpmzrj4vm2nvwzw6dysb4"
         )
 
         runTest(
             initial = "ipfs://ipfs/bafkreig7jn6iwz4fo3mwkl3ndljbrf7ot4mwyvpmzrj4vm2nvwzw6dysb4",
-            customGateways = mapOf(FileStorage.IPFS to "custom.domain.com"),
+            customGateways = mapOf(FileStorage.IPFS to "custom.domain.com/ipfs/"),
             expected = "custom.domain.com/ipfs/bafkreig7jn6iwz4fo3mwkl3ndljbrf7ot4mwyvpmzrj4vm2nvwzw6dysb4"
+        )
+    }
+
+    @Test
+    fun `should fallback`() {
+        runTest(
+            initial = "bafkreig7jn6iwz4fo3mwkl3ndljbrf7ot4mwyvpmzrj4vm2nvwzw6dysb4",
+            expected = "${FileStorage.IPFS.defaultHttpsGateway}bafkreig7jn6iwz4fo3mwkl3ndljbrf7ot4mwyvpmzrj4vm2nvwzw6dysb4"
         )
     }
 

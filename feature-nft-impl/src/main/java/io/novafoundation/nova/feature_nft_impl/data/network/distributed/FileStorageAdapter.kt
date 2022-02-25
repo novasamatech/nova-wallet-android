@@ -1,41 +1,46 @@
 package io.novafoundation.nova.feature_nft_impl.data.network.distributed
 
-enum class FileStorage(val protocol: String, val defaultHttpsGateway: String?) {
-    IPFS("ipfs", "https://cloudflare-ipfs.com"),
-    HTTPS("https", null),
-    HTTP("http", null);
+enum class FileStorage(val prefix: String, val defaultHttpsGateway: String?) {
+    IPFS("ipfs://ipfs/", "https://rmrk.mypinata.cloud/ipfs/"),
+    HTTPS("https://", null),
+    HTTP("http://", null);
 
     init {
-        require(!defaultHttpsGateway.orEmpty().endsWith("/")) {
-            "Gateway should not end with '/' separator"
-        }
-        require(!protocol.endsWith("://")) {
-            "Protocol should not end with '://' separator"
-        }
+        validateHttpsGateway(defaultHttpsGateway)
     }
 }
 
-val FileStorage.protocolPrefix
-    get() = "$protocol://"
+private fun validateHttpsGateway(gateway: String?) {
+    require(gateway == null || gateway.endsWith("/")) {
+        "Gateway should end with '/' separator"
+    }
+}
 
 object FileStorageAdapter {
 
+    fun String.adoptFileStorageLinkToHttps(
+        customGateways: Map<FileStorage, String> = emptyMap(),
+        noProtocolStorage: FileStorage = FileStorage.IPFS
+    ) = adaptToHttps(this, customGateways, noProtocolStorage)
 
     fun adaptToHttps(
         distributedStorageLink: String,
-        customGateways: Map<FileStorage, String> = emptyMap()
-    ): String? {
+        customGateways: Map<FileStorage, String> = emptyMap(),
+        noProtocolStorage: FileStorage = FileStorage.IPFS
+    ): String {
         val distributedStorage = FileStorage.values().firstOrNull { storage ->
             distributedStorageLink.pointsTo(storage)
-        } ?: return null
+        } ?: noProtocolStorage
 
         val gateway = customGateways[distributedStorage] ?: distributedStorage.defaultHttpsGateway
             ?: return distributedStorageLink
 
-        val path = distributedStorageLink.removePrefix(distributedStorage.protocolPrefix)
+        validateHttpsGateway(gateway)
 
-        return "$gateway/$path"
+        val path = distributedStorageLink.removePrefix(distributedStorage.prefix)
+
+        return "$gateway$path"
     }
 
-    private fun String.pointsTo(fileStorage: FileStorage) = startsWith(fileStorage.protocolPrefix)
+    private fun String.pointsTo(fileStorage: FileStorage) = startsWith(fileStorage.prefix)
 }

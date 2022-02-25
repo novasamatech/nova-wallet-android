@@ -5,6 +5,7 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import java.math.BigInteger
 
 class Nft(
+    val identifier: String,
     val chain: Chain,
     val owner: AccountId,
     val metadataRaw: ByteArray?,
@@ -32,7 +33,7 @@ class Nft(
     sealed class Issuance {
         class Unlimited(val edition: String) : Issuance()
 
-        class Limited(val max: Int, val edition: Int): Issuance()
+        class Limited(val max: Int, val edition: Int) : Issuance()
     }
 
     sealed class Type {
@@ -44,3 +45,6 @@ class Nft(
         class Rmrk2(val collectionId: String) : Type()
     }
 }
+
+val Nft.isFullySynced
+    get() = details is Nft.Details.Loaded

@@ -4,6 +4,7 @@ import io.novafoundation.nova.core_db.dao.NftDao
 import io.novafoundation.nova.core_db.model.NftLocal
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
+import io.novafoundation.nova.feature_nft_api.data.model.Nft
 import io.novafoundation.nova.feature_nft_impl.data.source.NftProvider
 import io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV1.network.RmrkV1Api
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -41,6 +42,10 @@ class RmrkV1NftProvider(
         }
 
         nftDao.insertNftsDiff(NftLocal.Type.RMRK1, metaAccount.id, toSave)
+    }
+
+    override suspend fun nftFullSync(nft: Nft) {
+        // TODO
     }
 
     private fun identifier(chainId: ChainId, id: String): String {
