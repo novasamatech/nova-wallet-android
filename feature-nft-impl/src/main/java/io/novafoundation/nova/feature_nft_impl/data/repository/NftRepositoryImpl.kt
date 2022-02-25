@@ -58,12 +58,12 @@ class NftRepositoryImpl(
     }
 
     override suspend fun fullNftSync(nft: Nft) = withContext(Dispatchers.IO) {
-       jobOrchestrator.runUniqueJob(nft.identifier) {
-           runCatching {
-               nftProvidersRegistry.get(nft).nftFullSync(nft)
-           }.onFailure {
-               Log.e(NFT_TAG, "Failed to fully sync nft ${nft.identifier} in ${nft.chain.name} with type ${nft.type::class.simpleName}", it)
-           }
-       }
+        jobOrchestrator.runUniqueJob(nft.identifier) {
+            runCatching {
+                nftProvidersRegistry.get(nft).nftFullSync(nft)
+            }.onFailure {
+                Log.e(NFT_TAG, "Failed to fully sync nft ${nft.identifier} in ${nft.chain.name} with type ${nft.type::class.simpleName}", it)
+            }
+        }
     }
 }

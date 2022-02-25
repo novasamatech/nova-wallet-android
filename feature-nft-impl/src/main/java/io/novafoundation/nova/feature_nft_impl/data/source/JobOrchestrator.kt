@@ -18,7 +18,7 @@ class JobOrchestrator {
         if (id in runningJobs) {
             return@withLock
         }
-        
+
         runningJobs += id
 
         CoroutineScope(coroutineContext).async { action() }

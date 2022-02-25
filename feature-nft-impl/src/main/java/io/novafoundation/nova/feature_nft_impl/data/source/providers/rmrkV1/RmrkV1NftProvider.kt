@@ -52,7 +52,7 @@ class RmrkV1NftProvider(
         val collection = api.getCollection(type.collectionId)
 
         val metadata = nft.metadataRaw?.let {
-           api.getIpfsMetadata(it.decodeToString().adoptFileStorageLinkToHttps())
+            api.getIpfsMetadata(it.decodeToString().adoptFileStorageLinkToHttps())
         }
 
         nftDao.updateNft(nft.identifier) { local ->
@@ -63,7 +63,6 @@ class RmrkV1NftProvider(
                 wholeDetailsLoaded = true
             )
         }
-
     }
 
     private fun identifier(chainId: ChainId, id: String): String {
