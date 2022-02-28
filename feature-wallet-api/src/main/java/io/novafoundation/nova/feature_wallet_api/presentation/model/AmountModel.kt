@@ -29,7 +29,6 @@ fun mapAmountToAmountModel(
     token = token
 )
 
-
 fun mapAmountToAmountModel(
     amount: BigDecimal,
     token: Token,

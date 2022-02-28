@@ -16,7 +16,7 @@ class TokenRepositoryImpl(
 ) : TokenRepository {
 
     override suspend fun observeTokens(chainAssets: List<Chain.Asset>): Flow<Map<Chain.Asset, Token>> {
-       val symbols = chainAssets.map { it.symbol }.distinct()
+        val symbols = chainAssets.map { it.symbol }.distinct()
 
         return tokenDao.observeTokens(symbols).map { tokens ->
             val tokensBySymbol = tokens.associateBy { it.symbol }

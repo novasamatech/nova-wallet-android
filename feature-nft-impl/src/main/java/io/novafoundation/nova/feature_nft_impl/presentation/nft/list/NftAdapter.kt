@@ -122,7 +122,6 @@ class NftHolder(
                     itemNftPriceDivider.makeGone()
                 }
             }
-
         }
 
         setOnClickListener { itemHandler.itemClicked(item) }

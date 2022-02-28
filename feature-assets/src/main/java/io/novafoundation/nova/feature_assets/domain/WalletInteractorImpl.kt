@@ -80,7 +80,7 @@ class WalletInteractorImpl(
     }
 
     override suspend fun syncNfts(metaAccount: MetaAccount) {
-        nftRepository.initialNftSync(metaAccount, forceOverwrite=false)
+        nftRepository.initialNftSync(metaAccount, forceOverwrite = false)
     }
 
     override fun assetFlow(chainId: ChainId, chainAssetId: Int): Flow<Asset> {
