@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_nft_impl.presentation.nft.list
 
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -97,8 +96,6 @@ class NftHolder(
                 itemNftShimmer.makeGone()
                 itemNftShimmer.stopShimmer()
                 itemNftContent.makeVisible()
-
-                Log.e("RX", content.data.media.orEmpty())
 
                 itemNftMedia.load(content.data.media, imageLoader) {
                     transformations(RoundedCornersTransformation(8.dpF(context)))
