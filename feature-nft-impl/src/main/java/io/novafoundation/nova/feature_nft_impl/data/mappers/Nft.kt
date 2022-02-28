@@ -28,21 +28,39 @@ fun mapNftLocalToNft(
         )
     }
 
-    val metadata = when {
-        nftLocal.metadata == null -> null // not present
-        nftLocal.wholeMetadataLoaded -> Nft.Metadata.Loaded(
-            name = nftLocal.name!!,
-            label = nftLocal.label,
-            media = nftLocal.media,
-            price = nftLocal.price
+    val details = if (nftLocal.wholeDetailsLoaded) {
+        val issuance = if (nftLocal.issuanceTotal != null) {
+            Nft.Issuance.Limited(
+                max = nftLocal.issuanceTotal!!,
+                edition = nftLocal.issuanceMyEdition!!.toInt()
+            )
+        } else {
+            Nft.Issuance.Unlimited(nftLocal.issuanceMyEdition!!)
+        }
+
+        val metadata = nftLocal.metadata?.let {
+            Nft.Metadata(
+                name = nftLocal.name!!,
+                label = nftLocal.label,
+                media = nftLocal.media
+            )
+        }
+
+        Nft.Details.Loaded(
+            metadata = metadata,
+            price = nftLocal.price,
+            issuance = issuance,
         )
-        else -> Nft.Metadata.Loadable(nftLocal.metadata!!)
+    } else {
+        Nft.Details.Loadable
     }
 
     return Nft(
+        identifier = nftLocal.identifier,
         chain = chain,
         owner = metaAccount.accountIdIn(chain)!!,
-        metadata = metadata,
-        type = type
+        metadataRaw = nftLocal.metadata,
+        type = type,
+        details = details
     )
 }

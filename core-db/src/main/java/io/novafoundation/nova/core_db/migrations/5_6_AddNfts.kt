@@ -15,14 +15,16 @@ val AddNfts_5_6 = object : Migration(5, 6) {
             `collectionId` TEXT,
             `instanceId` TEXT,
             `metadata` BLOB,
-            `wholeMetadataLoaded` INTEGER NOT NULL,
+            `type` TEXT NOT NULL,
+            `wholeDetailsLoaded` INTEGER NOT NULL,
             `name` TEXT,
             `label` TEXT,
             `media` TEXT,
+            `issuanceTotal` INTEGER,
+            `issuanceMyEdition` TEXT,
             `price` TEXT,
-            `type` TEXT NOT NULL,
             PRIMARY KEY(`identifier`))
-            """
+            """.trimIndent()
         )
         database.execSQL("CREATE INDEX IF NOT EXISTS `index_nfts_metaId` ON `nfts` (`metaId`)")
     }

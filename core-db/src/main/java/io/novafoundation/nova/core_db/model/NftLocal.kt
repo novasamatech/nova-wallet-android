@@ -8,7 +8,7 @@ import io.novafoundation.nova.common.utils.optionalContentEquals
 import java.math.BigInteger
 
 @Entity(tableName = "nfts")
-class NftLocal(
+data class NftLocal(
     @PrimaryKey
     override val identifier: String,
     @ColumnInfo(index = true)
@@ -17,14 +17,20 @@ class NftLocal(
     val collectionId: String?,
     val instanceId: String?,
     val metadata: ByteArray?,
-    val wholeMetadataLoaded: Boolean,
+    val type: Type,
+
+    val wholeDetailsLoaded: Boolean,
+
     // --- metadata fields ---
     val name: String? = null,
     val label: String? = null,
     val media: String? = null,
-    // --- metadata fields ---
+    // --- !metadata fields ---
+
+    val issuanceTotal: Int? = null,
+    val issuanceMyEdition: String? = null,
+
     val price: BigInteger? = null,
-    val type: Type
 ) : Identifiable {
 
     enum class Type {
@@ -36,6 +42,8 @@ class NftLocal(
             identifier == other.identifier &&
             // metadata is either direct data or a link to immutable distributed storage
             metadata.optionalContentEquals(other.metadata) &&
-            price == other.price
+            price == other.price &&
+            issuanceTotal == other.issuanceTotal &&
+            issuanceMyEdition == issuanceMyEdition
     }
 }

@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.dao.NftDao
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_nft_impl.data.repository.NftRepositoryImpl
+import io.novafoundation.nova.feature_nft_impl.data.source.JobOrchestrator
 import io.novafoundation.nova.feature_nft_impl.data.source.NftProvidersRegistry
 import io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV1.RmrkV1NftProvider
 import io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV2.RmrkV2NftProvider
@@ -26,6 +27,10 @@ class NftFeatureModule {
 
     @Provides
     @FeatureScope
+    fun provideJobOrchestrator() = JobOrchestrator()
+
+    @Provides
+    @FeatureScope
     fun provideNftProviderRegistry(
         uniquesNftProvider: UniquesNftProvider,
         rmrkV1NftProvider: RmrkV1NftProvider,
@@ -37,6 +42,7 @@ class NftFeatureModule {
     fun provideNftRepository(
         nftProvidersRegistry: NftProvidersRegistry,
         chainRegistry: ChainRegistry,
+        jobOrchestrator: JobOrchestrator,
         nftDao: NftDao
-    ): NftRepository = NftRepositoryImpl(nftProvidersRegistry, chainRegistry, nftDao)
+    ): NftRepository = NftRepositoryImpl(nftProvidersRegistry, chainRegistry, jobOrchestrator, nftDao)
 }
