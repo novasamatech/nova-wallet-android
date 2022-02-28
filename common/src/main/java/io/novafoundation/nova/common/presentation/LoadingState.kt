@@ -11,7 +11,7 @@ sealed class LoadingState<T> {
 
     class Loading<T> : LoadingState<T>()
 
-    class Loaded<T>(val data: T) : LoadingState<T>()
+    data class Loaded<T>(val data: T) : LoadingState<T>()
 }
 
 @Suppress("UNCHECKED_CAST")

@@ -22,6 +22,15 @@ fun mapAmountToAmountModel(
 )
 
 fun mapAmountToAmountModel(
+    amountInPlanks: BigInteger,
+    token: Token
+): AmountModel = mapAmountToAmountModel(
+    amount = token.amountFromPlanks(amountInPlanks),
+    token = token
+)
+
+
+fun mapAmountToAmountModel(
     amount: BigDecimal,
     token: Token,
 ): AmountModel {

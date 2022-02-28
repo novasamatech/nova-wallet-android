@@ -14,7 +14,7 @@ data class NftLocal(
     @ColumnInfo(index = true)
     val metaId: Long,
     val chainId: String,
-    val collectionId: String?,
+    val collectionId: String,
     val instanceId: String?,
     val metadata: ByteArray?,
     val type: Type,
@@ -42,8 +42,6 @@ data class NftLocal(
             identifier == other.identifier &&
             // metadata is either direct data or a link to immutable distributed storage
             metadata.optionalContentEquals(other.metadata) &&
-            price == other.price &&
-            issuanceTotal == other.issuanceTotal &&
-            issuanceMyEdition == issuanceMyEdition
+            price == other.price
     }
 }

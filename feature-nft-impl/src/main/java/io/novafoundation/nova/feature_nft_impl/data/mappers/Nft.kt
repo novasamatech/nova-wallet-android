@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import java.math.BigInteger
 
 fun mapNftLocalToNft(
     chainsById: Map<ChainId, Chain>,
@@ -17,19 +18,19 @@ fun mapNftLocalToNft(
     val type = when (nftLocal.type) {
         NftLocal.Type.UNIQUES -> Nft.Type.Uniques(
             instanceId = nftLocal.instanceId!!.toBigInteger(),
-            collectionId = nftLocal.collectionId!!.toBigInteger(),
+            collectionId = nftLocal.collectionId.toBigInteger(),
         )
         NftLocal.Type.RMRK1 -> Nft.Type.Rmrk1(
             instanceId = nftLocal.instanceId!!,
-            collectionId = nftLocal.collectionId!!
+            collectionId = nftLocal.collectionId
         )
         NftLocal.Type.RMRK2 -> Nft.Type.Rmrk2(
-            collectionId = nftLocal.collectionId!!
+            collectionId = nftLocal.collectionId
         )
     }
 
     val details = if (nftLocal.wholeDetailsLoaded) {
-        val issuance = if (nftLocal.issuanceTotal != null) {
+        val issuance = if (nftLocal.issuanceTotal != null && nftLocal.issuanceTotal!! > 0) {
             Nft.Issuance.Limited(
                 max = nftLocal.issuanceTotal!!,
                 edition = nftLocal.issuanceMyEdition!!.toInt()
@@ -46,9 +47,15 @@ fun mapNftLocalToNft(
             )
         }
 
+        val price = if (nftLocal.price == BigInteger.ZERO) {
+            null
+        } else {
+            nftLocal.price
+        }
+
         Nft.Details.Loaded(
             metadata = metadata,
-            price = nftLocal.price,
+            price = price,
             issuance = issuance,
         )
     } else {
@@ -57,6 +64,8 @@ fun mapNftLocalToNft(
 
     return Nft(
         identifier = nftLocal.identifier,
+        instanceId = nftLocal.instanceId,
+        collectionId = nftLocal.collectionId,
         chain = chain,
         owner = metaAccount.accountIdIn(chain)!!,
         metadataRaw = nftLocal.metadata,

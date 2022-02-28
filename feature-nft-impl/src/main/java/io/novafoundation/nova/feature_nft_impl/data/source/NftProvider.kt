@@ -6,7 +6,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 interface NftProvider {
 
-    suspend fun initialNftsSync(chain: Chain, metaAccount: MetaAccount)
+    suspend fun initialNftsSync(chain: Chain, metaAccount: MetaAccount, forceOverwrite: Boolean)
 
     suspend fun nftFullSync(nft: Nft)
 }

@@ -26,7 +26,7 @@ class UniquesNftProvider(
     private val ipfsApi: IpfsApi,
 ) : NftProvider {
 
-    override suspend fun initialNftsSync(chain: Chain, metaAccount: MetaAccount) {
+    override suspend fun initialNftsSync(chain: Chain, metaAccount: MetaAccount, forceOverwrite: Boolean) {
         val accountId = metaAccount.accountIdIn(chain)!!
 
         val newNfts = remoteStorage.query(chain.id) {
@@ -92,7 +92,7 @@ class UniquesNftProvider(
             }
         }
 
-        nftDao.insertNftsDiff(NftLocal.Type.UNIQUES, metaAccount.id, newNfts)
+        nftDao.insertNftsDiff(NftLocal.Type.UNIQUES, metaAccount.id, newNfts, forceOverwrite)
     }
 
     override suspend fun nftFullSync(nft: Nft) {

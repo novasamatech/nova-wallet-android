@@ -36,10 +36,15 @@ abstract class NftDao {
     abstract suspend fun markFullSynced(nftIdentifier: String)
 
     @Transaction
-    open suspend fun insertNftsDiff(nftType: NftLocal.Type, metaId: Long, newNfts: List<NftLocal>) {
+    open suspend fun insertNftsDiff(
+        nftType: NftLocal.Type,
+        metaId: Long,
+        newNfts: List<NftLocal>,
+        forceOverwrite: Boolean
+    ) {
         val oldNfts = getNfts(metaId, nftType)
 
-        val diff = CollectionDiffer.findDiff(newNfts, oldNfts)
+        val diff = CollectionDiffer.findDiff(newNfts, oldNfts, forceUseNewItems = forceOverwrite)
 
         deleteNfts(diff.removed)
         insertNfts(diff.newOrUpdated)

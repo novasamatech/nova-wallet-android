@@ -20,7 +20,7 @@ class ChainSyncService(
         val remoteChains = retryUntilDone { chainFetcher.getChains() }.map(::mapChainRemoteToChain)
         val localChains = localChainsJoinedInfo.map { mapChainLocalToChain(it, gson) }
 
-        val diff = CollectionDiffer.findDiff(newItems = remoteChains, oldItems = localChains)
+        val diff = CollectionDiffer.findDiff(newItems = remoteChains, oldItems = localChains, forceUseNewItems = false)
 
         dao.update(
             newOrUpdated = diff.newOrUpdated.map { mapChainToChainLocal(it, gson) },

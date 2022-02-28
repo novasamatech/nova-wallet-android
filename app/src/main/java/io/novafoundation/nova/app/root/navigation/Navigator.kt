@@ -409,6 +409,10 @@ class Navigator(
         navController?.navigate(R.id.action_mainFragment_to_assetFiltersFragment)
     }
 
+    override fun openNfts() {
+        navController?.navigate(R.id.action_mainFragment_to_nfts_nav_graph)
+    }
+
     override fun returnToWallet() {
         // to achieve smooth animation
         postToUiThread {

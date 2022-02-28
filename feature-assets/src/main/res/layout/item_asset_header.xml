@@ -34,25 +34,34 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/balanceListTotalTitle" />
 
+    <io.novafoundation.nova.feature_assets.presentation.balance.list.view.GoToNftsView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:id="@+id/balanceListNfts"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/balanceListTotalBalance" />
+
     <TextView
         android:id="@+id/balanceListAssetTitle"
         style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_goneMarginBottom="20dp"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/balanceListAssetPlaceholder"
         android:layout_marginTop="28dp"
+        android:layout_marginBottom="16dp"
         android:text="@string/wallet_assets"
+        app:layout_constraintBottom_toTopOf="@+id/balanceListAssetPlaceholder"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/balanceListTotalBalance" />
+        app:layout_constraintTop_toBottomOf="@id/balanceListNfts"
+        app:layout_goneMarginBottom="20dp" />
 
     <ImageView
+        android:id="@+id/balanceListManage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingStart="12dp"
         android:paddingTop="6dp"
-        android:id="@+id/balanceListManage"
         android:paddingEnd="12dp"
         android:paddingBottom="6dp"
         android:src="@drawable/ic_options"
@@ -63,11 +72,11 @@
         tools:background="@color/black_48" />
 
     <io.novafoundation.nova.common.view.PlaceholderView
+        android:id="@+id/balanceListAssetPlaceholder"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:id="@+id/balanceListAssetPlaceholder"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:text="@string/wallet_assets_empty"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:text="@string/wallet_assets_empty" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

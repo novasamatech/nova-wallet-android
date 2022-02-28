@@ -28,6 +28,11 @@
         <item name="lineHeight">22sp</item>
     </style>
 
+    <style name="TextAppearance.NovaFoundation.SemiBold.Footnote">
+        <item name="android:textSize">13sp</item>
+        <item name="lineHeight">18sp</item>
+    </style>
+
     <!-- Bold -->
 
     <style name="TextAppearance.NovaFoundation.Bold" parent="TextAppearance.AppCompat.Title">

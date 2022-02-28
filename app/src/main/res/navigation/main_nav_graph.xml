@@ -227,6 +227,9 @@
             app:popExitAnim="@anim/fragment_close_exit"
             android:id="@+id/action_mainFragment_to_assetFiltersFragment"
             app:destination="@id/assetFiltersFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_nfts_nav_graph"
+            app:destination="@id/nfts_nav_graph" />
     </fragment>
 
 
@@ -912,6 +915,7 @@
 
     <include app:graph="@navigation/dapp_search_graph" />
 
+    <include app:graph="@navigation/nfts_nav_graph" />
 
     <fragment
         android:id="@+id/assetFiltersFragment"

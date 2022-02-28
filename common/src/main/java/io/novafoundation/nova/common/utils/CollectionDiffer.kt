@@ -12,7 +12,11 @@ object CollectionDiffer {
         val removed: List<T>
     )
 
-    fun <T : Identifiable> findDiff(newItems: List<T>, oldItems: List<T>): Diff<T> {
+    fun <T : Identifiable> findDiff(
+        newItems: List<T>,
+        oldItems: List<T>,
+        forceUseNewItems: Boolean
+    ): Diff<T> {
 
         val newKeys: Set<String> = newItems.mapTo(mutableSetOf()) { it.identifier }
         val oldMapping = oldItems.associateBy { it.identifier }
@@ -23,6 +27,7 @@ object CollectionDiffer {
             when {
                 old == null -> new // new
                 old != new -> new // updated
+                forceUseNewItems -> new // forced to use new item
                 else -> null // same
             }
         }

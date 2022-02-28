@@ -32,4 +32,6 @@ interface WalletRouter {
     fun openReceive(assetPayload: AssetPayload)
 
     fun openAssetFilters()
+
+    fun openNfts()
 }
