@@ -1,10 +1,9 @@
 package io.novafoundation.nova.runtime.multiNetwork.chain
 
 import com.google.gson.Gson
+import io.novafoundation.nova.common.utils.CollectionDiffer
 import io.novafoundation.nova.common.utils.retryUntilDone
 import io.novafoundation.nova.core_db.dao.ChainDao
-import io.novafoundation.nova.core_db.model.chain.JoinedChainInfo
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.ChainFetcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -19,25 +18,13 @@ class ChainSyncService(
         val localChainsJoinedInfo = dao.getJoinChainInfo()
 
         val remoteChains = retryUntilDone { chainFetcher.getChains() }.map(::mapChainRemoteToChain)
-
         val localChains = localChainsJoinedInfo.map { mapChainLocalToChain(it, gson) }
 
-        val remoteMapping = remoteChains.associateBy(Chain::id)
-        val localMapping = localChains.associateBy(Chain::id)
+        val diff = CollectionDiffer.findDiff(newItems = remoteChains, oldItems = localChains)
 
-        val newOrUpdated = remoteChains.mapNotNull { remoteChain ->
-            val localVersion = localMapping[remoteChain.id]
-
-            when {
-                localVersion == null -> remoteChain // new
-                localVersion != remoteChain -> remoteChain // updated
-                else -> null // same
-            }
-        }.map { mapChainToChainLocal(it, gson) }
-
-        val removed = localChainsJoinedInfo.filter { it.chain.id !in remoteMapping }
-            .map(JoinedChainInfo::chain)
-
-        dao.update(removed, newOrUpdated)
+        dao.update(
+            newOrUpdated = diff.newOrUpdated.map { mapChainToChainLocal(it, gson) },
+            removed = diff.removed.map { mapChainToChainLocal(it, gson).chain }
+        )
     }
 }

@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_assets.domain
 
 import io.novafoundation.nova.common.data.model.CursorPage
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Balances
@@ -13,7 +14,9 @@ interface WalletInteractor {
 
     fun balancesFlow(): Flow<Balances>
 
-    suspend fun syncAssetsRates(): Result<Unit>
+    suspend fun syncAssetsRates()
+
+    suspend fun syncNfts(metaAccount: MetaAccount)
 
     fun assetFlow(chainId: ChainId, chainAssetId: Int): Flow<Asset>
 

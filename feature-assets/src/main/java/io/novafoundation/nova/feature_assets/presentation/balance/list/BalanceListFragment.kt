@@ -76,7 +76,7 @@ class BalanceListFragment :
         balanceListAssets.itemAnimator = null
 
         walletContainer.setOnRefreshListener {
-            viewModel.sync()
+            viewModel.fullSync()
         }
     }
 
@@ -91,8 +91,6 @@ class BalanceListFragment :
     }
 
     override fun subscribe(viewModel: BalanceListViewModel) {
-        viewModel.sync()
-
         viewModel.assetsFlow.observe {
             assetsAdapter.submitList(it) {
                 balanceListAssets.invalidateItemDecorations()

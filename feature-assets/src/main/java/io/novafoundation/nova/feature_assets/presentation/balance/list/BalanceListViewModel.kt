@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
-import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.address.createAddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.list.toListWithHeaders
@@ -13,6 +12,7 @@ import io.novafoundation.nova.common.utils.formatAsCurrency
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress
 import io.novafoundation.nova.feature_assets.data.mappers.mappers.mapAssetToAssetModel
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
@@ -22,12 +22,18 @@ import io.novafoundation.nova.feature_assets.presentation.balance.list.model.Ass
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.TotalBalanceModel
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.AssetGroup
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 
 private const val CURRENT_ICON_SIZE = 40
+
+private typealias SyncAction = suspend (MetaAccount) -> Unit
 
 class BalanceListViewModel(
     private val interactor: WalletInteractor,
@@ -39,7 +45,20 @@ class BalanceListViewModel(
     private val _hideRefreshEvent = MutableLiveData<Event<Unit>>()
     val hideRefreshEvent: LiveData<Event<Unit>> = _hideRefreshEvent
 
-    val currentAddressModelFlow = currentAddressModelFlow()
+    private val fullSyncActions: List<SyncAction> = listOf(
+        { interactor.syncAssetsRates() },
+        interactor::syncNfts
+    )
+
+    private val accountChangeSyncActions: List<SyncAction> = listOf(
+        interactor::syncNfts
+    )
+
+    private val selectedMetaAccount = selectedAccountUseCase.selectedMetaAccountFlow()
+        .share()
+
+    val currentAddressModelFlow = selectedMetaAccount
+        .map { addressIconGenerator.createAddressModel(it.defaultSubstrateAddress, CURRENT_ICON_SIZE, it.name) }
         .inBackground()
         .share()
 
@@ -67,11 +86,17 @@ class BalanceListViewModel(
         .inBackground()
         .share()
 
-    fun sync() {
-        viewModelScope.launch {
-            val result = interactor.syncAssetsRates()
+    init {
+        fullSync()
 
-            result.exceptionOrNull()?.let(::showError)
+        selectedMetaAccount
+            .mapLatest { syncWith(accountChangeSyncActions, it) }
+            .launchIn(this)
+    }
+
+    fun fullSync() {
+        viewModelScope.launch {
+            syncWith(fullSyncActions, selectedMetaAccount.first())
 
             _hideRefreshEvent.value = Event(Unit)
         }
@@ -94,13 +119,16 @@ class BalanceListViewModel(
         router.openAssetFilters()
     }
 
+    private suspend fun syncWith(syncActions: List<SyncAction>, metaAccount: MetaAccount) = if (syncActions.size == 1) {
+        val syncAction = syncActions.first()
+        syncAction(metaAccount)
+    } else {
+        val syncJobs = syncActions.map { async { it(metaAccount) } }
+        syncJobs.joinAll()
+    }
+
     private fun mapAssetGroupToUi(assetGroup: AssetGroup) = AssetGroupUi(
         chainUi = mapChainToUi(assetGroup.chain),
         groupBalanceFiat = assetGroup.groupBalanceFiat.formatAsCurrency()
     )
-
-    private fun currentAddressModelFlow(): Flow<AddressModel> {
-        return selectedAccountUseCase.selectedMetaAccountFlow()
-            .map { addressIconGenerator.createAddressModel(it.defaultSubstrateAddress, CURRENT_ICON_SIZE, it.name) }
-    }
 }

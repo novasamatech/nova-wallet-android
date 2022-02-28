@@ -5,7 +5,10 @@ import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.common.utils.applyFilters
 import io.novafoundation.nova.common.utils.sumByBigDecimal
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
+import io.novafoundation.nova.feature_assets.data.repository.assetFilters.AssetFiltersRepository
+import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -13,7 +16,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.AssetGroup
 import io.novafoundation.nova.feature_wallet_api.domain.model.Balances
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.OperationsPageChange
-import io.novafoundation.nova.feature_assets.data.repository.assetFilters.AssetFiltersRepository
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -33,6 +35,7 @@ class WalletInteractorImpl(
     private val accountRepository: AccountRepository,
     private val assetFiltersRepository: AssetFiltersRepository,
     private val chainRegistry: ChainRegistry,
+    private val nftRepository: NftRepository,
 ) : WalletInteractor {
 
     override fun balancesFlow(): Flow<Balances> {
@@ -70,10 +73,14 @@ class WalletInteractorImpl(
             }
     }
 
-    override suspend fun syncAssetsRates(): Result<Unit> {
-        return runCatching {
+    override suspend fun syncAssetsRates() {
+        runCatching {
             walletRepository.syncAssetsRates()
         }
+    }
+
+    override suspend fun syncNfts(metaAccount: MetaAccount) {
+        nftRepository.initialNftSync(metaAccount)
     }
 
     override fun assetFlow(chainId: ChainId, chainAssetId: Int): Flow<Asset> {

@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_assets.domain.WalletInteractorImpl
 import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy.BuyMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy.BuyMixinProvider
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProvider
+import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -36,11 +37,13 @@ class AssetsFeatureModule {
         accountRepository: AccountRepository,
         assetFiltersRepository: AssetFiltersRepository,
         chainRegistry: ChainRegistry,
+        nftRepository: NftRepository,
     ): WalletInteractor = WalletInteractorImpl(
         walletRepository,
         accountRepository,
         assetFiltersRepository,
-        chainRegistry
+        chainRegistry,
+        nftRepository
     )
 
     @Provides
