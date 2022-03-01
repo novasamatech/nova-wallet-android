@@ -98,8 +98,10 @@ class BalanceListFragment :
         }
 
         viewModel.totalBalanceFlow.observe(headerAdapter::setTotalBalance)
-
         viewModel.currentAddressModelFlow.observe(headerAdapter::setAddress)
+
+        viewModel.nftCountFlow.observe(headerAdapter::setNftCountLabel)
+        viewModel.nftPreviewsUi.observe(headerAdapter::setNftPreviews)
 
         viewModel.hideRefreshEvent.observeEvent {
             walletContainer.isRefreshing = false

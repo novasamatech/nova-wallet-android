@@ -10,7 +10,6 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
-import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_nft_api.NftFeatureApi
 import io.novafoundation.nova.feature_nft_impl.di.NftFeatureComponent
 import kotlinx.android.synthetic.main.fragment_nft_list.nftListBack
@@ -38,7 +37,6 @@ class NftListFragment : BaseFragment<NftListViewModel>(), NftAdapter.Handler {
     override fun initViews() {
         nftListToolbar.applyStatusBarInsets()
         nftListBack.setOnClickListener { viewModel.backClicked() }
-        nftListCounter.background = requireContext().getRoundedCornerDrawable(R.color.white_16, cornerSizeInDp = 6)
 
         nftListNfts.setHasFixedSize(true)
         nftListNfts.adapter = adapter

@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_assets.presentation.WalletRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.di.BalanceDetailComponent
 import io.novafoundation.nova.feature_assets.presentation.balance.filters.di.AssetFiltersComponent
 import io.novafoundation.nova.feature_assets.presentation.balance.list.di.BalanceListComponent
+import io.novafoundation.nova.feature_assets.presentation.balance.list.view.GoToNftsView
 import io.novafoundation.nova.feature_assets.presentation.receive.di.ReceiveComponent
 import io.novafoundation.nova.feature_assets.presentation.send.amount.di.ChooseAmountComponent
 import io.novafoundation.nova.feature_assets.presentation.send.confirm.di.ConfirmTransferComponent
@@ -54,6 +55,8 @@ interface AssetsFeatureComponent : AssetsFeatureApi {
     fun receiveComponentFactory(): ReceiveComponent.Factory
 
     fun assetFiltersComponentFactory(): AssetFiltersComponent.Factory
+
+    fun inject(view: GoToNftsView)
 
     @Component.Factory
     interface Factory {
