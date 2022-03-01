@@ -71,7 +71,7 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<H
                 when (it) {
                     Payload.TOTAL_BALANCE -> holder.bindTotalBalance(totalBalance)
                     Payload.ADDRESS -> holder.bindAddress(addressModel)
-                    Payload.NFT_COUNT ->  holder.bindNftCount(nftCountLabel)
+                    Payload.NFT_COUNT -> holder.bindNftCount(nftCountLabel)
                     Payload.NFT_PREVIEWS -> holder.bindNftPreviews(nftPreviews)
                 }
             }

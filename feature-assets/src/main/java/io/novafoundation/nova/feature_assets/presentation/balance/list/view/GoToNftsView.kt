@@ -33,7 +33,6 @@ class GoToNftsView @JvmOverloads constructor(
 
     @Inject lateinit var imageLoader: ImageLoader
 
-
     override val providedContext: Context = context
 
     private val previewViews by lazy(LazyThreadSafetyMode.NONE) {

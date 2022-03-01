@@ -22,7 +22,7 @@ class AssetsListInteractor(
             .map { nfts ->
                 NftPreviews(
                     totalNftsCount = nfts.size,
-                    nftPreviews =  nfts.take(PREVIEW_COUNT)
+                    nftPreviews = nfts.take(PREVIEW_COUNT)
                 )
             }
     }
