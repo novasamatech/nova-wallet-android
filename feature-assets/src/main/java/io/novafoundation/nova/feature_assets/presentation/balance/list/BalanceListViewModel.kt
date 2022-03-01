@@ -116,7 +116,10 @@ class BalanceListViewModel(
 
         nftsPreviews
             .debounce(1L.seconds)
-            .onEach { nfts -> nfts.nftPreviews.forEach { assetsListInteractor.fullSyncNft(it) } }
+            .onEach { nfts -> nfts.nftPreviews
+                .filter { it.details is Nft.Details.Loadable }
+                .forEach { assetsListInteractor.fullSyncNft(it) } }
+            .inBackground()
             .launchIn(this)
 
         selectedMetaAccount
