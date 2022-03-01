@@ -229,6 +229,10 @@
             app:destination="@id/assetFiltersFragment" />
         <action
             android:id="@+id/action_mainFragment_to_nfts_nav_graph"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
             app:destination="@id/nfts_nav_graph" />
     </fragment>
 
