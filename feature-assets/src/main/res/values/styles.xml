@@ -2,7 +2,6 @@
 <resources>
     <style name="Widget.Nova.NftPreview" parent="">
         <item name="android:cropToPadding">true</item>
-<!--        <item name="android:padding">10dp</item>-->
         <item name="android:layout_height">32dp</item>
         <item name="android:layout_width">32dp</item>
         <item name="android:background">@drawable/bg_nft_preview</item>
