@@ -32,18 +32,11 @@
             android:gravity="center"
             android:text="@string/nft_your_nfts" />
 
-        <TextView
+        <io.novafoundation.nova.common.view.CounterView
             android:id="@+id/nftListCounter"
-            style="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
-            android:paddingStart="8dp"
-            android:paddingTop="1.5dp"
-            android:paddingEnd="8dp"
-            android:paddingBottom="1.5dp"
-            android:textColor="@color/white_80"
-            tools:background="@color/white_16"
             tools:text="6" />
     </LinearLayout>
 
