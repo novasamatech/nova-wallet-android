@@ -75,7 +75,6 @@ class NftHolder(
             itemNftContent.background = with(context) {
                 addRipple(getRoundedCornerDrawable(R.color.black_48, cornerSizeInDp = 12))
             }
-            itemNftIssuance.background = context.getRoundedCornerDrawable(R.color.white_16, cornerSizeInDp = 4)
         }
     }
 

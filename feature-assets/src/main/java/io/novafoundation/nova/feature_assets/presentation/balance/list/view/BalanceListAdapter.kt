@@ -14,8 +14,6 @@ import io.novafoundation.nova.common.utils.format
 import io.novafoundation.nova.common.utils.formatAsCurrency
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.setTextColorRes
-import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
-import io.novafoundation.nova.common.view.shape.gradientDrawable
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.AssetGroupUi
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import kotlinx.android.synthetic.main.item_asset.view.itemAssetBalance
@@ -25,8 +23,7 @@ import kotlinx.android.synthetic.main.item_asset.view.itemAssetRate
 import kotlinx.android.synthetic.main.item_asset.view.itemAssetRateChange
 import kotlinx.android.synthetic.main.item_asset.view.itemAssetToken
 import kotlinx.android.synthetic.main.item_asset_group.view.itemAssetGroupBalance
-import kotlinx.android.synthetic.main.item_asset_group.view.itemAssetGroupLabel
-import kotlinx.android.synthetic.main.item_asset_group.view.itemAssetGroupLabelIcon
+import kotlinx.android.synthetic.main.item_asset_group.view.itemAssetGroupChain
 import java.math.BigDecimal
 
 val dollarRateExtractor = { assetModel: AssetModel -> assetModel.token.dollarRate }
@@ -44,7 +41,7 @@ class BalanceListAdapter(
     override fun createGroupViewHolder(parent: ViewGroup): GroupedListHolder {
         val view = parent.inflateChild(R.layout.item_asset_group)
 
-        return AssetGroupViewHolder(view, imageLoader)
+        return AssetGroupViewHolder(view)
     }
 
     override fun createChildViewHolder(parent: ViewGroup): GroupedListHolder {
@@ -80,26 +77,11 @@ class BalanceListAdapter(
 
 class AssetGroupViewHolder(
     containerView: View,
-    private val imageLoader: ImageLoader
 ) : GroupedListHolder(containerView) {
-    init {
-        with(containerView) {
-            itemAssetGroupLabel.background = context.getRoundedCornerDrawable(R.color.white_16, cornerSizeInDp = 8)
-        }
-    }
 
     fun bind(assetGroup: AssetGroupUi) = with(containerView) {
-
-        itemAssetGroupLabel.text = assetGroup.chainUi.name
+        itemAssetGroupChain.setChain(assetGroup.chainUi)
         itemAssetGroupBalance.text = assetGroup.groupBalanceFiat
-
-        itemAssetGroupLabelIcon.load(assetGroup.chainUi.icon, imageLoader)
-        itemAssetGroupLabelIcon.background = context.gradientDrawable(
-            colors = assetGroup.chainUi.gradient.colors,
-            offsets = assetGroup.chainUi.gradient.positions,
-            angle = assetGroup.chainUi.gradient.angle,
-            cornerRadiusDp = 8
-        )
     }
 }
 

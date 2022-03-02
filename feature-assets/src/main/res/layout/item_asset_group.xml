@@ -9,28 +9,10 @@
     android:paddingEnd="16dp"
     tools:background="@color/black_48">
 
-    <TextView
-        android:id="@+id/itemAssetGroupLabel"
-        style="@style/TextAppearance.NovaFoundation.SemiBold.Caps1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:includeFontPadding="false"
-        android:paddingStart="32dp"
-        android:paddingTop="4.5dp"
-        android:paddingEnd="8dp"
-        android:paddingBottom="4.5dp"
-        android:textColor="@color/white_80"
-        tools:background="@color/white_16"
-        tools:text="Polkadot" />
-
-    <ImageView
-        android:id="@+id/itemAssetGroupLabelIcon"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:padding="1.5dp"
-        tools:background="@color/colorAccent"
-        tools:src="@drawable/ic_polkadot_24" />
+   <io.novafoundation.nova.feature_account_api.view.ChainChipView
+       android:layout_width="wrap_content"
+       android:id="@+id/itemAssetGroupChain"
+       android:layout_height="wrap_content" />
 
     <TextView
         android:id="@+id/itemAssetGroupBalance"
