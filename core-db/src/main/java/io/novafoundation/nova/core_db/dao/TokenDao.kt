@@ -13,6 +13,9 @@ abstract class TokenDao {
     @Query("select * from tokens where symbol = :symbol")
     abstract suspend fun getToken(symbol: String): TokenLocal?
 
+    @Query("select * from tokens where symbol in (:symbols)")
+    abstract fun observeTokens(symbols: List<String>): Flow<List<TokenLocal>>
+
     @Query("select * from tokens where symbol = :symbol")
     abstract fun observeToken(symbol: String): Flow<TokenLocal>
 

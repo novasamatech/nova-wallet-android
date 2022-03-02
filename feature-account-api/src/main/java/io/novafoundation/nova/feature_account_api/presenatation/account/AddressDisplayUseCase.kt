@@ -20,12 +20,12 @@ class AddressDisplayUseCase(
 
     @Deprecated("Does not work with Meta Accounts. Use `invoke(chain: Chain, address: String)` instead")
     // TODO remove
-    suspend operator fun invoke(address: String): String? {
-        return accountRepository.getAccountOrNull(address)?.name
+    suspend operator fun invoke(address: String): String? = withContext(Dispatchers.Default) {
+        accountRepository.getAccountOrNull(address)?.name
     }
 
-    suspend operator fun invoke(accountId: AccountId): String? {
-        return accountRepository.findMetaAccount(accountId)?.name
+    suspend operator fun invoke(accountId: AccountId): String? = withContext(Dispatchers.Default) {
+        accountRepository.findMetaAccount(accountId)?.name
     }
 
     suspend fun createIdentifier(): Identifier = withContext(Dispatchers.Default) {

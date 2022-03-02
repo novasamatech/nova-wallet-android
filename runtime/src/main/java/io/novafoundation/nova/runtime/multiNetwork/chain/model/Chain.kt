@@ -1,5 +1,6 @@
 package io.novafoundation.nova.runtime.multiNetwork.chain.model
 
+import io.novafoundation.nova.common.utils.Identifiable
 import java.math.BigInteger
 
 typealias ChainId = String
@@ -22,7 +23,7 @@ data class Chain(
     val isTestNet: Boolean,
     val hasCrowdloans: Boolean,
     val parentId: String?,
-) {
+) : Identifiable {
 
     companion object // extensions
 
@@ -95,6 +96,8 @@ data class Chain(
         val colors: List<String>,
         val positionsPercent: List<Float>
     )
+
+    override val identifier: String = id
 }
 
 enum class TypesUsage {

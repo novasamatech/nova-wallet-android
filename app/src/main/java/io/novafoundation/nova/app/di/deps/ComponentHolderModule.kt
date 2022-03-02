@@ -14,10 +14,14 @@ import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.core_db.di.DbHolder
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureHolder
+import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
+import io.novafoundation.nova.feature_assets.di.AssetsFeatureHolder
 import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
 import io.novafoundation.nova.feature_crowdloan_impl.di.CrowdloanFeatureHolder
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureHolder
+import io.novafoundation.nova.feature_nft_api.NftFeatureApi
+import io.novafoundation.nova.feature_nft_impl.di.NftFeatureHolder
 import io.novafoundation.nova.feature_onboarding_api.di.OnboardingFeatureApi
 import io.novafoundation.nova.feature_onboarding_impl.di.OnboardingFeatureHolder
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
@@ -68,6 +72,12 @@ interface ComponentHolderModule {
 
     @ApplicationScope
     @Binds
+    @ClassKey(AssetsFeatureApi::class)
+    @IntoMap
+    fun provideAssetsFeature(holder: AssetsFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
     @ClassKey(WalletFeatureApi::class)
     @IntoMap
     fun provideWalletFeature(walletFeatureHolder: WalletFeatureHolder): FeatureApiHolder
@@ -95,4 +105,10 @@ interface ComponentHolderModule {
     @ClassKey(CrowdloanFeatureApi::class)
     @IntoMap
     fun provideCrowdloanFeature(holder: CrowdloanFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(NftFeatureApi::class)
+    @IntoMap
+    fun provideNftFeature(holder: NftFeatureHolder): FeatureApiHolder
 }

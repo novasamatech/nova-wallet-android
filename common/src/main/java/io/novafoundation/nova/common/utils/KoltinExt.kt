@@ -136,3 +136,12 @@ fun <T> List<T>.modified(index: Int, modification: T): List<T> {
 
     return newList
 }
+
+@Suppress("IfThenToElvis")
+fun ByteArray?.optionalContentEquals(other: ByteArray?): Boolean {
+    return if (this == null) {
+        other == null
+    } else {
+        this.contentEquals(other)
+    }
+}

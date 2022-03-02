@@ -12,7 +12,7 @@ import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBo
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListSheetAdapter
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.HolderCreator
 import io.novafoundation.nova.feature_wallet_api.R
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetModel
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetSelectorModel
 import kotlinx.android.synthetic.main.item_asset_selector.view.itemAssetSelectorBalance
 import kotlinx.android.synthetic.main.item_asset_selector.view.itemAssetSelectorCheckmark
 import kotlinx.android.synthetic.main.item_asset_selector.view.itemAssetSelectorIcon
@@ -21,12 +21,12 @@ import kotlinx.android.synthetic.main.item_asset_selector.view.itemAssetSelector
 class AssetSelectorBottomSheet(
     private val imageLoader: ImageLoader,
     context: Context,
-    payload: Payload<AssetModel>,
-    onClicked: ClickHandler<AssetModel>
-) : DynamicListBottomSheet<AssetModel>(
+    payload: Payload<AssetSelectorModel>,
+    onClicked: ClickHandler<AssetSelectorModel>
+) : DynamicListBottomSheet<AssetSelectorModel>(
     context,
     payload,
-    AssetModel.DIFF_CALLBACK,
+    AssetSelectorModel.DIFF_CALLBACK,
     onClicked
 ) {
 
@@ -36,7 +36,7 @@ class AssetSelectorBottomSheet(
         setTitle(R.string.wallet_assets)
     }
 
-    override fun holderCreator(): HolderCreator<AssetModel> = { parent ->
+    override fun holderCreator(): HolderCreator<AssetSelectorModel> = { parent ->
         AssetSelectorHolder(parent.inflateChild(R.layout.item_asset_selector), imageLoader)
     }
 }
@@ -44,12 +44,12 @@ class AssetSelectorBottomSheet(
 private class AssetSelectorHolder(
     parent: View,
     private val imageLoader: ImageLoader,
-) : DynamicListSheetAdapter.Holder<AssetModel>(parent) {
+) : DynamicListSheetAdapter.Holder<AssetSelectorModel>(parent) {
 
     override fun bind(
-        item: AssetModel,
+        item: AssetSelectorModel,
         isSelected: Boolean,
-        handler: DynamicListSheetAdapter.Handler<AssetModel>
+        handler: DynamicListSheetAdapter.Handler<AssetSelectorModel>
     ) {
         super.bind(item, isSelected, handler)
 

@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="nft_issuance_unlimited">Unlimited series</string>
+  <string name="nft_issuance_limited_format">#%s Edition of %s</string>
+  <string name="nft_your_nfts">Your NFTs</string>
+
   <string name="wallet_assets_empty">Your assets will appear here.\nMake sure the "Hide zero balances" filter is turned off</string>
   <string name="wallet_filter_hide_zero_balance">Hide assets with zero balances</string>
 

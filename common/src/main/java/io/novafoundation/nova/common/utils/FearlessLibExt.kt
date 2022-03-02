@@ -20,11 +20,10 @@ import jp.co.soramitsu.fearless_utils.runtime.metadata.module.MetadataFunction
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module.Module
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module.StorageEntry
 import jp.co.soramitsu.fearless_utils.runtime.metadata.moduleOrNull
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
+import jp.co.soramitsu.fearless_utils.runtime.metadata.splitKey
 import jp.co.soramitsu.fearless_utils.scale.EncodableStruct
 import jp.co.soramitsu.fearless_utils.scale.Schema
 import jp.co.soramitsu.fearless_utils.scale.dataType.DataType
-import jp.co.soramitsu.fearless_utils.scale.dataType.uint32
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.addressPrefix
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
@@ -104,8 +103,8 @@ fun RuntimeMetadata.tokens() = module(Modules.TOKENS)
 fun RuntimeMetadata.tokensOrNull() = moduleOrNull(Modules.TOKENS)
 fun RuntimeMetadata.currencies() = module(Modules.CURRENCIES)
 fun RuntimeMetadata.currenciesOrNull() = moduleOrNull(Modules.CURRENCIES)
-
 fun RuntimeMetadata.crowdloan() = module(Modules.CROWDLOAN)
+fun RuntimeMetadata.uniques() = module(Modules.UNIQUES)
 
 fun RuntimeMetadata.babe() = module(Modules.BABE)
 fun RuntimeMetadata.babeOrNull() = moduleOrNull(Modules.BABE)
@@ -120,29 +119,13 @@ fun RuntimeMetadata.firstExistingModule(vararg options: String): String {
     return options.first(::hasModule)
 }
 
-fun <T> StorageEntry.storageKeys(runtime: RuntimeSnapshot, singleMapArguments: Collection<T>): Map<String, T> {
-    return singleMapArguments.associateBy { storageKey(runtime, it) }
-}
-
-inline fun <K, T> StorageEntry.storageKeys(
-    runtime: RuntimeSnapshot,
-    singleMapArguments: Collection<T>,
-    argumentTransform: (T) -> K,
-): Map<String, K> {
-    return singleMapArguments.associateBy(
-        keySelector = { storageKey(runtime, it) },
-        valueTransform = { argumentTransform(it) }
-    )
+fun StorageEntry.splitKeyToComponents(runtime: RuntimeSnapshot, key: String): ComponentHolder {
+    return ComponentHolder(splitKey(runtime, key))
 }
 
 fun String.networkType() = Node.NetworkType.findByAddressByte(addressPrefix())!!
 
 fun RuntimeMetadata.hasModule(name: String) = moduleOrNull(name) != null
-
-private const val HEX_SYMBOLS_PER_BYTE = 2
-private const val UINT_32_BYTES = 4
-
-fun String.u32ArgumentFromStorageKey() = uint32.fromHex(takeLast(HEX_SYMBOLS_PER_BYTE * UINT_32_BYTES)).toLong().toBigInteger()
 
 fun SeedFactory.createSeed32(length: Mnemonic.Length, password: String?) = cropSeedTo32Bytes(createSeed(length, password))
 
@@ -168,4 +151,6 @@ object Modules {
     const val ASSETS = "Assets"
     const val TOKENS = "Tokens"
     const val CURRENCIES = "Currencies"
+
+    const val UNIQUES = "Uniques"
 }

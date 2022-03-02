@@ -140,6 +140,7 @@ object ChainGeneses {
 
     const val KUSAMA = "b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"
     const val POLKADOT = "91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"
+    const val STATEMINE = "48239ef607d7928874027a43a67689209727dfb3d3dc5e5b03a39bdc2eda771a"
 
     const val ROCOCO_ACALA = "a84b46a3e602245284bb9a72c4abd58ee979aa7a5d7f8c4dfdddfaaf0665a4ae"
 }

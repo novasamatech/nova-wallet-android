@@ -7,6 +7,7 @@ import io.novafoundation.nova.core_db.dao.AssetDao
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.dao.DappAuthorizationDao
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
+import io.novafoundation.nova.core_db.dao.NftDao
 import io.novafoundation.nova.core_db.dao.NodeDao
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.dao.PhishingAddressDao
@@ -41,4 +42,6 @@ interface DbApi {
     fun metaAccountDao(): MetaAccountDao
 
     fun dappAuthorizationDao(): DappAuthorizationDao
+
+    fun nftDao(): NftDao
 }

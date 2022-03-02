@@ -8,6 +8,7 @@ import androidx.room.TypeConverters
 import io.novafoundation.nova.core_db.converters.CryptoTypeConverters
 import io.novafoundation.nova.core_db.converters.LongMathConverters
 import io.novafoundation.nova.core_db.converters.NetworkTypeConverters
+import io.novafoundation.nova.core_db.converters.NftTypeConverters
 import io.novafoundation.nova.core_db.converters.OperationConverters
 import io.novafoundation.nova.core_db.converters.TokenConverters
 import io.novafoundation.nova.core_db.dao.AccountDao
@@ -16,6 +17,7 @@ import io.novafoundation.nova.core_db.dao.AssetDao
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.dao.DappAuthorizationDao
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
+import io.novafoundation.nova.core_db.dao.NftDao
 import io.novafoundation.nova.core_db.dao.NodeDao
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.dao.PhishingAddressDao
@@ -24,12 +26,14 @@ import io.novafoundation.nova.core_db.dao.StorageDao
 import io.novafoundation.nova.core_db.dao.TokenDao
 import io.novafoundation.nova.core_db.migrations.AddChainColor_4_5
 import io.novafoundation.nova.core_db.migrations.AddDAppAuthorizations_1_2
+import io.novafoundation.nova.core_db.migrations.AddNfts_5_6
 import io.novafoundation.nova.core_db.migrations.AssetTypes_2_3
 import io.novafoundation.nova.core_db.migrations.ChangeAsset_3_4
 import io.novafoundation.nova.core_db.model.AccountLocal
 import io.novafoundation.nova.core_db.model.AccountStakingLocal
 import io.novafoundation.nova.core_db.model.AssetLocal
 import io.novafoundation.nova.core_db.model.DappAuthorizationLocal
+import io.novafoundation.nova.core_db.model.NftLocal
 import io.novafoundation.nova.core_db.model.NodeLocal
 import io.novafoundation.nova.core_db.model.OperationLocal
 import io.novafoundation.nova.core_db.model.PhishingAddressLocal
@@ -45,7 +49,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
 import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
 
 @Database(
-    version = 5,
+    version = 6,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -65,7 +69,8 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
         MetaAccountLocal::class,
         ChainAccountLocal::class,
 
-        DappAuthorizationLocal::class
+        DappAuthorizationLocal::class,
+        NftLocal::class,
     ],
 )
 @TypeConverters(
@@ -73,7 +78,8 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
     NetworkTypeConverters::class,
     TokenConverters::class,
     OperationConverters::class,
-    CryptoTypeConverters::class
+    CryptoTypeConverters::class,
+    NftTypeConverters::class
 )
 
 abstract class AppDatabase : RoomDatabase() {
@@ -92,7 +98,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java, "app.db"
                 )
                     .addMigrations(AddDAppAuthorizations_1_2, AssetTypes_2_3, ChangeAsset_3_4)
-                    .addMigrations(AddChainColor_4_5)
+                    .addMigrations(AddChainColor_4_5, AddNfts_5_6)
                     .fallbackToDestructiveMigration()
                     .build()
             }
@@ -123,4 +129,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun metaAccountDao(): MetaAccountDao
 
     abstract fun dAppAuthorizationDao(): DappAuthorizationDao
+
+    abstract fun nftDao(): NftDao
 }
