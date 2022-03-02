@@ -119,6 +119,10 @@ class BalanceListViewModel(
         router.openAssetFilters()
     }
 
+    fun goToNftsClicked() {
+        router.openNfts()
+    }
+
     private suspend fun syncWith(syncActions: List<SyncAction>, metaAccount: MetaAccount) = if (syncActions.size == 1) {
         val syncAction = syncActions.first()
         syncAction(metaAccount)

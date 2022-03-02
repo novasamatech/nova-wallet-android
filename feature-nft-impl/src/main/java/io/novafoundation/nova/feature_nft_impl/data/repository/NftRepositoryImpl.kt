@@ -37,7 +37,10 @@ class NftRepositoryImpl(
             }
     }
 
-    override suspend fun initialNftSync(metaAccount: MetaAccount): Unit = withContext(Dispatchers.IO) {
+    override suspend fun initialNftSync(
+        metaAccount: MetaAccount,
+        forceOverwrite: Boolean,
+    ): Unit = withContext(Dispatchers.IO) {
         val chains = chainRegistry.currentChains.first()
 
         val syncJobs = chains.flatMap { chain ->
@@ -46,7 +49,7 @@ class NftRepositoryImpl(
                 launch {
                     // prevent whole sync from failing if some particular provider fails
                     runCatching {
-                        nftProvider.initialNftsSync(chain, metaAccount)
+                        nftProvider.initialNftsSync(chain, metaAccount, forceOverwrite)
                     }.onFailure {
                         Log.e(NFT_TAG, "Failed to sync nfts in ${chain.name} using ${nftProvider::class.simpleName}", it)
                     }

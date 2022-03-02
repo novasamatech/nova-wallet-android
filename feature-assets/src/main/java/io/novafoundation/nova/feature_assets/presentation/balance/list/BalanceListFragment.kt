@@ -117,4 +117,8 @@ class BalanceListFragment :
     override fun avatarClicked() {
         viewModel.avatarClicked()
     }
+
+    override fun goToNftsClicked() {
+        viewModel.goToNftsClicked()
+    }
 }

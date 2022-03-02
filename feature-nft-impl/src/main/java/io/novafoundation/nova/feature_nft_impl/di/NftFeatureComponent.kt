@@ -8,6 +8,7 @@ import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_nft_api.NftFeatureApi
 import io.novafoundation.nova.feature_nft_impl.NftRouter
+import io.novafoundation.nova.feature_nft_impl.presentation.nft.list.di.NftListComponent
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 
@@ -21,6 +22,8 @@ import io.novafoundation.nova.runtime.di.RuntimeApi
 )
 @FeatureScope
 interface NftFeatureComponent : NftFeatureApi {
+
+    fun nftListComponentFactory(): NftListComponent.Factory
 
     @Component.Factory
     interface Factory {

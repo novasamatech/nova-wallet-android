@@ -16,7 +16,7 @@ class RmrkV1NftProvider(
     private val nftDao: NftDao
 ) : NftProvider {
 
-    override suspend fun initialNftsSync(chain: Chain, metaAccount: MetaAccount) {
+    override suspend fun initialNftsSync(chain: Chain, metaAccount: MetaAccount, forceOverwrite: Boolean) {
         val address = metaAccount.addressIn(chain)!!
         val nfts = api.getNfts(address)
 
@@ -42,7 +42,7 @@ class RmrkV1NftProvider(
             )
         }
 
-        nftDao.insertNftsDiff(NftLocal.Type.RMRK1, metaAccount.id, toSave)
+        nftDao.insertNftsDiff(NftLocal.Type.RMRK1, metaAccount.id, toSave, forceOverwrite)
     }
 
     override suspend fun nftFullSync(nft: Nft) {
@@ -57,7 +57,7 @@ class RmrkV1NftProvider(
 
         nftDao.updateNft(nft.identifier) { local ->
             local.copy(
-                media = metadata?.image,
+                media = metadata?.image?.adoptFileStorageLinkToHttps(),
                 label = metadata?.description,
                 issuanceTotal = collection.first().max,
                 wholeDetailsLoaded = true

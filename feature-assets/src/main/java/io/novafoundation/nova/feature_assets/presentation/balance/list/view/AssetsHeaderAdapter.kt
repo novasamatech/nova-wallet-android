@@ -14,6 +14,7 @@ import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListAssetPlaceholder
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListAvatar
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListManage
+import kotlinx.android.synthetic.main.item_asset_header.view.balanceListNfts
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListTotalBalance
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListTotalTitle
 
@@ -24,6 +25,8 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<H
         fun manageClicked()
 
         fun avatarClicked()
+
+        fun goToNftsClicked()
     }
 
     private var totalBalance: TotalBalanceModel? = null
@@ -84,6 +87,7 @@ class HeaderHolder(
 
             balanceListManage.setOnClickListener { handler.manageClicked() }
             balanceListAvatar.setOnClickListener { handler.avatarClicked() }
+            balanceListNfts.setOnClickListener { handler.goToNftsClicked() }
         }
     }
 

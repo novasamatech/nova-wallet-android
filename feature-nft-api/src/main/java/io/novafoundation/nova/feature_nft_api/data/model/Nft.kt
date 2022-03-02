@@ -6,6 +6,8 @@ import java.math.BigInteger
 
 class Nft(
     val identifier: String,
+    val instanceId: String?,
+    val collectionId: String,
     val chain: Chain,
     val owner: AccountId,
     val metadataRaw: ByteArray?,

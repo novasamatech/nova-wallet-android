@@ -8,7 +8,7 @@ interface NftRepository {
 
     fun allNftFlow(metaAccount: MetaAccount): Flow<List<Nft>>
 
-    suspend fun initialNftSync(metaAccount: MetaAccount)
+    suspend fun initialNftSync(metaAccount: MetaAccount, forceOverwrite: Boolean)
 
     suspend fun fullNftSync(nft: Nft)
 }

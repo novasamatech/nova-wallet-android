@@ -15,6 +15,18 @@ class TokenRepositoryImpl(
     private val tokenDao: TokenDao
 ) : TokenRepository {
 
+    override suspend fun observeTokens(chainAssets: List<Chain.Asset>): Flow<Map<Chain.Asset, Token>> {
+        val symbols = chainAssets.map { it.symbol }.distinct()
+
+        return tokenDao.observeTokens(symbols).map { tokens ->
+            val tokensBySymbol = tokens.associateBy { it.symbol }
+
+            chainAssets.associateWith {
+                mapTokenLocalToToken(tokensBySymbol.getValue(it.symbol), it)
+            }
+        }
+    }
+
     override suspend fun getToken(chainAsset: Chain.Asset): Token = withContext(Dispatchers.Default) {
         val tokenLocal = tokenDao.getToken(chainAsset.symbol) ?: TokenLocal.createEmpty(chainAsset.symbol)
 

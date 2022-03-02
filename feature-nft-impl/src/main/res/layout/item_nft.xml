@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="11dp"
+    android:layout_marginBottom="12dp"
+    app:shimmer_auto_start="false"
+    android:id="@+id/itemNftContainer"
+    tools:background="@color/black_48">
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:layout_width="wrap_content"
+        android:id="@+id/itemNftShimmer"
+        android:layout_height="wrap_content">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="231dp"
+            android:background="@drawable/bg_shimerring" />
+
+    </com.facebook.shimmer.ShimmerFrameLayout>
+
+
+    <LinearLayout
+        android:id="@+id/itemNftContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/itemNftMedia"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="6dp"
+            android:adjustViewBounds="true"
+            android:maxHeight="154dp"
+            tools:src="@drawable/bg_splash" />
+
+        <TextView
+            android:id="@+id/itemNftTitle"
+            style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="8dp"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textColor="@color/white"
+            tools:text="Honeybird" />
+
+        <TextView
+            android:id="@+id/itemNftIssuance"
+            style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="12dp"
+            android:paddingStart="6dp"
+            android:paddingTop="1.5dp"
+            android:paddingEnd="6dp"
+            android:paddingBottom="1.5dp"
+            tools:background="@color/white_16"
+            tools:text="#11 Edition of 9978" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:id="@+id/itemNftPriceDivider"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="@color/white_8" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="12dp"
+            android:gravity="center_vertical"
+            android:id="@+id/itemNftPrice"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/itemNftPriceToken"
+                style="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="5 KSM" />
+
+            <TextView
+                android:id="@+id/itemNftPriceFiat"
+                style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:textColor="@color/white_64"
+                tools:text="($865.19)" />
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

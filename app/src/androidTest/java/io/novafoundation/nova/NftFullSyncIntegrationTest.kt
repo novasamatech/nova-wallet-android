@@ -44,7 +44,7 @@ class NftFullSyncIntegrationTest {
 
         val nftRepository = nftApi.nftRepository
 
-        nftRepository.initialNftSync(metaAccount)
+        nftRepository.initialNftSync(metaAccount, true)
 
         nftRepository.allNftFlow(metaAccount)
             .map { nfts -> nfts.filter { !it.isFullySynced } }
