@@ -16,7 +16,7 @@
         tools:visibility="visible"
         app:layout_constraintHorizontal_bias="1"
         app:layout_constraintStart_toEndOf="@id/tableCellTitle"
-        android:layout_marginStart="24dp"
+        android:layout_marginStart="48dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/barrier"
         app:layout_constraintTop_toTopOf="parent"
@@ -43,7 +43,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:ellipsize="middle"
-        android:gravity="center_vertical"
+        android:gravity="end"
         android:includeFontPadding="false"
         android:singleLine="true"
         app:layout_constrainedWidth="true"
@@ -53,7 +53,7 @@
         app:layout_constraintStart_toEndOf="@id/tableCellTitle"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
-        tools:text="Value primary"
+        tools:text="@tools:sample/lorem[20]"
         tools:textColor="@color/white" />
 
     <TextView

@@ -13,8 +13,10 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.Group
 import coil.ImageLoader
 import coil.load
+import coil.transform.RoundedCornersTransformation
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
@@ -82,7 +84,9 @@ open class TableCellView @JvmOverloads constructor(
     fun loadImage(url: String?) {
         url?.let {
             image.makeVisible()
-            image.load(url, imageLoader)
+            image.load(url, imageLoader) {
+                transformations(RoundedCornersTransformation(10.dpF(context)))
+            }
         }
     }
 

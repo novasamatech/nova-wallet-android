@@ -152,7 +152,7 @@ class UniquesNftProvider(
                     NftDetails.Collection(
                         id = nftLocal.collectionId,
                         name = classMetadata.name,
-                        media = classMetadata.image
+                        media = classMetadata.image?.adoptFileStorageLinkToHttps()
                     )
                 }
 
