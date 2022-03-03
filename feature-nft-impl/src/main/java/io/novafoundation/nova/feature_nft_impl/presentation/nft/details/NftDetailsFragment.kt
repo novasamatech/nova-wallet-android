@@ -96,11 +96,22 @@ class NftDetailsFragment : BaseFragment<NftDetailsViewModel>() {
 
             nftDetailsPrice.setPriceOrHide(it.price)
 
-            nftDetailsCollection.loadImage(it.collection.media)
-            nftDetailsCollection.showValue(it.collection.name)
+            if (it.collection != null) {
+                nftDetailsCollection.makeVisible()
+                nftDetailsCollection.loadImage(it.collection.media)
+                nftDetailsCollection.showValue(it.collection.name)
+            } else {
+                nftDetailsCollection.makeGone()
+            }
 
             nftDetailsOnwer.showAddress(it.owner)
-            nftDetailsCreator.showAddress(it.creator)
+
+            if (it.creator != null) {
+                nftDetailsCreator.makeVisible()
+                nftDetailsCreator.showAddress(it.creator)
+            } else {
+                nftDetailsCreator.makeGone()
+            }
 
             nftDetailsChain.showChain(it.network)
         }

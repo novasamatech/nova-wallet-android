@@ -58,6 +58,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
+            android:layout_marginBottom="24dp"
             tools:text="Wayne: Hello sir, what's your name and what brings you to Pastel Beach Mall?" />
 
         <io.novafoundation.nova.feature_wallet_api.presentation.view.PriceSectionView
@@ -65,14 +66,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginBottom="12dp"
             android:layout_marginEnd="16dp" />
 
         <io.novafoundation.nova.common.view.TableView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="12dp"
             android:id="@+id/nftDetailsTable"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="24dp">

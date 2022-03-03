@@ -8,13 +8,13 @@ class NftDetails(
     val identifier: String,
     val chain: Chain,
     val owner: AccountId,
-    val creator: AccountId,
+    val creator: AccountId?,
     val media: String?,
     val name: String,
     val description: String?,
     val issuance: Nft.Issuance,
     val price: BigInteger?,
-    val collection: Collection
+    val collection: Collection?
 ) {
 
     class Collection(

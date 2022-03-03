@@ -49,7 +49,7 @@ class NftDetailsViewModel(
         val pricedNftDetails = nftDetailsFlow.first()
 
         with(pricedNftDetails.nftDetails) {
-            externalActionsDelegate.showAddressActions(creator, chain)
+            externalActionsDelegate.showAddressActions(creator!!, chain)
         }
     }
 
@@ -64,22 +64,26 @@ class NftDetailsViewModel(
             price = pricedNftDetails.price?.let {
                 mapAmountToAmountModel(it.amount, it.token)
             },
-            collection = NftDetailsModel.Collection(
-                name = nftDetails.collection.name ?: nftDetails.collection.id,
-                media = nftDetails.collection.media,
-            ),
+            collection = nftDetails.collection?.let {
+                NftDetailsModel.Collection(
+                    name = it.name ?: it.id,
+                    media = it.media,
+                )
+            },
             owner = addressIconGenerator.createAddressModel(
                 chain = nftDetails.chain,
                 accountId = nftDetails.owner,
                 sizeInDp = AddressIconGenerator.SIZE_MEDIUM,
                 addressDisplayUseCase = addressDisplayUseCase
             ),
-            creator = addressIconGenerator.createAddressModel(
-                chain = nftDetails.chain,
-                accountId = nftDetails.creator,
-                sizeInDp = AddressIconGenerator.SIZE_MEDIUM,
-                addressDisplayUseCase = addressDisplayUseCase
-            ),
+            creator = nftDetails.creator?.let {
+                addressIconGenerator.createAddressModel(
+                    chain = nftDetails.chain,
+                    accountId = it,
+                    sizeInDp = AddressIconGenerator.SIZE_MEDIUM,
+                    addressDisplayUseCase = addressDisplayUseCase
+                )
+            },
             network = mapChainToUi(nftDetails.chain)
         )
     }

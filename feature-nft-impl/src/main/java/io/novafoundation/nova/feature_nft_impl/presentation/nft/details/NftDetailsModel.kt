@@ -10,9 +10,9 @@ class NftDetailsModel(
     val issuance: String,
     val description: String?,
     val price: AmountModel?,
-    val collection: Collection,
+    val collection: Collection?,
     val owner: AddressModel,
-    val creator: AddressModel,
+    val creator: AddressModel?,
     val network: ChainUi
 ) {
 
