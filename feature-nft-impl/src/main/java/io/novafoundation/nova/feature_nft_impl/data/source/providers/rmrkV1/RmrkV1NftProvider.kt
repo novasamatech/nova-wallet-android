@@ -108,7 +108,6 @@ class RmrkV1NftProvider(
                 )
             )
         }
-
     }
 
     private fun identifier(chainId: ChainId, id: String): String {

@@ -15,7 +15,7 @@ class PriceSectionView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : SectionView(R.layout.section_price,  context, attrs, defStyleAttr) {
+) : SectionView(R.layout.section_price, context, attrs, defStyleAttr) {
 
     init {
         attrs?.let(::applyAttrs)
@@ -30,7 +30,7 @@ class PriceSectionView @JvmOverloads constructor(
         sectionTitle.text = title
     }
 
-    private fun applyAttrs(attrs: AttributeSet) = context.useAttributes(attrs,R.styleable.PriceSectionView) {
+    private fun applyAttrs(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.PriceSectionView) {
         val title = it.getString(R.styleable.PriceSectionView_sectionTitle)
         title?.let(::setTitle)
     }

@@ -10,7 +10,7 @@ import java.math.BigInteger
 
 fun mapNftTypeLocalToTypeKey(
     typeLocal: NftLocal.Type
-): Nft.Type.Key = when(typeLocal) {
+): Nft.Type.Key = when (typeLocal) {
     NftLocal.Type.UNIQUES -> Nft.Type.Key.UNIQUES
     NftLocal.Type.RMRK1 -> Nft.Type.Key.RMRKV1
     NftLocal.Type.RMRK2 -> Nft.Type.Key.RMRKV2

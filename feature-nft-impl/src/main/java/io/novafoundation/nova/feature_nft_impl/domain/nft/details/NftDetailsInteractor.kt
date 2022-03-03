@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 
-
 class NftDetailsInteractor(
     private val nftRepository: NftRepository,
     private val tokenRepository: TokenRepository
