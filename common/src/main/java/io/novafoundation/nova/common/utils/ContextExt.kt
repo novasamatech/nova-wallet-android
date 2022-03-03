@@ -41,6 +41,14 @@ fun Int.dp(context: Context): Int {
 }
 
 fun Int.dpF(context: Context): Float {
+    return toFloat().dpF(context)
+}
+
+fun Float.dp(context: Context): Int {
+    return dpF(context).toInt()
+}
+
+fun Float.dpF(context: Context): Float {
     return context.resources.displayMetrics.density * this
 }
 
@@ -66,6 +74,9 @@ interface WithContextExtensions {
     val providedContext: Context
 
     val Int.dp: Int
+        get() = dp(providedContext)
+
+    val Float.dp: Int
         get() = dp(providedContext)
 
     fun addRipple(to: Drawable) = providedContext.addRipple(to)

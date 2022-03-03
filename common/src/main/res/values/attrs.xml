@@ -65,6 +65,8 @@
     <declare-styleable name="TableCellView">
         <attr name="title" />
         <attr name="dividerVisible" />
+        <attr name="primaryValueIcon" format="reference|color" />
+        <attr name="primaryValueIconTint" format="color" />
     </declare-styleable>
 
     <declare-styleable name="GoNextView">
