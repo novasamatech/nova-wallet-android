@@ -87,8 +87,8 @@ class NftDetailsFragment : BaseFragment<NftDetailsViewModel>() {
             contentViews.forEach(View::makeVisible)
 
             nftDetailsMedia.load(it.media, imageLoader) {
-                placeholder(R.drawable.nft_media_progress_or_error)
-                error(R.drawable.nft_media_progress_or_error)
+                placeholder(R.drawable.nft_media_progress)
+                error(R.drawable.nft_media_progress)
             }
             nftDetailsTitle.text = it.name
             nftDetailsDescription.setTextOrHide(it.description)

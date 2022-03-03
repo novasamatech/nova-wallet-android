@@ -38,7 +38,7 @@
             android:layout_marginEnd="6dp"
             android:adjustViewBounds="true"
             android:maxHeight="154dp"
-            tools:src="@drawable/bg_splash" />
+            tools:src="@drawable/nft_media_progress" />
 
         <TextView
             android:id="@+id/itemNftTitle"
