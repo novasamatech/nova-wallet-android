@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_nft_impl.presentation.nft.details
 
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -64,6 +65,8 @@ class NftDetailsFragment : BaseFragment<NftDetailsViewModel>() {
 
         nftDetailsOnwer.setOnClickListener { viewModel.ownerClicked() }
         nftDetailsCreator.setOnClickListener { viewModel.creatorClicked() }
+
+        nftDetailsCollection.valuePrimary.ellipsize = TextUtils.TruncateAt.END
 
         nftDetailsProgress.makeVisible()
         contentViews.forEach(View::makeGone)

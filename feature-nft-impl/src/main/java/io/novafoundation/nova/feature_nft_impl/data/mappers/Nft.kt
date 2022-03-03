@@ -29,6 +29,14 @@ fun nftIssuance(nftLocal: NftLocal): Nft.Issuance {
     }
 }
 
+fun nftPrice(nftLocal: NftLocal): BigInteger? {
+    return if (nftLocal.price == BigInteger.ZERO) {
+        null
+    } else {
+        nftLocal.price
+    }
+}
+
 fun mapNftLocalToNft(
     chainsById: Map<ChainId, Chain>,
     metaAccount: MetaAccount,
@@ -61,15 +69,9 @@ fun mapNftLocalToNft(
             )
         }
 
-        val price = if (nftLocal.price == BigInteger.ZERO) {
-            null
-        } else {
-            nftLocal.price
-        }
-
         Nft.Details.Loaded(
             metadata = metadata,
-            price = price,
+            price = nftPrice(nftLocal),
             issuance = issuance,
         )
     } else {
