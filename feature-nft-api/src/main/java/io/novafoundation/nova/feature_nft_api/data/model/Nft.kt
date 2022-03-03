@@ -38,13 +38,17 @@ class Nft(
         class Limited(val max: Int, val edition: Int) : Issuance()
     }
 
-    sealed class Type {
+    sealed class Type(val key: Key) {
 
-        class Uniques(val instanceId: BigInteger, val collectionId: BigInteger) : Type()
+        enum class Key {
+            UNIQUES, RMRKV1, RMRKV2
+        }
 
-        class Rmrk1(val instanceId: String, val collectionId: String) : Type()
+        class Uniques(val instanceId: BigInteger, val collectionId: BigInteger) : Type(Key.UNIQUES)
 
-        class Rmrk2(val collectionId: String) : Type()
+        class Rmrk1(val instanceId: String, val collectionId: String) : Type(Key.RMRKV1)
+
+        class Rmrk2(val collectionId: String) : Type(Key.RMRKV2)
     }
 }
 

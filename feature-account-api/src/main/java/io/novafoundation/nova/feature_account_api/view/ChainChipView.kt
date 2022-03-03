@@ -8,9 +8,9 @@ import coil.ImageLoader
 import coil.load
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
-import io.novafoundation.nova.common.view.shape.gradientDrawable
 import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
+import io.novafoundation.nova.feature_account_api.presenatation.chain.toDrawable
 import kotlinx.android.synthetic.main.view_chain_chip.view.itemAssetGroupLabel
 import kotlinx.android.synthetic.main.view_chain_chip.view.itemAssetGroupLabelIcon
 
@@ -34,11 +34,6 @@ class ChainChipView @JvmOverloads constructor(
         itemAssetGroupLabel.text = chainUi.name
 
         itemAssetGroupLabelIcon.load(chainUi.icon, imageLoader)
-        itemAssetGroupLabelIcon.background = context.gradientDrawable(
-            colors = chainUi.gradient.colors,
-            offsets = chainUi.gradient.positions,
-            angle = chainUi.gradient.angle,
-            cornerRadiusDp = 8
-        )
+        itemAssetGroupLabelIcon.background = chainUi.gradient.toDrawable(context)
     }
 }

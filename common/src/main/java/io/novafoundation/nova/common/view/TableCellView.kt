@@ -61,6 +61,8 @@ open class TableCellView @JvmOverloads constructor(
     init {
         View.inflate(context, R.layout.view_table_cell, this)
 
+        setBackgroundResource(R.drawable.bg_primary_list_item)
+
         attrs?.let { applyAttributes(it) }
     }
 
@@ -77,9 +79,11 @@ open class TableCellView @JvmOverloads constructor(
         image.makeVisible()
     }
 
-    fun loadImage(url: String) {
-        image.makeVisible()
-        image.load(url, imageLoader)
+    fun loadImage(url: String?) {
+        url?.let {
+            image.makeVisible()
+            image.load(url, imageLoader)
+        }
     }
 
     fun showProgress() {

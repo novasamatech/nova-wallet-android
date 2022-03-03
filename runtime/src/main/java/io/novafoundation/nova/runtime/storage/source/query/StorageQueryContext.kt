@@ -25,6 +25,11 @@ interface StorageQueryContext {
         binding: (String?, K) -> V
     ): Map<K, V>
 
+    suspend fun <K, V> StorageEntry.query(
+        vararg keyArguments: Any?,
+        binding: (scale: String?) -> V
+    ): V
+
     suspend fun multi(
         builderBlock: MultiQueryBuilder.() -> Unit
     ): Map<StorageEntry, Map<StorageKeyComponents, Any?>>
@@ -48,5 +53,7 @@ interface StorageQueryContext {
         binding = binding
     )
 }
+
+fun Map<StorageEntry, Map<StorageKeyComponents, Any?>>.singleValueOf(storageEntry: StorageEntry) = getValue(storageEntry).values.first()
 
 fun Collection<*>.wrapSingleArgumentKeys(): List<List<Any?>> = map(::listOf)

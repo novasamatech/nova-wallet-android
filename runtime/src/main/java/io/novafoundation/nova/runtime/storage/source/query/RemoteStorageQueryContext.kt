@@ -1,6 +1,7 @@
 package io.novafoundation.nova.runtime.storage.source.query
 
 import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
+import io.novafoundation.nova.common.data.network.rpc.queryKey
 import io.novafoundation.nova.common.data.network.rpc.retrieveAllValues
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
@@ -23,5 +24,9 @@ class RemoteStorageQueryContext(
 
     override suspend fun queryKeys(keys: List<String>, at: BlockHash?): Map<String, String?> {
         return bulkRetriever.queryKeys(socketService, keys, at)
+    }
+
+    override suspend fun queryKey(key: String, at: BlockHash?): String? {
+        return bulkRetriever.queryKey(socketService, key, at)
     }
 }

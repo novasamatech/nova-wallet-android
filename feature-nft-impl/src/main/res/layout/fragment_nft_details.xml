@@ -13,8 +13,17 @@
 
         <io.novafoundation.nova.common.view.Toolbar
             android:layout_width="match_parent"
+            android:id="@+id/nftDetailsToolbar"
             android:layout_height="wrap_content"
             app:dividerVisible="false" />
+
+        <ProgressBar
+            android:id="@+id/nftDetailsProgress"
+            android:layout_marginTop="16dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminateTint="@color/white" />
 
         <ImageView
             android:id="@+id/nftDetailsMedia"
@@ -65,6 +74,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="12dp"
+            android:id="@+id/nftDetailsTable"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="24dp">
 
@@ -76,6 +86,8 @@
 
             <io.novafoundation.nova.common.view.TableCellView
                 android:id="@+id/nftDetailsOnwer"
+                app:primaryValueIcon="@drawable/ic_info_16"
+                app:primaryValueIconTint="@color/white_64"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:title="@string/nft_owned_by" />
@@ -84,6 +96,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryValueIcon="@drawable/ic_info_16"
+                app:primaryValueIconTint="@color/white_64"
                 android:id="@+id/nftDetailsCreator"
                 app:title="@string/nft_created_by" />
 

@@ -36,4 +36,8 @@ class LocalStorageQueryContext(
             valueTransform = StorageEntry::content
         )
     }
+
+    override suspend fun queryKey(key: String, at: BlockHash?): String? {
+        return storageCache.getEntry(key, chainId).content
+    }
 }

@@ -23,6 +23,8 @@ abstract class BaseStorageQueryContext(
 
     protected abstract suspend fun queryKeys(keys: List<String>, at: BlockHash?): Map<String, String?>
 
+    protected abstract suspend fun queryKey(key: String, at: BlockHash?): String?
+
     override suspend fun StorageEntry.keys(vararg prefixArgs: Any?): List<StorageKeyComponents> {
         val prefix = storageKey(runtime, *prefixArgs)
 
@@ -49,6 +51,19 @@ abstract class BaseStorageQueryContext(
         val entries = queryKeys(storageKeys(runtime, keysArguments), at)
 
         return applyMappersToEntries(entries, storageEntry = this, keyExtractor, binding)
+    }
+
+    override suspend fun <K, V> StorageEntry.query(
+        vararg keyArguments: Any?,
+        binding: (scale: String?) -> V
+    ): V {
+        val storageKey = if (keyArguments.isEmpty()) {
+            storageKey()
+        } else {
+            storageKey(runtime, keyArguments)
+        }
+
+        return binding(queryKey(storageKey, at))
     }
 
     override suspend fun multi(

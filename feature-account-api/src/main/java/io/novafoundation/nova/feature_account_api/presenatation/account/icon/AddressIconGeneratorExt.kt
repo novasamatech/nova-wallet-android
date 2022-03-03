@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.invoke
 import io.novafoundation.nova.runtime.ext.accountIdOf
+import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 suspend fun AddressIconGenerator.createAddressModel(chain: Chain, address: String, sizeInDp: Int, accountName: String? = null): AddressModel {
@@ -21,6 +22,18 @@ suspend fun AddressIconGenerator.createAddressModel(
     addressDisplayUseCase: AddressDisplayUseCase,
 ): AddressModel {
     val icon = createAddressIcon(chain, address, sizeInDp)
+
+    return AddressModel(address, icon, addressDisplayUseCase(chain, address))
+}
+
+suspend fun AddressIconGenerator.createAddressModel(
+    chain: Chain,
+    accountId: ByteArray,
+    sizeInDp: Int,
+    addressDisplayUseCase: AddressDisplayUseCase,
+): AddressModel {
+    val icon = createAddressIcon(accountId, sizeInDp)
+    val address = chain.addressOf(accountId)
 
     return AddressModel(address, icon, addressDisplayUseCase(chain, address))
 }

@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_nft_impl.presentation.nft.list
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import io.novafoundation.nova.R
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -15,6 +14,7 @@ import io.novafoundation.nova.feature_nft_api.data.model.Nft
 import io.novafoundation.nova.feature_nft_impl.NftRouter
 import io.novafoundation.nova.feature_nft_impl.domain.nft.list.NftListInteractor
 import io.novafoundation.nova.feature_nft_impl.domain.nft.list.PricedNft
+import io.novafoundation.nova.feature_nft_impl.presentation.nft.common.formatIssuance
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -50,7 +50,9 @@ class NftListViewModel(
     }
 
     fun nftClicked(nftListItem: NftListItem) = launch {
-        // TODO nft details
+        if (nftListItem.content is LoadingState.Loaded) {
+            router.openNftDetails(nftListItem.identifier)
+        }
     }
 
     fun loadableNftShown(nftListItem: NftListItem) = launch(Dispatchers.Default) {
@@ -65,16 +67,7 @@ class NftListViewModel(
             Nft.Details.Loadable -> LoadingState.Loading()
 
             is Nft.Details.Loaded -> {
-                val issuanceFormatted = when (val issuance = details.issuance) {
-                    is Nft.Issuance.Unlimited -> resourceManager.getString(R.string.nft_issuance_unlimited)
-
-                    is Nft.Issuance.Limited -> {
-                        resourceManager.getString(
-                            R.string.nft_issuance_limited_format,
-                            issuance.edition.format(), issuance.max.format()
-                        )
-                    }
-                }
+                val issuanceFormatted = resourceManager.formatIssuance(details.issuance)
 
                 val amountModel = if (details.price != null && pricedNft.nftPriceToken != null) {
                     mapAmountToAmountModel(details.price!!, pricedNft.nftPriceToken)

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_wallet_api.presentation.view
 
 import android.content.Context
 import android.util.AttributeSet
+import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.common.view.section.SectionView
 import io.novafoundation.nova.feature_wallet_api.R
@@ -33,4 +34,10 @@ class PriceSectionView @JvmOverloads constructor(
         val title = it.getString(R.styleable.PriceSectionView_sectionTitle)
         title?.let(::setTitle)
     }
+}
+
+fun PriceSectionView.setPriceOrHide(amountModel: AmountModel?) = if (amountModel != null) {
+    setPrice(amountModel)
+} else {
+    makeGone()
 }

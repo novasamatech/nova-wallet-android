@@ -10,5 +10,20 @@
         tools:layout="@layout/fragment_nft_list"
         android:id="@+id/nftListFragment"
         android:name="io.novafoundation.nova.feature_nft_impl.presentation.nft.list.NftListFragment"
-        android:label="NftListFragment" />
+        android:label="NftListFragment" >
+
+        <action
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            android:id="@+id/action_nftListFragment_to_nftDetailsFragment"
+            app:destination="@id/nftDetailsFragment" />
+    </fragment>
+
+    <fragment
+        tools:layout="@layout/fragment_nft_details"
+        android:id="@+id/nftDetailsFragment"
+        android:name="io.novafoundation.nova.feature_nft_impl.presentation.nft.details.NftDetailsFragment"
+        android:label="NftDetailsFragment" />
 </navigation>

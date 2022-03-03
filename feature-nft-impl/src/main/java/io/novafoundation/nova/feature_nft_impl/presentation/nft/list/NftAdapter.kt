@@ -99,7 +99,7 @@ class NftHolder(
                 itemNftMedia.load(content.data.media, imageLoader) {
                     transformations(RoundedCornersTransformation(8.dpF(context)))
                     placeholder(R.drawable.nft_media_progress_or_error)
-                    error(R.color.red)
+                    error(R.drawable.nft_media_progress_or_error)
                 }
 
                 itemNftIssuance.text = content.data.issuance

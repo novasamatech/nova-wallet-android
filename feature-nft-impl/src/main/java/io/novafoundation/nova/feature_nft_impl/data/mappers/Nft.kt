@@ -8,6 +8,27 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import java.math.BigInteger
 
+fun mapNftTypeLocalToTypeKey(
+    typeLocal: NftLocal.Type
+): Nft.Type.Key = when(typeLocal) {
+    NftLocal.Type.UNIQUES -> Nft.Type.Key.UNIQUES
+    NftLocal.Type.RMRK1 -> Nft.Type.Key.RMRKV1
+    NftLocal.Type.RMRK2 -> Nft.Type.Key.RMRKV2
+}
+
+fun nftIssuance(nftLocal: NftLocal): Nft.Issuance {
+    require(nftLocal.wholeDetailsLoaded)
+
+    return if (nftLocal.issuanceTotal != null && nftLocal.issuanceTotal!! > 0) {
+        Nft.Issuance.Limited(
+            max = nftLocal.issuanceTotal!!,
+            edition = nftLocal.issuanceMyEdition!!.toInt()
+        )
+    } else {
+        Nft.Issuance.Unlimited(nftLocal.issuanceMyEdition!!)
+    }
+}
+
 fun mapNftLocalToNft(
     chainsById: Map<ChainId, Chain>,
     metaAccount: MetaAccount,
@@ -30,14 +51,7 @@ fun mapNftLocalToNft(
     }
 
     val details = if (nftLocal.wholeDetailsLoaded) {
-        val issuance = if (nftLocal.issuanceTotal != null && nftLocal.issuanceTotal!! > 0) {
-            Nft.Issuance.Limited(
-                max = nftLocal.issuanceTotal!!,
-                edition = nftLocal.issuanceMyEdition!!.toInt()
-            )
-        } else {
-            Nft.Issuance.Unlimited(nftLocal.issuanceMyEdition!!)
-        }
+        val issuance = nftIssuance(nftLocal)
 
         val metadata = nftLocal.metadata?.let {
             Nft.Metadata(
