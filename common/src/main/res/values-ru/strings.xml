@@ -141,6 +141,7 @@
   <string name="common_not_enough_funds_title">Недостаточный баланс</string>
   <string name="common_ok">OK</string>
   <string name="common_options_title">Выберите опцию</string>
+  <string name="common_price">Цена</string>
   <string name="common_proceed">Продолжить</string>
   <string name="common_reject">Отклонить</string>
   <string name="common_reset">Сброс</string>
@@ -275,6 +276,13 @@
   <string name="network_info_address">Адрес ноды</string>
   <string name="network_info_title">Информация ноды</string>
   <string name="network_status_connecting">Подключение…</string>
+  <string name="nft_collection">Коллекция</string>
+  <string name="nft_created_by">Создатель</string>
+  <string name="nft_issuance_limited_format">#%s Издание из %s</string>
+  <string name="nft_issuance_unlimited">Неограниченная серия</string>
+  <string name="nft_owned_by">Владелец</string>
+  <string name="nft_price_not_listed">Без цены</string>
+  <string name="nft_your_nfts">Ваши NFT</string>
   <string name="onboarding_create_account">Создать аккаунт</string>
   <string name="onboarding_create_wallet">Создать новый кошелёк</string>
   <string name="onboarding_privacy_policy">Политикой конфиденциальности</string>

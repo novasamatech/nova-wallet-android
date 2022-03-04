@@ -15,6 +15,7 @@ import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.NftPreviewUi
@@ -39,7 +40,7 @@ class GoToNftsView @JvmOverloads constructor(
         listOf(goToNftPreview1, goToNftPreview2, goToNftPreview3)
     }
 
-    private val mediaLoadingTransformation = RoundedCornersTransformation(8.dpF(context))
+    private val mediaLoadingTransformation = RoundedCornersTransformation(radius = 6.5f.dpF(context))
 
     init {
         View.inflate(context, R.layout.view_go_to_nfts, this)
@@ -65,8 +66,10 @@ class GoToNftsView @JvmOverloads constructor(
         } else {
             goToNftsShimmer.makeGone()
 
+            setVisible(previews!!.isNotEmpty())
+
             previewViews.forEachIndexed { index, view ->
-                val previewContent = previews!!.getOrNull(index)
+                val previewContent = previews.getOrNull(index)
 
                 if (previewContent == null) { // no such element
                     view.makeGone()
