@@ -77,7 +77,6 @@ class GoToNftsView @JvmOverloads constructor(
                     view.makeVisible()
                     view.load(previewContent.dataOrNull, imageLoader) {
                         transformations(mediaLoadingTransformation)
-
                     }
                 }
             }
