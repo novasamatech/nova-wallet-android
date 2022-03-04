@@ -65,6 +65,8 @@
     <declare-styleable name="TableCellView">
         <attr name="title" />
         <attr name="dividerVisible" />
+        <attr name="primaryValueIcon" format="reference|color" />
+        <attr name="primaryValueIconTint" format="color" />
     </declare-styleable>
 
     <declare-styleable name="GoNextView">
@@ -86,5 +88,11 @@
 
     <declare-styleable name="PlaceholderView">
         <attr name="android:text" />
+    </declare-styleable>
+
+    <declare-styleable name="TitleImageContentSectionView">
+        <attr name="sectionTitle" format="string" />
+        <attr name="sectionContentEndIcon" format="reference|color" />
+        <attr name="sectionContentEndIconTint" format="color" />
     </declare-styleable>
 </resources>

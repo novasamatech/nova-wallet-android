@@ -25,11 +25,11 @@ class NftProvidersRegistry(
         }
     }
 
-    fun get(nft: Nft): NftProvider {
-        return when (nft.type) {
-            is Nft.Type.Rmrk1 -> rmrkV1NftProvider
-            is Nft.Type.Rmrk2 -> rmrkV2NftProvider
-            is Nft.Type.Uniques -> uniquesNftProvider
+    fun get(nftTypeKey: Nft.Type.Key): NftProvider {
+        return when (nftTypeKey) {
+            Nft.Type.Key.RMRKV1 -> rmrkV1NftProvider
+            Nft.Type.Key.RMRKV2 -> rmrkV2NftProvider
+            Nft.Type.Key.UNIQUES -> uniquesNftProvider
         }
     }
 }

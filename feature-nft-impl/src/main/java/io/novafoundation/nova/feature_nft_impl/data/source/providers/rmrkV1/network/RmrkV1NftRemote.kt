@@ -16,7 +16,10 @@ class RmrkV1NftRemote(
 )
 
 class RmrkV1CollectionRemote(
-    val max: Int
+    val max: Int,
+    val name: String,
+    val issuer: String,
+    val metadata: String?
 )
 
 class RmrkV1NftMetadataRemote(

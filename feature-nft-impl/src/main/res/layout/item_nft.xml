@@ -2,17 +2,17 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/itemNftContainer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginEnd="11dp"
     android:layout_marginBottom="12dp"
     app:shimmer_auto_start="false"
-    android:id="@+id/itemNftContainer"
     tools:background="@color/black_48">
 
     <com.facebook.shimmer.ShimmerFrameLayout
-        android:layout_width="wrap_content"
         android:id="@+id/itemNftShimmer"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
         <View
@@ -32,13 +32,13 @@
         <ImageView
             android:id="@+id/itemNftMedia"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="154dp"
             android:layout_marginStart="6dp"
             android:layout_marginTop="6dp"
             android:layout_marginEnd="6dp"
             android:adjustViewBounds="true"
             android:maxHeight="154dp"
-            tools:src="@drawable/bg_splash" />
+            tools:src="@drawable/nft_media_progress" />
 
         <TextView
             android:id="@+id/itemNftTitle"
@@ -53,31 +53,26 @@
             android:textColor="@color/white"
             tools:text="Honeybird" />
 
-        <TextView
+        <io.novafoundation.nova.feature_nft_impl.presentation.nft.common.NftIssuanceView
             android:id="@+id/itemNftIssuance"
-            style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="4dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="12dp"
-            android:paddingStart="6dp"
-            android:paddingTop="1.5dp"
-            android:paddingEnd="6dp"
-            android:paddingBottom="1.5dp"
-            tools:background="@color/white_16"
             tools:text="#11 Edition of 9978" />
 
         <View
+            android:id="@+id/itemNftPriceDivider"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:id="@+id/itemNftPriceDivider"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:background="@color/white_8" />
 
         <LinearLayout
+            android:id="@+id/itemNftPrice"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -85,7 +80,6 @@
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="12dp"
             android:gravity="center_vertical"
-            android:id="@+id/itemNftPrice"
             android:orientation="horizontal">
 
             <TextView

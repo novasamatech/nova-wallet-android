@@ -23,6 +23,12 @@
         <item name="android:letterSpacing">0.06</item>
     </style>
 
+    <style name="TextAppearance.NovaFoundation.SemiBold.Caps2">
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:letterSpacing">0.06</item>
+    </style>
+
     <style name="TextAppearance.NovaFoundation.SemiBold.Body">
         <item name="android:textSize">17sp</item>
         <item name="lineHeight">22sp</item>

@@ -30,7 +30,10 @@ abstract class NftDao {
     protected abstract suspend fun updateNft(nft: NftLocal)
 
     @Query("SELECT * FROM nfts WHERE identifier = :nftIdentifier")
-    protected abstract suspend fun getNft(nftIdentifier: String): NftLocal
+    abstract suspend fun getNft(nftIdentifier: String): NftLocal
+
+    @Query("SELECT type FROM nfts WHERE identifier = :nftIdentifier")
+    abstract suspend fun getNftType(nftIdentifier: String): NftLocal.Type
 
     @Query("UPDATE nfts SET wholeDetailsLoaded = 1 WHERE identifier = :nftIdentifier")
     abstract suspend fun markFullSynced(nftIdentifier: String)

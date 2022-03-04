@@ -75,7 +75,6 @@ class NftHolder(
             itemNftContent.background = with(context) {
                 addRipple(getRoundedCornerDrawable(R.color.black_48, cornerSizeInDp = 12))
             }
-            itemNftIssuance.background = context.getRoundedCornerDrawable(R.color.white_16, cornerSizeInDp = 4)
         }
     }
 
@@ -99,8 +98,9 @@ class NftHolder(
 
                 itemNftMedia.load(content.data.media, imageLoader) {
                     transformations(RoundedCornersTransformation(8.dpF(context)))
-                    placeholder(R.drawable.nft_media_progress_or_error)
-                    error(R.color.red)
+                    placeholder(R.drawable.nft_media_progress)
+                    error(R.drawable.nft_media_progress)
+                    fallback(R.drawable.nft_media_progress)
                 }
 
                 itemNftIssuance.text = content.data.issuance

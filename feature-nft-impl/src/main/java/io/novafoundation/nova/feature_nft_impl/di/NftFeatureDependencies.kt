@@ -9,6 +9,8 @@ import io.novafoundation.nova.core_db.dao.NftDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
@@ -31,6 +33,10 @@ interface NftFeatureDependencies {
     fun chainRegistry(): ChainRegistry
 
     fun imageLoader(): ImageLoader
+
+    fun externalAccountActions(): ExternalActions.Presentation
+
+    fun addressDisplayUseCase(): AddressDisplayUseCase
 
     fun feeLoaderMixinFactory(): FeeLoaderMixin.Factory
 
