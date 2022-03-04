@@ -15,6 +15,7 @@ import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.NftPreviewUi
@@ -65,8 +66,10 @@ class GoToNftsView @JvmOverloads constructor(
         } else {
             goToNftsShimmer.makeGone()
 
+            setVisible(previews!!.isNotEmpty())
+
             previewViews.forEachIndexed { index, view ->
-                val previewContent = previews!!.getOrNull(index)
+                val previewContent = previews.getOrNull(index)
 
                 if (previewContent == null) { // no such element
                     view.makeGone()
