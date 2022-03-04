@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="nft_price_not_listed">Not listed</string>
   <string name="common_price">Price</string>
 
   <string name="nft_collection">Collection</string>

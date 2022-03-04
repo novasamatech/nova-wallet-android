@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_nft_impl.presentation.nft.list
 
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -21,9 +22,8 @@ import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_nft.view.itemNftContent
 import kotlinx.android.synthetic.main.item_nft.view.itemNftIssuance
 import kotlinx.android.synthetic.main.item_nft.view.itemNftMedia
-import kotlinx.android.synthetic.main.item_nft.view.itemNftPrice
-import kotlinx.android.synthetic.main.item_nft.view.itemNftPriceDivider
 import kotlinx.android.synthetic.main.item_nft.view.itemNftPriceFiat
+import kotlinx.android.synthetic.main.item_nft.view.itemNftPricePlaceholder
 import kotlinx.android.synthetic.main.item_nft.view.itemNftPriceToken
 import kotlinx.android.synthetic.main.item_nft.view.itemNftShimmer
 import kotlinx.android.synthetic.main.item_nft.view.itemNftTitle
@@ -99,8 +99,18 @@ class NftHolder(
                 itemNftMedia.load(content.data.media, imageLoader) {
                     transformations(RoundedCornersTransformation(8.dpF(context)))
                     placeholder(R.drawable.nft_media_progress)
-                    error(R.drawable.nft_media_progress)
-                    fallback(R.drawable.nft_media_progress)
+                    error(R.drawable.nft_media_error)
+                    fallback(R.drawable.nft_media_error)
+                    listener(
+                        onError = { _, _ ->
+                            // so that placeholder would be able to change aspect ratio and fill ImageView entirely
+                            itemNftMedia.scaleType = ImageView.ScaleType.FIT_XY
+                        },
+                        onSuccess = { _, _ ->
+                            // set default scale type back
+                            itemNftMedia.scaleType = ImageView.ScaleType.FIT_CENTER
+                        }
+                    )
                 }
 
                 itemNftIssuance.text = content.data.issuance
@@ -109,14 +119,16 @@ class NftHolder(
                 val price = content.data.price
 
                 if (price != null) {
-                    itemNftPrice.makeVisible()
-                    itemNftPriceDivider.makeVisible()
+                    itemNftPriceFiat.makeVisible()
+                    itemNftPriceToken.makeVisible()
+                    itemNftPricePlaceholder.makeGone()
 
                     itemNftPriceToken.text = price.token
                     itemNftPriceFiat.text = price.fiat
                 } else {
-                    itemNftPrice.makeGone()
-                    itemNftPriceDivider.makeGone()
+                    itemNftPriceFiat.makeGone()
+                    itemNftPriceToken.makeGone()
+                    itemNftPricePlaceholder.makeVisible()
                 }
             }
         }
