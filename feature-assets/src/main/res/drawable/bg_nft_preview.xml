@@ -9,10 +9,4 @@
         android:color="@color/black" />
 
     <corners android:radius="8dp" />
-
-    <padding
-        android:bottom="2dp"
-        android:left="2dp"
-        android:right="2dp"
-        android:top="2dp" />
 </shape>

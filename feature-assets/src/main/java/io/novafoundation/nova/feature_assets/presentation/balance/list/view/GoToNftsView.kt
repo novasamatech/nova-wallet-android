@@ -40,7 +40,7 @@ class GoToNftsView @JvmOverloads constructor(
         listOf(goToNftPreview1, goToNftPreview2, goToNftPreview3)
     }
 
-    private val mediaLoadingTransformation = RoundedCornersTransformation(8.dpF(context))
+    private val mediaLoadingTransformation = RoundedCornersTransformation(radius = 6.5f.dpF(context))
 
     init {
         View.inflate(context, R.layout.view_go_to_nfts, this)
@@ -77,6 +77,7 @@ class GoToNftsView @JvmOverloads constructor(
                     view.makeVisible()
                     view.load(previewContent.dataOrNull, imageLoader) {
                         transformations(mediaLoadingTransformation)
+
                     }
                 }
             }
