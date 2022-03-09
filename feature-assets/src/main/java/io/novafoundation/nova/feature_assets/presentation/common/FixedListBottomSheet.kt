@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_assets.presentation.common
 
 import androidx.annotation.StringRes
-import io.novafoundation.nova.R
+import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.common.utils.format
 import io.novafoundation.nova.common.view.bottomSheet.list.fixed.FixedListBottomSheet
 import kotlinx.android.synthetic.main.item_sheet_currency.view.itemCurrencyLabel

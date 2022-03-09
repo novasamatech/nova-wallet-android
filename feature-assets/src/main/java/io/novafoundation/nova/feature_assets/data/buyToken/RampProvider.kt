@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_assets.data.buyToken
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
-import io.novafoundation.nova.R
+import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.common.utils.showBrowser
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 

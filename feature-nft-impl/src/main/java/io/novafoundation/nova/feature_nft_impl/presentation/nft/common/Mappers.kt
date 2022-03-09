@@ -1,9 +1,9 @@
 package io.novafoundation.nova.feature_nft_impl.presentation.nft.common
 
-import io.novafoundation.nova.R
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.format
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
+import io.novafoundation.nova.feature_nft_impl.R
 
 fun ResourceManager.formatIssuance(issuance: Nft.Issuance): String {
     return when (issuance) {

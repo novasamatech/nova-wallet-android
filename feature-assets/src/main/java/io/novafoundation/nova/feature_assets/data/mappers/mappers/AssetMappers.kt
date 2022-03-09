@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_assets.data.mappers.mappers
 
-import io.novafoundation.nova.R
+import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.common.utils.formatAsChange
 import io.novafoundation.nova.common.utils.formatAsCurrency
 import io.novafoundation.nova.common.utils.isNonNegative

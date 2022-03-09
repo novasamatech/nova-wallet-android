@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_assets.presentation.send.recipient
 
 import android.content.Context
 import android.os.Bundle
-import io.novafoundation.nova.R
+import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.common.view.bottomSheet.list.fixed.FixedListBottomSheet
 import io.novafoundation.nova.common.view.bottomSheet.list.fixed.item
 

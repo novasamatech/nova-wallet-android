@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_assets.presentation.transaction.detail.reward
 
 import androidx.lifecycle.liveData
-import io.novafoundation.nova.R
+import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.createAddressModel
 import io.novafoundation.nova.common.base.BaseViewModel

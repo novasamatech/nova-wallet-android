@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_assets.presentation.send.phishing
 
-import io.novafoundation.nova.R
+import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.view.dialog.warningDialog
