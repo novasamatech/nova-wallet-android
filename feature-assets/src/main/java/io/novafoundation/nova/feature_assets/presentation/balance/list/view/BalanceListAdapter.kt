@@ -4,7 +4,7 @@ import android.view.View
 import android.view.ViewGroup
 import coil.ImageLoader
 import coil.load
-import io.novafoundation.nova.R
+import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.common.list.BaseGroupedDiffCallback
 import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder

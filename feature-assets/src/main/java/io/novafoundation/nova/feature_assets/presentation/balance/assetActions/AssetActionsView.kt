@@ -5,7 +5,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
-import io.novafoundation.nova.R
+import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.common.view.shape.getBlurDrawable

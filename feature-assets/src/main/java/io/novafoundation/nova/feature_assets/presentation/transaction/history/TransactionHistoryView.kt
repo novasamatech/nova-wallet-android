@@ -12,7 +12,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import io.novafoundation.nova.R
+import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.enableShowingNewlyAddedTopElements
 import io.novafoundation.nova.common.utils.makeGone

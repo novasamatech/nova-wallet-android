@@ -3,11 +3,11 @@ package io.novafoundation.nova.feature_nft_impl.presentation.nft.common
 import android.content.Context
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatTextView
-import io.novafoundation.nova.R
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
+import io.novafoundation.nova.feature_nft_impl.R
 
 class NftIssuanceView @JvmOverloads constructor(
     context: Context,

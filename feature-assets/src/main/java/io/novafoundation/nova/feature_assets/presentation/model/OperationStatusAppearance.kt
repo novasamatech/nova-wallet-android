@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_assets.presentation.model
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import io.novafoundation.nova.R
+import io.novafoundation.nova.feature_assets.R
 
 enum class OperationStatusAppearance(
     @DrawableRes val icon: Int,

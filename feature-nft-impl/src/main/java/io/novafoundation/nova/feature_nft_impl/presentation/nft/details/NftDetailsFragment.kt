@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import coil.ImageLoader
 import coil.load
-import io.novafoundation.nova.R
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
@@ -19,6 +18,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExt
 import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_account_api.view.showChain
 import io.novafoundation.nova.feature_nft_api.NftFeatureApi
+import io.novafoundation.nova.feature_nft_impl.R
 import io.novafoundation.nova.feature_nft_impl.di.NftFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.view.setPriceOrHide
 import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsChain

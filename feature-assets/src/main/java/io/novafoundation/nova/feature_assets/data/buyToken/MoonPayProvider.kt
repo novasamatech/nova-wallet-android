@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_assets.data.buyToken
 
 import android.content.Context
-import io.novafoundation.nova.R
+import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.common.utils.hmacSHA256
 import io.novafoundation.nova.common.utils.showBrowser
 import io.novafoundation.nova.common.utils.toBase64

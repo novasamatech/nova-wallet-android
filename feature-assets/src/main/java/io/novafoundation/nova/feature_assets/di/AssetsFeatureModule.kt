@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_assets.di
 
 import dagger.Module
 import dagger.Provides
-import io.novafoundation.nova.BuildConfig
+import io.novafoundation.nova.feature_assets.BuildConfig
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository

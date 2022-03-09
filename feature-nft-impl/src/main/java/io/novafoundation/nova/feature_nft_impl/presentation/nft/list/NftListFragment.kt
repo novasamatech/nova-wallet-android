@@ -5,12 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import coil.ImageLoader
-import io.novafoundation.nova.R
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.feature_nft_api.NftFeatureApi
+import io.novafoundation.nova.feature_nft_impl.R
 import io.novafoundation.nova.feature_nft_impl.di.NftFeatureComponent
 import kotlinx.android.synthetic.main.fragment_nft_list.nftListBack
 import kotlinx.android.synthetic.main.fragment_nft_list.nftListCounter

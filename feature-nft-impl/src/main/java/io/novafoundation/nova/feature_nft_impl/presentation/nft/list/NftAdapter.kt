@@ -10,7 +10,6 @@ import coil.ImageLoader
 import coil.clear
 import coil.load
 import coil.transform.RoundedCornersTransformation
-import io.novafoundation.nova.R
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.common.utils.inflateChild
@@ -18,6 +17,7 @@ import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
+import io.novafoundation.nova.feature_nft_impl.R
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_nft.view.itemNftContent
 import kotlinx.android.synthetic.main.item_nft.view.itemNftIssuance

@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_assets.presentation.receive
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import io.novafoundation.nova.R
+import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager

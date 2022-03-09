@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_assets.presentation.balance.detail
 
 import android.content.Context
 import android.util.AttributeSet
-import io.novafoundation.nova.R
+import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.common.utils.setDrawableEnd
 import io.novafoundation.nova.feature_wallet_api.presentation.view.BalancesView
 

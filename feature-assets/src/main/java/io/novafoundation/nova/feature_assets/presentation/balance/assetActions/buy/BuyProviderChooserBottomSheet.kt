@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_assets.presentation.balance.assetActions.
 import android.content.Context
 import android.os.Bundle
 import android.view.View
-import io.novafoundation.nova.R
+import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.ClickHandler
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet

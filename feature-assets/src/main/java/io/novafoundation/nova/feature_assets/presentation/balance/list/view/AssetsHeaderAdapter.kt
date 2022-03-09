@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_assets.presentation.balance.list.view
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import io.novafoundation.nova.R
+import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.setVisible
