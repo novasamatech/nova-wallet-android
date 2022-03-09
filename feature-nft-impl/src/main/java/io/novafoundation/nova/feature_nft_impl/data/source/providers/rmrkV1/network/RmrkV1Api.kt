@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV1.network
 
+import io.novafoundation.nova.common.data.network.http.CacheControl
 import retrofit2.http.GET
+import retrofit2.http.Headers
 import retrofit2.http.Path
 import retrofit2.http.Url
 
@@ -11,6 +13,7 @@ interface RmrkV1Api {
     }
 
     @GET("account/{address}")
+    @Headers(CacheControl.NO_CACHE)
     suspend fun getNfts(@Path("address") address: String): List<RmrkV1NftRemote>
 
     @GET("collection/{collectionId}")
