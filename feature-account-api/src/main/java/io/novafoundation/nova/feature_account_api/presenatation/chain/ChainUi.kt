@@ -23,9 +23,9 @@ data class GradientUi(
     }
 }
 
-fun GradientUi.toDrawable(context: Context) = context.gradientDrawable(
+fun GradientUi.toDrawable(context: Context, cornerRadiusDp: Int = 8) = context.gradientDrawable(
     colors = colors,
     offsets = positions,
     angle = angle,
-    cornerRadiusDp = 8
+    cornerRadiusDp = cornerRadiusDp
 )
