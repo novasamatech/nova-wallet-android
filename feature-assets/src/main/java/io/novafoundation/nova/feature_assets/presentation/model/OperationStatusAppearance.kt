@@ -19,7 +19,6 @@ enum class OperationStatusAppearance(
     FAILED(R.drawable.ic_red_cross, R.string.transaction_status_failed, R.color.red, R.color.white_64),
 }
 
-
 fun TextView.showOperationStatus(statusAppearance: OperationStatusAppearance) {
     setText(statusAppearance.labelRes)
     setDrawableStart(
