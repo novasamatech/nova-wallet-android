@@ -14,6 +14,10 @@ object SubqueryExpressions {
         return compoundExpression("and", *innerExpressions)
     }
 
+    infix fun String.and(another: String): String {
+        return and(this, another)
+    }
+
     fun and(innerExpressions: Collection<String>) = and(*innerExpressions.toTypedArray())
 
     fun not(expression: String): String {

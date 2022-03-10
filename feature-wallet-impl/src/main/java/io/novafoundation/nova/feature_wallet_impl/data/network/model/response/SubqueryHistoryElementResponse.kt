@@ -14,6 +14,7 @@ class SubqueryHistoryElementResponse(val query: Query) {
             class Node(
                 val id: String,
                 val timestamp: String,
+                val extrinsicHash: String,
                 val address: String,
                 val reward: Rewards?,
                 val transfer: Transfer?,
@@ -32,12 +33,10 @@ class SubqueryHistoryElementResponse(val query: Query) {
                     val from: String,
                     val fee: BigInteger,
                     val block: String,
-                    val success: Boolean,
-                    val extrinsicHash: String? // nullable since not all transfers not hash hash on SubQuery
+                    val success: Boolean
                 )
 
                 class Extrinsic(
-                    val hash: String,
                     val module: String,
                     val call: String,
                     val fee: BigInteger,

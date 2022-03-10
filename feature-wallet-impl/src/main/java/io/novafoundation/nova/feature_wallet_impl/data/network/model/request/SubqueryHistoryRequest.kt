@@ -49,6 +49,7 @@ class SubqueryHistoryRequest(
                 nodes {
                     id
                     timestamp
+                    extrinsicHash
                     address
                     reward
                     extrinsic
@@ -64,26 +65,20 @@ class SubqueryHistoryRequest(
         or: [ {transfer: { notEqualTo: "null"} },  {extrinsic: { notEqualTo: "null"} } ]
      */
     private fun Set<TransactionFilter>.toQueryFilter(): String {
+        val additionalFilters = not(isIgnoredExtrinsic())
 
         // optimize query in case all filters are on
-        if (allFiltersIncluded()) {
-            return ""
+        return if (allFiltersIncluded()) {
+            additionalFilters
+        } else {
+            val filtersExpressions = map { hasType(it.filterName) }
+            val userFilters = anyOf(filtersExpressions)
+
+            userFilters and additionalFilters
         }
-
-        val typeExpressions = map {
-            if (it == TransactionFilter.EXTRINSIC) {
-                createExtrinsicExpression()
-            } else {
-                hasType(it.filterName)
-            }
-        }
-
-        val result = anyOf(typeExpressions)
-
-        return result
     }
 
-    private fun createExtrinsicExpression(): String {
+    private fun isIgnoredExtrinsic(): String {
         val exists = hasType(TransactionFilter.EXTRINSIC.filterName)
 
         val restrictedModulesList = EXTRINSIC_RESTRICTIONS.map {
@@ -99,7 +94,7 @@ class SubqueryHistoryRequest(
 
         return and(
             exists,
-            not(hasRestrictedModules)
+            hasRestrictedModules
         )
     }
 

@@ -2,6 +2,7 @@ package io.novafoundation.nova.common.view
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.ContextThemeWrapper
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.lifecycle.LifecycleOwner
 import com.github.razir.progressbutton.bindProgressButton
@@ -29,7 +30,7 @@ class PrimaryButton @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : AppCompatTextView(context, attrs, defStyle) {
+) : AppCompatTextView(ContextThemeWrapper(context, R.style.Widget_Nova_Button), attrs, defStyle) {
 
     enum class Appearance {
         FILL, OUTLINE

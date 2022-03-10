@@ -10,6 +10,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import coil.ImageLoader
 import coil.load
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.utils.getResourceIdOrNull
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.setVisible
 import kotlinx.android.synthetic.main.view_go_next.view.goNextActionImage
@@ -83,10 +84,8 @@ class GoNextView @JvmOverloads constructor(
         val backgroundDrawable = typedArray.getDrawable(R.styleable.GoNextView_android_background)
         if (backgroundDrawable != null) background = backgroundDrawable else setBackgroundResource(R.drawable.bg_primary_list_item)
 
-        val textAppearance = typedArray.getResourceId(R.styleable.GoNextView_android_textAppearance, 0)
-        if (textAppearance != 0) {
-            title.setTextAppearance(textAppearance)
-        }
+        val textAppearance = typedArray.getResourceIdOrNull(R.styleable.GoNextView_android_textAppearance)
+        textAppearance?.let(title::setTextAppearance)
 
         typedArray.recycle()
     }

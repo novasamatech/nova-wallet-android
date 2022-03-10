@@ -12,253 +12,123 @@
         android:id="@+id/transactionDetailToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:dividerVisible="false"
         app:homeButtonIcon="@drawable/ic_close"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:titleText="@string/common_details" />
+        app:titleText="Apr 10, 2022, 22:36"
+        app:titleTextAppearance="@style/TextAppearance.NovaFoundation.TransactionDetailToolbar" />
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <io.novafoundation.nova.common.view.LabeledTextView
-                android:id="@+id/transactionDetailHash"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                app:actionIcon="@drawable/ic_more"
-                app:label="@string/transaction_details_hash_title"
-                app:layout_constraintEnd_toEndOf="@+id/transactionDetailDivider4"
-                app:layout_constraintStart_toStartOf="@+id/transactionDetailDivider4"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <io.novafoundation.nova.common.view.LabeledTextView
-                android:id="@+id/transactionDetailFrom"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                app:actionIcon="@drawable/ic_more"
-                app:label="@string/transaction_details_from"
-                app:layout_constraintEnd_toEndOf="@+id/transactionDetailDivider4"
-                app:layout_constraintHorizontal_bias="1.0"
-                app:layout_constraintStart_toStartOf="@+id/transactionDetailDivider4"
-                app:layout_constraintTop_toBottomOf="@+id/transactionDetailHash"
-                tools:textIcon="@color/colorAccent" />
-
-            <io.novafoundation.nova.common.view.LabeledTextView
-                android:id="@+id/transactionDetailTo"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="24dp"
-                app:actionIcon="@drawable/ic_more"
-                app:label="@string/choose_amount_to"
-                app:layout_constraintEnd_toEndOf="@+id/transactionDetailDivider4"
-                app:layout_constraintStart_toStartOf="@+id/transactionDetailDivider4"
-                app:layout_constraintTop_toBottomOf="@+id/transactionDetailFrom"
-                tools:textIcon="@color/colorAccent" />
-
-            <TextView
-                android:id="@+id/transactionDetailStatusLabel"
-                style="@style/TextAppearance.NovaFoundation.Body1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="20dp"
-                android:text="@string/transaction_detail_status"
-                android:textColor="@color/gray1"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/transactionDetailTo"
-                />
-
-            <TextView
-                android:id="@+id/transactionDetailStatus"
-                style="@style/TextAppearance.NovaFoundation.Body1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                app:layout_constraintBottom_toBottomOf="@+id/transactionDetailStatusIcon"
-                app:layout_constraintEnd_toStartOf="@+id/transactionDetailStatusIcon"
-                app:layout_constraintTop_toTopOf="@+id/transactionDetailStatusIcon"
-                tools:text="@string/transaction_status_completed" />
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
 
             <ImageView
-                android:id="@+id/transactionDetailStatusIcon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginEnd="16dp"
-                app:layout_constraintBottom_toBottomOf="@+id/transactionDetailStatusLabel"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/transactionDetailStatusLabel"
-                tools:src="@drawable/ic_transaction_completed" />
-
-            <View
-                android:id="@+id/transactionDetailDivider1"
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_marginTop="14dp"
-                android:background="@color/gray3"
-                app:layout_constraintEnd_toEndOf="@+id/transactionDetailStatusIcon"
-                app:layout_constraintStart_toStartOf="@+id/transactionDetailStatusLabel"
-                app:layout_constraintTop_toBottomOf="@+id/transactionDetailStatusLabel" />
-
-            <TextView
-                android:id="@+id/transactionDetailDateLabel"
-                style="@style/TextAppearance.NovaFoundation.Body1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="15dp"
-                android:text="@string/common_date"
-                android:textColor="@color/gray1"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/transactionDetailDivider1" />
-
-            <TextView
-                android:id="@+id/transactionDetailDate"
-                style="@style/TextAppearance.NovaFoundation.Body1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="@+id/transactionDetailDateLabel"
-                app:layout_constraintEnd_toEndOf="@+id/transactionDetailDivider1"
-                app:layout_constraintTop_toTopOf="@+id/transactionDetailDateLabel"
-                tools:text="10 Apr 2020, 22:36:45" />
-
-            <View
-                android:id="@+id/transactionDetailDivider2"
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_marginTop="14dp"
-                android:background="@color/gray3"
-                app:layout_constraintEnd_toEndOf="@+id/transactionDetailStatusIcon"
-                app:layout_constraintStart_toStartOf="@+id/transactionDetailStatusLabel"
-                app:layout_constraintTop_toBottomOf="@+id/transactionDetailDateLabel" />
-
-            <TextView
-                android:id="@+id/transactionDetailAmountLabel"
-                style="@style/TextAppearance.NovaFoundation.Body1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="15dp"
-                android:text="@string/common_amount"
-                android:textColor="@color/gray1"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/transactionDetailDivider2" />
+                android:id="@+id/transactionDetailTransferDirection"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_icon_round"
+                android:padding="11dp"
+                app:tint="@color/white_64"
+                tools:src="@drawable/ic_arrow_up" />
 
             <TextView
                 android:id="@+id/transactionDetailAmount"
-                style="@style/TextAppearance.NovaFoundation.Body1"
+                style="@style/TextAppearance.NovaFoundation.Bold.LargeTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="@+id/transactionDetailAmountLabel"
-                app:layout_constraintEnd_toEndOf="@+id/transactionDetailDivider1"
-                app:layout_constraintTop_toTopOf="@+id/transactionDetailAmountLabel"
-                tools:text="4.01 KSM" />
-
-            <View
-                android:id="@+id/transactionDetailDivider3"
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_marginTop="14dp"
-                android:background="@color/gray3"
-                app:layout_constraintEnd_toEndOf="@+id/transactionDetailStatusIcon"
-                app:layout_constraintStart_toStartOf="@+id/transactionDetailStatusLabel"
-                app:layout_constraintTop_toBottomOf="@+id/transactionDetailAmountLabel" />
+                android:layout_marginTop="16dp"
+                tools:text="-4 KSM" />
 
             <TextView
-                android:id="@+id/transactionDetailFeeLabel"
-                style="@style/TextAppearance.NovaFoundation.Body1"
+                android:id="@+id/transactionDetailStatus"
+                style="@style/TextAppearance.NovaFoundation.SemiBold.Caps2"
                 android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center_vertical"
+                tools:drawablePadding="4dp"
+                tools:drawableStart="@drawable/ic_checkmark_circle_16"
+                tools:drawableTint="@color/green"
+                tools:text="completed"
+                tools:textColor="@color/green" />
+
+            <io.novafoundation.nova.common.view.TableView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="14dp"
-                android:text="@string/choose_amount_fee"
-                android:textColor="@color/gray1"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/transactionDetailDivider3" />
+                android:layout_marginTop="24dp"
+                android:layout_marginEnd="16dp">
 
-            <TextView
-                android:id="@+id/transactionDetailFee"
-                style="@style/TextAppearance.NovaFoundation.Body1"
-                android:layout_width="wrap_content"
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/transactionDetailFrom"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryValueIcon="@drawable/ic_info_16"
+                    app:primaryValueIconTint="@color/white_64"
+                    app:title="@string/wallet_sender" />
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/transactionDetailNetwork"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="@string/common_network" />
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/transactionDetailFee"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="@string/network_fee" />
+            </io.novafoundation.nova.common.view.TableView>
+
+            <io.novafoundation.nova.common.view.TableView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="@+id/transactionDetailFeeLabel"
-                app:layout_constraintEnd_toEndOf="@+id/transactionDetailDivider1"
-                app:layout_constraintTop_toTopOf="@+id/transactionDetailFeeLabel"
-                tools:text="0.0001 KSM" />
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="16dp">
 
-            <View
-                android:id="@+id/transactionDetailDivider4"
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_marginTop="15dp"
-                android:background="@color/gray3"
-                app:layout_constraintEnd_toEndOf="@+id/transactionDetailStatusIcon"
-                app:layout_constraintStart_toStartOf="@+id/transactionDetailStatusLabel"
-                app:layout_constraintTop_toBottomOf="@+id/transactionDetailFeeLabel" />
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/transactionDetailTo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryValueIcon="@drawable/ic_info_16"
+                    app:primaryValueIconTint="@color/white_64"
+                    app:title="@string/wallet_recipient" />
+            </io.novafoundation.nova.common.view.TableView>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            <io.novafoundation.nova.common.view.TableView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:id="@+id/transactionDetailTxSection"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="16dp">
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/transactionDetailHash"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryValueIcon="@drawable/ic_info_16"
+                    app:primaryValueIconTint="@color/white_64"
+                    app:title="@string/common_transaction_id" />
+            </io.novafoundation.nova.common.view.TableView>
+        </LinearLayout>
 
     </ScrollView>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/transactionDetailRepeat"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/gray4">
-
-        <View
-            android:id="@+id/transactionDetailDivider5"
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="22dp"
-            android:background="@color/gray3"
-            app:layout_constraintBottom_toTopOf="@+id/transactionDetailRepeat"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <TextView
-            android:id="@+id/transactionDetailTotalLabel"
-            style="@style/TextAppearance.NovaFoundation.Header5"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="15dp"
-            android:paddingTop="15dp"
-            android:text="@string/wallet_send_total_title"
-            app:layout_constraintBottom_toTopOf="@+id/transactionDetailDivider5"
-            app:layout_constraintStart_toStartOf="@+id/transactionDetailDivider5" />
-
-        <TextView
-            android:id="@+id/transactionDetailTotal"
-            style="@style/TextAppearance.NovaFoundation.Body1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="@+id/transactionDetailTotalLabel"
-            app:layout_constraintEnd_toEndOf="@+id/transactionDetailDivider5"
-            tools:text="1.001 KSM" />
-
-        <io.novafoundation.nova.common.view.AccountInfoView
-            android:id="@+id/transactionDetailRepeat"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="24dp"
-            android:text="@string/wallet_send_confirm_transfer"
-            app:accountActionIcon="@drawable/ic_send"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:textVisible="true" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="@string/wallet_transfer_details_send_back" />
 </LinearLayout>
