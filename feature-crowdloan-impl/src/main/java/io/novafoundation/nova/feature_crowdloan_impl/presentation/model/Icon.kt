@@ -1,14 +1,9 @@
 package io.novafoundation.nova.feature_crowdloan_impl.presentation.model
 
-import android.widget.ImageView
-import coil.ImageLoader
-import coil.load
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.createAddressIcon
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ParachainMetadata
-
-
 
 suspend fun generateCrowdloanIcon(
     parachainMetadata: ParachainMetadata?,

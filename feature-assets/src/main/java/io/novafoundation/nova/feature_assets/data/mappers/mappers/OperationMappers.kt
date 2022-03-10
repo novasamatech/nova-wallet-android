@@ -67,7 +67,7 @@ private fun Operation.Type.Extrinsic.formattedCall() = call.camelCaseToCapitaliz
 private fun Operation.Type.Extrinsic.formattedModule() = module.camelCaseToCapitalizedWords()
 
 @DrawableRes
-private fun Operation.Type.Transfer.transferDirectionIcon() : Int {
+private fun Operation.Type.Transfer.transferDirectionIcon(): Int {
     return if (isIncome) R.drawable.ic_arrow_down else R.drawable.ic_arrow_up
 }
 
