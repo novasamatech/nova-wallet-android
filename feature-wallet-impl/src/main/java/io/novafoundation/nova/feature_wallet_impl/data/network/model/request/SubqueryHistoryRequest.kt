@@ -49,6 +49,7 @@ class SubqueryHistoryRequest(
                 nodes {
                     id
                     timestamp
+                    extrinsicHash
                     address
                     reward
                     extrinsic

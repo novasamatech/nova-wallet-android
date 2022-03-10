@@ -35,6 +35,7 @@
         <attr name="textRight" format="string" />
         <attr name="homeButtonIcon" format="reference|color" />
         <attr name="homeButtonVisible" format="boolean" />
+        <attr name="titleTextAppearance" format="reference" />
     </declare-styleable>
 
     <declare-styleable name="LabeledTextView">

@@ -83,7 +83,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/extrinsicDetailStatusLabel"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/extrinsicDetailStatusLabel"
-                tools:src="@drawable/ic_transaction_completed" />
+                tools:src="@drawable/ic_checkmark_circle_16" />
 
             <View
                 android:id="@+id/extrinsicDetailDivider1"

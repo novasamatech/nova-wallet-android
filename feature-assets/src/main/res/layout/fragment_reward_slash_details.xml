@@ -83,7 +83,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/rewardDetailStatusLabel"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/rewardDetailStatusLabel"
-                android:src="@drawable/ic_transaction_completed" />
+                android:src="@drawable/ic_checkmark_circle_16" />
 
             <View
                 android:id="@+id/rewardDetailDivider1"

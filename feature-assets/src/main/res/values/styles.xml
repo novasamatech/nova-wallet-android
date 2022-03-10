@@ -7,4 +7,8 @@
         <item name="android:padding">2dp</item>
         <item name="android:scaleType">centerCrop</item>
     </style>
+
+    <style name="TextAppearance.NovaFoundation.TransactionDetailToolbar" parent="TextAppearance.NovaFoundation.Regular.Footnote">
+        <item name="android:textColor">@color/white_64</item>
+    </style>
 </resources>

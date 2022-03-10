@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="wallet_sender">Sender</string>
+  <string name="wallet_recipient">Recipient</string>
+  <string name="wallet_transfer_details_send_back">Send to this contact</string>
+
+  <string name="common_transaction_id">Transaction ID</string>
+
   <string name="nft_price_not_listed">Not listed</string>
   <string name="common_price">Price</string>
 

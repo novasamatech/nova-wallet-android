@@ -1,17 +1,18 @@
 package io.novafoundation.nova.feature_assets.data.mappers.mappers
 
-import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAddressIcon
+import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.model.OperationModel
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.model.OperationStatusAppearance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
-import io.novafoundation.nova.runtime.ext.utilityAsset
+import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger
@@ -23,7 +24,7 @@ private val Operation.Type.operationStatus
         is Operation.Type.Transfer -> status
     }
 
-private fun Chain.Asset.formatPlanks(planks: BigInteger, negative: Boolean): String {
+private fun Chain.Asset.formatPlanksSigned(planks: BigInteger, negative: Boolean): String {
     val amount = amountFromPlanks(planks)
 
     val withoutSign = amount.formatTokenAmount(this)
@@ -39,15 +40,15 @@ private val Operation.Type.Transfer.displayAddress
     get() = if (isIncome) sender else receiver
 
 private fun formatAmount(chainAsset: Chain.Asset, transfer: Operation.Type.Transfer): String {
-    return chainAsset.formatPlanks(transfer.amount, negative = !transfer.isIncome)
+    return chainAsset.formatPlanksSigned(transfer.amount, negative = !transfer.isIncome)
 }
 
 private fun formatAmount(chainAsset: Chain.Asset, reward: Operation.Type.Reward): String {
-    return chainAsset.formatPlanks(reward.amount, negative = !reward.isReward)
+    return chainAsset.formatPlanksSigned(reward.amount, negative = !reward.isReward)
 }
 
 private fun formatFee(chainAsset: Chain.Asset, extrinsic: Operation.Type.Extrinsic): String {
-    return chainAsset.formatPlanks(extrinsic.fee, negative = true)
+    return chainAsset.formatPlanksSigned(extrinsic.fee, negative = true)
 }
 
 private fun mapStatusToStatusAppearance(status: Operation.Status): OperationStatusAppearance {
@@ -138,19 +139,9 @@ suspend fun mapOperationToParcel(
         return when (val operationType = operation.type) {
             is Operation.Type.Transfer -> {
                 val chain = chainRegistry.getChain(chainAsset.chainId)
-                val commissionAsset = chain.utilityAsset
 
-                val feeOrZero = operationType.fee ?: BigInteger.ZERO
-
-                val feeFormatted = operationType.fee?.let {
-                    commissionAsset.formatPlanks(it, negative = true)
-                } ?: resourceManager.getString(R.string.common_unknown)
-
-                val total = if (commissionAsset == chainAsset) {
-                    operationType.amount + feeOrZero
-                } else {
-                    operationType.amount
-                }
+                val feeFormatted = operationType.fee?.formatPlanks(chain.commissionAsset)
+                    ?: resourceManager.getString(R.string.common_unknown)
 
                 OperationParcelizeModel.Transfer(
                     chainId = operation.chainAsset.chainId,
@@ -163,7 +154,6 @@ suspend fun mapOperationToParcel(
                     sender = operationType.sender,
                     fee = feeFormatted,
                     isIncome = operationType.isIncome,
-                    total = chainAsset.formatPlanks(total, negative = !operationType.isIncome),
                     statusAppearance = mapStatusToStatusAppearance(operationType.operationStatus)
                 )
             }
