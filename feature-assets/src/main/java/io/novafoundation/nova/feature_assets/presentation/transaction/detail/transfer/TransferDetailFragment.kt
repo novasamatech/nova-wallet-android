@@ -7,7 +7,6 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.formatDateTime
 import io.novafoundation.nova.common.utils.makeGone
-import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.view.showAddress
@@ -16,6 +15,7 @@ import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
+import io.novafoundation.nova.feature_assets.presentation.model.showOperationStatus
 import kotlinx.android.synthetic.main.fragment_transfer_details.transactionDetailAmount
 import kotlinx.android.synthetic.main.fragment_transfer_details.transactionDetailFee
 import kotlinx.android.synthetic.main.fragment_transfer_details.transactionDetailFrom
@@ -80,14 +80,7 @@ class TransferDetailFragment : BaseFragment<TransactionDetailViewModel>() {
         setupExternalActions(viewModel)
 
         with(viewModel.operation) {
-            transactionDetailStatus.setText(statusAppearance.labelRes)
-            transactionDetailStatus.setDrawableStart(
-                drawableRes = statusAppearance.icon,
-                widthInDp = 16,
-                paddingInDp = 4,
-                tint = statusAppearance.statusTint
-            )
-            transactionDetailStatus.setTextColorRes(statusAppearance.statusTint)
+            transactionDetailStatus.showOperationStatus(statusAppearance)
 
             transactionDetailToolbar.setTitle(time.formatDateTime(requireContext()))
 

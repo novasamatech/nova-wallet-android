@@ -159,15 +159,18 @@ suspend fun mapOperationToParcel(
             }
 
             is Operation.Type.Reward -> {
+                val typeRes = if (operationType.isReward) R.string.staking_reward else R.string.staking_slash
+
                 OperationParcelizeModel.Reward(
                     chainId = chainAsset.chainId,
                     eventId = id,
                     address = address,
                     time = time,
                     amount = formatAmount(chainAsset, operationType),
-                    isReward = operationType.isReward,
-                    era = operationType.era,
+                    type = resourceManager.getString(typeRes),
+                    era = resourceManager.getString(R.string.staking_era_index_no_prefix, operationType.era),
                     validator = operationType.validator,
+                    statusAppearance = OperationStatusAppearance.COMPLETED
                 )
             }
 
