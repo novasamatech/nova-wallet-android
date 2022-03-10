@@ -1,13 +1,13 @@
 package io.novafoundation.nova.feature_assets.presentation.transaction.detail.reward
 
-import androidx.lifecycle.liveData
-import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.createAddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
+import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.invoke
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -18,7 +18,6 @@ import kotlinx.coroutines.launch
 
 class RewardDetailViewModel(
     val operation: OperationParcelizeModel.Reward,
-    private val resourceManager: ResourceManager,
     private val addressIconGenerator: AddressIconGenerator,
     private val addressDisplayUseCase: AddressDisplayUseCase,
     private val router: WalletRouter,
@@ -31,21 +30,17 @@ class RewardDetailViewModel(
         chainRegistry.getChain(operation.chainId)
     }
 
-    val validatorAddressModelLiveData = liveData {
-        val icon = operation.validator?.let { getIcon(it) }
-
-        emit(icon)
+    val validatorAddressModelFlow = flowOf {
+        operation.validator?.let { getIcon(it) }
     }
+        .inBackground()
+        .share()
 
-    val eraLiveData = liveData {
-        emit(resourceManager.getString(R.string.staking_era_index_no_prefix, operation.era))
+    val chainUi = flowOf {
+        mapChainToUi(chain())
     }
-
-    private suspend fun getIcon(address: String) = addressIconGenerator.createAddressModel(
-        address,
-        AddressIconGenerator.SIZE_BIG,
-        addressDisplayUseCase(chain(), address)
-    )
+        .inBackground()
+        .share()
 
     fun backClicked() {
         router.back()
@@ -64,4 +59,10 @@ class RewardDetailViewModel(
     private fun shoExternalActions(type: ExternalActions.Type) = launch {
         externalActions.showExternalActions(type, chain())
     }
+
+    private suspend fun getIcon(address: String) = addressIconGenerator.createAddressModel(
+        address,
+        AddressIconGenerator.SIZE_BIG,
+        addressDisplayUseCase(chain(), address)
+    )
 }

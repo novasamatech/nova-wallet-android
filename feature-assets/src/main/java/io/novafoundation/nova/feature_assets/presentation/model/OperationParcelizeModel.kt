@@ -13,9 +13,10 @@ sealed class OperationParcelizeModel : Parcelable {
         val address: String,
         val time: Long,
         val amount: String,
-        val isReward: Boolean,
-        val era: Int,
+        val type: String,
+        val era: String,
         val validator: String?,
+        val statusAppearance: OperationStatusAppearance,
     ) : OperationParcelizeModel()
 
     @Parcelize

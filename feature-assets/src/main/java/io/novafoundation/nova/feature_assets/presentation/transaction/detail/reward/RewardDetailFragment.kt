@@ -3,22 +3,25 @@ package io.novafoundation.nova.feature_assets.presentation.transaction.detail.re
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.formatDateTime
 import io.novafoundation.nova.common.utils.makeGone
-import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
+import io.novafoundation.nova.feature_account_api.view.showAddress
+import io.novafoundation.nova.feature_account_api.view.showChain
+import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
-import kotlinx.android.synthetic.main.fragment_reward_slash_details.rewardDetailDate
+import io.novafoundation.nova.feature_assets.presentation.model.showOperationStatus
+import kotlinx.android.synthetic.main.fragment_reward_slash_details.rewardDetailAmount
 import kotlinx.android.synthetic.main.fragment_reward_slash_details.rewardDetailEra
-import kotlinx.android.synthetic.main.fragment_reward_slash_details.rewardDetailHash
-import kotlinx.android.synthetic.main.fragment_reward_slash_details.rewardDetailReward
-import kotlinx.android.synthetic.main.fragment_reward_slash_details.rewardDetailRewardLabel
+import kotlinx.android.synthetic.main.fragment_reward_slash_details.rewardDetailEvent
+import kotlinx.android.synthetic.main.fragment_reward_slash_details.rewardDetailNetwork
+import kotlinx.android.synthetic.main.fragment_reward_slash_details.rewardDetailStatus
 import kotlinx.android.synthetic.main.fragment_reward_slash_details.rewardDetailToolbar
+import kotlinx.android.synthetic.main.fragment_reward_slash_details.rewardDetailType
 import kotlinx.android.synthetic.main.fragment_reward_slash_details.rewardDetailValidator
 
 private const val KEY_REWARD = "KEY_REWARD"
@@ -39,11 +42,11 @@ class RewardDetailFragment : BaseFragment<RewardDetailViewModel>() {
     override fun initViews() {
         rewardDetailToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        rewardDetailHash.setWholeClickListener {
+        rewardDetailEvent.setOnClickListener {
             viewModel.eventIdClicked()
         }
 
-        rewardDetailValidator.setWholeClickListener {
+        rewardDetailValidator.setOnClickListener {
             viewModel.validatorAddressClicked()
         }
     }
@@ -60,38 +63,29 @@ class RewardDetailFragment : BaseFragment<RewardDetailViewModel>() {
             .inject(this)
     }
 
-    private fun amountColorRes(operation: OperationParcelizeModel.Reward) = when {
-        operation.isReward -> R.color.green
-        else -> R.color.white
-    }
-
     override fun subscribe(viewModel: RewardDetailViewModel) {
         setupExternalActions(viewModel)
 
         with(viewModel.operation) {
-            rewardDetailHash.setMessage(eventId)
-            rewardDetailDate.text = time.formatDateTime(requireContext())
-            rewardDetailReward.text = amount
-            rewardDetailReward.setTextColorRes(amountColorRes(this))
+            rewardDetailEvent.showValue(eventId)
+            rewardDetailToolbar.setTitle(time.formatDateTime(requireContext()))
+            rewardDetailAmount.text = amount
 
-            if (isReward) {
-                rewardDetailRewardLabel.setText(R.string.staking_reward)
-            } else {
-                rewardDetailRewardLabel.setText(R.string.staking_slash)
-            }
+            rewardDetailEra.showValue(era)
+
+            rewardDetailStatus.showOperationStatus(statusAppearance)
+
+            rewardDetailType.showValue(type)
         }
 
-        viewModel.validatorAddressModelLiveData.observe { addressModel ->
+        viewModel.validatorAddressModelFlow.observe { addressModel ->
             if (addressModel != null) {
-                rewardDetailValidator.setMessage(addressModel.nameOrAddress)
-                rewardDetailValidator.setTextIcon(addressModel.image)
+                rewardDetailValidator.showAddress(addressModel)
             } else {
                 rewardDetailValidator.makeGone()
             }
         }
 
-        viewModel.eraLiveData.observe {
-            rewardDetailEra.text = it
-        }
+        viewModel.chainUi.observe(rewardDetailNetwork::showChain)
     }
 }
