@@ -44,7 +44,6 @@ class TransactionDetailViewModel(
         .inBackground()
         .share()
 
-
     val transferDirection = if (operation.isIncome) R.drawable.ic_arrow_down else R.drawable.ic_arrow_up
 
     val chainUi = flowOf {
