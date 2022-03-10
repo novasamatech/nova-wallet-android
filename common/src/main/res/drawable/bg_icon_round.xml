@@ -3,6 +3,6 @@
     <corners android:radius="999dp" />
     <solid android:color="@color/white_16" />
     <stroke
-        android:width="0.5dp"
+        android:width="1dp"
         android:color="@color/white_8" />
 </shape>
