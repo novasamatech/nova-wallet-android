@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_assets.presentation.transaction.detail.reward
 
-import androidx.lifecycle.liveData
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.createAddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
@@ -31,23 +30,17 @@ class RewardDetailViewModel(
         chainRegistry.getChain(operation.chainId)
     }
 
-    val validatorAddressModelFlow = liveData {
-        val icon = operation.validator?.let { getIcon(it) }
-
-        emit(icon)
+    val validatorAddressModelFlow = flowOf {
+        operation.validator?.let { getIcon(it) }
     }
+        .inBackground()
+        .share()
 
     val chainUi = flowOf {
         mapChainToUi(chain())
     }
         .inBackground()
         .share()
-
-    private suspend fun getIcon(address: String) = addressIconGenerator.createAddressModel(
-        address,
-        AddressIconGenerator.SIZE_BIG,
-        addressDisplayUseCase(chain(), address)
-    )
 
     fun backClicked() {
         router.back()
@@ -66,4 +59,10 @@ class RewardDetailViewModel(
     private fun shoExternalActions(type: ExternalActions.Type) = launch {
         externalActions.showExternalActions(type, chain())
     }
+
+    private suspend fun getIcon(address: String) = addressIconGenerator.createAddressModel(
+        address,
+        AddressIconGenerator.SIZE_BIG,
+        addressDisplayUseCase(chain(), address)
+    )
 }
