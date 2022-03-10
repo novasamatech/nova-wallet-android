@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
+import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
@@ -27,6 +28,7 @@ class RootFeatureHolder @Inject constructor(
             .accountFeatureApi(getFeature(AccountFeatureApi::class.java))
             .walletFeatureApi(getFeature(WalletFeatureApi::class.java))
             .stakingFeatureApi(getFeature(StakingFeatureApi::class.java))
+            .assetsFeatureApi(getFeature(AssetsFeatureApi::class.java))
             .crowdloanFeatureApi(getFeature(CrowdloanFeatureApi::class.java))
             .runtimeApi(getFeature(RuntimeApi::class.java))
             .build()

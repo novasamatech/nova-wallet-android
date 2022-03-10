@@ -102,7 +102,7 @@ suspend fun ChainRegistry.asset(chainId: String, assetId: Int): Chain.Asset {
 
 suspend fun ChainRegistry.getRuntime(chainId: String) = getRuntimeProvider(chainId).get()
 
-suspend fun ChainRegistry.getSocket(chainId: String) = getConnection(chainId).socketService
+fun ChainRegistry.getSocket(chainId: String) = getConnection(chainId).socketService
 
 fun ChainRegistry.getService(chainId: String) = ChainService(
     runtimeProvider = getRuntimeProvider(chainId),

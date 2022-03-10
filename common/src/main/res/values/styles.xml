@@ -23,9 +23,20 @@
         <item name="android:letterSpacing">0.06</item>
     </style>
 
+    <style name="TextAppearance.NovaFoundation.SemiBold.Caps2">
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:letterSpacing">0.06</item>
+    </style>
+
     <style name="TextAppearance.NovaFoundation.SemiBold.Body">
         <item name="android:textSize">17sp</item>
         <item name="lineHeight">22sp</item>
+    </style>
+
+    <style name="TextAppearance.NovaFoundation.SemiBold.Footnote">
+        <item name="android:textSize">13sp</item>
+        <item name="lineHeight">18sp</item>
     </style>
 
     <!-- Bold -->
@@ -209,6 +220,14 @@
         <item name="android:background">@drawable/divider_drawable</item>
         <item name="android:textAppearance">@style/TextAppearance.NovaFoundation.Body1</item>
         <item name="android:textColor">@color/gray1</item>
+    </style>
+
+    <style name="Widget.Nova.Counter" parent="">
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingTop">1.5dp</item>
+        <item name="android:paddingEnd">8dp</item>
+        <item name="android:paddingBottom">2.5dp</item>
+        <item name="android:textColor">@color/white_80</item>
     </style>
 
     <!-- Buttons -->

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="16dp"
+    android:paddingTop="11dp"
+    android:paddingBottom="9dp"
+    android:paddingEnd="16dp"
+    tools:background="@color/black_48">
+
+   <io.novafoundation.nova.feature_account_api.view.ChainChipView
+       android:layout_width="wrap_content"
+       android:id="@+id/itemAssetGroupChain"
+       android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/itemAssetGroupBalance"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|center_vertical"
+        tools:text="$703.51" />
+</FrameLayout>

@@ -1,9 +1,9 @@
 package io.novafoundation.nova.runtime.storage.source
 
 import io.novafoundation.nova.common.data.network.runtime.binding.Binder
-import io.novafoundation.nova.common.data.network.runtime.binding.BinderWithKey
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.common.data.network.runtime.binding.NonNullBinder
+import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import kotlinx.coroutines.flow.Flow
 import java.io.OutputStream
@@ -20,25 +20,11 @@ interface StorageDataSource {
         binding: Binder<T>,
     ): T
 
-    suspend fun <K, T> queryKeys(
-        chainId: String,
-        keysBuilder: (RuntimeSnapshot) -> Map<StorageKey, K>,
-        at: BlockHash? = null,
-        binding: Binder<T>,
-    ): Map<K, T>
-
     fun <T> observe(
         chainId: String,
         keyBuilder: (RuntimeSnapshot) -> StorageKey,
         binder: Binder<T>,
     ): Flow<T>
-
-    suspend fun <K, T> queryByPrefix(
-        chainId: String,
-        prefixKeyBuilder: (RuntimeSnapshot) -> StorageKey,
-        keyExtractor: (String) -> K,
-        binding: BinderWithKey<T, K>,
-    ): Map<K, T>
 
     suspend fun <T> queryChildState(
         chainId: String,
@@ -46,6 +32,12 @@ interface StorageDataSource {
         childKeyBuilder: ChildKeyBuilder,
         binder: Binder<T>
     ): T
+
+    suspend fun <R> query(
+        chainId: String,
+        at: BlockHash? = null,
+        query: suspend StorageQueryContext.() -> R
+    ): R
 }
 
 suspend inline fun <T> StorageDataSource.queryNonNull(

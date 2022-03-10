@@ -263,6 +263,8 @@ inline fun Context.useAttributes(
     typedArray.recycle()
 }
 
+fun TypedArray.getResourceIdOrNull(@StyleableRes index: Int) = getResourceId(index, 0).takeIf { it != 0 }
+
 fun View.applyBarMargin() = applyInsetter {
     type(statusBars = true) {
         margin()

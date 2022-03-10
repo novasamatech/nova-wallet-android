@@ -3,7 +3,7 @@ package io.novafoundation.nova.app.root.domain
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
-import io.novafoundation.nova.feature_wallet_impl.data.buyToken.ExternalProvider
+import io.novafoundation.nova.feature_assets.data.buyToken.ExternalProvider
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 

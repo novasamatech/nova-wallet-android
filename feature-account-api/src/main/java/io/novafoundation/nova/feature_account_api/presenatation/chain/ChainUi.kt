@@ -1,5 +1,8 @@
 package io.novafoundation.nova.feature_account_api.presenatation.chain
 
+import android.content.Context
+import io.novafoundation.nova.common.view.shape.gradientDrawable
+
 data class ChainUi(
     val id: String,
     val name: String,
@@ -19,3 +22,10 @@ data class GradientUi(
             positions.contentEquals(other.positions)
     }
 }
+
+fun GradientUi.toDrawable(context: Context) = context.gradientDrawable(
+    colors = colors,
+    offsets = positions,
+    angle = angle,
+    cornerRadiusDp = 8
+)

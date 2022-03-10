@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    tools:parentTag="android.widget.FrameLayout">
+
+    <TextView
+        android:id="@+id/itemAssetGroupLabel"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Caps1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:includeFontPadding="false"
+        android:paddingStart="32dp"
+        android:paddingTop="4.5dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="4.5dp"
+        android:textColor="@color/white_80"
+        tools:background="@color/white_16"
+        tools:text="Polkadot" />
+
+    <ImageView
+        android:id="@+id/itemAssetGroupLabelIcon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:padding="1.5dp"
+        tools:background="@color/colorAccent"
+        tools:src="@drawable/ic_polkadot_24" />
+
+</merge>

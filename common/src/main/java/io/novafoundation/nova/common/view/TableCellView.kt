@@ -1,19 +1,31 @@
 package io.novafoundation.nova.common.view
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.View
+import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.Group
+import coil.ImageLoader
+import coil.load
+import coil.transform.RoundedCornersTransformation
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.dpF
+import io.novafoundation.nova.common.utils.getResourceIdOrNull
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
+import io.novafoundation.nova.common.utils.setDrawableEnd
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.common.utils.useAttributes
 import kotlinx.android.synthetic.main.view_table_cell.view.tableCellContent
+import kotlinx.android.synthetic.main.view_table_cell.view.tableCellImage
 import kotlinx.android.synthetic.main.view_table_cell.view.tableCellTitle
 import kotlinx.android.synthetic.main.view_table_cell.view.tableCellValueDivider
 import kotlinx.android.synthetic.main.view_table_cell.view.tableCellValuePrimary
@@ -35,28 +47,25 @@ open class TableCellView @JvmOverloads constructor(
     val valueSecondary: TextView
         get() = tableCellValueSecondary
 
+    val image: ImageView
+        get() = tableCellImage
+
     private val valueProgress: ProgressBar
         get() = tableCellValueProgress
 
     private val contentGroup: Group
         get() = tableCellContent
 
+    private val imageLoader: ImageLoader by lazy(LazyThreadSafetyMode.NONE) {
+        FeatureUtils.getCommonApi(context).imageLoader()
+    }
+
     init {
         View.inflate(context, R.layout.view_table_cell, this)
 
+        setBackgroundResource(R.drawable.bg_primary_list_item)
+
         attrs?.let { applyAttributes(it) }
-    }
-
-    private fun applyAttributes(attrs: AttributeSet) {
-        val typedArray = context.obtainStyledAttributes(attrs, R.styleable.TableCellView)
-
-        val title = typedArray.getString(R.styleable.TableCellView_title)
-        setTitle(title)
-
-        val dividerVisible = typedArray.getBoolean(R.styleable.TableCellView_dividerVisible, true)
-        setDividerVisible(dividerVisible)
-
-        typedArray.recycle()
     }
 
     fun setTitle(titleRes: Int) {
@@ -65,6 +74,20 @@ open class TableCellView @JvmOverloads constructor(
 
     fun setTitle(title: String?) {
         tableCellTitle.text = title
+    }
+
+    fun setImage(src: Drawable) {
+        image.setImageDrawable(src)
+        image.makeVisible()
+    }
+
+    fun loadImage(url: String?) {
+        url?.let {
+            image.makeVisible()
+            image.load(url, imageLoader) {
+                transformations(RoundedCornersTransformation(10.dpF(context)))
+            }
+        }
     }
 
     fun showProgress() {
@@ -80,6 +103,10 @@ open class TableCellView @JvmOverloads constructor(
         tableCellValueDivider.setBackgroundColor(context.getColor(colorRes))
     }
 
+    fun setPrimaryValueIcon(@DrawableRes icon: Int, @ColorRes tint: Int? = null) {
+        tableCellValuePrimary.setDrawableEnd(icon, widthInDp = 16, paddingInDp = 8, tint = tint)
+    }
+
     fun showValue(primary: String, secondary: String? = null) {
         contentGroup.makeVisible()
 
@@ -87,5 +114,21 @@ open class TableCellView @JvmOverloads constructor(
         valueSecondary.setTextOrHide(secondary)
 
         valueProgress.makeGone()
+    }
+
+    private fun applyAttributes(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.TableCellView) { typedArray ->
+        val title = typedArray.getString(R.styleable.TableCellView_title)
+        setTitle(title)
+
+        val dividerVisible = typedArray.getBoolean(R.styleable.TableCellView_dividerVisible, true)
+        setDividerVisible(dividerVisible)
+
+        val primaryValueIcon = typedArray.getResourceIdOrNull(R.styleable.TableCellView_primaryValueIcon)
+
+        primaryValueIcon?.let {
+            val primaryValueIconTint = typedArray.getResourceIdOrNull(R.styleable.TableCellView_primaryValueIconTint)
+
+            setPrimaryValueIcon(primaryValueIcon, primaryValueIconTint)
+        }
     }
 }

@@ -32,6 +32,6 @@
     <fragment
         android:id="@+id/walletFragment"
         tools:layout="@layout/fragment_balance_list"
-        android:name="io.novafoundation.nova.feature_wallet_impl.presentation.balance.list.BalanceListFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.balance.list.BalanceListFragment"
         android:label="WalletFragment" />
 </navigation>
