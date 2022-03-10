@@ -1,15 +1,15 @@
 package io.novafoundation.nova.feature_assets.presentation.model
 
-import android.graphics.drawable.Drawable
 import androidx.annotation.ColorRes
+import io.novafoundation.nova.common.utils.images.Icon
 
 class OperationModel(
     val id: String,
-    val time: Long,
+    val formattedTime: String,
     val amount: String,
     @ColorRes val amountColorRes: Int,
     val header: String,
     val statusAppearance: OperationStatusAppearance,
-    val operationIcon: Drawable,
+    val operationIcon: Icon,
     val subHeader: String
 )

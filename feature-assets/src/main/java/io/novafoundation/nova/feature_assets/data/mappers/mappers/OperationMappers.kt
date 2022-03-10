@@ -1,9 +1,9 @@
 package io.novafoundation.nova.feature_assets.data.mappers.mappers
 
-import io.novafoundation.nova.common.address.AddressIconGenerator
+import androidx.annotation.DrawableRes
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.images.asIcon
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
-import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAddressIcon
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.model.OperationModel
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
@@ -66,28 +66,33 @@ private fun String.camelCaseToCapitalizedWords() = CAMEL_CASE_REGEX.split(this).
 private fun Operation.Type.Extrinsic.formattedCall() = call.camelCaseToCapitalizedWords()
 private fun Operation.Type.Extrinsic.formattedModule() = module.camelCaseToCapitalizedWords()
 
+@DrawableRes
+private fun Operation.Type.Transfer.transferDirectionIcon() : Int {
+    return if (isIncome) R.drawable.ic_arrow_down else R.drawable.ic_arrow_up
+}
+
 suspend fun mapOperationToOperationModel(
     chain: Chain,
     operation: Operation,
     nameIdentifier: AddressDisplayUseCase.Identifier,
     resourceManager: ResourceManager,
-    iconGenerator: AddressIconGenerator,
 ): OperationModel {
     val statusAppearance = mapStatusToStatusAppearance(operation.type.operationStatus)
+    val formattedTime = resourceManager.formatTime(operation.time)
 
     return with(operation) {
         when (val operationType = type) {
             is Operation.Type.Reward -> {
                 OperationModel(
                     id = id,
-                    time = time,
+                    formattedTime = formattedTime,
                     amount = formatAmount(chainAsset, operationType),
                     amountColorRes = if (operationType.isReward) R.color.green else R.color.white,
                     header = resourceManager.getString(
                         if (operationType.isReward) R.string.staking_reward else R.string.staking_slash
                     ),
                     statusAppearance = statusAppearance,
-                    operationIcon = resourceManager.getDrawable(R.drawable.ic_staking),
+                    operationIcon = resourceManager.getDrawable(R.drawable.ic_staking_filled).asIcon(),
                     subHeader = resourceManager.getString(R.string.tabbar_staking_title),
                 )
             }
@@ -101,12 +106,12 @@ suspend fun mapOperationToOperationModel(
 
                 OperationModel(
                     id = id,
-                    time = time,
+                    formattedTime = formattedTime,
                     amount = formatAmount(chainAsset, operationType),
                     amountColorRes = amountColor,
                     header = nameIdentifier.nameOrAddress(operationType.displayAddress),
                     statusAppearance = statusAppearance,
-                    operationIcon = iconGenerator.createAddressIcon(chain, operationType.displayAddress, AddressIconGenerator.SIZE_BIG),
+                    operationIcon = resourceManager.getDrawable(operationType.transferDirectionIcon()).asIcon(),
                     subHeader = resourceManager.getString(R.string.transfer_title),
                 )
             }
@@ -117,12 +122,12 @@ suspend fun mapOperationToOperationModel(
 
                 OperationModel(
                     id = id,
-                    time = time,
+                    formattedTime = formattedTime,
                     amount = formatFee(chainAsset, operationType),
                     amountColorRes = amountColor,
                     header = operationType.formattedCall(),
                     statusAppearance = statusAppearance,
-                    operationIcon = resourceManager.getDrawable(R.drawable.ic_code),
+                    operationIcon = chain.icon.asIcon(),
                     subHeader = operationType.formattedModule()
                 )
             }
@@ -154,7 +159,8 @@ suspend fun mapOperationToParcel(
                     sender = operationType.sender,
                     fee = feeFormatted,
                     isIncome = operationType.isIncome,
-                    statusAppearance = mapStatusToStatusAppearance(operationType.operationStatus)
+                    statusAppearance = mapStatusToStatusAppearance(operationType.operationStatus),
+                    transferDirectionIcon = operationType.transferDirectionIcon()
                 )
             }
 

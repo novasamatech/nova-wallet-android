@@ -9,10 +9,10 @@ import coil.ImageLoader
 import coil.clear
 import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
+import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contributions.model.ContributionModel
-import io.novafoundation.nova.feature_crowdloan_impl.presentation.model.setIcon
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_contribution.view.itemContributionAmount
 import kotlinx.android.synthetic.main.item_contribution.view.itemContributionIcon

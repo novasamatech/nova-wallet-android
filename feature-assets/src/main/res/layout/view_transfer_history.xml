@@ -8,23 +8,23 @@
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
     <ImageView
+        android:id="@+id/transactionHistoryPuller"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:id="@+id/transactionHistoryPuller"
-        android:src="@drawable/ic_bottom_sheet_pin"
         android:layout_marginTop="2dp"
+        android:src="@drawable/ic_bottom_sheet_pin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/transactionHistoryTitle"
-        style="@style/TextAppearance.NovaFoundation.Body0"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="20dp"
         android:text="@string/history_v1.9.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -33,23 +33,24 @@
         android:id="@+id/transactionHistoryList"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="16dp"
-        android:visibility="gone"
+        android:layout_marginTop="2dp"
         android:overScrollMode="never"
+        android:visibility="gone"
         app:layoutManager="io.novafoundation.nova.common.view.recyclerview.LinearLayoutManagerFixed"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/transactionHistoryTitle"
-        tools:listitem="@layout/item_transaction" />
+        tools:listitem="@layout/item_transaction"
+        tools:visibility="visible" />
 
     <ImageView
         android:id="@+id/placeholderIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="64dp"
         android:src="@drawable/ic_placeholder"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="64dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/transactionHistoryTitle" />
 
@@ -69,29 +70,30 @@
 
     <androidx.constraintlayout.widget.Group
         android:id="@+id/placeholder"
-        android:visibility="visible"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="visible"
         app:constraint_referenced_ids="placeholderIcon,placeholderText" />
 
     <ImageView
         android:id="@+id/transactionHistoryFilter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/transactionHistoryTitle"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_filter" />
+        app:layout_constraintTop_toTopOf="@+id/transactionHistoryTitle"
+        app:srcCompat="@drawable/ic_filter"
+        app:tint="@color/actions_color" />
 
     <ProgressBar
         android:id="@+id/transactionHistoryProgress"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        app:layout_constraintTop_toBottomOf="@id/transactionHistoryTitle"
-        android:indeterminate="true"
         android:layout_marginTop="16dp"
+        android:indeterminate="true"
         android:indeterminateTint="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/transactionHistoryTitle" />
 </merge>

@@ -2,16 +2,17 @@ package io.novafoundation.nova.feature_assets.presentation.transaction.history
 
 import android.view.View
 import android.view.ViewGroup
-import io.novafoundation.nova.feature_assets.R
+import coil.ImageLoader
 import io.novafoundation.nova.common.list.BaseGroupedDiffCallback
 import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
-import io.novafoundation.nova.common.utils.formatDateTime
 import io.novafoundation.nova.common.utils.formatDaysSinceEpoch
+import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setTextColorRes
+import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.model.OperationModel
 import io.novafoundation.nova.feature_assets.presentation.model.OperationStatusAppearance
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.model.DayHeader
@@ -24,10 +25,12 @@ import kotlinx.android.synthetic.main.item_transaction.view.itemTransactionSubHe
 import kotlinx.android.synthetic.main.item_transaction.view.itemTransactionTime
 
 class TransactionHistoryAdapter(
-    private val handler: Handler
+    private val handler: Handler,
+    private val imageLoader: ImageLoader,
 ) : GroupedListAdapter<DayHeader, OperationModel>(TransactionHistoryDiffCallback) {
 
     interface Handler {
+
         fun transactionClicked(transactionModel: OperationModel)
     }
 
@@ -36,7 +39,7 @@ class TransactionHistoryAdapter(
     }
 
     override fun createChildViewHolder(parent: ViewGroup): GroupedListHolder {
-        return TransactionHolder(parent.inflateChild(R.layout.item_transaction))
+        return TransactionHolder(parent.inflateChild(R.layout.item_transaction), imageLoader)
     }
 
     override fun bindGroup(holder: GroupedListHolder, group: DayHeader) {
@@ -48,7 +51,7 @@ class TransactionHistoryAdapter(
     }
 }
 
-class TransactionHolder(view: View) : GroupedListHolder(view) {
+class TransactionHolder(view: View, private val imageLoader: ImageLoader) : GroupedListHolder(view) {
     fun bind(item: OperationModel, handler: TransactionHistoryAdapter.Handler) {
         with(containerView) {
             with(item) {
@@ -57,7 +60,7 @@ class TransactionHolder(view: View) : GroupedListHolder(view) {
                 itemTransactionAmount.setTextColorRes(amountColorRes)
                 itemTransactionAmount.text = amount
 
-                itemTransactionTime.text = time.formatDateTime(context)
+                itemTransactionTime.text = formattedTime
 
                 itemTransactionSubHeader.text = subHeader
 
@@ -71,7 +74,7 @@ class TransactionHolder(view: View) : GroupedListHolder(view) {
                 setOnClickListener { handler.transactionClicked(this) }
             }
 
-            itemTransactionIcon.setImageDrawable(item.operationIcon)
+            itemTransactionIcon.setIcon(item.operationIcon, imageLoader)
         }
     }
 }

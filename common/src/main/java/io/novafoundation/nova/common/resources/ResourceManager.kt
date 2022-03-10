@@ -21,8 +21,8 @@ interface ResourceManager {
     fun measureInPx(dp: Int): Int
 
     fun formatDate(timestamp: Long): String
-
     fun formatDuration(elapsedTime: Long): String
+    fun formatTime(timestamp: Long): String
 
     fun getDrawable(@DrawableRes id: Int): Drawable
 }

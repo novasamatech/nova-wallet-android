@@ -53,6 +53,10 @@ class ResourceManagerImpl(
         return timestamp.formatDateTime(contextManager.getContext()).toString()
     }
 
+    override fun formatTime(timestamp: Long): String {
+        return DateUtils.formatDateTime(contextManager.getContext(), timestamp, DateUtils.FORMAT_SHOW_TIME)
+    }
+
     @OptIn(ExperimentalTime::class)
     override fun formatDuration(elapsedTime: Long): String {
         val inDays = elapsedTime.daysFromMillis().toInt()
