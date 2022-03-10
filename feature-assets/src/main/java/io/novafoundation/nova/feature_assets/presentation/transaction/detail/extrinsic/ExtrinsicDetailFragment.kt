@@ -8,6 +8,7 @@ import coil.load
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.formatDateTime
+import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_account_api.view.showChain
@@ -75,7 +76,10 @@ class ExtrinsicDetailFragment : BaseFragment<ExtrinsicDetailViewModel>() {
 
         with(viewModel.operation) {
             extrinsicDetailHash.showValue(hash)
+
             extrinsicDetailStatus.showOperationStatus(statusAppearance)
+            extrinsicDetailAmount.setTextColorRes(statusAppearance.amountTint)
+
             extrinsicDetailToolbar.setTitle(time.formatDateTime(requireContext()))
             extrinsicDetailModule.showValue(module)
             extrinsicDetailCall.showValue(call)
