@@ -34,7 +34,7 @@ suspend fun AddressIconGenerator.createAddressModel(
     sizeInDp: Int,
     addressDisplayUseCase: AddressDisplayUseCase,
     @ColorRes background: Int = AddressIconGenerator.BACKGROUND_DEFAULT,
-    ): AddressModel {
+): AddressModel {
     val icon = createAddressIcon(accountId, sizeInDp, background)
     val address = chain.addressOf(accountId)
 

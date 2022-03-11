@@ -13,4 +13,3 @@ class SingularV2CollectionMetadata(
     @SerializedName("image", alternate = ["mediaUri"])
     val image: String
 )
-

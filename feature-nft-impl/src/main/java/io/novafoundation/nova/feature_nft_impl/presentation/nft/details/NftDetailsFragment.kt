@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setTextOrHide
+import io.novafoundation.nova.common.view.dialog.errorDialog
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_account_api.view.showChain
@@ -114,6 +115,12 @@ class NftDetailsFragment : BaseFragment<NftDetailsViewModel>() {
             }
 
             nftDetailsChain.showChain(it.network)
+        }
+
+        viewModel.exitingErrorLiveData.observeEvent {
+            errorDialog(requireContext(), onConfirm = viewModel::backClicked) {
+                setMessage(it)
+            }
         }
     }
 }

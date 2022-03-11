@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_nft_impl.di
 import coil.ImageLoader
 import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core_db.dao.NftDao
@@ -50,4 +51,6 @@ interface NftFeatureDependencies {
 
     @Named(REMOTE_STORAGE_SOURCE)
     fun remoteStorageSource(): StorageDataSource
+
+    fun exceptionHandler(): HttpExceptionHandler
 }
