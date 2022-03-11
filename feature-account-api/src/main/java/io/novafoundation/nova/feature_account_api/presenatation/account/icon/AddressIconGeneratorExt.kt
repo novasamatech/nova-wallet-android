@@ -45,6 +45,6 @@ suspend fun AddressIconGenerator.createAddressIcon(
     address: String,
     sizeInDp: Int,
     @ColorRes background: Int = AddressIconGenerator.BACKGROUND_DEFAULT,
-    ): Drawable {
+): Drawable {
     return createAddressIcon(chain.accountIdOf(address), sizeInDp, background)
 }
