@@ -21,12 +21,17 @@ interface AddressIconGenerator {
         const val SIZE_SMALL = 18
         const val SIZE_MEDIUM = 24
         const val SIZE_BIG = 32
+
+        val BACKGROUND_LIGHT = R.color.account_icon_light
+        val BACKGROUND_TRANSPARENT = android.R.color.transparent
+
+        val BACKGROUND_DEFAULT = BACKGROUND_LIGHT
     }
 
     suspend fun createAddressIcon(
         accountId: AccountId,
         sizeInDp: Int,
-        @ColorRes backgroundColorRes: Int = R.color.account_icon_light
+        @ColorRes backgroundColorRes: Int = BACKGROUND_DEFAULT
     ): Drawable
 }
 

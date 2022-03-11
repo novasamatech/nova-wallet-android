@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_account_api.presenatation.account.icon
 
 import android.graphics.drawable.Drawable
+import androidx.annotation.ColorRes
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
@@ -20,8 +21,9 @@ suspend fun AddressIconGenerator.createAddressModel(
     address: String,
     sizeInDp: Int,
     addressDisplayUseCase: AddressDisplayUseCase,
+    @ColorRes background: Int = AddressIconGenerator.BACKGROUND_DEFAULT,
 ): AddressModel {
-    val icon = createAddressIcon(chain, address, sizeInDp)
+    val icon = createAddressIcon(chain, address, sizeInDp, background)
 
     return AddressModel(address, icon, addressDisplayUseCase(chain, address))
 }
@@ -38,6 +40,11 @@ suspend fun AddressIconGenerator.createAddressModel(
     return AddressModel(address, icon, addressDisplayUseCase(chain, address))
 }
 
-suspend fun AddressIconGenerator.createAddressIcon(chain: Chain, address: String, sizeInDp: Int): Drawable {
-    return createAddressIcon(chain.accountIdOf(address), sizeInDp)
+suspend fun AddressIconGenerator.createAddressIcon(
+    chain: Chain,
+    address: String,
+    sizeInDp: Int,
+    @ColorRes background: Int = AddressIconGenerator.BACKGROUND_DEFAULT,
+    ): Drawable {
+    return createAddressIcon(chain.accountIdOf(address), sizeInDp, background)
 }
