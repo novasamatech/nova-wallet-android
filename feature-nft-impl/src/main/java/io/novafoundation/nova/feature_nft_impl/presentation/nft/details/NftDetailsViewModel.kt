@@ -14,6 +14,8 @@ import io.novafoundation.nova.feature_nft_impl.domain.nft.details.NftDetailsInte
 import io.novafoundation.nova.feature_nft_impl.domain.nft.details.PricedNftDetails
 import io.novafoundation.nova.feature_nft_impl.presentation.nft.common.formatIssuance
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -70,23 +72,21 @@ class NftDetailsViewModel(
                     media = it.media,
                 )
             },
-            owner = addressIconGenerator.createAddressModel(
-                chain = nftDetails.chain,
-                accountId = nftDetails.owner,
-                sizeInDp = AddressIconGenerator.SIZE_MEDIUM,
-                addressDisplayUseCase = addressDisplayUseCase
-            ),
+            owner = createAddressModel(nftDetails.owner, nftDetails.chain),
             creator = nftDetails.creator?.let {
-                addressIconGenerator.createAddressModel(
-                    chain = nftDetails.chain,
-                    accountId = it,
-                    sizeInDp = AddressIconGenerator.SIZE_MEDIUM,
-                    addressDisplayUseCase = addressDisplayUseCase
-                )
+                createAddressModel(it, nftDetails.chain)
             },
             network = mapChainToUi(nftDetails.chain)
         )
     }
+
+    private suspend fun createAddressModel(accountId: AccountId, chain: Chain) = addressIconGenerator.createAddressModel(
+        chain = chain,
+        accountId = accountId,
+        sizeInDp = AddressIconGenerator.SIZE_MEDIUM,
+        addressDisplayUseCase = addressDisplayUseCase,
+        background = AddressIconGenerator.BACKGROUND_TRANSPARENT
+    )
 
     fun backClicked() {
         router.back()
