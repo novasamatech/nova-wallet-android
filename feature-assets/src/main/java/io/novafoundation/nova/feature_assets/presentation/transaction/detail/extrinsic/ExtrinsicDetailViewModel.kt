@@ -1,11 +1,13 @@
 package io.novafoundation.nova.feature_assets.presentation.transaction.detail.extrinsic
 
-import androidx.lifecycle.liveData
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.createAddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
+import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.invoke
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -28,9 +30,17 @@ class ExtrinsicDetailViewModel(
         chainRegistry.getChain(operation.chainId)
     }
 
-    val fromAddressModelLiveData = liveData {
-        emit(getIcon(operation.originAddress))
+    val senderAddressModelFlow = flowOf {
+        getIcon(operation.originAddress)
     }
+        .inBackground()
+        .share()
+
+    val chainUi = flowOf {
+        mapChainToUi(chain())
+    }
+        .inBackground()
+        .share()
 
     private suspend fun getIcon(address: String) = addressIconGenerator.createAddressModel(
         address,

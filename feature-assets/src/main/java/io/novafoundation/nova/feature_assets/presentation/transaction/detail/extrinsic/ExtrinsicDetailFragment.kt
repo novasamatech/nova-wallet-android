@@ -3,32 +3,43 @@ package io.novafoundation.nova.feature_assets.presentation.transaction.detail.ex
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import io.novafoundation.nova.feature_assets.R
+import coil.ImageLoader
+import coil.load
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.formatDateTime
+import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
+import io.novafoundation.nova.feature_account_api.view.showAddress
+import io.novafoundation.nova.feature_account_api.view.showChain
+import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
+import io.novafoundation.nova.feature_assets.presentation.model.showOperationStatus
+import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailAmount
 import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailCall
-import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailDate
-import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailFee
-import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailFrom
 import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailHash
+import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailIcon
 import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailModule
+import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailNetwork
+import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailSender
 import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailStatus
-import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailStatusIcon
 import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailToolbar
+import javax.inject.Inject
 
 private const val KEY_EXTRINSIC = "KEY_EXTRINSIC"
 
 class ExtrinsicDetailFragment : BaseFragment<ExtrinsicDetailViewModel>() {
+
     companion object {
         fun getBundle(operation: OperationParcelizeModel.Extrinsic) = Bundle().apply {
             putParcelable(KEY_EXTRINSIC, operation)
         }
     }
+
+    @Inject
+    lateinit var imageLoader: ImageLoader
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,11 +50,11 @@ class ExtrinsicDetailFragment : BaseFragment<ExtrinsicDetailViewModel>() {
     override fun initViews() {
         extrinsicDetailToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        extrinsicDetailHash.setWholeClickListener {
+        extrinsicDetailHash.setOnClickListener {
             viewModel.extrinsicClicked()
         }
 
-        extrinsicDetailFrom.setWholeClickListener {
+        extrinsicDetailSender.setOnClickListener {
             viewModel.fromAddressClicked()
         }
     }
@@ -64,18 +75,24 @@ class ExtrinsicDetailFragment : BaseFragment<ExtrinsicDetailViewModel>() {
         setupExternalActions(viewModel)
 
         with(viewModel.operation) {
-            extrinsicDetailHash.setMessage(hash)
-            extrinsicDetailStatus.setText(statusAppearance.labelRes)
-            extrinsicDetailStatusIcon.setImageResource(statusAppearance.icon)
-            extrinsicDetailDate.text = time.formatDateTime(requireContext())
-            extrinsicDetailModule.text = module
-            extrinsicDetailCall.text = call
-            extrinsicDetailFee.text = fee
+            extrinsicDetailHash.showValue(hash)
+
+            extrinsicDetailStatus.showOperationStatus(statusAppearance)
+            extrinsicDetailAmount.setTextColorRes(statusAppearance.amountTint)
+
+            extrinsicDetailToolbar.setTitle(time.formatDateTime(requireContext()))
+            extrinsicDetailModule.showValue(module)
+            extrinsicDetailCall.showValue(call)
+
+            extrinsicDetailAmount.text = fee
         }
 
-        viewModel.fromAddressModelLiveData.observe { addressModel ->
-            extrinsicDetailFrom.setMessage(addressModel.nameOrAddress)
-            extrinsicDetailFrom.setTextIcon(addressModel.image)
+        viewModel.senderAddressModelFlow.observe(extrinsicDetailSender::showAddress)
+
+        viewModel.chainUi.observe {
+            extrinsicDetailNetwork.showChain(it)
+
+            extrinsicDetailIcon.load(it.icon, imageLoader)
         }
     }
 }
