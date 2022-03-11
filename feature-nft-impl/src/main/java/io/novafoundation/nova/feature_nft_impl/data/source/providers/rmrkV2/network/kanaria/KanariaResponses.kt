@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV2.network
+package io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV2.network.kanaria
 
 import com.google.gson.annotations.SerializedName
 import java.math.BigInteger
