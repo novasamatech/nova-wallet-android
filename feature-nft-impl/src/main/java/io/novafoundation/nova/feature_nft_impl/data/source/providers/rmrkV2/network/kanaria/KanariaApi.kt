@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV2.network
+package io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV2.network.kanaria
 
 import io.novafoundation.nova.common.data.network.http.CacheControl
 import retrofit2.http.GET
@@ -6,7 +6,7 @@ import retrofit2.http.Headers
 import retrofit2.http.Path
 import retrofit2.http.Url
 
-interface RmrkV2Api {
+interface KanariaApi {
 
     companion object {
         const val BASE_URL = "https://kanaria.rmrk.app/api/rmrk2/"

@@ -13,7 +13,9 @@ import io.novafoundation.nova.feature_nft_impl.data.mappers.nftIssuance
 import io.novafoundation.nova.feature_nft_impl.data.mappers.nftPrice
 import io.novafoundation.nova.feature_nft_impl.data.network.distributed.FileStorageAdapter.adoptFileStorageLinkToHttps
 import io.novafoundation.nova.feature_nft_impl.data.source.NftProvider
-import io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV2.network.RmrkV2Api
+import io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV2.network.kanaria.KanariaApi
+import io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV2.network.singular.SingularV2Api
+import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -22,13 +24,14 @@ import kotlinx.coroutines.flow.Flow
 class RmrkV2NftProvider(
     private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
-    private val api: RmrkV2Api,
+    private val kanariaApi: KanariaApi,
+    private val singularV2Api: SingularV2Api,
     private val nftDao: NftDao
 ) : NftProvider {
 
     override suspend fun initialNftsSync(chain: Chain, metaAccount: MetaAccount, forceOverwrite: Boolean) {
         val address = metaAccount.addressIn(chain)!!
-        val nfts = api.getBirds(address) + api.getItems(address)
+        val nfts = kanariaApi.getBirds(address) + kanariaApi.getItems(address)
 
         val toSave = nfts.map {
             NftLocal(
@@ -54,7 +57,7 @@ class RmrkV2NftProvider(
 
     override suspend fun nftFullSync(nft: Nft) {
         val metadataLink = nft.metadataRaw!!.decodeToString().adoptFileStorageLinkToHttps()
-        val metadata = api.getIpfsMetadata(metadataLink)
+        val metadata = kanariaApi.getIpfsMetadata(metadataLink)
 
         nftDao.updateNft(nft.identifier) { local ->
             local.copy(
@@ -73,17 +76,26 @@ class RmrkV2NftProvider(
             val chain = chainRegistry.getChain(nftLocal.chainId)
             val metaAccount = accountRepository.getMetaAccount(nftLocal.metaId)
 
+            val collection = singularV2Api.getCollection(nftLocal.collectionId).first()
+            val collectionMetadata = collection.metadata?.let {
+                singularV2Api.getIpfsMetadata(it.adoptFileStorageLinkToHttps())
+            }
+
             NftDetails(
                 identifier = nftLocal.identifier,
                 chain = chain,
                 owner = metaAccount.accountIdIn(chain)!!,
-                creator = null, // TODO waiting for API description from Remark team
+                creator = chain.accountIdOf(collection.issuer),
                 media = nftLocal.media,
                 name = nftLocal.name!!,
                 description = nftLocal.label,
                 issuance = nftIssuance(nftLocal),
                 price = nftPrice(nftLocal),
-                collection = null // TODO waiting for API description from Remark team
+                collection = NftDetails.Collection(
+                    id = nftLocal.collectionId,
+                    name = collectionMetadata?.name,
+                    media = collectionMetadata?.image?.adoptFileStorageLinkToHttps()
+                )
             )
         }
     }

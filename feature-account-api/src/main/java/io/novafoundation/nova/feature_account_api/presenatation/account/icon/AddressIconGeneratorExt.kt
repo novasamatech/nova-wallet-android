@@ -33,8 +33,9 @@ suspend fun AddressIconGenerator.createAddressModel(
     accountId: ByteArray,
     sizeInDp: Int,
     addressDisplayUseCase: AddressDisplayUseCase,
+    @ColorRes background: Int = AddressIconGenerator.BACKGROUND_DEFAULT,
 ): AddressModel {
-    val icon = createAddressIcon(accountId, sizeInDp)
+    val icon = createAddressIcon(accountId, sizeInDp, background)
     val address = chain.addressOf(accountId)
 
     return AddressModel(address, icon, addressDisplayUseCase(chain, address))

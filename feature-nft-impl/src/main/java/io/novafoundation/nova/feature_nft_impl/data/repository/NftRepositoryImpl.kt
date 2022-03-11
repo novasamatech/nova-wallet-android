@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_nft_impl.data.repository
 
 import android.util.Log
+import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.core_db.dao.NftDao
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
@@ -13,6 +14,7 @@ import io.novafoundation.nova.feature_nft_impl.data.source.NftProvidersRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
@@ -28,6 +30,7 @@ class NftRepositoryImpl(
     private val chainRegistry: ChainRegistry,
     private val jobOrchestrator: JobOrchestrator,
     private val nftDao: NftDao,
+    private val exceptionHandler: HttpExceptionHandler,
 ) : NftRepository {
 
     override fun allNftFlow(metaAccount: MetaAccount): Flow<List<Nft>> {
@@ -47,7 +50,7 @@ class NftRepositoryImpl(
             val nftProvider = nftProvidersRegistry.get(nftTypeKey)
 
             emitAll(nftProvider.nftDetailsFlow(nftId))
-        }
+        }.catch { throw exceptionHandler.transformException(it) }
     }
 
     override suspend fun initialNftSync(
