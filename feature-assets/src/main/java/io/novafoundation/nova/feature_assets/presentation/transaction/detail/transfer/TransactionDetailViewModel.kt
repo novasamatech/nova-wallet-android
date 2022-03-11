@@ -11,7 +11,6 @@ import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.WalletRouter
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
@@ -44,8 +43,6 @@ class TransactionDetailViewModel(
         .inBackground()
         .share()
 
-    val transferDirection = if (operation.isIncome) R.drawable.ic_arrow_down else R.drawable.ic_arrow_up
-
     val chainUi = flowOf {
         mapChainToUi(chain())
     }
@@ -57,7 +54,13 @@ class TransactionDetailViewModel(
     }
 
     private suspend fun getIcon(address: String): AddressModel {
-        return addressIconGenerator.createAddressModel(chain(), address, AddressIconGenerator.SIZE_BIG, addressDisplayUseCase)
+        return addressIconGenerator.createAddressModel(
+            chain = chain(),
+            address = address,
+            sizeInDp = AddressIconGenerator.SIZE_BIG,
+            addressDisplayUseCase = addressDisplayUseCase,
+            background = AddressIconGenerator.BACKGROUND_TRANSPARENT
+        )
     }
 
     fun repeatTransaction() {

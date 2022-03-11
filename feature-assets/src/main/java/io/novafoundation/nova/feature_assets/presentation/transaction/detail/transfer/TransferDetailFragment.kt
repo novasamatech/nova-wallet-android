@@ -81,6 +81,7 @@ class TransferDetailFragment : BaseFragment<TransactionDetailViewModel>() {
 
         with(viewModel.operation) {
             transactionDetailStatus.showOperationStatus(statusAppearance)
+            transactionDetailTransferDirection.setImageResource(transferDirectionIcon)
 
             transactionDetailToolbar.setTitle(time.formatDateTime(requireContext()))
 
@@ -100,7 +101,5 @@ class TransferDetailFragment : BaseFragment<TransactionDetailViewModel>() {
         viewModel.recipientAddressModelFlow.observe(transactionDetailTo::showAddress)
 
         viewModel.chainUi.observe(transactionDetailNetwork::showChain)
-
-        transactionDetailTransferDirection.setImageResource(viewModel.transferDirection)
     }
 }
