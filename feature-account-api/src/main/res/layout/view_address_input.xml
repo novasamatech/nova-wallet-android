@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="48dp"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
+    android:layout_height="wrap_content"
+    tools:parentTag="android.widget.LinearLayout"
+    tools:gravity="center_vertical"
+    tools:orientation="horizontal"
     tools:background="@color/black">
 
     <ImageView
         android:layout_width="24dp"
+        android:layout_marginTop="13dp"
+        android:layout_marginBottom="13dp"
         android:layout_height="24dp"
         android:id="@+id/addressInputIdenticon"
         android:layout_marginStart="12dp"
@@ -70,4 +73,4 @@
         android:visibility="gone"
         app:tint="@color/white_64"
         tools:visibility="visible" />
-</LinearLayout>
+</merge>

@@ -41,6 +41,7 @@ fun Context.getInputBackground() = getCornersStateDrawable(
     focusedDrawable = getRoundedCornerDrawableFromColors(
         fillColor = getColor(R.color.white_8),
         strokeColor = getAccentColor(),
+        strokeSizeInDp = 0.5f
     ),
     idleDrawable = getRoundedCornerDrawable(R.color.white_8)
 )
@@ -56,7 +57,7 @@ fun Context.getRoundedCornerDrawable(
     @ColorRes fillColorRes: Int = R.color.black,
     @ColorRes strokeColorRes: Int? = null,
     cornerSizeInDp: Int = 10,
-    strokeSizeInDp: Int = 1,
+    strokeSizeInDp: Float = 1.0f,
 ): Drawable {
     val fillColor = getColor(fillColorRes)
     val strokeColor = strokeColorRes?.let(this::getColor)
@@ -68,7 +69,7 @@ fun Context.getTopRoundedCornerDrawable(
     @ColorRes fillColorRes: Int = R.color.black,
     @ColorRes strokeColorRes: Int? = null,
     cornerSizeInDp: Int = 10,
-    strokeSizeInDp: Int = 1,
+    strokeSizeInDp: Float = 1.0f,
 ): Drawable {
     val fillColor = getColor(fillColorRes)
     val strokeColor = strokeColorRes?.let(this::getColor)
@@ -80,7 +81,7 @@ fun Context.getTopRoundedCornerDrawableFromColors(
     @ColorInt fillColor: Int = getColor(R.color.black),
     @ColorInt strokeColor: Int? = null,
     cornerSizeInDp: Int = 10,
-    strokeSizeInDp: Int = 1,
+    strokeSizeInDp: Float = 1.0f,
 ): Drawable {
     return cornerDrawableFromColors(
         fillColor = fillColor,
@@ -100,7 +101,7 @@ fun Context.getRoundedCornerDrawableFromColors(
     @ColorInt fillColor: Int = getColor(R.color.black),
     @ColorInt strokeColor: Int? = null,
     cornerSizeInDp: Int = 10,
-    strokeSizeInDp: Int = 1,
+    strokeSizeInDp: Float = 1.0f,
 ): Drawable {
     return cornerDrawableFromColors(
         fillColor = fillColor,
@@ -119,7 +120,7 @@ private fun Context.cornerDrawableFromColors(
     @ColorInt fillColor: Int,
     @ColorInt strokeColor: Int?,
     cornerSizeInDp: Int,
-    strokeSizeInDp: Int,
+    strokeSizeInDp: Float,
     shapeBuilder: (cornerSize: Float) -> ShapeAppearanceModel
 ): Drawable {
     val density = resources.displayMetrics.density

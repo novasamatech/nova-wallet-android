@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_account_api.presenatation.mixin.addressIn
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.Gravity
 import android.view.View
 import android.widget.EditText
 import android.widget.LinearLayout
@@ -28,6 +29,7 @@ class AddressInputField @JvmOverloads constructor(
 
     init {
         orientation = HORIZONTAL
+        gravity = Gravity.CENTER_VERTICAL
 
         View.inflate(context, R.layout.view_address_input, this)
 
