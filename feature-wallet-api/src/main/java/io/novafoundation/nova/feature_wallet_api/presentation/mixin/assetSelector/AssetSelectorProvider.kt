@@ -9,7 +9,7 @@ import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBo
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapAssetToAssetModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetSelectorModel
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetModel
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -37,13 +37,13 @@ private class AssetSelectorProvider(
     private val scope: CoroutineScope,
 ) : AssetSelectorMixin.Presentation, CoroutineScope by scope {
 
-    override val showAssetChooser = MutableLiveData<Event<DynamicListBottomSheet.Payload<AssetSelectorModel>>>()
+    override val showAssetChooser = MutableLiveData<Event<DynamicListBottomSheet.Payload<AssetModel>>>()
 
     override val selectedAssetFlow: Flow<Asset> = assetUseCase.currentAssetFlow()
         .inBackground()
         .shareIn(this, SharingStarted.Eagerly, replay = 1)
 
-    override val selectedAssetModelFlow: Flow<AssetSelectorModel> = selectedAssetFlow
+    override val selectedAssetModelFlow: Flow<AssetModel> = selectedAssetFlow
         .map {
             mapAssetToAssetModel(it, resourceManager, patternId = null)
         }
@@ -63,7 +63,7 @@ private class AssetSelectorProvider(
         }
     }
 
-    override fun assetChosen(assetModel: AssetSelectorModel) {
+    override fun assetChosen(assetModel: AssetModel) {
         singleAssetSharedState.update(assetModel.chainId, assetModel.chainAssetId)
     }
 }

@@ -1,6 +1,7 @@
 package io.novafoundation.nova.common.validation
 
 import io.novafoundation.nova.common.utils.requireException
+import io.novafoundation.nova.common.utils.requireValue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -49,13 +50,34 @@ class CompositeValidation<T, S>(
     val validations: Collection<Validation<T, S>>,
 ) : Validation<T, S> {
 
+    /**
+     * Finds the most serious failure across supplied validations
+     * If exception occurred during any validation it will be ignored if there is any validation that reported NotValid state
+     * If all validations either failed to complete or were valid, then the first exception will be rethrown
+     *
+     * That is we achieve the following behavior:
+     * User does not see exception until he really has to
+     */
     override suspend fun validate(value: T): ValidationStatus<S> {
-        val failureStatuses = validations.map { it.validate(value) }
+        val validationStatuses = validations.map { runCatching { it.validate(value) } }
+
+        val failureStatuses = validationStatuses.filter { it.isSuccess } // Result.isSuccess -> validation completed w/o exception
+            .map { it.requireValue() }
             .filterIsInstance<ValidationStatus.NotValid<S>>()
 
         val mostSeriousReason = failureStatuses.maxByOrNull { it.level.value }
 
-        return mostSeriousReason ?: ValidationStatus.Valid()
+        return if (mostSeriousReason != null) { // there is at least one NotValid validation
+            mostSeriousReason
+        } else {
+            val firstFailure = validationStatuses.firstOrNull { it.isFailure }
+
+            // rethrow exception if any
+            firstFailure?.let { throw it.requireException() }
+
+            ValidationStatus.Valid()
+        }
+
     }
 }
 

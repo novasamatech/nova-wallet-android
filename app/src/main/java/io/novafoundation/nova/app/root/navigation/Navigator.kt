@@ -36,9 +36,8 @@ import io.novafoundation.nova.feature_assets.presentation.balance.detail.Balance
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.receive.ReceiveFragment
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
-import io.novafoundation.nova.feature_assets.presentation.send.amount.ChooseAmountFragment
+import io.novafoundation.nova.feature_assets.presentation.send.amount.SelectSendFragment
 import io.novafoundation.nova.feature_assets.presentation.send.confirm.ConfirmTransferFragment
-import io.novafoundation.nova.feature_assets.presentation.send.recipient.ChooseRecipientFragment
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.extrinsic.ExtrinsicDetailFragment
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.reward.RewardDetailFragment
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.transfer.TransferDetailFragment
@@ -337,18 +336,14 @@ class Navigator(
         navController?.navigate(R.id.open_validator_details, ValidatorDetailsFragment.getBundle(validatorDetails))
     }
 
-    override fun openChooseRecipient(assetPayload: AssetPayload) {
-        navController?.navigate(R.id.action_open_send, ChooseRecipientFragment.getBundle(assetPayload))
-    }
-
     override fun openFilter() {
         navController?.navigate(R.id.action_mainFragment_to_filterFragment)
     }
 
-    override fun openChooseAmount(recipientAddress: String, assetPayload: AssetPayload) {
-        val bundle = ChooseAmountFragment.getBundle(recipientAddress, assetPayload)
+    override fun openSend(assetPayload: AssetPayload, initialRecipientAddress: String?) {
+        val extras = SelectSendFragment.getBundle(assetPayload, initialRecipientAddress)
 
-        navController?.navigate(R.id.action_chooseRecipientFragment_to_chooseAmountFragment, bundle)
+        navController?.navigate(R.id.action_open_send, extras)
     }
 
     override fun openConfirmTransfer(transferDraft: TransferDraft) {
@@ -359,12 +354,6 @@ class Navigator(
 
     override fun finishSendFlow() {
         navController?.navigate(R.id.finish_send_flow)
-    }
-
-    override fun openRepeatTransaction(recipientAddress: String, assetPayload: AssetPayload) {
-        val bundle = ChooseAmountFragment.getBundle(recipientAddress, assetPayload)
-
-        navController?.navigate(R.id.openSelectAmount, bundle)
     }
 
     override fun openTransferDetail(transaction: OperationParcelizeModel.Transfer) {

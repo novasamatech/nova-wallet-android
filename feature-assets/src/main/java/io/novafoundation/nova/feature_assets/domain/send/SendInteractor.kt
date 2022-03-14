@@ -17,7 +17,7 @@ import java.math.BigInteger
 class SendInteractor(
     private val chainRegistry: ChainRegistry,
     private val walletRepository: WalletRepository,
-    private val assetTransfersProvider: AssetTransfersProvider
+    private val assetTransfersProvider: AssetTransfersProvider,
 ) {
 
     // TODO wallet

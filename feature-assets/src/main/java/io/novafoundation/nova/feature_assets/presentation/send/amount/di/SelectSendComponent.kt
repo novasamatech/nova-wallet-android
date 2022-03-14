@@ -5,25 +5,25 @@ import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
-import io.novafoundation.nova.feature_assets.presentation.send.amount.ChooseAmountFragment
+import io.novafoundation.nova.feature_assets.presentation.send.amount.SelectSendFragment
 
 @Subcomponent(
     modules = [
-        ChooseAmountModule::class
+        SelectSendModule::class
     ]
 )
 @ScreenScope
-interface ChooseAmountComponent {
+interface SelectSendComponent {
 
     @Subcomponent.Factory
     interface Factory {
 
         fun create(
             @BindsInstance fragment: Fragment,
-            @BindsInstance address: String,
+            @BindsInstance recipientAddress: String?,
             @BindsInstance payload: AssetPayload
-        ): ChooseAmountComponent
+        ): SelectSendComponent
     }
 
-    fun inject(fragment: ChooseAmountFragment)
+    fun inject(fragment: SelectSendFragment)
 }

@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
 
 interface AccountFeatureApi {
@@ -23,4 +24,6 @@ interface AccountFeatureApi {
     fun extrinsicService(): ExtrinsicService
 
     fun importTypeChooserMixin(): ImportTypeChooserMixin.Presentation
+
+    val addressInputMixinFactory: AddressInputMixinFactory
 }

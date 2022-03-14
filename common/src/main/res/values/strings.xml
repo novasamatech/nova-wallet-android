@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="wallet_send_tokens_on">Send %s on</string>
+
+  <string name="common_validation_invalid_address_title">Invalid recipient</string>
+  <string name="common_validation_invalid_address_message">Recipient should be a valid %s address</string>
+
+  <string name="common_paste">Paste</string>
+
   <string name="wallet_sender">Sender</string>
   <string name="wallet_recipient">Recipient</string>
   <string name="wallet_transfer_details_send_back">Send to this contact</string>

@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_assets.presentation.send
 
-import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.common.base.TitleAndMessage
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure
 
 fun mapAssetTransferValidationFailureToUI(
@@ -33,6 +33,10 @@ fun mapAssetTransferValidationFailureToUI(
         is AssetTransferValidationFailure.WillRemoveAccount.WillTransferDust -> {
             resourceManager.getString(R.string.wallet_send_existential_warning_title) to
                 resourceManager.getString(R.string.wallet_send_existential_warnining_transfer_dust)
+        }
+        is AssetTransferValidationFailure.InvalidRecipientAddress -> {
+            resourceManager.getString(R.string.common_validation_invalid_address_title) to
+                resourceManager.getString(R.string.common_validation_invalid_address_message, failure.chain.name)
         }
     }
 }

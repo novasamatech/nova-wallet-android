@@ -15,6 +15,7 @@ import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.LanguagesHolder
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.vibration.DeviceVibrator
 import io.novafoundation.nova.core_db.dao.AccountDao
@@ -78,4 +79,6 @@ interface AccountFeatureDependencies {
     fun appVersionProvider(): AppVersionProvider
 
     fun validationExecutor(): ValidationExecutor
+
+    val systemCallExecutor: SystemCallExecutor
 }

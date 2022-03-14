@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_account_impl.di
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.network.rpc.SocketSingleRequestExecutor
 import io.novafoundation.nova.common.data.secrets.v1.SecretStoreV1
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
@@ -12,6 +13,7 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.LanguagesHolder
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.core_db.dao.AccountDao
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.dao.NodeDao
@@ -23,6 +25,7 @@ import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateS
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActionsProvider
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserProvider
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSource
@@ -234,5 +237,19 @@ class AccountFeatureModule {
         importTypeChooserMixin = importTypeChooserMixin,
         resourceManager = resourceManager,
         router = router
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideAddressInputMixinFactory(
+        chainRegistry: ChainRegistry,
+        addressIconGenerator: AddressIconGenerator,
+        systemCallExecutor: SystemCallExecutor,
+        clipboardManager: ClipboardManager,
+    ) = AddressInputMixinFactory(
+        chainRegistry = chainRegistry,
+        addressIconGenerator = addressIconGenerator,
+        systemCallExecutor = systemCallExecutor,
+        clipboardManager = clipboardManager
     )
 }

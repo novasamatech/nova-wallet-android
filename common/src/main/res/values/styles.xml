@@ -92,6 +92,10 @@
         <item name="android:letterSpacing">0.05</item>
     </style>
 
+    <style name="TextAppearance.NovaFoundation.Regular.Title2">
+        <item name="android:textSize">22sp</item>
+    </style>
+
     <style name="TextAppearance.NovaFoundation.Regular.Title3">
         <item name="android:textSize">20sp</item>
     </style>

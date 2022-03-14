@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.nativeTr
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.BalanceSourceProvider
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.BaseAssetTransfers
+import io.novafoundation.nova.runtime.ext.accountIdOrDefault
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 
@@ -24,7 +25,7 @@ class NativeAssetTransfers(
 
     override fun ExtrinsicBuilder.transfer(transfer: AssetTransfer) {
         nativeTransfer(
-            accountId = transfer.recipient,
+            accountId = transfer.chain.accountIdOrDefault(transfer.recipient),
             amount = transfer.chainAsset.planksFromAmount(transfer.amount)
         )
     }

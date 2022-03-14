@@ -13,15 +13,20 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.EventObserver
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.showToast
+import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.splash.presentation.SplashBackgroundHolder
-import kotlinx.android.synthetic.main.activity_root.*
+import kotlinx.android.synthetic.main.activity_root.mainView
+import kotlinx.android.synthetic.main.activity_root.rootNetworkBar
 import javax.inject.Inject
 
 class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
 
     @Inject
     lateinit var navigationHolder: NavigationHolder
+    @Inject
+    lateinit var systemCallExecutor: SystemCallExecutor
+
 
     override fun inject() {
         FeatureUtils.getFeature<RootComponent>(this, RootApi::class.java)
@@ -38,9 +43,16 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
         viewModel.restoredAfterConfigChange()
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (!systemCallExecutor.onActivityResult(requestCode, resultCode, data)) {
+            super.onActivityResult(requestCode, resultCode, data)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        systemCallExecutor.attachActivity(this)
         navigationHolder.attach(navController, this)
 
         rootNetworkBar.setOnApplyWindowInsetsListener { view, insets ->
@@ -57,6 +69,8 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
     override fun onDestroy() {
         super.onDestroy()
 
+
+        systemCallExecutor.detachActivity()
         navigationHolder.detach()
     }
 

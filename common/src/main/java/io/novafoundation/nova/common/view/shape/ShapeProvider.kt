@@ -12,6 +12,7 @@ import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.utils.getAccentColor
 
 fun Int.toColorStateList() = ColorStateList.valueOf(this)
 
@@ -35,6 +36,14 @@ fun Context.getCornersStateDrawable(
         addState(StateSet.WILD_CARD, idleDrawable)
     }
 }
+
+fun Context.getInputBackground() = getCornersStateDrawable(
+    focusedDrawable = getRoundedCornerDrawableFromColors(
+        fillColor = getColor(R.color.white_8),
+        strokeColor = getAccentColor(),
+    ),
+    idleDrawable = getRoundedCornerDrawable(R.color.white_8)
+)
 
 fun Context.getFocusedDrawable(): Drawable = getRoundedCornerDrawable(strokeColorRes = R.color.white)
 fun Context.getDisabledDrawable(): Drawable = getRoundedCornerDrawable(fillColorRes = R.color.gray3)

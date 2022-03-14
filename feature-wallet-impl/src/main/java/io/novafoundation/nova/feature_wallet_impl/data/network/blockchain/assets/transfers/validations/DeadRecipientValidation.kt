@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PlanksProducer
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.BalanceSourceProvider
+import io.novafoundation.nova.runtime.ext.accountIdOf
 import java.math.BigInteger
 
 class DeadRecipientValidation(
@@ -25,7 +26,9 @@ class DeadRecipientValidation(
         val balanceSource = balanceSourceProvider.provideFor(chainAsset)
 
         val existentialDeposit = balanceSource.existentialDeposit(chain, chainAsset)
-        val recipientBalance = balanceSource.queryTotalBalance(chain, chainAsset, value.transfer.recipient)
+        val recipientAccountId = value.transfer.chain.accountIdOf(value.transfer.recipient)
+
+        val recipientBalance = balanceSource.queryTotalBalance(chain, chainAsset, recipientAccountId)
 
         return validOrError(recipientBalance + addingAmount(value) >= existentialDeposit) {
             failure(value)
