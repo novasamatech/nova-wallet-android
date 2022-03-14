@@ -16,11 +16,11 @@ import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.shape.getBlurDrawable
 import io.novafoundation.nova.common.view.shape.getCornersStateDrawable
-import kotlinx.android.synthetic.main.view_choose_amount.view.stakingAmountInput
-import kotlinx.android.synthetic.main.view_choose_amount.view.stakingAssetBalance
-import kotlinx.android.synthetic.main.view_choose_amount.view.stakingAssetDollarAmount
-import kotlinx.android.synthetic.main.view_choose_amount.view.stakingAssetImage
-import kotlinx.android.synthetic.main.view_choose_amount.view.stakingAssetToken
+import kotlinx.android.synthetic.main.view_choose_amount_old.view.stakingAmountInput
+import kotlinx.android.synthetic.main.view_choose_amount_old.view.stakingAssetBalance
+import kotlinx.android.synthetic.main.view_choose_amount_old.view.stakingAssetDollarAmount
+import kotlinx.android.synthetic.main.view_choose_amount_old.view.stakingAssetImage
+import kotlinx.android.synthetic.main.view_choose_amount_old.view.stakingAssetToken
 
 class AmountView @JvmOverloads constructor(
     context: Context,
@@ -36,7 +36,7 @@ class AmountView @JvmOverloads constructor(
     }
 
     init {
-        View.inflate(context, R.layout.view_choose_amount, this)
+        View.inflate(context, R.layout.view_choose_amount_old, this)
 
         setBackground()
 

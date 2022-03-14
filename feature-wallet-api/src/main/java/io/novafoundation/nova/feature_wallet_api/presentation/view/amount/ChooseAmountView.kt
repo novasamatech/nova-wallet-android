@@ -22,7 +22,7 @@ class ChooseAmountView @JvmOverloads constructor(
         get() = chooseAmountInput.amountInput
 
     init {
-        View.inflate(context, R.layout.view_choose_amount, this)
+        View.inflate(context, R.layout.view_choose_amount_old, this)
     }
 
     fun setBalanceLabel(label: String?) {
