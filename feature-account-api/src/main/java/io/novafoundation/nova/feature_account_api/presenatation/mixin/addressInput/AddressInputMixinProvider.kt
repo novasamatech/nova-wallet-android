@@ -2,16 +2,19 @@ package io.novafoundation.nova.feature_account_api.presenatation.mixin.addressIn
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.resources.ClipboardManager
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.utils.systemCall.ScanQrCodeCall
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
+import io.novafoundation.nova.common.utils.systemCall.onSystemCallFailure
+import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import jp.co.soramitsu.fearless_utils.encrypt.qr.QrSharing
+import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -23,11 +26,13 @@ class AddressInputMixinFactory(
     private val addressIconGenerator: AddressIconGenerator,
     private val systemCallExecutor: SystemCallExecutor,
     private val clipboardManager: ClipboardManager,
-) {
+    private val resourceManager: ResourceManager,
+    private val qrSharingFactory: MultiChainQrSharingFactory,
+    ) {
 
     fun create(
         chainId: ChainId,
-        errorDisplayer: (Throwable) -> Unit,
+        errorDisplayer: (cause: String) -> Unit,
         coroutineScope: CoroutineScope
     ): AddressInputMixin = AddressInputMixinProvider(
         chainId = chainId,
@@ -35,6 +40,8 @@ class AddressInputMixinFactory(
         addressIconGenerator = addressIconGenerator,
         systemCallExecutor = systemCallExecutor,
         clipboardManager = clipboardManager,
+        qrSharingFactory = qrSharingFactory,
+        resourceManager = resourceManager,
         errorDisplayer = errorDisplayer,
         coroutineScope = coroutineScope
     )
@@ -46,7 +53,9 @@ class AddressInputMixinProvider(
     private val addressIconGenerator: AddressIconGenerator,
     private val systemCallExecutor: SystemCallExecutor,
     private val clipboardManager: ClipboardManager,
-    private val errorDisplayer: (Throwable) -> Unit,
+    private val qrSharingFactory: MultiChainQrSharingFactory,
+    private val resourceManager: ResourceManager,
+    private val errorDisplayer: (error: String) -> Unit,
     coroutineScope: CoroutineScope,
 ): AddressInputMixin,
     CoroutineScope by coroutineScope,
@@ -81,10 +90,12 @@ class AddressInputMixinProvider(
     override fun scanClicked() {
        launch {
            systemCallExecutor.executeSystemCall(ScanQrCodeCall()).mapCatching {
-               QrSharing.decode(it).address
+               qrSharingFactory.create(chain()).decode(it).address
            }.onSuccess { address ->
                inputFlow.value = address
-           }.onFailure(errorDisplayer)
+           }.onSystemCallFailure {
+               errorDisplayer(resourceManager.getString(R.string.invoice_scan_error_no_info))
+           }
        }
     }
 

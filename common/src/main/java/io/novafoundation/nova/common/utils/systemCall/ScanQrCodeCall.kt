@@ -1,5 +1,6 @@
 package io.novafoundation.nova.common.utils.systemCall
 
+import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import com.google.zxing.integration.android.IntentIntegrator
@@ -22,10 +23,10 @@ class ScanQrCodeCall : SystemCall<String> {
     override fun parseResult(requestCode: Int, resultCode: Int, intent: Intent?): Result<String> {
         val qrContent = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent)?.contents
 
-        return if (qrContent != null) {
-            Result.success(qrContent)
-        } else {
-            Result.failure(IllegalStateException("Failed to scan qr code"))
+        return when {
+            resultCode == Activity.RESULT_CANCELED -> Result.failure(SystemCall.Failure.Cancelled())
+            qrContent == null -> Result.failure(SystemCall.Failure.Unknown())
+            else -> Result.success(qrContent)
         }
     }
 }

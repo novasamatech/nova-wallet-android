@@ -46,6 +46,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.add
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherProvider
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedDecoder
 import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedEncoder
@@ -87,6 +88,7 @@ class AccountFeatureModule {
         accountSubstrateSource: AccountSubstrateSource,
         languagesHolder: LanguagesHolder,
         secretStoreV2: SecretStoreV2,
+        multiChainQrSharingFactory: MultiChainQrSharingFactory,
     ): AccountRepository {
         return AccountRepositoryImpl(
             accountDataSource,
@@ -95,7 +97,8 @@ class AccountFeatureModule {
             jsonSeedEncoder,
             languagesHolder,
             accountSubstrateSource,
-            secretStoreV2
+            secretStoreV2,
+            multiChainQrSharingFactory
         )
     }
 
@@ -246,10 +249,14 @@ class AccountFeatureModule {
         addressIconGenerator: AddressIconGenerator,
         systemCallExecutor: SystemCallExecutor,
         clipboardManager: ClipboardManager,
+        multiChainQrSharingFactory: MultiChainQrSharingFactory,
+        resourceManager: ResourceManager,
     ) = AddressInputMixinFactory(
         chainRegistry = chainRegistry,
         addressIconGenerator = addressIconGenerator,
         systemCallExecutor = systemCallExecutor,
-        clipboardManager = clipboardManager
+        clipboardManager = clipboardManager,
+        qrSharingFactory = multiChainQrSharingFactory,
+        resourceManager = resourceManager
     )
 }

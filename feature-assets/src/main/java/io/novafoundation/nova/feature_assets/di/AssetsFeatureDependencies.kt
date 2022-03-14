@@ -29,6 +29,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoade
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import jp.co.soramitsu.fearless_utils.encrypt.Signer
@@ -105,4 +106,6 @@ interface AssetsFeatureDependencies {
     fun nftRepository(): NftRepository
 
     val addressInputMixinFactory: AddressInputMixinFactory
+
+    val multiChainQrSharingFactory: MultiChainQrSharingFactory
 }

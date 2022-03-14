@@ -11,6 +11,7 @@ import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicSerializers
 import io.novafoundation.nova.runtime.extrinsic.MortalityConstructor
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.DbRuntimeVersionsRepository
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RemoteEventsRepository
@@ -101,4 +102,8 @@ class RuntimeModule {
         chainRegistry: ChainRegistry,
         @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource
     ): EventsRepository = RemoteEventsRepository(rpcCalls, chainRegistry, remoteStorageSource)
+
+    @Provides
+    @ApplicationScope
+    fun provideMultiChainQrSharingFactory() = MultiChainQrSharingFactory()
 }

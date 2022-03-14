@@ -30,10 +30,11 @@ import io.novafoundation.nova.feature_account_impl.data.network.blockchain.Accou
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSource
 import io.novafoundation.nova.runtime.ext.genesisHash
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedEncoder
 import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.Mnemonic
 import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.MnemonicCreator
-import jp.co.soramitsu.fearless_utils.encrypt.qr.QrSharing
+import jp.co.soramitsu.fearless_utils.encrypt.qr.QrFormat
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -50,6 +51,7 @@ class AccountRepositoryImpl(
     private val languagesHolder: LanguagesHolder,
     private val accountSubstrateSource: AccountSubstrateSource,
     private val secretStoreV2: SecretStoreV2,
+    private val multiChainQrSharingFactory: MultiChainQrSharingFactory,
 ) : AccountRepository {
 
     override fun getEncryptionTypes(): List<CryptoType> {
@@ -272,13 +274,15 @@ class AccountRepositoryImpl(
     }
 
     override suspend fun createQrAccountContent(chain: Chain, account: MetaAccount): String {
-        val payload = QrSharing.Payload(
+        val payload = QrFormat.Payload(
             address = account.addressIn(chain)!!,
             publicKey = account.publicKeyIn(chain)!!,
             name = account.name
         )
 
-        return QrSharing.encode(payload)
+        val qrSharing = multiChainQrSharingFactory.create(chain)
+
+        return qrSharing.encode(payload)
     }
 
     private suspend fun mapAccountLocalToAccount(accountLocal: AccountLocal): Account {
