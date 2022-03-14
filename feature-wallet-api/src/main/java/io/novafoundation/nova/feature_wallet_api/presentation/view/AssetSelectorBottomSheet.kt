@@ -19,10 +19,10 @@ import kotlinx.android.synthetic.main.item_asset_selector.view.itemAssetSelector
 import kotlinx.android.synthetic.main.item_asset_selector.view.itemAssetSelectorTokenName
 
 class AssetSelectorBottomSheet(
-        private val imageLoader: ImageLoader,
-        context: Context,
-        payload: Payload<AssetModel>,
-        onClicked: ClickHandler<AssetModel>
+    private val imageLoader: ImageLoader,
+    context: Context,
+    payload: Payload<AssetModel>,
+    onClicked: ClickHandler<AssetModel>
 ) : DynamicListBottomSheet<AssetModel>(
     context,
     payload,
@@ -47,9 +47,9 @@ private class AssetSelectorHolder(
 ) : DynamicListSheetAdapter.Holder<AssetModel>(parent) {
 
     override fun bind(
-            item: AssetModel,
-            isSelected: Boolean,
-            handler: DynamicListSheetAdapter.Handler<AssetModel>
+        item: AssetModel,
+        isSelected: Boolean,
+        handler: DynamicListSheetAdapter.Handler<AssetModel>
     ) {
         super.bind(item, isSelected, handler)
 

@@ -50,7 +50,6 @@ class SelectSendFragment : BaseFragment<SelectSendViewModel>() {
         selectSendNext.setOnClickListener { viewModel.nextClicked() }
 
         selectSendToolbar.setHomeButtonListener { viewModel.backClicked() }
-
     }
 
     override fun inject() {

@@ -27,7 +27,6 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
     @Inject
     lateinit var systemCallExecutor: SystemCallExecutor
 
-
     override fun inject() {
         FeatureUtils.getFeature<RootComponent>(this, RootApi::class.java)
             .mainActivityComponentFactory()
@@ -68,7 +67,6 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
 
     override fun onDestroy() {
         super.onDestroy()
-
 
         systemCallExecutor.detachActivity()
         navigationHolder.detach()

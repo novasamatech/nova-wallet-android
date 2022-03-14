@@ -28,7 +28,7 @@ class AddressInputMixinFactory(
     private val clipboardManager: ClipboardManager,
     private val resourceManager: ResourceManager,
     private val qrSharingFactory: MultiChainQrSharingFactory,
-    ) {
+) {
 
     fun create(
         chainId: ChainId,
@@ -57,7 +57,7 @@ class AddressInputMixinProvider(
     private val resourceManager: ResourceManager,
     private val errorDisplayer: (error: String) -> Unit,
     coroutineScope: CoroutineScope,
-): AddressInputMixin,
+) : AddressInputMixin,
     CoroutineScope by coroutineScope,
     WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(coroutineScope) {
 
@@ -76,27 +76,27 @@ class AddressInputMixinProvider(
         .share()
 
     override fun pasteClicked() {
-       launch {
-          clipboardFlow.first()?.let {
-              inputFlow.value = it
-          }
-       }
+        launch {
+            clipboardFlow.first()?.let {
+                inputFlow.value = it
+            }
+        }
     }
 
     override fun clearClicked() {
-       inputFlow.value = ""
+        inputFlow.value = ""
     }
 
     override fun scanClicked() {
-       launch {
-           systemCallExecutor.executeSystemCall(ScanQrCodeCall()).mapCatching {
-               qrSharingFactory.create(chain()).decode(it).address
-           }.onSuccess { address ->
-               inputFlow.value = address
-           }.onSystemCallFailure {
-               errorDisplayer(resourceManager.getString(R.string.invoice_scan_error_no_info))
-           }
-       }
+        launch {
+            systemCallExecutor.executeSystemCall(ScanQrCodeCall()).mapCatching {
+                qrSharingFactory.create(chain()).decode(it).address
+            }.onSuccess { address ->
+                inputFlow.value = address
+            }.onSystemCallFailure {
+                errorDisplayer(resourceManager.getString(R.string.invoice_scan_error_no_info))
+            }
+        }
     }
 
     private suspend fun createState(input: String, clipboard: String?): AddressInputState {
@@ -109,7 +109,6 @@ class AddressInputMixinProvider(
 
             AddressInputState.IdenticonState.Address(icon)
         }.getOrDefault(AddressInputState.IdenticonState.Placeholder)
-
 
         return AddressInputState(
             iconState = iconState,

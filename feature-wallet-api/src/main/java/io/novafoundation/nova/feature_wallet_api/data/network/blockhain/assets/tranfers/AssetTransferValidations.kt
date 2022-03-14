@@ -32,7 +32,7 @@ sealed class AssetTransferValidationFailure {
         class InCommissionAsset(val commissionAsset: Chain.Asset) : NotEnoughFunds()
     }
 
-    class InvalidRecipientAddress(val chain: Chain): AssetTransferValidationFailure()
+    class InvalidRecipientAddress(val chain: Chain) : AssetTransferValidationFailure()
 }
 
 data class AssetTransferPayload(

@@ -96,11 +96,11 @@ class SelectSendViewModel(
 
     override val feeLoaderMixin: FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(commissionAssetFlow)
 
-   val amountChooserMixin: AmountChooserMixin.Presentation = amountChooserMixinFactory.create(
+    val amountChooserMixin: AmountChooserMixin.Presentation = amountChooserMixinFactory.create(
         scope = this,
         assetFlow = assetFlow,
         balanceLabel = R.string.wallet_balance_transferable,
-        balanceField =  Asset::transferable,
+        balanceField = Asset::transferable,
     )
 
     val continueButtonStateLiveData = combine(

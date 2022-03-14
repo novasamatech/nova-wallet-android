@@ -11,8 +11,8 @@ class AddressInputState(
 
     sealed class IdenticonState {
 
-        object Placeholder: IdenticonState()
+        object Placeholder : IdenticonState()
 
-        class Address(val drawable: Drawable): IdenticonState()
+        class Address(val drawable: Drawable) : IdenticonState()
     }
 }
