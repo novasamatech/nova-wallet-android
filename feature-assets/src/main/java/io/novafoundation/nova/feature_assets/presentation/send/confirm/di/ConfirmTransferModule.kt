@@ -19,7 +19,6 @@ import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.WalletRouter
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.confirm.ConfirmTransferViewModel
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -39,7 +38,6 @@ class ConfirmTransferModule {
         selectedAccountUseCase: SelectedAccountUseCase,
         addressDisplayUseCase: AddressDisplayUseCase,
         feeLoaderMixinFactory: FeeLoaderMixin.Factory,
-        amountChooserMixinFactory: AmountChooserMixin.Factory,
         resourceManager: ResourceManager,
         transferDraft: TransferDraft,
         chainRegistry: ChainRegistry,
@@ -56,7 +54,6 @@ class ConfirmTransferModule {
             resourceManager,
             validationExecutor,
             feeLoaderMixinFactory,
-            amountChooserMixinFactory,
             transferDraft
         )
     }

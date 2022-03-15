@@ -25,6 +25,10 @@ class TableView @JvmOverloads constructor(
 
         doOnPreDraw {
             (children.last() as? TableCellView)?.setDividerVisible(false)
+
+            children.filterIsInstance<TableCellView>()
+                .toList()
+                .onEach { it.setDividerColor(R.color.white_8)  }
         }
     }
 }

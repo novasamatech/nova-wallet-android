@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_assets.presentation.send.confirm
 
-import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
@@ -17,21 +16,17 @@ import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.WalletRouter
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.mapAssetTransferValidationFailureToUI
-import io.novafoundation.nova.feature_wallet_api.data.mappers.mapAssetToAssetModel
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.WithAmountChooser
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
-import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -53,16 +48,13 @@ class ConfirmTransferViewModel(
     private val resourceManager: ResourceManager,
     private val validationExecutor: ValidationExecutor,
     feeLoaderMixinFactory: FeeLoaderMixin.Factory,
-    amountChooserMixinFactory: AmountChooserMixin.Factory,
     val transferDraft: TransferDraft,
 ) : BaseViewModel(),
     ExternalActions by externalActions,
     Validatable by validationExecutor,
-    WithFeeLoaderMixin,
-    WithAmountChooser {
+    WithFeeLoaderMixin {
 
     private val chain by lazyAsync { chainRegistry.getChain(transferDraft.assetPayload.chainId) }
-
     private val chainAsset by lazyAsync { chainRegistry.asset(transferDraft.assetPayload.chainId, transferDraft.assetPayload.chainAssetId) }
 
     private val assetFlow = interactor.assetFlow(transferDraft.assetPayload.chainId, transferDraft.assetPayload.chainAssetId)
@@ -74,12 +66,6 @@ class ConfirmTransferViewModel(
         .share()
 
     override val feeLoaderMixin: FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(commissionAssetFlow)
-
-    override val amountChooserMixin: AmountChooserMixin.Presentation = amountChooserMixinFactory.create(
-        scope = this,
-        assetFlow = assetFlow,
-        assetUiMapper = { mapAssetToAssetModel(it, resourceManager) }
-    )
 
     private val currentAccount = selectedAccountUseCase.selectedMetaAccountFlow()
         .inBackground()
@@ -152,8 +138,6 @@ class ConfirmTransferViewModel(
 
     private fun setInitialState() = launch {
         feeLoaderMixin.setFee(transferDraft.fee)
-
-        amountChooserMixin.setAmount(transferDraft.amount)
     }
 
     private fun performTransfer(transfer: AssetTransfer, fee: BigDecimal) = launch {
@@ -174,7 +158,7 @@ class ConfirmTransferViewModel(
         return AssetTransferPayload(
             transfer = AssetTransfer(
                 sender = currentAccount.first(),
-                recipient = chain.accountIdOf(transferDraft.recipientAddress),
+                recipient = transferDraft.recipientAddress,
                 chain = chain,
                 chainAsset = chainAsset,
                 amount = transferDraft.amount

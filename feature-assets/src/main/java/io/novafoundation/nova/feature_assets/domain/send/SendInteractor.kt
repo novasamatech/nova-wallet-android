@@ -4,11 +4,9 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersProvider
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.RecipientSearchResult
-import io.novafoundation.nova.runtime.ext.isValidAddress
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import jp.co.soramitsu.fearless_utils.encrypt.qr.QrSharing
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
@@ -17,7 +15,7 @@ import java.math.BigInteger
 class SendInteractor(
     private val chainRegistry: ChainRegistry,
     private val walletRepository: WalletRepository,
-    private val assetTransfersProvider: AssetTransfersProvider
+    private val assetTransfersProvider: AssetTransfersProvider,
 ) {
 
     // TODO wallet
@@ -45,23 +43,9 @@ class SendInteractor(
         )
     }
 
-    suspend fun validateSendAddress(chainId: ChainId, address: String): Boolean = withContext(Dispatchers.Default) {
-        val chain = chainRegistry.getChain(chainId)
-
-        chain.isValidAddress(address)
-    }
-
     // TODO wallet phishing
     suspend fun isAddressFromPhishingList(address: String): Boolean {
         return /*walletRepository.isAccountIdFromPhishingList(address)*/ false
-    }
-
-    suspend fun getRecipientFromQrCodeContent(content: String): Result<String> {
-        return withContext(Dispatchers.Default) {
-            runCatching {
-                QrSharing.decode(content).address
-            }
-        }
     }
 
     suspend fun getTransferFee(transfer: AssetTransfer): BigInteger = withContext(Dispatchers.Default) {

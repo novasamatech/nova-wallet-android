@@ -1,8 +1,6 @@
 package io.novafoundation.nova.feature_assets.presentation.send.amount
 
 import androidx.lifecycle.viewModelScope
-import io.novafoundation.nova.common.address.AddressIconGenerator
-import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -13,28 +11,26 @@ import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.ButtonState
+import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
-import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
-import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAddressModel
-import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
+import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.WalletRouter
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.mapAssetTransferValidationFailureToUI
-import io.novafoundation.nova.feature_wallet_api.data.mappers.mapAssetToAssetModel
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure.WillRemoveAccount
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.WithAmountChooser
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.requireFee
-import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,36 +42,45 @@ import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import kotlin.time.ExperimentalTime
 
-class ChooseAmountViewModel(
+class SelectSendViewModel(
     private val interactor: WalletInteractor,
     private val sendInteractor: SendInteractor,
     private val router: WalletRouter,
-    private val addressIconGenerator: AddressIconGenerator,
-    private val externalActions: ExternalActions.Presentation,
-    private val recipientAddress: String,
     private val assetPayload: AssetPayload,
+    private val initialRecipientAddress: String?,
     private val chainRegistry: ChainRegistry,
     private val validationExecutor: ValidationExecutor,
     private val feeLoaderMixinFactory: FeeLoaderMixin.Factory,
     private val selectedAccountUseCase: SelectedAccountUseCase,
-    private val addressDisplayUseCase: AddressDisplayUseCase,
     private val resourceManager: ResourceManager,
-    amountChooserMixinFactory: AmountChooserMixin.Factory,
+    private val addressInputMixinFactory: AddressInputMixinFactory,
+    amountChooserMixinFactory: AmountChooserMixin.Factory
 ) : BaseViewModel(),
-    ExternalActions by externalActions,
     Validatable by validationExecutor,
-    WithFeeLoaderMixin,
-    WithAmountChooser {
+    WithFeeLoaderMixin {
 
     private val chain by lazyAsync { chainRegistry.getChain(assetPayload.chainId) }
-
     private val chainAsset by lazyAsync { chainRegistry.asset(assetPayload.chainId, assetPayload.chainAssetId) }
 
-    private val selectedAccount = selectedAccountUseCase.selectedMetaAccountFlow()
+    val addressInputMixin = addressInputMixinFactory.create(
+        chainId = assetPayload.chainId,
+        errorDisplayer = ::showError,
+        coroutineScope = this
+    )
+
+    val chainUi = flowOf {
+        mapChainToUi(chain())
+    }
         .inBackground()
         .share()
 
-    val recipientModelFlow = flowOf { generateAddressModel(recipientAddress) }
+    val title = flowOf {
+        resourceManager.getString(R.string.wallet_send_tokens_on, chainAsset().symbol)
+    }
+        .inBackground()
+        .share()
+
+    private val selectedAccount = selectedAccountUseCase.selectedMetaAccountFlow()
         .inBackground()
         .share()
 
@@ -91,10 +96,11 @@ class ChooseAmountViewModel(
 
     override val feeLoaderMixin: FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(commissionAssetFlow)
 
-    override val amountChooserMixin: AmountChooserMixin.Presentation = amountChooserMixinFactory.create(
+    val amountChooserMixin: AmountChooserMixin.Presentation = amountChooserMixinFactory.create(
         scope = this,
         assetFlow = assetFlow,
-        assetUiMapper = { mapAssetToAssetModel(it, resourceManager) }
+        balanceLabel = R.string.wallet_balance_transferable,
+        balanceField = Asset::transferable,
     )
 
     val continueButtonStateLiveData = combine(
@@ -109,13 +115,15 @@ class ChooseAmountViewModel(
     }
 
     init {
+        setInitialState()
+
         listenFee()
     }
 
     fun nextClicked() = feeLoaderMixin.requireFee(this) { fee ->
         launch {
             val payload = AssetTransferPayload(
-                transfer = buildTransfer(amountChooserMixin.amount.first()),
+                transfer = buildTransfer(amountChooserMixin.amount.first(), addressInputMixin.inputFlow.first()),
                 fee = fee,
                 commissionAsset = commissionAssetFlow.first(),
                 usedAsset = assetFlow.first()
@@ -139,10 +147,8 @@ class ChooseAmountViewModel(
         router.back()
     }
 
-    fun recipientAddressClicked() = launch {
-        val recipientAddress = recipientModelFlow.first().address
-
-        externalActions.showExternalActions(ExternalActions.Type.Address(recipientAddress), chain())
+    private fun setInitialState() {
+        initialRecipientAddress?.let { addressInputMixin.inputFlow.value = it }
     }
 
     @OptIn(ExperimentalTime::class)
@@ -152,10 +158,17 @@ class ChooseAmountViewModel(
             .launchIn(viewModelScope)
     }
 
-    private fun openConfirmScreen(validPayload: AssetTransferPayload) {
-        val transferDraft = TransferDraft(validPayload.transfer.amount, validPayload.fee, assetPayload, recipientAddress)
+    private fun openConfirmScreen(validPayload: AssetTransferPayload) = launch {
+        val transferDraft = TransferDraft(
+            amount = validPayload.transfer.amount,
+            fee = validPayload.fee,
+            assetPayload = assetPayload,
+            recipientAddress = validPayload.transfer.recipient
+        )
 
-        router.openConfirmTransfer(transferDraft)
+        showMessage("Ready to open confirm")
+
+//        router.openConfirmTransfer(transferDraft)
     }
 
     private fun autoFixValidationPayload(
@@ -174,22 +187,18 @@ class ChooseAmountViewModel(
         feeLoaderMixin.loadFeeSuspending(
             retryScope = viewModelScope,
             feeConstructor = {
-                sendInteractor.getTransferFee(buildTransfer(amount))
+                sendInteractor.getTransferFee(buildTransfer(amount, addressInputMixin.inputFlow.first()))
             },
             onRetryCancelled = ::backClicked
         )
     }
 
-    private suspend fun generateAddressModel(address: String): AddressModel {
-        return addressIconGenerator.createAddressModel(chain(), address, AddressIconGenerator.SIZE_MEDIUM, addressDisplayUseCase)
-    }
-
-    private suspend fun buildTransfer(amount: BigDecimal): AssetTransfer {
+    private suspend fun buildTransfer(amount: BigDecimal, address: String): AssetTransfer {
         val chain = chain()
 
         return AssetTransfer(
             sender = selectedAccount.first(),
-            recipient = chain.accountIdOf(recipientAddress),
+            recipient = address,
             chain = chain,
             chainAsset = chainAsset(),
             amount = amount

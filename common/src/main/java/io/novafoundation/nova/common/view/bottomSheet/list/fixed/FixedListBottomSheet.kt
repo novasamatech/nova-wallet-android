@@ -31,7 +31,6 @@ abstract class FixedListBottomSheet(context: Context) :
 
     @CallSuper
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
     }
 

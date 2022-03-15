@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:background="@color/white_8"
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+
+
+    <ImageView
+        android:id="@+id/chooseAmountInputImage"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/bg_icon_round_black"
+        android:padding="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/ic_token_ksm" />
+
+    <TextView
+        android:id="@+id/chooseAmountInputToken"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:includeFontPadding="false"
+        app:layout_constraintBottom_toBottomOf="@+id/chooseAmountInputImage"
+        app:layout_constraintStart_toEndOf="@id/chooseAmountInputImage"
+        app:layout_constraintTop_toTopOf="@+id/chooseAmountInputImage"
+        tools:text="KSM" />
+
+
+    <EditText
+        android:id="@+id/chooseAmountInputField"
+        style="@style/TextAppearance.NovaFoundation.Regular.Title2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="9dp"
+        android:layout_marginEnd="16dp"
+        android:background="@null"
+        android:gravity="end"
+        android:hint="0"
+        android:inputType="numberDecimal"
+        android:paddingBottom="26dp"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white_32"
+        android:textCursorDrawable="@null"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@id/chooseAmountInputToken"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="4.508614" />
+
+    <TextView
+        android:id="@+id/chooseAmountInputFiat"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="9dp"
+        android:textColor="@color/white_64"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/chooseAmountInputField"
+        tools:text="$1,524.11" />
+</merge>

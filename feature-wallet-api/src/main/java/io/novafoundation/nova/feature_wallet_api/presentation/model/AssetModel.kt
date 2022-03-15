@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_wallet_api.presentation.model
 
 import androidx.recyclerview.widget.DiffUtil
 
-data class AssetSelectorModel(
+data class AssetModel(
     val chainId: String,
     val chainAssetId: Int,
     val imageUrl: String,
@@ -12,13 +12,13 @@ data class AssetSelectorModel(
 
     companion object {
 
-        val DIFF_CALLBACK = object : DiffUtil.ItemCallback<AssetSelectorModel>() {
+        val DIFF_CALLBACK = object : DiffUtil.ItemCallback<AssetModel>() {
 
-            override fun areItemsTheSame(oldItem: AssetSelectorModel, newItem: AssetSelectorModel): Boolean {
+            override fun areItemsTheSame(oldItem: AssetModel, newItem: AssetModel): Boolean {
                 return oldItem.chainId == newItem.chainId && oldItem.chainAssetId == newItem.chainAssetId
             }
 
-            override fun areContentsTheSame(oldItem: AssetSelectorModel, newItem: AssetSelectorModel): Boolean {
+            override fun areContentsTheSame(oldItem: AssetModel, newItem: AssetModel): Boolean {
                 return oldItem == newItem
             }
         }

@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.amountInPlanks
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.BalanceSourceProvider
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.BaseAssetTransfers
+import io.novafoundation.nova.runtime.ext.accountIdOrDefault
 import io.novafoundation.nova.runtime.ext.ormlCurrencyId
 import io.novafoundation.nova.runtime.ext.requireOrml
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -27,7 +28,7 @@ class OrmlAssetTransfers(
     override fun ExtrinsicBuilder.transfer(transfer: AssetTransfer) {
         ormlTransfer(
             chainAsset = transfer.chainAsset,
-            target = transfer.recipient,
+            target = transfer.chain.accountIdOrDefault(transfer.recipient),
             amount = transfer.amountInPlanks
         )
     }

@@ -156,7 +156,9 @@ class WalletFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideAmountChooserFactory(): AmountChooserMixin.Factory = AmountChooserProviderFactory()
+    fun provideAmountChooserFactory(
+        resourceManager: ResourceManager
+    ): AmountChooserMixin.Factory = AmountChooserProviderFactory(resourceManager)
 
     @Provides
     @FeatureScope

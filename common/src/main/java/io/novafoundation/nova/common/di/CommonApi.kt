@@ -25,6 +25,7 @@ import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.LanguagesHolder
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.QrCodeGenerator
+import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.vibration.DeviceVibrator
 import jp.co.soramitsu.fearless_utils.encrypt.Signer
@@ -99,4 +100,6 @@ interface CommonApi {
     fun customDialogDisplayer(): CustomDialogDisplayer.Presentation
 
     fun appVersionsProvider(): AppVersionProvider
+
+    val systemCallExecutor: SystemCallExecutor
 }

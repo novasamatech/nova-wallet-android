@@ -66,7 +66,7 @@ class TransactionDetailViewModel(
     fun repeatTransaction() {
         val retryAddress = if (operation.isIncome) operation.sender else operation.receiver
 
-        router.openRepeatTransaction(retryAddress, AssetPayload(operation.chainId, operation.assetId))
+        router.openSend(AssetPayload(operation.chainId, operation.assetId), initialRecipientAddress = retryAddress)
     }
 
     fun transactionHashClicked() = operation.hash?.let {

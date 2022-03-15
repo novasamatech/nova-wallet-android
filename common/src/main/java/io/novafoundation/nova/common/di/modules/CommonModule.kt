@@ -35,6 +35,7 @@ import io.novafoundation.nova.common.resources.OSAppVersionProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.resources.ResourceManagerImpl
 import io.novafoundation.nova.common.utils.QrCodeGenerator
+import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.vibration.DeviceVibrator
 import jp.co.soramitsu.fearless_utils.encrypt.Signer
@@ -198,4 +199,8 @@ class CommonModule {
     fun provideAppVersionsProvider(context: Context): AppVersionProvider {
         return OSAppVersionProvider(context)
     }
+
+    @Provides
+    @ApplicationScope
+    fun provideSystemCallExecutor(): SystemCallExecutor = SystemCallExecutor()
 }
