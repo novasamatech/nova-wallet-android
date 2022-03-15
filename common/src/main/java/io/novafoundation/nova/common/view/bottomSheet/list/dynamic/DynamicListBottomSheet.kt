@@ -6,7 +6,9 @@ import androidx.annotation.CallSuper
 import androidx.recyclerview.widget.DiffUtil
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.utils.setVisible
 import kotlinx.android.synthetic.main.bottom_sheet_dynamic_list.dynamicListSheetContent
+import kotlinx.android.synthetic.main.bottom_sheet_dynamic_list.dynamicListSheetDivider
 import kotlinx.android.synthetic.main.bottom_sheet_dynamic_list.dynamicListSheetTitle
 
 typealias ClickHandler<T> = (T) -> Unit
@@ -52,6 +54,10 @@ abstract class DynamicListBottomSheet<T>(
 
     override fun setTitle(titleId: Int) {
         dynamicListSheetTitle.setText(titleId)
+    }
+
+    fun setDividerVisible(visible: Boolean) {
+        dynamicListSheetDivider.setVisible(visible)
     }
 
     override fun itemClicked(item: T) {

@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import io.novafoundation.nova.common.address.AddressChooserBottomSheetDialog
+import io.novafoundation.nova.feature_account_api.presenatation.account.chooser.AccountChooserBottomSheetDialog
 import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -80,7 +80,7 @@ class SetControllerFragment : BaseFragment<SetControllerViewModel>() {
     }
 
     private fun showControllerChooser(payload: DynamicListBottomSheet.Payload<AddressModel>) {
-        AddressChooserBottomSheetDialog(
+        AccountChooserBottomSheetDialog(
             requireContext(),
             payload,
             viewModel::payoutControllerChanged,

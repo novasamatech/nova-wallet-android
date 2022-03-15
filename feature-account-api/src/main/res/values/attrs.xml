@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="AddressView">
+        <attr name="actionIcon" />
+        <attr name="showBackground" format="boolean" />
+    </declare-styleable>
+</resources>

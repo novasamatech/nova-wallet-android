@@ -33,7 +33,7 @@ class AmountChooserProviderFactory(
     ): AmountChooserMixin.Presentation {
         return AmountChooserProvider(
             coroutineScope = scope,
-            assetFlow = assetFlow,
+            usedAssetFlow = assetFlow,
             balanceField = balanceField,
             balanceLabel = balanceLabel,
             resourceManager = resourceManager
@@ -44,7 +44,7 @@ class AmountChooserProviderFactory(
 @OptIn(ExperimentalTime::class)
 class AmountChooserProvider(
     coroutineScope: CoroutineScope,
-    assetFlow: Flow<Asset>,
+    override val usedAssetFlow: Flow<Asset>,
     private val resourceManager: ResourceManager,
     private val balanceField: (Asset) -> BigDecimal,
     @StringRes private val balanceLabel: Int?
@@ -54,7 +54,7 @@ class AmountChooserProvider(
 
     override val amountInput: MutableStateFlow<String> = MutableStateFlow("")
 
-    override val assetModel = assetFlow
+    override val assetModel = usedAssetFlow
         .map { ChooseAmountModel(it, resourceManager, balanceField, balanceLabel) }
         .inBackground()
         .share()
@@ -71,7 +71,7 @@ class AmountChooserProvider(
     override val backPressuredAmount: Flow<BigDecimal> = amount
         .debounce(DEBOUNCE_DURATION_MILLIS.milliseconds)
 
-    override val fiatAmount: Flow<String> = assetFlow.combine(amountOrNull) { asset, amount ->
+    override val fiatAmount: Flow<String> = usedAssetFlow.combine(amountOrNull) { asset, amount ->
         val amountOrDefault = amount ?: BigDecimal.ZERO
 
         asset.token.fiatAmount(amountOrDefault).formatAsCurrency()

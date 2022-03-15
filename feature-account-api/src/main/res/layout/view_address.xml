@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:background="@color/black"
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+
+    <ImageView
+        android:id="@+id/addressPrimaryIcon"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@tools:sample/avatars" />
+
+    <ImageView
+        android:id="@+id/addressSecondaryIcon"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/addressSubtitle"
+        app:layout_constraintStart_toStartOf="@id/addressTitle"
+        app:layout_constraintTop_toTopOf="@id/addressSubtitle"
+        tools:src="@color/colorAccent" />
+
+    <TextView
+        android:id="@+id/addressTitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="9dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="29dp"
+        app:layout_goneMarginBottom="9dp"
+        android:includeFontPadding="false"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toTopOf="@+id/addressSubtitle"
+        app:layout_constraintEnd_toStartOf="@id/addressAction"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@id/addressPrimaryIcon"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:layout_goneMarginStart="16dp"
+        tools:text="Account name" />
+
+    <TextView
+        android:id="@+id/addressSubtitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:ellipsize="middle"
+        android:singleLine="true"
+        android:layout_marginBottom="9dp"
+        android:textColor="@color/white_64"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/addressTitle"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/addressSecondaryIcon"
+        app:layout_constraintTop_toBottomOf="@+id/addressTitle"
+        app:layout_constraintVertical_bias="0.0"
+        app:layout_goneMarginEnd="16dp"
+        app:layout_goneMarginStart="0dp"
+        tools:text="GybH55zsi5nAGybH55zsi5nAGybH55zsi5nAGybH55zsi5nA" />
+
+    <ImageView
+        android:id="@+id/addressAction"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/bg_primary_list_item"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="@dimen/x1"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/white_48"
+        tools:src="@drawable/ic_chevron_down" />
+
+</merge>

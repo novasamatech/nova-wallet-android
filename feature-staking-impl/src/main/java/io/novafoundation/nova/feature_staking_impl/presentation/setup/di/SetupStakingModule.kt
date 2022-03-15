@@ -18,9 +18,10 @@ import io.novafoundation.nova.feature_staking_impl.domain.validations.setup.Setu
 import io.novafoundation.nova.feature_staking_impl.domain.validations.setup.SetupStakingValidationFailure
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_staking_impl.presentation.common.rewardDestination.RewardDestinationMixin
 import io.novafoundation.nova.feature_staking_impl.presentation.setup.SetupStakingViewModel
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 
 @Module(includes = [ViewModelModule::class])
 class SetupStakingModule {
@@ -38,7 +39,8 @@ class SetupStakingModule {
         validationExecutor: ValidationExecutor,
         setupStakingSharedState: SetupStakingSharedState,
         rewardDestinationMixin: RewardDestinationMixin.Presentation,
-        feeLoaderMixin: FeeLoaderMixin.Presentation
+        feeLoaderMixin: FeeLoaderMixin.Presentation,
+        amountChooserMixinFactory: AmountChooserMixin.Factory
     ): ViewModel {
         return SetupStakingViewModel(
             router,
@@ -50,7 +52,8 @@ class SetupStakingModule {
             setupStakingSharedState,
             validationExecutor,
             feeLoaderMixin,
-            rewardDestinationMixin
+            rewardDestinationMixin,
+            amountChooserMixinFactory
         )
     }
 

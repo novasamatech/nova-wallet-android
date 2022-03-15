@@ -42,6 +42,8 @@
     <color name="black3">@color/gray3</color>
     <color name="black4">@color/gray4</color>
 
+    <color name="bg_bottom_sheet">#1D1D20</color>
+
     <color name="settings_group_background">#1D1D20</color>
 
     <color name="account_icon_light">#eeeeee</color>

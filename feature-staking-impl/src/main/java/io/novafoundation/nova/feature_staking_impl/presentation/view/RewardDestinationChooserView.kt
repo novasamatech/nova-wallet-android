@@ -4,10 +4,13 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
+import android.widget.TextView
+import io.novafoundation.nova.feature_account_api.view.AddressView
 import io.novafoundation.nova.feature_staking_impl.R
 import kotlinx.android.synthetic.main.view_reward_destination_chooser.view.rewardDestinationChooserLearnMore
 import kotlinx.android.synthetic.main.view_reward_destination_chooser.view.rewardDestinationChooserPayout
 import kotlinx.android.synthetic.main.view_reward_destination_chooser.view.rewardDestinationChooserPayoutTarget
+import kotlinx.android.synthetic.main.view_reward_destination_chooser.view.rewardDestinationChooserPayoutTitle
 import kotlinx.android.synthetic.main.view_reward_destination_chooser.view.rewardDestinationChooserRestake
 
 class RewardDestinationChooserView @JvmOverloads constructor(
@@ -22,15 +25,18 @@ class RewardDestinationChooserView @JvmOverloads constructor(
         View.inflate(context, R.layout.view_reward_destination_chooser, this)
     }
 
-    val learnMore
+    val learnMore: TextView
         get() = rewardDestinationChooserLearnMore
 
-    val destinationRestake
+    val destinationRestake: RewardDestinationView
         get() = rewardDestinationChooserRestake
 
-    val destinationPayout
+    val destinationPayout: RewardDestinationView
         get() = rewardDestinationChooserPayout
 
-    val payoutTarget
+    val payoutTarget: AddressView
         get() = rewardDestinationChooserPayoutTarget
+
+    val payoutTitle: TextView
+        get() = rewardDestinationChooserPayoutTitle
 }

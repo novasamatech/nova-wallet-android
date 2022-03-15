@@ -64,8 +64,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="9dp"
+        android:singleLine="true"
         android:textColor="@color/white_64"
+        app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/chooseAmountInputField"
-        tools:text="$1,524.11" />
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintStart_toStartOf="@+id/chooseAmountInputField"
+        tools:text="@tools:sample/lorem[50]" />
 </merge>

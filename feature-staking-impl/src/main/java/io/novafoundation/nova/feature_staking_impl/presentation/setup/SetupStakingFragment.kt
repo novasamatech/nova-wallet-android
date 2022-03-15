@@ -4,26 +4,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.lifecycleScope
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
-import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.view.setProgress
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.common.rewardDestination.observeRewardDestinationChooser
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeViews
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.displayFeeStatus
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 import kotlinx.android.synthetic.main.fragment_setup_staking.setupStakingAmountField
 import kotlinx.android.synthetic.main.fragment_setup_staking.setupStakingContainer
-import kotlinx.android.synthetic.main.fragment_setup_staking.setupStakingFeeFiat
-import kotlinx.android.synthetic.main.fragment_setup_staking.setupStakingFeeProgress
-import kotlinx.android.synthetic.main.fragment_setup_staking.setupStakingFeeToken
+import kotlinx.android.synthetic.main.fragment_setup_staking.setupStakingFee
 import kotlinx.android.synthetic.main.fragment_setup_staking.setupStakingNext
 import kotlinx.android.synthetic.main.fragment_setup_staking.setupStakingRewardDestinationChooser
 import kotlinx.android.synthetic.main.fragment_setup_staking.setupStakingToolbar
@@ -69,26 +65,11 @@ class SetupStakingFragment : BaseFragment<SetupStakingViewModel>() {
         observeValidations(viewModel)
         observeBrowserEvents(viewModel)
         observeRewardDestinationChooser(viewModel, setupStakingRewardDestinationChooser)
+        setupAmountChooser(viewModel.amountChooserMixin, setupStakingAmountField)
+        setupFeeLoading(viewModel, setupStakingFee)
+
+        viewModel.title.observe(setupStakingToolbar::setTitle)
 
         viewModel.showNextProgress.observe(setupStakingNext::setProgress)
-
-        viewModel.assetModelsFlow.observe {
-            setupStakingAmountField.setAssetBalance(it.assetBalance)
-            setupStakingAmountField.setAssetName(it.tokenName)
-            setupStakingAmountField.loadAssetImage(it.imageUrl)
-        }
-
-        setupStakingAmountField.amountInput.bindTo(viewModel.enteredAmountFlow, lifecycleScope)
-
-        viewModel.enteredFiatAmountFlow.observe {
-            it.let(setupStakingAmountField::setFiatAmount)
-        }
-
-        viewModel.feeLiveData.observe {
-            displayFeeStatus(
-                it,
-                FeeViews(setupStakingFeeProgress, setupStakingFeeFiat, setupStakingFeeToken)
-            )
-        }
     }
 }
