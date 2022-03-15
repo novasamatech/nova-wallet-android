@@ -10,4 +10,3 @@ class SubQueryTotalRewardResponse(val accumulatedRewards: SubQueryNodes<TotalRew
 
 val SubQueryTotalRewardResponse.totalReward: BigInteger
     get() = accumulatedRewards.nodes.firstOrNull()?.amount ?: BigInteger.ZERO
-

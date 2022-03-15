@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.data.mappers
 
-import io.novafoundation.nova.common.data.network.subquery.SubQueryResponse
 import io.novafoundation.nova.core_db.model.TotalRewardLocal
 import io.novafoundation.nova.feature_staking_impl.domain.model.TotalReward
 
