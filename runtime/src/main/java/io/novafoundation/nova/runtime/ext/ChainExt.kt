@@ -3,6 +3,7 @@ package io.novafoundation.nova.runtime.ext
 import io.novafoundation.nova.common.data.network.runtime.binding.MultiAddress
 import io.novafoundation.nova.common.data.network.runtime.binding.bindOrNull
 import io.novafoundation.nova.common.utils.ethereumAddressFromPublicKey
+import io.novafoundation.nova.common.utils.ethereumAddressToAccountId
 import io.novafoundation.nova.common.utils.ethereumAddressToHex
 import io.novafoundation.nova.common.utils.formatNamed
 import io.novafoundation.nova.common.utils.substrateAccountId
@@ -49,7 +50,7 @@ fun Chain.addressOf(accountId: ByteArray): String {
 
 fun Chain.accountIdOf(address: String): ByteArray {
     return if (isEthereumBased) {
-        address.fromHex()
+        address.ethereumAddressToAccountId()
     } else {
         address.toAccountId()
     }
