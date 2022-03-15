@@ -2,16 +2,16 @@ package io.novafoundation.nova.feature_staking_impl.data.network.subquery.reques
 
 class StakingSumRewardRequest(accountAddress: String) {
     val query = """
-    query {
-        historyElements(
-        filter: {
-            reward: { notEqualTo: "null"},
-            address: { equalTo: "$accountAddress"}  }
-        ) {
-            nodes {
-                  reward
+        query {
+            accumulatedRewards (
+               filter: {
+                    id: { equalTo: "$accountAddress"}  
+               }  
+            ) {
+                nodes {
+                    amount
+                }
             }
         }
-    }
     """.trimIndent()
 }

@@ -5,6 +5,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
 
 interface StakingRewardsDataSource {
+
     fun totalRewardsFlow(accountAddress: String): Flow<TotalReward>
 
     suspend fun sync(accountAddress: String, chain: Chain)
