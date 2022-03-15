@@ -39,9 +39,6 @@ class ConfirmSendFragment : BaseFragment<ConfirmSendViewModel>() {
         }
     }
 
-    @Inject
-    lateinit var imageLoader: ImageLoader
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
