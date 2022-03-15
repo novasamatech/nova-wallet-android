@@ -165,7 +165,7 @@ class SelectSendViewModel(
             assetPayload = assetPayload,
             recipientAddress = validPayload.transfer.recipient
         )
-        
+
         router.openConfirmTransfer(transferDraft)
     }
 
