@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_assets.presentation.send.confirm
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
@@ -26,7 +25,6 @@ import kotlinx.android.synthetic.main.fragment_confirm_send.confirmSendRecipient
 import kotlinx.android.synthetic.main.fragment_confirm_send.confirmSendSender
 import kotlinx.android.synthetic.main.fragment_confirm_send.confirmSendToolbar
 import kotlinx.android.synthetic.main.fragment_confirm_send.confirmSendWallet
-import javax.inject.Inject
 
 private const val KEY_DRAFT = "KEY_DRAFT"
 
