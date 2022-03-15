@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.list.di.Balanc
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.GoToNftsView
 import io.novafoundation.nova.feature_assets.presentation.receive.di.ReceiveComponent
 import io.novafoundation.nova.feature_assets.presentation.send.amount.di.SelectSendComponent
-import io.novafoundation.nova.feature_assets.presentation.send.confirm.di.ConfirmTransferComponent
+import io.novafoundation.nova.feature_assets.presentation.send.confirm.di.ConfirmSendComponent
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.ExtrinsicDetailComponent
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.RewardDetailComponent
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.TransactionDetailComponent
@@ -39,7 +39,7 @@ interface AssetsFeatureComponent : AssetsFeatureApi {
 
     fun chooseAmountComponentFactory(): SelectSendComponent.Factory
 
-    fun confirmTransferComponentFactory(): ConfirmTransferComponent.Factory
+    fun confirmTransferComponentFactory(): ConfirmSendComponent.Factory
 
     fun transactionDetailComponentFactory(): TransactionDetailComponent.Factory
 

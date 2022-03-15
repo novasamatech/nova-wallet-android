@@ -18,16 +18,16 @@ import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.WalletRouter
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
-import io.novafoundation.nova.feature_assets.presentation.send.confirm.ConfirmTransferViewModel
+import io.novafoundation.nova.feature_assets.presentation.send.confirm.ConfirmSendViewModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
-class ConfirmTransferModule {
+class ConfirmSendModule {
 
     @Provides
     @IntoMap
-    @ViewModelKey(ConfirmTransferViewModel::class)
+    @ViewModelKey(ConfirmSendViewModel::class)
     fun provideViewModel(
         interactor: WalletInteractor,
         sendInteractor: SendInteractor,
@@ -42,7 +42,7 @@ class ConfirmTransferModule {
         transferDraft: TransferDraft,
         chainRegistry: ChainRegistry,
     ): ViewModel {
-        return ConfirmTransferViewModel(
+        return ConfirmSendViewModel(
             interactor,
             sendInteractor,
             router,
@@ -62,7 +62,7 @@ class ConfirmTransferModule {
     fun provideViewModelCreator(
         fragment: Fragment,
         viewModelFactory: ViewModelProvider.Factory
-    ): ConfirmTransferViewModel {
-        return ViewModelProvider(fragment, viewModelFactory).get(ConfirmTransferViewModel::class.java)
+    ): ConfirmSendViewModel {
+        return ViewModelProvider(fragment, viewModelFactory).get(ConfirmSendViewModel::class.java)
     }
 }

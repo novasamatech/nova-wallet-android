@@ -5,15 +5,15 @@ import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
-import io.novafoundation.nova.feature_assets.presentation.send.confirm.ConfirmTransferFragment
+import io.novafoundation.nova.feature_assets.presentation.send.confirm.ConfirmSendFragment
 
 @Subcomponent(
     modules = [
-        ConfirmTransferModule::class
+        ConfirmSendModule::class
     ]
 )
 @ScreenScope
-interface ConfirmTransferComponent {
+interface ConfirmSendComponent {
 
     @Subcomponent.Factory
     interface Factory {
@@ -21,8 +21,8 @@ interface ConfirmTransferComponent {
         fun create(
             @BindsInstance fragment: Fragment,
             @BindsInstance transferDraft: TransferDraft
-        ): ConfirmTransferComponent
+        ): ConfirmSendComponent
     }
 
-    fun inject(fragment: ConfirmTransferFragment)
+    fun inject(fragment: ConfirmSendFragment)
 }

@@ -11,8 +11,9 @@ import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.ButtonState
+import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
-import io.novafoundation.nova.feature_account_api.domain.model.addressIn
+import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -27,6 +28,9 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountSign
+import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.model.mapMetaAccountToWalletModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,7 +40,7 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
-class ConfirmTransferViewModel(
+class ConfirmSendViewModel(
     private val interactor: WalletInteractor,
     private val sendInteractor: SendInteractor,
     private val router: WalletRouter,
@@ -72,25 +76,25 @@ class ConfirmTransferViewModel(
         .share()
 
     val recipientModel = flowOf {
-        addressIconGenerator.createAddressModel(
-            chain = chain(),
-            sizeInDp = AddressIconGenerator.SIZE_MEDIUM,
-            address = transferDraft.recipientAddress,
-            addressDisplayUseCase = addressDisplayUseCase
-        )
+        createAddressModel(transferDraft.recipientAddress, resolveName = true)
     }
         .inBackground()
         .share()
 
-    val senderModel = currentAccount.mapLatest {
-        addressIconGenerator.createAddressModel(
-            chain = chain(),
-            sizeInDp = AddressIconGenerator.SIZE_MEDIUM,
-            address = it.addressIn(chain())!!,
-            addressDisplayUseCase = addressDisplayUseCase
-        )
+    val senderModel = currentAccount.mapLatest { metaAccount ->
+        createAddressModel(metaAccount.requireAddressIn(chain()), resolveName = false)
     }
         .inBackground()
+        .share()
+
+    val amountModel = assetFlow.map { asset ->
+        mapAmountToAmountModel(transferDraft.amount, asset, tokenAmountSign = AmountSign.NEGATIVE)
+    }
+
+    val chainUi = flowOf { mapChainToUi(chain()) }
+        .share()
+
+    val wallet = currentAccount.mapLatest(::mapMetaAccountToWalletModel)
         .share()
 
     private val _transferSubmittingLiveData = MutableStateFlow(false)
@@ -139,6 +143,15 @@ class ConfirmTransferViewModel(
     private fun setInitialState() = launch {
         feeLoaderMixin.setFee(transferDraft.fee)
     }
+
+    private suspend fun createAddressModel(address: String, resolveName: Boolean) =
+        addressIconGenerator.createAddressModel(
+            chain = chain(),
+            sizeInDp = AddressIconGenerator.SIZE_MEDIUM,
+            address = address,
+            background = AddressIconGenerator.BACKGROUND_TRANSPARENT,
+            addressDisplayUseCase = addressDisplayUseCase.takeIf { resolveName }
+        )
 
     private fun performTransfer(transfer: AssetTransfer, fee: BigDecimal) = launch {
         sendInteractor.performTransfer(transfer, fee)

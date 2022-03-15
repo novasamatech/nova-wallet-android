@@ -20,12 +20,12 @@ suspend fun AddressIconGenerator.createAddressModel(
     chain: Chain,
     address: String,
     sizeInDp: Int,
-    addressDisplayUseCase: AddressDisplayUseCase,
+    addressDisplayUseCase: AddressDisplayUseCase? = null,
     @ColorRes background: Int = AddressIconGenerator.BACKGROUND_DEFAULT,
 ): AddressModel {
     val icon = createAddressIcon(chain, address, sizeInDp, background)
 
-    return AddressModel(address, icon, addressDisplayUseCase(chain, address))
+    return AddressModel(address, icon, addressDisplayUseCase?.invoke(chain, address))
 }
 
 suspend fun AddressIconGenerator.createAddressModel(

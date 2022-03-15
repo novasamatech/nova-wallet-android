@@ -165,10 +165,8 @@ class SelectSendViewModel(
             assetPayload = assetPayload,
             recipientAddress = validPayload.transfer.recipient
         )
-
-        showMessage("Ready to open confirm")
-
-//        router.openConfirmTransfer(transferDraft)
+        
+        router.openConfirmTransfer(transferDraft)
     }
 
     private fun autoFixValidationPayload(
