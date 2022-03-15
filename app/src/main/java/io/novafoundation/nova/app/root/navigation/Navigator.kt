@@ -37,7 +37,7 @@ import io.novafoundation.nova.feature_assets.presentation.model.OperationParceli
 import io.novafoundation.nova.feature_assets.presentation.receive.ReceiveFragment
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SelectSendFragment
-import io.novafoundation.nova.feature_assets.presentation.send.confirm.ConfirmTransferFragment
+import io.novafoundation.nova.feature_assets.presentation.send.confirm.ConfirmSendFragment
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.extrinsic.ExtrinsicDetailFragment
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.reward.RewardDetailFragment
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.transfer.TransferDetailFragment
@@ -347,7 +347,7 @@ class Navigator(
     }
 
     override fun openConfirmTransfer(transferDraft: TransferDraft) {
-        val bundle = ConfirmTransferFragment.getBundle(transferDraft)
+        val bundle = ConfirmSendFragment.getBundle(transferDraft)
 
         navController?.navigate(R.id.action_chooseAmountFragment_to_confirmTransferFragment, bundle)
     }

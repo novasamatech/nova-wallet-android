@@ -13,6 +13,10 @@ data class AmountModel(
     val fiat: String
 )
 
+enum class AmountSign(val signSymbol: String) {
+    NONE(""), NEGATIVE("-"), POSITIVE("+")
+}
+
 fun mapAmountToAmountModel(
     amountInPlanks: BigInteger,
     asset: Asset
@@ -32,11 +36,12 @@ fun mapAmountToAmountModel(
 fun mapAmountToAmountModel(
     amount: BigDecimal,
     token: Token,
+    tokenAmountSign: AmountSign = AmountSign.NONE
 ): AmountModel {
     val fiatAmount = token.fiatAmount(amount)
 
     return AmountModel(
-        token = amount.formatTokenAmount(token.configuration),
+        token = tokenAmountSign.signSymbol + amount.formatTokenAmount(token.configuration),
         fiat = fiatAmount.formatAsCurrency()
     )
 }
@@ -44,4 +49,5 @@ fun mapAmountToAmountModel(
 fun mapAmountToAmountModel(
     amount: BigDecimal,
     asset: Asset,
-): AmountModel = mapAmountToAmountModel(amount, asset.token)
+    tokenAmountSign: AmountSign = AmountSign.NONE
+): AmountModel = mapAmountToAmountModel(amount, asset.token, tokenAmountSign)

@@ -413,9 +413,9 @@
 
     <fragment
         android:id="@+id/confirmTransferFragment"
-        android:name="io.novafoundation.nova.feature_assets.presentation.send.confirm.ConfirmTransferFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.send.confirm.ConfirmSendFragment"
         android:label="ConfirmTransferFragment"
-        tools:layout="@layout/fragment_confirm_transfer">
+        tools:layout="@layout/fragment_confirm_send">
 
         <action
             android:id="@+id/finish_send_flow"
