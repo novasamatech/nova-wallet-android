@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingState
 import io.novafoundation.nova.feature_staking_impl.domain.model.Unbonding
 import io.novafoundation.nova.feature_staking_impl.domain.staking.unbond.UnbondInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.staking.unbond.UnboningsdState
 import io.novafoundation.nova.feature_staking_impl.domain.validations.balance.ManageStakingValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.validations.balance.ManageStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -99,22 +100,23 @@ private class UnbondingMixinProvider(
     }
 
     private suspend fun openConfirmRebond(amountBuilder: (List<Unbonding>) -> BigInteger) {
-        val unbondings = unbondingsFlow.first()
+        val unbondingsState = unbondingsFlow.first()
         val asset = assetFlow.first()
 
-        val amountInPlanks = amountBuilder(unbondings)
+        val amountInPlanks = amountBuilder(unbondingsState.unbondings)
         val amount = asset.token.amountFromPlanks(amountInPlanks)
 
         router.openConfirmRebond(ConfirmRebondPayload(amount))
     }
 
-    private fun createUiState(unbondings: List<Unbonding>, asset: Asset): UnbondingMixin.State {
-        return if (unbondings.isEmpty()) {
+    private fun createUiState(unbondingsState: UnboningsdState, asset: Asset): UnbondingMixin.State {
+        return if (unbondingsState.unbondings.isEmpty()) {
             UnbondingMixin.State.Empty
         } else {
             UnbondingMixin.State.HaveUnbondings(
-                redeemEnabled = unbondings.any { it.status is Unbonding.Status.Redeemable },
-                unbondings = unbondings.mapIndexed { idx, unbonding ->
+                redeemEnabled = unbondingsState.anythingToRedeem,
+                cancelEnabled = unbondingsState.anythingToUnbond,
+                unbondings = unbondingsState.unbondings.mapIndexed { idx, unbonding ->
                     mapUnbondingToUnbondingModel(idx, unbonding, asset)
                 }
             )

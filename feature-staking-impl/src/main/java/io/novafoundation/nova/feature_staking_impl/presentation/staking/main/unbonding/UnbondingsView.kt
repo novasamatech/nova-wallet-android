@@ -45,6 +45,7 @@ class UnbondingsView @JvmOverloads constructor(
                 unbondingsAdapter.submitList(state.unbondings)
 
                 unbondingRedeem.isEnabled = state.redeemEnabled
+                unbondingCancel.isEnabled = state.cancelEnabled
             }
         }
     }

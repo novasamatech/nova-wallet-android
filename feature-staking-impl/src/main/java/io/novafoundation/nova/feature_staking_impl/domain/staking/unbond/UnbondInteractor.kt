@@ -48,7 +48,7 @@ class UnbondInteractor(
         }
     }
 
-    fun unbondingsFlow(stakingState: StakingState.Stash): Flow<List<Unbonding>> {
+    fun unbondingsFlow(stakingState: StakingState.Stash): Flow<UnboningsdState> {
         return flowOf(stakingState).flatMapLatest { stash ->
             val calculator = eraTimeCalculator.create(stakingState.chain.id)
 
@@ -56,24 +56,29 @@ class UnbondInteractor(
                 stakingRepository.ledgerFlow(stash),
                 stakingRepository.observeActiveEraIndex(stash.chain.id)
             ) { ledger, activeEraIndex ->
-                ledger.unlocking
-                    .map {
-                        val progressState = if (it.isRedeemableIn(activeEraIndex)) {
-                            Unbonding.Status.Redeemable
-                        } else {
-                            val leftTime = calculator.calculate(destinationEra = it.era)
+                val unbondings = ledger.unlocking.map {
+                    val progressState = if (it.isRedeemableIn(activeEraIndex)) {
+                        Unbonding.Status.Redeemable
+                    } else {
+                        val leftTime = calculator.calculate(destinationEra = it.era)
 
-                            Unbonding.Status.Unbonding(
-                                timeLeft = leftTime.toLong(),
-                                calculatedAt = System.currentTimeMillis()
-                            )
-                        }
-
-                        Unbonding(
-                            amount = it.amount,
-                            status = progressState,
+                        Unbonding.Status.Unbonding(
+                            timeLeft = leftTime.toLong(),
+                            calculatedAt = System.currentTimeMillis()
                         )
                     }
+
+                    Unbonding(
+                        amount = it.amount,
+                        status = progressState,
+                    )
+                }
+
+                UnboningsdState(
+                    unbondings = unbondings,
+                    anythingToRedeem = unbondings.any { it.status is Unbonding.Status.Redeemable },
+                    anythingToUnbond = unbondings.any { it.status is Unbonding.Status.Unbonding }
+                )
             }
         }
     }
@@ -85,7 +90,7 @@ class UnbondInteractor(
     ) {
         // see https://github.com/paritytech/substrate/blob/master/frame/staking/src/lib.rs#L1614
         if (
-            // if account is nominating
+        // if account is nominating
             stashState is StakingState.Stash.Nominator &&
             // and resulting bonded balance is less than min bond
             currentBondedBalance - unbondAmount < stakingRepository.minimumNominatorBond(stashState.chain.id)
@@ -97,7 +102,9 @@ class UnbondInteractor(
     }
 
     // unbondings are always going from the oldest to newest so last in the list will be the newest one
-    fun newestUnbondingAmount(unbondings: List<Unbonding>) = unbondings.last().amount
+    fun newestUnbondingAmount(unbondings: List<Unbonding>) = unbondings.filterNonRedeemable().last().amount
 
-    fun allUnbondingsAmount(unbondings: List<Unbonding>): BigInteger = unbondings.sumByBigInteger(Unbonding::amount)
+    fun allUnbondingsAmount(unbondings: List<Unbonding>): BigInteger = unbondings.filterNonRedeemable().sumByBigInteger(Unbonding::amount)
+
+    private fun List<Unbonding>.filterNonRedeemable() = filter { it.status is Unbonding.Status.Unbonding }
 }
