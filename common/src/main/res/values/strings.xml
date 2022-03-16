@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="staking_rebond_custom">Custom amount</string>
+  <string name="staking_rebond_all">All unstaking</string>
+  <string name="staking_rebond_last">Latest unstake</string>
   <string name="staking_select_payout_account">Select payout account</string>
 
   <string name="staking_rewards_about">About rewards</string>
@@ -448,9 +451,7 @@
   <string name="staking_pending_rewards_info">Validators payout the rewards every 2–5 days. However, you can payout them by yourself, especially if rewards are close to expiring, but you will pay the fee.</string>
   <string name="staking_pending_rewards_info_v2_2_0">Rewards are paid every 2–3 days by validators. You can payout them by yourself, when they are close to expire, but you will pay the fee</string>
   <string name="staking_rebond">Return to stake</string>
-  <string name="staking_rebond_all">Rebond all</string>
   <string name="staking_rebond_insufficient_bondings">Amount you want to return to stake is greater than unstaking balance</string>
-  <string name="staking_rebond_last">Rebond last</string>
   <string name="staking_recommended_feature_1">Most profitable</string>
   <string name="staking_recommended_feature_2">Not oversubscribed</string>
   <string name="staking_recommended_feature_3">Having onchain identity</string>

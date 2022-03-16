@@ -17,7 +17,7 @@ class ChooseRebondKindBottomSheet(
 
         setOnCancelListener { onCancel() }
 
-        setTitle(R.string.wallet_balance_unbonding_v1_9_0)
+        setTitle(R.string.staking_rebond)
 
         item(R.drawable.ic_staking_outline, R.string.staking_rebond_all) {
             actionListener(RebondKind.ALL)
@@ -27,7 +27,7 @@ class ChooseRebondKindBottomSheet(
             actionListener(RebondKind.LAST)
         }
 
-        item(R.drawable.ic_staking_outline, R.string.staking_rebond) {
+        item(R.drawable.ic_staking_outline, R.string.staking_rebond_custom) {
             actionListener(RebondKind.CUSTOM)
         }
     }
