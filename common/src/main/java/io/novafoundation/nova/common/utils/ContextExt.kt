@@ -83,10 +83,15 @@ interface WithContextExtensions {
         get() = dp(providedContext)
 
     fun addRipple(to: Drawable) = providedContext.addRipple(to)
+    fun Drawable.withRipple() = addRipple(this)
 
     fun getRoundedCornerDrawable(
         @ColorRes fillColorRes: Int = R.color.black,
         @ColorRes strokeColorRes: Int? = null,
-        cornerSizeDp: Int = 10,
+        cornerSizeDp: Int = 12,
     ) = providedContext.getRoundedCornerDrawable(fillColorRes, strokeColorRes, cornerSizeDp)
+}
+
+fun WithContextExtensions(context: Context) = object : WithContextExtensions {
+    override val providedContext: Context = context
 }

@@ -1,21 +1,21 @@
-package io.novafoundation.nova.common.address
+package io.novafoundation.nova.feature_account_api.presenatation.account.chooser
 
 import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.annotation.StringRes
 import androidx.recyclerview.widget.DiffUtil
-import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.ClickHandler
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListSheetAdapter
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.HolderCreator
-import kotlinx.android.synthetic.main.item_address_chooser.view.accountChecked
-import kotlinx.android.synthetic.main.item_address_chooser.view.accountIcon
-import kotlinx.android.synthetic.main.item_address_chooser.view.accountTitle
+import io.novafoundation.nova.feature_account_api.R
+import kotlinx.android.synthetic.main.item_account_chooser.view.itemAccountChooserAddress
+import kotlinx.android.synthetic.main.item_account_chooser.view.itemAccountChooserCheck
 
-class AddressChooserBottomSheetDialog(
+class AccountChooserBottomSheetDialog(
     context: Context,
     payload: Payload<AddressModel>,
     clickHandler: ClickHandler<AddressModel>,
@@ -28,10 +28,11 @@ class AddressChooserBottomSheetDialog(
         super.onCreate(savedInstanceState)
 
         setTitle(title)
+        setDividerVisible(false)
     }
 
     override fun holderCreator(): HolderCreator<AddressModel> = { parent ->
-        AddressModelHolder(parent.inflateChild(R.layout.item_address_chooser))
+        AddressModelHolder(parent.inflateChild(R.layout.item_account_chooser))
     }
 }
 
@@ -45,9 +46,8 @@ private class AddressModelHolder(parent: View) : DynamicListSheetAdapter.Holder<
         super.bind(item, isSelected, handler)
 
         with(itemView) {
-            accountTitle.text = item.name ?: item.address
-            accountIcon.setImageDrawable(item.image)
-            accountChecked.visibility = if (isSelected) View.VISIBLE else View.INVISIBLE
+            itemAccountChooserAddress.setAddressModel(item)
+            itemAccountChooserCheck.isChecked = isSelected
         }
     }
 }

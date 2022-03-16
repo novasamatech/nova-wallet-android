@@ -7,11 +7,12 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Retriable
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.formatAsCurrency
+import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_staking_api.domain.model.RewardDestination
+import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.mappers.mapRewardDestinationModelToRewardDestination
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculatorFactory
@@ -22,20 +23,14 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.common.rewardDestination.RewardDestinationMixin
+import io.novafoundation.nova.feature_staking_impl.presentation.common.rewardDestination.connectWith
 import io.novafoundation.nova.feature_staking_impl.presentation.common.validation.stakingValidationFailure
-import io.novafoundation.nova.feature_wallet_api.data.mappers.mapAssetToAssetModel
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
@@ -49,7 +44,8 @@ class SetupStakingViewModel(
     private val setupStakingSharedState: SetupStakingSharedState,
     private val validationExecutor: ValidationExecutor,
     private val feeLoaderMixin: FeeLoaderMixin.Presentation,
-    private val rewardDestinationMixin: RewardDestinationMixin.Presentation
+    private val rewardDestinationMixin: RewardDestinationMixin.Presentation,
+    amountChooserMixinFactory: AmountChooserMixin.Factory,
 ) : BaseViewModel(),
     Retriable,
     Validatable by validationExecutor,
@@ -64,28 +60,23 @@ class SetupStakingViewModel(
     private val assetFlow = interactor.currentAssetFlow()
         .share()
 
-    val assetModelsFlow = assetFlow
-        .map { mapAssetToAssetModel(it, resourceManager) }
-        .flowOn(Dispatchers.Default)
-
-    val enteredAmountFlow = MutableSharedFlow<String>(replay = 1)
-
-    private val parsedAmountFlow = enteredAmountFlow.mapNotNull { it.toBigDecimalOrNull() }
-        .onStart { emit(BigDecimal.ZERO) }
-        .share()
-
-    val enteredFiatAmountFlow = assetFlow.combine(parsedAmountFlow) { asset, amount ->
-        asset.token.fiatAmount(amount).formatAsCurrency()
-    }
-        .flowOn(Dispatchers.Default)
-        .asLiveData()
-
     private val rewardCalculator = viewModelScope.async { rewardCalculatorFactory.create() }
+
+    val amountChooserMixin = amountChooserMixinFactory.create(
+        scope = this,
+        assetFlow = assetFlow,
+        balanceField = Asset::transferable,
+        balanceLabel = R.string.wallet_balance_transferable
+    )
+
+    val title = assetFlow.map { resourceManager.getString(R.string.staking_stake_format, it.token.configuration.symbol) }
+        .inBackground()
+        .share()
 
     init {
         loadFee()
 
-        startUpdatingReturns()
+        rewardDestinationMixin.connectWith(amountChooserMixin, rewardCalculator = rewardCalculator)
     }
 
     fun nextClicked() {
@@ -96,12 +87,6 @@ class SetupStakingViewModel(
         setupStakingSharedState.set(currentProcessState.previous())
 
         router.back()
-    }
-
-    private fun startUpdatingReturns() {
-        assetFlow.combine(parsedAmountFlow, ::Pair)
-            .onEach { (asset, amount) -> rewardDestinationMixin.updateReturns(rewardCalculator(), asset, amount) }
-            .launchIn(viewModelScope)
     }
 
     private fun loadFee() {
@@ -120,7 +105,7 @@ class SetupStakingViewModel(
         launch {
             val rewardDestinationModel = rewardDestinationMixin.rewardDestinationModelFlow.first()
             val rewardDestination = mapRewardDestinationModelToRewardDestination(rewardDestinationModel)
-            val amount = parsedAmountFlow.first()
+            val amount = amountChooserMixin.amount.first()
             val currentAccountAddress = interactor.getSelectedAccountProjection().address
 
             val payload = SetupStakingPayload(
@@ -158,6 +143,4 @@ class SetupStakingViewModel(
         block,
         onError = { title, message -> showError(title, message) }
     )
-
-    private suspend fun rewardCalculator() = rewardCalculator.await()
 }

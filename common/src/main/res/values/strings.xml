@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="staking_select_payout_account">Select payout account</string>
+
+  <string name="staking_rewards_about">About rewards</string>
+  <string name="staking_reward_destination">Reward destination</string>
+  <string name="staking_stake_format">Stake %s</string>
+  <!--  <string name="staking_stake">Stake</string>-->
+<!--  <string name="staking_rewards_learn_more">Learn more about rewards</string>-->
+<!--  <string name="staking_rewards_learn_more_v2_2_0">More about rewards</string>-->
+
   <string name="wallet_send_tokens_on">Send %s on</string>
 
   <string name="common_validation_invalid_address_title">Invalid recipient</string>
@@ -13,7 +22,6 @@
 
   <string name="common_transaction_id">Transaction ID</string>
   <string name="common_type">Type</string>
-
 
   <string name="nft_price_not_listed">Not listed</string>
   <string name="common_price">Price</string>
@@ -467,8 +475,6 @@
   <string name="staking_reward_payouts_title_v2_2_0">Unpaid rewards</string>
   <string name="staking_rewards_apy">Rewards (APY)</string>
   <string name="staking_rewards_destination_title_v2_0_0">Rewards destination</string>
-  <string name="staking_rewards_learn_more">Learn more about rewards</string>
-  <string name="staking_rewards_learn_more_v2_2_0">More about rewards</string>
   <string name="staking_select_custom">Select by yourself</string>
   <string name="staking_select_recommended">Select recommended</string>
   <string name="staking_selected_validators_count_v1.9.1" formatted="false">selected %d (max %d)</string>
@@ -484,7 +490,7 @@
   <string name="staking_setup_reward_destination_section_title_v2_2_0">Select your rewards type</string>
   <string name="staking_setup_reward_payout_account">Payout account</string>
   <string name="staking_slash">Slash</string>
-  <string name="staking_stake">Stake</string>
+
   <string name="staking_staking_period">Staking period</string>
   <string name="staking_start_change_validators_custom_subtitle">You should trust your nominations to act competently and honest, basing your decision purely on their current profitability could lead to reduced profits or even loss of funds.</string>
   <string name="staking_start_change_validators_custom_subtitle_v2_2_0">Choose your validators carefully, as they should act proficiently and honest. Basing your decision purely on the profitability could lead to reduced rewards or even loss of stake</string>

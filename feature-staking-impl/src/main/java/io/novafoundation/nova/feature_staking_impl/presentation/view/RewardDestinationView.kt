@@ -1,38 +1,28 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.view
 
 import android.content.Context
-import android.graphics.drawable.StateListDrawable
 import android.util.AttributeSet
-import android.util.StateSet
 import android.view.View
-import android.widget.Checkable
 import androidx.constraintlayout.widget.ConstraintLayout
-import io.novafoundation.nova.common.utils.getColorFromAttr
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
-import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawableFromColors
 import io.novafoundation.nova.feature_staking_impl.R
 import kotlinx.android.synthetic.main.view_payout_target.view.payoutTargetAmountFiat
 import kotlinx.android.synthetic.main.view_payout_target.view.payoutTargetAmountGain
 import kotlinx.android.synthetic.main.view_payout_target.view.payoutTargetAmountToken
 import kotlinx.android.synthetic.main.view_payout_target.view.payoutTargetCheck
 import kotlinx.android.synthetic.main.view_payout_target.view.payoutTargetName
-import io.novafoundation.nova.common.R as RCommon
-
-private val CheckedStateSet = intArrayOf(android.R.attr.state_checked)
 
 class RewardDestinationView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : ConstraintLayout(context, attrs, defStyleAttr), Checkable {
-
-    private var isChecked: Boolean = false
+) : ConstraintLayout(context, attrs, defStyleAttr) {
 
     init {
         View.inflate(context, R.layout.view_payout_target, this)
 
-        background = stateDrawable()
+        background = context.getRoundedCornerDrawable(R.color.white_8)
 
         attrs?.let(this::applyAttrs)
     }
@@ -65,31 +55,7 @@ class RewardDestinationView @JvmOverloads constructor(
         payoutTargetAmountFiat.setTextOrHide(amount)
     }
 
-    override fun setChecked(checked: Boolean) {
-        isChecked = checked
+    fun setChecked(checked: Boolean) {
         payoutTargetCheck.isChecked = checked
-        refreshDrawableState()
-    }
-
-    override fun isChecked(): Boolean = isChecked
-
-    override fun toggle() {
-        isChecked = !isChecked
-        refreshDrawableState()
-    }
-
-    override fun onCreateDrawableState(extraSpace: Int): IntArray {
-        val drawableState = super.onCreateDrawableState(extraSpace + 1)
-
-        if (isChecked()) {
-            mergeDrawableStates(drawableState, CheckedStateSet)
-        }
-
-        return drawableState
-    }
-
-    private fun stateDrawable() = StateListDrawable().apply {
-        addState(CheckedStateSet, context.getRoundedCornerDrawableFromColors(strokeColor = context.getColorFromAttr(R.attr.colorAccent)))
-        addState(StateSet.WILD_CARD, context.getRoundedCornerDrawable(strokeColorRes = RCommon.color.gray2))
     }
 }

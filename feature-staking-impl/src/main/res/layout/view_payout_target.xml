@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="64dp"
+    android:layout_height="wrap_content"
     tools:background="@color/black"
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
@@ -19,70 +19,73 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/payoutTargetName"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="11dp"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toTopOf="@+id/payoutTargetAmountGain"
         app:layout_constraintStart_toEndOf="@+id/payoutTargetCheck"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="Restake" />
 
-        <TextView
-            android:id="@+id/payoutTargetName"
-            style="@style/TextAppearance.NovaFoundation.Header5"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toEndOf="@+id/payoutTargetCheck"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="Restake" />
-
-        <TextView
-            android:id="@+id/payoutTargetAmountGain"
-            style="@style/TextAppearance.NovaFoundation.CapsTitle1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:textColor="@color/green"
-            app:layout_constraintStart_toStartOf="@+id/payoutTargetName"
-            app:layout_constraintTop_toBottomOf="@+id/payoutTargetName"
-            tools:text="+35.51%" />
-
-    </LinearLayout>
-
-    <LinearLayout
+    <TextView
+        android:id="@+id/payoutTargetAmountGain"
+        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="8dp"
-        android:gravity="end|center"
-        android:orientation="vertical"
+        android:layout_marginTop="2dp"
+        android:textColor="@color/green"
+        android:layout_marginBottom="11dp"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/payoutTargetName"
+        app:layout_constraintTop_toBottomOf="@+id/payoutTargetName"
+        tools:text="+35.51%" />
+
+    <TextView
+        android:id="@+id/payoutTargetAmountToken"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:singleLine="true"
+        android:ellipsize="middle"
+        android:layout_marginEnd="16dp"
+        android:textColor="@color/white"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintBottom_toTopOf="@+id/payoutTargetAmountFiat"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintStart_toStartOf="@+id/payoutTargetStartBarrier"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="4.12 KSM" />
 
-        <TextView
-            android:id="@+id/payoutTargetAmountToken"
-            style="@style/TextAppearance.NovaFoundation.CapsTitle1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="4.12 KSM" />
+    <TextView
+        android:id="@+id/payoutTargetAmountFiat"
+        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="3dp"
+        android:singleLine="true"
+        android:textColor="@color/white_64"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/payoutTargetAmountToken"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintStart_toStartOf="@+id/payoutTargetStartBarrier"
+        app:layout_constraintTop_toBottomOf="@+id/payoutTargetAmountToken"
+        tools:text="$432.94" />
 
-        <TextView
-            android:id="@+id/payoutTargetAmountFiat"
-            style="@style/TextAppearance.NovaFoundation.CapsTitle1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:textColor="@color/gray1"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/payoutTargetAmountToken"
-            tools:text="$432.9" />
-    </LinearLayout>
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/payoutTargetStartBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="end"
+        app:constraint_referenced_ids="payoutTargetName,payoutTargetAmountGain" />
 </merge>
