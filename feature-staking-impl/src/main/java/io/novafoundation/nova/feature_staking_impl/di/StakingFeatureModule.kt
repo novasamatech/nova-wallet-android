@@ -333,7 +333,8 @@ class StakingFeatureModule {
     fun provideUnbondInteractor(
         extrinsicService: ExtrinsicService,
         stakingRepository: StakingRepository,
-    ) = UnbondInteractor(extrinsicService, stakingRepository)
+        eraTimeCalculatorFactory: EraTimeCalculatorFactory,
+    ) = UnbondInteractor(extrinsicService, stakingRepository, eraTimeCalculatorFactory)
 
     @Provides
     @FeatureScope

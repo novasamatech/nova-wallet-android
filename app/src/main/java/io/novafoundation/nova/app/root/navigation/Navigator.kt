@@ -217,8 +217,8 @@ class Navigator(
         navController?.navigate(R.id.action_selectUnbondFragment_to_confirmUnbondFragment, ConfirmUnbondFragment.getBundle(payload))
     }
 
-    override fun openRedeem(payload: RedeemPayload) {
-        navController?.navigate(R.id.action_open_redeemFragment, RedeemFragment.getBundle(payload))
+    override fun openRedeem() {
+        navController?.navigate(R.id.action_open_redeemFragment, RedeemFragment.getBundle(RedeemPayload()))
     }
 
     override fun openConfirmRebond(payload: ConfirmRebondPayload) {
@@ -260,7 +260,7 @@ class Navigator(
     }
 
     override fun openCustomRebond() {
-        navController?.navigate(R.id.action_stakingBalanceFragment_to_customRebondFragment)
+        navController?.navigate(R.id.action_mainFragment_to_customRebondFragment)
     }
 
     override fun openCurrentValidators() {

@@ -41,17 +41,17 @@ class RedeemModule {
         singleAssetSharedState: StakingSharedState,
     ): ViewModel {
         return RedeemViewModel(
-            router,
-            interactor,
-            redeemInteractor,
-            resourceManager,
-            validationExecutor,
-            validationSystem,
-            iconGenerator,
-            feeLoaderMixin,
-            externalActions,
-            payload,
-            singleAssetSharedState
+            router = router,
+            interactor = interactor,
+            redeemInteractor = redeemInteractor,
+            resourceManager = resourceManager,
+            validationExecutor = validationExecutor,
+            validationSystem = validationSystem,
+            iconGenerator = iconGenerator,
+            feeLoaderMixin = feeLoaderMixin,
+            externalActions = externalActions,
+            selectedAssetState = singleAssetSharedState,
+            payload = payload
         )
     }
 

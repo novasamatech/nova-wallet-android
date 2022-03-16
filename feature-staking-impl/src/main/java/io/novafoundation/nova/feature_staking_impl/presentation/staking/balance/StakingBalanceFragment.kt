@@ -13,12 +13,10 @@ import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.balance.rebond.ChooseRebondKindBottomSheet
 import kotlinx.android.synthetic.main.fragment_staking_balance.stakingBalanceActions
 import kotlinx.android.synthetic.main.fragment_staking_balance.stakingBalanceInfo
 import kotlinx.android.synthetic.main.fragment_staking_balance.stakingBalanceScrollingArea
 import kotlinx.android.synthetic.main.fragment_staking_balance.stakingBalanceToolbar
-import kotlinx.android.synthetic.main.fragment_staking_balance.stakingBalanceUnbondings
 
 class StakingBalanceFragment : BaseFragment<StakingBalanceViewModel>() {
 
@@ -41,15 +39,10 @@ class StakingBalanceFragment : BaseFragment<StakingBalanceViewModel>() {
 
         stakingBalanceActions.bondMore.setOnClickListener { viewModel.bondMoreClicked() }
         stakingBalanceActions.unbond.setOnClickListener { viewModel.unbondClicked() }
-        stakingBalanceActions.redeem.setOnClickListener { viewModel.redeemClicked() }
 
         // set padding dynamically so initially scrolling area in under toolbar
         stakingBalanceToolbar.doOnNextLayout {
             stakingBalanceScrollingArea.updatePadding(top = it.height + 8.dp)
-        }
-
-        stakingBalanceUnbondings.setMoreActionClickListener {
-            viewModel.unbondingsMoreClicked()
         }
     }
 
@@ -77,17 +70,6 @@ class StakingBalanceFragment : BaseFragment<StakingBalanceViewModel>() {
                 redeemable.setTokenAmount(it.redeemable.token)
                 redeemable.setFiatAmount(it.redeemable.fiat)
             }
-        }
-
-        viewModel.unbondingModelsLiveData.observe(stakingBalanceUnbondings::submitList)
-
-        viewModel.redeemEnabledLiveData.observe {
-            stakingBalanceActions.redeem.isEnabled = it
-        }
-
-        viewModel.showRebondActionsEvent.observeEvent {
-            ChooseRebondKindBottomSheet(requireContext(), viewModel::rebondKindChosen)
-                .show()
         }
     }
 }

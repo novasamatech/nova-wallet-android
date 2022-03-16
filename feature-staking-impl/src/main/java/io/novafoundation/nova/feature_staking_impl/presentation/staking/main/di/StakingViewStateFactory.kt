@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.Nom
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.StashNoneViewState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.ValidatorViewState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.WelcomeViewState
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.unbonding.UnbondingMixinFactory
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -26,6 +27,7 @@ class StakingViewStateFactory(
     private val rewardCalculatorFactory: RewardCalculatorFactory,
     private val welcomeStakingValidationSystem: WelcomeStakingValidationSystem,
     private val stakeActionsValidations: Map<ManageStakeAction, StakeActionsValidationSystem>,
+    private val unbondingMixinFactory: UnbondingMixinFactory,
     private val validationExecutor: ValidationExecutor
 ) {
 
@@ -43,7 +45,8 @@ class StakingViewStateFactory(
         errorDisplayer = errorDisplayer,
         resourceManager = resourceManager,
         stakeActionsValidations = stakeActionsValidations,
-        validationExecutor = validationExecutor
+        validationExecutor = validationExecutor,
+        unbondingMixinFactory = unbondingMixinFactory
     )
 
     fun createStashNoneState(
@@ -60,7 +63,8 @@ class StakingViewStateFactory(
         router = router,
         errorDisplayer = errorDisplayer,
         stakeActionsValidations = stakeActionsValidations,
-        validationExecutor = validationExecutor
+        validationExecutor = validationExecutor,
+        unbondingMixinFactory = unbondingMixinFactory
     )
 
     fun createWelcomeViewState(
@@ -93,6 +97,7 @@ class StakingViewStateFactory(
         errorDisplayer = errorDisplayer,
         resourceManager = resourceManager,
         stakeActionsValidations = stakeActionsValidations,
-        validationExecutor = validationExecutor
+        validationExecutor = validationExecutor,
+        unbondingMixinFactory = unbondingMixinFactory
     )
 }

@@ -82,8 +82,9 @@
 
     <declare-styleable name="PrimaryButton">
         <attr format="enum" name="appearance">
-            <enum name="fill" value="0" />
-            <enum name="outline" value="1" />
+            <enum name="primary" value="0" />
+            <enum name="secondary" value="1" />
+            <enum name="outline" value="2" />
         </attr>
     </declare-styleable>
 

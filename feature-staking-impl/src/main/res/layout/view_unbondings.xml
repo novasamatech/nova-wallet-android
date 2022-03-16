@@ -4,72 +4,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:background="@color/blurColor"
+    tools:background="@color/black_48"
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
     <TextView
         android:id="@+id/unbondingsTitle"
-        style="@style/TextAppearance.NovaFoundation.Header5"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="16dp"
         android:text="@string/wallet_balance_unbonding_v1_9_0"
-        android:textColor="@color/white"
+        android:textColor="@color/white_64"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/unbondingsMoreAction"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:padding="8dp"
-        android:layout_marginEnd="8dp"
-        android:src="@drawable/ic_more"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/actions_color" />
-
-    <View
-        android:id="@+id/unbondingsDivider"
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="14dp"
-        android:layout_marginEnd="16dp"
-        android:background="@color/white_24"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/unbondingsTitle" />
-
-    <TextView
-        android:id="@+id/unbondingsPlaceholder"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:text="@string/staking_unbonding_empty_list_v2_2_0"
-        android:textColor="@color/white_64"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/unbondingsDivider" />
 
     <!--  Wrapping recyclerview into nested scrollview so Constraint Layout wont cut off bottom of RecyclerView  -->
     <!--  More details: https://stackoverflow.com/a/45999832 -->
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/unbondingListContainer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginBottom="12dp"
-        android:visibility="gone"
-        android:id="@+id/unbondingListContainer"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/unbondingsDivider">
+        app:layout_constraintTop_toBottomOf="@+id/unbondingsTitle">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/unbondingsList"
@@ -77,7 +37,42 @@
             android:layout_height="wrap_content"
             android:overScrollMode="never"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:itemCount="15"
-            tools:listitem="@layout/item_list_default" />
+            tools:itemCount="5"
+            tools:listitem="@layout/item_unbonding" />
     </androidx.core.widget.NestedScrollView>
+
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/unbondingCancel"
+        style="@style/Widget.Nova.Button.Secondary"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="20dp"
+        android:text="@string/common_cancel"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/guideline"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/unbondingListContainer" />
+
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/unbondingRedeem"
+        style="@style/Widget.Nova.Button.Primary"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/staking_redeem"
+        app:layout_constraintBottom_toBottomOf="@+id/unbondingCancel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/guideline"
+        app:layout_constraintTop_toTopOf="@+id/unbondingCancel" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
 </merge>

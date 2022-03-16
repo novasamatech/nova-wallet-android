@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.model.NominatorStatus
 import io.novafoundation.nova.feature_staking_impl.domain.model.StashNoneStatus
 import io.novafoundation.nova.feature_staking_impl.domain.model.ValidatorStatus
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.model.StakingNetworkInfoModel
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.unbonding.setupUnbondingMixin
 import io.novafoundation.nova.feature_staking_impl.presentation.view.StakeSummaryView
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.setupAssetSelector
 import kotlinx.android.synthetic.main.fragment_staking.stakingAlertsInfo
@@ -30,6 +31,7 @@ import kotlinx.android.synthetic.main.fragment_staking.stakingContainer
 import kotlinx.android.synthetic.main.fragment_staking.stakingEstimate
 import kotlinx.android.synthetic.main.fragment_staking.stakingNetworkInfo
 import kotlinx.android.synthetic.main.fragment_staking.stakingStakeSummary
+import kotlinx.android.synthetic.main.fragment_staking.stakingStakeUnbondings
 import kotlinx.android.synthetic.main.fragment_staking.stakingUserRewards
 import javax.inject.Inject
 import kotlin.time.ExperimentalTime
@@ -95,6 +97,7 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
                     stakingEstimate.setVisible(false)
                     stakingUserRewards.setVisible(false)
                     stakingStakeSummary.setVisible(false)
+                    stakingStakeUnbondings.setVisible(false)
                 }
 
                 is LoadingState.Loaded -> {
@@ -103,6 +106,7 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
                     stakingEstimate.setVisible(stakingState is WelcomeViewState)
                     stakingUserRewards.setVisible(stakingState is StakeViewState<*>)
                     stakingStakeSummary.setVisible(stakingState is StakeViewState<*>)
+                    stakingStakeUnbondings.setVisible(stakingState is StakeViewState<*>)
 
                     stakingNetworkInfo.setExpanded(stakingState is WelcomeViewState)
 
@@ -172,6 +176,8 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
         bindUserRewards(stakingViewState)
 
         stakingStakeSummary.bindStakeSummary(stakingViewState, mapStatus)
+
+        setupUnbondingMixin(stakingViewState.unbondingMixin, stakingStakeUnbondings)
     }
 
     private fun bindUserRewards(

@@ -41,6 +41,7 @@ class EraTimeCalculator(
     private val eraStartSessionIndex: BigInteger,
     private val activeEra: EraIndex,
 ) {
+
     fun calculate(destinationEra: EraIndex? = null): BigInteger {
         val sessionStartSlot = currentSessionIndex * sessionLength + genesisSlot
         val sessionProgress = currentSlot - sessionStartSlot
@@ -69,6 +70,7 @@ class EraTimeCalculator(
 }
 
 class EraTimeCalculatorFactory(val repository: StakingRepository) {
+
     suspend fun create(chainId: ChainId): EraTimeCalculator {
         val startRequestTime = System.currentTimeMillis().toBigInteger()
         val sessionLength = repository.sessionLength(chainId)
