@@ -19,27 +19,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!--  Wrapping recyclerview into nested scrollview so Constraint Layout wont cut off bottom of RecyclerView  -->
-    <!--  More details: https://stackoverflow.com/a/45999832 -->
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/unbondingListContainer"
+    <androidx.recyclerview.widget.RecyclerView
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/unbondingsTitle">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/unbondingsList"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:overScrollMode="never"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:itemCount="5"
-            tools:listitem="@layout/item_unbonding" />
-    </androidx.core.widget.NestedScrollView>
+        app:layout_constraintTop_toBottomOf="@+id/unbondingsTitle"
+        android:id="@+id/unbondingsList"
+        android:overScrollMode="never"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:itemCount="5"
+        tools:listitem="@layout/item_unbonding" />
 
     <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/unbondingCancel"
@@ -54,7 +46,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/guideline"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/unbondingListContainer" />
+        app:layout_constraintTop_toBottomOf="@id/unbondingsList" />
 
     <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/unbondingRedeem"
