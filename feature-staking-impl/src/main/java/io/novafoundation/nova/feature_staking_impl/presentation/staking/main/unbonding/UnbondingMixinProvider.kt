@@ -78,7 +78,7 @@ private class UnbondingMixinProvider(
         .inBackground()
         .share()
 
-    override val state: Flow<UnbondingMixin.State> = combine(assetFlow,unbondingsFlow) { asset, unbondings ->
+    override val state: Flow<UnbondingMixin.State> = combine(assetFlow, unbondingsFlow) { asset, unbondings ->
         createUiState(unbondings, asset)
     }
         .inBackground()

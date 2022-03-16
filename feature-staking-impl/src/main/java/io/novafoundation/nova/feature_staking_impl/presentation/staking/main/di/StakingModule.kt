@@ -42,7 +42,7 @@ class StakingModule {
     fun provideUnbondingMixinFactory(
         unbondInteractor: UnbondInteractor,
         validationExecutor: ValidationExecutor,
-        actionAwaitableMixinFactory:ActionAwaitableMixin.Factory,
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         resourceManager: ResourceManager,
         @Named(SYSTEM_MANAGE_STAKING_REDEEM) redeemValidationSystem: ManageStakingValidationSystem,
         @Named(SYSTEM_MANAGE_STAKING_REBOND) rebondValidationSystem: ManageStakingValidationSystem,

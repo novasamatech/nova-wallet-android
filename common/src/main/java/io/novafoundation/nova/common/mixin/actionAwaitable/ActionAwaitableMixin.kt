@@ -13,7 +13,7 @@ interface ActionAwaitableMixin<P, R> {
 
     val awaitableActionLiveData: LiveData<Event<Action<P, R>>>
 
-    interface Presentation<P, R>: ActionAwaitableMixin<P, R> {
+    interface Presentation<P, R> : ActionAwaitableMixin<P, R> {
 
         suspend fun awaitAction(payload: P): R
     }

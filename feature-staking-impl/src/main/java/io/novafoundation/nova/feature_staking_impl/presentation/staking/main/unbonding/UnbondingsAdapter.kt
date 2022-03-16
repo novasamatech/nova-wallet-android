@@ -39,7 +39,7 @@ class UnbondingsHolder(override val containerView: View) : RecyclerView.ViewHold
     @ExperimentalTime
     fun bind(unbonding: UnbondingModel) = with(containerView) {
         with(unbonding) {
-            when(status) {
+            when (status) {
                 Unbonding.Status.Redeemable -> {
                     itemUnbondStatus.setTextColorRes(R.color.white)
                     itemUnbondStatus.removeCompoundDrawables()

@@ -10,7 +10,7 @@ interface UnbondingMixin {
 
         object Empty : State()
 
-        class HaveUnbondings(val redeemEnabled: Boolean, val unbondings: List<UnbondingModel>): State()
+        class HaveUnbondings(val redeemEnabled: Boolean, val unbondings: List<UnbondingModel>) : State()
     }
 
     val rebondKindAwaitable: ActionAwaitableMixin<Unit, RebondKind>

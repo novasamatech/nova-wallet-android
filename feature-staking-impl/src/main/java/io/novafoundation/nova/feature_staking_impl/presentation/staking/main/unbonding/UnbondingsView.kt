@@ -37,7 +37,7 @@ class UnbondingsView @JvmOverloads constructor(
     }
 
     fun setState(state: UnbondingMixin.State) {
-        when(state) {
+        when (state) {
             UnbondingMixin.State.Empty -> makeGone()
             is UnbondingMixin.State.HaveUnbondings -> {
                 makeVisible()

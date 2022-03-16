@@ -22,7 +22,7 @@ class UnbondInteractor(
     private val extrinsicService: ExtrinsicService,
     private val stakingRepository: StakingRepository,
     private val eraTimeCalculator: EraTimeCalculatorFactory,
-    ) {
+) {
 
     suspend fun estimateFee(
         stashState: StakingState.Stash,
