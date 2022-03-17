@@ -35,7 +35,7 @@
 
     <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/unbondingCancel"
-        style="@style/Widget.Nova.Button.Secondary"
+        style="@style/Widget.Nova.Button.SecondaryTransparent.Small"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -50,7 +50,7 @@
 
     <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/unbondingRedeem"
-        style="@style/Widget.Nova.Button.Primary"
+        style="@style/Widget.Nova.Button.PrimaryTransparent.Small"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
