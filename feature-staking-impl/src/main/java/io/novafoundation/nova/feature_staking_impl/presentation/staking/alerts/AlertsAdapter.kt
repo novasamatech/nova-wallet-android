@@ -15,7 +15,6 @@ import kotlinx.android.synthetic.main.item_alert.view.alertItemGoToFlowIcon
 import kotlinx.android.synthetic.main.item_alert.view.alertItemMessage
 import kotlinx.android.synthetic.main.item_alert.view.alertItemTitle
 
-
 class AlertsAdapter : ListAdapter<AlertModel, AlertsAdapter.AlertViewHolder>(AlertDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlertViewHolder {
