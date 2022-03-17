@@ -13,7 +13,6 @@ import io.novafoundation.nova.common.utils.format
 import io.novafoundation.nova.common.utils.formatAsCurrency
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.requireException
-import io.novafoundation.nova.common.utils.requireValue
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -45,8 +44,8 @@ class RedeemViewModel(
     private val iconGenerator: AddressIconGenerator,
     private val feeLoaderMixin: FeeLoaderMixin.Presentation,
     private val externalActions: ExternalActions.Presentation,
-    private val payload: RedeemPayload,
     private val selectedAssetState: SingleAssetSharedState,
+    private val payload: RedeemPayload,
 ) : BaseViewModel(),
     Validatable by validationExecutor,
     FeeLoaderMixin by feeLoaderMixin,
@@ -147,11 +146,7 @@ class RedeemViewModel(
         if (result.isSuccess) {
             showMessage(resourceManager.getString(R.string.common_transaction_submitted))
 
-            when {
-                payload.overrideFinishAction != null -> payload.overrideFinishAction.invoke(router)
-                result.requireValue().willKillStash -> router.returnToMain()
-                else -> router.returnToStakingBalance()
-            }
+            router.back()
         } else {
             showError(result.requireException())
         }

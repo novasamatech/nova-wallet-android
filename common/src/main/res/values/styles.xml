@@ -189,8 +189,11 @@
     </style>
 
     <style name="Widget.Nova.Button.Primary">
-        <!--        <item name="android:background">@drawable/bg_button_primary_selector</item>-->
-        <item name="appearance">fill</item>
+        <item name="appearance">primary</item>
+    </style>
+
+    <style name="Widget.Nova.Button.Secondary">
+        <item name="appearance">secondary</item>
     </style>
 
     <style name="Widget.Nova.Button.Outline">

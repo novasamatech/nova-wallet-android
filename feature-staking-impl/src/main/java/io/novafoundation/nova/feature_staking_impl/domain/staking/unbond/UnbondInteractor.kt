@@ -1,20 +1,27 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.unbond
 
 import io.novafoundation.nova.common.utils.sumByBigInteger
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_staking_api.domain.api.EraTimeCalculatorFactory
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingState
+import io.novafoundation.nova.feature_staking_api.domain.model.isRedeemableIn
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.calls.chill
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.calls.unbond
 import io.novafoundation.nova.feature_staking_impl.domain.model.Unbonding
+import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.withContext
 import java.math.BigInteger
 
 class UnbondInteractor(
     private val extrinsicService: ExtrinsicService,
-    private val stakingRepository: StakingRepository
+    private val stakingRepository: StakingRepository,
+    private val eraTimeCalculator: EraTimeCalculatorFactory,
 ) {
 
     suspend fun estimateFee(
@@ -41,6 +48,41 @@ class UnbondInteractor(
         }
     }
 
+    fun unbondingsFlow(stakingState: StakingState.Stash): Flow<UnboningsdState> {
+        return flowOf(stakingState).flatMapLatest { stash ->
+            val calculator = eraTimeCalculator.create(stakingState.chain.id)
+
+            combine(
+                stakingRepository.ledgerFlow(stash),
+                stakingRepository.observeActiveEraIndex(stash.chain.id)
+            ) { ledger, activeEraIndex ->
+                val unbondings = ledger.unlocking.map {
+                    val progressState = if (it.isRedeemableIn(activeEraIndex)) {
+                        Unbonding.Status.Redeemable
+                    } else {
+                        val leftTime = calculator.calculate(destinationEra = it.era)
+
+                        Unbonding.Status.Unbonding(
+                            timeLeft = leftTime.toLong(),
+                            calculatedAt = System.currentTimeMillis()
+                        )
+                    }
+
+                    Unbonding(
+                        amount = it.amount,
+                        status = progressState,
+                    )
+                }
+
+                UnboningsdState(
+                    unbondings = unbondings,
+                    anythingToRedeem = unbondings.any { it.status is Unbonding.Status.Redeemable },
+                    anythingToUnbond = unbondings.any { it.status is Unbonding.Status.Unbonding }
+                )
+            }
+        }
+    }
+
     private suspend fun ExtrinsicBuilder.constructUnbondExtrinsic(
         stashState: StakingState.Stash,
         currentBondedBalance: BigInteger,
@@ -60,7 +102,9 @@ class UnbondInteractor(
     }
 
     // unbondings are always going from the oldest to newest so last in the list will be the newest one
-    fun newestUnbondingAmount(unbondings: List<Unbonding>) = unbondings.last().amount
+    fun newestUnbondingAmount(unbondings: List<Unbonding>) = unbondings.filterNonRedeemable().last().amount
 
-    fun allUnbondingsAmount(unbondings: List<Unbonding>): BigInteger = unbondings.sumByBigInteger(Unbonding::amount)
+    fun allUnbondingsAmount(unbondings: List<Unbonding>): BigInteger = unbondings.filterNonRedeemable().sumByBigInteger(Unbonding::amount)
+
+    private fun List<Unbonding>.filterNonRedeemable() = filter { it.status is Unbonding.Status.Unbonding }
 }

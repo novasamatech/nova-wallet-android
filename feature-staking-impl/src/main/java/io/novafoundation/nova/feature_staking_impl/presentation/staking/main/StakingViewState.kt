@@ -33,6 +33,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.validations.welcome.We
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.unbonding.UnbondingMixinFactory
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
@@ -81,8 +82,16 @@ sealed class StakeViewState<S>(
     protected val statusMessageProvider: (S) -> TitleAndMessage,
     private val validationExecutor: ValidationExecutor,
     private val availableManageActions: Set<ManageStakeAction>,
-    private val stakeActionsValidations: Map<ManageStakeAction, StakeActionsValidationSystem>
+    private val stakeActionsValidations: Map<ManageStakeAction, StakeActionsValidationSystem>,
+    unbondingMixinFactory: UnbondingMixinFactory,
 ) : StakingViewState(scope, validationExecutor) {
+
+    val unbondingMixin = unbondingMixinFactory.create(
+        errorDisplayer = errorDisplayer,
+        stashState = stakeState,
+        assetFlow = currentAssetFlow,
+        coroutineScope = coroutineScope
+    )
 
     init {
         syncStakingRewards()
@@ -192,6 +201,7 @@ class ValidatorViewState(
     errorDisplayer: (Throwable) -> Unit,
     stakeActionsValidations: Map<ManageStakeAction, StakeActionsValidationSystem>,
     validationExecutor: ValidationExecutor,
+    unbondingMixinFactory: UnbondingMixinFactory
 ) : StakeViewState<ValidatorStatus>(
     validatorState, currentAssetFlow, stakingInteractor,
     resourceManager, scope, router, errorDisplayer,
@@ -199,7 +209,8 @@ class ValidatorViewState(
     statusMessageProvider = { getValidatorStatusTitleAndMessage(resourceManager, it) },
     availableManageActions = ManageStakeAction.values().toSet() - ManageStakeAction.VALIDATORS,
     validationExecutor = validationExecutor,
-    stakeActionsValidations = stakeActionsValidations
+    stakeActionsValidations = stakeActionsValidations,
+    unbondingMixinFactory = unbondingMixinFactory
 )
 
 private fun getValidatorStatusTitleAndMessage(
@@ -225,6 +236,7 @@ class StashNoneViewState(
     errorDisplayer: (Throwable) -> Unit,
     validationExecutor: ValidationExecutor,
     stakeActionsValidations: Map<ManageStakeAction, StakeActionsValidationSystem>,
+    unbondingMixinFactory: UnbondingMixinFactory
 ) : StakeViewState<StashNoneStatus>(
     stashState, currentAssetFlow, stakingInteractor,
     resourceManager, scope, router, errorDisplayer,
@@ -232,7 +244,8 @@ class StashNoneViewState(
     statusMessageProvider = { getStashStatusTitleAndMessage(resourceManager, it) },
     availableManageActions = ManageStakeAction.values().toSet() - ManageStakeAction.PAYOUTS,
     validationExecutor = validationExecutor,
-    stakeActionsValidations = stakeActionsValidations
+    stakeActionsValidations = stakeActionsValidations,
+    unbondingMixinFactory = unbondingMixinFactory
 )
 
 private fun getStashStatusTitleAndMessage(
@@ -256,6 +269,7 @@ class NominatorViewState(
     errorDisplayer: (Throwable) -> Unit,
     validationExecutor: ValidationExecutor,
     stakeActionsValidations: Map<ManageStakeAction, StakeActionsValidationSystem>,
+    unbondingMixinFactory: UnbondingMixinFactory
 ) : StakeViewState<NominatorStatus>(
     nominatorState, currentAssetFlow, stakingInteractor,
     resourceManager, scope, router, errorDisplayer,
@@ -263,7 +277,8 @@ class NominatorViewState(
     statusMessageProvider = { getNominatorStatusTitleAndMessage(resourceManager, it) },
     availableManageActions = ManageStakeAction.values().toSet(),
     validationExecutor = validationExecutor,
-    stakeActionsValidations = stakeActionsValidations
+    stakeActionsValidations = stakeActionsValidations,
+    unbondingMixinFactory = unbondingMixinFactory
 )
 
 private fun getNominatorStatusTitleAndMessage(

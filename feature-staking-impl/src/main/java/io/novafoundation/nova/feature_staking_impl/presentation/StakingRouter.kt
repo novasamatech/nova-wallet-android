@@ -8,7 +8,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.sel
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.controller.confirm.ConfirmSetControllerPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.model.StakingStoryModel
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.confirm.ConfirmRebondPayload
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.redeem.RedeemPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.confirm.parcel.ConfirmRewardDestinationPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.confirm.ConfirmUnbondPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.ValidatorDetailsParcelModel
@@ -59,9 +58,7 @@ interface StakingRouter {
 
     fun openConfirmUnbond(payload: ConfirmUnbondPayload)
 
-    fun openRedeem(payload: RedeemPayload)
-
-    fun openConfirmRebond(payload: ConfirmRebondPayload)
+    fun openRedeem()
 
     fun openControllerAccount()
 
@@ -70,6 +67,7 @@ interface StakingRouter {
     fun openConfirmSetController(payload: ConfirmSetControllerPayload)
 
     fun openCustomRebond()
+    fun openConfirmRebond(payload: ConfirmRebondPayload)
 
     fun openCurrentValidators()
 

@@ -234,6 +234,14 @@
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit"
             app:destination="@id/nfts_nav_graph" />
+
+        <action
+            android:id="@+id/action_mainFragment_to_customRebondFragment"
+            app:destination="@id/customRebondFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
 
@@ -683,14 +691,6 @@
         <action
             android:id="@+id/action_stakingBalanceFragment_to_selectUnbondFragment"
             app:destination="@id/selectUnbondFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-
-        <action
-            android:id="@+id/action_stakingBalanceFragment_to_customRebondFragment"
-            app:destination="@id/customRebondFragment"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
