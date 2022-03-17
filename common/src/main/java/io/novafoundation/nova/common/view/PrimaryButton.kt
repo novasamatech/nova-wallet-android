@@ -106,7 +106,6 @@ class PrimaryButton @JvmOverloads constructor(
         }
     }
 
-
     private fun setSize(size: Size) {
         doOnGlobalLayout {
             layoutParams.apply {
