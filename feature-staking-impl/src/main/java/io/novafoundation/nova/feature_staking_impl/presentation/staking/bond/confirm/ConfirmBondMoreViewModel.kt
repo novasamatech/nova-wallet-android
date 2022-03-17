@@ -130,8 +130,7 @@ class ConfirmBondMoreViewModel(
         }
     }
 
-    private fun finishFlow() = when {
-        payload.overrideFinishAction != null -> payload.overrideFinishAction.invoke(router)
-        else -> router.returnToStakingBalance()
+    private fun finishFlow() {
+        router.returnToMain()
     }
 }

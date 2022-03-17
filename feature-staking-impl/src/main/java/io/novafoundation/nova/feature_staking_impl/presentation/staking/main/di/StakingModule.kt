@@ -18,18 +18,18 @@ import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.alerts.AlertsInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.main.ManageStakeAction
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.unbond.UnbondInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.validations.balance.ManageStakingValidationSystem
-import io.novafoundation.nova.feature_staking_impl.domain.validations.balance.SYSTEM_MANAGE_STAKING_BOND_MORE
-import io.novafoundation.nova.feature_staking_impl.domain.validations.balance.SYSTEM_MANAGE_STAKING_REBOND
-import io.novafoundation.nova.feature_staking_impl.domain.validations.balance.SYSTEM_MANAGE_STAKING_REDEEM
+import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_STAKING_BOND_MORE
+import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_STAKING_REBOND
+import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_STAKING_REDEEM
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.StakeActionsValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.validations.welcome.WelcomeStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.StakingViewModel
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.manage.ManageStakeAction
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.manage.ManageStakeMixinFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.unbonding.UnbondingMixinFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorMixin
 import javax.inject.Named
@@ -44,8 +44,8 @@ class StakingModule {
         validationExecutor: ValidationExecutor,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         resourceManager: ResourceManager,
-        @Named(SYSTEM_MANAGE_STAKING_REDEEM) redeemValidationSystem: ManageStakingValidationSystem,
-        @Named(SYSTEM_MANAGE_STAKING_REBOND) rebondValidationSystem: ManageStakingValidationSystem,
+        @Named(SYSTEM_MANAGE_STAKING_REDEEM) redeemValidationSystem: StakeActionsValidationSystem,
+        @Named(SYSTEM_MANAGE_STAKING_REBOND) rebondValidationSystem: StakeActionsValidationSystem,
         router: StakingRouter,
     ) = UnbondingMixinFactory(
         unbondInteractor = unbondInteractor,
@@ -59,6 +59,20 @@ class StakingModule {
 
     @Provides
     @ScreenScope
+    fun provideManageStakingMixinFactory(
+        validationExecutor: ValidationExecutor,
+        resourceManager: ResourceManager,
+        router: StakingRouter,
+        stakeActionsValidations: Map<@JvmSuppressWildcards ManageStakeAction, StakeActionsValidationSystem>,
+    ) = ManageStakeMixinFactory(
+        validationExecutor = validationExecutor,
+        resourceManager = resourceManager,
+        stakeActionsValidations = stakeActionsValidations,
+        router = router
+    )
+
+    @Provides
+    @ScreenScope
     fun provideStakingViewStateFactory(
         interactor: StakingInteractor,
         setupStakingSharedState: SetupStakingSharedState,
@@ -67,8 +81,8 @@ class StakingModule {
         router: StakingRouter,
         welcomeStakingValidationSystem: WelcomeStakingValidationSystem,
         validationExecutor: ValidationExecutor,
-        stakeActionsValidations: Map<@JvmSuppressWildcards ManageStakeAction, StakeActionsValidationSystem>,
-        unbondingMixinFactory: UnbondingMixinFactory
+        unbondingMixinFactory: UnbondingMixinFactory,
+        manageStakeMixinFactory: ManageStakeMixinFactory,
     ) = StakingViewStateFactory(
         stakingInteractor = interactor,
         setupStakingSharedState = setupStakingSharedState,
@@ -76,7 +90,7 @@ class StakingModule {
         router = router,
         rewardCalculatorFactory = rewardCalculatorFactory,
         welcomeStakingValidationSystem = welcomeStakingValidationSystem,
-        stakeActionsValidations = stakeActionsValidations,
+        manageStakeMixinFactory = manageStakeMixinFactory,
         unbondingMixinFactory = unbondingMixinFactory,
         validationExecutor = validationExecutor
     )
@@ -91,8 +105,8 @@ class StakingModule {
         stakingViewStateFactory: StakingViewStateFactory,
         router: StakingRouter,
         resourceManager: ResourceManager,
-        @Named(SYSTEM_MANAGE_STAKING_REDEEM) redeemValidationSystem: ManageStakingValidationSystem,
-        @Named(SYSTEM_MANAGE_STAKING_BOND_MORE) bondMoreValidationSystem: ManageStakingValidationSystem,
+        @Named(SYSTEM_MANAGE_STAKING_REDEEM) redeemValidationSystem: StakeActionsValidationSystem,
+        @Named(SYSTEM_MANAGE_STAKING_BOND_MORE) bondMoreValidationSystem: StakeActionsValidationSystem,
         validationExecutor: ValidationExecutor,
         stakingUpdateSystem: UpdateSystem,
         assetSelectorFactory: MixinFactory<AssetSelectorMixin.Presentation>,

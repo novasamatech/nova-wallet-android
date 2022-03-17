@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:orientation="vertical"
+    tools:parentTag="android.widget.LinearLayout">
+
+    <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.ManageStakingActionView
+        android:layout_width="match_parent"
+        android:id="@+id/manageStakingBondMore"
+        android:layout_height="wrap_content"
+        app:icon="@drawable/ic_plus_circle"
+        app:label="@string/staking_bond_more_v1_9_0" />
+
+    <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.ManageStakingActionView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/manageStakingUnbond"
+        app:icon="@drawable/ic_unstake_24"
+        app:label="@string/staking_unbond_v1_9_0" />
+
+    <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.ManageStakingActionView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/manageStakingRewardDestination"
+        app:icon="@drawable/ic_wallet_24"
+        app:label="@string/staking_rewards_destination_title_v2_0_0" />
+
+    <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.ManageStakingActionView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/manageStakingPayouts"
+        app:icon="@drawable/ic_unpaid_rewards"
+        app:label="@string/staking_reward_payouts_title_v2_2_0" />
+
+    <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.ManageStakingActionView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/manageStakingValidators"
+        app:icon="@drawable/ic_validators_outline"
+        app:label="@string/staking_your_validators" />
+
+    <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.ManageStakingActionView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/manageStakingController"
+        app:icon="@drawable/ic_people_outline"
+        app:label="@string/staking_controller_account" />
+
+</merge>

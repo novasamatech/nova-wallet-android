@@ -193,24 +193,16 @@ class Navigator(
         navController?.navigate(R.id.action_open_confirm_payout, ConfirmPayoutFragment.getBundle(payload))
     }
 
-    override fun openStakingBalance() {
-        navController?.navigate(R.id.action_mainFragment_to_stakingBalanceFragment)
-    }
-
-    override fun openBondMore(payload: SelectBondMorePayload) {
-        navController?.navigate(R.id.action_open_selectBondMoreFragment, SelectBondMoreFragment.getBundle(payload))
+    override fun openBondMore() {
+        navController?.navigate(R.id.action_open_selectBondMoreFragment, SelectBondMoreFragment.getBundle(SelectBondMorePayload()))
     }
 
     override fun openConfirmBondMore(payload: ConfirmBondMorePayload) {
         navController?.navigate(R.id.action_selectBondMoreFragment_to_confirmBondMoreFragment, ConfirmBondMoreFragment.getBundle(payload))
     }
 
-    override fun returnToStakingBalance() {
-        navController?.navigate(R.id.action_return_to_staking_balance)
-    }
-
     override fun openSelectUnbond() {
-        navController?.navigate(R.id.action_stakingBalanceFragment_to_selectUnbondFragment)
+        navController?.navigate(R.id.action_mainFragment_to_selectUnbondFragment)
     }
 
     override fun openConfirmUnbond(payload: ConfirmUnbondPayload) {

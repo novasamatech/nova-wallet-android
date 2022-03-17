@@ -144,7 +144,6 @@ class SelectBondMoreViewModel(
             amount = validationPayload.amount,
             fee = validationPayload.fee,
             stashAddress = validationPayload.stashAddress,
-            overrideFinishAction = payload.overrideFinishAction
         )
 
         router.openConfirmBondMore(confirmPayload)
