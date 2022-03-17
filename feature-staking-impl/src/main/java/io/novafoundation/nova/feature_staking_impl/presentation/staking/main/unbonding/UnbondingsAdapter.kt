@@ -41,7 +41,7 @@ class UnbondingsHolder(override val containerView: View) : RecyclerView.ViewHold
         with(unbonding) {
             when (status) {
                 Unbonding.Status.Redeemable -> {
-                    itemUnbondStatus.setTextColorRes(R.color.white)
+                    itemUnbondStatus.setTextColorRes(R.color.green)
                     itemUnbondStatus.removeCompoundDrawables()
                     itemUnbondStatus.stopTimer()
                     itemUnbondStatus.setText(R.string.wallet_balance_redeemable)
