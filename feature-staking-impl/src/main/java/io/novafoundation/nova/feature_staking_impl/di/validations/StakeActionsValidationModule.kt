@@ -164,5 +164,4 @@ interface StakeActionsValidationModule {
     fun provideUnbondValidationSystemToMap(
         @Named(SYSTEM_MANAGE_STAKING_UNBOND) system: StakeActionsValidationSystem,
     ): StakeActionsValidationSystem
-
 }

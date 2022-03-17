@@ -84,7 +84,7 @@ private class ManageStakeProvider(
         }
     }
 
-    private fun determineForbiddenActions(stashState: StakingState.Stash): Set<ManageStakeAction> = when(stashState) {
+    private fun determineForbiddenActions(stashState: StakingState.Stash): Set<ManageStakeAction> = when (stashState) {
         is StakingState.Stash.Nominator -> emptySet()
         is StakingState.Stash.None -> setOf(ManageStakeAction.PAYOUTS)
         is StakingState.Stash.Validator -> setOf(ManageStakeAction.VALIDATORS)
