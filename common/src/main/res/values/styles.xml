@@ -238,6 +238,23 @@
         <item name="colorAccent">@color/white_8</item>
     </style>
 
+    <style name="Widget.Nova.Action" parent="">
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingTop">6dp</item>
+        <item name="android:paddingEnd">12dp</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:textColor">@color/button_text_colors</item>
+        <item name="android:textAppearance">@style/TextAppearance.NovaFoundation.SemiBold.Footnote</item>
+    </style>
+
+    <style name="Widget.Nova.Action.Primary">
+        <item name="android:background">@drawable/primary_chip_background</item>
+    </style>
+
+    <style name="Widget.Nova.Action.Secondary">
+        <item name="android:background">@drawable/secondary_chip_background</item>
+    </style>
+
     <style name="Widget.Nova.Puller" parent="">
         <item name="android:layout_height">2dp</item>
         <item name="android:layout_width">35dp</item>

@@ -4,12 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.getDrawableCompat
 import io.novafoundation.nova.common.utils.scrollToTopWhenItemsShuffled
 import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
@@ -62,11 +59,6 @@ class SelectCustomValidatorsFragment : BaseFragment<SelectCustomValidatorsViewMo
         }
 
         selectCustomValidatorsList.scrollToTopWhenItemsShuffled(viewLifecycleOwner)
-
-        val dividerItemDecoration = DividerItemDecoration(context, LinearLayoutManager.VERTICAL).apply {
-            setDrawable(requireContext().getDrawableCompat(R.drawable.divider_decoration))
-        }
-        selectCustomValidatorsList.addItemDecoration(dividerItemDecoration)
 
         selectCustomValidatorsFillWithRecommended.setOnClickListener { viewModel.fillRestWithRecommended() }
         selectCustomValidatorsClearFilters.setOnClickListener { viewModel.clearFilters() }

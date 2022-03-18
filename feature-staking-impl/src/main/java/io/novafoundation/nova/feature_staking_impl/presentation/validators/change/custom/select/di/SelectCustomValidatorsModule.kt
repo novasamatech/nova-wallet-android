@@ -7,6 +7,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.di.modules.Caching
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -28,7 +29,7 @@ class SelectCustomValidatorsModule {
     fun provideViewModel(
         validatorRecommendatorFactory: ValidatorRecommendatorFactory,
         recommendationSettingsProviderFactory: RecommendationSettingsProviderFactory,
-        addressIconGenerator: AddressIconGenerator,
+        @Caching addressIconGenerator: AddressIconGenerator,
         stakingInteractor: StakingInteractor,
         resourceManager: ResourceManager,
         setupStakingSharedState: SetupStakingSharedState,
