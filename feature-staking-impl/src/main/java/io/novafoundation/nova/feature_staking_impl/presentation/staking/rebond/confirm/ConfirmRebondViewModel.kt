@@ -148,7 +148,7 @@ class ConfirmRebondViewModel(
             .onSuccess {
                 showMessage(resourceManager.getString(R.string.common_transaction_submitted))
 
-                router.returnToStakingBalance()
+                router.returnToMain()
             }
             .onFailure(::showError)
 

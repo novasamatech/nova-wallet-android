@@ -172,13 +172,13 @@
     <!-- Buttons -->
 
     <style name="Widget.Nova.Button" parent="Widget.AppCompat.Button">
+        <item name="size">large</item>
         <item name="android:stateListAnimator">@null</item>
         <item name="android:textColor">@color/button_text_colors</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:letterSpacing">0.02</item>
         <item name="android:textSize">?attr/textSizeB1</item>
         <item name="android:fontFamily">?attr/fontBold</item>
-        <item name="android:minHeight">52dp</item>
     </style>
 
     <style name="Widget.Nova.Button.Iconic">
@@ -186,6 +186,12 @@
         <item name="android:paddingStart">24dp</item>
         <item name="android:paddingEnd">24dp</item>
         <item name="android:textSize">?attr/textSizeSubHeadline</item>
+    </style>
+
+    <!-- Button Large -suffix is omitted for compatibility -->
+
+    <style name="Widget.Nova.Button.PrimaryTransparent">
+        <item name="appearance">primaryTransparent</item>
     </style>
 
     <style name="Widget.Nova.Button.Primary">
@@ -196,9 +202,33 @@
         <item name="appearance">secondary</item>
     </style>
 
-    <style name="Widget.Nova.Button.Outline">
-        <item name="appearance">outline</item>
+    <style name="Widget.Nova.Button.SecondaryTransparent">
+        <item name="appearance">secondaryTransparent</item>
     </style>
+
+    <!-- Button Small -->
+
+    <style name="Widget.Nova.Button.PrimaryTransparent.Small">
+        <item name="size">small</item>
+        <item name="appearance">primaryTransparent</item>
+    </style>
+
+    <style name="Widget.Nova.Button.Primary.Small">
+        <item name="size">small</item>
+        <item name="appearance">primary</item>
+    </style>
+
+    <style name="Widget.Nova.Button.Secondary.Small">
+        <item name="size">small</item>
+        <item name="appearance">secondary</item>
+    </style>
+
+    <style name="Widget.Nova.Button.SecondaryTransparent.Small">
+        <item name="size">small</item>
+        <item name="appearance">secondaryTransparent</item>
+    </style>
+
+    <!--   Misc   -->
 
     <style name="AccentBlue" parent="">
         <item name="colorAccent">@color/accentBlue</item>

@@ -20,7 +20,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import kotlinx.android.synthetic.main.view_stake_summary.view.stakeSummaryContentGroup
 import kotlinx.android.synthetic.main.view_stake_summary.view.stakeSummaryFiatStake
 import kotlinx.android.synthetic.main.view_stake_summary.view.stakeSummaryFiatStakeShimmer
-import kotlinx.android.synthetic.main.view_stake_summary.view.stakeSummaryMoreActions
 import kotlinx.android.synthetic.main.view_stake_summary.view.stakeSummaryShimmerGroup
 import kotlinx.android.synthetic.main.view_stake_summary.view.stakeSummaryStatus
 import kotlinx.android.synthetic.main.view_stake_summary.view.stakeSummaryStatusShimmer
@@ -46,7 +45,7 @@ class StakeSummaryView @JvmOverloads constructor(
         View.inflate(context, R.layout.view_stake_summary, this)
 
         with(context) {
-            background = addRipple(getBlurDrawable())
+            background = getBlurDrawable()
             stakeSummaryStatus.background = addRipple(getRoundedCornerDrawable(fillColorRes = R.color.white_8))
         }
     }
@@ -92,11 +91,4 @@ class StakeSummaryView @JvmOverloads constructor(
     fun setStatusClickListener(listener: OnClickListener) {
         stakeSummaryStatus.setOnClickListener(listener)
     }
-
-    fun setStakeInfoClickListener(listener: OnClickListener) {
-        setOnClickListener(listener)
-    }
-
-    val moreActions: View
-        get() = stakeSummaryMoreActions
 }

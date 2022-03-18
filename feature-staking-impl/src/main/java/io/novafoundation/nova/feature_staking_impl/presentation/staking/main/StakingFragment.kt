@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.model.StashNoneStatus
 import io.novafoundation.nova.feature_staking_impl.domain.model.ValidatorStatus
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.model.StakingNetworkInfoModel
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.unbonding.setupUnbondingMixin
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.ManageStakingView
 import io.novafoundation.nova.feature_staking_impl.presentation.view.StakeSummaryView
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.setupAssetSelector
 import kotlinx.android.synthetic.main.fragment_staking.stakingAlertsInfo
@@ -30,6 +31,7 @@ import kotlinx.android.synthetic.main.fragment_staking.stakingAvatar
 import kotlinx.android.synthetic.main.fragment_staking.stakingContainer
 import kotlinx.android.synthetic.main.fragment_staking.stakingEstimate
 import kotlinx.android.synthetic.main.fragment_staking.stakingNetworkInfo
+import kotlinx.android.synthetic.main.fragment_staking.stakingStakeManage
 import kotlinx.android.synthetic.main.fragment_staking.stakingStakeSummary
 import kotlinx.android.synthetic.main.fragment_staking.stakingStakeUnbondings
 import kotlinx.android.synthetic.main.fragment_staking.stakingUserRewards
@@ -107,6 +109,7 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
                     stakingUserRewards.setVisible(stakingState is StakeViewState<*>)
                     stakingStakeSummary.setVisible(stakingState is StakeViewState<*>)
                     stakingStakeUnbondings.setVisible(stakingState is StakeViewState<*>)
+                    stakingStakeManage.setVisible(stakingState is StakeViewState<*>)
 
                     stakingNetworkInfo.setExpanded(stakingState is WelcomeViewState)
 
@@ -176,6 +179,7 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
         bindUserRewards(stakingViewState)
 
         stakingStakeSummary.bindStakeSummary(stakingViewState, mapStatus)
+        stakingStakeManage.bindStakeActions(stakingViewState)
 
         setupUnbondingMixin(stakingViewState.unbondingMixin, stakingStakeUnbondings)
     }
@@ -191,6 +195,15 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
         }
     }
 
+    private fun ManageStakingView.bindStakeActions(
+        stakingViewState: StakeViewState<*>
+    ) {
+        with(stakingViewState.manageStakeMixin) {
+            setAvailableActions(allowedStakeActions)
+            onManageStakeActionClicked(::manageActionChosen)
+        }
+    }
+
     private fun <S> StakeSummaryView.bindStakeSummary(
         stakingViewState: StakeViewState<S>,
         mapStatus: (StakeSummaryModel<S>) -> StakeSummaryView.Status,
@@ -199,18 +212,8 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
             stakingViewState.statusClicked()
         }
 
-        setStakeInfoClickListener {
-            stakingViewState.moreActionsClicked()
-        }
-
         stakingViewState.showStatusAlertEvent.observeEvent { (title, message) ->
             showStatusAlert(title, message)
-        }
-
-        moreActions.setVisible(stakingViewState.manageStakingActionsButtonVisible)
-
-        stakingViewState.showManageActionsEvent.observeEvent {
-            ManageStakingBottomSheet(requireContext(), it, stakingViewState::manageActionChosen).show()
         }
 
         stakingViewState.stakeSummaryFlow.observe { summaryState ->

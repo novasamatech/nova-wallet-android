@@ -4,7 +4,6 @@ import androidx.lifecycle.Lifecycle
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.model.ConfirmPayoutPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.model.PendingPayoutParcelable
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.confirm.ConfirmBondMorePayload
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.select.SelectBondMorePayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.controller.confirm.ConfirmSetControllerPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.model.StakingStoryModel
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.confirm.ConfirmRebondPayload
@@ -46,13 +45,9 @@ interface StakingRouter {
 
     fun openConfirmPayout(payload: ConfirmPayoutPayload)
 
-    fun openStakingBalance()
-
-    fun openBondMore(payload: SelectBondMorePayload)
+    fun openBondMore()
 
     fun openConfirmBondMore(payload: ConfirmBondMorePayload)
-
-    fun returnToStakingBalance()
 
     fun openSelectUnbond()
 

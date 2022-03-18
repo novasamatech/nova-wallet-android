@@ -16,7 +16,6 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.main.ManageStakeAction
 import io.novafoundation.nova.feature_staking_impl.domain.model.NominatorStatus
 import io.novafoundation.nova.feature_staking_impl.domain.model.NominatorStatus.Inactive.Reason
 import io.novafoundation.nova.feature_staking_impl.domain.model.StakeSummary
@@ -26,13 +25,12 @@ import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculat
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.calculateMaxPeriodReturns
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.maxCompoundAPY
-import io.novafoundation.nova.feature_staking_impl.domain.validations.main.StakeActionsValidationPayload
-import io.novafoundation.nova.feature_staking_impl.domain.validations.main.StakeActionsValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.validations.welcome.WelcomeStakingValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.validations.welcome.WelcomeStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.manage.ManageStakeMixinFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.unbonding.UnbondingMixinFactory
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
@@ -77,13 +75,12 @@ sealed class StakeViewState<S>(
     protected val resourceManager: ResourceManager,
     protected val scope: CoroutineScope,
     protected val router: StakingRouter,
-    protected val errorDisplayer: (Throwable) -> Unit,
     protected val summaryFlowProvider: suspend (StakingState.Stash) -> Flow<StakeSummary<S>>,
     protected val statusMessageProvider: (S) -> TitleAndMessage,
-    private val validationExecutor: ValidationExecutor,
-    private val availableManageActions: Set<ManageStakeAction>,
-    private val stakeActionsValidations: Map<ManageStakeAction, StakeActionsValidationSystem>,
+    errorDisplayer: (Throwable) -> Unit,
+    validationExecutor: ValidationExecutor,
     unbondingMixinFactory: UnbondingMixinFactory,
+    manageStakeMixinFactory: ManageStakeMixinFactory,
 ) : StakingViewState(scope, validationExecutor) {
 
     val unbondingMixin = unbondingMixinFactory.create(
@@ -93,40 +90,14 @@ sealed class StakeViewState<S>(
         coroutineScope = coroutineScope
     )
 
+    val manageStakeMixin = manageStakeMixinFactory.create(
+        errorDisplayer = errorDisplayer,
+        stashState = stakeState,
+        coroutineScope = coroutineScope
+    )
+
     init {
         syncStakingRewards()
-    }
-
-    val manageStakingActionsButtonVisible = availableManageActions.isNotEmpty()
-
-    private val _showManageActionsEvent = MutableLiveData<Event<ManageStakingBottomSheet.Payload>>()
-    val showManageActionsEvent: LiveData<Event<ManageStakingBottomSheet.Payload>> = _showManageActionsEvent
-
-    fun manageActionChosen(action: ManageStakeAction) {
-        if (action !in availableManageActions) return
-
-        val validationSystem = stakeActionsValidations[action]
-
-        if (validationSystem != null) {
-            val payload = StakeActionsValidationPayload(stakeState)
-
-            scope.launch {
-                validationExecutor.requireValid(
-                    validationSystem = validationSystem,
-                    payload = payload,
-                    errorDisplayer = errorDisplayer,
-                    validationFailureTransformerDefault = { mainStakingValidationFailure(it, resourceManager) },
-                ) {
-                    navigateToAction(action)
-                }
-            }
-        } else {
-            navigateToAction(action)
-        }
-    }
-
-    fun moreActionsClicked() {
-        _showManageActionsEvent.value = Event(ManageStakingBottomSheet.Payload(availableManageActions))
     }
 
     val userRewardsFlow = combine(
@@ -153,16 +124,6 @@ sealed class StakeViewState<S>(
         val titleAndMessage = statusMessageProvider(nominatorSummaryModel.status)
 
         _showStatusAlertEvent.value = Event(titleAndMessage)
-    }
-
-    private fun navigateToAction(action: ManageStakeAction) {
-        when (action) {
-            ManageStakeAction.PAYOUTS -> router.openPayouts()
-            ManageStakeAction.BALANCE -> router.openStakingBalance()
-            ManageStakeAction.CONTROLLER -> router.openControllerAccount()
-            ManageStakeAction.VALIDATORS -> router.openCurrentValidators()
-            ManageStakeAction.REWARD_DESTINATION -> router.openChangeRewardDestination()
-        }
     }
 
     private fun syncStakingRewards() {
@@ -199,17 +160,21 @@ class ValidatorViewState(
     scope: CoroutineScope,
     router: StakingRouter,
     errorDisplayer: (Throwable) -> Unit,
-    stakeActionsValidations: Map<ManageStakeAction, StakeActionsValidationSystem>,
     validationExecutor: ValidationExecutor,
-    unbondingMixinFactory: UnbondingMixinFactory
+    unbondingMixinFactory: UnbondingMixinFactory,
+    manageStakeMixinFactory: ManageStakeMixinFactory,
 ) : StakeViewState<ValidatorStatus>(
-    validatorState, currentAssetFlow, stakingInteractor,
-    resourceManager, scope, router, errorDisplayer,
+    stakeState = validatorState,
+    currentAssetFlow = currentAssetFlow,
+    stakingInteractor = stakingInteractor,
+    resourceManager = resourceManager,
+    scope = scope,
+    router = router,
+    errorDisplayer = errorDisplayer,
     summaryFlowProvider = { stakingInteractor.observeValidatorSummary(validatorState) },
     statusMessageProvider = { getValidatorStatusTitleAndMessage(resourceManager, it) },
-    availableManageActions = ManageStakeAction.values().toSet() - ManageStakeAction.VALIDATORS,
     validationExecutor = validationExecutor,
-    stakeActionsValidations = stakeActionsValidations,
+    manageStakeMixinFactory = manageStakeMixinFactory,
     unbondingMixinFactory = unbondingMixinFactory
 )
 
@@ -235,16 +200,20 @@ class StashNoneViewState(
     router: StakingRouter,
     errorDisplayer: (Throwable) -> Unit,
     validationExecutor: ValidationExecutor,
-    stakeActionsValidations: Map<ManageStakeAction, StakeActionsValidationSystem>,
-    unbondingMixinFactory: UnbondingMixinFactory
+    unbondingMixinFactory: UnbondingMixinFactory,
+    manageStakeMixinFactory: ManageStakeMixinFactory,
 ) : StakeViewState<StashNoneStatus>(
-    stashState, currentAssetFlow, stakingInteractor,
-    resourceManager, scope, router, errorDisplayer,
+    stakeState = stashState,
+    currentAssetFlow = currentAssetFlow,
+    stakingInteractor = stakingInteractor,
+    resourceManager = resourceManager,
+    scope = scope,
+    router = router,
+    errorDisplayer = errorDisplayer,
     summaryFlowProvider = { stakingInteractor.observeStashSummary(stashState) },
     statusMessageProvider = { getStashStatusTitleAndMessage(resourceManager, it) },
-    availableManageActions = ManageStakeAction.values().toSet() - ManageStakeAction.PAYOUTS,
     validationExecutor = validationExecutor,
-    stakeActionsValidations = stakeActionsValidations,
+    manageStakeMixinFactory = manageStakeMixinFactory,
     unbondingMixinFactory = unbondingMixinFactory
 )
 
@@ -268,16 +237,20 @@ class NominatorViewState(
     router: StakingRouter,
     errorDisplayer: (Throwable) -> Unit,
     validationExecutor: ValidationExecutor,
-    stakeActionsValidations: Map<ManageStakeAction, StakeActionsValidationSystem>,
-    unbondingMixinFactory: UnbondingMixinFactory
+    unbondingMixinFactory: UnbondingMixinFactory,
+    manageStakeMixinFactory: ManageStakeMixinFactory,
 ) : StakeViewState<NominatorStatus>(
-    nominatorState, currentAssetFlow, stakingInteractor,
-    resourceManager, scope, router, errorDisplayer,
+    stakeState = nominatorState,
+    currentAssetFlow = currentAssetFlow,
+    stakingInteractor = stakingInteractor,
+    resourceManager = resourceManager,
+    scope = scope,
+    router = router,
+    errorDisplayer = errorDisplayer,
     summaryFlowProvider = { stakingInteractor.observeNominatorSummary(nominatorState) },
     statusMessageProvider = { getNominatorStatusTitleAndMessage(resourceManager, it) },
-    availableManageActions = ManageStakeAction.values().toSet(),
     validationExecutor = validationExecutor,
-    stakeActionsValidations = stakeActionsValidations,
+    manageStakeMixinFactory = manageStakeMixinFactory,
     unbondingMixinFactory = unbondingMixinFactory
 )
 

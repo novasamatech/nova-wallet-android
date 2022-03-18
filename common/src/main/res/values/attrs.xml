@@ -83,8 +83,14 @@
     <declare-styleable name="PrimaryButton">
         <attr format="enum" name="appearance">
             <enum name="primary" value="0" />
-            <enum name="secondary" value="1" />
-            <enum name="outline" value="2" />
+            <enum name="primaryTransparent" value="1" />
+            <enum name="secondary" value="2" />
+            <enum name="secondaryTransparent" value="3" />
+        </attr>
+
+        <attr format="enum" name="size">
+            <enum name="large" value="0" />
+            <enum name="small" value="1" />
         </attr>
     </declare-styleable>
 

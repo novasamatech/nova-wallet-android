@@ -50,7 +50,7 @@ fun Context.getFocusedDrawable(): Drawable = getRoundedCornerDrawable(strokeColo
 fun Context.getDisabledDrawable(): Drawable = getRoundedCornerDrawable(fillColorRes = R.color.gray3)
 fun Context.getIdleDrawable(): Drawable = getRoundedCornerDrawable(strokeColorRes = R.color.gray2)
 fun Context.getBlurDrawable(@ColorRes strokeColorRes: Int? = null): Drawable {
-    return getRoundedCornerDrawable(fillColorRes = R.color.blurColor, strokeColorRes = strokeColorRes)
+    return getRoundedCornerDrawable(fillColorRes = R.color.black_48, strokeColorRes = strokeColorRes)
 }
 
 fun Context.getRoundedCornerDrawable(

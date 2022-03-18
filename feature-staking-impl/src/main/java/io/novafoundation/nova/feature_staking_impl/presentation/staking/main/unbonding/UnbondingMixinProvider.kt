@@ -10,10 +10,10 @@ import io.novafoundation.nova.feature_staking_api.domain.model.StakingState
 import io.novafoundation.nova.feature_staking_impl.domain.model.Unbonding
 import io.novafoundation.nova.feature_staking_impl.domain.staking.unbond.UnbondInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.unbond.UnboningsdState
-import io.novafoundation.nova.feature_staking_impl.domain.validations.balance.ManageStakingValidationPayload
-import io.novafoundation.nova.feature_staking_impl.domain.validations.balance.ManageStakingValidationSystem
+import io.novafoundation.nova.feature_staking_impl.domain.validations.main.StakeActionsValidationPayload
+import io.novafoundation.nova.feature_staking_impl.domain.validations.main.StakeActionsValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.balance.manageStakingActionValidationFailure
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.mainStakingValidationFailure
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.unbonding.rebond.RebondKind
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.confirm.ConfirmRebondPayload
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -31,8 +31,8 @@ class UnbondingMixinFactory(
     private val validationExecutor: ValidationExecutor,
     private val actionAwaitableFactory: ActionAwaitableMixin.Factory,
     private val resourceManager: ResourceManager,
-    private val rebondValidationSystem: ManageStakingValidationSystem,
-    private val redeemValidationSystem: ManageStakingValidationSystem,
+    private val rebondValidationSystem: StakeActionsValidationSystem,
+    private val redeemValidationSystem: StakeActionsValidationSystem,
     private val router: StakingRouter,
 ) {
 
@@ -61,8 +61,8 @@ private class UnbondingMixinProvider(
     private val validationExecutor: ValidationExecutor,
     private val actionAwaitableFactory: ActionAwaitableMixin.Factory,
     private val resourceManager: ResourceManager,
-    private val rebondValidationSystem: ManageStakingValidationSystem,
-    private val redeemValidationSystem: ManageStakingValidationSystem,
+    private val rebondValidationSystem: StakeActionsValidationSystem,
+    private val redeemValidationSystem: StakeActionsValidationSystem,
     private val router: StakingRouter,
     // From Parent Component
     private val errorDisplayer: (Throwable) -> Unit,
@@ -132,15 +132,15 @@ private class UnbondingMixinProvider(
     }
 
     private fun requireValidManageAction(
-        validationSystem: ManageStakingValidationSystem,
-        block: (ManageStakingValidationPayload) -> Unit,
+        validationSystem: StakeActionsValidationSystem,
+        block: (StakeActionsValidationPayload) -> Unit,
     ) {
         launch {
             validationExecutor.requireValid(
                 validationSystem = validationSystem,
-                payload = ManageStakingValidationPayload(stashState),
+                payload = StakeActionsValidationPayload(stashState),
                 errorDisplayer = errorDisplayer,
-                validationFailureTransformerDefault = { manageStakingActionValidationFailure(it, resourceManager) },
+                validationFailureTransformerDefault = { mainStakingValidationFailure(it, resourceManager) },
                 block = block
             )
         }

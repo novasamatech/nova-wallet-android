@@ -54,6 +54,10 @@
     <color name="bar_bg_64">#A8252528</color>
 
     <color name="accentBlue">#409DF3</color>
+    <color name="accentSecondary">#2D2D30</color>
+
+    <color name="disabledColor">#1D1D20</color>
+    <color name="disabledTransparent">@color/white_8</color>
 
     <color name="pms_black">#2D2926</color>
 </resources>

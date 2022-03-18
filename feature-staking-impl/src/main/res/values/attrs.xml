@@ -31,4 +31,9 @@
     <declare-styleable name="StakingBalanceItemView">
         <attr name="title" format="string" />
     </declare-styleable>
+
+    <declare-styleable name="ManageStakingActionView">
+        <attr name="label" />
+        <attr name="icon" />
+    </declare-styleable>
 </resources>

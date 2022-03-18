@@ -143,7 +143,7 @@ class ConfirmUnbondViewModel(
         if (result.isSuccess) {
             showMessage(resourceManager.getString(R.string.common_transaction_submitted))
 
-            router.returnToStakingBalance()
+            router.returnToMain()
         } else {
             showError(result.requireException())
         }

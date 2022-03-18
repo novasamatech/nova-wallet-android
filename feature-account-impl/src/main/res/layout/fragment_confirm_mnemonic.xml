@@ -79,7 +79,7 @@
 
     <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/conformMnemonicSkip"
-        style="@style/Widget.Nova.Button.Outline"
+        style="@style/Widget.Nova.Button.Secondary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
