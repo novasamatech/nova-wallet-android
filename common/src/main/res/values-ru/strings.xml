@@ -141,6 +141,7 @@
   <string name="common_not_enough_funds_title">Недостаточный баланс</string>
   <string name="common_ok">OK</string>
   <string name="common_options_title">Выберите опцию</string>
+  <string name="common_paste">Вставить</string>
   <string name="common_price">Цена</string>
   <string name="common_proceed">Продолжить</string>
   <string name="common_reject">Отклонить</string>
@@ -153,12 +154,16 @@
   <string name="common_skip">Пропустить</string>
   <string name="common_skip_process">Пропустить</string>
   <string name="common_time_left">Оставшееся время</string>
+  <string name="common_transaction_id">ID транзакции</string>
   <string name="common_transaction_submitted">Транзакция отправлена</string>
+  <string name="common_type">Тип</string>
   <string name="common_undefined_error_message">Пожалуйста, попробуйте снова с другими входными данными. Если ошибка повторяется, то свяжитесь со службой поддержки.</string>
   <string name="common_unknown">Неизвестно</string>
   <string name="common_unlimited">Неограниченно</string>
   <string name="common_update">Обновить</string>
   <string name="common_use">Использовать</string>
+  <string name="common_validation_invalid_address_message">Получатель должен быть допустимым адресом %s</string>
+  <string name="common_validation_invalid_address_title">Недопустимый получатель</string>
   <string name="common_warning">Предупреждение</string>
   <string name="connection_add_already_exists_error">Узел уже был добавлен ранее. Пожалуйста, попробуйте другой узел.</string>
   <string name="connection_add_invalid_error">Не удается установить соединение с узлом. Пожалуйста, попробуйте другой узел.</string>
@@ -578,6 +583,7 @@
   <string name="wallet_receive_description_v2_2_0">Покажите QR код отправителю для сканирования</string>
   <string name="wallet_receive_share_message" formatted="false">Мой %s адрес для получения %s:</string>
   <string name="wallet_receive_share_qr">Поделиться</string>
+  <string name="wallet_recipient">Получатель</string>
   <string name="wallet_search_empty_title">Убедитесь, что адрес\nиз правильной сети</string>
   <string name="wallet_search_empty_title_v2_2_0">Неверный формат адреса.\nУбедитесь, что адрес \nсоответствует сети</string>
   <string name="wallet_send_balance_minimal">Минимальный баланс</string>
@@ -592,7 +598,10 @@
   <string name="wallet_send_insufficient_balance_commission">У вас недостаточно %s для оплаты комиссии</string>
   <string name="wallet_send_phishing_warning_text">Следующий адрес: %s как известно, используется для фишинга, поэтому мы не рекомендуем отправлять токены на этот адрес. Вы все равно хотите продолжить?</string>
   <string name="wallet_send_phishing_warning_title">Предупреждение о мошенничестве</string>
+  <string name="wallet_send_tokens_on">Отправить %s в</string>
   <string name="wallet_send_total_title">Всего</string>
+  <string name="wallet_sender">Отправитель</string>
+  <string name="wallet_transfer_details_send_back">Отправить этому контакту</string>
   <string name="wallet_transfer_details_title">Детали перевода</string>
   <string name="wallet_your_balance">Ваш баланс</string>
   <string name="yesterday">Вчера</string>
