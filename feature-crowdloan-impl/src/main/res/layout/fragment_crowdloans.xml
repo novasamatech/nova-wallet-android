@@ -15,16 +15,16 @@
         android:orientation="vertical">
 
         <TextView
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             android:id="@+id/crowdloanTitle"
             style="@style/TextAppearance.NovaFoundation.Header1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="17dp"
             android:layout_marginTop="25dp"
-            android:text="@string/crowdloan_crowdloan" />
+            android:text="@string/crowdloan_crowdloan"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
 
         <io.novafoundation.nova.feature_wallet_api.presentation.view.AssetSelectorView
@@ -114,16 +114,13 @@
             tools:listitem="@layout/item_crowdloan"
             tools:visibility="visible" />
 
-        <TextView
+        <io.novafoundation.nova.common.view.PlaceholderView
             android:id="@+id/crowdloanPlaceholder"
-            style="@style/TextAppearance.NovaFoundation.Body2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="64dp"
-            android:drawablePadding="18dp"
-            android:gravity="center"
+            app:image="@drawable/ic_placeholder"
             android:text="@string/crowdloan_empty_message_v2_2_0"
-            app:drawableTopCompat="@drawable/ic_placeholder"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/crowdloanMyContributions"

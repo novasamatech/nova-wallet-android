@@ -44,36 +44,18 @@
         tools:listitem="@layout/item_transaction"
         tools:visibility="visible" />
 
-    <ImageView
-        android:id="@+id/placeholderIcon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="64dp"
-        android:src="@drawable/ic_placeholder"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/transactionHistoryTitle" />
 
-    <TextView
-        android:id="@+id/placeholderText"
-        style="@style/TextAppearance.NovaFoundation.Body2"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="95dp"
-        android:layout_marginTop="18dp"
-        android:layout_marginEnd="96dp"
-        android:gravity="center"
-        android:text="@string/transfers_empty_v2_2_0"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/placeholderIcon" />
-
-    <androidx.constraintlayout.widget.Group
+    <io.novafoundation.nova.common.view.PlaceholderView
         android:id="@+id/placeholder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="visible"
-        app:constraint_referenced_ids="placeholderIcon,placeholderText" />
+        android:layout_marginTop="32dp"
+        android:text="@string/transfers_empty_v2_2_0"
+        app:image="@drawable/ic_placeholder"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/transactionHistoryTitle"
+        app:showBackground="false" />
 
     <ImageView
         android:id="@+id/transactionHistoryFilter"

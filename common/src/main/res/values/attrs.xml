@@ -96,11 +96,18 @@
 
     <declare-styleable name="PlaceholderView">
         <attr name="android:text" />
+        <attr name="image" format="color|reference" />
+        <attr name="showBackground" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="TitleImageContentSectionView">
         <attr name="sectionTitle" format="string" />
         <attr name="sectionContentEndIcon" format="reference|color" />
         <attr name="sectionContentEndIconTint" format="color" />
+    </declare-styleable>
+    
+    <declare-styleable name="SearchView">
+        <attr name="android:hint" />
+        <attr name="icon" />
     </declare-styleable>
 </resources>
