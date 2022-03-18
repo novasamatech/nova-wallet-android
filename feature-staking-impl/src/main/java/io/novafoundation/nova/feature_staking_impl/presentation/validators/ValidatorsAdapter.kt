@@ -10,10 +10,11 @@ import io.novafoundation.nova.common.list.resolvePayload
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
-import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorModel
 import kotlinx.android.extensions.LayoutContainer
+import kotlinx.android.synthetic.main.item_validator.view.itemValidationCheck
 import kotlinx.android.synthetic.main.item_validator.view.itemValidatorActionIcon
 import kotlinx.android.synthetic.main.item_validator.view.itemValidatorIcon
 import kotlinx.android.synthetic.main.item_validator.view.itemValidatorInfo
@@ -109,19 +110,20 @@ class ValidatorViewHolder(override val containerView: View) : RecyclerView.ViewH
     ) = with(containerView) {
         when {
             mode == ValidatorsAdapter.Mode.EDIT -> {
-                itemValidatorActionIcon.setImageResource(R.drawable.ic_delete_symbol)
                 itemValidatorActionIcon.makeVisible()
+                itemValidationCheck.makeGone()
 
                 itemValidatorActionIcon.setOnClickListener { handler.removeClicked(validatorModel) }
             }
             validatorModel.isChecked == null -> {
                 itemValidatorActionIcon.makeGone()
+                itemValidationCheck.makeGone()
             }
             else -> {
-                itemValidatorActionIcon.setOnClickListener(null)
+                itemValidatorActionIcon.makeGone()
+                itemValidationCheck.makeVisible()
 
-                itemValidatorActionIcon.setImageResource(R.drawable.ic_checkmark)
-                itemValidatorActionIcon.setVisible(validatorModel.isChecked, falseState = View.INVISIBLE)
+                itemValidationCheck.isChecked = validatorModel.isChecked
             }
         }
     }
@@ -134,12 +136,14 @@ class ValidatorViewHolder(override val containerView: View) : RecyclerView.ViewH
             }
 
             is ValidatorModel.Scoring.OneField -> {
+                itemValidatorScoringPrimary.setTextColorRes(R.color.white_64)
                 itemValidatorScoringPrimary.makeVisible()
                 itemValidatorScoringSecondary.makeGone()
                 itemValidatorScoringPrimary.text = scoring.field
             }
 
             is ValidatorModel.Scoring.TwoFields -> {
+                itemValidatorScoringPrimary.setTextColorRes(R.color.white)
                 itemValidatorScoringPrimary.makeVisible()
                 itemValidatorScoringSecondary.makeVisible()
                 itemValidatorScoringPrimary.text = scoring.primary

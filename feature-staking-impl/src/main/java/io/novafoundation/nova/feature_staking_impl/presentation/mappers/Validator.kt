@@ -8,7 +8,6 @@ import io.novafoundation.nova.common.utils.format
 import io.novafoundation.nova.common.utils.formatAsCurrency
 import io.novafoundation.nova.common.utils.formatAsPercentage
 import io.novafoundation.nova.common.utils.fractionToPercentage
-import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import io.novafoundation.nova.feature_staking_api.domain.model.NominatedValidator
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_impl.R
@@ -30,6 +29,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import java.math.BigInteger
 
 private val PERCENT_MULTIPLIER = 100.toBigDecimal()
@@ -45,12 +45,12 @@ suspend fun mapValidatorToValidatorModel(
     isChecked: Boolean? = null,
     sorting: RecommendationSorting = APYSorting,
 ) = mapValidatorToValidatorModel(
-    chain,
-    validator,
-    { iconGenerator.createAddressModel(it, ICON_SIZE_DP, validator.identity?.display) },
-    token,
-    isChecked,
-    sorting
+    chain = chain,
+    validator = validator,
+    createIcon = { iconGenerator.createAddressModel(it, ICON_SIZE_DP, validator.identity?.display, AddressIconGenerator.BACKGROUND_TRANSPARENT) },
+    token = token,
+    isChecked = isChecked,
+    sorting = sorting
 )
 
 suspend fun mapValidatorToValidatorModel(

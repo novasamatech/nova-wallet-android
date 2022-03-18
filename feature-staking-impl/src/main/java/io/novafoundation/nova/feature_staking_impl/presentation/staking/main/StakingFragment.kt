@@ -108,8 +108,9 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
                     stakingEstimate.setVisible(stakingState is WelcomeViewState)
                     stakingUserRewards.setVisible(stakingState is StakeViewState<*>)
                     stakingStakeSummary.setVisible(stakingState is StakeViewState<*>)
-                    stakingStakeUnbondings.setVisible(stakingState is StakeViewState<*>)
                     stakingStakeManage.setVisible(stakingState is StakeViewState<*>)
+
+                    if (stakingState !is StakeViewState<*>) stakingStakeUnbondings.makeGone()
 
                     stakingNetworkInfo.setExpanded(stakingState is WelcomeViewState)
 
