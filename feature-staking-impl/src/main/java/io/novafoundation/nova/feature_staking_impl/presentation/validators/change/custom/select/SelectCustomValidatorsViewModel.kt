@@ -65,6 +65,14 @@ class SelectCustomValidatorsViewModel(
         emitAll(recommendationSettingsProvider().observeRecommendationSettings())
     }.share()
 
+    val recommendationSettingsIcon = recommendationSettingsFlow.map {
+        val isChanged = it != recommendationSettingsProvider().defaultSelectCustomSettings()
+
+        if (isChanged) R.drawable.ic_filter_indicator else R.drawable.ic_filter
+    }
+        .inBackground()
+        .share()
+
     private val shownValidators = recommendationSettingsFlow.map {
         recommendator().recommendations(it)
     }.share()

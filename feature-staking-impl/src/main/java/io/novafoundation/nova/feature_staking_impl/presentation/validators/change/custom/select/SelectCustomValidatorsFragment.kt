@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -28,6 +29,8 @@ class SelectCustomValidatorsFragment : BaseFragment<SelectCustomValidatorsViewMo
 
     lateinit var adapter: ValidatorsAdapter
 
+    var filterAction: ImageView? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -50,7 +53,7 @@ class SelectCustomValidatorsFragment : BaseFragment<SelectCustomValidatorsViewMo
         selectCustomValidatorsToolbar.setHomeButtonListener { viewModel.backClicked() }
         onBackPressed { viewModel.backClicked() }
 
-        selectCustomValidatorsToolbar.addCustomAction(R.drawable.ic_filter) {
+        filterAction = selectCustomValidatorsToolbar.addCustomAction(R.drawable.ic_filter) {
             viewModel.settingsClicked()
         }
 
@@ -65,6 +68,12 @@ class SelectCustomValidatorsFragment : BaseFragment<SelectCustomValidatorsViewMo
         selectCustomValidatorsDeselectAll.setOnClickListener { viewModel.deselectAll() }
 
         selectCustomValidatorsNext.setOnClickListener { viewModel.nextClicked() }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        filterAction = null
     }
 
     override fun inject() {
@@ -95,6 +104,10 @@ class SelectCustomValidatorsFragment : BaseFragment<SelectCustomValidatorsViewMo
         viewModel.fillWithRecommendedEnabled.observe(selectCustomValidatorsFillWithRecommended::setEnabled)
         viewModel.clearFiltersEnabled.observe(selectCustomValidatorsClearFilters::setEnabled)
         viewModel.deselectAllEnabled.observe(selectCustomValidatorsDeselectAll::setEnabled)
+
+        viewModel.recommendationSettingsIcon.observe { icon ->
+            filterAction?.setImageResource(icon)
+        }
     }
 
     override fun validatorInfoClicked(validatorModel: ValidatorModel) {
