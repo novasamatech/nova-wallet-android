@@ -259,6 +259,13 @@
         <item name="android:textColor">@color/gray1</item>
     </style>
 
+    <style name="Widget.Nova.Checkbox" parent="">
+        <item name="android:minWidth">0dp</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="buttonTint">@color/tint_radio_button</item>
+    </style>
+
+
     <style name="Widget.Nova.Counter" parent="">
         <item name="android:paddingStart">8dp</item>
         <item name="android:paddingTop">1.5dp</item>

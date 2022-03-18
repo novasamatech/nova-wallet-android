@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.ValidatorsAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorModel
 import kotlinx.android.synthetic.main.fragment_recommended_validators.recommendedValidatorsAccounts
+import kotlinx.android.synthetic.main.fragment_recommended_validators.recommendedValidatorsContent
 import kotlinx.android.synthetic.main.fragment_recommended_validators.recommendedValidatorsList
 import kotlinx.android.synthetic.main.fragment_recommended_validators.recommendedValidatorsNext
 import kotlinx.android.synthetic.main.fragment_recommended_validators.recommendedValidatorsProgress
@@ -59,8 +60,7 @@ class RecommendedValidatorsFragment : BaseFragment<RecommendedValidatorsViewMode
             adapter.submitList(it)
 
             recommendedValidatorsProgress.setVisible(false)
-            recommendedValidatorsNext.setVisible(true)
-            recommendedValidatorsList.setVisible(true)
+            recommendedValidatorsContent.setVisible(true)
         }
 
         viewModel.selectedTitle.observe(recommendedValidatorsAccounts::setText)
