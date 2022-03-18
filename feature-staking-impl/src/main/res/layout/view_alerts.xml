@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:background="@color/black"
+    tools:background="@color/black_48"
     tools:orientation="vertical"
     tools:parentTag="android.widget.LinearLayout">
 
@@ -16,23 +16,17 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_weight="1"
-        android:text="@string/staking_alert_title" />
-
-    <View
-        android:id="@+id/view"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:background="@color/white_24" />
+        android:drawablePadding="8dp"
+        android:text="@string/staking_alert_title"
+        android:textColor="@color/yellow"
+        app:drawableStartCompat="@drawable/ic_warning_filled" />
 
     <com.facebook.shimmer.ShimmerFrameLayout
         android:id="@+id/alertShimmer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         tools:visibility="gone">
 
         <LinearLayout
@@ -43,16 +37,17 @@
 
             <View
                 android:layout_width="160dp"
-                android:layout_height="14dp"
+                android:layout_height="12dp"
+                android:layout_marginTop="10dp"
                 android:background="@drawable/bg_shimerring" />
 
             <View
                 android:layout_width="130dp"
-                android:layout_height="12dp"
+                android:layout_height="10dp"
                 android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
                 android:background="@drawable/bg_shimerring" />
         </LinearLayout>
-
     </com.facebook.shimmer.ShimmerFrameLayout>
 
     <TextView
@@ -63,16 +58,18 @@
         android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"
         android:layout_weight="1"
-        android:visibility="gone"
-        android:text="@string/staking_alert_no_alerts_now" />
+        android:text="@string/staking_alert_no_alerts_now"
+        android:visibility="gone" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/alertsRecycler"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:visibility="gone"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:itemCount="3"
-        tools:visibility="visible"
-        tools:listitem="@layout/item_alert" />
+        tools:listitem="@layout/item_alert"
+        tools:visibility="visible" />
 </merge>
