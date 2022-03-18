@@ -4,12 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
+import android.widget.ImageView
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.getDrawableCompat
 import io.novafoundation.nova.common.utils.scrollToTopWhenItemsShuffled
 import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
@@ -30,6 +28,8 @@ import kotlinx.android.synthetic.main.fragment_select_custom_validators.selectCu
 class SelectCustomValidatorsFragment : BaseFragment<SelectCustomValidatorsViewModel>(), ValidatorsAdapter.ItemHandler {
 
     lateinit var adapter: ValidatorsAdapter
+
+    var filterAction: ImageView? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -53,7 +53,7 @@ class SelectCustomValidatorsFragment : BaseFragment<SelectCustomValidatorsViewMo
         selectCustomValidatorsToolbar.setHomeButtonListener { viewModel.backClicked() }
         onBackPressed { viewModel.backClicked() }
 
-        selectCustomValidatorsToolbar.addCustomAction(R.drawable.ic_filter) {
+        filterAction = selectCustomValidatorsToolbar.addCustomAction(R.drawable.ic_filter) {
             viewModel.settingsClicked()
         }
 
@@ -63,16 +63,17 @@ class SelectCustomValidatorsFragment : BaseFragment<SelectCustomValidatorsViewMo
 
         selectCustomValidatorsList.scrollToTopWhenItemsShuffled(viewLifecycleOwner)
 
-        val dividerItemDecoration = DividerItemDecoration(context, LinearLayoutManager.VERTICAL).apply {
-            setDrawable(requireContext().getDrawableCompat(R.drawable.divider_decoration))
-        }
-        selectCustomValidatorsList.addItemDecoration(dividerItemDecoration)
-
         selectCustomValidatorsFillWithRecommended.setOnClickListener { viewModel.fillRestWithRecommended() }
         selectCustomValidatorsClearFilters.setOnClickListener { viewModel.clearFilters() }
         selectCustomValidatorsDeselectAll.setOnClickListener { viewModel.deselectAll() }
 
         selectCustomValidatorsNext.setOnClickListener { viewModel.nextClicked() }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        filterAction = null
     }
 
     override fun inject() {
@@ -103,6 +104,10 @@ class SelectCustomValidatorsFragment : BaseFragment<SelectCustomValidatorsViewMo
         viewModel.fillWithRecommendedEnabled.observe(selectCustomValidatorsFillWithRecommended::setEnabled)
         viewModel.clearFiltersEnabled.observe(selectCustomValidatorsClearFilters::setEnabled)
         viewModel.deselectAllEnabled.observe(selectCustomValidatorsDeselectAll::setEnabled)
+
+        viewModel.recommendationSettingsIcon.observe { icon ->
+            filterAction?.setImageResource(icon)
+        }
     }
 
     override fun validatorInfoClicked(validatorModel: ValidatorModel) {

@@ -2,8 +2,6 @@ package io.novafoundation.nova.feature_staking_impl.presentation.validators.chan
 
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
-import io.novafoundation.nova.common.address.AddressModel
-import io.novafoundation.nova.common.address.createAddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
@@ -67,6 +65,14 @@ class SelectCustomValidatorsViewModel(
         emitAll(recommendationSettingsProvider().observeRecommendationSettings())
     }.share()
 
+    val recommendationSettingsIcon = recommendationSettingsFlow.map {
+        val isChanged = it != recommendationSettingsProvider().defaultSelectCustomSettings()
+
+        if (isChanged) R.drawable.ic_filter_indicator else R.drawable.ic_filter
+    }
+        .inBackground()
+        .share()
+
     private val shownValidators = recommendationSettingsFlow.map {
         recommendator().recommendations(it)
     }.share()
@@ -80,8 +86,6 @@ class SelectCustomValidatorsViewModel(
     private val maxSelectedValidatorsFlow = flowOf {
         interactor.maxValidatorsPerNominator()
     }.share()
-
-    private val iconsCache: MutableMap<String, AddressModel> = mutableMapOf()
 
     val validatorModelsFlow = combine(
         shownValidators,
@@ -216,11 +220,7 @@ class SelectCustomValidatorsViewModel(
             mapValidatorToValidatorModel(
                 chain = chain,
                 validator = validator,
-                createIcon = {
-                    iconsCache.getOrPut(it) {
-                        addressIconGenerator.createAddressModel(it, AddressIconGenerator.SIZE_MEDIUM, validator.identity?.display)
-                    }
-                },
+                iconGenerator = addressIconGenerator,
                 token = token,
                 isChecked = validator in selectedValidators,
                 sorting = recommendationSettingsFlow.first().sorting

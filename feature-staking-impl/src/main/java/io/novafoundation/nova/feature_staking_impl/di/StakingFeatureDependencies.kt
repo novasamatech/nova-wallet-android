@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
 import io.novafoundation.nova.common.data.storage.Preferences
+import io.novafoundation.nova.common.di.modules.Caching
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
@@ -99,4 +100,7 @@ interface StakingFeatureDependencies {
     val amountChooserMixinFactory: AmountChooserMixin.Factory
 
     val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+
+    @Caching
+    fun cachingIconGenerator(): AddressIconGenerator
 }

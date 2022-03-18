@@ -23,9 +23,9 @@
         android:id="@+id/itemValidationCheck"
         style="@style/Widget.Nova.Checkbox"
         android:layout_width="wrap_content"
-        tools:visibility="gone"
+        tools:visibility="visible"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
+        android:layout_marginStart="16dp"
         android:clickable="false" />
 
     <ImageView
