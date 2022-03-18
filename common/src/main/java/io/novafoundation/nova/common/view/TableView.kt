@@ -19,12 +19,30 @@ class TableView @JvmOverloads constructor(
 
     init {
         orientation = VERTICAL
-        updatePadding(top = 16.dp, bottom = 8.dp, start = 16.dp, end = 16.dp)
 
-        background = addRipple(getRoundedCornerDrawable(R.color.white_8))
+        background = getRoundedCornerDrawable(R.color.white_8)
+        clipToOutline = true
 
         doOnPreDraw {
-            (children.last() as? TableCellView)?.setDividerVisible(false)
+            setupTableChildrenAppearance()
+        }
+    }
+
+    private fun setupTableChildrenAppearance() {
+        val tableChildren = children.filterIsInstance<TableCellView>()
+            .toList()
+
+        tableChildren.forEach {
+            it.setDividerColor(R.color.white_8)
+            it.updatePadding(start = 16.dp, end = 16.dp)
+        }
+
+        tableChildren.first().apply {
+            updatePadding(top = 4.dp)
+        }
+        tableChildren.last().apply {
+            updatePadding(bottom = 4.dp)
+            setDividerVisible(false)
         }
     }
 }

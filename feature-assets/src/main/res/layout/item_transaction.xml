@@ -1,32 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@drawable/bg_primary_list_item"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_primary_list_item">
 
     <ImageView
         android:id="@+id/itemTransactionIcon"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
         android:layout_marginStart="16dp"
-        app:layout_constraintBottom_toBottomOf="@+id/itemTransactionTime"
+        android:background="@drawable/bg_icon_round_white"
+        android:padding="6dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/itemTransactionHeader"
-        tools:src="@drawable/ic_token_ksm" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/white_64"
+        tools:src="@drawable/ic_staking_filled" />
 
     <TextView
         android:id="@+id/itemTransactionHeader"
-        style="@style/TextAppearance.NovaFoundation.Body1"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="12dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="48dp"
         android:ellipsize="middle"
         android:singleLine="true"
+        android:textColor="@color/white"
         app:layout_constraintEnd_toStartOf="@+id/itemTransactionAmount"
         app:layout_constraintStart_toEndOf="@+id/itemTransactionIcon"
         app:layout_constraintTop_toTopOf="parent"
@@ -34,51 +39,49 @@
 
     <TextView
         android:id="@+id/itemTransactionTime"
-        style="@style/TextAppearance.NovaFoundation.Body2"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="12dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
-        android:textColor="@color/colorGreyText"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:textColor="@color/white_48"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/itemTransactionAmount"
-        tools:text="10/04/20, 22:36:45" />
+        tools:text="22:36" />
 
     <TextView
         android:id="@+id/itemTransactionSubHeader"
-        style="@style/TextAppearance.NovaFoundation.Body2"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:textColor="@color/colorGreyText"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="9dp"
+        android:textColor="@color/white_48"
         app:layout_constraintStart_toStartOf="@+id/itemTransactionHeader"
         app:layout_constraintTop_toBottomOf="@+id/itemTransactionAmount"
         tools:text="Transfer" />
 
     <TextView
         android:id="@+id/itemTransactionAmount"
-        style="@style/TextAppearance.NovaFoundation.Body1"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="4dp"
         android:ellipsize="middle"
         android:singleLine="true"
+        android:textColor="@color/white"
         app:layout_constraintEnd_toStartOf="@+id/itemTransactionStatus"
         app:layout_constraintTop_toTopOf="@+id/itemTransactionHeader"
-        app:layout_goneMarginEnd="12dp"
+        app:layout_goneMarginEnd="0dp"
         tools:text="4.01 KSM" />
 
     <ImageView
-        android:visibility="gone"
         android:id="@+id/itemTransactionStatus"
-        tools:visibility="visible"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="12dp"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/itemTransactionAmount"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/itemTransactionTime"
         app:layout_constraintTop_toTopOf="@+id/itemTransactionAmount"
-        tools:src="@drawable/ic_transaction_pending" />
+        tools:src="@drawable/ic_time_16"
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>

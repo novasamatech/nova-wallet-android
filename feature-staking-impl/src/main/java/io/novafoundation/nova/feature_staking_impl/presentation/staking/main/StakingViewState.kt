@@ -158,9 +158,7 @@ sealed class StakeViewState<S>(
 
     private fun syncStakingRewards() {
         scope.launch {
-            val syncResult = stakingInteractor.syncStakingRewards(stakeState)
-
-            syncResult.exceptionOrNull()?.let { errorDisplayer(it) }
+            stakingInteractor.syncStakingRewards(stakeState)
         }
     }
 

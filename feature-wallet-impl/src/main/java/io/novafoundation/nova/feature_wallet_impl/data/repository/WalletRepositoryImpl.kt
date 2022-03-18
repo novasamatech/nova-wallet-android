@@ -285,7 +285,7 @@ class WalletRepositoryImpl(
             chainId = transfer.chainAsset.chainId,
             amount = transfer.amountInPlanks,
             senderAddress = senderAddress,
-            receiverAddress = transfer.chain.addressOf(transfer.recipient),
+            receiverAddress = transfer.recipient,
             fee = transfer.chain.commissionAsset.planksFromAmount(fee),
             status = OperationLocal.Status.PENDING,
             source = source

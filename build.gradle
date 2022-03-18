@@ -1,8 +1,8 @@
 buildscript {
     ext {
         // App version
-        versionName = '2.5.0'
-        versionCode = 12
+        versionName = '2.6.0'
+        versionCode = 13
 
         applicationId = "io.novafoundation.nova"
 
@@ -45,7 +45,7 @@ buildscript {
 
         bouncyCastleVersion = '1.60'
 
-        fearlessLibVersion = '1.3.4'
+        fearlessLibVersion = '1.3.5'
 
         gifVersion = '1.2.19'
 

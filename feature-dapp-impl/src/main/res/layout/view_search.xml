@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     tools:background="@color/white_8"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:parentTag="android.widget.LinearLayout">
 
     <EditText
@@ -26,10 +27,11 @@
     <ImageView
         android:id="@+id/searchClear"
         android:layout_width="20dp"
-        android:visibility="gone"
-        tools:visibility="visible"
         android:layout_height="20dp"
         android:layout_gravity="center_vertical"
         android:layout_marginEnd="8dp"
-        android:src="@drawable/ic_close_circle" />
+        android:src="@drawable/ic_close_circle"
+        app:tint="@color/white_32"
+        android:visibility="gone"
+        tools:visibility="visible" />
 </merge>

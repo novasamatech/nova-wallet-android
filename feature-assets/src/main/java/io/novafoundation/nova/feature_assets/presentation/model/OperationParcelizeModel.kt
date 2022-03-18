@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_assets.presentation.model
 
 import android.os.Parcelable
+import androidx.annotation.DrawableRes
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.android.parcel.Parcelize
 
@@ -13,9 +14,10 @@ sealed class OperationParcelizeModel : Parcelable {
         val address: String,
         val time: Long,
         val amount: String,
-        val isReward: Boolean,
-        val era: Int,
+        val type: String,
+        val era: String,
         val validator: String?,
+        val statusAppearance: OperationStatusAppearance,
     ) : OperationParcelizeModel()
 
     @Parcelize
@@ -39,10 +41,10 @@ sealed class OperationParcelizeModel : Parcelable {
         val hash: String?,
         val isIncome: Boolean,
         val amount: String,
-        val total: String,
         val receiver: String,
         val sender: String,
         val fee: String,
         val statusAppearance: OperationStatusAppearance,
+        @DrawableRes val transferDirectionIcon: Int
     ) : Parcelable, OperationParcelizeModel()
 }

@@ -1,20 +1,18 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser
 
+import androidx.annotation.StringRes
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetSelectorModel
+import io.novafoundation.nova.feature_wallet_api.presentation.model.ChooseAmountModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.math.BigDecimal
 
-typealias AssetUiMapper = (Asset) -> AssetSelectorModel
-
 interface AmountChooserMixin {
 
     val amountInput: MutableStateFlow<String>
 
-    val assetModel: Flow<AssetSelectorModel>
-
+    val assetModel: Flow<ChooseAmountModel>
     val fiatAmount: Flow<String>
 
     interface Presentation : AmountChooserMixin {
@@ -29,7 +27,8 @@ interface AmountChooserMixin {
         fun create(
             scope: CoroutineScope,
             assetFlow: Flow<Asset>,
-            assetUiMapper: AssetUiMapper,
+            balanceField: (Asset) -> BigDecimal,
+            @StringRes balanceLabel: Int?
         ): Presentation
     }
 }

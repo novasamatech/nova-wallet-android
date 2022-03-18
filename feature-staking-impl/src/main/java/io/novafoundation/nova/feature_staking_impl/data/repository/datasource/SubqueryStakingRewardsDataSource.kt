@@ -2,10 +2,10 @@ package io.novafoundation.nova.feature_staking_impl.data.repository.datasource
 
 import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.core_db.model.TotalRewardLocal
-import io.novafoundation.nova.feature_staking_impl.data.mappers.mapSubqueryHistoryToTotalReward
 import io.novafoundation.nova.feature_staking_impl.data.mappers.mapTotalRewardLocalToTotalReward
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.StakingApi
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.request.StakingSumRewardRequest
+import io.novafoundation.nova.feature_staking_impl.data.network.subquery.response.totalReward
 import io.novafoundation.nova.feature_staking_impl.domain.model.TotalReward
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
@@ -26,13 +26,12 @@ class SubqueryStakingRewardsDataSource(
     override suspend fun sync(accountAddress: String, chain: Chain) {
         val stakingExternalApi = chain.externalApi?.staking ?: return
 
-        val totalReward = mapSubqueryHistoryToTotalReward(
-            stakingApi.getSumReward(
-                url = stakingExternalApi.url,
-                body = StakingSumRewardRequest(accountAddress = accountAddress)
-            )
+        val response = stakingApi.getTotalReward(
+            url = stakingExternalApi.url,
+            body = StakingSumRewardRequest(accountAddress = accountAddress)
         )
+        val totalResult = response.data.totalReward
 
-        stakingTotalRewardDao.insert(TotalRewardLocal(accountAddress, totalReward))
+        stakingTotalRewardDao.insert(TotalRewardLocal(accountAddress, totalResult))
     }
 }

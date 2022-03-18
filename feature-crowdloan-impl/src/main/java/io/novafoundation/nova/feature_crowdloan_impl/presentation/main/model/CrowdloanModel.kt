@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_crowdloan_impl.presentation.main.model
 
+import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.ParaId
-import io.novafoundation.nova.feature_crowdloan_impl.presentation.model.Icon
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
 data class CrowdloanStatusModel(

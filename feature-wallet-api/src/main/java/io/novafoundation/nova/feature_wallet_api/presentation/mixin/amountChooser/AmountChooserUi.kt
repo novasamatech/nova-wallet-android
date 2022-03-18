@@ -3,27 +3,15 @@ package io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoos
 import androidx.lifecycle.lifecycleScope
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.bindTo
-import io.novafoundation.nova.common.view.AmountView
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetSelectorModel
-
-interface WithAmountChooser {
-
-    val amountChooserMixin: AmountChooserMixin
-}
+import io.novafoundation.nova.feature_wallet_api.presentation.view.amount.ChooseAmountView
+import io.novafoundation.nova.feature_wallet_api.presentation.view.amount.setChooseAmountModel
 
 fun BaseFragment<*>.setupAmountChooser(
-    withChooser: WithAmountChooser,
-    amountView: AmountView,
+    mixin: AmountChooserMixin,
+    amountView: ChooseAmountView,
 ) {
-    amountView.amountInput.bindTo(withChooser.amountChooserMixin.amountInput, lifecycleScope)
+    amountView.amountInput.bindTo(mixin.amountInput, lifecycleScope)
 
-    withChooser.amountChooserMixin.assetModel.observe(amountView::setAssetModel)
-
-    withChooser.amountChooserMixin.fiatAmount.observe(amountView::setFiatAmount)
-}
-
-fun AmountView.setAssetModel(assetModel: AssetSelectorModel) {
-    setAssetBalance(assetModel.assetBalance)
-    setAssetName(assetModel.tokenName)
-    loadAssetImage(assetModel.imageUrl)
+    mixin.assetModel.observe(amountView::setChooseAmountModel)
+    mixin.fiatAmount.observe(amountView::setFiatAmount)
 }

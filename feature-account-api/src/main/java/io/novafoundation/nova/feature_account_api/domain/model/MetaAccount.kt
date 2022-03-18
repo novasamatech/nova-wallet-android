@@ -93,6 +93,8 @@ fun MetaAccount.addressIn(chain: Chain): String? {
     }
 }
 
+fun MetaAccount.requireAddressIn(chain: Chain): String = addressIn(chain) ?: throw NoSuchElementException("No chain account found for $chain in $name")
+
 val MetaAccount.defaultSubstrateAddress
     get() = substrateAccountId.toAddress(SS58Encoder.DEFAULT_PREFIX)
 

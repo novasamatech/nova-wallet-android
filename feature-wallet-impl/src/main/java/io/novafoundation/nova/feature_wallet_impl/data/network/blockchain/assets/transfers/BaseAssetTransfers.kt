@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.ExistentialDe
 import io.novafoundation.nova.feature_wallet_api.domain.validation.doNotCrossExistentialDeposit
 import io.novafoundation.nova.feature_wallet_api.domain.validation.enoughTotalToStayAboveED
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
+import io.novafoundation.nova.feature_wallet_api.domain.validation.validAddress
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.BalanceSourceProvider
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.notDeadRecipient
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -81,6 +82,8 @@ abstract class BaseAssetTransfers(
     protected fun defaultValidationSystem(
         removeAccountBehavior: ExistentialDepositError<WillRemoveAccount>
     ): AssetTransfersValidationSystem = ValidationSystem {
+        validaAddress()
+
         sufficientTransferableBalanceToPayFee()
         sufficientBalanceInUsedAsset()
 
@@ -91,6 +94,12 @@ abstract class BaseAssetTransfers(
 
         doNotCrossExistentialDeposit(removeAccountBehavior)
     }
+
+    private fun AssetTransfersValidationSystemBuilder.validaAddress() = validAddress(
+        address = { it.transfer.recipient },
+        chain = { it.transfer.chain },
+        error = { AssetTransferValidationFailure.InvalidRecipientAddress(it.transfer.chain) }
+    )
 
     protected fun AssetTransfersValidationSystemBuilder.sufficientBalanceInUsedAsset() = sufficientBalance(
         amount = { it.transfer.amount },

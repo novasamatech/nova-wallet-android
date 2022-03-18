@@ -9,7 +9,6 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
-import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_assets.presentation.WalletRouter
@@ -25,7 +24,6 @@ class RewardDetailModule {
     @ViewModelKey(RewardDetailViewModel::class)
     fun provideViewModel(
         operation: OperationParcelizeModel.Reward,
-        resourceManager: ResourceManager,
         addressIconGenerator: AddressIconGenerator,
         addressDisplayUseCase: AddressDisplayUseCase,
         chainRegistry: ChainRegistry,
@@ -34,7 +32,6 @@ class RewardDetailModule {
     ): ViewModel {
         return RewardDetailViewModel(
             operation,
-            resourceManager,
             addressIconGenerator,
             addressDisplayUseCase,
             router,

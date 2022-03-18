@@ -14,6 +14,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.dp
+import io.novafoundation.nova.common.utils.getResourceIdOrNull
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setVisible
@@ -65,6 +66,9 @@ class Toolbar @JvmOverloads constructor(
             val backgroundAttrDrawable = typedArray.getDrawable(R.styleable.Toolbar_contentBackground) ?: ColorDrawable(context.getColor(R.color.black))
             toolbarContainer.background = backgroundAttrDrawable
 
+            val textAppearance = typedArray.getResourceIdOrNull(R.styleable.Toolbar_titleTextAppearance)
+            textAppearance?.let(titleTv::setTextAppearance)
+
             typedArray.recycle()
         }
     }
@@ -84,7 +88,7 @@ class Toolbar @JvmOverloads constructor(
         rightImg.setVisible(visible)
     }
 
-    fun setTitle(title: String?) {
+    fun setTitle(title: CharSequence?) {
         titleTv.text = title
     }
 

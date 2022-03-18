@@ -12,6 +12,7 @@ import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.utils.getAccentColor
 
 fun Int.toColorStateList() = ColorStateList.valueOf(this)
 
@@ -36,6 +37,15 @@ fun Context.getCornersStateDrawable(
     }
 }
 
+fun Context.getInputBackground() = getCornersStateDrawable(
+    focusedDrawable = getRoundedCornerDrawableFromColors(
+        fillColor = getColor(R.color.white_8),
+        strokeColor = getAccentColor(),
+        strokeSizeInDp = 0.5f
+    ),
+    idleDrawable = getRoundedCornerDrawable(R.color.white_8)
+)
+
 fun Context.getFocusedDrawable(): Drawable = getRoundedCornerDrawable(strokeColorRes = R.color.white)
 fun Context.getDisabledDrawable(): Drawable = getRoundedCornerDrawable(fillColorRes = R.color.gray3)
 fun Context.getIdleDrawable(): Drawable = getRoundedCornerDrawable(strokeColorRes = R.color.gray2)
@@ -47,7 +57,7 @@ fun Context.getRoundedCornerDrawable(
     @ColorRes fillColorRes: Int = R.color.black,
     @ColorRes strokeColorRes: Int? = null,
     cornerSizeInDp: Int = 10,
-    strokeSizeInDp: Int = 1,
+    strokeSizeInDp: Float = 1.0f,
 ): Drawable {
     val fillColor = getColor(fillColorRes)
     val strokeColor = strokeColorRes?.let(this::getColor)
@@ -59,7 +69,7 @@ fun Context.getTopRoundedCornerDrawable(
     @ColorRes fillColorRes: Int = R.color.black,
     @ColorRes strokeColorRes: Int? = null,
     cornerSizeInDp: Int = 10,
-    strokeSizeInDp: Int = 1,
+    strokeSizeInDp: Float = 1.0f,
 ): Drawable {
     val fillColor = getColor(fillColorRes)
     val strokeColor = strokeColorRes?.let(this::getColor)
@@ -71,7 +81,7 @@ fun Context.getTopRoundedCornerDrawableFromColors(
     @ColorInt fillColor: Int = getColor(R.color.black),
     @ColorInt strokeColor: Int? = null,
     cornerSizeInDp: Int = 10,
-    strokeSizeInDp: Int = 1,
+    strokeSizeInDp: Float = 1.0f,
 ): Drawable {
     return cornerDrawableFromColors(
         fillColor = fillColor,
@@ -91,7 +101,7 @@ fun Context.getRoundedCornerDrawableFromColors(
     @ColorInt fillColor: Int = getColor(R.color.black),
     @ColorInt strokeColor: Int? = null,
     cornerSizeInDp: Int = 10,
-    strokeSizeInDp: Int = 1,
+    strokeSizeInDp: Float = 1.0f,
 ): Drawable {
     return cornerDrawableFromColors(
         fillColor = fillColor,
@@ -110,7 +120,7 @@ private fun Context.cornerDrawableFromColors(
     @ColorInt fillColor: Int,
     @ColorInt strokeColor: Int?,
     cornerSizeInDp: Int,
-    strokeSizeInDp: Int,
+    strokeSizeInDp: Float,
     shapeBuilder: (cornerSize: Float) -> ShapeAppearanceModel
 ): Drawable {
     val density = resources.displayMetrics.density

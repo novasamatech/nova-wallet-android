@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
+import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
@@ -19,7 +20,6 @@ import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.bindi
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.main.model.CrowdloanModel
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.main.model.CrowdloanStatusModel
-import io.novafoundation.nova.feature_crowdloan_impl.presentation.model.setIcon
 import kotlinx.android.synthetic.main.item_crowdloan.view.itemCrowdloanArrow
 import kotlinx.android.synthetic.main.item_crowdloan.view.itemCrowdloanIcon
 import kotlinx.android.synthetic.main.item_crowdloan.view.itemCrowdloanParaDescription

@@ -9,17 +9,13 @@ interface WalletRouter {
 
     fun back()
 
-    fun openChooseRecipient(assetPayload: AssetPayload)
-
     fun openFilter()
 
-    fun openChooseAmount(recipientAddress: String, assetPayload: AssetPayload)
+    fun openSend(assetPayload: AssetPayload, initialRecipientAddress: String? = null)
 
     fun openConfirmTransfer(transferDraft: TransferDraft)
 
     fun finishSendFlow()
-
-    fun openRepeatTransaction(recipientAddress: String, assetPayload: AssetPayload)
 
     fun openTransferDetail(transaction: OperationParcelizeModel.Transfer)
 

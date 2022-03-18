@@ -31,8 +31,11 @@ dependencies {
     implementation project(":common")
 
     implementation liveDataKtxDep
+    implementation lifeCycleKtxDep
     implementation androidDep
     implementation materialDep
+
+//    implementation fragmentKtxDep
 
     implementation constraintDep
 

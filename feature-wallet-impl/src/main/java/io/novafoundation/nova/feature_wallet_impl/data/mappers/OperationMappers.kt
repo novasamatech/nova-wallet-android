@@ -147,7 +147,7 @@ fun mapNodeToOperation(
 
         node.extrinsic != null -> with(node.extrinsic) {
             Operation.Type.Extrinsic(
-                hash = hash,
+                hash = node.extrinsicHash,
                 module = module,
                 call = call,
                 fee = fee,
@@ -163,7 +163,7 @@ fun mapNodeToOperation(
                 sender = from,
                 fee = fee,
                 status = Operation.Status.fromSuccess(success),
-                hash = extrinsicHash
+                hash = node.extrinsicHash
             )
         }
 

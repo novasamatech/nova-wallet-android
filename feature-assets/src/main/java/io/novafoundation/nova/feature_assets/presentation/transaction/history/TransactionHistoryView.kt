@@ -11,8 +11,9 @@ import android.view.ViewTreeObserver
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import coil.ImageLoader
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.enableShowingNewlyAddedTopElements
 import io.novafoundation.nova.common.utils.makeGone
@@ -21,6 +22,7 @@ import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.updateTopMargin
 import io.novafoundation.nova.common.view.bottomSheet.LockBottomSheetBehavior
 import io.novafoundation.nova.common.view.shape.getTopRoundedCornerDrawable
+import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.model.OperationModel
 import kotlinx.android.synthetic.main.view_transfer_history.view.placeholder
 import kotlinx.android.synthetic.main.view_transfer_history.view.transactionHistoryFilter
@@ -33,10 +35,10 @@ typealias ScrollingListener = (position: Int) -> Unit
 typealias SlidingStateListener = (Int) -> Unit
 typealias TransactionClickListener = (OperationModel) -> Unit
 
-private const val MIN_ALPHA = (0.55 * 255).toInt()
+private const val MIN_ALPHA = (0.48 * 255).toInt()
 private const val MAX_ALPHA = 1 * 255
 
-private const val MIN_MARGIN = 16 // dp
+private const val MIN_MARGIN = 20 // dp
 private const val MAX_MARGIN = 32 // dp
 
 private const val PULLER_VISIBILITY_OFFSET = 0.9
@@ -58,7 +60,11 @@ class TransferHistorySheet @JvmOverloads constructor(
     private var slidingStateListener: SlidingStateListener? = null
     private var transactionClickListener: TransactionClickListener? = null
 
-    private val adapter = TransactionHistoryAdapter(this)
+    private val imageLoader: ImageLoader by lazy(LazyThreadSafetyMode.NONE) {
+        FeatureUtils.getCommonApi(context).imageLoader()
+    }
+
+    private val adapter = TransactionHistoryAdapter(this, imageLoader)
 
     private var lastOffset: Float = 0.0F
 
@@ -226,7 +232,6 @@ class TransferHistorySheet @JvmOverloads constructor(
         val newMarginPx = newMargin.dp(context)
 
         transactionHistoryTitle.updateTopMargin(newMarginPx)
-        transactionHistoryFilter.updateTopMargin(newMarginPx)
     }
 
     private fun updatePullerVisibility() {

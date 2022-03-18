@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_nft_impl.di
 
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.dao.NftDao
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
@@ -43,6 +44,13 @@ class NftFeatureModule {
         nftProvidersRegistry: NftProvidersRegistry,
         chainRegistry: ChainRegistry,
         jobOrchestrator: JobOrchestrator,
-        nftDao: NftDao
-    ): NftRepository = NftRepositoryImpl(nftProvidersRegistry, chainRegistry, jobOrchestrator, nftDao)
+        nftDao: NftDao,
+        httpExceptionHandler: HttpExceptionHandler,
+    ): NftRepository = NftRepositoryImpl(
+        nftProvidersRegistry = nftProvidersRegistry,
+        chainRegistry = chainRegistry,
+        jobOrchestrator = jobOrchestrator,
+        nftDao = nftDao,
+        exceptionHandler = httpExceptionHandler
+    )
 }

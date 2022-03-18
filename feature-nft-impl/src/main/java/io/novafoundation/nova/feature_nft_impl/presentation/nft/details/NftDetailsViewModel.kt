@@ -1,8 +1,12 @@
 package io.novafoundation.nova.feature_nft_impl.presentation.nft.details
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
@@ -14,6 +18,9 @@ import io.novafoundation.nova.feature_nft_impl.domain.nft.details.NftDetailsInte
 import io.novafoundation.nova.feature_nft_impl.domain.nft.details.PricedNftDetails
 import io.novafoundation.nova.feature_nft_impl.presentation.nft.common.formatIssuance
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -28,8 +35,12 @@ class NftDetailsViewModel(
     private val addressDisplayUseCase: AddressDisplayUseCase
 ) : BaseViewModel(), ExternalActions by externalActionsDelegate {
 
+    private val _exitingErrorLiveData = MutableLiveData<Event<String>>()
+    val exitingErrorLiveData: LiveData<Event<String>> = _exitingErrorLiveData
+
     private val nftDetailsFlow = interactor.nftDetailsFlow(nftIdentifier)
         .inBackground()
+        .catch { showExitingError(it) }
         .share()
 
     val nftDetailsUi = nftDetailsFlow
@@ -53,6 +64,10 @@ class NftDetailsViewModel(
         }
     }
 
+    private fun showExitingError(exception: Throwable) {
+        _exitingErrorLiveData.value = exception.message.orEmpty().event()
+    }
+
     private suspend fun mapNftDetailsToUi(pricedNftDetails: PricedNftDetails): NftDetailsModel {
         val nftDetails = pricedNftDetails.nftDetails
 
@@ -70,23 +85,21 @@ class NftDetailsViewModel(
                     media = it.media,
                 )
             },
-            owner = addressIconGenerator.createAddressModel(
-                chain = nftDetails.chain,
-                accountId = nftDetails.owner,
-                sizeInDp = AddressIconGenerator.SIZE_MEDIUM,
-                addressDisplayUseCase = addressDisplayUseCase
-            ),
+            owner = createAddressModel(nftDetails.owner, nftDetails.chain),
             creator = nftDetails.creator?.let {
-                addressIconGenerator.createAddressModel(
-                    chain = nftDetails.chain,
-                    accountId = it,
-                    sizeInDp = AddressIconGenerator.SIZE_MEDIUM,
-                    addressDisplayUseCase = addressDisplayUseCase
-                )
+                createAddressModel(it, nftDetails.chain)
             },
             network = mapChainToUi(nftDetails.chain)
         )
     }
+
+    private suspend fun createAddressModel(accountId: AccountId, chain: Chain) = addressIconGenerator.createAddressModel(
+        chain = chain,
+        accountId = accountId,
+        sizeInDp = AddressIconGenerator.SIZE_MEDIUM,
+        addressDisplayUseCase = addressDisplayUseCase,
+        background = AddressIconGenerator.BACKGROUND_TRANSPARENT
+    )
 
     fun backClicked() {
         router.back()

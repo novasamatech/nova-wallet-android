@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.amountInPlanks
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.BalanceSourceProvider
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.BaseAssetTransfers
+import io.novafoundation.nova.runtime.ext.accountIdOrDefault
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
@@ -33,7 +34,7 @@ class StatemineAssetTransfers(
 
         statemineTransfer(
             assetId = chainAssetType.id,
-            target = transfer.recipient,
+            target = transfer.chain.accountIdOrDefault(transfer.recipient),
             amount = transfer.amountInPlanks
         )
     }

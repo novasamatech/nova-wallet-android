@@ -146,30 +146,25 @@ class TransactionHistoryProvider(
         return when (state) {
             is State.Empty -> TransactionHistoryUi.State.Empty
             is State.EmptyProgress -> TransactionHistoryUi.State.EmptyProgress
-            is State.Data -> TransactionHistoryUi.State.Data(transformData(state.data))
-            is State.FullData -> TransactionHistoryUi.State.Data(transformData(state.data))
-            is State.NewPageProgress -> TransactionHistoryUi.State.Data(transformData(state.data))
+            is State.Data -> TransactionHistoryUi.State.Data(transformDataToUi(state.data))
+            is State.FullData -> TransactionHistoryUi.State.Data(transformDataToUi(state.data))
+            is State.NewPageProgress -> TransactionHistoryUi.State.Data(transformDataToUi(state.data))
         }
     }
 
-    private suspend fun transformData(data: List<Operation>): List<Any> {
+    private suspend fun transformDataToUi(data: List<Operation>): List<Any> {
         val accountIdentifier = addressDisplayUseCase.createIdentifier()
         val chain = chainAsync()
 
-        val operations = data.map { operation ->
-            mapOperationToOperationModel(chain, operation, accountIdentifier, resourceManager, iconGenerator)
-        }
-
-        return regroup(operations)
-    }
-
-    private fun regroup(operations: List<OperationModel>): List<Any> {
-
-        return operations.groupBy { it.time.daysFromMillis() }
-            .map { (daysSinceEpoch, transactions) ->
+        return data.groupBy { it.time.daysFromMillis() }
+            .map { (daysSinceEpoch, operationsPerDay) ->
                 val header = DayHeader(daysSinceEpoch)
 
-                listOf(header) + transactions
+                val operationModels = operationsPerDay.map { operation ->
+                    mapOperationToOperationModel(chain, operation, accountIdentifier, resourceManager)
+                }
+
+                listOf(header) + operationModels
             }.flatten()
     }
 }

@@ -12,217 +12,102 @@
         android:id="@+id/extrinsicDetailToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:dividerVisible="false"
         app:homeButtonIcon="@drawable/ic_close"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:titleText="@string/common_details" />
+        app:titleText="Apr 10, 2022, 22:36"
+        app:titleTextAppearance="@style/TextAppearance.NovaFoundation.TransactionDetailToolbar" />
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
 
-            <io.novafoundation.nova.common.view.LabeledTextView
-                android:id="@+id/extrinsicDetailHash"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                app:actionIcon="@drawable/ic_more"
-                app:label="@string/transaction_details_hash_title"
-                app:layout_constraintEnd_toEndOf="@+id/extrinsicDetailDivider4"
-                app:layout_constraintStart_toStartOf="@+id/extrinsicDetailDivider4"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <io.novafoundation.nova.common.view.LabeledTextView
-                android:id="@+id/extrinsicDetailFrom"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
+            <ImageView
+                android:id="@+id/extrinsicDetailIcon"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
                 android:layout_marginTop="16dp"
-                android:layout_marginBottom="24dp"
-                app:actionIcon="@drawable/ic_more"
-                app:label="@string/transaction_details_from"
-                app:layout_constraintEnd_toEndOf="@+id/extrinsicDetailDivider4"
-                app:layout_constraintStart_toStartOf="@+id/extrinsicDetailDivider4"
-                app:layout_constraintTop_toBottomOf="@+id/extrinsicDetailHash"
-                tools:textIcon="@color/colorAccent" />
+                android:background="@drawable/bg_icon_round_white"
+                android:padding="11dp"
+                app:tint="@color/white_64" />
 
             <TextView
-                android:id="@+id/extrinsicDetailStatusLabel"
-                style="@style/TextAppearance.NovaFoundation.Body1"
+                android:id="@+id/extrinsicDetailAmount"
+                style="@style/TextAppearance.NovaFoundation.Bold.LargeTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="20dp"
-                android:text="@string/transaction_detail_status"
-                android:textColor="@color/gray1"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/extrinsicDetailFrom"
-                />
+                android:layout_marginTop="16dp"
+                tools:text="−0.00481 KSM" />
 
             <TextView
                 android:id="@+id/extrinsicDetailStatus"
-                style="@style/TextAppearance.NovaFoundation.Body1"
+                style="@style/TextAppearance.NovaFoundation.SemiBold.Caps2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                app:layout_constraintBottom_toBottomOf="@+id/extrinsicDetailStatusIcon"
-                app:layout_constraintEnd_toStartOf="@+id/extrinsicDetailStatusIcon"
-                app:layout_constraintTop_toTopOf="@+id/extrinsicDetailStatusIcon"
-                tools:text="@string/transaction_status_completed" />
+                android:layout_marginTop="8dp"
+                android:gravity="center_vertical"
+                tools:drawablePadding="4dp"
+                tools:drawableStart="@drawable/ic_checkmark_circle_16"
+                tools:drawableTint="@color/green"
+                tools:text="completed"
+                tools:textColor="@color/green" />
 
-            <ImageView
-                android:id="@+id/extrinsicDetailStatusIcon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginEnd="16dp"
-                app:layout_constraintBottom_toBottomOf="@+id/extrinsicDetailStatusLabel"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/extrinsicDetailStatusLabel"
-                tools:src="@drawable/ic_transaction_completed" />
-
-            <View
-                android:id="@+id/extrinsicDetailDivider1"
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_marginTop="14dp"
-                android:background="@color/gray3"
-                app:layout_constraintEnd_toEndOf="@+id/extrinsicDetailStatusIcon"
-                app:layout_constraintStart_toStartOf="@+id/extrinsicDetailStatusLabel"
-                app:layout_constraintTop_toBottomOf="@+id/extrinsicDetailStatusLabel" />
-
-            <TextView
-                android:id="@+id/extrinsicDetailDateLabel"
-                style="@style/TextAppearance.NovaFoundation.Body1"
-                android:layout_width="wrap_content"
+            <io.novafoundation.nova.common.view.TableView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="15dp"
-                android:text="@string/common_date"
-                android:textColor="@color/gray1"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/extrinsicDetailDivider1" />
+                android:layout_marginTop="24dp"
+                android:layout_marginEnd="16dp">
 
-            <TextView
-                android:id="@+id/extrinsicDetailDate"
-                style="@style/TextAppearance.NovaFoundation.Body1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="@+id/extrinsicDetailDateLabel"
-                app:layout_constraintEnd_toEndOf="@+id/extrinsicDetailDivider1"
-                app:layout_constraintTop_toTopOf="@+id/extrinsicDetailDateLabel"
-                tools:text="10 Apr 2020, 22:36:45" />
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/extrinsicDetailSender"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryValueIcon="@drawable/ic_info_16"
+                    app:primaryValueIconTint="@color/white_64"
+                    app:title="@string/wallet_sender" />
 
-            <View
-                android:id="@+id/extrinsicDetailDivider2"
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_marginTop="14dp"
-                android:background="@color/gray3"
-                app:layout_constraintEnd_toEndOf="@+id/extrinsicDetailStatusIcon"
-                app:layout_constraintStart_toStartOf="@+id/extrinsicDetailStatusLabel"
-                app:layout_constraintTop_toBottomOf="@+id/extrinsicDetailDateLabel" />
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/extrinsicDetailNetwork"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="@string/common_network" />
+            </io.novafoundation.nova.common.view.TableView>
 
-            <TextView
-                android:id="@+id/extrinsicDetailModuleLabel"
-                style="@style/TextAppearance.NovaFoundation.Body1"
-                android:layout_width="wrap_content"
+            <io.novafoundation.nova.common.view.TableView
+                android:id="@+id/extrinsicDetailTxSection"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="15dp"
-                android:text="@string/common_module"
-                android:textColor="@color/gray1"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/extrinsicDetailDivider2" />
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="16dp">
 
-            <TextView
-                android:id="@+id/extrinsicDetailModule"
-                style="@style/TextAppearance.NovaFoundation.Body1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="@+id/extrinsicDetailModuleLabel"
-                app:layout_constraintEnd_toEndOf="@+id/extrinsicDetailDivider1"
-                app:layout_constraintTop_toTopOf="@+id/extrinsicDetailModuleLabel"
-                tools:text="Utility" />
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/extrinsicDetailHash"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryValueIcon="@drawable/ic_info_16"
+                    app:primaryValueIconTint="@color/white_64"
+                    app:title="@string/common_transaction_id" />
 
-            <View
-                android:id="@+id/extrinsicDetailDivider3"
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_marginTop="14dp"
-                android:background="@color/gray3"
-                app:layout_constraintEnd_toEndOf="@+id/extrinsicDetailStatusIcon"
-                app:layout_constraintStart_toStartOf="@+id/extrinsicDetailStatusLabel"
-                app:layout_constraintTop_toBottomOf="@+id/extrinsicDetailModuleLabel" />
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/extrinsicDetailModule"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="@string/common_module" />
 
-            <TextView
-                android:id="@+id/extrinsicDetailCallLabel"
-                style="@style/TextAppearance.NovaFoundation.Body1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="14dp"
-                android:text="@string/common_call"
-                android:textColor="@color/gray1"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/extrinsicDetailDivider3" />
-
-            <TextView
-                android:id="@+id/extrinsicDetailCall"
-                style="@style/TextAppearance.NovaFoundation.Body1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="@+id/extrinsicDetailCallLabel"
-                app:layout_constraintEnd_toEndOf="@+id/extrinsicDetailDivider1"
-                app:layout_constraintTop_toTopOf="@+id/extrinsicDetailCallLabel"
-                tools:text="Batch" />
-
-            <View
-                android:id="@+id/extrinsicDetailDivider4"
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_marginTop="15dp"
-                android:background="@color/gray3"
-                app:layout_constraintEnd_toEndOf="@+id/extrinsicDetailStatusIcon"
-                app:layout_constraintStart_toStartOf="@+id/extrinsicDetailStatusLabel"
-                app:layout_constraintTop_toBottomOf="@+id/extrinsicDetailCallLabel" />
-
-            <TextView
-                android:id="@+id/extrinsicDetailFeeLabel"
-                style="@style/TextAppearance.NovaFoundation.Body1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="14dp"
-                android:text="@string/transaction_details_extrinsic_fee"
-                android:textColor="@color/gray1"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/extrinsicDetailDivider4" />
-
-            <TextView
-                android:id="@+id/extrinsicDetailFee"
-                style="@style/TextAppearance.NovaFoundation.Body1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="@+id/extrinsicDetailFeeLabel"
-                app:layout_constraintEnd_toEndOf="@+id/extrinsicDetailDivider1"
-                app:layout_constraintTop_toTopOf="@+id/extrinsicDetailFeeLabel"
-                tools:text="-1.01 KSM" />
-
-            <View
-                android:id="@+id/extrinsicDetailDivider5"
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_marginTop="15dp"
-                android:background="@color/gray3"
-                app:layout_constraintEnd_toEndOf="@+id/extrinsicDetailStatusIcon"
-                app:layout_constraintStart_toStartOf="@+id/extrinsicDetailStatusLabel"
-                app:layout_constraintTop_toBottomOf="@+id/extrinsicDetailFeeLabel" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/extrinsicDetailCall"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="@string/common_call" />
+            </io.novafoundation.nova.common.view.TableView>
+        </LinearLayout>
     </ScrollView>
 </LinearLayout>
