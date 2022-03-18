@@ -17,7 +17,7 @@
         tools:visibility="gone"
         android:layout_gravity="center_vertical"
         android:layout_marginStart="16dp"
-        tools:src="@drawable/ic_delete_symbol" />
+        android:src="@drawable/ic_delete_symbol" />
 
     <com.google.android.material.checkbox.MaterialCheckBox
         android:id="@+id/itemValidationCheck"

@@ -57,7 +57,7 @@ class ReviewCustomValidatorsViewModel(
         val isOverflow = validators.size > maxValidatorsPerNominator
 
         ValidatorsSelectionState(
-            selectedHeaderText = resourceManager.getString(R.string.staking_selected_validators_count_v1_9_1, validators.size, maxValidatorsPerNominator),
+            selectedHeaderText = resourceManager.getString(R.string.staking_custom_header_validators_title, validators.size, maxValidatorsPerNominator),
             isOverflow = isOverflow,
             nextButtonText = if (isOverflow) {
                 resourceManager.getString(R.string.staking_custom_proceed_button_disabled_title, maxValidatorsPerNominator)
