@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/toolbarContainer"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@android:color/black"
     android:gravity="center_vertical"
-    android:id="@+id/toolbarContainer"
     android:orientation="horizontal"
     tools:layout_height="48dp">
 
@@ -16,9 +16,9 @@
         android:layout_height="match_parent"
         android:layout_gravity="center_vertical"
         android:paddingStart="16dp"
-        app:tint="@color/actions_color"
         android:paddingEnd="16dp"
-        android:src="@drawable/ic_arrow_back" />
+        android:src="@drawable/ic_arrow_back"
+        app:tint="@color/actions_color" />
 
     <TextView
         android:id="@+id/titleTv"
@@ -36,37 +36,37 @@
         android:id="@+id/rightImg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="8dp"
-        android:layout_marginEnd="9dp"
         android:layout_gravity="center_vertical|end"
+        android:layout_marginEnd="9dp"
+        android:padding="8dp"
         android:src="@drawable/ic_info_24"
         android:visibility="gone" />
 
     <TextView
         android:id="@+id/rightText"
-        style="@style/TextAppearance.NovaFoundation.Body2"
+        style="@style/TextAppearance.NovaFoundation.Regular.Body"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="center_vertical|end"
-        android:fontFamily="?attr/fontSemiBold"
         android:gravity="center_vertical"
         android:paddingStart="@dimen/x2"
         android:paddingEnd="@dimen/x2"
-        android:textColor="@color/actions_color"
+        android:textColor="?attr/colorAccent"
         android:visibility="gone"
-        tools:text="Action" />
+        tools:text="Action"
+        tools:visibility="visible" />
 
     <LinearLayout
         android:id="@+id/toolbarCustomActions"
-        android:layout_gravity="center_vertical|end"
-        android:orientation="horizontal"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|end"
+        android:orientation="horizontal" />
 
     <View
+        android:id="@+id/toolbarDivider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_gravity="bottom"
-        android:id="@+id/toolbarDivider"
         android:background="@color/dividerGray" />
 </FrameLayout>
