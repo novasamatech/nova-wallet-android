@@ -32,6 +32,12 @@ fun bindFundInfo(scale: String, runtime: RuntimeSnapshot, paraId: ParaId): FundI
 
     val dynamicInstance = type.fromHexOrIncompatible(scale, runtime).cast<Struct.Instance>()
 
+    val fundIndex = bindTrieIndex(dynamicInstance["fundIndex"] ?: dynamicInstance["trieIndex"])
+
+    // If fundIndex exists, https://github.com/paritytech/polkadot/pull/4772/files is included => use new way for calculating bidder account
+    val indexForBidderAccountId = if (dynamicInstance.get<Any?>("fundIndex") != null) fundIndex else paraId
+    val bidderAccountId = createBidderAccountId(runtime, indexForBidderAccountId)
+
     return FundInfo(
         depositor = bindAccountId(dynamicInstance["depositor"]),
         deposit = bindNumber(dynamicInstance["deposit"]),
@@ -41,8 +47,8 @@ fun bindFundInfo(scale: String, runtime: RuntimeSnapshot, paraId: ParaId): FundI
         firstSlot = bindNumber(dynamicInstance["firstPeriod"] ?: dynamicInstance["firstSlot"]),
         lastSlot = bindNumber(dynamicInstance["lastPeriod"] ?: dynamicInstance["lastSlot"]),
         verifier = dynamicInstance["verifier"],
-        trieIndex = bindTrieIndex(dynamicInstance["trieIndex"]),
-        bidderAccountId = createBidderAccountId(runtime, paraId),
+        trieIndex = fundIndex,
+        bidderAccountId = bidderAccountId,
         paraId = paraId
     )
 }
@@ -50,8 +56,8 @@ fun bindFundInfo(scale: String, runtime: RuntimeSnapshot, paraId: ParaId): FundI
 private val ADDRESS_PADDING = ByteArray(32)
 private val ADDRESS_PREFIX = "modlpy/cfund".encodeToByteArray()
 
-private fun createBidderAccountId(runtime: RuntimeSnapshot, paraId: ParaId): AccountId {
-    val fullKey = ADDRESS_PREFIX + u32.toByteArray(runtime, paraId) + ADDRESS_PADDING
+private fun createBidderAccountId(runtime: RuntimeSnapshot, index: BigInteger): AccountId {
+    val fullKey = ADDRESS_PREFIX + u32.toByteArray(runtime, index) + ADDRESS_PADDING
 
     return fullKey.copyOfRange(0, 32)
 }
