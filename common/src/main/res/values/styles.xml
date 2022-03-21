@@ -244,7 +244,8 @@
         <item name="android:paddingEnd">12dp</item>
         <item name="android:paddingBottom">8dp</item>
         <item name="android:textColor">@color/button_text_colors</item>
-        <item name="android:textAppearance">@style/TextAppearance.NovaFoundation.SemiBold.Footnote</item>
+        <item name="android:textAppearance">@style/TextAppearance.NovaFoundation.SemiBold.Footnote
+        </item>
     </style>
 
     <style name="Widget.Nova.Action.Primary">
@@ -270,18 +271,18 @@
         <item name="android:drawablePadding">4dp</item>
     </style>
 
-    <style name="Widget.Nova.Switch" parent="">
-        <item name="android:background">@drawable/divider_drawable</item>
-        <item name="android:textAppearance">@style/TextAppearance.NovaFoundation.Body1</item>
-        <item name="android:textColor">@color/gray1</item>
-    </style>
-
     <style name="Widget.Nova.Checkbox" parent="">
         <item name="android:minWidth">0dp</item>
         <item name="android:minHeight">0dp</item>
         <item name="buttonTint">@color/tint_radio_button</item>
     </style>
 
+    <style name="Widget.Nova.RadioButton" parent="">
+        <item name="android:paddingStart">4dp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textAppearance">@style/TextAppearance.NovaFoundation.Regular.Footnote</item>
+        <item name="buttonTint">@color/tint_radio_button</item>
+    </style>
 
     <style name="Widget.Nova.Counter" parent="">
         <item name="android:paddingStart">8dp</item>
