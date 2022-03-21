@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
@@ -19,7 +20,7 @@ import kotlinx.android.synthetic.main.fragment_search_custom_validators.searchCu
 import kotlinx.android.synthetic.main.fragment_search_custom_validators.searchCustomValidatorListHeader
 import kotlinx.android.synthetic.main.fragment_search_custom_validators.searchCustomValidatorProgress
 import kotlinx.android.synthetic.main.fragment_search_custom_validators.searchCustomValidatorsContainer
-import kotlinx.android.synthetic.main.fragment_search_custom_validators.searchCustomValidatorsField
+import kotlinx.android.synthetic.main.fragment_search_custom_validators.searchCustomValidatorsInput
 import kotlinx.android.synthetic.main.fragment_search_custom_validators.searchCustomValidatorsList
 import kotlinx.android.synthetic.main.fragment_search_custom_validators.searchCustomValidatorsPlaceholder
 import kotlinx.android.synthetic.main.fragment_search_custom_validators.searchCustomValidatorsToolbar
@@ -49,6 +50,7 @@ class SearchCustomValidatorsFragment : BaseFragment<SearchCustomValidatorsViewMo
 
         searchCustomValidatorsList.adapter = adapter
         searchCustomValidatorsList.setHasFixedSize(true)
+        searchCustomValidatorsList.itemAnimator = null
 
         searchCustomValidatorsToolbar.setHomeButtonListener { viewModel.backClicked() }
         onBackPressed { viewModel.backClicked() }
@@ -77,23 +79,23 @@ class SearchCustomValidatorsFragment : BaseFragment<SearchCustomValidatorsViewMo
 
             when (it) {
                 SearchValidatorsState.NoInput -> {
-                    searchCustomValidatorsPlaceholder.setCompoundDrawablesRelativeWithIntrinsicBounds(0, R.drawable.ic_placeholder, 0, 0)
-                    searchCustomValidatorsPlaceholder.text = getString(R.string.search_recipient_welcome_v2_2_0)
+                    searchCustomValidatorsPlaceholder.setImage(R.drawable.ic_placeholder)
+                    searchCustomValidatorsPlaceholder.setText(getString(R.string.search_recipient_welcome_v2_2_0))
                 }
                 SearchValidatorsState.NoResults -> {
-                    searchCustomValidatorsPlaceholder.setCompoundDrawablesRelativeWithIntrinsicBounds(0, R.drawable.ic_no_search_results, 0, 0)
-                    searchCustomValidatorsPlaceholder.text = getString(R.string.staking_validator_search_empty_title)
+                    searchCustomValidatorsPlaceholder.setImage(R.drawable.ic_no_search_results)
+                    searchCustomValidatorsPlaceholder.setText(getString(R.string.staking_validator_search_empty_title))
                 }
                 SearchValidatorsState.Loading -> {}
                 is SearchValidatorsState.Success -> {
                     searchCustomValidatorAccounts.text = it.headerTitle
 
-                    adapter.submitList(it.validators)
+                    adapter.submitListPreservingViewPoint(it.validators, searchCustomValidatorsList)
                 }
             }
         }
 
-        searchCustomValidatorsField.bindTo(viewModel.enteredQuery, viewLifecycleOwner.lifecycleScope)
+        searchCustomValidatorsInput.content.bindTo(viewModel.enteredQuery, viewLifecycleOwner.lifecycleScope)
     }
 
     override fun validatorInfoClicked(validatorModel: ValidatorModel) {

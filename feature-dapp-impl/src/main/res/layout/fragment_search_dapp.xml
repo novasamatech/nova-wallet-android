@@ -15,11 +15,12 @@
         android:background="@color/bar_bg_64"
         android:orientation="horizontal">
 
-        <io.novafoundation.nova.feature_dapp_impl.presentation.search.SearchView
+        <io.novafoundation.nova.common.view.SearchView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:id="@+id/searhDappQuery"
+            android:hint="@string/dapp_search_hint"
             android:layout_marginStart="16dp"
             android:layout_marginBottom="6dp"
             android:layout_marginTop="6dp"
