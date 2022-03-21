@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="common_cannot_open_link">Cannot open this link</string>
+
   <string name="wallet_send_tokens_on">Send %s on</string>
 
   <string name="common_validation_invalid_address_title">Invalid recipient</string>

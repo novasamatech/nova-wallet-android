@@ -5,6 +5,7 @@ buildscript {
         versionCode = 13
 
         applicationId = "io.novafoundation.nova"
+        releaseApplicationSuffix = "market"
 
         // SDK and tools
         compileSdkVersion = 30

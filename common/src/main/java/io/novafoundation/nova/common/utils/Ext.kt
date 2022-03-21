@@ -1,6 +1,8 @@
 package io.novafoundation.nova.common.utils
 
+import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -14,6 +16,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import java.net.URLEncoder
+
 
 fun Activity.showToast(msg: String, duration: Int = Toast.LENGTH_LONG) {
     Toast.makeText(this, msg, duration).show()
@@ -41,9 +44,16 @@ fun Fragment.hideKeyboard() {
 
 fun Fragment.showBrowser(link: String) = requireContext().showBrowser(link)
 
+@SuppressLint("QueryPermissionsNeeded") // added to the `app` manifest
 fun Context.showBrowser(link: String) {
     val intent = Intent(Intent.ACTION_VIEW).apply { data = Uri.parse(link) }
-    startActivity(intent)
+
+    try {
+        startActivity(intent)
+    } catch (e: ActivityNotFoundException) {
+        Toast.makeText(this, R.string.common_cannot_open_link, Toast.LENGTH_SHORT)
+            .show()
+    }
 }
 
 fun Context.sendEmailIntent(

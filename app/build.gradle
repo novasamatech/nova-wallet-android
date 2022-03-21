@@ -36,8 +36,8 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.debug
 
-            versionNameSuffix '-market'
-            applicationIdSuffix '.market'
+            versionNameSuffix "-${releaseApplicationSuffix}"
+            applicationIdSuffix ".${releaseApplicationSuffix}"
         }
         releaseGithub {
             initWith buildTypes.release
