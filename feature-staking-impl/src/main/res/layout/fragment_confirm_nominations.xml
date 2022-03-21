@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/black"
     android:fitsSystemWindows="true"
     android:orientation="vertical">
@@ -12,18 +12,19 @@
         android:id="@+id/confirmNominationsToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:titleText="Validators (5)" />
+        app:dividerVisible="false"
+        app:titleText="@string/staking_confirm_selected_validators" />
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="13dp"
+        android:layout_marginTop="21dp"
         android:layout_marginEnd="16dp"
         android:orientation="horizontal">
 
         <TextView
-            style="@style/TextAppearance.NovaFoundation.Body3"
+            style="@style/TextAppearance.NovaFoundation.SemiBold.Caps2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
@@ -32,7 +33,7 @@
             android:textColor="@color/gray1" />
 
         <TextView
-            style="@style/TextAppearance.NovaFoundation.Body3"
+            style="@style/TextAppearance.NovaFoundation.SemiBold.Caps2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
@@ -46,7 +47,7 @@
         android:id="@+id/confirmNominationsList"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="6dp"
+        android:layout_marginTop="10dp"
         android:layout_weight="1"
         android:orientation="vertical"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
