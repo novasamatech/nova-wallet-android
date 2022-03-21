@@ -1,6 +1,5 @@
 package io.novafoundation.nova.common.utils
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -43,7 +42,6 @@ fun Fragment.hideKeyboard() {
 
 fun Fragment.showBrowser(link: String) = requireContext().showBrowser(link)
 
-@SuppressLint("QueryPermissionsNeeded") // added to the `app` manifest
 fun Context.showBrowser(link: String) {
     val intent = Intent(Intent.ACTION_VIEW).apply { data = Uri.parse(link) }
 
