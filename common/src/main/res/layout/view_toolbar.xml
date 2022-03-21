@@ -53,8 +53,7 @@
         android:paddingEnd="@dimen/x2"
         android:textColor="?attr/colorAccent"
         android:visibility="gone"
-        tools:text="Action"
-        tools:visibility="visible" />
+        tools:text="Action" />
 
     <LinearLayout
         android:id="@+id/toolbarCustomActions"

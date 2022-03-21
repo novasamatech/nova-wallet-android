@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAddressModel
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
@@ -30,7 +31,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeL
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountSign
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapMetaAccountToWalletModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -51,6 +51,7 @@ class ConfirmSendViewModel(
     private val addressDisplayUseCase: AddressDisplayUseCase,
     private val resourceManager: ResourceManager,
     private val validationExecutor: ValidationExecutor,
+    private val walletUiUseCase: WalletUiUseCase,
     feeLoaderMixinFactory: FeeLoaderMixin.Factory,
     val transferDraft: TransferDraft,
 ) : BaseViewModel(),
@@ -94,7 +95,8 @@ class ConfirmSendViewModel(
     val chainUi = flowOf { mapChainToUi(chain()) }
         .share()
 
-    val wallet = currentAccount.mapLatest(::mapMetaAccountToWalletModel)
+    val wallet = walletUiUseCase.selectedWalletUiFlow()
+        .inBackground()
         .share()
 
     private val _transferSubmittingLiveData = MutableStateFlow(false)
