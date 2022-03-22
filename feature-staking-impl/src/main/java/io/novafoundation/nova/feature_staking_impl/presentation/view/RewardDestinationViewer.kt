@@ -3,6 +3,8 @@ package io.novafoundation.nova.feature_staking_impl.presentation.view
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import io.novafoundation.nova.common.utils.makeGone
+import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.TableView
 import io.novafoundation.nova.feature_account_api.view.showAddress
@@ -22,8 +24,12 @@ class RewardDestinationViewer @JvmOverloads constructor(
     }
 
     fun showRewardDestination(rewardDestinationModel: RewardDestinationModel?) {
-        viewRewardDestinationPayoutAccount.setVisible(rewardDestinationModel is RewardDestinationModel.Payout)
-        viewRewardDestinationDestination.setVisible(rewardDestinationModel != null)
+        if (rewardDestinationModel == null) {
+            makeGone()
+            return
+        }
+
+        makeVisible()
         viewRewardDestinationPayoutAccount.setVisible(rewardDestinationModel is RewardDestinationModel.Payout)
 
         when (rewardDestinationModel) {

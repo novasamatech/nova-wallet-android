@@ -11,7 +11,6 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
-import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.confirm.nominations.ConfirmNominationsViewModel
@@ -28,7 +27,6 @@ class ConfirmNominationsModule {
         resourceManager: ResourceManager,
         router: StakingRouter,
         setupStakingSharedState: SetupStakingSharedState,
-        interactor: StakingInteractor,
         tokenUseCase: TokenUseCase,
         selectedAssetState: StakingSharedState
     ): ViewModel {
@@ -37,7 +35,6 @@ class ConfirmNominationsModule {
             addressIconGenerator,
             resourceManager,
             setupStakingSharedState,
-            interactor,
             selectedAssetState,
             tokenUseCase
         )
