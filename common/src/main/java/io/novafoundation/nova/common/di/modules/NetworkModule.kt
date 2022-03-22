@@ -35,7 +35,7 @@ class NetworkModule {
 
     @Provides
     @ApplicationScope
-    fun provideAppLinksProvider(): AppLinksProvider {
+    fun provideAppLinksProvider(context: Context): AppLinksProvider {
         return AppLinksProvider(
             termsUrl = BuildConfig.TERMS_URL,
             privacyUrl = BuildConfig.PRIVACY_URL,
