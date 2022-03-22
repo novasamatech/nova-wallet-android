@@ -24,7 +24,8 @@ class FundInfo(
     val verifier: Any?,
     val trieIndex: TrieIndex,
     val paraId: ParaId,
-    val bidderAccountId: AccountId
+    val bidderAccountId: AccountId,
+    val pre9180BidderAccountId: AccountId,
 )
 
 fun bindFundInfo(scale: String, runtime: RuntimeSnapshot, paraId: ParaId): FundInfo {
@@ -33,10 +34,6 @@ fun bindFundInfo(scale: String, runtime: RuntimeSnapshot, paraId: ParaId): FundI
     val dynamicInstance = type.fromHexOrIncompatible(scale, runtime).cast<Struct.Instance>()
 
     val fundIndex = bindTrieIndex(dynamicInstance["fundIndex"] ?: dynamicInstance["trieIndex"])
-
-    // If fundIndex exists, https://github.com/paritytech/polkadot/pull/4772/files is included => use new way for calculating bidder account
-    val indexForBidderAccountId = if (dynamicInstance.get<Any?>("fundIndex") != null) fundIndex else paraId
-    val bidderAccountId = createBidderAccountId(runtime, indexForBidderAccountId)
 
     return FundInfo(
         depositor = bindAccountId(dynamicInstance["depositor"]),
@@ -48,7 +45,8 @@ fun bindFundInfo(scale: String, runtime: RuntimeSnapshot, paraId: ParaId): FundI
         lastSlot = bindNumber(dynamicInstance["lastPeriod"] ?: dynamicInstance["lastSlot"]),
         verifier = dynamicInstance["verifier"],
         trieIndex = fundIndex,
-        bidderAccountId = bidderAccountId,
+        bidderAccountId = createBidderAccountId(runtime, fundIndex),
+        pre9180BidderAccountId = createBidderAccountId(runtime, paraId),
         paraId = paraId
     )
 }
