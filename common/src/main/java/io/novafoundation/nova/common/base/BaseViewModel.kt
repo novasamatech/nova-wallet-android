@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.utils.Event
-import io.novafoundation.nova.common.utils.asLiveData
+import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.validation.ProgressConsumer
 import io.novafoundation.nova.common.validation.TransformedFailure
 import io.novafoundation.nova.common.validation.ValidationExecutor
@@ -13,14 +13,11 @@ import io.novafoundation.nova.common.validation.ValidationFlowActions
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.ValidationSystem
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.shareIn
 import kotlin.coroutines.CoroutineContext
 
 typealias TitleAndMessage = Pair<String, String>
 
-open class BaseViewModel : ViewModel(), CoroutineScope {
+open class BaseViewModel : ViewModel(), CoroutineScope, WithCoroutineScopeExtensions {
 
     private val _errorLiveData = MutableLiveData<Event<String>>()
     val errorLiveData: LiveData<Event<String>> = _errorLiveData
@@ -50,11 +47,8 @@ open class BaseViewModel : ViewModel(), CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = viewModelScope.coroutineContext
 
-    fun <T> Flow<T>.asLiveData(): LiveData<T> {
-        return asLiveData(viewModelScope)
-    }
-
-    fun <T> Flow<T>.share() = shareIn(viewModelScope, started = SharingStarted.Eagerly, replay = 1)
+    override val coroutineScope: CoroutineScope
+        get() = this
 
     suspend fun <P, S> ValidationExecutor.requireValid(
         validationSystem: ValidationSystem<P, S>,
