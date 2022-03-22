@@ -11,6 +11,8 @@ interface WithCoroutineScopeExtensions {
     val coroutineScope: CoroutineScope
 
     fun <T> Flow<T>.share() = shareIn(coroutineScope, started = SharingStarted.Eagerly, replay = 1)
+
+    fun <T> Flow<T>.shareLazily() = shareIn(coroutineScope, started = SharingStarted.Lazily, replay = 1)
 }
 
 fun WithCoroutineScopeExtensions(coroutineScope: CoroutineScope) = object : WithCoroutineScopeExtensions {

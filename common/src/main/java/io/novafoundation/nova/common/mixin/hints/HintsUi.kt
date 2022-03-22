@@ -37,5 +37,5 @@ class HintsView @JvmOverloads constructor(
 }
 
 fun BaseFragment<*>.observeHints(mixin: HintsMixin, view: HintsView) {
-    mixin.hints.observe { view.setHints(it) }
+    mixin.hintsFlow.observe { view.setHints(it) }
 }
