@@ -14,7 +14,7 @@ class HintsView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : LinearLayout(context, attrs, defStyleAttr), WithContextExtensions by WithContextExtensions(context){
+) : LinearLayout(context, attrs, defStyleAttr), WithContextExtensions by WithContextExtensions(context) {
 
     init {
         orientation = VERTICAL

@@ -98,7 +98,7 @@ class ConfirmStakingViewModel(
         .share()
 
     val title = flowOf {
-        when(payload) {
+        when (payload) {
             is Payload.ExistingStash, is Payload.Full -> resourceManager.getString(R.string.staking_start_title)
             is Payload.Validators -> resourceManager.getString(R.string.staking_change_validators)
         }

@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.mapLatest
 
 class WalletUiUseCaseImpl(
     private val accountRepository: AccountRepository
-): WalletUiUseCase {
+) : WalletUiUseCase {
 
     override fun selectedWalletUiFlow(): Flow<WalletModel> {
         return accountRepository.selectedMetaAccountFlow().mapLatest {

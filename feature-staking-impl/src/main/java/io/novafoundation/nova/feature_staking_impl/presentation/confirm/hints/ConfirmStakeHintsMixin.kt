@@ -33,7 +33,7 @@ private class ConfirmStakeHintsMixin(
 
     override suspend fun getHints(): List<String> {
 
-        return when(payload) {
+        return when (payload) {
             is Payload.Validators -> changeValidatorsHints()
             else -> beginStakeHints()
         }
