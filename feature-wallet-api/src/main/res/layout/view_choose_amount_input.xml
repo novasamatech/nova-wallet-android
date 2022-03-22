@@ -71,5 +71,5 @@
         app:layout_constraintEnd_toEndOf="@id/chooseAmountInputField"
         app:layout_constraintHorizontal_bias="1"
         app:layout_constraintStart_toStartOf="@+id/chooseAmountInputField"
-        tools:text="@tools:sample/lorem[50]" />
+        tools:text="135.87$" />
 </merge>

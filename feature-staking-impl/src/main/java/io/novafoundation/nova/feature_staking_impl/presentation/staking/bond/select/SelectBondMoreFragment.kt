@@ -4,21 +4,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.lifecycleScope
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.mixin.impl.observeRetries
+import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeValidations
-import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.view.setProgress
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 import kotlinx.android.synthetic.main.fragment_bond_more.bondMoreAmount
 import kotlinx.android.synthetic.main.fragment_bond_more.bondMoreContainer
 import kotlinx.android.synthetic.main.fragment_bond_more.bondMoreContinue
 import kotlinx.android.synthetic.main.fragment_bond_more.bondMoreFee
+import kotlinx.android.synthetic.main.fragment_bond_more.bondMoreHints
 import kotlinx.android.synthetic.main.fragment_bond_more.bondMoreToolbar
 
 private const val PAYLOAD_KEY = "PAYLOAD_KEY"
@@ -67,22 +68,12 @@ class SelectBondMoreFragment : BaseFragment<SelectBondMoreViewModel>() {
     }
 
     override fun subscribe(viewModel: SelectBondMoreViewModel) {
-        observeRetries(viewModel)
         observeValidations(viewModel)
+        setupAmountChooser(viewModel.amountChooserMixin, bondMoreAmount)
+        setupFeeLoading(viewModel, bondMoreFee)
+        observeHints(viewModel.hintsMixin, bondMoreHints)
 
         viewModel.showNextProgress.observe(bondMoreContinue::setProgress)
-
-        viewModel.assetModelFlow.observe {
-            bondMoreAmount.setAssetBalance(it.assetBalance)
-            bondMoreAmount.setAssetName(it.tokenName)
-            bondMoreAmount.loadAssetImage(it.imageUrl)
-        }
-
-        bondMoreAmount.amountInput.bindTo(viewModel.enteredAmountFlow, lifecycleScope)
-
-        viewModel.enteredFiatAmountFlow.observe {
-            it.let(bondMoreAmount::setFiatAmount)
-        }
 
         viewModel.feeLiveData.observe(bondMoreFee::setFeeStatus)
     }

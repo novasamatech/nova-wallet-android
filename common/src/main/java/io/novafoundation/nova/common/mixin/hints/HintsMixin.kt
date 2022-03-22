@@ -8,20 +8,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface HintsMixin {
 
-    val hints: Flow<List<String>>
+    val hintsFlow: Flow<List<String>>
 }
 
-abstract class ConstantHintsMixin(
-    coroutineScope: CoroutineScope
-) : HintsMixin,
-    CoroutineScope by coroutineScope,
-    WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(coroutineScope) {
-
-    abstract suspend fun getHints(): List<String>
-
-    override val hints: Flow<List<String>> = flowOf {
-        getHints()
-    }
-        .inBackground()
-        .share()
-}

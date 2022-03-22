@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.modules.Caching
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.core.storage.StorageCache
@@ -106,4 +107,6 @@ interface StakingFeatureDependencies {
     fun cachingIconGenerator(): AddressIconGenerator
 
     val walletUiUseCase: WalletUiUseCase
+
+    val resourcesHintsMixinFactory: ResourcesHintsMixinFactory
 }
