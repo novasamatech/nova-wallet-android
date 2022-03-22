@@ -9,8 +9,10 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
@@ -37,18 +39,22 @@ class ConfirmBondMoreModule {
         externalActions: ExternalActions.Presentation,
         payload: ConfirmBondMorePayload,
         singleAssetSharedState: StakingSharedState,
+        walletUiUseCase: WalletUiUseCase,
+        hintsMixinFactory: ResourcesHintsMixinFactory,
     ): ViewModel {
         return ConfirmBondMoreViewModel(
-            router,
-            interactor,
-            bondMoreInteractor,
-            resourceManager,
-            validationExecutor,
-            iconGenerator,
-            validationSystem,
-            externalActions,
-            payload,
-            singleAssetSharedState
+            router = router,
+            interactor = interactor,
+            bondMoreInteractor = bondMoreInteractor,
+            resourceManager = resourceManager,
+            validationExecutor = validationExecutor,
+            iconGenerator = iconGenerator,
+            validationSystem = validationSystem,
+            externalActions = externalActions,
+            payload = payload,
+            selectedAssetState = singleAssetSharedState,
+            walletUiUseCase = walletUiUseCase,
+            hintsMixinFactory = hintsMixinFactory
         )
     }
 
