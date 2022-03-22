@@ -62,15 +62,17 @@ class CrowdloanRepositoryImpl(
                     val leases = scale?.let { bindLeases(it, runtime) }
                     val fund = funds.getValue(paraId)
 
-                    leases?.let { isWinner(leases, fund.bidderAccountId) } ?: false
+                    leases?.let { isWinner(leases, fund) } ?: false
                 }
             )
         }
     }
 
-    private fun isWinner(leases: List<LeaseEntry?>, bidderAccount: AccountId): Boolean {
-        return leases.any { it?.accountId.contentEquals(bidderAccount) }
+    private fun isWinner(leases: List<LeaseEntry?>, fundInfo: FundInfo): Boolean {
+        return leases.any { it.isOwnedBy(fundInfo.bidderAccountId) || it.isOwnedBy(fundInfo.pre9180BidderAccountId) }
     }
+
+    private fun LeaseEntry?.isOwnedBy(accountId: AccountId): Boolean = this?.accountId.contentEquals(accountId)
 
     override suspend fun getParachainMetadata(chain: Chain): Map<ParaId, ParachainMetadata> {
         return withContext(Dispatchers.Default) {
