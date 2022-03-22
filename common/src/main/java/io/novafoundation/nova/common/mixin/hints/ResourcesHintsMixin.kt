@@ -7,7 +7,7 @@ class ResourcesHintsMixinFactory(
     private val resourceManager: ResourceManager
 ) {
 
-    fun create(coroutineScope: CoroutineScope, hintsRes: List<Int>) : HintsMixin {
+    fun create(coroutineScope: CoroutineScope, hintsRes: List<Int>): HintsMixin {
         return ResourcesHintsMixin(coroutineScope, resourceManager, hintsRes)
     }
 }

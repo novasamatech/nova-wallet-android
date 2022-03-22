@@ -215,5 +215,5 @@ class CommonModule {
     @ApplicationScope
     fun resourcesHintsMixinFactory(
         resourceManager: ResourceManager,
-    ) =  ResourcesHintsMixinFactory(resourceManager)
+    ) = ResourcesHintsMixinFactory(resourceManager)
 }
