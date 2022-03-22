@@ -1,6 +1,7 @@
 package io.novafoundation.nova.common.utils
 
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -43,7 +44,13 @@ fun Fragment.showBrowser(link: String) = requireContext().showBrowser(link)
 
 fun Context.showBrowser(link: String) {
     val intent = Intent(Intent.ACTION_VIEW).apply { data = Uri.parse(link) }
-    startActivity(intent)
+
+    try {
+        startActivity(intent)
+    } catch (e: ActivityNotFoundException) {
+        Toast.makeText(this, R.string.common_cannot_open_link, Toast.LENGTH_SHORT)
+            .show()
+    }
 }
 
 fun Context.sendEmailIntent(
