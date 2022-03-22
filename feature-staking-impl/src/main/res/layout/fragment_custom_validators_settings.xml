@@ -4,73 +4,67 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black"
-    android:orientation="vertical"
-    android:fitsSystemWindows="true">
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
 
     <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/customValidatorSettingsToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/customValidatorSettingsToolbar"
+        app:dividerVisible="false"
         app:textRight="@string/common_reset"
         app:titleText="@string/profile_settings_title" />
 
     <TextView
-        style="@style/TextAppearance.NovaFoundation.Header3"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
         android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
         android:text="@string/wallet_filters_header" />
 
-    <com.google.android.material.switchmaterial.SwitchMaterial
-        style="@style/Widget.Nova.Switch"
-        android:layout_width="match_parent"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_height="wrap_content"
+    <io.novafoundation.nova.common.view.Switch
         android:id="@+id/customValidatorSettingsFilterIdentity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="12dp"
-        android:checked="true"
-        android:text="@string/staking_recommended_feature_3" />
-
-    <com.google.android.material.switchmaterial.SwitchMaterial
-        style="@style/Widget.Nova.Switch"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
+        app:subtitle="@string/staking_recommended_filter_identity_subtitle"
+        app:title="@string/staking_recommended_feature_3" />
+
+    <io.novafoundation.nova.common.view.Switch
         android:id="@+id/customValidatorSettingsFilterSlashes"
-        android:text="@string/staking_recommended_feature_4" />
-
-    <com.google.android.material.switchmaterial.SwitchMaterial
-        style="@style/Widget.Nova.Switch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
+        app:title="@string/staking_recommended_feature_4" />
+
+    <io.novafoundation.nova.common.view.Switch
         android:id="@+id/customValidatorSettingsFilterOverSubscribed"
-        android:checked="true"
-        android:text="@string/staking_recommended_feature_2" />
-
-    <com.google.android.material.switchmaterial.SwitchMaterial
-        style="@style/Widget.Nova.Switch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:id="@+id/customValidatorSettingsFilterClustering"
-        android:checked="true"
-        android:text="@string/staking_recommended_feature_5" />
+        app:title="@string/staking_recommended_feature_2" />
 
+    <io.novafoundation.nova.common.view.Switch
+        android:id="@+id/customValidatorSettingsFilterClustering"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        app:title="@string/staking_recommended_feature_5" />
 
     <TextView
-        style="@style/TextAppearance.NovaFoundation.Header3"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
         android:layout_marginTop="24dp"
+        android:layout_marginEnd="16dp"
         android:text="@string/common_filter_sort_header" />
 
     <RadioGroup
@@ -78,36 +72,30 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="8dp">
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp">
 
         <com.google.android.material.radiobutton.MaterialRadioButton
-            style="@style/TextAppearance.NovaFoundation.Body1"
+            android:id="@+id/customValidatorSettingsSortAPY"
+            style="@style/Widget.Nova.RadioButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:checked="true"
-            android:id="@+id/customValidatorSettingsSortAPY"
-            android:paddingStart="4dp"
-            android:text="@string/staking_custom_validators_settings_sort_apy"
-            android:textColor="@color/gray1" />
+            android:text="@string/staking_custom_validators_settings_sort_apy" />
 
         <com.google.android.material.radiobutton.MaterialRadioButton
-            style="@style/TextAppearance.NovaFoundation.Body1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:id="@+id/customValidatorSettingsSortTotalStake"
-            android:paddingStart="4dp"
-            android:text="@string/staking_validator_total_stake_token"
-            android:textColor="@color/gray1" />
+            style="@style/Widget.Nova.RadioButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/staking_validator_total_stake_token" />
 
         <com.google.android.material.radiobutton.MaterialRadioButton
-            style="@style/TextAppearance.NovaFoundation.Body1"
-            android:layout_width="match_parent"
             android:id="@+id/customValidatorSettingsSortOwnStake"
+            style="@style/Widget.Nova.RadioButton"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="4dp"
-            android:text="@string/staking_filter_title_own_stake_token"
-            android:textColor="@color/gray1" />
+            android:text="@string/staking_filter_title_own_stake_token" />
     </RadioGroup>
 
     <Space
@@ -116,12 +104,12 @@
         android:layout_weight="1" />
 
     <io.novafoundation.nova.common.view.PrimaryButton
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
         android:id="@+id/customValidatorSettingsApply"
         style="@style/Widget.Nova.Button.Primary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="20dp"
         android:text="@string/common_apply" />
 

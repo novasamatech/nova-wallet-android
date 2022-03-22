@@ -60,10 +60,10 @@ class CustomValidatorsSettingsFragment : BaseFragment<CustomValidatorsSettingsVi
     override fun subscribe(viewModel: CustomValidatorsSettingsViewModel) {
         customValidatorSettingsSort.bindTo(viewModel.selectedSortingIdFlow, lifecycleScope)
 
-        customValidatorSettingsFilterIdentity.bindFilter(HasIdentityFilter::class.java)
-        customValidatorSettingsFilterSlashes.bindFilter(NotSlashedFilter::class.java)
-        customValidatorSettingsFilterOverSubscribed.bindFilter(NotOverSubscribedFilter::class.java)
-        customValidatorSettingsFilterClustering.bindPostProcessor(RemoveClusteringPostprocessor::class.java)
+        customValidatorSettingsFilterIdentity.field.bindFilter(HasIdentityFilter::class.java)
+        customValidatorSettingsFilterSlashes.field.bindFilter(NotSlashedFilter::class.java)
+        customValidatorSettingsFilterOverSubscribed.field.bindFilter(NotOverSubscribedFilter::class.java)
+        customValidatorSettingsFilterClustering.field.bindPostProcessor(RemoveClusteringPostprocessor::class.java)
 
         viewModel.isResetButtonEnabled.observe(customValidatorSettingsToolbar.rightActionText::setEnabled)
         viewModel.isApplyButtonEnabled.observe {

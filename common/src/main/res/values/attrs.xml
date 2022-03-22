@@ -66,6 +66,7 @@
     <declare-styleable name="TableCellView">
         <attr name="title" />
         <attr name="dividerVisible" />
+        <attr name="dividerColor" format="color" />
         <attr name="primaryValueIcon" format="reference|color" />
         <attr name="primaryValueIconTint" format="color" />
     </declare-styleable>
@@ -109,5 +110,11 @@
     <declare-styleable name="SearchView">
         <attr name="android:hint" />
         <attr name="icon" />
+    </declare-styleable>
+
+    <declare-styleable name="Switch">
+        <attr name="title" />
+        <attr name="subtitle" />
+        <attr name="dividerVisible" />
     </declare-styleable>
 </resources>

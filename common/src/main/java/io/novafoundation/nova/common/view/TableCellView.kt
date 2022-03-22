@@ -123,6 +123,9 @@ open class TableCellView @JvmOverloads constructor(
         val dividerVisible = typedArray.getBoolean(R.styleable.TableCellView_dividerVisible, true)
         setDividerVisible(dividerVisible)
 
+        val dividerColor = typedArray.getResourceIdOrNull(R.styleable.TableCellView_dividerColor)
+        dividerColor?.let(::setDividerColor)
+
         val primaryValueIcon = typedArray.getResourceIdOrNull(R.styleable.TableCellView_primaryValueIcon)
 
         primaryValueIcon?.let {
