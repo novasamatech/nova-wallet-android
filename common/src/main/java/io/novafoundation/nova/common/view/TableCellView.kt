@@ -129,7 +129,7 @@ open class TableCellView @JvmOverloads constructor(
         val primaryValueIcon = typedArray.getResourceIdOrNull(R.styleable.TableCellView_primaryValueIcon)
 
         primaryValueIcon?.let {
-            val primaryValueIconTint = typedArray.getResourceIdOrNull(R.styleable.TableCellView_primaryValueIconTint)
+            val primaryValueIconTint = typedArray.getResourceId(R.styleable.TableCellView_primaryValueIconTint, R.color.white_64)
 
             setPrimaryValueIcon(primaryValueIcon, primaryValueIconTint)
         }

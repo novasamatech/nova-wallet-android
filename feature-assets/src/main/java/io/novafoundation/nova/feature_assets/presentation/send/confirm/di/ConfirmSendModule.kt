@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
@@ -41,20 +42,22 @@ class ConfirmSendModule {
         resourceManager: ResourceManager,
         transferDraft: TransferDraft,
         chainRegistry: ChainRegistry,
+        walletUiUseCase: WalletUiUseCase,
     ): ViewModel {
         return ConfirmSendViewModel(
-            interactor,
-            sendInteractor,
-            router,
-            addressIconGenerator,
-            externalActions,
-            chainRegistry,
-            selectedAccountUseCase,
-            addressDisplayUseCase,
-            resourceManager,
-            validationExecutor,
-            feeLoaderMixinFactory,
-            transferDraft
+            interactor = interactor,
+            sendInteractor = sendInteractor,
+            router = router,
+            addressIconGenerator = addressIconGenerator,
+            externalActions = externalActions,
+            chainRegistry = chainRegistry,
+            selectedAccountUseCase = selectedAccountUseCase,
+            addressDisplayUseCase = addressDisplayUseCase,
+            resourceManager = resourceManager,
+            validationExecutor = validationExecutor,
+            walletUiUseCase = walletUiUseCase,
+            feeLoaderMixinFactory = feeLoaderMixinFactory,
+            transferDraft = transferDraft
         )
     }
 

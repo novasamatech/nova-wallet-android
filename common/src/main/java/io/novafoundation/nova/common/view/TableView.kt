@@ -4,12 +4,12 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.LinearLayout
 import androidx.core.view.children
-import androidx.core.view.doOnPreDraw
+import androidx.core.view.isVisible
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.updatePadding
 
-class TableView @JvmOverloads constructor(
+open class TableView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
@@ -22,14 +22,17 @@ class TableView @JvmOverloads constructor(
 
         background = getRoundedCornerDrawable(R.color.white_8)
         clipToOutline = true
+    }
 
-        doOnPreDraw {
-            setupTableChildrenAppearance()
-        }
+    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+        super.onLayout(changed, l, t, r, b)
+
+        setupTableChildrenAppearance()
     }
 
     private fun setupTableChildrenAppearance() {
         val tableChildren = children.filterIsInstance<TableCellView>()
+            .filter { it.isVisible }
             .toList()
 
         tableChildren.forEach {

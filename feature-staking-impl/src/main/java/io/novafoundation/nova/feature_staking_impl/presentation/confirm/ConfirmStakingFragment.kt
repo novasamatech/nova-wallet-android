@@ -7,30 +7,29 @@ import android.view.ViewGroup
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.setProgress
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.showWallet
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
+import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeViews
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.displayFeeStatus
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
+import kotlinx.android.synthetic.main.fragment_confirm_stake.confirmStakeAccount
 import kotlinx.android.synthetic.main.fragment_confirm_stake.confirmStakeAmount
 import kotlinx.android.synthetic.main.fragment_confirm_stake.confirmStakeConfirm
-import kotlinx.android.synthetic.main.fragment_confirm_stake.confirmStakeOriginAccount
+import kotlinx.android.synthetic.main.fragment_confirm_stake.confirmStakeFee
+import kotlinx.android.synthetic.main.fragment_confirm_stake.confirmStakeHints
 import kotlinx.android.synthetic.main.fragment_confirm_stake.confirmStakeRewardDestination
-import kotlinx.android.synthetic.main.fragment_confirm_stake.confirmStakeSelectedValidators
-import kotlinx.android.synthetic.main.fragment_confirm_stake.confirmStakeSelectedValidatorsCount
 import kotlinx.android.synthetic.main.fragment_confirm_stake.confirmStakeToolbar
-import kotlinx.android.synthetic.main.fragment_confirm_stake.confirmStakingEachEraLength
-import kotlinx.android.synthetic.main.fragment_confirm_stake.confirmStakingFeeFiat
-import kotlinx.android.synthetic.main.fragment_confirm_stake.confirmStakingFeeProgress
-import kotlinx.android.synthetic.main.fragment_confirm_stake.confirmStakingFeeToken
-import kotlinx.android.synthetic.main.fragment_confirm_stake.confirmStakingUnstakingPeriodLength
+import kotlinx.android.synthetic.main.fragment_confirm_stake.confirmStakeValidators
+import kotlinx.android.synthetic.main.fragment_confirm_stake.confirmStakeWallet
 import kotlinx.android.synthetic.main.fragment_confirm_stake.stakingConfirmationContainer
 
 class ConfirmStakingFragment : BaseFragment<ConfirmStakingViewModel>() {
@@ -55,12 +54,12 @@ class ConfirmStakingFragment : BaseFragment<ConfirmStakingViewModel>() {
         confirmStakeToolbar.setHomeButtonListener { viewModel.backClicked() }
         onBackPressed { viewModel.backClicked() }
 
-        confirmStakeOriginAccount.setWholeClickListener { viewModel.originAccountClicked() }
+        confirmStakeAccount.setOnClickListener { viewModel.originAccountClicked() }
 
         confirmStakeConfirm.prepareForProgress(viewLifecycleOwner)
         confirmStakeConfirm.setOnClickListener { viewModel.confirmClicked() }
 
-        confirmStakeSelectedValidators.setOnClickListener { viewModel.nominationsClicked() }
+        confirmStakeValidators.setOnClickListener { viewModel.nominationsClicked() }
 
         confirmStakeRewardDestination.setPayoutAccountClickListener { viewModel.payoutAccountClicked() }
     }
@@ -79,53 +78,35 @@ class ConfirmStakingFragment : BaseFragment<ConfirmStakingViewModel>() {
         observeRetries(viewModel)
         observeValidations(viewModel)
         setupExternalActions(viewModel)
+        setupFeeLoading(viewModel, confirmStakeFee)
+        observeHints(viewModel.hintsMixin, confirmStakeHints)
 
+        viewModel.title.observe(confirmStakeToolbar::setTitle)
         viewModel.showNextProgress.observe(confirmStakeConfirm::setProgress)
 
-        viewModel.rewardDestinationLiveData.observe {
+        viewModel.rewardDestinationFlow.observe {
+            confirmStakeRewardDestination.showRewardDestination(it)
+        }
 
-            if (it != null) {
-                confirmStakeRewardDestination.makeVisible()
-                confirmStakeRewardDestination.showRewardDestination(it)
+        viewModel.amountModel.observe { amountModel ->
+            if (amountModel != null) {
+                confirmStakeAmount.setAmount(amountModel)
+                confirmStakeAmount.makeVisible()
             } else {
-                confirmStakeRewardDestination.makeGone()
+                confirmStakeAmount.makeGone()
             }
         }
 
-        viewModel.assetModelLiveData.observe {
-            confirmStakeAmount.setAssetBalance(it.assetBalance)
-            confirmStakeAmount.setAssetName(it.tokenName)
-            confirmStakeAmount.loadAssetImage(it.imageUrl)
+        viewModel.currentAccountModelFlow.observe(confirmStakeAccount::showAddress)
+        viewModel.walletFlow.observe(confirmStakeWallet::showWallet)
+
+        viewModel.nominationsFlow.observe {
+            confirmStakeValidators.showValue(it)
         }
 
-        viewModel.feeLiveData.observe {
-            displayFeeStatus(
-                it,
-                FeeViews(confirmStakingFeeProgress, confirmStakingFeeFiat, confirmStakingFeeToken)
-            )
-        }
-
-        viewModel.currentAccountModelFlow.observe {
-            confirmStakeOriginAccount.setMessage(it.nameOrAddress)
-            confirmStakeOriginAccount.setTextIcon(it.image)
-        }
-
-        viewModel.nominationsLiveData.observe {
-            confirmStakeSelectedValidatorsCount.text = it
-        }
-
-        viewModel.displayAmountLiveData.observe { bondedAmount ->
+        viewModel.amountModel.observe { bondedAmount ->
             confirmStakeAmount.setVisible(bondedAmount != null)
-
-            bondedAmount?.let { confirmStakeAmount.amountInput.setText(it.toString()) }
-        }
-
-        viewModel.unstakingTime.observe {
-            confirmStakingUnstakingPeriodLength.text = it
-        }
-
-        viewModel.eraHoursLength.observe {
-            confirmStakingEachEraLength.text = it
+            bondedAmount?.let(confirmStakeAmount::setAmount)
         }
     }
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="staking_change_validators">Change validators</string>
   <string name="staking_recommended_filter_identity_subtitle">with at least one identity contact</string>
   <string name="staking_rebond_custom">Custom amount</string>
   <string name="staking_rebond_all">All unstaking</string>
