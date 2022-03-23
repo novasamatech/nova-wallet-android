@@ -23,7 +23,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.model.transferableAmountModelOf
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
@@ -42,7 +42,7 @@ class SelectUnbondViewModel(
     private val validationExecutor: ValidationExecutor,
     private val validationSystem: UnbondValidationSystem,
     private val feeLoaderMixin: FeeLoaderMixin.Presentation,
-    private val unbondHintsMixinFactory: UnbondHintsMixinFactory,
+    unbondHintsMixinFactory: UnbondHintsMixinFactory,
     amountChooserMixinFactory: AmountChooserMixin.Factory
 ) : BaseViewModel(),
     Validatable by validationExecutor,
@@ -59,9 +59,8 @@ class SelectUnbondViewModel(
         .flatMapLatest { interactor.assetFlow(it.controllerAddress) }
         .shareInBackground()
 
-    val transferableFlow = assetFlow.mapLatest {
-        mapAmountToAmountModel(it.transferable, it)
-    }.shareInBackground()
+    val transferableFlow = assetFlow.mapLatest(::transferableAmountModelOf)
+        .shareInBackground()
 
     val hintsMixin = unbondHintsMixinFactory.create(coroutineScope = this)
 
