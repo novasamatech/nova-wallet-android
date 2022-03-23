@@ -12,51 +12,36 @@
         android:id="@+id/redeemToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:titleText="@string/common_confirm" />
+        app:dividerVisible="false"
+        app:titleText="@string/staking_redeem" />
 
-    <io.novafoundation.nova.common.view.LabeledTextView
-        android:id="@+id/redeemOriginAccount"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        app:actionIcon="@drawable/ic_more"
-        app:label="@string/account_info_title" />
 
-    <io.novafoundation.nova.common.view.AmountView
+    <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.PrimaryAmountView
         android:id="@+id/redeemAmount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:enabled="false" />
+        android:layout_marginEnd="16dp" />
+
+    <io.novafoundation.nova.feature_wallet_api.presentation.view.extrinsic.GenericExtrinsicInformationView
+        android:id="@+id/redeemExtrinsicInformation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="16dp" />
 
     <Space
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />
 
-    <LinearLayout
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/redeemConfirm"
+        style="@style/Widget.Nova.Button.Primary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/black4"
-        android:orientation="vertical">
-
-        <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
-            android:id="@+id/redeemFee"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp" />
-
-        <io.novafoundation.nova.common.view.PrimaryButton
-            android:id="@+id/redeemConfirm"
-            style="@style/Widget.Nova.Button.Primary"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:text="@string/common_confirm" />
-    </LinearLayout>
+        android:layout_margin="16dp"
+        android:text="@string/common_confirm" />
 </LinearLayout>
