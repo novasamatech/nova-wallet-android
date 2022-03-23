@@ -44,11 +44,11 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.controller.Con
 import io.novafoundation.nova.feature_staking_impl.domain.staking.rebond.RebondInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.redeem.RedeemInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.rewardDestination.ChangeRewardDestinationInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.staking.unbond.UnbondInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validators.ValidatorProvider
 import io.novafoundation.nova.feature_staking_impl.domain.validators.current.CurrentValidatorsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validators.current.search.SearchCustomValidatorsInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
+import io.novafoundation.nova.feature_staking_impl.presentation.common.hints.StakingHintsUseCase
 import io.novafoundation.nova.feature_staking_impl.presentation.common.rewardDestination.RewardDestinationMixin
 import io.novafoundation.nova.feature_staking_impl.presentation.common.rewardDestination.RewardDestinationProvider
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
@@ -330,14 +330,6 @@ class StakingFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideUnbondInteractor(
-        extrinsicService: ExtrinsicService,
-        stakingRepository: StakingRepository,
-        eraTimeCalculatorFactory: EraTimeCalculatorFactory,
-    ) = UnbondInteractor(extrinsicService, stakingRepository, eraTimeCalculatorFactory)
-
-    @Provides
-    @FeatureScope
     fun provideRedeemInteractor(
         extrinsicService: ExtrinsicService,
         stakingRepository: StakingRepository,
@@ -379,4 +371,11 @@ class StakingFeatureModule {
         validatorProvider: ValidatorProvider,
         sharedState: StakingSharedState
     ) = SearchCustomValidatorsInteractor(validatorProvider, sharedState)
+
+    @Provides
+    @FeatureScope
+    fun provideStakingHintsUseCase(
+        resourceManager: ResourceManager,
+        stakingInteractor: StakingInteractor
+    ) = StakingHintsUseCase(resourceManager, stakingInteractor)
 }

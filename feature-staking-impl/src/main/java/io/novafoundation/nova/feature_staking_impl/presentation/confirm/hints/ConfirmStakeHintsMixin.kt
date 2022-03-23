@@ -6,11 +6,13 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess.ReadyToSubmit.Payload
+import io.novafoundation.nova.feature_staking_impl.presentation.common.hints.StakingHintsUseCase
 import kotlinx.coroutines.CoroutineScope
 
 class ConfirmStakeHintsMixinFactory(
     private val interactor: StakingInteractor,
     private val resourceManager: ResourceManager,
+    private val stakingHintsUseCase: StakingHintsUseCase,
 ) {
 
     fun create(
@@ -20,7 +22,8 @@ class ConfirmStakeHintsMixinFactory(
         interactor = interactor,
         resourceManager = resourceManager,
         payload = payload,
-        coroutineScope = coroutineScope
+        coroutineScope = coroutineScope,
+        stakingHintsUseCase = stakingHintsUseCase
     )
 }
 
@@ -28,6 +31,7 @@ private class ConfirmStakeHintsMixin(
     private val interactor: StakingInteractor,
     private val resourceManager: ResourceManager,
     private val payload: Payload,
+    private val stakingHintsUseCase: StakingHintsUseCase,
     coroutineScope: CoroutineScope
 ) : ConstantHintsMixin(coroutineScope) {
 
@@ -41,34 +45,17 @@ private class ConfirmStakeHintsMixin(
 
     private suspend fun beginStakeHints(): List<String> = listOf(
         rewardPeriodHint(),
-        noRewardDurationUnstakingHint(),
-        redeemHint(),
-        unstakingDurationHint(),
+        stakingHintsUseCase.noRewardDurationUnstakingHint(),
+        stakingHintsUseCase.redeemHint(),
+        stakingHintsUseCase.unstakingDurationHint(),
     )
 
     private fun changeValidatorsHints(): List<String> = listOf(
         validatorsChangeHint()
     )
 
-    private fun redeemHint(): String {
-        return resourceManager.getString(R.string.staking_hint_redeem_v2_2_0)
-    }
-
     private fun validatorsChangeHint(): String {
         return resourceManager.getString(R.string.staking_your_validators_changing_title)
-    }
-
-    private fun noRewardDurationUnstakingHint(): String {
-        return resourceManager.getString(R.string.staking_hint_no_rewards_v2_2_0)
-    }
-
-    private suspend fun unstakingDurationHint(): String {
-        val lockupPeriod = interactor.getLockupPeriodInDays()
-
-        return resourceManager.getString(
-            R.string.staking_hint_unstake_format_v2_2_0,
-            resourceManager.getQuantityString(R.plurals.staking_main_lockup_period_value, lockupPeriod, lockupPeriod)
-        )
     }
 
     private suspend fun rewardPeriodHint(): String {
