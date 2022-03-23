@@ -49,3 +49,14 @@ suspend fun AddressIconGenerator.createAddressIcon(
 ): Drawable {
     return createAddressIcon(chain.accountIdOf(address), sizeInDp, background)
 }
+
+suspend fun AddressIconGenerator.createAccountAddressModel(
+    chain: Chain,
+    address: String
+) = createAddressModel(
+    chain = chain,
+    address = address,
+    sizeInDp = AddressIconGenerator.SIZE_SMALL,
+    addressDisplayUseCase = null,
+    background = AddressIconGenerator.BACKGROUND_TRANSPARENT
+)

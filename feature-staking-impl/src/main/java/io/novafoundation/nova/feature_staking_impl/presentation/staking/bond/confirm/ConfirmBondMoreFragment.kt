@@ -10,19 +10,15 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.view.setProgress
-import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.showWallet
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
-import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
-import kotlinx.android.synthetic.main.fragment_confirm_bond_more.confirmBondMoreAccount
 import kotlinx.android.synthetic.main.fragment_confirm_bond_more.confirmBondMoreAmount
 import kotlinx.android.synthetic.main.fragment_confirm_bond_more.confirmBondMoreConfirm
-import kotlinx.android.synthetic.main.fragment_confirm_bond_more.confirmBondMoreFee
+import kotlinx.android.synthetic.main.fragment_confirm_bond_more.confirmBondMoreExtrinsicInformation
 import kotlinx.android.synthetic.main.fragment_confirm_bond_more.confirmBondMoreHints
 import kotlinx.android.synthetic.main.fragment_confirm_bond_more.confirmBondMoreToolbar
-import kotlinx.android.synthetic.main.fragment_confirm_bond_more.confirmBondMoreWallet
 
 private const val PAYLOAD_KEY = "PAYLOAD_KEY"
 
@@ -50,7 +46,7 @@ class ConfirmBondMoreFragment : BaseFragment<ConfirmBondMoreViewModel>() {
             }
         }
 
-        confirmBondMoreAccount.setOnClickListener { viewModel.originAccountClicked() }
+        confirmBondMoreExtrinsicInformation.setOnAccountClickedListener { viewModel.originAccountClicked() }
 
         confirmBondMoreToolbar.setHomeButtonListener { viewModel.backClicked() }
         confirmBondMoreConfirm.prepareForProgress(viewLifecycleOwner)
@@ -77,10 +73,9 @@ class ConfirmBondMoreFragment : BaseFragment<ConfirmBondMoreViewModel>() {
         viewModel.showNextProgress.observe(confirmBondMoreConfirm::setProgress)
 
         viewModel.amountModelFlow.observe(confirmBondMoreAmount::setAmount)
-        viewModel.feeStatusFlow.observe(confirmBondMoreFee::setFeeStatus)
 
-        viewModel.walletUiFlow.observe(confirmBondMoreWallet::showWallet)
-
-        viewModel.originAddressModelFlow.observe(confirmBondMoreAccount::showAddress)
+        viewModel.feeStatusFlow.observe(confirmBondMoreExtrinsicInformation::setFeeStatus)
+        viewModel.walletUiFlow.observe(confirmBondMoreExtrinsicInformation::setWallet)
+        viewModel.originAddressModelFlow.observe(confirmBondMoreExtrinsicInformation::setAccount)
     }
 }
