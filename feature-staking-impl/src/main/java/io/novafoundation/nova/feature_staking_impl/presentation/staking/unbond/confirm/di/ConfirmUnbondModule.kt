@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
@@ -19,6 +20,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.validations.unbond.Unb
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.confirm.ConfirmUnbondPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.confirm.ConfirmUnbondViewModel
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.hints.UnbondHintsMixinFactory
 
 @Module(includes = [ViewModelModule::class])
 class ConfirmUnbondModule {
@@ -37,18 +39,22 @@ class ConfirmUnbondModule {
         externalActions: ExternalActions.Presentation,
         payload: ConfirmUnbondPayload,
         singleAssetSharedState: StakingSharedState,
+        unbondHintsMixinFactory: UnbondHintsMixinFactory,
+        walletUiUseCase: WalletUiUseCase,
     ): ViewModel {
         return ConfirmUnbondViewModel(
-            router,
-            interactor,
-            unbondInteractor,
-            resourceManager,
-            validationExecutor,
-            iconGenerator,
-            validationSystem,
-            externalActions,
-            payload,
-            singleAssetSharedState
+            router = router,
+            interactor = interactor,
+            unbondInteractor = unbondInteractor,
+            resourceManager = resourceManager,
+            validationExecutor = validationExecutor,
+            iconGenerator = iconGenerator,
+            validationSystem = validationSystem,
+            externalActions = externalActions,
+            payload = payload,
+            selectedAssetState = singleAssetSharedState,
+            unbondHintsMixinFactory = unbondHintsMixinFactory,
+            walletUiUseCase = walletUiUseCase
         )
     }
 

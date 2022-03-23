@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:parentTag="io.novafoundation.nova.common.view.TableView"
+    android:layout_height="match_parent">
+
+    <io.novafoundation.nova.common.view.TableCellView
+        android:id="@+id/viewGenericExtrinsicInformationWallet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:title="@string/tabbar_wallet_title" />
+
+    <io.novafoundation.nova.common.view.TableCellView
+        android:id="@+id/viewGenericExtrinsicInformationAccount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryValueIcon="@drawable/ic_info_16"
+        app:primaryValueIconTint="@color/white_64"
+        app:title="@string/common_account" />
+
+    <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
+        android:id="@+id/viewGenericExtrinsicInformationFee"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</merge>

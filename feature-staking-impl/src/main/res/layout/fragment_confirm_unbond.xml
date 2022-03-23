@@ -12,92 +12,43 @@
         android:id="@+id/confirmUnbondToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:titleText="@string/common_confirm" />
+        app:dividerVisible="false"
+        app:titleText="@string/staking_unbond_v1_9_0" />
 
-    <io.novafoundation.nova.common.view.LabeledTextView
-        android:id="@+id/confirmUnbondOriginAccount"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        app:actionIcon="@drawable/ic_more"
-        app:label="@string/account_info_title" />
-
-    <io.novafoundation.nova.common.view.AmountView
+    <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.PrimaryAmountView
         android:id="@+id/confirmUnbondAmount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:enabled="false" />
+        android:layout_marginEnd="16dp" />
 
-    <TextView
-        style="@style/TextAppearance.NovaFoundation.Body2"
-        android:layout_width="wrap_content"
+    <io.novafoundation.nova.feature_wallet_api.presentation.view.extrinsic.GenericExtrinsicInformationView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/confirmUnbondExtrinsicInformation"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="16dp"
-        android:drawablePadding="8dp"
-        android:gravity="left|center"
-        android:includeFontPadding="false"
-        android:text="@string/staking_hint_no_rewards_v2_2_0"
-        android:textColor="@color/white"
-        app:drawableLeftCompat="@drawable/ic_nova" />
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="16dp" />
 
-    <TextView
-        style="@style/TextAppearance.NovaFoundation.Body2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="8dp"
-        android:drawablePadding="8dp"
-        android:gravity="left|center"
-        android:includeFontPadding="false"
-        android:text="@string/staking_hint_unbond_kills_stash"
-        android:textColor="@color/white"
-        app:drawableLeftCompat="@drawable/ic_nova" />
-
-    <TextView
-        style="@style/TextAppearance.NovaFoundation.Body2"
-        android:layout_width="wrap_content"
+    <io.novafoundation.nova.common.mixin.hints.HintsView
+        android:layout_width="match_parent"
+        android:id="@+id/confirmUnbondHints"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
-        android:drawablePadding="8dp"
-        android:gravity="left|center"
-        android:includeFontPadding="false"
-        android:text="@string/staking_hint_redeem_v2_2_0"
-        android:textColor="@color/white"
-        app:drawableLeftCompat="@drawable/ic_nova" />
+        android:layout_marginEnd="16dp" />
 
     <Space
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />
 
-    <LinearLayout
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/confirmUnbondConfirm"
+        style="@style/Widget.Nova.Button.Primary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/black4"
-        android:orientation="vertical">
-
-        <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
-            android:id="@+id/confirmUnbondFee"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp" />
-
-        <io.novafoundation.nova.common.view.PrimaryButton
-            android:id="@+id/confirmUnbondConfirm"
-            style="@style/Widget.Nova.Button.Primary"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:text="@string/common_confirm" />
-    </LinearLayout>
+        android:layout_margin="16dp"
+        android:text="@string/common_confirm" />
 </LinearLayout>

@@ -23,33 +23,13 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp" />
 
-    <io.novafoundation.nova.common.view.TableView
+    <io.novafoundation.nova.feature_wallet_api.presentation.view.extrinsic.GenericExtrinsicInformationView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/confirmBondMoreExtrinsicInformation"
         android:layout_marginStart="16dp"
         android:layout_marginTop="24dp"
-        android:layout_marginEnd="16dp">
-
-        <io.novafoundation.nova.common.view.TableCellView
-            android:id="@+id/confirmBondMoreWallet"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:title="@string/tabbar_wallet_title" />
-
-        <io.novafoundation.nova.common.view.TableCellView
-            android:id="@+id/confirmBondMoreAccount"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:primaryValueIcon="@drawable/ic_info_16"
-            app:primaryValueIconTint="@color/white_64"
-            app:title="@string/common_account" />
-
-        <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
-            android:id="@+id/confirmBondMoreFee"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-    </io.novafoundation.nova.common.view.TableView>
+        android:layout_marginEnd="16dp" />
 
     <io.novafoundation.nova.common.mixin.hints.HintsView
         android:layout_width="match_parent"
