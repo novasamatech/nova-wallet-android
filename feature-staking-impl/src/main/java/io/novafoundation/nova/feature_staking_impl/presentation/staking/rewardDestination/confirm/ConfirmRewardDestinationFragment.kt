@@ -4,10 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.setProgress
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
@@ -16,8 +16,7 @@ import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.confirm.parcel.ConfirmRewardDestinationPayload
 import kotlinx.android.synthetic.main.fragment_confirm_reward_destination.confirmRewardDestinationConfirm
 import kotlinx.android.synthetic.main.fragment_confirm_reward_destination.confirmRewardDestinationContainer
-import kotlinx.android.synthetic.main.fragment_confirm_reward_destination.confirmRewardDestinationFee
-import kotlinx.android.synthetic.main.fragment_confirm_reward_destination.confirmRewardDestinationOriginAccount
+import kotlinx.android.synthetic.main.fragment_confirm_reward_destination.confirmRewardDestinationExtrinsicInformation
 import kotlinx.android.synthetic.main.fragment_confirm_reward_destination.confirmRewardDestinationRewardDestination
 import kotlinx.android.synthetic.main.fragment_confirm_reward_destination.confirmRewardDestinationToolbar
 
@@ -41,17 +40,11 @@ class ConfirmRewardDestinationFragment : BaseFragment<ConfirmRewardDestinationVi
     }
 
     override fun initViews() {
-        confirmRewardDestinationContainer.applyInsetter {
-            type(statusBars = true) {
-                padding()
-            }
-
-            consume(true)
-        }
+        confirmRewardDestinationContainer.applyStatusBarInsets()
 
         confirmRewardDestinationToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        confirmRewardDestinationOriginAccount.setWholeClickListener { viewModel.originAccountClicked() }
+        confirmRewardDestinationExtrinsicInformation.setOnAccountClickedListener { viewModel.originAccountClicked() }
 
         confirmRewardDestinationConfirm.prepareForProgress(viewLifecycleOwner)
         confirmRewardDestinationConfirm.setOnClickListener { viewModel.confirmClicked() }
@@ -77,13 +70,10 @@ class ConfirmRewardDestinationFragment : BaseFragment<ConfirmRewardDestinationVi
 
         viewModel.showNextProgress.observe(confirmRewardDestinationConfirm::setProgress)
 
-        viewModel.rewardDestinationLiveData.observe(confirmRewardDestinationRewardDestination::showRewardDestination)
+        viewModel.rewardDestinationFlow.observe(confirmRewardDestinationRewardDestination::showRewardDestination)
 
-        viewModel.feeLiveData.observe(confirmRewardDestinationFee::setFeeStatus)
-
-        viewModel.originAccountModelLiveData.observe {
-            confirmRewardDestinationOriginAccount.setMessage(it.nameOrAddress)
-            confirmRewardDestinationOriginAccount.setTextIcon(it.image)
-        }
+        viewModel.walletUiFlow.observe(confirmRewardDestinationExtrinsicInformation::setWallet)
+        viewModel.feeStatusFlow.observe(confirmRewardDestinationExtrinsicInformation::setFeeStatus)
+        viewModel.originAccountModelFlow.observe(confirmRewardDestinationExtrinsicInformation::setAccount)
     }
 }

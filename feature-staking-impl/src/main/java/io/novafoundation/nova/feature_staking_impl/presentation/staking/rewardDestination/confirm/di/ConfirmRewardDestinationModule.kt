@@ -11,7 +11,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
-import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
@@ -36,22 +36,22 @@ class ConfirmRewardDestinationModule {
         validationExecutor: ValidationExecutor,
         rewardDestinationInteractor: ChangeRewardDestinationInteractor,
         externalActions: ExternalActions.Presentation,
-        addressDisplayUseCase: AddressDisplayUseCase,
         payload: ConfirmRewardDestinationPayload,
         singleAssetSharedState: StakingSharedState,
+        walletUiUseCase: WalletUiUseCase,
     ): ViewModel {
         return ConfirmRewardDestinationViewModel(
-            router,
-            interactor,
-            addressIconGenerator,
-            resourceManager,
-            validationSystem,
-            rewardDestinationInteractor,
-            externalActions,
-            addressDisplayUseCase,
-            validationExecutor,
-            payload,
-            singleAssetSharedState
+            router = router,
+            interactor = interactor,
+            addressIconGenerator = addressIconGenerator,
+            resourceManager = resourceManager,
+            validationSystem = validationSystem,
+            rewardDestinationInteractor = rewardDestinationInteractor,
+            externalActions = externalActions,
+            validationExecutor = validationExecutor,
+            payload = payload,
+            selectedAssetState = singleAssetSharedState,
+            walletUiUseCase = walletUiUseCase
         )
     }
 
