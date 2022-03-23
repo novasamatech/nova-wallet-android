@@ -5,9 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
+import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.formatAsCurrency
-import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingState
@@ -19,28 +18,21 @@ import io.novafoundation.nova.feature_staking_impl.domain.validations.rebond.Reb
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.confirm.ConfirmRebondPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.rebondValidationFailure
-import io.novafoundation.nova.feature_wallet_api.data.mappers.mapAssetToAssetModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.requireFee
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.debounce
+import io.novafoundation.nova.feature_wallet_api.presentation.model.transferableAmountModelOf
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import kotlin.time.ExperimentalTime
-import kotlin.time.milliseconds
-
-private const val DEFAULT_AMOUNT = 1
-private const val DEBOUNCE_DURATION_MILLIS = 500
 
 class CustomRebondViewModel(
     private val router: StakingRouter,
@@ -50,6 +42,8 @@ class CustomRebondViewModel(
     private val validationExecutor: ValidationExecutor,
     private val validationSystem: RebondValidationSystem,
     private val feeLoaderMixin: FeeLoaderMixin.Presentation,
+    amountChooserMixinFactory: AmountChooserMixin.Factory,
+    hintsMixinFactory: ResourcesHintsMixinFactory
 ) : BaseViewModel(),
     FeeLoaderMixin by feeLoaderMixin,
     Validatable by validationExecutor {
@@ -59,29 +53,27 @@ class CustomRebondViewModel(
 
     private val accountStakingFlow = interactor.selectedAccountStakingStateFlow()
         .filterIsInstance<StakingState.Stash>()
-        .inBackground()
-        .share()
+        .shareInBackground()
 
     private val assetFlow = accountStakingFlow.flatMapLatest {
         interactor.assetFlow(it.controllerAddress)
     }
-        .inBackground()
-        .share()
+        .shareInBackground()
 
-    val assetModelFlow = assetFlow
-        .map { mapAssetToAssetModel(it, resourceManager, Asset::unbonding, R.string.staking_unbonding_format) }
-        .inBackground()
-        .asLiveData()
+    val amountChooserMixin = amountChooserMixinFactory.create(
+        scope = this,
+        assetFlow = assetFlow,
+        balanceField = Asset::unbonding,
+        balanceLabel = R.string.wallet_balance_unbonding_v1_9_0
+    )
 
-    val enteredAmountFlow = MutableStateFlow(DEFAULT_AMOUNT.toString())
+    val hintsMixin = hintsMixinFactory.create(
+        coroutineScope = this,
+        hintsRes = listOf(R.string.staking_rebond_counted_next_era_hint)
+    )
 
-    private val parsedAmountFlow = enteredAmountFlow.mapNotNull { it.toBigDecimalOrNull() }
-
-    val amountFiatFLow = assetFlow.combine(parsedAmountFlow) { asset, amount ->
-        asset.token.fiatAmount(amount).formatAsCurrency()
-    }
-        .inBackground()
-        .asLiveData()
+    val transferableFlow = assetFlow.mapLatest(::transferableAmountModelOf)
+        .shareInBackground()
 
     init {
         listenFee()
@@ -97,8 +89,7 @@ class CustomRebondViewModel(
 
     @OptIn(ExperimentalTime::class)
     private fun listenFee() {
-        parsedAmountFlow
-            .debounce(DEBOUNCE_DURATION_MILLIS.milliseconds)
+        amountChooserMixin.backPressuredAmount
             .onEach { loadFee(it) }
             .launchIn(viewModelScope)
     }
@@ -119,7 +110,7 @@ class CustomRebondViewModel(
         launch {
             val payload = RebondValidationPayload(
                 fee = fee,
-                rebondAmount = parsedAmountFlow.first(),
+                rebondAmount = amountChooserMixin.amount.first(),
                 controllerAsset = assetFlow.first()
             )
 

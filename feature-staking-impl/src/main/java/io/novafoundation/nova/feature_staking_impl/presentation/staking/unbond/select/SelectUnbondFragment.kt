@@ -4,11 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeValidations
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.setProgress
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
@@ -35,13 +35,7 @@ class SelectUnbondFragment : BaseFragment<SelectUnbondViewModel>() {
     }
 
     override fun initViews() {
-        unbondContainer.applyInsetter {
-            type(statusBars = true) {
-                padding()
-            }
-
-            consume(true)
-        }
+        unbondContainer.applyStatusBarInsets()
 
         unbondToolbar.setHomeButtonListener { viewModel.backClicked() }
         unbondContinue.prepareForProgress(viewLifecycleOwner)

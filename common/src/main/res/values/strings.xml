@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="staking_unbond_too_big">Amount you want to unstake is greater than staked balance</string>
+  <string name="staking_rebond_counted_next_era_hint">Returned tokens will be counted from the next era</string>
   <string name="staking_change_validators">Change validators</string>
   <string name="staking_recommended_filter_identity_subtitle">with at least one identity contact</string>
   <string name="staking_rebond_custom">Custom amount</string>
