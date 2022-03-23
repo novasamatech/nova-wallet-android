@@ -60,12 +60,12 @@ class CustomRebondViewModel(
     }
         .shareInBackground()
 
-   val amountChooserMixin = amountChooserMixinFactory.create(
-       scope = this,
-       assetFlow = assetFlow,
-       balanceField = Asset::unbonding,
-       balanceLabel = R.string.wallet_balance_unbonding_v1_9_0
-   )
+    val amountChooserMixin = amountChooserMixinFactory.create(
+        scope = this,
+        assetFlow = assetFlow,
+        balanceField = Asset::unbonding,
+        balanceLabel = R.string.wallet_balance_unbonding_v1_9_0
+    )
 
     val hintsMixin = hintsMixinFactory.create(
         coroutineScope = this,
