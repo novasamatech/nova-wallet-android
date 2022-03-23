@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.co
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.address.AddressIconGenerator
-import io.novafoundation.nova.common.address.createAddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
@@ -12,6 +11,7 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.requireException
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
+import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_impl.R
@@ -75,12 +75,7 @@ class ConfirmBondMoreViewModel(
         .shareInBackground()
 
     val originAddressModelFlow = flowOf {
-        iconGenerator.createAddressModel(
-            accountAddress = payload.stashAddress,
-            sizeInDp = AddressIconGenerator.SIZE_SMALL,
-            accountName = null,
-            background = AddressIconGenerator.BACKGROUND_TRANSPARENT
-        )
+        iconGenerator.createAccountAddressModel(selectedAssetState.chain(), payload.stashAddress)
     }
         .shareInBackground()
 
