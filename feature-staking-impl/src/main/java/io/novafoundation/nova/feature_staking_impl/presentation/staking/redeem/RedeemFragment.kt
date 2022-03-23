@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
@@ -62,7 +61,6 @@ class RedeemFragment : BaseFragment<RedeemViewModel>() {
     }
 
     override fun subscribe(viewModel: RedeemViewModel) {
-        observeRetries(viewModel)
         observeValidations(viewModel)
         setupExternalActions(viewModel)
         setupFeeLoading(viewModel, redeemExtrinsicInformation.fee)
