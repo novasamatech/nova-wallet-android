@@ -111,7 +111,7 @@ class StakingInteractor(
                         era = era,
                         amountInPlanks = amount,
                         timeLeft = leftTime,
-                        createdAt = currentTimestamp,
+                        timeLeftCalculatedAt = currentTimestamp,
                         closeToExpire = closeToExpire
                     )
                 }

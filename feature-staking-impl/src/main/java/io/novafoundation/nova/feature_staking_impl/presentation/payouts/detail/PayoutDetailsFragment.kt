@@ -7,17 +7,17 @@ import android.view.ViewGroup
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.formatDateFromMillis
+import io.novafoundation.nova.common.utils.setTextColorRes
+import io.novafoundation.nova.common.view.startTimer
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
+import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.model.PendingPayoutParcelable
+import kotlinx.android.synthetic.main.fragment_payout_details.payoutDetailsAmount
 import kotlinx.android.synthetic.main.fragment_payout_details.payoutDetailsContainer
-import kotlinx.android.synthetic.main.fragment_payout_details.payoutDetailsDate
 import kotlinx.android.synthetic.main.fragment_payout_details.payoutDetailsEra
-import kotlinx.android.synthetic.main.fragment_payout_details.payoutDetailsReward
-import kotlinx.android.synthetic.main.fragment_payout_details.payoutDetailsRewardFiat
 import kotlinx.android.synthetic.main.fragment_payout_details.payoutDetailsSubmit
 import kotlinx.android.synthetic.main.fragment_payout_details.payoutDetailsToolbar
 import kotlinx.android.synthetic.main.fragment_payout_details.payoutDetailsValidator
@@ -25,7 +25,7 @@ import kotlinx.android.synthetic.main.fragment_payout_details.payoutDetailsValid
 class PayoutDetailsFragment : BaseFragment<PayoutDetailsViewModel>() {
 
     companion object {
-        private const val KEY_PAYOUT = "validator"
+        private const val KEY_PAYOUT = "payout"
 
         fun getBundle(payout: PendingPayoutParcelable): Bundle {
             return Bundle().apply {
@@ -53,7 +53,7 @@ class PayoutDetailsFragment : BaseFragment<PayoutDetailsViewModel>() {
 
         payoutDetailsSubmit.setOnClickListener { viewModel.payoutClicked() }
 
-        payoutDetailsValidator.setWholeClickListener { viewModel.validatorExternalActionClicked() }
+        payoutDetailsValidator.setOnClickListener { viewModel.validatorExternalActionClicked() }
     }
 
     override fun inject() {
@@ -72,14 +72,13 @@ class PayoutDetailsFragment : BaseFragment<PayoutDetailsViewModel>() {
         setupExternalActions(viewModel)
 
         viewModel.payoutDetails.observe {
-            // TODO perform date formatting in viewModel
-            payoutDetailsDate.text = it.createdAt.formatDateFromMillis(requireContext())
-            payoutDetailsEra.text = it.eraDisplay
-            payoutDetailsReward.text = it.reward
-            payoutDetailsRewardFiat.text = it.rewardFiat
+            payoutDetailsToolbar.titleView.startTimer(millis = it.timeLeft, millisCalculatedAt = it.timeLeftCalculatedAt)
+            payoutDetailsToolbar.titleView.setTextColorRes(it.timerColor)
 
-            payoutDetailsValidator.setMessage(it.validatorAddressModel.nameOrAddress)
-            payoutDetailsValidator.setTextIcon(it.validatorAddressModel.image)
+            payoutDetailsEra.showValue(it.eraDisplay)
+            payoutDetailsValidator.showAddress(it.validatorAddressModel)
+
+            payoutDetailsAmount.setAmount(it.reward)
         }
     }
 }
