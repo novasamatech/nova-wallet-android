@@ -35,6 +35,9 @@ class Toolbar @JvmOverloads constructor(
     val rightActionText: TextView
         get() = rightText
 
+    val titleView: TextView
+        get() = titleTv
+
     init {
         View.inflate(context, R.layout.view_toolbar, this)
 

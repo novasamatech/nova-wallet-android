@@ -54,7 +54,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        app:targetName="@string/staking_payout_v2_2_0" />
+        app:targetName="@string/staking_reward_destination_payout" />
 
     <TextView
         android:id="@+id/rewardDestinationChooserPayoutTitle"

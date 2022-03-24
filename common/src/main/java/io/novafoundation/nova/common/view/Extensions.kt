@@ -17,12 +17,12 @@ private val TIMER_TAG = R.string.common_time_left
 @OptIn(ExperimentalTime::class)
 fun TextView.startTimer(
     millis: Long,
-    timeLeftTimestamp: Long? = null,
+    millisCalculatedAt: Long? = null,
     @PluralsRes daysPlurals: Int = R.plurals.staking_payouts_days_left,
     @StringRes customMessageFormat: Int? = null,
     onFinish: ((view: TextView) -> Unit)? = null
 ) {
-    val deltaTime = if (timeLeftTimestamp != null) System.currentTimeMillis() - timeLeftTimestamp else 0L
+    val timePassedSinceCalculation = if (millisCalculatedAt != null) System.currentTimeMillis() - millisCalculatedAt else 0L
 
     val currentTimer = getTag(TIMER_TAG)
 
@@ -30,7 +30,7 @@ fun TextView.startTimer(
         currentTimer.cancel()
     }
 
-    val newTimer = object : CountDownTimer(millis - deltaTime, 1000) {
+    val newTimer = object : CountDownTimer(millis - timePassedSinceCalculation, 1000) {
         override fun onTick(millisUntilFinished: Long) {
             val days = millisUntilFinished.milliseconds.inDays.toInt()
 

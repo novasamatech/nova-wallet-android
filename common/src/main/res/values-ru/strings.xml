@@ -407,7 +407,7 @@
   <string name="staking_nominator_status_waiting_format">ожидание следующей эры (%s)</string>
   <string name="staking_payout">Выплаты</string>
   <string name="staking_payout_expired">Срок выплаты истёк</string>
-  <string name="staking_payout_v2_2_0">Увеличивать баланс</string>
+  <string name="staking_reward_destination_payout">Увеличивать баланс</string>
   <plurals name="staking_payouts_days_left">
     <item quantity="one">%d день</item>
     <item quantity="few">%d дня</item>

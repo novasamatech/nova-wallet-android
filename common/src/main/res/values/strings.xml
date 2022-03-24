@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="staking_payout">Payout</string>
+  <string name="staking_reward_destination_payout">Transferable rewards</string>
+<!--  <string name="staking_payout_v2_2_0">Transferable rewards</string>-->
+
   <string name="staking_unbond_too_big">Amount you want to unstake is greater than staked balance</string>
   <string name="staking_rebond_counted_next_era_hint">Returned tokens will be counted from the next era</string>
   <string name="staking_change_validators">Change validators</string>
@@ -447,9 +451,7 @@
   <string name="staking_nominator_status_inactive">Inactive</string>
   <string name="staking_nominator_status_waiting">Waiting for the next Era</string>
   <string name="staking_nominator_status_waiting_format">waiting for the next era (%s)</string>
-  <string name="staking_payout">Payout</string>
   <string name="staking_payout_expired">Payout expired</string>
-  <string name="staking_payout_v2_2_0">Transferable rewards</string>
   <plurals name="staking_payouts_days_left">
     <item quantity="one">%d day left</item>
     <item quantity="other">%d days left</item>
