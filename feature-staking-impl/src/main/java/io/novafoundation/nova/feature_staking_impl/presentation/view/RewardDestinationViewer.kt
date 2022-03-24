@@ -37,7 +37,7 @@ class RewardDestinationViewer @JvmOverloads constructor(
                 viewRewardDestinationDestination.showValue(context.getString(R.string.staking_setup_restake_v2_2_0))
             }
             is RewardDestinationModel.Payout -> {
-                viewRewardDestinationDestination.showValue(context.getString(R.string.staking_payout_v2_2_0))
+                viewRewardDestinationDestination.showValue(context.getString(R.string.staking_reward_destination_payout))
                 viewRewardDestinationPayoutAccount.showAddress(rewardDestinationModel.destination)
             }
         }
