@@ -43,7 +43,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:adjustViewBounds="true"
-            android:scaleType="centerCrop"
+            android:scaleType="fitXY"
             android:src="@drawable/bg_dapp_welcome"
             app:layout_constraintBottom_toBottomOf="@+id/dappMainWelcomeBottomMargin"
             app:layout_constraintEnd_toEndOf="parent"
