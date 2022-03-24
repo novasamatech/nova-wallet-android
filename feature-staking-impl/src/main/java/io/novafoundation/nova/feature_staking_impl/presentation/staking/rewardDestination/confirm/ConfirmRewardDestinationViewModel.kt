@@ -3,19 +3,17 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardD
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.address.AddressIconGenerator
-import io.novafoundation.nova.common.address.AddressModel
-import io.novafoundation.nova.common.address.createAddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.requireException
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
-import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_api.domain.model.RewardDestination
-import io.novafoundation.nova.feature_staking_api.domain.model.StakingAccount
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.mappers.mapRewardDestinationModelToRewardDestination
@@ -35,7 +33,6 @@ import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -47,43 +44,42 @@ class ConfirmRewardDestinationViewModel(
     private val validationSystem: RewardDestinationValidationSystem,
     private val rewardDestinationInteractor: ChangeRewardDestinationInteractor,
     private val externalActions: ExternalActions.Presentation,
-    private val addressDisplayUseCase: AddressDisplayUseCase,
     private val validationExecutor: ValidationExecutor,
     private val payload: ConfirmRewardDestinationPayload,
     private val selectedAssetState: SingleAssetSharedState,
+    walletUiUseCase: WalletUiUseCase,
 ) : BaseViewModel(),
     Validatable by validationExecutor,
     ExternalActions by externalActions {
 
-    private val stashFlow = interactor.selectedAccountStakingStateFlow()
-        .filterIsInstance<StakingState.Stash>()
-        .inBackground()
-        .share()
-
-    private val controllerAssetFlow = stashFlow
-        .flatMapLatest { interactor.assetFlow(it.controllerAddress) }
-        .inBackground()
-        .share()
-
-    val originAccountModelLiveData = stashFlow.map {
-        generateDestinationModel(interactor.getProjectedAccount(it.controllerAddress))
-    }
-        .inBackground()
-        .asLiveData()
-
-    val rewardDestinationLiveData = flowOf(payload)
-        .map { mapRewardDestinationParcelModelToRewardDestinationModel(it.rewardDestination) }
-        .inBackground()
-        .asLiveData()
-
     private val _showNextProgress = MutableLiveData(false)
     val showNextProgress: LiveData<Boolean> = _showNextProgress
 
-    val feeLiveData = controllerAssetFlow.map {
+    private val stashFlow = interactor.selectedAccountStakingStateFlow()
+        .filterIsInstance<StakingState.Stash>()
+        .shareInBackground()
+
+    private val controllerAssetFlow = stashFlow
+        .flatMapLatest { interactor.assetFlow(it.controllerAddress) }
+        .shareInBackground()
+
+    val walletUiFlow = walletUiUseCase.selectedWalletUiFlow()
+        .shareInBackground()
+
+    val originAccountModelFlow = stashFlow.map {
+        addressIconGenerator.createAccountAddressModel(it.chain, it.controllerAddress)
+    }
+        .shareInBackground()
+
+    val rewardDestinationFlow = flowOf {
+        mapRewardDestinationParcelModelToRewardDestinationModel(payload.rewardDestination)
+    }
+        .shareInBackground()
+
+    val feeStatusFlow = controllerAssetFlow.map {
         FeeStatus.Loaded(mapFeeToFeeModel(payload.fee, it.token))
     }
-        .inBackground()
-        .asLiveData()
+        .shareInBackground()
 
     fun confirmClicked() {
         sendTransactionIfValid()
@@ -93,19 +89,19 @@ class ConfirmRewardDestinationViewModel(
         router.back()
     }
 
-    fun originAccountClicked() {
-        val originAddress = originAccountModelLiveData.value?.address ?: return
+    fun originAccountClicked() = launch {
+        val originAddress = originAccountModelFlow.first().address
 
         showAddressExternalActions(originAddress)
     }
 
-    fun payoutAccountClicked() {
-        val payoutDestination = rewardDestinationLiveData.value as? RewardDestinationModel.Payout ?: return
+    fun payoutAccountClicked() = launch {
+        val payoutDestination = rewardDestinationFlow.first() as? RewardDestinationModel.Payout ?: return@launch
 
         showAddressExternalActions(payoutDestination.destination.address)
     }
 
-    private fun showAddressExternalActions(address: String) = launch {
+    private suspend fun showAddressExternalActions(address: String) {
         externalActions.showExternalActions(ExternalActions.Type.Address(address), selectedAssetState.chain())
     }
 
@@ -116,35 +112,32 @@ class ConfirmRewardDestinationViewModel(
             is RewardDestinationParcelModel.Restake -> RewardDestinationModel.Restake
             is RewardDestinationParcelModel.Payout -> {
                 val address = rewardDestinationParcelModel.targetAccountAddress
-                val accountDisplay = addressDisplayUseCase(address)
-                val addressModel = addressIconGenerator.createAddressModel(address, AddressIconGenerator.SIZE_SMALL, accountDisplay)
+                val addressModel = addressIconGenerator.createAccountAddressModel(selectedAssetState.chain(), address)
 
                 RewardDestinationModel.Payout(addressModel)
             }
         }
     }
 
-    private fun sendTransactionIfValid() {
-        val rewardDestinationModel = rewardDestinationLiveData.value ?: return
+    private fun sendTransactionIfValid() = launch {
+        val rewardDestinationModel = rewardDestinationFlow.first()
 
-        launch {
-            val controllerAsset = controllerAssetFlow.first()
-            val stashState = stashFlow.first()
+        val controllerAsset = controllerAssetFlow.first()
+        val stashState = stashFlow.first()
 
-            val payload = RewardDestinationValidationPayload(
-                availableControllerBalance = controllerAsset.transferable,
-                fee = payload.fee,
-                stashState = stashState
-            )
+        val payload = RewardDestinationValidationPayload(
+            availableControllerBalance = controllerAsset.transferable,
+            fee = payload.fee,
+            stashState = stashState
+        )
 
-            validationExecutor.requireValid(
-                validationSystem = validationSystem,
-                payload = payload,
-                validationFailureTransformer = { rewardDestinationValidationFailure(resourceManager, it) },
-                progressConsumer = _showNextProgress.progressConsumer()
-            ) {
-                sendTransaction(stashState, mapRewardDestinationModelToRewardDestination(rewardDestinationModel))
-            }
+        validationExecutor.requireValid(
+            validationSystem = validationSystem,
+            payload = payload,
+            validationFailureTransformer = { rewardDestinationValidationFailure(resourceManager, it) },
+            progressConsumer = _showNextProgress.progressConsumer()
+        ) {
+            sendTransaction(stashState, mapRewardDestinationModelToRewardDestination(rewardDestinationModel))
         }
     }
 
@@ -163,9 +156,5 @@ class ConfirmRewardDestinationViewModel(
         } else {
             showError(setupResult.requireException())
         }
-    }
-
-    private suspend fun generateDestinationModel(account: StakingAccount): AddressModel {
-        return addressIconGenerator.createAddressModel(account.address, AddressIconGenerator.SIZE_SMALL, account.name)
     }
 }
