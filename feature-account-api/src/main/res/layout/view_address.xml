@@ -40,6 +40,8 @@
         app:layout_goneMarginBottom="9dp"
         android:includeFontPadding="false"
         android:textColor="@color/white"
+        android:ellipsize="middle"
+        android:singleLine="true"
         app:layout_constraintBottom_toTopOf="@+id/addressSubtitle"
         app:layout_constraintEnd_toStartOf="@id/addressAction"
         app:layout_constraintHorizontal_bias="0.5"
