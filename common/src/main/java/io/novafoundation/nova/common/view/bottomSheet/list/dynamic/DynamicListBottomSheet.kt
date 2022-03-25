@@ -28,7 +28,8 @@ abstract class DynamicListBottomSheet<T>(
     context: Context,
     private val payload: Payload<T>,
     private val diffCallback: DiffUtil.ItemCallback<T>,
-    private val onClicked: ClickHandler<T>
+    private val onClicked: ClickHandler<T>,
+    private val onCancel: (() -> Unit)? = null,
 ) : BottomSheetDialog(context, R.style.BottomSheetDialog), DynamicListSheetAdapter.Handler<T> {
 
     class Payload<T>(val data: List<T>, val selected: T? = null)
@@ -44,6 +45,8 @@ abstract class DynamicListBottomSheet<T>(
         dynamicListSheetContent.adapter = adapter
 
         adapter.submitList(payload.data)
+
+        setOnCancelListener { onCancel?.invoke() }
     }
 
     abstract fun holderCreator(): HolderCreator<T>

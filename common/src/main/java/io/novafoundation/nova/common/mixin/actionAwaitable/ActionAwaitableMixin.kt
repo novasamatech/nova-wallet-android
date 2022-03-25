@@ -2,6 +2,7 @@ package io.novafoundation.nova.common.mixin.actionAwaitable
 
 import androidx.lifecycle.LiveData
 import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
 
 interface ActionAwaitableMixin<P, R> {
 
@@ -23,5 +24,7 @@ interface ActionAwaitableMixin<P, R> {
         fun <P, R> create(): Presentation<P, R>
     }
 }
+
+fun <T> ActionAwaitableMixin.Factory.selectingOneOf() = create<DynamicListBottomSheet.Payload<T>, T>()
 
 suspend fun <R> ActionAwaitableMixin.Presentation<Unit, R>.awaitAction() = awaitAction(Unit)

@@ -18,10 +18,15 @@ import kotlinx.android.synthetic.main.item_account_chooser.view.itemAccountChoos
 class AccountChooserBottomSheetDialog(
     context: Context,
     payload: Payload<AddressModel>,
-    clickHandler: ClickHandler<AddressModel>,
+    onSuccess: ClickHandler<AddressModel>,
+    onCancel: (() -> Unit)? = null,
     @StringRes val title: Int
 ) : DynamicListBottomSheet<AddressModel>(
-    context, payload, AddressModelDiffCallback, clickHandler
+    context = context,
+    payload = payload,
+    diffCallback = AddressModelDiffCallback,
+    onClicked = onSuccess,
+    onCancel = onCancel
 ) {
 
     override fun onCreate(savedInstanceState: Bundle?) {

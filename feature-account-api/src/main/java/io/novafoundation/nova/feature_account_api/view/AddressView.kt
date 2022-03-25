@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.View
+import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.utils.WithContextExtensions
@@ -58,6 +59,10 @@ class AddressView @JvmOverloads constructor(
     fun setActionIcon(icon: Drawable?) {
         addressAction.setImageDrawable(icon)
         addressAction.setVisible(icon != null)
+    }
+
+    fun setActionIcon(@DrawableRes icon: Int?) {
+        setActionIcon(icon?.let(context::getDrawable))
     }
 
     private fun applyAttributes(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.AddressView) { typedArray ->

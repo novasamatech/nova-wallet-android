@@ -16,15 +16,17 @@ import io.novafoundation.nova.common.utils.doOnGlobalLayout
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.getColorFromAttr
 import io.novafoundation.nova.common.utils.getEnum
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getCornersStateDrawable
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawableFromColors
 
-enum class ButtonState(val viewEnabled: Boolean) {
-    NORMAL(true),
-    DISABLED(false),
-    PROGRESS(false)
+enum class ButtonState {
+    NORMAL,
+    DISABLED,
+    PROGRESS,
+    GONE
 }
 
 class PrimaryButton @JvmOverloads constructor(
@@ -95,7 +97,8 @@ class PrimaryButton @JvmOverloads constructor(
     }
 
     fun setState(state: ButtonState) {
-        isEnabled = state.viewEnabled
+        isEnabled = state == ButtonState.NORMAL
+        setVisible(state != ButtonState.GONE)
 
         if (state == ButtonState.PROGRESS) {
             checkPreparedForProgress()
@@ -167,6 +170,9 @@ fun PrimaryButton.setState(descriptiveButtonState: DescriptiveButtonState) {
         }
         DescriptiveButtonState.Loading -> {
             setState(ButtonState.PROGRESS)
+        }
+        DescriptiveButtonState.Gone -> {
+            setState(ButtonState.GONE)
         }
     }
 }

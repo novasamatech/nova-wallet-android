@@ -12,52 +12,41 @@
         android:id="@+id/confirmSetControllerToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:titleText="@string/common_confirm_title" />
+        app:dividerVisible="false"
+        app:titleText="@string/staking_change_controller" />
 
-    <io.novafoundation.nova.common.view.LabeledTextView
-        android:id="@+id/confirmSetControllerStashAccount"
+    <io.novafoundation.nova.feature_wallet_api.presentation.view.extrinsic.GenericExtrinsicInformationView
+        android:id="@+id/confirmSetControllerExtrinsicInformation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        app:actionIcon="@drawable/ic_more"
-        app:label="@string/staking_stash_account" />
+        android:layout_marginEnd="16dp" />
 
-    <io.novafoundation.nova.common.view.LabeledTextView
-        android:id="@+id/confirmSetControllerDestinationAccount"
+    <io.novafoundation.nova.common.view.TableView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        app:actionIcon="@drawable/ic_more"
-        app:label="@string/staking_controller_account" />
-    
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="16dp">
+
+        <io.novafoundation.nova.common.view.TableCellView
+            app:title="@string/staking_controller_account"
+            android:id="@+id/confirmSetControllerController"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </io.novafoundation.nova.common.view.TableView>
+
     <Space
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />
 
-    <LinearLayout
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/confirmSetControllerConfirm"
+        style="@style/Widget.Nova.Button.Primary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/black4"
-        android:orientation="vertical">
-
-        <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
-            android:id="@+id/confirmSetControllerFee"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp" />
-
-        <io.novafoundation.nova.common.view.PrimaryButton
-            android:id="@+id/confirmSetControllerConfirm"
-            style="@style/Widget.Nova.Button.Primary"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:text="@string/common_confirm" />
-    </LinearLayout>
+        android:layout_margin="16dp"
+        android:text="@string/common_confirm" />
 </LinearLayout>

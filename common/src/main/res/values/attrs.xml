@@ -125,4 +125,12 @@
         <attr name="learnMore" format="string" />
         <attr name="action" format="string" />
     </declare-styleable>
+
+    <declare-styleable name="AlertView">
+        <attr name="style" format="enum">
+            <enum name="warning" value="0" />
+        </attr>
+
+        <attr name="android:text" />
+    </declare-styleable>
 </resources>

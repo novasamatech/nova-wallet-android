@@ -67,3 +67,9 @@ suspend fun AddressIconGenerator.createAccountAddressModel(
     accountName = name,
     background = AddressIconGenerator.BACKGROUND_TRANSPARENT
 )
+
+suspend fun AddressIconGenerator.createAccountAddressModel(
+    chain: Chain,
+    address: String,
+    addressDisplayUseCase: AddressDisplayUseCase,
+) = createAccountAddressModel(chain, address, addressDisplayUseCase(chain, address))
