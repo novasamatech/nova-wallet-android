@@ -55,7 +55,7 @@ class PayoutViewHolder(override val containerView: View) : RecyclerView.ViewHold
             itemListElementDescriptionLeft.setTextColorRes(daysLeftColor)
         }
 
-        setOnClickListener { itemHandler.payoutClicked(adapterPosition) }
+        setOnClickListener { itemHandler.payoutClicked(bindingAdapterPosition) }
     }
 }
 

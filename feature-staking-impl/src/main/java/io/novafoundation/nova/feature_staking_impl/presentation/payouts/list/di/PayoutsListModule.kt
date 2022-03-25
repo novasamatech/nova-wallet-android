@@ -25,9 +25,9 @@ class PayoutsListModule {
         router: StakingRouter,
     ): ViewModel {
         return PayoutsListViewModel(
-            router,
-            resourceManager,
-            stakingInteractor,
+            router = router,
+            resourceManager = resourceManager,
+            interactor = stakingInteractor,
         )
     }
 

@@ -1,32 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@drawable/bg_primary_list_item"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_primary_list_item">
 
     <ImageView
         android:id="@+id/itemListDefaultIcon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
         android:layout_marginStart="16dp"
-        app:layout_constraintBottom_toBottomOf="@+id/itemListElementDescriptionLeft"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/bg_icon_round_white"
+        android:padding="6dp"
+        android:src="@drawable/ic_staking_filled"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/itemListElementTitleLeft"
-        android:src="@drawable/ic_staking" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/white_64" />
 
     <TextView
         android:id="@+id/itemListElementTitleLeft"
-        style="@style/TextAppearance.NovaFoundation.Body1"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="9dp"
         android:layout_marginEnd="16dp"
         android:ellipsize="middle"
         android:singleLine="true"
+        android:textColor="@color/white"
         app:layout_constraintEnd_toStartOf="@+id/itemListElementTitleRight"
         app:layout_constraintStart_toEndOf="@+id/itemListDefaultIcon"
         app:layout_constraintTop_toTopOf="parent"
@@ -34,11 +39,11 @@
 
     <TextView
         android:id="@+id/itemListElementDescriptionLeft"
-        style="@style/TextAppearance.NovaFoundation.Body2"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:textColor="@color/colorGreyText"
+        android:layout_marginBottom="9dp"
+        android:textColor="@color/white_64"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@+id/itemListElementTitleLeft"
         app:layout_constraintTop_toBottomOf="@+id/itemListElementTitleLeft"
@@ -46,27 +51,28 @@
 
     <TextView
         android:id="@+id/itemListElementTitleRight"
-        style="@style/TextAppearance.NovaFoundation.Body1"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="9dp"
         android:layout_marginEnd="16dp"
         android:ellipsize="middle"
-        android:layout_marginTop="8dp"
         android:singleLine="true"
+        android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_goneMarginEnd="12dp"
         tools:text="+0.012 KSM" />
 
     <TextView
-        style="@style/TextAppearance.NovaFoundation.Body2"
+        android:id="@+id/itemListElementDescriptionRight"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:id="@+id/itemListElementDescriptionRight"
+        android:layout_marginBottom="9dp"
         android:ellipsize="middle"
         android:singleLine="true"
-        android:textColor="@color/black1"
+        android:textColor="@color/white_64"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/itemListElementTitleRight"
         app:layout_constraintTop_toBottomOf="@+id/itemListElementTitleRight"

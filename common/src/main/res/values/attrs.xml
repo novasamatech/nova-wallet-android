@@ -117,4 +117,12 @@
         <attr name="subtitle" />
         <attr name="dividerVisible" />
     </declare-styleable>
+    
+    <declare-styleable name="AdvertisementCard">
+        <attr name="title" />
+        <attr name="subtitle" />
+        <attr name="image" />
+        <attr name="learnMore" format="string" />
+        <attr name="action" format="string" />
+    </declare-styleable>
 </resources>
