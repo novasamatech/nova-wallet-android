@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="staking_pending_rewards_title">Rewards are paid every 2–3 days by validators</string>
+  <string name="staking_pending_rewards_subtitle">You can payout them by yourself, when they are close to expire, but you will pay the fee</string>
+  <!--  <string name="staking_pending_rewards_info_v2_2_0">Rewards are paid every 2–3 days by validators. You can payout them by yourself, when they are close to expire, but you will pay the fee</string>-->
+
+  <string name="common_how_it_works">How it works</string>
   <string name="staking_payout">Payout</string>
   <string name="staking_reward_destination_payout">Transferable rewards</string>
 <!--  <string name="staking_payout_v2_2_0">Transferable rewards</string>-->

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:paddingBottom="16dp"
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+
+    <ImageView
+        android:id="@+id/advertisementCardImage"
+        android:layout_width="60dp"
+        android:layout_height="100dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/advertisementCardTitle" />
+
+    <TextView
+        android:id="@+id/advertisementCardTitle"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toStartOf="@id/advertisementCardImage"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Rewards are paid every 2-3 days by validators" />
+
+    <TextView
+        android:id="@+id/advertisementCardSubTitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:paddingBottom="4dp"
+        android:textColor="@color/white_64"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toStartOf="@id/advertisementCardImage"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toStartOf="@+id/advertisementCardTitle"
+        app:layout_constraintTop_toBottomOf="@+id/advertisementCardTitle"
+        tools:text="You can payout them by yourself, when they are close to expire, but you will pay the fee" />
+
+    <TextView
+        android:id="@+id/advertisementCardLearnMoreContent"
+        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawablePadding="5dp"
+        android:includeFontPadding="false"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:textColor="?attr/colorAccent"
+        app:drawableStartCompat="@drawable/ic_info_16"
+        app:drawableTint="?attr/colorAccent"
+        app:layout_constraintStart_toStartOf="@+id/advertisementCardSubTitle"
+        app:layout_constraintTop_toBottomOf="@+id/advertisementCardSubTitle"
+        tools:text="@string/common_how_it_works" />
+
+    <ImageView
+        android:id="@+id/advertisementCardLearnMoreArrow"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:src="@drawable/ic_chevron_right"
+        app:layout_constraintBottom_toBottomOf="@+id/advertisementCardLearnMoreContent"
+        app:layout_constraintStart_toEndOf="@+id/advertisementCardLearnMoreContent"
+        app:layout_constraintTop_toTopOf="@+id/advertisementCardLearnMoreContent"
+        app:tint="?attr/colorAccent" />
+
+    <androidx.constraintlayout.widget.Group
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/advertisementCardLearnMoreGroup"
+        android:visibility="gone"
+        app:constraint_referenced_ids="advertisementCardLearnMoreArrow,advertisementCardLearnMoreContent"
+        tools:visibility="visible" />
+
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:layout_width="0dp"
+        android:id="@+id/advertisementCardButton"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        app:appearance="primaryTransparent"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/advertisementCardLearnMoreContent"
+        app:layout_goneMarginTop="16dp"
+        tools:text="@string/common_continue"
+        tools:visibility="visible" />
+</merge>

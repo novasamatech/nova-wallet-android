@@ -16,13 +16,12 @@ import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.list.model.PendingPayoutsStatisticsModel
-import kotlinx.android.synthetic.main.fragment_payouts_list.payoutListContentGroup
+import kotlinx.android.synthetic.main.fragment_payouts_list.payoutListPlaceholder
 import kotlinx.android.synthetic.main.fragment_payouts_list.payoutsList
 import kotlinx.android.synthetic.main.fragment_payouts_list.payoutsListAll
 import kotlinx.android.synthetic.main.fragment_payouts_list.payoutsListContainer
 import kotlinx.android.synthetic.main.fragment_payouts_list.payoutsListProgress
 import kotlinx.android.synthetic.main.fragment_payouts_list.payoutsListToolbar
-import kotlinx.android.synthetic.main.fragment_payouts_list.payoutsPlaceholderGroup
 
 class PayoutsListFragment : BaseFragment<PayoutsListViewModel>(), PayoutAdapter.ItemHandler {
 
@@ -71,8 +70,8 @@ class PayoutsListFragment : BaseFragment<PayoutsListViewModel>(), PayoutAdapter.
             if (it is LoadingState.Loaded<PendingPayoutsStatisticsModel>) {
                 val placeholderVisible = it.data.placeholderVisible
 
-                payoutListContentGroup.setVisible(placeholderVisible.not())
-                payoutsPlaceholderGroup.setVisible(placeholderVisible)
+                setContentVisible(!placeholderVisible)
+                payoutListPlaceholder.setVisible(placeholderVisible)
                 payoutsListProgress.makeGone()
 
                 adapter.submitList(it.data.payouts)
@@ -86,5 +85,10 @@ class PayoutsListFragment : BaseFragment<PayoutsListViewModel>(), PayoutAdapter.
 
     override fun payoutClicked(index: Int) {
         viewModel.payoutClicked(index)
+    }
+
+    private fun setContentVisible(visible: Boolean) {
+        payoutsList.setVisible(visible)
+        payoutsListAll.setVisible(visible)
     }
 }
