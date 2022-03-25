@@ -7,4 +7,6 @@ sealed class DescriptiveButtonState {
     class Disabled(val reason: String) : DescriptiveButtonState()
 
     object Loading : DescriptiveButtonState()
+
+    object Gone : DescriptiveButtonState()
 }

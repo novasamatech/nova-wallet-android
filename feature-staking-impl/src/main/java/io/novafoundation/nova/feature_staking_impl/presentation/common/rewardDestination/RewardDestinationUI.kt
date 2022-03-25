@@ -34,10 +34,11 @@ fun <V> BaseFragment<V>.observeRewardDestinationChooser(
 
     viewModel.showDestinationChooserEvent.observeEvent {
         AccountChooserBottomSheetDialog(
-            requireContext(),
-            it,
-            viewModel::payoutDestinationChanged,
-            R.string.staking_select_payout_account
+            context = requireContext(),
+            payload = it,
+            onSuccess = viewModel::payoutDestinationChanged,
+            onCancel = null,
+            title = R.string.staking_select_payout_account
         ).show()
     }
 

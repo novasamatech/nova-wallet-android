@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="staking_change_controller">Change controller</string>
+  <string name="staking_controller">Controller</string>
+  <string name="staking_stash">Stash</string>
+<!--  <string name="staking_stash_account">Stash account</string>-->
+
+  <string name="common_find_out_more">Find out more</string>
+  <string name="staking_set_controller_title">Improve staking security</string>
+  <string name="staking_set_controller_subtitle">Select another account as a controller to delegate staking management operations to it</string>
+<!--  <string name="staking_set_separate_account_controller">Set a separate account as a controller to increase staking management security.</string>-->
+<!--  <string name="staking_set_separate_account_controller_v2_2_0">Select another account as a controller to improve staking security by delegating staking management operations to it</string>-->
+
   <string name="staking_pending_rewards_title">Rewards are paid every 2–3 days by validators</string>
   <string name="staking_pending_rewards_subtitle">You can payout them by yourself, when they are close to expire, but you will pay the fee</string>
   <!--  <string name="staking_pending_rewards_info_v2_2_0">Rewards are paid every 2–3 days by validators. You can payout them by yourself, when they are close to expire, but you will pay the fee</string>-->
@@ -493,8 +504,6 @@
   <string name="staking_select_recommended">Select recommended</string>
   <string name="staking_selected_validators_count_v1.9.1" formatted="false">selected %d (max %d)</string>
   <string name="staking_selected_validators_mask">Validators (%d)</string>
-  <string name="staking_set_separate_account_controller">Set a separate account as a controller to increase staking management security.</string>
-  <string name="staking_set_separate_account_controller_v2_2_0">Select another account as a controller to improve staking security by delegating staking management operations to it</string>
   <string name="staking_set_validators_message">Validators are not selected</string>
   <string name="staking_set_validators_title">Select validators to start staking</string>
   <string name="staking_setup_amount_too_low">Can\'t stake less than minimal value (%s)</string>
@@ -513,7 +522,6 @@
   <string name="staking_start_change_validators_recommended_subtitle_v2_2_0">Nova Wallet created a list of recommended validators based on blockchain data and with the following criteria:</string>
   <string name="staking_start_change_validators_recommended_title">Stake with recommended validators</string>
   <string name="staking_start_title">Start staking</string>
-  <string name="staking_stash_account">Stash account</string>
   <string name="staking_stash_can_hint">Stash can bond more and set the controller.</string>
   <string name="staking_stash_can_hint_v2_2_0">Stash is used to: stake more and set the controller</string>
   <string name="staking_stash_missing_message">Stash account %s is unavailable to update staking setup.</string>

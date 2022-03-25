@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
@@ -36,18 +37,20 @@ class ConfirmSetControllerModule {
         validationExecutor: ValidationExecutor,
         validationSystem: SetControllerValidationSystem,
         singleAssetSharedState: StakingSharedState,
+        walletUiUseCase: WalletUiUseCase
     ): ViewModel {
         return ConfirmSetControllerViewModel(
-            router,
-            controllerInteractor,
-            addressIconGenerator,
-            payload,
-            interactor,
-            resourceManager,
-            externalActions,
-            validationExecutor,
-            validationSystem,
-            singleAssetSharedState
+            router = router,
+            controllerInteractor = controllerInteractor,
+            addressIconGenerator = addressIconGenerator,
+            payload = payload,
+            interactor = interactor,
+            resourceManager = resourceManager,
+            externalActions = externalActions,
+            validationExecutor = validationExecutor,
+            validationSystem = validationSystem,
+            selectedAssetState = singleAssetSharedState,
+            walletUiUseCase = walletUiUseCase
         )
     }
 

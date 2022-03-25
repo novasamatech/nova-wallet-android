@@ -4,9 +4,11 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.View
+import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.utils.WithContextExtensions
+import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.useAttributes
@@ -38,6 +40,8 @@ class AddressView @JvmOverloads constructor(
             addressSubtitle.makeVisible()
         } else {
             addressTitle.text = addressModel.address
+
+            addressSubtitle.makeGone()
         }
 
         addressPrimaryIcon.setImageDrawable(addressModel.image)
@@ -58,6 +62,10 @@ class AddressView @JvmOverloads constructor(
     fun setActionIcon(icon: Drawable?) {
         addressAction.setImageDrawable(icon)
         addressAction.setVisible(icon != null)
+    }
+
+    fun setActionIcon(@DrawableRes icon: Int?) {
+        setActionIcon(icon?.let(context::getDrawable))
     }
 
     private fun applyAttributes(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.AddressView) { typedArray ->

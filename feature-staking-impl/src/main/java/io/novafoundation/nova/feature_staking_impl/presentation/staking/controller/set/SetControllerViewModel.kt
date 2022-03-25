@@ -1,23 +1,24 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.controller.set
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AddressModel
-import io.novafoundation.nova.common.address.createAddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.data.network.AppLinksProvider
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.mixin.actionAwaitable.selectingOneOf
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
-import io.novafoundation.nova.common.utils.combine
-import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.mediatorLiveData
+import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.utils.updateFrom
 import io.novafoundation.nova.common.validation.ValidationExecutor
-import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet.Payload
+import io.novafoundation.nova.common.validation.progressConsumer
+import io.novafoundation.nova.common.view.ButtonState
+import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingAccount
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingState
@@ -31,6 +32,9 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoade
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.requireFee
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -49,6 +53,7 @@ class SetControllerViewModel(
     private val validationExecutor: ValidationExecutor,
     private val validationSystem: SetControllerValidationSystem,
     private val selectedAssetState: SingleAssetSharedState,
+    private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
 ) : BaseViewModel(),
     FeeLoaderMixin by feeLoaderMixin,
     ExternalActions by externalActions,
@@ -56,66 +61,75 @@ class SetControllerViewModel(
 
     private val accountStakingFlow = stakingInteractor.selectedAccountStakingStateFlow()
         .filterIsInstance<StakingState.Stash>()
-        .inBackground()
-        .share()
+        .shareInBackground()
 
-    val showNotStashAccountWarning = accountStakingFlow.map { stakingState ->
-        stakingState.accountAddress != stakingState.stashAddress
-    }.asLiveData()
+    val ableToChangeController = accountStakingFlow.map { stakingState ->
+        stakingState.accountAddress == stakingState.stashAddress
+    }
+        .share()
 
     val stashAccountModel = accountStakingFlow.map {
-        generateIcon(it.stashAddress)
-    }.asLiveData()
+        createAccountAddressModel(it.stashAddress)
+    }.shareInBackground()
 
     private val assetFlow = stakingInteractor.currentAssetFlow()
-        .inBackground()
-        .share()
+        .shareInBackground()
 
-    private val _controllerAccountModel = MutableLiveData<AddressModel>()
-    val controllerAccountModel: LiveData<AddressModel> = _controllerAccountModel
+    private val _controllerAccountModel = singleReplaySharedFlow<AddressModel>()
+    val controllerAccountModel: Flow<AddressModel> = _controllerAccountModel
 
     override val openBrowserEvent = mediatorLiveData<Event<String>> {
         updateFrom(externalActions.openBrowserEvent)
     }
 
-    private val _showControllerChooserEvent = MutableLiveData<Event<Payload<AddressModel>>>()
-    val showControllerChooserEvent: LiveData<Event<Payload<AddressModel>>> = _showControllerChooserEvent
+    val chooseControllerAction = actionAwaitableMixinFactory.selectingOneOf<AddressModel>()
 
-    val isContinueButtonAvailable = combine(
+    private val validationInProgress = MutableStateFlow(false)
+
+    val continueButtonState = combine(
         controllerAccountModel,
-        accountStakingFlow.asLiveData(),
-        showNotStashAccountWarning
-    ) { (selectedController: AddressModel, stakingState: StakingState.Stash, warningShown: Boolean) ->
-        selectedController.address != stakingState.controllerAddress && // The user selected account that was not the controller already
-            warningShown.not() // The account is stash, so we don't have warning
-    }
-
-    fun onMoreClicked() {
-        openBrowserEvent.value = Event(appLinksProvider.setControllerLearnMore)
-    }
-
-    fun openExternalActions() {
-        viewModelScope.launch {
-            externalActions.showExternalActions(ExternalActions.Type.Address(stashAddress()), selectedAssetState.chain())
-        }
-    }
-
-    fun openAccounts() {
-        viewModelScope.launch {
-            val accountsInNetwork = accountsInCurrentNetwork()
-
-            _showControllerChooserEvent.value = Event(Payload(accountsInNetwork))
+        accountStakingFlow,
+        ableToChangeController,
+        validationInProgress
+    ) { selectedController, stakingState, ableToChangeController, validationInProgress ->
+        when {
+            validationInProgress -> ButtonState.PROGRESS
+            // The user selected account that was not the controller already and we able to change it
+            selectedController.address != stakingState.controllerAddress && ableToChangeController -> ButtonState.NORMAL
+            else -> ButtonState.GONE
         }
     }
 
     init {
         loadFee()
 
+        setInitialController()
+    }
+
+    fun onMoreClicked() {
+        openBrowserEvent.value = Event(appLinksProvider.setControllerLearnMore)
+    }
+
+    fun stashClicked() {
         viewModelScope.launch {
-            _controllerAccountModel.value = accountStakingFlow.map {
-                generateIcon(it.controllerAddress)
-            }.first()
+            externalActions.showExternalActions(ExternalActions.Type.Address(stashAddress()), selectedAssetState.chain())
         }
+    }
+
+    fun controllerClicked() = launch {
+        val accountsInNetwork = accountsInCurrentNetwork()
+        val currentController = controllerAccountModel.first()
+        val payload = DynamicListBottomSheet.Payload(accountsInNetwork, currentController)
+
+        val newController = chooseControllerAction.awaitAction(payload)
+
+        _controllerAccountModel.emit(newController)
+    }
+
+    private fun setInitialController() = launch {
+        val initialController = createAccountAddressModel(controllerAddress())
+
+        _controllerAccountModel.emit(initialController)
     }
 
     private fun loadFee() {
@@ -126,10 +140,6 @@ class SetControllerViewModel(
         )
     }
 
-    fun payoutControllerChanged(newController: AddressModel) {
-        _controllerAccountModel.value = newController
-    }
-
     fun backClicked() {
         router.back()
     }
@@ -138,32 +148,18 @@ class SetControllerViewModel(
         maybeGoToConfirm()
     }
 
+    private suspend fun accountsInCurrentNetwork(): List<AddressModel> {
+        return stakingInteractor.getAccountProjectionsInSelectedChains()
+            .map { addressModelForStakingAccount(it) }
+    }
+
     private suspend fun stashAddress() = accountStakingFlow.first().stashAddress
 
     private suspend fun controllerAddress() = accountStakingFlow.first().controllerAddress
 
-    private suspend fun accountsInCurrentNetwork(): List<AddressModel> {
-        return stakingInteractor.getAccountProjectionsInSelectedChains()
-            .map { generateDestinationModel(it) }
-    }
-
-    private suspend fun generateDestinationModel(account: StakingAccount): AddressModel {
-        return addressIconGenerator.createAddressModel(account.address, AddressIconGenerator.SIZE_SMALL, account.name)
-    }
-
-    private suspend fun generateIcon(address: String): AddressModel {
-        val name = addressDisplayUseCase(address)
-        return addressIconGenerator
-            .createAddressModel(
-                address,
-                AddressIconGenerator.SIZE_SMALL,
-                name
-            )
-    }
-
     private fun maybeGoToConfirm() = feeLoaderMixin.requireFee(this) { fee ->
         launch {
-            val controllerAddress = controllerAccountModel.value?.address ?: return@launch
+            val controllerAddress = controllerAccountModel.first().address
 
             val payload = SetControllerValidationPayload(
                 stashAddress = stashAddress(),
@@ -175,8 +171,11 @@ class SetControllerViewModel(
             validationExecutor.requireValid(
                 validationSystem = validationSystem,
                 payload = payload,
+                progressConsumer = validationInProgress.progressConsumer(),
                 validationFailureTransformer = { bondSetControllerValidationFailure(it, resourceManager) }
             ) {
+                validationInProgress.value = false
+
                 openConfirm(
                     ConfirmSetControllerPayload(
                         fee = fee,
@@ -187,6 +186,22 @@ class SetControllerViewModel(
                 )
             }
         }
+    }
+
+    private suspend fun addressModelForStakingAccount(account: StakingAccount): AddressModel {
+        return addressIconGenerator.createAccountAddressModel(
+            chain = selectedAssetState.chain(),
+            address = account.address,
+            name = account.name
+        )
+    }
+
+    private suspend fun createAccountAddressModel(address: String): AddressModel {
+        return addressIconGenerator.createAccountAddressModel(
+            chain = selectedAssetState.chain(),
+            address = address,
+            addressDisplayUseCase = addressDisplayUseCase
+        )
     }
 
     private fun openConfirm(payload: ConfirmSetControllerPayload) {
