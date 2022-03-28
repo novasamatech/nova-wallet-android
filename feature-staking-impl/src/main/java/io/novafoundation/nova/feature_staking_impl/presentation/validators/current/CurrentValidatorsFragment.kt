@@ -20,7 +20,6 @@ import kotlinx.android.synthetic.main.fragment_current_validators.currentValidat
 import kotlinx.android.synthetic.main.fragment_current_validators.currentValidatorsOversubscribedMessage
 import kotlinx.android.synthetic.main.fragment_current_validators.currentValidatorsProgress
 import kotlinx.android.synthetic.main.fragment_current_validators.currentValidatorsToolbar
-import kotlinx.android.synthetic.main.fragment_current_validators.payoutDivider
 
 class CurrentValidatorsFragment : BaseFragment<CurrentValidatorsViewModel>(), CurrentValidatorsAdapter.Handler {
 
@@ -80,7 +79,6 @@ class CurrentValidatorsFragment : BaseFragment<CurrentValidatorsViewModel>(), Cu
 
         viewModel.shouldShowOversubscribedNoRewardWarning.observe {
             currentValidatorsOversubscribedMessage.setVisible(it)
-            payoutDivider.setVisible(it)
         }
     }
 

@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.validators.current
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
-import io.novafoundation.nova.common.address.createAddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.list.toValueList
@@ -9,6 +8,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.toHexAccountId
 import io.novafoundation.nova.common.utils.withLoading
+import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_staking_api.domain.model.NominatedValidator
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
@@ -18,13 +18,13 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess.ReadyToSubmit.SelectionMethod
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
+import io.novafoundation.nova.feature_staking_impl.presentation.mappers.formatValidatorApy
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValidatorToValidatorDetailsWithStakeFlagParcelModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.current.model.NominatedValidatorModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.current.model.NominatedValidatorStatusModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.current.model.NominatedValidatorStatusModel.TitleConfig
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
-import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
+import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
@@ -90,57 +90,63 @@ class CurrentValidatorsViewModel(
     ): NominatedValidatorModel {
         val validator = nominatedValidator.validator
 
-        val nominationFormatted = (nominatedValidator.status as? NominatedValidator.Status.Active)?.let { activeStatus ->
-            val amountFormatted = token.configuration.amountFromPlanks(activeStatus.nomination).formatTokenAmount(token.configuration)
-
-            resourceManager.getString(R.string.staking_your_nominated_format, amountFormatted)
+        val nominationAmount = (nominatedValidator.status as? NominatedValidator.Status.Active)?.let { activeStatus ->
+            mapAmountToAmountModel(activeStatus.nomination, token)
         }
 
         val validatorAddress = chain.addressOf(validator.accountIdHex.fromHex())
 
         return NominatedValidatorModel(
-            addressModel = iconGenerator.createAddressModel(validatorAddress, AddressIconGenerator.SIZE_MEDIUM, validator.identity?.display),
-            nominated = nominationFormatted,
+            addressModel = iconGenerator.createAccountAddressModel(
+                chain = chain,
+                address = validatorAddress,
+                name = validator.identity?.display
+            ),
+            nominated = nominationAmount,
             isOversubscribed = validator.electedInfo?.isOversubscribed ?: false,
-            isSlashed = validator.slashed
+            isSlashed = validator.slashed,
+            apy = formatValidatorApy(validator)
         )
     }
 
     private fun mapNominatedValidatorStatusToUiModel(statusGroup: NominatedValidator.Status.Group) = when (statusGroup) {
-
         is NominatedValidator.Status.Group.Active -> NominatedValidatorStatusModel(
             TitleConfig(
-                resourceManager.getString(
-                    R.string.staking_your_elected_format, statusGroup.numberOfValidators
-                ),
-                R.color.green
+                text = resourceManager.getString(R.string.staking_your_elected_format, statusGroup.numberOfValidators),
+                iconRes = R.drawable.ic_checkmark_circle_16,
+                iconTintRes = R.color.green,
+                textColorRes = R.color.white,
             ),
-            resourceManager.getString(R.string.staking_your_allocated_description_v2_2_0)
+            description = resourceManager.getString(R.string.staking_your_allocated_description_v2_2_0)
         )
 
         is NominatedValidator.Status.Group.Inactive -> NominatedValidatorStatusModel(
             TitleConfig(
-                resourceManager.getString(R.string.staking_your_not_elected_format, statusGroup.numberOfValidators),
-                R.color.black1
+                text = resourceManager.getString(R.string.staking_your_not_elected_format, statusGroup.numberOfValidators),
+                iconRes = R.drawable.ic_time_16,
+                iconTintRes = R.color.white_64,
+                textColorRes = R.color.white_64,
             ),
-            resourceManager.getString(R.string.staking_your_inactive_description_v2_2_0)
+            description = resourceManager.getString(R.string.staking_your_inactive_description_v2_2_0)
         )
 
         is NominatedValidator.Status.Group.Elected -> NominatedValidatorStatusModel(
             null,
-            resourceManager.getString(R.string.staking_your_not_allocated_description_v2_2_0)
+            description = resourceManager.getString(R.string.staking_your_not_allocated_description_v2_2_0)
         )
 
         is NominatedValidator.Status.Group.WaitingForNextEra -> NominatedValidatorStatusModel(
             TitleConfig(
-                resourceManager.getString(
+                text = resourceManager.getString(
                     R.string.staking_custom_header_validators_title,
                     statusGroup.numberOfValidators,
                     statusGroup.maxValidatorsPerNominator
                 ),
-                R.color.black1
+                iconRes = R.drawable.ic_time_16,
+                iconTintRes = R.color.white_64,
+                textColorRes = R.color.white_64,
             ),
-            resourceManager.getString(R.string.staking_your_validators_changing_title)
+            description = resourceManager.getString(R.string.staking_your_validators_changing_title)
         )
     }
 
