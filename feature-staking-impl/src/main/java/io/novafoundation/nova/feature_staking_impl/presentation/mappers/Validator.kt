@@ -66,13 +66,7 @@ suspend fun mapValidatorToValidatorModel(
 
     return with(validator) {
         val scoring = when (sorting) {
-            APYSorting -> {
-                electedInfo?.apy?.let {
-                    val apyPercentage = it.fractionToPercentage().formatAsPercentage()
-
-                    ValidatorModel.Scoring.OneField(apyPercentage)
-                }
-            }
+            APYSorting -> formatValidatorApy(validator)?.let(ValidatorModel.Scoring::OneField)
 
             TotalStakeSorting -> stakeToScoring(electedInfo?.totalStake, token)
 
@@ -221,3 +215,5 @@ suspend fun mapValidatorDetailsParcelToValidatorDetailsModel(
         )
     }
 }
+
+fun formatValidatorApy(validator: Validator) = validator.electedInfo?.apy?.fractionToPercentage()?.formatAsPercentage()
