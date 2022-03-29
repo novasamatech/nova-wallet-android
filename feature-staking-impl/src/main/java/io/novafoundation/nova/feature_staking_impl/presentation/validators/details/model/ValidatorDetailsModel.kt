@@ -1,10 +1,9 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.validators.details.model
 
-import android.graphics.drawable.Drawable
+import io.novafoundation.nova.common.address.AddressModel
 
 class ValidatorDetailsModel(
     val stake: ValidatorStakeModel,
-    val address: String,
-    val addressImage: Drawable,
+    val addressModel: AddressModel,
     val identity: IdentityModel?,
 )

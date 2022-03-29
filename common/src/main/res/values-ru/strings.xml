@@ -530,7 +530,7 @@
   <string name="tabbar_staking_title">Стейкинг</string>
   <string name="tabbar_wallet_title">Кошелёк</string>
   <string name="today">Сегодня</string>
-  <string name="transaction_detail_status">Статус</string>
+  <string name="common_status">Статус</string>
   <string name="transaction_details_copy_hash">Копировать хеш</string>
   <string name="transaction_details_extrinsic_fee">Комиссия</string>
   <string name="transaction_details_from">От</string>

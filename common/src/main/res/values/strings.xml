@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="staking_nominations_rewarded_format" formatted="false">%s rewarded</string>
+
+  <string name="common_status">Status</string>
+<!--  <string name="transaction_detail_status">Status</string>-->
+
   <string name="staking_nominated">Nominated:</string>
   <!--  <string name="staking_your_nominated_format">Nominated:</string>-->
 
@@ -583,7 +588,6 @@
   <string name="tabbar_staking_title">Staking</string>
   <string name="tabbar_wallet_title">Wallet</string>
   <string name="today">Today</string>
-  <string name="transaction_detail_status">Status</string>
   <string name="transaction_details_copy_hash">Copy hash</string>
   <string name="transaction_details_extrinsic_fee">Fee</string>
   <string name="transaction_details_from">From</string>
