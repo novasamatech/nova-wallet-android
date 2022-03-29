@@ -19,24 +19,48 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:src="@color/colorAccent" />
 
-    <TextView
-        android:id="@+id/itemCurrentValidatorName"
-        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+    <LinearLayout
+        android:id="@+id/itemCurrentValidatorTitleContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
-        android:layout_marginEnd="48dp"
-        android:ellipsize="end"
-        android:singleLine="true"
-        android:textColor="@color/white"
+        android:layout_marginEnd="24dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
         app:layout_constrainedWidth="true"
-        app:layout_constraintBottom_toTopOf="@+id/itemCurrentValidatorNominatedLabel"
-        app:layout_constraintEnd_toStartOf="@+id/itemCurrentValidatorInfo"
         app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintBottom_toTopOf="@+id/itemCurrentValidatorNominatedLabel"
+        app:layout_constraintEnd_toStartOf="@+id/itemCurrentValidatorApy"
         app:layout_constraintStart_toEndOf="@+id/itemCurrentValidatorIcon"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed"
-        tools:text="✨👍✨ Day7 ✨👍✨" />
+        app:layout_constraintVertical_chainStyle="packed">
+
+        <TextView
+            android:id="@+id/itemCurrentValidatorName"
+            style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="middle"
+            android:singleLine="true"
+            android:textColor="@color/white"
+            tools:text="✨👍✨ Day7 ✨👍" />
+
+        <ImageView
+            android:id="@+id/itemCurrentValidatorOversubscribed"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="4dp"
+            app:srcCompat="@drawable/ic_warning_filled" />
+
+
+        <ImageView
+            android:id="@+id/currentValidatorSlashedIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            app:srcCompat="@drawable/ic_slash" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/itemCurrentValidatorNominatedLabel"
@@ -47,8 +71,8 @@
         android:textColor="@color/white_64"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="@+id/itemCurrentValidatorName"
-        app:layout_constraintTop_toBottomOf="@+id/itemCurrentValidatorName" />
+        app:layout_constraintStart_toStartOf="@+id/itemCurrentValidatorTitleContainer"
+        app:layout_constraintTop_toBottomOf="@+id/itemCurrentValidatorTitleContainer" />
 
     <TextView
         android:id="@+id/itemCurrentValidatorNominatedAmount"
@@ -73,30 +97,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:constraint_referenced_ids="itemCurrentValidatorNominatedLabel, itemCurrentValidatorNominatedAmount" />
-
-    <ImageView
-        android:id="@+id/itemCurrentValidatorOversubscribed"
-        android:layout_width="16dp"
-        android:layout_height="16dp"
-        android:layout_marginStart="4dp"
-        app:layout_constraintBottom_toBottomOf="@+id/itemCurrentValidatorName"
-        app:layout_constraintStart_toEndOf="@+id/itemCurrentValidatorName"
-        app:layout_constraintTop_toTopOf="@+id/itemCurrentValidatorName"
-        app:srcCompat="@drawable/ic_warning_filled" />
-
-
-    <ImageView
-        android:id="@+id/currentValidatorSlashedIcon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:layout_marginEnd="24dp"
-        app:layout_constraintBottom_toBottomOf="@+id/itemCurrentValidatorName"
-        app:layout_constraintEnd_toStartOf="@+id/itemCurrentValidatorInfo"
-        app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintStart_toEndOf="@+id/itemCurrentValidatorOversubscribed"
-        app:layout_constraintTop_toTopOf="@+id/itemCurrentValidatorName"
-        app:srcCompat="@drawable/ic_slash" />
 
     <TextView
         android:id="@+id/itemCurrentValidatorApy"
