@@ -68,7 +68,16 @@
         <attr name="dividerVisible" />
         <attr name="dividerColor" format="color" />
         <attr name="primaryValueIcon" format="reference|color" />
+        <attr name="primaryValueStyle" format="enum">
+            <enum name="text" value="0" />
+            <enum name="link" value="1" />
+        </attr>
+        <attr name="titleIcon" format="reference|color" />
         <attr name="primaryValueIconTint" format="color" />
+    </declare-styleable>
+
+    <declare-styleable name="TableView">
+        <attr name="title" />
     </declare-styleable>
 
     <declare-styleable name="GoNextView">
@@ -129,6 +138,7 @@
     <declare-styleable name="AlertView">
         <attr name="style" format="enum">
             <enum name="warning" value="0" />
+            <enum name="error" value="1" />
         </attr>
 
         <attr name="android:text" />

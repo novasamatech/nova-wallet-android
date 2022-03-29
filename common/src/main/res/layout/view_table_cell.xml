@@ -53,7 +53,7 @@
         app:layout_constraintStart_toEndOf="@id/tableCellTitle"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
-        tools:text="@tools:sample/lorem[20]"
+        tools:text="Value primary"
         tools:textColor="@color/white" />
 
     <TextView

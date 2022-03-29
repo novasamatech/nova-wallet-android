@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.utils.format
 import io.novafoundation.nova.common.utils.formatAsCurrency
 import io.novafoundation.nova.common.utils.formatAsPercentage
 import io.novafoundation.nova.common.utils.fractionToPercentage
+import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_staking_api.domain.model.NominatedValidator
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_impl.R
@@ -16,10 +17,10 @@ import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settin
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.sortings.TotalStakeSorting
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.sortings.ValidatorOwnStakeSorting
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorModel
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.model.ValidatorAlert
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.model.ValidatorDetailsModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.model.ValidatorStakeModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.model.ValidatorStakeModel.ActiveStakeModel
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.view.Error
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.ValidatorDetailsParcelModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.ValidatorStakeParcelModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.ValidatorStakeParcelModel.Active.NominatorInfo
@@ -27,15 +28,13 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
+import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import java.math.BigInteger
 
-private val PERCENT_MULTIPLIER = 100.toBigDecimal()
-
 private const val ICON_SIZE_DP = 24
-private const val ICON_DETAILS_SIZE_DP = 32
 
 suspend fun mapValidatorToValidatorModel(
     chain: Chain,
@@ -128,34 +127,36 @@ private fun mapValidatorToValidatorDetailsParcelModel(
                 ownStake = it.ownStake,
                 nominators = nominators,
                 apy = it.apy,
-                isSlashed = slashed,
                 isOversubscribed = it.isOversubscribed,
                 nominatorInfo = nominatorInfo
             )
         } ?: ValidatorStakeParcelModel.Inactive
 
-        ValidatorDetailsParcelModel(accountIdHex, stakeModel, identityModel)
+        ValidatorDetailsParcelModel(
+            accountIdHex = accountIdHex,
+            isSlashed = validator.slashed,
+            stake = stakeModel,
+            identity = identityModel
+        )
     }
 }
 
-// FIXME Wrong logic for isOversubscribed & isSlashed - should not require elected state/nominator info
+@OptIn(ExperimentalStdlibApi::class)
 fun mapValidatorDetailsToErrors(
     validator: ValidatorDetailsParcelModel,
-): List<Error>? {
-    return when (val stake = validator.stake) {
-        ValidatorStakeParcelModel.Inactive -> null
-        is ValidatorStakeParcelModel.Active -> {
-            val nominatorInfo = stake.nominatorInfo ?: return null
+): List<ValidatorAlert> {
+    return buildList {
+        if (validator.isSlashed) {
+            add(ValidatorAlert.Slashed)
+        }
 
-            return mutableListOf<Error>().apply {
-                if (stake.isOversubscribed) {
-                    if (nominatorInfo.willBeRewarded) {
-                        add(Error.OversubscribedPaid)
-                    } else {
-                        add(Error.OversubscribedUnpaid)
-                    }
-                }
-                if (stake.isSlashed) add(Error.Slashed)
+        if (validator.stake is ValidatorStakeParcelModel.Active && validator.stake.isOversubscribed) {
+            val nominatorInfo = validator.stake.nominatorInfo
+
+            if (nominatorInfo == null || nominatorInfo.willBeRewarded) {
+                add(ValidatorAlert.Oversubscribed.UserNotInvolved)
+            } else {
+                add(ValidatorAlert.Oversubscribed.UserMissedReward)
             }
         }
     }
@@ -170,48 +171,50 @@ suspend fun mapValidatorDetailsParcelToValidatorDetailsModel(
     resourceManager: ResourceManager,
 ): ValidatorDetailsModel {
     return with(validator) {
-        val token = asset.token
-
         val address = chain.addressOf(validator.accountIdHex.fromHex())
 
-        val addressImage = iconGenerator.createAddressModel(address, ICON_DETAILS_SIZE_DP)
+        val addressModel = iconGenerator.createAccountAddressModel(chain, address, validator.identity?.display)
 
         val identity = identity?.let(::mapIdentityParcelModelToIdentityModel)
 
         val stake = when (val stake = validator.stake) {
 
             ValidatorStakeParcelModel.Inactive -> ValidatorStakeModel(
-                statusText = resourceManager.getString(R.string.staking_nominator_status_inactive),
-                statusColorRes = R.color.gray2,
+                status = ValidatorStakeModel.Status(
+                    text = resourceManager.getString(R.string.staking_nominator_status_inactive),
+                    icon = R.drawable.ic_time_16,
+                    iconTint = R.color.white_48
+                ),
                 activeStakeModel = null
             )
 
             is ValidatorStakeParcelModel.Active -> {
-                val totalStake = token.amountFromPlanks(stake.totalStake)
-                val totalStakeFormatted = totalStake.formatTokenAmount(asset.token.configuration)
-                val totalStakeFiatFormatted = token.fiatAmount(totalStake).formatAsCurrency()
+                val totalStakeModel = mapAmountToAmountModel(stake.totalStake, asset)
+
                 val nominatorsCount = stake.nominators.size
-                val apyPercentageFormatted = (PERCENT_MULTIPLIER * stake.apy).formatAsPercentage()
+                val apyPercentageFormatted = stake.apy.fractionToPercentage().formatAsPercentage()
+                val apyWithLabel = resourceManager.getString(R.string.staking_apy, apyPercentageFormatted)
 
                 ValidatorStakeModel(
-                    statusText = resourceManager.getString(R.string.staking_nominator_status_active),
-                    statusColorRes = R.color.green,
+                    status = ValidatorStakeModel.Status(
+                        text = resourceManager.getString(R.string.staking_nominator_status_active),
+                        icon = R.drawable.ic_checkmark_circle_16,
+                        iconTint = R.color.green
+                    ),
                     activeStakeModel = ActiveStakeModel(
-                        totalStake = totalStakeFormatted,
-                        totalStakeFiat = totalStakeFiatFormatted,
+                        totalStake = totalStakeModel,
                         nominatorsCount = nominatorsCount.format(),
-                        apy = apyPercentageFormatted,
-                        maxNominations = maxNominators.format()
+                        maxNominations = resourceManager.getString(R.string.staking_nominations_rewarded_format, maxNominators.format()),
+                        apy = apyWithLabel
                     )
                 )
             }
         }
 
         ValidatorDetailsModel(
-            stake,
-            address,
-            addressImage.image,
-            identity
+            stake = stake,
+            addressModel = addressModel,
+            identity = identity
         )
     }
 }

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.common.base
 
+import android.content.Context
 import android.os.Bundle
 import android.view.ContextThemeWrapper
 import android.view.View
@@ -14,16 +15,19 @@ import androidx.lifecycle.lifecycleScope
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.EventObserver
+import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.bindTo
-import io.novafoundation.nova.common.utils.dp
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 
-interface BaseFragmentMixin<T : BaseViewModel> {
+interface BaseFragmentMixin<T : BaseViewModel> : WithContextExtensions {
 
     val fragment: Fragment
 
     val viewModel: T
+
+    override val providedContext: Context
+        get() = fragment.requireContext()
 
     fun initViews()
 
@@ -76,9 +80,6 @@ interface BaseFragmentMixin<T : BaseViewModel> {
     fun <V> LiveData<V>.observe(observer: (V) -> Unit) {
         observe(fragment.viewLifecycleOwner, observer)
     }
-
-    val Int.dp: Int
-        get() = dp(fragment.requireContext())
 
     fun EditText.bindTo(liveData: MutableLiveData<String>) = bindTo(liveData, fragment.viewLifecycleOwner)
 
