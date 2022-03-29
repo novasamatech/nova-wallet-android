@@ -28,9 +28,9 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         app:layout_constrainedWidth="true"
-        app:layout_constraintHorizontal_bias="0"
         app:layout_constraintBottom_toTopOf="@+id/itemCurrentValidatorNominatedLabel"
         app:layout_constraintEnd_toStartOf="@+id/itemCurrentValidatorApy"
+        app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toEndOf="@+id/itemCurrentValidatorIcon"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed">
