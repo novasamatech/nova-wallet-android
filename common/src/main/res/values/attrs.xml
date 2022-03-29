@@ -87,6 +87,7 @@
         <attr name="actionIcon" />
         <attr name="dividerVisible" />
         <attr name="android:textAppearance" format="reference" />
+        <attr name="actionTint" format="color" />
         <attr name="android:background" />
     </declare-styleable>
 

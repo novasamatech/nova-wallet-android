@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -26,14 +27,16 @@ class StartChangeValidatorsModule {
         router: StakingRouter,
         sharedState: SetupStakingSharedState,
         resourceManager: ResourceManager,
+        appLinksProvider: AppLinksProvider,
         interactor: StakingInteractor
     ): ViewModel {
         return StartChangeValidatorsViewModel(
-            router,
-            validatorRecommendatorFactory,
-            sharedState,
-            resourceManager,
-            interactor
+            router = router,
+            validatorRecommendatorFactory = validatorRecommendatorFactory,
+            setupStakingSharedState = sharedState,
+            appLinksProvider = appLinksProvider,
+            resourceManager = resourceManager,
+            interactor = interactor
         )
     }
 
