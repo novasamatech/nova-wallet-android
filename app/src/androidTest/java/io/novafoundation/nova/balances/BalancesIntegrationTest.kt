@@ -173,7 +173,7 @@ class BalancesIntegrationTest(
                 arrayOf(
                     "631ccc82a078481584041656af292834e1ae6daab61d2875b4dd0c14bb9b17bc",
                     "Robonomics",
-                    "0x70c17d7ec00783fcf263b1f7cfa493ad62177d45f9b5ef77a3848b3a2ed9f05e",
+                    "0x6d6f646c70792f74727372790000000000000000000000000000000000000000",
                     true
                 ),
                 arrayOf(
