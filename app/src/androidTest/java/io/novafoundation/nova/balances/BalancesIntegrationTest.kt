@@ -169,6 +169,78 @@ class BalancesIntegrationTest(
                     "Parallel",
                     "0xd24bfa7e01cb86e6eab810a04a61d7bc3c32c094afd5b4739194c9583a69d238",
                     true
+                ),
+                arrayOf(
+                    "631ccc82a078481584041656af292834e1ae6daab61d2875b4dd0c14bb9b17bc",
+                    "Robonomics",
+                    "0x70c17d7ec00783fcf263b1f7cfa493ad62177d45f9b5ef77a3848b3a2ed9f05e",
+                    true
+                ),
+                arrayOf(
+                    "9af9a64e6e4da8e3073901c3ff0cc4c3aad9563786d89daf6ad820b6e14a0b8b",
+                    "Kintsugi",
+                    "0x6d6f646c6d6f642f747273790000000000000000000000000000000000000000",
+                    true
+                ),
+                arrayOf(
+                    "6811a339673c9daa897944dcdac99c6e2939cc88245ed21951a0a3c9a2be75bc",
+                    "Picasso",
+                    "0xe29a3f1571721bdbda403d5ebaf976b6ce9aab4617a29c13794c4ecc19f48d7d",
+                    true
+                ),
+                arrayOf(
+                    "da5831fbc8570e3c6336d0d72b8c08f8738beefec812df21ef2afc2982ede09c",
+                    "Litmus",
+                    "0x54191c48bef94a4b91384c52dc9c4e4e56c176c954ec841dc9d29cd2a4ffe76b",
+                    true
+                ),
+                arrayOf(
+                    "eac895d7768b17837a9c3a9f0280c01502c3ef40193df923490a0fa9c60ea076",
+                    "Crab",
+                    "0x6d6f646c64612f636c61696d0000000000000000000000000000000000000000",
+                    true
+                ),
+                arrayOf(
+                    "d4c0c08ca49dc7c680c3dac71a7c0703e5b222f4b6c03fe4c5219bb8f22c18dc",
+                    "Crust Shadow",
+                    "0x6d6f646c6372636c61696d730000000000000000000000000000000000000000",
+                    true
+                ),
+                arrayOf(
+                    "f195ef30c646663a24a3164b307521174a86f437c586397a43183c736a8383c1",
+                    "Integritee Soloсhain",
+                    "0x03bd97c3a34229dbdd4fc3b3a8c0647e9369c5c44555f252f2307d5efe7f4abd",
+                    true
+                ),
+                arrayOf(
+                    "b3db41421702df9a7fcac62b53ffeac85f7853cc4e689e0b93aeb3db18c09d82",
+                    "Centrifuge Parachain",
+                    "0xb03cd3fb823de75f888ac647105d7820476a6b1943a74af840996d2b28e64017",
+                    true
+                ),
+                arrayOf(
+                    "0bd72c1c305172e1275278aaeb3f161e02eccb7a819e63f62d47bd53a28189f8",
+                    "Subsocial Solochain",
+                    "0x24d6d8fc5d051fd471e275f14c83e95287d2b863e4cc802de1f78dea06c6ca78",
+                    true
+                ),
+                arrayOf(
+                    "1bf2a2ecb4a868de66ea8610f2ce7c8c43706561b6476031315f6640fe38e060",
+                    "Zeitgeist",
+                    "0x524e9aac979cbb9ecdb7acd1635755c3b15696321a3345ca77f0ab0ae23f675a",
+                    true
+                ),
+                arrayOf(
+                    "52149c30c1eb11460dce6c08b73df8d53bb93b4a15d0a2e7fd5dafe86a73c0da",
+                    "KICO",
+                    "0xfcacdc1b0849908f55623b4249ab6c63823122703c6fa9e223e15c0b0fffd371",
+                    true
+                ),
+                arrayOf(
+                    "a3d114c2b8d0627c1aa9b134eafcf7d05ca561fdc19fb388bb9457f81809fb23",
+                    "Nodle Solochain",
+                    "0xf233477e8d4e36baafb87987c74ae24e36cf33eb54485998e012e17acc421808",
+                    true
                 )
             )
         }
