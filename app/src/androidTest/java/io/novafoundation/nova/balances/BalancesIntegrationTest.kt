@@ -195,12 +195,6 @@ class BalancesIntegrationTest(
                     true
                 ),
                 arrayOf(
-                    "eac895d7768b17837a9c3a9f0280c01502c3ef40193df923490a0fa9c60ea076",
-                    "Crab",
-                    "0x6d6f646c64612f636c61696d0000000000000000000000000000000000000000",
-                    true
-                ),
-                arrayOf(
                     "d4c0c08ca49dc7c680c3dac71a7c0703e5b222f4b6c03fe4c5219bb8f22c18dc",
                     "Crust Shadow",
                     "0x6d6f646c6372636c61696d730000000000000000000000000000000000000000",
