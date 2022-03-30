@@ -31,12 +31,12 @@ class BalancesIntegrationTest(
     private val testChainName: String,
     private val testAccount: String,
     private val testHaveBalance: Boolean
-    ) {
+) {
 
-    companion object  {
+    companion object {
         @JvmStatic
-        @Parameterized.Parameters(name= "Getting balance for {1} network")
-        fun data() : Collection<Array<Any>> {
+        @Parameterized.Parameters(name = "Getting balance for {1} network")
+        fun data(): Collection<Array<Any>> {
             return listOf(
                 arrayOf(
                     "f1cf9022c7ebb34b162d5b5e34e705a5a740b2d0ecc1009fb89023e62a488108",
@@ -177,12 +177,6 @@ class BalancesIntegrationTest(
                     true
                 ),
                 arrayOf(
-                    "9af9a64e6e4da8e3073901c3ff0cc4c3aad9563786d89daf6ad820b6e14a0b8b",
-                    "Kintsugi",
-                    "0x6d6f646c6d6f642f747273790000000000000000000000000000000000000000",
-                    true
-                ),
-                arrayOf(
                     "6811a339673c9daa897944dcdac99c6e2939cc88245ed21951a0a3c9a2be75bc",
                     "Picasso",
                     "0xe29a3f1571721bdbda403d5ebaf976b6ce9aab4617a29c13794c4ecc19f48d7d",
@@ -264,8 +258,7 @@ class BalancesIntegrationTest(
             val freeBalance = errorMessage?.map { it?.data?.free }?.getOrNull() ?: throw errorMessage?.exceptionOrNull()!!
             assertTrue("Free balance: $freeBalance is less than $maxAmount", maxAmount > freeBalance)
             assertTrue("Free balance: $freeBalance is greater than 0", ZERO < freeBalance)
-        }
-        else assertEquals(kotlin.Result.success(null), errorMessage)
+        } else assertEquals(kotlin.Result.success(null), errorMessage)
 
     }
 
