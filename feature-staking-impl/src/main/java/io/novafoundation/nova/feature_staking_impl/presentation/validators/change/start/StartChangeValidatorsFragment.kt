@@ -63,8 +63,9 @@ class StartChangeValidatorsFragment : BaseFragment<StartChangeValidatorsViewMode
         }
 
         viewModel.customValidatorsTexts.observe {
-            startChangeValidatorsCustom.title.text = it.title
-            startChangeValidatorsCustom.setBadgeText(it.badge)
+            startChangeValidatorsToolbar.setTitle(it.toolbarTitle)
+            startChangeValidatorsCustom.title.text = it.selectManuallyTitle
+            startChangeValidatorsCustom.setBadgeText(it.selectManuallyBadge)
         }
     }
 }

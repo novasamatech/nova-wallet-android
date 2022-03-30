@@ -20,9 +20,10 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.launch
 
-class CustomValidatorsTexts(
-    val title: String,
-    val badge: String?
+class Texts(
+    val toolbarTitle: String,
+    val selectManuallyTitle: String,
+    val selectManuallyBadge: String?
 )
 
 class StartChangeValidatorsViewModel(
@@ -45,9 +46,10 @@ class StartChangeValidatorsViewModel(
     val customValidatorsTexts = setupStakingSharedState.setupStakingProcess.transform {
         when {
             it is SetupStakingProcess.ReadyToSubmit && it.payload.validators.isNotEmpty() -> emit(
-                CustomValidatorsTexts(
-                    title = resourceManager.getString(R.string.staking_select_custom),
-                    badge = resourceManager.getString(
+                Texts(
+                    toolbarTitle = resourceManager.getString(R.string.staking_change_validators),
+                    selectManuallyTitle = resourceManager.getString(R.string.staking_select_custom),
+                    selectManuallyBadge = resourceManager.getString(
                         R.string.staking_max_format,
                         it.payload.validators.size,
                         maxValidatorsPerNominator.first()
@@ -55,9 +57,10 @@ class StartChangeValidatorsViewModel(
                 )
             )
             it is SetupStakingProcess.Validators -> emit(
-                CustomValidatorsTexts(
-                    title = resourceManager.getString(R.string.staking_select_custom),
-                    badge = null
+                Texts(
+                    toolbarTitle = resourceManager.getString(R.string.staking_set_validators),
+                    selectManuallyTitle = resourceManager.getString(R.string.staking_select_custom),
+                    selectManuallyBadge = null
                 )
             )
         }

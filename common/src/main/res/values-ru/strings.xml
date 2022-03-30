@@ -466,6 +466,7 @@
   <string name="staking_selected_validators_mask">Валидаторы (%d)</string>
   <string name="staking_set_controller_subtitle">Выберите другой аккаунт в качестве контроллера, чтобы делегировать ей операции по управлению стекингом</string>
   <string name="staking_set_controller_title">Улучшите безопасность стекинга</string>
+  <string name="staking_set_validators">Установить валидаторов</string>
   <string name="staking_set_validators_message">Валидаторы не выбраны</string>
   <string name="staking_set_validators_title">Выберите валидаторов для начала стейкинга</string>
   <string name="staking_setup_amount_too_low">Нельзя застейкать меньше минимального значения (%s)</string>
