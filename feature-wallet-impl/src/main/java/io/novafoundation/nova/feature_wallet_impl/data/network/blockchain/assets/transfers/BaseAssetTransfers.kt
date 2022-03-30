@@ -15,8 +15,10 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.feeInUsedAsset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.validation.ExistentialDepositError
+import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.doNotCrossExistentialDeposit
 import io.novafoundation.nova.feature_wallet_api.domain.validation.enoughTotalToStayAboveED
+import io.novafoundation.nova.feature_wallet_api.domain.validation.notPhishingAccount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 import io.novafoundation.nova.feature_wallet_api.domain.validation.validAddress
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.BalanceSourceProvider
@@ -36,13 +38,14 @@ abstract class BaseAssetTransfers(
     private val chainRegistry: ChainRegistry,
     private val balanceSourceProvider: BalanceSourceProvider,
     private val extrinsicService: ExtrinsicService,
+    private val phishingValidationFactory: PhishingValidationFactory,
 ) : AssetTransfers {
 
     protected abstract fun ExtrinsicBuilder.transfer(transfer: AssetTransfer)
 
     /**
      * Format: [(Module, Function)]
-     * Tranfers will be enabled if at least one function exists
+     * Transfers will be enabled if at least one function exists
      */
     protected abstract val transferFunctions: List<Pair<String, String>>
 
@@ -82,7 +85,9 @@ abstract class BaseAssetTransfers(
     protected fun defaultValidationSystem(
         removeAccountBehavior: ExistentialDepositError<WillRemoveAccount>
     ): AssetTransfersValidationSystem = ValidationSystem {
-        validaAddress()
+        validAddress()
+
+        notPhishingRecipient()
 
         sufficientTransferableBalanceToPayFee()
         sufficientBalanceInUsedAsset()
@@ -95,7 +100,14 @@ abstract class BaseAssetTransfers(
         doNotCrossExistentialDeposit(removeAccountBehavior)
     }
 
-    private fun AssetTransfersValidationSystemBuilder.validaAddress() = validAddress(
+    private fun AssetTransfersValidationSystemBuilder.notPhishingRecipient() = notPhishingAccount(
+        factory = phishingValidationFactory,
+        address = { it.transfer.recipient },
+        chain = { it.transfer.chain },
+        warning = AssetTransferValidationFailure::PhishingRecipient
+    )
+
+    private fun AssetTransfersValidationSystemBuilder.validAddress() = validAddress(
         address = { it.transfer.recipient },
         chain = { it.transfer.chain },
         error = { AssetTransferValidationFailure.InvalidRecipientAddress(it.transfer.chain) }

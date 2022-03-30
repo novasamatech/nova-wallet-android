@@ -5,6 +5,7 @@ import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
+import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.SubstrateRemoteSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.BalanceSourceProvider
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.utility.NativeBalanceSource
@@ -29,6 +30,7 @@ class NativeAssetsModule {
     fun provideNativeAssetTransfers(
         chainRegistry: ChainRegistry,
         balanceSourceProvider: BalanceSourceProvider,
-        extrinsicService: ExtrinsicService
-    ) = NativeAssetTransfers(chainRegistry, balanceSourceProvider, extrinsicService)
+        extrinsicService: ExtrinsicService,
+        phishingValidationFactory: PhishingValidationFactory,
+    ) = NativeAssetTransfers(chainRegistry, balanceSourceProvider, extrinsicService, phishingValidationFactory)
 }
