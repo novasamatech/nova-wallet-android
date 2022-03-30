@@ -56,7 +56,7 @@ class StartChangeValidatorsViewModel(
                     )
                 )
             )
-            it is SetupStakingProcess.Validators -> emit(
+            else -> emit(
                 Texts(
                     toolbarTitle = resourceManager.getString(R.string.staking_set_validators),
                     selectManuallyTitle = resourceManager.getString(R.string.staking_select_custom),
