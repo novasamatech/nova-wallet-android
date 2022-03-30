@@ -5,6 +5,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.getEnum
@@ -20,7 +21,8 @@ class AlertView @JvmOverloads constructor(
 ) : LinearLayout(context, attrs, defStyle), WithContextExtensions by WithContextExtensions(context) {
 
     enum class Style(@DrawableRes val iconRes: Int, val backgroundColorRes: Int) {
-        WARNING(R.drawable.ic_warning_filled, R.color.yellow_12)
+        WARNING(R.drawable.ic_warning_filled, R.color.yellow_12),
+        ERROR(R.drawable.ic_slash, R.color.red_12)
     }
 
     init {
@@ -40,6 +42,10 @@ class AlertView @JvmOverloads constructor(
 
     fun setText(text: String) {
         alertMessage.text = text
+    }
+
+    fun setText(@StringRes textRes: Int) {
+        alertMessage.setText(textRes)
     }
 
     private fun applyAttrs(attributeSet: AttributeSet) = context.useAttributes(attributeSet, R.styleable.AlertView) {

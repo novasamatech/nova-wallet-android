@@ -15,6 +15,7 @@ import io.novafoundation.nova.core_db.dao.NftDao
 import io.novafoundation.nova.core_db.dao.NodeDao
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.dao.PhishingAddressDao
+import io.novafoundation.nova.core_db.dao.PhishingSitesDao
 import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.core_db.dao.StorageDao
 import io.novafoundation.nova.core_db.dao.TokenDao
@@ -106,5 +107,11 @@ class DbModule {
     @ApplicationScope
     fun provideNftDao(appDatabase: AppDatabase): NftDao {
         return appDatabase.nftDao()
+    }
+
+    @Provides
+    @ApplicationScope
+    fun providePhishingSitesDao(appDatabase: AppDatabase): PhishingSitesDao {
+        return appDatabase.phishingSitesDao()
     }
 }

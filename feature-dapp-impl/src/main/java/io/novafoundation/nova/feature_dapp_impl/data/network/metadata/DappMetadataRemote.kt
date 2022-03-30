@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_dapp_impl.data.network.api
+package io.novafoundation.nova.feature_dapp_impl.data.network.metadata
 
 class DappMetadataResponse(
     val categories: List<DappCategoryRemote>,

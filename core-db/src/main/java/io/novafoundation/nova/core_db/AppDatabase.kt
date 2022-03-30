@@ -21,12 +21,14 @@ import io.novafoundation.nova.core_db.dao.NftDao
 import io.novafoundation.nova.core_db.dao.NodeDao
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.dao.PhishingAddressDao
+import io.novafoundation.nova.core_db.dao.PhishingSitesDao
 import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.core_db.dao.StorageDao
 import io.novafoundation.nova.core_db.dao.TokenDao
 import io.novafoundation.nova.core_db.migrations.AddChainColor_4_5
 import io.novafoundation.nova.core_db.migrations.AddDAppAuthorizations_1_2
 import io.novafoundation.nova.core_db.migrations.AddNfts_5_6
+import io.novafoundation.nova.core_db.migrations.AddSitePhishing_6_7
 import io.novafoundation.nova.core_db.migrations.AssetTypes_2_3
 import io.novafoundation.nova.core_db.migrations.ChangeAsset_3_4
 import io.novafoundation.nova.core_db.model.AccountLocal
@@ -37,6 +39,7 @@ import io.novafoundation.nova.core_db.model.NftLocal
 import io.novafoundation.nova.core_db.model.NodeLocal
 import io.novafoundation.nova.core_db.model.OperationLocal
 import io.novafoundation.nova.core_db.model.PhishingAddressLocal
+import io.novafoundation.nova.core_db.model.PhishingSiteLocal
 import io.novafoundation.nova.core_db.model.StorageEntryLocal
 import io.novafoundation.nova.core_db.model.TokenLocal
 import io.novafoundation.nova.core_db.model.TotalRewardLocal
@@ -49,7 +52,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
 import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
 
 @Database(
-    version = 6,
+    version = 7,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -71,6 +74,8 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
 
         DappAuthorizationLocal::class,
         NftLocal::class,
+
+        PhishingSiteLocal::class
     ],
 )
 @TypeConverters(
@@ -98,7 +103,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java, "app.db"
                 )
                     .addMigrations(AddDAppAuthorizations_1_2, AssetTypes_2_3, ChangeAsset_3_4)
-                    .addMigrations(AddChainColor_4_5, AddNfts_5_6)
+                    .addMigrations(AddChainColor_4_5, AddNfts_5_6, AddSitePhishing_6_7)
                     .fallbackToDestructiveMigration()
                     .build()
             }
@@ -131,4 +136,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun dAppAuthorizationDao(): DappAuthorizationDao
 
     abstract fun nftDao(): NftDao
+
+    abstract fun phishingSitesDao(): PhishingSitesDao
 }

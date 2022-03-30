@@ -2,18 +2,15 @@ package io.novafoundation.nova.feature_staking_impl.presentation.validators.deta
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.flowOf
-import io.novafoundation.nova.common.utils.formatAsCurrency
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValidatorDetailsParcelToValidatorDetailsModel
@@ -22,8 +19,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.parce
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.ValidatorDetailsParcelModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.ValidatorStakeParcelModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
+import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.Dispatchers
@@ -71,41 +67,23 @@ class ValidatorDetailsViewModel(
         router.back()
     }
 
-    fun totalStakeClicked() {
+    fun totalStakeClicked() = launch {
         val validatorStake = validator.stake
-        viewModelScope.launch {
-            val asset = assetFlow.first()
-            val payload = calculatePayload(asset, validatorStake)
-            _totalStakeEvent.value = Event(payload)
-        }
+        val asset = assetFlow.first()
+        val payload = calculatePayload(asset, validatorStake)
+
+        _totalStakeEvent.value = Event(payload)
     }
 
     private suspend fun calculatePayload(asset: Asset, validatorStake: ValidatorStakeParcelModel) = withContext(Dispatchers.Default) {
         require(validatorStake is ValidatorStakeParcelModel.Active)
 
-        val ownStake = asset.token.amountFromPlanks(validatorStake.ownStake)
-        val ownStakeFormatted = ownStake.formatTokenAmount(asset.token.configuration)
-        val ownStakeFiatFormatted = asset.token.fiatAmount(ownStake).formatAsCurrency()
-
-        val nominatorsStakeValue = validatorStake.nominators.sumByBigInteger(NominatorParcelModel::value)
-        val nominatorsStake = asset.token.amountFromPlanks(nominatorsStakeValue)
-        val nominatorsStakeFormatted = nominatorsStake.formatTokenAmount(asset.token.configuration)
-        val nominatorsStakeFiatFormatted = asset.token.fiatAmount(nominatorsStake).formatAsCurrency()
-
-        val totalStake = asset.token.amountFromPlanks(validatorStake.totalStake)
-        val totalStakeFormatted = totalStake.formatTokenAmount(asset.token.configuration)
-        val totalStakeFiatFormatted = asset.token.fiatAmount(totalStake).formatAsCurrency()
+        val nominatorsStake = validatorStake.nominators.sumByBigInteger(NominatorParcelModel::value)
 
         ValidatorStakeBottomSheet.Payload(
-            resourceManager.getString(R.string.staking_validator_own_stake),
-            ownStakeFormatted,
-            ownStakeFiatFormatted,
-            resourceManager.getString(R.string.staking_validator_nominators),
-            nominatorsStakeFormatted,
-            nominatorsStakeFiatFormatted,
-            resourceManager.getString(R.string.wallet_send_total_title),
-            totalStakeFormatted,
-            totalStakeFiatFormatted
+            own = mapAmountToAmountModel(validatorStake.ownStake, asset),
+            nominators = mapAmountToAmountModel(nominatorsStake, asset),
+            total = mapAmountToAmountModel(validatorStake.totalStake, asset)
         )
     }
 
@@ -128,7 +106,7 @@ class ValidatorDetailsViewModel(
     }
 
     fun accountActionsClicked() = launch {
-        val address = validatorDetails.first().address
+        val address = validatorDetails.first().addressModel.address
         val chain = selectedAssetState.chain()
 
         externalActions.showExternalActions(ExternalActions.Type.Address(address), chain)

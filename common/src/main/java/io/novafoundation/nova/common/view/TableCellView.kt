@@ -17,10 +17,13 @@ import coil.transform.RoundedCornersTransformation
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.dpF
+import io.novafoundation.nova.common.utils.getAccentColor
+import io.novafoundation.nova.common.utils.getEnum
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setDrawableEnd
+import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.useAttributes
@@ -32,11 +35,17 @@ import kotlinx.android.synthetic.main.view_table_cell.view.tableCellValuePrimary
 import kotlinx.android.synthetic.main.view_table_cell.view.tableCellValueProgress
 import kotlinx.android.synthetic.main.view_table_cell.view.tableCellValueSecondary
 
+private val ICON_TINT_DEFAULT = R.color.white_64
+
 open class TableCellView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyle) {
+
+    enum class FieldStyle {
+        TEXT, LINK
+    }
 
     val title: TextView
         get() = tableCellTitle
@@ -107,6 +116,21 @@ open class TableCellView @JvmOverloads constructor(
         tableCellValuePrimary.setDrawableEnd(icon, widthInDp = 16, paddingInDp = 8, tint = tint)
     }
 
+    fun setPrimaryValueStyle(style: FieldStyle) {
+        when (style) {
+            FieldStyle.TEXT -> {
+                valuePrimary.setTextColorRes(R.color.white)
+            }
+            FieldStyle.LINK -> {
+                valuePrimary.setTextColor(context.getAccentColor())
+            }
+        }
+    }
+
+    fun setTitleIcon(@DrawableRes icon: Int?) {
+        tableCellTitle.setDrawableEnd(icon, widthInDp = 16, paddingInDp = 4, tint = ICON_TINT_DEFAULT)
+    }
+
     fun showValue(primary: String, secondary: String? = null) {
         contentGroup.makeVisible()
 
@@ -127,11 +151,24 @@ open class TableCellView @JvmOverloads constructor(
         dividerColor?.let(::setDividerColor)
 
         val primaryValueIcon = typedArray.getResourceIdOrNull(R.styleable.TableCellView_primaryValueIcon)
-
         primaryValueIcon?.let {
-            val primaryValueIconTint = typedArray.getResourceId(R.styleable.TableCellView_primaryValueIconTint, R.color.white_64)
+            val primaryValueIconTint = typedArray.getResourceId(R.styleable.TableCellView_primaryValueIconTint, ICON_TINT_DEFAULT)
 
             setPrimaryValueIcon(primaryValueIcon, primaryValueIconTint)
         }
+
+        val primaryValueStyle = typedArray.getEnum(R.styleable.TableCellView_primaryValueStyle, default = FieldStyle.TEXT)
+        setPrimaryValueStyle(primaryValueStyle)
+
+        val titleIcon = typedArray.getResourceIdOrNull(R.styleable.TableCellView_titleIcon)
+        titleIcon?.let(::setTitleIcon)
     }
+}
+
+fun TableCellView.showValueOrHide(primary: String?, secondary: String? = null) {
+    if (primary != null) {
+        showValue(primary, secondary)
+    }
+
+    setVisible(primary != null)
 }

@@ -50,6 +50,7 @@
     <color name="account_icon_dark">@color/black</color>
 
     <color name="red">#FF3A69</color>
+    <color name="red_12">#1FFF3A69</color>
 
     <color name="yellow">#FFE711</color>
     <color name="yellow_12">#1FFFE711</color>
