@@ -189,12 +189,6 @@ class BalancesIntegrationTest(
                     true
                 ),
                 arrayOf(
-                    "d4c0c08ca49dc7c680c3dac71a7c0703e5b222f4b6c03fe4c5219bb8f22c18dc",
-                    "Crust Shadow",
-                    "0x6d6f646c6372636c61696d730000000000000000000000000000000000000000",
-                    true
-                ),
-                arrayOf(
                     "f195ef30c646663a24a3164b307521174a86f437c586397a43183c736a8383c1",
                     "Integritee Soloсhain",
                     "0x03bd97c3a34229dbdd4fc3b3a8c0647e9369c5c44555f252f2307d5efe7f4abd",
