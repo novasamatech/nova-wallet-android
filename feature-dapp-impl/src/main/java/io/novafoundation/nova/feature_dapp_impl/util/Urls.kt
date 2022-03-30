@@ -17,6 +17,10 @@ object Urls {
         return "${parsedUrl.protocol}://${parsedUrl.host}"
     }
 
+    fun hostOf(url: String): String {
+        return URL(url).host
+    }
+
     fun isValidWebUrl(url: String): Boolean {
         return Patterns.WEB_URL.matcher(url).matches()
     }
