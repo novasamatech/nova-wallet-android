@@ -31,12 +31,12 @@ class BalancesIntegrationTest(
     private val testChainName: String,
     private val testAccount: String,
     private val testHaveBalance: Boolean
-    ) {
+) {
 
-    companion object  {
+    companion object {
         @JvmStatic
-        @Parameterized.Parameters(name= "Getting balance for {1} network")
-        fun data() : Collection<Array<Any>> {
+        @Parameterized.Parameters(name = "Getting balance for {1} network")
+        fun data(): Collection<Array<Any>> {
             return listOf(
                 arrayOf(
                     "f1cf9022c7ebb34b162d5b5e34e705a5a740b2d0ecc1009fb89023e62a488108",
@@ -169,6 +169,60 @@ class BalancesIntegrationTest(
                     "Parallel",
                     "0xd24bfa7e01cb86e6eab810a04a61d7bc3c32c094afd5b4739194c9583a69d238",
                     true
+                ),
+                arrayOf(
+                    "631ccc82a078481584041656af292834e1ae6daab61d2875b4dd0c14bb9b17bc",
+                    "Robonomics",
+                    "0x6d6f646c70792f74727372790000000000000000000000000000000000000000",
+                    true
+                ),
+                arrayOf(
+                    "6811a339673c9daa897944dcdac99c6e2939cc88245ed21951a0a3c9a2be75bc",
+                    "Picasso",
+                    "0xe29a3f1571721bdbda403d5ebaf976b6ce9aab4617a29c13794c4ecc19f48d7d",
+                    true
+                ),
+                arrayOf(
+                    "da5831fbc8570e3c6336d0d72b8c08f8738beefec812df21ef2afc2982ede09c",
+                    "Litmus",
+                    "0x54191c48bef94a4b91384c52dc9c4e4e56c176c954ec841dc9d29cd2a4ffe76b",
+                    true
+                ),
+                arrayOf(
+                    "f195ef30c646663a24a3164b307521174a86f437c586397a43183c736a8383c1",
+                    "Integritee Soloсhain",
+                    "0x03bd97c3a34229dbdd4fc3b3a8c0647e9369c5c44555f252f2307d5efe7f4abd",
+                    true
+                ),
+                arrayOf(
+                    "b3db41421702df9a7fcac62b53ffeac85f7853cc4e689e0b93aeb3db18c09d82",
+                    "Centrifuge Parachain",
+                    "0xb03cd3fb823de75f888ac647105d7820476a6b1943a74af840996d2b28e64017",
+                    true
+                ),
+                arrayOf(
+                    "0bd72c1c305172e1275278aaeb3f161e02eccb7a819e63f62d47bd53a28189f8",
+                    "Subsocial Solochain",
+                    "0x24d6d8fc5d051fd471e275f14c83e95287d2b863e4cc802de1f78dea06c6ca78",
+                    true
+                ),
+                arrayOf(
+                    "1bf2a2ecb4a868de66ea8610f2ce7c8c43706561b6476031315f6640fe38e060",
+                    "Zeitgeist",
+                    "0x524e9aac979cbb9ecdb7acd1635755c3b15696321a3345ca77f0ab0ae23f675a",
+                    true
+                ),
+                arrayOf(
+                    "52149c30c1eb11460dce6c08b73df8d53bb93b4a15d0a2e7fd5dafe86a73c0da",
+                    "KICO",
+                    "0xfcacdc1b0849908f55623b4249ab6c63823122703c6fa9e223e15c0b0fffd371",
+                    true
+                ),
+                arrayOf(
+                    "a3d114c2b8d0627c1aa9b134eafcf7d05ca561fdc19fb388bb9457f81809fb23",
+                    "Nodle Solochain",
+                    "0xf233477e8d4e36baafb87987c74ae24e36cf33eb54485998e012e17acc421808",
+                    true
                 )
             )
         }
@@ -198,8 +252,7 @@ class BalancesIntegrationTest(
             val freeBalance = errorMessage?.map { it?.data?.free }?.getOrNull() ?: throw errorMessage?.exceptionOrNull()!!
             assertTrue("Free balance: $freeBalance is less than $maxAmount", maxAmount > freeBalance)
             assertTrue("Free balance: $freeBalance is greater than 0", ZERO < freeBalance)
-        }
-        else assertEquals(kotlin.Result.success(null), errorMessage)
+        } else assertEquals(kotlin.Result.success(null), errorMessage)
 
     }
 
