@@ -22,7 +22,7 @@
         android:id="@+id/goNextTitle"
         android:layout_marginTop="14dp"
         android:layout_marginBottom="14dp"
-        style="@style/TextAppearance.NovaFoundation.Body1"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_marginStart="12dp"
@@ -37,7 +37,7 @@
 
     <TextView
         android:id="@+id/goNextBadgeText"
-        style="@style/TextAppearance.NovaFoundation.Body1"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"

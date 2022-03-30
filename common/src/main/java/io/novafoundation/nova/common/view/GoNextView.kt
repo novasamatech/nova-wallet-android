@@ -1,11 +1,13 @@
 package io.novafoundation.nova.common.view
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.ColorInt
 import androidx.constraintlayout.widget.ConstraintLayout
 import coil.ImageLoader
 import coil.load
@@ -63,6 +65,11 @@ class GoNextView @JvmOverloads constructor(
         icon.setVisible(drawable != null)
     }
 
+    fun setActionTint(@ColorInt color: Int) {
+        goNextActionImage.imageTintList = ColorStateList.valueOf(color)
+        goNextBadgeText.setTextColor(color)
+    }
+
     private fun applyAttributes(attributeSet: AttributeSet?) {
         val typedArray = context.obtainStyledAttributes(attributeSet, R.styleable.GoNextView)
 
@@ -86,6 +93,9 @@ class GoNextView @JvmOverloads constructor(
 
         val textAppearance = typedArray.getResourceIdOrNull(R.styleable.GoNextView_android_textAppearance)
         textAppearance?.let(title::setTextAppearance)
+
+        val actionTint = typedArray.getColor(R.styleable.GoNextView_actionTint, context.getColor(R.color.white))
+        setActionTint(actionTint)
 
         typedArray.recycle()
     }

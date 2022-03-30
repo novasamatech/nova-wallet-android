@@ -12,8 +12,10 @@ class AppLinksProvider(
     val youtube: String,
 
     val payoutsLearnMore: String,
+    val recommendedValidatorsLearnMore: String,
     val twitterAccountTemplate: String,
-    val setControllerLearnMore: String,
+    val setControllerLearnMore: String
+
 ) {
 
     fun getTwitterAccountUrl(

@@ -35,13 +35,14 @@ class NetworkModule {
 
     @Provides
     @ApplicationScope
-    fun provideAppLinksProvider(context: Context): AppLinksProvider {
+    fun provideAppLinksProvider(): AppLinksProvider {
         return AppLinksProvider(
             termsUrl = BuildConfig.TERMS_URL,
             privacyUrl = BuildConfig.PRIVACY_URL,
             payoutsLearnMore = BuildConfig.PAYOUTS_LEARN_MORE,
             twitterAccountTemplate = BuildConfig.TWITTER_ACCOUNT_TEMPLATE,
             setControllerLearnMore = BuildConfig.SET_CONTROLLER_LEARN_MORE,
+            recommendedValidatorsLearnMore = BuildConfig.RECOMMENDED_VALIDATORS_LEARN_MORE,
             telegram = BuildConfig.TELEGRAM_URL,
             twitter = BuildConfig.TWITTER_URL,
             rateApp = BuildConfig.RATE_URL,
