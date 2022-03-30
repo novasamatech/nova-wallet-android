@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_dapp_impl.BuildConfig
-import io.novafoundation.nova.feature_dapp_impl.data.network.api.DappMetadataApi
+import io.novafoundation.nova.feature_dapp_impl.data.network.metadata.DappMetadataApi
 import io.novafoundation.nova.feature_dapp_impl.data.repository.InMemoryDAppMetadataRepository
 
 @Module

@@ -1,9 +1,10 @@
 package io.novafoundation.nova.feature_dapp_impl.data.repository
 
+import io.novafoundation.nova.common.utils.retryUntilDone
 import io.novafoundation.nova.feature_dapp_api.data.model.DappMetadata
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_dapp_impl.data.mappers.mapDAppMetadataResponseToDAppMetadatas
-import io.novafoundation.nova.feature_dapp_impl.data.network.api.DappMetadataApi
+import io.novafoundation.nova.feature_dapp_impl.data.network.metadata.DappMetadataApi
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -17,7 +18,7 @@ class InMemoryDAppMetadataRepository(
     private val dappMetadatasFlow = MutableSharedFlow<List<DappMetadata>>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
     override suspend fun syncDAppMetadatas() {
-        val response = dappMetadataApi.getParachainMetadata(remoteApiUrl)
+        val response = retryUntilDone { dappMetadataApi.getParachainMetadata(remoteApiUrl) }
         val dappMetadatas = mapDAppMetadataResponseToDAppMetadatas(response)
 
         dappMetadatasFlow.emit(dappMetadatas)
