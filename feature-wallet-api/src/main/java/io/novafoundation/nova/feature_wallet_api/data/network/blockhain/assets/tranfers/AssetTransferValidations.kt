@@ -33,6 +33,8 @@ sealed class AssetTransferValidationFailure {
     }
 
     class InvalidRecipientAddress(val chain: Chain) : AssetTransferValidationFailure()
+
+    class PhishingRecipient(val address: String) : AssetTransferValidationFailure()
 }
 
 data class AssetTransferPayload(

@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 
@@ -27,4 +28,6 @@ interface WalletFeatureApi {
     fun provideAssetTransfersProvider(): AssetTransfersProvider
 
     fun provideAmountChooserFactory(): AmountChooserMixin.Factory
+
+    val phishingValidationFactory: PhishingValidationFactory
 }

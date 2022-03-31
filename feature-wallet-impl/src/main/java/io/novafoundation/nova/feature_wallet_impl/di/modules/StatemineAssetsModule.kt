@@ -5,6 +5,7 @@ import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
+import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.BalanceSourceProvider
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.statemine.StatemineBalanceSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.statemine.StatemineAssetTransfers
@@ -31,6 +32,7 @@ class StatemineAssetsModule {
     fun provideStatemineAssetTransfers(
         chainRegistry: ChainRegistry,
         balanceSourceProvider: BalanceSourceProvider,
-        extrinsicService: ExtrinsicService
-    ) = StatemineAssetTransfers(chainRegistry, balanceSourceProvider, extrinsicService)
+        extrinsicService: ExtrinsicService,
+        phishingValidationFactory: PhishingValidationFactory,
+    ) = StatemineAssetTransfers(chainRegistry, balanceSourceProvider, extrinsicService, phishingValidationFactory)
 }
