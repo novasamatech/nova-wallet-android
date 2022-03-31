@@ -14,6 +14,7 @@ import android.view.ViewGroup.MarginLayoutParams
 import android.view.ViewTreeObserver
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.webkit.WebView
 import android.widget.EditText
 import android.widget.TextView
 import androidx.annotation.ColorRes
@@ -297,3 +298,5 @@ fun <T> ListAdapter<T, *>.submitListPreservingViewPoint(data: List<T>, into: Rec
         into.layoutManager!!.onRestoreInstanceState(recyclerViewState)
     }
 }
+
+fun WebView.isLoading(): Boolean = progress < 100
