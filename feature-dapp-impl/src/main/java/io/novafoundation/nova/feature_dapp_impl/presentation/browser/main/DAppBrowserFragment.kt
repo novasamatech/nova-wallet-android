@@ -65,9 +65,9 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
 
         dappBrowserAddressBarGroup.applyStatusBarInsets()
 
-        dappBrowserClose.setOnClickListener { viewModel.closeClicked(wasForcedByApplication = false) }
+        dappBrowserClose.setOnClickListener { viewModel.closeClicked() }
 
-        dappBrowserBack.setOnClickListener { backClicked(wasForcedByApplication = false) }
+        dappBrowserBack.setOnClickListener { backClicked() }
         attachBackCallback()
 
         dappBrowserAddressBar.setOnClickListener {
@@ -121,7 +121,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
 
         viewModel.browserNavigationCommandEvent.observeEvent {
             when (it) {
-                BrowserNavigationCommand.GoBack -> backClicked(wasForcedByApplication = true)
+                BrowserNavigationCommand.GoBack -> backClicked()
                 is BrowserNavigationCommand.OpenUrl -> dappBrowserWebView.loadUrl(it.url)
             }
         }
@@ -157,11 +157,11 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
         ).show()
     }
 
-    private fun backClicked(wasForcedByApplication: Boolean) {
+    private fun backClicked() {
         if (dappBrowserWebView.canGoBack()) {
             dappBrowserWebView.goBack()
         } else {
-            viewModel.closeClicked(wasForcedByApplication)
+            viewModel.closeClicked()
         }
     }
 
@@ -176,7 +176,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
     private fun attachBackCallback() {
         backCallback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                backClicked(wasForcedByApplication = false)
+                backClicked()
             }
         }
 

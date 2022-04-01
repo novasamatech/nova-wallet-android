@@ -103,17 +103,11 @@ class DAppBrowserViewModel(
         updatePageDisplay(url, synchronizedWithBrowser = true)
     }
 
-    fun closeClicked(wasForcedByApplication: Boolean) = launch {
-        if (wasForcedByApplication) {
-            // no need for confirmation in such case
-            router.back()
-            return@launch
-        }
-
+    fun closeClicked() = launch {
         val confirmationState = awaitConfirmation(DappPendingConfirmation.Action.CloseScreen)
 
         if (confirmationState == ConfirmationState.ALLOWED) {
-            router.back()
+            exitBrowser()
         }
     }
 
@@ -130,7 +124,7 @@ class DAppBrowserViewModel(
             .onEach {
                 awaitConfirmation(DappPendingConfirmation.Action.AcknowledgePhishingAlert)
 
-                _browserNavigationCommandEvent.value = BrowserNavigationCommand.GoBack.event()
+                exitBrowser()
             }
             .launchIn(this)
     }
@@ -276,6 +270,8 @@ class DAppBrowserViewModel(
     } else {
         request.reject(NotAuthorizedException)
     }
+
+    private fun exitBrowser() = router.back()
 
     private fun updatePageDisplay(url: String, synchronizedWithBrowser: Boolean) = launch {
         _currentPage.emit(interactor.browserPageFor(url, synchronizedWithBrowser))
