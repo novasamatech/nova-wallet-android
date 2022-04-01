@@ -96,6 +96,7 @@
   <string name="common_bonus">Бонус</string>
   <string name="common_call">Вызов</string>
   <string name="common_cancel">Отмена</string>
+  <string name="common_cannot_open_link">Не удается открыть данную ссылку</string>
   <string name="common_chain">Сеть</string>
   <string name="common_change">Изменить</string>
   <string name="common_choose_network">Выберите сеть</string>
@@ -121,12 +122,14 @@
   <string name="common_existential_warning_title">Операция удалит аккаунт</string>
   <string name="common_explore">Исследуй</string>
   <string name="common_filter_sort_header">Сортировать по:</string>
+  <string name="common_find_out_more">Узнать больше</string>
   <plurals name="common_hours_format">
     <item quantity="one">%d час</item>
     <item quantity="few">%d часа</item>
     <item quantity="many">%d часов</item>
     <item quantity="other">%d час</item>
   </plurals>
+  <string name="common_how_it_works">Как это работает</string>
   <string name="common_i_understand">Понятно</string>
   <string name="common_info">Информация</string>
   <string name="common_input_error_set_password">Установите пароль...</string>
@@ -153,6 +156,7 @@
   <string name="common_share">Поделиться</string>
   <string name="common_skip">Пропустить</string>
   <string name="common_skip_process">Пропустить</string>
+  <string name="common_status">Статус</string>
   <string name="common_time_left">Оставшееся время</string>
   <string name="common_transaction_id">ID транзакции</string>
   <string name="common_transaction_submitted">Транзакция отправлена</string>
@@ -283,7 +287,7 @@
   <string name="network_status_connecting">Подключение…</string>
   <string name="nft_collection">Коллекция</string>
   <string name="nft_created_by">Создатель</string>
-  <string name="nft_issuance_limited_format">#%s Издание из %s</string>
+  <string name="nft_issuance_limited_format" formatted="false">#%s Издание из %s</string>
   <string name="nft_issuance_unlimited">Неограниченная серия</string>
   <string name="nft_owned_by">Владелец</string>
   <string name="nft_price_not_listed">Без цены</string>
@@ -347,8 +351,11 @@
   <string name="staking_bond_more_v1_9_0">Застейкать ещё</string>
   <string name="staking_bonded_format">Застейкано: %s</string>
   <string name="staking_bonded_inactive">Вы не номинируете и не валидируете</string>
+  <string name="staking_change_controller">Сменить контроллер</string>
+  <string name="staking_change_validators">Сменить валидаторов</string>
   <string name="staking_confirm_nominations" formatted="false">%s из %s</string>
   <string name="staking_confirm_selected_validators">Выбранные валидаторы</string>
+  <string name="staking_controller">Контроллер</string>
   <string name="staking_controller_account">Контроллер аккаунт</string>
   <string name="staking_controller_account_zero_balance">Мы обнаружили, что на этом аккаунте нет свободных токенов. Вы уверены, что хотите сменить контроллер?</string>
   <string name="staking_controller_can_hint">Контроллер аккаунт может вывести из стейка, забрать, вернуть в стейк, сменить назначение вознаграждений и валидаторов.</string>
@@ -395,6 +402,8 @@
   <string name="staking_max_nominators_reached_message">Достигнуто максимальное количество номинаторов</string>
   <string name="staking_max_nominators_reached_title">Невозможно начать стейкинг</string>
   <string name="staking_month_period_title">Eжемесячно</string>
+  <string name="staking_nominated">Номинировано:</string>
+  <string name="staking_nominations_rewarded_format">%s вознаграждены</string>
   <string name="staking_nominator_status_active">Активен</string>
   <string name="staking_nominator_status_alert_active_message">Один из ваших валидаторов был выбран сетью.</string>
   <string name="staking_nominator_status_alert_active_title">Активный статус</string>
@@ -407,7 +416,6 @@
   <string name="staking_nominator_status_waiting_format">ожидание следующей эры (%s)</string>
   <string name="staking_payout">Выплаты</string>
   <string name="staking_payout_expired">Срок выплаты истёк</string>
-  <string name="staking_reward_destination_payout">Увеличивать баланс</string>
   <plurals name="staking_payouts_days_left">
     <item quantity="one">%d день</item>
     <item quantity="few">%d дня</item>
@@ -415,22 +423,28 @@
     <item quantity="other">%d дней</item>
   </plurals>
   <string name="staking_pending_rewards_info">Валидаторы выплачивают вознаграждения каждые 2–5 дней. Однако, вы можете инициировать выплату самостоятельно, особенно, если срок вознаграждения истекает. В этом случае придётся заплатить комиссию.</string>
-  <string name="staking_pending_rewards_info_v2_2_0">Вознаграждения выплачиваются валидаторами каждые 2–3 дня. Вы можете выплатить их самостоятельно, когда срок вознаграждения истекает, но в этом случае придётся заплатить комиссию</string>
+  <string name="staking_pending_rewards_subtitle">Вы можете выплатить их самостоятельно, когда они близки к истечению, но вы заплатите комиссию</string>
+  <string name="staking_pending_rewards_title">Вознаграждения выплачиваются каждые 2–3 дня валидаторами</string>
   <string name="staking_rebond">Вернуть в стейк</string>
-  <string name="staking_rebond_all">Ребонд все</string>
+  <string name="staking_rebond_all">Всё, что выводится из стейка</string>
+  <string name="staking_rebond_counted_next_era_hint">Возвращенные токены будут учитываться со следующей эры</string>
+  <string name="staking_rebond_custom">Выбрать сумму</string>
   <string name="staking_rebond_insufficient_bondings">Сумма, которую вы хотите вернуть в стейк больше суммы вывода</string>
-  <string name="staking_rebond_last">Ребонд последний</string>
+  <string name="staking_rebond_last">Последний вывод из стейка</string>
   <string name="staking_recommended_feature_1">Самые доходные</string>
   <string name="staking_recommended_feature_2">Не превышен лимит номинаторов</string>
   <string name="staking_recommended_feature_3">Идентифицирован в сети</string>
   <string name="staking_recommended_feature_4">Не был заслешан</string>
   <string name="staking_recommended_feature_5">Лимит 2 валидатора на персонализацию</string>
+  <string name="staking_recommended_filter_identity_subtitle">хотя бы с одним контактом</string>
   <string name="staking_recommended_section_title">Рекомендованные валидаторы</string>
   <string name="staking_recommended_title">Валидаторы</string>
   <string name="staking_recommended_validators_apy">Вознаграждения (APY)</string>
   <string name="staking_redeem">Забрать</string>
   <string name="staking_redeemable_format">Можно забрать: %s</string>
   <string name="staking_reward">Вознаграждение</string>
+  <string name="staking_reward_destination">Место назначения вознаграждения</string>
+  <string name="staking_reward_destination_payout">Увеличивать баланс</string>
   <string name="staking_reward_details_era">Эра</string>
   <string name="staking_reward_details_title">Детали награды</string>
   <string name="staking_reward_details_validator">Валидатор</string>
@@ -442,16 +456,17 @@
   <string name="staking_reward_payouts_payout_all">Выплатить все (%s)</string>
   <string name="staking_reward_payouts_title">Ожидаемые вознаграждения</string>
   <string name="staking_reward_payouts_title_v2_2_0">Невыплаченные награды</string>
+  <string name="staking_rewards_about">О наградах</string>
   <string name="staking_rewards_apy">Вознаграждение (APY)</string>
   <string name="staking_rewards_destination_title_v2_0_0">Назначение наград</string>
-  <string name="staking_rewards_learn_more">Подробнее о вознаграждениях</string>
-  <string name="staking_rewards_learn_more_v2_2_0">Подробнее о вознаграждениях</string>
   <string name="staking_select_custom">Выбрать самому</string>
+  <string name="staking_select_payout_account">Выберите аккаунт для выплат</string>
   <string name="staking_select_recommended">Выбрать рекомендованных</string>
   <string name="staking_selected_validators_count_v1.9.1" formatted="false">выбрано %d (макс. %d)</string>
   <string name="staking_selected_validators_mask">Валидаторы (%d)</string>
-  <string name="staking_set_separate_account_controller">Установите отдельный аккаунт как контроллер, чтобы увеличить безопасность управления стейкингом.</string>
-  <string name="staking_set_separate_account_controller_v2_2_0">Установите отдельный аккаунт как контроллер, чтобы увеличить безопасность стейкинга делегируя ему управление стейком</string>
+  <string name="staking_set_controller_subtitle">Выберите другой аккаунт в качестве контроллера, чтобы делегировать ей операции по управлению стекингом</string>
+  <string name="staking_set_controller_title">Улучшите безопасность стекинга</string>
+  <string name="staking_set_validators">Установить валидаторов</string>
   <string name="staking_set_validators_message">Валидаторы не выбраны</string>
   <string name="staking_set_validators_title">Выберите валидаторов для начала стейкинга</string>
   <string name="staking_setup_amount_too_low">Нельзя застейкать меньше минимального значения (%s)</string>
@@ -461,16 +476,15 @@
   <string name="staking_setup_reward_destination_section_title_v2_2_0">Использовать вознаграждения чтобы</string>
   <string name="staking_setup_reward_payout_account">Аккаунт для выплат</string>
   <string name="staking_slash">Слэш</string>
-  <string name="staking_stake">Стейкинг</string>
+  <string name="staking_stake_format">Застейкать %s</string>
   <string name="staking_staking_period">Время стекинга</string>
   <string name="staking_start_change_validators_custom_subtitle">Вы должны доверять своим валидаторам, чтобы они действовали грамотно и честно. Принятие решения исключительно на основе их текущей прибыльности может привести к снижению прибыли или даже потере средств.</string>
   <string name="staking_start_change_validators_custom_subtitle_v2_2_0">Тщательно выбирайте своих валидаторов, чтобы они действовали профессионально и честно. Принятие решения исключительно на основе прибыльности может привести к уменьшению наград или даже потере стейка</string>
   <string name="staking_start_change_validators_custom_title">Стейкинг с выбранными валидаторами</string>
-  <string name="staking_start_change_validators_recommended_subtitle">Алгоритм Nova Wallet составил список рекомендованных валидаторов, основываясь на критериях:</string>
-  <string name="staking_start_change_validators_recommended_subtitle_v2_2_0">Приложение Nova Wallet составило список рекомендованных валидаторов, используя данные сети и учитывая следующие критерии:</string>
+  <string name="staking_start_change_validators_recommended_subtitle">Nova Wallet выберет лучших валидаторов по критериям безопасности и прибыльности</string>
   <string name="staking_start_change_validators_recommended_title">Стейкинг с рекоммендованными валидаторами</string>
   <string name="staking_start_title">Начать стейкинг</string>
-  <string name="staking_stash_account">Стэш аккаунт</string>
+  <string name="staking_stash">Стэш</string>
   <string name="staking_stash_can_hint">С помощью стэш аккаунта можно застейкать больше и установить контроллер аккаунт</string>
   <string name="staking_stash_can_hint_v2_2_0">Стэш аккаунт может: застейкать больше и установить контроллер аккаунт</string>
   <string name="staking_stash_missing_message">Стэш аккаунт %s недоступен для обновления настроек стейкинга</string>
@@ -491,6 +505,7 @@
   <string name="staking_total_rewards_v1.9.0">Заработано</string>
   <string name="staking_total_staked">Всего застейкано</string>
   <string name="staking_unbond_crossed_existential">В результате этой операции все токены будут выведены из стейкинга.</string>
+  <string name="staking_unbond_too_big">Сумма, которую вы хотите вывести из стейкинга, превышает сумму застейканных токенов.</string>
   <string name="staking_unbond_v1_9_0">Вывод из стейка</string>
   <string name="staking_unbonding_empty_list_v1_9_0">Операции по выводу из стейка появятся здесь</string>
   <string name="staking_unbonding_empty_list_v2_2_0">Операции по выводу из стейка появятся здесь</string>
@@ -517,7 +532,6 @@
   <string name="staking_your_elected_format">Избраны (%s)</string>
   <string name="staking_your_inactive_description">Валидаторы, которые не были избраны в этой эре.</string>
   <string name="staking_your_inactive_description_v2_2_0">Валидаторы с недостаточным стейком, чтобы быть избранными</string>
-  <string name="staking_your_nominated_format">Номинировано: %s</string>
   <string name="staking_your_not_allocated_description">Другие, которые активны без вашего стейка.</string>
   <string name="staking_your_not_allocated_description_v2_2_0">Активные валидаторы без вашего стейка</string>
   <string name="staking_your_not_elected_format">Не избраны (%s)</string>
@@ -530,7 +544,6 @@
   <string name="tabbar_staking_title">Стейкинг</string>
   <string name="tabbar_wallet_title">Кошелёк</string>
   <string name="today">Сегодня</string>
-  <string name="common_status">Статус</string>
   <string name="transaction_details_copy_hash">Копировать хеш</string>
   <string name="transaction_details_extrinsic_fee">Комиссия</string>
   <string name="transaction_details_from">От</string>
