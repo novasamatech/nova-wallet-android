@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.b
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.AssetHistory
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.runtime.ext.findAssetByOrmlCurrencyId
+import io.novafoundation.nova.runtime.ext.isUtilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
@@ -54,7 +55,10 @@ class OrmlAssetHistory(
     }
 
     override fun availableOperationFilters(asset: Chain.Asset): Set<TransactionFilter> {
-        return setOf(TransactionFilter.TRANSFER)
+        return setOfNotNull(
+            TransactionFilter.TRANSFER,
+            TransactionFilter.EXTRINSIC.takeIf { asset.isUtilityAsset }
+        )
     }
 
     private fun GenericCall.Instance.isTransfer(runtime: RuntimeSnapshot): Boolean {

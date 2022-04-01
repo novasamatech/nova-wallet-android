@@ -102,12 +102,7 @@ class SubqueryHistoryRequest(
     }
 
     private fun Asset.Type.transferModules(): List<String> {
-        return when (this) {
-            Asset.Type.Native -> listOf("balances")
-            is Asset.Type.Orml -> listOf("currencies", "tokens")
-            is Asset.Type.Statemine -> listOf("assets")
-            Asset.Type.Unsupported -> throw IllegalArgumentException("Unsupported asset")
-        }
+        return listOf("balances")
     }
 
     private fun isIgnoredExtrinsic(assetType: Asset.Type): String {
