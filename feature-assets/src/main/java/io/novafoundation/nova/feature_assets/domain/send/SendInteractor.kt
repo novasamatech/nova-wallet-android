@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_assets.domain.send
 
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersProvider
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.RecipientSearchResult
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -15,7 +15,7 @@ import java.math.BigInteger
 class SendInteractor(
     private val chainRegistry: ChainRegistry,
     private val walletRepository: WalletRepository,
-    private val assetTransfersProvider: AssetTransfersProvider,
+    private val assetSourceRegistry: AssetSourceRegistry,
 ) {
 
     // TODO wallet
@@ -62,10 +62,10 @@ class SendInteractor(
             }
     }
 
-    fun validationSystemFor(asset: Chain.Asset) = assetTransfersProvider.provideFor(asset).validationSystem
+    fun validationSystemFor(asset: Chain.Asset) = assetSourceRegistry.sourceFor(asset).transfers.validationSystem
 
-    suspend fun areTransfersEnabled(asset: Chain.Asset) = assetTransfersProvider.provideFor(asset).areTransfersEnabled(asset)
+    suspend fun areTransfersEnabled(asset: Chain.Asset) = assetSourceRegistry.sourceFor(asset).transfers.areTransfersEnabled(asset)
 
     private fun getAssetTransfers(transfer: AssetTransfer) =
-        assetTransfersProvider.provideFor(transfer.chainAsset)
+        assetSourceRegistry.sourceFor(transfer.chainAsset).transfers
 }

@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure
@@ -21,7 +22,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.enoughTotalTo
 import io.novafoundation.nova.feature_wallet_api.domain.validation.notPhishingAccount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 import io.novafoundation.nova.feature_wallet_api.domain.validation.validAddress
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.BalanceSourceProvider
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.notDeadRecipient
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -36,7 +36,7 @@ typealias AssetTransfersValidationSystemBuilder = ValidationSystemBuilder<AssetT
 
 abstract class BaseAssetTransfers(
     private val chainRegistry: ChainRegistry,
-    private val balanceSourceProvider: BalanceSourceProvider,
+    private val assetSourceRegistry: AssetSourceRegistry,
     private val extrinsicService: ExtrinsicService,
     private val phishingValidationFactory: PhishingValidationFactory,
 ) : AssetTransfers {
@@ -76,7 +76,7 @@ abstract class BaseAssetTransfers(
     }
 
     private suspend fun existentialDeposit(chain: Chain, asset: Chain.Asset): BigDecimal {
-        val inPlanks = balanceSourceProvider.provideFor(asset)
+        val inPlanks = assetSourceRegistry.sourceFor(asset).balance
             .existentialDeposit(chain, asset)
 
         return asset.amountFromPlanks(inPlanks)
@@ -121,14 +121,14 @@ abstract class BaseAssetTransfers(
     )
 
     protected fun AssetTransfersValidationSystemBuilder.notDeadRecipientInUsedAsset() = notDeadRecipient(
-        balanceSourceProvider = balanceSourceProvider,
+        assetSourceRegistry = assetSourceRegistry,
         assetToCheck = { it.usedAsset },
         addingAmount = { it.transfer.amountInPlanks },
         failure = { AssetTransferValidationFailure.DeadRecipient.InUsedAsset }
     )
 
     protected fun AssetTransfersValidationSystemBuilder.notDeadRecipientInCommissionAsset() = notDeadRecipient(
-        balanceSourceProvider = balanceSourceProvider,
+        assetSourceRegistry = assetSourceRegistry,
         assetToCheck = { it.commissionAsset },
         addingAmount = { it.amountInCommissionAsset },
         failure = { AssetTransferValidationFailure.DeadRecipient.InCommissionAsset(commissionAsset = it.commissionAsset.token.configuration) }

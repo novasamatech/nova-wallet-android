@@ -39,7 +39,6 @@ import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorSto
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.ext.historySupported
-import io.novafoundation.nova.runtime.ext.isUtilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -166,8 +165,8 @@ class WalletRepositoryImpl(
 
         val elements = page.map { mapOperationToOperationLocalDb(it, chainAsset, OperationLocal.Source.SUBQUERY) }
 
-        operationDao.insertFromSubquery(accountAddress, chain.id, chainAsset.id, elements)
         cursorStorage.saveCursor(chain.id, chainAsset.id, accountId, page.nextCursor)
+        operationDao.insertFromSubquery(accountAddress, chain.id, chainAsset.id, elements)
     }
 
     override suspend fun getOperations(
@@ -179,18 +178,20 @@ class WalletRepositoryImpl(
         chainAsset: Chain.Asset,
     ): CursorPage<Operation> {
         return withContext(Dispatchers.Default) {
-            if (!isHistorySupported(chain, chainAsset)) {
+            if (!chain.historySupported) {
                 return@withContext CursorPage(nextCursor = null, items = emptyList())
             }
 
+            val request = SubqueryHistoryRequest(
+                accountAddress = chain.addressOf(accountId),
+                pageSize = pageSize,
+                cursor = cursor,
+                filters = filters,
+                assetType = chainAsset.type
+            )
             val response = walletOperationsApi.getOperationsHistory(
-                url = chain.externalApi!!.history!!.url, // TODO external api is optional
-                SubqueryHistoryRequest(
-                    accountAddress = chain.addressOf(accountId),
-                    pageSize,
-                    cursor,
-                    filters
-                )
+                url = chain.externalApi!!.history!!.url,
+                request
             ).data.query
 
             val pageInfo = response.historyElements.pageInfo
@@ -213,8 +214,7 @@ class WalletRepositoryImpl(
                 mapOperationLocalToOperation(it, chainAsset)
             }
             .mapLatest { operations ->
-                // TODO force allow history for utility assets only since SubQuery projects are not yet ready for multi-asset
-                val cursor = if (chain.historySupported && chainAsset.isUtilityAsset) {
+                val cursor = if (chain.historySupported) {
                     cursorStorage.awaitCursor(chain.id, chainAsset.id, accountId)
                 } else {
                     null
@@ -223,8 +223,6 @@ class WalletRepositoryImpl(
                 CursorPage(cursor, operations)
             }
     }
-
-    private fun isHistorySupported(chain: Chain, chainAsset: Chain.Asset) = chain.historySupported && chainAsset.isUtilityAsset
 
     override suspend fun getContacts(
         accountId: AccountId,

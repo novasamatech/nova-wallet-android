@@ -9,7 +9,7 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.feature_assets.presentation.WalletRouter
-import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProvider
+import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProviderFactory
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.TransactionHistoryFilterViewModel
 
 @Module(includes = [ViewModelModule::class])
@@ -20,9 +20,9 @@ class TransactionHistoryFilterModule {
     @ViewModelKey(TransactionHistoryFilterViewModel::class)
     fun provideViewModel(
         router: WalletRouter,
-        provider: HistoryFiltersProvider
+        historyFiltersProviderFactory: HistoryFiltersProviderFactory
     ): ViewModel {
-        return TransactionHistoryFilterViewModel(router, provider)
+        return TransactionHistoryFilterViewModel(router, historyFiltersProviderFactory)
     }
 
     @Provides

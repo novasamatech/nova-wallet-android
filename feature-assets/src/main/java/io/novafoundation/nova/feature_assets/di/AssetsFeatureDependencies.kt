@@ -4,6 +4,7 @@ import android.content.ContentResolver
 import coil.ImageLoader
 import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
@@ -22,7 +23,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.W
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersProvider
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
@@ -102,7 +103,7 @@ interface AssetsFeatureDependencies {
 
     fun walletConstants(): WalletConstants
 
-    fun assetTransfersProvider(): AssetTransfersProvider
+    val assetsSourceRegistry: AssetSourceRegistry
 
     fun nftRepository(): NftRepository
 
@@ -111,4 +112,6 @@ interface AssetsFeatureDependencies {
     val multiChainQrSharingFactory: MultiChainQrSharingFactory
 
     val walletUiUseCase: WalletUiUseCase
+
+    val computationalCache: ComputationalCache
 }
