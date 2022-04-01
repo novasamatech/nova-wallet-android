@@ -15,45 +15,48 @@
         app:dividerVisible="false"
         app:homeButtonIcon="@drawable/ic_close" />
 
-    <LinearLayout
+    <com.google.android.flexbox.FlexboxLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:layout_marginEnd="16dp"
+        app:flexDirection="row"
+        app:flexWrap="wrap">
 
         <TextView
             android:id="@+id/selectSendTitle"
             style="@style/TextAppearance.NovaFoundation.Bold.Title2"
             android:layout_width="wrap_content"
-            android:includeFontPadding="false"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="8dp"
+            android:includeFontPadding="false"
             tools:text="Send KSM on" />
 
         <io.novafoundation.nova.feature_account_api.view.ChainChipView
+            android:id="@+id/selectSendChain"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/selectSendChain"
-            android:layout_marginStart="10dp" />
-    </LinearLayout>
+            android:layout_marginBottom="8dp" />
+    </com.google.android.flexbox.FlexboxLayout>
 
     <TextView
         style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="wrap_content"
-        android:textColor="@color/white_64"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
         android:layout_height="wrap_content"
-        android:text="@string/wallet_recipient"/>
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/wallet_recipient"
+        android:textColor="@color/white_64" />
 
     <io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputField
+        android:id="@+id/selectSendRecipient"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:id="@+id/selectSendRecipient"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="8dp" />
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp" />
 
     <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.ChooseAmountView
         android:id="@+id/selectSendAmount"
@@ -69,8 +72,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="12dp"
-        app:dividerVisible="false"
-        android:layout_marginEnd="16dp" />
+        android:layout_marginEnd="16dp"
+        app:dividerVisible="false" />
 
     <Space
         android:layout_width="wrap_content"
@@ -82,8 +85,8 @@
         style="@style/Widget.Nova.Button.Primary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="24dp"
         android:enabled="false"
