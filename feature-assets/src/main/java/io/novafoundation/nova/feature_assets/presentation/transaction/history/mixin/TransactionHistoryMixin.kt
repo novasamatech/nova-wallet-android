@@ -6,13 +6,19 @@ import kotlinx.coroutines.flow.Flow
 
 interface TransactionHistoryUi {
 
-    sealed class State {
+    class State(
+        val filtersButtonVisible: Boolean,
+        val listState: ListState,
+    ) {
 
-        object Empty : State()
+        sealed class ListState {
 
-        object EmptyProgress : State()
+            object Empty : State.ListState()
 
-        class Data(val items: List<Any>) : State()
+            object EmptyProgress : State.ListState()
+
+            class Data(val items: List<Any>) : State.ListState()
+        }
     }
 
     val state: Flow<State>

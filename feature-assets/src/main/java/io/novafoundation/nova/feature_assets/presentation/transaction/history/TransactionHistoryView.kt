@@ -89,6 +89,10 @@ class TransferHistorySheet @JvmOverloads constructor(
         updateSlidingEffects()
     }
 
+    fun setFiltersVisible(visible: Boolean) {
+        transactionHistoryFilter.setVisible(visible)
+    }
+
     fun showProgress() {
         placeholder.makeGone()
         transactionHistoryProgress.makeVisible()

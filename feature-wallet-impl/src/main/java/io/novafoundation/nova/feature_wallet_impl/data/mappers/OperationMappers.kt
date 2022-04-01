@@ -167,6 +167,18 @@ fun mapNodeToOperation(
             )
         }
 
+        node.assetTransfer != null -> with(node.assetTransfer) {
+            Operation.Type.Transfer(
+                myAddress = node.address,
+                amount = amount,
+                receiver = to,
+                sender = from,
+                fee = fee,
+                status = Operation.Status.fromSuccess(success),
+                hash = node.extrinsicHash
+            )
+        }
+
         else -> throw IllegalStateException("All of the known operation type fields were null")
     }
 

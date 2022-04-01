@@ -3,17 +3,17 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.asset
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.common.validation.validOrError
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidation
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PlanksProducer
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.BalanceSourceProvider
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import java.math.BigInteger
 
 class DeadRecipientValidation(
-    private val balanceSourceProvider: BalanceSourceProvider,
+    private val assetSourceRegistry: AssetSourceRegistry,
     private val addingAmount: PlanksProducer<AssetTransferPayload>,
     private val assetToCheck: (AssetTransferPayload) -> Asset,
     private val failure: (AssetTransferPayload) -> AssetTransferValidationFailure.DeadRecipient,
@@ -23,7 +23,7 @@ class DeadRecipientValidation(
         val chain = value.transfer.chain
         val chainAsset = assetToCheck(value).token.configuration
 
-        val balanceSource = balanceSourceProvider.provideFor(chainAsset)
+        val balanceSource = assetSourceRegistry.sourceFor(chainAsset).balance
 
         val existentialDeposit = balanceSource.existentialDeposit(chain, chainAsset)
         val recipientAccountId = value.transfer.chain.accountIdOf(value.transfer.recipient)
@@ -37,13 +37,13 @@ class DeadRecipientValidation(
 }
 
 fun ValidationSystemBuilder<AssetTransferPayload, AssetTransferValidationFailure>.notDeadRecipient(
-    balanceSourceProvider: BalanceSourceProvider,
+    assetSourceRegistry: AssetSourceRegistry,
     failure: (AssetTransferPayload) -> AssetTransferValidationFailure.DeadRecipient,
     assetToCheck: (AssetTransferPayload) -> Asset,
     addingAmount: PlanksProducer<AssetTransferPayload> = { BigInteger.ZERO },
 ) = validate(
     DeadRecipientValidation(
-        balanceSourceProvider = balanceSourceProvider,
+        assetSourceRegistry = assetSourceRegistry,
         addingAmount = addingAmount,
         assetToCheck = assetToCheck,
         failure = failure

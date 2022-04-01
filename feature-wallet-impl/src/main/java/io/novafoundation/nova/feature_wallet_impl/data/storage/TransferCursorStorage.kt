@@ -1,8 +1,9 @@
 package io.novafoundation.nova.feature_wallet_impl.data.storage
 
 import io.novafoundation.nova.common.data.storage.Preferences
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import jp.co.soramitsu.fearless_utils.extensions.toHexString
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -42,5 +43,5 @@ class TransferCursorStorage(
             }
         }.first()
 
-    private fun cursorKey(chainId: String, chainAssetId: Int, accountId: AccountId) = "$TRANSACTIONS_CURSOR_KEY:$accountId:$chainId:$chainAssetId"
+    private fun cursorKey(chainId: String, chainAssetId: Int, accountId: AccountId) = "$TRANSACTIONS_CURSOR_KEY:${accountId.toHexString()}:$chainId:$chainAssetId"
 }

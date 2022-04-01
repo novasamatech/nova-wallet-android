@@ -15,6 +15,7 @@ import io.novafoundation.nova.core_db.dao.TokenDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.di.Wallet
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
@@ -25,7 +26,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoade
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderProviderFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.SubstrateRemoteSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.WssSubstrateSource
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.BalanceSourceProvider
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.BalancesUpdateSystem
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.balance.PaymentUpdaterFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.coingecko.CoingeckoApi
@@ -127,11 +127,11 @@ class WalletFeatureModule {
     @FeatureScope
     fun providePaymentUpdaterFactory(
         operationDao: OperationDao,
-        balanceSourceProvider: BalanceSourceProvider,
+        assetSourceRegistry: AssetSourceRegistry,
         accountUpdateScope: AccountUpdateScope,
     ) = PaymentUpdaterFactory(
         operationDao,
-        balanceSourceProvider,
+        assetSourceRegistry,
         accountUpdateScope
     )
 

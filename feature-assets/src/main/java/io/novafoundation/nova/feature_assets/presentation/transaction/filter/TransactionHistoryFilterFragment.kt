@@ -5,11 +5,12 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.CompoundButton
 import androidx.lifecycle.lifecycleScope
-import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.common.view.bindFromMap
+import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
@@ -57,6 +58,8 @@ class TransactionHistoryFilterFragment : BaseFragment<TransactionHistoryFilterVi
     }
 
     private fun CompoundButton.bindFilter(filter: TransactionFilter) {
-        bindFromMap(filter, viewModel.filtersEnabledMap, viewLifecycleOwner.lifecycleScope)
+        lifecycleScope.launchWhenResumed {
+            bindFromMap(filter, viewModel.filtersEnabledMap(), viewLifecycleOwner.lifecycleScope)
+        }
     }
 }

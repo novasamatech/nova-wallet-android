@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_assets.presentation
 
+import androidx.lifecycle.Lifecycle
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 
@@ -30,4 +31,6 @@ interface WalletRouter {
     fun openAssetFilters()
 
     fun openNfts()
+
+    val currentStackEntryLifecycle: Lifecycle
 }
