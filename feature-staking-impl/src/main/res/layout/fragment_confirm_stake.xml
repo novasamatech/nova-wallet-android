@@ -12,202 +12,103 @@
         android:id="@+id/confirmStakeToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:titleText="@string/common_confirm_title" />
+        app:dividerVisible="false"
+        tools:titleText="@string/staking_start_title" />
 
-    <io.novafoundation.nova.common.view.LabeledTextView
-        android:id="@+id/confirmStakeOriginAccount"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        app:actionIcon="@drawable/ic_more"
-        app:enabled="false"
-        app:label="@string/account_info_title" />
-
-    <io.novafoundation.nova.common.view.AmountView
-        android:id="@+id/confirmStakeAmount"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:enabled="false" />
-
-    <io.novafoundation.nova.feature_staking_impl.presentation.view.RewardDestinationViewer
-        android:id="@+id/confirmStakeRewardDestination"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp" />
-
-    <LinearLayout
-        android:id="@+id/confirmStakeSelectedValidators"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/bg_primary_list_item"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingTop="16dp"
-        android:paddingBottom="15dp">
-
-        <TextView
-            style="@style/TextAppearance.NovaFoundation.Body1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_weight="1"
-            android:text="@string/staking_confirm_selected_validators"
-            android:textColor="@color/gray1" />
-
-        <TextView
-            android:id="@+id/confirmStakeSelectedValidatorsCount"
-            style="@style/TextAppearance.NovaFoundation.Body1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            tools:text="16 of 16" />
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:src="@drawable/ic_chevron_right" />
-    </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:background="@color/gray3" />
-
-    <TextView
-        android:id="@+id/confirmStakingEachEraLength"
-        style="@style/TextAppearance.NovaFoundation.Body2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:drawablePadding="8dp"
-        android:gravity="left|center"
-        android:includeFontPadding="false"
-        android:text="@string/staking_hint_rewards_format_v2_2_0"
-        android:textColor="@color/white"
-        app:drawableLeftCompat="@drawable/ic_nova" />
-
-    <TextView
-        android:id="@+id/confirmStakingUnstakingPeriodLength"
-        style="@style/TextAppearance.NovaFoundation.Body2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:drawablePadding="8dp"
-        android:gravity="left|center"
-        android:includeFontPadding="false"
-        android:text="@string/staking_hint_unstake_format_v2_2_0"
-        android:textColor="@color/white"
-        app:drawableLeftCompat="@drawable/ic_nova" />
-
-    <TextView
-        style="@style/TextAppearance.NovaFoundation.Body2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:drawablePadding="8dp"
-        android:gravity="left|center"
-        android:includeFontPadding="false"
-        android:text="@string/staking_hint_no_rewards_v2_2_0"
-        android:textColor="@color/white"
-        app:drawableLeftCompat="@drawable/ic_nova" />
-
-    <TextView
-        style="@style/TextAppearance.NovaFoundation.Body2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:drawablePadding="8dp"
-        android:gravity="left|center"
-        android:includeFontPadding="false"
-        android:text="@string/staking_hint_redeem_v2_2_0"
-        android:textColor="@color/white"
-        app:drawableLeftCompat="@drawable/ic_nova" />
-
-    <Space
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/gray4"
-        android:orientation="vertical">
-
-        <LinearLayout
+        <ScrollView
+            android:overScrollMode="never"
+            android:paddingBottom="84dp"
+            android:clipToPadding="false"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="15dp"
-            android:layout_marginEnd="16dp"
-            android:orientation="horizontal">
+            android:layout_height="match_parent">
 
-            <TextView
-                style="@style/TextAppearance.NovaFoundation.Body1"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/network_fee"
-                android:textColor="@color/gray1" />
+                android:orientation="vertical">
 
-            <ProgressBar
-                android:id="@+id/confirmStakingFeeProgress"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:layout_gravity="center_vertical"
-                android:indeterminate="true"
-                android:indeterminateTint="@color/white" />
+                <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.PrimaryAmountView
+                    android:id="@+id/confirmStakeAmount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp" />
 
-            <TextView
-                android:id="@+id/confirmStakingFeeToken"
-                style="@style/TextAppearance.NovaFoundation.Body1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:textColor="@color/white"
-                android:visibility="gone" />
+                <io.novafoundation.nova.common.view.TableView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginEnd="16dp">
 
+                    <io.novafoundation.nova.common.view.TableCellView
+                        android:id="@+id/confirmStakeWallet"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:title="@string/tabbar_wallet_title" />
 
-            <TextView
-                android:id="@+id/confirmStakingFeeFiat"
-                style="@style/TextAppearance.NovaFoundation.Body1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/gray2" />
-        </LinearLayout>
+                    <io.novafoundation.nova.common.view.TableCellView
+                        android:id="@+id/confirmStakeAccount"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:primaryValueIcon="@drawable/ic_info_16"
+                        app:title="@string/common_account" />
 
+                    <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
+                        android:id="@+id/confirmStakeFee"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </io.novafoundation.nova.common.view.TableView>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="15dp"
-            android:layout_marginEnd="16dp"
-            android:background="@color/gray3" />
+                <io.novafoundation.nova.feature_staking_impl.presentation.view.RewardDestinationViewer
+                    android:id="@+id/confirmStakeRewardDestination"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginEnd="16dp" />
+
+                <io.novafoundation.nova.common.view.TableView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginEnd="16dp">
+
+                    <io.novafoundation.nova.common.view.TableCellView
+                        android:id="@+id/confirmStakeValidators"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:primaryValueIcon="@drawable/ic_chevron_right"
+                        app:title="@string/staking_confirm_selected_validators" />
+                </io.novafoundation.nova.common.view.TableView>
+
+                <io.novafoundation.nova.common.mixin.hints.HintsView
+                    android:id="@+id/confirmStakeHints"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp" />
+            </LinearLayout>
+        </ScrollView>
 
         <io.novafoundation.nova.common.view.PrimaryButton
             android:id="@+id/confirmStakeConfirm"
             style="@style/Widget.Nova.Button.Primary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
-            android:layout_marginBottom="22dp"
+            android:layout_marginBottom="16dp"
             android:text="@string/common_confirm" />
-    </LinearLayout>
+    </FrameLayout>
 </LinearLayout>

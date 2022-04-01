@@ -26,5 +26,14 @@ fun mainStakingValidationFailure(
             getString(R.string.common_error_general_title) to
                 getString(R.string.staking_add_controller, reason.controllerAddress)
         }
+
+        is StakeActionsValidationFailure.UnbondingRequestLimitReached -> {
+            getString(R.string.staking_unbonding_limit_reached_title) to
+                getString(R.string.staking_unbonding_limit_reached_message, reason.limit)
+        }
+        is StakeActionsValidationFailure.StashRequired -> {
+            getString(R.string.common_error_general_title) to
+                getString(R.string.staking_stash_missing_message, reason.stashAddress)
+        }
     }
 }

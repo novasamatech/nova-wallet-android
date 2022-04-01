@@ -8,15 +8,12 @@ import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
-import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.alerts.model.AlertModel
 import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_alert.view.alertItemDivider
 import kotlinx.android.synthetic.main.item_alert.view.alertItemGoToFlowIcon
 import kotlinx.android.synthetic.main.item_alert.view.alertItemMessage
 import kotlinx.android.synthetic.main.item_alert.view.alertItemTitle
-import kotlinx.android.synthetic.main.item_alert.view.imageView
 
 class AlertsAdapter : ListAdapter<AlertModel, AlertsAdapter.AlertViewHolder>(AlertDiffCallback()) {
 
@@ -27,16 +24,14 @@ class AlertsAdapter : ListAdapter<AlertModel, AlertsAdapter.AlertViewHolder>(Ale
     }
 
     override fun onBindViewHolder(holder: AlertViewHolder, position: Int) {
-        val isLast = position == itemCount - 1
-
         val item = getItem(position)
 
-        holder.bind(item, isLast)
+        holder.bind(item)
     }
 
     class AlertViewHolder(override val containerView: View) : RecyclerView.ViewHolder(containerView), LayoutContainer {
-        fun bind(alert: AlertModel, isLast: Boolean) = with(containerView) {
-            imageView.setImageResource(alert.icon)
+
+        fun bind(alert: AlertModel) = with(containerView) {
             alertItemTitle.text = alert.title
             alertItemMessage.text = alert.extraMessage
 
@@ -49,8 +44,6 @@ class AlertsAdapter : ListAdapter<AlertModel, AlertsAdapter.AlertViewHolder>(Ale
             } else {
                 alertItemGoToFlowIcon.makeGone()
             }
-
-            alertItemDivider.setVisible(isLast.not())
         }
     }
 }

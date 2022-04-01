@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:background="@color/yellow_12"
+    tools:orientation="horizontal"
+    tools:paddingBottom="10dp"
+    tools:paddingEnd="16dp"
+    tools:paddingStart="16dp"
+    tools:paddingTop="10dp"
+    tools:parentTag="android.widget.LinearLayout">
+
+    <ImageView
+        android:id="@+id/alertIcon"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        tools:src="@drawable/ic_warning_filled" />
+
+    <TextView
+        android:id="@+id/alertMessage"
+        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_weight="1"
+        android:layout_gravity="center_vertical"
+        android:includeFontPadding="false"
+        android:textColor="@color/white"
+        tools:text="@tools:sample/lorem[20]" />
+</merge>

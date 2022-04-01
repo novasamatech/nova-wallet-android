@@ -15,6 +15,7 @@
         android:paddingStart="32dp"
         android:paddingTop="4.5dp"
         android:paddingEnd="8dp"
+        android:singleLine="true"
         android:paddingBottom="4.5dp"
         android:textColor="@color/white_80"
         tools:background="@color/white_16"

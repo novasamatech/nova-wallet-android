@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_staking_impl.presentation.confirm
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AddressModel
@@ -11,12 +10,14 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Retriable
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.requireException
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_api.domain.model.RewardDestination
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingState
@@ -33,20 +34,16 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStak
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.common.rewardDestination.RewardDestinationModel
 import io.novafoundation.nova.feature_staking_impl.presentation.common.validation.stakingValidationFailure
-import io.novafoundation.nova.feature_wallet_api.data.mappers.mapAssetToAssetModel
+import io.novafoundation.nova.feature_staking_impl.presentation.confirm.hints.ConfirmStakeHintsMixinFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
@@ -63,6 +60,8 @@ class ConfirmStakingViewModel(
     private val externalActions: ExternalActions.Presentation,
     private val selectedAssetState: SingleAssetSharedState,
     private val validationExecutor: ValidationExecutor,
+    walletUiUseCase: WalletUiUseCase,
+    hintsMixinFactory: ConfirmStakeHintsMixinFactory,
 ) : BaseViewModel(),
     Retriable,
     Validatable by validationExecutor,
@@ -70,8 +69,9 @@ class ConfirmStakingViewModel(
     ExternalActions by externalActions {
 
     private val currentProcessState = setupStakingSharedState.get<SetupStakingProcess.ReadyToSubmit>()
-
     private val payload = currentProcessState.payload
+
+    val hintsMixin = hintsMixinFactory.create(coroutineScope = this, payload)
 
     private val bondPayload = when (payload) {
         is Payload.Full -> BondPayload(payload.amount, payload.rewardDestination)
@@ -83,13 +83,12 @@ class ConfirmStakingViewModel(
         .inBackground()
         .share()
 
-    private val controllerAddressFlow = flowOf(payload)
-        .map {
-            when (it) {
-                is Payload.Full -> it.currentAccountAddress
-                else -> stashFlow.first().controllerAddress
-            }
+    private val controllerAddressFlow = flowOf {
+        when (payload) {
+            is Payload.Full -> payload.currentAccountAddress
+            else -> stashFlow.first().controllerAddress
         }
+    }
         .inBackground()
         .share()
 
@@ -98,69 +97,51 @@ class ConfirmStakingViewModel(
         .inBackground()
         .share()
 
-    val assetModelLiveData = controllerAssetFlow
-        .map { mapAssetToAssetModel(it, resourceManager) }
-        .inBackground()
-        .asLiveData()
-
-    val currentAccountModelFlow = controllerAddressFlow.map {
-        generateDestinationModel(it, addressDisplayUseCase(it))
+    val title = flowOf {
+        when (payload) {
+            is Payload.ExistingStash, is Payload.Full -> resourceManager.getString(R.string.staking_start_title)
+            is Payload.Validators -> resourceManager.getString(R.string.staking_change_validators)
+        }
     }
         .inBackground()
         .share()
 
-    val nominationsLiveData = liveData(Dispatchers.Default) {
+    val amountModel = controllerAssetFlow.map { asset ->
+        bondPayload?.let {
+            mapAmountToAmountModel(it.amount, asset)
+        }
+    }
+        .inBackground()
+        .share()
+
+    val walletFlow = walletUiUseCase.selectedWalletUiFlow()
+        .inBackground()
+        .share()
+
+    val currentAccountModelFlow = controllerAddressFlow.map {
+        generateDestinationModel(it, name = null)
+    }
+        .inBackground()
+        .share()
+
+    val nominationsFlow = flowOf {
         val selectedCount = payload.validators.size
         val maxValidatorsPerNominator = interactor.maxValidatorsPerNominator()
 
-        emit(resourceManager.getString(R.string.staking_confirm_nominations, selectedCount, maxValidatorsPerNominator))
+        resourceManager.getString(R.string.staking_confirm_nominations, selectedCount, maxValidatorsPerNominator)
     }
 
-    val displayAmountLiveData = flowOf(payload)
-        .transform { payload ->
-            when (payload) {
-                is Payload.Full -> emit(payload.amount)
-                is Payload.ExistingStash -> emitAll(controllerAssetFlow.map { it.bonded })
-                else -> emit(null)
-            }
+    val rewardDestinationFlow = flowOf {
+        val rewardDestination = when (payload) {
+            is Payload.Full -> payload.rewardDestination
+            is Payload.ExistingStash -> interactor.getRewardDestination(stashFlow.first())
+            else -> null
         }
-        .asLiveData()
 
-    val unstakingTime = flow {
-        val lockupPeriod = interactor.getLockupPeriodInDays()
-        emit(
-            resourceManager.getString(
-                R.string.staking_hint_unstake_format_v2_2_0,
-                resourceManager.getQuantityString(R.plurals.staking_main_lockup_period_value, lockupPeriod, lockupPeriod)
-            )
-        )
-    }.inBackground()
-        .share()
-
-    val eraHoursLength = flow {
-        val hours = interactor.getEraHoursLength()
-        emit(
-            resourceManager.getString(
-                R.string.staking_hint_rewards_format_v2_2_0,
-                resourceManager.getQuantityString(R.plurals.common_hours_format, hours, hours)
-            )
-        )
+        rewardDestination?.let { mapRewardDestinationToRewardDestinationModel(it) }
     }
         .inBackground()
         .share()
-
-    val rewardDestinationLiveData = flowOf(payload)
-        .map {
-            val rewardDestination = when (payload) {
-                is Payload.Full -> payload.rewardDestination
-                is Payload.ExistingStash -> interactor.getRewardDestination(stashFlow.first())
-                else -> null
-            }
-
-            rewardDestination?.let { mapRewardDestinationToRewardDestinationModel(it) }
-        }
-        .inBackground()
-        .asLiveData()
 
     private val _showNextProgress = MutableLiveData(false)
     val showNextProgress: LiveData<Boolean> = _showNextProgress
@@ -184,7 +165,7 @@ class ConfirmStakingViewModel(
     }
 
     fun payoutAccountClicked() = launch {
-        val payoutDestination = rewardDestinationLiveData.value as? RewardDestinationModel.Payout ?: return@launch
+        val payoutDestination = rewardDestinationFlow.first() as? RewardDestinationModel.Payout ?: return@launch
 
         val type = ExternalActions.Type.Address(payoutDestination.destination.address)
         externalActions.showExternalActions(type, selectedAssetState.chain())
@@ -280,6 +261,11 @@ class ConfirmStakingViewModel(
     )
 
     private suspend fun generateDestinationModel(address: String, name: String?): AddressModel {
-        return addressIconGenerator.createAddressModel(address, AddressIconGenerator.SIZE_MEDIUM, name)
+        return addressIconGenerator.createAddressModel(
+            accountAddress = address,
+            sizeInDp = AddressIconGenerator.SIZE_MEDIUM,
+            accountName = name,
+            background = AddressIconGenerator.BACKGROUND_TRANSPARENT
+        )
     }
 }

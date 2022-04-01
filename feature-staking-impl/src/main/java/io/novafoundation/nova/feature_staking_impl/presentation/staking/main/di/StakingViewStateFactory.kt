@@ -4,9 +4,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingState
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.main.ManageStakeAction
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculatorFactory
-import io.novafoundation.nova.feature_staking_impl.domain.validations.main.StakeActionsValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.validations.welcome.WelcomeStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
@@ -14,6 +12,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.Nom
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.StashNoneViewState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.ValidatorViewState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.WelcomeViewState
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.manage.ManageStakeMixinFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.unbonding.UnbondingMixinFactory
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -25,7 +25,8 @@ class StakingViewStateFactory(
     private val router: StakingRouter,
     private val rewardCalculatorFactory: RewardCalculatorFactory,
     private val welcomeStakingValidationSystem: WelcomeStakingValidationSystem,
-    private val stakeActionsValidations: Map<ManageStakeAction, StakeActionsValidationSystem>,
+    private val manageStakeMixinFactory: ManageStakeMixinFactory,
+    private val unbondingMixinFactory: UnbondingMixinFactory,
     private val validationExecutor: ValidationExecutor
 ) {
 
@@ -42,8 +43,9 @@ class StakingViewStateFactory(
         router = router,
         errorDisplayer = errorDisplayer,
         resourceManager = resourceManager,
-        stakeActionsValidations = stakeActionsValidations,
-        validationExecutor = validationExecutor
+        validationExecutor = validationExecutor,
+        unbondingMixinFactory = unbondingMixinFactory,
+        manageStakeMixinFactory = manageStakeMixinFactory,
     )
 
     fun createStashNoneState(
@@ -59,8 +61,9 @@ class StakingViewStateFactory(
         scope = scope,
         router = router,
         errorDisplayer = errorDisplayer,
-        stakeActionsValidations = stakeActionsValidations,
-        validationExecutor = validationExecutor
+        validationExecutor = validationExecutor,
+        unbondingMixinFactory = unbondingMixinFactory,
+        manageStakeMixinFactory = manageStakeMixinFactory,
     )
 
     fun createWelcomeViewState(
@@ -92,7 +95,8 @@ class StakingViewStateFactory(
         router = router,
         errorDisplayer = errorDisplayer,
         resourceManager = resourceManager,
-        stakeActionsValidations = stakeActionsValidations,
-        validationExecutor = validationExecutor
+        validationExecutor = validationExecutor,
+        unbondingMixinFactory = unbondingMixinFactory,
+        manageStakeMixinFactory = manageStakeMixinFactory,
     )
 }

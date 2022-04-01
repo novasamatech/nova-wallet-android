@@ -35,6 +35,9 @@ class Toolbar @JvmOverloads constructor(
     val rightActionText: TextView
         get() = rightText
 
+    val titleView: TextView
+        get() = titleTv
+
     init {
         View.inflate(context, R.layout.view_toolbar, this)
 
@@ -124,10 +127,9 @@ class Toolbar @JvmOverloads constructor(
         backImg.visibility = if (visible) View.VISIBLE else View.GONE
     }
 
-    fun addCustomAction(@DrawableRes icon: Int, onClick: OnClickListener) {
+    fun addCustomAction(@DrawableRes icon: Int, onClick: OnClickListener): ImageView {
         val actionView = ImageView(context).apply {
             setImageResource(icon)
-            imageTintList = context.getColorStateList(R.color.actions_color)
 
             layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
                 val verticalMargin = 16.dp(context)
@@ -145,5 +147,7 @@ class Toolbar @JvmOverloads constructor(
 
         toolbarCustomActions.makeVisible()
         toolbarCustomActions.addView(actionView, 0)
+
+        return actionView
     }
 }

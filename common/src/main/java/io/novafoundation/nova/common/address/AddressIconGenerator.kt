@@ -36,17 +36,26 @@ interface AddressIconGenerator {
 }
 
 @Throws(AddressFormatException::class)
-suspend fun AddressIconGenerator.createAddressModel(accountAddress: String, sizeInDp: Int, accountName: String? = null): AddressModel {
-    val icon = createAddressIcon(accountAddress, sizeInDp)
+suspend fun AddressIconGenerator.createAddressModel(
+    accountAddress: String,
+    sizeInDp: Int,
+    accountName: String? = null,
+    @ColorRes background: Int = AddressIconGenerator.BACKGROUND_DEFAULT
+): AddressModel {
+    val icon = createAddressIcon(accountAddress, sizeInDp, background)
 
     return AddressModel(accountAddress, icon, accountName)
 }
 
 @Throws(AddressFormatException::class)
-suspend fun AddressIconGenerator.createAddressIcon(accountAddress: String, sizeInDp: Int) = withContext(Dispatchers.Default) {
+suspend fun AddressIconGenerator.createAddressIcon(
+    accountAddress: String,
+    sizeInDp: Int,
+    @ColorRes background: Int = AddressIconGenerator.BACKGROUND_DEFAULT
+) = withContext(Dispatchers.Default) {
     val addressId = accountAddress.toAccountId()
 
-    createAddressIcon(addressId, sizeInDp)
+    createAddressIcon(addressId, sizeInDp, background)
 }
 
 class CachingAddressIconGenerator(

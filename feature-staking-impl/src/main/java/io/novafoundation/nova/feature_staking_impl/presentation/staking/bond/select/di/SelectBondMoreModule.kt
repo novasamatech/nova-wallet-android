@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
@@ -16,6 +17,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.validations.bond.BondM
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.select.SelectBondMorePayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.select.SelectBondMoreViewModel
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 
 @Module(includes = [ViewModelModule::class])
@@ -32,17 +34,21 @@ class SelectBondMoreModule {
         validationExecutor: ValidationExecutor,
         validationSystem: BondMoreValidationSystem,
         feeLoaderMixin: FeeLoaderMixin.Presentation,
-        payload: SelectBondMorePayload
+        payload: SelectBondMorePayload,
+        amountChooserMixinFactory: AmountChooserMixin.Factory,
+        resourcesHintsMixinFactory: ResourcesHintsMixinFactory,
     ): ViewModel {
         return SelectBondMoreViewModel(
-            router,
-            interactor,
-            bondMoreInteractor,
-            resourceManager,
-            validationExecutor,
-            validationSystem,
-            feeLoaderMixin,
-            payload
+            router = router,
+            interactor = interactor,
+            bondMoreInteractor = bondMoreInteractor,
+            resourceManager = resourceManager,
+            validationExecutor = validationExecutor,
+            validationSystem = validationSystem,
+            feeLoaderMixin = feeLoaderMixin,
+            payload = payload,
+            amountChooserMixinFactory = amountChooserMixinFactory,
+            hintsMixinFactory = resourcesHintsMixinFactory
         )
     }
 

@@ -111,6 +111,8 @@ private fun TextView.setCompoundDrawable(
     compoundDrawablePadding = paddingInPx
 }
 
+fun TextView.removeCompoundDrawables() = setCompoundDrawablesRelative(null, null, null, null)
+
 fun TextView.setDrawableEnd(
     @DrawableRes drawableRes: Int? = null,
     widthInDp: Int? = null,

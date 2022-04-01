@@ -4,23 +4,25 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.lifecycleScope
-import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.mixin.impl.observeRetries
+import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeValidations
-import io.novafoundation.nova.common.utils.bindTo
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.setProgress
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
+import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
 import kotlinx.android.synthetic.main.fragment_select_unbond.unbondAmount
 import kotlinx.android.synthetic.main.fragment_select_unbond.unbondContainer
 import kotlinx.android.synthetic.main.fragment_select_unbond.unbondContinue
 import kotlinx.android.synthetic.main.fragment_select_unbond.unbondFee
-import kotlinx.android.synthetic.main.fragment_select_unbond.unbondPeriod
+import kotlinx.android.synthetic.main.fragment_select_unbond.unbondHints
 import kotlinx.android.synthetic.main.fragment_select_unbond.unbondToolbar
+import kotlinx.android.synthetic.main.fragment_select_unbond.unbondTransferable
 
 class SelectUnbondFragment : BaseFragment<SelectUnbondViewModel>() {
 
@@ -33,13 +35,7 @@ class SelectUnbondFragment : BaseFragment<SelectUnbondViewModel>() {
     }
 
     override fun initViews() {
-        unbondContainer.applyInsetter {
-            type(statusBars = true) {
-                padding()
-            }
-
-            consume(true)
-        }
+        unbondContainer.applyStatusBarInsets()
 
         unbondToolbar.setHomeButtonListener { viewModel.backClicked() }
         unbondContinue.prepareForProgress(viewLifecycleOwner)
@@ -57,25 +53,13 @@ class SelectUnbondFragment : BaseFragment<SelectUnbondViewModel>() {
     }
 
     override fun subscribe(viewModel: SelectUnbondViewModel) {
-        observeRetries(viewModel)
         observeValidations(viewModel)
+        setupFeeLoading(viewModel, unbondFee)
+        observeHints(viewModel.hintsMixin, unbondHints)
+        setupAmountChooser(viewModel.amountMixin, unbondAmount)
+
+        viewModel.transferableFlow.observe(unbondTransferable::showAmount)
 
         viewModel.showNextProgress.observe(unbondContinue::setProgress)
-
-        viewModel.assetModelFlow.observe {
-            unbondAmount.setAssetBalance(it.assetBalance)
-            unbondAmount.setAssetName(it.tokenName)
-            unbondAmount.loadAssetImage(it.imageUrl)
-        }
-
-        unbondAmount.amountInput.bindTo(viewModel.enteredAmountFlow, lifecycleScope)
-
-        viewModel.enteredFiatAmountFlow.observe {
-            it.let(unbondAmount::setFiatAmount)
-        }
-
-        viewModel.feeLiveData.observe(unbondFee::setFeeStatus)
-
-        viewModel.lockupPeriodLiveData.observe(unbondPeriod::showValue)
     }
 }

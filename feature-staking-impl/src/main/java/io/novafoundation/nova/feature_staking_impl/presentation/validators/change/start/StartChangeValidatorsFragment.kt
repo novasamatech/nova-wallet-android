@@ -7,13 +7,14 @@ import android.view.ViewGroup
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
+import io.novafoundation.nova.common.view.setProgress
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import kotlinx.android.synthetic.main.fragment_start_change_validators.startChangeValidatorsContainer
 import kotlinx.android.synthetic.main.fragment_start_change_validators.startChangeValidatorsCustom
 import kotlinx.android.synthetic.main.fragment_start_change_validators.startChangeValidatorsRecommended
-import kotlinx.android.synthetic.main.fragment_start_change_validators.startChangeValidatorsRecommendedFeatures
 import kotlinx.android.synthetic.main.fragment_start_change_validators.startChangeValidatorsToolbar
 
 class StartChangeValidatorsFragment : BaseFragment<StartChangeValidatorsViewModel>() {
@@ -36,7 +37,10 @@ class StartChangeValidatorsFragment : BaseFragment<StartChangeValidatorsViewMode
         startChangeValidatorsToolbar.setHomeButtonListener { viewModel.backClicked() }
         onBackPressed { viewModel.backClicked() }
 
-        startChangeValidatorsRecommended.setOnClickListener { viewModel.goToRecommendedClicked() }
+        startChangeValidatorsRecommended.setupAction(viewLifecycleOwner) { viewModel.goToRecommendedClicked() }
+        startChangeValidatorsRecommended.setOnLearnMoreClickedListener { viewModel.recommendedLearnMoreClicked() }
+
+        startChangeValidatorsCustom.background = getRoundedCornerDrawable(R.color.white_8).withRipple()
         startChangeValidatorsCustom.setOnClickListener { viewModel.goToCustomClicked() }
     }
 
@@ -51,16 +55,17 @@ class StartChangeValidatorsFragment : BaseFragment<StartChangeValidatorsViewMode
     }
 
     override fun subscribe(viewModel: StartChangeValidatorsViewModel) {
-        viewModel.validatorsLoading.observe {
-            startChangeValidatorsRecommended.setInProgress(it)
-            startChangeValidatorsCustom.setInProgress(it)
+        observeBrowserEvents(viewModel)
+
+        viewModel.validatorsLoading.observe { loading ->
+            startChangeValidatorsRecommended.action.setProgress(loading)
+            startChangeValidatorsCustom.setInProgress(loading)
         }
 
-        viewModel.recommendedFeaturesText.observe(startChangeValidatorsRecommendedFeatures::setText)
-
         viewModel.customValidatorsTexts.observe {
-            startChangeValidatorsCustom.title.text = it.title
-            startChangeValidatorsCustom.setBadgeText(it.badge)
+            startChangeValidatorsToolbar.setTitle(it.toolbarTitle)
+            startChangeValidatorsCustom.title.text = it.selectManuallyTitle
+            startChangeValidatorsCustom.setBadgeText(it.selectManuallyBadge)
         }
     }
 }

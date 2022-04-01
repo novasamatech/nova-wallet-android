@@ -25,7 +25,10 @@ import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferencesIm
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptionUtil
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.common.interfaces.FileProvider
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableProvider
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
+import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.mixin.impl.CustomDialogProvider
 import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.common.resources.ClipboardManager
@@ -203,4 +206,14 @@ class CommonModule {
     @Provides
     @ApplicationScope
     fun provideSystemCallExecutor(): SystemCallExecutor = SystemCallExecutor()
+
+    @Provides
+    @ApplicationScope
+    fun actionAwaitableMixinFactory(): ActionAwaitableMixin.Factory = ActionAwaitableProvider
+
+    @Provides
+    @ApplicationScope
+    fun resourcesHintsMixinFactory(
+        resourceManager: ResourceManager,
+    ) = ResourcesHintsMixinFactory(resourceManager)
 }

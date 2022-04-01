@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
@@ -15,6 +16,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.rebond.RebondI
 import io.novafoundation.nova.feature_staking_impl.domain.validations.rebond.RebondValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.custom.CustomRebondViewModel
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 
 @Module(includes = [ViewModelModule::class])
@@ -31,15 +33,19 @@ class CustomRebondModule {
         validationExecutor: ValidationExecutor,
         feeLoaderMixin: FeeLoaderMixin.Presentation,
         validationSystem: RebondValidationSystem,
+        amountChooserMixin: AmountChooserMixin.Factory,
+        hintsMixinFactory: ResourcesHintsMixinFactory,
     ): ViewModel {
         return CustomRebondViewModel(
-            router,
-            interactor,
-            rebondInteractor,
-            resourceManager,
-            validationExecutor,
-            validationSystem,
-            feeLoaderMixin
+            router = router,
+            interactor = interactor,
+            rebondInteractor = rebondInteractor,
+            resourceManager = resourceManager,
+            validationExecutor = validationExecutor,
+            validationSystem = validationSystem,
+            feeLoaderMixin = feeLoaderMixin,
+            amountChooserMixinFactory = amountChooserMixin,
+            hintsMixinFactory = hintsMixinFactory
         )
     }
 

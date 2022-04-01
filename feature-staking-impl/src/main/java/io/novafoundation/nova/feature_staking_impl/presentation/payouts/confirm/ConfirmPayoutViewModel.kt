@@ -4,23 +4,17 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
-import io.novafoundation.nova.common.address.createAddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.base.TitleAndMessage
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.formatAsCurrency
-import io.novafoundation.nova.common.utils.inBackground
-import io.novafoundation.nova.common.utils.networkType
 import io.novafoundation.nova.common.utils.requireException
-import io.novafoundation.nova.common.utils.toAddress
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.progressConsumer
-import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_staking_api.domain.model.RewardDestination
-import io.novafoundation.nova.feature_staking_api.domain.model.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.model.Payout
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
@@ -30,9 +24,9 @@ import io.novafoundation.nova.feature_staking_impl.domain.validations.payout.Pay
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.model.ConfirmPayoutPayload
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.requireFee
+import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.first
@@ -47,11 +41,11 @@ class ConfirmPayoutViewModel(
     private val addressModelGenerator: AddressIconGenerator,
     private val externalActions: ExternalActions.Presentation,
     private val feeLoaderMixin: FeeLoaderMixin.Presentation,
-    private val addressDisplayUseCase: AddressDisplayUseCase,
     private val validationSystem: ValidationSystem<MakePayoutPayload, PayoutValidationFailure>,
     private val validationExecutor: ValidationExecutor,
     private val resourceManager: ResourceManager,
     private val selectedAssetState: SingleAssetSharedState,
+    walletUiUseCase: WalletUiUseCase,
 ) : BaseViewModel(),
     ExternalActions.Presentation by externalActions,
     FeeLoaderMixin by feeLoaderMixin,
@@ -68,57 +62,33 @@ class ConfirmPayoutViewModel(
     private val _showNextProgress = MutableLiveData(false)
     val showNextProgress: LiveData<Boolean> = _showNextProgress
 
-    val totalRewardDisplay = assetFlow.map {
-        val token = it.token
-        val totalReward = token.amountFromPlanks(payload.totalRewardInPlanks)
-        val inToken = totalReward.formatTokenAmount(token.configuration)
-        val inFiat = token.fiatAmount(totalReward).formatAsCurrency()
-
-        inToken to inFiat
+    val totalRewardFlow = assetFlow.map {
+        mapAmountToAmountModel(payload.totalRewardInPlanks, it)
     }
-        .inBackground()
-        .asLiveData()
+        .shareInBackground()
 
-    val rewardDestinationModel = stakingStateFlow.map { stakingState ->
-        require(stakingState is StakingState.Stash)
-
-        val networkType = stakingState.accountAddress.networkType()
-
-        val destinationAddress = when (val rewardDestination = interactor.getRewardDestination(stakingState)) {
-            RewardDestination.Restake -> stakingState.accountAddress
-            is RewardDestination.Payout -> rewardDestination.targetAccountId.toAddress(networkType)
-        }
-
-        val destinationAddressDisplay = addressDisplayUseCase(destinationAddress)
-
-        addressModelGenerator.createAddressModel(destinationAddress, AddressIconGenerator.SIZE_SMALL, destinationAddressDisplay)
-    }
-        .inBackground()
-        .asLiveData()
+    val walletUiFlow = walletUiUseCase.selectedWalletUiFlow()
+        .shareInBackground()
 
     val initiatorAddressModel = stakingStateFlow.map { stakingState ->
-        val initiatorAddress = stakingState.accountAddress
-        val initiatorDisplay = addressDisplayUseCase(initiatorAddress)
-
-        addressModelGenerator.createAddressModel(initiatorAddress, AddressIconGenerator.SIZE_SMALL, initiatorDisplay)
+        addressModelGenerator.createAccountAddressModel(selectedAssetState.chain(), stakingState.accountAddress)
     }
-        .inBackground()
-        .asLiveData()
+        .shareInBackground()
 
     init {
         loadFee()
     }
 
-    fun controllerClicked() {
-        maybeShowExternalActions { initiatorAddressModel.value?.address }
+    fun accountClicked() {
+        launch {
+            val address = initiatorAddressModel.first().address
+
+            externalActions.showExternalActions(ExternalActions.Type.Address(address), selectedAssetState.chain())
+        }
     }
 
     fun submitClicked() {
         sendTransactionIfValid()
-    }
-
-    fun rewardDestinationClicked() {
-        maybeShowExternalActions { rewardDestinationModel.value?.address }
     }
 
     fun backClicked() {
@@ -179,13 +149,5 @@ class ConfirmPayoutViewModel(
         }
 
         return resourceManager.getString(titleRes) to resourceManager.getString(messageRes)
-    }
-
-    private fun maybeShowExternalActions(addressProducer: () -> String?) {
-        val address = addressProducer() ?: return
-
-        launch {
-            externalActions.showExternalActions(ExternalActions.Type.Address(address), selectedAssetState.chain())
-        }
     }
 }

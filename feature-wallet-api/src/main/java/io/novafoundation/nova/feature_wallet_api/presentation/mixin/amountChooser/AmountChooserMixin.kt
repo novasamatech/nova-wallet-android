@@ -8,11 +8,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.math.BigDecimal
 
-interface AmountChooserMixin {
+interface AmountChooserMixin : CoroutineScope {
+
+    val usedAssetFlow: Flow<Asset>
 
     val amountInput: MutableStateFlow<String>
 
     val assetModel: Flow<ChooseAmountModel>
+
     val fiatAmount: Flow<String>
 
     interface Presentation : AmountChooserMixin {

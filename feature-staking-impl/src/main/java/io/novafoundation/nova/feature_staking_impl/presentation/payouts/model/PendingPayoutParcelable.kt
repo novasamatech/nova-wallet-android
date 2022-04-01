@@ -9,7 +9,7 @@ class PendingPayoutParcelable(
     val validatorInfo: ValidatorInfoParcelable,
     val era: BigInteger,
     val amountInPlanks: BigInteger,
-    val createdAt: Long,
+    val timeLeftCalculatedAt: Long,
     val timeLeft: Long,
     val closeToExpire: Boolean,
 ) : Parcelable {

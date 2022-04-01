@@ -51,3 +51,5 @@ fun mapAmountToAmountModel(
     asset: Asset,
     tokenAmountSign: AmountSign = AmountSign.NONE
 ): AmountModel = mapAmountToAmountModel(amount, asset.token, tokenAmountSign)
+
+fun transferableAmountModelOf(asset: Asset) = mapAmountToAmountModel(asset.transferable, asset)

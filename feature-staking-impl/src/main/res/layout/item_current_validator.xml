@@ -9,88 +9,115 @@
 
     <ImageView
         android:id="@+id/itemCurrentValidatorIcon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@color/colorAccent" />
+
+    <LinearLayout
+        android:id="@+id/itemCurrentValidatorTitleContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="12dp"
-        tools:src="@drawable/ic_subtract"
-        app:layout_constraintBottom_toBottomOf="@+id/itemCurrentValidatorNominated"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/itemCurrentValidatorName" />
-
-    <TextView
-        android:id="@+id/itemCurrentValidatorName"
-        style="@style/TextAppearance.NovaFoundation.Body1"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="48dp"
-        android:ellipsize="middle"
-        android:singleLine="true"
-        app:layout_constraintBottom_toTopOf="@+id/itemCurrentValidatorNominated"
-        app:layout_constraintEnd_toStartOf="@+id/itemCurrentValidatorBadge"
-        app:layout_constraintHorizontal_bias="0.5"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="24dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintBottom_toTopOf="@+id/itemCurrentValidatorNominatedLabel"
+        app:layout_constraintEnd_toStartOf="@+id/itemCurrentValidatorApy"
+        app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toEndOf="@+id/itemCurrentValidatorIcon"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed"
-        tools:text="✨👍✨ Day7 ✨👍✨" />
+        app:layout_constraintVertical_chainStyle="packed">
+
+        <TextView
+            android:id="@+id/itemCurrentValidatorName"
+            style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="middle"
+            android:singleLine="true"
+            android:textColor="@color/white"
+            tools:text="✨👍✨ Day7 ✨👍" />
+
+        <ImageView
+            android:id="@+id/itemCurrentValidatorOversubscribed"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="4dp"
+            app:srcCompat="@drawable/ic_warning_filled" />
+
+
+        <ImageView
+            android:id="@+id/currentValidatorSlashedIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            app:srcCompat="@drawable/ic_slash" />
+    </LinearLayout>
 
     <TextView
-        android:id="@+id/itemCurrentValidatorNominated"
-        style="@style/TextAppearance.NovaFoundation.Body2"
-        android:layout_width="0dp"
+        android:id="@+id/itemCurrentValidatorNominatedLabel"
+        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="48dp"
-        android:ellipsize="end"
-        android:includeFontPadding="false"
-        android:textColor="@color/black1"
+        android:text="@string/staking_nominated"
+        android:textColor="@color/white_64"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/itemCurrentValidatorBadge"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="@+id/itemCurrentValidatorName"
-        app:layout_constraintTop_toBottomOf="@+id/itemCurrentValidatorName"
-        tools:text="Nominated: 10.00003 KSM" />
+        app:layout_constraintStart_toStartOf="@+id/itemCurrentValidatorTitleContainer"
+        app:layout_constraintTop_toBottomOf="@+id/itemCurrentValidatorTitleContainer" />
 
-    <ImageView
-        android:id="@+id/itemCurrentValidatorBadge"
-        android:layout_width="16dp"
-        android:layout_height="16dp"
-        app:layout_constraintBottom_toBottomOf="@+id/currentValidatorSlashedIcon"
-        app:layout_constraintEnd_toStartOf="@+id/currentValidatorSlashedIcon"
-        app:layout_constraintTop_toTopOf="@+id/currentValidatorSlashedIcon"
-        app:srcCompat="@drawable/ic_warning_filled"
-        tools:visibility="visible"
-        android:layout_marginEnd="8dp"/>
+    <TextView
+        android:id="@+id/itemCurrentValidatorNominatedAmount"
+        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="24dp"
+        android:ellipsize="middle"
+        android:singleLine="true"
+        android:textColor="@color/white"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintBottom_toBottomOf="@id/itemCurrentValidatorNominatedLabel"
+        app:layout_constraintEnd_toStartOf="@+id/itemCurrentValidatorInfo"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toEndOf="@+id/itemCurrentValidatorNominatedLabel"
+        app:layout_constraintTop_toTopOf="@id/itemCurrentValidatorNominatedLabel"
+        tools:text="10.00003 KSM" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/itemCurrentValidatorNominated"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="itemCurrentValidatorNominatedLabel, itemCurrentValidatorNominatedAmount" />
+
+    <TextView
+        android:id="@+id/itemCurrentValidatorApy"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/itemCurrentValidatorInfo"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="17.81%" />
 
     <ImageView
         android:id="@+id/itemCurrentValidatorInfo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:src="@drawable/ic_info_24"
+        android:layout_marginEnd="8dp"
+        android:padding="8dp"
+        android:src="@drawable/ic_info_16"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <View
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:background="@color/dividerGray"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <ImageView
-        android:id="@+id/currentValidatorSlashedIcon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="@+id/itemCurrentValidatorInfo"
-        app:layout_constraintEnd_toStartOf="@+id/itemCurrentValidatorInfo"
-        app:layout_constraintTop_toTopOf="@+id/itemCurrentValidatorInfo"
-        app:srcCompat="@drawable/ic_red_cross"
-        android:layout_marginEnd="12dp"/>
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/white_48" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

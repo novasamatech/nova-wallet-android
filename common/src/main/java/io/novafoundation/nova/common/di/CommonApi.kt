@@ -17,8 +17,10 @@ import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.di.modules.Caching
 import io.novafoundation.nova.common.interfaces.FileProvider
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
+import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ContextManager
@@ -102,4 +104,8 @@ interface CommonApi {
     fun appVersionsProvider(): AppVersionProvider
 
     val systemCallExecutor: SystemCallExecutor
+
+    val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+
+    val resourcesHintsMixinFactory: ResourcesHintsMixinFactory
 }

@@ -1,5 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="staking_start_change_validators_recommended_subtitle">Nova Wallet will select the top validators based on security and profitability criteria</string>
+
+  <string name="staking_nominations_rewarded_format" formatted="false">%s rewarded</string>
+
+  <string name="common_status">Status</string>
+
+  <string name="staking_nominated">Nominated:</string>
+
+  <string name="staking_change_controller">Change controller</string>
+  <string name="staking_controller">Controller</string>
+  <string name="staking_stash">Stash</string>
+
+  <string name="common_find_out_more">Find out more</string>
+  <string name="staking_set_controller_title">Improve staking security</string>
+  <string name="staking_set_controller_subtitle">Select another account as a controller to delegate staking management operations to it</string>
+
+  <string name="staking_pending_rewards_title">Rewards are paid every 2–3 days by validators</string>
+  <string name="staking_pending_rewards_subtitle">You can payout them by yourself, when they are close to expire, but you will pay the fee</string>
+
+  <string name="common_how_it_works">How it works</string>
+  <string name="staking_payout">Payout</string>
+  <string name="staking_reward_destination_payout">Transferable rewards</string>
+
+  <string name="staking_unbond_too_big">Amount you want to unstake is greater than staked balance</string>
+  <string name="staking_rebond_counted_next_era_hint">Returned tokens will be counted from the next era</string>
+  <string name="staking_change_validators">Change validators</string>
+  <string name="staking_set_validators">Set validators</string>
+  <string name="staking_recommended_filter_identity_subtitle">with at least one identity contact</string>
+  <string name="staking_rebond_custom">Custom amount</string>
+  <string name="staking_rebond_all">All unstaking</string>
+  <string name="staking_rebond_last">Latest unstake</string>
+  <string name="staking_select_payout_account">Select payout account</string>
+
+  <string name="staking_rewards_about">About rewards</string>
+  <string name="staking_reward_destination">Reward destination</string>
+  <string name="staking_stake_format">Stake %s</string>
+
   <string name="common_cannot_open_link">Cannot open this link</string>
 
   <string name="wallet_send_tokens_on">Send %s on</string>
@@ -15,7 +52,6 @@
 
   <string name="common_transaction_id">Transaction ID</string>
   <string name="common_type">Type</string>
-
 
   <string name="nft_price_not_listed">Not listed</string>
   <string name="common_price">Price</string>
@@ -432,9 +468,7 @@
   <string name="staking_nominator_status_inactive">Inactive</string>
   <string name="staking_nominator_status_waiting">Waiting for the next Era</string>
   <string name="staking_nominator_status_waiting_format">waiting for the next era (%s)</string>
-  <string name="staking_payout">Payout</string>
   <string name="staking_payout_expired">Payout expired</string>
-  <string name="staking_payout_v2_2_0">Transferable rewards</string>
   <plurals name="staking_payouts_days_left">
     <item quantity="one">%d day left</item>
     <item quantity="other">%d days left</item>
@@ -442,9 +476,7 @@
   <string name="staking_pending_rewards_info">Validators payout the rewards every 2–5 days. However, you can payout them by yourself, especially if rewards are close to expiring, but you will pay the fee.</string>
   <string name="staking_pending_rewards_info_v2_2_0">Rewards are paid every 2–3 days by validators. You can payout them by yourself, when they are close to expire, but you will pay the fee</string>
   <string name="staking_rebond">Return to stake</string>
-  <string name="staking_rebond_all">Rebond all</string>
   <string name="staking_rebond_insufficient_bondings">Amount you want to return to stake is greater than unstaking balance</string>
-  <string name="staking_rebond_last">Rebond last</string>
   <string name="staking_recommended_feature_1">Most profitable</string>
   <string name="staking_recommended_feature_2">Not oversubscribed</string>
   <string name="staking_recommended_feature_3">Having onchain identity</string>
@@ -469,14 +501,10 @@
   <string name="staking_reward_payouts_title_v2_2_0">Unpaid rewards</string>
   <string name="staking_rewards_apy">Rewards (APY)</string>
   <string name="staking_rewards_destination_title_v2_0_0">Rewards destination</string>
-  <string name="staking_rewards_learn_more">Learn more about rewards</string>
-  <string name="staking_rewards_learn_more_v2_2_0">More about rewards</string>
   <string name="staking_select_custom">Select by yourself</string>
   <string name="staking_select_recommended">Select recommended</string>
   <string name="staking_selected_validators_count_v1.9.1" formatted="false">selected %d (max %d)</string>
   <string name="staking_selected_validators_mask">Validators (%d)</string>
-  <string name="staking_set_separate_account_controller">Set a separate account as a controller to increase staking management security.</string>
-  <string name="staking_set_separate_account_controller_v2_2_0">Select another account as a controller to improve staking security by delegating staking management operations to it</string>
   <string name="staking_set_validators_message">Validators are not selected</string>
   <string name="staking_set_validators_title">Select validators to start staking</string>
   <string name="staking_setup_amount_too_low">Can\'t stake less than minimal value (%s)</string>
@@ -486,16 +514,14 @@
   <string name="staking_setup_reward_destination_section_title_v2_2_0">Select your rewards type</string>
   <string name="staking_setup_reward_payout_account">Payout account</string>
   <string name="staking_slash">Slash</string>
-  <string name="staking_stake">Stake</string>
+
   <string name="staking_staking_period">Staking period</string>
   <string name="staking_start_change_validators_custom_subtitle">You should trust your nominations to act competently and honest, basing your decision purely on their current profitability could lead to reduced profits or even loss of funds.</string>
   <string name="staking_start_change_validators_custom_subtitle_v2_2_0">Choose your validators carefully, as they should act proficiently and honest. Basing your decision purely on the profitability could lead to reduced rewards or even loss of stake</string>
   <string name="staking_start_change_validators_custom_title">Stake with your validators</string>
-  <string name="staking_start_change_validators_recommended_subtitle">Nova algorithm selected a list of recommended validators based on the criteria:</string>
-  <string name="staking_start_change_validators_recommended_subtitle_v2_2_0">Nova Wallet created a list of recommended validators based on blockchain data and with the following criteria:</string>
+
   <string name="staking_start_change_validators_recommended_title">Stake with recommended validators</string>
   <string name="staking_start_title">Start staking</string>
-  <string name="staking_stash_account">Stash account</string>
   <string name="staking_stash_can_hint">Stash can bond more and set the controller.</string>
   <string name="staking_stash_can_hint_v2_2_0">Stash is used to: stake more and set the controller</string>
   <string name="staking_stash_missing_message">Stash account %s is unavailable to update staking setup.</string>
@@ -542,7 +568,6 @@
   <string name="staking_your_elected_format">Elected (%s)</string>
   <string name="staking_your_inactive_description">Validators who were not elected in this era.</string>
   <string name="staking_your_inactive_description_v2_2_0">Validators without enough stake to be elected</string>
-  <string name="staking_your_nominated_format">Nominated: %s</string>
   <string name="staking_your_not_allocated_description">Others, who are active without your stake allocation.</string>
   <string name="staking_your_not_allocated_description_v2_2_0">Active validators without your stake assignment</string>
   <string name="staking_your_not_elected_format">Not elected (%s)</string>
@@ -555,7 +580,6 @@
   <string name="tabbar_staking_title">Staking</string>
   <string name="tabbar_wallet_title">Wallet</string>
   <string name="today">Today</string>
-  <string name="transaction_detail_status">Status</string>
   <string name="transaction_details_copy_hash">Copy hash</string>
   <string name="transaction_details_extrinsic_fee">Fee</string>
   <string name="transaction_details_from">From</string>

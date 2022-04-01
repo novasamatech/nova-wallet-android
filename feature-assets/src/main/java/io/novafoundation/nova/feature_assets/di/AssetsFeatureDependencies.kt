@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
@@ -108,4 +109,6 @@ interface AssetsFeatureDependencies {
     val addressInputMixinFactory: AddressInputMixinFactory
 
     val multiChainQrSharingFactory: MultiChainQrSharingFactory
+
+    val walletUiUseCase: WalletUiUseCase
 }

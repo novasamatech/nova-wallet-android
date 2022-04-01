@@ -14,8 +14,10 @@ import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.unbond.UnbondInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validations.unbond.UnbondValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.hints.UnbondHintsMixinFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.select.SelectUnbondViewModel
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 
 @Module(includes = [ViewModelModule::class])
 class SelectUnbondModule {
@@ -30,16 +32,20 @@ class SelectUnbondModule {
         resourceManager: ResourceManager,
         validationExecutor: ValidationExecutor,
         validationSystem: UnbondValidationSystem,
-        feeLoaderMixin: FeeLoaderMixin.Presentation
+        feeLoaderMixin: FeeLoaderMixin.Presentation,
+        unbondHintsMixinFactory: UnbondHintsMixinFactory,
+        amountChooserMixinFactory: AmountChooserMixin.Factory
     ): ViewModel {
         return SelectUnbondViewModel(
-            router,
-            interactor,
-            unbondInteractor,
-            resourceManager,
-            validationExecutor,
-            validationSystem,
-            feeLoaderMixin
+            router = router,
+            interactor = interactor,
+            unbondInteractor = unbondInteractor,
+            resourceManager = resourceManager,
+            validationExecutor = validationExecutor,
+            validationSystem = validationSystem,
+            feeLoaderMixin = feeLoaderMixin,
+            unbondHintsMixinFactory = unbondHintsMixinFactory,
+            amountChooserMixinFactory = amountChooserMixinFactory
         )
     }
 

@@ -4,13 +4,10 @@ package io.novafoundation.nova.feature_staking_impl.presentation.validators.chan
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.presentation.LoadingState
-import io.novafoundation.nova.common.presentation.map
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.toggle
-import io.novafoundation.nova.common.utils.withLoadingSingle
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.validators.current.search.SearchCustomValidatorsInteractor
@@ -30,6 +27,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlin.time.ExperimentalTime
 
@@ -73,7 +72,7 @@ class SearchCustomValidatorsViewModel(
     }
 
     private val foundValidatorsState = enteredQuery
-        .withLoadingSingle {
+        .mapLatest {
             if (it.isNotEmpty()) {
                 interactor.searchValidator(it, allElectedValidators() + selectedValidators.first())
             } else {
@@ -87,32 +86,27 @@ class SearchCustomValidatorsViewModel(
         selectedValidators,
         foundValidatorsState,
         currentTokenFlow
-    ) { selectedValidators, foundValidatorsState, token ->
+    ) { selectedValidators, foundValidators, token ->
         val chain = singleAssetSharedState.chain()
 
-        foundValidatorsState.map { validators ->
-            validators?.map { validator ->
-                mapValidatorToValidatorModel(
-                    chain = chain,
-                    validator = validator,
-                    iconGenerator = addressIconGenerator,
-                    token = token,
-                    isChecked = validator in selectedValidators
-                )
-            }
+        foundValidators?.map { validator ->
+            mapValidatorToValidatorModel(
+                chain = chain,
+                validator = validator,
+                iconGenerator = addressIconGenerator,
+                token = token,
+                isChecked = validator in selectedValidators
+            )
         }
     }
         .inBackground()
         .share()
 
-    val screenState = selectedValidatorModelsState.map { validatorsState ->
+    val screenState = selectedValidatorModelsState.map { validators ->
         when {
-            validatorsState is LoadingState.Loading -> SearchValidatorsState.Loading
-            validatorsState is LoadingState.Loaded && validatorsState.data == null -> SearchValidatorsState.NoInput
+            validators == null -> SearchValidatorsState.NoInput
 
-            validatorsState is LoadingState.Loaded && validatorsState.data.isNullOrEmpty().not() -> {
-                val validators = validatorsState.data!!
-
+            validators.isNullOrEmpty().not() -> {
                 SearchValidatorsState.Success(
                     validators = validators,
                     headerTitle = resourceManager.getString(R.string.common_search_results_number, validators.size)
@@ -121,7 +115,9 @@ class SearchCustomValidatorsViewModel(
 
             else -> SearchValidatorsState.NoResults
         }
-    }.share()
+    }
+        .onStart { emit(SearchValidatorsState.Loading) }
+        .share()
 
     fun validatorClicked(validatorModel: ValidatorModel) {
         if (validatorModel.validator.prefs!!.blocked) {

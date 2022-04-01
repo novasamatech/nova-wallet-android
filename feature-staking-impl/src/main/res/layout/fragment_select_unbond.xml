@@ -12,10 +12,11 @@
         android:id="@+id/unbondToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:dividerVisible="false"
         app:homeButtonIcon="@drawable/ic_close"
         app:titleText="@string/staking_unbond_v1_9_0" />
 
-    <io.novafoundation.nova.common.view.AmountView
+    <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.ChooseAmountView
         android:id="@+id/unbondAmount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -23,45 +24,31 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp" />
 
+    <io.novafoundation.nova.common.view.TableCellView
+        android:id="@+id/unbondTransferable"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:title="@string/wallet_balance_transferable"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        app:dividerVisible="false" />
+
     <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
         android:id="@+id/unbondFee"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp" />
-
-    <io.novafoundation.nova.common.view.TableCellView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:id="@+id/unbondPeriod"
-        app:title="@string/staking_unbonding_period_v1_9_0" />
+        app:dividerVisible="false" />
 
-    <LinearLayout
+    <io.novafoundation.nova.common.mixin.hints.HintsView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/unbondHints"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="24dp"
-        android:orientation="horizontal">
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_info_16"
-            app:tint="@color/black2" />
-
-        <TextView
-            style="@style/TextAppearance.NovaFoundation.Body2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:includeFontPadding="false"
-            android:text="@string/staking_unbonding_hint"
-            android:textColor="@color/black1" />
-    </LinearLayout>
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp" />
 
     <Space
         android:layout_width="match_parent"

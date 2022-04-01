@@ -11,23 +11,23 @@
 
     <View
         style="@style/Widget.Nova.Puller"
-        android:layout_marginTop="2dp"
+        android:layout_marginTop="4dp"
         android:layout_gravity="center_horizontal" />
 
     <TextView
         android:id="@+id/dynamicListSheetTitle"
-        style="@style/TextAppearance.NovaFoundation.Header3"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="13dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="16dp"
         tools:text="Title" />
 
     <View
         android:id="@+id/dynamicListSheetDivider"
         android:layout_width="wrap_content"
         android:layout_height="1dp"
-        android:layout_marginTop="16dp"
         android:background="@color/gray3" />
     
     <androidx.recyclerview.widget.RecyclerView

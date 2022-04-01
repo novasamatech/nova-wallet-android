@@ -1,65 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:animateLayoutChanges="true"
     android:background="@drawable/bg_primary_list_item"
+    android:gravity="center_vertical"
     android:orientation="horizontal"
     tools:background="@color/black">
-    
+
     <ImageView
+        android:id="@+id/itemValidatorActionIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        tools:visibility="gone"
         android:layout_gravity="center_vertical"
         android:layout_marginStart="16dp"
-        android:id="@+id/itemValidatorActionIcon"
-        android:src="@drawable/ic_checkmark" />
+        android:src="@drawable/ic_delete_symbol" />
+
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/itemValidationCheck"
+        style="@style/Widget.Nova.Checkbox"
+        android:layout_width="wrap_content"
+        tools:visibility="visible"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:clickable="false" />
 
     <ImageView
         android:id="@+id/itemValidatorIcon"
         android:layout_width="24dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="12dp"
         android:layout_height="24dp"
         android:layout_gravity="center_vertical"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
         tools:src="@color/colorAccent" />
 
     <TextView
         android:id="@+id/itemValidatorName"
-        style="@style/TextAppearance.NovaFoundation.Body1"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginStart="12dp"
         android:layout_marginEnd="16dp"
         android:layout_weight="1"
-        android:singleLine="true"
         android:ellipsize="middle"
+        android:singleLine="true"
+        android:textColor="@color/white"
         tools:text="SUPERSYMMETRY" />
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:layout_height="wrap_content">
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/itemValidatorScoringPrimary"
-            style="@style/TextAppearance.NovaFoundation.Body1"
+            style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
+            android:textColor="@color/white"
             tools:text="17.81%" />
 
         <TextView
             android:id="@+id/itemValidatorScoringSecondary"
-            style="@style/TextAppearance.NovaFoundation.Body2"
-            android:textColor="@color/black2"
+            style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|end"
+            android:textColor="@color/white_64"
             tools:text="17.81%" />
     </LinearLayout>
 
@@ -67,9 +81,10 @@
     <ImageView
         android:id="@+id/itemValidatorInfo"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
+        android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:src="@drawable/ic_info_24" />
+        android:layout_marginEnd="8dp"
+        android:padding="8dp"
+        android:src="@drawable/ic_info_16"
+        app:tint="@color/white_48" />
 </LinearLayout>

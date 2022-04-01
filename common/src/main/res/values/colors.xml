@@ -42,16 +42,26 @@
     <color name="black3">@color/gray3</color>
     <color name="black4">@color/gray4</color>
 
+    <color name="bg_bottom_sheet">#1D1D20</color>
+
     <color name="settings_group_background">#1D1D20</color>
 
     <color name="account_icon_light">#eeeeee</color>
     <color name="account_icon_dark">@color/black</color>
 
-    <color name="red">#FF285C</color>
+    <color name="red">#FF3A69</color>
+    <color name="red_12">#1FFF3A69</color>
+
+    <color name="yellow">#FFE711</color>
+    <color name="yellow_12">#1FFFE711</color>
 
     <color name="bar_bg_64">#A8252528</color>
 
     <color name="accentBlue">#409DF3</color>
+    <color name="accentSecondary">#2D2D30</color>
+
+    <color name="disabledColor">#1D1D20</color>
+    <color name="disabledTransparent">@color/white_8</color>
 
     <color name="pms_black">#2D2926</color>
 </resources>

@@ -66,8 +66,18 @@
     <declare-styleable name="TableCellView">
         <attr name="title" />
         <attr name="dividerVisible" />
+        <attr name="dividerColor" format="color" />
         <attr name="primaryValueIcon" format="reference|color" />
+        <attr name="primaryValueStyle" format="enum">
+            <enum name="text" value="0" />
+            <enum name="link" value="1" />
+        </attr>
+        <attr name="titleIcon" format="reference|color" />
         <attr name="primaryValueIconTint" format="color" />
+    </declare-styleable>
+
+    <declare-styleable name="TableView">
+        <attr name="title" />
     </declare-styleable>
 
     <declare-styleable name="GoNextView">
@@ -77,23 +87,61 @@
         <attr name="actionIcon" />
         <attr name="dividerVisible" />
         <attr name="android:textAppearance" format="reference" />
+        <attr name="actionTint" format="color" />
         <attr name="android:background" />
     </declare-styleable>
 
     <declare-styleable name="PrimaryButton">
         <attr format="enum" name="appearance">
-            <enum name="fill" value="0" />
-            <enum name="outline" value="1" />
+            <enum name="primary" value="0" />
+            <enum name="primaryTransparent" value="1" />
+            <enum name="secondary" value="2" />
+            <enum name="secondaryTransparent" value="3" />
+        </attr>
+
+        <attr format="enum" name="size">
+            <enum name="large" value="0" />
+            <enum name="small" value="1" />
         </attr>
     </declare-styleable>
 
     <declare-styleable name="PlaceholderView">
         <attr name="android:text" />
+        <attr name="image" format="color|reference" />
+        <attr name="showBackground" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="TitleImageContentSectionView">
         <attr name="sectionTitle" format="string" />
         <attr name="sectionContentEndIcon" format="reference|color" />
         <attr name="sectionContentEndIconTint" format="color" />
+    </declare-styleable>
+    
+    <declare-styleable name="SearchView">
+        <attr name="android:hint" />
+        <attr name="icon" />
+    </declare-styleable>
+
+    <declare-styleable name="Switch">
+        <attr name="title" />
+        <attr name="subtitle" />
+        <attr name="dividerVisible" />
+    </declare-styleable>
+    
+    <declare-styleable name="AdvertisementCard">
+        <attr name="title" />
+        <attr name="subtitle" />
+        <attr name="image" />
+        <attr name="learnMore" format="string" />
+        <attr name="action" format="string" />
+    </declare-styleable>
+
+    <declare-styleable name="AlertView">
+        <attr name="style" format="enum">
+            <enum name="warning" value="0" />
+            <enum name="error" value="1" />
+        </attr>
+
+        <attr name="android:text" />
     </declare-styleable>
 </resources>

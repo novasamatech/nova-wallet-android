@@ -17,7 +17,6 @@ import io.novafoundation.nova.feature_staking_api.domain.model.IndividualExposur
 import io.novafoundation.nova.feature_staking_api.domain.model.RewardDestination
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingAccount
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingState
-import io.novafoundation.nova.feature_staking_api.domain.model.isUnbondingIn
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.mappers.mapAccountToStakingAccount
 import io.novafoundation.nova.feature_staking_impl.data.model.Payout
@@ -32,7 +31,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.model.PendingPayoutsSt
 import io.novafoundation.nova.feature_staking_impl.domain.model.StakeSummary
 import io.novafoundation.nova.feature_staking_impl.domain.model.StakingPeriod
 import io.novafoundation.nova.feature_staking_impl.domain.model.StashNoneStatus
-import io.novafoundation.nova.feature_staking_impl.domain.model.Unbonding
 import io.novafoundation.nova.feature_staking_impl.domain.model.ValidatorStatus
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
@@ -47,7 +45,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
@@ -96,7 +93,7 @@ class StakingInteractor(
             val allValidatorAddresses = payouts.map(Payout::validatorAddress).distinct()
             val identityMapping = identityRepository.getIdentitiesFromAddresses(currentStakingState.chain, allValidatorAddresses)
 
-            val calculator = getCalculator()
+            val calculator = getEraTimeCalculator()
             val pendingPayouts = payouts.map {
                 val relativeInfo = eraRelativeInfo(it.era, activeEraIndex, historyDepth, erasPerDay)
 
@@ -114,7 +111,7 @@ class StakingInteractor(
                         era = era,
                         amountInPlanks = amount,
                         timeLeft = leftTime,
-                        createdAt = currentTimestamp,
+                        timeLeftCalculatedAt = currentTimestamp,
                         closeToExpire = closeToExpire
                     )
                 }
@@ -158,7 +155,7 @@ class StakingInteractor(
             isNominationActive(nominatorState.stashId, it.eraStakers.values, it.rewardedNominatorsPerValidator) -> NominatorStatus.Active
 
             nominatorState.nominations.isWaiting(it.activeEraIndex) -> NominatorStatus.Waiting(
-                timeLeft = getCalculator().calculate(nominatorState.nominations.submittedInEra + ERA_OFFSET).toLong()
+                timeLeft = getEraTimeCalculator().calculate(nominatorState.nominations.submittedInEra + ERA_OFFSET).toLong()
             )
 
             else -> {
@@ -282,31 +279,7 @@ class StakingInteractor(
         stakingConstantsRepository.maxRewardedNominatorPerValidator(stakingSharedState.chainId())
     }
 
-    fun currentUnbondingsFlow(): Flow<List<Unbonding>> {
-        return selectedAccountStakingStateFlow()
-            .filterIsInstance<StakingState.Stash>()
-            .flatMapLatest { stash ->
-                val calculator = getCalculator()
-
-                combine(
-                    stakingRepository.ledgerFlow(stash),
-                    stakingRepository.observeActiveEraIndex(stash.chain.id)
-                ) { ledger, activeEraIndex ->
-                    ledger.unlocking
-                        .filter { it.isUnbondingIn(activeEraIndex) }
-                        .map {
-                            val leftTime = calculator.calculate(destinationEra = it.era)
-                            Unbonding(
-                                amount = it.amount,
-                                timeLeft = leftTime.toLong(),
-                                calculatedAt = System.currentTimeMillis()
-                            )
-                        }
-                }
-            }
-    }
-
-    private suspend fun getCalculator(): EraTimeCalculator {
+    private suspend fun getEraTimeCalculator(): EraTimeCalculator {
         return factory.create(stakingSharedState.chainId())
     }
 

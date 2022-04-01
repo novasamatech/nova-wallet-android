@@ -2,17 +2,17 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.co
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.liveData
 import io.novafoundation.nova.common.address.AddressIconGenerator
-import io.novafoundation.nova.common.address.createAddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
+import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.formatAsCurrency
-import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.requireException
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
+import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
@@ -21,10 +21,10 @@ import io.novafoundation.nova.feature_staking_impl.domain.validations.bond.BondM
 import io.novafoundation.nova.feature_staking_impl.domain.validations.bond.BondMoreValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.bondMoreValidationFailure
-import io.novafoundation.nova.feature_wallet_api.data.mappers.mapAssetToAssetModel
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapFeeToFeeModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
+import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.first
@@ -42,6 +42,8 @@ class ConfirmBondMoreViewModel(
     private val externalActions: ExternalActions.Presentation,
     private val payload: ConfirmBondMorePayload,
     private val selectedAssetState: SingleAssetSharedState,
+    walletUiUseCase: WalletUiUseCase,
+    hintsMixinFactory: ResourcesHintsMixinFactory,
 ) : BaseViewModel(),
     ExternalActions by externalActions,
     Validatable by validationExecutor {
@@ -49,39 +51,33 @@ class ConfirmBondMoreViewModel(
     private val _showNextProgress = MutableLiveData(false)
     val showNextProgress: LiveData<Boolean> = _showNextProgress
 
+    val hintsMixin = hintsMixinFactory.create(
+        coroutineScope = this,
+        hintsRes = listOf(R.string.staking_hint_reward_bond_more_v2_2_0)
+    )
+
     private val assetFlow = interactor.assetFlow(payload.stashAddress)
-        .inBackground()
-        .share()
+        .shareInBackground()
 
-    val assetModelFlow = assetFlow
-        .map { mapAssetToAssetModel(it, resourceManager) }
-        .inBackground()
-        .asLiveData()
-
-    val amountFiatFLow = assetFlow.map { asset ->
-        asset.token.fiatAmount(payload.amount).formatAsCurrency()
+    val amountModelFlow = assetFlow.map { asset ->
+        mapAmountToAmountModel(payload.amount, asset)
     }
-        .inBackground()
-        .asLiveData()
+        .shareInBackground()
 
-    val amount = payload.amount.toString()
+    val walletUiFlow = walletUiUseCase.selectedWalletUiFlow()
+        .shareInBackground()
 
-    val feeStatusLiveData = assetFlow.map { asset ->
+    val feeStatusFlow = assetFlow.map { asset ->
         val feeModel = mapFeeToFeeModel(payload.fee, asset.token)
 
         FeeStatus.Loaded(feeModel)
     }
-        .inBackground()
-        .asLiveData()
+        .shareInBackground()
 
-    val originAddressModelLiveData = liveData {
-        val address = payload.stashAddress
-        val account = interactor.getProjectedAccount(address)
-
-        val addressModel = iconGenerator.createAddressModel(address, AddressIconGenerator.SIZE_SMALL, account.name)
-
-        emit(addressModel)
+    val originAddressModelFlow = flowOf {
+        iconGenerator.createAccountAddressModel(selectedAssetState.chain(), payload.stashAddress)
     }
+        .shareInBackground()
 
     fun confirmClicked() {
         maybeGoToNext()
@@ -130,8 +126,7 @@ class ConfirmBondMoreViewModel(
         }
     }
 
-    private fun finishFlow() = when {
-        payload.overrideFinishAction != null -> payload.overrideFinishAction.invoke(router)
-        else -> router.returnToStakingBalance()
+    private fun finishFlow() {
+        router.returnToMain()
     }
 }

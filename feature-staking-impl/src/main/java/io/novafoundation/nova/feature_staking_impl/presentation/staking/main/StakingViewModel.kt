@@ -26,15 +26,12 @@ import io.novafoundation.nova.feature_staking_impl.domain.alerts.Alert
 import io.novafoundation.nova.feature_staking_impl.domain.alerts.AlertsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.model.NetworkInfo
 import io.novafoundation.nova.feature_staking_impl.domain.model.StakingPeriod
-import io.novafoundation.nova.feature_staking_impl.domain.validations.balance.ManageStakingValidationPayload
-import io.novafoundation.nova.feature_staking_impl.domain.validations.balance.ManageStakingValidationSystem
+import io.novafoundation.nova.feature_staking_impl.domain.validations.main.StakeActionsValidationPayload
+import io.novafoundation.nova.feature_staking_impl.domain.validations.main.StakeActionsValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.alerts.model.AlertModel
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.balance.manageStakingActionValidationFailure
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.select.SelectBondMorePayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.di.StakingViewStateFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.model.StakingNetworkInfoModel
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.redeem.RedeemPayload
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
@@ -66,8 +63,8 @@ class StakingViewModel(
     private val stakingViewStateFactory: StakingViewStateFactory,
     private val router: StakingRouter,
     private val resourceManager: ResourceManager,
-    private val redeemValidationSystem: ManageStakingValidationSystem,
-    private val bondMoreValidationSystem: ManageStakingValidationSystem,
+    private val redeemValidationSystem: StakeActionsValidationSystem,
+    private val bondMoreValidationSystem: StakeActionsValidationSystem,
     private val validationExecutor: ValidationExecutor,
     stakingUpdateSystem: UpdateSystem,
     assetSelectorMixinFactory: MixinFactory<AssetSelectorMixin.Presentation>,
@@ -186,19 +183,15 @@ class StakingViewModel(
     }
 
     private fun bondMoreAlertClicked() = requireValidManageStakingAction(bondMoreValidationSystem) {
-        val bondMorePayload = SelectBondMorePayload(overrideFinishAction = StakingRouter::returnToMain)
-
-        router.openBondMore(bondMorePayload)
+        router.openBondMore()
     }
 
     private fun redeemAlertClicked() = requireValidManageStakingAction(redeemValidationSystem) {
-        val redeemPayload = RedeemPayload(overrideFinishAction = StakingRouter::back)
-
-        router.openRedeem(redeemPayload)
+        router.openRedeem()
     }
 
     private fun requireValidManageStakingAction(
-        validationSystem: ManageStakingValidationSystem,
+        validationSystem: StakeActionsValidationSystem,
         action: () -> Unit,
     ) = launch {
         val stakingState = (loadingStakingState.first() as? LoadingState.Loaded)?.data
@@ -206,8 +199,8 @@ class StakingViewModel(
 
         validationExecutor.requireValid(
             validationSystem,
-            ManageStakingValidationPayload(stashState),
-            validationFailureTransformer = { manageStakingActionValidationFailure(it, resourceManager) }
+            StakeActionsValidationPayload(stashState),
+            validationFailureTransformer = { mainStakingValidationFailure(it, resourceManager) }
         ) {
             action()
         }

@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
@@ -39,21 +40,23 @@ class SetControllerModule {
         addressDisplayUseCase: AddressDisplayUseCase,
         validationExecutor: ValidationExecutor,
         validationSystem: SetControllerValidationSystem,
-        selectedAssetState: StakingSharedState
+        selectedAssetState: StakingSharedState,
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
     ): ViewModel {
         return SetControllerViewModel(
-            interactor,
-            stackingInteractor,
-            addressIconGenerator,
-            router,
-            feeLoaderMixin,
-            externalActions,
-            appLinksProvider,
-            resourceManager,
-            addressDisplayUseCase,
-            validationExecutor,
-            validationSystem,
-            selectedAssetState
+            interactor = interactor,
+            stakingInteractor = stackingInteractor,
+            addressIconGenerator = addressIconGenerator,
+            router = router,
+            feeLoaderMixin = feeLoaderMixin,
+            externalActions = externalActions,
+            appLinksProvider = appLinksProvider,
+            resourceManager = resourceManager,
+            addressDisplayUseCase = addressDisplayUseCase,
+            validationExecutor = validationExecutor,
+            validationSystem = validationSystem,
+            selectedAssetState = selectedAssetState,
+            actionAwaitableMixinFactory = actionAwaitableMixinFactory
         )
     }
 

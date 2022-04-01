@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.view.setProgress
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
@@ -15,8 +16,8 @@ import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import kotlinx.android.synthetic.main.fragment_confirm_bond_more.confirmBondMoreAmount
 import kotlinx.android.synthetic.main.fragment_confirm_bond_more.confirmBondMoreConfirm
-import kotlinx.android.synthetic.main.fragment_confirm_bond_more.confirmBondMoreFee
-import kotlinx.android.synthetic.main.fragment_confirm_bond_more.confirmBondMoreOriginAccount
+import kotlinx.android.synthetic.main.fragment_confirm_bond_more.confirmBondMoreExtrinsicInformation
+import kotlinx.android.synthetic.main.fragment_confirm_bond_more.confirmBondMoreHints
 import kotlinx.android.synthetic.main.fragment_confirm_bond_more.confirmBondMoreToolbar
 
 private const val PAYLOAD_KEY = "PAYLOAD_KEY"
@@ -45,7 +46,7 @@ class ConfirmBondMoreFragment : BaseFragment<ConfirmBondMoreViewModel>() {
             }
         }
 
-        confirmBondMoreOriginAccount.setWholeClickListener { viewModel.originAccountClicked() }
+        confirmBondMoreExtrinsicInformation.setOnAccountClickedListener { viewModel.originAccountClicked() }
 
         confirmBondMoreToolbar.setHomeButtonListener { viewModel.backClicked() }
         confirmBondMoreConfirm.prepareForProgress(viewLifecycleOwner)
@@ -67,26 +68,14 @@ class ConfirmBondMoreFragment : BaseFragment<ConfirmBondMoreViewModel>() {
     override fun subscribe(viewModel: ConfirmBondMoreViewModel) {
         observeValidations(viewModel)
         setupExternalActions(viewModel)
+        observeHints(viewModel.hintsMixin, confirmBondMoreHints)
 
         viewModel.showNextProgress.observe(confirmBondMoreConfirm::setProgress)
 
-        viewModel.assetModelFlow.observe {
-            confirmBondMoreAmount.setAssetBalance(it.assetBalance)
-            confirmBondMoreAmount.setAssetName(it.tokenName)
-            confirmBondMoreAmount.loadAssetImage(it.imageUrl)
-        }
+        viewModel.amountModelFlow.observe(confirmBondMoreAmount::setAmount)
 
-        confirmBondMoreAmount.amountInput.setText(viewModel.amount)
-
-        viewModel.amountFiatFLow.observe {
-            it.let(confirmBondMoreAmount::setFiatAmount)
-        }
-
-        viewModel.feeStatusLiveData.observe(confirmBondMoreFee::setFeeStatus)
-
-        viewModel.originAddressModelLiveData.observe {
-            confirmBondMoreOriginAccount.setMessage(it.nameOrAddress)
-            confirmBondMoreOriginAccount.setTextIcon(it.image)
-        }
+        viewModel.feeStatusFlow.observe(confirmBondMoreExtrinsicInformation::setFeeStatus)
+        viewModel.walletUiFlow.observe(confirmBondMoreExtrinsicInformation::setWallet)
+        viewModel.originAddressModelFlow.observe(confirmBondMoreExtrinsicInformation::setAccount)
     }
 }

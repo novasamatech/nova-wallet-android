@@ -2,9 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/payoutDetailsContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/payoutDetailsContainer"
+    android:gravity="center_horizontal"
     android:orientation="vertical"
     tools:background="@color/black">
 
@@ -12,140 +13,51 @@
         android:id="@+id/payoutDetailsToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:titleText="@string/staking_reward_details_title" />
+        app:dividerVisible="false"
+        tools:titleText="20 days left" />
 
-    <io.novafoundation.nova.common.view.LabeledTextView
-        android:id="@+id/payoutDetailsValidator"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+    <ImageView
+        android:layout_width="64dp"
+        android:layout_height="64dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        app:actionIcon="@drawable/ic_more"
-        app:label="@string/staking_reward_details_validator" />
+        android:background="@drawable/bg_icon_round_white"
+        android:padding="11dp"
+        android:src="@drawable/ic_staking_filled"
+        app:tint="@color/white_64" />
 
-    <LinearLayout
+    <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.PrimaryAmountView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="32dp"
         android:layout_marginEnd="16dp"
-        android:orientation="horizontal">
+        android:id="@+id/payoutDetailsAmount"
+        android:layout_marginTop="12dp" />
 
-        <TextView
-            style="@style/TextAppearance.NovaFoundation.Body1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/common_date"
-            android:textColor="@color/gray1" />
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
-        <TextView
-            android:id="@+id/payoutDetailsDate"
-            style="@style/TextAppearance.NovaFoundation.Body1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            tools:text="Feb 2, 2021" />
-    </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginEnd="16dp"
-        android:background="@color/dividerGray" />
-
-    <LinearLayout
+    <io.novafoundation.nova.common.view.TableView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="24dp"
         android:layout_marginEnd="16dp"
-        android:orientation="horizontal">
+        android:layout_marginBottom="24dp">
 
-        <TextView
-            style="@style/TextAppearance.NovaFoundation.Body1"
-            android:layout_width="wrap_content"
+        <io.novafoundation.nova.common.view.TableCellView
+            android:id="@+id/payoutDetailsValidator"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/staking_reward_details_era"
-            android:textColor="@color/gray1" />
+            app:primaryValueIcon="@drawable/ic_info_16"
+            app:primaryValueIconTint="@color/white_64"
+            app:title="@string/staking_reward_details_validator" />
 
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
-        <TextView
+        <io.novafoundation.nova.common.view.TableCellView
             android:id="@+id/payoutDetailsEra"
-            style="@style/TextAppearance.NovaFoundation.Body1"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            tools:text="#1,690" />
-    </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginEnd="16dp"
-        android:background="@color/dividerGray" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginEnd="16dp"
-        android:orientation="horizontal">
-
-        <TextView
-            style="@style/TextAppearance.NovaFoundation.Body1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/staking_reward"
-            android:textColor="@color/gray1" />
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
-        <TextView
-            android:id="@+id/payoutDetailsReward"
-            style="@style/TextAppearance.NovaFoundation.Body1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:textColor="@color/white"
-            tools:text="0.00005 KSM" />
-
-        <TextView
-            android:id="@+id/payoutDetailsRewardFiat"
-            style="@style/TextAppearance.NovaFoundation.Body1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/gray2"
-            tools:text="$0,01" />
-    </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginEnd="16dp"
-        android:background="@color/dividerGray" />
+            app:title="@string/staking_reward_details_era" />
+    </io.novafoundation.nova.common.view.TableView>
 
     <Space
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />
 
@@ -157,6 +69,6 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:text="@string/staking_payout_v2_2_0" />
+        android:text="@string/staking_payout" />
 
 </LinearLayout>

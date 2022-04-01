@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAddressModel
 import io.novafoundation.nova.feature_staking_api.domain.model.RewardDestination
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingAccount
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingState
@@ -19,8 +20,9 @@ import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculat
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.RewardSuffix
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapPeriodReturnsToRewardEstimation
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.runtime.ext.addressOf
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.chain
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -105,7 +107,7 @@ class RewardDestinationProvider(
             RewardDestination.Restake -> RewardDestinationModel.Restake
             is RewardDestination.Payout -> {
                 val chain = sharedState.chain()
-                val addressModel = generateDestinationModel(chain.addressOf(rewardDestination.targetAccountId))
+                val addressModel = generateDestinationModel(chain, rewardDestination.targetAccountId)
 
                 RewardDestinationModel.Payout(addressModel)
             }
@@ -118,10 +120,21 @@ class RewardDestinationProvider(
     }
 
     private suspend fun generateDestinationModel(account: StakingAccount): AddressModel {
-        return addressIconGenerator.createAddressModel(account.address, AddressIconGenerator.SIZE_MEDIUM, account.name)
+        return addressIconGenerator.createAddressModel(
+            accountAddress = account.address,
+            sizeInDp = AddressIconGenerator.SIZE_MEDIUM,
+            accountName = account.name,
+            background = AddressIconGenerator.BACKGROUND_TRANSPARENT
+        )
     }
 
-    private suspend fun generateDestinationModel(address: String): AddressModel {
-        return addressIconGenerator.createAddressModel(address, AddressIconGenerator.SIZE_MEDIUM, accountDisplayUseCase(address))
+    private suspend fun generateDestinationModel(chain: Chain, accountId: AccountId): AddressModel {
+        return addressIconGenerator.createAddressModel(
+            chain = chain,
+            accountId = accountId,
+            sizeInDp = AddressIconGenerator.SIZE_MEDIUM,
+            addressDisplayUseCase = accountDisplayUseCase,
+            background = AddressIconGenerator.BACKGROUND_TRANSPARENT
+        )
     }
 }

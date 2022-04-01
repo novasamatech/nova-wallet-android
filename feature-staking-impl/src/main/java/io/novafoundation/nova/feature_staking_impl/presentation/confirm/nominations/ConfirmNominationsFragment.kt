@@ -56,4 +56,8 @@ class ConfirmNominationsFragment : BaseFragment<ConfirmNominationsViewModel>(), 
     override fun validatorInfoClicked(validatorModel: ValidatorModel) {
         viewModel.validatorInfoClicked(validatorModel)
     }
+
+    override fun validatorClicked(validatorModel: ValidatorModel) {
+        viewModel.validatorInfoClicked(validatorModel)
+    }
 }

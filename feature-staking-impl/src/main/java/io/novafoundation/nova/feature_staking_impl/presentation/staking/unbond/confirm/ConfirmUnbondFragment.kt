@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.view.setProgress
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
@@ -15,8 +16,8 @@ import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import kotlinx.android.synthetic.main.fragment_confirm_unbond.confirmUnbondAmount
 import kotlinx.android.synthetic.main.fragment_confirm_unbond.confirmUnbondConfirm
-import kotlinx.android.synthetic.main.fragment_confirm_unbond.confirmUnbondFee
-import kotlinx.android.synthetic.main.fragment_confirm_unbond.confirmUnbondOriginAccount
+import kotlinx.android.synthetic.main.fragment_confirm_unbond.confirmUnbondExtrinsicInformation
+import kotlinx.android.synthetic.main.fragment_confirm_unbond.confirmUnbondHints
 import kotlinx.android.synthetic.main.fragment_confirm_unbond.confirmUnbondToolbar
 
 private const val PAYLOAD_KEY = "PAYLOAD_KEY"
@@ -45,7 +46,7 @@ class ConfirmUnbondFragment : BaseFragment<ConfirmUnbondViewModel>() {
             }
         }
 
-        confirmUnbondOriginAccount.setWholeClickListener { viewModel.originAccountClicked() }
+        confirmUnbondExtrinsicInformation.setOnAccountClickedListener { viewModel.originAccountClicked() }
 
         confirmUnbondToolbar.setHomeButtonListener { viewModel.backClicked() }
         confirmUnbondConfirm.prepareForProgress(viewLifecycleOwner)
@@ -67,26 +68,14 @@ class ConfirmUnbondFragment : BaseFragment<ConfirmUnbondViewModel>() {
     override fun subscribe(viewModel: ConfirmUnbondViewModel) {
         observeValidations(viewModel)
         setupExternalActions(viewModel)
+        observeHints(viewModel.hintsMixin, confirmUnbondHints)
+
+        viewModel.amountModelFlow.observe(confirmUnbondAmount::setAmount)
 
         viewModel.showNextProgress.observe(confirmUnbondConfirm::setProgress)
 
-        viewModel.assetModelFlow.observe {
-            confirmUnbondAmount.setAssetBalance(it.assetBalance)
-            confirmUnbondAmount.setAssetName(it.tokenName)
-            confirmUnbondAmount.loadAssetImage(it.imageUrl)
-        }
-
-        confirmUnbondAmount.amountInput.setText(viewModel.amount)
-
-        viewModel.amountFiatFLow.observe {
-            it.let(confirmUnbondAmount::setFiatAmount)
-        }
-
-        viewModel.feeStatusLiveData.observe(confirmUnbondFee::setFeeStatus)
-
-        viewModel.originAddressModelLiveData.observe {
-            confirmUnbondOriginAccount.setMessage(it.nameOrAddress)
-            confirmUnbondOriginAccount.setTextIcon(it.image)
-        }
+        viewModel.walletUiFlow.observe(confirmUnbondExtrinsicInformation::setWallet)
+        viewModel.feeStatusLiveData.observe(confirmUnbondExtrinsicInformation::setFeeStatus)
+        viewModel.originAddressModelFlow.observe(confirmUnbondExtrinsicInformation::setAccount)
     }
 }

@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
@@ -39,19 +40,21 @@ class RedeemModule {
         feeLoaderMixin: FeeLoaderMixin.Presentation,
         payload: RedeemPayload,
         singleAssetSharedState: StakingSharedState,
+        walletUiUseCase: WalletUiUseCase
     ): ViewModel {
         return RedeemViewModel(
-            router,
-            interactor,
-            redeemInteractor,
-            resourceManager,
-            validationExecutor,
-            validationSystem,
-            iconGenerator,
-            feeLoaderMixin,
-            externalActions,
-            payload,
-            singleAssetSharedState
+            router = router,
+            interactor = interactor,
+            redeemInteractor = redeemInteractor,
+            resourceManager = resourceManager,
+            validationExecutor = validationExecutor,
+            validationSystem = validationSystem,
+            iconGenerator = iconGenerator,
+            feeLoaderMixin = feeLoaderMixin,
+            externalActions = externalActions,
+            selectedAssetState = singleAssetSharedState,
+            payload = payload,
+            walletUiUseCase = walletUiUseCase
         )
     }
 
