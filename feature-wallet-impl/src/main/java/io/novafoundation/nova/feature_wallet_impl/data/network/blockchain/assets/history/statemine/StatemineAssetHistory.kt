@@ -22,7 +22,7 @@ import jp.co.soramitsu.fearless_utils.runtime.metadata.call
 class StatemineAssetHistory(
     private val chainRegistry: ChainRegistry,
     private val eventsRepository: EventsRepository,
-): AssetHistory  {
+) : AssetHistory {
 
     override suspend fun fetchOperationsForBalanceChange(
         chain: Chain,

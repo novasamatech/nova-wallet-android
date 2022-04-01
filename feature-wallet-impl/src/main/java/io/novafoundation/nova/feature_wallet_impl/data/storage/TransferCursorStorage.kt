@@ -43,5 +43,7 @@ class TransferCursorStorage(
             }
         }.first()
 
-    private fun cursorKey(chainId: String, chainAssetId: Int, accountId: AccountId) = "$TRANSACTIONS_CURSOR_KEY:${accountId.toHexString()}:$chainId:$chainAssetId"
+    private fun cursorKey(chainId: String, chainAssetId: Int, accountId: AccountId): String {
+        return "$TRANSACTIONS_CURSOR_KEY:${accountId.toHexString()}:$chainId:$chainAssetId"
+    }
 }

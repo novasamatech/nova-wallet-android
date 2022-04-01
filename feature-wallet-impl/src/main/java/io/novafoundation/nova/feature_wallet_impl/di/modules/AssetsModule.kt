@@ -18,7 +18,6 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets
 )
 class AssetsModule {
 
-
     @Provides
     @FeatureScope
     fun provideAssetSourceRegistry(

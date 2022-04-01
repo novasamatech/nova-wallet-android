@@ -12,7 +12,7 @@ class StaticAssetSource(
     override val transfers: AssetTransfers,
     override val balance: AssetBalance,
     override val history: AssetHistory
-): AssetSource
+) : AssetSource
 
 // Use lazy to resolve possible circular dependencies
 class TypeBasedAssetSourceRegistry(
@@ -20,7 +20,7 @@ class TypeBasedAssetSourceRegistry(
     private val statemineSource: Lazy<AssetSource>,
     private val ormlSource: Lazy<AssetSource>,
     private val unsupportedBalanceSource: AssetSource,
-): AssetSourceRegistry {
+) : AssetSourceRegistry {
 
     override fun sourceFor(chainAsset: Chain.Asset): AssetSource {
         return when (chainAsset.type) {

@@ -86,7 +86,7 @@ class SubqueryHistoryRequest(
     }
 
     private fun transferResponseSection(assetType: Asset.Type): String {
-        return when(assetType) {
+        return when (assetType) {
             Asset.Type.Native -> "transfer"
             else -> "assetTransfer"
         }

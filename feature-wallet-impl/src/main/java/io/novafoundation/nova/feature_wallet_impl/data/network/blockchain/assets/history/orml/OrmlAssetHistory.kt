@@ -24,7 +24,7 @@ import jp.co.soramitsu.fearless_utils.runtime.metadata.callOrNull
 class OrmlAssetHistory(
     private val chainRegistry: ChainRegistry,
     private val eventsRepository: EventsRepository,
-): AssetHistory {
+) : AssetHistory {
 
     override suspend fun fetchOperationsForBalanceChange(
         chain: Chain,
