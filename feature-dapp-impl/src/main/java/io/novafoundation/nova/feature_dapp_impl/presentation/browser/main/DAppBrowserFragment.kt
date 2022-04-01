@@ -15,13 +15,21 @@ import io.novafoundation.nova.common.view.dialog.dialog
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
+import io.novafoundation.nova.feature_dapp_impl.domain.browser.isSecure
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DappPendingConfirmation.Action
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.sheets.AcknowledgePhishingBottomSheet
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.sheets.ConfirmAuthorizeBottomSheet
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3WebViewClientFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewHolder
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.injectWeb3
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.uninjectWeb3
-import kotlinx.android.synthetic.main.fragment_dapp_browser.*
+import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserAddressBar
+import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserAddressBarGroup
+import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserBack
+import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserClose
+import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserForward
+import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserRefresh
+import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserWebView
 import javax.inject.Inject
 
 class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
@@ -57,9 +65,9 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
 
         dappBrowserAddressBarGroup.applyStatusBarInsets()
 
-        dappBrowserClose.setOnClickListener { viewModel.closeClicked() }
+        dappBrowserClose.setOnClickListener { viewModel.closeClicked(wasForcedByApplication = false) }
 
-        dappBrowserBack.setOnClickListener { backClicked() }
+        dappBrowserBack.setOnClickListener { backClicked(wasForcedByApplication = false) }
         attachBackCallback()
 
         dappBrowserAddressBar.setOnClickListener {
@@ -104,10 +112,19 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
                     showConfirmAuthorizeSheet(it as DappPendingConfirmation<Action.Authorize>)
                 }
                 Action.CloseScreen -> showCloseConfirmation(it)
+                Action.AcknowledgePhishingAlert -> {
+                    AcknowledgePhishingBottomSheet(requireContext(), it)
+                        .show()
+                }
             }
         }
 
-        viewModel.loadUrlEvent.observeEvent(dappBrowserWebView::loadUrl)
+        viewModel.browserNavigationCommandEvent.observeEvent {
+            when (it) {
+                BrowserNavigationCommand.GoBack -> backClicked(wasForcedByApplication = true)
+                is BrowserNavigationCommand.OpenUrl -> dappBrowserWebView.loadUrl(it.url)
+            }
+        }
 
         viewModel.currentPage.observe {
             dappBrowserAddressBar.setAddress(it.display)
@@ -140,11 +157,11 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
         ).show()
     }
 
-    private fun backClicked() {
+    private fun backClicked(wasForcedByApplication: Boolean) {
         if (dappBrowserWebView.canGoBack()) {
             dappBrowserWebView.goBack()
         } else {
-            viewModel.closeClicked()
+            viewModel.closeClicked(wasForcedByApplication)
         }
     }
 
@@ -159,7 +176,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
     private fun attachBackCallback() {
         backCallback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                backClicked()
+                backClicked(wasForcedByApplication = false)
             }
         }
 

@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="dapp_phishing_title">Phishing detected</string>
+  <string name="dapp_phishing_subtitle">Nova Wallet believes that this website could compromise the security of your accounts and your tokens</string>
+  <string name="dapp_phishing_go_back">Okay, take me back</string>
+
   <string name="staking_start_change_validators_recommended_subtitle">Nova Wallet will select the top validators based on security and profitability criteria</string>
 <!--  <string name="staking_start_change_validators_recommended_subtitle">Nova algorithm selected a list of recommended validators based on the criteria:</string>-->
 <!--  <string name="staking_start_change_validators_recommended_subtitle_v2_2_0">Nova Wallet created a list of recommended validators based on blockchain data and with the following criteria:</string>-->

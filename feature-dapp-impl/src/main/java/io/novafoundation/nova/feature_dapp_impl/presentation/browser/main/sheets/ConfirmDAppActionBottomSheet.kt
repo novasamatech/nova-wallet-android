@@ -30,11 +30,11 @@ abstract class ConfirmDAppActionBottomSheet<A : DappPendingConfirmation.Action>(
         setContentView(R.layout.bottom_sheet_confirm_dapp_action)
         super.onCreate(savedInstanceState)
 
+        setCancelable(false)
+
         confirmInnerContent.inflateChild(contentLayoutRes, attachToRoot = true)
 
         confirmDAppActionAllow.setDismissingClickListener { confirmation.onConfirm() }
         confirmDAppActionReject.setDismissingClickListener { confirmation.onDeny() }
-
-        setOnCancelListener { confirmation.onCancel() }
     }
 }

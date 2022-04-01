@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:background="@color/bg_bottom_sheet"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:layout_height="wrap_content">
+
+    <View
+        android:layout_marginTop="4dp"
+        style="@style/Widget.Nova.Puller" />
+
+    <ImageView
+        android:layout_width="88dp"
+        android:layout_height="88dp"
+        android:layout_marginTop="17dp"
+        android:padding="12dp"
+        android:background="@drawable/dapp_confirm_background"
+        android:src="@drawable/ic_warning_filled" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
+        android:text="@string/dapp_phishing_title" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:gravity="center"
+        android:textColor="@color/white_64"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:text="@string/dapp_phishing_subtitle" />
+
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:layout_width="match_parent"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="16dp"
+        android:id="@+id/phishingAlertAcknowledge"
+        android:text="@string/dapp_phishing_go_back"
+        android:layout_height="wrap_content" />
+</LinearLayout>

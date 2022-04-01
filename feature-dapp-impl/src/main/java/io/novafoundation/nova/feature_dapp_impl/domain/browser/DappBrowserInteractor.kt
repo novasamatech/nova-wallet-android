@@ -3,6 +3,8 @@ package io.novafoundation.nova.feature_dapp_impl.domain.browser
 import io.novafoundation.nova.common.data.mappers.mapCryptoTypeToEncryption
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress
+import io.novafoundation.nova.feature_dapp_impl.data.repository.PhishingSitesRepository
+import io.novafoundation.nova.feature_dapp_impl.util.Urls
 import io.novafoundation.nova.feature_dapp_impl.util.isSecure
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.InjectedAccount
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.InjectedMetadataKnown
@@ -18,6 +20,7 @@ import java.net.URL
 class DappBrowserInteractor(
     private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
+    private val phishingSitesRepository: PhishingSitesRepository,
     private val runtimeVersionsRepository: RuntimeVersionsRepository,
 ) {
 
@@ -62,13 +65,16 @@ class DappBrowserInteractor(
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
-    suspend fun browserPageFor(fullUrl: String): BrowserPage = withContext(Dispatchers.Default) {
+    suspend fun browserPageFor(fullUrl: String, synchronizedWithBrowser: Boolean): BrowserPage = withContext(Dispatchers.Default) {
         runCatching {
-            val url = URL(fullUrl)
-
-            BrowserPage(display = url.host, isSecure = url.isSecure)
+            val security = when {
+                phishingSitesRepository.isPhishing(fullUrl) -> BrowserPage.Security.DANGEROUS
+                URL(fullUrl).isSecure -> BrowserPage.Security.SECURE
+                else -> BrowserPage.Security.UNKNOWN
+            }
+            BrowserPage(display = Urls.hostOf(fullUrl), security = security, synchronizedWithBrowser = synchronizedWithBrowser)
         }.getOrElse {
-            BrowserPage(display = fullUrl, isSecure = false)
+            BrowserPage(display = fullUrl, security = BrowserPage.Security.UNKNOWN, synchronizedWithBrowser = synchronizedWithBrowser)
         }
     }
 }
