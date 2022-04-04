@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_assets.data.buyToken
+package io.novafoundation.nova.feature_assets.data.buyToken.providers
 
 import android.content.Context
 import io.novafoundation.nova.common.utils.hmacSHA256
@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.utils.toBase64
 import io.novafoundation.nova.common.utils.toHexColor
 import io.novafoundation.nova.common.utils.urlEncoded
 import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.data.buyToken.ExternalProvider
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 class MoonPayProvider(
@@ -32,7 +33,7 @@ class MoonPayProvider(
         private val address: String,
     ) : ExternalProvider.Integrator {
 
-        override fun integrate(using: Context) {
+        override fun openBuyFlow(using: Context) {
             using.showBrowser(createPurchaseLink(using))
         }
 

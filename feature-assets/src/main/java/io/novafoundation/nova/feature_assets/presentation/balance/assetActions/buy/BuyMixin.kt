@@ -31,7 +31,7 @@ fun BaseFragment<*>.setupBuyIntegration(
     mixin.integrateWithBuyProviderEvent.observeEvent {
         with(it) {
             when (integrator) {
-                is ExternalProvider.Integrator -> integrator.integrate(requireContext())
+                is ExternalProvider.Integrator -> integrator.openBuyFlow(requireContext())
             }
         }
     }

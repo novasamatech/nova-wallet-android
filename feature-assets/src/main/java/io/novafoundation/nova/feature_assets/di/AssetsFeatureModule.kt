@@ -10,7 +10,8 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_assets.BuildConfig
 import io.novafoundation.nova.feature_assets.data.buyToken.BuyTokenRegistry
-import io.novafoundation.nova.feature_assets.data.buyToken.RampProvider
+import io.novafoundation.nova.feature_assets.data.buyToken.providers.RampProvider
+import io.novafoundation.nova.feature_assets.data.buyToken.providers.TransakProvider
 import io.novafoundation.nova.feature_assets.data.repository.assetFilters.AssetFiltersRepository
 import io.novafoundation.nova.feature_assets.data.repository.assetFilters.PreferencesAssetFiltersRepository
 import io.novafoundation.nova.feature_assets.di.modules.SendModule
@@ -49,11 +50,37 @@ class AssetsFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideBuyTokenIntegration(): BuyTokenRegistry {
+    fun provideTransakProvider(): TransakProvider {
+        val environment = if (BuildConfig.DEBUG) "STAGING" else "PRODUCTION"
+
+        return TransakProvider(
+            host = BuildConfig.TRANSAK_HOST,
+            apiKey = BuildConfig.TRANSAK_TOKEN,
+            environment = environment
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideRampProvider(): RampProvider {
+        return RampProvider(
+            host = BuildConfig.RAMP_HOST,
+            apiToken = BuildConfig.RAMP_TOKEN,
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideBuyTokenIntegration(
+        rampProvider: RampProvider,
+        transakProvider: TransakProvider
+    ): BuyTokenRegistry {
+
         return BuyTokenRegistry(
             providers = listOf(
-                // TODO waiting for secret keys for Ramp and Moonpay
-                RampProvider(host = BuildConfig.RAMP_HOST, apiToken = null/*BuildConfig.RAMP_TOKEN*/),
+                rampProvider,
+                transakProvider,
+                // TODO waiting for secret keys for Moonpay
 //                MoonPayProvider(host = BuildConfig.MOONPAY_HOST, publicKey = BuildConfig.MOONPAY_PUBLIC_KEY, privateKey = BuildConfig.MOONPAY_PRIVATE_KEY)
             )
         )

@@ -1,9 +1,12 @@
-package io.novafoundation.nova.feature_assets.data.buyToken
+package io.novafoundation.nova.feature_assets.data.buyToken.providers
 
 import android.content.Context
 import android.net.Uri
+import io.novafoundation.nova.common.utils.appendNullableQueryParameter
 import io.novafoundation.nova.common.utils.showBrowser
 import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.data.buyToken.BuyTokenRegistry
+import io.novafoundation.nova.feature_assets.data.buyToken.ExternalProvider
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 private const val RAMP_APP_NAME = "Nova Wallet"
@@ -35,7 +38,7 @@ class RampProvider(
         private val address: String
     ) : ExternalProvider.Integrator {
 
-        override fun integrate(using: Context) {
+        override fun openBuyFlow(using: Context) {
             using.showBrowser(createPurchaseLink())
         }
 
@@ -45,11 +48,7 @@ class RampProvider(
                 .authority(host)
                 .appendQueryParameter("swapAsset", chainAsset.symbol)
                 .appendQueryParameter("userAddress", address)
-                .apply {
-                    apiToken?.let {
-                        appendQueryParameter("hostApiKey", apiToken)
-                    }
-                }
+                .appendNullableQueryParameter("hostApiKey", apiToken)
                 .appendQueryParameter("hostAppName", RAMP_APP_NAME)
                 .appendQueryParameter("hostLogoUrl", RAMP_APP_LOGO)
                 .appendQueryParameter("finalUrl", ExternalProvider.REDIRECT_URL_BASE)

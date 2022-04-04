@@ -24,6 +24,6 @@ class BuyTokenRegistry(private val providers: List<Provider<*>>) {
 
     interface Integrator<T> {
 
-        fun integrate(using: T)
+        fun openBuyFlow(using: T)
     }
 }

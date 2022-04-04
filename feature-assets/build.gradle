@@ -14,8 +14,11 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-//        buildConfigField "String", "RAMP_TOKEN", "\"4bk3yhfrg99fer764bo7egrqmxbfene7gbrpwmp3\""
+        buildConfigField "String", "RAMP_TOKEN", "\"n8ev677z3z7enckabyc249j84ajpc28o9tmsgob7\""
         buildConfigField "String", "RAMP_HOST", "\"ri-widget-staging.firebaseapp.com\""
+
+        buildConfigField "String", "TRANSAK_TOKEN", "\"ed6a6887-57fd-493a-8075-4718b463913b\""
+        buildConfigField "String", "TRANSAK_HOST", "\"staging-global.transak.com\""
 
         buildConfigField "String", "MOONPAY_PRIVATE_KEY", readSecret("MOONPAY_TEST_SECRET")
         buildConfigField "String", "MOONPAY_HOST", "\"buy-staging.moonpay.com\""
@@ -24,8 +27,11 @@ android {
 
     buildTypes {
         release {
-//            buildConfigField "String", "RAMP_TOKEN", "\"3quzr4e6wdyccndec8jzjebzar5kxxzfy2f3us5k\""
+            buildConfigField "String", "RAMP_TOKEN", "\"6hrtmyabadyjf6q4jc6h45yv3k8h7s88ebgubscd\""
             buildConfigField "String", "RAMP_HOST", "\"buy.ramp.network\""
+
+            buildConfigField "String", "TRANSAK_TOKEN", "\"861a131b-1721-4e99-8ec3-7349840c888f\""
+            buildConfigField "String", "TRANSAK_HOST", "\"global.transak.com\""
 
             buildConfigField "String", "MOONPAY_PRIVATE_KEY", readSecret("MOONPAY_PRODUCTION_SECRET")
             buildConfigField "String", "MOONPAY_PUBLIC_KEY", "\"pk_live_Boi6Rl107p7XuJWBL8GJRzGWlmUSoxbz\""
