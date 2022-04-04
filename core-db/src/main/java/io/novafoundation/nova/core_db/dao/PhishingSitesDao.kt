@@ -10,7 +10,7 @@ import io.novafoundation.nova.core_db.model.PhishingSiteLocal
 @Dao
 abstract class PhishingSitesDao {
 
-    @Query("SELECT EXISTS (SELECT * FROM phishing_sites WHERE host = :host)")
+    @Query("SELECT EXISTS (SELECT * FROM phishing_sites WHERE :host LIKE '%' || host)")
     abstract suspend fun isPhishing(host: String): Boolean
 
     @Transaction
