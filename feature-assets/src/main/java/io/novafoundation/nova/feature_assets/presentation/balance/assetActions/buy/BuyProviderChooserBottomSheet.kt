@@ -3,13 +3,13 @@ package io.novafoundation.nova.feature_assets.presentation.balance.assetActions.
 import android.content.Context
 import android.os.Bundle
 import android.view.View
-import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.ClickHandler
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListSheetAdapter
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.HolderCreator
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.ReferentialEqualityDiffCallBack
+import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.data.buyToken.BuyTokenRegistry
 import kotlinx.android.synthetic.main.item_sheet_buy_provider.view.itemSheetBuyProviderImage
 import kotlinx.android.synthetic.main.item_sheet_buy_provider.view.itemSheetBuyProviderText
@@ -18,13 +18,15 @@ typealias BuyProvider = BuyTokenRegistry.Provider<*>
 
 class BuyProviderChooserBottomSheet(
     context: Context,
-    providers: List<BuyProvider>,
-    onClick: ClickHandler<BuyProvider>,
+    payload: Payload<BuyProvider>,
+    onSelect: ClickHandler<BuyProvider>,
+    onCancel: () -> Unit,
 ) : DynamicListBottomSheet<BuyProvider>(
-    context,
-    Payload(providers),
-    ReferentialEqualityDiffCallBack(),
-    onClick
+    context = context,
+    payload = payload,
+    diffCallback = ReferentialEqualityDiffCallBack(),
+    onClicked = onSelect,
+    onCancel = onCancel
 ) {
 
     override fun onCreate(savedInstanceState: Bundle?) {

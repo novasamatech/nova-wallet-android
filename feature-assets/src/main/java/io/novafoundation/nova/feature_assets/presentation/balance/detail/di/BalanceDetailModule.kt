@@ -15,7 +15,7 @@ import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.WalletRouter
-import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy.BuyMixin
+import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy.BuyMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.BalanceDetailViewModel
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProviderFactory
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryMixin
@@ -59,10 +59,17 @@ class BalanceDetailModule {
         sendInteractor: SendInteractor,
         router: WalletRouter,
         transactionHistoryMixin: TransactionHistoryMixin,
-        buyMixin: BuyMixin.Presentation,
+        buyMixinFactory: BuyMixinFactory,
         assetPayload: AssetPayload
     ): ViewModel {
-        return BalanceDetailViewModel(interactor, sendInteractor, router, assetPayload, buyMixin, transactionHistoryMixin)
+        return BalanceDetailViewModel(
+            interactor = interactor,
+            sendInteractor = sendInteractor,
+            router = router,
+            assetPayload = assetPayload,
+            buyMixinFactory = buyMixinFactory,
+            transactionHistoryMixin = transactionHistoryMixin
+        )
     }
 
     @Provides

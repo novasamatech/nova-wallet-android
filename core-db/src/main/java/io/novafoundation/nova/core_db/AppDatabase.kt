@@ -25,6 +25,7 @@ import io.novafoundation.nova.core_db.dao.PhishingSitesDao
 import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.core_db.dao.StorageDao
 import io.novafoundation.nova.core_db.dao.TokenDao
+import io.novafoundation.nova.core_db.migrations.AddBuyProviders_7_8
 import io.novafoundation.nova.core_db.migrations.AddChainColor_4_5
 import io.novafoundation.nova.core_db.migrations.AddDAppAuthorizations_1_2
 import io.novafoundation.nova.core_db.migrations.AddNfts_5_6
@@ -52,7 +53,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
 import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
 
 @Database(
-    version = 7,
+    version = 8,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -103,7 +104,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java, "app.db"
                 )
                     .addMigrations(AddDAppAuthorizations_1_2, AssetTypes_2_3, ChangeAsset_3_4)
-                    .addMigrations(AddChainColor_4_5, AddNfts_5_6, AddSitePhishing_6_7)
+                    .addMigrations(AddChainColor_4_5, AddNfts_5_6, AddSitePhishing_6_7, AddBuyProviders_7_8)
                     .fallbackToDestructiveMigration()
                     .build()
             }

@@ -3,26 +3,27 @@ package io.novafoundation.nova.feature_assets.data.buyToken
 import androidx.annotation.DrawableRes
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
-class BuyTokenRegistry(val availableProviders: List<Provider<*>>) {
+class BuyTokenRegistry(private val providers: List<Provider<*>>) {
 
-    fun availableProviders(chainAsset: Chain.Asset) = availableProviders.filter { it.isTokenSupported(chainAsset) }
+    fun availableProvidersFor(chainAsset: Chain.Asset) = providers.filter { it.isTokenSupported(chainAsset) }
 
     interface Provider<I : Integrator<*>> {
         class UnsupportedTokenException : Exception()
 
-        val supportedTokens: Set<Chain.Asset>
+        val id: String
 
         val name: String
 
         @get:DrawableRes
         val icon: Int
 
-        fun isTokenSupported(chainAsset: Chain.Asset): Boolean = chainAsset in supportedTokens
+        fun isTokenSupported(chainAsset: Chain.Asset): Boolean = id in chainAsset.buyProviders
 
         fun createIntegrator(chainAsset: Chain.Asset, address: String): I
     }
 
     interface Integrator<T> {
+
         fun integrate(using: T)
     }
 }
