@@ -9,5 +9,6 @@ class ChainAssetRemote(
     val staking: String?,
     val type: String?,
     val icon: String?,
+    val buyProviders: Map<String, Map<String, Any>>?, // { "providerName": { arguments map } }
     val typeExtras: Map<String, Any?>?,
 )

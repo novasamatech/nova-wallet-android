@@ -38,7 +38,7 @@
             <intent-filter android:autoVerify="true">
                 <data
                     android:host="buy-success"
-                    android:scheme="fearless" />
+                    android:scheme="nova" />
 
                 <action android:name="android.intent.action.VIEW" />
 

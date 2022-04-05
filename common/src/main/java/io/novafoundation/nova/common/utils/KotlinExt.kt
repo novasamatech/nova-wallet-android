@@ -1,5 +1,6 @@
 package io.novafoundation.nova.common.utils
 
+import android.net.Uri
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
@@ -146,4 +147,8 @@ fun ByteArray?.optionalContentEquals(other: ByteArray?): Boolean {
     } else {
         this.contentEquals(other)
     }
+}
+
+fun Uri.Builder.appendNullableQueryParameter(name: String, value: String?) = apply {
+    value?.let { appendQueryParameter(name, value) }
 }

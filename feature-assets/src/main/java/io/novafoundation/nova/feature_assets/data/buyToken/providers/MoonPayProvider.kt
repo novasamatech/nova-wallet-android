@@ -1,12 +1,13 @@
-package io.novafoundation.nova.feature_assets.data.buyToken
+package io.novafoundation.nova.feature_assets.data.buyToken.providers
 
 import android.content.Context
-import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.common.utils.hmacSHA256
 import io.novafoundation.nova.common.utils.showBrowser
 import io.novafoundation.nova.common.utils.toBase64
 import io.novafoundation.nova.common.utils.toHexColor
 import io.novafoundation.nova.common.utils.urlEncoded
+import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.data.buyToken.ExternalProvider
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 class MoonPayProvider(
@@ -15,13 +16,12 @@ class MoonPayProvider(
     private val publicKey: String,
 ) : ExternalProvider {
 
-    override val supportedTokens = emptySet<Chain.Asset>() // TODO wallet - buy
+    override val id: String = "moonpay"
 
     override val name: String = "Moonpay"
-
     override val icon: Int = R.drawable.ic_moonpay
 
-    override fun createIntegrator(chainAsset: Chain.Asset, address: String): BuyTokenRegistry.Integrator<Context> {
+    override fun createIntegrator(chainAsset: Chain.Asset, address: String): ExternalProvider.Integrator {
         return MoonPayIntegrator(host, privateKey, publicKey, chainAsset, address)
     }
 
@@ -31,9 +31,9 @@ class MoonPayProvider(
         private val publicKey: String,
         private val tokenType: Chain.Asset,
         private val address: String,
-    ) : BuyTokenRegistry.Integrator<Context> {
+    ) : ExternalProvider.Integrator {
 
-        override fun integrate(using: Context) {
+        override fun openBuyFlow(using: Context) {
             using.showBrowser(createPurchaseLink(using))
         }
 

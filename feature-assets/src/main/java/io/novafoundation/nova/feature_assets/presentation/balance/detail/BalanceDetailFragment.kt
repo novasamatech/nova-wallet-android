@@ -7,12 +7,12 @@ import android.view.ViewGroup
 import coil.ImageLoader
 import coil.load
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyBarMargin
 import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.common.utils.setTextColorRes
+import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
@@ -85,10 +85,6 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
             viewModel.receiveClicked()
         }
 
-        balanceDetaiActions.buy.setOnClickListener {
-            viewModel.buyClicked()
-        }
-
         balanceDetailsBalances.locked.setOnClickListener {
             viewModel.lockedInfoClicked()
         }
@@ -111,7 +107,7 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
 
         viewModel.state.observe(transfersContainer::showState)
 
-        setupBuyIntegration(viewModel)
+        setupBuyIntegration(viewModel.buyMixin, buyButton = balanceDetaiActions.buy)
 
         viewModel.assetDetailsModel.observe { asset ->
             balanceDetailTokenIcon.load(asset.token.configuration.iconUrl, imageLoader)
@@ -132,8 +128,6 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
         }
 
         viewModel.showFrozenDetailsEvent.observeEvent(::showLockedDetails)
-
-        balanceDetaiActions.buy.isEnabled = viewModel.buyEnabled
 
         viewModel.sendEnabled.observe(balanceDetaiActions.send::setEnabled)
     }

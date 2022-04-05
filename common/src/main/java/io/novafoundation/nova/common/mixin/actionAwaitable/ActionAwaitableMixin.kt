@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
 
+typealias ChooseOneOfManyAwaitable<E> = ActionAwaitableMixin<DynamicListBottomSheet.Payload<E>, E>
+
 interface ActionAwaitableMixin<P, R> {
 
     class Action<P, R>(

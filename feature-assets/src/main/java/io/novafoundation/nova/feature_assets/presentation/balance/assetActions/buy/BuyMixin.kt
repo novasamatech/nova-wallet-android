@@ -1,63 +1,51 @@
 package io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy
 
+import android.view.View
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseFragment
-import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.mixin.actionAwaitable.ChooseOneOfManyAwaitable
 import io.novafoundation.nova.common.utils.Event
-import io.novafoundation.nova.feature_assets.data.buyToken.ExternalProvider
 import io.novafoundation.nova.feature_assets.data.buyToken.BuyTokenRegistry
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.feature_assets.data.buyToken.ExternalProvider
+import kotlinx.coroutines.flow.Flow
 
 interface BuyMixin {
-    class IntegrationPayload(
-        val provider: BuyTokenRegistry.Provider<*>,
-        val chainAsset: Chain.Asset,
-        val address: String,
-    )
 
-    class ProviderChooserPayload(
-        val providers: List<BuyTokenRegistry.Provider<*>>,
-        val chainAsset: Chain.Asset,
-    )
+    class IntegrationPayload(val integrator: BuyTokenRegistry.Integrator<*>)
 
-    val showProviderChooserEvent: LiveData<Event<ProviderChooserPayload>>
+    val awaitProviderChoosing: ChooseOneOfManyAwaitable<BuyProvider>
 
     val integrateWithBuyProviderEvent: LiveData<Event<IntegrationPayload>>
 
-    fun providerChosen(
-        provider: BuyTokenRegistry.Provider<*>,
-        chainAsset: Chain.Asset
-    )
+    val buyEnabled: Flow<Boolean>
 
-    interface Presentation : BuyMixin {
+    fun buyClicked()
 
-        override val showProviderChooserEvent: MutableLiveData<Event<ProviderChooserPayload>>
-
-        override val integrateWithBuyProviderEvent: MutableLiveData<Event<IntegrationPayload>>
-
-        fun buyClicked(chainId: ChainId, chainAssetId: Int)
-
-        fun isBuyEnabled(chainId: ChainId, chainAssetId: Int): Boolean
-    }
+    interface Presentation : BuyMixin
 }
 
-fun <V> BaseFragment<V>.setupBuyIntegration(viewModel: V) where V : BaseViewModel, V : BuyMixin {
-    viewModel.integrateWithBuyProviderEvent.observeEvent {
+fun BaseFragment<*>.setupBuyIntegration(
+    mixin: BuyMixin,
+    buyButton: View,
+) {
+    mixin.integrateWithBuyProviderEvent.observeEvent {
         with(it) {
-            when (provider) {
-                is ExternalProvider -> provider.createIntegrator(it.chainAsset, address).integrate(requireContext())
+            when (integrator) {
+                is ExternalProvider.Integrator -> integrator.openBuyFlow(requireContext())
             }
         }
     }
 
-    viewModel.showProviderChooserEvent.observeEvent { payload ->
+    mixin.awaitProviderChoosing.awaitableActionLiveData.observeEvent { action ->
         BuyProviderChooserBottomSheet(
-            requireContext(), payload.providers,
-            onClick = {
-                viewModel.providerChosen(it, payload.chainAsset)
-            }
+            context = requireContext(),
+            payload = action.payload,
+            onSelect = action.onSuccess,
+            onCancel = action.onCancel
         ).show()
     }
+
+    buyButton.setOnClickListener { mixin.buyClicked() }
+
+    mixin.buyEnabled.observe(buyButton::setEnabled)
 }

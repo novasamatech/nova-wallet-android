@@ -2,6 +2,7 @@ package io.novafoundation.nova.runtime.multiNetwork.chain
 
 import com.google.gson.Gson
 import io.novafoundation.nova.common.utils.asGsonParsedNumber
+import io.novafoundation.nova.common.utils.fromJsonOrNull
 import io.novafoundation.nova.common.utils.parseArbitraryObject
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 import io.novafoundation.nova.core_db.model.chain.ChainExplorerLocal
@@ -9,6 +10,8 @@ import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.JoinedChainInfo
 import io.novafoundation.nova.runtime.multiNetwork.ChainGradientParser
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.BuyProviderArguments
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.BuyProviderId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainExternalApiRemote
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainRemote
@@ -130,7 +133,8 @@ fun mapChainRemoteToChain(
             name = it.name ?: chainRemote.name,
             priceId = it.priceId,
             staking = mapStakingStringToStakingType(it.staking),
-            type = mapChainAssetTypeFromRaw(it.type, it.typeExtras)
+            type = mapChainAssetTypeFromRaw(it.type, it.typeExtras),
+            buyProviders = it.buyProviders.orEmpty()
         )
     }
 
@@ -190,6 +194,7 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
 
     val assets = chainLocal.assets.map {
         val typeExtrasParsed = it.typeExtras?.let(gson::parseArbitraryObject)
+        val buyProviders = it.buyProviders?.let<String, Map<BuyProviderId, BuyProviderArguments>?>(gson::fromJsonOrNull).orEmpty()
 
         Chain.Asset(
             iconUrl = it.icon ?: chainLocal.chain.icon,
@@ -199,6 +204,7 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
             name = it.name,
             chainId = it.chainId,
             priceId = it.priceId,
+            buyProviders = buyProviders,
             staking = mapStakingTypeFromLocal(it.staking),
             type = mapChainAssetTypeFromRaw(it.type, typeExtrasParsed)
         )
@@ -269,6 +275,7 @@ fun mapChainToChainLocal(chain: Chain, gson: Gson): JoinedChainInfo {
             priceId = it.priceId,
             staking = mapStakingTypeToLocal(it.staking),
             type = type,
+            buyProviders = gson.toJson(it.buyProviders),
             typeExtras = gson.toJson(typeExtras),
             icon = it.iconUrl
         )
