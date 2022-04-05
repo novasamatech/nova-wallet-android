@@ -2,7 +2,7 @@ package io.novafoundation.nova.runtime.extrinsic
 
 import io.novafoundation.nova.common.data.mappers.mapCryptoTypeToEncryption
 import io.novafoundation.nova.core.model.CryptoType
-import io.novafoundation.nova.runtime.ext.accountIdFromPublicKey
+import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.genesisHash
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -53,7 +53,7 @@ class ExtrinsicBuilderFactory(
 
         val runtime = chainRegistry.getRuntime(chain.id)
 
-        val accountId = chain.accountIdFromPublicKey(keypair.publicKey)
+        val accountId = chain.accountIdOf(publicKey = keypair.publicKey)
         val accountAddress = chain.addressOf(accountId)
 
         val nonce = rpcCalls.getNonce(chain.id, accountAddress)

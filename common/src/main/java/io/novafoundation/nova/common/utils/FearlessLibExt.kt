@@ -44,14 +44,6 @@ fun ByteArray.toAddress(networkType: Node.NetworkType) = toAddress(networkType.r
 
 fun String.removeHexPrefix() = removePrefix("0x")
 
-fun String.ethereumAddressToAccountId(): ByteArray {
-    return fromHex().also {
-        require(it.size == 20) {
-            "Ethereum address must be 20 bytes long"
-        }
-    }
-}
-
 fun <T> DataType<T>.fromHex(hex: String): T {
     val codecReader = ScaleCodecReader(hex.fromHex())
 

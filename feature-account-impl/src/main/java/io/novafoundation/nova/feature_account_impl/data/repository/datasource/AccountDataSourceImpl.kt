@@ -7,7 +7,6 @@ import io.novafoundation.nova.common.data.secrets.v2.MetaAccountSecrets
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
-import io.novafoundation.nova.common.utils.ethereumAddressFromPublicKey
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.common.utils.substrateAccountId
@@ -33,6 +32,8 @@ import io.novafoundation.nova.feature_account_impl.data.repository.datasource.mi
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import jp.co.soramitsu.fearless_utils.extensions.asEthereumPublicKey
+import jp.co.soramitsu.fearless_utils.extensions.toAccountId
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.scale.EncodableStruct
 import kotlinx.coroutines.Dispatchers
@@ -229,7 +230,7 @@ class AccountDataSourceImpl(
             substrateCryptoType = substrateCryptoType,
             substrateAccountId = substratePublicKey.substrateAccountId(),
             ethereumPublicKey = ethereumPublicKey,
-            ethereumAddress = ethereumPublicKey?.ethereumAddressFromPublicKey(),
+            ethereumAddress = ethereumPublicKey?.asEthereumPublicKey()?.toAccountId()?.value,
             name = name,
             isSelected = false,
             position = metaAccountDao.nextAccountPosition()
