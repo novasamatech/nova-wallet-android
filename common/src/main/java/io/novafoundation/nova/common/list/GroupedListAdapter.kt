@@ -79,6 +79,10 @@ abstract class GroupedListAdapter<GROUP, CHILD>(private val diffCallback: BaseGr
         }
     }
 
+    override fun onViewRecycled(holder: GroupedListHolder) {
+        holder.unbind()
+    }
+
     protected inline fun <reified T> findIndexOfElement(crossinline condition: (T) -> Boolean): Int {
         return currentList.indexOfFirst { it is T && condition(it) }
     }
@@ -129,4 +133,9 @@ abstract class BaseGroupedDiffCallback<GROUP, CHILD>(private val groupClass: Cla
 }
 
 abstract class GroupedListHolder(override val containerView: View) :
-    RecyclerView.ViewHolder(containerView), LayoutContainer
+    RecyclerView.ViewHolder(containerView), LayoutContainer {
+
+    open fun unbind() {
+
+    }
+}

@@ -55,10 +55,6 @@ class SearchDappAdapter(
             }
         }
     }
-
-    override fun onViewRecycled(holder: GroupedListHolder) {
-        (holder as? SearchHolder)?.unbind()
-    }
 }
 
 private object DiffCallback : BaseGroupedDiffCallback<TextHeader, DappSearchModel>(TextHeader::class.java) {
@@ -108,7 +104,7 @@ private class SearchHolder(
     private val itemHandler: SearchDappAdapter.Handler
 ) : GroupedListHolder(parentView.inflateChild(R.layout.item_dapp)) {
 
-    fun unbind() = with(containerView) {
+    override fun unbind() = with(containerView) {
         itemDAppIcon.clear()
     }
 
