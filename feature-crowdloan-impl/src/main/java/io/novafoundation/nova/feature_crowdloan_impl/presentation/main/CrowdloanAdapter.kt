@@ -65,12 +65,6 @@ class CrowdloanAdapter(
             }
         }
     }
-
-    override fun onViewRecycled(holder: GroupedListHolder) {
-        if (holder is CrowdloanChildHolder) {
-            holder.unbind()
-        }
-    }
 }
 
 private object CrowdloanDiffCallback : BaseGroupedDiffCallback<CrowdloanStatusModel, CrowdloanModel>(CrowdloanStatusModel::class.java) {
@@ -163,7 +157,7 @@ private class CrowdloanChildHolder(
         }
     }
 
-    fun unbind() {
+    override fun unbind() {
         with(containerView) {
             itemCrowdloanIcon.clear()
         }

@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_assets.presentation.transaction.history
 import android.view.View
 import android.view.ViewGroup
 import coil.ImageLoader
+import coil.clear
 import io.novafoundation.nova.common.list.BaseGroupedDiffCallback
 import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
@@ -52,6 +53,7 @@ class TransactionHistoryAdapter(
 }
 
 class TransactionHolder(view: View, private val imageLoader: ImageLoader) : GroupedListHolder(view) {
+
     fun bind(item: OperationModel, handler: TransactionHistoryAdapter.Handler) {
         with(containerView) {
             with(item) {
@@ -76,6 +78,10 @@ class TransactionHolder(view: View, private val imageLoader: ImageLoader) : Grou
 
             itemTransactionIcon.setIcon(item.operationIcon, imageLoader)
         }
+    }
+
+    override fun unbind() {
+        containerView.itemTransactionIcon.clear()
     }
 }
 
