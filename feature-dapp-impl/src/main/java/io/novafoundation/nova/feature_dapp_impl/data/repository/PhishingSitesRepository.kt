@@ -27,7 +27,20 @@ class PhishingSitesRepositoryImpl(
 
     override suspend fun isPhishing(url: String): Boolean {
         val host = Urls.hostOf(url)
+        val hostSuffixes = extractAllPossibleSubDomains(host)
 
-        return phishingSitesDao.isPhishing(host)
+        return phishingSitesDao.isPhishing(hostSuffixes)
+    }
+
+    private fun extractAllPossibleSubDomains(host: String): List<String> {
+        val separator = "."
+
+        val segments = host.split(separator)
+
+        val suffixes = (2..segments.size).map { suffixLength ->
+            segments.takeLast(suffixLength).joinToString(separator = ".")
+        }
+
+        return suffixes
     }
 }
