@@ -136,6 +136,5 @@ abstract class GroupedListHolder(override val containerView: View) :
     RecyclerView.ViewHolder(containerView), LayoutContainer {
 
     open fun unbind() {
-
     }
 }
