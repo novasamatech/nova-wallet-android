@@ -17,7 +17,7 @@ class RampProvider(
     private val apiToken: String?
 ) : ExternalProvider {
 
-    override val id = "moonpay"
+    override val id = "ramp"
 
     override val name: String = "Ramp"
 
