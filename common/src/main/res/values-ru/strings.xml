@@ -242,6 +242,9 @@
   <string name="dapp_dapps">DApps</string>
   <string name="dapp_main_welcome_subtitle">Подключайтесь к приложениям\nэкосистемы Полькадот &amp; Кусама,\nиспользуя аккаунты из Nova Wallet</string>
   <string name="dapp_main_welcome_title">Добро пожаловать\nна портал приложений</string>
+  <string name="dapp_phishing_go_back">Хорошо, уходим отсюда</string>
+  <string name="dapp_phishing_subtitle">Nova Wallet считает, что этот веб-сайт может поставить под угрозу безопасность ваших учетных записей и ваших токенов.</string>
+  <string name="dapp_phishing_title">Обнаружен фишинг</string>
   <string name="dapp_search_hint">Введите имя или URL</string>
   <string name="dapp_sign_extrinsic_details_subtitle">Убедитесь, что операция правильная</string>
   <string name="dapp_sign_extrinsic_failed">Не удалось подписать запрошенную операцию</string>
