@@ -88,7 +88,7 @@ fun MetaAccount.addressIn(chain: Chain): String? {
     return when {
         hasChainAccountIn(chain.id) -> chain.addressOf(chainAccounts.getValue(chain.id).accountId)
         chain.isEthereumBased -> ethereumAddress?.let(chain::addressOf)
-        else ->  chain.addressOf(substrateAccountId)
+        else -> chain.addressOf(substrateAccountId)
     }
 }
 
