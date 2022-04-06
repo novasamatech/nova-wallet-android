@@ -36,7 +36,7 @@ sealed class AssetTransferValidationFailure {
 
     class PhishingRecipient(val address: String) : AssetTransferValidationFailure()
 
-    object NonPositiveAmount: AssetTransferValidationFailure()
+    object NonPositiveAmount : AssetTransferValidationFailure()
 }
 
 data class AssetTransferPayload(
