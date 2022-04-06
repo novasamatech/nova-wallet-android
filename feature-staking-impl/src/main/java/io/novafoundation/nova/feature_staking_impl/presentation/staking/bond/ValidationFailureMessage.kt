@@ -17,7 +17,7 @@ fun bondMoreValidationFailure(
 
         BondMoreValidationFailure.ZERO_BOND -> {
             resourceManager.getString(R.string.common_error_general_title) to
-                resourceManager.getString(R.string.staking_zero_bond_error)
+                resourceManager.getString(R.string.common_zero_amount_error)
         }
     }
 }

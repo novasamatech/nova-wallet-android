@@ -1,11 +1,12 @@
-package io.novafoundation.nova.feature_staking_impl.domain.validations
+package io.novafoundation.nova.feature_wallet_api.domain.validation
 
 import io.novafoundation.nova.common.validation.DefaultFailureLevel
 import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationStatus
+import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import java.math.BigDecimal
 
-class NotZeroAmountValidation <P, E>(
+class PositiveAmountValidation<P, E>(
     val amountExtractor: (P) -> BigDecimal,
     val errorProvider: () -> E
 ) : Validation<P, E> {
@@ -18,3 +19,13 @@ class NotZeroAmountValidation <P, E>(
         }
     }
 }
+
+fun <P, E> ValidationSystemBuilder<P, E>.positiveAmount(
+    amount: (P) -> BigDecimal,
+    error: () -> E
+) = validate(
+    PositiveAmountValidation(
+        amountExtractor = amount,
+        errorProvider = error
+    )
+)

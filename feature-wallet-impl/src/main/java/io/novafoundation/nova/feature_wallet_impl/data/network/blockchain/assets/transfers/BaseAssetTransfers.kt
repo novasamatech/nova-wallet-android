@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValid
 import io.novafoundation.nova.feature_wallet_api.domain.validation.doNotCrossExistentialDeposit
 import io.novafoundation.nova.feature_wallet_api.domain.validation.enoughTotalToStayAboveED
 import io.novafoundation.nova.feature_wallet_api.domain.validation.notPhishingAccount
+import io.novafoundation.nova.feature_wallet_api.domain.validation.positiveAmount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 import io.novafoundation.nova.feature_wallet_api.domain.validation.validAddress
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.notDeadRecipient
@@ -89,6 +90,8 @@ abstract class BaseAssetTransfers(
 
         notPhishingRecipient()
 
+        positiveAmount()
+
         sufficientTransferableBalanceToPayFee()
         sufficientBalanceInUsedAsset()
 
@@ -111,6 +114,11 @@ abstract class BaseAssetTransfers(
         address = { it.transfer.recipient },
         chain = { it.transfer.chain },
         error = { AssetTransferValidationFailure.InvalidRecipientAddress(it.transfer.chain) }
+    )
+
+    protected fun AssetTransfersValidationSystemBuilder.positiveAmount() = positiveAmount(
+        amount = { it.transfer.amount },
+        error = { AssetTransferValidationFailure.NonPositiveAmount }
     )
 
     protected fun AssetTransfersValidationSystemBuilder.sufficientBalanceInUsedAsset() = sufficientBalance(
