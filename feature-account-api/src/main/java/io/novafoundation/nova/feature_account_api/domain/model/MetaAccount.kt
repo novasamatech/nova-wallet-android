@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_account_api.domain.model
 
 import io.novafoundation.nova.common.data.mappers.mapCryptoTypeToEncryption
 import io.novafoundation.nova.common.utils.DEFAULT_PREFIX
-import io.novafoundation.nova.common.utils.ethereumAddressToHex
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -88,8 +87,8 @@ fun MetaAccount.cryptoTypeIn(chain: Chain): CryptoType {
 fun MetaAccount.addressIn(chain: Chain): String? {
     return when {
         hasChainAccountIn(chain.id) -> chain.addressOf(chainAccounts.getValue(chain.id).accountId)
-        chain.isEthereumBased -> ethereumAddress?.ethereumAddressToHex()
-        else -> substrateAccountId.toAddress(chain.addressPrefix.toShort())
+        chain.isEthereumBased -> ethereumAddress?.let(chain::addressOf)
+        else ->  chain.addressOf(substrateAccountId)
     }
 }
 
