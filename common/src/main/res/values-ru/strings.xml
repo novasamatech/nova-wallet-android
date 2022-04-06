@@ -543,7 +543,7 @@
   <string name="staking_your_stake">Ваш стейк</string>
   <string name="staking_your_validators">Ваши валидаторы</string>
   <string name="staking_your_validators_changing_title">Ваши валидаторы поменяются в следующую эру</string>
-  <string name="staking_zero_bond_error">Сумма должна быть больше нуля</string>
+  <string name="common_zero_amount_error">Сумма должна быть больше нуля</string>
   <string name="tabbar_staking_title">Стейкинг</string>
   <string name="tabbar_wallet_title">Кошелёк</string>
   <string name="today">Сегодня</string>

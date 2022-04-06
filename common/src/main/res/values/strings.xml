@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="common_zero_amount_error">Amount must be positive</string>
+
   <string name="dapp_phishing_title">Phishing detected</string>
   <string name="dapp_phishing_subtitle">Nova Wallet believes that this website could compromise the security of your accounts and your tokens</string>
   <string name="dapp_phishing_go_back">Okay, take me back</string>
@@ -580,7 +582,6 @@
   <string name="staking_your_stake">Your stake</string>
   <string name="staking_your_validators">Your validators</string>
   <string name="staking_your_validators_changing_title">Your validators will change in the next era.</string>
-  <string name="staking_zero_bond_error">Amount must be positive</string>
   <string name="tabbar_staking_title">Staking</string>
   <string name="tabbar_wallet_title">Wallet</string>
   <string name="today">Today</string>
