@@ -1,7 +1,6 @@
 package io.novafoundation.nova.common.utils
 
 import android.util.Base64
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.hash.Hasher.blake2b256
 import org.bouncycastle.jcajce.provider.digest.SHA256
 import java.security.MessageDigest
@@ -15,8 +14,6 @@ fun String.hmacSHA256(secret: String): ByteArray {
 
     return chiper.doFinal(this.toByteArray())
 }
-
-fun ByteArray.ethereumAddressToHex() = toHexString(withPrefix = true)
 
 fun ByteArray.substrateAccountId(): ByteArray {
     return if (size > 32) {
