@@ -93,6 +93,8 @@ class TransactionHistoryProvider(
             pageSize = TransactionStateMachine.PAGE_SIZE,
             filters = allAvailableFilters()
         ).onFailure {
+            performTransition(Action.PageError(error = it))
+
             Log.d(LOG_TAG, "Failed to sync operations page", it)
         }
     }
