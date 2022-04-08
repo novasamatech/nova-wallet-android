@@ -152,9 +152,7 @@ class ChainSyncServiceTest {
         runBlocking {
             localReturns(listOf(LOCAL_CHAIN))
 
-            val secondChain = REMOTE_CHAIN.copy(chainId = "0x001")
-
-            remoteReturns(listOf(secondChain))
+            remoteReturns(emptyList())
 
             chainSyncService.syncUp()
 
@@ -203,5 +201,5 @@ class ChainSyncServiceTest {
         )
     }
 
-    private fun <T> emptyDiff() = eq(CollectionDiffer.Diff<T>(emptyList(), emptyList()))
+    private fun <T> emptyDiff() = eq(CollectionDiffer.Diff<T>(emptyList(), emptyList(), emptyList()))
 }
