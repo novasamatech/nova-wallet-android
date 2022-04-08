@@ -208,5 +208,5 @@ task ktlintFormat(type: JavaExec, group: "formatting") {
 }
 
 task runTest(type: GradleBuild) {
-    tasks = ['clean', 'ktlint', 'runModuleTests']
+    tasks = ['clean', 'ktlint', 'testDebugUnitTest']
 }

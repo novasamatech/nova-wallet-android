@@ -9,12 +9,17 @@ import io.novafoundation.nova.core_db.model.AssetWithToken
 import kotlinx.coroutines.flow.Flow
 
 private const val RETRIEVE_ASSET_SQL_META_ID = """
-           select * from assets as a inner join tokens as t ON a.tokenSymbol = t.symbol WHERE
-            a.metaId = :metaId and a.chainId = :chainId AND a.tokenSymbol = :symbol
+    SELECT * FROM assets AS a 
+    INNER JOIN chain_assets AS ca ON a.assetId = ca.id AND a.chainId = ca.chainId
+    INNER JOIN tokens AS t ON ca.symbol = t.symbol
+    WHERE a.metaId = :metaId AND a.chainId = :chainId AND a.assetId = :assetId
 """
 
 private const val RETRIEVE_ACCOUNT_ASSETS_QUERY = """
-       select * from assets as a inner join tokens as t on a.tokenSymbol = t.symbol WHERE a.metaId = :metaId
+    SELECT * FROM assets AS a 
+    INNER JOIN chain_assets AS ca ON a.assetId = ca.id AND a.chainId = ca.chainId
+    INNER JOIN tokens AS t ON ca.symbol = t.symbol
+    WHERE a.metaId = :metaId
 """
 
 interface AssetReadOnlyCache {
@@ -22,9 +27,9 @@ interface AssetReadOnlyCache {
     fun observeAssets(metaId: Long): Flow<List<AssetWithToken>>
     suspend fun getAssets(metaId: Long): List<AssetWithToken>
 
-    fun observeAsset(metaId: Long, chainId: String, symbol: String): Flow<AssetWithToken?>
+    fun observeAsset(metaId: Long, chainId: String, assetId: Int): Flow<AssetWithToken?>
 
-    suspend fun getAsset(metaId: Long, chainId: String, symbol: String): AssetWithToken?
+    suspend fun getAsset(metaId: Long, chainId: String, assetId: Int): AssetWithToken?
 }
 
 @Dao
@@ -37,10 +42,10 @@ abstract class AssetDao : AssetReadOnlyCache {
     abstract override suspend fun getAssets(metaId: Long): List<AssetWithToken>
 
     @Query(RETRIEVE_ASSET_SQL_META_ID)
-    abstract override fun observeAsset(metaId: Long, chainId: String, symbol: String): Flow<AssetWithToken?>
+    abstract override fun observeAsset(metaId: Long, chainId: String, assetId: Int): Flow<AssetWithToken?>
 
     @Query(RETRIEVE_ASSET_SQL_META_ID)
-    abstract override suspend fun getAsset(metaId: Long, chainId: String, symbol: String): AssetWithToken?
+    abstract override suspend fun getAsset(metaId: Long, chainId: String, assetId: Int): AssetWithToken?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insertAsset(asset: AssetLocal)

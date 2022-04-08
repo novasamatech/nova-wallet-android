@@ -1,7 +1,9 @@
 package io.novafoundation.nova.core_db.dao
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import io.novafoundation.nova.common.utils.CollectionDiffer
 import io.novafoundation.nova.core_db.AppDatabase
+import io.novafoundation.nova.core_db.model.chain.JoinedChainInfo
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -9,13 +11,13 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class ChainDaoTest : DaoTest<ChainDao>(AppDatabase::chainDao){
+class ChainDaoTest : DaoTest<ChainDao>(AppDatabase::chainDao) {
 
     @Test
     fun shouldInsertWholeChain() = runBlocking {
         val chainInfo = createTestChain("0x00")
 
-        dao.update(newOrUpdated = listOf(chainInfo), removed = emptyList())
+        dao.addChain(chainInfo)
 
         val chainsFromDb = dao.getJoinChainInfo()
 
@@ -31,8 +33,8 @@ class ChainDaoTest : DaoTest<ChainDao>(AppDatabase::chainDao){
     fun shouldDeleteChainWithCascade() = runBlocking {
         val chainInfo = createTestChain("0x00")
 
-        dao.update(newOrUpdated = listOf(chainInfo), removed = emptyList())
-        dao.update(removed = listOf(chainInfo.chain), newOrUpdated = emptyList())
+        dao.addChain(chainInfo)
+        dao.removeChain(chainInfo)
 
         val assetsCursor = db.query("SELECT * FROM chain_assets", emptyArray())
         assertEquals(0, assetsCursor.count)
@@ -45,10 +47,10 @@ class ChainDaoTest : DaoTest<ChainDao>(AppDatabase::chainDao){
     fun shouldNotDeleteRuntimeCacheEntryAfterChainUpdate() = runBlocking {
         val chainInfo = createTestChain("0x00")
 
-        dao.update(newOrUpdated = listOf(chainInfo), removed = emptyList())
+        dao.addChain(chainInfo)
         dao.updateRemoteRuntimeVersion(chainInfo.chain.id, remoteVersion = 1)
 
-        dao.update(newOrUpdated = listOf(chainInfo), removed = emptyList())
+        dao.updateChain(chainInfo)
 
         val runtimeEntry = dao.runtimeInfo(chainInfo.chain.id)
 
@@ -56,52 +58,71 @@ class ChainDaoTest : DaoTest<ChainDao>(AppDatabase::chainDao){
     }
 
     @Test
-    fun shouldDeleteRemovedNodes() = runBlocking {
-        val chainInfo = createTestChain("0x00", nodesCount = 3)
+    fun shouldDeleteRemovedNestedFields() = runBlocking {
+        val chainInfo = createTestChain("0x00", nodesCount = 3, assetsCount = 3)
 
-        dao.update(newOrUpdated = listOf(chainInfo), removed = emptyList())
+        dao.addChain(chainInfo)
 
-        val newChainInfo = createTestChain("0x00", nodesCount = 2)
-
-        dao.update(newOrUpdated = listOf(newChainInfo), removed = emptyList())
+        dao.applyDiff(
+            chainDiff = updatedDiff(chainInfo.chain),
+            assetsDiff = CollectionDiffer.Diff(
+                added = emptyList(),
+                updated = emptyList(),
+                removed = chainInfo.assets.takeLast(1)
+            ),
+            nodesDiff = CollectionDiffer.Diff(
+                added = emptyList(),
+                updated = emptyList(),
+                removed = chainInfo.nodes.takeLast(1)
+            ),
+            explorersDiff = emptyDiff()
+        )
 
         val chainFromDb2 = dao.getJoinChainInfo().first()
 
         assertEquals(2, chainFromDb2.nodes.size)
+        assertEquals(2, chainFromDb2.assets.size)
     }
 
     @Test
     fun shouldUpdate() = runBlocking {
-        val chainsInitial = listOf(
-            createTestChain("0x00"),
-            createTestChain("0x01"),
-            createTestChain("0x02"),
+        val toBeRemoved = listOf(
+            createTestChain("to be removed 1"),
+            createTestChain("to be removed 2"),
         )
 
-        dao.update(newOrUpdated = chainsInitial, removed = emptyList())
-
-        val newOrUpdated = listOf(
-            createTestChain("0x00", "new name"),
-            createTestChain("0x03")
+        val stayTheSame = listOf(
+            createTestChain("stay the same")
         )
 
-        val removed = listOf(
-            chainOf("0x01"),
-            chainOf("0x02")
-        )
+        val chainsInitial = listOf(createTestChain("to be changed")) + stayTheSame + toBeRemoved
 
-        dao.update(newOrUpdated = newOrUpdated, removed = removed)
+        dao.addChains(chainsInitial)
+
+        val added = listOf(createTestChain("to be added"))
+        val updated = listOf(createTestChain("to be changed", "new name"))
+
+        val expectedResult = stayTheSame + added + updated
+
+        dao.applyDiff(
+            chainDiff = CollectionDiffer.Diff(
+                added = added.map(JoinedChainInfo::chain),
+                updated = updated.map(JoinedChainInfo::chain),
+                removed = toBeRemoved.map(JoinedChainInfo::chain)
+            ),
+            assetsDiff = emptyDiff(),
+            nodesDiff = emptyDiff(),
+            explorersDiff = emptyDiff()
+        )
 
         val chainsFromDb = dao.getJoinChainInfo()
 
-        assertEquals(chainsFromDb.size, newOrUpdated.size)
+        assertEquals(expectedResult.size, chainsFromDb.size)
+        expectedResult.forEach { expected ->
+            val tryFind = chainsFromDb.firstOrNull { actual -> expected.chain.id == actual.chain.id && expected.chain.name == actual.chain.name }
 
-        newOrUpdated.zip(chainsFromDb) { expected, actual ->
-            assertEquals(expected.chain.id, actual.chain.id)
-            assertEquals(expected.chain.name, actual.chain.name)
+            assertNotNull("Did not find ${expected.chain.id} in result set", tryFind)
         }
-
-        Unit
     }
 
     @Test
@@ -109,7 +130,7 @@ class ChainDaoTest : DaoTest<ChainDao>(AppDatabase::chainDao){
         runBlocking {
             val chainId = "0x00"
 
-            dao.update(newOrUpdated = listOf(createTestChain(chainId)), removed = emptyList())
+            dao.addChain(createTestChain(chainId))
 
             dao.updateRemoteRuntimeVersion(chainId, 1)
 

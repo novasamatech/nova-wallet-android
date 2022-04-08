@@ -119,7 +119,8 @@ fun mapChainRemoteToChain(
     val nodes = chainRemote.nodes.map {
         Chain.Node(
             url = it.url,
-            name = it.name
+            name = it.name,
+            chainId = chainRemote.chainId
         )
     }
 
@@ -143,7 +144,8 @@ fun mapChainRemoteToChain(
             name = it.name,
             account = it.account,
             extrinsic = it.extrinsic,
-            event = it.event
+            event = it.event,
+            chainId = chainRemote.chainId
         )
     }
 
@@ -188,7 +190,8 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
     val nodes = chainLocal.nodes.map {
         Chain.Node(
             url = it.url,
-            name = it.name
+            name = it.name,
+            chainId = it.chainId
         )
     }
 
@@ -215,7 +218,8 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
             name = it.name,
             account = it.account,
             extrinsic = it.extrinsic,
-            event = it.event
+            event = it.event,
+            chainId = it.chainId
         )
     }
 
@@ -254,41 +258,46 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
     }
 }
 
-fun mapChainToChainLocal(chain: Chain, gson: Gson): JoinedChainInfo {
-    val nodes = chain.nodes.map {
-        ChainNodeLocal(
-            url = it.url,
-            name = it.name,
-            chainId = chain.id
-        )
-    }
+fun mapChainNodeToLocal(node: Chain.Node): ChainNodeLocal {
+    return ChainNodeLocal(
+        url = node.url,
+        name = node.name,
+        chainId = node.chainId,
+    )
+}
 
-    val assets = chain.assets.map {
-        val (type, typeExtras) = mapChainAssetTypeToRaw(it.type)
+fun mapChainAssetToLocal(asset: Chain.Asset, gson: Gson): ChainAssetLocal = with(asset) {
+    val (type, typeExtras) = mapChainAssetTypeToRaw(type)
 
-        ChainAssetLocal(
-            id = it.id,
-            symbol = it.symbol,
-            precision = it.precision,
-            chainId = chain.id,
-            name = it.name,
-            priceId = it.priceId,
-            staking = mapStakingTypeToLocal(it.staking),
-            type = type,
-            buyProviders = gson.toJson(it.buyProviders),
-            typeExtras = gson.toJson(typeExtras),
-            icon = it.iconUrl
-        )
-    }
+    return ChainAssetLocal(
+        id = id,
+        symbol = symbol,
+        precision = precision,
+        chainId = chainId,
+        name = name,
+        priceId = priceId,
+        staking = mapStakingTypeToLocal(staking),
+        type = type,
+        buyProviders = gson.toJson(buyProviders),
+        typeExtras = gson.toJson(typeExtras),
+        icon = iconUrl
+    )
+}
 
-    val explorers = chain.explorers.map {
+fun mapChainExplorersToLocal(explorer: Chain.Explorer): ChainExplorerLocal {
+    return with(explorer) {
         ChainExplorerLocal(
-            chainId = chain.id,
-            name = it.name,
-            extrinsic = it.extrinsic,
-            account = it.account,
-            event = it.event
+            chainId = chainId,
+            name = name,
+            extrinsic = extrinsic,
+            account = account,
+            event = event
         )
+    }
+}
+
+fun mapChainToChainLocal(chain: Chain, gson: Gson): ChainLocal {
+    val explorers = chain.explorers.map {
     }
 
     val types = chain.types?.let {
@@ -322,10 +331,5 @@ fun mapChainToChainLocal(chain: Chain, gson: Gson): JoinedChainInfo {
         )
     }
 
-    return JoinedChainInfo(
-        chain = chainLocal,
-        nodes = nodes,
-        assets = assets,
-        explorers = explorers
-    )
+    return chainLocal
 }

@@ -50,5 +50,5 @@ class RoundRobinStrategyTest {
         assertEquals(expected, nextActual)
     }
 
-    private fun createFakeNode(id: String) = Chain.Node(url = id, name = id)
+    private fun createFakeNode(id: String) = Chain.Node(url = id, name = id, chainId = "test")
 }
