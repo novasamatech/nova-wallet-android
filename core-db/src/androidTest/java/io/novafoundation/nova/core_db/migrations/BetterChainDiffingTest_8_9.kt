@@ -2,10 +2,7 @@ package io.novafoundation.nova.core_db.migrations
 
 import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
-import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.SupportSQLiteDatabase
-import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
-import androidx.test.platform.app.InstrumentationRegistry
 import io.novafoundation.nova.core_db.AppDatabase
 import io.novafoundation.nova.core_db.converters.CryptoTypeConverters
 import io.novafoundation.nova.core_db.dao.assetOf
@@ -13,7 +10,6 @@ import io.novafoundation.nova.core_db.dao.chainOf
 import io.novafoundation.nova.core_db.dao.testMetaAccount
 import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
 import org.junit.Assert.assertEquals
-import org.junit.Rule
 import org.junit.Test
 import java.math.BigInteger
 
@@ -25,13 +21,6 @@ private class OldAsset(
 )
 
 class BetterChainDiffingTest_8_9 : BaseMigrationTest() {
-
-    @get:Rule
-    val testHelper = MigrationTestHelper(
-        InstrumentationRegistry.getInstrumentation(),
-        AppDatabase::class.java.canonicalName,
-        FrameworkSQLiteOpenHelperFactory()
-    )
 
     private val cryptoTypeConverters = CryptoTypeConverters()
 
