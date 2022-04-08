@@ -49,7 +49,7 @@ data class Chain(
         val staking: StakingType,
         val type: Type,
         val name: String,
-    ): Identifiable {
+    ) : Identifiable {
 
         sealed class Type {
             object Native : Type()
@@ -77,7 +77,7 @@ data class Chain(
         val chainId: ChainId,
         val url: String,
         val name: String,
-    ): Identifiable {
+    ) : Identifiable {
 
         override val identifier: String = "$chainId:$url"
     }
@@ -88,7 +88,7 @@ data class Chain(
         val account: StringTemplate?,
         val extrinsic: StringTemplate?,
         val event: StringTemplate?
-    ): Identifiable {
+    ) : Identifiable {
 
         override val identifier = "$chainId:$name"
     }

@@ -6,7 +6,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 val BetterChainDiffing_8_9 = object : Migration(8, 9) {
 
     override fun migrate(database: SupportSQLiteDatabase) {
-       migrateAssets(database)
+        migrateAssets(database)
 
         migrateRuntimeVersions(database)
     }
@@ -17,7 +17,8 @@ val BetterChainDiffing_8_9 = object : Migration(8, 9) {
         database.execSQL("ALTER TABLE chain_runtimes RENAME TO chain_runtimes_old")
 
         // new table
-        database.execSQL("""
+        database.execSQL(
+            """
             CREATE TABLE IF NOT EXISTS `chain_runtimes` (
             `chainId` TEXT NOT NULL,
             `syncedVersion` INTEGER NOT NULL,
@@ -25,16 +26,18 @@ val BetterChainDiffing_8_9 = object : Migration(8, 9) {
             PRIMARY KEY(`chainId`),
             FOREIGN KEY(`chainId`) REFERENCES `chains`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE 
             )
-        """.trimIndent())
+            """.trimIndent()
+        )
         database.execSQL("CREATE INDEX `index_chain_runtimes_chainId` ON `chain_runtimes` (`chainId`)")
 
-
         // insert to new from old
-        database.execSQL("""
+        database.execSQL(
+            """
             INSERT INTO chain_runtimes
             SELECT chainId, syncedVersion, remoteVersion
             FROM chain_runtimes_old
-        """.trimIndent())
+            """.trimIndent()
+        )
 
         // delete old
         database.execSQL("DROP TABLE chain_runtimes_old")
@@ -61,17 +64,20 @@ val BetterChainDiffing_8_9 = object : Migration(8, 9) {
             PRIMARY KEY(`assetId`,`chainId`,`metaId`),
             FOREIGN KEY(`assetId`, `chainId`) REFERENCES `chain_assets`(`id`, `chainId`) ON UPDATE NO ACTION ON DELETE CASCADE 
             )
-            """.trimIndent())
+            """.trimIndent()
+        )
         database.execSQL("CREATE INDEX IF NOT EXISTS `index_assets_metaId` ON `assets` (`metaId`)".trimIndent())
 
         // insert to new from old
-        database.execSQL("""
+        database.execSQL(
+            """
             INSERT INTO assets
             SELECT
             ca.id, ca.chainId,
             a.metaId, a.freeInPlanks, a.frozenInPlanks, a.reservedInPlanks, a.bondedInPlanks, a.redeemableInPlanks, a.unbondingInPlanks
             FROM assets_old AS a INNER JOIN chain_assets AS ca WHERE a.tokenSymbol = ca.symbol AND a.chainId = ca.chainId
-        """.trimIndent())
+            """.trimIndent()
+        )
 
         // delete old
         database.execSQL("DROP TABLE assets_old")

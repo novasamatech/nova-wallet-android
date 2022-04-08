@@ -298,7 +298,6 @@ fun mapChainExplorersToLocal(explorer: Chain.Explorer): ChainExplorerLocal {
 
 fun mapChainToChainLocal(chain: Chain, gson: Gson): ChainLocal {
     val explorers = chain.explorers.map {
-
     }
 
     val types = chain.types?.let {

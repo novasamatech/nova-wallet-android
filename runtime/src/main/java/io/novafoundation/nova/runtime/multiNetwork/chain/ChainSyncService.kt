@@ -49,7 +49,7 @@ class ChainSyncService(
         )
     }
 
-    private fun <T: Identifiable, R> nestedCollectionDiff(
+    private fun <T : Identifiable, R> nestedCollectionDiff(
         newChains: List<Chain>,
         oldChains: List<Chain>,
         collection: (Chain) -> List<T>,
