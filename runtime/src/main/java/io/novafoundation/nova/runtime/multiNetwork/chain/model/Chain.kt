@@ -49,7 +49,7 @@ data class Chain(
         val staking: StakingType,
         val type: Type,
         val name: String,
-    ) {
+    ): Identifiable {
 
         sealed class Type {
             object Native : Type()
@@ -69,19 +69,29 @@ data class Chain(
         enum class StakingType {
             UNSUPPORTED, RELAYCHAIN
         }
+
+        override val identifier = "$chainId:$id"
     }
 
     data class Node(
+        val chainId: ChainId,
         val url: String,
         val name: String,
-    )
+    ): Identifiable {
+
+        override val identifier: String = "$chainId:$url"
+    }
 
     data class Explorer(
+        val chainId: ChainId,
         val name: String,
         val account: StringTemplate?,
         val extrinsic: StringTemplate?,
         val event: StringTemplate?
-    )
+    ): Identifiable {
+
+        override val identifier = "$chainId:$name"
+    }
 
     data class ExternalApi(
         val staking: Section?,

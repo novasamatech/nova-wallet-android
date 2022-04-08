@@ -7,10 +7,13 @@ interface Identifiable {
 
 object CollectionDiffer {
 
-    class Diff<T>(
-        val newOrUpdated: List<T>,
+    data class Diff<T>(
+        val added: List<T>,
+        val updated: List<T>,
         val removed: List<T>
-    )
+    ) {
+        val newOrUpdated by lazy { updated + added }
+    }
 
     fun <T : Identifiable> findDiff(
         newItems: List<T>,
@@ -21,19 +24,27 @@ object CollectionDiffer {
         val newKeys: Set<String> = newItems.mapTo(mutableSetOf()) { it.identifier }
         val oldMapping = oldItems.associateBy { it.identifier }
 
-        val newOrUpdated = newItems.mapNotNull { new ->
+        val added = newItems.mapNotNull { new ->
             val old = oldMapping[new.identifier]
 
-            when {
-                old == null -> new // new
-                old != new -> new // updated
-                forceUseNewItems -> new // forced to use new item
-                else -> null // same
-            }
+            new.takeIf { old == null }
+        }
+
+        val updated = newItems.mapNotNull { new ->
+            val old = oldMapping[new.identifier]
+
+            // old exists and it is different from new (or we're forced to use new)
+            new.takeIf { old != null && (old != new || forceUseNewItems) }
         }
 
         val removed = oldItems.filter { it.identifier !in newKeys }
 
-        return Diff(newOrUpdated, removed)
+        return Diff(added = added, updated = updated, removed = removed)
     }
 }
+
+fun <T, R> CollectionDiffer.Diff<T>.map(mapper: (T) -> R) = CollectionDiffer.Diff(
+    added = added.map(mapper),
+    updated = updated.map(mapper),
+    removed = removed.map(mapper)
+)

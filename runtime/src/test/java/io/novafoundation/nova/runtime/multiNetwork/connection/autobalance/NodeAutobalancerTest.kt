@@ -64,7 +64,7 @@ class NodeAutobalancerTest : CoroutineTest() {
     }
 
     private fun generateNodes() = (1..10).map {
-        Chain.Node(url = it.toString(), name = it.toString())
+        Chain.Node(url = it.toString(), name = it.toString(), chainId = "test")
     }
 
     private fun nodeFlow(scope: CoroutineScope) = autobalancer.balancingNodeFlow(

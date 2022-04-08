@@ -135,10 +135,10 @@ class WalletRepositoryImpl(
     }
 
     override fun assetFlow(metaId: Long, chainAsset: Chain.Asset): Flow<Asset> {
-        return assetCache.observeAsset(metaId, chainAsset.chainId, chainAsset.symbol)
+        return assetCache.observeAsset(metaId, chainAsset.chainId, chainAsset.id)
             .map {
                 it.defaultOnNull {
-                    val asset = AssetLocal.createEmpty(chainAsset.symbol, chainAsset.chainId, metaId)
+                    val asset = AssetLocal.createEmpty(chainAsset.id, chainAsset.chainId, metaId)
                     val token = tokenDao.getTokenOrDefault(chainAsset.symbol)
 
                     AssetWithToken(asset, token)
@@ -148,7 +148,7 @@ class WalletRepositoryImpl(
     }
 
     override suspend fun getAsset(accountId: AccountId, chainAsset: Chain.Asset): Asset? {
-        val assetLocal = getAsset(accountId, chainAsset.chainId, chainAsset.symbol)
+        val assetLocal = getAsset(accountId, chainAsset.chainId, chainAsset.id)
 
         return assetLocal?.let { mapAssetLocalToAsset(it, chainAsset) }
     }
@@ -296,10 +296,10 @@ class WalletRepositoryImpl(
 
     private suspend fun <T> apiCall(block: suspend () -> T): T = httpExceptionHandler.wrap(block)
 
-    private suspend fun getAsset(accountId: AccountId, chainId: String, symbol: String) = withContext(Dispatchers.Default) {
+    private suspend fun getAsset(accountId: AccountId, chainId: String, assetId: Int) = withContext(Dispatchers.Default) {
         val metaAccount = accountRepository.findMetaAccountOrThrow(accountId)
 
-        assetCache.getAsset(metaAccount.id, chainId, symbol)
+        assetCache.getAsset(metaAccount.id, chainId, assetId)
     }
 
     private suspend fun TokenDao.getTokenOrDefault(symbol: String) =

@@ -2,14 +2,24 @@ package io.novafoundation.nova.core_db.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.ForeignKey
+import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 import java.math.BigInteger
 
 @Entity(
     tableName = "assets",
-    primaryKeys = ["tokenSymbol", "chainId", "metaId"],
+    primaryKeys = ["assetId", "chainId", "metaId"],
+    foreignKeys = [
+        ForeignKey(
+            entity = ChainAssetLocal::class,
+            parentColumns = ["id", "chainId"],
+            childColumns = ["assetId", "chainId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ]
 )
 data class AssetLocal(
-    val tokenSymbol: String,
+    val assetId: Int,
     val chainId: String,
     @ColumnInfo(index = true) val metaId: Long,
 
@@ -24,11 +34,11 @@ data class AssetLocal(
 ) {
     companion object {
         fun createEmpty(
-            symbol: String,
+            assetId: Int,
             chainId: String,
             metaId: Long
         ) = AssetLocal(
-            tokenSymbol = symbol,
+            assetId = assetId,
             chainId = chainId,
             metaId = metaId,
             freeInPlanks = BigInteger.ZERO,
