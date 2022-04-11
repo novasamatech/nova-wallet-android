@@ -13,6 +13,7 @@ import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_dapp.view.itemDAppIcon
 import kotlinx.android.synthetic.main.item_dapp.view.itemDAppSubtitle
 import kotlinx.android.synthetic.main.item_dapp.view.itemDAppTitle
+import kotlinx.android.synthetic.main.item_dapp.view.itemDappAction
 
 class DappListAdapter(
     private val handler: Handler,
@@ -22,6 +23,8 @@ class DappListAdapter(
     interface Handler {
 
         fun onItemClicked(item: DappModel)
+
+        fun onItemFavouriteClicked(item: DappModel)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DappViewHolder {
@@ -50,10 +53,17 @@ class DappViewHolder(
     private val imageLoader: ImageLoader,
 ) : RecyclerView.ViewHolder(containerView), LayoutContainer {
 
+    init {
+        containerView.itemDappAction.setImageResource(R.drawable.ic_favourite)
+    }
+
     fun bind(item: DappModel) = with(containerView) {
         itemDAppIcon.load(item.iconUrl, imageLoader)
         itemDAppTitle.text = item.name
         itemDAppSubtitle.text = item.description
+
+        itemDappAction.isActivated = item.isFavourite
+        itemDappAction.setOnClickListener { itemHandler.onItemFavouriteClicked(item) }
 
         setOnClickListener { itemHandler.onItemClicked(item) }
     }

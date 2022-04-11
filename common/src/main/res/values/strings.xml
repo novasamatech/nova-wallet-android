@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="dapp_favourites">Favourites</string>
+
   <string name="common_zero_amount_error">Amount must be positive</string>
 
   <string name="dapp_phishing_title">Phishing detected</string>

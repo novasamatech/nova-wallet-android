@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core_db.dao.DappAuthorizationDao
+import io.novafoundation.nova.core_db.dao.FavouriteDAppsDao
 import io.novafoundation.nova.core_db.dao.PhishingSitesDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -54,4 +55,6 @@ interface DAppFeatureDependencies {
     fun dappAuthorizationDao(): DappAuthorizationDao
 
     val phishingSitesDao: PhishingSitesDao
+
+    val favouriteDAppsDao: FavouriteDAppsDao
 }

@@ -6,6 +6,7 @@ import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.dao.AssetDao
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.dao.DappAuthorizationDao
+import io.novafoundation.nova.core_db.dao.FavouriteDAppsDao
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.dao.NftDao
 import io.novafoundation.nova.core_db.dao.NodeDao
@@ -47,4 +48,6 @@ interface DbApi {
     fun nftDao(): NftDao
 
     val phishingSitesDao: PhishingSitesDao
+
+    val favouritesDAppsDao: FavouriteDAppsDao
 }

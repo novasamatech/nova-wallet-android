@@ -5,21 +5,21 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import io.novafoundation.nova.common.list.PayloadGenerator
+import io.novafoundation.nova.common.list.resolvePayload
 import io.novafoundation.nova.common.utils.inflateChild
-import io.novafoundation.nova.feature_dapp_api.data.model.DappCategory
 import io.novafoundation.nova.feature_dapp_impl.R
+import io.novafoundation.nova.feature_dapp_impl.presentation.main.model.DAppCategoryModel
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_dapp_category.view.itemDappCategory
 
 class DappCategoriesAdapter(
     private val handler: Handler,
-) : ListAdapter<DappCategory, DappCategoryViewHolder>(DappDiffCallback) {
-
-    private var selectedPosition = 0
+) : ListAdapter<DAppCategoryModel, DappCategoryViewHolder>(DappDiffCallback) {
 
     interface Handler {
 
-        fun onItemClicked(position: Int)
+        fun onItemClicked(id: String)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DappCategoryViewHolder {
@@ -27,62 +27,48 @@ class DappCategoriesAdapter(
     }
 
     override fun onBindViewHolder(holder: DappCategoryViewHolder, position: Int, payloads: MutableList<Any>) {
-        if (payloads.isEmpty()) {
-            onBindViewHolder(holder, position)
-            return
-        }
+        val item = getItem(position)
 
-        payloads.onEach {
-            when (it) {
-                is SelectionChanged -> holder.bindSelected(isItemSelected(position))
+        resolvePayload(holder, position, payloads) {
+            when(it) {
+                DAppCategoryModel::selected -> holder.bindSelected(item.selected)
             }
         }
     }
 
     override fun onBindViewHolder(holder: DappCategoryViewHolder, position: Int) {
-        holder.bind(getItem(position), isItemSelected(position))
+        holder.bind(getItem(position))
     }
-
-    fun setSelectedCategory(newSelected: Int) {
-        val previousSelected = selectedPosition
-        selectedPosition = newSelected
-
-        notifyItemChanged(previousSelected, SelectionChanged)
-        notifyItemChanged(newSelected, SelectionChanged)
-    }
-
-    private fun isItemSelected(position: Int) = position == selectedPosition
 }
 
-private object DappDiffCallback : DiffUtil.ItemCallback<DappCategory>() {
+private val dAppCategoryPayloadGenerator = PayloadGenerator(DAppCategoryModel::selected)
 
-    override fun areItemsTheSame(oldItem: DappCategory, newItem: DappCategory): Boolean {
+private object DappDiffCallback : DiffUtil.ItemCallback<DAppCategoryModel>() {
+
+    override fun areItemsTheSame(oldItem: DAppCategoryModel, newItem: DAppCategoryModel): Boolean {
         return oldItem.id == newItem.id
     }
 
-    override fun areContentsTheSame(oldItem: DappCategory, newItem: DappCategory): Boolean {
+    override fun areContentsTheSame(oldItem: DAppCategoryModel, newItem: DAppCategoryModel): Boolean {
         return oldItem == newItem
     }
-}
 
-private object SelectionChanged
+    override fun getChangePayload(oldItem: DAppCategoryModel, newItem: DAppCategoryModel): Any? {
+        return dAppCategoryPayloadGenerator.diff(oldItem, newItem)
+    }
+}
 
 class DappCategoryViewHolder(
     override val containerView: View,
     private val itemHandler: DappCategoriesAdapter.Handler,
 ) : RecyclerView.ViewHolder(containerView), LayoutContainer {
 
-    init {
-        containerView.setOnClickListener { itemHandler.onItemClicked(adapterPosition) }
-    }
-
-    fun bind(
-        item: DappCategory,
-        selected: Boolean
-    ) = with(containerView) {
+    fun bind(item: DAppCategoryModel) = with(containerView) {
         itemDappCategory.text = item.name
 
-        bindSelected(selected)
+        bindSelected(item.selected)
+
+        containerView.setOnClickListener { itemHandler.onItemClicked(item.id) }
     }
 
     fun bindSelected(isSelected: Boolean) = with(containerView) {
