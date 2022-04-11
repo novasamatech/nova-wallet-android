@@ -12,7 +12,7 @@ fun BaseFragment<*>.setupRemoveFavouritesConfirmation(awaitableMixin: Confirmati
         warningDialog(
             context = requireContext(),
             onConfirm = { it.onSuccess(Unit) },
-            confirmTextRes =  R.string.common_remove,
+            confirmTextRes = R.string.common_remove,
             onCancel = it.onCancel
         ) {
             setTitle(R.string.dapp_favourites_remove_title)

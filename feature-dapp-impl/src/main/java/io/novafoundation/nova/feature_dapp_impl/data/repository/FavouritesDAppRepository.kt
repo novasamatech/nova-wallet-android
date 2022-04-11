@@ -18,7 +18,7 @@ interface FavouritesDAppRepository {
 
 class DbFavouritesDAppRepository(
     private val favouriteDAppsDao: FavouriteDAppsDao
-): FavouritesDAppRepository {
+) : FavouritesDAppRepository {
 
     override fun observeFavourites(): Flow<List<FavouriteDApp>> {
         return favouriteDAppsDao.observeFavouriteDApps()

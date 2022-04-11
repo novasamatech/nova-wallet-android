@@ -30,7 +30,7 @@ class DappCategoriesAdapter(
         val item = getItem(position)
 
         resolvePayload(holder, position, payloads) {
-            when(it) {
+            when (it) {
                 DAppCategoryModel::selected -> holder.bindSelected(item.selected)
             }
         }

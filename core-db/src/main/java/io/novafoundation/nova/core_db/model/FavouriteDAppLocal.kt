@@ -10,5 +10,3 @@ class FavouriteDAppLocal(
     val label: String,
     val icon: String?
 )
-
-

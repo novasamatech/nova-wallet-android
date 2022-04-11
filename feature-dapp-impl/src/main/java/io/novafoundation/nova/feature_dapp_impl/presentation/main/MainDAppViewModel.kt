@@ -126,7 +126,7 @@ class MainDAppViewModel(
         dappInteractor.toggleDAppFavouritesState(dApp)
     }
 
-    private fun watchInvalidSelectedCategory() =  shownDappsFlow.onEach {
+    private fun watchInvalidSelectedCategory() = shownDappsFlow.onEach {
         // cannot find selected category in current grouping
         if (it == null) selectedCategoryId.value = INITIAL_SELECTED_CATEGORY_ID
     }.launchIn(this)
