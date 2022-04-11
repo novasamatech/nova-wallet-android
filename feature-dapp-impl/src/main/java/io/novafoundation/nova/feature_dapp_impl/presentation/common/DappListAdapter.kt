@@ -3,12 +3,12 @@ package io.novafoundation.nova.feature_dapp_impl.presentation.common
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
 import coil.ImageLoader
+import coil.clear
+import io.novafoundation.nova.common.list.BaseListAdapter
+import io.novafoundation.nova.common.list.BaseViewHolder
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_dapp_impl.R
-import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_dapp.view.itemDAppIcon
 import kotlinx.android.synthetic.main.item_dapp.view.itemDAppSubtitle
 import kotlinx.android.synthetic.main.item_dapp.view.itemDAppTitle
@@ -17,7 +17,7 @@ import kotlinx.android.synthetic.main.item_dapp.view.itemDappAction
 class DappListAdapter(
     private val handler: Handler,
     private val imageLoader: ImageLoader,
-) : ListAdapter<DappModel, DappViewHolder>(DappDiffCallback) {
+) : BaseListAdapter<DappModel, DappViewHolder>(DappDiffCallback) {
 
     interface Handler {
 
@@ -47,10 +47,10 @@ private object DappDiffCallback : DiffUtil.ItemCallback<DappModel>() {
 }
 
 class DappViewHolder(
-    override val containerView: View,
+    containerView: View,
     private val itemHandler: DappListAdapter.Handler,
     private val imageLoader: ImageLoader,
-) : RecyclerView.ViewHolder(containerView), LayoutContainer {
+) : BaseViewHolder(containerView) {
 
     init {
         containerView.itemDappAction.setImageResource(R.drawable.ic_favourite)
@@ -65,5 +65,9 @@ class DappViewHolder(
         itemDappAction.setOnClickListener { itemHandler.onItemFavouriteClicked(item) }
 
         setOnClickListener { itemHandler.onItemClicked(item) }
+    }
+
+    override fun unbind() {
+        containerView.itemDAppIcon.clear()
     }
 }
