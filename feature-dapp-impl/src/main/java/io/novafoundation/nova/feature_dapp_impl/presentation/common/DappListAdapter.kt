@@ -6,7 +6,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.ImageLoader
-import coil.load
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_dapp_impl.R
 import kotlinx.android.extensions.LayoutContainer
@@ -58,7 +57,7 @@ class DappViewHolder(
     }
 
     fun bind(item: DappModel) = with(containerView) {
-        itemDAppIcon.load(item.iconUrl, imageLoader)
+        itemDAppIcon.showDAppIcon(item.iconUrl, imageLoader)
         itemDAppTitle.text = item.name
         itemDAppSubtitle.text = item.description
 
