@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.DappListAdapter
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.DappModel
+import io.novafoundation.nova.feature_dapp_impl.presentation.common.favourites.setupRemoveFavouritesConfirmation
 import kotlinx.android.synthetic.main.fragment_dapp_main.dappMainCategorizedDapps
 import kotlinx.android.synthetic.main.fragment_dapp_main.dappMainContainer
 import kotlinx.android.synthetic.main.fragment_dapp_main.dappMainIcon
@@ -53,6 +54,7 @@ class MainDAppFragment : BaseFragment<MainDAppViewModel>(), DappListAdapter.Hand
 
     override fun subscribe(viewModel: MainDAppViewModel) {
         observeBrowserEvents(viewModel)
+        setupRemoveFavouritesConfirmation(viewModel.removeFavouriteConfirmationAwaitable)
 
         viewModel.currentAddressIconFlow.observe(dappMainIcon::setImageDrawable)
 

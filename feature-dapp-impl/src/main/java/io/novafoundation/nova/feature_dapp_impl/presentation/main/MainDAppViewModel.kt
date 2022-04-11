@@ -4,6 +4,9 @@ import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.createAddressIcon
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.mixin.actionAwaitable.awaitAction
+import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.inBackground
@@ -17,6 +20,7 @@ import io.novafoundation.nova.feature_dapp_impl.data.mappers.mapDappModelToDApp
 import io.novafoundation.nova.feature_dapp_impl.data.mappers.mapDappToDappModel
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.DappModel
+import io.novafoundation.nova.feature_dapp_impl.presentation.common.favourites.RemoveFavouritesPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.model.DAppCategoryModel
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.model.DAppCategoryState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,10 +38,13 @@ class MainDAppViewModel(
     private val router: DAppRouter,
     private val addressIconGenerator: AddressIconGenerator,
     private val selectedAccountUseCase: SelectedAccountUseCase,
+    private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val dappInteractor: DappInteractor,
 ) : BaseViewModel(), Browserable {
 
     override val openBrowserEvent = MutableLiveData<Event<String>>()
+
+    val removeFavouriteConfirmationAwaitable = actionAwaitableMixinFactory.confirmingAction<RemoveFavouritesPayload>()
 
     val currentAddressIconFlow = selectedAccountUseCase.selectedMetaAccountFlow()
         .map { addressIconGenerator.createAddressIcon(it.defaultSubstrateAddress, AddressIconGenerator.SIZE_BIG) }
@@ -111,6 +118,10 @@ class MainDAppViewModel(
 
     fun dappFavouriteClicked(item: DappModel) = launch {
         val dApp = mapDappModelToDApp(item)
+
+        if (item.isFavourite) {
+            removeFavouriteConfirmationAwaitable.awaitAction()
+        }
 
         dappInteractor.toggleDAppFavouritesState(dApp)
     }

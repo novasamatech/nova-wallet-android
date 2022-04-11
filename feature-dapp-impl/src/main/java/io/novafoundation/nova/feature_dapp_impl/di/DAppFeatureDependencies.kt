@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core_db.dao.DappAuthorizationDao
 import io.novafoundation.nova.core_db.dao.FavouriteDAppsDao
@@ -57,4 +58,6 @@ interface DAppFeatureDependencies {
     val phishingSitesDao: PhishingSitesDao
 
     val favouriteDAppsDao: FavouriteDAppsDao
+
+    val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
 }
