@@ -2,16 +2,18 @@ package io.novafoundation.nova.runtime.ext
 
 import io.novafoundation.nova.common.data.network.runtime.binding.MultiAddress
 import io.novafoundation.nova.common.data.network.runtime.binding.bindOrNull
-import io.novafoundation.nova.common.utils.ethereumAddressFromPublicKey
-import io.novafoundation.nova.common.utils.ethereumAddressToAccountId
-import io.novafoundation.nova.common.utils.ethereumAddressToHex
 import io.novafoundation.nova.common.utils.formatNamed
 import io.novafoundation.nova.common.utils.substrateAccountId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Type
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ExplorerTemplateExtractor
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.TypesUsage
-import jp.co.soramitsu.fearless_utils.extensions.fromHex
+import jp.co.soramitsu.fearless_utils.extensions.asEthereumAccountId
+import jp.co.soramitsu.fearless_utils.extensions.asEthereumAddress
+import jp.co.soramitsu.fearless_utils.extensions.asEthereumPublicKey
+import jp.co.soramitsu.fearless_utils.extensions.isValid
+import jp.co.soramitsu.fearless_utils.extensions.toAccountId
+import jp.co.soramitsu.fearless_utils.extensions.toAddress
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHex
@@ -42,7 +44,7 @@ val Chain.genesisHash: String
 
 fun Chain.addressOf(accountId: ByteArray): String {
     return if (isEthereumBased) {
-        accountId.ethereumAddressToHex()
+        accountId.asEthereumAccountId().toAddress(withChecksum = true).value
     } else {
         accountId.toAddress(addressPrefix.toShort())
     }
@@ -50,7 +52,7 @@ fun Chain.addressOf(accountId: ByteArray): String {
 
 fun Chain.accountIdOf(address: String): ByteArray {
     return if (isEthereumBased) {
-        address.ethereumAddressToAccountId()
+        address.asEthereumAddress().toAccountId().value
     } else {
         address.toAccountId()
     }
@@ -72,7 +74,7 @@ fun Chain.accountIdOrDefault(maybeAddress: String): ByteArray {
 
 fun Chain.accountIdOf(publicKey: ByteArray): ByteArray {
     return if (isEthereumBased) {
-        publicKey.ethereumAddressFromPublicKey()
+        publicKey.asEthereumPublicKey().toAccountId().value
     } else {
         publicKey.substrateAccountId()
     }
@@ -90,22 +92,6 @@ fun Chain.multiAddressOf(accountId: ByteArray): MultiAddress {
     }
 }
 
-fun Chain.addressFromPublicKey(publicKey: ByteArray): String {
-    return if (isEthereumBased) {
-        publicKey.ethereumAddressFromPublicKey().ethereumAddressToHex()
-    } else {
-        publicKey.toAddress(addressPrefix.toShort())
-    }
-}
-
-fun Chain.accountIdFromPublicKey(publicKey: ByteArray): ByteArray {
-    return if (isEthereumBased) {
-        publicKey.ethereumAddressFromPublicKey()
-    } else {
-        publicKey.substrateAccountId()
-    }
-}
-
 val Chain.historySupported: Boolean
     get() {
         val historyType = externalApi?.history?.type ?: return false
@@ -116,7 +102,7 @@ val Chain.historySupported: Boolean
 fun Chain.isValidAddress(address: String): Boolean {
     return runCatching {
         if (isEthereumBased) {
-            address.fromHex().size == 20
+            address.asEthereumAddress().isValid()
         } else {
             address.toAccountId() // verify supplied address can be converted to account id
 

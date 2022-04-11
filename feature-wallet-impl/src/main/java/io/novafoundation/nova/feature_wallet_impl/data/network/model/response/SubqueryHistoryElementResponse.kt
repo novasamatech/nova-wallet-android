@@ -18,7 +18,8 @@ class SubqueryHistoryElementResponse(val query: Query) {
                 val address: String,
                 val reward: Rewards?,
                 val transfer: Transfer?,
-                val extrinsic: Extrinsic?
+                val extrinsic: Extrinsic?,
+                val assetTransfer: AssetTransfer?,
             ) {
                 class Rewards(
                     val era: Int,
@@ -32,13 +33,21 @@ class SubqueryHistoryElementResponse(val query: Query) {
                     val to: String,
                     val from: String,
                     val fee: BigInteger,
-                    val block: String,
                     val success: Boolean
                 )
 
                 class Extrinsic(
                     val module: String,
                     val call: String,
+                    val fee: BigInteger,
+                    val success: Boolean
+                )
+
+                class AssetTransfer(
+                    val assetId: String,
+                    val amount: BigInteger,
+                    val to: String,
+                    val from: String,
                     val fee: BigInteger,
                     val success: Boolean
                 )

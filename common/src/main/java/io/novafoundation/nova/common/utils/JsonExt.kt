@@ -18,3 +18,7 @@ fun Gson.parseArbitraryObject(src: String): Map<String, Any?>? {
 
     return fromJson(src, typeToken.type)
 }
+
+inline fun <reified T> Gson.fromJson(src: String): T = fromJson(src, object : TypeToken<T>() {}.type)
+
+inline fun <reified T> Gson.fromJsonOrNull(src: String): T? = runCatching<T> { fromJson(src) }.getOrNull()

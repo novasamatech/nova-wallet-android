@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
+import io.novafoundation.nova.feature_dapp_impl.data.repository.PhishingSitesRepository
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.DappBrowserInteractor
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBrowserViewModel
@@ -32,7 +33,13 @@ class DAppBrowserModule {
         chainRegistry: ChainRegistry,
         accountRepository: AccountRepository,
         runtimeVersionsRepository: RuntimeVersionsRepository,
-    ) = DappBrowserInteractor(chainRegistry, accountRepository, runtimeVersionsRepository)
+        phishingSitesRepository: PhishingSitesRepository,
+    ) = DappBrowserInteractor(
+        chainRegistry = chainRegistry,
+        accountRepository = accountRepository,
+        phishingSitesRepository = phishingSitesRepository,
+        runtimeVersionsRepository = runtimeVersionsRepository
+    )
 
     @Provides
     internal fun provideViewModel(fragment: Fragment, factory: ViewModelProvider.Factory): DAppBrowserViewModel {

@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
-import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
@@ -16,11 +15,12 @@ import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.WalletRouter
-import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy.BuyMixin
+import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy.BuyMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.BalanceDetailViewModel
-import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProvider
+import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProviderFactory
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryMixin
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryProvider
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
@@ -30,24 +30,24 @@ class BalanceDetailModule {
     @ScreenScope
     fun provideTransferHistoryMixin(
         walletInteractor: WalletInteractor,
-        addressIconGenerator: AddressIconGenerator,
         walletRouter: WalletRouter,
-        historyFiltersProvider: HistoryFiltersProvider,
+        historyFiltersProviderFactory: HistoryFiltersProviderFactory,
+        assetSourceRegistry: AssetSourceRegistry,
         resourceManager: ResourceManager,
         assetPayload: AssetPayload,
         addressDisplayUseCase: AddressDisplayUseCase,
         chainRegistry: ChainRegistry,
     ): TransactionHistoryMixin {
         return TransactionHistoryProvider(
-            walletInteractor,
-            addressIconGenerator,
-            walletRouter,
-            historyFiltersProvider,
-            resourceManager,
-            addressDisplayUseCase,
-            chainRegistry,
-            assetPayload.chainId,
-            assetPayload.chainAssetId
+            walletInteractor = walletInteractor,
+            router = walletRouter,
+            historyFiltersProviderFactory = historyFiltersProviderFactory,
+            resourceManager = resourceManager,
+            addressDisplayUseCase = addressDisplayUseCase,
+            assetsSourceRegistry = assetSourceRegistry,
+            chainRegistry = chainRegistry,
+            chainId = assetPayload.chainId,
+            assetId = assetPayload.chainAssetId
         )
     }
 
@@ -59,10 +59,17 @@ class BalanceDetailModule {
         sendInteractor: SendInteractor,
         router: WalletRouter,
         transactionHistoryMixin: TransactionHistoryMixin,
-        buyMixin: BuyMixin.Presentation,
+        buyMixinFactory: BuyMixinFactory,
         assetPayload: AssetPayload
     ): ViewModel {
-        return BalanceDetailViewModel(interactor, sendInteractor, router, assetPayload, buyMixin, transactionHistoryMixin)
+        return BalanceDetailViewModel(
+            interactor = interactor,
+            sendInteractor = sendInteractor,
+            router = router,
+            assetPayload = assetPayload,
+            buyMixinFactory = buyMixinFactory,
+            transactionHistoryMixin = transactionHistoryMixin
+        )
     }
 
     @Provides

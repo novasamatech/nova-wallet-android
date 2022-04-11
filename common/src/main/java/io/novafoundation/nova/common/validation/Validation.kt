@@ -28,6 +28,12 @@ fun <S> validOrError(
     ValidationStatus.NotValid(DefaultFailureLevel.ERROR, lazyReason())
 }
 
+infix fun <E> Boolean.isTrueOrError(error: () -> E) = validOrError(this, error)
+infix fun <E> Boolean.isFalseOrError(error: () -> E) = this.not().isTrueOrError(error)
+
+infix fun <E> Boolean.isTrueOrWarning(warning: () -> E) = validOrWarning(this, warning)
+infix fun <E> Boolean.isFalseOrWarning(warning: () -> E) = this.not().isTrueOrWarning(warning)
+
 sealed class ValidationStatus<S> {
 
     class Valid<S> : ValidationStatus<S>()
@@ -52,7 +58,7 @@ class CompositeValidation<T, S>(
 
     /**
      * Finds the most serious failure across supplied validations
-     * If exception occurred during any validation it will be ignored if there is any validation that reported NotValid state
+     * If exception occurred during any validation it will be ignored if there is any validation that reported [ValidationStatus.NotValid] state
      * If all validations either failed to complete or were valid, then the first exception will be rethrown
      *
      * That is we achieve the following behavior:

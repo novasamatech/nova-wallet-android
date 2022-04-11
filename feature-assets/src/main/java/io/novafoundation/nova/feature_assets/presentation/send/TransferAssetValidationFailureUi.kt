@@ -38,5 +38,13 @@ fun mapAssetTransferValidationFailureToUI(
             resourceManager.getString(R.string.common_validation_invalid_address_title) to
                 resourceManager.getString(R.string.common_validation_invalid_address_message, failure.chain.name)
         }
+        is AssetTransferValidationFailure.PhishingRecipient -> {
+            resourceManager.getString(R.string.wallet_send_phishing_warning_title) to
+                resourceManager.getString(R.string.wallet_send_phishing_warning_text, failure.address)
+        }
+        AssetTransferValidationFailure.NonPositiveAmount -> {
+            resourceManager.getString(R.string.common_error_general_title) to
+                resourceManager.getString(R.string.common_zero_amount_error)
+        }
     }
 }

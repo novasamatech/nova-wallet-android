@@ -17,6 +17,8 @@ class DappPendingConfirmation<A : DappPendingConfirmation.Action>(
             val walletAddressModel: AddressModel
         ) : Action()
 
+        object AcknowledgePhishingAlert : Action()
+
         object CloseScreen : Action()
     }
 }

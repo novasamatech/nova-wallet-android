@@ -25,11 +25,13 @@
     <TextView
         android:id="@+id/viewAssetsTotalBalanceTotal"
         style="@style/TextAppearance.NovaFoundation.Bold.LargeTitle"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="4dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:gravity="center_vertical"
+        android:gravity="center_horizontal"
         android:visibility="gone"
         tools:text="$214.66"
         tools:visibility="visible" />
@@ -76,8 +78,8 @@
                 android:layout_width="80dp"
                 android:layout_height="18dp"
                 android:layout_marginTop="12dp"
-                android:visibility="gone"
-                android:background="@drawable/bg_shimerring" />
+                android:background="@drawable/bg_shimerring"
+                android:visibility="gone" />
         </LinearLayout>
     </com.facebook.shimmer.ShimmerFrameLayout>
 </merge>

@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.BrowserPage
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.DappBrowserInteractor
+import io.novafoundation.nova.feature_dapp_impl.domain.browser.isDangerous
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignRequester
@@ -35,6 +36,9 @@ import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.SignerResu
 import io.novafoundation.nova.feature_dapp_impl.web3.session.Web3Session.AuthorizationState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
@@ -72,14 +76,16 @@ class DAppBrowserViewModel(
     private val selectedAccount = selectedAccountUseCase.selectedMetaAccountFlow()
         .share()
 
-    private val _loadUrlEvent = MutableLiveData<Event<String>>()
-    val loadUrlEvent: LiveData<Event<String>> = _loadUrlEvent
+    private val _browserNavigationCommandEvent = MutableLiveData<Event<BrowserNavigationCommand>>()
+    val browserNavigationCommandEvent: LiveData<Event<BrowserNavigationCommand>> = _browserNavigationCommandEvent
 
     private val _currentPage = singleReplaySharedFlow<BrowserPage>()
     val currentPage: Flow<BrowserPage> = _currentPage
 
     init {
         polkadotJsExtension.requestsFlow
+            // skip all requests on dangerous websites
+            .filterNot { currentPage.first().isDangerous }
             .onEach(::handleDAppRequest)
             .inBackground()
             .launchIn(this)
@@ -88,18 +94,20 @@ class DAppBrowserViewModel(
             .onEach { it.newUrl?.let(::forceLoad) }
             .launchIn(this)
 
+        watchDangerousWebsites()
+
         forceLoad(initialUrl)
     }
 
     fun onPageChanged(url: String) {
-        updatePageDisplay(url)
+        updatePageDisplay(url, synchronizedWithBrowser = true)
     }
 
     fun closeClicked() = launch {
         val confirmationState = awaitConfirmation(DappPendingConfirmation.Action.CloseScreen)
 
         if (confirmationState == ConfirmationState.ALLOWED) {
-            router.back()
+            exitBrowser()
         }
     }
 
@@ -107,6 +115,18 @@ class DAppBrowserViewModel(
         val currentPage = currentPage.first()
 
         dAppSearchRequester.openRequest(SearchPayload(initialUrl = currentPage.display))
+    }
+
+    private fun watchDangerousWebsites() {
+        currentPage
+            .filter { it.synchronizedWithBrowser && it.security == BrowserPage.Security.DANGEROUS }
+            .distinctUntilChanged()
+            .onEach {
+                awaitConfirmation(DappPendingConfirmation.Action.AcknowledgePhishingAlert)
+
+                exitBrowser()
+            }
+            .launchIn(this)
     }
 
     private suspend fun handleDAppRequest(request: PolkadotJsExtensionRequest<*>) {
@@ -217,9 +237,9 @@ class DAppBrowserViewModel(
     }
 
     private fun forceLoad(url: String) {
-        _loadUrlEvent.value = url.event()
+        _browserNavigationCommandEvent.value = BrowserNavigationCommand.OpenUrl(url).event()
 
-        updatePageDisplay(url)
+        updatePageDisplay(url, synchronizedWithBrowser = false)
     }
 
     private suspend fun awaitConfirmation(action: DappPendingConfirmation.Action) = suspendCoroutine<ConfirmationState> {
@@ -251,8 +271,10 @@ class DAppBrowserViewModel(
         request.reject(NotAuthorizedException)
     }
 
-    private fun updatePageDisplay(url: String) = launch {
-        _currentPage.emit(interactor.browserPageFor(url))
+    private fun exitBrowser() = router.back()
+
+    private fun updatePageDisplay(url: String, synchronizedWithBrowser: Boolean) = launch {
+        _currentPage.emit(interactor.browserPageFor(url, synchronizedWithBrowser))
     }
 
     private fun mapSignExtrinsicRequestToPayload(request: Sign) = DAppSignPayload(

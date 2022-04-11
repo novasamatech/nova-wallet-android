@@ -80,7 +80,7 @@ class MainDAppViewModel(
     }
 
     private fun syncDApps() = launch {
-        dappInteractor.syncDAppMetadatas()
+        dappInteractor.dAppsSync()
     }
 
     fun searchClicked() {

@@ -12,7 +12,7 @@ import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.WalletRouter
-import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy.BuyMixin
+import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy.BuyMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryMixin
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryUi
@@ -30,11 +30,10 @@ class BalanceDetailViewModel(
     private val sendInteractor: SendInteractor,
     private val router: WalletRouter,
     private val assetPayload: AssetPayload,
-    private val buyMixin: BuyMixin.Presentation,
+    buyMixinFactory: BuyMixinFactory,
     private val transactionHistoryMixin: TransactionHistoryMixin,
 ) : BaseViewModel(),
-    TransactionHistoryUi by transactionHistoryMixin,
-    BuyMixin by buyMixin {
+    TransactionHistoryUi by transactionHistoryMixin {
 
     private val _hideRefreshEvent = MutableLiveData<Event<Unit>>()
     val hideRefreshEvent: LiveData<Event<Unit>> = _hideRefreshEvent
@@ -56,7 +55,7 @@ class BalanceDetailViewModel(
         .inBackground()
         .share()
 
-    val buyEnabled = buyMixin.isBuyEnabled(assetPayload.chainId, assetPayload.chainAssetId)
+    val buyMixin = buyMixinFactory.create(scope = this, assetPayload)
 
     val sendEnabled = assetFlow.map {
         sendInteractor.areTransfersEnabled(it.token.configuration)
@@ -99,12 +98,6 @@ class BalanceDetailViewModel(
 
     fun receiveClicked() {
         router.openReceive(assetPayload)
-    }
-
-    fun buyClicked() {
-        viewModelScope.launch {
-            buyMixin.buyClicked(assetPayload.chainId, assetPayload.chainAssetId)
-        }
     }
 
     fun lockedInfoClicked() = launch {

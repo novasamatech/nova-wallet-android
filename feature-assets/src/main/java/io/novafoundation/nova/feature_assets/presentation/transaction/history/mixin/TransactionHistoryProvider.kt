@@ -1,11 +1,13 @@
 package io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin
 
-import io.novafoundation.nova.common.address.AddressIconGenerator
+import android.util.Log
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.daysFromMillis
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
+import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_assets.data.mappers.mappers.mapOperationToOperationModel
 import io.novafoundation.nova.feature_assets.data.mappers.mappers.mapOperationToParcel
@@ -13,21 +15,24 @@ import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.presentation.WalletRouter
 import io.novafoundation.nova.feature_assets.presentation.model.OperationModel
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
-import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProvider
+import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProviderFactory
+import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryUi.State.ListState
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionStateMachine.Action
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionStateMachine.State
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.model.DayHeader
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
@@ -36,22 +41,28 @@ import kotlinx.coroutines.withContext
 
 class TransactionHistoryProvider(
     private val walletInteractor: WalletInteractor,
-    private val iconGenerator: AddressIconGenerator,
     private val router: WalletRouter,
-    private val historyFiltersProvider: HistoryFiltersProvider,
+    private val historyFiltersProviderFactory: HistoryFiltersProviderFactory,
     private val resourceManager: ResourceManager,
     private val addressDisplayUseCase: AddressDisplayUseCase,
+    private val assetsSourceRegistry: AssetSourceRegistry,
     private val chainRegistry: ChainRegistry,
     private val chainId: ChainId,
     private val assetId: Int
 ) : TransactionHistoryMixin, CoroutineScope by CoroutineScope(Dispatchers.Default) {
 
-    private val domainState = MutableStateFlow<State>(
-        State.EmptyProgress(filters = historyFiltersProvider.currentFilters())
-    )
+    private val domainState = singleReplaySharedFlow<State>()
 
     private val chainAsync by lazyAsync {
         chainRegistry.getChain(chainId)
+    }
+
+    private val chainAssetAsync by lazyAsync {
+        chainRegistry.asset(chainId, assetId)
+    }
+
+    private val historyFiltersProviderAsync by lazyAsync {
+        historyFiltersProviderFactory.get(router.currentStackEntryLifecycle)
     }
 
     override val state = domainState.map(::mapOperationHistoryStateToUi)
@@ -66,10 +77,9 @@ class TransactionHistoryProvider(
         .shareIn(this, SharingStarted.Eagerly, replay = 1)
 
     init {
-        historyFiltersProvider.filtersFlow()
-            .distinctUntilChanged()
-            .onEach { performTransition(Action.FiltersChanged(it)) }
-            .launchIn(this)
+        emitInitialState()
+
+        observeFilters()
     }
 
     override fun scrolled(currentIndex: Int) {
@@ -81,8 +91,12 @@ class TransactionHistoryProvider(
             chainId = chainId,
             chainAssetId = assetId,
             pageSize = TransactionStateMachine.PAGE_SIZE,
-            filters = historyFiltersProvider.allFilters
-        )
+            filters = allAvailableFilters()
+        ).onFailure {
+            performTransition(Action.PageError(error = it))
+
+            Log.d(LOG_TAG, "Failed to sync operations page", it)
+        }
     }
 
     override fun transactionClicked(transactionModel: OperationModel) {
@@ -109,8 +123,34 @@ class TransactionHistoryProvider(
         }
     }
 
+    private fun observeFilters() = launch {
+        historyFiltersProviderAsync().filtersFlow()
+            .map(::ensureOnlyAvailableFiltersUsed)
+            .distinctUntilChanged()
+            .onEach { performTransition(Action.FiltersChanged(it)) }
+            .collect()
+    }
+
+    // We cannot currently trust HistoryFiltersProvider to not allow users to select unavailable filters so ensure it here
+    private suspend fun ensureOnlyAvailableFiltersUsed(used: Set<TransactionFilter>): Set<TransactionFilter> {
+        val allAvailable = allAvailableFilters()
+
+        return allAvailable.intersect(used)
+    }
+
+    private fun emitInitialState() {
+        launch {
+            val initialState = State.EmptyProgress(
+                allAvailableFilters = allAvailableFilters(),
+                usedFilters = allAvailableFilters()
+            )
+
+            domainState.emit(initialState)
+        }
+    }
+
     private suspend fun performTransition(action: Action) = withContext(Dispatchers.Default) {
-        val newState = TransactionStateMachine.transition(action, domainState.value) { sideEffect ->
+        val newState = TransactionStateMachine.transition(action, domainState.first()) { sideEffect ->
             when (sideEffect) {
                 is TransactionStateMachine.SideEffect.ErrorEvent -> {
                     // ignore errors here, they are bypassed to client of mixin
@@ -120,7 +160,7 @@ class TransactionHistoryProvider(
             }
         }
 
-        domainState.value = newState
+        domainState.emit(newState)
     }
 
     private fun triggerCache() {
@@ -143,13 +183,29 @@ class TransactionHistoryProvider(
     }
 
     private suspend fun mapOperationHistoryStateToUi(state: State): TransactionHistoryUi.State {
-        return when (state) {
-            is State.Empty -> TransactionHistoryUi.State.Empty
-            is State.EmptyProgress -> TransactionHistoryUi.State.EmptyProgress
-            is State.Data -> TransactionHistoryUi.State.Data(transformDataToUi(state.data))
-            is State.FullData -> TransactionHistoryUi.State.Data(transformDataToUi(state.data))
-            is State.NewPageProgress -> TransactionHistoryUi.State.Data(transformDataToUi(state.data))
+        val listState = when (state) {
+            is State.Empty -> ListState.Empty
+            is State.EmptyProgress -> ListState.EmptyProgress
+            is State.Data -> ListState.Data(transformDataToUi(state.data))
+            is State.FullData -> ListState.Data(transformDataToUi(state.data))
+            is State.NewPageProgress -> ListState.Data(transformDataToUi(state.data))
         }
+
+        return TransactionHistoryUi.State(
+            filtersButtonVisible = filterButtonVisible(),
+            listState = listState
+        )
+    }
+
+    private suspend fun filterButtonVisible(): Boolean {
+        // 0 or 1 filters does not need filters screen since there will be nothing to change there
+        return allAvailableFilters().size > 1
+    }
+
+    private suspend fun allAvailableFilters(): Set<TransactionFilter> {
+        val assetSource = assetsSourceRegistry.sourceFor(chainAssetAsync())
+
+        return assetSource.history.availableOperationFilters(chainAssetAsync())
     }
 
     private suspend fun transformDataToUi(data: List<Operation>): List<Any> {
