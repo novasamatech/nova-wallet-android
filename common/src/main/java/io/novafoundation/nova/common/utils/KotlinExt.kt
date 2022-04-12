@@ -140,6 +140,10 @@ fun <T> List<T>.modified(index: Int, modification: T): List<T> {
     return newList
 }
 
+inline fun <T, R> List<T>.mapToSet(mapper: (T) -> R): Set<R> = mapTo(mutableSetOf(), mapper)
+
+fun <T> List<T>.indexOfFirstOrNull(predicate: (T) -> Boolean) = indexOfFirst(predicate).takeIf { it >= 0 }
+
 @Suppress("IfThenToElvis")
 fun ByteArray?.optionalContentEquals(other: ByteArray?): Boolean {
     return if (this == null) {

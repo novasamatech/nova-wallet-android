@@ -2,8 +2,10 @@ package io.novafoundation.nova.common.view.dialog
 
 import android.content.Context
 import android.view.ContextThemeWrapper
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.utils.themed
 
 typealias DialogClickHandler = () -> Unit
 
@@ -35,11 +37,12 @@ fun infoDialog(
 fun warningDialog(
     context: Context,
     onConfirm: DialogClickHandler,
+    @StringRes confirmTextRes: Int = R.string.common_continue,
     onCancel: DialogClickHandler? = null,
     decorator: DialogDecorator? = null
 ) {
-    dialog(context) {
-        setPositiveButton(R.string.common_continue) { _, _ -> onConfirm() }
+    dialog(context.themed(R.style.AccentAlertDialogTheme_Reversed)) {
+        setPositiveButton(confirmTextRes) { _, _ -> onConfirm() }
         setNegativeButton(R.string.common_cancel) { _, _ -> onCancel?.invoke() }
 
         decorator?.invoke(this)

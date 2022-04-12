@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_dapp_impl.data.mappers
 
+import io.novafoundation.nova.feature_dapp_api.data.model.DApp
 import io.novafoundation.nova.feature_dapp_api.data.model.DappCategory
 import io.novafoundation.nova.feature_dapp_api.data.model.DappMetadata
 import io.novafoundation.nova.feature_dapp_impl.data.network.metadata.DappMetadataResponse
@@ -29,11 +30,22 @@ fun mapDAppMetadataResponseToDAppMetadatas(
 
 fun mapDappCategoriesToDescription(categories: Collection<DappCategory>) = categories.joinToString { it.name }
 
-fun mapDappMetadataToDappModel(dappMetadata: DappMetadata) = with(dappMetadata) {
+fun mapDappToDappModel(dApp: DApp) = with(dApp) {
     DappModel(
         name = name,
-        description = mapDappCategoriesToDescription(categories),
+        description = description,
         iconUrl = iconLink,
         url = url,
+        isFavourite = isFavourite
+    )
+}
+
+fun mapDappModelToDApp(dApp: DappModel) = with(dApp) {
+    DApp(
+        name = name,
+        description = description,
+        iconLink = iconUrl,
+        url = url,
+        isFavourite = isFavourite
     )
 }
