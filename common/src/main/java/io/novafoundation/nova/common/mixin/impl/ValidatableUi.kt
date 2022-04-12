@@ -1,8 +1,6 @@
 package io.novafoundation.nova.common.mixin.impl
 
 import android.content.Context
-import android.view.ContextThemeWrapper
-import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.mixin.api.ValidationFailureUi
@@ -25,7 +23,7 @@ fun BaseFragment<*>.observeValidations(
                         setMessage(it.message)
                     }
                     level >= DefaultFailureLevel.WARNING -> warningDialog(
-                        context = ContextThemeWrapper(dialogContext, R.style.AccentAlertDialogTheme_Reversed),
+                        context = requireContext(),
                         onConfirm = it.confirmWarning
                     ) {
                         setTitle(it.title)
