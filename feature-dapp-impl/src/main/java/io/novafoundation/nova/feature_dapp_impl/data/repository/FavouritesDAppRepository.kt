@@ -11,6 +11,8 @@ interface FavouritesDAppRepository {
 
     fun observeFavourites(): Flow<List<FavouriteDApp>>
 
+    suspend fun getFavourites(): List<FavouriteDApp>
+
     suspend fun addFavourite(favouriteDApp: FavouriteDApp)
 
     suspend fun removeFavourite(dAppUrl: String)
@@ -23,6 +25,11 @@ class DbFavouritesDAppRepository(
     override fun observeFavourites(): Flow<List<FavouriteDApp>> {
         return favouriteDAppsDao.observeFavouriteDApps()
             .mapList(::mapFavouriteDAppLocalToFavouriteDApp)
+    }
+
+    override suspend fun getFavourites(): List<FavouriteDApp> {
+        return favouriteDAppsDao.getFavouriteDApps()
+            .map(::mapFavouriteDAppLocalToFavouriteDApp)
     }
 
     override suspend fun addFavourite(favouriteDApp: FavouriteDApp) {

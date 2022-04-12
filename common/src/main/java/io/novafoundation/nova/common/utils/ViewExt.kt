@@ -15,6 +15,7 @@ import android.view.ViewTreeObserver
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
@@ -296,4 +297,10 @@ fun <T> ListAdapter<T, *>.submitListPreservingViewPoint(data: List<T>, into: Rec
     submitList(data) {
         into.layoutManager!!.onRestoreInstanceState(recyclerViewState)
     }
+}
+
+fun ImageView.setImageResource(@DrawableRes imageRes: Int?) = if (imageRes == null) {
+    setImageDrawable(null)
+} else {
+    setImageResource(imageRes)
 }
