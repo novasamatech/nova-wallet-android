@@ -182,6 +182,8 @@ fun View.hideSoftKeyboard() {
 }
 
 fun View.showSoftKeyboard() {
+    requestFocus()
+
     val inputMethodManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
     inputMethodManager.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
@@ -304,3 +306,5 @@ fun ImageView.setImageResource(@DrawableRes imageRes: Int?) = if (imageRes == nu
 } else {
     setImageResource(imageRes)
 }
+
+ fun EditText.moveCursorToTheEnd() = setSelection(length())

@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_dapp_impl.domain.browser.BrowserPage
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.BrowserPageAnalyzed
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.DappBrowserInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.isDangerous
+import io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites.AddToFavouritesPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignRequester
@@ -136,7 +137,13 @@ class DAppBrowserViewModel(
 
             interactor.removeDAppFromFavourites(page.url)
         } else {
-            showMessage("TODO open add to favourites")
+            val payload = AddToFavouritesPayload(
+                url = page.url,
+                label = null,
+                iconLink = null
+            )
+
+            router.openAddToFavourites(payload)
         }
     }
 
