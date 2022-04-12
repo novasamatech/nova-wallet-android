@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_dapp_impl.presentation.common
 
+import android.content.res.ColorStateList
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -52,10 +53,6 @@ class DappViewHolder(
     private val imageLoader: ImageLoader,
 ) : BaseViewHolder(containerView) {
 
-    init {
-        containerView.itemDappAction.setImageResource(R.drawable.ic_favourite)
-    }
-
     fun bind(item: DappModel) = with(containerView) {
         itemDAppIcon.showDAppIcon(item.iconUrl, imageLoader)
         itemDAppTitle.text = item.name
@@ -63,6 +60,16 @@ class DappViewHolder(
 
         itemDappAction.isActivated = item.isFavourite
         itemDappAction.setOnClickListener { itemHandler.onItemFavouriteClicked(item) }
+
+        if (item.isFavourite) {
+            itemDappAction.setImageResource(R.drawable.ic_heart_filled)
+            itemDappAction.imageTintList = null
+        } else {
+            val tintColor = context.getColor(R.color.white_48)
+
+            itemDappAction.setImageResource(R.drawable.ic_heart_outline)
+            itemDappAction.imageTintList = ColorStateList.valueOf(tintColor)
+        }
 
         setOnClickListener { itemHandler.onItemClicked(item) }
     }

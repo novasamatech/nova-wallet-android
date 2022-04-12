@@ -1,8 +1,15 @@
 package io.novafoundation.nova.feature_dapp_impl.domain.browser
 
 class BrowserPage(
+    val url: String,
+    val synchronizedWithBrowser: Boolean
+)
+
+class BrowserPageAnalyzed(
     val display: String,
+    val url: String,
     val synchronizedWithBrowser: Boolean,
+    val isFavourite: Boolean,
     val security: Security
 ) {
 
@@ -11,8 +18,8 @@ class BrowserPage(
     }
 }
 
-val BrowserPage.isSecure
-    get() = security == BrowserPage.Security.SECURE
+val BrowserPageAnalyzed.isSecure
+    get() = security == BrowserPageAnalyzed.Security.SECURE
 
-val BrowserPage.isDangerous
-    get() = security == BrowserPage.Security.DANGEROUS
+val BrowserPageAnalyzed.isDangerous
+    get() = security == BrowserPageAnalyzed.Security.DANGEROUS

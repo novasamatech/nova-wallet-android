@@ -10,10 +10,12 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
+import io.novafoundation.nova.feature_dapp_impl.data.repository.FavouritesDAppRepository
 import io.novafoundation.nova.feature_dapp_impl.data.repository.PhishingSitesRepository
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.DappBrowserInteractor
@@ -34,11 +36,13 @@ class DAppBrowserModule {
         accountRepository: AccountRepository,
         runtimeVersionsRepository: RuntimeVersionsRepository,
         phishingSitesRepository: PhishingSitesRepository,
+        favouritesDAppRepository: FavouritesDAppRepository,
     ) = DappBrowserInteractor(
         chainRegistry = chainRegistry,
         accountRepository = accountRepository,
         phishingSitesRepository = phishingSitesRepository,
-        runtimeVersionsRepository = runtimeVersionsRepository
+        runtimeVersionsRepository = runtimeVersionsRepository,
+        favouritesDAppRepository = favouritesDAppRepository
     )
 
     @Provides
@@ -59,7 +63,8 @@ class DAppBrowserModule {
         selectedAccountUseCase: SelectedAccountUseCase,
         signRequester: DAppSignCommunicator,
         searchRequester: DAppSearchCommunicator,
-        initialUrl: String
+        initialUrl: String,
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
     ): ViewModel {
         return DAppBrowserViewModel(
             router = router,
@@ -71,7 +76,8 @@ class DAppBrowserModule {
             commonInteractor = commonInteractor,
             signRequester = signRequester,
             dAppSearchRequester = searchRequester,
-            initialUrl = initialUrl
+            initialUrl = initialUrl,
+            actionAwaitableMixinFactory = actionAwaitableMixinFactory
         )
     }
 }

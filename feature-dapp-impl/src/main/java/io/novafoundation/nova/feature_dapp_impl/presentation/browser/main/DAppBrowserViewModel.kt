@@ -5,6 +5,9 @@ import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.createAddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.mixin.actionAwaitable.awaitAction
+import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
@@ -16,12 +19,14 @@ import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.BrowserPage
+import io.novafoundation.nova.feature_dapp_impl.domain.browser.BrowserPageAnalyzed
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.DappBrowserInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.isDangerous
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignRequester
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.awaitConfirmation
+import io.novafoundation.nova.feature_dapp_impl.presentation.common.favourites.RemoveFavouritesPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchRequester
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.SearchPayload
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionFactory
@@ -35,11 +40,11 @@ import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtens
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.SignerResult
 import io.novafoundation.nova.feature_dapp_impl.web3.session.Web3Session.AuthorizationState
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -66,6 +71,7 @@ class DAppBrowserViewModel(
     private val dAppSearchRequester: DAppSearchRequester,
     private val initialUrl: String,
     private val selectedAccountUseCase: SelectedAccountUseCase,
+    private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
 ) : BaseViewModel() {
 
     private val polkadotJsExtension = polkadotJsExtensionFactory.create(scope = this)
@@ -79,13 +85,18 @@ class DAppBrowserViewModel(
     private val _browserNavigationCommandEvent = MutableLiveData<Event<BrowserNavigationCommand>>()
     val browserNavigationCommandEvent: LiveData<Event<BrowserNavigationCommand>> = _browserNavigationCommandEvent
 
-    private val _currentPage = singleReplaySharedFlow<BrowserPage>()
-    val currentPage: Flow<BrowserPage> = _currentPage
+    private val currentPage = singleReplaySharedFlow<BrowserPage>()
+
+    val removeFromFavouritesConfirmation = actionAwaitableMixinFactory.confirmingAction<RemoveFavouritesPayload>()
+
+    val currentPageAnalyzed = currentPage.flatMapLatest {
+        interactor.observeBrowserPageFor(it)
+    }.shareInBackground()
 
     init {
         polkadotJsExtension.requestsFlow
             // skip all requests on dangerous websites
-            .filterNot { currentPage.first().isDangerous }
+            .filterNot { currentPageAnalyzed.first().isDangerous }
             .onEach(::handleDAppRequest)
             .inBackground()
             .launchIn(this)
@@ -114,12 +125,24 @@ class DAppBrowserViewModel(
     fun openSearch() = launch {
         val currentPage = currentPage.first()
 
-        dAppSearchRequester.openRequest(SearchPayload(initialUrl = currentPage.display))
+        dAppSearchRequester.openRequest(SearchPayload(initialUrl = currentPage.url))
+    }
+
+    fun onFavouriteClicked() = launch {
+        val page = currentPageAnalyzed.first()
+
+        if (page.isFavourite) {
+            removeFromFavouritesConfirmation.awaitAction()
+
+            interactor.removeDAppFromFavourites(page.url)
+        } else {
+            showMessage("TODO open add to favourites")
+        }
     }
 
     private fun watchDangerousWebsites() {
-        currentPage
-            .filter { it.synchronizedWithBrowser && it.security == BrowserPage.Security.DANGEROUS }
+        currentPageAnalyzed
+            .filter { it.synchronizedWithBrowser && it.security == BrowserPageAnalyzed.Security.DANGEROUS }
             .distinctUntilChanged()
             .onEach {
                 awaitConfirmation(DappPendingConfirmation.Action.AcknowledgePhishingAlert)
@@ -274,7 +297,7 @@ class DAppBrowserViewModel(
     private fun exitBrowser() = router.back()
 
     private fun updatePageDisplay(url: String, synchronizedWithBrowser: Boolean) = launch {
-        _currentPage.emit(interactor.browserPageFor(url, synchronizedWithBrowser))
+        currentPage.emit(BrowserPage(url, synchronizedWithBrowser))
     }
 
     private fun mapSignExtrinsicRequestToPayload(request: Sign) = DAppSignPayload(
