@@ -11,7 +11,6 @@ import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.sendEvent
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.R
-import io.novafoundation.nova.feature_dapp_impl.data.mappers.mapDappCategoriesToDescription
 import io.novafoundation.nova.feature_dapp_impl.domain.search.DappSearchGroup
 import io.novafoundation.nova.feature_dapp_impl.domain.search.DappSearchResult
 import io.novafoundation.nova.feature_dapp_impl.domain.search.SearchDappInteractor
@@ -72,27 +71,30 @@ class DAppSearchViewModel(
     private fun mapSearchResultToSearchModel(searchResult: DappSearchResult): DappSearchModel {
         return when (searchResult) {
             is DappSearchResult.Dapp -> DappSearchModel(
-                title = searchResult.metadata.name,
-                description = mapDappCategoriesToDescription(searchResult.metadata.categories),
-                icon = searchResult.metadata.iconLink,
-                searchResult = searchResult
+                title = searchResult.dapp.name,
+                description = searchResult.dapp.description,
+                icon = searchResult.dapp.iconLink,
+                searchResult = searchResult,
+                actionIcon = R.drawable.ic_heart_filled.takeIf { searchResult.dapp.isFavourite }
             )
 
             is DappSearchResult.Search -> DappSearchModel(
                 title = searchResult.query,
-                searchResult = searchResult
+                searchResult = searchResult,
+                actionIcon = null
             )
 
             is DappSearchResult.Url -> DappSearchModel(
                 title = searchResult.url,
-                searchResult = searchResult
+                searchResult = searchResult,
+                actionIcon = null
             )
         }
     }
 
     fun searchResultClicked(searchResult: DappSearchResult) {
         val newUrl = when (searchResult) {
-            is DappSearchResult.Dapp -> searchResult.metadata.url
+            is DappSearchResult.Dapp -> searchResult.dapp.url
             is DappSearchResult.Search -> searchResult.searchUrl
             is DappSearchResult.Url -> searchResult.url
         }

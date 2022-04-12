@@ -1,22 +1,29 @@
 package io.novafoundation.nova.feature_dapp_impl.domain.search
 
 import io.novafoundation.nova.common.list.GroupedList
-import io.novafoundation.nova.feature_dapp_api.data.model.DappMetadata
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
+import io.novafoundation.nova.feature_dapp_impl.data.repository.FavouritesDAppRepository
+import io.novafoundation.nova.feature_dapp_impl.domain.common.buildUrlToDappMapping
+import io.novafoundation.nova.feature_dapp_impl.domain.common.createDAppComparator
 import io.novafoundation.nova.feature_dapp_impl.util.Urls
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class SearchDappInteractor(
     private val dAppMetadataRepository: DAppMetadataRepository,
+    private val favouritesDAppRepository: FavouritesDAppRepository,
 ) {
 
     @OptIn(ExperimentalStdlibApi::class)
     suspend fun searchDapps(query: String): GroupedList<DappSearchGroup, DappSearchResult> = withContext(Dispatchers.Default) {
-        val allDapps = dAppMetadataRepository.getDAppMetadatas()
+        val dAppMetadatas = dAppMetadataRepository.getDAppMetadatas()
+        val favouriteDApps = favouritesDAppRepository.getFavourites()
 
-        val dappsGroupContent = allDapps.filter { query.isEmpty() || query.lowercase() in it.name.lowercase() }
-            .sortedBy(DappMetadata::name)
+        val dAppByUrlMapping = buildUrlToDappMapping(dAppMetadatas, favouriteDApps)
+        val allDApps = dAppByUrlMapping.values
+
+        val dappsGroupContent = allDApps.filter { query.isEmpty() || query.lowercase() in it.name.lowercase() }
+            .sortedWith(createDAppComparator())
             .map(DappSearchResult::Dapp)
 
         val searchGroupContent = when {
