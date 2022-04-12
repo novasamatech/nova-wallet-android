@@ -307,4 +307,4 @@ fun ImageView.setImageResource(@DrawableRes imageRes: Int?) = if (imageRes == nu
     setImageResource(imageRes)
 }
 
- fun EditText.moveCursorToTheEnd() = setSelection(length())
+fun EditText.moveCursorToTheEnd() = setSelection(length())

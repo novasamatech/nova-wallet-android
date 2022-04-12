@@ -19,7 +19,6 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites.Add
 @Module(includes = [ViewModelModule::class])
 class AddToFavouritesModule {
 
-
     @Provides
     @ScreenScope
     fun provideInteractor(
