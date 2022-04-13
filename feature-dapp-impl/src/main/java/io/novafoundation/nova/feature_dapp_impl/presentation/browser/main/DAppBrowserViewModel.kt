@@ -6,7 +6,6 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.createAddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
-import io.novafoundation.nova.common.mixin.actionAwaitable.awaitAction
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
@@ -22,6 +21,7 @@ import io.novafoundation.nova.feature_dapp_impl.domain.browser.BrowserPage
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.BrowserPageAnalyzed
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.DappBrowserInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.isDangerous
+import io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites.AddToFavouritesPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignRequester
@@ -110,8 +110,8 @@ class DAppBrowserViewModel(
         forceLoad(initialUrl)
     }
 
-    fun onPageChanged(url: String) {
-        updatePageDisplay(url, synchronizedWithBrowser = true)
+    fun onPageChanged(url: String, title: String?) {
+        updateCurrentPage(url, title, synchronizedWithBrowser = true)
     }
 
     fun closeClicked() = launch {
@@ -132,11 +132,18 @@ class DAppBrowserViewModel(
         val page = currentPageAnalyzed.first()
 
         if (page.isFavourite) {
-            removeFromFavouritesConfirmation.awaitAction()
+            val dAppTitle = page.title ?: page.display
+            removeFromFavouritesConfirmation.awaitAction(dAppTitle)
 
             interactor.removeDAppFromFavourites(page.url)
         } else {
-            showMessage("TODO open add to favourites")
+            val payload = AddToFavouritesPayload(
+                url = page.url,
+                label = page.title,
+                iconLink = null
+            )
+
+            router.openAddToFavourites(payload)
         }
     }
 
@@ -262,7 +269,7 @@ class DAppBrowserViewModel(
     private fun forceLoad(url: String) {
         _browserNavigationCommandEvent.value = BrowserNavigationCommand.OpenUrl(url).event()
 
-        updatePageDisplay(url, synchronizedWithBrowser = false)
+        updateCurrentPage(url, title = null, synchronizedWithBrowser = false)
     }
 
     private suspend fun awaitConfirmation(action: DappPendingConfirmation.Action) = suspendCoroutine<ConfirmationState> {
@@ -296,8 +303,12 @@ class DAppBrowserViewModel(
 
     private fun exitBrowser() = router.back()
 
-    private fun updatePageDisplay(url: String, synchronizedWithBrowser: Boolean) = launch {
-        currentPage.emit(BrowserPage(url, synchronizedWithBrowser))
+    private fun updateCurrentPage(
+        url: String,
+        title: String?,
+        synchronizedWithBrowser: Boolean
+    ) = launch {
+        currentPage.emit(BrowserPage(url, title, synchronizedWithBrowser))
     }
 
     private fun mapSignExtrinsicRequestToPayload(request: Sign) = DAppSignPayload(

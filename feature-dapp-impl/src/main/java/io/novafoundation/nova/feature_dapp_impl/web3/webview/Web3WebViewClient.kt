@@ -23,7 +23,7 @@ class Web3WebViewClientFactory(
     }
 }
 
-typealias OnPageChangedListener = (url: String) -> Unit
+typealias OnPageChangedListener = (url: String, title: String?) -> Unit
 
 class Web3WebViewClient(
     private val controllers: List<Web3Controller>,
@@ -44,7 +44,7 @@ class Web3WebViewClient(
     }
 
     override fun doUpdateVisitedHistory(view: WebView, url: String, isReload: Boolean) {
-        onPageChangedListener(url)
+        onPageChangedListener(url, view.title)
     }
 
     // we try to inject both at `onPageStarted` and `onPageFinished` since

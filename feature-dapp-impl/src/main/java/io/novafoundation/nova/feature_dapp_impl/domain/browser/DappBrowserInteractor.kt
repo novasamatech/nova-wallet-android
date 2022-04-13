@@ -81,6 +81,7 @@ class DappBrowserInteractor(
                 }
                 BrowserPageAnalyzed(
                     display = Urls.hostOf(browserPage.url),
+                    title = browserPage.title,
                     url = browserPage.url,
                     security = security,
                     isFavourite = isFavourite,
@@ -90,6 +91,7 @@ class DappBrowserInteractor(
             }.getOrElse {
                 BrowserPageAnalyzed(
                     display = browserPage.url,
+                    title = browserPage.title,
                     url = browserPage.url,
                     isFavourite = isFavourite,
                     security = BrowserPageAnalyzed.Security.UNKNOWN,

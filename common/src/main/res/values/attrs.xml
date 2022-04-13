@@ -27,6 +27,9 @@
 
     <!--text sizes-->
 
+    <!-- Views -->
+    <attr name="defaultTextInputStyle" format="reference" />
+
     <declare-styleable name="Toolbar">
         <attr name="contentBackground" format="reference|color" />
         <attr name="dividerVisible" format="boolean" />

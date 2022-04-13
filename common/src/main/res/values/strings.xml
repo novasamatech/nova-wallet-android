@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
-  <string name="dapp_favourites_remove_title">Are you sure you want to remove this DApp from favorites?</string>
+  <string name="common_title">Title</string>
+
+  <string name="common_save">Save</string>
+  <string name="dapp_favourites_add">Add to favorites</string>
+
+  <string name="dapp_favourites_remove_title">Remove from Favorites?</string>
+  <string name="dapp_favourites_remove_description">“%s” DApp will be removed from Favorites</string>
+
   <string name="common_remove">Remove</string>
-  <string name="dapp_favourites">Favourites</string>
+  <string name="dapp_favourites">Favorites</string>
 
   <string name="common_zero_amount_error">Amount must be positive</string>
 

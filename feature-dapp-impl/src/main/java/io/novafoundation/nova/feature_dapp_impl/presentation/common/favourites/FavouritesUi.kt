@@ -5,7 +5,7 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ConfirmationAwaitable
 import io.novafoundation.nova.common.view.dialog.warningDialog
 import io.novafoundation.nova.feature_dapp_impl.R
 
-typealias RemoveFavouritesPayload = Unit
+typealias RemoveFavouritesPayload = String // dApp title
 
 fun BaseFragment<*>.setupRemoveFavouritesConfirmation(awaitableMixin: ConfirmationAwaitable<RemoveFavouritesPayload>) {
     awaitableMixin.awaitableActionLiveData.observeEvent {
@@ -16,6 +16,8 @@ fun BaseFragment<*>.setupRemoveFavouritesConfirmation(awaitableMixin: Confirmati
             onCancel = it.onCancel
         ) {
             setTitle(R.string.dapp_favourites_remove_title)
+
+            setMessage(getString(R.string.dapp_favourites_remove_description, it.payload))
         }
     }
 }

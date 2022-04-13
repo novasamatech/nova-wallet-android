@@ -6,6 +6,8 @@ import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.AccountChosenNavDirection
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.AccountListFragment
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
+import io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites.AddToFavouritesFragment
+import io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites.AddToFavouritesPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.extrinsicDetails.DappExtrinsicDetailsFragment
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBrowserFragment
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DappSearchFragment
@@ -31,6 +33,11 @@ class DAppNavigator(
     override fun openDappSearch() = performNavigation(
         actionId = R.id.action_mainFragment_to_dappSearchGraph,
         args = DappSearchFragment.getBundle(SearchPayload(initialUrl = null))
+    )
+
+    override fun openAddToFavourites(payload: AddToFavouritesPayload) = performNavigation(
+        actionId = R.id.action_DAppBrowserFragment_to_addToFavouritesFragment,
+        args = AddToFavouritesFragment.getBundle(payload)
     )
 
     override fun openExtrinsicDetails(extrinsicContent: String) = performNavigation(

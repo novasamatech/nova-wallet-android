@@ -54,7 +54,6 @@ class CategorizedDappsView @JvmOverloads constructor(
         ).inject(this)
 
         categorizedDappsList.adapter = dappListAdapter
-        categorizedDappsList.itemAnimator = null
         categorizedDappsCategories.adapter = categoriesAdapter
         clipToOutline = true // for round corners
     }
