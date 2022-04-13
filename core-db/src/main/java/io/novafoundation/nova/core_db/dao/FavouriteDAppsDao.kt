@@ -16,6 +16,9 @@ interface FavouriteDAppsDao {
     @Query("SELECT * FROM favourite_dapps")
     suspend fun getFavouriteDApps(): List<FavouriteDAppLocal>
 
+    @Query("SELECT EXISTS(SELECT * FROM favourite_dapps WHERE url = :dAppUrl)")
+    fun observeIsFavourite(dAppUrl: String): Flow<Boolean>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertFavouriteDApp(dApp: FavouriteDAppLocal)
 

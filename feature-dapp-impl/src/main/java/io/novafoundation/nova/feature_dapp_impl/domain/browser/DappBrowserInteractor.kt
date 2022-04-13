@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_dapp_impl.domain.browser
 import io.novafoundation.nova.common.data.mappers.mapCryptoTypeToEncryption
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress
+import io.novafoundation.nova.feature_dapp_impl.data.repository.FavouritesDAppRepository
 import io.novafoundation.nova.feature_dapp_impl.data.repository.PhishingSitesRepository
 import io.novafoundation.nova.feature_dapp_impl.util.Urls
 import io.novafoundation.nova.feature_dapp_impl.util.isSecure
@@ -13,14 +14,15 @@ import io.novafoundation.nova.runtime.ext.genesisHash
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RuntimeVersionsRepository
 import jp.co.soramitsu.fearless_utils.extensions.requireHexPrefix
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import java.net.URL
 
 class DappBrowserInteractor(
     private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
     private val phishingSitesRepository: PhishingSitesRepository,
+    private val favouritesDAppRepository: FavouritesDAppRepository,
     private val runtimeVersionsRepository: RuntimeVersionsRepository,
 ) {
 
@@ -64,17 +66,36 @@ class DappBrowserInteractor(
         }
     }
 
+    suspend fun removeDAppFromFavourites(dAppUrl: String) {
+        favouritesDAppRepository.removeFavourite(dAppUrl)
+    }
+
     @Suppress("BlockingMethodInNonBlockingContext")
-    suspend fun browserPageFor(fullUrl: String, synchronizedWithBrowser: Boolean): BrowserPage = withContext(Dispatchers.Default) {
-        runCatching {
-            val security = when {
-                phishingSitesRepository.isPhishing(fullUrl) -> BrowserPage.Security.DANGEROUS
-                URL(fullUrl).isSecure -> BrowserPage.Security.SECURE
-                else -> BrowserPage.Security.UNKNOWN
+    suspend fun observeBrowserPageFor(browserPage: BrowserPage): Flow<BrowserPageAnalyzed> {
+        return favouritesDAppRepository.observeIsFavourite(browserPage.url).map { isFavourite ->
+            runCatching {
+                val security = when {
+                    phishingSitesRepository.isPhishing(browserPage.url) -> BrowserPageAnalyzed.Security.DANGEROUS
+                    URL(browserPage.url).isSecure -> BrowserPageAnalyzed.Security.SECURE
+                    else -> BrowserPageAnalyzed.Security.UNKNOWN
+                }
+                BrowserPageAnalyzed(
+                    display = Urls.hostOf(browserPage.url),
+                    url = browserPage.url,
+                    security = security,
+                    isFavourite = isFavourite,
+                    synchronizedWithBrowser = browserPage.synchronizedWithBrowser
+
+                )
+            }.getOrElse {
+                BrowserPageAnalyzed(
+                    display = browserPage.url,
+                    url = browserPage.url,
+                    isFavourite = isFavourite,
+                    security = BrowserPageAnalyzed.Security.UNKNOWN,
+                    synchronizedWithBrowser = browserPage.synchronizedWithBrowser
+                )
             }
-            BrowserPage(display = Urls.hostOf(fullUrl), security = security, synchronizedWithBrowser = synchronizedWithBrowser)
-        }.getOrElse {
-            BrowserPage(display = fullUrl, security = BrowserPage.Security.UNKNOWN, synchronizedWithBrowser = synchronizedWithBrowser)
         }
     }
 }

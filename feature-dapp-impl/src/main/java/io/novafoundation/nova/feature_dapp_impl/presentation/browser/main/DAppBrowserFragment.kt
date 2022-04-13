@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_dapp_impl.domain.browser.isSecure
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DappPendingConfirmation.Action
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.sheets.AcknowledgePhishingBottomSheet
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.sheets.ConfirmAuthorizeBottomSheet
+import io.novafoundation.nova.feature_dapp_impl.presentation.common.favourites.setupRemoveFavouritesConfirmation
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3WebViewClientFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewHolder
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.injectWeb3
@@ -27,6 +28,7 @@ import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserAddressBa
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserAddressBarGroup
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserBack
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserClose
+import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserFavourite
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserForward
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserRefresh
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserWebView
@@ -76,6 +78,8 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
 
         dappBrowserForward.setOnClickListener { forwardClicked() }
         dappBrowserRefresh.setOnClickListener { refreshClicked() }
+
+        dappBrowserFavourite.setOnClickListener { viewModel.onFavouriteClicked() }
     }
 
     override fun onDestroyView() {
@@ -104,6 +108,8 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
 
     @Suppress("UNCHECKED_CAST")
     override fun subscribe(viewModel: DAppBrowserViewModel) {
+        setupRemoveFavouritesConfirmation(viewModel.removeFromFavouritesConfirmation)
+
         dappBrowserWebView.injectWeb3(web3WebViewClientFactory, viewModel::onPageChanged)
 
         viewModel.showConfirmationSheet.observeEvent {
@@ -126,9 +132,12 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
             }
         }
 
-        viewModel.currentPage.observe {
+        viewModel.currentPageAnalyzed.observe {
             dappBrowserAddressBar.setAddress(it.display)
             dappBrowserAddressBar.showSecureIcon(it.isSecure)
+
+            val favouriteIcon = if (it.isFavourite) R.drawable.ic_heart_filled else R.drawable.ic_heart_outline
+            dappBrowserFavourite.setImageResource(favouriteIcon)
 
             updateButtonsState()
         }

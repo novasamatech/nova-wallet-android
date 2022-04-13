@@ -15,6 +15,8 @@ interface FavouritesDAppRepository {
 
     suspend fun addFavourite(favouriteDApp: FavouriteDApp)
 
+    fun observeIsFavourite(url: String): Flow<Boolean>
+
     suspend fun removeFavourite(dAppUrl: String)
 }
 
@@ -36,6 +38,10 @@ class DbFavouritesDAppRepository(
         val local = mapFavouriteDAppToFavouriteDAppLocal(favouriteDApp)
 
         favouriteDAppsDao.insertFavouriteDApp(local)
+    }
+
+    override fun observeIsFavourite(url: String): Flow<Boolean> {
+        return favouriteDAppsDao.observeIsFavourite(url)
     }
 
     override suspend fun removeFavourite(dAppUrl: String) {
