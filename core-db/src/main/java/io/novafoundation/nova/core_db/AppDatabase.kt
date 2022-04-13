@@ -35,6 +35,7 @@ import io.novafoundation.nova.core_db.migrations.AddSitePhishing_6_7
 import io.novafoundation.nova.core_db.migrations.AssetTypes_2_3
 import io.novafoundation.nova.core_db.migrations.BetterChainDiffing_8_9
 import io.novafoundation.nova.core_db.migrations.ChangeAsset_3_4
+import io.novafoundation.nova.core_db.migrations.ChangeDAppAuthorization_10_11
 import io.novafoundation.nova.core_db.model.AccountLocal
 import io.novafoundation.nova.core_db.model.AccountStakingLocal
 import io.novafoundation.nova.core_db.model.AssetLocal
@@ -57,7 +58,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
 import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
 
 @Database(
-    version = 10,
+    version = 11,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -111,7 +112,7 @@ abstract class AppDatabase : RoomDatabase() {
                 )
                     .addMigrations(AddDAppAuthorizations_1_2, AssetTypes_2_3, ChangeAsset_3_4)
                     .addMigrations(AddChainColor_4_5, AddNfts_5_6, AddSitePhishing_6_7, AddBuyProviders_7_8, BetterChainDiffing_8_9)
-                    .addMigrations(AddFavouriteDApps_9_10)
+                    .addMigrations(AddFavouriteDApps_9_10, ChangeDAppAuthorization_10_11)
                     .fallbackToDestructiveMigration()
                     .build()
             }

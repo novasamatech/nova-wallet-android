@@ -38,7 +38,7 @@ import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtens
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.Single.Sign
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.Subscription.SubscribeAccounts
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.SignerResult
-import io.novafoundation.nova.feature_dapp_impl.web3.session.Web3Session.AuthorizationState
+import io.novafoundation.nova.feature_dapp_impl.web3.session.Web3Session.Authorization.State
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -160,7 +160,7 @@ class DAppBrowserViewModel(
     }
 
     private suspend fun handleDAppRequest(request: PolkadotJsExtensionRequest<*>) {
-        val authorizationState = polkadotJsExtension.session.authorizationStateFor(request.url)
+        val authorizationState = polkadotJsExtension.session.authorizationStateFor(request.url, selectedAccountId())
 
         when (request) {
             is AuthorizeTab -> authorizeTab(request, authorizationState)
@@ -172,10 +172,10 @@ class DAppBrowserViewModel(
         }
     }
 
-    private suspend fun signExtrinsicIfAllowed(request: Sign, authorizationState: AuthorizationState) {
-        when (authorizationState) {
+    private suspend fun signExtrinsicIfAllowed(request: Sign, state: State) {
+        when (state) {
             // request user confirmation if dapp is authorized
-            AuthorizationState.ALLOWED -> signExtrinsicWithConfirmation(request)
+            State.ALLOWED -> signExtrinsicWithConfirmation(request)
             // reject otherwise
             else -> request.reject(NotAuthorizedException)
         }
@@ -197,21 +197,23 @@ class DAppBrowserViewModel(
         }
     }
 
-    private suspend fun authorizeTab(request: AuthorizeTab, authorizationState: AuthorizationState) {
-        when (authorizationState) {
+    private suspend fun authorizeTab(request: AuthorizeTab, state: State) {
+        when (state) {
             // user already accepted - no need to ask second time
-            AuthorizationState.ALLOWED -> request.accept(AuthorizeTab.Response(true))
+            State.ALLOWED -> request.accept(AuthorizeTab.Response(true))
             // first time dapp request authorization during this session
-            AuthorizationState.NONE -> authorizeTabWithConfirmation(request)
+            State.NONE -> authorizeTabWithConfirmation(request)
             // user rejected this dapp previosuly - ask for authorization one more time
-            AuthorizationState.REJECTED -> authorizeTabWithConfirmation(request)
+            State.REJECTED -> authorizeTabWithConfirmation(request)
         }
     }
 
     private suspend fun authorizeTabWithConfirmation(request: AuthorizeTab) {
-        val dappInfo = commonInteractor.getDAppInfo(request.url)
+        val currentPage = currentPageAnalyzed.first()
+        // use url got from browser instead of url got from dApp to prevent dApp supplying wrong URL
+        val dAppInfo = commonInteractor.getDAppInfo(dAppUrl = currentPage.url)
 
-        val dAppIdentifier = dappInfo.metadata?.name ?: dappInfo.baseUrl
+        val dAppIdentifier = dAppInfo.metadata?.name ?: currentPage.title ?: dAppInfo.baseUrl
 
         val metaAccount = selectedAccount.first()
 
@@ -220,8 +222,8 @@ class DAppBrowserViewModel(
                 R.string.dapp_confirm_authorize_title_format,
                 dAppIdentifier
             ),
-            dAppIconUrl = dappInfo.metadata?.iconLink,
-            dAppUrl = dappInfo.baseUrl,
+            dAppIconUrl = dAppInfo.metadata?.iconLink,
+            dAppUrl = dAppInfo.baseUrl,
             walletAddressModel = addressIconGenerator.createAddressModel(
                 accountAddress = metaAccount.defaultSubstrateAddress,
                 sizeInDp = AddressIconGenerator.SIZE_MEDIUM,
@@ -233,36 +235,41 @@ class DAppBrowserViewModel(
 
         val authorizationState = mapConfirmationStateToAuthorizationState(confirmationState)
 
-        polkadotJsExtension.session.updateAuthorizationState(request.url, authorizationState)
+        polkadotJsExtension.session.updateAuthorization(
+            state = authorizationState,
+            fullUrl = request.url,
+            dAppTitle = dAppIdentifier,
+            metaId = metaAccount.id
+        )
 
-        request.accept(AuthorizeTab.Response(authorizationState == AuthorizationState.ALLOWED))
+        request.accept(AuthorizeTab.Response(authorizationState == State.ALLOWED))
     }
 
     private suspend fun handleProvideMetadata(
         request: ProvideMetadata,
-        authorizationState: AuthorizationState
-    ) = respondIfAllowed(request, authorizationState) {
+        state: State
+    ) = respondIfAllowed(request, state) {
         false // we do not accept provided metadata since app handles metadata sync by its own
     }
 
     private suspend fun suppleKnownMetadatas(
         request: ListMetadata,
-        authorizationState: AuthorizationState
-    ) = respondIfAllowed(request, authorizationState) {
+        state: State
+    ) = respondIfAllowed(request, state) {
         interactor.getKnownInjectedMetadatas()
     }
 
     private suspend fun supplyAccountList(
         request: ListAccounts,
-        authorizationState: AuthorizationState
-    ) = respondIfAllowed(request, authorizationState) {
+        state: State
+    ) = respondIfAllowed(request, state) {
         interactor.getInjectedAccounts()
     }
 
     private suspend fun supplyAccountListSubscription(
         request: SubscribeAccounts,
-        authorizationState: AuthorizationState
-    ) = respondIfAllowed(request, authorizationState) {
+        state: State
+    ) = respondIfAllowed(request, state) {
         flowOf(interactor.getInjectedAccounts())
     }
 
@@ -285,17 +292,17 @@ class DAppBrowserViewModel(
 
     private fun mapConfirmationStateToAuthorizationState(
         confirmationState: ConfirmationState
-    ): AuthorizationState = when (confirmationState) {
-        ConfirmationState.ALLOWED -> AuthorizationState.ALLOWED
-        ConfirmationState.REJECTED -> AuthorizationState.REJECTED
-        ConfirmationState.CANCELLED -> AuthorizationState.NONE
+    ): State = when (confirmationState) {
+        ConfirmationState.ALLOWED -> State.ALLOWED
+        ConfirmationState.REJECTED -> State.REJECTED
+        ConfirmationState.CANCELLED -> State.NONE
     }
 
     private suspend fun <T> respondIfAllowed(
         request: PolkadotJsExtensionRequest<T>,
-        authorizationState: AuthorizationState,
+        state: State,
         responseConstructor: suspend () -> T
-    ) = if (authorizationState == AuthorizationState.ALLOWED) {
+    ) = if (state == State.ALLOWED) {
         request.accept(responseConstructor())
     } else {
         request.reject(NotAuthorizedException)
@@ -316,4 +323,6 @@ class DAppBrowserViewModel(
         signerPayload = request.signerPayload,
         dappUrl = request.url
     )
+
+    private suspend fun selectedAccountId() = selectedAccount.first().id
 }

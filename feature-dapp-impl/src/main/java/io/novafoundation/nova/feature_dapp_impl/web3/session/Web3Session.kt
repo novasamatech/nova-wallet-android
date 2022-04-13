@@ -1,12 +1,28 @@
 package io.novafoundation.nova.feature_dapp_impl.web3.session
 
+import kotlinx.coroutines.flow.Flow
+
 interface Web3Session {
 
-    enum class AuthorizationState {
-        ALLOWED, REJECTED, NONE
+    class Authorization(
+        val state: State,
+        val baseUrl: String,
+        val dAppTitle: String?,
+        val metaId: Long
+    ) {
+        enum class State {
+            ALLOWED, REJECTED, NONE
+        }
     }
 
-    suspend fun authorizationStateFor(url: String): AuthorizationState
+    suspend fun authorizationStateFor(url: String, metaId: Long): Authorization.State
 
-    suspend fun updateAuthorizationState(url: String, state: AuthorizationState)
+    suspend fun updateAuthorization(
+        state: Authorization.State,
+        fullUrl: String,
+        dAppTitle: String,
+        metaId: Long
+    )
+
+    fun observeAuthorizationsFor(metaId: Long): Flow<List<Authorization>>
 }
