@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.common.favourites.s
 import kotlinx.android.synthetic.main.fragment_dapp_main.dappMainCategorizedDapps
 import kotlinx.android.synthetic.main.fragment_dapp_main.dappMainContainer
 import kotlinx.android.synthetic.main.fragment_dapp_main.dappMainIcon
+import kotlinx.android.synthetic.main.fragment_dapp_main.dappMainManage
 import kotlinx.android.synthetic.main.fragment_dapp_main.dappMainSearch
 
 class MainDAppFragment : BaseFragment<MainDAppViewModel>(), DappListAdapter.Handler {
@@ -42,6 +43,10 @@ class MainDAppFragment : BaseFragment<MainDAppViewModel>(), DappListAdapter.Hand
 
         dappMainSearch.setOnClickListener {
             viewModel.searchClicked()
+        }
+
+        dappMainManage.setOnClickListener {
+            viewModel.manageClicked()
         }
     }
 

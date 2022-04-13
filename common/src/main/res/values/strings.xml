@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="dapp_list_placeholder">List of DApps will appear here</string>
+
+  <string name="dapp_authorized_remove_title">Remove from Authorized?</string>
+  <string name="dapp_authorized_remove_description">“%s” DApp will be removed from Authorized</string>
+
+  <string name="dapp_catalog">Catalog</string>
+
+  <string name="dapp_authorized_title">Authorized DApps</string>
+  <string name="dapp_authorized_description">DApps to which you allowed access to see your address when you use them</string>
+
   <string name="common_title">Title</string>
 
   <string name="common_save">Save</string>

@@ -16,6 +16,9 @@ interface DappAuthorizationDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun updateAuthorization(dappAuthorization: DappAuthorizationLocal)
 
+    @Query("UPDATE dapp_authorizations SET authorized = 0 WHERE baseUrl = :baseUrl AND metaId = :metaId")
+    suspend fun removeAuthorization(baseUrl: String, metaId: Long)
+
     @Query("SELECT * FROM dapp_authorizations WHERE metaId = :metaId")
     fun observeAuthorizations(metaId: Long): Flow<List<DappAuthorizationLocal>>
 }
