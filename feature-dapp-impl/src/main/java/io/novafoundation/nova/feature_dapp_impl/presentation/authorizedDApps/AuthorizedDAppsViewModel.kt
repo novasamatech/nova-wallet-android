@@ -25,7 +25,7 @@ class AuthorizedDAppsViewModel(
     val walletUi = walletUiUseCase.selectedWalletUiFlow(showAddressIcon = true)
         .shareInBackground()
 
-    val authorizedDApps  = interactor.observeAuthorizedDApps()
+    val authorizedDApps = interactor.observeAuthorizedDApps()
         .mapList(::mapAuthorizedDAppToModel)
         .shareInBackground()
 
@@ -38,9 +38,6 @@ class AuthorizedDAppsViewModel(
         revokeAuthorizationConfirmation.awaitAction(dAppTitle)
 
         interactor.revokeAuthorization(item.url)
-
-
-
     }
 
     private fun mapAuthorizedDAppToModel(
