@@ -33,7 +33,7 @@ class InMemoryDAppMetadataRepository(
     }
 
     override suspend fun findDAppMetadatasByBaseUrlMatch(baseUrl: String): List<DappMetadata> {
-        return dappMetadatasFlow.first().filter { it.baseUrl == baseUrl}
+        return dappMetadatasFlow.first().filter { it.baseUrl == baseUrl }
     }
 
     override suspend fun getDAppMetadatas(): List<DappMetadata> {
