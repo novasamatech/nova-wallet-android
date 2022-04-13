@@ -16,22 +16,17 @@ class AddToFavouritesInteractor(
         favouritesDAppRepository.addFavourite(favouriteDApp)
     }
 
-    /**
-     * Tries to resolve given url without breaking user expectations, that is
-     * - Url should be the same as supplied
-     * - Label should be either the name of known dApp by exact url match OR supplied label OR host of url
-     * - Icon may be taken both from known dApp by exact match OR known dApp by base url match
-     *
-     * We do not allow label to be taken from known dApp by base url match since it may be confusing for a user to see the same label as for exact-matched entry
-     */
     suspend fun resolveFavouriteDAppDisplay(url: String, suppliedLabel: String?) = withContext(Dispatchers.Default) {
         val dAppMetadataExactMatch = dAppMetadataRepository.findDAppMetadataByExactUrlMatch(url)
-        val dAppMetadataBaseUrlMatch = dAppMetadataRepository.getDAppMetadata(baseUrl = Urls.normalizeUrl(url))
+        val dAppMetadataBaseUrlMatches = dAppMetadataRepository.findDAppMetadatasByBaseUrlMatch(baseUrl = Urls.normalizeUrl(url))
+
+        // we don't want to use base url match if there more than one candidate
+        val dAppMetadataBaseUrlSingleMatch = dAppMetadataBaseUrlMatches.singleOrNull()
 
         FavouriteDApp(
             url = url,
             label = dAppMetadataExactMatch?.name ?: suppliedLabel ?: Urls.hostOf(url),
-            icon = dAppMetadataExactMatch?.iconLink ?: dAppMetadataBaseUrlMatch?.iconLink
+            icon = dAppMetadataExactMatch?.iconLink ?: dAppMetadataBaseUrlSingleMatch?.iconLink
         )
     }
 }

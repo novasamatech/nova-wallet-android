@@ -44,7 +44,7 @@ class AddToFavouritesViewModel(
     }
 
     private fun setInitialValues() = launch {
-        val resolvedDAppDisplay = interactor.resolveFavouriteDAppDisplay(url = payload.url, suppliedLabel = null)
+        val resolvedDAppDisplay = interactor.resolveFavouriteDAppDisplay(url = payload.url, suppliedLabel = payload.label)
 
         labelFlow.emit(resolvedDAppDisplay.label)
         iconLink.emit(resolvedDAppDisplay.icon)

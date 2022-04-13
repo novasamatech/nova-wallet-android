@@ -111,8 +111,8 @@ class DAppBrowserViewModel(
         forceLoad(initialUrl)
     }
 
-    fun onPageChanged(url: String) {
-        updatePageDisplay(url, synchronizedWithBrowser = true)
+    fun onPageChanged(url: String, title: String?) {
+        updateCurrentPage(url, title, synchronizedWithBrowser = true)
     }
 
     fun closeClicked() = launch {
@@ -139,7 +139,7 @@ class DAppBrowserViewModel(
         } else {
             val payload = AddToFavouritesPayload(
                 url = page.url,
-                label = null,
+                label = page.title,
                 iconLink = null
             )
 
@@ -269,7 +269,7 @@ class DAppBrowserViewModel(
     private fun forceLoad(url: String) {
         _browserNavigationCommandEvent.value = BrowserNavigationCommand.OpenUrl(url).event()
 
-        updatePageDisplay(url, synchronizedWithBrowser = false)
+        updateCurrentPage(url, title = null, synchronizedWithBrowser = false)
     }
 
     private suspend fun awaitConfirmation(action: DappPendingConfirmation.Action) = suspendCoroutine<ConfirmationState> {
@@ -303,8 +303,12 @@ class DAppBrowserViewModel(
 
     private fun exitBrowser() = router.back()
 
-    private fun updatePageDisplay(url: String, synchronizedWithBrowser: Boolean) = launch {
-        currentPage.emit(BrowserPage(url, synchronizedWithBrowser))
+    private fun updateCurrentPage(
+        url: String,
+        title: String?,
+        synchronizedWithBrowser: Boolean
+    ) = launch {
+        currentPage.emit(BrowserPage(url, title, synchronizedWithBrowser))
     }
 
     private fun mapSignExtrinsicRequestToPayload(request: Sign) = DAppSignPayload(

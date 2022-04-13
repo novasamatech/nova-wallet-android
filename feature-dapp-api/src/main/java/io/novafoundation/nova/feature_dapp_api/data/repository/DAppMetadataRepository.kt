@@ -11,6 +11,8 @@ interface DAppMetadataRepository {
 
     suspend fun findDAppMetadataByExactUrlMatch(fullUrl: String): DappMetadata?
 
+    suspend fun findDAppMetadatasByBaseUrlMatch(baseUrl: String): List<DappMetadata>
+
     suspend fun getDAppMetadatas(): List<DappMetadata>
 
     fun observeDAppMetadatas(): Flow<List<DappMetadata>>
