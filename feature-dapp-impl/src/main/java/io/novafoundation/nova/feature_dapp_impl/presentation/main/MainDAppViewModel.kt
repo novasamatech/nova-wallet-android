@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.createAddressIcon
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
-import io.novafoundation.nova.common.mixin.actionAwaitable.awaitAction
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.utils.Event
@@ -120,7 +119,7 @@ class MainDAppViewModel(
         val dApp = mapDappModelToDApp(item)
 
         if (item.isFavourite) {
-            removeFavouriteConfirmationAwaitable.awaitAction()
+            removeFavouriteConfirmationAwaitable.awaitAction(item.name)
         }
 
         dappInteractor.toggleDAppFavouritesState(dApp)

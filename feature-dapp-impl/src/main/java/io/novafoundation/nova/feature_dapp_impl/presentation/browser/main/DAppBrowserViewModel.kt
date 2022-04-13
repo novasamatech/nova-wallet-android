@@ -6,7 +6,6 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.createAddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
-import io.novafoundation.nova.common.mixin.actionAwaitable.awaitAction
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
@@ -133,7 +132,8 @@ class DAppBrowserViewModel(
         val page = currentPageAnalyzed.first()
 
         if (page.isFavourite) {
-            removeFromFavouritesConfirmation.awaitAction()
+            val dAppTitle = page.title ?: page.display
+            removeFromFavouritesConfirmation.awaitAction(dAppTitle)
 
             interactor.removeDAppFromFavourites(page.url)
         } else {
