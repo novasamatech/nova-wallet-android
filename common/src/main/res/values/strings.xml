@@ -9,7 +9,7 @@
   <string name="dapp_favourites_remove_description">“%s” DApp will be removed from Favorites</string>
 
   <string name="common_remove">Remove</string>
-  <string name="dapp_favourites">Favourites</string>
+  <string name="dapp_favourites">Favorites</string>
 
   <string name="common_zero_amount_error">Amount must be positive</string>
 
