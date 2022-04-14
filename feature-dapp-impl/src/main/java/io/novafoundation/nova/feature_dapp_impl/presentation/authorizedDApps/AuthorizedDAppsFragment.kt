@@ -59,7 +59,6 @@ class AuthorizedDAppsFragment : BaseFragment<AuthorizedDAppsViewModel>(), Author
             .inject(this)
     }
 
-    @Suppress("UNCHECKED_CAST")
     override fun subscribe(viewModel: AuthorizedDAppsViewModel) {
         viewModel.authorizedDApps.observe {
             val showPlaceholder = it.isEmpty()
