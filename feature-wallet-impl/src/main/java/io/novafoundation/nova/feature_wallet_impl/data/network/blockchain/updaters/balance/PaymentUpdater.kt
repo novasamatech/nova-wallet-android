@@ -64,7 +64,7 @@ class PaymentUpdater(
             assetUpdateFlow
                 ?.filterNotNull()
                 ?.catch { logSyncError(chain, chainAsset, error = it) }
-                ?.onEach { Log.d(LOG_TAG, "Starting block fetching for ${chain.name}.${chainAsset.name}") }
+                ?.onEach { Log.d(LOG_TAG, "Starting block fetching for ${chain.name}.${chainAsset.symbol}") }
                 ?.onEach { blockHash -> assetSource.history.syncOperationsForBalanceChange(chainAsset, blockHash, accountId) }
         }
 
@@ -80,7 +80,7 @@ class PaymentUpdater(
     }
 
     private fun logSyncError(chain: Chain, chainAsset: Chain.Asset, error: Throwable) {
-        Log.e(LOG_TAG, "Failed to sync balance for ${chainAsset.name} in ${chain.name}", error)
+        Log.e(LOG_TAG, "Failed to sync balance for ${chainAsset.symbol} in ${chain.name}", error)
     }
 
     private suspend fun AssetHistory.syncOperationsForBalanceChange(chainAsset: Chain.Asset, blockHash: String, accountId: AccountId) {
@@ -90,7 +90,7 @@ class PaymentUpdater(
 
                 operationDao.insertAll(localOperations)
             }.onFailure {
-                Log.e(LOG_TAG, "Failed to retrieve transactions from block (${chain.name}.${chainAsset.name}): ${it.message}")
+                Log.e(LOG_TAG, "Failed to retrieve transactions from block (${chain.name}.${chainAsset.symbol}): ${it.message}")
             }
     }
 
