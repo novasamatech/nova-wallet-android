@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.data.mappers
 
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.filterNotNull
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.core.model.Node
 import io.novafoundation.nova.core.model.Node.NetworkType
@@ -107,15 +108,18 @@ fun mapMetaAccountLocalToMetaAccount(
     val chainAccounts = joinedMetaAccountInfo.chainAccounts.associateBy(
         keySelector = ChainAccountLocal::chainId,
         valueTransform = {
+            // ignore chainAccounts with unknown chainId
+            val chain = chainsById[it.chainId] ?: return@associateBy null
+
             MetaAccount.ChainAccount(
                 metaId = joinedMetaAccountInfo.metaAccount.id,
-                chain = chainsById.getValue(it.chainId),
+                chain = chain,
                 publicKey = it.publicKey,
                 accountId = it.accountId,
                 cryptoType = it.cryptoType
             )
         }
-    )
+    ).filterNotNull()
 
     return with(joinedMetaAccountInfo.metaAccount) {
         MetaAccount(

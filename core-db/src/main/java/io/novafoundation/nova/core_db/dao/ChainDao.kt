@@ -81,6 +81,9 @@ abstract class ChainDao {
     @Transaction
     abstract fun joinChainInfoFlow(): Flow<List<JoinedChainInfo>>
 
+    @Query("SELECT EXISTS(SELECT * FROM chains WHERE id = :chainId)")
+    abstract suspend fun chainExists(chainId: String): Boolean
+
     @Query("SELECT * FROM chain_runtimes WHERE chainId = :chainId")
     abstract suspend fun runtimeInfo(chainId: String): ChainRuntimeInfoLocal?
 
@@ -91,7 +94,9 @@ abstract class ChainDao {
     abstract suspend fun updateSyncedRuntimeVersion(chainId: String, syncedVersion: Int)
 
     @Transaction
-    open suspend fun updateRemoteRuntimeVersion(chainId: String, remoteVersion: Int) {
+    open suspend fun updateRemoteRuntimeVersionIfChainExists(chainId: String, remoteVersion: Int) {
+        if (!chainExists(chainId)) return
+
         if (isRuntimeInfoExists(chainId)) {
             updateRemoteRuntimeVersionUnsafe(chainId, remoteVersion)
         } else {

@@ -2,10 +2,12 @@ package io.novafoundation.nova.runtime.state
 
 import io.novafoundation.nova.common.data.holders.ChainIdHolder
 import io.novafoundation.nova.common.data.storage.Preferences
+import io.novafoundation.nova.common.utils.defaultOnNull
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.chainWithAssetOrNull
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
@@ -41,10 +43,7 @@ abstract class SingleAssetSharedState(
         .map { encoded ->
             val (chainId, chainAssetId) = decode(encoded)
 
-            val chain = chainRegistry.getChain(chainId)
-            val chainAsset = chain.assetsById.getValue(chainAssetId)
-
-            AssetWithChain(chain, chainAsset)
+            getChainWithAssetOrFallback(chainId, chainAssetId)
         }
         .inBackground()
         .shareIn(GlobalScope, started = SharingStarted.Eagerly, replay = 1)
@@ -65,6 +64,17 @@ abstract class SingleAssetSharedState(
 
     override suspend fun chainId(): String {
         return assetWithChain.first().chain.id
+    }
+
+    private suspend fun getChainWithAssetOrFallback(chainId: ChainId, chainAssetId: Int): AssetWithChain {
+        val (chain, asset) = chainRegistry.chainWithAssetOrNull(chainId, chainAssetId).defaultOnNull {
+            val fallbackAsset = availableToSelect().first()
+            val fallbackChain = chainRegistry.getChain(fallbackAsset.chainId)
+
+            fallbackChain to fallbackAsset
+        }
+
+        return AssetWithChain(chain, asset)
     }
 
     private fun encode(chainId: ChainId, chainAssetId: Int): String {
