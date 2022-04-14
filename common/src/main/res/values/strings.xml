@@ -500,8 +500,6 @@
     <item quantity="one">%d day left</item>
     <item quantity="other">%d days left</item>
   </plurals>
-  <string name="staking_pending_rewards_info">Validators payout the rewards every 2–5 days. However, you can payout them by yourself, especially if rewards are close to expiring, but you will pay the fee.</string>
-  <string name="staking_pending_rewards_info_v2_2_0">Rewards are paid every 2–3 days by validators. You can payout them by yourself, when they are close to expire, but you will pay the fee</string>
   <string name="staking_rebond">Return to stake</string>
   <string name="staking_rebond_insufficient_bondings">Amount you want to return to stake is greater than unstaking balance</string>
   <string name="staking_recommended_feature_1">Most profitable</string>
