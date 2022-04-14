@@ -24,5 +24,10 @@ interface Web3Session {
         metaId: Long
     )
 
+    suspend fun revokeAuthorization(
+        url: String,
+        metaId: Long
+    )
+
     fun observeAuthorizationsFor(metaId: Long): Flow<List<Authorization>>
 }

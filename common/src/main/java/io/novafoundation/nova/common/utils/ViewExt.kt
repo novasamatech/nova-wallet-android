@@ -17,6 +17,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.LayoutRes
@@ -160,6 +161,14 @@ private fun Drawable.updateDimensions(
     val heightInPx = heightInDp?.dp(context) ?: intrinsicHeight
 
     setBounds(0, 0, widthInPx, heightInPx)
+}
+
+fun ImageView.setImageTintRes(@ColorRes tintRes: Int) {
+    imageTintList = ColorStateList.valueOf(context.getColor(tintRes))
+}
+
+fun ImageView.setImageTint(@ColorInt tint: Int) {
+    imageTintList = ColorStateList.valueOf(tint)
 }
 
 inline fun View.doOnGlobalLayout(crossinline action: () -> Unit) {

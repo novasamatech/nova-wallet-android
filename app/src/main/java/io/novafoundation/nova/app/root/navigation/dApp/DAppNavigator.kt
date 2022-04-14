@@ -44,4 +44,8 @@ class DAppNavigator(
         actionId = R.id.action_ConfirmSignExtrinsicFragment_to_extrinsicDetailsFragment,
         args = DappExtrinsicDetailsFragment.getBundle(extrinsicContent)
     )
+
+    override fun openAuthorizedDApps() = performNavigation(
+        actionId = R.id.action_mainFragment_to_authorizedDAppsFragment
+    )
 }

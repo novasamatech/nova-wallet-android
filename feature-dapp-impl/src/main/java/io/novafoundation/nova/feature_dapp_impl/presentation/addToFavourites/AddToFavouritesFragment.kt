@@ -62,7 +62,7 @@ class AddToFavouritesFragment : BaseFragment<AddToFavouritesViewModel>() {
 
     override fun inject() {
         FeatureUtils.getFeature<DAppFeatureComponent>(this, DAppFeatureApi::class.java)
-            .addToFavouritesFactory()
+            .addToFavouritesComponentFactory()
             .create(this, argument(PAYLOAD_KEY))
             .inject(this)
     }

@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites.di.AddToFavouritesComponent
+import io.novafoundation.nova.feature_dapp_impl.presentation.authorizedDApps.di.AuthorizedDAppsComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.extrinsicDetails.di.DAppExtrinsicDetailsComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.di.DAppBrowserComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator
@@ -43,7 +44,9 @@ interface DAppFeatureComponent : DAppFeatureApi {
 
     fun dAppSearchComponentFactory(): DAppSearchComponent.Factory
 
-    fun addToFavouritesFactory(): AddToFavouritesComponent.Factory
+    fun addToFavouritesComponentFactory(): AddToFavouritesComponent.Factory
+
+    fun authorizedDAppsComponentFactory(): AuthorizedDAppsComponent.Factory
 
     // Views
 

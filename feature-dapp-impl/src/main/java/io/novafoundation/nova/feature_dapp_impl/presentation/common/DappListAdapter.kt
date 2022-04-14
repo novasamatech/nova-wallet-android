@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_dapp_impl.presentation.common
 
-import android.content.res.ColorStateList
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -9,6 +8,7 @@ import coil.clear
 import io.novafoundation.nova.common.list.BaseListAdapter
 import io.novafoundation.nova.common.list.BaseViewHolder
 import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.feature_dapp_impl.R
 import kotlinx.android.synthetic.main.item_dapp.view.itemDAppIcon
 import kotlinx.android.synthetic.main.item_dapp.view.itemDAppSubtitle
@@ -65,10 +65,8 @@ class DappViewHolder(
             itemDappAction.setImageResource(R.drawable.ic_heart_filled)
             itemDappAction.imageTintList = null
         } else {
-            val tintColor = context.getColor(R.color.white_48)
-
             itemDappAction.setImageResource(R.drawable.ic_heart_outline)
-            itemDappAction.imageTintList = ColorStateList.valueOf(tintColor)
+            itemDappAction.setImageTintRes(R.color.white_48)
         }
 
         setOnClickListener { itemHandler.onItemClicked(item) }

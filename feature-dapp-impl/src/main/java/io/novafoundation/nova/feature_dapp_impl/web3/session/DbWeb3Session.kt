@@ -28,6 +28,10 @@ class DbWeb3Session(
         authorizationDao.updateAuthorization(authorization)
     }
 
+    override suspend fun revokeAuthorization(url: String, metaId: Long) {
+        authorizationDao.removeAuthorization(baseUrl = Urls.normalizeUrl(url), metaId)
+    }
+
     override fun observeAuthorizationsFor(metaId: Long): Flow<List<Web3Session.Authorization>> {
         return authorizationDao.observeAuthorizations(metaId)
             .mapList(::mapAuthorizationFromLocal)

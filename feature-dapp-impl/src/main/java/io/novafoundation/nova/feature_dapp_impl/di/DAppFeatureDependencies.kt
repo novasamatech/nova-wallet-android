@@ -14,6 +14,7 @@ import io.novafoundation.nova.core_db.dao.PhishingSitesDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.runtime.di.ExtrinsicSerialization
@@ -60,4 +61,6 @@ interface DAppFeatureDependencies {
     val favouriteDAppsDao: FavouriteDAppsDao
 
     val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+
+    val walletUiUseCase: WalletUiUseCase
 }

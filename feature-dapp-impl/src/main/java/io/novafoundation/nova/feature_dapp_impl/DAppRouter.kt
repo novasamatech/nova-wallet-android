@@ -14,5 +14,7 @@ interface DAppRouter {
 
     fun openExtrinsicDetails(extrinsicContent: String)
 
+    fun openAuthorizedDApps()
+
     fun back()
 }

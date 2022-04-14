@@ -182,50 +182,50 @@
 
         <action
             android:id="@+id/action_mainFragment_to_moonbeamCrowdloanTermsFragment"
+            app:destination="@id/moonbeamCrowdloanTermsFragment"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit"
-            app:destination="@id/moonbeamCrowdloanTermsFragment" />
+            app:popExitAnim="@anim/fragment_close_exit" />
 
         <action
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit"
             android:id="@+id/action_mainFragment_to_userContributionsFragment"
-            app:destination="@id/userContributionsFragment" />
-
-        <action
+            app:destination="@id/userContributionsFragment"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
             android:id="@+id/action_mainFragment_to_dappBrowserGraph"
-            app:destination="@id/dapp_browser_graph" />
-
-        <action
+            app:destination="@id/dapp_browser_graph"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
             android:id="@+id/action_mainFragment_to_dappSearchGraph"
-            app:destination="@id/dapp_search_graph" />
-
-        <action
+            app:destination="@id/dapp_search_graph"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
             android:id="@+id/action_mainFragment_to_assetFiltersFragment"
-            app:destination="@id/assetFiltersFragment" />
+            app:destination="@id/assetFiltersFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
         <action
             android:id="@+id/action_mainFragment_to_nfts_nav_graph"
+            app:destination="@id/nfts_nav_graph"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit"
-            app:destination="@id/nfts_nav_graph" />
+            app:popExitAnim="@anim/fragment_close_exit" />
 
         <action
             android:id="@+id/action_mainFragment_to_customRebondFragment"
@@ -238,6 +238,14 @@
         <action
             android:id="@+id/action_mainFragment_to_selectUnbondFragment"
             app:destination="@id/selectUnbondFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_mainFragment_to_authorizedDAppsFragment"
+            app:destination="@id/authorizedDAppsFragment"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
@@ -316,21 +324,21 @@
 
 
         <action
+            android:id="@+id/action_accountDetailsFragment_to_mnemonic_nav_graph"
+            app:destination="@id/mnemonic_nav_graph"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit"
-            android:id="@+id/action_accountDetailsFragment_to_mnemonic_nav_graph"
-            app:destination="@id/mnemonic_nav_graph" />
+            app:popExitAnim="@anim/fragment_close_exit" />
 
 
         <action
+            android:id="@+id/action_accountDetailsFragment_to_import_nav_graph"
+            app:destination="@id/import_nav_graph"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit"
-            android:id="@+id/action_accountDetailsFragment_to_import_nav_graph"
-            app:destination="@id/import_nav_graph" />
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
     <include app:graph="@navigation/mnemonic_nav_graph" />
@@ -338,12 +346,12 @@
     <include app:graph="@navigation/import_nav_graph" />
 
     <action
+        android:id="@+id/action_open_mnemonic_nav_graph"
+        app:destination="@id/mnemonic_nav_graph"
         app:enterAnim="@anim/fragment_open_enter"
         app:exitAnim="@anim/fragment_open_exit"
         app:popEnterAnim="@anim/fragment_close_enter"
-        app:popExitAnim="@anim/fragment_close_exit"
-        android:id="@+id/action_open_mnemonic_nav_graph"
-        app:destination="@id/mnemonic_nav_graph" />
+        app:popExitAnim="@anim/fragment_close_exit" />
 
     <fragment
         android:id="@+id/editAccountsFragment"
@@ -418,7 +426,7 @@
     <fragment
         android:id="@+id/transactionHistoryFilterFragment"
         android:name="io.novafoundation.nova.feature_assets.presentation.transaction.filter.TransactionHistoryFilterFragment"
-        android:label="TransactionHistoryFilterFragment"/>
+        android:label="TransactionHistoryFilterFragment" />
 
     <fragment
         android:id="@+id/confirmTransferFragment"
@@ -437,9 +445,9 @@
 
     <fragment
         android:id="@+id/advancedEncryptionFragment"
-        tools:layout="@layout/fragment_advanced_encryption"
         android:name="io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionFragment"
-        android:label="AdvancedEncryptionFragment" />
+        android:label="AdvancedEncryptionFragment"
+        tools:layout="@layout/fragment_advanced_encryption" />
 
     <action
         android:id="@+id/action_open_advancedEncryptionFragment"
@@ -848,26 +856,26 @@
         tools:layout="@layout/fragment_custom_contribute" />
 
     <fragment
-        tools:layout="@layout/fragment_moonbeam_terms"
         android:id="@+id/moonbeamCrowdloanTermsFragment"
         android:name="io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.terms.MoonbeamCrowdloanTermsFragment"
-        android:label="MoonbeamCrowdloanTermsFragment">
+        android:label="MoonbeamCrowdloanTermsFragment"
+        tools:layout="@layout/fragment_moonbeam_terms">
 
         <action
             android:id="@+id/action_moonbeamCrowdloanTermsFragment_to_crowdloanContributeFragment"
+            app:destination="@id/crowdloanContributeFragment"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit"
-            app:popUpTo="@id/mainFragment"
-            app:destination="@id/crowdloanContributeFragment" />
+            app:popUpTo="@id/mainFragment" />
     </fragment>
 
     <fragment
-        tools:layout="@layout/fragment_my_contributions"
         android:id="@+id/userContributionsFragment"
         android:name="io.novafoundation.nova.feature_crowdloan_impl.presentation.contributions.UserContributionsFragment"
-        android:label="UserContributionsFragment" />
+        android:label="UserContributionsFragment"
+        tools:layout="@layout/fragment_my_contributions" />
 
     <include app:graph="@navigation/dapp_browser_graph" />
 
@@ -879,4 +887,10 @@
         android:id="@+id/assetFiltersFragment"
         android:name="io.novafoundation.nova.feature_assets.presentation.balance.filters.AssetFiltersFragment"
         android:label="AssetFiltersFragment" />
+
+    <fragment
+        android:id="@+id/authorizedDAppsFragment"
+        android:name="io.novafoundation.nova.feature_dapp_impl.presentation.authorizedDApps.AuthorizedDAppsFragment"
+        android:label="AuthorizedDAppsFragment"
+        tools:layout="@layout/fragment_authorized_dapps" />
 </navigation>

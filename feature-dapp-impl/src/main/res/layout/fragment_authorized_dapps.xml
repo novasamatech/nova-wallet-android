@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:background="@color/black">
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:dividerVisible="false"
+        android:id="@+id/authorizedDAppsToolbar"
+        app:homeButtonIcon="@drawable/ic_close"
+        app:titleText="@string/dapp_authorized_title" />
+
+    <TextView
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/dapp_authorized_description" />
+
+    <io.novafoundation.nova.common.view.TableCellView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/authorizedDAppsWallet"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        app:dividerVisible="false"
+        app:title="@string/tabbar_wallet_title" />
+
+    <Space
+        android:id="@+id/authorizedPlaceholderSpacerTop"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_weight="1" />
+
+    <io.novafoundation.nova.common.view.PlaceholderView
+        android:layout_width="match_parent"
+        app:showBackground="false"
+        app:image="@drawable/ic_placeholder"
+        android:id="@+id/authorizedPlaceholder"
+        android:text="@string/dapp_list_placeholder"
+        android:layout_height="wrap_content" />
+
+    <Space
+        android:id="@+id/authorizedPlaceholderSpacerBottom"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_weight="2" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        tools:visibility="gone"
+        android:id="@+id/authorizedDAppsList"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:layout_weight="1"
+        tools:listitem="@layout/item_dapp" />
+</LinearLayout>
