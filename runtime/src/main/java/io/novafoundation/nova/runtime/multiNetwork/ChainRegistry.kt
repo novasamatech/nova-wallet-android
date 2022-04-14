@@ -88,6 +88,13 @@ class ChainRegistry(
     suspend fun getChain(chainId: String): Chain = chainsById.first().getValue(chainId.removeHexPrefix())
 }
 
+suspend fun ChainRegistry.chainWithAssetOrNull(chainId: String, assetId: Int): Pair<Chain, Chain.Asset>? {
+    val chain = chainsById.first()[chainId] ?: return null
+    val chainAsset = chain.assetsById[assetId] ?: return null
+
+    return chain to chainAsset
+}
+
 suspend fun ChainRegistry.chainWithAsset(chainId: String, assetId: Int): Pair<Chain, Chain.Asset> {
     val chain = chainsById.first().getValue(chainId)
 

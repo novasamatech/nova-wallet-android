@@ -252,15 +252,6 @@ class StakingInteractor(
         }
     }
 
-    suspend fun getProjectedAccount(address: String): StakingAccount = withContext(Dispatchers.Default) {
-        val chain = stakingSharedState.chain()
-        val accountId = chain.accountIdOf(address)
-
-        val metaAccount = accountRepository.findMetaAccount(accountId)!!
-
-        mapAccountToStakingAccount(chain, metaAccount)
-    }
-
     suspend fun getSelectedAccountProjection(): StakingAccount = withContext(Dispatchers.Default) {
         val account = accountRepository.getSelectedAccount(stakingSharedState.chainId())
 
