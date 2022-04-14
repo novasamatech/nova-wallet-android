@@ -1,6 +1,5 @@
 package io.novafoundation.nova.runtime.multiNetwork.chain
 
-import android.util.Log
 import com.google.gson.Gson
 import io.novafoundation.nova.common.utils.CollectionDiffer
 import io.novafoundation.nova.common.utils.Identifiable
@@ -27,8 +26,6 @@ class ChainSyncService(
         val chainsDiff = CollectionDiffer.findDiff(newItems = remoteChains, oldItems = localChains, forceUseNewItems = false)
             .map { mapChainToChainLocal(it, gson) }
 
-        Log.d("RX", "Diff start")
-
         dao.applyDiff(
             chainDiff = chainsDiff,
             assetsDiff = nestedCollectionDiff(
@@ -50,8 +47,6 @@ class ChainSyncService(
                 domainToLocalMapper = ::mapChainExplorersToLocal
             ),
         )
-
-        Log.d("RX", "Diff success")
     }
 
     private fun <T : Identifiable, R> nestedCollectionDiff(
