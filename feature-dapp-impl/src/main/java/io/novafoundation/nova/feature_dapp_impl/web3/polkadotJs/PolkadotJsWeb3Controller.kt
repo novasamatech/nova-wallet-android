@@ -14,7 +14,7 @@ class PolkadotJsWeb3Controller(
     }
 
     override fun injectForPage(into: WebView, url: String) {
-        webViewScriptInjector.injectScript(R.raw.nova_min, into, WebViewScriptInjector.InjectionPosition.START)
+        webViewScriptInjector.injectScript(R.raw.nova_min, into, WebViewScriptInjector.InjectionPosition.END)
         webViewScriptInjector.injectScript(R.raw.javascript_interface_bridge, into, WebViewScriptInjector.InjectionPosition.END)
     }
 }

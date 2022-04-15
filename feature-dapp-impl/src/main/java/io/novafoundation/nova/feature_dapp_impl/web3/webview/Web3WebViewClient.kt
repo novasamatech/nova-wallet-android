@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_dapp_impl.web3.webview
 
-import android.graphics.Bitmap
 import android.webkit.WebView
 import android.webkit.WebViewClient
 
@@ -35,12 +34,10 @@ class Web3WebViewClient(
         controllers.forEach { it.initialInject(webView) }
     }
 
-    override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
-        tryInject(view, url)
-    }
-
-    override fun onPageFinished(view: WebView, url: String) {
-        tryInject(view, url)
+    // onLoadResource() appears to be more reliable then onPageStart() and onPageFinished() combined for injection js
+    override fun onLoadResource(view: WebView?, url: String) {
+        super.onLoadResource(view, url)
+        tryInject(webView, url)
     }
 
     override fun doUpdateVisitedHistory(view: WebView, url: String, isReload: Boolean) {
