@@ -16,6 +16,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.ExtrinsicStatus
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.merge
@@ -51,14 +52,20 @@ class PaymentUpdater(
 
         val accountId = metaAccount.accountIdIn(chain) ?: return emptyFlow()
 
-        val assetSyncs = chain.assets.map { chainAsset ->
+        val assetSyncs = chain.assets.mapNotNull { chainAsset ->
             val assetSource = assetSourceRegistry.sourceFor(chainAsset)
 
-            assetSource.balance
-                .startSyncingBalance(chain, chainAsset, metaAccount, accountId, storageSubscriptionBuilder)
-                .filterNotNull()
-                .onEach { Log.d(LOG_TAG, "Starting block fetching for ${chain.name}.${chainAsset.name}") }
-                .onEach { blockHash -> assetSource.history.syncOperationsForBalanceChange(chainAsset, blockHash, accountId) }
+            val assetUpdateFlow = runCatching {
+                assetSource.balance.startSyncingBalance(chain, chainAsset, metaAccount, accountId, storageSubscriptionBuilder)
+            }
+                .onFailure { logSyncError(chain, chainAsset, error = it) }
+                .getOrNull()
+
+            assetUpdateFlow
+                ?.filterNotNull()
+                ?.catch { logSyncError(chain, chainAsset, error = it) }
+                ?.onEach { Log.d(LOG_TAG, "Starting block fetching for ${chain.name}.${chainAsset.symbol}") }
+                ?.onEach { blockHash -> assetSource.history.syncOperationsForBalanceChange(chainAsset, blockHash, accountId) }
         }
 
         val chainSyncingFlow = if (assetSyncs.size == 1) {
@@ -72,6 +79,10 @@ class PaymentUpdater(
             .noSideAffects()
     }
 
+    private fun logSyncError(chain: Chain, chainAsset: Chain.Asset, error: Throwable) {
+        Log.e(LOG_TAG, "Failed to sync balance for ${chainAsset.symbol} in ${chain.name}", error)
+    }
+
     private suspend fun AssetHistory.syncOperationsForBalanceChange(chainAsset: Chain.Asset, blockHash: String, accountId: AccountId) {
         fetchOperationsForBalanceChange(chain, blockHash, accountId)
             .onSuccess { blockTransfers ->
@@ -79,7 +90,7 @@ class PaymentUpdater(
 
                 operationDao.insertAll(localOperations)
             }.onFailure {
-                Log.e(LOG_TAG, "Failed to retrieve transactions from block (${chain.name}.${chainAsset.name}): ${it.message}")
+                Log.e(LOG_TAG, "Failed to retrieve transactions from block (${chain.name}.${chainAsset.symbol}): ${it.message}")
             }
     }
 
