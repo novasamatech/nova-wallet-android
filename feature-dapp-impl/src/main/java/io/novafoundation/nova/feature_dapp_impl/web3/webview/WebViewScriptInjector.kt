@@ -47,16 +47,20 @@ class WebViewScriptInjector(
         val encoded: String = Base64.encodeToString(js.encodeToByteArray(), Base64.NO_WRAP)
         val method = injectionPosition.addMethodName
 
+        // Self-invocation of anonymous function is due to lack of jquery and its $(document).onReady
+        // https://stackoverflow.com/a/9899701/7996129
         val wrappedScript = """
-        var parent = document.getElementsByTagName('body').item(0);
-        var prevScripts = parent.getElementsByClassName("$scriptId")
-        if (prevScripts.length== 0) {
-            var script = document.createElement('script');                 
-            script.type = 'text/javascript';
-            script.innerHTML = window.atob('$encoded');
-            script.className = "$scriptId";
-            parent.$method(script);
-        }
+         (function() {
+            var parent = document.getElementsByTagName('body').item(0);
+            var prevScripts = parent.getElementsByClassName("$scriptId")
+            if (prevScripts.length== 0) {
+                var script = document.createElement('script');                 
+                script.type = 'text/javascript';
+                script.innerHTML = window.atob('$encoded');
+                script.className = "$scriptId";
+                parent.$method(script);
+            }
+             })();
         """.trimIndent()
         into.evaluateJavascript(wrappedScript, null)
     }
