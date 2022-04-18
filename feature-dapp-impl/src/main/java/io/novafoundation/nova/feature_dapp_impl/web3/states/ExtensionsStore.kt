@@ -18,7 +18,7 @@ interface ExtensionsStore {
 }
 
 class ExtensionStoreFactory(
-    private val polkadotJsFactory: PolkadotJsStateFactory,
+    private val polkadotJsStateFactory: PolkadotJsStateFactory,
     private val polkadotJsTransportFactory: PolkadotJsTransportFactory,
 ) {
 
@@ -26,12 +26,13 @@ class ExtensionStoreFactory(
         hostApi: Web3StateMachineHost,
         coroutineScope: CoroutineScope
     ): ExtensionsStore {
-        val polkadotJsStateMachine: PolkadotJsStateMachine = DefaultWeb3ExtensionStateMachine(polkadotJsFactory.default(hostApi))
+        val initialPolkadotJsState = polkadotJsStateFactory.default(hostApi)
+        val polkadotJsStateMachine: PolkadotJsStateMachine = DefaultWeb3ExtensionStateMachine(initialPolkadotJsState)
         val polkadotJsExtension = polkadotJsTransportFactory.create(coroutineScope)
 
         return DefaultExtensionsStore(
             polkadotJs = polkadotJsStateMachine,
-            polkadotJsExtension = polkadotJsExtension,
+            polkadotJsTransport = polkadotJsExtension,
 
             externalEvents = hostApi.externalEvents,
             coroutineScope = coroutineScope
@@ -41,13 +42,13 @@ class ExtensionStoreFactory(
 
 private class DefaultExtensionsStore(
     override val polkadotJs: PolkadotJsStateMachine,
-    private val polkadotJsExtension: PolkadotJsTransport,
+    private val polkadotJsTransport: PolkadotJsTransport,
     private val externalEvents: Flow<ExternalEvent>,
     private val coroutineScope: CoroutineScope
 ) : ExtensionsStore {
 
     init {
-        polkadotJs wireWith polkadotJsExtension
+        polkadotJs wireWith polkadotJsTransport
     }
 
     private infix fun <R : Web3Transport.Request<*>, S : State<R, S>> Web3ExtensionStateMachine<S>.wireWith(transport: Web3Transport<R>) {
