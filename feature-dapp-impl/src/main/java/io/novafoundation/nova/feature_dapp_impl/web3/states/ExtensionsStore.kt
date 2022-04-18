@@ -59,5 +59,3 @@ private class DefaultExtensionsStore(
             .launchIn(coroutineScope)
     }
 }
-
-

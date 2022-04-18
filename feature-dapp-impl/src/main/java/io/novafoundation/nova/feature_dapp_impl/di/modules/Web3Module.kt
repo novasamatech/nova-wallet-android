@@ -95,7 +95,6 @@ class Web3Module {
         accountRepository: AccountRepository
     ) = PolkadotJsExtensionInteractor(chainRegistry, accountRepository, runtimeVersionsRepository)
 
-
     @Provides
     @FeatureScope
     fun providePolkadotJsStateFactory(
@@ -113,7 +112,6 @@ class Web3Module {
             web3Session = web3Session,
         )
     }
-
 
     @Provides
     @FeatureScope

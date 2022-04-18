@@ -156,7 +156,6 @@ class DAppBrowserViewModel(
             .launchIn(this)
     }
 
-
     private fun forceLoad(url: String) {
         _browserNavigationCommandEvent.value = BrowserNavigationCommand.OpenUrl(url).event()
 
@@ -181,7 +180,6 @@ class DAppBrowserViewModel(
         ConfirmationState.REJECTED -> State.REJECTED
         ConfirmationState.CANCELLED -> State.NONE
     }
-
 
     private fun exitBrowser() = router.back()
 

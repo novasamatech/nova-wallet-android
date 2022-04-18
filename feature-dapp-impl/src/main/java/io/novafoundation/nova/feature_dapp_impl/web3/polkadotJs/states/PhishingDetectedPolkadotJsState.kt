@@ -9,7 +9,10 @@ class PhishingDetectedPolkadotJsState : PolkadotJsState {
         request.reject(IllegalStateException("Phishing detected!"))
     }
 
-    override suspend fun acceptEvent(event: Web3ExtensionStateMachine.ExternalEvent, transition: Web3ExtensionStateMachine.StateMachineTransition<PolkadotJsState>) {
+    override suspend fun acceptEvent(
+        event: Web3ExtensionStateMachine.ExternalEvent,
+        transition: Web3ExtensionStateMachine.StateMachineTransition<PolkadotJsState>
+    ) {
         // do nothing
     }
 }

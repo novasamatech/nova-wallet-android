@@ -33,4 +33,3 @@ sealed class ConfirmTxResponse : Parcelable {
     @Parcelize
     class SigningFailed(override val requestId: String) : ConfirmTxResponse()
 }
-

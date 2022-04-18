@@ -159,4 +159,3 @@ class DefaultPolkadotJsState(
         request.accept(PolkadotJsTransportRequest.Single.AuthorizeTab.Response(authorized))
     }
 }
-
