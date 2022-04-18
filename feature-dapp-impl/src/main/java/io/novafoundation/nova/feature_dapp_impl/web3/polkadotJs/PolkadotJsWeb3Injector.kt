@@ -1,0 +1,26 @@
+package io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs
+
+import android.webkit.WebView
+import io.novafoundation.nova.feature_dapp_impl.R
+import io.novafoundation.nova.feature_dapp_impl.web3.states.ExtensionsStore
+import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3Injector
+import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewScriptInjector
+import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewWeb3JavaScriptInterface
+
+// should be in tact with javascript_interface_bridge.js
+private const val JS_INTERFACE_NAME = "PolkadotJs"
+
+class PolkadotJsWeb3Injector(
+    private val jsInterface: WebViewWeb3JavaScriptInterface,
+    private val webViewScriptInjector: WebViewScriptInjector
+) : Web3Injector {
+
+    override fun initialInject(into: WebView, extensionStore: ExtensionsStore) {
+        webViewScriptInjector.injectJsInterface(into, jsInterface, JS_INTERFACE_NAME)
+    }
+
+    override fun injectForPage(into: WebView, url: String, extensionStore: ExtensionsStore) {
+        webViewScriptInjector.injectScript(R.raw.nova_min, into)
+        webViewScriptInjector.injectScript(R.raw.javascript_interface_bridge, into)
+    }
+}

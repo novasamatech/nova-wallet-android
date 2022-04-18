@@ -5,33 +5,44 @@ import android.webkit.WebView
 import androidx.annotation.RawRes
 import io.novafoundation.nova.common.resources.ResourceManager
 
-// should be in tact with javascript_interface_bridge.js
-private const val JAVASCRIPT_INTERFACE_NAME = "Nova"
+private const val JAVASCRIPT_INTERFACE_PREFIX = "Nova"
 
 class WebViewScriptInjector(
-    private val web3JavaScriptInterface: WebViewWeb3JavaScriptInterface,
     private val resourceManager: ResourceManager
 ) {
 
-    enum class InjectionPosition {
+    private enum class InjectionPosition {
         START, END
     }
 
     private val scriptCache: MutableMap<Int, String> = mutableMapOf()
 
-    fun injectJsInterface(into: WebView) {
-        into.addJavascriptInterface(web3JavaScriptInterface, JAVASCRIPT_INTERFACE_NAME)
+    fun injectJsInterface(
+        into: WebView,
+        jsInterface: WebViewWeb3JavaScriptInterface,
+        interfaceName: String
+    ) {
+        val fullName = "${JAVASCRIPT_INTERFACE_PREFIX}_$interfaceName"
+
+        into.addJavascriptInterface(jsInterface, fullName)
+    }
+
+    fun injectScript(
+        scriptContent: String,
+        into: WebView,
+        scriptId: String = scriptContent.hashCode().toString(),
+    ) {
+        addScriptToDomIfNotExists(scriptContent, scriptId, into)
     }
 
     fun injectScript(
         @RawRes scriptRes: Int,
         into: WebView,
-        injectionPosition: InjectionPosition = InjectionPosition.START
     ) {
         val script = loadScript(scriptRes)
         val scriptId = scriptRes.toString()
 
-        addScriptToDomIfNotExists(script, injectionPosition, scriptId, into)
+        addScriptToDomIfNotExists(script, scriptId, into)
     }
 
     private fun loadScript(@RawRes scriptRes: Int) = scriptCache.getOrPut(scriptRes) {
@@ -40,12 +51,11 @@ class WebViewScriptInjector(
 
     private fun addScriptToDomIfNotExists(
         js: String,
-        injectionPosition: InjectionPosition,
         scriptId: String,
         into: WebView,
     ) {
         val encoded: String = Base64.encodeToString(js.encodeToByteArray(), Base64.NO_WRAP)
-        val method = injectionPosition.addMethodName
+        val method = InjectionPosition.END.addMethodName
 
         // Self-invocation of anonymous function is due to lack of jquery and its $(document).onReady
         // https://stackoverflow.com/a/9899701/7996129

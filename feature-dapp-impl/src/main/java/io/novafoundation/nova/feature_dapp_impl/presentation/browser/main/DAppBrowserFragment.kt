@@ -110,7 +110,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
     override fun subscribe(viewModel: DAppBrowserViewModel) {
         setupRemoveFavouritesConfirmation(viewModel.removeFromFavouritesConfirmation)
 
-        dappBrowserWebView.injectWeb3(web3WebViewClientFactory, viewModel::onPageChanged)
+        dappBrowserWebView.injectWeb3(web3WebViewClientFactory, viewModel.extensionsStore, viewModel::onPageChanged)
 
         viewModel.showConfirmationSheet.observeEvent {
             when (it.action) {

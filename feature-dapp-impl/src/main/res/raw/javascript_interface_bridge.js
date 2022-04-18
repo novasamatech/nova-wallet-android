@@ -8,6 +8,6 @@ window.addEventListener("message", ({ data, source }) => {
 
       if (data.origin === "dapp-request") {
       // should be in tact with PolkadotJsExtension.kt
-        Nova.onNewMessage(JSON.stringify(data))
+        Nova_PolkadotJs.onNewMessage(JSON.stringify(data))
       }
     });

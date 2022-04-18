@@ -2,25 +2,17 @@ package io.novafoundation.nova.feature_dapp_impl.presentation.browser.main
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import io.novafoundation.nova.common.address.AddressIconGenerator
-import io.novafoundation.nova.common.address.createAddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
-import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
-import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
-import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
-import io.novafoundation.nova.feature_dapp_impl.R
-import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.BrowserPage
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.BrowserPageAnalyzed
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.DappBrowserInteractor
-import io.novafoundation.nova.feature_dapp_impl.domain.browser.isDangerous
 import io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites.AddToFavouritesPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignPayload
@@ -29,32 +21,24 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrins
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.favourites.RemoveFavouritesPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchRequester
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.SearchPayload
-import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionFactory
-import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest
-import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.Single.AuthorizeTab
-import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.Single.ListAccounts
-import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.Single.ListMetadata
-import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.Single.ProvideMetadata
-import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.Single.Sign
-import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionRequest.Subscription.SubscribeAccounts
-import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.SignerResult
 import io.novafoundation.nova.feature_dapp_impl.web3.session.Web3Session.Authorization.State
+import io.novafoundation.nova.feature_dapp_impl.web3.states.ExtensionStoreFactory
+import io.novafoundation.nova.feature_dapp_impl.web3.states.Web3ExtensionStateMachine.ExternalEvent
+import io.novafoundation.nova.feature_dapp_impl.web3.states.Web3StateMachineHost
+import io.novafoundation.nova.feature_dapp_impl.web3.states.hostApi.AuthorizeDAppPayload
+import io.novafoundation.nova.feature_dapp_impl.web3.states.hostApi.ConfirmTxRequest
+import io.novafoundation.nova.feature_dapp_impl.web3.states.hostApi.ConfirmTxResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
-
-object NotAuthorizedException : Exception("Rejected by user")
-object SigningFailedException : Exception("Signing failed")
 
 enum class ConfirmationState {
     ALLOWED, REJECTED, CANCELLED
@@ -63,44 +47,36 @@ enum class ConfirmationState {
 class DAppBrowserViewModel(
     private val router: DAppRouter,
     private val signRequester: DAppSignRequester,
-    private val polkadotJsExtensionFactory: PolkadotJsExtensionFactory,
+    private val extensionStoreFactory: ExtensionStoreFactory,
     private val interactor: DappBrowserInteractor,
-    private val commonInteractor: DappInteractor,
-    private val resourceManager: ResourceManager,
-    private val addressIconGenerator: AddressIconGenerator,
     private val dAppSearchRequester: DAppSearchRequester,
     private val initialUrl: String,
     private val selectedAccountUseCase: SelectedAccountUseCase,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
-) : BaseViewModel() {
-
-    private val polkadotJsExtension = polkadotJsExtensionFactory.create(scope = this)
+) : BaseViewModel(), Web3StateMachineHost {
 
     private val _showConfirmationDialog = MutableLiveData<Event<DappPendingConfirmation<*>>>()
     val showConfirmationSheet = _showConfirmationDialog
 
-    private val selectedAccount = selectedAccountUseCase.selectedMetaAccountFlow()
+    override val selectedAccount = selectedAccountUseCase.selectedMetaAccountFlow()
         .share()
+
+    private val currentPage = singleReplaySharedFlow<BrowserPage>()
+
+    override val currentPageAnalyzed = currentPage.flatMapLatest {
+        interactor.observeBrowserPageFor(it)
+    }.shareInBackground()
+
+    override val externalEvents = singleReplaySharedFlow<ExternalEvent>()
 
     private val _browserNavigationCommandEvent = MutableLiveData<Event<BrowserNavigationCommand>>()
     val browserNavigationCommandEvent: LiveData<Event<BrowserNavigationCommand>> = _browserNavigationCommandEvent
 
-    private val currentPage = singleReplaySharedFlow<BrowserPage>()
-
     val removeFromFavouritesConfirmation = actionAwaitableMixinFactory.confirmingAction<RemoveFavouritesPayload>()
 
-    val currentPageAnalyzed = currentPage.flatMapLatest {
-        interactor.observeBrowserPageFor(it)
-    }.shareInBackground()
+    val extensionsStore = extensionStoreFactory.create(hostApi = this, coroutineScope = this)
 
     init {
-        polkadotJsExtension.requestsFlow
-            // skip all requests on dangerous websites
-            .filterNot { currentPageAnalyzed.first().isDangerous }
-            .onEach(::handleDAppRequest)
-            .inBackground()
-            .launchIn(this)
-
         dAppSearchRequester.responseFlow
             .onEach { it.newUrl?.let(::forceLoad) }
             .launchIn(this)
@@ -108,6 +84,25 @@ class DAppBrowserViewModel(
         watchDangerousWebsites()
 
         forceLoad(initialUrl)
+    }
+
+    override suspend fun authorizeDApp(payload: AuthorizeDAppPayload): State {
+        val confirmationState = awaitConfirmation(DappPendingConfirmation.Action.Authorize(payload))
+
+        return mapConfirmationStateToAuthorizationState(confirmationState)
+    }
+
+    override suspend fun confirmTx(request: ConfirmTxRequest): ConfirmTxResponse {
+        val response = withContext(Dispatchers.Main) {
+            signRequester.awaitConfirmation(mapSignExtrinsicRequestToPayload(request))
+        }
+
+        return when (response) {
+            is DAppSignCommunicator.Response.Rejected -> ConfirmTxResponse.Rejected(response.requestId)
+            is DAppSignCommunicator.Response.Signed -> ConfirmTxResponse.Signed(response.requestId, response.signature)
+            is DAppSignCommunicator.Response.SigningFailed -> ConfirmTxResponse.SigningFailed(response.requestId)
+            is DAppSignCommunicator.Response.Sent -> ConfirmTxResponse.Sent(response.requestId, response.txHash)
+        }
     }
 
     fun onPageChanged(url: String, title: String?) {
@@ -152,6 +147,8 @@ class DAppBrowserViewModel(
             .filter { it.synchronizedWithBrowser && it.security == BrowserPageAnalyzed.Security.DANGEROUS }
             .distinctUntilChanged()
             .onEach {
+                externalEvents.emit(ExternalEvent.PhishingDetected)
+
                 awaitConfirmation(DappPendingConfirmation.Action.AcknowledgePhishingAlert)
 
                 exitBrowser()
@@ -159,119 +156,6 @@ class DAppBrowserViewModel(
             .launchIn(this)
     }
 
-    private suspend fun handleDAppRequest(request: PolkadotJsExtensionRequest<*>) {
-        val authorizationState = polkadotJsExtension.session.authorizationStateFor(request.url, selectedAccountId())
-
-        when (request) {
-            is AuthorizeTab -> authorizeTab(request, authorizationState)
-            is ListAccounts -> supplyAccountList(request, authorizationState)
-            is Sign -> signExtrinsicIfAllowed(request, authorizationState)
-            is SubscribeAccounts -> supplyAccountListSubscription(request, authorizationState)
-            is ListMetadata -> suppleKnownMetadatas(request, authorizationState)
-            is ProvideMetadata -> handleProvideMetadata(request, authorizationState)
-        }
-    }
-
-    private suspend fun signExtrinsicIfAllowed(request: Sign, state: State) {
-        when (state) {
-            // request user confirmation if dapp is authorized
-            State.ALLOWED -> signExtrinsicWithConfirmation(request)
-            // reject otherwise
-            else -> request.reject(NotAuthorizedException)
-        }
-    }
-
-    private suspend fun signExtrinsicWithConfirmation(request: Sign) {
-        val response = withContext(Dispatchers.Main) {
-            signRequester.awaitConfirmation(mapSignExtrinsicRequestToPayload(request))
-        }
-
-        when (response) {
-            is DAppSignCommunicator.Response.Rejected -> request.reject(NotAuthorizedException)
-            is DAppSignCommunicator.Response.Signed -> request.accept(SignerResult(response.requestId, response.signature))
-            is DAppSignCommunicator.Response.SigningFailed -> {
-                showError(resourceManager.getString(R.string.dapp_sign_extrinsic_failed))
-
-                request.reject(SigningFailedException)
-            }
-        }
-    }
-
-    private suspend fun authorizeTab(request: AuthorizeTab, state: State) {
-        when (state) {
-            // user already accepted - no need to ask second time
-            State.ALLOWED -> request.accept(AuthorizeTab.Response(true))
-            // first time dapp request authorization during this session
-            State.NONE -> authorizeTabWithConfirmation(request)
-            // user rejected this dapp previosuly - ask for authorization one more time
-            State.REJECTED -> authorizeTabWithConfirmation(request)
-        }
-    }
-
-    private suspend fun authorizeTabWithConfirmation(request: AuthorizeTab) {
-        val currentPage = currentPageAnalyzed.first()
-        // use url got from browser instead of url got from dApp to prevent dApp supplying wrong URL
-        val dAppInfo = commonInteractor.getDAppInfo(dAppUrl = currentPage.url)
-
-        val dAppIdentifier = dAppInfo.metadata?.name ?: currentPage.title ?: dAppInfo.baseUrl
-
-        val metaAccount = selectedAccount.first()
-
-        val action = DappPendingConfirmation.Action.Authorize(
-            title = resourceManager.getString(
-                R.string.dapp_confirm_authorize_title_format,
-                dAppIdentifier
-            ),
-            dAppIconUrl = dAppInfo.metadata?.iconLink,
-            dAppUrl = dAppInfo.baseUrl,
-            walletAddressModel = addressIconGenerator.createAddressModel(
-                accountAddress = metaAccount.defaultSubstrateAddress,
-                sizeInDp = AddressIconGenerator.SIZE_MEDIUM,
-                accountName = metaAccount.name
-            )
-        )
-
-        val confirmationState = awaitConfirmation(action)
-
-        val authorizationState = mapConfirmationStateToAuthorizationState(confirmationState)
-
-        polkadotJsExtension.session.updateAuthorization(
-            state = authorizationState,
-            fullUrl = request.url,
-            dAppTitle = dAppIdentifier,
-            metaId = metaAccount.id
-        )
-
-        request.accept(AuthorizeTab.Response(authorizationState == State.ALLOWED))
-    }
-
-    private suspend fun handleProvideMetadata(
-        request: ProvideMetadata,
-        state: State
-    ) = respondIfAllowed(request, state) {
-        false // we do not accept provided metadata since app handles metadata sync by its own
-    }
-
-    private suspend fun suppleKnownMetadatas(
-        request: ListMetadata,
-        state: State
-    ) = respondIfAllowed(request, state) {
-        interactor.getKnownInjectedMetadatas()
-    }
-
-    private suspend fun supplyAccountList(
-        request: ListAccounts,
-        state: State
-    ) = respondIfAllowed(request, state) {
-        interactor.getInjectedAccounts()
-    }
-
-    private suspend fun supplyAccountListSubscription(
-        request: SubscribeAccounts,
-        state: State
-    ) = respondIfAllowed(request, state) {
-        flowOf(interactor.getInjectedAccounts())
-    }
 
     private fun forceLoad(url: String) {
         _browserNavigationCommandEvent.value = BrowserNavigationCommand.OpenUrl(url).event()
@@ -298,15 +182,6 @@ class DAppBrowserViewModel(
         ConfirmationState.CANCELLED -> State.NONE
     }
 
-    private suspend fun <T> respondIfAllowed(
-        request: PolkadotJsExtensionRequest<T>,
-        state: State,
-        responseConstructor: suspend () -> T
-    ) = if (state == State.ALLOWED) {
-        request.accept(responseConstructor())
-    } else {
-        request.reject(NotAuthorizedException)
-    }
 
     private fun exitBrowser() = router.back()
 
@@ -318,11 +193,9 @@ class DAppBrowserViewModel(
         currentPage.emit(BrowserPage(url, title, synchronizedWithBrowser))
     }
 
-    private fun mapSignExtrinsicRequestToPayload(request: Sign) = DAppSignPayload(
-        requestId = request.requestId,
-        signerPayload = request.signerPayload,
-        dappUrl = request.url
+    private suspend fun mapSignExtrinsicRequestToPayload(request: ConfirmTxRequest) = DAppSignPayload(
+        requestId = request.id,
+        body = request.payload,
+        dappUrl = currentPageAnalyzed.first().url
     )
-
-    private suspend fun selectedAccountId() = selectedAccount.first().id
 }

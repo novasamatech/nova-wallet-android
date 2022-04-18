@@ -11,8 +11,8 @@ import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.signExtrinsic.DappSignExtrinsicInteractor
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator.Response
+import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.PolkadotJsSignPayload
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.SignerPayload
-import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.maybeSignExtrinsic
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
@@ -33,6 +33,9 @@ class DAppSignViewModel(
     feeLoaderMixinFactory: FeeLoaderMixin.Factory
 ) : BaseViewModel(), WithFeeLoaderMixin {
 
+    // TODO metamask transaction signing - multiple possible payloads
+    private val polkadotJsBody = payload.body as PolkadotJsSignPayload
+
     override val feeLoaderMixin: FeeLoaderMixin.Presentation? = tokenUseCase?.let {
         feeLoaderMixinFactory.create(tokenUseCase.currentTokenFlow())
     }
@@ -45,13 +48,13 @@ class DAppSignViewModel(
     }
 
     val requestedAccountModel = selectedAccount.map {
-        addressIconGenerator.createAddressModel(payload.signerPayload.address, AddressIconGenerator.SIZE_MEDIUM, null)
+        addressIconGenerator.createAddressModel(payload.body.address, AddressIconGenerator.SIZE_MEDIUM, null)
     }
         .inBackground()
         .share()
 
     val maybeChainUi = flowOf {
-        payload.signerPayload.maybeSignExtrinsic()?.genesisHash?.let {
+        payload.body.chainId?.let {
             chainRegistry.getChain(it)
         }
     }
@@ -73,7 +76,7 @@ class DAppSignViewModel(
     }
 
     fun acceptClicked() = launch {
-        val response = interactor.buildSignature(payload.signerPayload)
+        val response = interactor.buildSignature(polkadotJsBody.signerPayload)
             .fold(
                 onSuccess = { Response.Signed(payload.requestId, it) },
                 onFailure = {
@@ -88,10 +91,10 @@ class DAppSignViewModel(
     }
 
     private fun maybeLoadFee() {
-        if (payload.signerPayload is SignerPayload.Json) {
+        if (polkadotJsBody.signerPayload is SignerPayload.Json) {
             feeLoaderMixin!!.loadFee(
                 coroutineScope = this,
-                feeConstructor = { interactor.calculateFee(payload.signerPayload) },
+                feeConstructor = { interactor.calculateFee(polkadotJsBody.signerPayload) },
                 onRetryCancelled = {}
             )
         }
@@ -99,7 +102,7 @@ class DAppSignViewModel(
 
     fun detailsClicked() {
         launch {
-            val extrinsicContent = interactor.readableSignContent(payload.signerPayload)
+            val extrinsicContent = interactor.readableSignContent(polkadotJsBody.signerPayload)
 
             router.openExtrinsicDetails(extrinsicContent)
         }

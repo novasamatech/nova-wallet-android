@@ -2,8 +2,8 @@ package io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs
 
 import com.google.gson.Gson
 import io.novafoundation.nova.common.utils.inBackground
-import io.novafoundation.nova.feature_dapp_impl.web3.Web3Extension
 import io.novafoundation.nova.feature_dapp_impl.web3.Web3Responder
+import io.novafoundation.nova.feature_dapp_impl.web3.Web3Transport
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.InjectedAccount
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.InjectedMetadataKnown
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.SignerPayload
@@ -14,11 +14,11 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 
-sealed class PolkadotJsExtensionRequest<R>(
+sealed class PolkadotJsTransportRequest<R>(
     protected val web3Responder: Web3Responder,
     protected val identifier: Identifier,
     val url: String,
-) : Web3Extension.Request<R> {
+) : Web3Transport.Request<R> {
 
     override fun reject(error: Throwable) {
         web3Responder.respondError(identifier.id, error)
@@ -38,7 +38,7 @@ sealed class PolkadotJsExtensionRequest<R>(
         web3Responder: Web3Responder,
         url: String,
         identifier: Identifier
-    ) : PolkadotJsExtensionRequest<R>(web3Responder, identifier, url) {
+    ) : PolkadotJsTransportRequest<R>(web3Responder, identifier, url) {
 
         abstract fun serializeResponse(response: R): String
 
@@ -127,7 +127,7 @@ sealed class PolkadotJsExtensionRequest<R>(
         web3Responder: Web3Responder,
         url: String,
         identifier: Identifier
-    ) : PolkadotJsExtensionRequest<Flow<R>>(web3Responder, identifier, url) {
+    ) : PolkadotJsTransportRequest<Flow<R>>(web3Responder, identifier, url) {
 
         abstract fun serializeSubscriptionResponse(response: R): String
 
