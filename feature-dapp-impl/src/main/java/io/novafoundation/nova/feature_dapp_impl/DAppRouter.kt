@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_dapp_impl
 
+import io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites.AddToFavouritesPayload
+
 interface DAppRouter {
 
     fun openChangeAccount()
@@ -8,7 +10,11 @@ interface DAppRouter {
 
     fun openDappSearch()
 
+    fun openAddToFavourites(payload: AddToFavouritesPayload)
+
     fun openExtrinsicDetails(extrinsicContent: String)
+
+    fun openAuthorizedDApps()
 
     fun back()
 }

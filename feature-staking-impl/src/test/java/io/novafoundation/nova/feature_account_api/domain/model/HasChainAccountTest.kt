@@ -11,7 +11,7 @@ import org.mockito.Mockito.`when`
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
-class HashAccountTest {
+class HasChainAccountTest {
 
     @Mock
     lateinit var chain: Chain

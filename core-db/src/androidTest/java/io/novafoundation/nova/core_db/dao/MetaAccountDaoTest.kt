@@ -1,12 +1,9 @@
 package io.novafoundation.nova.core_db.dao
 
-import android.database.sqlite.SQLiteConstraintException
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.core_db.AppDatabase
-import io.novafoundation.nova.core_db.model.chain.ChainAccountLocal
-import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
 import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
@@ -19,9 +16,7 @@ private const val CHAIN_ID = "1"
 @RunWith(AndroidJUnit4::class)
 class MetaAccountDaoTest : DaoTest<MetaAccountDao>(AppDatabase::metaAccountDao) {
 
-    private val chainDao by lazy {
-        db.chainDao()
-    }
+    private val chainDao by dao<ChainDao>()
 
     @Before
     fun insertChain() = runBlocking {
@@ -53,7 +48,7 @@ class MetaAccountDaoTest : DaoTest<MetaAccountDao>(AppDatabase::metaAccountDao) 
 
             assertNotEquals(-1, metaId)
 
-            dao.insertChainAccount(chainAccount(metaId))
+            dao.insertChainAccount(testChainAccount(metaId, CHAIN_ID))
 
             val joinedMetaAccountInfo = dao.getJoinedMetaAccountInfo(metaId)
 
@@ -61,32 +56,20 @@ class MetaAccountDaoTest : DaoTest<MetaAccountDao>(AppDatabase::metaAccountDao) 
         }
     }
 
-    @Test(expected = SQLiteConstraintException::class)
-    fun shouldForbidInsertingSameChainAccounts() {
+    @Test
+    fun shouldReplaceChainAccounts() {
         runBlocking {
             val metaId = dao.insertMetaAccount(testMetaAccount())
 
-            dao.insertChainAccount(chainAccount(metaId))
-            dao.insertChainAccount(chainAccount(metaId))
+            val newAccountId = byteArrayOf(1)
+
+            dao.insertChainAccount(testChainAccount(metaId, CHAIN_ID, accountId = byteArrayOf(0)))
+            dao.insertChainAccount(testChainAccount(metaId, CHAIN_ID, accountId = newAccountId))
+
+            val chainAccounts = dao.getJoinedMetaAccountInfo(metaId).chainAccounts
+
+            assertEquals(1, chainAccounts.size)
+            assertArrayEquals(newAccountId, chainAccounts.single().accountId)
         }
     }
-
-    private fun testMetaAccount() = MetaAccountLocal(
-        substratePublicKey = byteArrayOf(),
-        substrateCryptoType = CryptoType.SR25519,
-        ethereumPublicKey = null,
-        name = "Test",
-        isSelected = false,
-        substrateAccountId = byteArrayOf(),
-        ethereumAddress = null,
-        position = 0
-    )
-
-    private fun chainAccount(metaId: Long) = ChainAccountLocal(
-        metaId = metaId,
-        chainId = CHAIN_ID,
-        publicKey = byteArrayOf(),
-        cryptoType = CryptoType.SR25519,
-        accountId = byteArrayOf()
-    )
 }

@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.headers.TextHeader
 import io.novafoundation.nova.common.list.resolvePayload
 import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.setImageResource
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.domain.search.DappSearchResult
@@ -18,6 +19,7 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.search.model.DappSe
 import kotlinx.android.synthetic.main.item_dapp.view.itemDAppIcon
 import kotlinx.android.synthetic.main.item_dapp.view.itemDAppSubtitle
 import kotlinx.android.synthetic.main.item_dapp.view.itemDAppTitle
+import kotlinx.android.synthetic.main.item_dapp.view.itemDappAction
 import kotlinx.android.synthetic.main.item_dapp_search_category.view.searchCategory
 
 class SearchDappAdapter(
@@ -110,8 +112,11 @@ private class SearchHolder(
 
     fun bind(item: DappSearchModel) = with(containerView) {
         itemDAppIcon.showDAppIcon(item.icon, imageLoader)
+
         bindTitle(item)
         itemDAppSubtitle.setTextOrHide(item.description)
+
+        itemDappAction.setImageResource(item.actionIcon)
 
         bindClick(item)
     }

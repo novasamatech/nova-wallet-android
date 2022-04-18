@@ -12,12 +12,16 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
+import io.novafoundation.nova.feature_dapp_impl.presentation.common.DappListAdapter
+import io.novafoundation.nova.feature_dapp_impl.presentation.common.DappModel
+import io.novafoundation.nova.feature_dapp_impl.presentation.common.favourites.setupRemoveFavouritesConfirmation
 import kotlinx.android.synthetic.main.fragment_dapp_main.dappMainCategorizedDapps
 import kotlinx.android.synthetic.main.fragment_dapp_main.dappMainContainer
 import kotlinx.android.synthetic.main.fragment_dapp_main.dappMainIcon
+import kotlinx.android.synthetic.main.fragment_dapp_main.dappMainManage
 import kotlinx.android.synthetic.main.fragment_dapp_main.dappMainSearch
 
-class MainDAppFragment : BaseFragment<MainDAppViewModel>() {
+class MainDAppFragment : BaseFragment<MainDAppViewModel>(), DappListAdapter.Handler {
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,12 +39,14 @@ class MainDAppFragment : BaseFragment<MainDAppViewModel>() {
         dappMainCategorizedDapps.setOnCategoryChangedListener {
             viewModel.categorySelected(it)
         }
-        dappMainCategorizedDapps.setOnDappClickedListener {
-            viewModel.dappClicked(it)
-        }
+        dappMainCategorizedDapps.setOnDappListEventsHandler(this)
 
         dappMainSearch.setOnClickListener {
             viewModel.searchClicked()
+        }
+
+        dappMainManage.setOnClickListener {
+            viewModel.manageClicked()
         }
     }
 
@@ -53,10 +59,11 @@ class MainDAppFragment : BaseFragment<MainDAppViewModel>() {
 
     override fun subscribe(viewModel: MainDAppViewModel) {
         observeBrowserEvents(viewModel)
+        setupRemoveFavouritesConfirmation(viewModel.removeFavouriteConfirmationAwaitable)
 
         viewModel.currentAddressIconFlow.observe(dappMainIcon::setImageDrawable)
 
-        viewModel.shownDappsFlow.observe { state ->
+        viewModel.shownDAppsStateFlow.observe { state ->
             when (state) {
                 is LoadingState.Loaded -> dappMainCategorizedDapps.showDapps(state.data)
                 is LoadingState.Loading -> dappMainCategorizedDapps.showDappsShimmering()
@@ -69,9 +76,13 @@ class MainDAppFragment : BaseFragment<MainDAppViewModel>() {
                 is LoadingState.Loading -> dappMainCategorizedDapps.showCategoriesShimmering()
             }
         }
+    }
 
-        viewModel.selectedCategoryPositionFlow.observe {
-            dappMainCategorizedDapps.setSelectedCategory(it)
-        }
+    override fun onItemClicked(item: DappModel) {
+        viewModel.dappClicked(item)
+    }
+
+    override fun onItemFavouriteClicked(item: DappModel) {
+        viewModel.dappFavouriteClicked(item)
     }
 }

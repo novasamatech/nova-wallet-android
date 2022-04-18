@@ -1,6 +1,6 @@
 package io.novafoundation.nova.runtime.multiNetwork.chain.remote.model
 
-class ChainAssetRemote(
+data class ChainAssetRemote(
     val assetId: Int,
     val symbol: String,
     val precision: Int,

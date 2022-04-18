@@ -1,5 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="dapp_list_placeholder">List of DApps will appear here</string>
+
+  <string name="dapp_authorized_remove_title">Remove from Authorized?</string>
+  <string name="dapp_authorized_remove_description">“%s” DApp will be removed from Authorized</string>
+
+  <string name="dapp_catalog">Catalog</string>
+
+  <string name="dapp_authorized_title">Authorized DApps</string>
+  <string name="dapp_authorized_description">DApps to which you allowed access to see your address when you use them</string>
+
+  <string name="common_title">Title</string>
+
+  <string name="common_save">Save</string>
+  <string name="dapp_favourites_add">Add to favorites</string>
+
+  <string name="dapp_favourites_remove_title">Remove from Favorites?</string>
+  <string name="dapp_favourites_remove_description">“%s” DApp will be removed from Favorites</string>
+
+  <string name="common_remove">Remove</string>
+  <string name="dapp_favourites">Favorites</string>
+
   <string name="common_zero_amount_error">Amount must be positive</string>
 
   <string name="dapp_phishing_title">Phishing detected</string>
@@ -479,8 +500,6 @@
     <item quantity="one">%d day left</item>
     <item quantity="other">%d days left</item>
   </plurals>
-  <string name="staking_pending_rewards_info">Validators payout the rewards every 2–5 days. However, you can payout them by yourself, especially if rewards are close to expiring, but you will pay the fee.</string>
-  <string name="staking_pending_rewards_info_v2_2_0">Rewards are paid every 2–3 days by validators. You can payout them by yourself, when they are close to expire, but you will pay the fee</string>
   <string name="staking_rebond">Return to stake</string>
   <string name="staking_rebond_insufficient_bondings">Amount you want to return to stake is greater than unstaking balance</string>
   <string name="staking_recommended_feature_1">Most profitable</string>

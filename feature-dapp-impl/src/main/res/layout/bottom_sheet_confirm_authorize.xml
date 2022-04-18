@@ -9,7 +9,7 @@
 
     <ImageView
         android:id="@+id/confirmAuthorizeNovaIcon"
-        style="@style/Widget.Nova.DappIcon.Confirm"
+        style="@style/Widget.Nova.DappIcon.Big"
         android:layout_marginTop="20dp"
         android:src="@drawable/ic_nova_wallet"
         app:layout_constraintEnd_toStartOf="@+id/confirmAuthorizeNovaArrow"
@@ -34,7 +34,7 @@
 
     <ImageView
         android:id="@+id/confirmAuthorizeDappIcon"
-        style="@style/Widget.Nova.DappIcon.Confirm"
+        style="@style/Widget.Nova.DappIcon.Big"
         android:layout_marginTop="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"

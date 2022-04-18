@@ -15,7 +15,9 @@ import android.view.ViewTreeObserver
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.LayoutRes
@@ -161,6 +163,14 @@ private fun Drawable.updateDimensions(
     setBounds(0, 0, widthInPx, heightInPx)
 }
 
+fun ImageView.setImageTintRes(@ColorRes tintRes: Int) {
+    imageTintList = ColorStateList.valueOf(context.getColor(tintRes))
+}
+
+fun ImageView.setImageTint(@ColorInt tint: Int) {
+    imageTintList = ColorStateList.valueOf(tint)
+}
+
 inline fun View.doOnGlobalLayout(crossinline action: () -> Unit) {
     viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
         override fun onGlobalLayout() {
@@ -181,6 +191,8 @@ fun View.hideSoftKeyboard() {
 }
 
 fun View.showSoftKeyboard() {
+    requestFocus()
+
     val inputMethodManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
     inputMethodManager.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
@@ -297,3 +309,11 @@ fun <T> ListAdapter<T, *>.submitListPreservingViewPoint(data: List<T>, into: Rec
         into.layoutManager!!.onRestoreInstanceState(recyclerViewState)
     }
 }
+
+fun ImageView.setImageResource(@DrawableRes imageRes: Int?) = if (imageRes == null) {
+    setImageDrawable(null)
+} else {
+    setImageResource(imageRes)
+}
+
+fun EditText.moveCursorToTheEnd() = setSelection(length())

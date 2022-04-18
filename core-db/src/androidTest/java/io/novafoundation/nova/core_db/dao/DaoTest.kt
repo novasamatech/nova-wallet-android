@@ -27,4 +27,10 @@ abstract class DaoTest<D : Any>(private val daoFetcher: (AppDatabase) -> D) {
     fun closeDb() {
         db.close()
     }
+
+    protected inline fun <reified T> dao(): Lazy<T> = lazy {
+        val method = db.javaClass.declaredMethods.first { it.returnType == T::class.java }
+
+        method.invoke(db) as T
+    }
 }

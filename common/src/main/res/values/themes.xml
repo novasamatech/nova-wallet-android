@@ -45,6 +45,8 @@
         <item name="editTextStyle">@style/Widget.Nova.Input.EditText</item>
 
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialog</item>
+
+        <item name="defaultTextInputStyle">@style/Widget.Nova.Input.Text</item>
     </style>
 
     <style name="WhiteOverlay" parent="ThemeOverlay.AppCompat">

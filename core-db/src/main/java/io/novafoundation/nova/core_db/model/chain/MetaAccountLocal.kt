@@ -51,12 +51,9 @@ class MetaAccountLocal(
 @Entity(
     tableName = "chain_accounts",
     foreignKeys = [
-        ForeignKey(
-            parentColumns = ["id"],
-            childColumns = ["chainId"],
-            entity = ChainLocal::class,
-            deferred = true
-        ),
+        // no foreign key for `chainId` since we do not want ChainAccounts to be deleted or modified when chain is deleted
+        // but rather keep it in db in case future UI will show them somehow
+
         ForeignKey(
             parentColumns = ["id"],
             childColumns = ["metaId"],

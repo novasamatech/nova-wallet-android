@@ -11,21 +11,20 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
-import io.novafoundation.nova.feature_dapp_api.data.model.DappCategory
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.DappListAdapter
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.DappModel
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.DappCategoriesAdapter
+import io.novafoundation.nova.feature_dapp_impl.presentation.main.model.DAppCategoryState
 import kotlinx.android.synthetic.main.view_categorized_dapps.view.categorizedDappsCategories
 import kotlinx.android.synthetic.main.view_categorized_dapps.view.categorizedDappsCategoriesShimmer
 import kotlinx.android.synthetic.main.view_categorized_dapps.view.categorizedDappsDappsShimmer
 import kotlinx.android.synthetic.main.view_categorized_dapps.view.categorizedDappsList
 import javax.inject.Inject
 
-typealias OnDappClickListener = (DappModel) -> Unit
-typealias OnCategoryClickListener = (position: Int) -> Unit
+typealias OnCategoryClickListener = (id: String) -> Unit
 
 class CategorizedDappsView @JvmOverloads constructor(
     context: Context,
@@ -40,7 +39,7 @@ class CategorizedDappsView @JvmOverloads constructor(
     private val dappListAdapter by lazy(LazyThreadSafetyMode.NONE) { DappListAdapter(this, imageLoader) }
     private val categoriesAdapter by lazy(LazyThreadSafetyMode.NONE) { DappCategoriesAdapter(this) }
 
-    private var onDappClickListener: OnDappClickListener? = null
+    private var dAppListEventHandler: DappListAdapter.Handler? = null
     private var onCategoryClickListener: OnCategoryClickListener? = null
 
     init {
@@ -59,25 +58,21 @@ class CategorizedDappsView @JvmOverloads constructor(
         clipToOutline = true // for round corners
     }
 
-    fun setSelectedCategory(position: Int) {
-        categoriesAdapter.setSelectedCategory(position)
-
-        scrollToCenter(position)
-    }
-
-    fun setOnCategoryChangedListener(listener: (position: Int) -> Unit) {
+    fun setOnCategoryChangedListener(listener: OnCategoryClickListener) {
         onCategoryClickListener = listener
     }
 
-    fun setOnDappClickedListener(listener: OnDappClickListener) {
-        onDappClickListener = listener
+    fun setOnDappListEventsHandler(handler: DappListAdapter.Handler) {
+        dAppListEventHandler = handler
     }
 
-    fun showCategories(categories: List<DappCategory>) {
+    fun showCategories(state: DAppCategoryState) {
         categorizedDappsCategoriesShimmer.makeGone()
         categorizedDappsCategories.makeVisible()
 
-        categoriesAdapter.submitList(categories)
+        categoriesAdapter.submitList(state.categories) {
+            state.selectedIndex?.let { scrollToCenter(it) }
+        }
     }
 
     fun showDapps(dapps: List<DappModel>) {
@@ -98,11 +93,15 @@ class CategorizedDappsView @JvmOverloads constructor(
     }
 
     override fun onItemClicked(item: DappModel) {
-        onDappClickListener?.invoke(item)
+        dAppListEventHandler?.onItemClicked(item)
     }
 
-    override fun onItemClicked(position: Int) {
-        onCategoryClickListener?.invoke(position)
+    override fun onItemFavouriteClicked(item: DappModel) {
+        dAppListEventHandler?.onItemFavouriteClicked(item)
+    }
+
+    override fun onItemClicked(id: String) {
+        onCategoryClickListener?.invoke(id)
     }
 
     private fun scrollToCenter(position: Int) {

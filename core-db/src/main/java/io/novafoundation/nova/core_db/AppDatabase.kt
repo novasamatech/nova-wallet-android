@@ -16,6 +16,7 @@ import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.dao.AssetDao
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.dao.DappAuthorizationDao
+import io.novafoundation.nova.core_db.dao.FavouriteDAppsDao
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.dao.NftDao
 import io.novafoundation.nova.core_db.dao.NodeDao
@@ -28,14 +29,19 @@ import io.novafoundation.nova.core_db.dao.TokenDao
 import io.novafoundation.nova.core_db.migrations.AddBuyProviders_7_8
 import io.novafoundation.nova.core_db.migrations.AddChainColor_4_5
 import io.novafoundation.nova.core_db.migrations.AddDAppAuthorizations_1_2
+import io.novafoundation.nova.core_db.migrations.AddFavouriteDApps_9_10
 import io.novafoundation.nova.core_db.migrations.AddNfts_5_6
 import io.novafoundation.nova.core_db.migrations.AddSitePhishing_6_7
 import io.novafoundation.nova.core_db.migrations.AssetTypes_2_3
+import io.novafoundation.nova.core_db.migrations.BetterChainDiffing_8_9
 import io.novafoundation.nova.core_db.migrations.ChangeAsset_3_4
+import io.novafoundation.nova.core_db.migrations.ChangeDAppAuthorization_10_11
+import io.novafoundation.nova.core_db.migrations.RemoveChainForeignKeyFromChainAccount_11_12
 import io.novafoundation.nova.core_db.model.AccountLocal
 import io.novafoundation.nova.core_db.model.AccountStakingLocal
 import io.novafoundation.nova.core_db.model.AssetLocal
 import io.novafoundation.nova.core_db.model.DappAuthorizationLocal
+import io.novafoundation.nova.core_db.model.FavouriteDAppLocal
 import io.novafoundation.nova.core_db.model.NftLocal
 import io.novafoundation.nova.core_db.model.NodeLocal
 import io.novafoundation.nova.core_db.model.OperationLocal
@@ -53,7 +59,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
 import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
 
 @Database(
-    version = 8,
+    version = 12,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -76,7 +82,9 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
         DappAuthorizationLocal::class,
         NftLocal::class,
 
-        PhishingSiteLocal::class
+        PhishingSiteLocal::class,
+
+        FavouriteDAppLocal::class
     ],
 )
 @TypeConverters(
@@ -104,7 +112,8 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java, "app.db"
                 )
                     .addMigrations(AddDAppAuthorizations_1_2, AssetTypes_2_3, ChangeAsset_3_4)
-                    .addMigrations(AddChainColor_4_5, AddNfts_5_6, AddSitePhishing_6_7, AddBuyProviders_7_8)
+                    .addMigrations(AddChainColor_4_5, AddNfts_5_6, AddSitePhishing_6_7, AddBuyProviders_7_8, BetterChainDiffing_8_9)
+                    .addMigrations(AddFavouriteDApps_9_10, ChangeDAppAuthorization_10_11, RemoveChainForeignKeyFromChainAccount_11_12)
                     .fallbackToDestructiveMigration()
                     .build()
             }
@@ -139,4 +148,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun nftDao(): NftDao
 
     abstract fun phishingSitesDao(): PhishingSitesDao
+
+    abstract fun favouriteDAppsDao(): FavouriteDAppsDao
 }

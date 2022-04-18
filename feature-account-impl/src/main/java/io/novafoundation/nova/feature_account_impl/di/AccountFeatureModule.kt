@@ -264,7 +264,10 @@ class AccountFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideWalletUiUseCase(accountRepository: AccountRepository): WalletUiUseCase {
-        return WalletUiUseCaseImpl(accountRepository)
+    fun provideWalletUiUseCase(
+        accountRepository: AccountRepository,
+        addressIconGenerator: AddressIconGenerator
+    ): WalletUiUseCase {
+        return WalletUiUseCaseImpl(accountRepository, addressIconGenerator)
     }
 }

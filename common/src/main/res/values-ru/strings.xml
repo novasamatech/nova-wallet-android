@@ -148,8 +148,10 @@
   <string name="common_price">Цена</string>
   <string name="common_proceed">Продолжить</string>
   <string name="common_reject">Отклонить</string>
+  <string name="common_remove">Удалить</string>
   <string name="common_reset">Сброс</string>
   <string name="common_retry">Повторить</string>
+  <string name="common_save">Сохранить</string>
   <string name="common_search">Поиск</string>
   <string name="common_search_results_number">Результаты поиска: %d</string>
   <string name="common_secret_derivation_path">Последовательность для вывода</string>
@@ -158,6 +160,7 @@
   <string name="common_skip_process">Пропустить</string>
   <string name="common_status">Статус</string>
   <string name="common_time_left">Оставшееся время</string>
+  <string name="common_title">Заголовок</string>
   <string name="common_transaction_id">ID транзакции</string>
   <string name="common_transaction_submitted">Транзакция отправлена</string>
   <string name="common_type">Тип</string>
@@ -169,6 +172,7 @@
   <string name="common_validation_invalid_address_message">Получатель должен быть допустимым адресом %s</string>
   <string name="common_validation_invalid_address_title">Недопустимый получатель</string>
   <string name="common_warning">Предупреждение</string>
+  <string name="common_zero_amount_error">Сумма должна быть больше нуля</string>
   <string name="connection_add_already_exists_error">Узел уже был добавлен ранее. Пожалуйста, попробуйте другой узел.</string>
   <string name="connection_add_invalid_error">Не удается установить соединение с узлом. Пожалуйста, попробуйте другой узел.</string>
   <string name="connection_add_unsupported_error">К сожалению, сеть не поддерживается. Пожалуйста, попробуйте одну из следующих: %s.</string>
@@ -234,12 +238,22 @@
   <string name="crowdloan_unlock_hint">Ваши %s токены будут возвращены обратно после срока лизинга парачейна.</string>
   <string name="crowdloan_your_contributions">Ваш вклад</string>
   <string name="crownloans_raised_format" formatted="false">Собрано: %s из %s</string>
+  <string name="dapp_authorized_description">DApps, к которым вы разрешили доступ, видят ваш адрес, когда вы их используете</string>
+  <string name="dapp_authorized_remove_description">”%s” DApp будет удален из Авторизованных</string>
+  <string name="dapp_authorized_remove_title">Удалить из Авторизованных?</string>
+  <string name="dapp_authorized_title">Авторизованные DApps</string>
   <string name="dapp_browser_close_warning_message">Вы уверены, что хотите закрыть этот экран?\nВсе изменения не будут применены.</string>
+  <string name="dapp_catalog">Каталог</string>
   <string name="dapp_confirm_authorize_subtitle">Одобрите этот запрос, если вы доверяете приложению</string>
   <string name="dapp_confirm_authorize_title_format">Разрешить “%s” доступ к адресам вашего кошелька?</string>
   <string name="dapp_confirm_sign_extrinsic_subtitle">Одобрите этот запрос, если вы доверяете приложению.\nПроверьте детали транзакции.</string>
   <string name="dapp_dapp">DApp</string>
   <string name="dapp_dapps">DApps</string>
+  <string name="dapp_favourites">Избранное</string>
+  <string name="dapp_favourites_add">Добавить в избранное</string>
+  <string name="dapp_favourites_remove_description">”%s” DApp будет удален из Избранного</string>
+  <string name="dapp_favourites_remove_title">Удалить из Избранного?</string>
+  <string name="dapp_list_placeholder">Список DApps появится здесь</string>
   <string name="dapp_main_welcome_subtitle">Подключайтесь к приложениям\nэкосистемы Полькадот &amp; Кусама,\nиспользуя аккаунты из Nova Wallet</string>
   <string name="dapp_main_welcome_title">Добро пожаловать\nна портал приложений</string>
   <string name="dapp_phishing_go_back">Хорошо, уходим отсюда</string>
@@ -543,7 +557,6 @@
   <string name="staking_your_stake">Ваш стейк</string>
   <string name="staking_your_validators">Ваши валидаторы</string>
   <string name="staking_your_validators_changing_title">Ваши валидаторы поменяются в следующую эру</string>
-  <string name="common_zero_amount_error">Сумма должна быть больше нуля</string>
   <string name="tabbar_staking_title">Стейкинг</string>
   <string name="tabbar_wallet_title">Кошелёк</string>
   <string name="today">Сегодня</string>
