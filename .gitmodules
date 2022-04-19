@@ -1,3 +1,6 @@
 [submodule "nova-wallet-dapp-js"]
 	path = nova-wallet-dapp-js
 	url = git@github.com:nova-wallet/nova-wallet-dapp-js.git
+[submodule "nova-wallet-metamask-js"]
+	path = nova-wallet-metamask-js
+	url = git@github.com:nova-wallet/nova-wallet-metamask-js.git

@@ -1,10 +1,11 @@
-package io.novafoundation.nova.feature_dapp_impl.web3.webview
+package io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs
 
 import android.util.Log
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.feature_dapp_impl.web3.Web3Responder
+import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewHolder
 
-class WebViewWeb3Responder(
+class PolkadotJsResponder(
     private val webViewHolder: WebViewHolder
 ) : Web3Responder {
 
