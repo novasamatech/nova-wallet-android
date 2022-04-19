@@ -4,8 +4,8 @@ import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskChai
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.transport.MetamaskTransportRequest
 import io.novafoundation.nova.feature_dapp_impl.web3.states.PhishingDetectedState
 
-class PhishingDetectedMetamaskState(override val chain: MetamaskChain)
-    : PhishingDetectedState<MetamaskTransportRequest<*>, MetamaskState>(), MetamaskState {
+class PhishingDetectedMetamaskState(override val chain: MetamaskChain) :
+    PhishingDetectedState<MetamaskTransportRequest<*>, MetamaskState>(), MetamaskState {
 
     override val selectedAccountAddress: String? = null
 }

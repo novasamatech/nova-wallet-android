@@ -42,12 +42,12 @@ class MetamaskInjector(
         val providerConfigJson = gson.toJson(providerConfig)
 
         val content = """
-                window.ethereum = new novawallet.Provider(${providerConfigJson});
+                window.ethereum = new novawallet.Provider($providerConfigJson);
                 window.web3 = new novawallet.Web3(window.ethereum);
                 novawallet.postMessage = (jsonString) => {
                         Nova_Metamask.onNewMessage(JSON.stringify(jsonString))
                 };
-            """.trimIndent()
+        """.trimIndent()
 
         webViewScriptInjector.injectScript(content, into)
     }

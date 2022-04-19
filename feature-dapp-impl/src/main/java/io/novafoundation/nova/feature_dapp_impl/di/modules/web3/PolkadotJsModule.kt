@@ -29,7 +29,6 @@ class PolkadotJsModule {
     @FeatureScope
     fun provideWeb3JavaScriptInterface() = WebViewWeb3JavaScriptInterface()
 
-
     @Provides
     @FeatureScope
     fun providePolkadotJsInjector(
@@ -82,5 +81,4 @@ class PolkadotJsModule {
             web3Session = web3Session,
         )
     }
-
 }

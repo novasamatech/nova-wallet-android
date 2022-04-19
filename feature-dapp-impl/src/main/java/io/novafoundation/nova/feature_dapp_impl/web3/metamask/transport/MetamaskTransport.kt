@@ -46,7 +46,7 @@ class MetamaskTransport(
     override suspend fun messageToRequest(message: String): MetamaskTransportRequest<*>? = runCatching {
         val request = gson.fromJson<MetamaskRequest>(message)
 
-        when(request.identifier) {
+        when (request.identifier) {
             MetamaskTransportRequest.Identifier.REQUEST_ACCOUNTS.id -> {
                 MetamaskTransportRequest.RequestAccounts(request.id, gson, responder)
             }
@@ -62,7 +62,6 @@ class MetamaskTransport(
             }
             else -> null
         }
-
     }
         .onFailure { Log.e(LOG_TAG, "Failed to parse dApp message: $message", it) }
         .getOrNull()

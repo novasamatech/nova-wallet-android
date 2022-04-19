@@ -14,7 +14,7 @@ class MetamaskStateFactory(
     private val resourceManager: ResourceManager,
     private val addressIconGenerator: AddressIconGenerator,
     private val web3Session: Web3Session,
-){
+) {
 
     fun default(
         hostApi: Web3StateMachineHost,

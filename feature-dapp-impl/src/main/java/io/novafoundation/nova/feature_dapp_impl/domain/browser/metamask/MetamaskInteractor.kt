@@ -13,7 +13,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 
-
 class MetamaskInteractor(
     private val accountRepository: AccountRepository,
     private val chainRegistry: ChainRegistry

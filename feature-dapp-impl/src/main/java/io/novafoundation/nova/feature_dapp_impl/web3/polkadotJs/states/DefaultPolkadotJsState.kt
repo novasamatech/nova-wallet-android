@@ -26,12 +26,13 @@ class DefaultPolkadotJsState(
     web3Session: Web3Session,
     hostApi: Web3StateMachineHost,
 ) : BaseState<PolkadotJsTransportRequest<*>, PolkadotJsState>(
-    commonInteractor = commonInteractor,
-    resourceManager = resourceManager,
-    addressIconGenerator = addressIconGenerator,
-    web3Session = web3Session,
-    hostApi = hostApi
-), PolkadotJsState {
+        commonInteractor = commonInteractor,
+        resourceManager = resourceManager,
+        addressIconGenerator = addressIconGenerator,
+        web3Session = web3Session,
+        hostApi = hostApi
+    ),
+    PolkadotJsState {
 
     override suspend fun acceptRequest(request: PolkadotJsTransportRequest<*>, transition: StateMachineTransition<PolkadotJsState>) {
         when (request) {

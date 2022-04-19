@@ -33,7 +33,6 @@ class Web3Module {
         resourceManager: ResourceManager,
     ) = WebViewScriptInjector(resourceManager)
 
-
     @Provides
     @FeatureScope
     fun provideWeb3ClientFactory(

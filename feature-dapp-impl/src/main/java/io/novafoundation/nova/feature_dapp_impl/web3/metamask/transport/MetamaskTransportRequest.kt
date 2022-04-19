@@ -16,7 +16,7 @@ sealed class MetamaskTransportRequest<R>(
             "Metamask transport allows only instances of MetamaskError as errors"
         }
 
-       responder.respondError(id, error)
+        responder.respondError(id, error)
     }
 
     override fun accept(response: R) {
@@ -44,12 +44,12 @@ sealed class MetamaskTransportRequest<R>(
         gson: Gson,
         responder: MetamaskResponder,
         val chain: MetamaskChain,
-    ): MetamaskTransportRequest<Unit>(id, gson, responder)
+    ) : MetamaskTransportRequest<Unit>(id, gson, responder)
 
     class SwitchEthereumChain(
         id: String,
         gson: Gson,
         responder: MetamaskResponder,
         val chainId: String
-    ): MetamaskTransportRequest<Unit>(id, gson, responder)
+    ) : MetamaskTransportRequest<Unit>(id, gson, responder)
 }

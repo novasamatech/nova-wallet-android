@@ -11,25 +11,25 @@ sealed class MetamaskError(val errorCode: Int, message: String) : Throwable(mess
 
     class NoAccounts : MetamaskError(0, "No Ethereum accounts found in selected wallet")
 
-    class SwitchChainNotFound(chainId: ChainId):  MetamaskError(4902, "Chain $chainId not found")
+    class SwitchChainNotFound(chainId: ChainId) : MetamaskError(4902, "Chain $chainId not found")
 }
 
 class MetamaskResponder(private val webViewHolder: WebViewHolder) {
 
     fun respondResult(messageId: String, result: String) {
-        val js = "window.ethereum.sendResponse(${messageId}, ${result});"
+        val js = "window.ethereum.sendResponse($messageId, $result);"
 
         evaluateJs(js)
     }
 
     fun respondNullResult(message: String) {
-        val js = "window.ethereum.sendNullResponse(${message})"
+        val js = "window.ethereum.sendNullResponse($message)"
 
         evaluateJs(js)
     }
 
     fun respondError(messageId: String, error: MetamaskError) {
-        val js = "window.ethereum.sendRpcError(${messageId}, ${error.errorCode}, \"${error.message}\")"
+        val js = "window.ethereum.sendRpcError($messageId, ${error.errorCode}, \"${error.message}\")"
 
         evaluateJs(js)
     }
