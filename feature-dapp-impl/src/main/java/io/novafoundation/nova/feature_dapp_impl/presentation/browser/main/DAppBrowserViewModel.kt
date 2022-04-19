@@ -105,6 +105,10 @@ class DAppBrowserViewModel(
         }
     }
 
+    override fun reloadPage() {
+        _browserNavigationCommandEvent.value = BrowserNavigationCommand.Reload.event()
+    }
+
     fun onPageChanged(url: String, title: String?) {
         updateCurrentPage(url, title, synchronizedWithBrowser = true)
     }

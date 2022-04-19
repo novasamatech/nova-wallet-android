@@ -49,12 +49,11 @@ sealed class PolkadotJsTransportRequest<R>(
         class AuthorizeTab(
             web3Responder: Web3Responder,
             url: String
-        ) : Single<AuthorizeTab.Response>(web3Responder, url, Identifier.AUTHORIZE_TAB) {
+        ) : Single<Boolean>(web3Responder, url, Identifier.AUTHORIZE_TAB) {
 
-            class Response(val authorized: Boolean)
-
-            override fun serializeResponse(response: Response): String {
-                return response.authorized.toString()
+            @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
+            override fun serializeResponse(authorized: Boolean): String {
+                return authorized.toString()
             }
         }
 

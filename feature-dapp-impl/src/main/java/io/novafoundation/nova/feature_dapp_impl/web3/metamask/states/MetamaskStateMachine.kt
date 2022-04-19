@@ -9,4 +9,6 @@ typealias MetamaskStateMachine = Web3ExtensionStateMachine<MetamaskState>
 interface MetamaskState : Web3ExtensionStateMachine.State<MetamaskTransportRequest<*>, MetamaskState> {
 
     val chain: MetamaskChain
+
+    val selectedAccountAddress: String?
 }

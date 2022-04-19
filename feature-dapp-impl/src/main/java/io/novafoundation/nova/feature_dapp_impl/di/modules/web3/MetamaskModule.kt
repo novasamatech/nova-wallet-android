@@ -3,18 +3,23 @@ package io.novafoundation.nova.feature_dapp_impl.di.modules.web3
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_dapp_impl.BuildConfig
+import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.metamask.MetamaskInteractor
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.di.Metamask
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.states.MetamaskStateFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.transport.MetamaskInjector
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.transport.MetamaskResponder
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.transport.MetamaskTransportFactory
-import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.di.PolkadotJs
+import io.novafoundation.nova.feature_dapp_impl.web3.session.Web3Session
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewHolder
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewScriptInjector
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewWeb3JavaScriptInterface
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module
 class MetamaskModule {
@@ -46,24 +51,39 @@ class MetamaskModule {
     @Provides
     @FeatureScope
     fun provideTransportFactory(
-        web3Responder: MetamaskResponder,
-        @PolkadotJs web3JavaScriptInterface: WebViewWeb3JavaScriptInterface,
+        responder: MetamaskResponder,
+        @Metamask web3JavaScriptInterface: WebViewWeb3JavaScriptInterface,
         gson: Gson
     ): MetamaskTransportFactory {
         return MetamaskTransportFactory(
             webViewWeb3JavaScriptInterface = web3JavaScriptInterface,
             gson = gson,
-            web3Responder = web3Responder,
+            responder = responder,
         )
     }
 
     @Provides
     @FeatureScope
-    fun provideInteractor() = MetamaskInteractor()
+    fun provideInteractor(
+        accountRepository: AccountRepository,
+        chainRegistry: ChainRegistry
+    ) = MetamaskInteractor(accountRepository, chainRegistry)
 
     @Provides
     @FeatureScope
-    fun provideStateFactory(): MetamaskStateFactory {
-        return MetamaskStateFactory()
+    fun provideStateFactory(
+        interactor: MetamaskInteractor,
+        commonInteractor: DappInteractor,
+        resourceManager: ResourceManager,
+        addressIconGenerator: AddressIconGenerator,
+        web3Session: Web3Session,
+    ): MetamaskStateFactory {
+        return MetamaskStateFactory(
+            interactor = interactor,
+            commonInteractor = commonInteractor,
+            resourceManager = resourceManager,
+            addressIconGenerator = addressIconGenerator,
+            web3Session = web3Session
+        )
     }
 }

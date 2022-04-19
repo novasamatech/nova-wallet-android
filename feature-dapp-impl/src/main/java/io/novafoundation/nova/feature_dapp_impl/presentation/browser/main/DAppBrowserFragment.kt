@@ -129,6 +129,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
             when (it) {
                 BrowserNavigationCommand.GoBack -> backClicked()
                 is BrowserNavigationCommand.OpenUrl -> dappBrowserWebView.loadUrl(it.url)
+                BrowserNavigationCommand.Reload -> dappBrowserWebView.reload()
             }
         }
 

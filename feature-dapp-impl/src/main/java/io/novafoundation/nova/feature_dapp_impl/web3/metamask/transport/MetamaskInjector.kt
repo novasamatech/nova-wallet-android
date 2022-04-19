@@ -14,6 +14,7 @@ private class ProviderConfig(
     val chainId: String,
     val rpcUrl: String?,
     val isDebug: Boolean,
+    val address: String?
 )
 
 class MetamaskInjector(
@@ -33,10 +34,11 @@ class MetamaskInjector(
     }
 
     private fun injectProvider(extensionStore: ExtensionsStore, into: WebView) {
-        val chain = extensionStore.metamask.state.value.chain
+        val state = extensionStore.metamask.state.value
+        val chain = state.chain
 
         val rpcUrl = chain.rpcUrls.firstOrNull()
-        val providerConfig = ProviderConfig(chain.chainId, rpcUrl, isDebug)
+        val providerConfig = ProviderConfig(chain.chainId, rpcUrl, isDebug, state.selectedAccountAddress)
         val providerConfigJson = gson.toJson(providerConfig)
 
         val content = """
