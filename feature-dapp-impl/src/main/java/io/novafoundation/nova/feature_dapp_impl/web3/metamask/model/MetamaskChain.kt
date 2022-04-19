@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_dapp_impl.web3.metamask.model
 
-class MetamaskChain(
+data class MetamaskChain(
     val chainId: String,
     val chainName: String,
     val nativeCurrency: NativeCurrency,

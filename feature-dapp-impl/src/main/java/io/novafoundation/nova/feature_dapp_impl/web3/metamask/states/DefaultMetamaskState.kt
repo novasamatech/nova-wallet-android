@@ -33,12 +33,44 @@ class DefaultMetamaskState(
     hostApi = hostApi
 ), MetamaskState {
 
+    private val knownChains = mapOf(MetamaskChain.ETHEREUM.chainId to MetamaskChain.ETHEREUM)
+
     override suspend fun acceptRequest(request: MetamaskTransportRequest<*>, transition: StateMachineTransition<MetamaskState>) {
         when (request) {
             is MetamaskTransportRequest.RequestAccounts -> handleRequestAccounts(request, transition)
             is MetamaskTransportRequest.AddEthereumChain -> handleAddEthereumChain(request, transition)
+            is MetamaskTransportRequest.SwitchEthereumChain -> handleSwitchEthereumChain(request, transition)
         }
     }
+
+    private suspend fun handleSwitchEthereumChain(
+        request: MetamaskTransportRequest.SwitchEthereumChain,
+        transition: StateMachineTransition<MetamaskState>
+    ) = respondIfAllowed(
+        ifAllowed = {
+            // already on this chain
+            if (request.chainId == chain.chainId) {
+                request.accept()
+                return@respondIfAllowed
+            }
+
+            val knownChain = knownChains[request.chainId]
+
+            if (knownChain != null) {
+                val nextState = stateFactory.default(hostApi, knownChain, selectedAccountAddress)
+                transition.emitState(nextState)
+
+                request.accept()
+
+                hostApi.reloadPage()
+            } else {
+                request.reject(MetamaskError.SwitchChainNotFound(request.chainId))
+            }
+        },
+        ifDenied = {
+            request.reject(MetamaskError.Rejected())
+        }
+    )
 
     override suspend fun acceptEvent(event: ExternalEvent, transition: StateMachineTransition<MetamaskState>) {
         when (event) {

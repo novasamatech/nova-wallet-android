@@ -9,7 +9,6 @@ sealed class MetamaskTransportRequest<R>(
     val id: String,
     private val gson: Gson,
     protected val responder: MetamaskResponder,
-    protected val identifier: Identifier,
 ) : Web3Transport.Request<R> {
 
     override fun reject(error: Throwable) {
@@ -30,19 +29,27 @@ sealed class MetamaskTransportRequest<R>(
 
     enum class Identifier(val id: String) {
         REQUEST_ACCOUNTS("requestAccounts"),
-        ADD_ETHEREUM_CHAIN("addEthereumChain")
+        ADD_ETHEREUM_CHAIN("addEthereumChain"),
+        SWITCH_ETHEREUM_CHAIN("switchEthereumChain")
     }
 
     class RequestAccounts(
         id: String,
         gson: Gson,
         responder: MetamaskResponder
-    ) : MetamaskTransportRequest<List<EthereumAddress>>(id, gson, responder, Identifier.REQUEST_ACCOUNTS)
+    ) : MetamaskTransportRequest<List<EthereumAddress>>(id, gson, responder)
 
     class AddEthereumChain(
         id: String,
         gson: Gson,
         responder: MetamaskResponder,
         val chain: MetamaskChain,
-    ): MetamaskTransportRequest<Unit>(id, gson, responder, Identifier.REQUEST_ACCOUNTS)
+    ): MetamaskTransportRequest<Unit>(id, gson, responder)
+
+    class SwitchEthereumChain(
+        id: String,
+        gson: Gson,
+        responder: MetamaskResponder,
+        val chainId: String
+    ): MetamaskTransportRequest<Unit>(id, gson, responder)
 }

@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.fromJson
 import io.novafoundation.nova.common.utils.fromParsedHierarchy
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskChain
+import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.SwitchChainRequest
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewWeb3JavaScriptInterface
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewWeb3Transport
 import kotlinx.coroutines.CoroutineScope
@@ -53,6 +54,11 @@ class MetamaskTransport(
                 val chain = gson.fromParsedHierarchy<MetamaskChain>(request.payload)
 
                 MetamaskTransportRequest.AddEthereumChain(request.id, gson, responder, chain)
+            }
+            MetamaskTransportRequest.Identifier.SWITCH_ETHEREUM_CHAIN.id -> {
+                val switchChainRequest = gson.fromParsedHierarchy<SwitchChainRequest>(request.payload)
+
+                MetamaskTransportRequest.SwitchEthereumChain(request.id, gson, responder, switchChainRequest.chainId)
             }
             else -> null
         }
