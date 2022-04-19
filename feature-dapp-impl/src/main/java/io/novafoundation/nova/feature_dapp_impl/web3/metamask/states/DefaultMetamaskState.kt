@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.metamask.MetamaskInteractor
+import io.novafoundation.nova.feature_dapp_impl.web3.accept
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskChain
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.transport.MetamaskError
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.transport.MetamaskTransportRequest
@@ -35,6 +36,7 @@ class DefaultMetamaskState(
     override suspend fun acceptRequest(request: MetamaskTransportRequest<*>, transition: StateMachineTransition<MetamaskState>) {
         when (request) {
             is MetamaskTransportRequest.RequestAccounts -> handleRequestAccounts(request, transition)
+            is MetamaskTransportRequest.AddEthereumChain -> handleAddEthereumChain(request, transition)
         }
     }
 
@@ -43,6 +45,27 @@ class DefaultMetamaskState(
             ExternalEvent.PhishingDetected -> transition.emitState(PhishingDetectedMetamaskState(chain))
         }
     }
+
+    private suspend fun handleAddEthereumChain(
+        request: MetamaskTransportRequest.AddEthereumChain,
+        transition: StateMachineTransition<MetamaskState>,
+    ) = respondIfAllowed(
+        ifAllowed = {
+            if (chain.chainId == request.chain.chainId) {
+                request.accept()
+            } else {
+                val nextState = stateFactory.default(hostApi, request.chain, selectedAccountAddress)
+                transition.emitState(nextState)
+
+                request.accept()
+
+                hostApi.reloadPage()
+            }
+        },
+        ifDenied = {
+            request.reject(MetamaskError.Rejected())
+        }
+    )
 
     private suspend fun handleRequestAccounts(
         request: MetamaskTransportRequest.RequestAccounts,
@@ -69,7 +92,7 @@ class DefaultMetamaskState(
                 hostApi.reloadPage()
             }
         } else {
-            request.reject(MetamaskError.AccountsRejected())
+            request.reject(MetamaskError.Rejected())
         }
     }
 }

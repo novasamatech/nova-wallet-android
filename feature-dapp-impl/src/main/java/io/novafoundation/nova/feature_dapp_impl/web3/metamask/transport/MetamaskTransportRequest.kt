@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_dapp_impl.web3.metamask.transport
 import com.google.gson.Gson
 import io.novafoundation.nova.feature_dapp_impl.web3.Web3Transport
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.EthereumAddress
+import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskChain
 
 sealed class MetamaskTransportRequest<R>(
     val id: String,
@@ -20,11 +21,16 @@ sealed class MetamaskTransportRequest<R>(
     }
 
     override fun accept(response: R) {
-        responder.respondResult(id, gson.toJson(response))
+        if (response is Unit) {
+            responder.respondNullResult(id)
+        } else {
+            responder.respondResult(id, gson.toJson(response))
+        }
     }
 
     enum class Identifier(val id: String) {
-        REQUEST_ACCOUNTS("requestAccounts")
+        REQUEST_ACCOUNTS("requestAccounts"),
+        ADD_ETHEREUM_CHAIN("addEthereumChain")
     }
 
     class RequestAccounts(
@@ -32,4 +38,11 @@ sealed class MetamaskTransportRequest<R>(
         gson: Gson,
         responder: MetamaskResponder
     ) : MetamaskTransportRequest<List<EthereumAddress>>(id, gson, responder, Identifier.REQUEST_ACCOUNTS)
+
+    class AddEthereumChain(
+        id: String,
+        gson: Gson,
+        responder: MetamaskResponder,
+        val chain: MetamaskChain,
+    ): MetamaskTransportRequest<Unit>(id, gson, responder, Identifier.REQUEST_ACCOUNTS)
 }

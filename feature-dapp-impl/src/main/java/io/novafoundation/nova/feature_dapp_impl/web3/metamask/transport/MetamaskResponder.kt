@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewHolder
 
 sealed class MetamaskError(val errorCode: Int, message: String) : Throwable(message) {
 
-    class AccountsRejected : MetamaskError(4001, "Account access rejected")
+    class Rejected : MetamaskError(4001, "Access rejected")
 
     class NoAccounts : MetamaskError(0, "No Ethereum accounts found in selected wallet")
 }
@@ -15,6 +15,12 @@ class MetamaskResponder(private val webViewHolder: WebViewHolder) {
 
     fun respondResult(messageId: String, result: String) {
         val js = "window.ethereum.sendResponse(${messageId}, ${result});"
+
+        evaluateJs(js)
+    }
+
+    fun respondNullResult(message: String) {
+        val js = "window.ethereum.sendNullResponse(${message})"
 
         evaluateJs(js)
     }

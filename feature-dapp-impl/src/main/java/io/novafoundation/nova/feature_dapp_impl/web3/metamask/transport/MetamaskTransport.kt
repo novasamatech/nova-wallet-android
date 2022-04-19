@@ -1,8 +1,12 @@
 package io.novafoundation.nova.feature_dapp_impl.web3.metamask.transport
 
+import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
+import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.fromJson
+import io.novafoundation.nova.common.utils.fromParsedHierarchy
+import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskChain
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewWeb3JavaScriptInterface
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewWeb3Transport
 import kotlinx.coroutines.CoroutineScope
@@ -45,8 +49,15 @@ class MetamaskTransport(
             MetamaskTransportRequest.Identifier.REQUEST_ACCOUNTS.id -> {
                 MetamaskTransportRequest.RequestAccounts(request.id, gson, responder)
             }
+            MetamaskTransportRequest.Identifier.ADD_ETHEREUM_CHAIN.id -> {
+                val chain = gson.fromParsedHierarchy<MetamaskChain>(request.payload)
+
+                MetamaskTransportRequest.AddEthereumChain(request.id, gson, responder, chain)
+            }
             else -> null
         }
 
-    }.getOrNull()
+    }
+        .onFailure { Log.e(LOG_TAG, "Failed to parse dApp message: $message", it) }
+        .getOrNull()
 }
