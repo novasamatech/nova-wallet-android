@@ -163,11 +163,6 @@ class BalancesIntegrationTest(
                     "0x54191c48bef94a4b91384c52dc9c4e4e56c176c954ec841dc9d29cd2a4ffe76b"
                 ),
                 arrayOf(
-                    "f195ef30c646663a24a3164b307521174a86f437c586397a43183c736a8383c1",
-                    "Integritee Soloсhain",
-                    "0x03bd97c3a34229dbdd4fc3b3a8c0647e9369c5c44555f252f2307d5efe7f4abd"
-                ),
-                arrayOf(
                     "b3db41421702df9a7fcac62b53ffeac85f7853cc4e689e0b93aeb3db18c09d82",
                     "Centrifuge Parachain",
                     "0xb03cd3fb823de75f888ac647105d7820476a6b1943a74af840996d2b28e64017"
