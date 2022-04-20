@@ -4,6 +4,7 @@ import android.util.Base64
 import android.webkit.WebView
 import androidx.annotation.RawRes
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.postToSelf
 
 private const val JAVASCRIPT_INTERFACE_PREFIX = "Nova"
 
@@ -72,7 +73,7 @@ class WebViewScriptInjector(
             }
              })();
         """.trimIndent()
-        into.evaluateJavascript(wrappedScript, null)
+        into.postToSelf { evaluateJavascript(wrappedScript, null) }
     }
 
     private val InjectionPosition.addMethodName
