@@ -13,3 +13,5 @@ interface Web3Transport<REQUEST : Web3Transport.Request<*>> {
         fun reject(error: Throwable)
     }
 }
+
+fun Web3Transport.Request<Unit>.accept() = accept(Unit)

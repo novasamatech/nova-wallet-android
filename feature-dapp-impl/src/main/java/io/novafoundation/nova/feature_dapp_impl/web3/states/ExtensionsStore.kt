@@ -1,6 +1,10 @@
 package io.novafoundation.nova.feature_dapp_impl.web3.states
 
 import io.novafoundation.nova.feature_dapp_impl.web3.Web3Transport
+import io.novafoundation.nova.feature_dapp_impl.web3.metamask.states.MetamaskStateFactory
+import io.novafoundation.nova.feature_dapp_impl.web3.metamask.states.MetamaskStateMachine
+import io.novafoundation.nova.feature_dapp_impl.web3.metamask.transport.MetamaskTransport
+import io.novafoundation.nova.feature_dapp_impl.web3.metamask.transport.MetamaskTransportFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsTransport
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsTransportFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.states.PolkadotJsStateFactory
@@ -15,11 +19,16 @@ import kotlinx.coroutines.flow.onEach
 interface ExtensionsStore {
 
     val polkadotJs: PolkadotJsStateMachine
+
+    val metamask: MetamaskStateMachine
 }
 
 class ExtensionStoreFactory(
     private val polkadotJsStateFactory: PolkadotJsStateFactory,
     private val polkadotJsTransportFactory: PolkadotJsTransportFactory,
+
+    private val metamaskStateFactory: MetamaskStateFactory,
+    private val metamaskTransportFactory: MetamaskTransportFactory,
 ) {
 
     fun create(
@@ -28,11 +37,18 @@ class ExtensionStoreFactory(
     ): ExtensionsStore {
         val initialPolkadotJsState = polkadotJsStateFactory.default(hostApi)
         val polkadotJsStateMachine: PolkadotJsStateMachine = DefaultWeb3ExtensionStateMachine(initialPolkadotJsState)
-        val polkadotJsExtension = polkadotJsTransportFactory.create(coroutineScope)
+        val polkadotJTransport = polkadotJsTransportFactory.create(coroutineScope)
+
+        val initialMetamaskState = metamaskStateFactory.default(hostApi)
+        val metamaskStateMachine: MetamaskStateMachine = DefaultWeb3ExtensionStateMachine(initialMetamaskState)
+        val metamaskTransport = metamaskTransportFactory.create(coroutineScope)
 
         return DefaultExtensionsStore(
             polkadotJs = polkadotJsStateMachine,
-            polkadotJsTransport = polkadotJsExtension,
+            polkadotJsTransport = polkadotJTransport,
+
+            metamask = metamaskStateMachine,
+            metamaskTransport = metamaskTransport,
 
             externalEvents = hostApi.externalEvents,
             coroutineScope = coroutineScope
@@ -43,12 +59,17 @@ class ExtensionStoreFactory(
 private class DefaultExtensionsStore(
     override val polkadotJs: PolkadotJsStateMachine,
     private val polkadotJsTransport: PolkadotJsTransport,
+
+    override val metamask: MetamaskStateMachine,
+    private val metamaskTransport: MetamaskTransport,
+
     private val externalEvents: Flow<ExternalEvent>,
     private val coroutineScope: CoroutineScope
 ) : ExtensionsStore {
 
     init {
         polkadotJs wireWith polkadotJsTransport
+        metamask wireWith metamaskTransport
     }
 
     private infix fun <R : Web3Transport.Request<*>, S : State<R, S>> Web3ExtensionStateMachine<S>.wireWith(transport: Web3Transport<R>) {

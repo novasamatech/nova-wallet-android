@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.data.mappers.mapCryptoTypeToEncryption
 import io.novafoundation.nova.common.utils.DEFAULT_PREFIX
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.runtime.ext.addressOf
+import io.novafoundation.nova.runtime.ext.toEthereumAddress
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.encrypt.MultiChainEncryption
@@ -91,6 +92,8 @@ fun MetaAccount.addressIn(chain: Chain): String? {
         else -> chain.addressOf(substrateAccountId)
     }
 }
+
+fun MetaAccount.mainEthereumAddress() = ethereumAddress?.toEthereumAddress()
 
 fun MetaAccount.requireAddressIn(chain: Chain): String = addressIn(chain) ?: throw NoSuchElementException("No chain account found for $chain in $name")
 

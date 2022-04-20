@@ -1,9 +1,7 @@
 package io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.states
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
-import io.novafoundation.nova.common.address.createAddressModel
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.polkadotJs.PolkadotJsExtensionInteractor
@@ -11,36 +9,39 @@ import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsTransp
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.PolkadotJsSignPayload
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.SignerResult
 import io.novafoundation.nova.feature_dapp_impl.web3.session.Web3Session
+import io.novafoundation.nova.feature_dapp_impl.web3.states.BaseState
 import io.novafoundation.nova.feature_dapp_impl.web3.states.Web3ExtensionStateMachine.ExternalEvent
 import io.novafoundation.nova.feature_dapp_impl.web3.states.Web3ExtensionStateMachine.StateMachineTransition
 import io.novafoundation.nova.feature_dapp_impl.web3.states.Web3StateMachineHost
 import io.novafoundation.nova.feature_dapp_impl.web3.states.Web3StateMachineHost.NotAuthorizedException
-import io.novafoundation.nova.feature_dapp_impl.web3.states.hostApi.AuthorizeDAppPayload
 import io.novafoundation.nova.feature_dapp_impl.web3.states.hostApi.ConfirmTxRequest
 import io.novafoundation.nova.feature_dapp_impl.web3.states.hostApi.ConfirmTxResponse
-import io.novafoundation.nova.feature_dapp_impl.web3.states.selectedMetaAccountId
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 
 class DefaultPolkadotJsState(
     private val interactor: PolkadotJsExtensionInteractor,
-    private val commonInteractor: DappInteractor,
-    private val resourceManager: ResourceManager,
-    private val addressIconGenerator: AddressIconGenerator,
-    private val web3Session: Web3Session,
-    private val hostApi: Web3StateMachineHost,
-) : PolkadotJsState {
+    commonInteractor: DappInteractor,
+    resourceManager: ResourceManager,
+    addressIconGenerator: AddressIconGenerator,
+    web3Session: Web3Session,
+    hostApi: Web3StateMachineHost,
+) : BaseState<PolkadotJsTransportRequest<*>, PolkadotJsState>(
+        commonInteractor = commonInteractor,
+        resourceManager = resourceManager,
+        addressIconGenerator = addressIconGenerator,
+        web3Session = web3Session,
+        hostApi = hostApi
+    ),
+    PolkadotJsState {
 
     override suspend fun acceptRequest(request: PolkadotJsTransportRequest<*>, transition: StateMachineTransition<PolkadotJsState>) {
-        val authorizationState = web3Session.authorizationStateFor(request.url, hostApi.selectedMetaAccountId())
-
         when (request) {
-            is PolkadotJsTransportRequest.Single.AuthorizeTab -> authorizeTab(request, authorizationState)
-            is PolkadotJsTransportRequest.Single.ListAccounts -> supplyAccountList(request, authorizationState)
-            is PolkadotJsTransportRequest.Single.Sign -> signExtrinsicIfAllowed(request, authorizationState)
-            is PolkadotJsTransportRequest.Subscription.SubscribeAccounts -> supplyAccountListSubscription(request, authorizationState)
-            is PolkadotJsTransportRequest.Single.ListMetadata -> suppleKnownMetadatas(request, authorizationState)
-            is PolkadotJsTransportRequest.Single.ProvideMetadata -> handleProvideMetadata(request, authorizationState)
+            is PolkadotJsTransportRequest.Single.AuthorizeTab -> authorizeTab(request)
+            is PolkadotJsTransportRequest.Single.ListAccounts -> supplyAccountList(request)
+            is PolkadotJsTransportRequest.Single.Sign -> signExtrinsicIfAllowed(request, getAuthorizationStateForCurrentPage())
+            is PolkadotJsTransportRequest.Subscription.SubscribeAccounts -> supplyAccountListSubscription(request)
+            is PolkadotJsTransportRequest.Single.ListMetadata -> suppleKnownMetadatas(request)
+            is PolkadotJsTransportRequest.Single.ProvideMetadata -> handleProvideMetadata(request)
         }
     }
 
@@ -50,15 +51,10 @@ class DefaultPolkadotJsState(
         }
     }
 
-    private suspend fun authorizeTab(request: PolkadotJsTransportRequest.Single.AuthorizeTab, state: Web3Session.Authorization.State) {
-        when (state) {
-            // user already accepted - no need to ask second time
-            Web3Session.Authorization.State.ALLOWED -> request.accept(PolkadotJsTransportRequest.Single.AuthorizeTab.Response(true))
-            // first time dapp request authorization during this session
-            Web3Session.Authorization.State.NONE -> authorizeTabWithConfirmation(request)
-            // user rejected this dapp previosuly - ask for authorization one more time
-            Web3Session.Authorization.State.REJECTED -> authorizeTabWithConfirmation(request)
-        }
+    private suspend fun authorizeTab(request: PolkadotJsTransportRequest.Single.AuthorizeTab) {
+        val authorized = authorizeDapp()
+
+        request.accept(authorized)
     }
 
     private suspend fun signExtrinsicIfAllowed(request: PolkadotJsTransportRequest.Single.Sign, state: Web3Session.Authorization.State) {
@@ -85,77 +81,27 @@ class DefaultPolkadotJsState(
         }
     }
 
-    private suspend fun handleProvideMetadata(
-        request: PolkadotJsTransportRequest.Single.ProvideMetadata,
-        state: Web3Session.Authorization.State
-    ) = respondIfAllowed(request, state) {
+    private suspend fun handleProvideMetadata(request: PolkadotJsTransportRequest.Single.ProvideMetadata) = request.respondIfAllowed {
         false // we do not accept provided metadata since app handles metadata sync by its own
     }
 
-    private suspend fun suppleKnownMetadatas(
-        request: PolkadotJsTransportRequest.Single.ListMetadata,
-        state: Web3Session.Authorization.State
-    ) = respondIfAllowed(request, state) {
+    private suspend fun suppleKnownMetadatas(request: PolkadotJsTransportRequest.Single.ListMetadata) = request.respondIfAllowed {
         interactor.getKnownInjectedMetadatas()
     }
 
-    private suspend fun supplyAccountList(
-        request: PolkadotJsTransportRequest.Single.ListAccounts,
-        state: Web3Session.Authorization.State
-    ) = respondIfAllowed(request, state) {
+    private suspend fun supplyAccountList(request: PolkadotJsTransportRequest.Single.ListAccounts) = request.respondIfAllowed {
         interactor.getInjectedAccounts()
     }
 
-    private suspend fun supplyAccountListSubscription(
-        request: PolkadotJsTransportRequest.Subscription.SubscribeAccounts,
-        state: Web3Session.Authorization.State
-    ) = respondIfAllowed(request, state) {
-        flowOf(interactor.getInjectedAccounts())
+    private suspend fun supplyAccountListSubscription(request: PolkadotJsTransportRequest.Subscription.SubscribeAccounts) {
+        request.respondIfAllowed {
+            flowOf(interactor.getInjectedAccounts())
+        }
     }
 
-    private suspend fun <T> respondIfAllowed(
-        request: PolkadotJsTransportRequest<T>,
-        state: Web3Session.Authorization.State,
+    private suspend fun <T> PolkadotJsTransportRequest<T>.respondIfAllowed(
         responseConstructor: suspend () -> T
-    ) = if (state == Web3Session.Authorization.State.ALLOWED) {
-        request.accept(responseConstructor())
-    } else {
-        request.reject(NotAuthorizedException)
-    }
-
-    private suspend fun authorizeTabWithConfirmation(request: PolkadotJsTransportRequest.Single.AuthorizeTab) {
-        val currentPage = hostApi.currentPageAnalyzed.first()
-        val selectedAccount = hostApi.selectedAccount.first()
-        // use url got from browser instead of url got from dApp to prevent dApp supplying wrong URL
-        val dAppInfo = commonInteractor.getDAppInfo(dAppUrl = currentPage.url)
-
-        val dAppIdentifier = dAppInfo.metadata?.name ?: currentPage.title ?: dAppInfo.baseUrl
-
-        val action = AuthorizeDAppPayload(
-            title = resourceManager.getString(
-                R.string.dapp_confirm_authorize_title_format,
-                dAppIdentifier
-            ),
-            dAppIconUrl = dAppInfo.metadata?.iconLink,
-            dAppUrl = dAppInfo.baseUrl,
-            walletAddressModel = addressIconGenerator.createAddressModel(
-                accountAddress = selectedAccount.defaultSubstrateAddress,
-                sizeInDp = AddressIconGenerator.SIZE_MEDIUM,
-                accountName = selectedAccount.name
-            )
-        )
-
-        val authorizationState = hostApi.authorizeDApp(action)
-
-        web3Session.updateAuthorization(
-            state = authorizationState,
-            fullUrl = request.url,
-            dAppTitle = dAppIdentifier,
-            metaId = selectedAccount.id
-        )
-
-        val authorized = authorizationState == Web3Session.Authorization.State.ALLOWED
-
-        request.accept(PolkadotJsTransportRequest.Single.AuthorizeTab.Response(authorized))
-    }
+    ) = respondIfAllowed(
+        ifAllowed = { accept(responseConstructor()) }
+    ) { reject(NotAuthorizedException) }
 }

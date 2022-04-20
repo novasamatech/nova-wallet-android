@@ -44,10 +44,14 @@ val Chain.genesisHash: String
 
 fun Chain.addressOf(accountId: ByteArray): String {
     return if (isEthereumBased) {
-        accountId.asEthereumAccountId().toAddress(withChecksum = true).value
+        accountId.toEthereumAddress()
     } else {
         accountId.toAddress(addressPrefix.toShort())
     }
+}
+
+fun ByteArray.toEthereumAddress(): String {
+    return asEthereumAccountId().toAddress(withChecksum = true).value
 }
 
 fun Chain.accountIdOf(address: String): ByteArray {

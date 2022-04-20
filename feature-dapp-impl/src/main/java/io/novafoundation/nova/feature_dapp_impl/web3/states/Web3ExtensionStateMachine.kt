@@ -52,6 +52,8 @@ interface Web3StateMachineHost {
     suspend fun confirmTx(request: ConfirmTxRequest): ConfirmTxResponse
 
     fun showError(text: String)
+
+    fun reloadPage()
 }
 
 suspend fun Web3StateMachineHost.selectedMetaAccountId() = selectedAccount.first().id
