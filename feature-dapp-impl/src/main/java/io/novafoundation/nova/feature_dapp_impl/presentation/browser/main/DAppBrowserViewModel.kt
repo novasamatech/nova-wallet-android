@@ -196,8 +196,7 @@ class DAppBrowserViewModel(
     }
 
     private suspend fun mapSignExtrinsicRequestToPayload(request: ConfirmTxRequest) = DAppSignPayload(
-        requestId = request.id,
-        body = request.payload,
+        body = request,
         dappUrl = currentPageAnalyzed.first().url
     )
 }

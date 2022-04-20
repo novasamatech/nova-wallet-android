@@ -16,7 +16,7 @@ class ChooseAmountModel(
 
 class ChooseAmountInputModel(
     val tokenSymbol: String,
-    val tokenIcon: String,
+    val tokenIcon: String?,
 )
 
 internal fun ChooseAmountModel(

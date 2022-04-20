@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoade
 import io.novafoundation.nova.runtime.di.ExtrinsicSerialization
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RuntimeVersionsRepository
+import okhttp3.OkHttpClient
 
 interface DAppFeatureDependencies {
 
@@ -63,4 +64,6 @@ interface DAppFeatureDependencies {
     val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
 
     val walletUiUseCase: WalletUiUseCase
+
+    val okHttpClient: OkHttpClient
 }

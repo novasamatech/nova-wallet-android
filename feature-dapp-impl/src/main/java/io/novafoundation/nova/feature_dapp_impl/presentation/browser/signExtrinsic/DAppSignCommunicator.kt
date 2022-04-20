@@ -33,7 +33,7 @@ interface DAppSignCommunicator : DAppSignRequester, DAppSignResponder {
 }
 
 suspend fun DAppSignRequester.awaitConfirmation(request: DAppSignPayload): Response {
-    val responsesForRequest = responseFlow.filter { it.requestId == request.requestId }
+    val responsesForRequest = responseFlow.filter { it.requestId == request.body.id }
 
     openRequest(request)
 

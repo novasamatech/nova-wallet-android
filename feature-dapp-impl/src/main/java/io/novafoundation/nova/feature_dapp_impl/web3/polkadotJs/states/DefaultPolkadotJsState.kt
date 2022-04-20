@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.polkadotJs.PolkadotJsExtensionInteractor
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsTransportRequest
-import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.PolkadotJsSignPayload
+import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.PolkadotJsSignRequest
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.SignerResult
 import io.novafoundation.nova.feature_dapp_impl.web3.session.Web3Session
 import io.novafoundation.nova.feature_dapp_impl.web3.states.BaseState
@@ -14,7 +14,6 @@ import io.novafoundation.nova.feature_dapp_impl.web3.states.Web3ExtensionStateMa
 import io.novafoundation.nova.feature_dapp_impl.web3.states.Web3ExtensionStateMachine.StateMachineTransition
 import io.novafoundation.nova.feature_dapp_impl.web3.states.Web3StateMachineHost
 import io.novafoundation.nova.feature_dapp_impl.web3.states.Web3StateMachineHost.NotAuthorizedException
-import io.novafoundation.nova.feature_dapp_impl.web3.states.hostApi.ConfirmTxRequest
 import io.novafoundation.nova.feature_dapp_impl.web3.states.hostApi.ConfirmTxResponse
 import kotlinx.coroutines.flow.flowOf
 
@@ -67,7 +66,7 @@ class DefaultPolkadotJsState(
     }
 
     private suspend fun signExtrinsicWithConfirmation(request: PolkadotJsTransportRequest.Single.Sign) {
-        val signRequest = ConfirmTxRequest(id = request.requestId, payload = PolkadotJsSignPayload(request.signerPayload))
+        val signRequest = PolkadotJsSignRequest(request.requestId, request.signerPayload)
 
         when (val response = hostApi.confirmTx(signRequest)) {
             is ConfirmTxResponse.Rejected -> request.reject(NotAuthorizedException)

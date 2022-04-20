@@ -3,18 +3,9 @@ package io.novafoundation.nova.feature_dapp_impl.web3.states.hostApi
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
-@Parcelize
-class ConfirmTxRequest(
-    val id: String,
-    val payload: Payload
-) : Parcelable {
+interface ConfirmTxRequest : Parcelable {
 
-    interface Payload : Parcelable {
-
-        val address: String
-
-        val chainId: String?
-    }
+    val id: String
 }
 
 sealed class ConfirmTxResponse : Parcelable {

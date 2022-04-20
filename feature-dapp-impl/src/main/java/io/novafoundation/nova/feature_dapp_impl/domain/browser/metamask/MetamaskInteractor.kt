@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_dapp_impl.domain.browser.metamask
 
+import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
@@ -45,8 +46,8 @@ class MetamaskInteractor(
         }
     }
 
-    private suspend fun tryFindChainFromEthereumChainId(ethereumChainId: String): Chain? {
-        val addressPrefix = ethereumChainId.toIntOrNull(radix = 16) ?: return null
+    suspend fun tryFindChainFromEthereumChainId(ethereumChainId: String): Chain? {
+        val addressPrefix = ethereumChainId.removeHexPrefix().toIntOrNull(radix = 16) ?: return null
 
         return chainRegistry.findChain { it.isEthereumBased && it.addressPrefix == addressPrefix }
     }

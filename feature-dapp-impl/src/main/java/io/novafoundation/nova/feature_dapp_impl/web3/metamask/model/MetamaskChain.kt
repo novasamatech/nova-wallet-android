@@ -1,5 +1,9 @@
 package io.novafoundation.nova.feature_dapp_impl.web3.metamask.model
 
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
+
+@Parcelize
 data class MetamaskChain(
     val chainId: String,
     val chainName: String,
@@ -7,7 +11,7 @@ data class MetamaskChain(
     val rpcUrls: List<String>,
     val blockExplorerUrls: List<String>?,
     val iconUrls: List<String>?
-) {
+) : Parcelable {
 
     companion object {
 
@@ -21,9 +25,10 @@ data class MetamaskChain(
         )
     }
 
+    @Parcelize
     class NativeCurrency(
         val name: String,
         val symbol: String,
         val decimals: Int
-    )
+    ) : Parcelable
 }

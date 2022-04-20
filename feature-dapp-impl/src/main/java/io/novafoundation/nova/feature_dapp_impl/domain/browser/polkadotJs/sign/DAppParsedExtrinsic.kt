@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_dapp_impl.domain.browser.signExtrinsic
+package io.novafoundation.nova.feature_dapp_impl.domain.browser.polkadotJs.sign
 
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Era
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Extrinsic

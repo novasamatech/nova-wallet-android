@@ -6,7 +6,6 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 class DAppSignPayload(
-    val requestId: String,
-    val body: ConfirmTxRequest.Payload,
+    val body: ConfirmTxRequest,
     val dappUrl: String
 ) : Parcelable
