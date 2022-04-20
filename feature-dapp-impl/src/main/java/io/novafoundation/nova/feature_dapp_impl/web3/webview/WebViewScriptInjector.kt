@@ -70,14 +70,17 @@ class WebViewScriptInjector(
             }
         """.trimIndent()
 
+        // some dApps (like Astar) breaks when the this code is executing directly. Anonymous function with self-invocation fixes this
         val wrappedScript = """
-            if (document !== undefined && document.readyState !== 'loading') {
-                $initializationCode
-            } else {
-                window.addEventListener("DOMContentLoaded", function(event) {
-                 $initializationCode
-                });
-            }
+            (function() {
+                if (document !== undefined && document.readyState !== 'loading') {
+                    $initializationCode
+                } else {
+                    window.addEventListener("DOMContentLoaded", function(event) {
+                     $initializationCode
+                    });
+                }
+            })();
         """.trimIndent()
 
         into.evaluateJavascript(wrappedScript, null)
