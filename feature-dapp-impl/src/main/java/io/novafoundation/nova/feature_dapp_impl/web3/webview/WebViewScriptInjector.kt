@@ -38,9 +38,9 @@ class WebViewScriptInjector(
     fun injectScript(
         @RawRes scriptRes: Int,
         into: WebView,
+        scriptId: String = scriptRes.toString()
     ) {
         val script = loadScript(scriptRes)
-        val scriptId = scriptRes.toString()
 
         addScriptToDomIfNotExists(script, scriptId, into)
     }
@@ -58,20 +58,18 @@ class WebViewScriptInjector(
         val method = InjectionPosition.START.addMethodName
 
         val initializationCode = """
-             var parent = document.getElementsByTagName('body').item(0);
-                var prevScripts = parent.getElementsByClassName("$scriptId")
-                console.log("Injecting ${scriptId}, previous scripts with the same id:" + prevScripts.length)
-                if (prevScripts.length== 0) {
-                    var script = document.createElement('script');                 
-                    script.type = 'text/javascript';
-                    script.innerHTML = window.atob('$encoded');
-                    script.className = "$scriptId";
-                    parent.$method(script);
-                }
+            var parent = document.getElementsByTagName('body').item(0);
+            var prevScripts = parent.getElementsByClassName("$scriptId")
+            console.log("Injecting $scriptId")
+            if (prevScripts.length== 0) {
+                var script = document.createElement('script');                 
+                script.type = 'text/javascript';
+                script.innerHTML = window.atob('$encoded');
+                script.className = "$scriptId";
+                parent.$method(script);
+            }
         """.trimIndent()
 
-        // Self-invocation of anonymous function is due to lack of jquery and its $(document).onReady
-        // https://stackoverflow.com/a/9899701/7996129
         val wrappedScript = """
             if (document !== undefined && document.readyState !== 'loading') {
                 $initializationCode

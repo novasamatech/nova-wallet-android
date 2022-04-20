@@ -29,7 +29,7 @@ class MetamaskInjector(
     }
 
     override fun injectForPage(into: WebView, url: String, extensionStore: ExtensionsStore) {
-        webViewScriptInjector.injectScript(R.raw.metamask_min, into)
+        webViewScriptInjector.injectScript(R.raw.metamask_min, into, scriptId = "novawallet-metamask-bundle")
         injectProvider(extensionStore, into)
     }
 
@@ -49,6 +49,6 @@ class MetamaskInjector(
                 };
         """.trimIndent()
 
-        webViewScriptInjector.injectScript(content, into)
+        webViewScriptInjector.injectScript(content, into, scriptId = "novawallet-metamask-provider")
     }
 }
