@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.core.os.bundleOf
-import androidx.lifecycle.lifecycleScope
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -115,7 +114,6 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
             web3ClientFactory = web3WebViewClientFactory,
             extensionsStore = viewModel.extensionsStore,
             onPageChanged = viewModel::onPageChanged,
-            coroutineScope = viewLifecycleOwner.lifecycleScope
         )
 
         viewModel.showConfirmationSheet.observeEvent {

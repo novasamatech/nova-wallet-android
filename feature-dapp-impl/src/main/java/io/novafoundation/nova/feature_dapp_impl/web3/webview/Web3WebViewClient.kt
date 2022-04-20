@@ -4,7 +4,6 @@ import android.graphics.Bitmap
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import io.novafoundation.nova.feature_dapp_impl.web3.states.ExtensionsStore
-import kotlinx.coroutines.CoroutineScope
 
 interface Web3Injector {
 
@@ -21,9 +20,8 @@ class Web3WebViewClientFactory(
         webView: WebView,
         extensionStore: ExtensionsStore,
         onPageChangedListener: OnPageChangedListener,
-        coroutineScope: CoroutineScope,
     ): Web3WebViewClient {
-        return Web3WebViewClient(injectors, extensionStore, webView, onPageChangedListener, coroutineScope)
+        return Web3WebViewClient(injectors, extensionStore, webView, onPageChangedListener)
     }
 }
 
@@ -34,7 +32,6 @@ class Web3WebViewClient(
     private val extensionStore: ExtensionsStore,
     private val webView: WebView,
     private val onPageChangedListener: OnPageChangedListener,
-    private val coroutineScope: CoroutineScope,
 ) : WebViewClient() {
 
     fun initialInject() {
