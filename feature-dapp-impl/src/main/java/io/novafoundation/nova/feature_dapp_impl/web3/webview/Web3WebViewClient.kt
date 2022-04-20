@@ -5,9 +5,6 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import io.novafoundation.nova.feature_dapp_impl.web3.states.ExtensionsStore
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlin.time.ExperimentalTime
 
 interface Web3Injector {
 
@@ -44,13 +41,7 @@ class Web3WebViewClient(
         injectors.forEach { it.initialInject(webView, extensionStore) }
     }
 
-    @OptIn(ExperimentalTime::class)
     override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
-        tryInject(webView, url)
-    }
-
-    @OptIn(ExperimentalTime::class)
-    override fun onPageFinished(view: WebView, url: String) {
         tryInject(webView, url)
     }
 
@@ -58,7 +49,5 @@ class Web3WebViewClient(
         onPageChangedListener(url, view.title)
     }
 
-    private fun tryInject(view: WebView, url: String) = coroutineScope.launch(Dispatchers.Default) {
-        injectors.forEach { it.injectForPage(view, url, extensionStore) }
-    }
+    private fun tryInject(view: WebView, url: String) = injectors.forEach { it.injectForPage(view, url, extensionStore) }
 }

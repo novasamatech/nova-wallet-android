@@ -4,7 +4,6 @@ import android.util.Base64
 import android.webkit.WebView
 import androidx.annotation.RawRes
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.postToSelf
 
 private const val JAVASCRIPT_INTERFACE_PREFIX = "Nova"
 
@@ -56,24 +55,34 @@ class WebViewScriptInjector(
         into: WebView,
     ) {
         val encoded: String = Base64.encodeToString(js.encodeToByteArray(), Base64.NO_WRAP)
-        val method = InjectionPosition.END.addMethodName
+        val method = InjectionPosition.START.addMethodName
+
+        val initializationCode = """
+             var parent = document.getElementsByTagName('body').item(0);
+                var prevScripts = parent.getElementsByClassName("$scriptId")
+                console.log("Injecting ${scriptId}, previous scripts with the same id:" + prevScripts.length)
+                if (prevScripts.length== 0) {
+                    var script = document.createElement('script');                 
+                    script.type = 'text/javascript';
+                    script.innerHTML = window.atob('$encoded');
+                    script.className = "$scriptId";
+                    parent.$method(script);
+                }
+        """.trimIndent()
 
         // Self-invocation of anonymous function is due to lack of jquery and its $(document).onReady
         // https://stackoverflow.com/a/9899701/7996129
         val wrappedScript = """
-         (function() {
-            var parent = document.getElementsByTagName('body').item(0);
-            var prevScripts = parent.getElementsByClassName("$scriptId")
-            if (prevScripts.length== 0) {
-                var script = document.createElement('script');                 
-                script.type = 'text/javascript';
-                script.innerHTML = window.atob('$encoded');
-                script.className = "$scriptId";
-                parent.$method(script);
+            if (document !== undefined && document.readyState !== 'loading') {
+                $initializationCode
+            } else {
+                window.addEventListener("DOMContentLoaded", function(event) {
+                 $initializationCode
+                });
             }
-             })();
         """.trimIndent()
-        into.postToSelf { evaluateJavascript(wrappedScript, null) }
+
+        into.evaluateJavascript(wrappedScript, null)
     }
 
     private val InjectionPosition.addMethodName
