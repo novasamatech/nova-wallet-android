@@ -26,18 +26,18 @@ class ConfirmAuthorizeBottomSheet(
 
         val action = confirmation.action
 
-        confirmAuthorizeDappIcon.showDAppIcon(action.dAppIconUrl, imageLoader)
+        confirmAuthorizeDappIcon.showDAppIcon(action.content.dAppIconUrl, imageLoader)
 
         with(confirmAuthorizeDappWallet) {
-            valuePrimary.setDrawableStart(action.walletAddressModel.image, paddingInDp = 8)
+            valuePrimary.setDrawableStart(action.content.walletAddressModel.image, paddingInDp = 8)
 
             // post to prevent secondaryValue not to hide due to early show
-            post { showValue(action.walletAddressModel.nameOrAddress) }
+            post { showValue(action.content.walletAddressModel.nameOrAddress) }
         }
 
-        confirmAuthorizeDappTitle.text = action.title
+        confirmAuthorizeDappTitle.text = action.content.title
         with(confirmAuthorizeDappDApp) {
-            post { confirmAuthorizeDappDApp.showValue(action.dAppUrl) }
+            post { confirmAuthorizeDappDApp.showValue(action.content.dAppUrl) }
         }
     }
 }

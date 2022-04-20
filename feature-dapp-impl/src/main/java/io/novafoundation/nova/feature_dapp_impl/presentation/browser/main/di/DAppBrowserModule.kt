@@ -6,25 +6,19 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
-import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
-import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.data.repository.FavouritesDAppRepository
 import io.novafoundation.nova.feature_dapp_impl.data.repository.PhishingSitesRepository
-import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.DappBrowserInteractor
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBrowserViewModel
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator
-import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionFactory
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RuntimeVersionsRepository
+import io.novafoundation.nova.feature_dapp_impl.web3.states.ExtensionStoreFactory
 
 @Module(includes = [ViewModelModule::class])
 class DAppBrowserModule {
@@ -32,16 +26,10 @@ class DAppBrowserModule {
     @Provides
     @ScreenScope
     fun provideInteractor(
-        chainRegistry: ChainRegistry,
-        accountRepository: AccountRepository,
-        runtimeVersionsRepository: RuntimeVersionsRepository,
         phishingSitesRepository: PhishingSitesRepository,
         favouritesDAppRepository: FavouritesDAppRepository,
     ) = DappBrowserInteractor(
-        chainRegistry = chainRegistry,
-        accountRepository = accountRepository,
         phishingSitesRepository = phishingSitesRepository,
-        runtimeVersionsRepository = runtimeVersionsRepository,
         favouritesDAppRepository = favouritesDAppRepository
     )
 
@@ -55,29 +43,23 @@ class DAppBrowserModule {
     @ViewModelKey(DAppBrowserViewModel::class)
     fun provideViewModel(
         router: DAppRouter,
-        polkadotJsExtensionFactory: PolkadotJsExtensionFactory,
         interactor: DappBrowserInteractor,
-        resourceManager: ResourceManager,
-        commonInteractor: DappInteractor,
-        addressIconGenerator: AddressIconGenerator,
         selectedAccountUseCase: SelectedAccountUseCase,
         signRequester: DAppSignCommunicator,
         searchRequester: DAppSearchCommunicator,
         initialUrl: String,
-        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+        extensionStoreFactory: ExtensionStoreFactory,
     ): ViewModel {
         return DAppBrowserViewModel(
             router = router,
-            polkadotJsExtensionFactory = polkadotJsExtensionFactory,
             interactor = interactor,
-            resourceManager = resourceManager,
-            addressIconGenerator = addressIconGenerator,
             selectedAccountUseCase = selectedAccountUseCase,
-            commonInteractor = commonInteractor,
             signRequester = signRequester,
             dAppSearchRequester = searchRequester,
             initialUrl = initialUrl,
-            actionAwaitableMixinFactory = actionAwaitableMixinFactory
+            actionAwaitableMixinFactory = actionAwaitableMixinFactory,
+            extensionStoreFactory = extensionStoreFactory
         )
     }
 }

@@ -21,7 +21,6 @@ import io.novafoundation.nova.feature_dapp_impl.domain.browser.signExtrinsic.Dap
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignViewModel
-import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.maybeSignExtrinsic
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.GenesisHashUtilityTokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
@@ -38,8 +37,8 @@ class DAppSignModule {
         payload: DAppSignPayload,
         chainRegistry: ChainRegistry,
         tokenRepository: TokenRepository
-    ): TokenUseCase? = payload.signerPayload.maybeSignExtrinsic()?.let {
-        GenesisHashUtilityTokenUseCase(it.genesisHash, chainRegistry, tokenRepository)
+    ): TokenUseCase? = payload.body.chainId?.let {
+        GenesisHashUtilityTokenUseCase(it, chainRegistry, tokenRepository)
     }
 
     @Provides

@@ -2,7 +2,18 @@ package io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model
 
 import android.os.Parcelable
 import com.google.gson.Gson
+import io.novafoundation.nova.feature_dapp_impl.web3.states.hostApi.ConfirmTxRequest
 import kotlinx.android.parcel.Parcelize
+
+@Parcelize
+class PolkadotJsSignPayload(val signerPayload: SignerPayload) : ConfirmTxRequest.Payload {
+
+    override val address: String
+        get() = signerPayload.address
+
+    override val chainId: String?
+        get() = signerPayload.maybeSignExtrinsic()?.genesisHash
+}
 
 sealed class SignerPayload : Parcelable {
 
