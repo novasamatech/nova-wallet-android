@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_dapp_impl.web3.metamask.model
 import android.os.Parcelable
 import io.novafoundation.nova.feature_dapp_impl.web3.states.hostApi.ConfirmTxRequest
 import kotlinx.android.parcel.Parcelize
-import java.math.BigInteger
 
 @Parcelize
 class MetamaskTransaction(
@@ -12,7 +11,7 @@ class MetamaskTransaction(
     val from: String,
     val to: String,
     val data: String,
-    val value: BigInteger?
+    val value: String?
 ) : Parcelable
 
 @Parcelize

@@ -153,7 +153,7 @@ class MetamaskSignInteractor(
             fromAddress = txPayload.from,
             toAddress = txPayload.to,
             data = txPayload.data,
-            value = txPayload.value
+            value = txPayload.value?.removeHexPrefix()?.toBigIntegerOrNull(16)
         )
     }
 

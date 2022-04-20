@@ -22,13 +22,14 @@ class FeeLoaderProviderFactory(
     private val resourceManager: ResourceManager,
 ) : FeeLoaderMixin.Factory {
 
-    override fun create(tokenFlow: Flow<Token>): FeeLoaderMixin.Presentation {
-        return FeeLoaderProvider(resourceManager, tokenFlow)
+    override fun create(tokenFlow: Flow<Token>, configuration: FeeLoaderMixin.Configuration): FeeLoaderMixin.Presentation {
+        return FeeLoaderProvider(resourceManager, configuration, tokenFlow)
     }
 }
 
 class FeeLoaderProvider(
     private val resourceManager: ResourceManager,
+    private val configuration: FeeLoaderMixin.Configuration,
     private val tokenFlow: Flow<Token>,
 ) : FeeLoaderMixin.Presentation {
 
@@ -52,7 +53,7 @@ class FeeLoaderProvider(
         val value = if (feeResult.isSuccess) {
             val feeInPlanks = feeResult.getOrThrow()
             val fee = token.amountFromPlanks(feeInPlanks)
-            val feeModel = mapFeeToFeeModel(fee, token)
+            val feeModel = mapFeeToFeeModel(fee, token, includeZeroFiat = configuration.showZeroFiat)
 
             FeeStatus.Loaded(feeModel)
         } else {
@@ -93,7 +94,7 @@ class FeeLoaderProvider(
 
     override suspend fun setFee(fee: BigDecimal) {
         val token = tokenFlow.first()
-        val feeModel = mapFeeToFeeModel(fee, token)
+        val feeModel = mapFeeToFeeModel(fee, token, includeZeroFiat = configuration.showZeroFiat)
 
         feeLiveData.postValue(FeeStatus.Loaded(feeModel))
     }

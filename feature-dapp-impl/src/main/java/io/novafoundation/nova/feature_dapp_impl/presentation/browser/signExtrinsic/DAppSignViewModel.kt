@@ -27,7 +27,12 @@ class DAppSignViewModel(
 ) : BaseViewModel(), WithFeeLoaderMixin {
 
     override val feeLoaderMixin: FeeLoaderMixin.Presentation? = interactor.commissionTokenFlow()
-        ?.let(feeLoaderMixinFactory::create)
+        ?.let {
+            feeLoaderMixinFactory.create(
+                tokenFlow = it,
+                configuration = FeeLoaderMixin.Configuration(showZeroFiat = false)
+            )
+        }
 
     private val selectedAccount = selectedAccountUseCase.selectedMetaAccountFlow()
         .share()

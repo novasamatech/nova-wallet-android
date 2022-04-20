@@ -27,10 +27,7 @@ class FeeView @JvmOverloads constructor(
                 showValue(context.getString(R.string.common_error_general_title))
             }
             is FeeStatus.Loaded -> {
-                showValue(
-                    primary = feeStatus.feeModel.displayToken,
-                    secondary = feeStatus.feeModel.displayFiat
-                )
+               showAmount(feeStatus.feeModel.display)
             }
         }
     }
