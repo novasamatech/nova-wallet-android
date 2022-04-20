@@ -1,8 +1,11 @@
 package io.novafoundation.nova.feature_dapp_impl.web3.webview
 
 import android.graphics.Bitmap
+import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.ProgressBar
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_dapp_impl.web3.states.ExtensionsStore
 
 interface Web3Injector {
@@ -47,4 +50,17 @@ class Web3WebViewClient(
     }
 
     private fun tryInject(view: WebView, url: String) = injectors.forEach { it.injectForPage(view, url, extensionStore) }
+}
+
+private const val MAX_PROGRESS = 100
+
+class Web3ChromeClient(
+    private val progressBar: ProgressBar
+) : WebChromeClient() {
+
+    override fun onProgressChanged(view: WebView, newProgress: Int) {
+        progressBar.progress = newProgress
+
+        progressBar.setVisible(newProgress < MAX_PROGRESS)
+    }
 }

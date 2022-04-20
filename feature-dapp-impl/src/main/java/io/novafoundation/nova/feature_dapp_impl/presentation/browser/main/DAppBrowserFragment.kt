@@ -30,6 +30,7 @@ import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserBack
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserClose
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserFavourite
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserForward
+import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserProgress
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserRefresh
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserWebView
 import javax.inject.Inject
@@ -113,6 +114,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
         dappBrowserWebView.injectWeb3(
             web3ClientFactory = web3WebViewClientFactory,
             extensionsStore = viewModel.extensionsStore,
+            progressBar = dappBrowserProgress,
             onPageChanged = viewModel::onPageChanged,
         )
 
