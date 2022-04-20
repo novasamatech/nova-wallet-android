@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_dapp_impl.web3.webview
 import android.annotation.SuppressLint
 import android.webkit.WebSettings
 import android.webkit.WebView
+import android.widget.ProgressBar
 import io.novafoundation.nova.common.BuildConfig
 import io.novafoundation.nova.feature_dapp_impl.web3.states.ExtensionsStore
 
@@ -10,6 +11,7 @@ import io.novafoundation.nova.feature_dapp_impl.web3.states.ExtensionsStore
 fun WebView.injectWeb3(
     web3ClientFactory: Web3WebViewClientFactory,
     extensionsStore: ExtensionsStore,
+    progressBar: ProgressBar,
     onPageChanged: OnPageChangedListener,
 ) {
     settings.javaScriptEnabled = true
@@ -25,6 +27,7 @@ fun WebView.injectWeb3(
     web3Client.initialInject()
 
     webViewClient = web3Client
+    webChromeClient = Web3ChromeClient(progressBar)
 
     WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
 
@@ -33,4 +36,7 @@ fun WebView.injectWeb3(
 
 fun WebView.uninjectWeb3() {
     settings.javaScriptEnabled = false
+
+    webChromeClient = null
+    webChromeClient = null
 }
