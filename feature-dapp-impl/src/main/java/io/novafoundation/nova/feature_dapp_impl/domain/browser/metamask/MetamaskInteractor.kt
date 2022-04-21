@@ -20,7 +20,7 @@ class MetamaskInteractor(
 ) {
 
     @OptIn(ExperimentalStdlibApi::class)
-    suspend fun getAddresses(ethereumChainId: String): Set<EthereumAddress> = withContext(Dispatchers.Default) {
+    suspend fun getAddresses(ethereumChainId: String): List<EthereumAddress> = withContext(Dispatchers.Default) {
         val selectedAccount = accountRepository.getSelectedMetaAccount()
         val maybeChain = tryFindChainFromEthereumChainId(ethereumChainId)
 
@@ -39,11 +39,11 @@ class MetamaskInteractor(
                 }
             }
 
-        buildSet {
+        buildList {
             selectedAddress?.let { add(it) }
             mainAddress?.let { add(it) }
             addAll(chainAccountAddresses)
-        }
+        }.distinct()
     }
 
     suspend fun tryFindChainFromEthereumChainId(ethereumChainId: String): Chain? {

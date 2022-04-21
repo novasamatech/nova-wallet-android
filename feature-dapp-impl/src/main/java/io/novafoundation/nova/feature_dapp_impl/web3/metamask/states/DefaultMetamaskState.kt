@@ -141,7 +141,7 @@ class DefaultMetamaskState(
         val authorized = authorizeDapp()
 
         if (authorized) {
-            val addresses = interactor.getAddresses(chain.chainId).toList()
+            val addresses = interactor.getAddresses(chain.chainId)
 
             if (addresses.isEmpty()) {
                 request.reject(MetamaskError.NoAccounts())
