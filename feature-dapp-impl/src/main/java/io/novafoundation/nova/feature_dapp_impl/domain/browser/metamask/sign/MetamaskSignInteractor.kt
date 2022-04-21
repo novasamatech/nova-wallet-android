@@ -56,14 +56,14 @@ class MetamaskSignInteractorFactory(
         addressIconGenerator = addressIconGenerator,
         request = request,
         metamaskInteractor = metamaskInteractor,
-        ethereumApi = ethereumApiFactory.create(request.payload.chain.rpcUrls.first()),
+        ethereumApiFactory = ethereumApiFactory,
         accountRepository = accountRepository,
         secretStoreV2 = secretStoreV2
     )
 }
 
 class MetamaskSignInteractor(
-    private val ethereumApi: EthereumApi,
+    private val ethereumApiFactory: EthereumApiFactory,
     private val request: MetamaskSendTransactionRequest,
     private val metamaskInteractor: MetamaskInteractor,
     private val addressIconGenerator: AddressIconGenerator,
@@ -74,19 +74,25 @@ class MetamaskSignInteractor(
     private val accountRepository: AccountRepository,
 ) : DAppSignInteractor {
 
-    val mostRecentFormedTx = singleReplaySharedFlow<RawTransaction>()
+    private val mostRecentFormedTx = singleReplaySharedFlow<RawTransaction>()
 
-    override suspend fun createAccountAddressModel(): AddressModel {
+    private val ethereumApi by lazy {
+        val nodeUrl = request.payload.chain.rpcUrls.first()
+
+        ethereumApiFactory.create(nodeUrl)
+    }
+
+    override suspend fun createAccountAddressModel(): AddressModel = withContext(Dispatchers.Default) {
         val address = request.payload.transaction.from
         val someEthereumChain = chainRegistry.findChain { it.isEthereumBased }!! // always have at least one ethereum chain in the app
 
-        return addressIconGenerator.createAccountAddressModel(someEthereumChain, address)
+        addressIconGenerator.createAccountAddressModel(someEthereumChain, address)
     }
 
-    override suspend fun chainUi(): ChainUi {
+    override suspend fun chainUi(): ChainUi = withContext(Dispatchers.Default) {
         val metamaskChain = request.payload.chain
 
-        return metamaskInteractor.tryFindChainFromEthereumChainId(metamaskChain.chainId)?.let(::mapChainToUi)
+        metamaskInteractor.tryFindChainFromEthereumChainId(metamaskChain.chainId)?.let(::mapChainToUi)
             ?: mapMetamaskChainToUi(metamaskChain)
     }
 

@@ -106,7 +106,7 @@ class DAppBrowserViewModel(
     }
 
     override fun reloadPage() {
-        _browserNavigationCommandEvent.value = BrowserNavigationCommand.Reload.event()
+        _browserNavigationCommandEvent.postValue(BrowserNavigationCommand.Reload.event())
     }
 
     fun onPageChanged(url: String, title: String?) {
