@@ -5,7 +5,9 @@ import io.novafoundation.nova.feature_dapp_impl.web3.Web3Transport
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.EthereumAddress
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskChain
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskTransaction
+import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.SignedMessage
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.TransactionHash
+import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.TypedMessage
 
 sealed class MetamaskTransportRequest<R>(
     val id: String,
@@ -33,7 +35,8 @@ sealed class MetamaskTransportRequest<R>(
         REQUEST_ACCOUNTS("requestAccounts"),
         ADD_ETHEREUM_CHAIN("addEthereumChain"),
         SWITCH_ETHEREUM_CHAIN("switchEthereumChain"),
-        SIGN_TRANSACTION("signTransaction")
+        SIGN_TRANSACTION("signTransaction"),
+        SIGN_TYPED_MESSAGE("signTypedMessage")
     }
 
     class RequestAccounts(
@@ -62,4 +65,11 @@ sealed class MetamaskTransportRequest<R>(
         responder: MetamaskResponder,
         val transaction: MetamaskTransaction
     ) : MetamaskTransportRequest<TransactionHash>(id, gson, responder)
+
+    class SignTypedMessage(
+        id: String,
+        gson: Gson,
+        responder: MetamaskResponder,
+        val message: TypedMessage
+    ) : MetamaskTransportRequest<SignedMessage>(id, gson, responder)
 }

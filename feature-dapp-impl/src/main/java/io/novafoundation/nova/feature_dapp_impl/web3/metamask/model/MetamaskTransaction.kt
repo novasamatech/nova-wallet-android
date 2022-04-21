@@ -17,11 +17,26 @@ class MetamaskTransaction(
 @Parcelize
 class MetamaskSendTransactionRequest(override val id: String, val payload: Payload) : ConfirmTxRequest {
 
-    @Parcelize
-    class Payload(
-        val transaction: MetamaskTransaction,
-        val chain: MetamaskChain
-    ) : Parcelable
+    sealed class Payload : Parcelable {
+
+        abstract val chain: MetamaskChain
+
+        abstract val originAddress: String
+
+        @Parcelize
+        class SendTx(
+            val transaction: MetamaskTransaction,
+            override val originAddress: String,
+            override val chain: MetamaskChain
+        ) : Payload()
+
+        @Parcelize
+        class SignTypedMessage(
+            val message: TypedMessage,
+            override val originAddress: String,
+            override val chain: MetamaskChain
+        ) : Payload()
+    }
 }
 
 typealias TransactionHash = String

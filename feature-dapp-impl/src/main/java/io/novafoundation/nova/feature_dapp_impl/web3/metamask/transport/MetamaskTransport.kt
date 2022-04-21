@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.utils.fromParsedHierarchy
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskChain
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskTransaction
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.SwitchChainRequest
+import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.TypedMessage
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewWeb3JavaScriptInterface
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewWeb3Transport
 import kotlinx.coroutines.CoroutineScope
@@ -65,6 +66,11 @@ class MetamaskTransport(
                 val transaction = gson.fromParsedHierarchy<MetamaskTransaction>(request.payload)
 
                 MetamaskTransportRequest.SendTransaction(request.id, gson, responder, transaction)
+            }
+            MetamaskTransportRequest.Identifier.SIGN_TYPED_MESSAGE.id -> {
+                val typedMessage = gson.fromParsedHierarchy<TypedMessage>(request.payload)
+
+                MetamaskTransportRequest.SignTypedMessage(request.id, gson, responder, typedMessage)
             }
             else -> null
         }

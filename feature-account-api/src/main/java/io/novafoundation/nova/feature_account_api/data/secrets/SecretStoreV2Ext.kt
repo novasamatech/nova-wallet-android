@@ -8,10 +8,13 @@ import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.multiChainEncryptionFor
 import io.novafoundation.nova.feature_account_api.domain.model.multiChainEncryptionIn
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import jp.co.soramitsu.fearless_utils.encrypt.SignatureWrapper
 import jp.co.soramitsu.fearless_utils.encrypt.Signer
 import jp.co.soramitsu.fearless_utils.encrypt.keypair.Keypair
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import org.web3j.crypto.ECKeyPair
+import org.web3j.crypto.Sign
 
 suspend fun SecretStoreV2.sign(
     metaAccount: MetaAccount,
@@ -38,6 +41,18 @@ suspend fun SecretStoreV2.signSubstrate(
     message = message,
     keypair = getSubstrateKeypair(metaAccount, accountId)
 ).signature
+
+suspend fun SecretStoreV2.signEthereum(
+    metaAccount: MetaAccount,
+    accountId: AccountId,
+    message: ByteArray
+): ByteArray {
+    val keypair = getEthereumKeypair(metaAccount, accountId)
+
+    val signingData = Sign.signMessage(message, ECKeyPair.create(keypair.privateKey), false)
+
+    return SignatureWrapper.Ecdsa(v = signingData.v, r = signingData.r, s = signingData.s).signature
+}
 
 /**
  * @return secrets for the given [accountId] in [metaAccount] respecting configuration of [chain] (is ethereum or not).
