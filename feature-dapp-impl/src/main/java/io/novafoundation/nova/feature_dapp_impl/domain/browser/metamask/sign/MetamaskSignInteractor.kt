@@ -149,7 +149,7 @@ class MetamaskSignInteractor(
         when (payload) {
             is Payload.SendTx -> extrinsicGson.toJson(mostRecentFormedTx.first())
             is Payload.SignTypedMessage -> signTypedMessageReadableContent(payload)
-            is Payload.PersonalSign -> payload.message.data.fromHex().decodeToString()
+            is Payload.PersonalSign -> personalSignReadableContent(payload)
         }
     }
 
@@ -195,6 +195,13 @@ class MetamaskSignInteractor(
             accountId = originAccountId(),
             message = message
         ).toHexString(withPrefix = true)
+    }
+
+    private fun personalSignReadableContent(payload: Payload.PersonalSign): String {
+        val data = payload.message.data
+
+        return runCatching { data.fromHex().decodeToString(throwOnInvalidSequence = true) }
+            .getOrDefault(data)
     }
 
     private fun signTypedMessageReadableContent(payload: Payload.SignTypedMessage): String {
