@@ -53,9 +53,13 @@ private class Web3JEthereumApi(
         val nonce = getNonce(fromAddress)
         val gasPrice = getGasPrice()
 
-        val forFeeEstimatesTx = Transaction.createEthCallTransaction(
+        val forFeeEstimatesTx = Transaction.createFunctionCallTransaction(
             fromAddress,
+            nonce,
+            null,
+            null,
             toAddress,
+            value,
             data
         )
 
