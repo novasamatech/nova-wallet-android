@@ -36,6 +36,13 @@ class MetamaskSendTransactionRequest(override val id: String, val payload: Paylo
             override val originAddress: String,
             override val chain: MetamaskChain
         ) : Payload()
+
+        @Parcelize
+        class PersonalSign(
+            val message: PersonalSignMessage,
+            override val originAddress: String,
+            override val chain: MetamaskChain
+        ) : Payload()
     }
 }
 

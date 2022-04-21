@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.utils.fromJson
 import io.novafoundation.nova.common.utils.fromParsedHierarchy
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskChain
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskTransaction
+import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.PersonalSignMessage
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.SwitchChainRequest
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.TypedMessage
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewWeb3JavaScriptInterface
@@ -71,6 +72,11 @@ class MetamaskTransport(
                 val typedMessage = gson.fromParsedHierarchy<TypedMessage>(request.payload)
 
                 MetamaskTransportRequest.SignTypedMessage(request.id, gson, responder, typedMessage)
+            }
+            MetamaskTransportRequest.Identifier.PERSONAL_SIGN.id -> {
+                val personalSignMessage = gson.fromParsedHierarchy<PersonalSignMessage>(request.payload)
+
+                MetamaskTransportRequest.PersonalSign(request.id, gson, responder, personalSignMessage)
             }
             else -> null
         }

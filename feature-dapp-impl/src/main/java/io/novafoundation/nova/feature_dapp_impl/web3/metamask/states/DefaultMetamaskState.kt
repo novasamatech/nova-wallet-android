@@ -49,6 +49,7 @@ class DefaultMetamaskState(
             is MetamaskTransportRequest.SwitchEthereumChain -> handleSwitchEthereumChain(request, transition)
             is MetamaskTransportRequest.SendTransaction -> handleOperation(request, ::sendTransactionWithConfirmation)
             is MetamaskTransportRequest.SignTypedMessage -> handleOperation(request, ::signTypedMessageWithConfirmation)
+            is MetamaskTransportRequest.PersonalSign -> handleOperation(request, ::signPersonalSignWithConfirmation)
         }
     }
 
@@ -86,6 +87,22 @@ class DefaultMetamaskState(
             request.reject(MetamaskError.Rejected())
         }
     )
+
+    private suspend fun signPersonalSignWithConfirmation(
+        request: MetamaskTransportRequest.PersonalSign,
+        selectedAddress: String
+    ) {
+        val hostApiConfirmRequest = MetamaskSendTransactionRequest(
+            id = request.id,
+            payload = MetamaskSendTransactionRequest.Payload.PersonalSign(
+                message = request.message,
+                chain = chain,
+                originAddress = selectedAddress
+            )
+        )
+
+        confirmOperation(request, hostApiConfirmRequest)
+    }
 
     private suspend fun signTypedMessageWithConfirmation(
         request: MetamaskTransportRequest.SignTypedMessage,

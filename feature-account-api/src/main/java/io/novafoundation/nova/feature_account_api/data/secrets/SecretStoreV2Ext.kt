@@ -45,11 +45,31 @@ suspend fun SecretStoreV2.signSubstrate(
 suspend fun SecretStoreV2.signEthereum(
     metaAccount: MetaAccount,
     accountId: AccountId,
+    message: ByteArray,
+): ByteArray {
+    return signEthereum(metaAccount, accountId) {
+        Sign.signMessage(message, it, false)
+    }
+}
+
+suspend fun SecretStoreV2.signEthereumPrefixed(
+    metaAccount: MetaAccount,
+    accountId: AccountId,
     message: ByteArray
+): ByteArray {
+    return signEthereum(metaAccount, accountId) {
+        Sign.signPrefixedMessage(message, it)
+    }
+}
+
+private suspend inline fun SecretStoreV2.signEthereum(
+    metaAccount: MetaAccount,
+    accountId: AccountId,
+    sign: (ECKeyPair) -> Sign.SignatureData
 ): ByteArray {
     val keypair = getEthereumKeypair(metaAccount, accountId)
 
-    val signingData = Sign.signMessage(message, ECKeyPair.create(keypair.privateKey), false)
+    val signingData = sign(ECKeyPair.create(keypair.privateKey))
 
     return SignatureWrapper.Ecdsa(v = signingData.v, r = signingData.r, s = signingData.s).signature
 }

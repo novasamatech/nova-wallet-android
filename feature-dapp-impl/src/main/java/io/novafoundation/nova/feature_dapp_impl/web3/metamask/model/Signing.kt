@@ -9,4 +9,9 @@ class TypedMessage(
     val raw: String?
 ) : Parcelable
 
+@Parcelize
+class PersonalSignMessage(
+    val data: String
+) : Parcelable
+
 typealias SignedMessage = String

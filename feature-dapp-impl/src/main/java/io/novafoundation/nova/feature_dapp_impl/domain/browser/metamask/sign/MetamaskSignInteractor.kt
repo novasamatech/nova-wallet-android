@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.data.mappers.mapGradientToUi
 import io.novafoundation.nova.feature_account_api.data.secrets.getEthereumKeypair
 import io.novafoundation.nova.feature_account_api.data.secrets.signEthereum
+import io.novafoundation.nova.feature_account_api.data.secrets.signEthereumPrefixed
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
@@ -25,6 +26,7 @@ import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskChai
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskSendTransactionRequest
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskSendTransactionRequest.Payload
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskTransaction
+import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.PersonalSignMessage
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.TypedMessage
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
@@ -134,6 +136,7 @@ class MetamaskSignInteractor(
             when (payload) {
                 is Payload.SendTx -> sendTx(payload.transaction)
                 is Payload.SignTypedMessage -> signTypedMessage(payload.message)
+                is Payload.PersonalSign -> personalSign(payload.message)
             }
         }.getOrElse {
             Log.e(LOG_TAG, "Failed to sign tx from Metamask", it)
@@ -146,6 +149,7 @@ class MetamaskSignInteractor(
         when (payload) {
             is Payload.SendTx -> extrinsicGson.toJson(mostRecentFormedTx.first())
             is Payload.SignTypedMessage -> signTypedMessageReadableContent(payload)
+            is Payload.PersonalSign -> payload.message.data.fromHex().decodeToString()
         }
     }
 
@@ -169,6 +173,18 @@ class MetamaskSignInteractor(
 
     private suspend fun signTypedMessage(message: TypedMessage): DAppSignCommunicator.Response.Signed {
         val signature = signMessage(message.data.fromHex())
+
+        return DAppSignCommunicator.Response.Signed(request.id, signature)
+    }
+
+    private suspend fun personalSign(message: PersonalSignMessage): DAppSignCommunicator.Response.Signed {
+        val messageBytes = message.data.fromHex()
+
+        val signature = secretStoreV2.signEthereumPrefixed(
+            metaAccount = accountRepository.getSelectedMetaAccount(),
+            accountId = originAccountId(),
+            message = messageBytes
+        ).toHexString(withPrefix = true)
 
         return DAppSignCommunicator.Response.Signed(request.id, signature)
     }
