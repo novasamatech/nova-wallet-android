@@ -16,7 +16,6 @@ data class GradientUi(
     val colors: IntArray,
     val positions: FloatArray
 ) {
-    companion object;
 
     override fun equals(other: Any?): Boolean {
         return other is GradientUi && angle == other.angle &&

@@ -33,7 +33,7 @@ import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHex
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.EraType
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Extrinsic
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Extrinsic.EncodingInstance.CallRepresentation
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.instances.AddressInstanceConstructor
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
@@ -136,8 +136,8 @@ class PolkadotJsSignInteractor(
         val runtime = chainRegistry.getRuntime(signerPayload.chain().id)
 
         val extrinsic = when (val callRepresentation = signerPayload.callRepresentation(runtime)) {
-            is Extrinsic.EncodingInstance.CallRepresentation.Instance -> extrinsicBuilder.call(callRepresentation.call).build()
-            is Extrinsic.EncodingInstance.CallRepresentation.Bytes -> extrinsicBuilder.build(rawCallBytes = callRepresentation.bytes)
+            is CallRepresentation.Instance -> extrinsicBuilder.call(callRepresentation.call).build()
+            is CallRepresentation.Bytes -> extrinsicBuilder.build(rawCallBytes = callRepresentation.bytes)
         }
 
         extrinsicService.estimateFee(signerPayload.chain().id, extrinsic)
@@ -173,8 +173,8 @@ class PolkadotJsSignInteractor(
         val extrinsicBuilder = extrinsicPayload.toExtrinsicBuilderWithoutCall()
 
         return when (val callRepresentation = extrinsicPayload.callRepresentation(runtime)) {
-            is Extrinsic.EncodingInstance.CallRepresentation.Instance -> extrinsicBuilder.call(callRepresentation.call).buildSignature()
-            is Extrinsic.EncodingInstance.CallRepresentation.Bytes -> extrinsicBuilder.buildSignature(rawCallBytes = callRepresentation.bytes)
+            is CallRepresentation.Instance -> extrinsicBuilder.call(callRepresentation.call).buildSignature()
+            is CallRepresentation.Bytes -> extrinsicBuilder.buildSignature(rawCallBytes = callRepresentation.bytes)
         }
     }
 
@@ -209,9 +209,9 @@ class PolkadotJsSignInteractor(
         }
     }
 
-    private fun SignerPayload.Json.callRepresentation(runtime: RuntimeSnapshot): Extrinsic.EncodingInstance.CallRepresentation = runCatching {
-        Extrinsic.EncodingInstance.CallRepresentation.Instance(GenericCall.fromHex(runtime, method))
-    }.getOrDefault(Extrinsic.EncodingInstance.CallRepresentation.Bytes(method.fromHex()))
+    private fun SignerPayload.Json.callRepresentation(runtime: RuntimeSnapshot): CallRepresentation = runCatching {
+        CallRepresentation.Instance(GenericCall.fromHex(runtime, method))
+    }.getOrDefault(CallRepresentation.Bytes(method.fromHex()))
 
     private suspend fun SignerPayload.Json.chain(): Chain {
         return chainRegistry.getChain(genesisHash)
