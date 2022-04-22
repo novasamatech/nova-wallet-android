@@ -51,7 +51,7 @@ abstract class BaseState<R : Web3Transport.Request<*>, S>(
         // use url got from browser instead of url got from dApp to prevent dApp supplying wrong URL
         val dAppInfo = commonInteractor.getDAppInfo(dAppUrl = currentPage.url)
 
-        val dAppIdentifier = dAppInfo.metadata?.name ?: currentPage.title ?: dAppInfo.baseUrl
+        val dAppIdentifier = dAppInfo.metadata?.name ?: dAppInfo.baseUrl
 
         val action = AuthorizeDAppPayload(
             title = resourceManager.getString(
@@ -63,7 +63,8 @@ abstract class BaseState<R : Web3Transport.Request<*>, S>(
             walletAddressModel = addressIconGenerator.createAddressModel(
                 accountAddress = selectedAccount.defaultSubstrateAddress,
                 sizeInDp = AddressIconGenerator.SIZE_MEDIUM,
-                accountName = selectedAccount.name
+                accountName = selectedAccount.name,
+                background = AddressIconGenerator.BACKGROUND_TRANSPARENT
             )
         )
 

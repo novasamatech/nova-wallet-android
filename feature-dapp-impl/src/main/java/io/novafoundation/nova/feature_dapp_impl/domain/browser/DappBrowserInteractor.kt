@@ -33,7 +33,6 @@ class DappBrowserInteractor(
                     security = security,
                     isFavourite = isFavourite,
                     synchronizedWithBrowser = browserPage.synchronizedWithBrowser
-
                 )
             }.getOrElse {
                 BrowserPageAnalyzed(

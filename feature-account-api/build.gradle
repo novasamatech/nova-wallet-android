@@ -35,6 +35,8 @@ dependencies {
     implementation androidDep
     implementation materialDep
 
+    implementation web3jDep
+
 //    implementation fragmentKtxDep
 
     implementation constraintDep

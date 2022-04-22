@@ -7,13 +7,15 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
 sealed class MetamaskError(val errorCode: Int, message: String) : Throwable(message) {
 
-    class Rejected : MetamaskError(4001, "Access rejected")
+    class Rejected : MetamaskError(4001, "Action rejected")
 
     class TxSendingFailed : MetamaskError(0, "Failed to sign and send transaction")
 
     class NoAccounts : MetamaskError(0, "No Ethereum accounts found in selected wallet")
 
     class SwitchChainNotFound(chainId: ChainId) : MetamaskError(4902, "Chain $chainId not found")
+
+    class AccountsMismatch : MetamaskError(0, "Selected account does not match with the transaction origin")
 }
 
 class MetamaskResponder(private val webViewHolder: WebViewHolder) {

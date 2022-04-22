@@ -11,11 +11,14 @@ import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskSend
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.transport.MetamaskError
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.transport.MetamaskTransportRequest
 import io.novafoundation.nova.feature_dapp_impl.web3.session.Web3Session
+import io.novafoundation.nova.feature_dapp_impl.web3.session.Web3Session.Authorization
 import io.novafoundation.nova.feature_dapp_impl.web3.states.BaseState
 import io.novafoundation.nova.feature_dapp_impl.web3.states.Web3ExtensionStateMachine.ExternalEvent
 import io.novafoundation.nova.feature_dapp_impl.web3.states.Web3ExtensionStateMachine.StateMachineTransition
 import io.novafoundation.nova.feature_dapp_impl.web3.states.Web3StateMachineHost
 import io.novafoundation.nova.feature_dapp_impl.web3.states.hostApi.ConfirmTxResponse
+import jp.co.soramitsu.fearless_utils.extensions.asEthereumAddress
+import jp.co.soramitsu.fearless_utils.extensions.toAccountId
 
 class DefaultMetamaskState(
     commonInteractor: DappInteractor,
@@ -44,7 +47,9 @@ class DefaultMetamaskState(
             is MetamaskTransportRequest.RequestAccounts -> handleRequestAccounts(request, transition)
             is MetamaskTransportRequest.AddEthereumChain -> handleAddEthereumChain(request, transition)
             is MetamaskTransportRequest.SwitchEthereumChain -> handleSwitchEthereumChain(request, transition)
-            is MetamaskTransportRequest.SendTransaction -> handleSendTransaction(request)
+            is MetamaskTransportRequest.SendTransaction -> handleOperation(request, ::sendTransactionWithConfirmation)
+            is MetamaskTransportRequest.SignTypedMessage -> handleOperation(request, ::signTypedMessageWithConfirmation)
+            is MetamaskTransportRequest.PersonalSign -> handleOperation(request, ::signPersonalSignWithConfirmation)
         }
     }
 
@@ -52,15 +57,6 @@ class DefaultMetamaskState(
         when (event) {
             ExternalEvent.PhishingDetected -> transition.emitState(PhishingDetectedMetamaskState(chain))
         }
-    }
-
-    private suspend fun handleSendTransaction(
-        request: MetamaskTransportRequest.SendTransaction
-    ) = when (getAuthorizationStateForCurrentPage()) {
-        // request user confirmation if dapp is authorized
-        Web3Session.Authorization.State.ALLOWED -> sendTransactionWithConfirmation(request)
-        // reject otherwise
-        else -> request.reject(Web3StateMachineHost.NotAuthorizedException)
     }
 
     private suspend fun handleSwitchEthereumChain(
@@ -92,23 +88,89 @@ class DefaultMetamaskState(
         }
     )
 
-    private suspend fun sendTransactionWithConfirmation(request: MetamaskTransportRequest.SendTransaction) {
-        val signRequest = MetamaskSendTransactionRequest(
+    private suspend fun signPersonalSignWithConfirmation(
+        request: MetamaskTransportRequest.PersonalSign,
+        selectedAddress: String
+    ) {
+        val hostApiConfirmRequest = MetamaskSendTransactionRequest(
             id = request.id,
-            payload = MetamaskSendTransactionRequest.Payload(
-                transaction = request.transaction,
-                chain = chain
+            payload = MetamaskSendTransactionRequest.Payload.PersonalSign(
+                message = request.message,
+                chain = chain,
+                originAddress = selectedAddress
             )
         )
 
-        when (val response = hostApi.confirmTx(signRequest)) {
-            is ConfirmTxResponse.Rejected -> request.reject(MetamaskError.Rejected())
-            is ConfirmTxResponse.Signed -> throw IllegalStateException("Metamask protocol requires transactions to be send by the wallet")
-            is ConfirmTxResponse.Sent -> request.accept(response.txHash)
+        confirmOperation(request, hostApiConfirmRequest)
+    }
+
+    private suspend fun signTypedMessageWithConfirmation(
+        request: MetamaskTransportRequest.SignTypedMessage,
+        selectedAddress: String
+    ) {
+        val hostApiConfirmRequest = MetamaskSendTransactionRequest(
+            id = request.id,
+            payload = MetamaskSendTransactionRequest.Payload.SignTypedMessage(
+                message = request.message,
+                chain = chain,
+                originAddress = selectedAddress
+            )
+        )
+
+        confirmOperation(request, hostApiConfirmRequest)
+    }
+
+    private suspend fun sendTransactionWithConfirmation(
+        request: MetamaskTransportRequest.SendTransaction,
+        selectedAddress: String,
+    ) {
+        val selectedAccountId = selectedAddress.asEthereumAddress().toAccountId().value
+        val txOriginAccountId = request.transaction.from.asEthereumAddress().toAccountId().value
+
+        if (!selectedAccountId.contentEquals(txOriginAccountId)) {
+            request.reject(MetamaskError.AccountsMismatch())
+            return
+        }
+
+        val hostApiConfirmRequest = MetamaskSendTransactionRequest(
+            id = request.id,
+            payload = MetamaskSendTransactionRequest.Payload.SendTx(
+                transaction = request.transaction,
+                chain = chain,
+                originAddress = selectedAddress
+            )
+        )
+
+        confirmOperation(request, hostApiConfirmRequest)
+    }
+
+    private suspend fun <T : MetamaskTransportRequest<*>> handleOperation(
+        request: T,
+        onAllowed: suspend (request: T, originAddress: String) -> Unit
+    ) {
+        val authorizationState = getAuthorizationStateForCurrentPage()
+
+        if (authorizationState == Authorization.State.ALLOWED && selectedAccountAddress != null) {
+            // request user confirmation if dapp is authorized
+            onAllowed(request, selectedAccountAddress)
+        } else {
+            // reject otherwise
+            request.reject(MetamaskError.Rejected())
+        }
+    }
+
+    private suspend fun confirmOperation(
+        metamaskRequest: MetamaskTransportRequest<String>,
+        hostApiConfirmRequest: MetamaskSendTransactionRequest
+    ) {
+        when (val response = hostApi.confirmTx(hostApiConfirmRequest)) {
+            is ConfirmTxResponse.Rejected -> metamaskRequest.reject(MetamaskError.Rejected())
+            is ConfirmTxResponse.Signed -> metamaskRequest.accept(response.signature)
+            is ConfirmTxResponse.Sent -> metamaskRequest.accept(response.txHash)
             is ConfirmTxResponse.SigningFailed -> {
                 hostApi.showError(resourceManager.getString(R.string.dapp_sign_extrinsic_failed))
 
-                request.reject(MetamaskError.TxSendingFailed())
+                metamaskRequest.reject(MetamaskError.TxSendingFailed())
             }
         }
     }
