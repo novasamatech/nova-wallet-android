@@ -1,6 +1,7 @@
 package io.novafoundation.nova.runtime.multiNetwork.chain.model
 
 import io.novafoundation.nova.common.utils.Identifiable
+import io.novafoundation.nova.runtime.multiNetwork.ChainGradientParser
 import java.math.BigInteger
 
 typealias ChainId = String
@@ -39,7 +40,7 @@ data class Chain(
     )
 
     data class Asset(
-        val iconUrl: String,
+        val iconUrl: String?,
         val id: Int,
         val priceId: String?,
         val chainId: ChainId,
@@ -109,7 +110,14 @@ data class Chain(
         val angle: Float,
         val colors: List<String>,
         val positionsPercent: List<Float>
-    )
+    ) {
+
+        companion object {
+            val Default by lazy {
+                ChainGradientParser.parse("linear-gradient(315deg, #434852 0%, #787F92 100%)")!!
+            }
+        }
+    }
 
     override val identifier: String = id
 }

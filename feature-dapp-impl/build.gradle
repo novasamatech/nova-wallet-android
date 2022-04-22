@@ -84,6 +84,9 @@ dependencies {
 
     implementation retrofitDep
 
+    implementation web3jDep
+    implementation coroutinesFutureDep
+
     testImplementation jUnitDep
     testImplementation mockitoDep
 }

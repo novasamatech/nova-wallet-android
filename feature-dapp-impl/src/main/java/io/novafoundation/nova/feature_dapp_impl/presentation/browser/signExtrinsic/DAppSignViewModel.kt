@@ -1,68 +1,57 @@
 package io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
-import io.novafoundation.nova.common.address.createAddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.utils.flowOf
-import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
-import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
-import io.novafoundation.nova.feature_dapp_impl.domain.browser.signExtrinsic.DappSignExtrinsicInteractor
+import io.novafoundation.nova.feature_dapp_impl.domain.browser.signExtrinsic.DAppSignInteractor
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator.Response
-import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.PolkadotJsSignPayload
-import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.SignerPayload
-import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class DAppSignViewModel(
     private val router: DAppRouter,
     private val responder: DAppSignResponder,
-    private val interactor: DappSignExtrinsicInteractor,
+    private val interactor: DAppSignInteractor,
     private val commonInteractor: DappInteractor,
     private val addressIconGenerator: AddressIconGenerator,
-    private val chainRegistry: ChainRegistry,
     private val payload: DAppSignPayload,
+    private val walletUiUseCase: WalletUiUseCase,
     selectedAccountUseCase: SelectedAccountUseCase,
-    tokenUseCase: TokenUseCase?,
     feeLoaderMixinFactory: FeeLoaderMixin.Factory
 ) : BaseViewModel(), WithFeeLoaderMixin {
 
-    // TODO metamask transaction signing - multiple possible payloads
-    private val polkadotJsBody = payload.body as PolkadotJsSignPayload
-
-    override val feeLoaderMixin: FeeLoaderMixin.Presentation? = tokenUseCase?.let {
-        feeLoaderMixinFactory.create(tokenUseCase.currentTokenFlow())
-    }
+    override val feeLoaderMixin: FeeLoaderMixin.Presentation? = interactor.commissionTokenFlow()
+        ?.let {
+            feeLoaderMixinFactory.create(
+                tokenFlow = it,
+                configuration = FeeLoaderMixin.Configuration(showZeroFiat = false)
+            )
+        }
 
     private val selectedAccount = selectedAccountUseCase.selectedMetaAccountFlow()
         .share()
 
-    val walletModel = selectedAccount.map {
-        addressIconGenerator.createAddressModel(it.defaultSubstrateAddress, AddressIconGenerator.SIZE_MEDIUM, it.name)
-    }
+    val walletUi = walletUiUseCase.selectedWalletUiFlow(showAddressIcon = true)
+        .shareInBackground()
 
     val requestedAccountModel = selectedAccount.map {
-        addressIconGenerator.createAddressModel(payload.body.address, AddressIconGenerator.SIZE_MEDIUM, null)
+        interactor.createAccountAddressModel()
     }
-        .inBackground()
-        .share()
+        .shareInBackground()
 
     val maybeChainUi = flowOf {
-        payload.body.chainId?.let {
-            chainRegistry.getChain(it)
-        }
+        interactor.chainUi()
     }
-        .share()
+        .shareInBackground()
 
     val dAppInfo = flowOf { commonInteractor.getDAppInfo(payload.dappUrl) }
-        .inBackground()
-        .share()
+        .shareInBackground()
 
     init {
         maybeLoadFee()
@@ -71,40 +60,37 @@ class DAppSignViewModel(
     fun cancelled() = rejectClicked()
 
     fun rejectClicked() {
-        responder.respond(Response.Rejected(payload.requestId))
-        router.back()
+        responder.respond(Response.Rejected(payload.body.id))
+
+        exit()
     }
 
     fun acceptClicked() = launch {
-        val response = interactor.buildSignature(polkadotJsBody.signerPayload)
-            .fold(
-                onSuccess = { Response.Signed(payload.requestId, it) },
-                onFailure = {
-                    it.printStackTrace()
-
-                    Response.SigningFailed(payload.requestId)
-                }
-            )
+        val response = interactor.performOperation()
 
         responder.respond(response)
-        router.back()
+
+        exit()
     }
 
     private fun maybeLoadFee() {
-        if (polkadotJsBody.signerPayload is SignerPayload.Json) {
-            feeLoaderMixin!!.loadFee(
-                coroutineScope = this,
-                feeConstructor = { interactor.calculateFee(polkadotJsBody.signerPayload) },
-                onRetryCancelled = {}
-            )
-        }
+        feeLoaderMixin?.loadFee(
+            coroutineScope = this,
+            feeConstructor = { interactor.calculateFee() },
+            onRetryCancelled = {}
+        )
     }
 
     fun detailsClicked() {
         launch {
-            val extrinsicContent = interactor.readableSignContent(polkadotJsBody.signerPayload)
+            val extrinsicContent = interactor.readableOperationContent()
 
             router.openExtrinsicDetails(extrinsicContent)
         }
+    }
+
+    fun exit() {
+        interactor.shutdown()
+        router.back()
     }
 }

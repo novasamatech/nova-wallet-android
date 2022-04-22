@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_dapp_impl.web3.states
 
+import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_dapp_impl.web3.Web3Transport
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.states.MetamaskStateFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.states.MetamaskStateMachine
@@ -75,9 +76,11 @@ private class DefaultExtensionsStore(
     private infix fun <R : Web3Transport.Request<*>, S : State<R, S>> Web3ExtensionStateMachine<S>.wireWith(transport: Web3Transport<R>) {
         transport.requestsFlow
             .onEach { request -> transition { it.acceptRequest(request) } }
+            .inBackground()
             .launchIn(coroutineScope)
 
         externalEvents.onEach { event -> transition { it.acceptEvent(event) } }
+            .inBackground()
             .launchIn(coroutineScope)
     }
 }

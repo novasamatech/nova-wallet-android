@@ -38,7 +38,7 @@ class ChooseAmountInputView @JvmOverloads constructor(
         background = context.getInputBackground()
     }
 
-    fun loadAssetImage(imageUrl: String) {
+    fun loadAssetImage(imageUrl: String?) {
         chooseAmountInputImage.load(imageUrl, imageLoader)
     }
 

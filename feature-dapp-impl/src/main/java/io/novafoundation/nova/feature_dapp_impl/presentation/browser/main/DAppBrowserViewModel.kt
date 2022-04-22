@@ -106,7 +106,7 @@ class DAppBrowserViewModel(
     }
 
     override fun reloadPage() {
-        _browserNavigationCommandEvent.value = BrowserNavigationCommand.Reload.event()
+        _browserNavigationCommandEvent.postValue(BrowserNavigationCommand.Reload.event())
     }
 
     fun onPageChanged(url: String, title: String?) {
@@ -196,8 +196,7 @@ class DAppBrowserViewModel(
     }
 
     private suspend fun mapSignExtrinsicRequestToPayload(request: ConfirmTxRequest) = DAppSignPayload(
-        requestId = request.id,
-        body = request.payload,
+        body = request,
         dappUrl = currentPageAnalyzed.first().url
     )
 }

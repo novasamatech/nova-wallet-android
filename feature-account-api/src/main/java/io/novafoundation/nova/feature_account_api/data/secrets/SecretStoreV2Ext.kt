@@ -78,3 +78,14 @@ suspend fun SecretStoreV2.getSubstrateKeypair(
         getMetaAccountKeypair(metaAccount.id, isEthereum = false)
     }
 }
+
+suspend fun SecretStoreV2.getEthereumKeypair(
+    metaAccount: MetaAccount,
+    accountId: AccountId
+): Keypair {
+    return if (hasChainSecrets(metaAccount.id, accountId)) {
+        getChainAccountKeypair(metaAccount.id, accountId)
+    } else {
+        getMetaAccountKeypair(metaAccount.id, isEthereum = true)
+    }
+}

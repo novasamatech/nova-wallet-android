@@ -4,11 +4,14 @@ import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.polkadotJs.PolkadotJsExtensionInteractor
+import io.novafoundation.nova.feature_dapp_impl.domain.browser.polkadotJs.sign.PolkadotJsSignInteractorFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsInjector
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsResponder
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsTransportFactory
@@ -18,6 +21,8 @@ import io.novafoundation.nova.feature_dapp_impl.web3.session.Web3Session
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewHolder
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewScriptInjector
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewWeb3JavaScriptInterface
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
+import io.novafoundation.nova.runtime.di.ExtrinsicSerialization
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RuntimeVersionsRepository
 
@@ -81,4 +86,24 @@ class PolkadotJsModule {
             web3Session = web3Session,
         )
     }
+
+    @Provides
+    @FeatureScope
+    fun provideSendInteractorFactory(
+        extrinsicService: ExtrinsicService,
+        chainRegistry: ChainRegistry,
+        accountRepository: AccountRepository,
+        secretStoreV2: SecretStoreV2,
+        tokenRepository: TokenRepository,
+        @ExtrinsicSerialization extrinsicGson: Gson,
+        addressIconGenerator: AddressIconGenerator,
+    ) = PolkadotJsSignInteractorFactory(
+        extrinsicService = extrinsicService,
+        chainRegistry = chainRegistry,
+        accountRepository = accountRepository,
+        secretStoreV2 = secretStoreV2,
+        tokenRepository = tokenRepository,
+        extrinsicGson = extrinsicGson,
+        addressIconGenerator = addressIconGenerator
+    )
 }

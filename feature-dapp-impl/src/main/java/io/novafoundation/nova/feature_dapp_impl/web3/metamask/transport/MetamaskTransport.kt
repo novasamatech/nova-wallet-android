@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.fromJson
 import io.novafoundation.nova.common.utils.fromParsedHierarchy
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskChain
+import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskTransaction
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.SwitchChainRequest
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewWeb3JavaScriptInterface
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewWeb3Transport
@@ -59,6 +60,11 @@ class MetamaskTransport(
                 val switchChainRequest = gson.fromParsedHierarchy<SwitchChainRequest>(request.payload)
 
                 MetamaskTransportRequest.SwitchEthereumChain(request.id, gson, responder, switchChainRequest.chainId)
+            }
+            MetamaskTransportRequest.Identifier.SIGN_TRANSACTION.id -> {
+                val transaction = gson.fromParsedHierarchy<MetamaskTransaction>(request.payload)
+
+                MetamaskTransportRequest.SendTransaction(request.id, gson, responder, transaction)
             }
             else -> null
         }
