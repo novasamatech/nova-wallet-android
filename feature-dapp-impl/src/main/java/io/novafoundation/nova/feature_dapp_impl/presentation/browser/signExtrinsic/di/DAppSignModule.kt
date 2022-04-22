@@ -6,10 +6,11 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
-import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
@@ -50,7 +51,6 @@ class DAppSignModule {
     @ViewModelKey(DAppSignViewModel::class)
     fun provideViewModel(
         router: DAppRouter,
-        addressIconGenerator: AddressIconGenerator,
         feeLoaderMixinFactory: FeeLoaderMixin.Factory,
         commonInteractor: DappInteractor,
         interactor: DAppSignInteractor,
@@ -58,17 +58,20 @@ class DAppSignModule {
         selectedAccountUseCase: SelectedAccountUseCase,
         communicator: DAppSignCommunicator,
         walletUiUseCase: WalletUiUseCase,
+        validationExecutor: ValidationExecutor,
+        resourceManager: ResourceManager
     ): ViewModel {
         return DAppSignViewModel(
             router = router,
-            addressIconGenerator = addressIconGenerator,
             selectedAccountUseCase = selectedAccountUseCase,
             interactor = interactor,
             feeLoaderMixinFactory = feeLoaderMixinFactory,
             payload = payload,
             commonInteractor = commonInteractor,
             responder = communicator,
-            walletUiUseCase = walletUiUseCase
+            walletUiUseCase = walletUiUseCase,
+            validationExecutor = validationExecutor,
+            resourceManager = resourceManager
         )
     }
 }

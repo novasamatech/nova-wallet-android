@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewHolder
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewScriptInjector
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewWeb3JavaScriptInterface
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.di.ExtrinsicSerialization
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RuntimeVersionsRepository
@@ -97,6 +98,7 @@ class PolkadotJsModule {
         tokenRepository: TokenRepository,
         @ExtrinsicSerialization extrinsicGson: Gson,
         addressIconGenerator: AddressIconGenerator,
+        walletRepository: WalletRepository
     ) = PolkadotJsSignInteractorFactory(
         extrinsicService = extrinsicService,
         chainRegistry = chainRegistry,
@@ -104,6 +106,7 @@ class PolkadotJsModule {
         secretStoreV2 = secretStoreV2,
         tokenRepository = tokenRepository,
         extrinsicGson = extrinsicGson,
-        addressIconGenerator = addressIconGenerator
+        addressIconGenerator = addressIconGenerator,
+        walletRepository = walletRepository
     )
 }

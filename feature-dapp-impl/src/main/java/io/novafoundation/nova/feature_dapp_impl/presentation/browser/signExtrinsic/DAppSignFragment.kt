@@ -9,9 +9,11 @@ import androidx.core.os.bundleOf
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseBottomSheetFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.postToSelf
+import io.novafoundation.nova.common.view.setProgress
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.showWallet
 import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_account_api.view.showChain
@@ -54,6 +56,8 @@ class DAppSignExtrinsicFragment : BaseBottomSheetFragment<DAppSignViewModel>() {
     override fun initViews() {
         confirmInnerContent.inflateChild(R.layout.bottom_sheet_confirm_sign_extrinsic, attachToRoot = true)
 
+        confirmDAppActionAllow.prepareForProgress(viewLifecycleOwner)
+
         confirmDAppActionAllow.setOnClickListener { viewModel.acceptClicked() }
         confirmDAppActionAllow.setText(R.string.common_confirm)
         confirmDAppActionReject.setOnClickListener { viewModel.rejectClicked() }
@@ -74,6 +78,9 @@ class DAppSignExtrinsicFragment : BaseBottomSheetFragment<DAppSignViewModel>() {
 
     @Suppress("UNCHECKED_CAST")
     override fun subscribe(viewModel: DAppSignViewModel) {
+        setupFeeLoading(viewModel, confirmSignExtinsicFee)
+        observeValidations(viewModel)
+
         viewModel.maybeChainUi.observe { chainUi ->
             confirmSignExtinsicNetwork.postToSelf {
                 if (chainUi != null) {
@@ -96,6 +103,12 @@ class DAppSignExtrinsicFragment : BaseBottomSheetFragment<DAppSignViewModel>() {
             confirmSignExtinsicIcon.showDAppIcon(it.metadata?.iconLink, imageLoader)
         }
 
-        setupFeeLoading(viewModel, confirmSignExtinsicFee)
+        viewModel.performingOperationInProgress.observe { operationInProgress ->
+            val actionsAllowed = !operationInProgress
+
+            isCancelable = actionsAllowed
+            confirmDAppActionReject.isEnabled = actionsAllowed
+            confirmDAppActionAllow.setProgress(show = operationInProgress)
+        }
     }
 }

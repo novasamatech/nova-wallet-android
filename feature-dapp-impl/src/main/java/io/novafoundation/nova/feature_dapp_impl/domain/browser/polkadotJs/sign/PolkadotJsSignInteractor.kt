@@ -7,6 +7,8 @@ import io.novafoundation.nova.common.address.createAddressModel
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.utils.bigIntegerFromHex
 import io.novafoundation.nova.common.utils.intFromHex
+import io.novafoundation.nova.common.validation.EmptyValidationSystem
+import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.data.secrets.getKeypair
@@ -14,13 +16,18 @@ import io.novafoundation.nova.feature_account_api.data.secrets.signSubstrate
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.multiChainEncryptionIn
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
+import io.novafoundation.nova.feature_dapp_impl.domain.browser.signExtrinsic.ConfirmDAppOperationValidationFailure
+import io.novafoundation.nova.feature_dapp_impl.domain.browser.signExtrinsic.ConfirmDAppOperationValidationSystem
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.signExtrinsic.DAppSignInteractor
+import io.novafoundation.nova.feature_dapp_impl.domain.browser.signExtrinsic.convertingToAmount
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator.Response
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.PolkadotJsSignRequest
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.SignerPayload
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.maybeSignExtrinsic
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
+import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.extrinsic.CustomSignedExtensions
@@ -54,6 +61,7 @@ class PolkadotJsSignInteractorFactory(
     private val tokenRepository: TokenRepository,
     private val extrinsicGson: Gson,
     private val addressIconGenerator: AddressIconGenerator,
+    private val walletRepository: WalletRepository,
 ) {
 
     fun create(request: PolkadotJsSignRequest) = PolkadotJsSignInteractor(
@@ -64,7 +72,8 @@ class PolkadotJsSignInteractorFactory(
         tokenRepository = tokenRepository,
         extrinsicGson = extrinsicGson,
         addressIconGenerator = addressIconGenerator,
-        request = request
+        request = request,
+        walletRepository = walletRepository
     )
 }
 
@@ -77,9 +86,15 @@ class PolkadotJsSignInteractor(
     private val extrinsicGson: Gson,
     private val addressIconGenerator: AddressIconGenerator,
     private val request: PolkadotJsSignRequest,
+    private val walletRepository: WalletRepository,
 ) : DAppSignInteractor {
 
     val signerPayload = request.payload
+
+    override val validationSystem: ConfirmDAppOperationValidationSystem = when (signerPayload) {
+        is SignerPayload.Json -> operationValidationSystem(signerPayload)
+        is SignerPayload.Raw -> EmptyValidationSystem()
+    }
 
     override suspend fun createAccountAddressModel(): AddressModel {
         return addressIconGenerator.createAddressModel(
@@ -141,6 +156,22 @@ class PolkadotJsSignInteractor(
         }
 
         extrinsicService.estimateFee(signerPayload.chain().id, extrinsic)
+    }
+
+    private fun operationValidationSystem(operationPayload: SignerPayload.Json): ConfirmDAppOperationValidationSystem = ValidationSystem {
+        // since we don't know how arbitrary extrinsic gonna affect transferable balance we only check for fees
+        sufficientBalance(
+            fee = { it.convertingToAmount { calculateFee() } },
+            available = {
+                val asset = walletRepository.getAsset(
+                    metaId = accountRepository.getSelectedMetaAccount().id,
+                    chainAsset = operationPayload.chain().utilityAsset
+                )!!
+
+                asset.transferable
+            },
+            error = { ConfirmDAppOperationValidationFailure.NotEnoughBalanceToPayFees }
+        )
     }
 
     private fun readableBytesContent(signBytesPayload: SignerPayload.Raw): String {

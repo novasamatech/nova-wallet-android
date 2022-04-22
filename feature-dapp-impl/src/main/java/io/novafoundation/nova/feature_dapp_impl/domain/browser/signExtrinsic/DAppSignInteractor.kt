@@ -9,6 +9,8 @@ import java.math.BigInteger
 
 interface DAppSignInteractor {
 
+    val validationSystem: ConfirmDAppOperationValidationSystem
+
     suspend fun createAccountAddressModel(): AddressModel
 
     suspend fun chainUi(): ChainUi?

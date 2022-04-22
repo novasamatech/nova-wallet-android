@@ -1,11 +1,11 @@
 package io.novafoundation.nova.common.mixin.impl
 
-import android.view.ContextThemeWrapper
 import androidx.lifecycle.MutableLiveData
-import io.novafoundation.nova.common.base.BaseFragment
+import io.novafoundation.nova.common.base.BaseFragmentMixin
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.themed
 import io.novafoundation.nova.common.view.dialog.dialog
 
 class CustomDialogProvider : CustomDialogDisplayer.Presentation {
@@ -17,7 +17,7 @@ class CustomDialogProvider : CustomDialogDisplayer.Presentation {
     }
 }
 
-fun <V> BaseFragment<V>.setupCustomDialogDisplayer(
+fun <V> BaseFragmentMixin<V>.setupCustomDialogDisplayer(
     viewModel: V,
 ) where V : BaseViewModel, V : CustomDialogDisplayer {
     viewModel.showCustomDialog.observeEvent {
@@ -25,9 +25,8 @@ fun <V> BaseFragment<V>.setupCustomDialogDisplayer(
     }
 }
 
-fun BaseFragment<*>.displayDialogFor(payload: CustomDialogDisplayer.Payload) {
-    val baseContext = requireContext()
-    val themedContext = payload.customStyle?.let { ContextThemeWrapper(requireContext(), it) } ?: baseContext
+fun BaseFragmentMixin<*>.displayDialogFor(payload: CustomDialogDisplayer.Payload) {
+    val themedContext = payload.customStyle?.let(providedContext::themed) ?: providedContext
 
     dialog(themedContext) {
         setTitle(payload.title)
