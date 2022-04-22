@@ -34,6 +34,11 @@ interface WalletRepository {
         chainAsset: Chain.Asset
     ): Asset?
 
+    suspend fun getAsset(
+        metaId: Long,
+        chainAsset: Chain.Asset
+    ): Asset?
+
     suspend fun syncOperationsFirstPage(
         pageSize: Int,
         filters: Set<TransactionFilter>,

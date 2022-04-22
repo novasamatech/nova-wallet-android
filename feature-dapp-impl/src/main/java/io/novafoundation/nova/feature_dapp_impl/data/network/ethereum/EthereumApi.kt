@@ -30,6 +30,8 @@ interface EthereumApi {
         ethereumChainId: Long,
     ): String
 
+    suspend fun getAccountBalance(address: String): BigInteger
+
     fun shutdown()
 }
 
@@ -85,6 +87,10 @@ private class Web3JEthereumApi(
         val transactionData = transactionManager.sign(transaction)
 
         return sendTransaction(transactionData)
+    }
+
+    override suspend fun getAccountBalance(address: String): BigInteger {
+        return web3.ethGetBalance(address, DefaultBlockParameterName.LATEST).sendSuspend().balance
     }
 
     override fun shutdown() {

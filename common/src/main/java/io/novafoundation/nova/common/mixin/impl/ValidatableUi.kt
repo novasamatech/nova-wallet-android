@@ -1,16 +1,16 @@
 package io.novafoundation.nova.common.mixin.impl
 
 import android.content.Context
-import io.novafoundation.nova.common.base.BaseFragment
+import io.novafoundation.nova.common.base.BaseFragmentMixin
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.mixin.api.ValidationFailureUi
 import io.novafoundation.nova.common.validation.DefaultFailureLevel
 import io.novafoundation.nova.common.view.dialog.errorDialog
 import io.novafoundation.nova.common.view.dialog.warningDialog
 
-fun BaseFragment<*>.observeValidations(
+fun BaseFragmentMixin<*>.observeValidations(
     viewModel: Validatable,
-    dialogContext: Context = requireContext()
+    dialogContext: Context = providedContext
 ) {
     viewModel.validationFailureEvent.observeEvent {
         when (it) {
@@ -23,7 +23,7 @@ fun BaseFragment<*>.observeValidations(
                         setMessage(it.message)
                     }
                     level >= DefaultFailureLevel.WARNING -> warningDialog(
-                        context = requireContext(),
+                        context = dialogContext,
                         onConfirm = it.confirmWarning
                     ) {
                         setTitle(it.title)

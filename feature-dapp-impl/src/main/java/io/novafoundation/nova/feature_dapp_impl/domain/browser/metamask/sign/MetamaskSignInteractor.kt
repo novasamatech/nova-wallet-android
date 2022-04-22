@@ -9,6 +9,8 @@ import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.parseArbitraryObject
 import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
+import io.novafoundation.nova.common.validation.EmptyValidationSystem
+import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.data.mappers.mapGradientToUi
 import io.novafoundation.nova.feature_account_api.data.secrets.getEthereumKeypair
@@ -20,7 +22,10 @@ import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.feature_dapp_impl.data.network.ethereum.EthereumApi
 import io.novafoundation.nova.feature_dapp_impl.data.network.ethereum.EthereumApiFactory
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.metamask.MetamaskInteractor
+import io.novafoundation.nova.feature_dapp_impl.domain.browser.signExtrinsic.ConfirmDAppOperationValidationFailure.NotEnoughBalanceToPayFees
+import io.novafoundation.nova.feature_dapp_impl.domain.browser.signExtrinsic.ConfirmDAppOperationValidationSystem
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.signExtrinsic.DAppSignInteractor
+import io.novafoundation.nova.feature_dapp_impl.domain.browser.signExtrinsic.convertingToAmount
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskChain
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskSendTransactionRequest
@@ -30,6 +35,7 @@ import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.PersonalSign
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.TypedMessage
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
+import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -93,6 +99,11 @@ class MetamaskSignInteractor(
         ethereumApiFactory.create(nodeUrl)
     }
 
+    override val validationSystem = when (payload) {
+        is Payload.SendTx -> transactionValidationSystem()
+        else -> EmptyValidationSystem()
+    }
+
     override suspend fun createAccountAddressModel(): AddressModel = withContext(Dispatchers.Default) {
         val address = request.payload.originAddress
         val someEthereumChain = chainRegistry.findChain { it.isEthereumBased }!! // always have at least one ethereum chain in the app
@@ -128,7 +139,7 @@ class MetamaskSignInteractor(
         val tx = ethereumApi.formTransaction(payload.transaction)
         mostRecentFormedTx.emit(tx)
 
-        tx.gasLimit * tx.gasPrice
+        tx.fee()
     }
 
     override suspend fun performOperation(): DAppSignCommunicator.Response = withContext(Dispatchers.Default) {
@@ -155,6 +166,23 @@ class MetamaskSignInteractor(
 
     override fun shutdown() {
         return ethereumApi.shutdown()
+    }
+
+    private fun transactionValidationSystem(): ConfirmDAppOperationValidationSystem {
+        return ValidationSystem {
+            sufficientBalance(
+                fee = { payload ->
+                    payload.convertingToAmount { mostRecentFormedTx.first().fee() }
+                },
+                amount = { payload ->
+                    payload.convertingToAmount { mostRecentFormedTx.first().value }
+                },
+                available = { validationPayload ->
+                    validationPayload.convertingToAmount { ethereumApi.getAccountBalance(payload.originAddress) }
+                },
+                error = { NotEnoughBalanceToPayFees }
+            )
+        }
     }
 
     private suspend fun sendTx(basedOn: MetamaskTransaction): DAppSignCommunicator.Response.Sent {
@@ -259,4 +287,6 @@ class MetamaskSignInteractor(
             )
         )
     }
+
+    private fun RawTransaction.fee() = gasLimit * gasPrice
 }

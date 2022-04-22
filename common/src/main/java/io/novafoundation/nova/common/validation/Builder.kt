@@ -27,3 +27,5 @@ fun <P, E> ValidationSystem(builderBlock: ValidationSystemBuilder<P, E>.() -> Un
 
     return builder.build()
 }
+
+fun <P, E> EmptyValidationSystem(): ValidationSystem<P, E> = ValidationSystem.from(emptyList())

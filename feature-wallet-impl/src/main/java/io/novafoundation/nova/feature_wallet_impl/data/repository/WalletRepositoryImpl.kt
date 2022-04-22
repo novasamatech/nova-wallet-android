@@ -153,6 +153,12 @@ class WalletRepositoryImpl(
         return assetLocal?.let { mapAssetLocalToAsset(it, chainAsset) }
     }
 
+    override suspend fun getAsset(metaId: Long, chainAsset: Chain.Asset): Asset? {
+        val assetLocal = assetCache.getAsset(metaId, chainAsset.chainId, chainAsset.id)
+
+        return assetLocal?.let { mapAssetLocalToAsset(it, chainAsset) }
+    }
+
     override suspend fun syncOperationsFirstPage(
         pageSize: Int,
         filters: Set<TransactionFilter>,
