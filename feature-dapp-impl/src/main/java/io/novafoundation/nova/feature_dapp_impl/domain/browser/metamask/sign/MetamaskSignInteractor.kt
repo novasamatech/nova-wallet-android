@@ -175,7 +175,7 @@ class MetamaskSignInteractor(
                     payload.convertingToAmount { mostRecentFormedTx.first().fee() }
                 },
                 amount = { payload ->
-                    payload.convertingToAmount { mostRecentFormedTx.first().value }
+                    payload.convertingToAmount { mostRecentFormedTx.first().value ?: BigInteger.ZERO }
                 },
                 available = { validationPayload ->
                     validationPayload.convertingToAmount { ethereumApi.getAccountBalance(payload.originAddress) }
