@@ -161,8 +161,12 @@ buildscript {
         google()
         jcenter()
         maven { url "https://plugins.gradle.org/m2/" }
+        mavenCentral()
     }
     dependencies {
+        classpath "io.qameta.allure:allure-kotlin-model:2.4.0"
+        classpath "io.qameta.allure:allure-kotlin-commons:2.4.0"
+        classpath "io.qameta.allure:allure-kotlin-junit4:2.4.0"
         classpath 'com.android.tools.build:gradle:3.6.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath 'com.google.gms:google-services:4.3.3'

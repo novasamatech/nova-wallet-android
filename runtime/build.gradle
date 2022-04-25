@@ -9,9 +9,11 @@ android {
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "io.qameta.allure.android.runners.AllureAndroidJUnitRunner"
 
         buildConfigField "String", "CHAINS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/chains/v3/chains_dev.json\""
+
+        buildConfigField "String", "TEST_CHAINS_URL", "\"https://raw.githubusercontent.com/stepanLav/nova-utils/4c6ffb924a0e9a4e830b70b724c6cae4336631bf/tests/chains_for_testBalance.json\""
     }
 
     buildTypes {

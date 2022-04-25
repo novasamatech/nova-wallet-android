@@ -16,7 +16,7 @@ android {
         targetSdkVersion rootProject.targetSdkVersion
         versionCode computeVersionCode()
         versionName computeVersionName()
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "io.qameta.allure.android.runners.AllureAndroidJUnitRunner"
     }
     signingConfigs {
       ci {
@@ -175,6 +175,11 @@ dependencies {
     androidTestImplementation androidTestRunnerDep
     androidTestImplementation androidTestRulesDep
     androidTestImplementation androidJunitDep
+
+    androidTestImplementation "io.qameta.allure:allure-kotlin-model:2.4.0"
+    androidTestImplementation "io.qameta.allure:allure-kotlin-commons:2.4.0"
+    androidTestImplementation "io.qameta.allure:allure-kotlin-junit4:2.4.0"
+    androidTestImplementation "io.qameta.allure:allure-kotlin-android:2.4.0"
 }
 
 task printVersion {
