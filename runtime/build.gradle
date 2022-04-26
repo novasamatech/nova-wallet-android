@@ -13,7 +13,7 @@ android {
 
         buildConfigField "String", "CHAINS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/chains/v3/chains_dev.json\""
 
-        buildConfigField "String", "TEST_CHAINS_URL", "\"https://raw.githubusercontent.com/stepanLav/nova-utils/feature/add_test_data/tests/chains_for_testBalance.json\""
+        buildConfigField "String", "TEST_CHAINS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/tests/chains_for_testBalance.json\""
     }
 
     buildTypes {
