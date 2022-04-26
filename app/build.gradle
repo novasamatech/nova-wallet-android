@@ -176,10 +176,10 @@ dependencies {
     androidTestImplementation androidTestRulesDep
     androidTestImplementation androidJunitDep
 
-    androidTestImplementation "io.qameta.allure:allure-kotlin-model:2.4.0"
-    androidTestImplementation "io.qameta.allure:allure-kotlin-commons:2.4.0"
-    androidTestImplementation "io.qameta.allure:allure-kotlin-junit4:2.4.0"
-    androidTestImplementation "io.qameta.allure:allure-kotlin-android:2.4.0"
+    androidTestImplementation allureKotlinModel
+    androidTestImplementation allureKotlinCommons
+    androidTestImplementation allureKotlinJunit4
+    androidTestImplementation allureKotlinAndroid
 }
 
 task printVersion {
