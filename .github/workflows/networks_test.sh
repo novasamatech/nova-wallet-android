@@ -7,7 +7,7 @@ adb devices
 ./gradlew :app:assembleDebugAndroidTest
 
 # Run tests
-adb shell am instrument -w -m -e debug false -e class 'io.novafoundation.nova.balances.BalancesIntegrationTest' io.novafoundation.nova.debug.test/io.qameta.allure.android.runners.AllureAndroidJUnitRunner
+adb shell am instrument -w -m -e debug false -e class 'io.novafoundation.nova.balances.BalancesIntegrationTest' io.novafoundation.nova.debug/io.qameta.allure.android.runners.AllureAndroidJUnitRunner
 EXIT_STATUS=$?
 
 # Export results
