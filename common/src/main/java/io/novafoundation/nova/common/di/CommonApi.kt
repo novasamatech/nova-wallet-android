@@ -34,6 +34,7 @@ import jp.co.soramitsu.fearless_utils.encrypt.Signer
 import jp.co.soramitsu.fearless_utils.icon.IconGenerator
 import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
 import jp.co.soramitsu.fearless_utils.wsrpc.logging.Logger
+import okhttp3.OkHttpClient
 import java.util.Random
 
 interface CommonApi {
@@ -108,4 +109,6 @@ interface CommonApi {
     val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
 
     val resourcesHintsMixinFactory: ResourcesHintsMixinFactory
+
+    val okHttpClient: OkHttpClient
 }

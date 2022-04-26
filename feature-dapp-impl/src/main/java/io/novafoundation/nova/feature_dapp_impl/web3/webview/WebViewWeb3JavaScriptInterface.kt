@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 
 class WebViewWeb3JavaScriptInterface {
 
-    private val _messages = MutableSharedFlow<String>(extraBufferCapacity = 10)
+    private val _messages = MutableSharedFlow<String>(extraBufferCapacity = 3)
     val messages: Flow<String> = _messages
 
     @JavascriptInterface

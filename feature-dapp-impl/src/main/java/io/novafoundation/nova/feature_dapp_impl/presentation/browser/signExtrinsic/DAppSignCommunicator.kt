@@ -25,12 +25,15 @@ interface DAppSignCommunicator : DAppSignRequester, DAppSignResponder {
         class Signed(override val requestId: String, val signature: String) : Response()
 
         @Parcelize
+        class Sent(override val requestId: String, val txHash: String) : Response()
+
+        @Parcelize
         class SigningFailed(override val requestId: String) : Response()
     }
 }
 
 suspend fun DAppSignRequester.awaitConfirmation(request: DAppSignPayload): Response {
-    val responsesForRequest = responseFlow.filter { it.requestId == request.requestId }
+    val responsesForRequest = responseFlow.filter { it.requestId == request.body.id }
 
     openRequest(request)
 

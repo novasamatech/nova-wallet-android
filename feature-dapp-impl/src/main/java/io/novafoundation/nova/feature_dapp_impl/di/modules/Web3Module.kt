@@ -1,23 +1,26 @@
 package io.novafoundation.nova.feature_dapp_impl.di.modules
 
-import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core_db.dao.DappAuthorizationDao
-import io.novafoundation.nova.feature_dapp_impl.web3.Web3Responder
-import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsExtensionFactory
-import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsWeb3Controller
+import io.novafoundation.nova.feature_dapp_impl.di.modules.web3.MetamaskModule
+import io.novafoundation.nova.feature_dapp_impl.di.modules.web3.PolkadotJsModule
+import io.novafoundation.nova.feature_dapp_impl.web3.metamask.states.MetamaskStateFactory
+import io.novafoundation.nova.feature_dapp_impl.web3.metamask.transport.MetamaskInjector
+import io.novafoundation.nova.feature_dapp_impl.web3.metamask.transport.MetamaskTransportFactory
+import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsInjector
+import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsTransportFactory
+import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.states.PolkadotJsStateFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.session.DbWeb3Session
 import io.novafoundation.nova.feature_dapp_impl.web3.session.Web3Session
+import io.novafoundation.nova.feature_dapp_impl.web3.states.ExtensionStoreFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3WebViewClientFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewHolder
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewScriptInjector
-import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewWeb3JavaScriptInterface
-import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewWeb3Responder
 
-@Module
+@Module(includes = [PolkadotJsModule::class, MetamaskModule::class])
 class Web3Module {
 
     @Provides
@@ -26,34 +29,19 @@ class Web3Module {
 
     @Provides
     @FeatureScope
-    fun provideWeb3JavascriptResponder(webViewHolder: WebViewHolder): Web3Responder {
-        return WebViewWeb3Responder(webViewHolder)
-    }
-
-    @Provides
-    @FeatureScope
-    fun provideWeb3JavaScriptInterface() = WebViewWeb3JavaScriptInterface()
-
-    @Provides
-    @FeatureScope
     fun provideScriptInjector(
         resourceManager: ResourceManager,
-        web3JavaScriptInterface: WebViewWeb3JavaScriptInterface,
-    ) = WebViewScriptInjector(web3JavaScriptInterface, resourceManager)
-
-    @Provides
-    @FeatureScope
-    fun providePolkadotJsWeb3Controller(
-        webViewScriptInjector: WebViewScriptInjector
-    ) = PolkadotJsWeb3Controller(webViewScriptInjector)
+    ) = WebViewScriptInjector(resourceManager)
 
     @Provides
     @FeatureScope
     fun provideWeb3ClientFactory(
-        polkadotJsWeb3Controller: PolkadotJsWeb3Controller,
+        polkadotJsInjector: PolkadotJsInjector,
+        metamaskInjector: MetamaskInjector,
     ) = Web3WebViewClientFactory(
-        controllers = listOf(
-            polkadotJsWeb3Controller
+        injectors = listOf(
+            polkadotJsInjector,
+            metamaskInjector
         )
     )
 
@@ -65,17 +53,15 @@ class Web3Module {
 
     @Provides
     @FeatureScope
-    fun providePolkadotJsFactory(
-        web3Responder: Web3Responder,
-        web3JavaScriptInterface: WebViewWeb3JavaScriptInterface,
-        web3Session: Web3Session,
-        gson: Gson
-    ): PolkadotJsExtensionFactory {
-        return PolkadotJsExtensionFactory(
-            webViewWeb3JavaScriptInterface = web3JavaScriptInterface,
-            gson = gson,
-            web3Responder = web3Responder,
-            web3Session = web3Session
-        )
-    }
+    fun provideExtensionStoreFactory(
+        polkadotJsStateFactory: PolkadotJsStateFactory,
+        polkadotJsTransportFactory: PolkadotJsTransportFactory,
+        metamaskStateFactory: MetamaskStateFactory,
+        metamaskTransportFactory: MetamaskTransportFactory,
+    ) = ExtensionStoreFactory(
+        polkadotJsStateFactory = polkadotJsStateFactory,
+        polkadotJsTransportFactory = polkadotJsTransportFactory,
+        metamaskStateFactory = metamaskStateFactory,
+        metamaskTransportFactory = metamaskTransportFactory
+    )
 }

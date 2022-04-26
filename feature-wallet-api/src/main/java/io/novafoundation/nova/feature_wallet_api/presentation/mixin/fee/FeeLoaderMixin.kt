@@ -23,6 +23,10 @@ sealed class FeeStatus {
 
 interface FeeLoaderMixin : Retriable {
 
+    class Configuration(
+        val showZeroFiat: Boolean = true
+    )
+
     val feeLiveData: LiveData<FeeStatus>
 
     interface Presentation : FeeLoaderMixin {
@@ -49,7 +53,10 @@ interface FeeLoaderMixin : Retriable {
 
     interface Factory {
 
-        fun create(tokenFlow: Flow<Token>): Presentation
+        fun create(
+            tokenFlow: Flow<Token>,
+            configuration: Configuration = Configuration()
+        ): Presentation
     }
 }
 

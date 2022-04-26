@@ -3,7 +3,8 @@ package io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.sheet
 import android.content.Context
 import android.os.Bundle
 import coil.ImageLoader
-import io.novafoundation.nova.common.utils.setDrawableStart
+import io.novafoundation.nova.common.utils.postToSelf
+import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DappPendingConfirmation
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DappPendingConfirmation.Action
@@ -26,18 +27,10 @@ class ConfirmAuthorizeBottomSheet(
 
         val action = confirmation.action
 
-        confirmAuthorizeDappIcon.showDAppIcon(action.dAppIconUrl, imageLoader)
+        confirmAuthorizeDappIcon.showDAppIcon(action.content.dAppIconUrl, imageLoader)
+        confirmAuthorizeDappWallet.postToSelf { showAddress(action.content.walletAddressModel) }
 
-        with(confirmAuthorizeDappWallet) {
-            valuePrimary.setDrawableStart(action.walletAddressModel.image, paddingInDp = 8)
-
-            // post to prevent secondaryValue not to hide due to early show
-            post { showValue(action.walletAddressModel.nameOrAddress) }
-        }
-
-        confirmAuthorizeDappTitle.text = action.title
-        with(confirmAuthorizeDappDApp) {
-            post { confirmAuthorizeDappDApp.showValue(action.dAppUrl) }
-        }
+        confirmAuthorizeDappTitle.text = action.content.title
+        confirmAuthorizeDappDApp.postToSelf { showValue(action.content.dAppUrl) }
     }
 }

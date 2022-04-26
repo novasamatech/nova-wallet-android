@@ -91,7 +91,7 @@ class AmountView @JvmOverloads constructor(
         stakingAssetImage.setImageDrawable(image)
     }
 
-    fun loadAssetImage(imageUrl: String) {
+    fun loadAssetImage(imageUrl: String?) {
         stakingAssetImage.load(imageUrl, imageLoader)
     }
 

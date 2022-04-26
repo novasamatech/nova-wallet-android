@@ -8,10 +8,13 @@ import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.multiChainEncryptionFor
 import io.novafoundation.nova.feature_account_api.domain.model.multiChainEncryptionIn
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import jp.co.soramitsu.fearless_utils.encrypt.SignatureWrapper
 import jp.co.soramitsu.fearless_utils.encrypt.Signer
 import jp.co.soramitsu.fearless_utils.encrypt.keypair.Keypair
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import org.web3j.crypto.ECKeyPair
+import org.web3j.crypto.Sign
 
 suspend fun SecretStoreV2.sign(
     metaAccount: MetaAccount,
@@ -38,6 +41,38 @@ suspend fun SecretStoreV2.signSubstrate(
     message = message,
     keypair = getSubstrateKeypair(metaAccount, accountId)
 ).signature
+
+suspend fun SecretStoreV2.signEthereum(
+    metaAccount: MetaAccount,
+    accountId: AccountId,
+    message: ByteArray,
+): ByteArray {
+    return signEthereum(metaAccount, accountId) {
+        Sign.signMessage(message, it, false)
+    }
+}
+
+suspend fun SecretStoreV2.signEthereumPrefixed(
+    metaAccount: MetaAccount,
+    accountId: AccountId,
+    message: ByteArray
+): ByteArray {
+    return signEthereum(metaAccount, accountId) {
+        Sign.signPrefixedMessage(message, it)
+    }
+}
+
+private suspend inline fun SecretStoreV2.signEthereum(
+    metaAccount: MetaAccount,
+    accountId: AccountId,
+    sign: (ECKeyPair) -> Sign.SignatureData
+): ByteArray {
+    val keypair = getEthereumKeypair(metaAccount, accountId)
+
+    val signingData = sign(ECKeyPair.create(keypair.privateKey))
+
+    return SignatureWrapper.Ecdsa(v = signingData.v, r = signingData.r, s = signingData.s).signature
+}
 
 /**
  * @return secrets for the given [accountId] in [metaAccount] respecting configuration of [chain] (is ethereum or not).
@@ -76,5 +111,16 @@ suspend fun SecretStoreV2.getSubstrateKeypair(
         getChainAccountKeypair(metaAccount.id, accountId)
     } else {
         getMetaAccountKeypair(metaAccount.id, isEthereum = false)
+    }
+}
+
+suspend fun SecretStoreV2.getEthereumKeypair(
+    metaAccount: MetaAccount,
+    accountId: AccountId
+): Keypair {
+    return if (hasChainSecrets(metaAccount.id, accountId)) {
+        getChainAccountKeypair(metaAccount.id, accountId)
+    } else {
+        getMetaAccountKeypair(metaAccount.id, isEthereum = true)
     }
 }

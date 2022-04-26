@@ -1,8 +1,8 @@
 buildscript {
     ext {
         // App version
-        versionName = '2.6.5'
-        versionCode = 18
+        versionName = '2.7.0'
+        versionCode = 19
 
         applicationId = "io.novafoundation.nova"
         releaseApplicationSuffix = "market"
@@ -45,6 +45,8 @@ buildscript {
         robolectricVersion = '4.1'
 
         bouncyCastleVersion = '1.65'
+
+        web3jVersion = '4.8.0'
 
         fearlessLibVersion = '1.4.0'
 
@@ -96,6 +98,9 @@ buildscript {
         coroutinesDep = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
         coroutinesAndroidDep = "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion"
         coroutinesTestDep = "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion"
+        coroutinesFutureDep = "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$coroutinesVersion"
+
+        web3jDep = "org.web3j:core:$web3jVersion"
 
         // viewModelScope
         viewModelKtxDep = "androidx.lifecycle:lifecycle-viewmodel-ktx:$architectureComponentVersion"

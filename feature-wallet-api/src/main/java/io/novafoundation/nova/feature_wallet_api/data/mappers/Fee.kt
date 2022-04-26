@@ -1,16 +1,15 @@
 package io.novafoundation.nova.feature_wallet_api.data.mappers
 
-import io.novafoundation.nova.common.utils.formatAsCurrency
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.model.FeeModel
+import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import java.math.BigDecimal
 
 fun mapFeeToFeeModel(
     fee: BigDecimal,
-    token: Token
+    token: Token,
+    includeZeroFiat: Boolean = true
 ) = FeeModel(
     fee = fee,
-    displayToken = fee.formatTokenAmount(token.configuration),
-    displayFiat = token.fiatAmount(fee).formatAsCurrency()
+    display = mapAmountToAmountModel(fee, token, includeZeroFiat)
 )

@@ -5,23 +5,18 @@ import io.novafoundation.nova.common.utils.floorMod
 import io.novafoundation.nova.common.utils.percentageToFraction
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.feature_account_api.presenatation.chain.GradientUi
-import io.novafoundation.nova.runtime.multiNetwork.ChainGradientParser
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-
-private val DEFAULT_GRADIENT by lazy {
-    ChainGradientParser.parse("linear-gradient(315deg, #434852 0%, #787F92 100%)")!!
-}
 
 fun mapChainToUi(chain: Chain): ChainUi = with(chain) {
     ChainUi(
         id = id,
         name = name,
-        gradient = mapGradientToUi(chain.color ?: DEFAULT_GRADIENT),
+        gradient = mapGradientToUi(chain.color ?: Chain.Gradient.Default),
         icon = icon
     )
 }
 
-private fun mapGradientToUi(gradient: Chain.Gradient) = GradientUi(
+fun mapGradientToUi(gradient: Chain.Gradient) = GradientUi(
     angle = cssAngleToAndroid(gradient.angle.toInt()),
     colors = gradient.colors.map(Color::parseColor).toIntArray(),
     positions = gradient.positionsPercent.map(Float::percentageToFraction).toFloatArray()

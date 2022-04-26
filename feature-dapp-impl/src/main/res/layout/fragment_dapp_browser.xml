@@ -34,6 +34,14 @@
             android:layout_weight="1" />
     </LinearLayout>
 
+    <ProgressBar
+        android:id="@+id/dappBrowserProgress"
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:max="100"
+        tools:progress="45" />
+
     <WebView
         android:id="@+id/dappBrowserWebView"
         android:layout_width="match_parent"

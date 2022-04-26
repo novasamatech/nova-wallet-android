@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_dapp_impl.presentation.browser.main
 
-import io.novafoundation.nova.common.address.AddressModel
+import io.novafoundation.nova.feature_dapp_impl.web3.states.hostApi.AuthorizeDAppPayload
 
 class DappPendingConfirmation<A : DappPendingConfirmation.Action>(
     val onConfirm: () -> Unit,
@@ -10,12 +10,7 @@ class DappPendingConfirmation<A : DappPendingConfirmation.Action>(
 ) {
 
     sealed class Action {
-        class Authorize(
-            val title: String,
-            val dAppIconUrl: String?,
-            val dAppUrl: String,
-            val walletAddressModel: AddressModel
-        ) : Action()
+        class Authorize(val content: AuthorizeDAppPayload) : Action()
 
         object AcknowledgePhishingAlert : Action()
 

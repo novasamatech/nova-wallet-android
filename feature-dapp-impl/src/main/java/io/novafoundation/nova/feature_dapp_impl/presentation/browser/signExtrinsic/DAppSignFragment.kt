@@ -1,20 +1,22 @@
 package io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic
 
 import android.content.DialogInterface
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import coil.ImageLoader
-import coil.request.ImageRequest
 import io.novafoundation.nova.common.base.BaseBottomSheetFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.postToSelf
-import io.novafoundation.nova.common.utils.setDrawableStart
+import io.novafoundation.nova.common.view.setProgress
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.showWallet
+import io.novafoundation.nova.feature_account_api.view.showAddress
+import io.novafoundation.nova.feature_account_api.view.showChain
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
@@ -54,6 +56,8 @@ class DAppSignExtrinsicFragment : BaseBottomSheetFragment<DAppSignViewModel>() {
     override fun initViews() {
         confirmInnerContent.inflateChild(R.layout.bottom_sheet_confirm_sign_extrinsic, attachToRoot = true)
 
+        confirmDAppActionAllow.prepareForProgress(viewLifecycleOwner)
+
         confirmDAppActionAllow.setOnClickListener { viewModel.acceptClicked() }
         confirmDAppActionAllow.setText(R.string.common_confirm)
         confirmDAppActionReject.setOnClickListener { viewModel.rejectClicked() }
@@ -74,39 +78,37 @@ class DAppSignExtrinsicFragment : BaseBottomSheetFragment<DAppSignViewModel>() {
 
     @Suppress("UNCHECKED_CAST")
     override fun subscribe(viewModel: DAppSignViewModel) {
+        setupFeeLoading(viewModel, confirmSignExtinsicFee)
+        observeValidations(viewModel)
+
         viewModel.maybeChainUi.observe { chainUi ->
-            if (chainUi != null) {
-                confirmSignExtinsicNetwork.postToSelf { showValue(chainUi.name) }
-                loadImage(chainUi.icon)?.let {
-                    confirmSignExtinsicNetwork.valuePrimary.setDrawableStart(it, paddingInDp = 8, widthInDp = 24)
+            confirmSignExtinsicNetwork.postToSelf {
+                if (chainUi != null) {
+                    showChain(chainUi)
+                } else {
+                    makeGone()
                 }
-            } else {
-                confirmSignExtinsicNetwork.makeGone()
             }
         }
 
         viewModel.requestedAccountModel.observe {
-            confirmSignExtinsicAccount.valuePrimary.setDrawableStart(it.image, paddingInDp = 8)
-            confirmSignExtinsicAccount.postToSelf { showValue(it.nameOrAddress) }
+            confirmSignExtinsicAccount.postToSelf { showAddress(it) }
         }
 
-        viewModel.walletModel.observe {
-            confirmSignExtinsicWallet.valuePrimary.setDrawableStart(it.image, paddingInDp = 8)
-            confirmSignExtinsicWallet.postToSelf { showValue(it.nameOrAddress) }
+        viewModel.walletUi.observe {
+            confirmSignExtinsicWallet.postToSelf { showWallet(it) }
         }
 
         viewModel.dAppInfo.observe {
             confirmSignExtinsicIcon.showDAppIcon(it.metadata?.iconLink, imageLoader)
         }
 
-        setupFeeLoading(viewModel, confirmSignExtinsicFee)
-    }
+        viewModel.performingOperationInProgress.observe { operationInProgress ->
+            val actionsAllowed = !operationInProgress
 
-    private suspend fun loadImage(url: String): Drawable? {
-        val request = ImageRequest.Builder(requireContext())
-            .data(url)
-            .build()
-
-        return imageLoader.execute(request).drawable
+            isCancelable = actionsAllowed
+            confirmDAppActionReject.isEnabled = actionsAllowed
+            confirmDAppActionAllow.setProgress(show = operationInProgress)
+        }
     }
 }
