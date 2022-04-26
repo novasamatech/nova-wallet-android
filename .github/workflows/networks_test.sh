@@ -3,10 +3,13 @@ adb devices
 # adb logcat -c
 # adb logcat &
 
-# Build tests
+# Build app and install
 ./gradlew :app:assembleDebug
-
 adb -s emulator-5554 install app/build/outputs/apk/debug/app-debug.apk
+
+# Build tests and install
+./gradlew :app:assembleDebugAndroidTest
+adb -s emulator-5554 install app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
 
 # Show instrumentation
 echo "List of instrumental tasks"
