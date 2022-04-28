@@ -59,6 +59,11 @@ android {
               groups = localFirebaseGroup
             }
         }
+        instrumentialTest {
+            initWith buildTypes.debug
+            matchingFallbacks = ['debug']
+            defaultConfig.testInstrumentationRunner "io.qameta.allure.android.runners.AllureAndroidJUnitRunner"
+        }
     }
 
     sourceSets {
@@ -175,6 +180,11 @@ dependencies {
     androidTestImplementation androidTestRunnerDep
     androidTestImplementation androidTestRulesDep
     androidTestImplementation androidJunitDep
+
+    androidTestImplementation allureKotlinModel
+    androidTestImplementation allureKotlinCommons
+    androidTestImplementation allureKotlinJunit4
+    androidTestImplementation allureKotlinAndroid
 }
 
 task printVersion {
