@@ -4,7 +4,7 @@ adb devices
 # adb logcat &
 
 # Build app and install
-./gradlew :app:assembleDebug
+./gradlew :app:assembleInstrumentialTest
 adb -s emulator-5554 install app/build/outputs/apk/debug/app-debug.apk
 
 # Build tests and install

@@ -16,7 +16,7 @@ android {
         targetSdkVersion rootProject.targetSdkVersion
         versionCode computeVersionCode()
         versionName computeVersionName()
-        testInstrumentationRunner "io.qameta.allure.android.runners.AllureAndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
       ci {
@@ -58,6 +58,11 @@ android {
               releaseNotes = localReleaseNotes
               groups = localFirebaseGroup
             }
+        }
+        instrumentialTest {
+            initWith buildTypes.debug
+            matchingFallbacks = ['debug']
+            defaultConfig.testInstrumentationRunner "io.qameta.allure.android.runners.AllureAndroidJUnitRunner"
         }
     }
 
