@@ -42,7 +42,7 @@ fun BaseFragment<*>.setupStartStakingComponent(component: StartStakingComponent,
 
     // events
     component.events.observeEvent {
-        when(it) {
+        when (it) {
             is StartStakingEvent.ShowRewardEstimationDetails -> {
                 StakingRewardEstimationBottomSheet(requireContext(), it.payload).show()
             }

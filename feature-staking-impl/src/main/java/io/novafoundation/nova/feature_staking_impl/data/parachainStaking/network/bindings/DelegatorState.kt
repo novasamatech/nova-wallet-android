@@ -66,7 +66,6 @@ private fun bindPendingDelegationRequests(
     )
 }
 
-
 // (collatorId, delegationRequest)
 private fun bindDelegationRequest(
     instance: Any?,

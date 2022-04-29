@@ -56,7 +56,7 @@ private class RelaychainStakeSummaryComponent(
     private val assetWithChain: SingleAssetSharedState.AssetWithChain,
     private val hostContext: ComponentHostContext,
     private val resourceManager: ResourceManager,
-): StakeSummaryComponent,
+) : StakeSummaryComponent,
     CoroutineScope by hostContext.scope,
     WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(hostContext.scope) {
 
@@ -67,7 +67,7 @@ private class RelaychainStakeSummaryComponent(
     }.shareInBackground()
 
     override val state: Flow<StakeSummaryState?> = selectedAccountStakingStateFlow.transformLatest { stakingState ->
-        when(stakingState) {
+        when (stakingState) {
             is StakingState.NonStash -> emit(null)
             is StakingState.Stash.Nominator -> emitAll(nominatorState(stakingState))
             is StakingState.Stash.Validator -> emitAll(validatorState(stakingState))
@@ -79,7 +79,7 @@ private class RelaychainStakeSummaryComponent(
 
     override fun onAction(action: StakeSummaryAction) {
         launch {
-            when(action) {
+            when (action) {
                 StakeSummaryAction.StatusClicked -> {
                     val details = state.firstNotNull().dataOrNull ?: return@launch
 
@@ -92,14 +92,14 @@ private class RelaychainStakeSummaryComponent(
     private suspend fun nominatorState(
         stakingState: StakingState.Stash.Nominator
     ): Flow<StakeSummaryState> = stakeSummaryState(stakingInteractor.observeNominatorSummary(stakingState)) { status ->
-        when(status) {
+        when (status) {
             NominatorStatus.Active -> StakeStatusModel.Active(
                 details = string(R.string.staking_nominator_status_alert_active_title) to
                     string(R.string.staking_nominator_status_alert_active_message)
             )
 
             is NominatorStatus.Inactive -> StakeStatusModel.Inactive(
-                details = when(status.reason) {
+                details = when (status.reason) {
                     Reason.MIN_STAKE -> string(R.string.staking_nominator_status_alert_inactive_title) to
                         string(R.string.staking_nominator_status_alert_low_stake)
 
@@ -120,7 +120,7 @@ private class RelaychainStakeSummaryComponent(
     private suspend fun validatorState(
         stakingState: StakingState.Stash.Validator
     ): Flow<StakeSummaryState> = stakeSummaryState(stakingInteractor.observeValidatorSummary(stakingState)) { status ->
-        when(status) {
+        when (status) {
             ValidatorStatus.ACTIVE -> StakeStatusModel.Active(
                 details = string(R.string.staking_nominator_status_alert_active_title) to
                     string(R.string.staking_nominator_status_alert_active_message)
@@ -136,7 +136,7 @@ private class RelaychainStakeSummaryComponent(
     private suspend fun neitherState(
         stakingState: StakingState.Stash.None
     ): Flow<StakeSummaryState> = stakeSummaryState(stakingInteractor.observeStashSummary(stakingState)) { status ->
-        when(status) {
+        when (status) {
             StashNoneStatus.INACTIVE -> StakeStatusModel.Inactive(
                 details = string(R.string.staking_nominator_status_alert_inactive_title) to
                     string(R.string.staking_bonded_inactive)

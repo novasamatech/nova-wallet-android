@@ -17,16 +17,16 @@ sealed class DelegatorState(
         val total: Balance,
         val requests: PendingDelegationRequests,
         val status: DelegatorStatus,
-    ): DelegatorState(accountId, chain)
+    ) : DelegatorState(accountId, chain)
 
-    class None(accountId: AccountId, chain: Chain): DelegatorState(accountId, chain)
+    class None(accountId: AccountId, chain: Chain) : DelegatorState(accountId, chain)
 }
 
 sealed class DelegatorStatus {
 
-    object Active: DelegatorStatus()
+    object Active : DelegatorStatus()
 
-    class Leaving(val roundIndex: RoundIndex): DelegatorStatus()
+    class Leaving(val roundIndex: RoundIndex) : DelegatorStatus()
 }
 
 class DelegatorBond(

@@ -15,7 +15,6 @@ typealias AlertsEvent = Nothing
 
 typealias AlertsAction = Nothing
 
-
 class AlertsComponentFactory(
     private val relaychainComponentFactory: RelaychainAlertsComponentFactory,
     private val compoundStakingComponentFactory: CompoundStakingComponentFactory,

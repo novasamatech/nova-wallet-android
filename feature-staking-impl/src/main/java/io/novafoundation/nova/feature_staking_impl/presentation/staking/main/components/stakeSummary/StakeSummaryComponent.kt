@@ -27,9 +27,9 @@ sealed class StakeStatusModel(val details: TitleAndMessage) {
         val timeLeft: Long,
         @StringRes val messageFormat: Int,
         details: TitleAndMessage
-    ): StakeStatusModel(details)
+    ) : StakeStatusModel(details)
 
-    class Inactive(details: TitleAndMessage): StakeStatusModel(details)
+    class Inactive(details: TitleAndMessage) : StakeStatusModel(details)
 }
 
 sealed class StakeSummaryEvent {

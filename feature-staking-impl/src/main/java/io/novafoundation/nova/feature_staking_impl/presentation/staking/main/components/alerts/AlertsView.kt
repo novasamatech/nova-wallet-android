@@ -34,7 +34,7 @@ class AlertsView @JvmOverloads constructor(
 
     fun setStatus(alerts: List<AlertModel>) {
         if (alerts.isEmpty()) {
-           makeGone()
+            makeGone()
         } else {
             makeVisible()
 
@@ -52,7 +52,7 @@ class AlertsView @JvmOverloads constructor(
 }
 
 fun AlertsView.setState(alertsState: AlertsState?) {
-    when(alertsState) {
+    when (alertsState) {
         is LoadingState.Loaded -> setStatus(alertsState.data)
         is LoadingState.Loading -> showLoading()
         null -> makeGone()

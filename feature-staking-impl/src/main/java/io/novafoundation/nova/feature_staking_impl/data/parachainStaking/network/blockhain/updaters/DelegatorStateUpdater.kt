@@ -17,7 +17,7 @@ class DelegatorStateUpdater(
     storageCache: StorageCache,
     val stakingSharedState: StakingSharedState,
     chainRegistry: ChainRegistry,
-): SingleStorageKeyUpdater<AccountUpdateScope>(scope, stakingSharedState, chainRegistry, storageCache), ParachainStakingUpdater {
+) : SingleStorageKeyUpdater<AccountUpdateScope>(scope, stakingSharedState, chainRegistry, storageCache), ParachainStakingUpdater {
 
     override suspend fun storageKey(runtime: RuntimeSnapshot): String? {
         val account = scope.getAccount()

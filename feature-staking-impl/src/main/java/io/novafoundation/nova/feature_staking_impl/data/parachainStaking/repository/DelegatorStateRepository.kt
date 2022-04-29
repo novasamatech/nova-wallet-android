@@ -20,14 +20,14 @@ interface DelegatorStateRepository {
 
 class RealDelegatorStateRepository(
     private val storage: StorageDataSource,
-): DelegatorStateRepository {
+) : DelegatorStateRepository {
 
     override fun observeDelegatorState(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): Flow<DelegatorState> {
-       return storage.subscribe(chain.id) {
-           runtime.metadata.parachainStaking().storage("DelegatorState").observe(
-               accountId,
-               binding = { bindDelegatorState(it, accountId, chain) }
-           )
-       }
+        return storage.subscribe(chain.id) {
+            runtime.metadata.parachainStaking().storage("DelegatorState").observe(
+                accountId,
+                binding = { bindDelegatorState(it, accountId, chain) }
+            )
+        }
     }
 }

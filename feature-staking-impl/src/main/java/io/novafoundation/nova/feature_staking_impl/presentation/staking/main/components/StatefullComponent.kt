@@ -23,12 +23,11 @@ interface StatefullComponent<STATE, EVENT, ACTION> {
      */
     val state: Flow<STATE?>
 
-
     fun onAction(action: ACTION)
 }
 
-class UnsupportedComponent<S, E, A>: StatefullComponent<S, E, A> {
-    override val events =  MutableLiveData<Event<E>>()
+class UnsupportedComponent<S, E, A> : StatefullComponent<S, E, A> {
+    override val events = MutableLiveData<Event<E>>()
 
     override val state: Flow<S?> = flowOf(null)
 
@@ -44,7 +43,7 @@ interface AwaitableEvent<P, R> {
 
 typealias ChooseOneOfAwaitableEvent<E> = AwaitableEvent<List<E>, E>
 
-suspend fun <A: AwaitableEvent<P, R>, P, R> MutableLiveData<out Event<in A>>.awaitAction(
+suspend fun <A : AwaitableEvent<P, R>, P, R> MutableLiveData<out Event<in A>>.awaitAction(
     payload: P,
     eventCreator: (ActionAwaitableMixin.Action<P, R>) -> A
 ): R {

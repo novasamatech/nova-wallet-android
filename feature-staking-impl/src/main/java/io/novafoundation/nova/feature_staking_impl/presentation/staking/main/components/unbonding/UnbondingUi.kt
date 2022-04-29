@@ -7,7 +7,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 
 fun BaseFragment<*>.setupUnbondingComponent(component: UnbondingComponent, view: UnbondingsView) {
     component.events.observeEvent {
-        when(it) {
+        when (it) {
             is UnbondingEvent.ChooseRebondKind -> {
                 ChooseRebondKindBottomSheet(requireContext(), it.value)
                     .show()
@@ -27,4 +27,3 @@ fun BaseFragment<*>.setupUnbondingComponent(component: UnbondingComponent, view:
         }
     }
 }
-

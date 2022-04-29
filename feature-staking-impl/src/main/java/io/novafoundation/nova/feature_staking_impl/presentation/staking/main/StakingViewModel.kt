@@ -28,23 +28,23 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 
 class StakingViewModel(
-        selectedAccountUseCase: SelectedAccountUseCase,
+    selectedAccountUseCase: SelectedAccountUseCase,
 
-        assetSelectorMixinFactory: MixinFactory<AssetSelectorMixin.Presentation>,
-        alertsComponentFactory: AlertsComponentFactory,
-        unbondingComponentFactory: UnbondingComponentFactory,
-        startStakingComponentFactory: StartStakingComponentFactory,
-        stakeSummaryComponentFactory: StakeSummaryComponentFactory,
-        userRewardsComponentFactory: UserRewardsComponentFactory,
-        stakeActionsComponentFactory: StakeActionsComponentFactory,
-        networkInfoComponentFactory: NetworkInfoComponentFactory,
+    assetSelectorMixinFactory: MixinFactory<AssetSelectorMixin.Presentation>,
+    alertsComponentFactory: AlertsComponentFactory,
+    unbondingComponentFactory: UnbondingComponentFactory,
+    startStakingComponentFactory: StartStakingComponentFactory,
+    stakeSummaryComponentFactory: StakeSummaryComponentFactory,
+    userRewardsComponentFactory: UserRewardsComponentFactory,
+    stakeActionsComponentFactory: StakeActionsComponentFactory,
+    networkInfoComponentFactory: NetworkInfoComponentFactory,
 
-        private val addressIconGenerator: AddressIconGenerator,
-        private val router: StakingRouter,
+    private val addressIconGenerator: AddressIconGenerator,
+    private val router: StakingRouter,
 
-        private val validationExecutor: ValidationExecutor,
-        private val singleAssetSharedState: SingleAssetSharedState,
-        stakingUpdateSystem: UpdateSystem,
+    private val validationExecutor: ValidationExecutor,
+    private val singleAssetSharedState: SingleAssetSharedState,
+    stakingUpdateSystem: UpdateSystem,
 ) : BaseViewModel(),
     Validatable by validationExecutor {
 

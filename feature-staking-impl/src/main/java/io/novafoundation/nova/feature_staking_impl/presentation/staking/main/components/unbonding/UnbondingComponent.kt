@@ -36,7 +36,6 @@ sealed class UnbondingAction {
     object RedeemClicked : UnbondingAction()
 }
 
-
 class UnbondingComponentFactory(
     private val relaychainUnbondingComponentFactory: RelaychainUnbondingComponentFactory,
     private val compoundStakingComponentFactory: CompoundStakingComponentFactory,
@@ -50,4 +49,3 @@ class UnbondingComponentFactory(
         hostContext = hostContext
     )
 }
-

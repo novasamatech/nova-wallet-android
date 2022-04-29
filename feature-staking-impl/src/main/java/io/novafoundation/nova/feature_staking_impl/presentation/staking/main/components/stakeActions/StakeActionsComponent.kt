@@ -16,8 +16,7 @@ typealias StakeActionsEvent = Nothing
 
 sealed class StakeActionsAction {
 
-    class ActionClicked(val action: ManageStakeAction): StakeActionsAction()
-
+    class ActionClicked(val action: ManageStakeAction) : StakeActionsAction()
 }
 
 class StakeActionsComponentFactory(

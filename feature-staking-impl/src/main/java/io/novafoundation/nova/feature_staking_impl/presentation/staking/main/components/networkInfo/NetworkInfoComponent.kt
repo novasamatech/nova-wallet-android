@@ -17,8 +17,7 @@ typealias NetworkInfoEvent = Nothing
 
 sealed class NetworkInfoAction {
 
-    object ChangeExpendedStateClicked: NetworkInfoAction()
-
+    object ChangeExpendedStateClicked : NetworkInfoAction()
 }
 
 class NetworkInfoComponentFactory(

@@ -12,7 +12,6 @@ data class NetworkInfoItem(val title: String, val content: LoadingState<Content>
     data class Content(val primary: String, val secondary: String?)
 }
 
-
 fun NetworkInfoItem.Companion.totalStaked(resourceManager: ResourceManager, content: NetworkInfoItem.Content?): NetworkInfoItem {
     return NetworkInfoItem(
         title = resourceManager.getString(R.string.staking_total_staked),

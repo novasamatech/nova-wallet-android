@@ -27,7 +27,7 @@ class NetworkInfoAdapter : BaseListAdapter<NetworkInfoItem, NetworkInfoHolder>(D
     }
 }
 
-private class DiffCallback: DiffUtil.ItemCallback<NetworkInfoItem>() {
+private class DiffCallback : DiffUtil.ItemCallback<NetworkInfoItem>() {
 
     override fun areItemsTheSame(oldItem: NetworkInfoItem, newItem: NetworkInfoItem): Boolean {
         return oldItem.title == newItem.title
@@ -38,12 +38,12 @@ private class DiffCallback: DiffUtil.ItemCallback<NetworkInfoItem>() {
     }
 }
 
-class NetworkInfoHolder(override val containerView: TableCellView): BaseViewHolder(containerView) {
+class NetworkInfoHolder(override val containerView: TableCellView) : BaseViewHolder(containerView) {
 
     fun bind(item: NetworkInfoItem, isLast: Boolean) = with(containerView) {
         setTitle(item.title)
 
-        when(val content = item.content) {
+        when (val content = item.content) {
             is LoadingState.Loaded -> showValue(content.data.primary, content.data.secondary)
             is LoadingState.Loading -> showProgress()
         }

@@ -6,7 +6,7 @@ fun <T> bindList(dynamicInstance: Any?, itemBinder: (Any?) -> T): List<T> {
     }
 }
 
-inline fun <reified T: Enum<T>> bindCollectionEnum(dynamicInstance: Any?): T {
+inline fun <reified T : Enum<T>> bindCollectionEnum(dynamicInstance: Any?): T {
     val enumValue = dynamicInstance.cast<String>()
 
     return enumValueOf(enumValue)

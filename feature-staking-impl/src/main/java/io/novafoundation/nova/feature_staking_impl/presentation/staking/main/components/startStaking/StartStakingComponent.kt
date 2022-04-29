@@ -22,7 +22,7 @@ class ReturnsModel(
 
 sealed class StartStakingEvent {
 
-    class ShowRewardEstimationDetails(val payload: StakingRewardEstimationBottomSheet.Payload): StartStakingEvent()
+    class ShowRewardEstimationDetails(val payload: StakingRewardEstimationBottomSheet.Payload) : StartStakingEvent()
 }
 
 sealed class StartStakingAction {
