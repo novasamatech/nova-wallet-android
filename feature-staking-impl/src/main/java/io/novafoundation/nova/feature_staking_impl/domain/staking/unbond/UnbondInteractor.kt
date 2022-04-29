@@ -4,8 +4,8 @@ import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_staking_api.domain.api.EraTimeCalculatorFactory
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
-import io.novafoundation.nova.feature_staking_api.domain.model.StakingState
 import io.novafoundation.nova.feature_staking_api.domain.model.isRedeemableIn
+import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.calls.chill
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.calls.unbond
 import io.novafoundation.nova.feature_staking_impl.domain.model.Unbonding
@@ -48,7 +48,7 @@ class UnbondInteractor(
         }
     }
 
-    fun unbondingsFlow(stakingState: StakingState.Stash): Flow<UnboningsdState> {
+    fun unbondingsFlow(stakingState: StakingState.Stash): Flow<UnbondingsState> {
         return flowOf(stakingState).flatMapLatest { stash ->
             val calculator = eraTimeCalculator.create(stakingState.chain.id)
 
@@ -74,7 +74,7 @@ class UnbondInteractor(
                     )
                 }
 
-                UnboningsdState(
+                UnbondingsState(
                     unbondings = unbondings,
                     anythingToRedeem = unbondings.any { it.status is Unbonding.Status.Redeemable },
                     anythingToUnbond = unbondings.any { it.status is Unbonding.Status.Unbonding }

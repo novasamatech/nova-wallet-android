@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.rebond
 
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
-import io.novafoundation.nova.feature_staking_api.domain.model.StakingState
+import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.calls.rebond
 import io.novafoundation.nova.runtime.state.chain

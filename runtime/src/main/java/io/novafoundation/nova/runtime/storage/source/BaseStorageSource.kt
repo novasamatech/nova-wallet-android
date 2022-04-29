@@ -82,4 +82,17 @@ abstract class BaseStorageSource(
 
         return context.query()
     }
+
+    override fun <R> subscribe(
+        chainId: String,
+        at: BlockHash?,
+        subscribe: suspend StorageQueryContext.() -> Flow<R>
+    ): Flow<R> {
+       return flow {
+           val runtime = chainRegistry.getRuntime(chainId)
+           val context = createQueryContext(chainId, at, runtime)
+
+           emitAll(context.subscribe())
+       }
+    }
 }

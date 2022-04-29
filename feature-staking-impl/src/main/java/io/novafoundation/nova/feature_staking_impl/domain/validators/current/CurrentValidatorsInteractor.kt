@@ -7,7 +7,7 @@ import io.novafoundation.nova.feature_staking_api.domain.api.getActiveElectedVal
 import io.novafoundation.nova.feature_staking_api.domain.model.IndividualExposure
 import io.novafoundation.nova.feature_staking_api.domain.model.NominatedValidator
 import io.novafoundation.nova.feature_staking_api.domain.model.NominatedValidator.Status
-import io.novafoundation.nova.feature_staking_api.domain.model.StakingState
+import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
 import io.novafoundation.nova.feature_staking_impl.domain.common.isWaiting
 import io.novafoundation.nova.feature_staking_impl.domain.validators.ValidatorProvider

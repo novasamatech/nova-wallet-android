@@ -21,7 +21,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.AddressD
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingAccount
-import io.novafoundation.nova.feature_staking_api.domain.model.StakingState
+import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.controller.ControllerInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validations.controller.SetControllerValidationPayload

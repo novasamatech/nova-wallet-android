@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.utils.ComponentHolder
 import io.novafoundation.nova.runtime.storage.source.multi.MultiQueryBuilder
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module.StorageEntry
+import kotlinx.coroutines.flow.Flow
 
 typealias StorageKeyComponents = ComponentHolder
 
@@ -12,6 +13,11 @@ interface StorageQueryContext {
     val runtime: RuntimeSnapshot
 
     suspend fun StorageEntry.keys(vararg prefixArgs: Any?): List<StorageKeyComponents>
+
+    suspend fun <V> StorageEntry.observe(
+        vararg keyArguments: Any?,
+        binding: (dynamicInstance: Any?) -> V
+    ): Flow<V>
 
     suspend fun <K, V> StorageEntry.entries(
         vararg prefixArgs: Any?,
@@ -25,7 +31,7 @@ interface StorageQueryContext {
         binding: (String?, K) -> V
     ): Map<K, V>
 
-    suspend fun <K, V> StorageEntry.query(
+    suspend fun <V> StorageEntry.query(
         vararg keyArguments: Any?,
         binding: (scale: String?) -> V
     ): V

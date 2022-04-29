@@ -50,16 +50,18 @@
             android:layout_marginEnd="16dp"
             app:backgroundStyle="blurred" />
 
-        <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.NetworkInfoView
+        <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.NetworkInfoView
             android:id="@+id/stakingNetworkInfo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
+            android:visibility="gone"
+            tools:visibility="visible"
             app:expanded="false" />
 
-        <io.novafoundation.nova.feature_staking_impl.presentation.view.AlertsView
+        <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.alerts.AlertsView
             android:id="@+id/stakingAlertsInfo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -75,7 +77,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp" />
 
-        <io.novafoundation.nova.feature_staking_impl.presentation.view.StakeSummaryView
+        <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.StakeSummaryView
             android:id="@+id/stakingStakeSummary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -86,7 +88,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             tools:visibility="visible" />
 
-        <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.unbonding.UnbondingsView
+        <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.UnbondingsView
             android:id="@+id/stakingStakeUnbondings"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

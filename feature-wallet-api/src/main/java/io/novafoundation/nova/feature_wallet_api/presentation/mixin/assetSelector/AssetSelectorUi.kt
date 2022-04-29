@@ -13,23 +13,23 @@ interface WithAssetSelector {
 
 fun <V> BaseFragment<V>.setupAssetSelector(
     view: AssetSelectorView,
-    viewModel: V,
+    selectorMixin: AssetSelectorMixin,
     imageLoader: ImageLoader
-) where V : BaseViewModel, V : WithAssetSelector {
+) where V : BaseViewModel {
     view.onClick {
-        viewModel.assetSelectorMixin.assetSelectorClicked()
+        selectorMixin.assetSelectorClicked()
     }
 
-    viewModel.assetSelectorMixin.selectedAssetModelFlow.observe {
+    selectorMixin.selectedAssetModelFlow.observe {
         view.setState(imageLoader, it)
     }
 
-    viewModel.assetSelectorMixin.showAssetChooser.observeEvent {
+    selectorMixin.showAssetChooser.observeEvent {
         AssetSelectorBottomSheet(
             imageLoader = imageLoader,
             context = requireContext(),
             payload = it,
-            onClicked = viewModel.assetSelectorMixin::assetChosen
+            onClicked = selectorMixin::assetChosen
         ).show()
     }
 }

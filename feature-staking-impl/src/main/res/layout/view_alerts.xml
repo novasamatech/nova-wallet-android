@@ -50,17 +50,6 @@
         </LinearLayout>
     </com.facebook.shimmer.ShimmerFrameLayout>
 
-    <TextView
-        android:id="@+id/alertNoAlertsInfoTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
-        android:layout_weight="1"
-        android:text="@string/staking_alert_no_alerts_now"
-        android:visibility="gone" />
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/alertsRecycler"
         android:layout_width="match_parent"

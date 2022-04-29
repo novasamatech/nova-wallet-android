@@ -115,6 +115,8 @@ fun RuntimeMetadata.slots() = module(Modules.SLOTS)
 
 fun RuntimeMetadata.session() = module(Modules.SESSION)
 
+fun RuntimeMetadata.parachainStaking() = module(Modules.PARACHAIN_STAKING)
+
 fun RuntimeMetadata.firstExistingModule(vararg options: String): String {
     return options.first(::hasModule)
 }
@@ -153,4 +155,6 @@ object Modules {
     const val CURRENCIES = "Currencies"
 
     const val UNIQUES = "Uniques"
+
+    const val PARACHAIN_STAKING = "ParachainStaking"
 }

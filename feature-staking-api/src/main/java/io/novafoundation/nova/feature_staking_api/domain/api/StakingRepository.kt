@@ -1,16 +1,16 @@
 package io.novafoundation.nova.feature_staking_api.domain.api
 
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import io.novafoundation.nova.feature_staking_api.domain.model.EraIndex
 import io.novafoundation.nova.feature_staking_api.domain.model.Exposure
 import io.novafoundation.nova.feature_staking_api.domain.model.RewardDestination
 import io.novafoundation.nova.feature_staking_api.domain.model.SlashingSpans
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingLedger
-import io.novafoundation.nova.feature_staking_api.domain.model.StakingState
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingStory
 import io.novafoundation.nova.feature_staking_api.domain.model.ValidatorPrefs
+import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import java.math.BigInteger
@@ -34,8 +34,6 @@ interface StakingRepository {
     suspend fun eraLength(chainId: ChainId): BigInteger
 
     suspend fun blockCreationTime(chainId: ChainId): BigInteger
-
-    fun stakingAvailableFlow(chainId: ChainId): Flow<Boolean>
 
     suspend fun getTotalIssuance(chainId: ChainId): BigInteger
 

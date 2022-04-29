@@ -51,6 +51,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStak
 import io.novafoundation.nova.feature_staking_impl.presentation.common.hints.StakingHintsUseCase
 import io.novafoundation.nova.feature_staking_impl.presentation.common.rewardDestination.RewardDestinationMixin
 import io.novafoundation.nova.feature_staking_impl.presentation.common.rewardDestination.RewardDestinationProvider
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.CompoundStakingComponentFactory
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.AssetUseCaseImpl
@@ -378,4 +379,10 @@ class StakingFeatureModule {
         resourceManager: ResourceManager,
         stakingInteractor: StakingInteractor
     ) = StakingHintsUseCase(resourceManager, stakingInteractor)
+
+    @Provides
+    @FeatureScope
+    fun provideCompoundStatefullComponent(
+        sharedState: StakingSharedState,
+    ) = CompoundStakingComponentFactory(sharedState)
 }

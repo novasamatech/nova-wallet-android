@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.validation.DefaultFailureLevel
 import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
-import io.novafoundation.nova.feature_staking_api.domain.model.StakingState
+import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import kotlinx.coroutines.flow.first
 
 private const val UNLOCKING_LIMIT = 32
