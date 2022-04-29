@@ -1,11 +1,11 @@
-package io.novafoundation.nova.feature_staking_impl.di
+package io.novafoundation.nova.feature_staking_impl.di.staking.relaychain
 
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core.storage.StorageCache
-import io.novafoundation.nova.core.updater.UpdateSystem
+import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
@@ -30,10 +30,9 @@ import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.update
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.scope.AccountStakingScope
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.network.updaters.SingleChainUpdateSystem
 
 @Module
-class StakingUpdatersModule {
+class RelaychainStakingUpdatersModule {
 
     @Provides
     @FeatureScope
@@ -243,8 +242,9 @@ class StakingUpdatersModule {
     )
 
     @Provides
+    @Relaychain
     @FeatureScope
-    fun provideStakingUpdaterSystem(
+    fun provideRelaychainStakingUpdaters(
         activeEraUpdater: ActiveEraUpdater,
         validatorExposureUpdater: ValidatorExposureUpdater,
         totalIssuanceUpdater: TotalIssuanceUpdater,
@@ -259,27 +259,20 @@ class StakingUpdatersModule {
         minBondUpdater: MinBondUpdater,
         maxNominatorsUpdater: MaxNominatorsUpdater,
         counterForNominatorsUpdater: CounterForNominatorsUpdater,
-
-        chainRegistry: ChainRegistry,
-        stakingSharedState: StakingSharedState
-    ): UpdateSystem = SingleChainUpdateSystem(
-        updaters = listOf(
-            activeEraUpdater,
-            validatorExposureUpdater,
-            totalIssuanceUpdater,
-            currentEraUpdater,
-            stakingLedgerUpdater,
-            accountValidatorPrefsUpdater,
-            accountNominationsUpdater,
-            rewardDestinationUpdater,
-            historyDepthUpdater,
-            historicalUpdateMediator,
-            accountControllerBalanceUpdater,
-            minBondUpdater,
-            maxNominatorsUpdater,
-            counterForNominatorsUpdater,
-        ),
-        chainRegistry = chainRegistry,
-        singleAssetSharedState = stakingSharedState
+    ): List<Updater> = listOf(
+        activeEraUpdater,
+        validatorExposureUpdater,
+        totalIssuanceUpdater,
+        currentEraUpdater,
+        stakingLedgerUpdater,
+        accountValidatorPrefsUpdater,
+        accountNominationsUpdater,
+        rewardDestinationUpdater,
+        historyDepthUpdater,
+        historicalUpdateMediator,
+        accountControllerBalanceUpdater,
+        minBondUpdater,
+        maxNominatorsUpdater,
+        counterForNominatorsUpdater,
     )
 }

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.main
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AddressModel
+import io.novafoundation.nova.common.address.createAddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.MixinFactory
 import io.novafoundation.nova.common.mixin.api.Validatable
@@ -86,12 +87,23 @@ class StakingViewModel(
             selectedAccountFlow,
             singleAssetSharedState.selectedChainFlow()
         ) { account, chain ->
-            addressIconGenerator.createAddressModel(
-                chain = chain,
-                address = account.addressIn(chain) ?: account.defaultSubstrateAddress,
-                sizeInDp = AddressIconGenerator.SIZE_BIG,
-                accountName = account.name,
-            )
+            val address = account.addressIn(chain)
+
+            if (address != null) {
+                addressIconGenerator.createAddressModel(
+                    chain = chain,
+                    address = address,
+                    sizeInDp = AddressIconGenerator.SIZE_BIG,
+                    accountName = account.name,
+                )
+            } else {
+                // no address found for specified chain - fallback to main substrate address
+                addressIconGenerator.createAddressModel(
+                    accountAddress = account.defaultSubstrateAddress,
+                    sizeInDp = AddressIconGenerator.SIZE_BIG,
+                    accountName = account.name,
+                )
+            }
         }
     }
 }

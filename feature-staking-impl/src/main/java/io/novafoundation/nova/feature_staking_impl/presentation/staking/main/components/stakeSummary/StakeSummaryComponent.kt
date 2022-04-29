@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.CompoundStakingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.StatefullComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.UnsupportedComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.parachain.ParachainStakeSummaryComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.relaychain.RelaychainStakeSummaryComponentFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 
@@ -44,6 +44,7 @@ sealed class StakeSummaryAction {
 
 class StakeSummaryComponentFactory(
     private val relaychainComponentFactory: RelaychainStakeSummaryComponentFactory,
+    private val parachainStakeSummaryComponentFactory: ParachainStakeSummaryComponentFactory,
     private val compoundStakingComponentFactory: CompoundStakingComponentFactory,
 ) {
 
@@ -51,7 +52,7 @@ class StakeSummaryComponentFactory(
         hostContext: ComponentHostContext
     ): StakeSummaryComponent = compoundStakingComponentFactory.create(
         relaychainComponentCreator = relaychainComponentFactory::create,
-        parachainComponentCreator = { _, _ -> UnsupportedComponent() },
+        parachainComponentCreator = parachainStakeSummaryComponentFactory::create,
         hostContext = hostContext
     )
 }

@@ -6,20 +6,19 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import java.math.BigInteger
 
 sealed class DelegatorState(
-    val accountId: AccountId,
     val chain: Chain,
 ) {
 
     class Delegator(
-        accountId: AccountId,
+        val accountId: AccountId,
         chain: Chain,
         val delegations: List<DelegatorBond>,
         val total: Balance,
         val requests: PendingDelegationRequests,
         val status: DelegatorStatus,
-    ) : DelegatorState(accountId, chain)
+    ) : DelegatorState(chain)
 
-    class None(accountId: AccountId, chain: Chain) : DelegatorState(accountId, chain)
+    class None(chain: Chain) : DelegatorState(chain)
 }
 
 sealed class DelegatorStatus {

@@ -103,7 +103,7 @@ abstract class BaseStorageQueryContext(
         return if (keyArguments.isEmpty()) {
             storageKey()
         } else {
-            storageKey(runtime, keyArguments)
+            storageKey(runtime, *keyArguments)
         }
     }
 

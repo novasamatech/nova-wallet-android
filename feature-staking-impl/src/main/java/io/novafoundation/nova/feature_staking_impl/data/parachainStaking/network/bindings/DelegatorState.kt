@@ -24,7 +24,7 @@ fun bindDelegatorState(
     chain: Chain
 ): DelegatorState {
     return when (dynamicInstance) {
-        null -> DelegatorState.None(accountId, chain)
+        null -> DelegatorState.None(chain)
         is Struct.Instance -> bindDelegator(dynamicInstance, accountId, chain)
         else -> incompatible()
     }
@@ -60,9 +60,9 @@ private fun bindPendingDelegationRequests(
     instance: Struct.Instance
 ): PendingDelegationRequests {
     return PendingDelegationRequests(
-        revocationsCount = bindNumber(instance["revocations_count"]),
+        revocationsCount = bindNumber(instance["revocationsCount"]),
         requests = bindList(instance["requests"], ::bindDelegationRequest),
-        lessTotal = bindNumber(instance["less_total"])
+        lessTotal = bindNumber(instance["lessTotal"])
     )
 }
 
@@ -76,7 +76,7 @@ private fun bindDelegationRequest(
     return DelegationRequest(
         collator = bindAccountId(delegationRequestStruct["collator"]),
         amount = bindNumber(delegationRequestStruct["amount"]),
-        whenExecutable = bindRoundIndex(delegationRequestStruct["when_executable"]),
+        whenExecutable = bindRoundIndex(delegationRequestStruct["whenExecutable"]),
         action = bindCollectionEnum(delegationRequestStruct["action"])
     )
 }

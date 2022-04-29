@@ -1,13 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.relaychain
 
 import androidx.annotation.StringRes
-import androidx.lifecycle.MutableLiveData
-import io.novafoundation.nova.common.presentation.dataOrNull
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.Event
-import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
-import io.novafoundation.nova.common.utils.event
-import io.novafoundation.nova.common.utils.firstNotNull
 import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
@@ -18,22 +12,19 @@ import io.novafoundation.nova.feature_staking_impl.domain.model.StakeSummary
 import io.novafoundation.nova.feature_staking_impl.domain.model.StashNoneStatus
 import io.novafoundation.nova.feature_staking_impl.domain.model.ValidatorStatus
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.BaseStakeSummaryComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.StakeStatusModel
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.StakeSummaryAction
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.StakeSummaryComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.StakeSummaryEvent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.StakeSummaryModel
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.StakeSummaryState
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.transformLatest
-import kotlinx.coroutines.launch
 
 class RelaychainStakeSummaryComponentFactory(
     private val stakingInteractor: StakingInteractor,
@@ -56,11 +47,7 @@ private class RelaychainStakeSummaryComponent(
     private val assetWithChain: SingleAssetSharedState.AssetWithChain,
     private val hostContext: ComponentHostContext,
     private val resourceManager: ResourceManager,
-) : StakeSummaryComponent,
-    CoroutineScope by hostContext.scope,
-    WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(hostContext.scope) {
-
-    override val events = MutableLiveData<Event<StakeSummaryEvent>>()
+) : BaseStakeSummaryComponent(hostContext.scope) {
 
     val selectedAccountStakingStateFlow = hostContext.selectedAccount.flatMapLatest {
         stakingInteractor.selectedAccountStakingStateFlow(it, assetWithChain)
@@ -76,18 +63,6 @@ private class RelaychainStakeSummaryComponent(
     }
         .onStart { emit(null) }
         .shareInBackground()
-
-    override fun onAction(action: StakeSummaryAction) {
-        launch {
-            when (action) {
-                StakeSummaryAction.StatusClicked -> {
-                    val details = state.firstNotNull().dataOrNull ?: return@launch
-
-                    events.value = StakeSummaryEvent.ShowStatusDialog(details.status.details).event()
-                }
-            }
-        }
-    }
 
     private suspend fun nominatorState(
         stakingState: StakingState.Stash.Nominator
