@@ -10,7 +10,7 @@ class MetamaskTransaction(
     val gasPrice: String?,
     val from: String,
     val to: String,
-    val data: String,
+    val data: String?,
     val value: String?
 ) : Parcelable
 
