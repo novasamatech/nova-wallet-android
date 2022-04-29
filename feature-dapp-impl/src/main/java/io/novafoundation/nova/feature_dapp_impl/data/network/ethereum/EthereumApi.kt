@@ -20,7 +20,7 @@ interface EthereumApi {
     suspend fun formTransaction(
         fromAddress: String,
         toAddress: String,
-        data: String,
+        data: String?,
         value: BigInteger?,
     ): RawTransaction
 
@@ -51,9 +51,11 @@ private class Web3JEthereumApi(
         return Web3j.build(HttpService(url, okHttpClient))
     }
 
-    override suspend fun formTransaction(fromAddress: String, toAddress: String, data: String, value: BigInteger?): RawTransaction {
+    override suspend fun formTransaction(fromAddress: String, toAddress: String, data: String?, value: BigInteger?): RawTransaction {
         val nonce = getNonce(fromAddress)
         val gasPrice = getGasPrice()
+
+        val dataOrDefault = data.orEmpty()
 
         val forFeeEstimatesTx = Transaction.createFunctionCallTransaction(
             fromAddress,
@@ -62,7 +64,7 @@ private class Web3JEthereumApi(
             null,
             toAddress,
             value,
-            data
+            dataOrDefault
         )
 
         val gasLimit = estimateGasLimit(forFeeEstimatesTx)
@@ -73,7 +75,7 @@ private class Web3JEthereumApi(
             gasLimit,
             toAddress,
             value,
-            data
+            dataOrDefault
         )
     }
 
