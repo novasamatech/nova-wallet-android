@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 
 abstract class BaseStakeSummaryComponent(
     scope: CoroutineScope
-): StakeSummaryComponent,
+) : StakeSummaryComponent,
     CoroutineScope by scope,
     WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(scope) {
 

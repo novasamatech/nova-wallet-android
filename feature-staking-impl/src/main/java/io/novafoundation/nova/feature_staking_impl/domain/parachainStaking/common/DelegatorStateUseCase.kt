@@ -18,7 +18,8 @@ class DelegatorStateUseCase(
     fun delegatorStateFlow(
         account: MetaAccount,
         chain: Chain,
-        chainAsset: Chain.Asset): Flow<DelegatorState> {
+        chainAsset: Chain.Asset
+    ): Flow<DelegatorState> {
         return flow {
             val accountId = account.accountIdIn(chain)
 

@@ -27,7 +27,6 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.flow.withIndex
 
-
 class ParachainStakeSummaryComponentFactory(
     private val resourceManager: ResourceManager,
     private val delegatorStateUseCase: DelegatorStateUseCase,
@@ -54,7 +53,6 @@ private class ParachainStakeSummaryComponent(
     assetWithChain: SingleAssetSharedState.AssetWithChain,
     hostContext: ComponentHostContext,
 ) : BaseStakeSummaryComponent(hostContext.scope) {
-
 
     override val state: Flow<StakeSummaryState?> = selectedAccountUseCase.selectedMetaAccountFlow()
         .transformLatest { account ->
@@ -87,7 +85,6 @@ private class ParachainStakeSummaryComponent(
         .onStart { emit(null) }
         .catch { Log.e(this@ParachainStakeSummaryComponent.LOG_TAG, "Failed to construct state", it) }
         .shareInBackground()
-
 
     private fun delegatorSummaryStateFlow(delegatorState: DelegatorState.Delegator, asset: Asset): Flow<StakeSummaryModel> {
         return flowOf {
