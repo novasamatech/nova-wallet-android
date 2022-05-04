@@ -22,7 +22,7 @@ val BigDecimal.isNonNegative: Boolean
 
 fun Long.daysFromMillis() = TimeUnit.MILLISECONDS.toDays(this)
 
-inline fun <T> List<T>.sumByBigInteger(extractor: (T) -> BigInteger) = fold(BigInteger.ZERO) { acc, element ->
+inline fun <T> Collection<T>.sumByBigInteger(extractor: (T) -> BigInteger) = fold(BigInteger.ZERO) { acc, element ->
     acc + extractor(element)
 }
 

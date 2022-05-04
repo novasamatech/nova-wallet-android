@@ -2,13 +2,12 @@ package io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.bind
 
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountId
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
-import io.novafoundation.nova.common.data.network.runtime.binding.cast
+import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.data.network.runtime.binding.fromHexOrIncompatible
 import io.novafoundation.nova.common.data.network.runtime.binding.storageReturnType
 import io.novafoundation.nova.common.utils.Modules
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.primitives.u32
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.toByteArray
 import java.math.BigInteger
@@ -28,10 +27,8 @@ class FundInfo(
     val pre9180BidderAccountId: AccountId,
 )
 
-fun bindFundInfo(scale: String, runtime: RuntimeSnapshot, paraId: ParaId): FundInfo {
-    val type = runtime.metadata.storageReturnType(Modules.CROWDLOAN, "Funds")
-
-    val dynamicInstance = type.fromHexOrIncompatible(scale, runtime).cast<Struct.Instance>()
+fun bindFundInfo(dynamic: Any?, runtime: RuntimeSnapshot, paraId: ParaId): FundInfo {
+    val dynamicInstance = dynamic.castToStruct()
 
     val fundIndex = bindTrieIndex(dynamicInstance["fundIndex"] ?: dynamicInstance["trieIndex"])
 
@@ -49,6 +46,14 @@ fun bindFundInfo(scale: String, runtime: RuntimeSnapshot, paraId: ParaId): FundI
         pre9180BidderAccountId = createBidderAccountId(runtime, paraId),
         paraId = paraId
     )
+}
+
+fun bindFundInfo(scale: String, runtime: RuntimeSnapshot, paraId: ParaId): FundInfo {
+    val type = runtime.metadata.storageReturnType(Modules.CROWDLOAN, "Funds")
+
+    val dynamicInstance = type.fromHexOrIncompatible(scale, runtime)
+
+    return bindFundInfo(dynamicInstance, runtime, paraId)
 }
 
 private val ADDRESS_PADDING = ByteArray(32)

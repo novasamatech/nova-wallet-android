@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.alerts.AlertsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.alerts.relaychain.RelaychainAlertsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.NetworkInfoComponentFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.parachain.ParachainNetworkInfoComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.relaychain.RelaychainNetworkInfoComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.StakeActionsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.relaychain.RelaychainStakeActionsComponentFactory
@@ -34,8 +35,9 @@ class ComponentsModule {
     @ScreenScope
     fun provideNetworkInfoFactory(
         relaychainComponentFactory: RelaychainNetworkInfoComponentFactory,
+        parachainComponentFactory: ParachainNetworkInfoComponentFactory,
         compoundStakingComponentFactory: CompoundStakingComponentFactory,
-    ) = NetworkInfoComponentFactory(relaychainComponentFactory, compoundStakingComponentFactory)
+    ) = NetworkInfoComponentFactory(relaychainComponentFactory, parachainComponentFactory, compoundStakingComponentFactory)
 
     @Provides
     @ScreenScope

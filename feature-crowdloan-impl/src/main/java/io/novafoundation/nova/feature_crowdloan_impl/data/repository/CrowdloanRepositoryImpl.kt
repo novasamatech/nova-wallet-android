@@ -49,7 +49,7 @@ class CrowdloanRepositoryImpl(
         return remoteStorage.query(chainId) {
             runtime.metadata.crowdloan().storage("Funds").entries(
                 keyExtractor = { (paraId: BigInteger) -> paraId },
-                binding = { scale, paraId -> bindFundInfo(scale!!, runtime, paraId) }
+                binding = { instance, paraId -> bindFundInfo(instance, runtime, paraId) }
             )
         }
     }

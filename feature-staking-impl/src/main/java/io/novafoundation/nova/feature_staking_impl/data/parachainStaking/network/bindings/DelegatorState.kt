@@ -45,7 +45,7 @@ private fun bindDelegator(
     )
 }
 
-private fun bindBond(
+fun bindBond(
     instance: Any?,
 ): DelegatorBond {
     val struct = instance.castToStruct()

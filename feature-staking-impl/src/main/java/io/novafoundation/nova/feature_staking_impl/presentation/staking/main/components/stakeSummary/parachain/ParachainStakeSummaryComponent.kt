@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.flowOf
-import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
@@ -30,7 +29,6 @@ import kotlinx.coroutines.flow.withIndex
 class ParachainStakeSummaryComponentFactory(
     private val resourceManager: ResourceManager,
     private val delegatorStateUseCase: DelegatorStateUseCase,
-    private val selectedAccountUseCase: SelectedAccountUseCase,
 ) {
 
     fun create(
@@ -41,20 +39,18 @@ class ParachainStakeSummaryComponentFactory(
         assetWithChain = assetWithChain,
         hostContext = hostContext,
         delegatorStateUseCase = delegatorStateUseCase,
-        selectedAccountUseCase = selectedAccountUseCase
     )
 }
 
 private class ParachainStakeSummaryComponent(
     delegatorStateUseCase: DelegatorStateUseCase,
-    selectedAccountUseCase: SelectedAccountUseCase,
     private val resourceManager: ResourceManager,
 
     assetWithChain: SingleAssetSharedState.AssetWithChain,
     hostContext: ComponentHostContext,
 ) : BaseStakeSummaryComponent(hostContext.scope) {
 
-    override val state: Flow<StakeSummaryState?> = selectedAccountUseCase.selectedMetaAccountFlow()
+    override val state: Flow<StakeSummaryState?> = hostContext.selectedAccount
         .transformLatest { account ->
             emit(null) // hide UI until state of delegator is determined
 
