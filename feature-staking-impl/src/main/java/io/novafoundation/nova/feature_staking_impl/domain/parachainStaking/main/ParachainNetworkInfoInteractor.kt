@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main
 
 import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.feature_staking_api.domain.api.AccountIdMap
+import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.RoundDurationEstimator
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.CollatorSnapshot
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CurrentRoundRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.ParachainStakingConstantsRepository
@@ -15,22 +16,26 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.mapLatest
 import java.math.BigInteger
+import kotlin.time.DurationUnit
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 class ParachainNetworkInfoInteractor(
     private val currentRoundRepository: CurrentRoundRepository,
     private val parachainStakingConstantsRepository: ParachainStakingConstantsRepository,
+    private val roundDurationEstimator: RoundDurationEstimator,
 ) {
 
     fun observeNetworkInfo(chainId: ChainId): Flow<NetworkInfo> = flow {
         val maximumRewardedDelegators = parachainStakingConstantsRepository.maxRewardedDelegatorsPerCollator(chainId)
         val systemForcedMinStake = parachainStakingConstantsRepository.systemForcedMinStake(chainId)
+        val lockupPeriodInDays = roundDurationEstimator.unstakeDuration(chainId).toInt(DurationUnit.DAYS)
 
         val realtimeChanges = currentRoundRepository.currentRoundInfoFlow(chainId).mapLatest {
             val currentCollatorSnapshot = currentRoundRepository.collatorsSnapshot(chainId, it.current)
 
             NetworkInfo(
-                // TODO
-                lockupPeriodInDays = 0,
+                lockupPeriodInDays = lockupPeriodInDays,
                 minimumStake = currentCollatorSnapshot.minimumStake(maximumRewardedDelegators, systemForcedMinStake),
                 totalStake = currentCollatorSnapshot.totalStake(),
                 stakingPeriod = StakingPeriod.Unlimited,

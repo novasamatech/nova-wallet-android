@@ -4,6 +4,8 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.RealRoundDurationEstimator
+import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.RoundDurationEstimator
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CurrentRoundRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.DelegatorStateRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.ParachainStakingConstantsRepository
@@ -14,6 +16,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.commo
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.ParachainNetworkInfoInteractor
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
@@ -40,6 +43,13 @@ class ParachainStakingModule {
 
     @Provides
     @FeatureScope
+    fun provideRoundDurationEstimator(
+        parachainStakingConstantsRepository: ParachainStakingConstantsRepository,
+        chainStateRepository: ChainStateRepository,
+    ): RoundDurationEstimator = RealRoundDurationEstimator(parachainStakingConstantsRepository, chainStateRepository)
+
+    @Provides
+    @FeatureScope
     fun provideDelegatorStateUseCase(
         repository: DelegatorStateRepository,
         accountRepository: AccountRepository
@@ -49,6 +59,7 @@ class ParachainStakingModule {
     @FeatureScope
     fun provideNetworkInfoInteractor(
         currentRoundRepository: CurrentRoundRepository,
-        parachainStakingConstantsRepository: ParachainStakingConstantsRepository
-    ) = ParachainNetworkInfoInteractor(currentRoundRepository, parachainStakingConstantsRepository)
+        parachainStakingConstantsRepository: ParachainStakingConstantsRepository,
+        roundDurationEstimator: RoundDurationEstimator
+    ) = ParachainNetworkInfoInteractor(currentRoundRepository, parachainStakingConstantsRepository, roundDurationEstimator)
 }

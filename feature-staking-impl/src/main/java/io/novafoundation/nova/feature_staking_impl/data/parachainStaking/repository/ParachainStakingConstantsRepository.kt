@@ -14,6 +14,10 @@ interface ParachainStakingConstantsRepository {
     suspend fun minimumDelegation(chainId: ChainId): BigInteger
 
     suspend fun minimumDelegatorStake(chainId: ChainId): BigInteger
+
+    suspend fun delegationBondLessDelay(chainId: ChainId): BigInteger
+
+    suspend fun defaultBlocksPerRound(chainId: ChainId): BigInteger
 }
 
 suspend fun ParachainStakingConstantsRepository.systemForcedMinStake(chainId: ChainId): BigInteger {
@@ -34,6 +38,14 @@ class RuntimeParachainStakingConstantsRepository(
 
     override suspend fun minimumDelegatorStake(chainId: ChainId): BigInteger {
         return numberConstant(chainId, "MinDelegatorStk")
+    }
+
+    override suspend fun delegationBondLessDelay(chainId: ChainId): BigInteger {
+        return numberConstant(chainId,"DelegationBondLessDelay")
+    }
+
+    override suspend fun defaultBlocksPerRound(chainId: ChainId): BigInteger {
+        return numberConstant(chainId, "DefaultBlocksPerRound")
     }
 
     private suspend fun numberConstant(chainId: ChainId, name: String): BigInteger {
