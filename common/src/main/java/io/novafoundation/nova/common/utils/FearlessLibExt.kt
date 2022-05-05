@@ -112,6 +112,7 @@ fun RuntimeMetadata.babe() = module(Modules.BABE)
 fun RuntimeMetadata.babeOrNull() = moduleOrNull(Modules.BABE)
 
 fun RuntimeMetadata.timestampOrNull() = moduleOrNull(Modules.TIMESTAMP)
+fun RuntimeMetadata.timestamp() = module(Modules.TIMESTAMP)
 
 fun RuntimeMetadata.slots() = module(Modules.SLOTS)
 

@@ -71,11 +71,13 @@ abstract class BaseStorageQueryContext(
 
     override suspend fun <V> StorageEntry.query(
         vararg keyArguments: Any?,
-        binding: (scale: String?) -> V
+        binding: (instance: Any?) -> V
     ): V {
         val storageKey = storageKeyWith(keyArguments)
+        val scaleResult = queryKey(storageKey, at)
+        val decoded = scaleResult?.let { type.value?.fromHex(runtime, scaleResult) }
 
-        return binding(queryKey(storageKey, at))
+        return binding(decoded)
     }
 
     override suspend fun <V> StorageEntry.observe(

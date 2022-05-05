@@ -13,10 +13,10 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.map
 import java.math.BigInteger
-import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
@@ -29,18 +29,23 @@ class ParachainNetworkInfoInteractor(
     fun observeNetworkInfo(chainId: ChainId): Flow<NetworkInfo> = flow {
         val maximumRewardedDelegators = parachainStakingConstantsRepository.maxRewardedDelegatorsPerCollator(chainId)
         val systemForcedMinStake = parachainStakingConstantsRepository.systemForcedMinStake(chainId)
-        val lockupPeriodInDays = roundDurationEstimator.unstakeDuration(chainId).toInt(DurationUnit.DAYS)
 
-        val realtimeChanges = currentRoundRepository.currentRoundInfoFlow(chainId).mapLatest {
+        val realtimeChanges = currentRoundRepository.currentRoundInfoFlow(chainId).flatMapLatest {
             val currentCollatorSnapshot = currentRoundRepository.collatorsSnapshot(chainId, it.current)
 
-            NetworkInfo(
-                lockupPeriodInDays = lockupPeriodInDays,
-                minimumStake = currentCollatorSnapshot.minimumStake(maximumRewardedDelegators, systemForcedMinStake),
-                totalStake = currentCollatorSnapshot.totalStake(),
-                stakingPeriod = StakingPeriod.Unlimited,
-                nominatorsCount = currentCollatorSnapshot.nominatorsCount()
-            )
+            val minimumStake = currentCollatorSnapshot.minimumStake(maximumRewardedDelegators, systemForcedMinStake)
+            val totalStake = currentCollatorSnapshot.totalStake()
+            val nominatorsCount = currentCollatorSnapshot.nominatorsCount()
+
+            roundDurationEstimator.unstakeDurationFlow(chainId).map { lockupPeriodDuration ->
+                NetworkInfo(
+                    lockupPeriod = lockupPeriodDuration,
+                    minimumStake = minimumStake,
+                    totalStake = totalStake,
+                    stakingPeriod = StakingPeriod.Unlimited,
+                    nominatorsCount = nominatorsCount
+                )
+            }
         }
 
         emitAll(realtimeChanges)

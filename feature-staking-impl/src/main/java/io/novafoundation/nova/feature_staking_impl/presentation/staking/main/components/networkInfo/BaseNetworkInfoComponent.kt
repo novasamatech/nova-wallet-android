@@ -42,8 +42,7 @@ abstract class BaseNetworkInfoComponent(
     }
 
     protected fun createNetworkInfoItems(asset: Asset, networkInfo: NetworkInfo): List<NetworkInfoItem> {
-        val unstakingPeriod = resourceManager.getQuantityString(R.plurals.staking_main_lockup_period_value, networkInfo.lockupPeriodInDays)
-            .format(networkInfo.lockupPeriodInDays)
+        val unstakingPeriod = resourceManager.formatDuration(networkInfo.lockupPeriod)
 
         val stakingPeriod = when (networkInfo.stakingPeriod) {
             StakingPeriod.Unlimited -> resourceManager.getString(R.string.common_unlimited)
@@ -53,7 +52,7 @@ abstract class BaseNetworkInfoComponent(
             totalStaked = mapAmountToAmountModel(networkInfo.totalStake, asset),
             minimumStake = mapAmountToAmountModel(networkInfo.minimumStake, asset),
             activeNominators = networkInfo.nominatorsCount.format(),
-            unstakingPeriod = unstakingPeriod,
+            unstakingPeriod = "~$unstakingPeriod",
             stakingPeriod = stakingPeriod
         )
     }

@@ -12,6 +12,8 @@ import io.novafoundation.nova.common.utils.timestampOrNull
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
+import io.novafoundation.nova.runtime.network.updaters.SampledBlockTime
+import io.novafoundation.nova.runtime.storage.SampledBlockTimeStorage
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.observeNonNull
 import io.novafoundation.nova.runtime.storage.source.queryNonNull
@@ -19,6 +21,7 @@ import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import java.math.BigInteger
 
 private val FALLBACK_BLOCK_TIME_MILLIS_RELAYCHAIN = (6 * 1000).toBigInteger()
@@ -26,8 +29,11 @@ private val FALLBACK_BLOCK_TIME_MILLIS_PARACHAIN = 2.toBigInteger() * FALLBACK_B
 
 private val PERIOD_VALIDITY_THRESHOLD = 500.toBigInteger()
 
+private val REQUIRED_SAMPLED_BLOCKS = 10.toBigInteger()
+
 class ChainStateRepository(
     private val localStorage: StorageDataSource,
+    private val sampledBlockTimeStorage: SampledBlockTimeStorage,
     private val chainRegistry: ChainRegistry
 ) {
 
@@ -39,13 +45,39 @@ class ChainStateRepository(
 
     suspend fun predictedBlockTime(chainId: ChainId): BigInteger {
         val runtime = chainRegistry.getRuntime(chainId)
-        val metadata = runtime.metadata
 
+        val blockTimeFromConstants = blockTimeFromConstants(runtime)
+        val sampledBlockTime = sampledBlockTimeStorage.get(chainId)
 
-        return metadata.babeOrNull()?.numberConstant("ExpectedBlockTime", runtime)
-            // Some chains incorrectly use these, i.e. it is set to values such as 0 or even 2
-            // Use a low minimum validity threshold to check these against
-            ?: metadata.timestampOrNull()?.numberConstant("MinimumPeriod", runtime)?.takeIf { it > PERIOD_VALIDITY_THRESHOLD }
+        return weightedAverageBlockTime(sampledBlockTime, blockTimeFromConstants)
+    }
+
+    suspend fun predictedBlockTimeFlow(chainId: ChainId): Flow<BigInteger> {
+        val runtime = chainRegistry.getRuntime(chainId)
+
+        val blockTimeFromConstants = blockTimeFromConstants(runtime)
+
+        return sampledBlockTimeStorage.observe(chainId).map {
+            weightedAverageBlockTime(it, blockTimeFromConstants)
+        }
+    }
+
+    private fun weightedAverageBlockTime(
+        sampledBlockTime: SampledBlockTime,
+        blockTimeFromConstants: BigInteger
+    ): BigInteger {
+        val cappedSampleSize = sampledBlockTime.sampleSize.min(REQUIRED_SAMPLED_BLOCKS)
+        val sampledPart = cappedSampleSize * sampledBlockTime.averageBlockTime
+        val constantsPart = (REQUIRED_SAMPLED_BLOCKS - cappedSampleSize) * blockTimeFromConstants
+
+        return (sampledPart + constantsPart) / REQUIRED_SAMPLED_BLOCKS
+    }
+
+    private fun blockTimeFromConstants(runtime: RuntimeSnapshot): BigInteger {
+        return runtime.metadata.babeOrNull()?.numberConstant("ExpectedBlockTime", runtime)
+        // Some chains incorrectly use these, i.e. it is set to values such as 0 or even 2
+        // Use a low minimum validity threshold to check these against
+            ?: runtime.metadata.timestampOrNull()?.numberConstant("MinimumPeriod", runtime)?.takeIf { it > PERIOD_VALIDITY_THRESHOLD }
             ?: fallbackBlockTime(runtime)
     }
 

@@ -33,7 +33,7 @@ interface StorageQueryContext {
 
     suspend fun <V> StorageEntry.query(
         vararg keyArguments: Any?,
-        binding: (scale: String?) -> V
+        binding: (instance: Any?) -> V
     ): V
 
     suspend fun multi(
