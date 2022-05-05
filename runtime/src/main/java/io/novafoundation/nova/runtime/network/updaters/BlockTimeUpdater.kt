@@ -46,7 +46,7 @@ class BlockTimeUpdater(
         val blockNumberKey = storage.storageKey()
 
         return storageSubscriptionBuilder.subscribe(blockNumberKey)
-            .drop(1)
+            .drop(1) // ignore fist subscription value since it comes immediately
             .distinctUntilChangedBy { it.value }
             .map {
                 remoteStorageSource.query(chainId, at = it.block) {
