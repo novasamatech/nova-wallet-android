@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.blockhain.updaters.CurrentRoundCollatorsUpdater
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.blockhain.updaters.CurrentRoundUpdater
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.blockhain.updaters.DelegatorStateUpdater
+import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.blockhain.updaters.TotalDelegatedUpdater
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CurrentRoundRepository
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -42,6 +43,7 @@ class ParachainStakingUpdatersModule {
         stakingSharedState = stakingSharedState,
         chainRegistry = chainRegistry
     )
+
     @Provides
     @FeatureScope
     fun provideCurrentRoundCollatorsUpdater(
@@ -59,15 +61,29 @@ class ParachainStakingUpdatersModule {
     )
 
     @Provides
+    @FeatureScope
+    fun provideTotalDelegatedUpdater(
+        storageCache: StorageCache,
+        stakingSharedState: StakingSharedState,
+        chainRegistry: ChainRegistry,
+    ) = TotalDelegatedUpdater(
+        storageCache = storageCache,
+        stakingSharedState = stakingSharedState,
+        chainRegistry = chainRegistry
+    )
+
+    @Provides
     @Parachain
     @FeatureScope
     fun provideRelaychainStakingUpdaters(
         delegatorStateUpdater: DelegatorStateUpdater,
         currentRoundUpdater: CurrentRoundUpdater,
-        currentRoundCollatorsUpdater: CurrentRoundCollatorsUpdater
+        currentRoundCollatorsUpdater: CurrentRoundCollatorsUpdater,
+        totalDelegatedUpdater: TotalDelegatedUpdater,
     ): List<Updater> = listOf(
         delegatorStateUpdater,
         currentRoundUpdater,
-        currentRoundCollatorsUpdater
+        currentRoundCollatorsUpdater,
+        totalDelegatedUpdater
     )
 }

@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main
 
-import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.feature_staking_api.domain.api.AccountIdMap
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.RoundDurationEstimator
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.CollatorSnapshot
@@ -12,10 +11,10 @@ import io.novafoundation.nova.feature_staking_impl.domain.model.StakingPeriod
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 import java.math.BigInteger
 import kotlin.time.ExperimentalTime
 
@@ -33,14 +32,16 @@ class ParachainNetworkInfoInteractor(
             val currentCollatorSnapshot = currentRoundRepository.collatorsSnapshot(chainId, it.current)
 
             val minimumStake = currentCollatorSnapshot.minimumStake(systemForcedMinStake)
-            val totalStake = currentCollatorSnapshot.totalStake()
             val nominatorsCount = currentCollatorSnapshot.activeDelegatorsCount()
 
-            roundDurationEstimator.unstakeDurationFlow(chainId).map { lockupPeriodDuration ->
+            combine(
+                currentRoundRepository.totalStakedFlow(chainId),
+                roundDurationEstimator.unstakeDurationFlow(chainId)
+            ) { totalStaked, lockupPeriodDuration ->
                 NetworkInfo(
                     lockupPeriod = lockupPeriodDuration,
                     minimumStake = minimumStake,
-                    totalStake = totalStake,
+                    totalStake = totalStaked,
                     stakingPeriod = StakingPeriod.Unlimited,
                     nominatorsCount = nominatorsCount
                 )
@@ -55,8 +56,6 @@ class ParachainNetworkInfoInteractor(
             collatorSnapshot.delegations.map { it.owner.toHexString() }
         }.size
     }
-
-    private fun AccountIdMap<CollatorSnapshot>.totalStake() = values.sumByBigInteger { it.total }
 
     private fun AccountIdMap<CollatorSnapshot>.minimumStake(
         systemForcedMinStake: BigInteger,
