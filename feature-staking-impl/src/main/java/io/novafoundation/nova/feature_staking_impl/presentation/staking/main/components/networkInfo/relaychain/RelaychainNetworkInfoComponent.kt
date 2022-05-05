@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
+import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.BaseNetworkInfoComponent
@@ -34,6 +35,8 @@ class RelaychainNetworkInfoComponentFactory(
     )
 }
 
+private val NOMINATORS_TITLE_RES =  R.string.staking_main_active_nominators_title
+
 private class RelaychainNetworkInfoComponent(
     private val stakingInteractor: StakingInteractor,
     resourceManager: ResourceManager,
@@ -58,7 +61,8 @@ private class RelaychainNetworkInfoComponent(
             minimumStake = null,
             activeNominators = null,
             unstakingPeriod = null,
-            stakingPeriod = null
+            stakingPeriod = null,
+            nominatorsLabel = NOMINATORS_TITLE_RES
         )
     }
 
@@ -71,7 +75,7 @@ private class RelaychainNetworkInfoComponent(
             hostContext.assetFlow,
             stakingInteractor.observeNetworkInfoState(assetWithChain.chain.id)
         ) { asset, networkInfo ->
-            val items = createNetworkInfoItems(asset, networkInfo)
+            val items = createNetworkInfoItems(asset, networkInfo, nominatorsLabel = NOMINATORS_TITLE_RES)
 
             updateState { it.copy(actions = items) }
         }

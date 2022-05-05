@@ -1,7 +1,9 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo
 
 import android.util.Log
+import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
+import io.novafoundation.nova.common.presentation.toLoadingState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.LOG_TAG
@@ -41,7 +43,11 @@ abstract class BaseNetworkInfoComponent(
         }
     }
 
-    protected fun createNetworkInfoItems(asset: Asset, networkInfo: NetworkInfo): List<NetworkInfoItem> {
+    protected fun createNetworkInfoItems(
+        asset: Asset,
+        networkInfo: NetworkInfo,
+        @StringRes nominatorsLabel: Int
+    ): List<NetworkInfoItem> {
         val unstakingPeriod = resourceManager.formatDuration(networkInfo.lockupPeriod)
 
         val stakingPeriod = when (networkInfo.stakingPeriod) {
@@ -53,7 +59,8 @@ abstract class BaseNetworkInfoComponent(
             minimumStake = mapAmountToAmountModel(networkInfo.minimumStake, asset),
             activeNominators = networkInfo.nominatorsCount.format(),
             unstakingPeriod = "~$unstakingPeriod",
-            stakingPeriod = stakingPeriod
+            stakingPeriod = stakingPeriod,
+            nominatorsLabel = nominatorsLabel
         )
     }
 
@@ -72,13 +79,17 @@ abstract class BaseNetworkInfoComponent(
         totalStaked: AmountModel?,
         minimumStake: AmountModel?,
         activeNominators: String?,
+        stakingPeriod: String?,
         unstakingPeriod: String?,
-        stakingPeriod: String?
+        @StringRes nominatorsLabel: Int
     ): List<NetworkInfoItem> {
         return listOf(
             NetworkInfoItem.totalStaked(resourceManager, totalStaked.toNetworkInfoContent()),
             NetworkInfoItem.minimumStake(resourceManager, minimumStake.toNetworkInfoContent()),
-            NetworkInfoItem.activeNominators(resourceManager, activeNominators.toNetworkInfoContent()),
+            NetworkInfoItem(
+                title = resourceManager.getString(nominatorsLabel),
+                content = activeNominators.toNetworkInfoContent().toLoadingState()
+            ),
             NetworkInfoItem.stakingPeriod(resourceManager, stakingPeriod.toNetworkInfoContent()),
             NetworkInfoItem.unstakingPeriod(resourceManager, unstakingPeriod.toNetworkInfoContent())
         )

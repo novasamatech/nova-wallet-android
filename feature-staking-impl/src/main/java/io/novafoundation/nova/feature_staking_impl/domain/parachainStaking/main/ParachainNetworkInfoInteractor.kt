@@ -27,15 +27,15 @@ class ParachainNetworkInfoInteractor(
 ) {
 
     fun observeNetworkInfo(chainId: ChainId): Flow<NetworkInfo> = flow {
-        val maximumRewardedDelegators = parachainStakingConstantsRepository.maxRewardedDelegatorsPerCollator(chainId)
+        val maxRewardedDelegatorsPerCollator = parachainStakingConstantsRepository.maxRewardedDelegatorsPerCollator(chainId)
         val systemForcedMinStake = parachainStakingConstantsRepository.systemForcedMinStake(chainId)
 
         val realtimeChanges = currentRoundRepository.currentRoundInfoFlow(chainId).flatMapLatest {
             val currentCollatorSnapshot = currentRoundRepository.collatorsSnapshot(chainId, it.current)
 
-            val minimumStake = currentCollatorSnapshot.minimumStake(maximumRewardedDelegators, systemForcedMinStake)
+            val minimumStake = currentCollatorSnapshot.minimumStake(maxRewardedDelegatorsPerCollator, systemForcedMinStake)
             val totalStake = currentCollatorSnapshot.totalStake()
-            val nominatorsCount = currentCollatorSnapshot.nominatorsCount()
+            val nominatorsCount = currentCollatorSnapshot.activeDelegatorsCount(maxRewardedDelegatorsPerCollator)
 
             roundDurationEstimator.unstakeDurationFlow(chainId).map { lockupPeriodDuration ->
                 NetworkInfo(
@@ -51,9 +51,12 @@ class ParachainNetworkInfoInteractor(
         emitAll(realtimeChanges)
     }
 
-    private fun AccountIdMap<CollatorSnapshot>.nominatorsCount(): Int {
+    private fun AccountIdMap<CollatorSnapshot>.activeDelegatorsCount(maximumRewardedDelegatorsPerCollator: Int, ): Int {
         return values.flatMapTo(mutableSetOf()) { collatorSnapshot ->
-            collatorSnapshot.delegations.map { it.owner.toHexString() }
+            collatorSnapshot.delegations
+                .sortedByDescending { it.balance }
+                .take(maximumRewardedDelegatorsPerCollator)
+                .map { it.owner.toHexString() }
         }.size
     }
 
