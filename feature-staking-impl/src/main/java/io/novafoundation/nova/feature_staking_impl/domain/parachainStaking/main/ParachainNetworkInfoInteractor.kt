@@ -27,15 +27,14 @@ class ParachainNetworkInfoInteractor(
 ) {
 
     fun observeNetworkInfo(chainId: ChainId): Flow<NetworkInfo> = flow {
-        val maxRewardedDelegatorsPerCollator = parachainStakingConstantsRepository.maxRewardedDelegatorsPerCollator(chainId)
         val systemForcedMinStake = parachainStakingConstantsRepository.systemForcedMinStake(chainId)
 
         val realtimeChanges = currentRoundRepository.currentRoundInfoFlow(chainId).flatMapLatest {
             val currentCollatorSnapshot = currentRoundRepository.collatorsSnapshot(chainId, it.current)
 
-            val minimumStake = currentCollatorSnapshot.minimumStake(maxRewardedDelegatorsPerCollator, systemForcedMinStake)
+            val minimumStake = currentCollatorSnapshot.minimumStake(systemForcedMinStake)
             val totalStake = currentCollatorSnapshot.totalStake()
-            val nominatorsCount = currentCollatorSnapshot.activeDelegatorsCount(maxRewardedDelegatorsPerCollator)
+            val nominatorsCount = currentCollatorSnapshot.activeDelegatorsCount()
 
             roundDurationEstimator.unstakeDurationFlow(chainId).map { lockupPeriodDuration ->
                 NetworkInfo(
@@ -51,27 +50,20 @@ class ParachainNetworkInfoInteractor(
         emitAll(realtimeChanges)
     }
 
-    private fun AccountIdMap<CollatorSnapshot>.activeDelegatorsCount(maximumRewardedDelegatorsPerCollator: Int,): Int {
+    private fun AccountIdMap<CollatorSnapshot>.activeDelegatorsCount(): Int {
         return values.flatMapTo(mutableSetOf()) { collatorSnapshot ->
-            collatorSnapshot.delegations
-                .sortedByDescending { it.balance }
-                .take(maximumRewardedDelegatorsPerCollator)
-                .map { it.owner.toHexString() }
+            collatorSnapshot.delegations.map { it.owner.toHexString() }
         }.size
     }
 
     private fun AccountIdMap<CollatorSnapshot>.totalStake() = values.sumByBigInteger { it.total }
 
     private fun AccountIdMap<CollatorSnapshot>.minimumStake(
-        maximumRewardedDelegators: Int,
         systemForcedMinStake: BigInteger,
     ): BigInteger {
-        val lastRewardedDelegatorIndex = maximumRewardedDelegators - 1
 
         val minStakeFromCollators = values.minOfOrNull { collatorSnapshot ->
-            collatorSnapshot.delegations.map { it.balance }
-                .sortedDescending()
-                .getOrElse(lastRewardedDelegatorIndex) { systemForcedMinStake }
+            collatorSnapshot.delegations.minOfOrNull { it.balance } ?: systemForcedMinStake
         } ?: systemForcedMinStake
 
         return minStakeFromCollators.max(systemForcedMinStake)
