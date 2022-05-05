@@ -14,7 +14,7 @@ class RoundInfo(
     // The first block of the current round
     val first: BlockNumber,
 
-    /// The length of the current round in number of blocks
+    // / The length of the current round in number of blocks
     val length: BigInteger
 )
 

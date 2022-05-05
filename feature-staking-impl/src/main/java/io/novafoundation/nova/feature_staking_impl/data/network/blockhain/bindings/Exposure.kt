@@ -47,7 +47,6 @@ fun bindExposure(scale: String, runtime: RuntimeSnapshot): Exposure {
     return bindExposure(decoded)
 }
 
-
 @UseCaseBinding
 fun bindExposure(instance: Any?): Exposure {
     val decoded = instance.castToStruct()

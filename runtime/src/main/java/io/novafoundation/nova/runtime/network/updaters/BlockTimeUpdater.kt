@@ -34,7 +34,7 @@ class BlockTimeUpdater(
     private val chainRegistry: ChainRegistry,
     private val sampledBlockTimeStorage: SampledBlockTimeStorage,
     private val remoteStorageSource: StorageDataSource,
-): GlobalScopeUpdater {
+) : GlobalScopeUpdater {
 
     override val requiredModules: List<String> = emptyList()
 
@@ -55,12 +55,12 @@ class BlockTimeUpdater(
             }
             .zipWithPrevious()
             .onEach { (previousTime, currentTime) ->
-            if (previousTime != null) {
-                val blockTime = currentTime - previousTime
+                if (previousTime != null) {
+                    val blockTime = currentTime - previousTime
 
-                updateSampledBlockTime(chainId, blockTime)
-            }
-        }.noSideAffects()
+                    updateSampledBlockTime(chainId, blockTime)
+                }
+            }.noSideAffects()
     }
 
     private suspend fun updateSampledBlockTime(chainId: ChainId, newSampledTime: BigInteger) {
@@ -73,7 +73,7 @@ class BlockTimeUpdater(
             averageBlockTime = adjustedAverage
         )
 
-        Log.d(LOG_TAG, "Adding new sampled time (${newSampledTime}): $adjustedSampledBlockTime in $chainId")
+        Log.d(LOG_TAG, "Adding new sampled time ($newSampledTime): $adjustedSampledBlockTime in $chainId")
 
         sampledBlockTimeStorage.put(chainId, adjustedSampledBlockTime)
     }

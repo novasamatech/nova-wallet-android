@@ -75,8 +75,8 @@ class ChainStateRepository(
 
     private fun blockTimeFromConstants(runtime: RuntimeSnapshot): BigInteger {
         return runtime.metadata.babeOrNull()?.numberConstant("ExpectedBlockTime", runtime)
-        // Some chains incorrectly use these, i.e. it is set to values such as 0 or even 2
-        // Use a low minimum validity threshold to check these against
+            // Some chains incorrectly use these, i.e. it is set to values such as 0 or even 2
+            // Use a low minimum validity threshold to check these against
             ?: runtime.metadata.timestampOrNull()?.numberConstant("MinimumPeriod", runtime)?.takeIf { it > PERIOD_VALIDITY_THRESHOLD }
             ?: fallbackBlockTime(runtime)
     }

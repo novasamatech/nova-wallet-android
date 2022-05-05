@@ -62,10 +62,10 @@ class ParachainNetworkInfoInteractor(
     private fun AccountIdMap<CollatorSnapshot>.minimumStake(
         maximumRewardedDelegators: Int,
         systemForcedMinStake: BigInteger,
-    ) : BigInteger {
+    ): BigInteger {
         val lastRewardedDelegatorIndex = maximumRewardedDelegators - 1
 
-        val minStakeFromCollators =  values.minOfOrNull { collatorSnapshot ->
+        val minStakeFromCollators = values.minOfOrNull { collatorSnapshot ->
             collatorSnapshot.delegations.map { it.balance }
                 .sortedDescending()
                 .getOrElse(lastRewardedDelegatorIndex) { systemForcedMinStake }

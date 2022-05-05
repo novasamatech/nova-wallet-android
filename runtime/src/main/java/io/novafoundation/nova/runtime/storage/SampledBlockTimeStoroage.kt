@@ -23,7 +23,7 @@ private const val KEY = "SampledBlockTime"
 internal class PrefsSampledBlockTimeStorage(
     private val gson: Gson,
     private val sharedPreferences: Preferences,
-): SampledBlockTimeStorage {
+) : SampledBlockTimeStorage {
 
     override suspend fun get(chainId: ChainId): SampledBlockTime {
         val raw = sharedPreferences.getString(key(chainId)) ?: return initial()

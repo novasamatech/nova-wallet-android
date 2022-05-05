@@ -38,7 +38,7 @@ class RealCurrentRoundRepository(
             runtime.metadata.parachainStaking().storage("AtStake").entries(
                 roundIndex,
                 keyExtractor = { (_: RoundIndex, collatorId: AccountId) -> collatorId.toHexString() },
-                binding = { instance, _ -> bindCollatorSnapshot(instance)  }
+                binding = { instance, _ -> bindCollatorSnapshot(instance) }
             )
         }
     }

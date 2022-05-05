@@ -62,7 +62,6 @@ private class RelaychainNetworkInfoComponent(
         )
     }
 
-
     private fun expandForceChangeFlow(): Flow<Boolean> {
         return selectedAccountStakingStateFlow.map { it is StakingState.NonStash }
     }

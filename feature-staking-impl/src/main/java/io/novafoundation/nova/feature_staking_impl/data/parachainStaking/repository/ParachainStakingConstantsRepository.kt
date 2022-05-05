@@ -26,10 +26,10 @@ suspend fun ParachainStakingConstantsRepository.systemForcedMinStake(chainId: Ch
 
 class RuntimeParachainStakingConstantsRepository(
     private val chainRegistry: ChainRegistry
-): ParachainStakingConstantsRepository{
+) : ParachainStakingConstantsRepository {
 
     override suspend fun maxRewardedDelegatorsPerCollator(chainId: ChainId): Int {
-       return numberConstant(chainId, "MaxTopDelegationsPerCandidate").toInt()
+        return numberConstant(chainId, "MaxTopDelegationsPerCandidate").toInt()
     }
 
     override suspend fun minimumDelegation(chainId: ChainId): BigInteger {
@@ -41,7 +41,7 @@ class RuntimeParachainStakingConstantsRepository(
     }
 
     override suspend fun delegationBondLessDelay(chainId: ChainId): BigInteger {
-        return numberConstant(chainId,"DelegationBondLessDelay")
+        return numberConstant(chainId, "DelegationBondLessDelay")
     }
 
     override suspend fun defaultBlocksPerRound(chainId: ChainId): BigInteger {
