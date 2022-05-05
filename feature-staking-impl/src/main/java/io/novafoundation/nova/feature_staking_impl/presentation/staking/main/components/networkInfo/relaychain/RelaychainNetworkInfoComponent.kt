@@ -35,7 +35,7 @@ class RelaychainNetworkInfoComponentFactory(
     )
 }
 
-private val NOMINATORS_TITLE_RES =  R.string.staking_main_active_nominators_title
+private val NOMINATORS_TITLE_RES = R.string.staking_main_active_nominators_title
 
 private class RelaychainNetworkInfoComponent(
     private val stakingInteractor: StakingInteractor,

@@ -38,7 +38,7 @@ class ParachainNetworkInfoComponentFactory(
     )
 }
 
-private val NOMINATORS_TITLE_RES =  R.string.staking_active_delegators
+private val NOMINATORS_TITLE_RES = R.string.staking_active_delegators
 
 private class ParachainNetworkInfoComponent(
     private val interactor: ParachainNetworkInfoInteractor,

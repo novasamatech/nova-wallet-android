@@ -51,7 +51,7 @@ class ParachainNetworkInfoInteractor(
         emitAll(realtimeChanges)
     }
 
-    private fun AccountIdMap<CollatorSnapshot>.activeDelegatorsCount(maximumRewardedDelegatorsPerCollator: Int, ): Int {
+    private fun AccountIdMap<CollatorSnapshot>.activeDelegatorsCount(maximumRewardedDelegatorsPerCollator: Int,): Int {
         return values.flatMapTo(mutableSetOf()) { collatorSnapshot ->
             collatorSnapshot.delegations
                 .sortedByDescending { it.balance }
