@@ -22,6 +22,7 @@ import io.novafoundation.nova.common.utils.getEnum
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
+import io.novafoundation.nova.common.utils.postToSelf
 import io.novafoundation.nova.common.utils.setDrawableEnd
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.setTextOrHide
@@ -132,12 +133,14 @@ open class TableCellView @JvmOverloads constructor(
     }
 
     fun showValue(primary: String, secondary: String? = null) {
-        contentGroup.makeVisible()
+        postToSelf {
+            contentGroup.makeVisible()
 
-        valuePrimary.text = primary
-        valueSecondary.setTextOrHide(secondary)
+            valuePrimary.text = primary
+            valueSecondary.setTextOrHide(secondary)
 
-        valueProgress.makeGone()
+            valueProgress.makeGone()
+        }
     }
 
     private fun applyAttributes(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.TableCellView) { typedArray ->

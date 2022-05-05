@@ -15,65 +15,27 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:includeFontPadding="false"
-        android:paddingTop="14dp"
-        android:paddingBottom="14dp"
         android:paddingStart="16dp"
+        android:paddingTop="14dp"
         android:paddingEnd="16dp"
+        android:paddingBottom="14dp"
         android:text="@string/staking_about"
-        app:drawableEndCompat="@drawable/ic_chevron_up"
+        app:drawableEndCompat="@drawable/ic_chevron_down"
         app:drawableTint="@color/white_48"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         tools:textColor="@color/white" />
 
-    <LinearLayout
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/stakingNetworkCollapsibleView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:paddingStart="16dp"
-        android:visibility="gone"
         android:paddingEnd="16dp"
-        tools:visibility="visible"
+        android:overScrollMode="never"
         android:paddingBottom="12dp"
-        app:layout_constraintTop_toBottomOf="@id/stakingNetworkInfo">
-
-        <io.novafoundation.nova.common.view.TableCellView
-            android:id="@+id/stakingAboutTotalStake"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:dividerColor="@color/white_8"
-            app:title="@string/staking_total_staked" />
-
-        <io.novafoundation.nova.common.view.TableCellView
-            android:id="@+id/stakingAboutMinimumStake"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:dividerColor="@color/white_8"
-            app:title="@string/staking_main_minimum_stake_title" />
-
-        <io.novafoundation.nova.common.view.TableCellView
-            android:id="@+id/stakingAboutActiveNominators"
-            android:layout_width="match_parent"
-            app:dividerColor="@color/white_8"
-            android:layout_height="wrap_content"
-            app:title="@string/staking_main_active_nominators_title" />
-
-        <io.novafoundation.nova.common.view.TableCellView
-            android:id="@+id/stakingAboutStakingPeriod"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:dividerColor="@color/white_8"
-            app:title="@string/staking_staking_period" />
-
-        <io.novafoundation.nova.common.view.TableCellView
-            android:id="@+id/stakingAboutUnstakingPeriod"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:dividerVisible="false"
-            app:title="@string/staking_unbonding_period_v1_9_0" />
-
-    </LinearLayout>
+        android:visibility="gone"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:itemCount="5"
+        tools:listitem="@layout/view_table_cell"
+        tools:visibility="visible" />
 
 </merge>

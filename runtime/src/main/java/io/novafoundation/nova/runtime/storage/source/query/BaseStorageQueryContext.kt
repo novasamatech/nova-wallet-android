@@ -11,6 +11,8 @@ import jp.co.soramitsu.fearless_utils.runtime.metadata.module.StorageEntry
 import jp.co.soramitsu.fearless_utils.runtime.metadata.splitKey
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKeys
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 abstract class BaseStorageQueryContext(
     override val runtime: RuntimeSnapshot,
@@ -24,6 +26,8 @@ abstract class BaseStorageQueryContext(
     protected abstract suspend fun queryKeys(keys: List<String>, at: BlockHash?): Map<String, String?>
 
     protected abstract suspend fun queryKey(key: String, at: BlockHash?): String?
+
+    protected abstract suspend fun observeKey(key: String): Flow<String?>
 
     override suspend fun StorageEntry.keys(vararg prefixArgs: Any?): List<StorageKeyComponents> {
         val prefix = storageKey(runtime, *prefixArgs)
@@ -53,17 +57,28 @@ abstract class BaseStorageQueryContext(
         return applyMappersToEntries(entries, storageEntry = this, keyExtractor, binding)
     }
 
-    override suspend fun <K, V> StorageEntry.query(
+    override suspend fun <V> StorageEntry.query(
         vararg keyArguments: Any?,
         binding: (scale: String?) -> V
     ): V {
-        val storageKey = if (keyArguments.isEmpty()) {
-            storageKey()
-        } else {
-            storageKey(runtime, keyArguments)
-        }
+        val storageKey = storageKeyWith(keyArguments)
 
         return binding(queryKey(storageKey, at))
+    }
+
+    override suspend fun <V> StorageEntry.observe(
+        vararg keyArguments: Any?,
+        binding: (dynamicInstance: Any?) -> V
+    ): Flow<V> {
+        val storageKey = storageKeyWith(keyArguments)
+
+        return observeKey(storageKey).map { scale ->
+            val dynamicInstance = scale?.let {
+                type.value?.fromHex(runtime, scale)
+            }
+
+            binding(dynamicInstance)
+        }
     }
 
     override suspend fun multi(
@@ -81,6 +96,14 @@ abstract class BaseStorageQueryContext(
                 keySelector = { key -> storageEntry.splitKeyToComponents(runtime, key) },
                 valueTransform = { key -> values[key]?.let { valueType.fromHex(runtime, it) } }
             )
+        }
+    }
+
+    private fun StorageEntry.storageKeyWith(keyArguments: Array<out Any?>): String {
+        return if (keyArguments.isEmpty()) {
+            storageKey()
+        } else {
+            storageKey(runtime, *keyArguments)
         }
     }
 

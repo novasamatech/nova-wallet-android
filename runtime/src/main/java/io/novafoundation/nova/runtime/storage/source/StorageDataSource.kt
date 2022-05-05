@@ -38,6 +38,12 @@ interface StorageDataSource {
         at: BlockHash? = null,
         query: suspend StorageQueryContext.() -> R
     ): R
+
+    fun <R> subscribe(
+        chainId: String,
+        at: BlockHash? = null,
+        subscribe: suspend StorageQueryContext.() -> Flow<R>
+    ): Flow<R>
 }
 
 suspend inline fun <T> StorageDataSource.queryNonNull(

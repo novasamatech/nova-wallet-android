@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
+import androidx.annotation.DrawableRes
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.feature_staking_impl.R
 import kotlinx.android.synthetic.main.item_staking_manage_action.view.itemManageStakingActionImage
@@ -30,6 +31,10 @@ class ManageStakingActionView @kotlin.jvm.JvmOverloads constructor(
 
     fun setIcon(icon: Drawable) {
         itemManageStakingActionImage.setImageDrawable(icon)
+    }
+
+    fun setIconRes(@DrawableRes iconRes: Int) {
+        itemManageStakingActionImage.setImageResource(iconRes)
     }
 
     private fun applyAttrs(attributeSet: AttributeSet) = context.useAttributes(attributeSet, R.styleable.ManageStakingActionView) {

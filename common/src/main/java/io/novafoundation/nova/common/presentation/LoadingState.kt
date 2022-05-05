@@ -37,6 +37,8 @@ inline fun <T, V> Flow<LoadingState<T>>.mapLoading(crossinline mapper: suspend (
     return map { loadingState -> loadingState.map { mapper(it) } }
 }
 
+fun <T> T?.toLoadingState(): LoadingState<T> = if (this == null) LoadingState.Loading() else LoadingState.Loaded(this)
+
 @Suppress("UNCHECKED_CAST")
 fun <T1, T2, R> combineLoading(
     source1: Flow<LoadingState<T1>>,

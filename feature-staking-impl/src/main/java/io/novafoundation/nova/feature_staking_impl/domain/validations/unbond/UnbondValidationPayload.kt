@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.validations.unbond
 
-import io.novafoundation.nova.feature_staking_api.domain.model.StakingState
+import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import java.math.BigDecimal
 

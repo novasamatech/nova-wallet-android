@@ -2,11 +2,9 @@ package io.novafoundation.nova.feature_staking_impl.data.repository
 
 import io.novafoundation.nova.common.data.network.runtime.binding.NonNullBinderWithType
 import io.novafoundation.nova.common.data.network.runtime.binding.returnType
-import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.babe
 import io.novafoundation.nova.common.utils.balances
 import io.novafoundation.nova.common.utils.constant
-import io.novafoundation.nova.common.utils.hasModule
 import io.novafoundation.nova.common.utils.numberConstant
 import io.novafoundation.nova.common.utils.session
 import io.novafoundation.nova.common.utils.staking
@@ -18,9 +16,9 @@ import io.novafoundation.nova.feature_staking_api.domain.model.EraIndex
 import io.novafoundation.nova.feature_staking_api.domain.model.Nominations
 import io.novafoundation.nova.feature_staking_api.domain.model.SlashingSpans
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingLedger
-import io.novafoundation.nova.feature_staking_api.domain.model.StakingState
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingStory
 import io.novafoundation.nova.feature_staking_api.domain.model.ValidatorPrefs
+import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindActiveEra
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindCurrentEra
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindCurrentIndex
@@ -62,7 +60,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.withContext
 import java.math.BigInteger
@@ -120,10 +117,6 @@ class StakingRepositoryImpl(
         val runtime = runtimeFor(chainId)
 
         return runtime.metadata.babe().numberConstant("ExpectedBlockTime", runtime)
-    }
-
-    override fun stakingAvailableFlow(chainId: ChainId): Flow<Boolean> {
-        return chainRegistry.getRuntimeProvider(chainId).observe().map { it.metadata.hasModule(Modules.STAKING) }
     }
 
     override suspend fun getTotalIssuance(chainId: ChainId): BigInteger = localStorage.queryNonNull(

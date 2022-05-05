@@ -7,6 +7,8 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
+import io.novafoundation.nova.feature_staking_impl.di.staking.UpdatersModule
+import io.novafoundation.nova.feature_staking_impl.di.staking.parachain.ParachainStakingModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.unbond.StakingUnbondModule
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.confirm.di.ConfirmStakingComponent
@@ -45,9 +47,10 @@ import io.novafoundation.nova.runtime.di.RuntimeApi
     ],
     modules = [
         StakingFeatureModule::class,
-        StakingUpdatersModule::class,
+        UpdatersModule::class,
         StakingValidationModule::class,
-        StakingUnbondModule::class
+        StakingUnbondModule::class,
+        ParachainStakingModule::class
     ]
 )
 @FeatureScope

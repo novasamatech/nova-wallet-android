@@ -38,6 +38,14 @@ inline fun <reified T> Any?.cast(): T {
     return this as? T ?: incompatible()
 }
 
+fun Any?.castToStruct(): Struct.Instance {
+    return cast()
+}
+
+fun Any?.castToList(): List<*> {
+    return cast()
+}
+
 inline fun <reified R> Struct.Instance.getTyped(key: String) = get<R>(key) ?: incompatible()
 
 fun Struct.Instance.getList(key: String) = get<List<*>>(key) ?: incompatible()

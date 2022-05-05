@@ -16,7 +16,7 @@ import io.novafoundation.nova.feature_staking_api.domain.model.Exposure
 import io.novafoundation.nova.feature_staking_api.domain.model.IndividualExposure
 import io.novafoundation.nova.feature_staking_api.domain.model.RewardDestination
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingAccount
-import io.novafoundation.nova.feature_staking_api.domain.model.StakingState
+import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.mappers.mapAccountToStakingAccount
 import io.novafoundation.nova.feature_staking_impl.data.model.Payout
@@ -173,10 +173,10 @@ class StakingInteractor(
 
     fun observeUserRewards(state: StakingState.Stash) = stakingRewardsRepository.totalRewardFlow(state.stashAddress)
 
-    suspend fun observeNetworkInfoState(chainId: ChainId): Flow<NetworkInfo> = withContext(Dispatchers.Default) {
+    fun observeNetworkInfoState(chainId: ChainId): Flow<NetworkInfo> = flow {
         val lockupPeriod = getLockupPeriodInDays(chainId)
 
-        stakingRepository.electedExposuresInActiveEra(chainId).map { exposuresMap ->
+        val innerFlow = stakingRepository.electedExposuresInActiveEra(chainId).map { exposuresMap ->
             val exposures = exposuresMap.values
 
             val minimumNominatorBond = stakingRepository.minimumNominatorBond(chainId)
@@ -189,6 +189,8 @@ class StakingInteractor(
                 nominatorsCount = activeNominators(chainId, exposures),
             )
         }
+
+        emitAll(innerFlow)
     }
 
     suspend fun getLockupPeriodInDays() = withContext(Dispatchers.Default) {
@@ -240,15 +242,6 @@ class StakingInteractor(
                     chainAsset = chainAsset
                 )
             )
-        }
-    }
-
-    fun selectedAccountProjectionFlow(): Flow<StakingAccount> {
-        return combine(
-            stakingSharedState.assetWithChain,
-            accountRepository.selectedMetaAccountFlow()
-        ) { (chain, _), account ->
-            mapAccountToStakingAccount(chain, account)
         }
     }
 

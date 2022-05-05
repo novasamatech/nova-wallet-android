@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="staking_parachain_delegator_status_active_message">One or more of your collators have been elected by network.</string>
+
   <string name="dapp_list_placeholder">List of DApps will appear here</string>
 
   <string name="dapp_authorized_remove_title">Remove from Authorized?</string>

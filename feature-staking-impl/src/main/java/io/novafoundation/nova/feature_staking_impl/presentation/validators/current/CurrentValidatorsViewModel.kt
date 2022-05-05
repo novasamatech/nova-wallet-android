@@ -10,7 +10,7 @@ import io.novafoundation.nova.common.utils.toHexAccountId
 import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_staking_api.domain.model.NominatedValidator
-import io.novafoundation.nova.feature_staking_api.domain.model.StakingState
+import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validators.current.CurrentValidatorsInteractor

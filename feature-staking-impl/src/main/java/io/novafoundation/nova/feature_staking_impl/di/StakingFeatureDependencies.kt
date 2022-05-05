@@ -19,6 +19,7 @@ import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
@@ -109,4 +110,6 @@ interface StakingFeatureDependencies {
     val walletUiUseCase: WalletUiUseCase
 
     val resourcesHintsMixinFactory: ResourcesHintsMixinFactory
+
+    val selectedAccountUseCase: SelectedAccountUseCase
 }

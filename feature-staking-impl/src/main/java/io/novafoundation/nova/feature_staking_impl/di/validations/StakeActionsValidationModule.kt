@@ -10,7 +10,6 @@ import io.novafoundation.nova.common.validation.CompositeValidation
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.manage.ManageStakeAction
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.BALANCE_REQUIRED_CONTROLLER
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.BALANCE_REQUIRED_STASH
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.MainStakingAccountRequiredValidation
@@ -26,7 +25,7 @@ import javax.inject.Named
 
 @Target(AnnotationTarget.FUNCTION)
 @MapKey
-annotation class StakeActionsValidationKey(val value: ManageStakeAction)
+annotation class StakeActionsValidationKey(val value: String)
 
 @Module
 class StakeActionsValidationsModule {
@@ -142,7 +141,7 @@ class StakeActionsValidationsModule {
 interface StakeActionsValidationModule {
 
     @FeatureScope
-    @StakeActionsValidationKey(ManageStakeAction.REWARD_DESTINATION)
+    @StakeActionsValidationKey(SYSTEM_MANAGE_REWARD_DESTINATION)
     @IntoMap
     @Binds
     fun provideRewardDestinationValidationSystemToMap(
@@ -150,7 +149,7 @@ interface StakeActionsValidationModule {
     ): StakeActionsValidationSystem
 
     @FeatureScope
-    @StakeActionsValidationKey(ManageStakeAction.BOND_MORE)
+    @StakeActionsValidationKey(SYSTEM_MANAGE_STAKING_BOND_MORE)
     @IntoMap
     @Binds
     fun provideBondMoreValidationSystemToMap(
@@ -158,7 +157,7 @@ interface StakeActionsValidationModule {
     ): StakeActionsValidationSystem
 
     @FeatureScope
-    @StakeActionsValidationKey(ManageStakeAction.UNBOND)
+    @StakeActionsValidationKey(SYSTEM_MANAGE_STAKING_UNBOND)
     @IntoMap
     @Binds
     fun provideUnbondValidationSystemToMap(

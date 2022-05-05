@@ -5,8 +5,10 @@ import io.novafoundation.nova.core.model.StorageEntry
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 
 class LocalStorageQueryContext(
     private val storageCache: StorageCache,
@@ -39,5 +41,9 @@ class LocalStorageQueryContext(
 
     override suspend fun queryKey(key: String, at: BlockHash?): String? {
         return storageCache.getEntry(key, chainId).content
+    }
+
+    override suspend fun observeKey(key: String): Flow<String?> {
+        return storageCache.observeEntry(key, chainId).map { it.content }
     }
 }
