@@ -22,7 +22,7 @@ interface StorageQueryContext {
     suspend fun <K, V> StorageEntry.entries(
         vararg prefixArgs: Any?,
         keyExtractor: (StorageKeyComponents) -> K,
-        binding: (String?, K) -> V
+        binding: (Any?, K) -> V
     ): Map<K, V>
 
     suspend fun <K, V> StorageEntry.entries(
@@ -33,7 +33,7 @@ interface StorageQueryContext {
 
     suspend fun <V> StorageEntry.query(
         vararg keyArguments: Any?,
-        binding: (scale: String?) -> V
+        binding: (instance: Any?) -> V
     ): V
 
     suspend fun multi(
@@ -43,7 +43,7 @@ interface StorageQueryContext {
     // no keyExtractor short-cut
     suspend fun <V> StorageEntry.entries(
         vararg prefixArgs: Any?,
-        binding: (String?, StorageKeyComponents) -> V
+        binding: (Any?, StorageKeyComponents) -> V
     ): Map<StorageKeyComponents, V> = entries(
         *prefixArgs,
         keyExtractor = { it },

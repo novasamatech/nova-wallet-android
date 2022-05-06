@@ -8,7 +8,6 @@ import java.lang.Integer.min
 
 private const val FALLBACK_MAX_HASH_COUNT = 250
 private const val MAX_FINALITY_LAG = 5
-private const val FALLBACK_PERIOD = 6 * 1000
 private const val MORTAL_PERIOD = 5 * 60 * 1000
 
 class Mortality(val era: Era.Mortal, val blockHash: String)
@@ -33,9 +32,7 @@ class MortalityConstructor(
 
         val blockHashCount = chainStateRepository.blockHashCount(chainId)?.toInt()
 
-        val blockTime = chainStateRepository.expectedBlockTimeInMillisOrNull(chainId)?.toInt()
-            ?: chainStateRepository.minimumPeriodOrNull(chainId)?.toInt()
-            ?: FALLBACK_PERIOD
+        val blockTime = chainStateRepository.predictedBlockTime(chainId).toInt()
 
         val mortalPeriod = MORTAL_PERIOD / blockTime + MAX_FINALITY_LAG
 

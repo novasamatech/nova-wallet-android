@@ -63,6 +63,8 @@ fun <T> DataType<T>.toByteArray(value: T): ByteArray {
     return stream.toByteArray()
 }
 
+fun RuntimeSnapshot.isParachain() = metadata.hasModule(Modules.PARACHAIN_SYSTEM)
+
 typealias StructBuilderWithContext<S> = S.(EncodableStruct<S>) -> Unit
 
 operator fun <S : Schema<S>> S.invoke(block: StructBuilderWithContext<S>? = null): EncodableStruct<S> {
@@ -110,6 +112,7 @@ fun RuntimeMetadata.babe() = module(Modules.BABE)
 fun RuntimeMetadata.babeOrNull() = moduleOrNull(Modules.BABE)
 
 fun RuntimeMetadata.timestampOrNull() = moduleOrNull(Modules.TIMESTAMP)
+fun RuntimeMetadata.timestamp() = module(Modules.TIMESTAMP)
 
 fun RuntimeMetadata.slots() = module(Modules.SLOTS)
 
@@ -157,4 +160,6 @@ object Modules {
     const val UNIQUES = "Uniques"
 
     const val PARACHAIN_STAKING = "ParachainStaking"
+
+    const val PARACHAIN_SYSTEM = "ParachainSystem"
 }

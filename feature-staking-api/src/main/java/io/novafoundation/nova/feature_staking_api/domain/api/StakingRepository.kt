@@ -33,6 +33,8 @@ interface StakingRepository {
 
     suspend fun eraLength(chainId: ChainId): BigInteger
 
+    // TODO migrate all usages to better block time estimation for relaychain staking
+    @Deprecated("Deprecated in favour of ChainStateRepository.predictedBlockTime")
     suspend fun blockCreationTime(chainId: ChainId): BigInteger
 
     suspend fun getTotalIssuance(chainId: ChainId): BigInteger

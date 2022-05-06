@@ -4,7 +4,10 @@ import android.graphics.drawable.Drawable
 import androidx.annotation.DrawableRes
 import androidx.annotation.RawRes
 import io.novafoundation.nova.common.R
+import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 interface ResourceManager {
 
     fun loadRawString(@RawRes res: Int): String
@@ -22,6 +25,9 @@ interface ResourceManager {
 
     fun formatDate(timestamp: Long): String
     fun formatDuration(elapsedTime: Long): String
+
+    fun formatDuration(duration: Duration): String
+
     fun formatTime(timestamp: Long): String
 
     fun getDrawable(@DrawableRes id: Int): Drawable

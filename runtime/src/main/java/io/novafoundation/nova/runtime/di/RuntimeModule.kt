@@ -1,8 +1,10 @@
 package io.novafoundation.nova.runtime.di
 
+import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
+import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.ChainDao
@@ -19,6 +21,8 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RuntimeVer
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.storage.DbStorageCache
+import io.novafoundation.nova.runtime.storage.PrefsSampledBlockTimeStorage
+import io.novafoundation.nova.runtime.storage.SampledBlockTimeStorage
 import io.novafoundation.nova.runtime.storage.source.LocalStorageSource
 import io.novafoundation.nova.runtime.storage.source.RemoteStorageSource
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
@@ -66,10 +70,18 @@ class RuntimeModule {
 
     @Provides
     @ApplicationScope
+    fun provideSampledBlockTimeStorage(
+        gson: Gson,
+        preferences: Preferences,
+    ): SampledBlockTimeStorage = PrefsSampledBlockTimeStorage(gson, preferences)
+
+    @Provides
+    @ApplicationScope
     fun provideChainStateRepository(
         @Named(LOCAL_STORAGE_SOURCE) localStorageSource: StorageDataSource,
+        sampledBlockTimeStorage: SampledBlockTimeStorage,
         chainRegistry: ChainRegistry
-    ) = ChainStateRepository(localStorageSource, chainRegistry)
+    ) = ChainStateRepository(localStorageSource, sampledBlockTimeStorage, chainRegistry)
 
     @Provides
     @ApplicationScope

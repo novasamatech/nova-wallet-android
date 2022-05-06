@@ -9,9 +9,11 @@ import io.novafoundation.nova.common.utils.daysFromMillis
 import io.novafoundation.nova.common.utils.formatDateTime
 import io.novafoundation.nova.common.utils.getDrawableCompat
 import io.novafoundation.nova.common.utils.readText
+import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.milliseconds
 
+@OptIn(ExperimentalTime::class)
 @ApplicationScope
 class ResourceManagerImpl(
     private val contextManager: ContextManager
@@ -68,6 +70,18 @@ class ResourceManagerImpl(
 
                 DateUtils.formatElapsedTime(inSeconds)
             }
+        }
+    }
+
+    override fun formatDuration(duration: Duration): String {
+        return duration.toComponents { days, hours, _, _, _ ->
+            val daysPart = getQuantityString(R.plurals.staking_main_lockup_period_value, days, days)
+            val hoursPart = getQuantityString(R.plurals.common_hours_format, hours, hours)
+
+            listOfNotNull(
+                daysPart.takeIf { days != 0 },
+                hoursPart.takeIf { hours != 0 }
+            ).joinToString(separator = " ")
         }
     }
 

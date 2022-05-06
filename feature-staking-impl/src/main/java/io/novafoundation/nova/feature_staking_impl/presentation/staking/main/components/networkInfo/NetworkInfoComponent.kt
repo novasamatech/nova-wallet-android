@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.co
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.CompoundStakingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.StatefullComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.UnsupportedComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.parachain.ParachainNetworkInfoComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.relaychain.RelaychainNetworkInfoComponentFactory
 
 typealias NetworkInfoComponent = StatefullComponent<NetworkInfoState, NetworkInfoEvent, NetworkInfoAction>
@@ -22,6 +22,7 @@ sealed class NetworkInfoAction {
 
 class NetworkInfoComponentFactory(
     private val relaychainComponentFactory: RelaychainNetworkInfoComponentFactory,
+    private val parachainComponentFactory: ParachainNetworkInfoComponentFactory,
     private val compoundStakingComponentFactory: CompoundStakingComponentFactory,
 ) {
 
@@ -29,7 +30,7 @@ class NetworkInfoComponentFactory(
         hostContext: ComponentHostContext
     ): NetworkInfoComponent = compoundStakingComponentFactory.create(
         relaychainComponentCreator = relaychainComponentFactory::create,
-        parachainComponentCreator = { _, _ -> UnsupportedComponent() },
+        parachainComponentCreator = parachainComponentFactory::create,
         hostContext = hostContext
     )
 }

@@ -157,7 +157,7 @@ class StakingRepositoryImpl(
         runtime.metadata.staking().storage("ErasStakers").entries(
             eraIndex,
             keyExtractor = { (_: BigInteger, accountId: ByteArray) -> accountId.toHexString() },
-            binding = { scale, _ -> bindExposure(scale!!, runtime) }
+            binding = { instance, _ -> bindExposure(instance) }
         )
     }
 

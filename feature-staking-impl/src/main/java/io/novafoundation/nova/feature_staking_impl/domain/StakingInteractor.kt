@@ -52,6 +52,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.math.BigInteger
 import kotlin.time.ExperimentalTime
+import kotlin.time.days
 
 const val HOURS_IN_DAY = 24
 
@@ -64,6 +65,7 @@ class EraRelativeInfo(
 
 val ERA_OFFSET = 1.toBigInteger()
 
+@OptIn(ExperimentalTime::class)
 class StakingInteractor(
     private val walletRepository: WalletRepository,
     private val accountRepository: AccountRepository,
@@ -182,7 +184,7 @@ class StakingInteractor(
             val minimumNominatorBond = stakingRepository.minimumNominatorBond(chainId)
 
             NetworkInfo(
-                lockupPeriodInDays = lockupPeriod,
+                lockupPeriod = lockupPeriod.days,
                 minimumStake = minimumStake(exposures, minimumNominatorBond),
                 totalStake = totalStake(exposures),
                 stakingPeriod = StakingPeriod.Unlimited,

@@ -4,8 +4,9 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.ParachainNetworkInfoInteractor
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.parachain.ParachainNetworkInfoComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.parachain.ParachainStakeSummaryComponentFactory
 
 @Module
@@ -15,11 +16,21 @@ class ParachainModule {
     @ScreenScope
     fun provideParachainStakeSummaryComponentFactory(
         delegatorStateUseCase: DelegatorStateUseCase,
-        selectedAccountUseCase: SelectedAccountUseCase,
         resourceManager: ResourceManager,
     ) = ParachainStakeSummaryComponentFactory(
         delegatorStateUseCase = delegatorStateUseCase,
         resourceManager = resourceManager,
-        selectedAccountUseCase = selectedAccountUseCase
+    )
+
+    @Provides
+    @ScreenScope
+    fun provideParachainNetworkInfoComponentFactory(
+        delegatorStateUseCase: DelegatorStateUseCase,
+        parachainNetworkInfoInteractor: ParachainNetworkInfoInteractor,
+        resourceManager: ResourceManager,
+    ) = ParachainNetworkInfoComponentFactory(
+        delegatorStateUseCase = delegatorStateUseCase,
+        resourceManager = resourceManager,
+        interactor = parachainNetworkInfoInteractor,
     )
 }

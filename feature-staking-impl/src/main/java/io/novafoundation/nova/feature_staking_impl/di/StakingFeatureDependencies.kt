@@ -35,6 +35,8 @@ import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
+import io.novafoundation.nova.runtime.storage.SampledBlockTimeStorage
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
@@ -112,4 +114,8 @@ interface StakingFeatureDependencies {
     val resourcesHintsMixinFactory: ResourcesHintsMixinFactory
 
     val selectedAccountUseCase: SelectedAccountUseCase
+
+    val chainStateRepository: ChainStateRepository
+
+    val sampledBlockTimeStorage: SampledBlockTimeStorage
 }

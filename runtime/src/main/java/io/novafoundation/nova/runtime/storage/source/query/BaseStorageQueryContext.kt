@@ -1,6 +1,8 @@
 package io.novafoundation.nova.runtime.storage.source.query
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
+import io.novafoundation.nova.common.data.network.runtime.binding.fromHexOrIncompatible
+import io.novafoundation.nova.common.data.network.runtime.binding.incompatible
 import io.novafoundation.nova.common.utils.ComponentHolder
 import io.novafoundation.nova.common.utils.splitKeyToComponents
 import io.novafoundation.nova.runtime.storage.source.multi.MultiQueryBuilder
@@ -38,13 +40,23 @@ abstract class BaseStorageQueryContext(
     override suspend fun <K, V> StorageEntry.entries(
         vararg prefixArgs: Any?,
         keyExtractor: (StorageKeyComponents) -> K,
-        binding: (String?, K) -> V
+        binding: (Any?, K) -> V
     ): Map<K, V> {
         val prefix = storageKey(runtime, *prefixArgs)
+        val returnType = type.value ?: incompatible()
 
         val entries = queryEntriesByPrefix(prefix)
 
-        return applyMappersToEntries(entries, storageEntry = this, keyExtractor, binding)
+        return applyMappersToEntries(
+            entries = entries,
+            storageEntry = this,
+            keyExtractor = keyExtractor,
+            binding = { scale, key ->
+                val decoded = scale?.let { returnType.fromHexOrIncompatible(scale, runtime) }
+
+                binding(decoded, key)
+            }
+        )
     }
 
     override suspend fun <K, V> StorageEntry.entries(
@@ -59,11 +71,13 @@ abstract class BaseStorageQueryContext(
 
     override suspend fun <V> StorageEntry.query(
         vararg keyArguments: Any?,
-        binding: (scale: String?) -> V
+        binding: (instance: Any?) -> V
     ): V {
         val storageKey = storageKeyWith(keyArguments)
+        val scaleResult = queryKey(storageKey, at)
+        val decoded = scaleResult?.let { type.value?.fromHex(runtime, scaleResult) }
 
-        return binding(queryKey(storageKey, at))
+        return binding(decoded)
     }
 
     override suspend fun <V> StorageEntry.observe(
@@ -111,7 +125,7 @@ abstract class BaseStorageQueryContext(
         entries: Map<String, String?>,
         storageEntry: StorageEntry,
         keyExtractor: (StorageKeyComponents) -> K,
-        binding: (String?, K) -> V
+        binding: (String?, K) -> V,
     ): Map<K, V> {
         return entries.mapKeys { (key, _) ->
             val keyComponents = ComponentHolder(storageEntry.splitKey(runtime, key))
