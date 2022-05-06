@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_staking_impl.data.repository
 import io.novafoundation.nova.common.data.network.runtime.binding.NonNullBinderWithType
 import io.novafoundation.nova.common.data.network.runtime.binding.returnType
 import io.novafoundation.nova.common.utils.babe
-import io.novafoundation.nova.common.utils.balances
 import io.novafoundation.nova.common.utils.constant
 import io.novafoundation.nova.common.utils.numberConstant
 import io.novafoundation.nova.common.utils.session
@@ -34,7 +33,6 @@ import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindin
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindSlashDeferDuration
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindSlashingSpans
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindStakingLedger
-import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindTotalInsurance
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindValidatorPrefs
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.activeEraStorageKey
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingStoriesDataSource
@@ -118,12 +116,6 @@ class StakingRepositoryImpl(
 
         return runtime.metadata.babe().numberConstant("ExpectedBlockTime", runtime)
     }
-
-    override suspend fun getTotalIssuance(chainId: ChainId): BigInteger = localStorage.queryNonNull(
-        keyBuilder = { it.metadata.balances().storage("TotalIssuance").storageKey() },
-        binding = ::bindTotalInsurance,
-        chainId = chainId
-    )
 
     override suspend fun getActiveEraIndex(chainId: ChainId): EraIndex = localStorage.queryNonNull(
         keyBuilder = { it.metadata.activeEraStorageKey() },

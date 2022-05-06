@@ -35,6 +35,6 @@ class AssetUseCaseImpl(
 
         walletRepository.getAssets(metaAccount.id).filter {
             it.token.configuration in availableChainAssets
-        }
+        }.sortedByDescending { it.token.fiatAmount(it.transferable) }
     }
 }

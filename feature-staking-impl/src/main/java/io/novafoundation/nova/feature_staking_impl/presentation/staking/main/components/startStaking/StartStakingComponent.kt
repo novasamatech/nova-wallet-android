@@ -5,7 +5,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.Sta
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.CompoundStakingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.StatefullComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.UnsupportedComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.startStaking.parachain.ParachainStartStakingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.startStaking.relaychain.RelaychainStartStakingComponentFactory
 
 typealias StartStakingComponent = StatefullComponent<StartStakingState, StartStakingEvent, StartStakingAction>
@@ -34,6 +34,7 @@ sealed class StartStakingAction {
 
 class StartStakingComponentFactory(
     private val relaychainComponentFactory: RelaychainStartStakingComponentFactory,
+    private val parachainComponentFactory: ParachainStartStakingComponentFactory,
     private val compoundStakingComponentFactory: CompoundStakingComponentFactory,
 ) {
 
@@ -41,7 +42,7 @@ class StartStakingComponentFactory(
         hostContext: ComponentHostContext
     ): StartStakingComponent = compoundStakingComponentFactory.create(
         relaychainComponentCreator = relaychainComponentFactory::create,
-        parachainComponentCreator = { _, _ -> UnsupportedComponent() },
+        parachainComponentCreator = parachainComponentFactory::create,
         hostContext = hostContext
     )
 }

@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+<!--  <string name="staking_reward_info_avg">Average APY</string>-->
+<!--  <string name="staking_reward_info_max">Maximum APY</string>-->
+
+  <string name="common_average">Average</string>
+  <string name="common_maximum">Maximum</string>
+
+<!--  <string name="staking_reward_info_title">Earnings with restake</string>-->
+  <string name="staking_reward_info_title_restake">Earnings with restake</string>
+  <string name="staking_reward_info_title_transferrable">Earnings without restake</string>
+
+
   <string name="staking_active_delegators">Active delegators</string>
   <string name="staking_parachain_delegator_status_active_message">One or more of your collators have been elected by network.</string>
 
@@ -519,9 +530,7 @@
   <string name="staking_reward_details_era">Era</string>
   <string name="staking_reward_details_title">Reward details</string>
   <string name="staking_reward_details_validator">Validator</string>
-  <string name="staking_reward_info_avg">Average APY</string>
-  <string name="staking_reward_info_max">Maximum APY</string>
-  <string name="staking_reward_info_title">Earnings with restake</string>
+
   <string name="staking_reward_payouts_empty_rewards">Perfect! All rewards are paid.</string>
   <string name="staking_reward_payouts_empty_rewards_v2_2_0">Awesome! You have no unpaid rewards</string>
   <string name="staking_reward_payouts_payout_all">Payout all (%s)</string>

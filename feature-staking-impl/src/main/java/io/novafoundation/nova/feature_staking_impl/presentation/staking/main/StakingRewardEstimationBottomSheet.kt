@@ -12,24 +12,37 @@ class StakingRewardEstimationBottomSheet(
     context: Context,
     private val payload: Payload,
 ) : FixedListBottomSheet(context) {
-    class Payload(val max: String, val average: String)
+
+    class Payload(
+        val max: String,
+        val average: String,
+        @StringRes val returnsTypeFormat: Int,
+        val title: String
+        )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setTitle(R.string.staking_reward_info_title)
+        setTitle(payload.title)
 
-        addItem(payload.max, R.string.staking_reward_info_max)
-        addItem(payload.average, R.string.staking_reward_info_avg)
+        addItem(payload.max, payload.formatWithReturnType(R.string.common_maximum))
+        addItem(payload.average, payload.formatWithReturnType(R.string.common_average))
     }
 
     private fun addItem(
         percentage: String,
-        @StringRes titleRes: Int,
+        title: String,
     ) {
         item(R.layout.item_sheet_staking_reward_estimation) {
-            it.itemSheetStakingEstimateTitle.setText(titleRes)
+            it.itemSheetStakingEstimateTitle.text = title
             it.itemSheetStakingEstimateValue.text = percentage
         }
+    }
+
+    private fun Payload.formatWithReturnType(@StringRes content: Int): String {
+        return context.getString(
+            returnsTypeFormat,
+            context.getString(content)
+        )
     }
 }

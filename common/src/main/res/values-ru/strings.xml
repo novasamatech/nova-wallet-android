@@ -467,7 +467,7 @@
   <string name="staking_reward_details_validator">Валидатор</string>
   <string name="staking_reward_info_avg">Средний APY</string>
   <string name="staking_reward_info_max">Максимальный APY</string>
-  <string name="staking_reward_info_title">Доходность с реинвестированием</string>
+  <string name="staking_reward_info_title_restake">Доходность с реинвестированием</string>
   <string name="staking_reward_payouts_empty_rewards">Прекрасно! Все вознаграждения выплачены.</string>
   <string name="staking_reward_payouts_empty_rewards_v2_2_0">Замечательно! Все вознаграждения выплачены</string>
   <string name="staking_reward_payouts_payout_all">Выплатить все (%s)</string>
