@@ -16,7 +16,7 @@ interface CommonStakingRepository {
 
 class RealCommonStakingRepository(
     private val storageDataSource: StorageDataSource
-): CommonStakingRepository {
+) : CommonStakingRepository {
 
     override suspend fun getTotalIssuance(chainId: ChainId): BigInteger = storageDataSource.queryNonNull(
         keyBuilder = { it.metadata.balances().storage("TotalIssuance").storageKey() },

@@ -56,7 +56,7 @@ class RealParachainStakingRewardCalculator(
     }
 
     override fun maximumApr(days: Int): BigDecimal {
-       return (maxApr  * days / DAYS_IN_YEAR).toBigDecimal()
+        return (maxApr * days / DAYS_IN_YEAR).toBigDecimal()
     }
 
     private fun calculateCollatorApr(collator: ParachainStakingRewardTarget): Double {

@@ -18,7 +18,7 @@ class StakingRewardEstimationBottomSheet(
         val average: String,
         @StringRes val returnsTypeFormat: Int,
         val title: String
-        )
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

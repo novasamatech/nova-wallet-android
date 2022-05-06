@@ -73,7 +73,6 @@ class RelaychainStakingUpdatersModule {
         storageCache
     )
 
-
     @Provides
     @FeatureScope
     fun provideCurrentEraUpdater(

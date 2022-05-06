@@ -22,7 +22,7 @@ interface RewardsRepository {
 
 class RealRewardsRepository(
     private val storageDataSource: StorageDataSource,
-): RewardsRepository {
+) : RewardsRepository {
     override suspend fun getInflationInfo(chainId: ChainId): InflationInfo {
         return storageDataSource.query(chainId) {
             runtime.metadata.parachainStaking().storage("InflationConfig").query(binding = ::bindInflationInfo)

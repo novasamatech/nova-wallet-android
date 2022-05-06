@@ -10,7 +10,6 @@ import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
 
-
 class ParachainBondInfoUpdater(
     stakingSharedState: StakingSharedState,
     chainRegistry: ChainRegistry,

@@ -30,7 +30,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 
-
 class RelaychainStartStakingComponentFactory(
     private val stakingInteractor: StakingInteractor,
     private val setupStakingSharedState: SetupStakingSharedState,
