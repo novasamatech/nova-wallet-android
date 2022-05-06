@@ -6,12 +6,14 @@ import io.novafoundation.nova.feature_staking_api.domain.api.getActiveElectedVal
 import io.novafoundation.nova.feature_staking_api.domain.model.Exposure
 import io.novafoundation.nova.feature_staking_api.domain.model.ValidatorPrefs
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.data.common.repository.CommonStakingRepository
 import io.novafoundation.nova.feature_staking_impl.domain.error.accountIdNotFound
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class RewardCalculatorFactory(
     private val stakingRepository: StakingRepository,
+    private val commonStakingRepository: CommonStakingRepository,
     @Deprecated("To be removed")
     private val sharedState: StakingSharedState,
 ) {
@@ -21,7 +23,7 @@ class RewardCalculatorFactory(
         exposures: AccountIdMap<Exposure>,
         validatorsPrefs: AccountIdMap<ValidatorPrefs?>
     ): RewardCalculator = withContext(Dispatchers.Default) {
-        val totalIssuance = stakingRepository.getTotalIssuance(chainId)
+        val totalIssuance = commonStakingRepository.getTotalIssuance(chainId)
 
         val validators = exposures.keys.mapNotNull { accountIdHex ->
             val exposure = exposures[accountIdHex] ?: accountIdNotFound(accountIdHex)

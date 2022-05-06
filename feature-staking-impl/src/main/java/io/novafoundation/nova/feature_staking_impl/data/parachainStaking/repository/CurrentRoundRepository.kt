@@ -20,9 +20,13 @@ interface CurrentRoundRepository {
 
     fun currentRoundInfoFlow(chainId: ChainId): Flow<RoundInfo>
 
+    suspend fun currentRoundInfo(chainId: ChainId): RoundInfo
+
     suspend fun collatorsSnapshot(chainId: ChainId, roundIndex: RoundIndex): AccountIdMap<CollatorSnapshot>
 
     fun totalStakedFlow(chainId: ChainId): Flow<Balance>
+
+    suspend fun totalStaked(chainId: ChainId): Balance
 }
 
 class RealCurrentRoundRepository(
@@ -32,6 +36,12 @@ class RealCurrentRoundRepository(
     override fun currentRoundInfoFlow(chainId: ChainId): Flow<RoundInfo> {
         return storageDataSource.subscribe(chainId) {
             runtime.metadata.parachainStaking().storage("Round").observe(binding = ::bindRoundInfo)
+        }
+    }
+
+    override suspend fun currentRoundInfo(chainId: ChainId): RoundInfo {
+        return storageDataSource.query(chainId) {
+            runtime.metadata.parachainStaking().storage("Round").query(binding = ::bindRoundInfo)
         }
     }
 
@@ -48,6 +58,12 @@ class RealCurrentRoundRepository(
     override fun totalStakedFlow(chainId: ChainId): Flow<Balance> {
         return storageDataSource.subscribe(chainId) {
             runtime.metadata.parachainStaking().storage("Total").observe(binding = ::bindNumber)
+        }
+    }
+
+    override suspend fun totalStaked(chainId: ChainId): Balance {
+        return storageDataSource.query(chainId) {
+            runtime.metadata.parachainStaking().storage("Total").query(binding = ::bindNumber)
         }
     }
 }

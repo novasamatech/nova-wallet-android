@@ -37,8 +37,6 @@ interface StakingRepository {
     @Deprecated("Deprecated in favour of ChainStateRepository.predictedBlockTime")
     suspend fun blockCreationTime(chainId: ChainId): BigInteger
 
-    suspend fun getTotalIssuance(chainId: ChainId): BigInteger
-
     suspend fun getActiveEraIndex(chainId: ChainId): EraIndex
 
     suspend fun getCurrentEraIndex(chainId: ChainId): EraIndex

@@ -8,14 +8,19 @@ import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.data.common.network.blockhain.updaters.TotalIssuanceUpdater
+import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.blockhain.updaters.CollatorCommissionUpdater
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.blockhain.updaters.CurrentRoundCollatorsUpdater
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.blockhain.updaters.CurrentRoundUpdater
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.blockhain.updaters.DelegatorStateUpdater
+import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.blockhain.updaters.InflationConfigUpdater
+import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.blockhain.updaters.ParachainBondInfoUpdater
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.blockhain.updaters.TotalDelegatedUpdater
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CurrentRoundRepository
+import io.novafoundation.nova.feature_staking_impl.di.staking.common.CommonStakingUpdatersModule
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
-@Module
+@Module(includes = [CommonStakingUpdatersModule::class])
 class ParachainStakingUpdatersModule {
 
     @Provides
@@ -73,6 +78,42 @@ class ParachainStakingUpdatersModule {
     )
 
     @Provides
+    @FeatureScope
+    fun provideInflationConfigUpdater(
+        storageCache: StorageCache,
+        stakingSharedState: StakingSharedState,
+        chainRegistry: ChainRegistry,
+    ) = InflationConfigUpdater(
+        storageCache = storageCache,
+        stakingSharedState = stakingSharedState,
+        chainRegistry = chainRegistry
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideParachainBondInfoUpdater(
+        storageCache: StorageCache,
+        stakingSharedState: StakingSharedState,
+        chainRegistry: ChainRegistry,
+    ) = ParachainBondInfoUpdater(
+        storageCache = storageCache,
+        stakingSharedState = stakingSharedState,
+        chainRegistry = chainRegistry
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideCollatorCommissionUpdater(
+        storageCache: StorageCache,
+        stakingSharedState: StakingSharedState,
+        chainRegistry: ChainRegistry,
+    ) = CollatorCommissionUpdater(
+        storageCache = storageCache,
+        stakingSharedState = stakingSharedState,
+        chainRegistry = chainRegistry
+    )
+
+    @Provides
     @Parachain
     @FeatureScope
     fun provideRelaychainStakingUpdaters(
@@ -80,10 +121,18 @@ class ParachainStakingUpdatersModule {
         currentRoundUpdater: CurrentRoundUpdater,
         currentRoundCollatorsUpdater: CurrentRoundCollatorsUpdater,
         totalDelegatedUpdater: TotalDelegatedUpdater,
+        inflationConfigUpdater: InflationConfigUpdater,
+        parachainBondInfoUpdater: ParachainBondInfoUpdater,
+        totalIssuanceUpdater: TotalIssuanceUpdater,
+        collatorCommissionUpdater: CollatorCommissionUpdater,
     ): List<Updater> = listOf(
         delegatorStateUpdater,
         currentRoundUpdater,
         currentRoundCollatorsUpdater,
-        totalDelegatedUpdater
+        totalDelegatedUpdater,
+        inflationConfigUpdater,
+        parachainBondInfoUpdater,
+        totalIssuanceUpdater,
+        collatorCommissionUpdater
     )
 }

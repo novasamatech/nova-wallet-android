@@ -6,8 +6,11 @@ import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.ParachainNetworkInfoInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.parachain.ParachainNetworkInfoComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.parachain.ParachainStakeSummaryComponentFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.startStaking.parachain.ParachainStartStakingComponentFactory
 
 @Module
 class ParachainModule {
@@ -32,5 +35,19 @@ class ParachainModule {
         delegatorStateUseCase = delegatorStateUseCase,
         resourceManager = resourceManager,
         interactor = parachainNetworkInfoInteractor,
+    )
+
+    @Provides
+    @ScreenScope
+    fun provideParachainStartStakingComponentFactory(
+        delegatorStateUseCase: DelegatorStateUseCase,
+        rewardCalculatorFactory: ParachainStakingRewardCalculatorFactory,
+        resourceManager: ResourceManager,
+        router: StakingRouter
+    ) = ParachainStartStakingComponentFactory(
+        delegatorStateUseCase = delegatorStateUseCase,
+        resourceManager = resourceManager,
+        rewardCalculatorFactory = rewardCalculatorFactory,
+        router = router
     )
 }

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindi
 
 import io.novafoundation.nova.common.data.network.runtime.binding.HelperBinding
 import io.novafoundation.nova.common.data.network.runtime.binding.UseCaseBinding
+import io.novafoundation.nova.common.data.network.runtime.binding.cast
 import io.novafoundation.nova.common.data.network.runtime.binding.getTyped
 import io.novafoundation.nova.common.data.network.runtime.binding.incompatible
 import io.novafoundation.nova.common.data.network.runtime.binding.returnType
@@ -14,11 +15,17 @@ import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import java.math.BigDecimal
 import java.math.BigInteger
 
+typealias Perbill = BigDecimal
+
 private const val PERBILL_MANTISSA_SIZE = 9
 
 @HelperBinding
-fun bindPerbill(value: BigInteger): BigDecimal {
+fun bindPerbill(value: BigInteger): Perbill {
     return value.toBigDecimal(scale = PERBILL_MANTISSA_SIZE)
+}
+
+fun bindPerbill(dynamic: Any?): Perbill {
+    return bindPerbill(dynamic.cast())
 }
 
 @UseCaseBinding
