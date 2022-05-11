@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="common_per_year_format">%s / year</string>
+
   <string name="staking_parachain_collator">Collator</string>
   <string name="staking_parachain_select_collator">Select collator</string>
 
