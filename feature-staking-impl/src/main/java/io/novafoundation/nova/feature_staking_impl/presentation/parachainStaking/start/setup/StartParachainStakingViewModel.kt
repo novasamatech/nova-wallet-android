@@ -1,11 +1,10 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Retriable
 import io.novafoundation.nova.common.mixin.api.Validatable
+import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.validation.ValidationExecutor
@@ -32,6 +31,7 @@ import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -54,8 +54,7 @@ class StartParachainStakingViewModel(
     Validatable by validationExecutor,
     FeeLoaderMixin by feeLoaderMixin {
 
-    private val _showNextProgress = MutableLiveData(false)
-    val showNextProgress: LiveData<Boolean> = _showNextProgress
+    private val validationInProgress = MutableStateFlow(false)
 
     private val assetFlow = assetUseCase.currentAssetFlow()
         .share()
@@ -101,6 +100,19 @@ class StartParachainStakingViewModel(
         .inBackground()
         .share()
 
+    val buttonState = combine(
+        validationInProgress,
+        selectedCollator,
+        amountChooserMixin.amountInput
+    ) { validationInProgress, collator, amountInput ->
+        when {
+            validationInProgress -> DescriptiveButtonState.Loading
+            collator == null -> DescriptiveButtonState.Disabled(resourceManager.getString(R.string.staking_parachain_select_collator_hint))
+            amountInput.isEmpty() -> DescriptiveButtonState.Disabled(resourceManager.getString(R.string.common_enter_amount))
+            else -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_continue))
+        }
+    }
+
     init {
         rewardsComponent connectWith amountChooserMixin
         rewardsComponent connectWith selectedCollator.map { it?.accountIdHex?.fromHex() }
@@ -143,9 +155,9 @@ class StartParachainStakingViewModel(
                 validationSystem = validationSystem,
                 payload = payload,
                 validationFailureTransformer = { startParachainStakingValidationFailure(it, resourceManager) },
-                progressConsumer = _showNextProgress.progressConsumer()
+                progressConsumer = validationInProgress.progressConsumer()
             ) {
-                _showNextProgress.value = false
+                validationInProgress.value = false
 
                 goToNextStep(amount,  collator)
             }

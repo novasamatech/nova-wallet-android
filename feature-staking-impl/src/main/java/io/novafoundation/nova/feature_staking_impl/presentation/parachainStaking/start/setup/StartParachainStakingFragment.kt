@@ -9,7 +9,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
-import io.novafoundation.nova.common.view.setProgress
+import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
@@ -71,7 +71,7 @@ class StartParachainStakingFragment : BaseFragment<StartParachainStakingViewMode
             startParachainStakingCollator.setSelectedCollator(it)
         }
 
-        viewModel.showNextProgress.observe(startParachainStakingNext::setProgress)
+        viewModel.buttonState.observe(startParachainStakingNext::setState)
 
         viewModel.minimumStake.observe(startParachainStakingMinStake::showAmount)
     }
