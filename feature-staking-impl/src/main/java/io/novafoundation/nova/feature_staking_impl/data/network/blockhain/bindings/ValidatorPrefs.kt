@@ -3,13 +3,12 @@ package io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindi
 import io.novafoundation.nova.common.data.network.runtime.binding.HelperBinding
 import io.novafoundation.nova.common.data.network.runtime.binding.UseCaseBinding
 import io.novafoundation.nova.common.data.network.runtime.binding.cast
+import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.data.network.runtime.binding.getTyped
-import io.novafoundation.nova.common.data.network.runtime.binding.incompatible
 import io.novafoundation.nova.common.data.network.runtime.binding.returnType
 import io.novafoundation.nova.common.utils.staking
 import io.novafoundation.nova.feature_staking_api.domain.model.ValidatorPrefs
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHexOrNull
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import java.math.BigDecimal
@@ -28,13 +27,19 @@ fun bindPerbill(dynamic: Any?): Perbill {
     return bindPerbill(dynamic.cast())
 }
 
+fun bindValidatorPrefs(decoded: Any?): ValidatorPrefs {
+    val asStruct = decoded.castToStruct()
+
+    return ValidatorPrefs(
+        commission = bindPerbill(asStruct.getTyped("commission")),
+        blocked = asStruct.getTyped("blocked")
+    )
+}
+
 @UseCaseBinding
 fun bindValidatorPrefs(scale: String, runtime: RuntimeSnapshot): ValidatorPrefs {
     val type = runtime.metadata.staking().storage("Validators").returnType()
-    val decoded = type.fromHexOrNull(runtime, scale) as? Struct.Instance ?: incompatible()
+    val decoded = type.fromHexOrNull(runtime, scale)
 
-    return ValidatorPrefs(
-        commission = bindPerbill(decoded.getTyped("commission")),
-        blocked = decoded.getTyped("blocked")
-    )
+    return bindValidatorPrefs(decoded)
 }

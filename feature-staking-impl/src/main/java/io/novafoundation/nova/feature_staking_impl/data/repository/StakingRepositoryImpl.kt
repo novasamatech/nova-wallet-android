@@ -161,16 +161,13 @@ class StakingRepositoryImpl(
             runtime.metadata.staking().storage("Validators").entries(
                 keysArguments = accountIdsHex.map(String::fromHex).wrapSingleArgumentKeys(),
                 keyExtractor = { (accountId: AccountId) -> accountId.toHexString() },
-                binding = { scale, _ -> scale?.let { bindValidatorPrefs(scale, runtime) } }
+                binding = { decoded, _ -> decoded?.let { bindValidatorPrefs(decoded) } }
             )
         }
     }
 
     override suspend fun getSlashes(chainId: ChainId, accountIdsHex: List<String>): AccountIdMap<Boolean> = withContext(Dispatchers.Default) {
         remoteStorage.query(chainId) {
-            val storage = runtime.metadata.staking().storage("SlashingSpans")
-            val returnType = storage.type.value!!
-
             val activeEraIndex = getActiveEraIndex(chainId)
 
             val slashDeferDurationConstant = runtime.metadata.staking().constant("SlashDeferDuration")
@@ -179,8 +176,8 @@ class StakingRepositoryImpl(
             runtime.metadata.staking().storage("SlashingSpans").entries(
                 keysArguments = accountIdsHex.map(String::fromHex).wrapSingleArgumentKeys(),
                 keyExtractor = { (accountId: AccountId) -> accountId.toHexString() },
-                binding = { scale, _ ->
-                    val span = scale?.let { bindSlashingSpans(it, runtime, returnType) }
+                binding = { decoded, _ ->
+                    val span = decoded?.let { bindSlashingSpans(it) }
 
                     isSlashed(span, activeEraIndex, slashDeferDuration)
                 }

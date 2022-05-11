@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
@@ -13,6 +14,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorProvider
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.RealStartParachainStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.StartParachainStakingInteractor
@@ -32,8 +34,9 @@ class StartParachainStakingModule {
     fun provideInteractor(
         extrinsicService: ExtrinsicService,
         chainRegistry: ChainRegistry,
-        singleAssetSharedState: StakingSharedState
-    ): StartParachainStakingInteractor = RealStartParachainStakingInteractor(extrinsicService, chainRegistry, singleAssetSharedState)
+        singleAssetSharedState: StakingSharedState,
+        collatorProvider: CollatorProvider,
+    ): StartParachainStakingInteractor = RealStartParachainStakingInteractor(extrinsicService, chainRegistry, singleAssetSharedState, collatorProvider)
 
     @Provides
     @ScreenScope
@@ -55,6 +58,8 @@ class StartParachainStakingModule {
         feeLoaderMixin: FeeLoaderMixin.Presentation,
         rewardsComponentFactory: RealParachainStakingRewardsComponentFactory,
         amountChooserMixinFactory: AmountChooserMixin.Factory,
+        singleAssetSharedState: StakingSharedState,
+        addressIconGenerator: AddressIconGenerator,
     ): ViewModel {
         return StartParachainStakingViewModel(
             router = router,
@@ -64,7 +69,9 @@ class StartParachainStakingModule {
             resourceManager = resourceManager,
             validationExecutor = validationExecutor,
             feeLoaderMixin = feeLoaderMixin,
-            amountChooserMixinFactory = amountChooserMixinFactory
+            amountChooserMixinFactory = amountChooserMixinFactory,
+            singleAssetSharedState = singleAssetSharedState,
+            addressIconGenerator = addressIconGenerator
         )
     }
 

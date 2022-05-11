@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 import kotlinx.android.synthetic.main.fragment_parachain_staking_start.startParachainStakingAmountField
+import kotlinx.android.synthetic.main.fragment_parachain_staking_start.startParachainStakingCollator
 import kotlinx.android.synthetic.main.fragment_parachain_staking_start.startParachainStakingContainer
 import kotlinx.android.synthetic.main.fragment_parachain_staking_start.startParachainStakingFee
 import kotlinx.android.synthetic.main.fragment_parachain_staking_start.startParachainStakingNext
@@ -41,6 +42,8 @@ class StartParachainStakingFragment : BaseFragment<StartParachainStakingViewMode
 
         startParachainStakingNext.prepareForProgress(viewLifecycleOwner)
         startParachainStakingNext.setOnClickListener { viewModel.nextClicked() }
+
+        startParachainStakingCollator.setOnClickListener { viewModel.selectCollatorClicked() }
     }
 
     override fun inject() {
@@ -61,6 +64,10 @@ class StartParachainStakingFragment : BaseFragment<StartParachainStakingViewMode
         setupFeeLoading(viewModel, startParachainStakingFee)
 
         viewModel.title.observe(startParachainStakingToolbar::setTitle)
+
+        viewModel.selectedCollatorModel.observe {
+            startParachainStakingCollator.setSelectedCollator(it)
+        }
 
         viewModel.showNextProgress.observe(startParachainStakingNext::setProgress)
     }

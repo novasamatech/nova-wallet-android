@@ -40,10 +40,9 @@ abstract class BaseStorageQueryContext(
     override suspend fun <K, V> StorageEntry.entries(
         vararg prefixArgs: Any?,
         keyExtractor: (StorageKeyComponents) -> K,
-        binding: (Any?, K) -> V
+        binding: DynamicInstanceBinderWithKey<K, V>
     ): Map<K, V> {
         val prefix = storageKey(runtime, *prefixArgs)
-        val returnType = type.value ?: incompatible()
 
         val entries = queryEntriesByPrefix(prefix)
 
@@ -51,27 +50,28 @@ abstract class BaseStorageQueryContext(
             entries = entries,
             storageEntry = this,
             keyExtractor = keyExtractor,
-            binding = { scale, key ->
-                val decoded = scale?.let { returnType.fromHexOrIncompatible(scale, runtime) }
-
-                binding(decoded, key)
-            }
+            binding = binding
         )
     }
 
     override suspend fun <K, V> StorageEntry.entries(
         keysArguments: List<List<Any?>>,
         keyExtractor: (StorageKeyComponents) -> K,
-        binding: (String?, K) -> V
+        binding: DynamicInstanceBinderWithKey<K, V>
     ): Map<K, V> {
         val entries = queryKeys(storageKeys(runtime, keysArguments), at)
 
-        return applyMappersToEntries(entries, storageEntry = this, keyExtractor, binding)
+        return applyMappersToEntries(
+            entries = entries,
+            storageEntry = this,
+            keyExtractor = keyExtractor,
+            binding = binding
+        )
     }
 
     override suspend fun <V> StorageEntry.query(
         vararg keyArguments: Any?,
-        binding: (instance: Any?) -> V
+        binding: DynamicInstanceBinder<V>
     ): V {
         val storageKey = storageKeyWith(keyArguments)
         val scaleResult = queryKey(storageKey, at)
@@ -82,7 +82,7 @@ abstract class BaseStorageQueryContext(
 
     override suspend fun <V> StorageEntry.observe(
         vararg keyArguments: Any?,
-        binding: (dynamicInstance: Any?) -> V
+        binding: DynamicInstanceBinder<V>
     ): Flow<V> {
         val storageKey = storageKeyWith(keyArguments)
 
@@ -125,12 +125,18 @@ abstract class BaseStorageQueryContext(
         entries: Map<String, String?>,
         storageEntry: StorageEntry,
         keyExtractor: (StorageKeyComponents) -> K,
-        binding: (String?, K) -> V,
+        binding: DynamicInstanceBinderWithKey<K, V>,
     ): Map<K, V> {
+        val returnType = storageEntry.type.value ?: incompatible()
+
         return entries.mapKeys { (key, _) ->
             val keyComponents = ComponentHolder(storageEntry.splitKey(runtime, key))
 
             keyExtractor(keyComponents)
-        }.mapValues { (key, value) -> binding(value, key) }
+        }.mapValues { (key, value) ->
+            val decoded = value?.let { returnType.fromHexOrIncompatible(value, runtime) }
+
+            binding(decoded, key)
+        }
     }
 }
