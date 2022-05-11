@@ -3,6 +3,8 @@ package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.star
 import io.novafoundation.nova.common.utils.parachainStaking
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.calls.delegate
+import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.ParachainStakingConstantsRepository
+import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.systemForcedMinStake
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorProvider
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.Collator
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -24,6 +26,8 @@ interface StartParachainStakingInteractor {
 
     // TODO stub until select collator screen is implemented
     suspend fun randomCollator(): Collator
+
+    suspend fun defaultMinimumStake(): BigInteger
 }
 
 class RealStartParachainStakingInteractor(
@@ -31,6 +35,7 @@ class RealStartParachainStakingInteractor(
     private val chainRegistry: ChainRegistry,
     private val singleAssetSharedState: SingleAssetSharedState,
     private val collatorProvider: CollatorProvider,
+    private val stakingConstantsRepository: ParachainStakingConstantsRepository,
 ): StartParachainStakingInteractor {
 
     override suspend fun estimateFee(amount: BigInteger): BigInteger {
@@ -50,6 +55,10 @@ class RealStartParachainStakingInteractor(
         val chainId = singleAssetSharedState.chainId()
 
         collatorProvider.electedCollators(chainId).random()
+    }
+
+    override suspend fun defaultMinimumStake(): BigInteger {
+        return stakingConstantsRepository.systemForcedMinStake(singleAssetSharedState.chainId())
     }
 
     private fun fakeDelegationCount() = BigInteger.TEN

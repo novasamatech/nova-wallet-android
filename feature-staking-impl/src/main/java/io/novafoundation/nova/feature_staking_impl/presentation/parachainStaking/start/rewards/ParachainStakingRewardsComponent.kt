@@ -47,5 +47,5 @@ infix fun ParachainStakingRewardsComponent.connectWith(selectedCollatorIdFlow: F
         val newConfiguration = rewardsConfiguration.copy(collator = newCollatorId)
 
         onAction(Action.ConfigurationUpdated(newConfiguration))
-    }
+    }.launchIn(this)
 }

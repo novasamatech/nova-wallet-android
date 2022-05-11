@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.ParachainStakingConstantsRepository
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorProvider
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.RealStartParachainStakingInteractor
@@ -36,7 +37,14 @@ class StartParachainStakingModule {
         chainRegistry: ChainRegistry,
         singleAssetSharedState: StakingSharedState,
         collatorProvider: CollatorProvider,
-    ): StartParachainStakingInteractor = RealStartParachainStakingInteractor(extrinsicService, chainRegistry, singleAssetSharedState, collatorProvider)
+        stakingConstantsRepository: ParachainStakingConstantsRepository,
+    ): StartParachainStakingInteractor = RealStartParachainStakingInteractor(
+        extrinsicService,
+        chainRegistry,
+        singleAssetSharedState,
+        collatorProvider,
+        stakingConstantsRepository
+    )
 
     @Provides
     @ScreenScope

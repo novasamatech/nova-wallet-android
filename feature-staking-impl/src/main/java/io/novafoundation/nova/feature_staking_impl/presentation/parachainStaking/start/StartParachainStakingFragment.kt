@@ -16,10 +16,12 @@ import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.rewards.setupParachainStakingRewardsComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
+import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
 import kotlinx.android.synthetic.main.fragment_parachain_staking_start.startParachainStakingAmountField
 import kotlinx.android.synthetic.main.fragment_parachain_staking_start.startParachainStakingCollator
 import kotlinx.android.synthetic.main.fragment_parachain_staking_start.startParachainStakingContainer
 import kotlinx.android.synthetic.main.fragment_parachain_staking_start.startParachainStakingFee
+import kotlinx.android.synthetic.main.fragment_parachain_staking_start.startParachainStakingMinStake
 import kotlinx.android.synthetic.main.fragment_parachain_staking_start.startParachainStakingNext
 import kotlinx.android.synthetic.main.fragment_parachain_staking_start.startParachainStakingRewards
 import kotlinx.android.synthetic.main.fragment_parachain_staking_start.startParachainStakingToolbar
@@ -70,5 +72,7 @@ class StartParachainStakingFragment : BaseFragment<StartParachainStakingViewMode
         }
 
         viewModel.showNextProgress.observe(startParachainStakingNext::setProgress)
+
+        viewModel.minimumStake.observe(startParachainStakingMinStake::showAmount)
     }
 }

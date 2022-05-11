@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.reposit
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.systemForcedMinStake
 import io.novafoundation.nova.feature_staking_impl.domain.model.NetworkInfo
 import io.novafoundation.nova.feature_staking_impl.domain.model.StakingPeriod
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.minimumStake
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import kotlinx.coroutines.flow.Flow
@@ -62,7 +63,7 @@ class ParachainNetworkInfoInteractor(
     ): BigInteger {
 
         val minStakeFromCollators = values.minOfOrNull { collatorSnapshot ->
-            collatorSnapshot.delegations.minOfOrNull { it.balance } ?: systemForcedMinStake
+            collatorSnapshot.minimumStake(systemForcedMinStake)
         } ?: systemForcedMinStake
 
         return minStakeFromCollators.max(systemForcedMinStake)

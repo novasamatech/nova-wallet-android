@@ -28,21 +28,21 @@
             android:orientation="vertical">
 
             <TextView
+                style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/staking_parachain_collator"
-                android:textColor="@color/white_64"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
-                style="@style/TextAppearance.NovaFoundation.Regular.Footnote" />
+                android:text="@string/staking_parachain_collator"
+                android:textColor="@color/white_64" />
 
             <io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.view.SelectCollatorView
+                android:id="@+id/startParachainStakingCollator"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:id="@+id/startParachainStakingCollator"
-                android:layout_marginEnd="16dp"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp" />
 
             <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.ChooseAmountView
                 android:id="@+id/startParachainStakingAmountField"
@@ -53,21 +53,30 @@
                 android:layout_marginEnd="16dp" />
 
             <io.novafoundation.nova.feature_staking_impl.presentation.view.RewardDestinationView
+                android:id="@+id/startParachainStakingRewards"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:id="@+id/startParachainStakingRewards"
                 android:layout_marginTop="16dp"
-                app:targetName="@string/staking_reward_destination_payout"
+                android:layout_marginEnd="16dp"
                 android:checkable="false"
-                android:layout_marginEnd="16dp"/>
+                app:targetName="@string/staking_reward_destination_payout" />
+
+            <io.novafoundation.nova.common.view.TableCellView
+                android:id="@+id/startParachainStakingMinStake"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                app:dividerVisible="false"
+                app:title="@string/staking_main_minimum_stake_title" />
 
             <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
+                android:id="@+id/startParachainStakingFee"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/startParachainStakingFee"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="12dp"
                 android:layout_marginEnd="16dp"
                 app:dividerVisible="false" />
         </LinearLayout>

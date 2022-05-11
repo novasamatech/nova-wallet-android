@@ -23,7 +23,7 @@ interface ParachainStakingRewardCalculator {
 
     fun calculateCollatorAnnualReturns(collatorId: AccountId, amount: BigDecimal): PeriodReturns
 
-    fun calculateAverageAnnualReturns(amount: BigDecimal): PeriodReturns
+    fun calculateMaxAnnualReturns(amount: BigDecimal): PeriodReturns
 }
 
 private const val DAYS_IN_YEAR = 365
@@ -75,8 +75,8 @@ class RealParachainStakingRewardCalculator(
         )
     }
 
-    override fun calculateAverageAnnualReturns(amount: BigDecimal): PeriodReturns {
-        val averageApr = averageApr()
+    override fun calculateMaxAnnualReturns(amount: BigDecimal): PeriodReturns {
+        val averageApr = maximumAnnualApr()
 
         return PeriodReturns(
             gainAmount = amount * averageApr,

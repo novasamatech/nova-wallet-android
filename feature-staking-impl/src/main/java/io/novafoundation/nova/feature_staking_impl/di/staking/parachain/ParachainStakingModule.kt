@@ -88,6 +88,7 @@ class ParachainStakingModule {
     @FeatureScope
     fun provideCollatorProvider(
         currentRoundRepository: CurrentRoundRepository,
-        identityRepository: IdentityRepository
-    ): CollatorProvider = RealCollatorProvider(identityRepository, currentRoundRepository)
+        identityRepository: IdentityRepository,
+        parachainStakingConstantsRepository: ParachainStakingConstantsRepository,
+    ): CollatorProvider = RealCollatorProvider(identityRepository, currentRoundRepository, parachainStakingConstantsRepository)
 }

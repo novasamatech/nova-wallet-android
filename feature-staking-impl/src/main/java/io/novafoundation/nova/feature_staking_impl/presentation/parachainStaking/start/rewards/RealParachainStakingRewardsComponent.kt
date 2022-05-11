@@ -58,7 +58,7 @@ private class RealParachainStakingRewardsComponent(
         val returns = if (it.collator != null) {
             rewardCalculator().calculateCollatorAnnualReturns(it.collator, it.amount)
         } else {
-            rewardCalculator().calculateAverageAnnualReturns(it.amount)
+            rewardCalculator().calculateMaxAnnualReturns(it.amount)
         }
 
         assetFlow.map { asset ->

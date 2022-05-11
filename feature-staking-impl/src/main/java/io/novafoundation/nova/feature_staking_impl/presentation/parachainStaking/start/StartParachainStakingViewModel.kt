@@ -22,11 +22,13 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
+import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
@@ -76,7 +78,14 @@ class StartParachainStakingViewModel(
                 addressModel = addressModel
             )
         }
-    }
+    }.shareInBackground()
+
+    val minimumStake = selectedCollator.map {
+        val minimumStake = it?.minimumStake ?: interactor.defaultMinimumStake()
+        val asset = assetFlow.first()
+
+        mapAmountToAmountModel(minimumStake, asset)
+    }.shareInBackground()
 
     val rewardsComponent = rewardsComponentFactory.create(
         parentScope = this,
