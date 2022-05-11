@@ -4,6 +4,9 @@ import io.novafoundation.nova.common.utils.percentageToFraction
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.Perbill
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.InflationInfo
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.ParachainBondConfig
+import io.novafoundation.nova.feature_staking_impl.domain.rewards.PeriodReturns
+import jp.co.soramitsu.fearless_utils.extensions.toHexString
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -14,9 +17,13 @@ class ParachainStakingRewardTarget(
 
 interface ParachainStakingRewardCalculator {
 
-    fun averageAnnualApr(): BigDecimal
+    fun averageApr(): BigDecimal
 
-    fun maximumApr(days: Int): BigDecimal
+    fun maximumGain(days: Int): BigDecimal
+
+    fun calculateCollatorAnnualReturns(collatorId: AccountId, amount: BigDecimal): PeriodReturns
+
+    fun calculateAverageAnnualReturns(amount: BigDecimal): PeriodReturns
 }
 
 private const val DAYS_IN_YEAR = 365
@@ -51,12 +58,30 @@ class RealParachainStakingRewardCalculator(
 
     private val maxApr = aprByCollator.values.maxOrNull() ?: 0.0
 
-    override fun averageAnnualApr(): BigDecimal {
+    override fun averageApr(): BigDecimal {
         return averageApr.toBigDecimal()
     }
 
-    override fun maximumApr(days: Int): BigDecimal {
+    override fun maximumGain(days: Int): BigDecimal {
         return (maxApr * days / DAYS_IN_YEAR).toBigDecimal()
+    }
+
+    override fun calculateCollatorAnnualReturns(collatorId: AccountId, amount: BigDecimal): PeriodReturns {
+        val collatorApr = aprByCollator[collatorId.toHexString()]?.toBigDecimal() ?: averageApr()
+
+        return PeriodReturns(
+            gainAmount = amount * collatorApr,
+            gainFraction = collatorApr
+        )
+    }
+
+    override fun calculateAverageAnnualReturns(amount: BigDecimal): PeriodReturns {
+        val averageApr = averageApr()
+
+        return PeriodReturns(
+            gainAmount = amount * averageApr,
+            gainFraction = averageApr
+        )
     }
 
     private fun calculateCollatorApr(collator: ParachainStakingRewardTarget): Double {
@@ -70,4 +95,4 @@ class RealParachainStakingRewardCalculator(
     private fun ParachainBondConfig.percentageAsFraction() = percent.toDouble().percentageToFraction()
 }
 
-fun ParachainStakingRewardCalculator.maximumAnnualApr() = maximumApr(DAYS_IN_YEAR)
+fun ParachainStakingRewardCalculator.maximumAnnualApr() = maximumGain(DAYS_IN_YEAR)

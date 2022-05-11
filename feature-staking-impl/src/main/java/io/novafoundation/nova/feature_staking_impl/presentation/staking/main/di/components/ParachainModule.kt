@@ -7,7 +7,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.ParachainNetworkInfoInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
-import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.parachain.ParachainNetworkInfoComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.parachain.ParachainStakeSummaryComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.startStaking.parachain.ParachainStartStakingComponentFactory
@@ -43,7 +43,7 @@ class ParachainModule {
         delegatorStateUseCase: DelegatorStateUseCase,
         rewardCalculatorFactory: ParachainStakingRewardCalculatorFactory,
         resourceManager: ResourceManager,
-        router: StakingRouter
+        router: ParachainStakingRouter
     ) = ParachainStartStakingComponentFactory(
         delegatorStateUseCase = delegatorStateUseCase,
         resourceManager = resourceManager,

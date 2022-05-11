@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_account_api.presenatation.account.chooser.AccountChooserBottomSheetDialog
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.presentation.view.RewardDestinationChooserView
+import io.novafoundation.nova.feature_staking_impl.presentation.view.showRewardEstimation
 
 fun <V> BaseFragment<V>.observeRewardDestinationChooser(
     viewModel: V,
@@ -23,13 +24,8 @@ fun <V> BaseFragment<V>.observeRewardDestinationChooser(
     }
 
     viewModel.rewardReturnsLiveData.observe {
-        chooser.destinationPayout.setPercentageGain(it.payout.gain)
-        chooser.destinationPayout.setTokenAmount(it.payout.amount)
-        chooser.destinationPayout.setFiatAmount(it.payout.fiatAmount)
-
-        chooser.destinationRestake.setPercentageGain(it.restake.gain)
-        chooser.destinationRestake.setTokenAmount(it.restake.amount)
-        chooser.destinationRestake.setFiatAmount(it.restake.fiatAmount)
+        chooser.destinationPayout.showRewardEstimation(it.payout)
+        chooser.destinationRestake.showRewardEstimation(it.restake)
     }
 
     viewModel.showDestinationChooserEvent.observeEvent {

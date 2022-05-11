@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/staking_parachain_start_graph"
+    app:startDestination="@id/startParachainStakingFragment">
+
+    <fragment
+        android:id="@+id/startParachainStakingFragment"
+        app:layout="@layout/fragment_parachain_staking_start"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.StartParachainStakingFragment"
+        android:label="StartParachainStakingFragment" />
+</navigation>

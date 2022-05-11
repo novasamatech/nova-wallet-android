@@ -9,7 +9,7 @@ import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.maximumAnnualApr
-import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.StakingRewardEstimationBottomSheet
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.startStaking.BaseStartStakingComponent
@@ -27,7 +27,7 @@ class ParachainStartStakingComponentFactory(
     private val delegatorStateUseCase: DelegatorStateUseCase,
     private val rewardCalculatorFactory: ParachainStakingRewardCalculatorFactory,
     private val resourceManager: ResourceManager,
-    private val router: StakingRouter,
+    private val router: ParachainStakingRouter,
 ) {
 
     fun create(
@@ -47,7 +47,7 @@ private class ParachainStartStakingComponent(
     private val delegatorStateUseCase: DelegatorStateUseCase,
     private val rewardCalculatorFactory: ParachainStakingRewardCalculatorFactory,
     private val resourceManager: ResourceManager,
-    private val router: StakingRouter,
+    private val router: ParachainStakingRouter,
 
     private val assetWithChain: SingleAssetSharedState.AssetWithChain,
     hostContext: ComponentHostContext,
@@ -60,7 +60,7 @@ private class ParachainStartStakingComponent(
     }.shareInBackground()
 
     override suspend fun maxPeriodReturnPercentage(days: Int): BigDecimal {
-        return rewardCalculator().maximumApr(days)
+        return rewardCalculator().maximumGain(days)
     }
 
     override val isComponentApplicable = delegatorStateFlow.map { it is DelegatorState.None }
@@ -70,7 +70,7 @@ private class ParachainStartStakingComponent(
 
         val payload = StakingRewardEstimationBottomSheet.Payload(
             max = rewardCalculator.maximumAnnualApr().formatFractionAsPercentage(),
-            average = rewardCalculator.averageAnnualApr().formatFractionAsPercentage(),
+            average = rewardCalculator.averageApr().formatFractionAsPercentage(),
             returnsTypeFormat = R.string.staking_apr,
             title = resourceManager.getString(R.string.staking_reward_info_title_transferrable)
         )
@@ -80,6 +80,8 @@ private class ParachainStartStakingComponent(
     }
 
     override suspend fun nextClicked() {
-        // TODO
+        // TODO validations
+
+        router.openStartStaking()
     }
 }

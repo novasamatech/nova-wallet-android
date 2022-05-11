@@ -63,7 +63,7 @@
         app:layout_constraintStart_toStartOf="@+id/payoutTargetStartBarrier"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
-        tools:text="4.12 KSM" />
+        tools:text="4.12 KSM / year" />
 
     <TextView
         android:id="@+id/payoutTargetAmountFiat"
