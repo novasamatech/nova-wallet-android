@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="common_missing_account_title">%s account is missing</string>
+  <string name="staking_missing_account_message">You should add %s account to the wallet in order to start staking</string>
+
   <string name="common_enter_amount">Enter amount…</string>
   <string name="staking_parachain_select_collator_hint">Select collator…</string>
   <string name="staking_parachain_wont_receive_rewards_title">You will not receive rewards</string>

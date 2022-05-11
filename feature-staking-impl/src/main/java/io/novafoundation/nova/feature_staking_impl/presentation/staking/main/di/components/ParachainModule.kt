@@ -4,6 +4,7 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.ParachainNetworkInfoInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
@@ -43,11 +44,13 @@ class ParachainModule {
         delegatorStateUseCase: DelegatorStateUseCase,
         rewardCalculatorFactory: ParachainStakingRewardCalculatorFactory,
         resourceManager: ResourceManager,
-        router: ParachainStakingRouter
+        router: ParachainStakingRouter,
+        validationExecutor: ValidationExecutor
     ) = ParachainStartStakingComponentFactory(
         delegatorStateUseCase = delegatorStateUseCase,
         resourceManager = resourceManager,
         rewardCalculatorFactory = rewardCalculatorFactory,
-        router = router
+        router = router,
+        validationExecutor = validationExecutor
     )
 }
