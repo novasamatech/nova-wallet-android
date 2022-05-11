@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.view
+package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.view
 
 import android.content.Context
 import android.util.AttributeSet
@@ -8,7 +8,7 @@ import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.model.SelectCollatorModel
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.model.SelectCollatorModel
 import kotlinx.android.synthetic.main.item_validator.view.itemValidationCheck
 import kotlinx.android.synthetic.main.item_validator.view.itemValidatorActionIcon
 import kotlinx.android.synthetic.main.item_validator.view.itemValidatorIcon

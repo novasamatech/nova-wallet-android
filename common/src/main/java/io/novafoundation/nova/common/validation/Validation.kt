@@ -28,6 +28,10 @@ fun <S> validOrError(
     ValidationStatus.NotValid(DefaultFailureLevel.ERROR, lazyReason())
 }
 
+fun <S> validationError(reason: S)  = ValidationStatus.NotValid(DefaultFailureLevel.ERROR, reason)
+fun <S> validationWarning(reason: S)  = ValidationStatus.NotValid(DefaultFailureLevel.WARNING, reason)
+fun <S> valid() = ValidationStatus.Valid<S>()
+
 infix fun <E> Boolean.isTrueOrError(error: () -> E) = validOrError(this, error)
 infix fun <E> Boolean.isFalseOrError(error: () -> E) = this.not().isTrueOrError(error)
 

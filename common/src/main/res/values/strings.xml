@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="staking_parachain_wont_receive_rewards_title">You will not receive rewards</string>
+  <string name="staking_parachain_wont_receive_rewards_message">Your stake will be less than the minimum stake (%s) for this collator.</string>
   <string name="common_per_year_format">%s / year</string>
 
   <string name="staking_parachain_collator">Collator</string>

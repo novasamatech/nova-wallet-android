@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start
+package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,7 +13,7 @@ import io.novafoundation.nova.common.view.setProgress
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.rewards.setupParachainStakingRewardsComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.setupParachainStakingRewardsComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount

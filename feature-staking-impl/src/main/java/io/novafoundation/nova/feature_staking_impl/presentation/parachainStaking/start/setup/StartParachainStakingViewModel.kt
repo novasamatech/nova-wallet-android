@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start
+package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -9,14 +9,18 @@ import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.Collator
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.StartParachainStakingInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationPayload
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
-import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.model.SelectCollatorModel
-import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.rewards.RealParachainStakingRewardsComponentFactory
-import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.rewards.connectWith
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.model.SelectCollatorModel
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.RealParachainStakingRewardsComponentFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.connectWith
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.startParachainStakingValidationFailure
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
@@ -42,6 +46,7 @@ class StartParachainStakingViewModel(
     private val assetUseCase: AssetUseCase,
     private val resourceManager: ResourceManager,
     private val validationExecutor: ValidationExecutor,
+    private val validationSystem: StartParachainStakingValidationSystem,
     private val feeLoaderMixin: FeeLoaderMixin.Presentation,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
 ) : BaseViewModel(),
@@ -124,40 +129,35 @@ class StartParachainStakingViewModel(
 
     private fun maybeGoToNext() = requireFee { fee ->
         launch {
-//            val rewardDestinationModel = rewardDestinationMixin.rewardDestinationModelFlow.first()
-//            val rewardDestination = mapRewardDestinationModelToRewardDestination(rewardDestinationModel)
-//            val amount = amountChooserMixin.amount.first()
-//            val currentAccountAddress = interactor.getSelectedAccountProjection().address
-//
-//            val payload = SetupStakingPayload(
-//                bondAmount = amount,
-//                controllerAddress = currentAccountAddress,
-//                maxFee = fee,
-//                asset = assetFlow.first(),
-//                isAlreadyNominating = false // on setup staking screen => not nominator
-//            )
-//
-//            validationExecutor.requireValid(
-//                validationSystem = validationSystem,
-//                payload = payload,
-//                validationFailureTransformer = { stakingValidationFailure(payload, it, resourceManager) },
-//                progressConsumer = _showNextProgress.progressConsumer()
-//            ) {
-//                _showNextProgress.value = false
-//
-//                goToNextStep(amount, rewardDestination, currentAccountAddress)
-//            }
+            val collator = selectedCollator.first() ?: return@launch
+            val amount = amountChooserMixin.amount.first()
+
+            val payload = StartParachainStakingValidationPayload(
+                amount = amount,
+                fee = fee,
+                asset = assetFlow.first(),
+                collator = collator
+            )
+
+            validationExecutor.requireValid(
+                validationSystem = validationSystem,
+                payload = payload,
+                validationFailureTransformer = { startParachainStakingValidationFailure(it, resourceManager) },
+                progressConsumer = _showNextProgress.progressConsumer()
+            ) {
+                _showNextProgress.value = false
+
+                goToNextStep(amount,  collator)
+            }
         }
     }
 
-//    private fun goToNextStep(
-//        newAmount: BigDecimal,
-//        rewardDestination: RewardDestination,
-//        currentAccountAddress: String
-//    ) {
-//
-//        router.openStartChangeValidators()
-//    }
+    private fun goToNextStep(
+        amount: BigDecimal,
+        collator: Collator,
+    ) {
+        showMessage("Ready to go to confirm")
+    }
 
     private fun requireFee(block: (BigDecimal) -> Unit) = feeLoaderMixin.requireFee(
         block,

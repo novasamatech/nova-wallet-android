@@ -1,8 +1,8 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.rewards
+package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards
 
 import io.novafoundation.nova.common.utils.firstNotNull
-import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.rewards.ParachainStakingRewardsComponent.Action
-import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.rewards.ParachainStakingRewardsComponent.State
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.ParachainStakingRewardsComponent.Action
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.ParachainStakingRewardsComponent.State
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.StatefullComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.model.RewardEstimation
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin

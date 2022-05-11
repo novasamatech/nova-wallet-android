@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.rewards
+package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards
 
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -8,9 +8,9 @@ import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.RewardSuffix
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapPeriodReturnsToRewardEstimation
-import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.rewards.ParachainStakingRewardsComponent.Action
-import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.rewards.ParachainStakingRewardsComponent.RewardsConfiguration
-import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.rewards.ParachainStakingRewardsComponent.State
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.ParachainStakingRewardsComponent.Action
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.ParachainStakingRewardsComponent.RewardsConfiguration
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.ParachainStakingRewardsComponent.State
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import kotlinx.coroutines.CoroutineScope
