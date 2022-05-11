@@ -36,10 +36,10 @@ class RealStartParachainStakingInteractor(
     private val singleAssetSharedState: SingleAssetSharedState,
     private val collatorProvider: CollatorProvider,
     private val stakingConstantsRepository: ParachainStakingConstantsRepository,
-): StartParachainStakingInteractor {
+) : StartParachainStakingInteractor {
 
     override suspend fun estimateFee(amount: BigInteger): BigInteger {
-       val chain = singleAssetSharedState.chain()
+        val chain = singleAssetSharedState.chain()
 
         return extrinsicService.estimateFee(chain) {
             delegate(

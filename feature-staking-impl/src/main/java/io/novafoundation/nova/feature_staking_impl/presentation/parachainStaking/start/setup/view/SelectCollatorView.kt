@@ -46,5 +46,3 @@ class SelectCollatorView @JvmOverloads constructor(
         }
     }
 }
-
-

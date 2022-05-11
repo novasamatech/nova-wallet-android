@@ -156,7 +156,7 @@ class StakingFeatureModule {
     @Provides
     @FeatureScope
     fun provideIdentityRepository(
-       @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource
+        @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource
     ): IdentityRepository = IdentityRepositoryImpl(remoteStorageSource)
 
     @Provides

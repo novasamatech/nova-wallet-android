@@ -18,7 +18,7 @@ class RealCollatorProvider(
     private val identityRepository: IdentityRepository,
     private val currentRoundRepository: CurrentRoundRepository,
     private val parachainStakingConstantsRepository: ParachainStakingConstantsRepository,
-): CollatorProvider {
+) : CollatorProvider {
 
     override suspend fun electedCollators(chainId: ChainId): List<Collator> {
         val snapshots = currentRoundRepository.collatorsSnapshotInCurrentRound(chainId)

@@ -159,7 +159,7 @@ class StartParachainStakingViewModel(
             ) {
                 validationInProgress.value = false
 
-                goToNextStep(amount,  collator)
+                goToNextStep(amount, collator)
             }
         }
     }

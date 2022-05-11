@@ -11,7 +11,7 @@ fun ExtrinsicBuilder.delegate(
     amount: Balance,
     candidateDelegationCount: BigInteger,
     delegationCount: BigInteger
-) : ExtrinsicBuilder {
+): ExtrinsicBuilder {
     return call(
         moduleName = Modules.PARACHAIN_STAKING,
         callName = "delegate",

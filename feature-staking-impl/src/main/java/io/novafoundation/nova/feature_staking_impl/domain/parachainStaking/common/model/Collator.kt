@@ -11,7 +11,6 @@ class Collator(
     val minimumStake: BigInteger,
 )
 
-
 fun CollatorSnapshot.minimumStake(systemForcedMinStake: BigInteger): BigInteger {
     return delegations.minOfOrNull { it.balance } ?: systemForcedMinStake
 }

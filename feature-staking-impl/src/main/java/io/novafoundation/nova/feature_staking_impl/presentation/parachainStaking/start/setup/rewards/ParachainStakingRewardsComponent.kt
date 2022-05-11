@@ -31,7 +31,6 @@ interface ParachainStakingRewardsComponent : StatefullComponent<State, Nothing, 
     }
 }
 
-
 infix fun ParachainStakingRewardsComponent.connectWith(amountChooserMixin: AmountChooserMixin.Presentation) {
     amountChooserMixin.amount.onEach { newAmount ->
         val rewardsConfiguration = state.firstNotNull().rewardsConfiguration

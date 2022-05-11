@@ -44,7 +44,7 @@ private class RealParachainStakingRewardsComponent(
     private val resourceManager: ResourceManager,
     private val parentScope: CoroutineScope,
     private val assetFlow: Flow<Asset>,
-): ParachainStakingRewardsComponent, CoroutineScope by parentScope {
+) : ParachainStakingRewardsComponent, CoroutineScope by parentScope {
 
     private val rewardCalculator by lazyAsync {
         rewardCalculatorFactory.create(singleAssetSharedState.chainId())
@@ -75,7 +75,7 @@ private class RealParachainStakingRewardsComponent(
     }
 
     override fun onAction(action: Action) {
-        when(action) {
+        when (action) {
             is Action.ConfigurationUpdated -> {
                 rewardConfiguration.value = action.newConfiguration
             }

@@ -12,15 +12,15 @@ fun startParachainStakingValidationFailure(
     failure: StartParachainStakingValidationFailure,
     resourceManager: ResourceManager
 ): TitleAndMessage {
-    return when(failure) {
-        NotEnoughBalanceToPayFees ->  {
+    return when (failure) {
+        NotEnoughBalanceToPayFees -> {
             resourceManager.getString(R.string.common_not_enough_funds_title) to
                 resourceManager.getString(R.string.common_not_enough_funds_message)
         }
         is TooLowStake -> {
             val formattedMinStake = mapAmountToAmountModel(failure.minimumStake, failure.asset).token
 
-            when(failure) {
+            when (failure) {
                 is TooLowStake.TooLowDelegation, is TooLowStake.TooLowTotalStake -> {
                     resourceManager.getString(R.string.common_amount_low) to
                         resourceManager.getString(R.string.staking_setup_amount_too_low, formattedMinStake)

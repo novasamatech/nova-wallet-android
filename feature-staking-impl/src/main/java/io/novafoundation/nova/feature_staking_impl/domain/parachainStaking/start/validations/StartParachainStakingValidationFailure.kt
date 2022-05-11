@@ -7,12 +7,12 @@ sealed class StartParachainStakingValidationFailure {
 
     object NotEnoughBalanceToPayFees : StartParachainStakingValidationFailure()
 
-    sealed class TooLowStake(val minimumStake: BigDecimal, val asset: Asset): StartParachainStakingValidationFailure() {
+    sealed class TooLowStake(val minimumStake: BigDecimal, val asset: Asset) : StartParachainStakingValidationFailure() {
 
-        class TooLowDelegation(minimumStake: BigDecimal, asset: Asset): TooLowStake(minimumStake, asset)
+        class TooLowDelegation(minimumStake: BigDecimal, asset: Asset) : TooLowStake(minimumStake, asset)
 
-        class TooLowTotalStake(minimumStake: BigDecimal, asset: Asset): TooLowStake(minimumStake, asset)
+        class TooLowTotalStake(minimumStake: BigDecimal, asset: Asset) : TooLowStake(minimumStake, asset)
 
-        class WontReceiveRewards(minimumStake: BigDecimal, asset: Asset): TooLowStake(minimumStake, asset)
+        class WontReceiveRewards(minimumStake: BigDecimal, asset: Asset) : TooLowStake(minimumStake, asset)
     }
 }
