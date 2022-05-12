@@ -15,7 +15,7 @@ interface CandidatesRepository {
 
 class RealCandidatesRepository(
     private val storageDataSource: StorageDataSource
-): CandidatesRepository {
+) : CandidatesRepository {
     override suspend fun getCandidateMetadata(chainId: ChainId, collatorId: AccountId): CandidateMetadata {
         return storageDataSource.query(chainId) {
             runtime.metadata.parachainStaking().storage("CandidateInfo").query(collatorId, binding = ::bindCandidateMetadata)

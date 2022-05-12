@@ -70,7 +70,7 @@ class RealStartParachainStakingInteractor(
             val (chain, chainAsset) = singleAssetSharedState.chainAndAsset()
             val accountId = chain.accountIdOf(originAddress)
 
-            val delegationsCount = when(val currentDelegationState = delegatorStateRepository.getDelegationState(chain, chainAsset, accountId)) {
+            val delegationsCount = when (val currentDelegationState = delegatorStateRepository.getDelegationState(chain, chainAsset, accountId)) {
                 is DelegatorState.Delegator -> currentDelegationState.delegations.size
                 is DelegatorState.None -> 0
             }
