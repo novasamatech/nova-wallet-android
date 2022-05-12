@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.hasAccountIn
 class HasEthereumAccountValidation : ParachainStakingWelcomeValidation {
 
     override suspend fun validate(value: ParachainStakingWelcomeValidationPayload): ValidationStatus<ParachainStakingWelcomeValidationFailure> {
-       val hasEthereumAccount = value.account.hasAccountIn(value.chain)
+        val hasEthereumAccount = value.account.hasAccountIn(value.chain)
 
         return hasEthereumAccount isTrueOrError {
             ParachainStakingWelcomeValidationFailure.MissingEthereumAccount(value.chain, value.account)

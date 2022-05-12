@@ -13,5 +13,7 @@ class StakingNavigationModule {
 
     @Provides
     @ApplicationScope
-    fun provideParachainStakingRouter(navigationHolder: NavigationHolder, navigator: Navigator): ParachainStakingRouter = ParachainStakingNavigator(navigationHolder, navigator)
+    fun provideParachainStakingRouter(navigationHolder: NavigationHolder, navigator: Navigator): ParachainStakingRouter {
+        return ParachainStakingNavigator(navigationHolder, navigator)
+    }
 }

@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.startStaking.parachain
 
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
-import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer.Payload.*
+import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer.Payload.DialogAction
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.formatFractionAsPercentage
@@ -110,14 +110,14 @@ private class ParachainStartStakingComponent(
             validationSystem = validationSystem,
             payload = payload,
             errorDisplayer = hostContext.errorDisplayer,
-            validationFailureTransformerCustom = { status, _ -> validationFailure(status.reason)  }
+            validationFailureTransformerCustom = { status, _ -> validationFailure(status.reason) }
         ) {
             router.openStartStaking()
         }
     }
 
     private fun validationFailure(failure: ParachainStakingWelcomeValidationFailure): TransformedFailure.Custom {
-        return when(failure) {
+        return when (failure) {
             is ParachainStakingWelcomeValidationFailure.MissingEthereumAccount -> {
                 TransformedFailure.Custom(
                     dialogPayload = CustomDialogDisplayer.Payload(
@@ -127,7 +127,8 @@ private class ParachainStartStakingComponent(
                             title = resourceManager.getString(R.string.common_add),
                             action = { router.openAddAccount(failure.chain.id, failure.metaAccount.id) }
                         ),
-                        cancelAction = DialogAction.noOp(resourceManager.getString(R.string.common_cancel))
+                        cancelAction = DialogAction.noOp(resourceManager.getString(R.string.common_cancel)),
+                        customStyle = R.style.AccentAlertDialogTheme
                     )
                 )
             }

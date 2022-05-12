@@ -5,5 +5,5 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 sealed class ParachainStakingWelcomeValidationFailure {
 
-    class MissingEthereumAccount(val chain: Chain, val metaAccount: MetaAccount): ParachainStakingWelcomeValidationFailure()
+    class MissingEthereumAccount(val chain: Chain, val metaAccount: MetaAccount) : ParachainStakingWelcomeValidationFailure()
 }
