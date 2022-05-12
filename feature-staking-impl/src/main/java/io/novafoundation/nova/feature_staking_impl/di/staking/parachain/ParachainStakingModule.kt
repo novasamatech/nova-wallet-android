@@ -4,6 +4,7 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_staking_api.domain.api.IdentityRepository
 import io.novafoundation.nova.feature_staking_impl.data.common.repository.CommonStakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.RealRoundDurationEstimator
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.RoundDurationEstimator
@@ -15,7 +16,9 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.reposit
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.RealRewardsRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.RewardsRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.RuntimeParachainStakingConstantsRepository
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorProvider
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.RealCollatorProvider
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.ParachainNetworkInfoInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
@@ -80,4 +83,12 @@ class ParachainStakingModule {
         parachainStakingConstantsRepository: ParachainStakingConstantsRepository,
         roundDurationEstimator: RoundDurationEstimator
     ) = ParachainNetworkInfoInteractor(currentRoundRepository, parachainStakingConstantsRepository, roundDurationEstimator)
+
+    @Provides
+    @FeatureScope
+    fun provideCollatorProvider(
+        currentRoundRepository: CurrentRoundRepository,
+        identityRepository: IdentityRepository,
+        parachainStakingConstantsRepository: ParachainStakingConstantsRepository,
+    ): CollatorProvider = RealCollatorProvider(identityRepository, currentRoundRepository, parachainStakingConstantsRepository)
 }

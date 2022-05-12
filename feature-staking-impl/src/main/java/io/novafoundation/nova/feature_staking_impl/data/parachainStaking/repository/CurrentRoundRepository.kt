@@ -29,6 +29,12 @@ interface CurrentRoundRepository {
     suspend fun totalStaked(chainId: ChainId): Balance
 }
 
+suspend fun CurrentRoundRepository.collatorsSnapshotInCurrentRound(chainId: ChainId): AccountIdMap<CollatorSnapshot> {
+    val roundIndex = currentRoundInfo(chainId).current
+
+    return collatorsSnapshot(chainId, roundIndex)
+}
+
 class RealCurrentRoundRepository(
     private val storageDataSource: StorageDataSource,
 ) : CurrentRoundRepository {

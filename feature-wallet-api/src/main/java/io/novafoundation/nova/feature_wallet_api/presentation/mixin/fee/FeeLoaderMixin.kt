@@ -6,10 +6,14 @@ import io.novafoundation.nova.common.mixin.api.Retriable
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
+import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.model.FeeModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -70,4 +74,19 @@ fun FeeLoaderMixin.Presentation.requireFee(
     requireFee(block) { title, message ->
         viewModel.showError(title, message)
     }
+}
+
+fun FeeLoaderMixin.Presentation.connectWith(
+    amountMixin: AmountChooserMixin.Presentation,
+    scope: CoroutineScope,
+    feeConstructor: suspend (amount: BigInteger) -> BigInteger,
+    onRetryCancelled: () -> Unit = {}
+) {
+    amountMixin.backPressuredAmount.onEach { amount ->
+        loadFee(
+            coroutineScope = scope,
+            feeConstructor = { feeConstructor(it.planksFromAmount(amount)) },
+            onRetryCancelled = onRetryCancelled
+        )
+    }.launchIn(scope)
 }

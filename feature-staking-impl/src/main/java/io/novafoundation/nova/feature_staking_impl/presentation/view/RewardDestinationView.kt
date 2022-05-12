@@ -5,19 +5,26 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.utils.setTextOrHide
+import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.model.RewardEstimation
 import kotlinx.android.synthetic.main.view_payout_target.view.payoutTargetAmountFiat
 import kotlinx.android.synthetic.main.view_payout_target.view.payoutTargetAmountGain
 import kotlinx.android.synthetic.main.view_payout_target.view.payoutTargetAmountToken
 import kotlinx.android.synthetic.main.view_payout_target.view.payoutTargetCheck
 import kotlinx.android.synthetic.main.view_payout_target.view.payoutTargetName
 
+private const val CHECKABLE_DEFAULT = true
+
 class RewardDestinationView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
+
+    private var checkable = CHECKABLE_DEFAULT
 
     init {
         View.inflate(context, R.layout.view_payout_target, this)
@@ -27,16 +34,17 @@ class RewardDestinationView @JvmOverloads constructor(
         attrs?.let(this::applyAttrs)
     }
 
-    private fun applyAttrs(attrs: AttributeSet) {
-        val typedArray = context.obtainStyledAttributes(attrs, R.styleable.RewardDestinationView)
+    private fun applyAttrs(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.RewardDestinationView) { typedArray ->
+        checkable = typedArray.getBoolean(R.styleable.RewardDestinationView_android_checkable, CHECKABLE_DEFAULT)
 
-        val checked = typedArray.getBoolean(R.styleable.RewardDestinationView_android_checked, false)
-        setChecked(checked)
+        if (checkable) {
+            val checked = typedArray.getBoolean(R.styleable.RewardDestinationView_android_checked, false)
+            setChecked(checked)
+        }
+        payoutTargetCheck.setVisible(checkable)
 
         val targetName = typedArray.getString(R.styleable.RewardDestinationView_targetName)
         targetName?.let(::setName)
-
-        typedArray.recycle()
     }
 
     fun setName(name: String) {
@@ -56,6 +64,16 @@ class RewardDestinationView @JvmOverloads constructor(
     }
 
     fun setChecked(checked: Boolean) {
+        require(checkable) {
+            "Cannot check non-checkable view"
+        }
+
         payoutTargetCheck.isChecked = checked
     }
+}
+
+fun RewardDestinationView.showRewardEstimation(rewardEstimation: RewardEstimation) {
+    setTokenAmount(rewardEstimation.amount)
+    setFiatAmount(rewardEstimation.fiatAmount)
+    setPercentageGain(rewardEstimation.gain)
 }

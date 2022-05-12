@@ -10,9 +10,11 @@ import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.di.staking.UpdatersModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.parachain.ParachainStakingModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.unbond.StakingUnbondModule
+import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.confirm.di.ConfirmStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.confirm.nominations.di.ConfirmNominationsComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.di.StartParachainStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.di.ConfirmPayoutComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.detail.di.PayoutDetailsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.list.di.PayoutsListComponent
@@ -55,6 +57,8 @@ import io.novafoundation.nova.runtime.di.RuntimeApi
 )
 @FeatureScope
 interface StakingFeatureComponent : StakingFeatureApi {
+
+    // relaychain staking
 
     fun searchCustomValidatorsComponentFactory(): SearchCustomValidatorsComponent.Factory
 
@@ -110,11 +114,16 @@ interface StakingFeatureComponent : StakingFeatureApi {
 
     fun confirmRewardDestinationFactory(): ConfirmRewardDestinationComponent.Factory
 
+    // parachain staking
+
+    fun startParachainStakingFactory(): StartParachainStakingComponent.Factory
+
     @Component.Factory
     interface Factory {
 
         fun create(
             @BindsInstance router: StakingRouter,
+            @BindsInstance parachainStaking: ParachainStakingRouter,
             deps: StakingFeatureDependencies
         ): StakingFeatureComponent
     }

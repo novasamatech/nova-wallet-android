@@ -120,6 +120,8 @@ fun RuntimeMetadata.session() = module(Modules.SESSION)
 
 fun RuntimeMetadata.parachainStaking() = module(Modules.PARACHAIN_STAKING)
 
+fun RuntimeMetadata.identity() = module(Modules.IDENTITY)
+
 fun RuntimeMetadata.firstExistingModule(vararg options: String): String {
     return options.first(::hasModule)
 }
@@ -162,4 +164,6 @@ object Modules {
     const val PARACHAIN_STAKING = "ParachainStaking"
 
     const val PARACHAIN_SYSTEM = "ParachainSystem"
+
+    const val IDENTITY = "Identity"
 }

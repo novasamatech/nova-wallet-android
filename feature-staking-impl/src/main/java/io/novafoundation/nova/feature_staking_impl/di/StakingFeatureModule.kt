@@ -156,12 +156,8 @@ class StakingFeatureModule {
     @Provides
     @FeatureScope
     fun provideIdentityRepository(
-        bulkRetriever: BulkRetriever,
-        chainRegistry: ChainRegistry,
-    ): IdentityRepository = IdentityRepositoryImpl(
-        bulkRetriever,
-        chainRegistry
-    )
+        @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource
+    ): IdentityRepository = IdentityRepositoryImpl(remoteStorageSource)
 
     @Provides
     @FeatureScope

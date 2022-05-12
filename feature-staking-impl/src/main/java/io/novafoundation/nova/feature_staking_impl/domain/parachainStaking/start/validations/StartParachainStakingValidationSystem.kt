@@ -1,0 +1,7 @@
+package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations
+
+import io.novafoundation.nova.common.validation.Validation
+import io.novafoundation.nova.common.validation.ValidationSystem
+
+typealias StartParachainStakingValidationSystem = ValidationSystem<StartParachainStakingValidationPayload, StartParachainStakingValidationFailure>
+typealias StartParachainStakingValidation = Validation<StartParachainStakingValidationPayload, StartParachainStakingValidationFailure>
