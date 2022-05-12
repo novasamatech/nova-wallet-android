@@ -9,7 +9,9 @@ import java.math.BigInteger
 
 interface ParachainStakingConstantsRepository {
 
-    suspend fun maxRewardedDelegatorsPerCollator(chainId: ChainId): Int
+    suspend fun maxRewardedDelegatorsPerCollator(chainId: ChainId): BigInteger
+
+    suspend fun maxTotalDelegatorsPerCollator(chainId: ChainId): BigInteger
 
     suspend fun minimumDelegation(chainId: ChainId): BigInteger
 
@@ -28,8 +30,12 @@ class RuntimeParachainStakingConstantsRepository(
     private val chainRegistry: ChainRegistry
 ) : ParachainStakingConstantsRepository {
 
-    override suspend fun maxRewardedDelegatorsPerCollator(chainId: ChainId): Int {
-        return numberConstant(chainId, "MaxTopDelegationsPerCandidate").toInt()
+    override suspend fun maxRewardedDelegatorsPerCollator(chainId: ChainId): BigInteger {
+        return numberConstant(chainId, "MaxTopDelegationsPerCandidate")
+    }
+
+    override suspend fun maxTotalDelegatorsPerCollator(chainId: ChainId): BigInteger {
+        return numberConstant(chainId, "MaxBottomDelegationsPerCandidate") + maxRewardedDelegatorsPerCollator(chainId)
     }
 
     override suspend fun minimumDelegation(chainId: ChainId): BigInteger {

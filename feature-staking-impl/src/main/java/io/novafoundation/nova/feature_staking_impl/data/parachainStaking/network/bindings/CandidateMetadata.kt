@@ -8,6 +8,10 @@ class CandidateMetadata(
     val delegationCount: BigInteger
 )
 
+fun CandidateMetadata.isFull(maxAllowedDelegators: BigInteger): Boolean {
+    return delegationCount == maxAllowedDelegators
+}
+
 fun bindCandidateMetadata(decoded: Any?): CandidateMetadata {
     return decoded.castToStruct().let { struct ->
         CandidateMetadata(

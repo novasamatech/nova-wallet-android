@@ -93,7 +93,7 @@ class RealStartParachainStakingInteractor(
     override suspend fun randomCollator(): Collator = withContext(Dispatchers.Default) {
         val chainId = singleAssetSharedState.chainId()
 
-        collatorProvider.electedCollators(chainId).first { it.accountIdHex == "bc9ccd0a3f84f47452b882d3f0796bb7e5be9ba0" }
+        collatorProvider.electedCollators(chainId).random()
     }
 
     override suspend fun getCollatorById(collatorId: AccountId): Collator {
