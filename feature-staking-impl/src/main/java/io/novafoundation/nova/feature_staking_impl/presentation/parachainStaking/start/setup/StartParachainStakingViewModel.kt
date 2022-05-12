@@ -15,7 +15,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.commo
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.StartParachainStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationSystem
-import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.model.ConfirmStartParachainStakingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.model.SelectCollatorModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.RealParachainStakingRewardsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.connectWith
@@ -38,7 +39,7 @@ import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
 class StartParachainStakingViewModel(
-    private val router: StakingRouter,
+    private val router: ParachainStakingRouter,
     private val interactor: StartParachainStakingInteractor,
     private val rewardsComponentFactory: RealParachainStakingRewardsComponentFactory,
     private val singleAssetSharedState: SingleAssetSharedState,
@@ -159,16 +160,23 @@ class StartParachainStakingViewModel(
             ) {
                 validationInProgress.value = false
 
-                goToNextStep(amount, collator)
+                goToNextStep(fee = fee, amount = amount, collator = collator)
             }
         }
     }
 
     private fun goToNextStep(
+        fee: BigDecimal,
         amount: BigDecimal,
         collator: Collator,
     ) {
-        showMessage("Ready to go to confirm")
+        val payload = ConfirmStartParachainStakingPayload(
+            collatorId = collator.accountIdHex.fromHex(),
+            amount = amount,
+            fee = fee
+        )
+
+        router.openConfirmStartStaking(payload)
     }
 
     private fun requireFee(block: (BigDecimal) -> Unit) = feeLoaderMixin.requireFee(

@@ -66,6 +66,6 @@ class ParachainNetworkInfoInteractor(
             collatorSnapshot.minimumStake(systemForcedMinStake)
         } ?: systemForcedMinStake
 
-        return minStakeFromCollators.max(systemForcedMinStake)
+        return minStakeFromCollators
     }
 }

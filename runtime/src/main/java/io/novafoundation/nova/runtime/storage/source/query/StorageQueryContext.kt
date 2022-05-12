@@ -35,7 +35,7 @@ interface StorageQueryContext {
 
     suspend fun <V> StorageEntry.query(
         vararg keyArguments: Any?,
-        binding: (instance: Any?) -> V
+        binding: DynamicInstanceBinder<V>
     ): V
 
     suspend fun multi(

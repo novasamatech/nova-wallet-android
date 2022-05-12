@@ -10,3 +10,7 @@ interface IdentityRepository {
 
     suspend fun getIdentitiesFromAddresses(chain: Chain, accountAddresses: List<String>): AccountAddressMap<Identity?>
 }
+
+suspend fun IdentityRepository.getIdentityFromId(chainId: ChainId, accountIdHex: String): Identity? {
+    return getIdentitiesFromIds(chainId, listOf(accountIdHex)).values.firstOrNull()
+}

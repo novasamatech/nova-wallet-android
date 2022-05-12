@@ -12,5 +12,7 @@ class Collator(
 )
 
 fun CollatorSnapshot.minimumStake(systemForcedMinStake: BigInteger): BigInteger {
-    return delegations.minOfOrNull { it.balance } ?: systemForcedMinStake
+    val minStakeToGetRewards = delegations.minOfOrNull { it.balance } ?: systemForcedMinStake
+
+    return minStakeToGetRewards.coerceAtLeast(systemForcedMinStake)
 }

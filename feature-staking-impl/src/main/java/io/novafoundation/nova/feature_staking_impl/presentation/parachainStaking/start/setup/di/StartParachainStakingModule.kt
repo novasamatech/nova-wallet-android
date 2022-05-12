@@ -12,59 +12,19 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
-import io.novafoundation.nova.common.validation.ValidationSystem
-import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
-import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.ParachainStakingConstantsRepository
-import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorProvider
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
-import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.RealStartParachainStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.StartParachainStakingInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationFailure
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationSystem
-import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.minimumDelegation
-import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.StartParachainStakingViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.RealParachainStakingRewardsComponentFactory
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
-import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
 class StartParachainStakingModule {
-
-    @Provides
-    @ScreenScope
-    fun provideValidationSystem(
-        stakingConstantsRepository: ParachainStakingConstantsRepository
-    ): StartParachainStakingValidationSystem = ValidationSystem {
-        minimumDelegation(stakingConstantsRepository)
-
-        sufficientBalance(
-            fee = { it.fee },
-            amount = { it.amount },
-            available = { it.asset.transferable },
-            error = { StartParachainStakingValidationFailure.NotEnoughBalanceToPayFees }
-        )
-    }
-
-    @Provides
-    @ScreenScope
-    fun provideInteractor(
-        extrinsicService: ExtrinsicService,
-        chainRegistry: ChainRegistry,
-        singleAssetSharedState: StakingSharedState,
-        collatorProvider: CollatorProvider,
-        stakingConstantsRepository: ParachainStakingConstantsRepository,
-    ): StartParachainStakingInteractor = RealStartParachainStakingInteractor(
-        extrinsicService,
-        chainRegistry,
-        singleAssetSharedState,
-        collatorProvider,
-        stakingConstantsRepository
-    )
 
     @Provides
     @ScreenScope
@@ -78,7 +38,7 @@ class StartParachainStakingModule {
     @IntoMap
     @ViewModelKey(StartParachainStakingViewModel::class)
     fun provideViewModel(
-        router: StakingRouter,
+        router: ParachainStakingRouter,
         interactor: StartParachainStakingInteractor,
         assetUseCase: AssetUseCase,
         resourceManager: ResourceManager,

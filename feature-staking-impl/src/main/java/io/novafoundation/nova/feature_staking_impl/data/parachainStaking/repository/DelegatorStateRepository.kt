@@ -16,6 +16,12 @@ interface DelegatorStateRepository {
         chainAsset: Chain.Asset,
         accountId: AccountId,
     ): Flow<DelegatorState>
+
+    suspend fun getDelegationState(
+        chain: Chain,
+        chainAsset: Chain.Asset,
+        accountId: AccountId
+    ): DelegatorState
 }
 
 class RealDelegatorStateRepository(
@@ -25,6 +31,15 @@ class RealDelegatorStateRepository(
     override fun observeDelegatorState(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): Flow<DelegatorState> {
         return storage.subscribe(chain.id) {
             runtime.metadata.parachainStaking().storage("DelegatorState").observe(
+                accountId,
+                binding = { bindDelegatorState(it, accountId, chain) }
+            )
+        }
+    }
+
+    override suspend fun getDelegationState(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): DelegatorState {
+        return storage.query(chain.id) {
+            runtime.metadata.parachainStaking().storage("DelegatorState").query(
                 accountId,
                 binding = { bindDelegatorState(it, accountId, chain) }
             )

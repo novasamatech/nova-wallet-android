@@ -14,7 +14,7 @@ sealed class DelegatorState(
         chain: Chain,
         val delegations: List<DelegatorBond>,
         val total: Balance,
-        val requests: PendingDelegationRequests,
+        val requests: PendingDelegationRequests?,
         val status: DelegatorStatus,
     ) : DelegatorState(chain)
 
