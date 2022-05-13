@@ -98,8 +98,8 @@ class ConfirmStartParachainStakingViewModel(
     }
 
     private val _showNextProgress = MutableStateFlow(false)
-
     val showNextProgress: StateFlow<Boolean> = _showNextProgress
+
     init {
         setInitialFee()
     }
