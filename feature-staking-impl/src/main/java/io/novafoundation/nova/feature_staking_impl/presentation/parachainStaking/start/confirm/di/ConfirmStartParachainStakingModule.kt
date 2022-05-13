@@ -7,19 +7,21 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
-import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.StartParachainStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.ParachainStakingHintsUseCase
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.ConfirmStartParachainStakingViewModel
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.hints.ConfirmStartParachainStakingHintsMixinFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.model.ConfirmStartParachainStakingPayload
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
@@ -27,15 +29,13 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoade
 @Module(includes = [ViewModelModule::class])
 class ConfirmStartParachainStakingModule {
 
-//    @Provides
-//    @ScreenScope
-//    fun provideConfirmStakeHintsMixinFactory(
-//        interactor: StakingInteractor,
-//        resourceManager: ResourceManager,
-//        stakingHintsUseCase: StakingHintsUseCase,
-//    ): ConfirmStakeHintsMixinFactory {
-//        return ConfirmStakeHintsMixinFactory(interactor, resourceManager, stakingHintsUseCase)
-//    }
+    @Provides
+    @ScreenScope
+    fun provideConfirmStartParachainStakingHintsMixinFactory(
+        stakingHintsUseCase: ParachainStakingHintsUseCase,
+    ): ConfirmStartParachainStakingHintsMixinFactory {
+        return ConfirmStartParachainStakingHintsMixinFactory(stakingHintsUseCase)
+    }
 
     @Provides
     @IntoMap
@@ -43,7 +43,6 @@ class ConfirmStartParachainStakingModule {
     fun provideViewModel(
         router: ParachainStakingRouter,
         addressIconGenerator: AddressIconGenerator,
-        addressDisplayUseCase: AddressDisplayUseCase,
         selectedAccountUseCase: SelectedAccountUseCase,
         resourceManager: ResourceManager,
         validationSystem: StartParachainStakingValidationSystem,
@@ -55,11 +54,11 @@ class ConfirmStartParachainStakingModule {
         selectedAssetState: StakingSharedState,
         walletUiUseCase: WalletUiUseCase,
         payload: ConfirmStartParachainStakingPayload,
+        hintsMixinFactory: ConfirmStartParachainStakingHintsMixinFactory,
     ): ViewModel {
         return ConfirmStartParachainStakingViewModel(
             router = router,
             addressIconGenerator = addressIconGenerator,
-            addressDisplayUseCase = addressDisplayUseCase,
             selectedAccountUseCase = selectedAccountUseCase,
             resourceManager = resourceManager,
             validationSystem = validationSystem,
@@ -70,7 +69,8 @@ class ConfirmStartParachainStakingModule {
             validationExecutor = validationExecutor,
             assetUseCase = assetUseCase,
             walletUiUseCase = walletUiUseCase,
-            payload = payload
+            payload = payload,
+            hintsMixinFactory = hintsMixinFactory
         )
     }
 

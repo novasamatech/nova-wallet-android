@@ -12,7 +12,6 @@ import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
-import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -21,6 +20,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.hints.ConfirmStartParachainStakingHintsMixinFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.model.ConfirmStartParachainStakingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.startParachainStakingValidationFailure
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
@@ -41,7 +41,6 @@ import java.math.BigDecimal
 class ConfirmStartParachainStakingViewModel(
     private val router: ParachainStakingRouter,
     private val addressIconGenerator: AddressIconGenerator,
-    private val addressDisplayUseCase: AddressDisplayUseCase,
     private val selectedAccountUseCase: SelectedAccountUseCase,
     private val resourceManager: ResourceManager,
     private val validationSystem: StartParachainStakingValidationSystem,
@@ -53,14 +52,14 @@ class ConfirmStartParachainStakingViewModel(
     private val assetUseCase: AssetUseCase,
     walletUiUseCase: WalletUiUseCase,
     private val payload: ConfirmStartParachainStakingPayload,
-//    hintsMixinFactory: ConfirmStakeHintsMixinFactory,
+    hintsMixinFactory: ConfirmStartParachainStakingHintsMixinFactory,
 ) : BaseViewModel(),
     Retriable,
     Validatable by validationExecutor,
     FeeLoaderMixin by feeLoaderMixin,
     ExternalActions by externalActions {
 
-//    val hintsMixin = hintsMixinFactory.create(coroutineScope = this, payload)
+    val hintsMixin = hintsMixinFactory.create(coroutineScope = this)
 
     private val assetFlow = assetUseCase.currentAssetFlow()
         .shareInBackground()
