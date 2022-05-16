@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenRequester
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.openRequest
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select.model.mapCollatorParcelModelToCollator
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select.model.mapCollatorToCollatorParcelModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.model.ConfirmStartParachainStakingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.model.SelectCollatorModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.RealParachainStakingRewardsComponentFactory
@@ -34,6 +35,7 @@ import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -41,6 +43,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 
 class StartParachainStakingViewModel(
@@ -177,12 +180,14 @@ class StartParachainStakingViewModel(
         fee: BigDecimal,
         amount: BigDecimal,
         collator: Collator,
-    ) {
-        val payload = ConfirmStartParachainStakingPayload(
-            collatorId = collator.accountIdHex.fromHex(),
-            amount = amount,
-            fee = fee
-        )
+    ) = launch {
+        val payload = withContext(Dispatchers.Default) {
+            ConfirmStartParachainStakingPayload(
+                collator = mapCollatorToCollatorParcelModel(collator),
+                amount = amount,
+                fee = fee
+            )
+        }
 
         router.openConfirmStartStaking(payload)
     }
