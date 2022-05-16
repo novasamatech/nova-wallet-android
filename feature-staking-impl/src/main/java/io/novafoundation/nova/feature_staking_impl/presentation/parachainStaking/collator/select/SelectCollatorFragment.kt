@@ -8,6 +8,8 @@ import android.widget.ImageView
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.makeGone
+import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.scrollToTopWhenItemsShuffled
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
@@ -17,8 +19,10 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.StakeTargetAdapter
 import kotlinx.android.synthetic.main.fragment_parachain_staking_select_collator.selectCollatorClearFilters
 import kotlinx.android.synthetic.main.fragment_parachain_staking_select_collator.selectCollatorContainer
+import kotlinx.android.synthetic.main.fragment_parachain_staking_select_collator.selectCollatorContentGroup
 import kotlinx.android.synthetic.main.fragment_parachain_staking_select_collator.selectCollatorCount
 import kotlinx.android.synthetic.main.fragment_parachain_staking_select_collator.selectCollatorList
+import kotlinx.android.synthetic.main.fragment_parachain_staking_select_collator.selectCollatorProgress
 import kotlinx.android.synthetic.main.fragment_parachain_staking_select_collator.selectCollatorSorting
 import kotlinx.android.synthetic.main.fragment_parachain_staking_select_collator.selectCollatorToolbar
 
@@ -78,7 +82,12 @@ class SelectCollatorFragment : BaseFragment<SelectCollatorViewModel>(), StakeTar
     }
 
     override fun subscribe(viewModel: SelectCollatorViewModel) {
-        viewModel.validatorModelsFlow.observe(adapter::submitList)
+        viewModel.collatorModelsFlow.observe {
+            adapter.submitList(it)
+
+            selectCollatorContentGroup.makeVisible()
+            selectCollatorProgress.makeGone()
+        }
 
         viewModel.collatorsTitle.observe(selectCollatorCount::setText)
 

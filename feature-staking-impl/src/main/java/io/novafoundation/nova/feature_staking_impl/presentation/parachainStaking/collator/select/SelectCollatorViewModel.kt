@@ -65,7 +65,7 @@ class SelectCollatorViewModel(
         .inBackground()
         .share()
 
-    val validatorModelsFlow = combine(shownValidators, tokenFlow, ::convertToModels)
+    val collatorModelsFlow = combine(shownValidators, tokenFlow, ::convertToModels)
         .shareInBackground()
 
     val collatorsTitle = shownValidators.map {

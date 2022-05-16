@@ -86,4 +86,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/selectCollatorCount"
         tools:listitem="@layout/item_validator" />
+
+    <ProgressBar
+        android:id="@+id/selectCollatorProgress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminateTint="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/selectCollatorContentGroup"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="selectCollatorCount,selectCollatorSorting,selectCollatorList, selectCollatorChips" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
