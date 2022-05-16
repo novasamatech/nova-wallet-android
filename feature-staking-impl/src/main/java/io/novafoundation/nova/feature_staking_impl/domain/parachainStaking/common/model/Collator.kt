@@ -8,7 +8,7 @@ class Collator(
     val accountIdHex: String,
     val identity: Identity?,
     val snapshot: CollatorSnapshot,
-    val minimumStake: BigInteger,
+    val minimumStakeToGetRewards: BigInteger,
 )
 
 fun CollatorSnapshot.minimumStake(systemForcedMinStake: BigInteger): BigInteger {

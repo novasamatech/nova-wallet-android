@@ -86,7 +86,7 @@ class StartParachainStakingViewModel(
     }.shareInBackground()
 
     val minimumStake = selectedCollator.map {
-        val minimumStake = it?.minimumStake ?: interactor.defaultMinimumStake()
+        val minimumStake = it?.minimumStakeToGetRewards ?: interactor.defaultMinimumStake()
         val asset = assetFlow.first()
 
         mapAmountToAmountModel(minimumStake, asset)
