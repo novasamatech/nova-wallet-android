@@ -17,6 +17,8 @@ class ParachainStakingNavigator(
 
     override fun openStartStaking() = performNavigation(R.id.action_mainFragment_to_startParachainStakingGraph)
 
+    override fun openSelectCollator() = performNavigation(R.id.action_startParachainStakingFragment_to_selectCollatorFragment)
+
     override fun openConfirmStartStaking(payload: ConfirmStartParachainStakingPayload) = performNavigation(
         actionId = R.id.action_startParachainStakingFragment_to_confirmStartParachainStakingFragment,
         args = ConfirmStartParachainStakingFragment.getBundle(payload)

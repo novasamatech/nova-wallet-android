@@ -86,7 +86,7 @@ class ReviewCustomValidatorsViewModel(
         launch {
             val validators = selectedValidators.first()
 
-            val withoutRemoved = validators - validatorModel.validator
+            val withoutRemoved = validators - validatorModel.stakeTarget
 
             sharedStateSetup.setCustomValidators(withoutRemoved)
 
@@ -101,7 +101,7 @@ class ReviewCustomValidatorsViewModel(
     }
 
     fun validatorInfoClicked(validatorModel: ValidatorModel) {
-        router.openValidatorDetails(mapValidatorToValidatorDetailsParcelModel(validatorModel.validator))
+        router.openValidatorDetails(mapValidatorToValidatorDetailsParcelModel(validatorModel.stakeTarget))
     }
 
     fun nextClicked() {

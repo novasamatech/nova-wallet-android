@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.comm
 
 import io.novafoundation.nova.feature_staking_api.domain.model.Identity
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.CollatorSnapshot
+import java.math.BigDecimal
 import java.math.BigInteger
 
 class Collator(
@@ -9,6 +10,7 @@ class Collator(
     val identity: Identity?,
     val snapshot: CollatorSnapshot,
     val minimumStakeToGetRewards: BigInteger,
+    val apr: BigDecimal?,
 )
 
 fun CollatorSnapshot.minimumStake(

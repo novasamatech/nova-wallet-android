@@ -127,9 +127,7 @@ class StartParachainStakingViewModel(
     }
 
     fun selectCollatorClicked() = launch {
-        val randomCollator = interactor.randomCollator()
-
-        selectedCollator.emit(randomCollator)
+        router.openSelectCollator()
     }
 
     fun nextClicked() {

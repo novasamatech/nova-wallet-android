@@ -154,12 +154,12 @@ class SelectCustomValidatorsViewModel(
     }
 
     fun validatorInfoClicked(validatorModel: ValidatorModel) {
-        router.openValidatorDetails(mapValidatorToValidatorDetailsParcelModel(validatorModel.validator))
+        router.openValidatorDetails(mapValidatorToValidatorDetailsParcelModel(validatorModel.stakeTarget))
     }
 
     fun validatorClicked(validatorModel: ValidatorModel) {
         mutateSelected {
-            it.toggle(validatorModel.validator)
+            it.toggle(validatorModel.stakeTarget)
         }
     }
 

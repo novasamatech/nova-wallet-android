@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/staking_parachain_start_graph"
     app:startDestination="@id/startParachainStakingFragment">
 
     <fragment
         android:id="@+id/startParachainStakingFragment"
-        app:layout="@layout/fragment_parachain_staking_start"
+        tools:layout="@layout/fragment_parachain_staking_start"
         android:name="io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.StartParachainStakingFragment"
         android:label="StartParachainStakingFragment" >
 
@@ -17,12 +18,26 @@
             app:popExitAnim="@anim/fragment_close_exit"
             android:id="@+id/action_startParachainStakingFragment_to_confirmStartParachainStakingFragment"
             app:destination="@id/confirmStartParachainStakingFragment" />
+
+        <action
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            android:id="@+id/action_startParachainStakingFragment_to_selectCollatorFragment"
+            app:destination="@id/selectCollatorFragment" />
     </fragment>
 
     <fragment
         android:id="@+id/confirmStartParachainStakingFragment"
-        app:layout="@layout/fragment_parachain_staking_start_confirm"
+        tools:layout="@layout/fragment_parachain_staking_start_confirm"
         android:name="io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.ConfirmStartParachainStakingFragment"
         android:label="ConfirmStartParachainStakingFragment" />
+
+    <fragment
+        android:id="@+id/selectCollatorFragment"
+        tools:layout="@layout/fragment_parachain_staking_select_collator"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select.SelectCollatorFragment"
+        android:label="SelectCollatorFragment" />
 
 </navigation>

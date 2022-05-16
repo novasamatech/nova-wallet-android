@@ -12,9 +12,10 @@ import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
+import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.ValidatorsAdapter
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.StakeTargetAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorModel
 import kotlinx.android.synthetic.main.fragment_search_custom_validators.searchCustomValidatorAccounts
 import kotlinx.android.synthetic.main.fragment_search_custom_validators.searchCustomValidatorListHeader
@@ -25,10 +26,10 @@ import kotlinx.android.synthetic.main.fragment_search_custom_validators.searchCu
 import kotlinx.android.synthetic.main.fragment_search_custom_validators.searchCustomValidatorsPlaceholder
 import kotlinx.android.synthetic.main.fragment_search_custom_validators.searchCustomValidatorsToolbar
 
-class SearchCustomValidatorsFragment : BaseFragment<SearchCustomValidatorsViewModel>(), ValidatorsAdapter.ItemHandler {
+class SearchCustomValidatorsFragment : BaseFragment<SearchCustomValidatorsViewModel>(), StakeTargetAdapter.ItemHandler<Validator> {
 
-    private val adapter: ValidatorsAdapter by lazy(LazyThreadSafetyMode.NONE) {
-        ValidatorsAdapter(this)
+    private val adapter by lazy(LazyThreadSafetyMode.NONE) {
+        StakeTargetAdapter(this)
     }
 
     override fun onCreateView(
@@ -98,11 +99,11 @@ class SearchCustomValidatorsFragment : BaseFragment<SearchCustomValidatorsViewMo
         searchCustomValidatorsInput.content.bindTo(viewModel.enteredQuery, viewLifecycleOwner.lifecycleScope)
     }
 
-    override fun validatorInfoClicked(validatorModel: ValidatorModel) {
+    override fun stakeTargetInfoClicked(validatorModel: ValidatorModel) {
         viewModel.validatorInfoClicked(validatorModel)
     }
 
-    override fun validatorClicked(validatorModel: ValidatorModel) {
+    override fun stakeTargetClicked(validatorModel: ValidatorModel) {
         viewModel.validatorClicked(validatorModel)
     }
 }
