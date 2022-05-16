@@ -73,8 +73,8 @@ class ResourceManagerImpl(
         }
     }
 
-    override fun formatDuration(duration: Duration): String {
-        return duration.toComponents { days, hours, _, _, _ ->
+    override fun formatDuration(duration: Duration, estimated: Boolean): String {
+        val withoutPrefix = duration.toComponents { days, hours, _, _, _ ->
             val daysPart = getQuantityString(R.plurals.staking_main_lockup_period_value, days, days)
             val hoursPart = getQuantityString(R.plurals.common_hours_format, hours, hours)
 
@@ -82,6 +82,12 @@ class ResourceManagerImpl(
                 daysPart.takeIf { days != 0 },
                 hoursPart.takeIf { hours != 0 }
             ).joinToString(separator = " ")
+        }
+
+        return if (estimated) {
+            "~$withoutPrefix"
+        } else {
+            withoutPrefix
         }
     }
 

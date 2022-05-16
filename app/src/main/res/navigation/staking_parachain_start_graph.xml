@@ -8,5 +8,21 @@
         android:id="@+id/startParachainStakingFragment"
         app:layout="@layout/fragment_parachain_staking_start"
         android:name="io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.StartParachainStakingFragment"
-        android:label="StartParachainStakingFragment" />
+        android:label="StartParachainStakingFragment" >
+
+        <action
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            android:id="@+id/action_startParachainStakingFragment_to_confirmStartParachainStakingFragment"
+            app:destination="@id/confirmStartParachainStakingFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/confirmStartParachainStakingFragment"
+        app:layout="@layout/fragment_parachain_staking_start_confirm"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.ConfirmStartParachainStakingFragment"
+        android:label="ConfirmStartParachainStakingFragment" />
+
 </navigation>

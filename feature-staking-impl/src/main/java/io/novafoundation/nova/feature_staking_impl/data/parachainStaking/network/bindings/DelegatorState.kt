@@ -35,12 +35,14 @@ private fun bindDelegator(
     accountId: AccountId,
     chain: Chain
 ): DelegatorState.Delegator {
+    val requests: Any? = struct["requests"]
+
     return DelegatorState.Delegator(
         accountId = accountId,
         chain = chain,
         delegations = bindList(struct["delegations"], ::bindBond),
         total = bindNumber(struct["total"]),
-        requests = bindPendingDelegationRequests(struct.getTyped("requests")),
+        requests = requests?.let { bindPendingDelegationRequests(it.castToStruct()) }, // 'requests' is removed in the new runtime
         status = bindDelegatorStatus(struct.getTyped("status"))
     )
 }

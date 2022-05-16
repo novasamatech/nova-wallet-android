@@ -26,7 +26,7 @@ interface ResourceManager {
     fun formatDate(timestamp: Long): String
     fun formatDuration(elapsedTime: Long): String
 
-    fun formatDuration(duration: Duration): String
+    fun formatDuration(duration: Duration, estimated: Boolean = true): String
 
     fun formatTime(timestamp: Long): String
 

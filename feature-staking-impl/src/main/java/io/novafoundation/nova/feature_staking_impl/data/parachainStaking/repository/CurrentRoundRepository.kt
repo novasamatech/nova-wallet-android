@@ -24,6 +24,8 @@ interface CurrentRoundRepository {
 
     suspend fun collatorsSnapshot(chainId: ChainId, roundIndex: RoundIndex): AccountIdMap<CollatorSnapshot>
 
+    suspend fun collatorSnapshot(chainId: ChainId, collatorId: AccountId, roundIndex: RoundIndex): CollatorSnapshot?
+
     fun totalStakedFlow(chainId: ChainId): Flow<Balance>
 
     suspend fun totalStaked(chainId: ChainId): Balance
@@ -33,6 +35,15 @@ suspend fun CurrentRoundRepository.collatorsSnapshotInCurrentRound(chainId: Chai
     val roundIndex = currentRoundInfo(chainId).current
 
     return collatorsSnapshot(chainId, roundIndex)
+}
+
+suspend fun CurrentRoundRepository.collatorSnapshotInCurrentRound(
+    chainId: ChainId,
+    collatorId: AccountId,
+): CollatorSnapshot? {
+    val roundIndex = currentRoundInfo(chainId).current
+
+    return collatorSnapshot(chainId, collatorId, roundIndex)
 }
 
 class RealCurrentRoundRepository(
@@ -57,6 +68,15 @@ class RealCurrentRoundRepository(
                 roundIndex,
                 keyExtractor = { (_: RoundIndex, collatorId: AccountId) -> collatorId.toHexString() },
                 binding = { instance, _ -> bindCollatorSnapshot(instance) }
+            )
+        }
+    }
+
+    override suspend fun collatorSnapshot(chainId: ChainId, collatorId: AccountId, roundIndex: RoundIndex): CollatorSnapshot? {
+        return storageDataSource.query(chainId) {
+            runtime.metadata.parachainStaking().storage("AtStake").query(
+                roundIndex, collatorId,
+                binding = ::bindCollatorSnapshot
             )
         }
     }

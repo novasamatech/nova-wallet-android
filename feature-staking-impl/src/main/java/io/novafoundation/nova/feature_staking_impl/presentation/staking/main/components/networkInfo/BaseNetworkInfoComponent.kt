@@ -58,7 +58,7 @@ abstract class BaseNetworkInfoComponent(
             totalStaked = mapAmountToAmountModel(networkInfo.totalStake, asset),
             minimumStake = mapAmountToAmountModel(networkInfo.minimumStake, asset),
             activeNominators = networkInfo.nominatorsCount.format(),
-            unstakingPeriod = "~$unstakingPeriod",
+            unstakingPeriod = unstakingPeriod,
             stakingPeriod = stakingPeriod,
             nominatorsLabel = nominatorsLabel
         )

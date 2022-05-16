@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.confirm.di.ConfirmStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.confirm.nominations.di.ConfirmNominationsComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.di.ConfirmStartParachainStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.di.StartParachainStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.di.ConfirmPayoutComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.detail.di.PayoutDetailsComponent
@@ -117,6 +118,8 @@ interface StakingFeatureComponent : StakingFeatureApi {
     // parachain staking
 
     fun startParachainStakingFactory(): StartParachainStakingComponent.Factory
+
+    fun confirmStartParachainStakingFactory(): ConfirmStartParachainStakingComponent.Factory
 
     @Component.Factory
     interface Factory {

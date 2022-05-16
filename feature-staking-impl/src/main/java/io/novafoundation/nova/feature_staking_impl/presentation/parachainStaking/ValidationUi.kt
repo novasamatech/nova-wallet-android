@@ -21,7 +21,14 @@ fun startParachainStakingValidationFailure(
             val formattedMinStake = mapAmountToAmountModel(failure.minimumStake, failure.asset).token
 
             when (failure) {
-                is TooLowStake.TooLowDelegation, is TooLowStake.TooLowTotalStake -> {
+                is TooLowStake.TooLowDelegation -> {
+                    val messageFormat = if (failure.strictGreaterThan) R.string.staking_setup_amount_too_low_strict else R.string.staking_setup_amount_too_low
+
+                    resourceManager.getString(R.string.common_amount_low) to
+                        resourceManager.getString(messageFormat, formattedMinStake)
+                }
+                is TooLowStake.TooLowTotalStake -> {
+
                     resourceManager.getString(R.string.common_amount_low) to
                         resourceManager.getString(R.string.staking_setup_amount_too_low, formattedMinStake)
                 }

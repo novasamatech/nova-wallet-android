@@ -15,6 +15,8 @@ import kotlin.time.milliseconds
 interface RoundDurationEstimator {
 
     suspend fun unstakeDurationFlow(chainId: ChainId): Flow<Duration>
+
+    suspend fun roundDurationFlow(chainId: ChainId): Flow<Duration>
 }
 
 class RealRoundDurationEstimator(
@@ -26,6 +28,16 @@ class RealRoundDurationEstimator(
         val bondLessDelay = parachainStakingConstantsRepository.delegationBondLessDelay(chainId)
 
         return estimateDuration(chainId, numberOfRounds = bondLessDelay)
+    }
+
+    override suspend fun roundDurationFlow(chainId: ChainId): Flow<Duration> {
+        return chainStateRepository.predictedBlockTimeFlow(chainId).map { blockTime ->
+            val blocksPerRound = parachainStakingConstantsRepository.defaultBlocksPerRound(chainId)
+
+            val durationInMillis = blocksPerRound * blockTime
+
+            durationInMillis.toLong().milliseconds
+        }
     }
 
     private suspend fun estimateDuration(chainId: ChainId, numberOfRounds: BigInteger): Flow<Duration> {
