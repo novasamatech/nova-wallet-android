@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.reposit
 import io.novafoundation.nova.feature_staking_impl.domain.model.NetworkInfo
 import io.novafoundation.nova.feature_staking_impl.domain.model.StakingPeriod
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.minimumStake
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import kotlinx.coroutines.flow.Flow
@@ -28,11 +29,12 @@ class ParachainNetworkInfoInteractor(
 
     fun observeNetworkInfo(chainId: ChainId): Flow<NetworkInfo> = flow {
         val systemForcedMinStake = parachainStakingConstantsRepository.systemForcedMinStake(chainId)
+        val maxRewardedDelegatorsPerCollator = parachainStakingConstantsRepository.maxRewardedDelegatorsPerCollator(chainId)
 
         val realtimeChanges = currentRoundRepository.currentRoundInfoFlow(chainId).flatMapLatest {
             val currentCollatorSnapshot = currentRoundRepository.collatorsSnapshot(chainId, it.current)
 
-            val minimumStake = currentCollatorSnapshot.minimumStake(systemForcedMinStake)
+            val minimumStake = currentCollatorSnapshot.minimumStake(systemForcedMinStake, maxRewardedDelegatorsPerCollator)
             val nominatorsCount = currentCollatorSnapshot.activeDelegatorsCount()
 
             combine(
@@ -59,11 +61,11 @@ class ParachainNetworkInfoInteractor(
     }
 
     private fun AccountIdMap<CollatorSnapshot>.minimumStake(
-        systemForcedMinStake: BigInteger,
+        systemForcedMinStake: Balance,
+        maxRewardedDelegatorsPerCollator: BigInteger
     ): BigInteger {
-
         val minStakeFromCollators = values.minOfOrNull { collatorSnapshot ->
-            collatorSnapshot.minimumStake(systemForcedMinStake)
+            collatorSnapshot.minimumStake(systemForcedMinStake, maxRewardedDelegatorsPerCollator)
         } ?: systemForcedMinStake
 
         return minStakeFromCollators

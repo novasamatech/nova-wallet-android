@@ -11,7 +11,14 @@ class Collator(
     val minimumStakeToGetRewards: BigInteger,
 )
 
-fun CollatorSnapshot.minimumStake(systemForcedMinStake: BigInteger): BigInteger {
+fun CollatorSnapshot.minimumStake(
+    systemForcedMinStake: BigInteger,
+    maxRewardableDelegatorsPerCollator: BigInteger
+): BigInteger {
+    if (delegations.size < maxRewardableDelegatorsPerCollator.toInt()) {
+        return systemForcedMinStake
+    }
+
     val minStakeToGetRewards = delegations.minOfOrNull { it.balance } ?: systemForcedMinStake
 
     return minStakeToGetRewards.coerceAtLeast(systemForcedMinStake)

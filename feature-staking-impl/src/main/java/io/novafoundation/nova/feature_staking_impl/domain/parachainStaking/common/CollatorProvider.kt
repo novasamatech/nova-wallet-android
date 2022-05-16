@@ -33,13 +33,14 @@ class RealCollatorProvider(
         val identities = identityRepository.getIdentitiesFromIds(chainId, allAccountsIds)
 
         val systemForcedMinimumStake = parachainStakingConstantsRepository.systemForcedMinStake(chainId)
+        val maxRewardableDelegatorsPerCollator = parachainStakingConstantsRepository.maxRewardedDelegatorsPerCollator(chainId)
 
         return snapshots.map { (accountIdHex, collatorSnapshot) ->
             Collator(
                 accountIdHex = accountIdHex,
                 identity = identities[accountIdHex],
                 snapshot = collatorSnapshot,
-                minimumStakeToGetRewards = collatorSnapshot.minimumStake(systemForcedMinimumStake)
+                minimumStakeToGetRewards = collatorSnapshot.minimumStake(systemForcedMinimumStake, maxRewardableDelegatorsPerCollator)
             )
         }
     }
@@ -50,12 +51,13 @@ class RealCollatorProvider(
         val accountIdHex = collatorId.toHexString()
         val identity = identityRepository.getIdentityFromId(chainId, accountIdHex)
         val systemForcedMinimumStake = parachainStakingConstantsRepository.systemForcedMinStake(chainId)
+        val maxRewardableDelegatorsPerCollator = parachainStakingConstantsRepository.maxRewardedDelegatorsPerCollator(chainId)
 
         return Collator(
             accountIdHex = accountIdHex,
             identity = identity,
             snapshot = snapshot,
-            minimumStakeToGetRewards = snapshot.minimumStake(systemForcedMinimumStake)
+            minimumStakeToGetRewards = snapshot.minimumStake(systemForcedMinimumStake, maxRewardableDelegatorsPerCollator)
         )
     }
 }
