@@ -12,5 +12,13 @@ class IdentityParcelModel(
     val email: String?,
     val pgpFingerprint: String?,
     val image: String?,
-    val twitter: String?
-) : Parcelable
+    val twitter: String?,
+    val childInfo: ChildInfo?,
+) : Parcelable {
+
+    @Parcelize
+    class ChildInfo(
+        val childName: String?,
+        val parentSeparateDisplay: String?
+    ): Parcelable
+}

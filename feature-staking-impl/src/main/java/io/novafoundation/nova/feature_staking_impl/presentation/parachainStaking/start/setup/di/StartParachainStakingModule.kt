@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewar
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.StartParachainStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.StartParachainStakingViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.RealParachainStakingRewardsComponentFactory
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
@@ -39,6 +40,7 @@ class StartParachainStakingModule {
     @ViewModelKey(StartParachainStakingViewModel::class)
     fun provideViewModel(
         router: ParachainStakingRouter,
+        selectCollatorInterScreenCommunicator: SelectCollatorInterScreenCommunicator,
         interactor: StartParachainStakingInteractor,
         assetUseCase: AssetUseCase,
         resourceManager: ResourceManager,
@@ -52,6 +54,7 @@ class StartParachainStakingModule {
     ): ViewModel {
         return StartParachainStakingViewModel(
             router = router,
+            selectCollatorInterScreenRequester = selectCollatorInterScreenCommunicator,
             interactor = interactor,
             rewardsComponentFactory = rewardsComponentFactory,
             assetUseCase = assetUseCase,

@@ -2,6 +2,7 @@ package io.novafoundation.nova.app.root.navigation
 
 import android.os.Parcelable
 import androidx.lifecycle.asFlow
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import io.novafoundation.nova.common.navigation.InterScreenCommunicator
 import kotlinx.coroutines.flow.Flow
@@ -35,6 +36,10 @@ abstract class BaseInterScreenCommunicator<I : Parcelable, O : Parcelable>(
 
     override fun respond(response: O) {
         // previousBackStackEntry since we want to report to previous screen
-        navController.previousBackStackEntry!!.savedStateHandle.set(liveDataKey, response)
+        saveResultTo(navController.previousBackStackEntry!!, response)
+    }
+
+    protected fun saveResultTo(backStackEntry: NavBackStackEntry, response: O) {
+        backStackEntry.savedStateHandle.set(liveDataKey, response)
     }
 }

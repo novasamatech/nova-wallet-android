@@ -6,7 +6,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 interface ParachainStakingRouter {
 
     fun openStartStaking()
-    fun openSelectCollator()
     fun openConfirmStartStaking(payload: ConfirmStartParachainStakingPayload)
 
     fun openAddAccount(chainId: ChainId, metaId: Long)

@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.confirm.di.ConfirmStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.confirm.nominations.di.ConfirmNominationsComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select.di.SelectCollatorComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.di.ConfirmStartParachainStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.di.StartParachainStakingComponent
@@ -129,7 +130,10 @@ interface StakingFeatureComponent : StakingFeatureApi {
 
         fun create(
             @BindsInstance router: StakingRouter,
+
             @BindsInstance parachainStaking: ParachainStakingRouter,
+            @BindsInstance selectCollatorInterScreenCommunicator: SelectCollatorInterScreenCommunicator,
+
             deps: StakingFeatureDependencies
         ): StakingFeatureComponent
     }

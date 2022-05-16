@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.recommendations.CollatorRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select.SelectCollatorViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 
@@ -25,6 +26,7 @@ class SelectCollatorModule {
     @ViewModelKey(SelectCollatorViewModel::class)
     fun provideViewModel(
         router: StakingRouter,
+        selectCollatorInterScreenCommunicator: SelectCollatorInterScreenCommunicator,
         collatorRecommendatorFactory: CollatorRecommendatorFactory,
         @Caching addressIconGenerator: AddressIconGenerator,
         resourceManager: ResourceManager,
@@ -33,6 +35,7 @@ class SelectCollatorModule {
     ): ViewModel {
         return SelectCollatorViewModel(
             router = router,
+            selectCollatorInterScreenResponder = selectCollatorInterScreenCommunicator,
             collatorRecommendatorFactory = collatorRecommendatorFactory,
             addressIconGenerator = addressIconGenerator,
             resourceManager = resourceManager,

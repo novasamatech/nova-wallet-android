@@ -13,20 +13,26 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.commo
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.recommendations.CollatorRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.recommendations.CollatorSorting
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator.Response
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenResponder
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select.model.mapCollatorToCollatorParcelModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.mappers.CollatorModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.mappers.mapCollatorToCollatorModel
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SelectCollatorViewModel(
     private val router: StakingRouter,
+    private val selectCollatorInterScreenResponder: SelectCollatorInterScreenResponder,
     private val collatorRecommendatorFactory: CollatorRecommendatorFactory,
     private val addressIconGenerator: AddressIconGenerator,
     private val resourceManager: ResourceManager,
@@ -88,8 +94,13 @@ class SelectCollatorViewModel(
         showMessage("TODO show collator info")
     }
 
-    fun collatorClicked(collatorModel: CollatorModel) {
-        showMessage("TODO collator clicked")
+    fun collatorClicked(collatorModel: CollatorModel) = launch {
+        val response = withContext(Dispatchers.Default) {
+            Response(mapCollatorToCollatorParcelModel(collatorModel.stakeTarget))
+        }
+
+        selectCollatorInterScreenResponder.respond(response)
+        router.back()
     }
 
     fun settingsClicked() {

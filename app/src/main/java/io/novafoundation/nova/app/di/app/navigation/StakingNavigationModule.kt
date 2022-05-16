@@ -5,8 +5,10 @@ import dagger.Provides
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.app.root.navigation.Navigator
 import io.novafoundation.nova.app.root.navigation.staking.ParachainStakingNavigator
+import io.novafoundation.nova.app.root.navigation.staking.SelectCollatorInterScreenCommunicatorImpl
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator
 
 @Module
 class StakingNavigationModule {
@@ -15,5 +17,11 @@ class StakingNavigationModule {
     @ApplicationScope
     fun provideParachainStakingRouter(navigationHolder: NavigationHolder, navigator: Navigator): ParachainStakingRouter {
         return ParachainStakingNavigator(navigationHolder, navigator)
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideSelectCollatorCommunicator(navigationHolder: NavigationHolder): SelectCollatorInterScreenCommunicator {
+        return SelectCollatorInterScreenCommunicatorImpl(navigationHolder)
     }
 }
