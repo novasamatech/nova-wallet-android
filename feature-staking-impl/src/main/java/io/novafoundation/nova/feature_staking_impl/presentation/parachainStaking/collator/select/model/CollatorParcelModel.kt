@@ -20,20 +20,20 @@ class CollatorParcelModel(
     val snapshot: CollatorSnapshotParcelModel,
     val minimumStakeToGetRewards: BigInteger,
     val apr: BigDecimal?,
-): Parcelable {
+) : Parcelable {
 
     @Parcelize
     class CollatorSnapshotParcelModel(
         val bond: BigInteger,
         val delegations: List<DelegatorBondParcelModel>,
         val total: BigInteger,
-    ): Parcelable
+    ) : Parcelable
 
     @Parcelize
     class DelegatorBondParcelModel(
         val owner: ByteArray,
         val balance: BigInteger,
-    ): Parcelable
+    ) : Parcelable
 }
 
 fun mapCollatorToCollatorParcelModel(collator: Collator): CollatorParcelModel {
@@ -76,7 +76,7 @@ private fun mapDelegatorBondToParcelModel(delegatorBond: DelegatorBond): Delegat
     }
 }
 
-private fun mapCollatorSnapshotFromParcelModel(snapshot: CollatorSnapshotParcelModel): CollatorSnapshot  {
+private fun mapCollatorSnapshotFromParcelModel(snapshot: CollatorSnapshotParcelModel): CollatorSnapshot {
     return with(snapshot) {
         CollatorSnapshot(
             bond = bond,

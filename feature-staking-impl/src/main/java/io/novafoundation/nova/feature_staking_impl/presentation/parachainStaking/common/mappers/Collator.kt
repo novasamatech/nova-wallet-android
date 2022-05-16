@@ -35,15 +35,14 @@ suspend fun mapCollatorToCollatorModel(
         name = collator.identity?.display
     )
 
-    val scoring = when(sorting) {
+    val scoring = when (sorting) {
         CollatorSorting.REWARDS -> rewardsToScoring(collator.apr)
         CollatorSorting.MIN_STAKE -> stakeToScoring(collator.minimumStakeToGetRewards, token)
         CollatorSorting.TOTAL_STAKE -> stakeToScoring(collator.snapshot.total, token)
         CollatorSorting.OWN_STAKE -> stakeToScoring(collator.snapshot.bond, token)
     }
 
-
-    val subtitle = when(sorting) {
+    val subtitle = when (sorting) {
         CollatorSorting.REWARDS -> {
             val formattedMinStake = mapAmountToAmountModel(collator.minimumStakeToGetRewards, token).token
 

@@ -14,7 +14,7 @@ interface SelectCollatorInterScreenResponder : InterScreenResponder<Request, Res
 interface SelectCollatorInterScreenCommunicator : SelectCollatorInterScreenRequester, SelectCollatorInterScreenResponder {
 
     @Parcelize
-    class Response(val collator: CollatorParcelModel): Parcelable
+    class Response(val collator: CollatorParcelModel) : Parcelable
 
     @kotlinx.android.parcel.Parcelize
     object Request : Parcelable

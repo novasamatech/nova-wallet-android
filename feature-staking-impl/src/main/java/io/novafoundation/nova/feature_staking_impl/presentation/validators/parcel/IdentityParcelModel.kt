@@ -20,5 +20,5 @@ class IdentityParcelModel(
     class ChildInfo(
         val childName: String?,
         val parentSeparateDisplay: String?
-    ): Parcelable
+    ) : Parcelable
 }

@@ -81,9 +81,8 @@ class SelectCollatorViewModel(
         }
     }.shareInBackground()
 
-
     fun clearFiltersClicked() = launch {
-        recommendationConfigFlow.value  = CollatorRecommendationConfig(sortingIterator.next())
+        recommendationConfigFlow.value = CollatorRecommendationConfig(sortingIterator.next())
     }
 
     fun backClicked() {

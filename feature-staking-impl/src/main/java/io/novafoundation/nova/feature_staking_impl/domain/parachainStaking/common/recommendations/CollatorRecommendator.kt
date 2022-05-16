@@ -13,12 +13,12 @@ class CollatorRecommendator(private val allCollators: List<Collator>) {
     }
 }
 
-
 private const val COLLATORS_CACHE = "COLLATORS_CACHE"
 
-class CollatorRecommendatorFactory(private val collatorProvider: CollatorProvider,
-                                   private val computationalCache: ComputationalCache
-                                   ) {
+class CollatorRecommendatorFactory(
+    private val collatorProvider: CollatorProvider,
+    private val computationalCache: ComputationalCache
+) {
 
     suspend fun create(lifecycle: Lifecycle, chainId: ChainId) = computationalCache.useCache(COLLATORS_CACHE, lifecycle) {
         val collators = collatorProvider.electedCollators(chainId)

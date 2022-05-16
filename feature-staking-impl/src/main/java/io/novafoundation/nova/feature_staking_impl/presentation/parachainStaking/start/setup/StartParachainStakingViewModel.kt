@@ -75,7 +75,6 @@ class StartParachainStakingViewModel(
 
     private val selectedCollator: Flow<Collator?> = selectCollatorInterScreenRequester.responseFlow.map { response ->
         mapCollatorParcelModelToCollator(response.collator)
-
     }
         .onStart<Collator?> { emit(null) }
         .shareInBackground()

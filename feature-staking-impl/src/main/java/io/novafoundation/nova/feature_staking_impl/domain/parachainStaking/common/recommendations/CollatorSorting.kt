@@ -10,7 +10,6 @@ enum class CollatorSorting(private val collatorComparator: Comparator<Collator>)
     OWN_STAKE(compareByDescending { it.snapshot.bond })
 }
 
-
 data class CollatorRecommendationConfig(val sorting: CollatorSorting) {
 
     companion object {

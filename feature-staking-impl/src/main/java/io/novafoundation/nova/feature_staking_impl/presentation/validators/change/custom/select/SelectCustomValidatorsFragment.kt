@@ -28,9 +28,9 @@ import kotlinx.android.synthetic.main.fragment_select_custom_validators.selectCu
 
 class SelectCustomValidatorsFragment : BaseFragment<SelectCustomValidatorsViewModel>(), StakeTargetAdapter.ItemHandler<Validator> {
 
-   val adapter by lazy(LazyThreadSafetyMode.NONE) {
-       StakeTargetAdapter(this)
-   }
+    val adapter by lazy(LazyThreadSafetyMode.NONE) {
+        StakeTargetAdapter(this)
+    }
 
     var filterAction: ImageView? = null
 
