@@ -6,7 +6,8 @@ import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import kotlinx.coroutines.CoroutineScope
 
-abstract class BaseRewardComponent(hostContext: ComponentHostContext): UserRewardsComponent,
+abstract class BaseRewardComponent(hostContext: ComponentHostContext) :
+    UserRewardsComponent,
     CoroutineScope by hostContext.scope,
     WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(hostContext.scope) {
 
