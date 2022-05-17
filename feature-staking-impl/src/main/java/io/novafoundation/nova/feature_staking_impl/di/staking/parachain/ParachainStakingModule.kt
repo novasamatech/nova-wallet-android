@@ -21,12 +21,14 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.reposit
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.RealRewardsRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.RewardsRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.RuntimeParachainStakingConstantsRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRewardsRepository
 import io.novafoundation.nova.feature_staking_impl.di.staking.parachain.start.StartParachainStakingFlowModule
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorProvider
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.RealCollatorProvider
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.recommendations.CollatorRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.ParachainNetworkInfoInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.userRewards.ParachainStakingUserRewardsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.ParachainStakingHintsUseCase
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
@@ -122,4 +124,10 @@ class ParachainStakingModule {
         collatorProvider: CollatorProvider,
         computationalCache: ComputationalCache
     ) = CollatorRecommendatorFactory(collatorProvider, computationalCache)
+
+    @Provides
+    @FeatureScope
+    fun provideTotalRewardsInteractor(
+        stakingRewardsRepository: StakingRewardsRepository
+    ) = ParachainStakingUserRewardsInteractor(stakingRewardsRepository)
 }

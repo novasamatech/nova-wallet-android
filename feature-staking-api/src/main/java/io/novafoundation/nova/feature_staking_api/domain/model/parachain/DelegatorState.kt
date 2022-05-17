@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_api.domain.model.parachain
 
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import java.math.BigInteger
@@ -51,3 +52,5 @@ enum class DelegationChange {
 }
 
 typealias RoundIndex = BigInteger
+
+fun DelegatorState.Delegator.address() = chain.addressOf(accountId)

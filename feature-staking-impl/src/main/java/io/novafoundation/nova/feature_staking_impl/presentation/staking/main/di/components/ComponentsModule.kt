@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.UnbondingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.relaychain.RelaychainUnbondingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.UserRewardsComponentFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.parachain.ParachainUserRewardsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.relaychain.RelaychainUserRewardsComponentFactory
 
 @Module(includes = [RelaychainModule::class, ParachainModule::class])
@@ -74,6 +75,7 @@ class ComponentsModule {
     @ScreenScope
     fun provideUserRewardsComponentFactory(
         relaychainComponentFactory: RelaychainUserRewardsComponentFactory,
+        parachainComponentFactory: ParachainUserRewardsComponentFactory,
         compoundStakingComponentFactory: CompoundStakingComponentFactory,
-    ) = UserRewardsComponentFactory(relaychainComponentFactory, compoundStakingComponentFactory)
+    ) = UserRewardsComponentFactory(relaychainComponentFactory, parachainComponentFactory, compoundStakingComponentFactory)
 }
