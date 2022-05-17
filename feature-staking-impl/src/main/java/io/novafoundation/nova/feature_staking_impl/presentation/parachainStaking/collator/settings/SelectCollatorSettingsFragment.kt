@@ -19,7 +19,6 @@ import kotlinx.android.synthetic.main.fragment_parachain_staking_select_collator
 import kotlinx.android.synthetic.main.fragment_parachain_staking_select_collator_settings.selectCollatorSettingsSort
 import kotlinx.android.synthetic.main.fragment_parachain_staking_select_collator_settings.selectCollatorSettingsToolbar
 
-
 private val SORT_MAPPING = mapOf(
     CollatorSorting.REWARDS to R.id.selectCollatorSettingsSortRewards,
     CollatorSorting.MIN_STAKE to R.id.selectCollatorSettingsSortMinimumStake,
@@ -28,11 +27,11 @@ private val SORT_MAPPING = mapOf(
 )
 
 class SelectCollatorSettingsFragment : BaseFragment<SelectCollatorSettingsViewModel>() {
-    
+
     companion object {
-        
+
         private const val PAYLOAD_KEY = "SelectCollatorSettingsFragment.Payload"
-        
+
         fun getBundle(payload: CollatorRecommendationConfigParcelModel) = bundleOf(PAYLOAD_KEY to payload)
     }
 

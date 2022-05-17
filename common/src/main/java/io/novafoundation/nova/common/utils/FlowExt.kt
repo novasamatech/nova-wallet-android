@@ -163,11 +163,11 @@ fun CompoundButton.bindTo(flow: MutableStateFlow<Boolean>, scope: CoroutineScope
     }
 }
 
-fun <T: Enum<T>> RadioGroup.bindTo(flow: MutableStateFlow<T>, scope: LifecycleCoroutineScope, valueToViewId: Map<T, Int>) {
+fun <T : Enum<T>> RadioGroup.bindTo(flow: MutableStateFlow<T>, scope: LifecycleCoroutineScope, valueToViewId: Map<T, Int>) {
     val viewIdToValue = valueToViewId.reversed()
 
     setOnCheckedChangeListener { _, checkedId ->
-        val newValue =  viewIdToValue.getValue(checkedId)
+        val newValue = viewIdToValue.getValue(checkedId)
 
         if (flow.value != newValue) {
             flow.value = newValue

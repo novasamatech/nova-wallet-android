@@ -17,5 +17,5 @@ interface SelectCollatorSettingsInterScreenCommunicator : SelectCollatorSettings
     class Response(val newConfig: CollatorRecommendationConfigParcelModel) : Parcelable
 
     @Parcelize
-    class Request(val currentConfig: CollatorRecommendationConfigParcelModel): Parcelable
+    class Request(val currentConfig: CollatorRecommendationConfigParcelModel) : Parcelable
 }
