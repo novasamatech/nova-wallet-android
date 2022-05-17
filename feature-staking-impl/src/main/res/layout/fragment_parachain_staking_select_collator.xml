@@ -36,13 +36,12 @@
             android:layout_height="match_parent"
             android:orientation="horizontal">
 
-            <!--  TODO sorting screen -->
             <TextView
                 android:id="@+id/selectCollatorClearFilters"
                 style="@style/Widget.Nova.Action.Secondary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Change sorting" />
+                android:text="@string/staking_custom_clear_button_title" />
         </LinearLayout>
     </HorizontalScrollView>
 

@@ -38,6 +38,21 @@
         android:id="@+id/selectCollatorFragment"
         tools:layout="@layout/fragment_parachain_staking_select_collator"
         android:name="io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select.SelectCollatorFragment"
-        android:label="SelectCollatorFragment" />
+        android:label="SelectCollatorFragment" >
+
+        <action
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            android:id="@+id/action_selectCollatorFragment_to_selectCollatorSettingsFragment"
+            app:destination="@id/selectCollatorSettingsFragment" />
+    </fragment>
+
+    <fragment
+        tools:layout="@layout/fragment_parachain_staking_select_collator_settings"
+        android:id="@+id/selectCollatorSettingsFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.settings.SelectCollatorSettingsFragment"
+        android:label="SelectCollatorSettingsFragment" />
 
 </navigation>

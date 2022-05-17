@@ -96,6 +96,8 @@ class SelectCollatorFragment : BaseFragment<SelectCollatorViewModel>(), StakeTar
         viewModel.recommendationSettingsIcon.observe { icon ->
             filterAction?.setImageResource(icon)
         }
+
+        viewModel.clearFiltersEnabled.observe(selectCollatorClearFilters::setEnabled)
     }
 
     override fun stakeTargetInfoClicked(stakeTargetModel: CollatorModel) {

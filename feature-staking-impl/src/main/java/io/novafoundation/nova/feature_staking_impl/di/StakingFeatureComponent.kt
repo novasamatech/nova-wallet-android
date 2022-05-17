@@ -16,6 +16,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.confirm.di.Confi
 import io.novafoundation.nova.feature_staking_impl.presentation.confirm.nominations.di.ConfirmNominationsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select.di.SelectCollatorComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.settings.SelectCollatorSettingsInterScreenCommunicator
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.settings.di.SelectCollatorSettingsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.di.ConfirmStartParachainStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.di.StartParachainStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.di.ConfirmPayoutComponent
@@ -125,6 +127,8 @@ interface StakingFeatureComponent : StakingFeatureApi {
 
     fun selectCollatorFactory(): SelectCollatorComponent.Factory
 
+    fun selectCollatorSettingsFactory(): SelectCollatorSettingsComponent.Factory
+
     @Component.Factory
     interface Factory {
 
@@ -133,6 +137,7 @@ interface StakingFeatureComponent : StakingFeatureApi {
 
             @BindsInstance parachainStaking: ParachainStakingRouter,
             @BindsInstance selectCollatorInterScreenCommunicator: SelectCollatorInterScreenCommunicator,
+            @BindsInstance selectCollatorSettingsInterScreenCommunicator: SelectCollatorSettingsInterScreenCommunicator,
 
             deps: StakingFeatureDependencies
         ): StakingFeatureComponent
