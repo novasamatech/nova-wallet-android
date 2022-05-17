@@ -7,7 +7,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator.Request
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator.Response
 
-class SelectCollatorInterScreenCommunicatorImpl(private val navigationHolder: NavigationHolder) :
+class SelectCollatorInterScreenCommunicatorImpl(navigationHolder: NavigationHolder) :
     SelectCollatorInterScreenCommunicator,
     BaseInterScreenCommunicator<Request, Response>(navigationHolder) {
 

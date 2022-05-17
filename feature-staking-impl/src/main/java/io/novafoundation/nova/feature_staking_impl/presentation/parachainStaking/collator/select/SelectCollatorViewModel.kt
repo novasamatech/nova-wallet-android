@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_staking_impl.presentation.parachainStakin
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.cycle
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
@@ -16,6 +15,10 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator.Response
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenResponder
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select.model.mapCollatorToCollatorParcelModel
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.settings.SelectCollatorSettingsInterScreenCommunicator.Request
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.settings.SelectCollatorSettingsInterScreenRequester
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.settings.model.mapCollatorRecommendationConfigFromParcel
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.settings.model.mapCollatorRecommendationConfigToParcel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.mappers.CollatorModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.mappers.mapCollatorToCollatorModel
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
@@ -26,13 +29,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class SelectCollatorViewModel(
     private val router: StakingRouter,
     private val selectCollatorInterScreenResponder: SelectCollatorInterScreenResponder,
+    private val selectCollatorSettingsInterScreenRequester: SelectCollatorSettingsInterScreenRequester,
     private val collatorRecommendatorFactory: CollatorRecommendatorFactory,
     private val addressIconGenerator: AddressIconGenerator,
     private val resourceManager: ResourceManager,
@@ -44,11 +50,7 @@ class SelectCollatorViewModel(
         collatorRecommendatorFactory.create(router.currentStackEntryLifecycle, selectedAssetState.chainId())
     }
 
-    // TODO sorting screen
-    private val sortingIterator = CollatorSorting.values().toList().cycle().iterator()
-
-    // TODO sorting screen
-    private val recommendationConfigFlow = MutableStateFlow(CollatorRecommendationConfig(CollatorSorting.REWARDS))
+    private val recommendationConfigFlow = MutableStateFlow(defaultConfig())
 
     val recommendationSettingsIcon = recommendationConfigFlow.map {
         val isChanged = it != CollatorRecommendationConfig.DEFAULT
@@ -56,6 +58,10 @@ class SelectCollatorViewModel(
         if (isChanged) R.drawable.ic_filter_indicator else R.drawable.ic_filter
     }
         .shareInBackground()
+
+    val clearFiltersEnabled = recommendationConfigFlow.map {
+        it != defaultConfig()
+    }.shareInBackground()
 
     private val shownValidators = recommendationConfigFlow.map {
         collatorRecommendator().recommendations(it)
@@ -81,8 +87,12 @@ class SelectCollatorViewModel(
         }
     }.shareInBackground()
 
-    fun clearFiltersClicked() = launch {
-        recommendationConfigFlow.value = CollatorRecommendationConfig(sortingIterator.next())
+    init {
+        listenRecommendationConfigChanges()
+    }
+
+    fun clearFiltersClicked() {
+        recommendationConfigFlow.value = defaultConfig()
     }
 
     fun backClicked() {
@@ -102,13 +112,25 @@ class SelectCollatorViewModel(
         router.back()
     }
 
-    fun settingsClicked() {
-        showMessage("TODO show settings")
+    fun settingsClicked() = launch {
+        val currentConfig = mapCollatorRecommendationConfigToParcel(recommendationConfigFlow.first())
+
+        selectCollatorSettingsInterScreenRequester.openRequest(Request((currentConfig)))
     }
 
     fun searchClicked() {
         showMessage("TODO show search")
     }
+
+    private fun listenRecommendationConfigChanges() {
+        selectCollatorSettingsInterScreenRequester.responseFlow
+            .map { mapCollatorRecommendationConfigFromParcel(it.newConfig) }
+            .onEach { recommendationConfigFlow.value = it }
+            .inBackground()
+            .launchIn(this)
+    }
+
+    private fun defaultConfig() = CollatorRecommendationConfig(CollatorSorting.REWARDS)
 
     private suspend fun convertToModels(
         collators: List<Collator>,
