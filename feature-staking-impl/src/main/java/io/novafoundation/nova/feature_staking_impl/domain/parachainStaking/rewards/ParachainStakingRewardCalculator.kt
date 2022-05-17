@@ -21,6 +21,8 @@ interface ParachainStakingRewardCalculator {
 
     fun maximumGain(days: Int): BigDecimal
 
+    fun collatorApr(collatorIdHex: String): BigDecimal?
+
     fun calculateCollatorAnnualReturns(collatorId: AccountId, amount: BigDecimal): PeriodReturns
 
     fun calculateMaxAnnualReturns(amount: BigDecimal): PeriodReturns
@@ -66,8 +68,12 @@ class RealParachainStakingRewardCalculator(
         return (maxApr * days / DAYS_IN_YEAR).toBigDecimal()
     }
 
+    override fun collatorApr(collatorIdHex: String): BigDecimal? {
+        return aprByCollator[collatorIdHex]?.toBigDecimal()
+    }
+
     override fun calculateCollatorAnnualReturns(collatorId: AccountId, amount: BigDecimal): PeriodReturns {
-        val collatorApr = aprByCollator[collatorId.toHexString()]?.toBigDecimal() ?: averageApr()
+        val collatorApr = collatorApr(collatorId.toHexString()) ?: averageApr()
 
         return PeriodReturns(
             gainAmount = amount * collatorApr,

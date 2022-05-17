@@ -7,6 +7,7 @@ import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 import javax.inject.Inject
@@ -16,6 +17,7 @@ class StakingFeatureHolder @Inject constructor(
     featureContainer: FeatureContainer,
     private val router: StakingRouter,
     private val parachainStakingRouter: ParachainStakingRouter,
+    private val selectCollatorInterScreenCommunicator: SelectCollatorInterScreenCommunicator,
 ) : FeatureApiHolder(featureContainer) {
 
     override fun initializeDependencies(): Any {
@@ -28,6 +30,6 @@ class StakingFeatureHolder @Inject constructor(
             .build()
 
         return DaggerStakingFeatureComponent.factory()
-            .create(router, parachainStakingRouter, dependencies)
+            .create(router, parachainStakingRouter, selectCollatorInterScreenCommunicator, dependencies)
     }
 }

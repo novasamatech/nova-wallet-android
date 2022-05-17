@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="staking_parachain_collator_own_stake">Collator\'s own stake</string>
+  <string name="staking_parachain_collators_number_format">Collators: %s</string>
+  <string name="staking_rewards">Rewards</string>
+  <string name="staking_min_stake">Min. stake</string>
+
   <string name="staking_parachain_reward_frequency_hint">Tokens in stake produce rewards each round (%s)</string>
   <string name="staking_setup_amount_too_low_strict">Minimum stake should be strictly greater than (%s)</string>
 

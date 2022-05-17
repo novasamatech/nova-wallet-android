@@ -8,9 +8,10 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
+import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.ValidatorsAdapter
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.StakeTargetAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorModel
 import kotlinx.android.synthetic.main.fragment_recommended_validators.recommendedValidatorsAccounts
 import kotlinx.android.synthetic.main.fragment_recommended_validators.recommendedValidatorsContent
@@ -19,9 +20,11 @@ import kotlinx.android.synthetic.main.fragment_recommended_validators.recommende
 import kotlinx.android.synthetic.main.fragment_recommended_validators.recommendedValidatorsProgress
 import kotlinx.android.synthetic.main.fragment_recommended_validators.recommendedValidatorsToolbar
 
-class RecommendedValidatorsFragment : BaseFragment<RecommendedValidatorsViewModel>(), ValidatorsAdapter.ItemHandler {
+class RecommendedValidatorsFragment : BaseFragment<RecommendedValidatorsViewModel>(), StakeTargetAdapter.ItemHandler<Validator> {
 
-    lateinit var adapter: ValidatorsAdapter
+    val adapter by lazy(LazyThreadSafetyMode.NONE) {
+        StakeTargetAdapter(this)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -32,7 +35,6 @@ class RecommendedValidatorsFragment : BaseFragment<RecommendedValidatorsViewMode
     }
 
     override fun initViews() {
-        adapter = ValidatorsAdapter(this)
         recommendedValidatorsList.adapter = adapter
 
         recommendedValidatorsList.setHasFixedSize(true)
@@ -66,11 +68,11 @@ class RecommendedValidatorsFragment : BaseFragment<RecommendedValidatorsViewMode
         viewModel.selectedTitle.observe(recommendedValidatorsAccounts::setText)
     }
 
-    override fun validatorInfoClicked(validatorModel: ValidatorModel) {
+    override fun stakeTargetInfoClicked(validatorModel: ValidatorModel) {
         viewModel.validatorInfoClicked(validatorModel)
     }
 
-    override fun validatorClicked(validatorModel: ValidatorModel) {
+    override fun stakeTargetClicked(validatorModel: ValidatorModel) {
         viewModel.validatorInfoClicked(validatorModel)
     }
 }

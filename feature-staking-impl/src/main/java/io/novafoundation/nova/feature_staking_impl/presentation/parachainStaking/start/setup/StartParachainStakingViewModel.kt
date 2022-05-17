@@ -16,6 +16,10 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenRequester
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.openRequest
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select.model.mapCollatorParcelModelToCollator
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select.model.mapCollatorToCollatorParcelModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.model.ConfirmStartParachainStakingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.model.SelectCollatorModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.RealParachainStakingRewardsComponentFactory
@@ -31,15 +35,20 @@ import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 
 class StartParachainStakingViewModel(
     private val router: ParachainStakingRouter,
+    private val selectCollatorInterScreenRequester: SelectCollatorInterScreenRequester,
     private val interactor: StartParachainStakingInteractor,
     private val rewardsComponentFactory: RealParachainStakingRewardsComponentFactory,
     private val singleAssetSharedState: SingleAssetSharedState,
@@ -67,7 +76,11 @@ class StartParachainStakingViewModel(
         balanceLabel = R.string.wallet_balance_transferable
     )
 
-    private val selectedCollator = MutableStateFlow<Collator?>(null)
+    private val selectedCollator: Flow<Collator?> = selectCollatorInterScreenRequester.responseFlow.map { response ->
+        mapCollatorParcelModelToCollator(response.collator)
+    }
+        .onStart<Collator?> { emit(null) }
+        .shareInBackground()
 
     val selectedCollatorModel = selectedCollator.map { collator ->
         collator?.let {
@@ -127,9 +140,7 @@ class StartParachainStakingViewModel(
     }
 
     fun selectCollatorClicked() = launch {
-        val randomCollator = interactor.randomCollator()
-
-        selectedCollator.emit(randomCollator)
+        selectCollatorInterScreenRequester.openRequest()
     }
 
     fun nextClicked() {
@@ -169,12 +180,14 @@ class StartParachainStakingViewModel(
         fee: BigDecimal,
         amount: BigDecimal,
         collator: Collator,
-    ) {
-        val payload = ConfirmStartParachainStakingPayload(
-            collatorId = collator.accountIdHex.fromHex(),
-            amount = amount,
-            fee = fee
-        )
+    ) = launch {
+        val payload = withContext(Dispatchers.Default) {
+            ConfirmStartParachainStakingPayload(
+                collator = mapCollatorToCollatorParcelModel(collator),
+                amount = amount,
+                fee = fee
+            )
+        }
 
         router.openConfirmStartStaking(payload)
     }

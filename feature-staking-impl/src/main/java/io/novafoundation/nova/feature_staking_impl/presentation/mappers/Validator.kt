@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settin
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.sortings.APYSorting
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.sortings.TotalStakeSorting
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.sortings.ValidatorOwnStakeSorting
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.StakeTargetModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.model.ValidatorAlert
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.model.ValidatorDetailsModel
@@ -32,6 +33,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToA
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
+import java.math.BigDecimal
 import java.math.BigInteger
 
 private const val ICON_SIZE_DP = 24
@@ -65,7 +67,7 @@ suspend fun mapValidatorToValidatorModel(
 
     return with(validator) {
         val scoring = when (sorting) {
-            APYSorting -> formatValidatorApy(validator)?.let(ValidatorModel.Scoring::OneField)
+            APYSorting -> rewardsToScoring(electedInfo?.apy)
 
             TotalStakeSorting -> stakeToScoring(electedInfo?.totalStake, token)
 
@@ -77,22 +79,27 @@ suspend fun mapValidatorToValidatorModel(
         ValidatorModel(
             accountIdHex = accountIdHex,
             slashed = slashed,
-            image = addressModel.image,
-            address = addressModel.address,
+            addressModel = addressModel,
             scoring = scoring,
-            title = addressModel.nameOrAddress,
             isChecked = isChecked,
-            validator = validator
+            stakeTarget = validator,
+            subtitle = null // TODO relaychain subtitles
         )
     }
 }
 
-private fun stakeToScoring(stakeInPlanks: BigInteger?, token: Token): ValidatorModel.Scoring.TwoFields? {
+fun rewardsToScoring(rewardsGain: BigDecimal?) = rewardsToColoredText(rewardsGain)?.let(StakeTargetModel.Scoring::OneField)
+
+fun rewardsToColoredText(rewardsGain: BigDecimal?) = formatStakeTargetRewardsOrNull(rewardsGain)?.let {
+    StakeTargetModel.ColoredText(it, R.color.green)
+}
+
+fun stakeToScoring(stakeInPlanks: BigInteger?, token: Token): StakeTargetModel.Scoring.TwoFields? {
     if (stakeInPlanks == null) return null
 
     val stake = token.amountFromPlanks(stakeInPlanks)
 
-    return ValidatorModel.Scoring.TwoFields(
+    return StakeTargetModel.Scoring.TwoFields(
         primary = stake.formatTokenAmount(token.configuration),
         secondary = token.fiatAmount(stake).formatAsCurrency()
     )
@@ -219,4 +226,7 @@ suspend fun mapValidatorDetailsParcelToValidatorDetailsModel(
     }
 }
 
-fun formatValidatorApy(validator: Validator) = validator.electedInfo?.apy?.fractionToPercentage()?.formatAsPercentage()
+fun formatStakeTargetRewards(rewardsRate: BigDecimal) = rewardsRate.fractionToPercentage().formatAsPercentage()
+fun formatStakeTargetRewardsOrNull(rewardsRate: BigDecimal?) = rewardsRate?.let(::formatStakeTargetRewards)
+
+fun formatValidatorApy(validator: Validator) = formatStakeTargetRewardsOrNull(validator.electedInfo?.apy)

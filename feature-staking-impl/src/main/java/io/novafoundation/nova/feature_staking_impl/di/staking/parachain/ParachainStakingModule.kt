@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.di.staking.parachain
 
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -24,6 +25,7 @@ import io.novafoundation.nova.feature_staking_impl.di.staking.parachain.start.St
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorProvider
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.RealCollatorProvider
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.recommendations.CollatorRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.ParachainNetworkInfoInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.ParachainStakingHintsUseCase
@@ -103,7 +105,8 @@ class ParachainStakingModule {
         currentRoundRepository: CurrentRoundRepository,
         identityRepository: IdentityRepository,
         parachainStakingConstantsRepository: ParachainStakingConstantsRepository,
-    ): CollatorProvider = RealCollatorProvider(identityRepository, currentRoundRepository, parachainStakingConstantsRepository)
+        rewardCalculatorFactory: ParachainStakingRewardCalculatorFactory,
+    ): CollatorProvider = RealCollatorProvider(identityRepository, currentRoundRepository, parachainStakingConstantsRepository, rewardCalculatorFactory)
 
     @Provides
     @FeatureScope
@@ -112,4 +115,11 @@ class ParachainStakingModule {
         resourceManager: ResourceManager,
         roundDurationEstimator: RoundDurationEstimator
     ) = ParachainStakingHintsUseCase(stakingSharedState, resourceManager, roundDurationEstimator)
+
+    @Provides
+    @FeatureScope
+    fun provideCollatorRecommendatorFactory(
+        collatorProvider: CollatorProvider,
+        computationalCache: ComputationalCache
+    ) = CollatorRecommendatorFactory(collatorProvider, computationalCache)
 }

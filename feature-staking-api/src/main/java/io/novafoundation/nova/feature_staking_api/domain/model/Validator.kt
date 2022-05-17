@@ -30,7 +30,7 @@ class RootIdentity(
 ) : Identity
 
 class ChildIdentity(
-    childName: String?,
+    val childName: String?,
     val parentIdentity: Identity,
 ) : Identity by parentIdentity {
 

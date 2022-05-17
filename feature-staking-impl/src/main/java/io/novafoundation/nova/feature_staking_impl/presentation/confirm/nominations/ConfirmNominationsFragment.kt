@@ -7,16 +7,17 @@ import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
+import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.ValidatorsAdapter
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.StakeTargetAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorModel
 import kotlinx.android.synthetic.main.fragment_confirm_nominations.confirmNominationsList
 import kotlinx.android.synthetic.main.fragment_confirm_nominations.confirmNominationsToolbar
 
-class ConfirmNominationsFragment : BaseFragment<ConfirmNominationsViewModel>(), ValidatorsAdapter.ItemHandler {
+class ConfirmNominationsFragment : BaseFragment<ConfirmNominationsViewModel>(), StakeTargetAdapter.ItemHandler<Validator> {
 
-    lateinit var adapter: ValidatorsAdapter
+    lateinit var adapter: StakeTargetAdapter<Validator>
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -27,7 +28,7 @@ class ConfirmNominationsFragment : BaseFragment<ConfirmNominationsViewModel>(), 
     }
 
     override fun initViews() {
-        adapter = ValidatorsAdapter(this)
+        adapter = StakeTargetAdapter(this)
         confirmNominationsList.adapter = adapter
 
         confirmNominationsList.setHasFixedSize(true)
@@ -53,11 +54,11 @@ class ConfirmNominationsFragment : BaseFragment<ConfirmNominationsViewModel>(), 
         viewModel.toolbarTitle.observe(confirmNominationsToolbar::setTitle)
     }
 
-    override fun validatorInfoClicked(validatorModel: ValidatorModel) {
+    override fun stakeTargetInfoClicked(validatorModel: ValidatorModel) {
         viewModel.validatorInfoClicked(validatorModel)
     }
 
-    override fun validatorClicked(validatorModel: ValidatorModel) {
+    override fun stakeTargetClicked(validatorModel: ValidatorModel) {
         viewModel.validatorInfoClicked(validatorModel)
     }
 }

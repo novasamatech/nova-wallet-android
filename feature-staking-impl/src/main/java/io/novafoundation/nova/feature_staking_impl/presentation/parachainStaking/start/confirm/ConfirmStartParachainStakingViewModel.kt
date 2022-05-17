@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select.model.mapCollatorParcelModelToCollator
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.hints.ConfirmStartParachainStakingHintsMixinFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.model.ConfirmStartParachainStakingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.startParachainStakingValidationFailure
@@ -30,10 +31,11 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToA
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
+import jp.co.soramitsu.fearless_utils.extensions.fromHex
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
@@ -64,8 +66,8 @@ class ConfirmStartParachainStakingViewModel(
     private val assetFlow = assetUseCase.currentAssetFlow()
         .shareInBackground()
 
-    private val collator by lazyAsync {
-        interactor.getCollatorById(payload.collatorId)
+    private val collator by lazyAsync(Dispatchers.Default) {
+        mapCollatorParcelModelToCollator(payload.collator)
     }
 
     val currentAccountModelFlow = selectedAccountUseCase.selectedMetaAccountFlow().map {
@@ -89,13 +91,9 @@ class ConfirmStartParachainStakingViewModel(
     val walletFlow = walletUiUseCase.selectedWalletUiFlow()
         .shareInBackground()
 
-    val collatorAddressModel = flow {
-        emit(createCollatorAddressModel(name = null))
-
-        val name = collator().identity?.display
-
-        emit(createCollatorAddressModel(name = name))
-    }
+    val collatorAddressModel = flowOf {
+        createCollatorAddressModel()
+    }.shareInBackground()
 
     private val _showNextProgress = MutableStateFlow(false)
     val showNextProgress: StateFlow<Boolean> = _showNextProgress
@@ -149,7 +147,7 @@ class ConfirmStartParachainStakingViewModel(
         interactor.delegate(
             originAddress = currentAccountModelFlow.first().address,
             amount = amountInPlanks,
-            collator = payload.collatorId
+            collator = payload.collator.accountIdHex.fromHex()
         )
             .onFailure {
                 it.printStackTrace()
@@ -165,13 +163,13 @@ class ConfirmStartParachainStakingViewModel(
         _showNextProgress.value = false
     }
 
-    private suspend fun createCollatorAddressModel(name: String?): AddressModel {
+    private suspend fun createCollatorAddressModel(): AddressModel {
         val chain = selectedAssetState.chain()
 
         return addressIconGenerator.createAccountAddressModel(
             chain = chain,
-            address = chain.addressOf(payload.collatorId),
-            name = name
+            address = chain.addressOf(collator().accountIdHex.fromHex()),
+            name = collator().identity?.display
         )
     }
 

@@ -69,7 +69,7 @@ class RecommendedValidatorsViewModel(
     }
 
     fun validatorInfoClicked(validatorModel: ValidatorModel) {
-        router.openValidatorDetails(mapValidatorToValidatorDetailsParcelModel(validatorModel.validator))
+        router.openValidatorDetails(mapValidatorToValidatorDetailsParcelModel(validatorModel.stakeTarget))
     }
 
     fun nextClicked() {
