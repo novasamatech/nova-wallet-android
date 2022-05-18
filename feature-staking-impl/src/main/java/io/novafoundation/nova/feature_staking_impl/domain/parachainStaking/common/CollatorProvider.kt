@@ -9,7 +9,10 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.reposit
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.Collator
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.minimumStake
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
+import io.novafoundation.nova.runtime.ext.addressOf
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
@@ -25,9 +28,12 @@ class RealCollatorProvider(
     private val currentRoundRepository: CurrentRoundRepository,
     private val parachainStakingConstantsRepository: ParachainStakingConstantsRepository,
     private val rewardCalculatorFactory: ParachainStakingRewardCalculatorFactory,
+    private val chainRegistry: ChainRegistry,
 ) : CollatorProvider {
 
     override suspend fun electedCollators(chainId: ChainId): List<Collator> {
+        val chain = chainRegistry.getChain(chainId)
+
         val snapshots = currentRoundRepository.collatorsSnapshotInCurrentRound(chainId)
         val allAccountsIds = snapshots.keys.toList()
 
@@ -40,6 +46,7 @@ class RealCollatorProvider(
         return snapshots.map { (accountIdHex, collatorSnapshot) ->
             Collator(
                 accountIdHex = accountIdHex,
+                address = chain.addressOf(accountIdHex.fromHex()),
                 identity = identities[accountIdHex],
                 snapshot = collatorSnapshot,
                 minimumStakeToGetRewards = collatorSnapshot.minimumStake(systemForcedMinimumStake, maxRewardableDelegatorsPerCollator),
@@ -52,6 +59,8 @@ class RealCollatorProvider(
         val snapshots = currentRoundRepository.collatorsSnapshotInCurrentRound(chainId)
         val collatorSnapshot = snapshots[collatorId.toHexString()] ?: return null
 
+        val chain = chainRegistry.getChain(chainId)
+
         val collatorIdHex = collatorId.toHexString()
         val identity = identityRepository.getIdentityFromId(chainId, collatorIdHex)
         val systemForcedMinimumStake = parachainStakingConstantsRepository.systemForcedMinStake(chainId)
@@ -61,6 +70,7 @@ class RealCollatorProvider(
 
         return Collator(
             accountIdHex = collatorIdHex,
+            address = chain.addressOf(collatorId),
             identity = identity,
             snapshot = collatorSnapshot,
             minimumStakeToGetRewards = collatorSnapshot.minimumStake(systemForcedMinimumStake, maxRewardableDelegatorsPerCollator),

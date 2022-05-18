@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.confirm.di.ConfirmStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.confirm.nominations.di.ConfirmNominationsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.search.di.SearchCollatorComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select.di.SelectCollatorComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.settings.SelectCollatorSettingsInterScreenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.settings.di.SelectCollatorSettingsComponent
@@ -128,6 +129,8 @@ interface StakingFeatureComponent : StakingFeatureApi {
     fun selectCollatorFactory(): SelectCollatorComponent.Factory
 
     fun selectCollatorSettingsFactory(): SelectCollatorSettingsComponent.Factory
+
+    fun searchCollatorFactory(): SearchCollatorComponent.Factory
 
     @Component.Factory
     interface Factory {

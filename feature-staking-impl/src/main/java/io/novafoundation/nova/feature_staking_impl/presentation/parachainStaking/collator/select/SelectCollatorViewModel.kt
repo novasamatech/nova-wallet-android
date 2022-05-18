@@ -11,7 +11,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.commo
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.recommendations.CollatorRecommendationConfig
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.recommendations.CollatorRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.recommendations.CollatorSorting
-import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator.Response
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenResponder
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select.model.mapCollatorToCollatorParcelModel
@@ -36,7 +36,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class SelectCollatorViewModel(
-    private val router: StakingRouter,
+    private val router: ParachainStakingRouter,
     private val selectCollatorInterScreenResponder: SelectCollatorInterScreenResponder,
     private val selectCollatorSettingsInterScreenRequester: SelectCollatorSettingsInterScreenRequester,
     private val collatorRecommendatorFactory: CollatorRecommendatorFactory,
@@ -109,7 +109,7 @@ class SelectCollatorViewModel(
         }
 
         selectCollatorInterScreenResponder.respond(response)
-        router.back()
+        router.returnToStartStaking()
     }
 
     fun settingsClicked() = launch {
@@ -119,7 +119,7 @@ class SelectCollatorViewModel(
     }
 
     fun searchClicked() {
-        showMessage("TODO show search")
+        router.openSearchCollator()
     }
 
     private fun listenRecommendationConfigChanges() {

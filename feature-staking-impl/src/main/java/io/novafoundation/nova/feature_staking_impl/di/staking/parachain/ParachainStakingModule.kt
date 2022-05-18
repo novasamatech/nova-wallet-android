@@ -108,7 +108,14 @@ class ParachainStakingModule {
         identityRepository: IdentityRepository,
         parachainStakingConstantsRepository: ParachainStakingConstantsRepository,
         rewardCalculatorFactory: ParachainStakingRewardCalculatorFactory,
-    ): CollatorProvider = RealCollatorProvider(identityRepository, currentRoundRepository, parachainStakingConstantsRepository, rewardCalculatorFactory)
+        chainRegistry: ChainRegistry,
+    ): CollatorProvider = RealCollatorProvider(
+        identityRepository = identityRepository,
+        currentRoundRepository = currentRoundRepository,
+        parachainStakingConstantsRepository = parachainStakingConstantsRepository,
+        rewardCalculatorFactory = rewardCalculatorFactory,
+        chainRegistry = chainRegistry
+    )
 
     @Provides
     @FeatureScope

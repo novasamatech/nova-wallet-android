@@ -16,6 +16,7 @@ import java.math.BigInteger
 @Parcelize
 class CollatorParcelModel(
     val accountIdHex: String,
+    val address: String,
     val identity: IdentityParcelModel?,
     val snapshot: CollatorSnapshotParcelModel,
     val minimumStakeToGetRewards: BigInteger,
@@ -43,7 +44,8 @@ fun mapCollatorToCollatorParcelModel(collator: Collator): CollatorParcelModel {
             identity = identity?.let(::mapIdentityToIdentityParcelModel),
             snapshot = mapCollatorSnapshotToParcelModel(snapshot),
             minimumStakeToGetRewards = minimumStakeToGetRewards,
-            apr = apr
+            apr = apr,
+            address = address
         )
     }
 }
@@ -55,7 +57,8 @@ fun mapCollatorParcelModelToCollator(collator: CollatorParcelModel): Collator {
             identity = identity?.let(::mapIdentityParcelModelToIdentity),
             snapshot = mapCollatorSnapshotFromParcelModel(snapshot),
             minimumStakeToGetRewards = minimumStakeToGetRewards,
-            apr = apr
+            apr = apr,
+            address = address
         )
     }
 }

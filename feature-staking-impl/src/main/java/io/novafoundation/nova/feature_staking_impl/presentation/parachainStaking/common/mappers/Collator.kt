@@ -23,7 +23,7 @@ suspend fun mapCollatorToCollatorModel(
     collator: Collator,
     chain: Chain,
     addressIconGenerator: AddressIconGenerator,
-    sorting: CollatorSorting = CollatorSorting.REWARDS,
+    sorting: CollatorSorting,
     resourceManager: ResourceManager,
     token: Token,
 ): CollatorModel {
