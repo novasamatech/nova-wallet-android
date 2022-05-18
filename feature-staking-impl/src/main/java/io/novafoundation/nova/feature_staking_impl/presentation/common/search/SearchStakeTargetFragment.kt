@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.presentation.SearchState
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.common.utils.showSoftKeyboard
 import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.StakeTargetAdapter
@@ -67,6 +68,9 @@ abstract class SearchStakeTargetFragment<V : SearchStakeTargetViewModel<S>, S> :
         }
 
         searchCustomValidatorRewards.setText(configuration.sortingLabelRes)
+
+        searchCustomValidatorsInput.requestFocus()
+        searchCustomValidatorsInput.content.showSoftKeyboard()
     }
 
     override fun subscribe(viewModel: V) {
