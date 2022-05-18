@@ -7,11 +7,13 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.ParachainNetworkInfoInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.userRewards.ParachainStakingUserRewardsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.parachain.ParachainNetworkInfoComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.parachain.ParachainStakeSummaryComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.startStaking.parachain.ParachainStartStakingComponentFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.parachain.ParachainUserRewardsComponentFactory
 
 @Module
 class ParachainModule {
@@ -52,5 +54,15 @@ class ParachainModule {
         rewardCalculatorFactory = rewardCalculatorFactory,
         router = router,
         validationExecutor = validationExecutor
+    )
+
+    @Provides
+    @ScreenScope
+    fun provideParachainUserRewardsComponentFactory(
+        delegatorStateUseCase: DelegatorStateUseCase,
+        interactor: ParachainStakingUserRewardsInteractor,
+    ) = ParachainUserRewardsComponentFactory(
+        delegatorStateUseCase = delegatorStateUseCase,
+        interactor = interactor
     )
 }
