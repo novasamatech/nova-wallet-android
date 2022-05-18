@@ -2,10 +2,11 @@ package io.novafoundation.nova.feature_staking_impl.presentation.validators.parc
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
-import java.math.BigInteger
 
 @Parcelize
-class NominatorParcelModel(
-    val who: ByteArray,
-    val value: BigInteger
+class StakeTargetDetailsParcelModel(
+    val accountIdHex: String,
+    val isSlashed: Boolean,
+    val stake: StakeTargetStakeParcelModel,
+    val identity: IdentityParcelModel?,
 ) : Parcelable

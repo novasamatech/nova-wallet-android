@@ -55,6 +55,8 @@ class ConfirmStartParachainStakingFragment : BaseFragment<ConfirmStartParachainS
 
         confirmStartParachainStakingConfirm.prepareForProgress(viewLifecycleOwner)
         confirmStartParachainStakingConfirm.setOnClickListener { viewModel.confirmClicked() }
+
+        confirmStartParachainStakingCollator.setOnClickListener { viewModel.collatorClicked() }
     }
 
     override fun inject() {

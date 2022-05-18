@@ -23,6 +23,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValid
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.current.model.NominatedValidatorModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.current.model.NominatedValidatorStatusModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.current.model.NominatedValidatorStatusModel.TitleConfig
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.relaychain
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.addressOf
@@ -176,7 +178,8 @@ class CurrentValidatorsViewModel(
 
             val nominatedValidator = allValidators.first { it.validator.accountIdHex == accountId }
 
-            mapValidatorToValidatorDetailsWithStakeFlagParcelModel(nominatedValidator)
+            val stakeTarget = mapValidatorToValidatorDetailsWithStakeFlagParcelModel(nominatedValidator)
+            StakeTargetDetailsPayload.relaychain(stakeTarget, stakingInteractor)
         }
 
         router.openValidatorDetails(payload)

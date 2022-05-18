@@ -6,11 +6,15 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.icon.cre
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.Collator
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.recommendations.CollatorSorting
+import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapIdentityToIdentityParcelModel
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.rewardsToColoredText
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.rewardsToScoring
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.stakeToScoring
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.StakeTargetModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.StakeTargetModel.ColoredText
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.StakeTargetDetailsParcelModel
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.StakeTargetStakeParcelModel
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.StakerParcelModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.addressOf
@@ -52,12 +56,10 @@ suspend fun mapCollatorToCollatorModel(
             )
         }
 
-        else -> collator.apr?.let { apr ->
-            StakeTargetModel.Subtitle(
-                label = resourceManager.getString(R.string.staking_rewards).withSubtitleSLabelSuffix(),
-                value = rewardsToColoredText(apr)!!
-            )
-        }
+        else -> StakeTargetModel.Subtitle(
+            label = resourceManager.getString(R.string.staking_rewards).withSubtitleSLabelSuffix(),
+            value = rewardsToColoredText(collator.apr)!!
+        )
     }
 
     return CollatorModel(
@@ -68,6 +70,34 @@ suspend fun mapCollatorToCollatorModel(
         isChecked = null,
         scoring = scoring,
         subtitle = subtitle
+    )
+}
+
+fun mapCollatorToDetailsParcelModel(
+    collator: Collator
+): StakeTargetDetailsParcelModel {
+    val snapshot = collator.snapshot
+
+    val stakeParcelModel = StakeTargetStakeParcelModel.Active(
+        totalStake = snapshot.total,
+        ownStake = snapshot.bond,
+        stakers = snapshot.delegations.map {
+            StakerParcelModel(
+                who = it.owner,
+                value = it.balance
+            )
+        },
+        rewards = collator.apr,
+        isOversubscribed = false, // TODO current collators screen - collator is "oversubscribed" when user is in its bottom delegations
+        minimumStake = collator.minimumStakeToGetRewards,
+        userStakeInfo = null,  // TODO current collators screen
+    )
+
+    return StakeTargetDetailsParcelModel(
+        accountIdHex = collator.accountIdHex,
+        isSlashed = false,
+        stake = stakeParcelModel,
+        identity = collator.identity?.let(::mapIdentityToIdentityParcelModel)
     )
 }
 

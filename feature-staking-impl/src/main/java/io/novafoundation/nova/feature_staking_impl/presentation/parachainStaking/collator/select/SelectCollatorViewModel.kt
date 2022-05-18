@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorConstantsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.Collator
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.recommendations.CollatorRecommendationConfig
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.recommendations.CollatorRecommendatorFactory
@@ -14,6 +15,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.commo
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator.Response
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenResponder
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.details.parachain
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select.model.mapCollatorToCollatorParcelModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.settings.SelectCollatorSettingsInterScreenCommunicator.Request
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.settings.SelectCollatorSettingsInterScreenRequester
@@ -21,6 +23,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.settings.model.mapCollatorRecommendationConfigToParcel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.mappers.CollatorModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.mappers.mapCollatorToCollatorModel
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.mappers.mapCollatorToDetailsParcelModel
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
@@ -39,6 +43,7 @@ class SelectCollatorViewModel(
     private val router: ParachainStakingRouter,
     private val selectCollatorInterScreenResponder: SelectCollatorInterScreenResponder,
     private val selectCollatorSettingsInterScreenRequester: SelectCollatorSettingsInterScreenRequester,
+    private val collatorConstantsUseCase: CollatorConstantsUseCase,
     private val collatorRecommendatorFactory: CollatorRecommendatorFactory,
     private val addressIconGenerator: AddressIconGenerator,
     private val resourceManager: ResourceManager,
@@ -100,7 +105,15 @@ class SelectCollatorViewModel(
     }
 
     fun collatorInfoClicked(collatorModel: CollatorModel) {
-        showMessage("TODO show collator info")
+        launch {
+            val payload = withContext(Dispatchers.Default) {
+                val parcel = mapCollatorToDetailsParcelModel(collatorModel.stakeTarget)
+
+                StakeTargetDetailsPayload.parachain(parcel, collatorConstantsUseCase)
+            }
+
+            router.openCollatorDetails(payload)
+        }
     }
 
     fun collatorClicked(collatorModel: CollatorModel) = launch {

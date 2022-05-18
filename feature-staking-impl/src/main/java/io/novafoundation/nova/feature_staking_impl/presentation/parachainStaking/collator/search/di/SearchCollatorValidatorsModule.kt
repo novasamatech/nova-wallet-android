@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.collator.search.SearchCollatorsInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorConstantsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.recommendations.CollatorRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator
@@ -36,6 +37,7 @@ class SearchCollatorValidatorsModule {
         stakingSharedState: StakingSharedState,
         selectCollatorInterScreenResponder: SelectCollatorInterScreenCommunicator,
         collatorRecommendatorFactory: CollatorRecommendatorFactory,
+        collatorConstantsUseCase: CollatorConstantsUseCase,
         resourceManager: ResourceManager,
         tokenUseCase: TokenUseCase,
     ): ViewModel {
@@ -46,6 +48,7 @@ class SearchCollatorValidatorsModule {
             singleAssetSharedState = stakingSharedState,
             selectCollatorInterScreenResponder = selectCollatorInterScreenResponder,
             collatorRecommendatorFactory = collatorRecommendatorFactory,
+            collatorConstantsUseCase = collatorConstantsUseCase,
             resourceManager = resourceManager,
             tokenUseCase = tokenUseCase
         )
