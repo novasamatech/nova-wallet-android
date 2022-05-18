@@ -12,7 +12,7 @@ import io.novafoundation.nova.common.view.PlaceholderView
 import kotlinx.coroutines.flow.Flow
 
 sealed class SearchState<out T> {
-    
+
     object NoInput : SearchState<Nothing>()
 
     object Loading : SearchState<Nothing>()
@@ -21,7 +21,6 @@ sealed class SearchState<out T> {
 
     class Success<T>(val data: List<T>, val headerTitle: String) : SearchState<T>()
 }
-
 
 fun <T> BaseFragment<*>.observeSearchState(
     state: Flow<SearchState<T>>,

@@ -27,7 +27,7 @@ import kotlinx.android.synthetic.main.fragment_search_custom_validators.searchCu
 
 typealias DoneAction = () -> Unit
 
-abstract class SearchStakeTargetFragment<V: SearchStakeTargetViewModel<S>, S>: BaseFragment<V>(), StakeTargetAdapter.ItemHandler<S> {
+abstract class SearchStakeTargetFragment<V : SearchStakeTargetViewModel<S>, S> : BaseFragment<V>(), StakeTargetAdapter.ItemHandler<S> {
 
     class Configuration(
         val doneAction: DoneAction?,
