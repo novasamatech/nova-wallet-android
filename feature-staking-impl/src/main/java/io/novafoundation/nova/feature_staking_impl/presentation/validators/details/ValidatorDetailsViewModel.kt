@@ -27,7 +27,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-
 class ValidatorDetailsViewModel(
     private val assetUseCase: AssetUseCase,
     private val router: StakingRouter,

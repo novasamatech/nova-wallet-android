@@ -4,15 +4,15 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.reposit
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 
 interface CollatorConstantsUseCase {
-    
+
     suspend fun maxRewardedDelegatorsPerCollator(): Int
 }
 
 class RealCollatorConstantsUseCase(
     private val singleAssetSharedState: SingleAssetSharedState,
     private val parachainStakingConstantsRepository: ParachainStakingConstantsRepository,
-): CollatorConstantsUseCase {
-    
+) : CollatorConstantsUseCase {
+
     override suspend fun maxRewardedDelegatorsPerCollator(): Int {
         val chainId = singleAssetSharedState.chainId()
 

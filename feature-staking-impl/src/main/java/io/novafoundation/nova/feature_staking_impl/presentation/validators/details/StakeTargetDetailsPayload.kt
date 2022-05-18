@@ -22,7 +22,7 @@ class StakeTargetDetailsPayload(
         val rewardedStakersPerStakeTarget: Int,
         @StringRes val titleRes: Int,
         @StringRes val stakersLabelRes: Int
-    ): Parcelable
+    ) : Parcelable
 }
 
 suspend fun StakeTargetDetailsPayload.Companion.relaychain(
@@ -39,4 +39,3 @@ suspend fun StakeTargetDetailsPayload.Companion.relaychain(
         )
     )
 }
-

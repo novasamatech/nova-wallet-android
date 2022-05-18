@@ -90,7 +90,7 @@ fun mapCollatorToDetailsParcelModel(
         rewards = collator.apr,
         isOversubscribed = false, // TODO current collators screen - collator is "oversubscribed" when user is in its bottom delegations
         minimumStake = collator.minimumStakeToGetRewards,
-        userStakeInfo = null,  // TODO current collators screen
+        userStakeInfo = null, // TODO current collators screen
     )
 
     return StakeTargetDetailsParcelModel(
