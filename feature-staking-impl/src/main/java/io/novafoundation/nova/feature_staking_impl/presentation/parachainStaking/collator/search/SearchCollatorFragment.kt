@@ -1,19 +1,16 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.search
+package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.search
 
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
-import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.Collator
 import io.novafoundation.nova.feature_staking_impl.presentation.common.search.SearchStakeTargetFragment
 
-class SearchCustomValidatorsFragment : SearchStakeTargetFragment<SearchCustomValidatorsViewModel, Validator>() {
+class SearchCollatorFragment : SearchStakeTargetFragment<SearchCollatorViewModel, Collator>() {
 
     override val configuration by lazy(LazyThreadSafetyMode.NONE) {
-        Configuration(
-            doneAction = viewModel::doneClicked,
-            sortingLabelRes = R.string.staking_rewards_apy
-        )
+        Configuration(doneAction = null, sortingLabelRes = R.string.staking_rewards)
     }
 
     override fun inject() {
@@ -21,7 +18,7 @@ class SearchCustomValidatorsFragment : SearchStakeTargetFragment<SearchCustomVal
             requireContext(),
             StakingFeatureApi::class.java
         )
-            .searchCustomValidatorsComponentFactory()
+            .searchCollatorFactory()
             .create(this)
             .inject(this)
     }

@@ -7,6 +7,7 @@ import java.math.BigInteger
 
 class Collator(
     val accountIdHex: String,
+    val address: String,
     val identity: Identity?,
     val snapshot: CollatorSnapshot,
     val minimumStakeToGetRewards: BigInteger,
