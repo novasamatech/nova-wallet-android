@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.withIndex
 fun <T> DelegatorStateUseCase.loadDelegatingState(
     hostContext: ComponentHostContext,
     assetWithChain: SingleAssetSharedState.AssetWithChain,
-    stateProducer: (DelegatorState.Delegator) -> Flow<T>,
+    stateProducer: suspend (DelegatorState.Delegator) -> Flow<T>,
     onDelegatorChange: (DelegatorState.Delegator) -> Unit = {}
 ): Flow<LoadingState<T>?> = hostContext.selectedAccount.transformLatest { account ->
     emit(null) // hide UI until state of delegator is determined

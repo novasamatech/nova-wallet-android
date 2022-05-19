@@ -30,6 +30,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.commo
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.RealCollatorProvider
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.recommendations.CollatorRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.ParachainNetworkInfoInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.stakeSummary.ParachainStakingStakeSummaryInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.userRewards.ParachainStakingUserRewardsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.ParachainStakingHintsUseCase
@@ -78,7 +79,8 @@ class ParachainStakingModule {
     fun provideRoundDurationEstimator(
         parachainStakingConstantsRepository: ParachainStakingConstantsRepository,
         chainStateRepository: ChainStateRepository,
-    ): RoundDurationEstimator = RealRoundDurationEstimator(parachainStakingConstantsRepository, chainStateRepository)
+        currentRoundRepository: CurrentRoundRepository
+    ): RoundDurationEstimator = RealRoundDurationEstimator(parachainStakingConstantsRepository, chainStateRepository, currentRoundRepository)
 
     @Provides
     @FeatureScope
@@ -146,4 +148,12 @@ class ParachainStakingModule {
         parachainStakingConstantsRepository: ParachainStakingConstantsRepository,
         stakingSharedState: StakingSharedState,
     ): CollatorConstantsUseCase = RealCollatorConstantsUseCase(stakingSharedState, parachainStakingConstantsRepository)
+
+    @Provides
+    @FeatureScope
+    fun provideStakeSummaryInteractor(
+        currentRoundRepository: CurrentRoundRepository,
+        parachainStakingConstantsRepository: ParachainStakingConstantsRepository,
+        roundDurationEstimator: RoundDurationEstimator
+    ) = ParachainStakingStakeSummaryInteractor(currentRoundRepository, parachainStakingConstantsRepository, roundDurationEstimator)
 }
