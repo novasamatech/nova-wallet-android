@@ -15,8 +15,9 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.ValidatorDetailsViewModel
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.ValidatorDetailsParcelModel
+import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 
 @Module(includes = [ViewModelModule::class])
 class ValidatorDetailsModule {
@@ -27,7 +28,8 @@ class ValidatorDetailsModule {
     fun provideViewModel(
         interactor: StakingInteractor,
         router: StakingRouter,
-        validator: ValidatorDetailsParcelModel,
+        payload: StakeTargetDetailsPayload,
+        assetUseCase: AssetUseCase,
         addressIconGenerator: AddressIconGenerator,
         externalActions: ExternalActions.Presentation,
         appLinksProvider: AppLinksProvider,
@@ -35,14 +37,14 @@ class ValidatorDetailsModule {
         singleAssetSharedState: StakingSharedState,
     ): ViewModel {
         return ValidatorDetailsViewModel(
-            interactor,
-            router,
-            validator,
-            addressIconGenerator,
-            externalActions,
-            appLinksProvider,
-            resourceManager,
-            singleAssetSharedState
+            assetUseCase = assetUseCase,
+            router = router,
+            payload = payload,
+            iconGenerator = addressIconGenerator,
+            externalActions = externalActions,
+            appLinksProvider = appLinksProvider,
+            resourceManager = resourceManager,
+            selectedAssetState = singleAssetSharedState
         )
     }
 

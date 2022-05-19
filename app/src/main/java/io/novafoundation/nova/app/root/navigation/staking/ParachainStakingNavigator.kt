@@ -9,6 +9,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddA
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.ConfirmStartParachainStakingFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.model.ConfirmStartParachainStakingPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.ValidatorDetailsFragment
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
 class ParachainStakingNavigator(
@@ -24,6 +26,11 @@ class ParachainStakingNavigator(
     )
 
     override fun openSearchCollator() = performNavigation(R.id.action_selectCollatorFragment_to_searchCollatorFragment)
+
+    override fun openCollatorDetails(payload: StakeTargetDetailsPayload) = performNavigation(
+        actionId = R.id.open_validator_details,
+        args = ValidatorDetailsFragment.getBundle(payload)
+    )
 
     override fun openAddAccount(chainId: ChainId, metaId: Long) {
         commonNavigator.openAddAccount(AddAccountPayload.ChainAccount(chainId, metaId))

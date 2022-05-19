@@ -22,8 +22,8 @@ import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.model.ValidatorAlert
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.ValidatorDetailsParcelModel
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
+import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmountOrHide
 import kotlinx.android.synthetic.main.fragment_validator_details.validatorAccountInfo
 import kotlinx.android.synthetic.main.fragment_validator_details.validatorDetailsContainer
 import kotlinx.android.synthetic.main.fragment_validator_details.validatorDetailsToolbar
@@ -34,18 +34,19 @@ import kotlinx.android.synthetic.main.fragment_validator_details.validatorIdenti
 import kotlinx.android.synthetic.main.fragment_validator_details.validatorIdentityTwitter
 import kotlinx.android.synthetic.main.fragment_validator_details.validatorIdentityWeb
 import kotlinx.android.synthetic.main.fragment_validator_details.validatorStakingEstimatedReward
-import kotlinx.android.synthetic.main.fragment_validator_details.validatorStakingNominators
+import kotlinx.android.synthetic.main.fragment_validator_details.validatorStakingMinimumStake
+import kotlinx.android.synthetic.main.fragment_validator_details.validatorStakingStakers
 import kotlinx.android.synthetic.main.fragment_validator_details.validatorStakingStatus
 import kotlinx.android.synthetic.main.fragment_validator_details.validatorStakingTotalStake
 
 class ValidatorDetailsFragment : BaseFragment<ValidatorDetailsViewModel>() {
 
     companion object {
-        private const val KEY_VALIDATOR = "validator"
+        private const val PAYLOAD = "ValidatorDetailsFragment.Payload"
 
-        fun getBundle(validator: ValidatorDetailsParcelModel): Bundle {
+        fun getBundle(payload: StakeTargetDetailsPayload): Bundle {
             return Bundle().apply {
-                putParcelable(KEY_VALIDATOR, validator)
+                putParcelable(PAYLOAD, payload)
             }
         }
     }
@@ -59,7 +60,7 @@ class ValidatorDetailsFragment : BaseFragment<ValidatorDetailsViewModel>() {
     }
 
     private val activeStakingFields by lazy(LazyThreadSafetyMode.NONE) {
-        listOf(validatorStakingNominators, validatorStakingTotalStake, validatorStakingEstimatedReward)
+        listOf(validatorStakingStakers, validatorStakingTotalStake, validatorStakingEstimatedReward, validatorStakingMinimumStake)
     }
 
     override fun initViews() {
@@ -75,21 +76,19 @@ class ValidatorDetailsFragment : BaseFragment<ValidatorDetailsViewModel>() {
     }
 
     override fun inject() {
-        val validator = argument<ValidatorDetailsParcelModel>(KEY_VALIDATOR)
-
         FeatureUtils.getFeature<StakingFeatureComponent>(
             requireContext(),
             StakingFeatureApi::class.java
         )
             .validatorDetailsComponentFactory()
-            .create(this, validator)
+            .create(this, argument(PAYLOAD))
             .inject(this)
     }
 
     override fun subscribe(viewModel: ValidatorDetailsViewModel) {
         setupExternalActions(viewModel)
 
-        viewModel.validatorDetails.observe { validator ->
+        viewModel.stakeTargetDetails.observe { validator ->
             with(validator.stake) {
                 validatorStakingStatus.showValue(status.text)
                 validatorStakingStatus.setPrimaryValueIcon(status.icon, tint = status.iconTint)
@@ -97,8 +96,9 @@ class ValidatorDetailsFragment : BaseFragment<ValidatorDetailsViewModel>() {
                 if (activeStakeModel != null) {
                     activeStakingFields.forEach(View::makeVisible)
 
-                    validatorStakingNominators.showValue(activeStakeModel.nominatorsCount, activeStakeModel.maxNominations)
+                    validatorStakingStakers.showValue(activeStakeModel.nominatorsCount, activeStakeModel.maxNominations)
                     validatorStakingTotalStake.showAmount(activeStakeModel.totalStake)
+                    validatorStakingMinimumStake.showAmountOrHide(activeStakeModel.minimumStake)
                     validatorStakingEstimatedReward.showValue(activeStakeModel.apy)
                 } else {
                     activeStakingFields.forEach(View::makeGone)
@@ -136,6 +136,9 @@ class ValidatorDetailsFragment : BaseFragment<ValidatorDetailsViewModel>() {
         viewModel.totalStakeEvent.observeEvent {
             ValidatorStakeBottomSheet(requireContext(), it).show()
         }
+
+        validatorDetailsToolbar.setTitle(viewModel.displayConfig.titleRes)
+        validatorStakingStakers.setTitle(viewModel.displayConfig.stakersLabelRes)
     }
 
     private fun removeAllAlerts() {

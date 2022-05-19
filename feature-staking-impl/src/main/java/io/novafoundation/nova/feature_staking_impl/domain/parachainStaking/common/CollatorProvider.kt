@@ -50,7 +50,7 @@ class RealCollatorProvider(
                 identity = identities[accountIdHex],
                 snapshot = collatorSnapshot,
                 minimumStakeToGetRewards = collatorSnapshot.minimumStake(systemForcedMinimumStake, maxRewardableDelegatorsPerCollator),
-                apr = rewardCalculator.collatorApr(accountIdHex)
+                apr = rewardCalculator.collatorApr(accountIdHex)!!
             )
         }
     }
@@ -74,7 +74,7 @@ class RealCollatorProvider(
             identity = identity,
             snapshot = collatorSnapshot,
             minimumStakeToGetRewards = collatorSnapshot.minimumStake(systemForcedMinimumStake, maxRewardableDelegatorsPerCollator),
-            apr = rewardCalculator.collatorApr(collatorIdHex)
+            apr = rewardCalculator.collatorApr(collatorIdHex)!!
         )
     }
 }

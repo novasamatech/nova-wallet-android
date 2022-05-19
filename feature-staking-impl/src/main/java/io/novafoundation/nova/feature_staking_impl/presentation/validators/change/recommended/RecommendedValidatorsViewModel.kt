@@ -20,6 +20,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValid
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValidatorToValidatorModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.setRecommendedValidators
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.relaychain
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
@@ -68,8 +70,11 @@ class RecommendedValidatorsViewModel(
         router.back()
     }
 
-    fun validatorInfoClicked(validatorModel: ValidatorModel) {
-        router.openValidatorDetails(mapValidatorToValidatorDetailsParcelModel(validatorModel.stakeTarget))
+    fun validatorInfoClicked(validatorModel: ValidatorModel) = launch {
+        val stakeTarget = mapValidatorToValidatorDetailsParcelModel(validatorModel.stakeTarget)
+        val payload = StakeTargetDetailsPayload.relaychain(stakeTarget, interactor)
+
+        router.openValidatorDetails(payload)
     }
 
     fun nextClicked() {

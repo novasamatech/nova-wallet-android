@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.common.view.TableCellView
 import io.novafoundation.nova.common.view.shape.getBlurDrawable
+import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import kotlinx.android.synthetic.main.view_balances.view.viewBalancesTitle
@@ -66,4 +67,8 @@ abstract class BalancesView @JvmOverloads constructor(
 
 fun TableCellView.showAmount(amountModel: AmountModel) {
     showValue(amountModel.token, amountModel.fiat)
+}
+
+fun TableCellView.showAmountOrHide(amountModel: AmountModel?) {
+    showValueOrHide(amountModel?.token, amountModel?.fiat)
 }

@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorConstantsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.StartParachainStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
@@ -46,6 +47,7 @@ class ConfirmStartParachainStakingModule {
         selectedAccountUseCase: SelectedAccountUseCase,
         resourceManager: ResourceManager,
         validationSystem: StartParachainStakingValidationSystem,
+        collatorConstantsUseCase: CollatorConstantsUseCase,
         validationExecutor: ValidationExecutor,
         assetUseCase: AssetUseCase,
         interactor: StartParachainStakingInteractor,
@@ -70,7 +72,8 @@ class ConfirmStartParachainStakingModule {
             assetUseCase = assetUseCase,
             walletUiUseCase = walletUiUseCase,
             payload = payload,
-            hintsMixinFactory = hintsMixinFactory
+            hintsMixinFactory = hintsMixinFactory,
+            collatorConstantsUseCase = collatorConstantsUseCase
         )
     }
 

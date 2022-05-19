@@ -11,7 +11,7 @@ class Collator(
     val identity: Identity?,
     val snapshot: CollatorSnapshot,
     val minimumStakeToGetRewards: BigInteger,
-    val apr: BigDecimal?,
+    val apr: BigDecimal,
 )
 
 fun CollatorSnapshot.minimumStake(

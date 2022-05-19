@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.toggle
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.validators.current.search.SearchCustomValidatorsInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -19,6 +20,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValid
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValidatorToValidatorModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.setCustomValidators
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.relaychain
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
@@ -35,6 +38,7 @@ class SearchCustomValidatorsViewModel(
     private val router: StakingRouter,
     private val addressIconGenerator: AddressIconGenerator,
     private val interactor: SearchCustomValidatorsInteractor,
+    private val stakingInteractor: StakingInteractor,
     resourceManager: ResourceManager,
     private val sharedStateSetup: SetupStakingSharedState,
     private val validatorRecommendatorFactory: ValidatorRecommendatorFactory,
@@ -101,7 +105,12 @@ class SearchCustomValidatorsViewModel(
     }
 
     override fun itemInfoClicked(item: ValidatorModel) {
-        router.openValidatorDetails(mapValidatorToValidatorDetailsParcelModel(item.stakeTarget))
+        launch {
+            val stakeTarget = mapValidatorToValidatorDetailsParcelModel(item.stakeTarget)
+            val payload = StakeTargetDetailsPayload.relaychain(stakeTarget, stakingInteractor)
+
+            router.openValidatorDetails(payload)
+        }
     }
 
     override fun backClicked() {

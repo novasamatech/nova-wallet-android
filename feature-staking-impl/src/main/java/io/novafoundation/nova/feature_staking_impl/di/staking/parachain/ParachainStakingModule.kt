@@ -23,8 +23,10 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.reposit
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.RuntimeParachainStakingConstantsRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRewardsRepository
 import io.novafoundation.nova.feature_staking_impl.di.staking.parachain.start.StartParachainStakingFlowModule
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorConstantsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorProvider
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.RealCollatorConstantsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.RealCollatorProvider
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.recommendations.CollatorRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.ParachainNetworkInfoInteractor
@@ -137,4 +139,11 @@ class ParachainStakingModule {
     fun provideTotalRewardsInteractor(
         stakingRewardsRepository: StakingRewardsRepository
     ) = ParachainStakingUserRewardsInteractor(stakingRewardsRepository)
+
+    @Provides
+    @FeatureScope
+    fun provideCollatorConstantsUseCase(
+        parachainStakingConstantsRepository: ParachainStakingConstantsRepository,
+        stakingSharedState: StakingSharedState,
+    ): CollatorConstantsUseCase = RealCollatorConstantsUseCase(stakingSharedState, parachainStakingConstantsRepository)
 }
