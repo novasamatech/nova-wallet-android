@@ -2,7 +2,10 @@
 
 package io.novafoundation.nova.feature_staking_impl.data.parachainStaking
 
+import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.RoundIndex
+import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.RoundDurationEstimator.DurationCalculator.CalculationResult
+import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.RoundInfo
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CurrentRoundRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.ParachainStakingConstantsRepository
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -15,6 +18,21 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.milliseconds
 
 interface RoundDurationEstimator {
+
+    interface DurationCalculator {
+
+        fun timeTillRound(targetRound: RoundIndex): CalculationResult
+
+        data class CalculationResult(
+            val duration: Duration,
+            val calculatedAt: Long
+        )
+    }
+
+    /**
+     * Creates a duration calculator based on current state of the storages
+     */
+    suspend fun createDurationCalculator(chainId: ChainId): DurationCalculator
 
     suspend fun timeTillRoundFlow(chainId: ChainId, targetRound: RoundIndex): Flow<Duration>
 
@@ -29,22 +47,26 @@ class RealRoundDurationEstimator(
     private val currentRoundRepository: CurrentRoundRepository,
 ) : RoundDurationEstimator {
 
+    override suspend fun createDurationCalculator(chainId: ChainId): RoundDurationEstimator.DurationCalculator {
+        val currentRoundInfo = currentRoundRepository.currentRoundInfo(chainId)
+
+        val blocksPerRound = parachainStakingConstantsRepository.defaultBlocksPerRound(chainId)
+        val blockTime = chainStateRepository.predictedBlockTime(chainId)
+        val blockNumber = chainStateRepository.currentBlock(chainId)
+
+        return RealDurationCalculator(currentRoundInfo, blockTime, blocksPerRound, blockNumber)
+    }
+
     override suspend fun timeTillRoundFlow(chainId: ChainId, targetRound: RoundIndex): Flow<Duration> {
         val currentRoundInfo = currentRoundRepository.currentRoundInfo(chainId)
 
         val blocksPerRound = parachainStakingConstantsRepository.defaultBlocksPerRound(chainId)
         val blockTime = chainStateRepository.predictedBlockTime(chainId)
 
-        // minus one since current round is going and it is not full
-        val remainedFullRounds = (targetRound - currentRoundInfo.current - BigInteger.ONE).coerceAtLeast(BigInteger.ZERO)
-
         return chainStateRepository.currentBlockNumberFlow(chainId).map { currentBlock ->
-            val remainedBlocksTillCurrentRound = (currentRoundInfo.first + currentRoundInfo.length - currentBlock).coerceAtLeast(BigInteger.ZERO)
+            val durationCalculator = RealDurationCalculator(currentRoundInfo, blockTime, blocksPerRound, currentBlock)
 
-            val remainedBlocks = remainedFullRounds * blocksPerRound + remainedBlocksTillCurrentRound
-            val durationInMillis = remainedBlocks * blockTime
-
-            durationInMillis.toLong().milliseconds
+            durationCalculator.timeTillRound(targetRound).duration
         }
     }
 
@@ -72,5 +94,28 @@ class RealRoundDurationEstimator(
 
             durationInMillis.toLong().milliseconds
         }
+    }
+}
+
+class RealDurationCalculator(
+    private val currentRoundInfo: RoundInfo,
+    private val blockTime: BigInteger,
+    private val blocksPerRound: BigInteger,
+    private val currentBlockNumber: BlockNumber,
+): RoundDurationEstimator.DurationCalculator {
+
+    override fun timeTillRound(targetRound: RoundIndex): CalculationResult {
+        // minus one since current round is going and it is not full
+        val remainedFullRounds = (targetRound - currentRoundInfo.current - BigInteger.ONE).coerceAtLeast(BigInteger.ZERO)
+
+        val remainedBlocksTillCurrentRound = (currentRoundInfo.first + currentRoundInfo.length - currentBlockNumber).coerceAtLeast(BigInteger.ZERO)
+
+        val remainedBlocks = remainedFullRounds * blocksPerRound + remainedBlocksTillCurrentRound
+        val durationInMillis = remainedBlocks * blockTime
+
+        return CalculationResult(
+            duration = durationInMillis.toLong().milliseconds,
+            calculatedAt = System.currentTimeMillis()
+        )
     }
 }

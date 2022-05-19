@@ -8,12 +8,14 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.ParachainNetworkInfoInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.stakeSummary.ParachainStakingStakeSummaryInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.unbondings.ParachainStakingUnbondingsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.userRewards.ParachainStakingUserRewardsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.parachain.ParachainNetworkInfoComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.parachain.ParachainStakeSummaryComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.startStaking.parachain.ParachainStartStakingComponentFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.parachain.ParachainUnbondingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.parachain.ParachainUserRewardsComponentFactory
 
 @Module
@@ -65,6 +67,18 @@ class ParachainModule {
         delegatorStateUseCase: DelegatorStateUseCase,
         interactor: ParachainStakingUserRewardsInteractor,
     ) = ParachainUserRewardsComponentFactory(
+        delegatorStateUseCase = delegatorStateUseCase,
+        interactor = interactor
+    )
+
+    @Provides
+    @ScreenScope
+    fun provideParachainUnbondingsFactory(
+        delegatorStateUseCase: DelegatorStateUseCase,
+        resourceManager: ResourceManager,
+        interactor: ParachainStakingUnbondingsInteractor,
+    ) = ParachainUnbondingComponentFactory(
+        resourceManager = resourceManager,
         delegatorStateUseCase = delegatorStateUseCase,
         interactor = interactor
     )

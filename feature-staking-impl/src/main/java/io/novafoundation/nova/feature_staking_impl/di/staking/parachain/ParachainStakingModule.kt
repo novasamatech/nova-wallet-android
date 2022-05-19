@@ -31,6 +31,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.commo
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.recommendations.CollatorRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.ParachainNetworkInfoInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.stakeSummary.ParachainStakingStakeSummaryInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.unbondings.ParachainStakingUnbondingsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.userRewards.ParachainStakingUserRewardsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.ParachainStakingHintsUseCase
@@ -47,8 +48,9 @@ class ParachainStakingModule {
     @Provides
     @FeatureScope
     fun provideDelegatorStateRepository(
-        @Named(LOCAL_STORAGE_SOURCE) storageDataSource: StorageDataSource
-    ): DelegatorStateRepository = RealDelegatorStateRepository(storageDataSource)
+        @Named(LOCAL_STORAGE_SOURCE) localDataSource: StorageDataSource,
+        @Named(REMOTE_STORAGE_SOURCE) remoteDataSource: StorageDataSource,
+    ): DelegatorStateRepository = RealDelegatorStateRepository(localStorage = localDataSource, remoteStorage =  remoteDataSource)
 
     @Provides
     @FeatureScope
@@ -156,4 +158,12 @@ class ParachainStakingModule {
         parachainStakingConstantsRepository: ParachainStakingConstantsRepository,
         roundDurationEstimator: RoundDurationEstimator
     ) = ParachainStakingStakeSummaryInteractor(currentRoundRepository, parachainStakingConstantsRepository, roundDurationEstimator)
+
+    @Provides
+    @FeatureScope
+    fun provideUnbondingInteractor(
+        delegatorStateRepository: DelegatorStateRepository,
+        currentRoundRepository: CurrentRoundRepository,
+        roundDurationEstimator: RoundDurationEstimator,
+    ) = ParachainStakingUnbondingsInteractor(delegatorStateRepository, currentRoundRepository, roundDurationEstimator)
 }

@@ -15,7 +15,6 @@ sealed class DelegatorState(
         chain: Chain,
         val delegations: List<DelegatorBond>,
         val total: Balance,
-        val requests: PendingDelegationRequests?,
         val status: DelegatorStatus,
     ) : DelegatorState(chain)
 
@@ -34,21 +33,16 @@ class DelegatorBond(
     val balance: Balance,
 )
 
-class PendingDelegationRequests(
-    val revocationsCount: BigInteger,
-    val requests: List<DelegationRequest>,
-    val lessTotal: Balance,
-)
-
-class DelegationRequest(
-    val collator: AccountId,
-    val amount: Balance,
+class ScheduledDelegationRequest(
+    val delegator: AccountId,
     val whenExecutable: RoundIndex,
-    val action: DelegationChange
+    val action: DelegationAction
 )
 
-enum class DelegationChange {
-    Revoke, Decrease
+sealed class DelegationAction(val amount: Balance) {
+    class Revoke(amount: Balance): DelegationAction(amount)
+
+    class Decrease(amount: Balance): DelegationAction(amount)
 }
 
 typealias RoundIndex = BigInteger

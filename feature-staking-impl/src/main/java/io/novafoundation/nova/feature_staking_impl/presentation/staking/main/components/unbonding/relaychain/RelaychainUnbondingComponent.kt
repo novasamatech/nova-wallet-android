@@ -1,17 +1,19 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.relaychain
 
 import androidx.lifecycle.MutableLiveData
+import io.novafoundation.nova.common.presentation.dataOrNull
+import io.novafoundation.nova.common.presentation.map
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.utils.firstNotNull
+import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.model.Unbonding
 import io.novafoundation.nova.feature_staking_impl.domain.staking.unbond.UnbondInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.staking.unbond.UnbondingsState
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.StakeActionsValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.StakeActionsValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -20,22 +22,20 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.UnbondingAction
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.UnbondingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.UnbondingEvent
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.UnbondingModel
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.UnbondingState
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.from
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.rebond.RebondKind
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.mainStakingValidationFailure
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.confirm.ConfirmRebondPayload
-import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState.AssetWithChain
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
@@ -96,13 +96,17 @@ private class RelaychainUnbondingComponent(
         if (it !is StakingState.Stash) {
             emit(null)
         } else {
-            emitAll(unbondInteractor.unbondingsFlow(it))
+            emitAll(unbondInteractor.unbondingsFlow(it).withLoading())
         }
     }
         .shareInBackground()
 
-    override val state: Flow<UnbondingState?> = combine(hostContext.assetFlow, unbondingsFlow) { asset, unbondings ->
-        createUiState(unbondings, asset)
+    override val state = combine(hostContext.assetFlow, unbondingsFlow) { asset, unbondingsLoading ->
+        unbondingsLoading?.let {
+            it.map { unbonding ->
+                UnbondingState.from(unbonding, asset)
+            }
+        }
     }
         .onStart { emit(null) }
         .shareInBackground()
@@ -112,22 +116,6 @@ private class RelaychainUnbondingComponent(
             when (action) {
                 UnbondingAction.RebondClicked -> rebondClicked()
                 UnbondingAction.RedeemClicked -> redeemClicked()
-            }
-        }
-    }
-
-    private fun createUiState(unbondingsState: UnbondingsState?, asset: Asset): UnbondingState? {
-        return when {
-            unbondingsState == null -> null
-            unbondingsState.unbondings.isEmpty() -> UnbondingState.Empty
-            else -> {
-                UnbondingState.HaveUnbondings(
-                    redeemEnabled = unbondingsState.anythingToRedeem,
-                    cancelEnabled = unbondingsState.anythingToUnbond,
-                    unbondings = unbondingsState.unbondings.mapIndexed { idx, unbonding ->
-                        mapUnbondingToUnbondingModel(idx, unbonding, asset)
-                    }
-                )
             }
         }
     }
@@ -153,21 +141,13 @@ private class RelaychainUnbondingComponent(
     )
 
     private suspend fun openConfirmRebond(amountBuilder: (List<Unbonding>) -> BigInteger) {
-        val unbondingsState = unbondingsFlow.firstNotNull()
+        val unbondingsState = unbondingsFlow.map { it?.dataOrNull }.firstNotNull()
         val asset = hostContext.assetFlow.first()
 
         val amountInPlanks = amountBuilder(unbondingsState.unbondings)
         val amount = asset.token.amountFromPlanks(amountInPlanks)
 
         router.openConfirmRebond(ConfirmRebondPayload(amount))
-    }
-
-    private fun mapUnbondingToUnbondingModel(index: Int, unbonding: Unbonding, asset: Asset): UnbondingModel {
-        return UnbondingModel(
-            index = index,
-            status = unbonding.status,
-            amountModel = mapAmountToAmountModel(unbonding.amount, asset)
-        )
     }
 
     private fun requireValidManageAction(
