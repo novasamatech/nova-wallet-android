@@ -23,7 +23,6 @@ class ParachainStakingStakeSummaryInteractor(
         COLLATOR_NOT_ACTIVE, TOO_LOW_STAKE, WAITING, ACTIVE
     }
 
-
     suspend fun delegatorStatusFlow(delegatorState: DelegatorState.Delegator): Flow<DelegatorStatus> {
         val chainId = delegatorState.chain.id
         val systemForcedMinStake = parachainStakingConstantsRepository.systemForcedMinStake(chainId)
