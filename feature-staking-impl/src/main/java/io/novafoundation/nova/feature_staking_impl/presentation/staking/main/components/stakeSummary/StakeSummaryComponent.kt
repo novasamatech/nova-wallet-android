@@ -19,14 +19,14 @@ class StakeSummaryModel(
     val status: StakeStatusModel,
 )
 
-sealed class StakeStatusModel(val details: TitleAndMessage) {
+sealed class StakeStatusModel(val details: TitleAndMessage?) {
 
     class Active(details: TitleAndMessage) : StakeStatusModel(details)
 
     class Waiting(
         val timeLeft: Long,
         @StringRes val messageFormat: Int,
-        details: TitleAndMessage
+        details: TitleAndMessage?
     ) : StakeStatusModel(details)
 
     class Inactive(details: TitleAndMessage) : StakeStatusModel(details)

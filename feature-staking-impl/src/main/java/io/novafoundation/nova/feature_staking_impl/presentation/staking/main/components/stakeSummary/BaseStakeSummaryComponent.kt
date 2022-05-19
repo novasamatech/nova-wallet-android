@@ -21,9 +21,9 @@ abstract class BaseStakeSummaryComponent(
         launch {
             when (action) {
                 StakeSummaryAction.StatusClicked -> {
-                    val details = state.firstNotNull().dataOrNull ?: return@launch
+                    val details = state.firstNotNull().dataOrNull?.status?.details ?: return@launch
 
-                    events.value = StakeSummaryEvent.ShowStatusDialog(details.status.details).event()
+                    events.value = StakeSummaryEvent.ShowStatusDialog(details).event()
                 }
             }
         }

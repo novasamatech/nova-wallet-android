@@ -2,6 +2,8 @@
 
 package io.novafoundation.nova.feature_staking_impl.data.parachainStaking
 
+import io.novafoundation.nova.feature_staking_api.domain.model.parachain.RoundIndex
+import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CurrentRoundRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.ParachainStakingConstantsRepository
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
@@ -14,6 +16,8 @@ import kotlin.time.milliseconds
 
 interface RoundDurationEstimator {
 
+    suspend fun timeTillRound(chainId: ChainId, targetRound: RoundIndex): Duration
+
     suspend fun unstakeDurationFlow(chainId: ChainId): Flow<Duration>
 
     suspend fun roundDurationFlow(chainId: ChainId): Flow<Duration>
@@ -22,7 +26,25 @@ interface RoundDurationEstimator {
 class RealRoundDurationEstimator(
     private val parachainStakingConstantsRepository: ParachainStakingConstantsRepository,
     private val chainStateRepository: ChainStateRepository,
+    private val currentRoundRepository: CurrentRoundRepository,
 ) : RoundDurationEstimator {
+
+    override suspend fun timeTillRound(chainId: ChainId, targetRound: RoundIndex): Duration {
+        val currentRoundInfo = currentRoundRepository.currentRoundInfo(chainId)
+
+        val currentBlock = chainStateRepository.currentBlock(chainId)
+        val blocksPerRound = parachainStakingConstantsRepository.defaultBlocksPerRound(chainId)
+        val blockTime = chainStateRepository.predictedBlockTime(chainId)
+
+        // minus one since current round is going and it is not full
+        val remainedFullRounds = (targetRound - currentRoundInfo.current - BigInteger.ONE).coerceAtLeast(BigInteger.ZERO)
+        val remainedBlocksTillCurrentRound = (currentRoundInfo.first + currentRoundInfo.length - currentBlock).coerceAtLeast(BigInteger.ZERO)
+
+        val remainedBlocks = remainedFullRounds * blocksPerRound + remainedBlocksTillCurrentRound
+        val durationInMillis = remainedBlocks * blockTime
+
+        return durationInMillis.toLong().milliseconds
+    }
 
     override suspend fun unstakeDurationFlow(chainId: ChainId): Flow<Duration> {
         val bondLessDelay = parachainStakingConstantsRepository.delegationBondLessDelay(chainId)

@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.ParachainNetworkInfoInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.stakeSummary.ParachainStakingStakeSummaryInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.userRewards.ParachainStakingUserRewardsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
@@ -22,10 +23,12 @@ class ParachainModule {
     @ScreenScope
     fun provideParachainStakeSummaryComponentFactory(
         delegatorStateUseCase: DelegatorStateUseCase,
+        interactor: ParachainStakingStakeSummaryInteractor,
         resourceManager: ResourceManager,
     ) = ParachainStakeSummaryComponentFactory(
         delegatorStateUseCase = delegatorStateUseCase,
         resourceManager = resourceManager,
+        interactor = interactor
     )
 
     @Provides

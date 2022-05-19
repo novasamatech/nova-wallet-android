@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="staking_parachain_next_round_format">waiting for the next round (%s)</string>
+  <string name="staking_parachain_status_inactive_message">You will not receive rewards for this round since none of your delegations was active.</string>
+
   <string name="staking_parachain_collator_info">Collator info</string>
   <string name="staking_parachain_delegators">Delegators</string>
   <string name="staking_custom_validators_settings_sort_apr">Estimated rewards (% APR)</string>
