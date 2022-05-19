@@ -102,7 +102,7 @@ class RealDurationCalculator(
     private val blockTime: BigInteger,
     private val blocksPerRound: BigInteger,
     private val currentBlockNumber: BlockNumber,
-): RoundDurationEstimator.DurationCalculator {
+) : RoundDurationEstimator.DurationCalculator {
 
     override fun timeTillRound(targetRound: RoundIndex): CalculationResult {
         // minus one since current round is going and it is not full

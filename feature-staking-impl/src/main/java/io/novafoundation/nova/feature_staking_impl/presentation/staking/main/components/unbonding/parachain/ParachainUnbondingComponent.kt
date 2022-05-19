@@ -57,7 +57,6 @@ private class ParachainUnbondingComponent(
     )
         .shareInBackground()
 
-
     override fun onAction(action: UnbondingAction) {
         // TODO
     }

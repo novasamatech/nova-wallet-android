@@ -50,7 +50,7 @@ class ParachainStakingModule {
     fun provideDelegatorStateRepository(
         @Named(LOCAL_STORAGE_SOURCE) localDataSource: StorageDataSource,
         @Named(REMOTE_STORAGE_SOURCE) remoteDataSource: StorageDataSource,
-    ): DelegatorStateRepository = RealDelegatorStateRepository(localStorage = localDataSource, remoteStorage =  remoteDataSource)
+    ): DelegatorStateRepository = RealDelegatorStateRepository(localStorage = localDataSource, remoteStorage = remoteDataSource)
 
     @Provides
     @FeatureScope

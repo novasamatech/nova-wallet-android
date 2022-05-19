@@ -40,9 +40,9 @@ class ScheduledDelegationRequest(
 )
 
 sealed class DelegationAction(val amount: Balance) {
-    class Revoke(amount: Balance): DelegationAction(amount)
+    class Revoke(amount: Balance) : DelegationAction(amount)
 
-    class Decrease(amount: Balance): DelegationAction(amount)
+    class Decrease(amount: Balance) : DelegationAction(amount)
 }
 
 typealias RoundIndex = BigInteger

@@ -20,7 +20,7 @@ fun BaseFragment<*>.setupUnbondingComponent(component: UnbondingComponent, view:
     view.onRedeemClicked { component.onAction(UnbondingAction.RedeemClicked) }
 
     component.state.observe { state ->
-        when(state) {
+        when (state) {
             null, is LoadingState.Loading -> view.makeGone()
             is LoadingState.Loaded -> {
                 view.makeVisible()
