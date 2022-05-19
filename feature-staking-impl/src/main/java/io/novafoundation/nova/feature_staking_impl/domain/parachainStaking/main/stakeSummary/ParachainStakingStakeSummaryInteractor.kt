@@ -10,7 +10,9 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.commo
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.transformLatest
 import java.math.BigInteger
 
 class ParachainStakingStakeSummaryInteractor(
@@ -28,7 +30,7 @@ class ParachainStakingStakeSummaryInteractor(
         val systemForcedMinStake = parachainStakingConstantsRepository.systemForcedMinStake(chainId)
         val maxRewardedDelegatorsPerCollator = parachainStakingConstantsRepository.maxRewardedDelegatorsPerCollator(chainId)
 
-        return currentRoundRepository.currentRoundInfoFlow(chainId).mapLatest { currentRoundInfo ->
+        return currentRoundRepository.currentRoundInfoFlow(chainId).transformLatest { currentRoundInfo ->
             val snapshots = currentRoundRepository.collatorsSnapshot(chainId, currentRoundInfo.current)
 
             val delegationStates = delegatorState.delegations.map { delegation ->
@@ -43,14 +45,16 @@ class ParachainStakingStakeSummaryInteractor(
             }
 
             when {
-                delegationStates.anyIs(DelegationState.ACTIVE) -> DelegatorStatus.Active
+                delegationStates.anyIs(DelegationState.ACTIVE) -> emit(DelegatorStatus.Active)
                 delegationStates.anyIs(DelegationState.WAITING) -> {
                     val targetRound = currentRoundInfo.current + BigInteger.ONE
-                    val waitingDuration = roundDurationEstimator.timeTillRound(chainId, targetRound)
 
-                    DelegatorStatus.Waiting(waitingDuration)
+                    val waitingStatusFlow = roundDurationEstimator.timeTillRoundFlow(chainId, targetRound)
+                        .map(DelegatorStatus::Waiting)
+
+                    emitAll(waitingStatusFlow)
                 }
-                else -> DelegatorStatus.Inactive
+                else -> emit(DelegatorStatus.Inactive)
             }
         }
     }

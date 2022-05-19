@@ -16,7 +16,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.mapLatest
 import kotlin.time.ExperimentalTime
 
 class ParachainStakeSummaryComponentFactory(
@@ -55,14 +56,15 @@ private class ParachainStakeSummaryComponent(
         .shareInBackground()
 
     private suspend fun delegatorSummaryStateFlow(delegatorState: DelegatorState.Delegator): Flow<StakeSummaryModel> {
-        return combine(
-            interactor.delegatorStatusFlow(delegatorState),
-            hostContext.assetFlow
-        ) { delegatorStatus, asset ->
-            StakeSummaryModel(
-                totalStaked = mapAmountToAmountModel(delegatorState.total, asset),
-                status = mapDelegatorStatusToStakeStatusModel(delegatorStatus)
-            )
+        return interactor.delegatorStatusFlow(delegatorState).flatMapLatest { delegatorStatus ->
+            val status = mapDelegatorStatusToStakeStatusModel(delegatorStatus)
+
+            hostContext.assetFlow.mapLatest { asset ->
+                StakeSummaryModel(
+                    totalStaked = mapAmountToAmountModel(delegatorState.total, asset),
+                    status = status
+                )
+            }
         }
     }
 

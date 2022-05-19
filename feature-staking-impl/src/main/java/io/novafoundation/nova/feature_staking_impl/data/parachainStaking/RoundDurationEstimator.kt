@@ -16,7 +16,7 @@ import kotlin.time.milliseconds
 
 interface RoundDurationEstimator {
 
-    suspend fun timeTillRound(chainId: ChainId, targetRound: RoundIndex): Duration
+    suspend fun timeTillRoundFlow(chainId: ChainId, targetRound: RoundIndex): Flow<Duration>
 
     suspend fun unstakeDurationFlow(chainId: ChainId): Flow<Duration>
 
@@ -29,21 +29,23 @@ class RealRoundDurationEstimator(
     private val currentRoundRepository: CurrentRoundRepository,
 ) : RoundDurationEstimator {
 
-    override suspend fun timeTillRound(chainId: ChainId, targetRound: RoundIndex): Duration {
+    override suspend fun timeTillRoundFlow(chainId: ChainId, targetRound: RoundIndex): Flow<Duration> {
         val currentRoundInfo = currentRoundRepository.currentRoundInfo(chainId)
 
-        val currentBlock = chainStateRepository.currentBlock(chainId)
         val blocksPerRound = parachainStakingConstantsRepository.defaultBlocksPerRound(chainId)
         val blockTime = chainStateRepository.predictedBlockTime(chainId)
 
         // minus one since current round is going and it is not full
         val remainedFullRounds = (targetRound - currentRoundInfo.current - BigInteger.ONE).coerceAtLeast(BigInteger.ZERO)
-        val remainedBlocksTillCurrentRound = (currentRoundInfo.first + currentRoundInfo.length - currentBlock).coerceAtLeast(BigInteger.ZERO)
 
-        val remainedBlocks = remainedFullRounds * blocksPerRound + remainedBlocksTillCurrentRound
-        val durationInMillis = remainedBlocks * blockTime
+        return chainStateRepository.currentBlockNumberFlow(chainId).map { currentBlock ->
+            val remainedBlocksTillCurrentRound = (currentRoundInfo.first + currentRoundInfo.length - currentBlock).coerceAtLeast(BigInteger.ZERO)
 
-        return durationInMillis.toLong().milliseconds
+            val remainedBlocks = remainedFullRounds * blocksPerRound + remainedBlocksTillCurrentRound
+            val durationInMillis = remainedBlocks * blockTime
+
+            durationInMillis.toLong().milliseconds
+        }
     }
 
     override suspend fun unstakeDurationFlow(chainId: ChainId): Flow<Duration> {
