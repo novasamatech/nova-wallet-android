@@ -10,7 +10,7 @@ import io.novafoundation.nova.feature_staking_api.domain.model.parachain.Delegat
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.ScheduledDelegationRequest
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.DictEnum
 
-fun bindDelegationRequests(instance: Any?) = bindList(instance, ::bindDelegationRequest)
+fun bindDelegationRequests(instance: Any?) = instance?.let { bindList(instance, ::bindDelegationRequest) }.orEmpty()
 
 private fun bindDelegationRequest(
     instance: Any?,
