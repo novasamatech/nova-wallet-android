@@ -37,6 +37,7 @@ class ManageStakingView @kotlin.jvm.JvmOverloads constructor(
         val view = ManageStakingActionView(context).apply {
             setLabel(action.label)
             setIconRes(action.iconRes)
+            setBadge(action.badge)
 
             setOnClickListener { listener?.invoke(action) }
         }

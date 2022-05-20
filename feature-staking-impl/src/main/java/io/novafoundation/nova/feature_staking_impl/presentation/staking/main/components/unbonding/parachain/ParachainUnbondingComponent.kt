@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.parachain
 
 import androidx.lifecycle.MutableLiveData
-import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
@@ -20,7 +19,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 
 class ParachainUnbondingComponentFactory(
-    private val resourceManager: ResourceManager,
     private val delegatorStateUseCase: DelegatorStateUseCase,
     private val interactor: ParachainStakingUnbondingsInteractor,
 ) {
@@ -29,7 +27,6 @@ class ParachainUnbondingComponentFactory(
         assetWithChain: AssetWithChain,
         hostContext: ComponentHostContext,
     ): UnbondingComponent = ParachainUnbondingComponent(
-        resourceManager = resourceManager,
         assetWithChain = assetWithChain,
         hostContext = hostContext,
         delegatorStateUseCase = delegatorStateUseCase,
@@ -40,7 +37,6 @@ class ParachainUnbondingComponentFactory(
 private class ParachainUnbondingComponent(
     delegatorStateUseCase: DelegatorStateUseCase,
     private val interactor: ParachainStakingUnbondingsInteractor,
-    private val resourceManager: ResourceManager,
 
     private val assetWithChain: AssetWithChain,
     private val hostContext: ComponentHostContext,
