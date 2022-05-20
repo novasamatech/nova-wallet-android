@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.removeCompoundDrawables
-import io.novafoundation.nova.common.utils.setDrawableStart
+import io.novafoundation.nova.common.utils.setDrawableEnd
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.view.startTimer
 import io.novafoundation.nova.common.view.stopTimer
@@ -48,7 +48,7 @@ class UnbondingsHolder(override val containerView: View) : RecyclerView.ViewHold
                 }
                 is Unbonding.Status.Unbonding -> {
                     itemUnbondStatus.setTextColorRes(R.color.white_64)
-                    itemUnbondStatus.setDrawableStart(R.drawable.ic_time_16, paddingInDp = 4, tint = R.color.white_48)
+                    itemUnbondStatus.setDrawableEnd(R.drawable.ic_time_16, paddingInDp = 4, tint = R.color.white_48)
 
                     itemUnbondStatus.startTimer(status.timeLeft, status.calculatedAt)
                 }

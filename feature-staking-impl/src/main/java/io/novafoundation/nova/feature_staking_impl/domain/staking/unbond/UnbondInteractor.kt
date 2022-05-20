@@ -48,7 +48,7 @@ class UnbondInteractor(
         }
     }
 
-    fun unbondingsFlow(stakingState: StakingState.Stash): Flow<UnbondingsState> {
+    fun unbondingsFlow(stakingState: StakingState.Stash): Flow<Unbondings> {
         return flowOf(stakingState).flatMapLatest { stash ->
             val calculator = eraTimeCalculator.create(stakingState.chain.id)
 
@@ -74,11 +74,7 @@ class UnbondInteractor(
                     )
                 }
 
-                UnbondingsState(
-                    unbondings = unbondings,
-                    anythingToRedeem = unbondings.any { it.status is Unbonding.Status.Redeemable },
-                    anythingToUnbond = unbondings.any { it.status is Unbonding.Status.Unbonding }
-                )
+                Unbondings.from(unbondings)
             }
         }
     }
