@@ -48,7 +48,7 @@ private class ParachainUserRewardsComponent(
         .shareInBackground()
 
     private fun rewardsFlow(delegatorState: DelegatorState.Delegator): Flow<AmountModel> = combine(
-        interactor.observeRewards(delegatorState),
+        interactor.observeRewards(delegatorState, assetWithChain.chain, assetWithChain.asset),
         hostContext.assetFlow
     ) { totalReward, asset ->
         mapAmountToAmountModel(totalReward, asset)
@@ -56,7 +56,7 @@ private class ParachainUserRewardsComponent(
 
     private fun syncStakingRewards(delegatorState: DelegatorState.Delegator) {
         launch {
-            interactor.syncRewards(delegatorState)
+            interactor.syncRewards(delegatorState, assetWithChain.chain, assetWithChain.asset)
         }
     }
 }

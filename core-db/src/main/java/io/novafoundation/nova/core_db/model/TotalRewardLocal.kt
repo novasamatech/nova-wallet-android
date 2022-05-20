@@ -1,12 +1,15 @@
 package io.novafoundation.nova.core_db.model
 
 import androidx.room.Entity
-import androidx.room.PrimaryKey
 import java.math.BigInteger
 
-@Entity(tableName = "total_reward")
+@Entity(
+    tableName = "total_reward",
+    primaryKeys = ["chainId", "chainAssetId", "accountAddress"]
+)
 data class TotalRewardLocal(
-    @PrimaryKey
     val accountAddress: String,
+    val chainId: String,
+    val chainAssetId: Int,
     val totalReward: BigInteger
 )
