@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.parachain.ParachainNetworkInfoComponentFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.parachain.ParachainStakeActionsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.parachain.ParachainStakeSummaryComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.startStaking.parachain.ParachainStartStakingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.parachain.ParachainUnbondingComponentFactory
@@ -75,11 +76,19 @@ class ParachainModule {
     @ScreenScope
     fun provideParachainUnbondingsFactory(
         delegatorStateUseCase: DelegatorStateUseCase,
-        resourceManager: ResourceManager,
         interactor: ParachainStakingUnbondingsInteractor,
     ) = ParachainUnbondingComponentFactory(
-        resourceManager = resourceManager,
         delegatorStateUseCase = delegatorStateUseCase,
         interactor = interactor
+    )
+
+    @Provides
+    @ScreenScope
+    fun provideStakeActionsFactory(
+        delegatorStateUseCase: DelegatorStateUseCase,
+        resourceManager: ResourceManager,
+    ) = ParachainStakeActionsComponentFactory(
+        delegatorStateUseCase = delegatorStateUseCase,
+        resourceManager = resourceManager
     )
 }

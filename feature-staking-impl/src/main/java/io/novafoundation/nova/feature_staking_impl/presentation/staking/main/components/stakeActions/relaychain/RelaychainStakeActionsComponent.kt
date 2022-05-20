@@ -30,7 +30,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.mainStakingValidationFailure
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
@@ -75,7 +74,7 @@ private class RelaychainStakeActionsComponent(
         stakingInteractor.selectedAccountStakingStateFlow(it, assetWithChain)
     }.shareInBackground()
 
-    override val state: Flow<StakeActionsState?> = selectedAccountStakingStateFlow.transformLatest { stakingState ->
+    override val state = selectedAccountStakingStateFlow.transformLatest { stakingState ->
         if (stakingState is StakingState.Stash) {
             emit(StakeActionsState(availableActionsFor(stakingState)))
         } else {

@@ -13,7 +13,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTE
 class ManageStakeAction(
     val id: String,
     val label: String,
-    @DrawableRes val iconRes: Int
+    @DrawableRes val iconRes: Int,
+    val badge: String? = null,
 ) {
     companion object
 }
