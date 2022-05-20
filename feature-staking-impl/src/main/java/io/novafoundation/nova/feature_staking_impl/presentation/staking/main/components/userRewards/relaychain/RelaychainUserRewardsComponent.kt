@@ -60,7 +60,7 @@ private class RelaychainUserRewardsComponent(
     }
 
     private fun rewardsFlow(stakingState: StakingState.Stash): Flow<UserRewardsState> = combine(
-        stakingInteractor.observeUserRewards(stakingState),
+        stakingInteractor.observeUserRewards(stakingState, assetWithChain.chain, assetWithChain.asset),
         hostContext.assetFlow
     ) { totalReward, asset ->
         mapAmountToAmountModel(totalReward, asset)
@@ -69,7 +69,7 @@ private class RelaychainUserRewardsComponent(
     private fun syncStakingRewards() {
         selectedAccountStakingStateFlow
             .filterIsInstance<StakingState.Stash>()
-            .onEach(stakingInteractor::syncStakingRewards)
+            .onEach { stakingInteractor.syncStakingRewards(it, assetWithChain.chain, assetWithChain.asset) }
             .inBackground()
             .launchIn(this)
     }

@@ -31,11 +31,13 @@ import io.novafoundation.nova.feature_staking_impl.domain.model.PendingPayoutsSt
 import io.novafoundation.nova.feature_staking_impl.domain.model.StakeSummary
 import io.novafoundation.nova.feature_staking_impl.domain.model.StakingPeriod
 import io.novafoundation.nova.feature_staking_impl.domain.model.StashNoneStatus
+import io.novafoundation.nova.feature_staking_impl.domain.model.TotalReward
 import io.novafoundation.nova.feature_staking_impl.domain.model.ValidatorStatus
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.ext.accountIdOf
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
@@ -126,9 +128,13 @@ class StakingInteractor(
         }
     }
 
-    suspend fun syncStakingRewards(stakingState: StakingState.Stash) = withContext(Dispatchers.IO) {
+    suspend fun syncStakingRewards(
+        stakingState: StakingState.Stash,
+        chain: Chain,
+        chainAsset: Chain.Asset
+    ) = withContext(Dispatchers.IO) {
         runCatching {
-            stakingRewardsRepository.sync(stakingState.stashAddress, stakingState.chain)
+            stakingRewardsRepository.sync(stakingState.stashAddress, chain, chainAsset)
         }
     }
 
@@ -173,7 +179,13 @@ class StakingInteractor(
         }
     }
 
-    fun observeUserRewards(state: StakingState.Stash) = stakingRewardsRepository.totalRewardFlow(state.stashAddress)
+    fun observeUserRewards(
+        state: StakingState.Stash,
+        chain: Chain,
+        chainAsset: Chain.Asset
+    ): Flow<TotalReward> {
+        return stakingRewardsRepository.totalRewardFlow(state.stashAddress, chain.id, chainAsset.id)
+    }
 
     fun observeNetworkInfoState(chainId: ChainId): Flow<NetworkInfo> = flow {
         val lockupPeriod = getLockupPeriodInDays(chainId)

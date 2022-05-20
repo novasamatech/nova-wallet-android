@@ -10,8 +10,8 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 abstract class StakingTotalRewardDao {
 
-    @Query("SELECT * FROM total_reward WHERE accountAddress = :accountAddress")
-    abstract fun observeTotalRewards(accountAddress: String): Flow<TotalRewardLocal>
+    @Query("SELECT * FROM total_reward WHERE accountAddress = :accountAddress AND chainId = :chainId AND chainAssetId = :chainAssetId")
+    abstract fun observeTotalRewards(accountAddress: String, chainId: String, chainAssetId: Int): Flow<TotalRewardLocal>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insert(totalRewardLocal: TotalRewardLocal)
