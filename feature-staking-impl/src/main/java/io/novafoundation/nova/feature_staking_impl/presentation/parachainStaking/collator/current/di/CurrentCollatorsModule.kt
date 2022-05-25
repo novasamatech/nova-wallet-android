@@ -32,7 +32,7 @@ class CurrentCollatorsModule {
         parachainStakingConstantsRepository: ParachainStakingConstantsRepository,
         currentRoundRepository: CurrentRoundRepository,
         collatorProvider: CollatorProvider,
-    ): CurrentCollatorInteractor =  RealCurrentCollatorInteractor(
+    ): CurrentCollatorInteractor = RealCurrentCollatorInteractor(
         parachainStakingConstantsRepository = parachainStakingConstantsRepository,
         currentRoundRepository = currentRoundRepository,
         collatorProvider = collatorProvider
@@ -50,7 +50,7 @@ class CurrentCollatorsModule {
         collatorConstantsUseCase: CollatorConstantsUseCase,
         delegatorStateUseCase: DelegatorStateUseCase,
         tokenUseCase: TokenUseCase,
-        ): ViewModel {
+    ): ViewModel {
         return CurrentCollatorsViewModel(
             router = router,
             resourceManager = resourceManager,

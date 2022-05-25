@@ -30,7 +30,7 @@ class ParachainStakeActionsComponentFactory(
     private val delegatorStateUseCase: DelegatorStateUseCase,
     private val resourceManager: ResourceManager,
     private val router: ParachainStakingRouter,
-    ) {
+) {
 
     fun create(
         assetWithChain: SingleAssetSharedState.AssetWithChain,

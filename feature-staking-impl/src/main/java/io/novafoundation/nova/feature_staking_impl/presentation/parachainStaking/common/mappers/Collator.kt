@@ -81,7 +81,7 @@ fun mapCollatorToDetailsParcelModel(
 ): StakeTargetDetailsParcelModel {
     val snapshot = collator.snapshot
 
-    val stakeParcelModel = if(snapshot != null && collator.apr != null) {
+    val stakeParcelModel = if (snapshot != null && collator.apr != null) {
         val isOversubscribed = delegationState == DelegationState.TOO_LOW_STAKE
 
         StakeTargetStakeParcelModel.Active(

@@ -27,9 +27,9 @@ interface CollatorProvider {
 
     sealed class CollatorSource {
 
-        object Elected: CollatorSource()
+        object Elected : CollatorSource()
 
-        class Custom(val collatorIdsHex: Collection<String>): CollatorSource()
+        class Custom(val collatorIdsHex: Collection<String>) : CollatorSource()
     }
 
     suspend fun getCollators(
@@ -59,7 +59,7 @@ class RealCollatorProvider(
 
         val snapshots = cachedSnapshots ?: currentRoundRepository.collatorsSnapshotInCurrentRound(chainId)
 
-        val requestedCollatorIds = when(collatorSource) {
+        val requestedCollatorIds = when (collatorSource) {
             is CollatorSource.Custom -> collatorSource.collatorIdsHex.toSet()
             CollatorSource.Elected -> snapshots.keys
         }

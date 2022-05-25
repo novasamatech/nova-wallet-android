@@ -8,7 +8,6 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 
-
 class SelectedStakeTargetModel(
     val addressModel: AddressModel,
     val nominated: AmountModel?,
@@ -16,7 +15,6 @@ class SelectedStakeTargetModel(
     val isOversubscribed: Boolean,
     val isSlashed: Boolean
 )
-
 
 data class SelectedStakeTargetStatusModel(
     val titleConfig: TitleConfig?,

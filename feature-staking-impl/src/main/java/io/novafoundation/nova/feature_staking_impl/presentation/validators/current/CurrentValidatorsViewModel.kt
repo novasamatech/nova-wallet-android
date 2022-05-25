@@ -42,7 +42,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-
 class CurrentValidatorsViewModel(
     private val router: StakingRouter,
     private val resourceManager: ResourceManager,

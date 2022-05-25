@@ -53,7 +53,7 @@ fun InputStream.readText() = bufferedReader().use { it.readText() }
 
 fun <T> List<T>.second() = get(1)
 
-fun <E: Enum<E>> Collection<Enum<E>>.anyIs(value: E) = any { it == value }
+fun <E : Enum<E>> Collection<Enum<E>>.anyIs(value: E) = any { it == value }
 
 fun Int.quantize(factor: Int) = this - this % factor
 

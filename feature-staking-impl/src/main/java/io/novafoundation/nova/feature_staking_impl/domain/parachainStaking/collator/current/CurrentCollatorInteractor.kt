@@ -9,7 +9,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.commo
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorProvider.CollatorSource
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegationState
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.delegationStatesIn
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
@@ -25,7 +24,7 @@ class RealCurrentCollatorInteractor(
     private val parachainStakingConstantsRepository: ParachainStakingConstantsRepository,
     private val currentRoundRepository: CurrentRoundRepository,
     private val collatorProvider: CollatorProvider,
-): CurrentCollatorInteractor {
+) : CurrentCollatorInteractor {
 
     override fun currentCollatorsFlow(delegatorState: DelegatorState.Delegator): Flow<GroupedList<DelegatedCollatorGroup, DelegatedCollator>> = flow {
         val chainId = delegatorState.chain.id
@@ -52,13 +51,13 @@ class RealCurrentCollatorInteractor(
                 )
             }
 
-            groupDelegatedCollators(delegatedCollators, chainId)
+            groupDelegatedCollators(delegatedCollators)
         }
 
         emitAll(innerFlow)
     }
 
-    private suspend fun groupDelegatedCollators(delegatedCollators: List<DelegatedCollator>, chainId: ChainId): Map<DelegatedCollatorGroup, List<DelegatedCollator>> {
+    private fun groupDelegatedCollators(delegatedCollators: List<DelegatedCollator>): Map<DelegatedCollatorGroup, List<DelegatedCollator>> {
         val delegatorsByStatus = delegatedCollators.groupBy { it.delegationStatus }
 
         val electedCollatorsCount = delegatorsByStatus.sizeOf(DelegationState.ACTIVE) + delegatorsByStatus.sizeOf(DelegationState.TOO_LOW_STAKE)

@@ -134,7 +134,7 @@ class CurrentCollatorsViewModel(
 
         is DelegatedCollatorGroup.WaitingForNextEra -> SelectedStakeTargetStatusModel.Waiting(
             resourceManager = resourceManager,
-            title =  resourceManager.getString(R.string.staking_parachain_your_collators_waiting_title, statusGroup.numberOfCollators),
+            title = resourceManager.getString(R.string.staking_parachain_your_collators_waiting_title, statusGroup.numberOfCollators),
             description = R.string.staking_parachain_your_collators_waiting
         )
     }
@@ -148,7 +148,6 @@ class CurrentCollatorsViewModel(
                 val stakeTarget = mapCollatorToDetailsParcelModel(selectedCollator.collator, selectedCollator.delegationStatus)
 
                 StakeTargetDetailsPayload.parachain(stakeTarget, collatorConstantsUseCase)
-
             }
 
             router.openCollatorDetails(payload)
