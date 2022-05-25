@@ -18,9 +18,9 @@ class CollatorParcelModel(
     val accountIdHex: String,
     val address: String,
     val identity: IdentityParcelModel?,
-    val snapshot: CollatorSnapshotParcelModel,
-    val minimumStakeToGetRewards: BigInteger,
-    val apr: BigDecimal,
+    val snapshot: CollatorSnapshotParcelModel?,
+    val minimumStakeToGetRewards: BigInteger?,
+    val apr: BigDecimal?,
 ) : Parcelable {
 
     @Parcelize
@@ -63,8 +63,8 @@ fun mapCollatorParcelModelToCollator(collator: CollatorParcelModel): Collator {
     }
 }
 
-private fun mapCollatorSnapshotToParcelModel(snapshot: CollatorSnapshot): CollatorSnapshotParcelModel {
-    return with(snapshot) {
+private fun mapCollatorSnapshotToParcelModel(snapshot: CollatorSnapshot?): CollatorSnapshotParcelModel? {
+    return snapshot?.run {
         CollatorSnapshotParcelModel(
             bond = bond,
             delegations = delegations.map(::mapDelegatorBondToParcelModel),
@@ -79,8 +79,8 @@ private fun mapDelegatorBondToParcelModel(delegatorBond: DelegatorBond): Delegat
     }
 }
 
-private fun mapCollatorSnapshotFromParcelModel(snapshot: CollatorSnapshotParcelModel): CollatorSnapshot {
-    return with(snapshot) {
+private fun mapCollatorSnapshotFromParcelModel(snapshot: CollatorSnapshotParcelModel?): CollatorSnapshot? {
+    return snapshot?.run {
         CollatorSnapshot(
             bond = bond,
             delegations = delegations.map(::mapDelegatorBondFromParcelModel),

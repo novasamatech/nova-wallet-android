@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="staking_parachain_your_collaotrs_no_rewards">Some of your collators are either not elected or have higher minimum stake than your staked amount. You will not receive reward in this round staking with them.</string>
+  <string name="staking_parachain_your_collators_active">Your stake is assigned to next collators</string>
+  <string name="staking_parachain_your_collators_elected">Active collators without producing rewards</string>
+  <string name="staking_parachain_your_collators_inactive">Collators without enough stake to be elected</string>
+  <string name="staking_parachain_your_collators_waiting">Collators that will enact in the next round</string>
+  <string name="staking_parachain_your_collators_waiting_title">Pending collators (%s)</string>
+
   <string name="staking_parachain_your_collators">Your collators</string>
 
   <string name="staking_parachain_next_round_format">waiting for the next round (%s)</string>

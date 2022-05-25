@@ -31,7 +31,7 @@ class IdentityRepositoryImpl(
 
     override suspend fun getIdentitiesFromIds(
         chainId: ChainId,
-        accountIdsHex: List<String>
+        accountIdsHex: Collection<String>
     ) = withContext(Dispatchers.Default) {
         storageDataSource.query(chainId) {
             if (!runtime.metadata.hasModule(Modules.IDENTITY)) {

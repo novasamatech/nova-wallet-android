@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.comm
 import androidx.lifecycle.Lifecycle
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorProvider
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorProvider.CollatorSource
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.Collator
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
@@ -21,7 +22,7 @@ class CollatorRecommendatorFactory(
 ) {
 
     suspend fun create(lifecycle: Lifecycle, chainId: ChainId) = computationalCache.useCache(COLLATORS_CACHE, lifecycle) {
-        val collators = collatorProvider.electedCollators(chainId)
+        val collators = collatorProvider.getCollators(chainId, CollatorSource.Elected)
 
         CollatorRecommendator(collators)
     }

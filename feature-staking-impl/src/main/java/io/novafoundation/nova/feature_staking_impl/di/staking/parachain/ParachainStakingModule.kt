@@ -96,8 +96,9 @@ class ParachainStakingModule {
     @FeatureScope
     fun provideDelegatorStateUseCase(
         repository: DelegatorStateRepository,
+        stakingSharedState: StakingSharedState,
         accountRepository: AccountRepository
-    ) = DelegatorStateUseCase(repository, accountRepository)
+    ) = DelegatorStateUseCase(repository, stakingSharedState, accountRepository)
 
     @Provides
     @FeatureScope

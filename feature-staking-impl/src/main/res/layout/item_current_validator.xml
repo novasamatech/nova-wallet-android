@@ -102,6 +102,7 @@
         android:id="@+id/itemCurrentValidatorApy"
         style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="wrap_content"
+        android:textColor="@color/green"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/itemCurrentValidatorInfo"

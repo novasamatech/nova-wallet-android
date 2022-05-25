@@ -23,6 +23,8 @@ infix fun Int.floorMod(divisor: Int) = Math.floorMod(this, divisor)
 val BigDecimal.isNonNegative: Boolean
     get() = signum() >= 0
 
+fun BigInteger?.orZero() = this ?: BigInteger.ZERO
+
 fun Long.daysFromMillis() = TimeUnit.MILLISECONDS.toDays(this)
 
 inline fun <T> Collection<T>.sumByBigInteger(extractor: (T) -> BigInteger) = fold(BigInteger.ZERO) { acc, element ->
@@ -50,6 +52,8 @@ fun <T> Result<T>.requireValue() = getOrThrow()!!
 fun InputStream.readText() = bufferedReader().use { it.readText() }
 
 fun <T> List<T>.second() = get(1)
+
+fun <E: Enum<E>> Collection<Enum<E>>.anyIs(value: E) = any { it == value }
 
 fun Int.quantize(factor: Int) = this - this % factor
 

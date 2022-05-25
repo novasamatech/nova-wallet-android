@@ -25,7 +25,7 @@
         android:layout_marginEnd="16dp"
         android:drawablePadding="8dp"
         android:layout_marginBottom="4dp"
-        android:text="@string/staking_your_oversubscribed_message"
+        tools:text="@string/staking_your_oversubscribed_message"
         android:visibility="gone"
         tools:visibility="visible"
         app:drawableStartCompat="@drawable/ic_warning_filled" />

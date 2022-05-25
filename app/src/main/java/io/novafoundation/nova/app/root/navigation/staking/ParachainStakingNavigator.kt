@@ -44,4 +44,6 @@ class ParachainStakingNavigator(
 
     override val currentStackEntryLifecycle: Lifecycle
         get() = commonNavigator.currentStackEntryLifecycle
+
+    override fun openCurrentCollators() = performNavigation(R.id.action_mainFragment_to_currentCollatorsFragment)
 }

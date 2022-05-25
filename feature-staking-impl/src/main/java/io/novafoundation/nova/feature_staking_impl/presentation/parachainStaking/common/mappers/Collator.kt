@@ -42,13 +42,13 @@ suspend fun mapCollatorToCollatorModel(
     val scoring = when (sorting) {
         CollatorSorting.REWARDS -> rewardsToScoring(collator.apr)
         CollatorSorting.MIN_STAKE -> stakeToScoring(collator.minimumStakeToGetRewards, token)
-        CollatorSorting.TOTAL_STAKE -> stakeToScoring(collator.snapshot.total, token)
-        CollatorSorting.OWN_STAKE -> stakeToScoring(collator.snapshot.bond, token)
+        CollatorSorting.TOTAL_STAKE -> stakeToScoring(collator.snapshot?.total, token)
+        CollatorSorting.OWN_STAKE -> stakeToScoring(collator.snapshot?.bond, token)
     }
 
     val subtitle = when (sorting) {
-        CollatorSorting.REWARDS -> {
-            val formattedMinStake = mapAmountToAmountModel(collator.minimumStakeToGetRewards, token).token
+        CollatorSorting.REWARDS -> collator.minimumStakeToGetRewards?.let {
+            val formattedMinStake = mapAmountToAmountModel(it, token).token
 
             StakeTargetModel.Subtitle(
                 label = resourceManager.getString(R.string.staking_min_stake).withSubtitleSLabelSuffix(),
@@ -78,20 +78,24 @@ fun mapCollatorToDetailsParcelModel(
 ): StakeTargetDetailsParcelModel {
     val snapshot = collator.snapshot
 
-    val stakeParcelModel = StakeTargetStakeParcelModel.Active(
-        totalStake = snapshot.total,
-        ownStake = snapshot.bond,
-        stakers = snapshot.delegations.map {
-            StakerParcelModel(
-                who = it.owner,
-                value = it.balance
-            )
-        },
-        rewards = collator.apr,
-        isOversubscribed = false, // TODO current collators screen - collator is "oversubscribed" when user is in its bottom delegations
-        minimumStake = collator.minimumStakeToGetRewards,
-        userStakeInfo = null, // TODO current collators screen
-    )
+    val stakeParcelModel = if(snapshot != null && collator.apr != null) {
+        StakeTargetStakeParcelModel.Active(
+            totalStake = snapshot.total,
+            ownStake = snapshot.bond,
+            stakers = snapshot.delegations.map {
+                StakerParcelModel(
+                    who = it.owner,
+                    value = it.balance
+                )
+            },
+            rewards = collator.apr,
+            isOversubscribed = false, // TODO current collators screen - collator is "oversubscribed" when user is in its bottom delegations
+            minimumStake = collator.minimumStakeToGetRewards,
+            userStakeInfo = null, // TODO current collators screen
+        )
+    } else {
+        StakeTargetStakeParcelModel.Inactive
+    }
 
     return StakeTargetDetailsParcelModel(
         accountIdHex = collator.accountIdHex,

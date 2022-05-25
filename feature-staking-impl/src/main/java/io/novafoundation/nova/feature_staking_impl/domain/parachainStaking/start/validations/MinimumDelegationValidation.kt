@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations
 
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.common.validation.valid
@@ -42,7 +43,7 @@ class MinimumDelegationValidation(
         val minimumTotalStakeInPlanks = stakingConstantsRepository.minimumDelegatorStake(chainId)
         val minimumTotalStakeAmount = token.amountFromPlanks(minimumTotalStakeInPlanks)
 
-        val minStakeToGetRewards = token.amountFromPlanks(value.collator.minimumStakeToGetRewards)
+        val minStakeToGetRewards = token.amountFromPlanks(value.collator.minimumStakeToGetRewards.orZero())
         val maxAllowedDelegators = stakingConstantsRepository.maxTotalDelegatorsPerCollator(chainId)
 
         val candidateMetadata = candidatesRepository.getCandidateMetadata(chainId, collatorId)

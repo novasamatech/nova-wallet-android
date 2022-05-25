@@ -6,7 +6,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
 interface IdentityRepository {
 
-    suspend fun getIdentitiesFromIds(chainId: ChainId, accountIdsHex: List<String>): AccountIdMap<Identity?>
+    suspend fun getIdentitiesFromIds(chainId: ChainId, accountIdsHex: Collection<String>): AccountIdMap<Identity?>
 
     suspend fun getIdentitiesFromAddresses(chain: Chain, accountAddresses: List<String>): AccountAddressMap<Identity?>
 }
