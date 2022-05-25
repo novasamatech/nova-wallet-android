@@ -20,6 +20,8 @@ infix fun Int.floorMod(divisor: Int) = Math.floorMod(this, divisor)
 val BigDecimal.isNonNegative: Boolean
     get() = signum() >= 0
 
+fun BigInteger?.orZero(): BigInteger = this ?: BigInteger.ZERO
+
 fun Long.daysFromMillis() = TimeUnit.MILLISECONDS.toDays(this)
 
 inline fun <T> List<T>.sumByBigInteger(extractor: (T) -> BigInteger) = fold(BigInteger.ZERO) { acc, element ->

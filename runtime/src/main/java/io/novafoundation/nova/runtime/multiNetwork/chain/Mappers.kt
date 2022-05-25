@@ -2,6 +2,7 @@ package io.novafoundation.nova.runtime.multiNetwork.chain
 
 import com.google.gson.Gson
 import io.novafoundation.nova.common.utils.asGsonParsedNumber
+import io.novafoundation.nova.common.utils.fromJson
 import io.novafoundation.nova.common.utils.fromJsonOrNull
 import io.novafoundation.nova.common.utils.parseArbitraryObject
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
@@ -74,6 +75,8 @@ private const val ORML_EXTRAS_EXISTENTIAL_DEPOSIT = "existentialDeposit"
 private const val ORML_EXTRAS_TRANSFERS_ENABLED = "transfersEnabled"
 
 private const val ORML_TRANSFERS_ENABLED_DEFAULT = true
+
+private const val CHAIN_ADDITIONAL_TIP = "defaultTip"
 
 private inline fun unsupportedOnError(creator: () -> Chain.Asset.Type): Chain.Asset.Type {
     return runCatching(creator).getOrDefault(Chain.Asset.Type.Unsupported)
@@ -164,6 +167,12 @@ fun mapChainRemoteToChain(
         )
     }
 
+    val additional = chainRemote.additional?.let {
+        Chain.Additional(
+            defaultTip = (it[CHAIN_ADDITIONAL_TIP] as? String)?.toBigInteger()
+        )
+    }
+
     return with(chainRemote) {
         val optionsOrEmpty = options.orEmpty()
 
@@ -181,7 +190,8 @@ fun mapChainRemoteToChain(
             addressPrefix = addressPrefix,
             isEthereumBased = ETHEREUM_OPTION in optionsOrEmpty,
             isTestNet = TESTNET_OPTION in optionsOrEmpty,
-            hasCrowdloans = CROWDLOAN_OPTION in optionsOrEmpty
+            hasCrowdloans = CROWDLOAN_OPTION in optionsOrEmpty,
+            additional = additional
         )
     }
 }
@@ -238,6 +248,10 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
         )
     }
 
+    val additional = chainLocal.chain.additional?.let { raw ->
+        gson.fromJson<Chain.Additional>(raw)
+    }
+
     return with(chainLocal.chain) {
         Chain(
             id = id,
@@ -253,7 +267,8 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
             addressPrefix = prefix,
             isEthereumBased = isEthereumBased,
             isTestNet = isTestNet,
-            hasCrowdloans = hasCrowdloans
+            hasCrowdloans = hasCrowdloans,
+            additional = additional
         )
     }
 }
@@ -297,8 +312,7 @@ fun mapChainExplorersToLocal(explorer: Chain.Explorer): ChainExplorerLocal {
 }
 
 fun mapChainToChainLocal(chain: Chain, gson: Gson): ChainLocal {
-    val explorers = chain.explorers.map {
-    }
+    val additional = chain.additional?.let { gson.toJson(it) }
 
     val types = chain.types?.let {
         ChainLocal.TypesConfig(
@@ -327,7 +341,8 @@ fun mapChainToChainLocal(chain: Chain, gson: Gson): ChainLocal {
             externalApi = externalApi,
             isEthereumBased = isEthereumBased,
             isTestNet = isTestNet,
-            hasCrowdloans = hasCrowdloans
+            hasCrowdloans = hasCrowdloans,
+            additional = additional,
         )
     }
 
