@@ -67,6 +67,8 @@ abstract class CurrentStakeTargetsFragment<V : CurrentStakeTargetsViewModel> : B
                 currentValidatorsOversubscribedMessage.makeGone()
             }
         }
+
+        viewModel.titleFlow.observe(currentValidatorsToolbar::setTitle)
     }
 
     override fun infoClicked(stakeTargetModel: SelectedStakeTargetModel) {

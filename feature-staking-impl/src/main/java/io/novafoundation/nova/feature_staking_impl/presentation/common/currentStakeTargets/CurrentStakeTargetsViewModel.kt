@@ -10,6 +10,8 @@ abstract class CurrentStakeTargetsViewModel : BaseViewModel() {
 
     abstract val warningFlow: Flow<String?>
 
+    abstract val titleFlow: Flow<String>
+
     abstract fun stakeTargetInfoClicked(address: String)
 
     abstract fun backClicked()

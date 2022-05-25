@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.list.toValueList
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.toHexAccountId
 import io.novafoundation.nova.common.utils.withLoading
@@ -32,6 +33,7 @@ import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
@@ -86,6 +88,10 @@ class CurrentValidatorsViewModel(
         } else {
             null
         }
+    }
+
+    override val titleFlow: Flow<String> = flowOf {
+        resourceManager.getString(R.string.staking_your_validators)
     }
 
     override fun backClicked() {
