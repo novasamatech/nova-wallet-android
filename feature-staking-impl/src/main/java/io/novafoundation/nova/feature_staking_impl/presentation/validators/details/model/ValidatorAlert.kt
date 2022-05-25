@@ -12,7 +12,7 @@ sealed class ValidatorAlert(@StringRes val descriptionRes: Int, val severity: Se
 
         object UserNotInvolved : ValidatorAlert.Oversubscribed(R.string.staking_validator_other_oversubscribed_message)
 
-        object UserMissedReward : ValidatorAlert.Oversubscribed(R.string.staking_validator_my_oversubscribed_message)
+        class UserMissedReward(errorDescription: Int) : ValidatorAlert.Oversubscribed(errorDescription)
     }
 
     object Slashed : ValidatorAlert(R.string.staking_validator_slashed_desc, Severity.ERROR)

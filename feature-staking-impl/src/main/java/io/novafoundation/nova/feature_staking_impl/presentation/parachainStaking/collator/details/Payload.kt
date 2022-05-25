@@ -15,6 +15,7 @@ suspend fun StakeTargetDetailsPayload.Companion.parachain(
         rewardSuffix = RewardSuffix.APR,
         rewardedStakersPerStakeTarget = collatorConstantsUseCase.maxRewardedDelegatorsPerCollator(),
         titleRes = R.string.staking_parachain_collator_info,
-        stakersLabelRes = R.string.staking_parachain_delegators
+        stakersLabelRes = R.string.staking_parachain_delegators,
+        oversubscribedWarningText = R.string.staking_parachain_collator_details_oversubscribed
     )
 )

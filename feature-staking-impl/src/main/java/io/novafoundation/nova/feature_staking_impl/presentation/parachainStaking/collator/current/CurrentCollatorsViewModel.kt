@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.collator.current.CurrentCollatorInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.collator.current.DelegatedCollator
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.collator.current.DelegatedCollatorGroup
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorConstantsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegationState.COLLATOR_NOT_ACTIVE
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegationState.TOO_LOW_STAKE
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
@@ -25,17 +26,24 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.currentSt
 import io.novafoundation.nova.feature_staking_impl.presentation.common.currentStakeTargets.model.SelectedStakeTargetStatusModel
 import io.novafoundation.nova.feature_staking_impl.presentation.common.currentStakeTargets.model.Waiting
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.formatStakeTargetRewardsOrNull
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.details.parachain
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.mappers.mapCollatorToDetailsParcelModel
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class CurrentCollatorsViewModel(
     private val router: ParachainStakingRouter,
@@ -44,6 +52,7 @@ class CurrentCollatorsViewModel(
     private val currentCollatorsInteractor: CurrentCollatorInteractor,
     private val selectedChainStale: SingleAssetSharedState,
     private val delegatorStateUseCase: DelegatorStateUseCase,
+    private val collatorConstantsUseCase: CollatorConstantsUseCase,
     tokenUseCase: TokenUseCase,
 ) : CurrentStakeTargetsViewModel() {
 
@@ -131,17 +140,19 @@ class CurrentCollatorsViewModel(
     }
 
     override fun stakeTargetInfoClicked(address: String) {
-//        val payload = withContext(Dispatchers.Default) {
-//            val accountId = address.toHexAccountId()
-//            val allValidators = flattenCurrentCollators.first()
-//
-//            val nominatedValidator = allValidators.first { it.validator.accountIdHex == accountId }
-//
-//            val stakeTarget = mapValidatorToValidatorDetailsWithStakeFlagParcelModel(nominatedValidator)
-//            StakeTargetDetailsPayload.relaychain(stakeTarget, stakingInteractor)
-//        }
-//
-//        router.openValidatorDetails(payload)
+        launch {
+            val payload = withContext(Dispatchers.Default) {
+                val allCollators = flattenCurrentCollators.first()
+                val selectedCollator = allCollators.first { it.collator.address == address }
+
+                val stakeTarget = mapCollatorToDetailsParcelModel(selectedCollator.collator, selectedCollator.delegationStatus)
+
+                StakeTargetDetailsPayload.parachain(stakeTarget, collatorConstantsUseCase)
+
+            }
+
+            router.openCollatorDetails(payload)
+        }
     }
 
     override fun backClicked() {
@@ -149,6 +160,6 @@ class CurrentCollatorsViewModel(
     }
 
     override fun changeClicked() {
-        // TODO
+        showMessage("TODO")
     }
 }

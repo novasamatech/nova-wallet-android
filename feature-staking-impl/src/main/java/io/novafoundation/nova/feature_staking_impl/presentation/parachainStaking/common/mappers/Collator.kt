@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegationState
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.Collator
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.recommendations.CollatorSorting
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapIdentityToIdentityParcelModel
@@ -14,6 +15,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.chang
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.StakeTargetModel.ColoredText
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.StakeTargetDetailsParcelModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.StakeTargetStakeParcelModel
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.StakeTargetStakeParcelModel.Active.UserStakeInfo
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.StakerParcelModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
@@ -74,11 +76,14 @@ suspend fun mapCollatorToCollatorModel(
 }
 
 fun mapCollatorToDetailsParcelModel(
-    collator: Collator
+    collator: Collator,
+    delegationState: DelegationState? = null
 ): StakeTargetDetailsParcelModel {
     val snapshot = collator.snapshot
 
     val stakeParcelModel = if(snapshot != null && collator.apr != null) {
+        val isOversubscribed = delegationState == DelegationState.TOO_LOW_STAKE
+
         StakeTargetStakeParcelModel.Active(
             totalStake = snapshot.total,
             ownStake = snapshot.bond,
@@ -89,9 +94,9 @@ fun mapCollatorToDetailsParcelModel(
                 )
             },
             rewards = collator.apr,
-            isOversubscribed = false, // TODO current collators screen - collator is "oversubscribed" when user is in its bottom delegations
+            isOversubscribed = isOversubscribed,
             minimumStake = collator.minimumStakeToGetRewards,
-            userStakeInfo = null, // TODO current collators screen
+            userStakeInfo = UserStakeInfo(willBeRewarded = !isOversubscribed),
         )
     } else {
         StakeTargetStakeParcelModel.Inactive

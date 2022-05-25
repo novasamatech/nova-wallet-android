@@ -56,7 +56,7 @@ class ValidatorDetailsViewModel(
     }
         .shareInBackground()
 
-    val errorFlow = flowOf { mapStakeTargetDetailsToErrors(stakeTarget) }
+    val errorFlow = flowOf { mapStakeTargetDetailsToErrors(stakeTarget, displayConfig) }
         .inBackground()
         .share()
 

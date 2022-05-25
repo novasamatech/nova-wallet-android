@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="staking_parachain_collator_details_oversubscribed">Collator\'s minimum stake is higher than your delegation. You will not receive rewards from the collator.</string>
+
   <string name="staking_parachain_your_collaotrs_no_rewards">Some of your collators are either not elected or have higher minimum stake than your staked amount. You will not receive reward in this round staking with them.</string>
   <string name="staking_parachain_your_collators_active">Your stake is assigned to next collators</string>
   <string name="staking_parachain_your_collators_elected">Active collators without producing rewards</string>
