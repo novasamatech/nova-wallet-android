@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="staking_parachain_stake_more_hint">You will get increased rewards starting from the next round</string>
   <string name="staking_parachain_max_delegations_title">You can\'t select a new collator</string>
   <string name="staking_parachain_max_delegations_message">You have reached the maximum number of delegations of %d collators</string>
 

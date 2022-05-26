@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.W
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorConstantsUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.StartParachainStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
@@ -34,8 +35,9 @@ class ConfirmStartParachainStakingModule {
     @ScreenScope
     fun provideConfirmStartParachainStakingHintsMixinFactory(
         stakingHintsUseCase: ParachainStakingHintsUseCase,
+        resourceManager: ResourceManager
     ): ConfirmStartParachainStakingHintsMixinFactory {
-        return ConfirmStartParachainStakingHintsMixinFactory(stakingHintsUseCase)
+        return ConfirmStartParachainStakingHintsMixinFactory(stakingHintsUseCase, resourceManager)
     }
 
     @Provides
@@ -57,6 +59,7 @@ class ConfirmStartParachainStakingModule {
         walletUiUseCase: WalletUiUseCase,
         payload: ConfirmStartParachainStakingPayload,
         hintsMixinFactory: ConfirmStartParachainStakingHintsMixinFactory,
+        delegatorStateUseCase: DelegatorStateUseCase
     ): ViewModel {
         return ConfirmStartParachainStakingViewModel(
             router = router,
@@ -73,7 +76,8 @@ class ConfirmStartParachainStakingModule {
             walletUiUseCase = walletUiUseCase,
             payload = payload,
             hintsMixinFactory = hintsMixinFactory,
-            collatorConstantsUseCase = collatorConstantsUseCase
+            collatorConstantsUseCase = collatorConstantsUseCase,
+            delegatorStateUseCase = delegatorStateUseCase
         )
     }
 
