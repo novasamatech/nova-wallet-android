@@ -2,15 +2,22 @@ package io.novafoundation.nova.feature_staking_impl.presentation.parachainStakin
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.api.Retriable
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
+import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
+import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
+import io.novafoundation.nova.feature_staking_api.domain.model.parachain.delegationAmountTo
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.Collator
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.StartParachainStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationPayload
@@ -21,27 +28,29 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select.model.mapCollatorParcelModelToCollator
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select.model.mapCollatorToCollatorParcelModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.model.ConfirmStartParachainStakingPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.model.ChooseCollatorResponse
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.model.SelectCollatorModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.RealParachainStakingRewardsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.connectWith
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.startParachainStakingValidationFailure
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
@@ -58,6 +67,8 @@ class StartParachainStakingViewModel(
     private val validationExecutor: ValidationExecutor,
     private val validationSystem: StartParachainStakingValidationSystem,
     private val feeLoaderMixin: FeeLoaderMixin.Presentation,
+    private val delegatorStateUseCase: DelegatorStateUseCase,
+    private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
 ) : BaseViewModel(),
     Retriable,
@@ -76,29 +87,43 @@ class StartParachainStakingViewModel(
         balanceLabel = R.string.wallet_balance_transferable
     )
 
-    private val selectedCollator: Flow<Collator?> = selectCollatorInterScreenRequester.responseFlow.map { response ->
-        mapCollatorParcelModelToCollator(response.collator)
-    }
-        .onStart<Collator?> { emit(null) }
+    private val currentDelegatorStateFlow = delegatorStateUseCase.currentDelegatorStateFlow()
         .shareInBackground()
 
-    val selectedCollatorModel = selectedCollator.map { collator ->
-        collator?.let {
-            val chain = singleAssetSharedState.chain()
+    private val alreadyStakedCollatorsFlow = currentDelegatorStateFlow
+        .mapLatest(interactor::getSelectedCollators)
+        .shareInBackground()
 
-            val addressModel = addressIconGenerator.createAccountAddressModel(
-                chain = chain,
-                address = chain.addressOf(it.accountIdHex.fromHex()),
-                name = it.identity?.display
-            )
+    private val selectedCollatorFlow = MutableStateFlow<Collator?>(null)
+    private val selectedCollatorIdFlow = selectedCollatorFlow.map { it?.accountIdHex?.fromHex() }
 
-            SelectCollatorModel(
-                addressModel = addressModel
-            )
-        }
+    val selectedCollatorModel = combine(
+        selectedCollatorFlow,
+        currentDelegatorStateFlow,
+        assetFlow
+    ) { selectedCollator, currentDelegatorState, asset ->
+        selectedCollator?.let { mapCollatorToSelectCollatorModel(it, currentDelegatorState, asset) }
     }.shareInBackground()
 
-    val minimumStake = selectedCollator.map {
+    private val resultingStakedAmountFlow = combine(
+        currentDelegatorStateFlow,
+        selectedCollatorFlow,
+        amountChooserMixin.amount,
+        assetFlow
+    ) { delegatorState, selectedCollator, enteredAmount, asset ->
+        val currentDelegationInPlanks = selectedCollator?.let {
+            val collatorId = it.accountIdHex.fromHex()
+            delegatorState.delegationAmountTo(collatorId)
+        }.orZero()
+
+        val currentDelegationAmount = asset.token.amountFromPlanks(currentDelegationInPlanks)
+
+        currentDelegationAmount + enteredAmount
+    }
+
+    val chooseCollatorAction = actionAwaitableMixinFactory.create<DynamicListBottomSheet.Payload<SelectCollatorModel>, ChooseCollatorResponse>()
+
+    val minimumStake = selectedCollatorFlow.map {
         val minimumStake = it?.minimumStakeToGetRewards ?: interactor.defaultMinimumStake()
         val asset = assetFlow.first()
 
@@ -116,7 +141,7 @@ class StartParachainStakingViewModel(
 
     val buttonState = combine(
         validationInProgress,
-        selectedCollator,
+        selectedCollatorFlow,
         amountChooserMixin.amountInput
     ) { validationInProgress, collator, amountInput ->
         when {
@@ -128,19 +153,42 @@ class StartParachainStakingViewModel(
     }
 
     init {
-        rewardsComponent connectWith amountChooserMixin
-        rewardsComponent connectWith selectedCollator.map { it?.accountIdHex?.fromHex() }
+        rewardsComponent connectWith resultingStakedAmountFlow
+        rewardsComponent connectWith selectedCollatorIdFlow
 
         feeLoaderMixin.connectWith(
-            amountMixin = amountChooserMixin,
+            inputSource1 = amountChooserMixin.backPressuredAmount,
+            inputSource2 = selectedCollatorIdFlow,
             scope = this,
-            feeConstructor = interactor::estimateFee,
+            feeConstructor = { amount, collatorId -> interactor.estimateFee(amount.toPlanks(), collatorId) },
             onRetryCancelled = ::backClicked
         )
+
+        listenCollatorChanges()
+        setInitialCollator()
     }
 
     fun selectCollatorClicked() = launch {
-        selectCollatorInterScreenRequester.openRequest()
+        val delegatorState = currentDelegatorStateFlow.first()
+        val alreadyStakedCollators = alreadyStakedCollatorsFlow.first()
+
+        if (alreadyStakedCollators.isEmpty()) {
+            selectCollatorInterScreenRequester.openRequest()
+        } else {
+            val asset = assetFlow.first()
+            val selectedCollator = selectedCollatorFlow.first()
+            val payload = withContext(Dispatchers.Default) {
+                val collatorModels = alreadyStakedCollators.map { mapCollatorToSelectCollatorModel(it, delegatorState, asset) }
+                val selected = collatorModels.find { it.collator.accountIdHex == selectedCollator?.accountIdHex }
+
+                DynamicListBottomSheet.Payload(collatorModels, selected)
+            }
+
+            when(val response = chooseCollatorAction.awaitAction(payload)) {
+                ChooseCollatorResponse.New -> selectCollatorInterScreenRequester.openRequest()
+                is ChooseCollatorResponse.Existing -> selectedCollatorFlow.value = response.collatorModel.collator
+            }
+        }
     }
 
     fun nextClicked() {
@@ -151,9 +199,27 @@ class StartParachainStakingViewModel(
         router.back()
     }
 
+    private fun setInitialCollator() = launch {
+        val alreadyStakedCollators = alreadyStakedCollatorsFlow.first()
+
+        if (alreadyStakedCollators.isNotEmpty()) {
+            selectedCollatorFlow.value = alreadyStakedCollators.first()
+        }
+    }
+
+    private fun listenCollatorChanges() {
+        selectCollatorInterScreenRequester.responseFlow.onEach { response ->
+            val collator = mapCollatorParcelModelToCollator(response.collator)
+
+            selectedCollatorFlow.value = collator
+        }
+            .inBackground()
+            .launchIn(this)
+    }
+
     private fun maybeGoToNext() = requireFee { fee ->
         launch {
-            val collator = selectedCollator.first() ?: return@launch
+            val collator = selectedCollatorFlow.first() ?: return@launch
             val amount = amountChooserMixin.amount.first()
 
             val payload = StartParachainStakingValidationPayload(
@@ -196,4 +262,29 @@ class StartParachainStakingViewModel(
         block,
         onError = { title, message -> showError(title, message) }
     )
+
+    private suspend fun mapCollatorToSelectCollatorModel(
+        collator: Collator,
+        delegatorState: DelegatorState,
+        asset: Asset,
+    ): SelectCollatorModel {
+        val chain = singleAssetSharedState.chain()
+
+        val addressModel = addressIconGenerator.createAccountAddressModel(
+            chain = chain,
+            address = collator.address,
+            name = collator.identity?.display
+        )
+
+        val collatorId = collator.accountIdHex.fromHex()
+        val stakedAmount = delegatorState.castOrNull<DelegatorState.Delegator>()?.delegationAmountTo(collatorId)?.let {
+            mapAmountToAmountModel(it, asset)
+        }
+
+        return SelectCollatorModel(
+            addressModel = addressModel,
+            staked = stakedAmount,
+            collator = collator
+        )
+    }
 }

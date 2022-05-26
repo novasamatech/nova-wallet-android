@@ -40,4 +40,17 @@ class DelegatorStateUseCase(
 
         delegatorStateFlow(it, chain, asset)
     }
+
+    suspend fun currentDelegatorState(): DelegatorState {
+        val account = accountRepository.getSelectedMetaAccount()
+        val (chain, asset) = singleAssetSharedState.chainAndAsset()
+
+        val accountId = account.accountIdIn(chain)
+
+        return if (accountId != null) {
+            delegatorStateRepository.getDelegationState(chain, asset, accountId)
+        } else {
+            DelegatorState.None(chain)
+        }
+    }
 }

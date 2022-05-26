@@ -5,6 +5,8 @@ import java.math.BigDecimal
 
 sealed class StartParachainStakingValidationFailure {
 
+    object NotPositiveAmount: StartParachainStakingValidationFailure()
+
     object NotEnoughBalanceToPayFees : StartParachainStakingValidationFailure()
 
     sealed class TooLowStake(val minimumStake: BigDecimal, val asset: Asset) : StartParachainStakingValidationFailure() {

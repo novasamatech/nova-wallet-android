@@ -6,11 +6,10 @@ import io.novafoundation.nova.common.mixin.api.Retriable
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
-import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.model.FeeModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -76,16 +75,36 @@ fun FeeLoaderMixin.Presentation.requireFee(
     }
 }
 
-fun FeeLoaderMixin.Presentation.connectWith(
-    amountMixin: AmountChooserMixin.Presentation,
+fun <I> FeeLoaderMixin.Presentation.connectWith(
+    inputSource: Flow<I>,
     scope: CoroutineScope,
-    feeConstructor: suspend (amount: BigInteger) -> BigInteger,
+    feeConstructor: suspend Token.(input: I) -> BigInteger,
     onRetryCancelled: () -> Unit = {}
 ) {
-    amountMixin.backPressuredAmount.onEach { amount ->
+    inputSource.onEach { input ->
         loadFee(
             coroutineScope = scope,
-            feeConstructor = { feeConstructor(it.planksFromAmount(amount)) },
+            feeConstructor = { feeConstructor(it, input) },
+            onRetryCancelled = onRetryCancelled
+        )
+    }.launchIn(scope)
+}
+
+
+fun <I1, I2> FeeLoaderMixin.Presentation.connectWith(
+    inputSource1: Flow<I1>,
+    inputSource2: Flow<I2>,
+    scope: CoroutineScope,
+    feeConstructor: suspend Token.(input1: I1, input2: I2) -> BigInteger,
+    onRetryCancelled: () -> Unit = {}
+) {
+    combine(
+        inputSource1,
+        inputSource2
+    ) { input1, input2 ->
+        loadFee(
+            coroutineScope = scope,
+            feeConstructor = { feeConstructor(it, input1, input2) },
             onRetryCancelled = onRetryCancelled
         )
     }.launchIn(scope)

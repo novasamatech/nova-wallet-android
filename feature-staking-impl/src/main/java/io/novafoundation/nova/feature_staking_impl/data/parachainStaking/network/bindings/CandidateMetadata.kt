@@ -14,6 +14,9 @@ class CandidateMetadata(
 fun CandidateMetadata.isFull(maxAllowedDelegators: BigInteger): Boolean {
     return delegationCount == maxAllowedDelegators
 }
+fun CandidateMetadata.isRewardedListFull(maxRewardedCollators: BigInteger): Boolean {
+    return totalCounted >= maxRewardedCollators
+}
 
 fun bindCandidateMetadata(decoded: Any?): CandidateMetadata {
     return decoded.castToStruct().let { struct ->

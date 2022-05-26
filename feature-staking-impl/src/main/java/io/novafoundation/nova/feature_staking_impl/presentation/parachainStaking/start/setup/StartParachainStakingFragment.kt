@@ -13,7 +13,9 @@ import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.model.ChooseCollatorResponse
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.setupParachainStakingRewardsComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.view.ChooseStakedCollatorBottomSheet
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
@@ -74,5 +76,15 @@ class StartParachainStakingFragment : BaseFragment<StartParachainStakingViewMode
         viewModel.buttonState.observe(startParachainStakingNext::setState)
 
         viewModel.minimumStake.observe(startParachainStakingMinStake::showAmount)
+
+        viewModel.chooseCollatorAction.awaitableActionLiveData.observeEvent { action ->
+            ChooseStakedCollatorBottomSheet(
+                context = requireContext(),
+                payload = action.payload,
+                stakedCollatorSelected = { action.onSuccess(ChooseCollatorResponse.Existing(it)) },
+                onCancel = action.onCancel,
+                newCollatorClicked = { action.onSuccess(ChooseCollatorResponse.New) }
+            ).show()
+        }
     }
 }

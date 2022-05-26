@@ -159,7 +159,6 @@ class ConfirmStartParachainStakingViewModel(
         val amountInPlanks = token.planksFromAmount(payload.amount)
 
         interactor.delegate(
-            originAddress = currentAccountModelFlow.first().address,
             amount = amountInPlanks,
             collator = payload.collator.accountIdHex.fromHex()
         )

@@ -38,5 +38,9 @@ fun startParachainStakingValidationFailure(
                 }
             }
         }
+        StartParachainStakingValidationFailure.NotPositiveAmount -> {
+            resourceManager.getString(R.string.common_amount_low) to
+                resourceManager.getString(R.string.common_zero_amount_error)
+        }
     }
 }

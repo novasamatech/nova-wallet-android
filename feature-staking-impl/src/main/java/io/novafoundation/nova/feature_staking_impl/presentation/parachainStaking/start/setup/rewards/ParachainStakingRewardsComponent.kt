@@ -5,7 +5,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.ParachainStakingRewardsComponent.State
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.StatefullComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.model.RewardEstimation
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -31,8 +30,9 @@ interface ParachainStakingRewardsComponent : StatefullComponent<State, Nothing, 
     }
 }
 
-infix fun ParachainStakingRewardsComponent.connectWith(amountChooserMixin: AmountChooserMixin.Presentation) {
-    amountChooserMixin.amount.onEach { newAmount ->
+@JvmName("connectWithAmount")
+infix fun ParachainStakingRewardsComponent.connectWith(amountFlow: Flow<BigDecimal>) {
+    amountFlow.onEach { newAmount ->
         val rewardsConfiguration = state.firstNotNull().rewardsConfiguration
         val newConfiguration = rewardsConfiguration.copy(amount = newAmount)
 
