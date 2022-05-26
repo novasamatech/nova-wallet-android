@@ -43,6 +43,8 @@ interface StartParachainStakingInteractor {
     suspend fun defaultMinimumStake(): BigInteger
 
     suspend fun getSelectedCollators(delegatorState: DelegatorState): List<Collator>
+
+    suspend fun checkDelegationsLimit(delegatorState: DelegatorState): DelegationsLimit
 }
 
 class RealStartParachainStakingInteractor(
@@ -129,6 +131,16 @@ class RealStartParachainStakingInteractor(
                 collatorProvider.getCollators(delegatorState.chain.id, collatorSource)
             }
             is DelegatorState.None -> emptyList()
+        }
+    }
+
+    override suspend fun checkDelegationsLimit(delegatorState: DelegatorState): DelegationsLimit {
+        val maxDelegations = stakingConstantsRepository.maxDelegationsPerDelegator(delegatorState.chain.id).toInt()
+
+        return if (delegatorState.delegationsCount < maxDelegations) {
+            DelegationsLimit.NotReached
+        } else {
+            DelegationsLimit.Reached(maxDelegations)
         }
     }
 

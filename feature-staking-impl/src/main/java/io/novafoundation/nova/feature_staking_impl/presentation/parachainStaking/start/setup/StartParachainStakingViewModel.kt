@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_staking_api.domain.model.parachain.delegat
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.Collator
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.DelegationsLimit
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.StartParachainStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationSystem
@@ -192,7 +193,7 @@ class StartParachainStakingViewModel(
             }
 
             when(val response = chooseCollatorAction.awaitAction(payload)) {
-                ChooseCollatorResponse.New -> selectCollatorInterScreenRequester.openRequest()
+                ChooseCollatorResponse.New -> openSelectNewCollatorCheckingLimits(delegatorState)
                 is ChooseCollatorResponse.Existing -> selectedCollatorFlow.value = response.collatorModel.collator
             }
         }
@@ -204,6 +205,18 @@ class StartParachainStakingViewModel(
 
     fun backClicked() {
         router.back()
+    }
+
+    private suspend fun openSelectNewCollatorCheckingLimits(delegatorState: DelegatorState) {
+        when(val check = interactor.checkDelegationsLimit(delegatorState)) {
+            DelegationsLimit.NotReached -> selectCollatorInterScreenRequester.openRequest()
+            is DelegationsLimit.Reached -> {
+                showError(
+                    title = resourceManager.getString(R.string.staking_parachain_max_delegations_title),
+                    text = resourceManager.getString(R.string.staking_parachain_max_delegations_message, check.limit)
+                )
+            }
+        }
     }
 
     private fun setInitialCollator() = launch {
