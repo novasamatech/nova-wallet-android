@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorConstantsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
@@ -92,8 +93,12 @@ class ConfirmStartParachainStakingViewModel(
         )
     }.shareInBackground()
 
-    val title = flowOf {
-        resourceManager.getString(R.string.staking_start_title)
+    val title = delegatorStateFlow.map {
+        if (it is DelegatorState.Delegator) {
+            resourceManager.getString(R.string.staking_bond_more_v1_9_0)
+        } else {
+            resourceManager.getString(R.string.staking_start_title)
+        }
     }
         .shareInBackground()
 
