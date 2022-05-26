@@ -90,6 +90,8 @@ class StartParachainStakingViewModel(
     private val currentDelegatorStateFlow = delegatorStateUseCase.currentDelegatorStateFlow()
         .shareInBackground()
 
+    private val isStakeMore = currentDelegatorStateFlow.map { it is DelegatorState.Delegator }
+
     private val alreadyStakedCollatorsFlow = currentDelegatorStateFlow
         .mapLatest(interactor::getSelectedCollators)
         .shareInBackground()
@@ -135,9 +137,14 @@ class StartParachainStakingViewModel(
         assetFlow = assetFlow
     )
 
-    val title = assetFlow.map { resourceManager.getString(R.string.staking_stake_format, it.token.configuration.symbol) }
-        .inBackground()
-        .share()
+    val title = combine(assetFlow, isStakeMore) { asset, isStakeMore ->
+        if (isStakeMore) {
+            resourceManager.getString(R.string.staking_bond_more_v1_9_0)
+        } else {
+            resourceManager.getString(R.string.staking_stake_format, asset.token.configuration.symbol)
+        }
+    }
+        .shareInBackground()
 
     val buttonState = combine(
         validationInProgress,
