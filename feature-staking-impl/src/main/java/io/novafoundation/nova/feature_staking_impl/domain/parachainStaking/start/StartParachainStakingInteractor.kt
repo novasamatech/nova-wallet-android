@@ -34,9 +34,6 @@ interface StartParachainStakingInteractor {
 
     suspend fun delegate(originAddress: String, amount: BigInteger, collator: AccountId): Result<*>
 
-    // TODO stub until select collator screen is implemented
-    suspend fun randomCollator(): Collator
-
     suspend fun getCollatorById(collatorId: AccountId): Collator
 
     suspend fun defaultMinimumStake(): BigInteger
@@ -88,12 +85,6 @@ class RealStartParachainStakingInteractor(
                 .filterIsInstance<ExtrinsicStatus.InBlock>()
                 .first()
         }
-    }
-
-    override suspend fun randomCollator(): Collator = withContext(Dispatchers.Default) {
-        val chainId = singleAssetSharedState.chainId()
-
-        collatorProvider.electedCollators(chainId).random()
     }
 
     override suspend fun getCollatorById(collatorId: AccountId): Collator {

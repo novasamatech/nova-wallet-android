@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import java.math.BigInteger
 
 class CandidateMetadata(
+    val totalCounted: Balance,
     val delegationCount: BigInteger,
     val lowestBottomDelegationAmount: Balance,
 )
@@ -17,6 +18,7 @@ fun CandidateMetadata.isFull(maxAllowedDelegators: BigInteger): Boolean {
 fun bindCandidateMetadata(decoded: Any?): CandidateMetadata {
     return decoded.castToStruct().let { struct ->
         CandidateMetadata(
+            totalCounted = bindNumber(struct["totalCounted"]),
             delegationCount = bindNumber(struct["delegationCount"]),
             lowestBottomDelegationAmount = bindNumber(struct["lowestBottomDelegationAmount"])
         )

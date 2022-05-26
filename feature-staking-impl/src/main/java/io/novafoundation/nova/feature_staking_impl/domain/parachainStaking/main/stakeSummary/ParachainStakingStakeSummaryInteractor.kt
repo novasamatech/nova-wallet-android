@@ -1,14 +1,13 @@
 package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.stakeSummary
 
+import io.novafoundation.nova.common.utils.anyIs
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.RoundDurationEstimator
-import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.CollatorSnapshot
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CurrentRoundRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.ParachainStakingConstantsRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.systemForcedMinStake
-import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.minimumStake
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegationState
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.delegationStatesIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.map
@@ -21,10 +20,6 @@ class ParachainStakingStakeSummaryInteractor(
     private val roundDurationEstimator: RoundDurationEstimator,
 ) {
 
-    private enum class DelegationState {
-        COLLATOR_NOT_ACTIVE, TOO_LOW_STAKE, WAITING, ACTIVE
-    }
-
     suspend fun delegatorStatusFlow(delegatorState: DelegatorState.Delegator): Flow<DelegatorStatus> {
         val chainId = delegatorState.chain.id
         val systemForcedMinStake = parachainStakingConstantsRepository.systemForcedMinStake(chainId)
@@ -33,16 +28,7 @@ class ParachainStakingStakeSummaryInteractor(
         return currentRoundRepository.currentRoundInfoFlow(chainId).transformLatest { currentRoundInfo ->
             val snapshots = currentRoundRepository.collatorsSnapshot(chainId, currentRoundInfo.current)
 
-            val delegationStates = delegatorState.delegations.map { delegation ->
-                val collator = snapshots[delegation.owner.toHexString()]
-
-                when {
-                    collator == null -> DelegationState.COLLATOR_NOT_ACTIVE
-                    collator.hasDelegator(delegatorState.accountId) -> DelegationState.ACTIVE
-                    delegation.balance < collator.minimumStake(systemForcedMinStake, maxRewardedDelegatorsPerCollator) -> DelegationState.TOO_LOW_STAKE
-                    else -> DelegationState.WAITING
-                }
-            }
+            val delegationStates = delegatorState.delegationStatesIn(snapshots, systemForcedMinStake, maxRewardedDelegatorsPerCollator).values
 
             when {
                 delegationStates.anyIs(DelegationState.ACTIVE) -> emit(DelegatorStatus.Active)
@@ -57,11 +43,5 @@ class ParachainStakingStakeSummaryInteractor(
                 else -> emit(DelegatorStatus.Inactive)
             }
         }
-    }
-
-    private fun List<DelegationState>.anyIs(state: DelegationState) = any { it == state }
-
-    private fun CollatorSnapshot.hasDelegator(delegatorId: AccountId): Boolean {
-        return delegations.any { it.owner.contentEquals(delegatorId) }
     }
 }

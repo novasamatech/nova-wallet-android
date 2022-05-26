@@ -151,20 +151,21 @@ private fun mapValidatorToValidatorDetailsParcelModel(
 
 @OptIn(ExperimentalStdlibApi::class)
 fun mapStakeTargetDetailsToErrors(
-    validator: StakeTargetDetailsParcelModel,
+    stakeTarget: StakeTargetDetailsParcelModel,
+    displayConfig: StakeTargetDetailsPayload.DisplayConfig,
 ): List<ValidatorAlert> {
     return buildList {
-        if (validator.isSlashed) {
+        if (stakeTarget.isSlashed) {
             add(ValidatorAlert.Slashed)
         }
 
-        if (validator.stake is StakeTargetStakeParcelModel.Active && validator.stake.isOversubscribed) {
-            val nominatorInfo = validator.stake.userStakeInfo
+        if (stakeTarget.stake is StakeTargetStakeParcelModel.Active && stakeTarget.stake.isOversubscribed) {
+            val nominatorInfo = stakeTarget.stake.userStakeInfo
 
             if (nominatorInfo == null || nominatorInfo.willBeRewarded) {
                 add(ValidatorAlert.Oversubscribed.UserNotInvolved)
             } else {
-                add(ValidatorAlert.Oversubscribed.UserMissedReward)
+                add(ValidatorAlert.Oversubscribed.UserMissedReward(displayConfig.oversubscribedWarningText))
             }
         }
     }

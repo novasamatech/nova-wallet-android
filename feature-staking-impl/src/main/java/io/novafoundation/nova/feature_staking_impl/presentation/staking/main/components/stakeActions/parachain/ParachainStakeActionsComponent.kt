@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_staking_api.domain.model.parachain.Delegat
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_VALIDATORS
+import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.common.parachainStaking.loadDelegatingState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.ManageStakeAction
@@ -28,6 +29,7 @@ import kotlinx.coroutines.flow.map
 class ParachainStakeActionsComponentFactory(
     private val delegatorStateUseCase: DelegatorStateUseCase,
     private val resourceManager: ResourceManager,
+    private val router: ParachainStakingRouter,
 ) {
 
     fun create(
@@ -37,13 +39,15 @@ class ParachainStakeActionsComponentFactory(
         delegatorStateUseCase = delegatorStateUseCase,
         resourceManager = resourceManager,
         assetWithChain = assetWithChain,
-        hostContext = hostContext
+        hostContext = hostContext,
+        router = router
     )
 }
 
 private class ParachainStakeActionsComponent(
     delegatorStateUseCase: DelegatorStateUseCase,
     private val resourceManager: ResourceManager,
+    private val router: ParachainStakingRouter,
 
     private val assetWithChain: SingleAssetSharedState.AssetWithChain,
     private val hostContext: ComponentHostContext,
@@ -64,8 +68,14 @@ private class ParachainStakeActionsComponent(
     override fun onAction(action: StakeActionsAction) {
         when (action) {
             is StakeActionsAction.ActionClicked -> {
-                // TODO bond more, unbond, current collators screens
+                navigateToAction(action.action)
             }
+        }
+    }
+
+    private fun navigateToAction(action: ManageStakeAction) {
+        when (action.id) {
+            SYSTEM_MANAGE_VALIDATORS -> router.openCurrentCollators()
         }
     }
 

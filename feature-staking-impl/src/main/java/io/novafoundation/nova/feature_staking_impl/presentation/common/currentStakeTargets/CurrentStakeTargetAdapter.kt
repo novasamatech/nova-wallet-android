@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.validators.current
+package io.novafoundation.nova.feature_staking_impl.presentation.common.currentStakeTargets
 
 import android.view.View
 import android.view.ViewGroup
@@ -13,8 +13,8 @@ import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.current.model.NominatedValidatorModel
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.current.model.NominatedValidatorStatusModel
+import io.novafoundation.nova.feature_staking_impl.presentation.common.currentStakeTargets.model.SelectedStakeTargetModel
+import io.novafoundation.nova.feature_staking_impl.presentation.common.currentStakeTargets.model.SelectedStakeTargetStatusModel
 import kotlinx.android.synthetic.main.item_current_validator.view.currentValidatorSlashedIcon
 import kotlinx.android.synthetic.main.item_current_validator.view.itemCurrentValidatorApy
 import kotlinx.android.synthetic.main.item_current_validator.view.itemCurrentValidatorIcon
@@ -27,13 +27,13 @@ import kotlinx.android.synthetic.main.item_current_validator_group.view.itemCurr
 import kotlinx.android.synthetic.main.item_current_validator_group.view.itemCurrentValidatorGroupDescription
 import kotlinx.android.synthetic.main.item_current_validator_group.view.itemCurrentValidatorGroupStatus
 
-class CurrentValidatorsAdapter(
+class CurrentStakeTargetAdapter(
     private val handler: Handler,
-) : GroupedListAdapter<NominatedValidatorStatusModel, NominatedValidatorModel>(CurrentValidatorsDiffCallback) {
+) : GroupedListAdapter<SelectedStakeTargetStatusModel, SelectedStakeTargetModel>(CurrentValidatorsDiffCallback) {
 
     interface Handler {
 
-        fun infoClicked(validatorModel: NominatedValidatorModel)
+        fun infoClicked(stakeTargetModel: SelectedStakeTargetModel)
     }
 
     override fun createGroupViewHolder(parent: ViewGroup): GroupedListHolder {
@@ -44,18 +44,18 @@ class CurrentValidatorsAdapter(
         return CurrentValidatorsChildHolder(parent.inflateChild(R.layout.item_current_validator))
     }
 
-    override fun bindGroup(holder: GroupedListHolder, group: NominatedValidatorStatusModel) {
+    override fun bindGroup(holder: GroupedListHolder, group: SelectedStakeTargetStatusModel) {
         (holder as CurrentValidatorsGroupHolder).bind(group)
     }
 
-    override fun bindChild(holder: GroupedListHolder, child: NominatedValidatorModel) {
+    override fun bindChild(holder: GroupedListHolder, child: SelectedStakeTargetModel) {
         (holder as CurrentValidatorsChildHolder).bind(child, handler)
     }
 }
 
 private class CurrentValidatorsGroupHolder(view: View) : GroupedListHolder(view) {
 
-    fun bind(group: NominatedValidatorStatusModel) = with(containerView) {
+    fun bind(group: SelectedStakeTargetStatusModel) = with(containerView) {
         val topPadding = if (isFirst()) 16 else 24
         itemCurrentValidatorContainer.updatePadding(top = topPadding.dp(context))
 
@@ -74,7 +74,7 @@ private class CurrentValidatorsGroupHolder(view: View) : GroupedListHolder(view)
 
 private class CurrentValidatorsChildHolder(view: View) : GroupedListHolder(view) {
 
-    fun bind(validator: NominatedValidatorModel, handler: CurrentValidatorsAdapter.Handler) = with(containerView) {
+    fun bind(validator: SelectedStakeTargetModel, handler: CurrentStakeTargetAdapter.Handler) = with(containerView) {
         itemCurrentValidatorIcon.setImageDrawable(validator.addressModel.image)
         itemCurrentValidatorName.text = validator.addressModel.nameOrAddress
 
@@ -91,21 +91,21 @@ private class CurrentValidatorsChildHolder(view: View) : GroupedListHolder(view)
 }
 
 private object CurrentValidatorsDiffCallback :
-    BaseGroupedDiffCallback<NominatedValidatorStatusModel, NominatedValidatorModel>(NominatedValidatorStatusModel::class.java) {
+    BaseGroupedDiffCallback<SelectedStakeTargetStatusModel, SelectedStakeTargetModel>(SelectedStakeTargetStatusModel::class.java) {
 
-    override fun areGroupItemsTheSame(oldItem: NominatedValidatorStatusModel, newItem: NominatedValidatorStatusModel): Boolean {
+    override fun areGroupItemsTheSame(oldItem: SelectedStakeTargetStatusModel, newItem: SelectedStakeTargetStatusModel): Boolean {
         return oldItem == newItem
     }
 
-    override fun areGroupContentsTheSame(oldItem: NominatedValidatorStatusModel, newItem: NominatedValidatorStatusModel): Boolean {
+    override fun areGroupContentsTheSame(oldItem: SelectedStakeTargetStatusModel, newItem: SelectedStakeTargetStatusModel): Boolean {
         return true
     }
 
-    override fun areChildItemsTheSame(oldItem: NominatedValidatorModel, newItem: NominatedValidatorModel): Boolean {
+    override fun areChildItemsTheSame(oldItem: SelectedStakeTargetModel, newItem: SelectedStakeTargetModel): Boolean {
         return oldItem.addressModel.address == newItem.addressModel.address
     }
 
-    override fun areChildContentsTheSame(oldItem: NominatedValidatorModel, newItem: NominatedValidatorModel): Boolean {
+    override fun areChildContentsTheSame(oldItem: SelectedStakeTargetModel, newItem: SelectedStakeTargetModel): Boolean {
         return oldItem.nominated == newItem.nominated
     }
 }

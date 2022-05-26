@@ -87,8 +87,10 @@ class ParachainModule {
     fun provideStakeActionsFactory(
         delegatorStateUseCase: DelegatorStateUseCase,
         resourceManager: ResourceManager,
+        router: ParachainStakingRouter
     ) = ParachainStakeActionsComponentFactory(
         delegatorStateUseCase = delegatorStateUseCase,
-        resourceManager = resourceManager
+        resourceManager = resourceManager,
+        router = router
     )
 }

@@ -20,4 +20,6 @@ interface ParachainStakingRouter {
     fun returnToStartStaking()
 
     val currentStackEntryLifecycle: Lifecycle
+
+    fun openCurrentCollators()
 }

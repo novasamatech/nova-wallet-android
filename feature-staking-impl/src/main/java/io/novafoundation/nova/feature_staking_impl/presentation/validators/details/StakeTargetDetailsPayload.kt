@@ -21,7 +21,8 @@ class StakeTargetDetailsPayload(
         val rewardSuffix: RewardSuffix,
         val rewardedStakersPerStakeTarget: Int,
         @StringRes val titleRes: Int,
-        @StringRes val stakersLabelRes: Int
+        @StringRes val stakersLabelRes: Int,
+        @StringRes val oversubscribedWarningText: Int,
     ) : Parcelable
 }
 
@@ -35,7 +36,8 @@ suspend fun StakeTargetDetailsPayload.Companion.relaychain(
             rewardSuffix = RewardSuffix.APY,
             rewardedStakersPerStakeTarget = stakingInteractor.maxRewardedNominators(),
             titleRes = R.string.staking_validator_info_title,
-            stakersLabelRes = R.string.staking_validator_nominators
+            stakersLabelRes = R.string.staking_validator_nominators,
+            oversubscribedWarningText = R.string.staking_validator_my_oversubscribed_message
         )
     )
 }
