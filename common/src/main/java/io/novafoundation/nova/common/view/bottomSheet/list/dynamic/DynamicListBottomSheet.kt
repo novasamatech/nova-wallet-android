@@ -36,7 +36,8 @@ abstract class DynamicListBottomSheet<T>(
     private val diffCallback: DiffUtil.ItemCallback<T>,
     private val onClicked: ClickHandler<T>,
     private val onCancel: (() -> Unit)? = null,
-) : BottomSheetDialog(context, R.style.BottomSheetDialog), DynamicListSheetAdapter.Handler<T>,
+) : BottomSheetDialog(context, R.style.BottomSheetDialog),
+    DynamicListSheetAdapter.Handler<T>,
     WithContextExtensions by WithContextExtensions(context),
     DialogExtensions {
 

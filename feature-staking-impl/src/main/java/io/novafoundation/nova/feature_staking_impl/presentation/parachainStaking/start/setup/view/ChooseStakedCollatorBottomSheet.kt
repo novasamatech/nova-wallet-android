@@ -27,7 +27,7 @@ class ChooseStakedCollatorBottomSheet(
     stakedCollatorSelected: ClickHandler<SelectCollatorModel>,
     onCancel: () -> Unit,
     private val newCollatorClicked: () -> Unit
-): DynamicListBottomSheet<SelectCollatorModel>(
+) : DynamicListBottomSheet<SelectCollatorModel>(
     context = context,
     payload = payload,
     diffCallback = DiffCallback(),
@@ -60,7 +60,7 @@ class ChooseStakedCollatorBottomSheet(
     }
 }
 
-private class ViewHolder(containerView: View): DynamicListSheetAdapter.Holder<SelectCollatorModel>(containerView) {
+private class ViewHolder(containerView: View) : DynamicListSheetAdapter.Holder<SelectCollatorModel>(containerView) {
 
     init {
         containerView.itemSelectStakedCollatorCollator.itemValidatorInfo.makeGone()
@@ -75,7 +75,7 @@ private class ViewHolder(containerView: View): DynamicListSheetAdapter.Holder<Se
     }
 }
 
-private class DiffCallback: DiffUtil.ItemCallback<SelectCollatorModel>() {
+private class DiffCallback : DiffUtil.ItemCallback<SelectCollatorModel>() {
     override fun areContentsTheSame(oldItem: SelectCollatorModel, newItem: SelectCollatorModel): Boolean {
         return oldItem.staked == newItem.staked
     }
@@ -83,5 +83,4 @@ private class DiffCallback: DiffUtil.ItemCallback<SelectCollatorModel>() {
     override fun areItemsTheSame(oldItem: SelectCollatorModel, newItem: SelectCollatorModel): Boolean {
         return oldItem.addressModel.address == newItem.addressModel.address
     }
-
 }

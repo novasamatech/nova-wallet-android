@@ -192,7 +192,7 @@ class StartParachainStakingViewModel(
                 DynamicListBottomSheet.Payload(collatorModels, selected)
             }
 
-            when(val response = chooseCollatorAction.awaitAction(payload)) {
+            when (val response = chooseCollatorAction.awaitAction(payload)) {
                 ChooseCollatorResponse.New -> openSelectNewCollatorCheckingLimits(delegatorState)
                 is ChooseCollatorResponse.Existing -> selectedCollatorFlow.value = response.collatorModel.collator
             }
@@ -208,7 +208,7 @@ class StartParachainStakingViewModel(
     }
 
     private suspend fun openSelectNewCollatorCheckingLimits(delegatorState: DelegatorState) {
-        when(val check = interactor.checkDelegationsLimit(delegatorState)) {
+        when (val check = interactor.checkDelegationsLimit(delegatorState)) {
             DelegationsLimit.NotReached -> selectCollatorInterScreenRequester.openRequest()
             is DelegationsLimit.Reached -> {
                 showError(

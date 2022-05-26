@@ -90,7 +90,6 @@ fun <I> FeeLoaderMixin.Presentation.connectWith(
     }.launchIn(scope)
 }
 
-
 fun <I1, I2> FeeLoaderMixin.Presentation.connectWith(
     inputSource1: Flow<I1>,
     inputSource2: Flow<I2>,

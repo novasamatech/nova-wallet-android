@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.parachainStakin
 
 sealed class ChooseCollatorResponse {
 
-    object New: ChooseCollatorResponse()
+    object New : ChooseCollatorResponse()
 
-    class Existing(val collatorModel: SelectCollatorModel): ChooseCollatorResponse()
+    class Existing(val collatorModel: SelectCollatorModel) : ChooseCollatorResponse()
 }

@@ -103,7 +103,7 @@ class RealStartParachainStakingInteractor(
                         candidate = collator,
                         amount = amount,
                         candidateDelegationCount = candidateMetadata.delegationCount,
-                        delegationCount =  currentDelegationState.delegationsCount.toBigInteger()
+                        delegationCount = currentDelegationState.delegationsCount.toBigInteger()
                     )
                 }
             }
@@ -123,7 +123,7 @@ class RealStartParachainStakingInteractor(
     }
 
     override suspend fun getSelectedCollators(delegatorState: DelegatorState): List<Collator> {
-        return when(delegatorState) {
+        return when (delegatorState) {
             is DelegatorState.Delegator -> {
                 val stakedCollatorsIds = delegatorState.delegations.map { it.owner.toHexString() }
 

@@ -5,7 +5,7 @@ import java.math.BigDecimal
 
 sealed class StartParachainStakingValidationFailure {
 
-    object NotPositiveAmount: StartParachainStakingValidationFailure()
+    object NotPositiveAmount : StartParachainStakingValidationFailure()
 
     object NotEnoughBalanceToPayFees : StartParachainStakingValidationFailure()
 

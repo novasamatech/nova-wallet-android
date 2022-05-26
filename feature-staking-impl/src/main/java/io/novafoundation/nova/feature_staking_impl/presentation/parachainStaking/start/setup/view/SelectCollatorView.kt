@@ -38,7 +38,6 @@ class SelectCollatorView @JvmOverloads constructor(
         itemValidatorInfo.setImageResource(R.drawable.ic_chevron_right)
         itemValidatorInfo.setImageTintRes(R.color.white_48)
 
-
         setSelectedCollator(null)
     }
 
