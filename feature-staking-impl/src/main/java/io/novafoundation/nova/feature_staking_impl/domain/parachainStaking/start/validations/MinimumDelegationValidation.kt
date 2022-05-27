@@ -58,7 +58,6 @@ class MinimumDelegationValidation(
         val lowestBottomDelegationAmount = token.amountFromPlanks(candidateMetadata.lowestBottomDelegationAmount)
 
         val delegatorState = delegatorStateUseCase.currentDelegatorState()
-        print(delegatorState)
         val asDelegator = delegatorState.castOrNull<DelegatorState.Delegator>()
 
         val totalDelegatedPlanks = asDelegator?.total.orZero()
