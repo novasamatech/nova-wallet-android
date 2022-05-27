@@ -84,7 +84,7 @@ class MinimumDelegationValidation(
                 validationError(TooLowDelegation(lowestBottomDelegationAmount, asset, strictGreaterThan = true))
             }
 
-            // collator's top is full but we can still join top delegations
+            // collator's top is full but we can still join bottom delegations
             candidateMetadata.isRewardedListFull(maxRewardedDelegators) && value.amount + stakedInSelectedCollator <= minStakeToGetRewards -> {
                 validationWarning(WontReceiveRewards(minStakeToGetRewards, asset))
             }

@@ -3,9 +3,9 @@ package io.novafoundation.nova.feature_staking_impl.presentation.parachainStakin
 import android.content.Context
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup.*
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
-import android.view.ViewGroup.MarginLayoutParams
 import androidx.recyclerview.widget.DiffUtil
 import io.novafoundation.nova.common.utils.addAfter
 import io.novafoundation.nova.common.utils.inflateChild
@@ -42,9 +42,7 @@ class ChooseStakedCollatorBottomSheet(
         setDividerVisible(false)
 
         val newCollatorAction = AccentActionView(context).apply {
-            layoutParams = MarginLayoutParams(MATCH_PARENT, WRAP_CONTENT).apply {
-                setMargins(0, 0, 0, 0)
-            }
+            layoutParams = LayoutParams(MATCH_PARENT, WRAP_CONTENT)
 
             setDismissingClickListener { newCollatorClicked() }
 
