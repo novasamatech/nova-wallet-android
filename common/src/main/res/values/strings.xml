@@ -29,7 +29,7 @@
   <string name="staking_min_stake">Min. stake</string>
 
   <string name="staking_parachain_reward_frequency_hint">Tokens in stake produce rewards each round (%s)</string>
-  <string name="staking_setup_amount_too_low_strict">Minimum stake should be strictly greater than (%s)</string>
+  <string name="staking_setup_amount_too_low_strict">Minimum stake should be greater than %s</string>
 
   <string name="common_missing_account_title">%s account is missing</string>
   <string name="staking_missing_account_message">You should add %s account to the wallet in order to start staking</string>
@@ -37,7 +37,7 @@
   <string name="common_enter_amount">Enter amount…</string>
   <string name="staking_parachain_select_collator_hint">Select collator…</string>
   <string name="staking_parachain_wont_receive_rewards_title">You will not receive rewards</string>
-  <string name="staking_parachain_wont_receive_rewards_message">Your stake must be strictly greater than the minimum stake (%s) for this collator.</string>
+  <string name="staking_parachain_wont_receive_rewards_message">Your stake must be greater than the minimum stake (%s) for this collator.</string>
   <string name="common_per_year_format">%s / year</string>
 
   <string name="staking_parachain_collator">Collator</string>
