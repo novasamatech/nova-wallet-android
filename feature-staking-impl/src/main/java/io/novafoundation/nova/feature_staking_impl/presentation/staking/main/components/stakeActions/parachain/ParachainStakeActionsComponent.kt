@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_staking_api.domain.model.parachain.Delegat
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_STAKING_BOND_MORE
+import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_STAKING_UNBOND
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_VALIDATORS
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
@@ -78,6 +79,7 @@ private class ParachainStakeActionsComponent(
         when (action.id) {
             SYSTEM_MANAGE_VALIDATORS -> router.openCurrentCollators()
             SYSTEM_MANAGE_STAKING_BOND_MORE -> router.openStartStaking()
+            SYSTEM_MANAGE_STAKING_UNBOND -> router.openUnbond()
         }
     }
 

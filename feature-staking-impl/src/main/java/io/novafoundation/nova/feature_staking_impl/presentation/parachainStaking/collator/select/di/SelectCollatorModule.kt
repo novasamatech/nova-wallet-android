@@ -12,7 +12,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
-import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorConstantsUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.recommendations.CollatorRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator
@@ -27,15 +27,15 @@ class SelectCollatorModule {
     @IntoMap
     @ViewModelKey(SelectCollatorViewModel::class)
     fun provideViewModel(
-        router: ParachainStakingRouter,
-        selectCollatorInterScreenCommunicator: SelectCollatorInterScreenCommunicator,
-        selectCollatorSettingsInterScreenCommunicator: SelectCollatorSettingsInterScreenCommunicator,
-        collatorRecommendatorFactory: CollatorRecommendatorFactory,
-        collatorConstantsUseCase: CollatorConstantsUseCase,
-        @Caching addressIconGenerator: AddressIconGenerator,
-        resourceManager: ResourceManager,
-        tokenUseCase: TokenUseCase,
-        selectedAssetState: StakingSharedState,
+            router: ParachainStakingRouter,
+            selectCollatorInterScreenCommunicator: SelectCollatorInterScreenCommunicator,
+            selectCollatorSettingsInterScreenCommunicator: SelectCollatorSettingsInterScreenCommunicator,
+            collatorRecommendatorFactory: CollatorRecommendatorFactory,
+            collatorsUseCase: CollatorsUseCase,
+            @Caching addressIconGenerator: AddressIconGenerator,
+            resourceManager: ResourceManager,
+            tokenUseCase: TokenUseCase,
+            selectedAssetState: StakingSharedState,
     ): ViewModel {
         return SelectCollatorViewModel(
             router = router,
@@ -45,7 +45,7 @@ class SelectCollatorModule {
             resourceManager = resourceManager,
             tokenUseCase = tokenUseCase,
             selectedAssetState = selectedAssetState,
-            collatorConstantsUseCase = collatorConstantsUseCase,
+            collatorsUseCase = collatorsUseCase,
             selectCollatorSettingsInterScreenRequester = selectCollatorSettingsInterScreenCommunicator
         )
     }

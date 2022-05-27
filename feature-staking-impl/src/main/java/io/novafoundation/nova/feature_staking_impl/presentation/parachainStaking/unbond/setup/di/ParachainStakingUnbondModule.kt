@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.di
+package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.setup.di
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
@@ -17,18 +17,17 @@ import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
-import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.StartParachainStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationSystem
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.ParachainStakingUnbondInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
-import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator
-import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.StartParachainStakingViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.RealParachainStakingRewardsComponentFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.setup.ParachainStakingUnbondViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 
 @Module(includes = [ViewModelModule::class])
-class StartParachainStakingModule {
+class ParachainStakingUnbondModule {
 
     @Provides
     @ScreenScope
@@ -40,40 +39,34 @@ class StartParachainStakingModule {
 
     @Provides
     @IntoMap
-    @ViewModelKey(StartParachainStakingViewModel::class)
+    @ViewModelKey(ParachainStakingUnbondViewModel::class)
     fun provideViewModel(
         router: ParachainStakingRouter,
-        selectCollatorInterScreenCommunicator: SelectCollatorInterScreenCommunicator,
-        interactor: StartParachainStakingInteractor,
+        interactor: ParachainStakingUnbondInteractor,
+        addressIconGenerator: AddressIconGenerator,
         assetUseCase: AssetUseCase,
         resourceManager: ResourceManager,
         validationExecutor: ValidationExecutor,
-        feeLoaderMixin: FeeLoaderMixin.Presentation,
-        rewardsComponentFactory: RealParachainStakingRewardsComponentFactory,
-        amountChooserMixinFactory: AmountChooserMixin.Factory,
         validationSystem: StartParachainStakingValidationSystem,
-        singleAssetSharedState: StakingSharedState,
-        addressIconGenerator: AddressIconGenerator,
+        feeLoaderMixin: FeeLoaderMixin.Presentation,
         delegatorStateUseCase: DelegatorStateUseCase,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         collatorsUseCase: CollatorsUseCase,
-    ): ViewModel {
-        return StartParachainStakingViewModel(
+        amountChooserMixinFactory: AmountChooserMixin.Factory,
+        ): ViewModel {
+        return ParachainStakingUnbondViewModel(
             router = router,
-            selectCollatorInterScreenRequester = selectCollatorInterScreenCommunicator,
             interactor = interactor,
-            rewardsComponentFactory = rewardsComponentFactory,
+            addressIconGenerator = addressIconGenerator,
             assetUseCase = assetUseCase,
             resourceManager = resourceManager,
             validationExecutor = validationExecutor,
+//            validationSystem = validationSystem,
             feeLoaderMixin = feeLoaderMixin,
-            amountChooserMixinFactory = amountChooserMixinFactory,
-            singleAssetSharedState = singleAssetSharedState,
-            addressIconGenerator = addressIconGenerator,
-            validationSystem = validationSystem,
             delegatorStateUseCase = delegatorStateUseCase,
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
-            collatorsUseCase = collatorsUseCase
+            collatorsUseCase = collatorsUseCase,
+            amountChooserMixinFactory = amountChooserMixinFactory
         )
     }
 
@@ -81,7 +74,7 @@ class StartParachainStakingModule {
     fun provideViewModelCreator(
         fragment: Fragment,
         viewModelFactory: ViewModelProvider.Factory
-    ): StartParachainStakingViewModel {
-        return ViewModelProvider(fragment, viewModelFactory).get(StartParachainStakingViewModel::class.java)
+    ): ParachainStakingUnbondViewModel {
+        return ViewModelProvider(fragment, viewModelFactory).get(ParachainStakingUnbondViewModel::class.java)
     }
 }

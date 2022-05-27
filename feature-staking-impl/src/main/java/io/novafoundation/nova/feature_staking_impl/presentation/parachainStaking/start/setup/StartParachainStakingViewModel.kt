@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.icon.cre
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.delegationAmountTo
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.Collator
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.DelegationsLimit
@@ -33,7 +34,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.model.SelectCollatorModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.RealParachainStakingRewardsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.connectWith
-import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.startParachainStakingValidationFailure
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.startParachainStakingValidationFailure
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
@@ -70,6 +71,7 @@ class StartParachainStakingViewModel(
     private val feeLoaderMixin: FeeLoaderMixin.Presentation,
     private val delegatorStateUseCase: DelegatorStateUseCase,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+    private val collatorsUseCase: CollatorsUseCase,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
 ) : BaseViewModel(),
     Retriable,
@@ -94,7 +96,7 @@ class StartParachainStakingViewModel(
     private val isStakeMore = currentDelegatorStateFlow.map { it is DelegatorState.Delegator }
 
     private val alreadyStakedCollatorsFlow = currentDelegatorStateFlow
-        .mapLatest(interactor::getSelectedCollators)
+        .mapLatest(collatorsUseCase::getSelectedCollators)
         .shareInBackground()
 
     private val selectedCollatorFlow = MutableStateFlow<Collator?>(null)
@@ -127,7 +129,7 @@ class StartParachainStakingViewModel(
     val chooseCollatorAction = actionAwaitableMixinFactory.create<DynamicListBottomSheet.Payload<SelectCollatorModel>, ChooseCollatorResponse>()
 
     val minimumStake = selectedCollatorFlow.map {
-        val minimumStake = it?.minimumStakeToGetRewards ?: interactor.defaultMinimumStake()
+        val minimumStake = it?.minimumStakeToGetRewards ?: collatorsUseCase.defaultMinimumStake()
         val asset = assetFlow.first()
 
         mapAmountToAmountModel(minimumStake, asset)

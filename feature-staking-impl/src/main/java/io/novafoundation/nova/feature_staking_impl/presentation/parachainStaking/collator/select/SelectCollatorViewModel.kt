@@ -7,7 +7,7 @@ import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorConstantsUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.Collator
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.recommendations.CollatorRecommendationConfig
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.recommendations.CollatorRecommendatorFactory
@@ -40,15 +40,15 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class SelectCollatorViewModel(
-    private val router: ParachainStakingRouter,
-    private val selectCollatorInterScreenResponder: SelectCollatorInterScreenResponder,
-    private val selectCollatorSettingsInterScreenRequester: SelectCollatorSettingsInterScreenRequester,
-    private val collatorConstantsUseCase: CollatorConstantsUseCase,
-    private val collatorRecommendatorFactory: CollatorRecommendatorFactory,
-    private val addressIconGenerator: AddressIconGenerator,
-    private val resourceManager: ResourceManager,
-    private val tokenUseCase: TokenUseCase,
-    private val selectedAssetState: SingleAssetSharedState,
+        private val router: ParachainStakingRouter,
+        private val selectCollatorInterScreenResponder: SelectCollatorInterScreenResponder,
+        private val selectCollatorSettingsInterScreenRequester: SelectCollatorSettingsInterScreenRequester,
+        private val collatorsUseCase: CollatorsUseCase,
+        private val collatorRecommendatorFactory: CollatorRecommendatorFactory,
+        private val addressIconGenerator: AddressIconGenerator,
+        private val resourceManager: ResourceManager,
+        private val tokenUseCase: TokenUseCase,
+        private val selectedAssetState: SingleAssetSharedState,
 ) : BaseViewModel() {
 
     private val collatorRecommendator by lazyAsync {
@@ -109,7 +109,7 @@ class SelectCollatorViewModel(
             val payload = withContext(Dispatchers.Default) {
                 val parcel = mapCollatorToDetailsParcelModel(collatorModel.stakeTarget)
 
-                StakeTargetDetailsPayload.parachain(parcel, collatorConstantsUseCase)
+                StakeTargetDetailsPayload.parachain(parcel, collatorsUseCase)
             }
 
             router.openCollatorDetails(payload)

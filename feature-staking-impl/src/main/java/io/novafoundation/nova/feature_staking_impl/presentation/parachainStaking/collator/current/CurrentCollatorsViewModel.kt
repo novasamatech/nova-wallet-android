@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.collator.current.CurrentCollatorInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.collator.current.DelegatedCollator
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.collator.current.DelegatedCollatorGroup
-import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorConstantsUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegationState.COLLATOR_NOT_ACTIVE
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegationState.TOO_LOW_STAKE
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
@@ -52,7 +52,7 @@ class CurrentCollatorsViewModel(
     private val currentCollatorsInteractor: CurrentCollatorInteractor,
     private val selectedChainStale: SingleAssetSharedState,
     private val delegatorStateUseCase: DelegatorStateUseCase,
-    private val collatorConstantsUseCase: CollatorConstantsUseCase,
+    private val collatorsUseCase: CollatorsUseCase,
     tokenUseCase: TokenUseCase,
 ) : CurrentStakeTargetsViewModel() {
 
@@ -147,7 +147,7 @@ class CurrentCollatorsViewModel(
 
                 val stakeTarget = mapCollatorToDetailsParcelModel(selectedCollator.collator, selectedCollator.delegationStatus)
 
-                StakeTargetDetailsPayload.parachain(stakeTarget, collatorConstantsUseCase)
+                StakeTargetDetailsPayload.parachain(stakeTarget, collatorsUseCase)
             }
 
             router.openCollatorDetails(payload)

@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.settings.di.SelectCollatorSettingsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.di.ConfirmStartParachainStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.di.StartParachainStakingComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.setup.di.ParachainStakingUnbondComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.di.ConfirmPayoutComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.detail.di.PayoutDetailsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.list.di.PayoutsListComponent
@@ -134,6 +135,8 @@ interface StakingFeatureComponent : StakingFeatureApi {
     fun searchCollatorFactory(): SearchCollatorComponent.Factory
 
     fun currentCollatorsFactory(): CurrentCollatorsComponent.Factory
+
+    fun parachainStakingUnbondSetupFactory(): ParachainStakingUnbondComponent.Factory
 
     @Component.Factory
     interface Factory {

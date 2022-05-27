@@ -41,7 +41,7 @@ class RuntimeParachainStakingConstantsRepository(
     }
 
     override suspend fun minimumDelegation(chainId: ChainId): BigInteger {
-        return numberConstant(chainId, "MinDelegatorStk")
+        return numberConstant(chainId, "MinDelegation")
     }
 
     override suspend fun minimumDelegatorStake(chainId: ChainId): BigInteger {

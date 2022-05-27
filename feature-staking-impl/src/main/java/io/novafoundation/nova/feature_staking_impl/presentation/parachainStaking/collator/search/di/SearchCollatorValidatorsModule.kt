@@ -13,7 +13,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.collator.search.SearchCollatorsInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorConstantsUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.recommendations.CollatorRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator
@@ -31,15 +31,15 @@ class SearchCollatorValidatorsModule {
     @IntoMap
     @ViewModelKey(SearchCollatorViewModel::class)
     fun provideViewModel(
-        router: ParachainStakingRouter,
-        interactor: SearchCollatorsInteractor,
-        addressIconGenerator: AddressIconGenerator,
-        stakingSharedState: StakingSharedState,
-        selectCollatorInterScreenResponder: SelectCollatorInterScreenCommunicator,
-        collatorRecommendatorFactory: CollatorRecommendatorFactory,
-        collatorConstantsUseCase: CollatorConstantsUseCase,
-        resourceManager: ResourceManager,
-        tokenUseCase: TokenUseCase,
+            router: ParachainStakingRouter,
+            interactor: SearchCollatorsInteractor,
+            addressIconGenerator: AddressIconGenerator,
+            stakingSharedState: StakingSharedState,
+            selectCollatorInterScreenResponder: SelectCollatorInterScreenCommunicator,
+            collatorRecommendatorFactory: CollatorRecommendatorFactory,
+            collatorsUseCase: CollatorsUseCase,
+            resourceManager: ResourceManager,
+            tokenUseCase: TokenUseCase,
     ): ViewModel {
         return SearchCollatorViewModel(
             router = router,
@@ -48,7 +48,7 @@ class SearchCollatorValidatorsModule {
             singleAssetSharedState = stakingSharedState,
             selectCollatorInterScreenResponder = selectCollatorInterScreenResponder,
             collatorRecommendatorFactory = collatorRecommendatorFactory,
-            collatorConstantsUseCase = collatorConstantsUseCase,
+            collatorsUseCase = collatorsUseCase,
             resourceManager = resourceManager,
             tokenUseCase = tokenUseCase
         )
