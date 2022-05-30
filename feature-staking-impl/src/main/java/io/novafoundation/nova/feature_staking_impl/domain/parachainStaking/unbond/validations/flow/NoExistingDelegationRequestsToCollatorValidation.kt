@@ -17,12 +17,10 @@ class NoExistingDelegationRequestsToCollatorValidationFactory(
     }
 }
 
-
 class NoExistingDelegationRequestsToCollatorValidation(
     private val interactor: ParachainStakingUnbondInteractor,
     private val delegatorStateUseCase: DelegatorStateUseCase,
 ) : ParachainStakingUnbondValidation {
-
 
     override suspend fun validate(value: ParachainStakingUnbondPayload): ValidationStatus<ParachainStakingUnbondValidationFailure> {
         val delegatorState = delegatorStateUseCase.currentDelegatorState()

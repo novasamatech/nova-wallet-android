@@ -30,8 +30,7 @@ class RealParachainStakingUnbondInteractor(
     private val delegatorStateUseCase: DelegatorStateUseCase,
     private val delegatorStateRepository: DelegatorStateRepository,
     private val selectedAssetSharedState: SingleAssetSharedState,
-): ParachainStakingUnbondInteractor {
-
+) : ParachainStakingUnbondInteractor {
 
     override suspend fun estimateFee(amount: BigInteger, collatorId: AccountId): BigInteger {
         val chain = selectedAssetSharedState.chain()
@@ -50,12 +49,12 @@ class RealParachainStakingUnbondInteractor(
     }
 
     override suspend fun canUnbond(fromCollator: AccountId, delegatorState: DelegatorState): Boolean = withContext(Dispatchers.IO) {
-        when(delegatorState) {
-           is DelegatorState.Delegator -> {
-               val scheduledDelegationRequest = delegatorStateRepository.scheduledDelegationRequest(delegatorState, fromCollator)
+        when (delegatorState) {
+            is DelegatorState.Delegator -> {
+                val scheduledDelegationRequest = delegatorStateRepository.scheduledDelegationRequest(delegatorState, fromCollator)
 
-               scheduledDelegationRequest == null // can unbond only if there is no scheduled request already
-           }
+                scheduledDelegationRequest == null // can unbond only if there is no scheduled request already
+            }
             is DelegatorState.None -> false
         }
     }

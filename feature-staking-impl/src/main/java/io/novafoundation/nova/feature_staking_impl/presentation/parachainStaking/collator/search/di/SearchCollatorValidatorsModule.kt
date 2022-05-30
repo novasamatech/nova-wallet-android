@@ -31,15 +31,15 @@ class SearchCollatorValidatorsModule {
     @IntoMap
     @ViewModelKey(SearchCollatorViewModel::class)
     fun provideViewModel(
-            router: ParachainStakingRouter,
-            interactor: SearchCollatorsInteractor,
-            addressIconGenerator: AddressIconGenerator,
-            stakingSharedState: StakingSharedState,
-            selectCollatorInterScreenResponder: SelectCollatorInterScreenCommunicator,
-            collatorRecommendatorFactory: CollatorRecommendatorFactory,
-            collatorsUseCase: CollatorsUseCase,
-            resourceManager: ResourceManager,
-            tokenUseCase: TokenUseCase,
+        router: ParachainStakingRouter,
+        interactor: SearchCollatorsInteractor,
+        addressIconGenerator: AddressIconGenerator,
+        stakingSharedState: StakingSharedState,
+        selectCollatorInterScreenResponder: SelectCollatorInterScreenCommunicator,
+        collatorRecommendatorFactory: CollatorRecommendatorFactory,
+        collatorsUseCase: CollatorsUseCase,
+        resourceManager: ResourceManager,
+        tokenUseCase: TokenUseCase,
     ): ViewModel {
         return SearchCollatorViewModel(
             router = router,

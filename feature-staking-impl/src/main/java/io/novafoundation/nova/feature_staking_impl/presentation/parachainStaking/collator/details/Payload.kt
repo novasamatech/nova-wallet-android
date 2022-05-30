@@ -7,8 +7,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.detai
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.StakeTargetDetailsParcelModel
 
 suspend fun StakeTargetDetailsPayload.Companion.parachain(
-        stakeTarget: StakeTargetDetailsParcelModel,
-        collatorsUseCase: CollatorsUseCase,
+    stakeTarget: StakeTargetDetailsParcelModel,
+    collatorsUseCase: CollatorsUseCase,
 ) = StakeTargetDetailsPayload(
     stakeTarget = stakeTarget,
     displayConfig = StakeTargetDetailsPayload.DisplayConfig(

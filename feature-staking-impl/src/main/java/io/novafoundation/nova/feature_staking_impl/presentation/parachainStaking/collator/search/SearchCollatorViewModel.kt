@@ -32,15 +32,15 @@ import kotlinx.coroutines.withContext
 import kotlin.time.ExperimentalTime
 
 class SearchCollatorViewModel(
-        private val router: ParachainStakingRouter,
-        private val interactor: SearchCollatorsInteractor,
-        private val addressIconGenerator: AddressIconGenerator,
-        private val selectCollatorInterScreenResponder: SelectCollatorInterScreenResponder,
-        private val collatorRecommendatorFactory: CollatorRecommendatorFactory,
-        private val singleAssetSharedState: SingleAssetSharedState,
-        private val collatorsUseCase: CollatorsUseCase,
-        resourceManager: ResourceManager,
-        tokenUseCase: TokenUseCase,
+    private val router: ParachainStakingRouter,
+    private val interactor: SearchCollatorsInteractor,
+    private val addressIconGenerator: AddressIconGenerator,
+    private val selectCollatorInterScreenResponder: SelectCollatorInterScreenResponder,
+    private val collatorRecommendatorFactory: CollatorRecommendatorFactory,
+    private val singleAssetSharedState: SingleAssetSharedState,
+    private val collatorsUseCase: CollatorsUseCase,
+    resourceManager: ResourceManager,
+    tokenUseCase: TokenUseCase,
 ) : SearchStakeTargetViewModel<Collator>(resourceManager) {
 
     private val currentTokenFlow = tokenUseCase.currentTokenFlow()

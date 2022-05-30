@@ -8,7 +8,7 @@ sealed class ParachainStakingUnbondValidationFailure {
     object NotPositiveAmount : ParachainStakingUnbondValidationFailure()
 
     object NotEnoughBalanceToPayFees : ParachainStakingUnbondValidationFailure()
-    object NotEnoughBondedToUnbond: ParachainStakingUnbondValidationFailure()
+    object NotEnoughBondedToUnbond : ParachainStakingUnbondValidationFailure()
 
     object AlreadyHasDelegationRequestToCollator : ParachainStakingUnbondValidationFailure()
 

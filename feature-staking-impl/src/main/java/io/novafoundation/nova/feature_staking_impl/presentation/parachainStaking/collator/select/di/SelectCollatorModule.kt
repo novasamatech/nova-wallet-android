@@ -27,15 +27,15 @@ class SelectCollatorModule {
     @IntoMap
     @ViewModelKey(SelectCollatorViewModel::class)
     fun provideViewModel(
-            router: ParachainStakingRouter,
-            selectCollatorInterScreenCommunicator: SelectCollatorInterScreenCommunicator,
-            selectCollatorSettingsInterScreenCommunicator: SelectCollatorSettingsInterScreenCommunicator,
-            collatorRecommendatorFactory: CollatorRecommendatorFactory,
-            collatorsUseCase: CollatorsUseCase,
-            @Caching addressIconGenerator: AddressIconGenerator,
-            resourceManager: ResourceManager,
-            tokenUseCase: TokenUseCase,
-            selectedAssetState: StakingSharedState,
+        router: ParachainStakingRouter,
+        selectCollatorInterScreenCommunicator: SelectCollatorInterScreenCommunicator,
+        selectCollatorSettingsInterScreenCommunicator: SelectCollatorSettingsInterScreenCommunicator,
+        collatorRecommendatorFactory: CollatorRecommendatorFactory,
+        collatorsUseCase: CollatorsUseCase,
+        @Caching addressIconGenerator: AddressIconGenerator,
+        resourceManager: ResourceManager,
+        tokenUseCase: TokenUseCase,
+        selectedAssetState: StakingSharedState,
     ): ViewModel {
         return SelectCollatorViewModel(
             router = router,

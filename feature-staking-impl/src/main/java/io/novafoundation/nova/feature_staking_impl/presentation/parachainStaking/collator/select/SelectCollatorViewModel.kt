@@ -40,15 +40,15 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class SelectCollatorViewModel(
-        private val router: ParachainStakingRouter,
-        private val selectCollatorInterScreenResponder: SelectCollatorInterScreenResponder,
-        private val selectCollatorSettingsInterScreenRequester: SelectCollatorSettingsInterScreenRequester,
-        private val collatorsUseCase: CollatorsUseCase,
-        private val collatorRecommendatorFactory: CollatorRecommendatorFactory,
-        private val addressIconGenerator: AddressIconGenerator,
-        private val resourceManager: ResourceManager,
-        private val tokenUseCase: TokenUseCase,
-        private val selectedAssetState: SingleAssetSharedState,
+    private val router: ParachainStakingRouter,
+    private val selectCollatorInterScreenResponder: SelectCollatorInterScreenResponder,
+    private val selectCollatorSettingsInterScreenRequester: SelectCollatorSettingsInterScreenRequester,
+    private val collatorsUseCase: CollatorsUseCase,
+    private val collatorRecommendatorFactory: CollatorRecommendatorFactory,
+    private val addressIconGenerator: AddressIconGenerator,
+    private val resourceManager: ResourceManager,
+    private val tokenUseCase: TokenUseCase,
+    private val selectedAssetState: SingleAssetSharedState,
 ) : BaseViewModel() {
 
     private val collatorRecommendator by lazyAsync {
