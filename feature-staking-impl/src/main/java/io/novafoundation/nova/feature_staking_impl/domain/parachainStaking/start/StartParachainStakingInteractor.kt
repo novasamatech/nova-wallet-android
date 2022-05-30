@@ -12,8 +12,6 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CandidatesRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.DelegatorStateRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.ParachainStakingConstantsRepository
-import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorProvider
-import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.Collator
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -36,8 +34,6 @@ interface StartParachainStakingInteractor {
 
     suspend fun delegate(amount: BigInteger, collator: AccountId): Result<*>
 
-    suspend fun getCollatorById(collatorId: AccountId): Collator
-
     suspend fun checkDelegationsLimit(delegatorState: DelegatorState): DelegationsLimit
 }
 
@@ -46,7 +42,6 @@ class RealStartParachainStakingInteractor(
     private val extrinsicService: ExtrinsicService,
     private val chainRegistry: ChainRegistry,
     private val singleAssetSharedState: SingleAssetSharedState,
-    private val collatorProvider: CollatorProvider,
     private val stakingConstantsRepository: ParachainStakingConstantsRepository,
     private val delegatorStateRepository: DelegatorStateRepository,
     private val candidatesRepository: CandidatesRepository,
@@ -104,12 +99,6 @@ class RealStartParachainStakingInteractor(
                 .filterIsInstance<ExtrinsicStatus.InBlock>()
                 .first()
         }
-    }
-
-    override suspend fun getCollatorById(collatorId: AccountId): Collator {
-        val chainId = singleAssetSharedState.chainId()
-
-        return collatorProvider.electedCollator(chainId, collatorId)!!
     }
 
     override suspend fun checkDelegationsLimit(delegatorState: DelegatorState): DelegationsLimit {

@@ -10,7 +10,6 @@ import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CandidatesRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.DelegatorStateRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.ParachainStakingConstantsRepository
-import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorProvider
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.RealStartParachainStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.StartParachainStakingInteractor
@@ -60,7 +59,6 @@ class StartParachainStakingFlowModule {
         extrinsicService: ExtrinsicService,
         chainRegistry: ChainRegistry,
         singleAssetSharedState: StakingSharedState,
-        collatorProvider: CollatorProvider,
         stakingConstantsRepository: ParachainStakingConstantsRepository,
         delegatorStateRepository: DelegatorStateRepository,
         candidatesRepository: CandidatesRepository,
@@ -69,7 +67,6 @@ class StartParachainStakingFlowModule {
         extrinsicService = extrinsicService,
         chainRegistry = chainRegistry,
         singleAssetSharedState = singleAssetSharedState,
-        collatorProvider = collatorProvider,
         stakingConstantsRepository = stakingConstantsRepository,
         delegatorStateRepository = delegatorStateRepository,
         candidatesRepository = candidatesRepository,

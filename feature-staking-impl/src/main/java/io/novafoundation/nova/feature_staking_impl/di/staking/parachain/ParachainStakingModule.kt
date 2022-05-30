@@ -161,8 +161,9 @@ class ParachainStakingModule {
     fun provideStakeSummaryInteractor(
         currentRoundRepository: CurrentRoundRepository,
         parachainStakingConstantsRepository: ParachainStakingConstantsRepository,
-        roundDurationEstimator: RoundDurationEstimator
-    ) = ParachainStakingStakeSummaryInteractor(currentRoundRepository, parachainStakingConstantsRepository, roundDurationEstimator)
+        roundDurationEstimator: RoundDurationEstimator,
+        candidatesRepository: CandidatesRepository
+    ) = ParachainStakingStakeSummaryInteractor(currentRoundRepository, candidatesRepository, parachainStakingConstantsRepository, roundDurationEstimator)
 
     @Provides
     @FeatureScope

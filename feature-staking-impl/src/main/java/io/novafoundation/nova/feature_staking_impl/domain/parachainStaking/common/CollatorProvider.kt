@@ -2,9 +2,9 @@ package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.comm
 
 import io.novafoundation.nova.feature_staking_api.domain.api.AccountIdMap
 import io.novafoundation.nova.feature_staking_api.domain.api.IdentityRepository
-import io.novafoundation.nova.feature_staking_api.domain.api.getIdentityFromId
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.CandidateMetadata
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.CollatorSnapshot
+import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.minimumStakeToGetRewards
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CandidatesRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CurrentRoundRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.ParachainStakingConstantsRepository
@@ -12,15 +12,12 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.reposit
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.systemForcedMinStake
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorProvider.CollatorSource
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.Collator
-import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.minimumStake
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculator
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import java.math.BigDecimal
 
 interface CollatorProvider {
@@ -37,8 +34,6 @@ interface CollatorProvider {
         collatorSource: CollatorSource,
         cachedSnapshots: AccountIdMap<CollatorSnapshot>? = null
     ): List<Collator>
-
-    suspend fun electedCollator(chainId: ChainId, collatorId: AccountId): Collator?
 }
 
 class RealCollatorProvider(
@@ -59,67 +54,30 @@ class RealCollatorProvider(
 
         val snapshots = cachedSnapshots ?: currentRoundRepository.collatorsSnapshotInCurrentRound(chainId)
 
-        val requestedCollatorIds = when (collatorSource) {
+        val requestedCollatorIdsHex = when (collatorSource) {
             is CollatorSource.Custom -> collatorSource.collatorIdsHex.toSet()
             CollatorSource.Elected -> snapshots.keys
         }
+        val requestedCollatorIds = requestedCollatorIdsHex.map { it.fromHex() }
 
-        val candidateMetadataForInactive = getInactiveCollatorsMetadatas(requestedCollatorIds, snapshots, chainId)
-
-        val identities = identityRepository.getIdentitiesFromIds(chainId, requestedCollatorIds)
+        val candidateMetadatas = candidatesRepository.getCandidatesMetadata(chainId, requestedCollatorIds)
+        val identities = identityRepository.getIdentitiesFromIds(chainId, requestedCollatorIdsHex)
 
         val systemForcedMinimumStake = parachainStakingConstantsRepository.systemForcedMinStake(chainId)
         val rewardCalculator = rewardCalculatorFactory.create(chainId, snapshots)
-        val maxRewardedDelegatorsPerCollator = parachainStakingConstantsRepository.maxRewardedDelegatorsPerCollator(chainId)
 
-        return requestedCollatorIds.map { accountIdHex ->
+        return requestedCollatorIdsHex.map { accountIdHex ->
             val collatorSnapshot = snapshots[accountIdHex]
+            val candidateMetadata = candidateMetadatas[accountIdHex]
 
             Collator(
                 accountIdHex = accountIdHex,
                 address = chain.addressOf(accountIdHex.fromHex()),
                 identity = identities[accountIdHex],
                 snapshot = collatorSnapshot,
-                minimumStakeToGetRewards = collatorSnapshot?.minimumStake(systemForcedMinimumStake, maxRewardedDelegatorsPerCollator),
-                apr = rewardCalculator.getAprOrEstimate(accountIdHex, candidateMetadataForInactive)
+                minimumStakeToGetRewards = candidateMetadata?.minimumStakeToGetRewards(systemForcedMinimumStake),
+                apr = rewardCalculator.getAprOrEstimate(accountIdHex, candidateMetadatas)
             )
-        }
-    }
-
-    override suspend fun electedCollator(chainId: ChainId, collatorId: AccountId): Collator? {
-        val snapshots = currentRoundRepository.collatorsSnapshotInCurrentRound(chainId)
-        val collatorSnapshot = snapshots[collatorId.toHexString()] ?: return null
-
-        val chain = chainRegistry.getChain(chainId)
-
-        val collatorIdHex = collatorId.toHexString()
-        val identity = identityRepository.getIdentityFromId(chainId, collatorIdHex)
-        val systemForcedMinimumStake = parachainStakingConstantsRepository.systemForcedMinStake(chainId)
-        val maxRewardedDelegatorsPerCollator = parachainStakingConstantsRepository.maxRewardedDelegatorsPerCollator(chainId)
-
-        val rewardCalculator = rewardCalculatorFactory.create(chainId, snapshots)
-
-        return Collator(
-            accountIdHex = collatorIdHex,
-            address = chain.addressOf(collatorId),
-            identity = identity,
-            snapshot = collatorSnapshot,
-            minimumStakeToGetRewards = collatorSnapshot.minimumStake(systemForcedMinimumStake, maxRewardedDelegatorsPerCollator),
-            apr = rewardCalculator.collatorApr(collatorIdHex)!!
-        )
-    }
-
-    private suspend fun getInactiveCollatorsMetadatas(
-        requestedCollatorIds: Set<String>,
-        snapshots: AccountIdMap<CollatorSnapshot>,
-        chainId: ChainId
-    ): AccountIdMap<CandidateMetadata> {
-        val notFoundInSnapshots = (requestedCollatorIds - snapshots.keys).map { it.fromHex() }
-
-        return if (notFoundInSnapshots.isNotEmpty()) {
-            candidatesRepository.getCandidatesMetadata(chainId, notFoundInSnapshots)
-        } else {
-            emptyMap()
         }
     }
 
