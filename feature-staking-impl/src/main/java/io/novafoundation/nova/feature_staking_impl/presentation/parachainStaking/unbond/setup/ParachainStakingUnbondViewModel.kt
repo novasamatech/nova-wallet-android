@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
+import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.delegationAmountTo
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorsUseCase
@@ -148,7 +149,7 @@ class ParachainStakingUnbondViewModel(
         }
 
         val newCollator = chooseCollatorAction.awaitAction(payload)
-        selectedCollatorFlow.emit(newCollator.collator)
+        setCollatorIfCanUnbond(newCollator, delegatorState)
     }
 
     fun nextClicked() {
@@ -157,6 +158,19 @@ class ParachainStakingUnbondViewModel(
 
     fun backClicked() {
         router.back()
+    }
+
+    private suspend fun setCollatorIfCanUnbond(newCollator: SelectCollatorModel, delegatorState: DelegatorState) {
+        val collarAccountId = newCollator.collator.accountIdHex.fromHex()
+
+        if (interactor.canUnbond(collarAccountId, delegatorState)) {
+            selectedCollatorFlow.emit(newCollator.collator)
+        } else {
+            showError(
+                title = resourceManager.getString(R.string.staking_parachain_unbond_already_exists_title),
+                text = resourceManager.getString(R.string.staking_parachain_unbond_already_exists_message)
+            )
+        }
     }
 
     private fun setInitialCollator() = launch {

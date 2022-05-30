@@ -31,8 +31,6 @@ private fun bindDelegator(
     accountId: AccountId,
     chain: Chain
 ): DelegatorState.Delegator {
-    val requests: Any? = struct["requests"]
-
     return DelegatorState.Delegator(
         accountId = accountId,
         chain = chain,

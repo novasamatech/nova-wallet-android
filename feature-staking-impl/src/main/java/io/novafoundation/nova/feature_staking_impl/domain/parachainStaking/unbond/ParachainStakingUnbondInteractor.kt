@@ -2,9 +2,11 @@ package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbo
 
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.delegationAmountTo
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.calls.scheduleBondLess
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.calls.scheduleRevokeDelegation
+import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.DelegatorStateRepository
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
@@ -19,11 +21,14 @@ interface ParachainStakingUnbondInteractor {
     suspend fun estimateFee(amount: BigInteger, collatorId: AccountId): BigInteger
 
     suspend fun unbond(amount: BigInteger, collator: AccountId): Result<*>
+
+    suspend fun canUnbond(fromCollator: AccountId, delegatorState: DelegatorState): Boolean
 }
 
 class RealParachainStakingUnbondInteractor(
     private val extrinsicService: ExtrinsicService,
     private val delegatorStateUseCase: DelegatorStateUseCase,
+    private val delegatorStateRepository: DelegatorStateRepository,
     private val selectedAssetSharedState: SingleAssetSharedState,
 ): ParachainStakingUnbondInteractor {
 
@@ -41,6 +46,17 @@ class RealParachainStakingUnbondInteractor(
 
         extrinsicService.submitExtrinsic(chain) {
             unbond(amount, collator)
+        }
+    }
+
+    override suspend fun canUnbond(fromCollator: AccountId, delegatorState: DelegatorState): Boolean = withContext(Dispatchers.IO) {
+        when(delegatorState) {
+           is DelegatorState.Delegator -> {
+               val scheduledDelegationRequest = delegatorStateRepository.scheduledDelegationRequest(delegatorState, fromCollator)
+
+               scheduledDelegationRequest == null // can unbond only if there is no scheduled request already
+           }
+            is DelegatorState.None -> false
         }
     }
 

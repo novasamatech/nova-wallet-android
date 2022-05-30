@@ -38,7 +38,6 @@ interface StartParachainStakingInteractor {
 
     suspend fun getCollatorById(collatorId: AccountId): Collator
 
-
     suspend fun checkDelegationsLimit(delegatorState: DelegatorState): DelegationsLimit
 }
 

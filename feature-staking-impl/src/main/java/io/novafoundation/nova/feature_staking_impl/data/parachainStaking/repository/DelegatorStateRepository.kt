@@ -16,6 +16,8 @@ interface DelegatorStateRepository {
 
     suspend fun scheduledDelegationRequests(delegatorState: DelegatorState.Delegator): List<ScheduledDelegationRequest>
 
+    suspend fun scheduledDelegationRequest(delegatorState: DelegatorState.Delegator, collatorId: AccountId): ScheduledDelegationRequest?
+
     fun observeDelegatorState(
         chain: Chain,
         chainAsset: Chain.Asset,
@@ -49,6 +51,17 @@ class RealDelegatorStateRepository(
 
                 collatorDelegationRequests?.find { it.delegator.contentEquals(delegatorState.accountId) }
             }
+        }
+    }
+
+    override suspend fun scheduledDelegationRequest(delegatorState: DelegatorState.Delegator, collatorId: AccountId): ScheduledDelegationRequest? {
+        return remoteStorage.query(delegatorState.chain.id) {
+            val allCollatorDelegationRequests = runtime.metadata.parachainStaking().storage("DelegationScheduledRequests").query(
+                collatorId,
+                binding = ::bindDelegationRequests
+            )
+
+            allCollatorDelegationRequests.find { it.delegator.contentEquals(delegatorState.accountId) }
         }
     }
 
