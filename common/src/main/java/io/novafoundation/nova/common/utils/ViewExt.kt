@@ -206,6 +206,12 @@ fun ViewGroup.addAfter(anchor: View, newViews: List<View>) {
     }
 }
 
+fun ViewGroup.addAfter(anchor: View, child: View) {
+    val index = indexOfChild(anchor)
+
+    addView(child, index + 1)
+}
+
 fun RecyclerView.scrollToTopWhenItemsShuffled(lifecycleOwner: LifecycleOwner) {
     val adapterDataObserver = object : RecyclerView.AdapterDataObserver() {
         override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {

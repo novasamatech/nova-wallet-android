@@ -23,3 +23,17 @@ fun ExtrinsicBuilder.delegate(
         )
     )
 }
+
+fun ExtrinsicBuilder.delegatorBondMore(
+    candidate: AccountId,
+    amount: Balance,
+): ExtrinsicBuilder {
+    return call(
+        moduleName = Modules.PARACHAIN_STAKING,
+        callName = "delegator_bond_more",
+        arguments = mapOf(
+            "candidate" to candidate,
+            "more" to amount
+        )
+    )
+}

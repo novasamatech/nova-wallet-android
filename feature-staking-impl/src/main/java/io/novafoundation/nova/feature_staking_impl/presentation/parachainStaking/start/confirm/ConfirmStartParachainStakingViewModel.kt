@@ -15,8 +15,10 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorConstantsUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.StartParachainStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationSystem
@@ -58,6 +60,7 @@ class ConfirmStartParachainStakingViewModel(
     private val validationExecutor: ValidationExecutor,
     private val assetUseCase: AssetUseCase,
     private val collatorConstantsUseCase: CollatorConstantsUseCase,
+    private val delegatorStateUseCase: DelegatorStateUseCase,
     walletUiUseCase: WalletUiUseCase,
     private val payload: ConfirmStartParachainStakingPayload,
     hintsMixinFactory: ConfirmStartParachainStakingHintsMixinFactory,
@@ -67,7 +70,13 @@ class ConfirmStartParachainStakingViewModel(
     FeeLoaderMixin by feeLoaderMixin,
     ExternalActions by externalActions {
 
-    val hintsMixin = hintsMixinFactory.create(coroutineScope = this)
+    private val delegatorStateFlow = delegatorStateUseCase.currentDelegatorStateFlow()
+        .shareInBackground()
+
+    val hintsMixin = hintsMixinFactory.create(
+        coroutineScope = this,
+        delegatorStateFlow = delegatorStateFlow
+    )
 
     private val assetFlow = assetUseCase.currentAssetFlow()
         .shareInBackground()
@@ -84,8 +93,12 @@ class ConfirmStartParachainStakingViewModel(
         )
     }.shareInBackground()
 
-    val title = flowOf {
-        resourceManager.getString(R.string.staking_start_title)
+    val title = delegatorStateFlow.map {
+        if (it is DelegatorState.Delegator) {
+            resourceManager.getString(R.string.staking_bond_more_v1_9_0)
+        } else {
+            resourceManager.getString(R.string.staking_start_title)
+        }
     }
         .shareInBackground()
 
@@ -159,7 +172,6 @@ class ConfirmStartParachainStakingViewModel(
         val amountInPlanks = token.planksFromAmount(payload.amount)
 
         interactor.delegate(
-            originAddress = currentAccountModelFlow.first().address,
             amount = amountInPlanks,
             collator = payload.collator.accountIdHex.fromHex()
         )

@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="staking_parachain_stake_more_hint">You will get increased rewards starting from the next round</string>
+  <string name="staking_parachain_max_delegations_title">You can\'t select a new collator</string>
+  <string name="staking_parachain_max_delegations_message">You have reached the maximum number of delegations of %d collators</string>
+
+  <string name="staking_parachain_new_collator">New collator</string>
   <string name="staking_parachain_collator_details_oversubscribed">Collator\'s minimum stake is higher than your delegation. You will not receive rewards from the collator.</string>
 
   <string name="staking_parachain_your_collaotrs_no_rewards">Some of your collators are either not elected or have higher minimum stake than your staked amount. You will not receive reward in this round staking with them.</string>
@@ -24,7 +29,7 @@
   <string name="staking_min_stake">Min. stake</string>
 
   <string name="staking_parachain_reward_frequency_hint">Tokens in stake produce rewards each round (%s)</string>
-  <string name="staking_setup_amount_too_low_strict">Minimum stake should be strictly greater than (%s)</string>
+  <string name="staking_setup_amount_too_low_strict">Minimum stake should be greater than %s</string>
 
   <string name="common_missing_account_title">%s account is missing</string>
   <string name="staking_missing_account_message">You should add %s account to the wallet in order to start staking</string>
@@ -32,7 +37,7 @@
   <string name="common_enter_amount">Enter amount…</string>
   <string name="staking_parachain_select_collator_hint">Select collator…</string>
   <string name="staking_parachain_wont_receive_rewards_title">You will not receive rewards</string>
-  <string name="staking_parachain_wont_receive_rewards_message">Your stake will be less than the minimum stake (%s) for this collator.</string>
+  <string name="staking_parachain_wont_receive_rewards_message">Your stake must be greater than the minimum stake (%s) for this collator.</string>
   <string name="common_per_year_format">%s / year</string>
 
   <string name="staking_parachain_collator">Collator</string>

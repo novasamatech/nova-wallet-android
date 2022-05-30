@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.utils.format
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_STAKING_BOND_MORE
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_VALIDATORS
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
@@ -76,6 +77,7 @@ private class ParachainStakeActionsComponent(
     private fun navigateToAction(action: ManageStakeAction) {
         when (action.id) {
             SYSTEM_MANAGE_VALIDATORS -> router.openCurrentCollators()
+            SYSTEM_MANAGE_STAKING_BOND_MORE -> router.openStartStaking()
         }
     }
 

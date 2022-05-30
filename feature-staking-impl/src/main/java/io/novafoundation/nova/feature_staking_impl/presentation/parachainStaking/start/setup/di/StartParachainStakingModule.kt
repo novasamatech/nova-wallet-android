@@ -10,9 +10,11 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.StartParachainStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationSystem
@@ -51,6 +53,8 @@ class StartParachainStakingModule {
         validationSystem: StartParachainStakingValidationSystem,
         singleAssetSharedState: StakingSharedState,
         addressIconGenerator: AddressIconGenerator,
+        delegatorStateUseCase: DelegatorStateUseCase,
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
     ): ViewModel {
         return StartParachainStakingViewModel(
             router = router,
@@ -64,7 +68,9 @@ class StartParachainStakingModule {
             amountChooserMixinFactory = amountChooserMixinFactory,
             singleAssetSharedState = singleAssetSharedState,
             addressIconGenerator = addressIconGenerator,
-            validationSystem = validationSystem
+            validationSystem = validationSystem,
+            delegatorStateUseCase = delegatorStateUseCase,
+            actionAwaitableMixinFactory = actionAwaitableMixinFactory
         )
     }
 

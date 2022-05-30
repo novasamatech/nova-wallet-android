@@ -7,6 +7,7 @@
     android:animateLayoutChanges="true"
     android:background="@drawable/bg_primary_list_item"
     android:gravity="center_vertical"
+    android:id="@+id/itemValidatorContainer"
     android:orientation="horizontal"
     tools:background="@color/black">
 

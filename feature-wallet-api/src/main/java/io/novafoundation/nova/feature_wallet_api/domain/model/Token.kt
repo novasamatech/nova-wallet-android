@@ -9,6 +9,8 @@ class Token(
     val recentRateChange: BigDecimal?,
     val configuration: Chain.Asset
 ) {
+    // TODO move out of the class when Context Receivers will be stable
+    fun BigDecimal.toPlanks() = planksFromAmount(this)
 
     fun fiatAmount(tokenAmount: BigDecimal): BigDecimal = dollarRate?.multiply(tokenAmount) ?: BigDecimal.ZERO
 }

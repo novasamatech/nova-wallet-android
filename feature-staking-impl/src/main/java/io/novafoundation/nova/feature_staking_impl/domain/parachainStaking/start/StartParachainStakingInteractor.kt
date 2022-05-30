@@ -2,22 +2,26 @@ package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.star
 
 import io.novafoundation.nova.common.utils.parachainStaking
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
+import io.novafoundation.nova.feature_staking_api.domain.model.parachain.delegationsCount
+import io.novafoundation.nova.feature_staking_api.domain.model.parachain.hasDelegation
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.calls.delegate
+import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.calls.delegatorBondMore
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CandidatesRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.DelegatorStateRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.ParachainStakingConstantsRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.systemForcedMinStake
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorProvider
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.Collator
-import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
-import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.chainAndAsset
+import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.primitives.FixedByteArray
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.skipAliases
@@ -30,16 +34,21 @@ import java.math.BigInteger
 
 interface StartParachainStakingInteractor {
 
-    suspend fun estimateFee(amount: BigInteger): BigInteger
+    suspend fun estimateFee(amount: BigInteger, collatorId: AccountId?): BigInteger
 
-    suspend fun delegate(originAddress: String, amount: BigInteger, collator: AccountId): Result<*>
+    suspend fun delegate(amount: BigInteger, collator: AccountId): Result<*>
 
     suspend fun getCollatorById(collatorId: AccountId): Collator
 
     suspend fun defaultMinimumStake(): BigInteger
+
+    suspend fun getSelectedCollators(delegatorState: DelegatorState): List<Collator>
+
+    suspend fun checkDelegationsLimit(delegatorState: DelegatorState): DelegationsLimit
 }
 
 class RealStartParachainStakingInteractor(
+    private val accountRepository: AccountRepository,
     private val extrinsicService: ExtrinsicService,
     private val chainRegistry: ChainRegistry,
     private val singleAssetSharedState: SingleAssetSharedState,
@@ -49,38 +58,54 @@ class RealStartParachainStakingInteractor(
     private val candidatesRepository: CandidatesRepository,
 ) : StartParachainStakingInteractor {
 
-    override suspend fun estimateFee(amount: BigInteger): BigInteger {
-        val chain = singleAssetSharedState.chain()
+    override suspend fun estimateFee(amount: BigInteger, collatorId: AccountId?): BigInteger {
+        val (chain, chainAsset) = singleAssetSharedState.chainAndAsset()
+        val metaAccount = accountRepository.getSelectedMetaAccount()
+        val accountId = metaAccount.accountIdIn(chain)!!
+
+        val currentDelegationState = delegatorStateRepository.getDelegationState(chain, chainAsset, accountId)
 
         return extrinsicService.estimateFee(chain) {
-            delegate(
-                candidate = fakeCollatorId(chain.id),
-                amount = amount,
-                candidateDelegationCount = fakeDelegationCount(),
-                delegationCount = fakeDelegationCount()
-            )
+            if (collatorId != null && currentDelegationState.hasDelegation(collatorId)) {
+                delegatorBondMore(
+                    candidate = collatorId,
+                    amount = amount
+                )
+            } else {
+                delegate(
+                    candidate = collatorId ?: fakeCollatorId(chain.id),
+                    amount = amount,
+                    candidateDelegationCount = fakeDelegationCount(),
+                    delegationCount = fakeDelegationCount()
+                )
+            }
         }
     }
 
-    override suspend fun delegate(originAddress: String, amount: BigInteger, collator: AccountId) = withContext(Dispatchers.Default) {
+    override suspend fun delegate(amount: BigInteger, collator: AccountId) = withContext(Dispatchers.Default) {
         runCatching {
             val (chain, chainAsset) = singleAssetSharedState.chainAndAsset()
-            val accountId = chain.accountIdOf(originAddress)
+            val metaAccount = accountRepository.getSelectedMetaAccount()
+            val accountId = metaAccount.accountIdIn(chain)!!
 
-            val delegationsCount = when (val currentDelegationState = delegatorStateRepository.getDelegationState(chain, chainAsset, accountId)) {
-                is DelegatorState.Delegator -> currentDelegationState.delegations.size
-                is DelegatorState.None -> 0
-            }
-
-            val candidateMetadata = candidatesRepository.getCandidateMetadata(chain.id, collator)
+            val currentDelegationState = delegatorStateRepository.getDelegationState(chain, chainAsset, accountId)
 
             extrinsicService.submitAndWatchExtrinsic(chain, accountId) {
-                delegate(
-                    candidate = collator,
-                    amount = amount,
-                    candidateDelegationCount = candidateMetadata.delegationCount,
-                    delegationCount = delegationsCount.toBigInteger()
-                )
+                if (currentDelegationState.hasDelegation(collator)) {
+                    delegatorBondMore(
+                        candidate = collator,
+                        amount = amount
+                    )
+                } else {
+                    val candidateMetadata = candidatesRepository.getCandidateMetadata(chain.id, collator)
+
+                    delegate(
+                        candidate = collator,
+                        amount = amount,
+                        candidateDelegationCount = candidateMetadata.delegationCount,
+                        delegationCount = currentDelegationState.delegationsCount.toBigInteger()
+                    )
+                }
             }
                 .filterIsInstance<ExtrinsicStatus.InBlock>()
                 .first()
@@ -95,6 +120,28 @@ class RealStartParachainStakingInteractor(
 
     override suspend fun defaultMinimumStake(): BigInteger {
         return stakingConstantsRepository.systemForcedMinStake(singleAssetSharedState.chainId())
+    }
+
+    override suspend fun getSelectedCollators(delegatorState: DelegatorState): List<Collator> {
+        return when (delegatorState) {
+            is DelegatorState.Delegator -> {
+                val stakedCollatorsIds = delegatorState.delegations.map { it.owner.toHexString() }
+
+                val collatorSource = CollatorProvider.CollatorSource.Custom(stakedCollatorsIds)
+                collatorProvider.getCollators(delegatorState.chain.id, collatorSource)
+            }
+            is DelegatorState.None -> emptyList()
+        }
+    }
+
+    override suspend fun checkDelegationsLimit(delegatorState: DelegatorState): DelegationsLimit {
+        val maxDelegations = stakingConstantsRepository.maxDelegationsPerDelegator(delegatorState.chain.id).toInt()
+
+        return if (delegatorState.delegationsCount < maxDelegations) {
+            DelegationsLimit.NotReached
+        } else {
+            DelegationsLimit.Reached(maxDelegations)
+        }
     }
 
     private fun fakeDelegationCount() = BigInteger.TEN
