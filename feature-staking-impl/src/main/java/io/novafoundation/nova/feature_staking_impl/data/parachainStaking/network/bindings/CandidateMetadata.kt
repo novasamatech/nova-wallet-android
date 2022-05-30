@@ -21,8 +21,8 @@ enum class CapacityStatus {
 fun CandidateMetadata.isFull(maxAllowedDelegators: BigInteger): Boolean {
     return delegationCount == maxAllowedDelegators
 }
-fun CandidateMetadata.isRewardedListFull(maxRewardedCollators: BigInteger): Boolean {
-    return totalCounted >= maxRewardedCollators
+fun CandidateMetadata.isRewardedListFull(): Boolean {
+    return topCapacity == CapacityStatus.Full
 }
 
 fun CandidateMetadata.minimumStakeToGetRewards(techMinimumStake: Balance): Balance {
