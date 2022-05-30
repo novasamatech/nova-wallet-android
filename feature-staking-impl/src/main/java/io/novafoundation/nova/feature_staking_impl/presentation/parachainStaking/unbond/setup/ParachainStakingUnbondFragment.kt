@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
@@ -21,6 +22,7 @@ import kotlinx.android.synthetic.main.fragment_parachain_staking_unbond.parachai
 import kotlinx.android.synthetic.main.fragment_parachain_staking_unbond.parachainStakingUnbondCollator
 import kotlinx.android.synthetic.main.fragment_parachain_staking_unbond.parachainStakingUnbondContainer
 import kotlinx.android.synthetic.main.fragment_parachain_staking_unbond.parachainStakingUnbondFee
+import kotlinx.android.synthetic.main.fragment_parachain_staking_unbond.parachainStakingUnbondHints
 import kotlinx.android.synthetic.main.fragment_parachain_staking_unbond.parachainStakingUnbondMinStake
 import kotlinx.android.synthetic.main.fragment_parachain_staking_unbond.parachainStakingUnbondNext
 import kotlinx.android.synthetic.main.fragment_parachain_staking_unbond.parachainStakingUnbondToolbar
@@ -63,6 +65,7 @@ class ParachainStakingUnbondFragment : BaseFragment<ParachainStakingUnbondViewMo
         observeValidations(viewModel)
         setupAmountChooser(viewModel.amountChooserMixin, parachainStakingUnbondAmountField)
         setupFeeLoading(viewModel, parachainStakingUnbondFee)
+        observeHints(viewModel.hintsMixin, parachainStakingUnbondHints)
 
         viewModel.selectedCollatorModel.observe(parachainStakingUnbondCollator::setSelectedCollator)
 

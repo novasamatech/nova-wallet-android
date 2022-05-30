@@ -8,6 +8,8 @@ import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.ParachainStakingUnbondInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.RealParachainStakingUnbondInteractor
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.ParachainStakingHintsUseCase
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.hints.ParachainStakingUnbondHintsMixinFactory
 
 @Module
 class ParachainStakingUnbondModule {
@@ -23,4 +25,10 @@ class ParachainStakingUnbondModule {
         delegatorStateUseCase = delegatorStateUseCase,
         selectedAssetSharedState = stakingSharedState
     )
+
+    @Provides
+    @FeatureScope
+    fun provideHintsFactory(
+        stakingHintsUseCase: ParachainStakingHintsUseCase
+    ) = ParachainStakingUnbondHintsMixinFactory(stakingHintsUseCase)
 }

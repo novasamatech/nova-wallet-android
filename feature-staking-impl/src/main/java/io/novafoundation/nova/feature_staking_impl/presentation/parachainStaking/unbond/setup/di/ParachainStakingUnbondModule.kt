@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.ParachainStakingUnbondInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.RealParachainStakingRewardsComponentFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.hints.ParachainStakingUnbondHintsMixinFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.setup.ParachainStakingUnbondViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
@@ -53,6 +54,7 @@ class ParachainStakingUnbondModule {
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         collatorsUseCase: CollatorsUseCase,
         amountChooserMixinFactory: AmountChooserMixin.Factory,
+        hintsMixinFactory: ParachainStakingUnbondHintsMixinFactory
         ): ViewModel {
         return ParachainStakingUnbondViewModel(
             router = router,
@@ -66,7 +68,8 @@ class ParachainStakingUnbondModule {
             delegatorStateUseCase = delegatorStateUseCase,
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
             collatorsUseCase = collatorsUseCase,
-            amountChooserMixinFactory = amountChooserMixinFactory
+            amountChooserMixinFactory = amountChooserMixinFactory,
+            hintsMixinFactory = hintsMixinFactory
         )
     }
 
