@@ -20,6 +20,11 @@ fun Double.percentageToFraction() = this / 100
 
 infix fun Int.floorMod(divisor: Int) = Math.floorMod(this, divisor)
 
+/**
+ * Compares two BigDecimals taking into account only values but not scale unlike `==` operator
+ */
+infix fun BigDecimal.hasTheSaveValueAs(another: BigDecimal) = compareTo(another) == 0
+
 val BigDecimal.isNonNegative: Boolean
     get() = signum() >= 0
 

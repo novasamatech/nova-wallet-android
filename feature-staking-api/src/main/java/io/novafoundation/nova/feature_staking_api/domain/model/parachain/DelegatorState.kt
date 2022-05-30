@@ -18,11 +18,14 @@ sealed class DelegatorState(
         chain: Chain,
         val delegations: List<DelegatorBond>,
         val total: Balance,
-        val status: DelegatorStatus,
+        val lessTotal: Balance,
     ) : DelegatorState(chain)
 
     class None(chain: Chain) : DelegatorState(chain)
 }
+
+val DelegatorState.Delegator.activeBonded: BigInteger
+    get() = total - lessTotal
 
 val DelegatorState.delegationsCount
     get() = when (this) {
@@ -38,13 +41,6 @@ fun DelegatorState.delegationAmountTo(collatorId: AccountId): BalanceOf? {
 }
 
 fun DelegatorState.hasDelegation(collatorId: AccountId): Boolean = this is DelegatorState.Delegator && delegations.any { it.owner.contentEquals(collatorId) }
-
-sealed class DelegatorStatus {
-
-    object Active : DelegatorStatus()
-
-    class Leaving(val roundIndex: RoundIndex) : DelegatorStatus()
-}
 
 class DelegatorBond(
     val owner: AccountId,

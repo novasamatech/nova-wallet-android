@@ -52,7 +52,6 @@ class MinimumDelegationValidation(
 
         val minStakeToGetRewards = token.amountFromPlanks(value.collator.minimumStakeToGetRewards.orZero())
         val maxAllowedDelegators = stakingConstantsRepository.maxTotalDelegatorsPerCollator(chainId)
-        val maxRewardedDelegators = stakingConstantsRepository.maxRewardedDelegatorsPerCollator(chainId)
 
         val candidateMetadata = candidatesRepository.getCandidateMetadata(chainId, collatorId)
         val lowestBottomDelegationAmount = token.amountFromPlanks(candidateMetadata.lowestBottomDelegationAmount)

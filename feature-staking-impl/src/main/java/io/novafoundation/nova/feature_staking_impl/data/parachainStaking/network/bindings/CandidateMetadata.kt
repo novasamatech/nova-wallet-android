@@ -10,6 +10,7 @@ class CandidateMetadata(
     val totalCounted: Balance,
     val delegationCount: BigInteger,
     val lowestBottomDelegationAmount: Balance,
+    val highestBottomDelegationAmount: Balance,
     val lowestTopDelegationAmount: Balance,
     val topCapacity: CapacityStatus,
 )
@@ -40,6 +41,7 @@ fun bindCandidateMetadata(decoded: Any?): CandidateMetadata {
             delegationCount = bindNumber(struct["delegationCount"]),
             lowestBottomDelegationAmount = bindNumber(struct["lowestBottomDelegationAmount"]),
             lowestTopDelegationAmount = bindNumber(struct["lowestTopDelegationAmount"]),
+            highestBottomDelegationAmount = bindNumber(struct["highestBottomDelegationAmount"]),
             topCapacity = bindCollectionEnum(struct["topCapacity"])
         )
     }

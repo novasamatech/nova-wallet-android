@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.delegationAmountTo
@@ -19,10 +20,14 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.commo
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.Collator
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.ParachainStakingUnbondInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.flow.ParachainStakingUnbondPayload
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.flow.ParachainStakingUnbondValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.selectCollators.mapCollatorToSelectCollatorModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.model.SelectCollatorModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.hints.ParachainStakingUnbondHintsMixinFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.parachainStakingUnbondPayloadAutoFix
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.parachainStakingUnbondValidationFailure
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
@@ -48,7 +53,7 @@ class ParachainStakingUnbondViewModel(
     private val assetUseCase: AssetUseCase,
     private val resourceManager: ResourceManager,
     private val validationExecutor: ValidationExecutor,
-//    private val validationSystem: StartParachainStakingValidationSystem,
+    private val validationSystem: ParachainStakingUnbondValidationSystem,
     private val feeLoaderMixin: FeeLoaderMixin.Presentation,
     private val delegatorStateUseCase: DelegatorStateUseCase,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
@@ -183,44 +188,34 @@ class ParachainStakingUnbondViewModel(
 
     private fun maybeGoToNext() = requireFee { fee ->
         launch {
-//            val collator = selectedCollatorFlow.first() ?: return@launch
-//            val amount = amountChooserMixin.amount.first()
-//
-//            val payload = StartParachainStakingValidationPayload(
-//                amount = amount,
-//                fee = fee,
-//                asset = assetFlow.first(),
-//                collator = collator
-//            )
-//
-//            validationExecutor.requireValid(
-//                validationSystem = validationSystem,
-//                payload = payload,
-//                validationFailureTransformer = { startParachainStakingValidationFailure(it, resourceManager) },
-//                progressConsumer = validationInProgress.progressConsumer()
-//            ) {
-//                validationInProgress.value = false
-//
-//                goToNextStep(fee = fee, amount = amount, collator = collator)
-//            }
+            val payload = ParachainStakingUnbondPayload(
+                amount = amountChooserMixin.amount.first(),
+                fee = fee,
+                asset = assetFlow.first(),
+                collator = selectedCollatorFlow.first()
+            )
+
+            validationExecutor.requireValid(
+                validationSystem = validationSystem,
+                payload = payload,
+                validationFailureTransformer = { parachainStakingUnbondValidationFailure(it, resourceManager) },
+                autoFixPayload = ::parachainStakingUnbondPayloadAutoFix,
+                progressConsumer = validationInProgress.progressConsumer()
+            ) {
+                validationInProgress.value = false
+
+                goToNextStep(fee = fee, amount = payload.amount, collator = payload.collator)
+            }
         }
     }
 
-//    private fun goToNextStep(
-//        fee: BigDecimal,
-//        amount: BigDecimal,
-//        collator: Collator,
-//    ) = launch {
-//        val payload = withContext(Dispatchers.Default) {
-//            ConfirmStartParachainStakingPayload(
-//                collator = mapCollatorToCollatorParcelModel(collator),
-//                amount = amount,
-//                fee = fee
-//            )
-//        }
-//
-//        router.openConfirmStartStaking(payload)
-//    }
+    private fun goToNextStep(
+        fee: BigDecimal,
+        amount: BigDecimal,
+        collator: Collator,
+    ) = launch {
+        showMessage("Ready to open confirm screen")
+    }
 
     private fun requireFee(block: (BigDecimal) -> Unit) = feeLoaderMixin.requireFee(
         block,

@@ -17,8 +17,8 @@ import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
-import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.ParachainStakingUnbondInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.flow.ParachainStakingUnbondValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.RealParachainStakingRewardsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.hints.ParachainStakingUnbondHintsMixinFactory
@@ -48,14 +48,14 @@ class ParachainStakingUnbondModule {
         assetUseCase: AssetUseCase,
         resourceManager: ResourceManager,
         validationExecutor: ValidationExecutor,
-        validationSystem: StartParachainStakingValidationSystem,
+        validationSystem: ParachainStakingUnbondValidationSystem,
         feeLoaderMixin: FeeLoaderMixin.Presentation,
         delegatorStateUseCase: DelegatorStateUseCase,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         collatorsUseCase: CollatorsUseCase,
         amountChooserMixinFactory: AmountChooserMixin.Factory,
         hintsMixinFactory: ParachainStakingUnbondHintsMixinFactory
-        ): ViewModel {
+    ): ViewModel {
         return ParachainStakingUnbondViewModel(
             router = router,
             interactor = interactor,
@@ -63,7 +63,7 @@ class ParachainStakingUnbondModule {
             assetUseCase = assetUseCase,
             resourceManager = resourceManager,
             validationExecutor = validationExecutor,
-//            validationSystem = validationSystem,
+            validationSystem = validationSystem,
             feeLoaderMixin = feeLoaderMixin,
             delegatorStateUseCase = delegatorStateUseCase,
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
