@@ -13,7 +13,7 @@ typealias ParachainStakingUnbondPreliminaryValidationSystemBuilder =
     ValidationSystemBuilder<ParachainStakingUnbondPreliminaryValidationPayload, ParachainStakingUnbondPreliminaryValidationFailure>
 
 fun ValidationSystem.Companion.parachainStakingPreliminaryUnbond(
-   anyAvailableCollatorForUnbondValidationFactory: AnyAvailableCollatorForUnbondValidationFactory
+    anyAvailableCollatorForUnbondValidationFactory: AnyAvailableCollatorForUnbondValidationFactory
 ): ParachainStakingUnbondPreliminaryValidationSystem = ValidationSystem {
     with(anyAvailableCollatorForUnbondValidationFactory) {
         anyAvailableCollatorForUnbond()

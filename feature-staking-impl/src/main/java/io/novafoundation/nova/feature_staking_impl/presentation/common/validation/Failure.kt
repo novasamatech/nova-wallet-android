@@ -38,7 +38,7 @@ fun unbondPreliminaryValidationFailure(
     reason: ParachainStakingUnbondPreliminaryValidationFailure,
     resourceManager: ResourceManager
 ): TitleAndMessage {
-    return when(reason) {
+    return when (reason) {
         ParachainStakingUnbondPreliminaryValidationFailure.NoAvailableCollators -> {
             resourceManager.getString(R.string.staking_parachain_no_unbond_collators_title) to
                 resourceManager.getString(R.string.staking_parachain_no_unbond_collators_message)

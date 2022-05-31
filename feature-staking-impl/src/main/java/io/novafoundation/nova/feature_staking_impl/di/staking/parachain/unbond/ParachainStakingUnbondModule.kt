@@ -51,7 +51,7 @@ class ParachainStakingUnbondModule {
     @Provides
     @FeatureScope
     fun providePreliminaryValidationSystem(
-       anyAvailableCollatorForUnbondValidationFactory: AnyAvailableCollatorForUnbondValidationFactory
+        anyAvailableCollatorForUnbondValidationFactory: AnyAvailableCollatorForUnbondValidationFactory
     ): ParachainStakingUnbondPreliminaryValidationSystem = ValidationSystem.parachainStakingPreliminaryUnbond(
         anyAvailableCollatorForUnbondValidationFactory = anyAvailableCollatorForUnbondValidationFactory
     )
