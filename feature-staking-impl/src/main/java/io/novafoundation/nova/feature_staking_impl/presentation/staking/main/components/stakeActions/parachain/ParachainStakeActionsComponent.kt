@@ -7,13 +7,17 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.format
+import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.preliminary.ParachainStakingUnbondPreliminaryValidationPayload
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.preliminary.ParachainStakingUnbondPreliminaryValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_STAKING_BOND_MORE
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_STAKING_UNBOND
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_VALIDATORS
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.common.validation.unbondPreliminaryValidationFailure
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.common.parachainStaking.loadDelegatingState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.ManageStakeAction
@@ -27,11 +31,14 @@ import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 class ParachainStakeActionsComponentFactory(
     private val delegatorStateUseCase: DelegatorStateUseCase,
     private val resourceManager: ResourceManager,
     private val router: ParachainStakingRouter,
+    private val validationExecutor: ValidationExecutor,
+    private val unbondPreliminaryValidationSystem: ParachainStakingUnbondPreliminaryValidationSystem,
 ) {
 
     fun create(
@@ -42,7 +49,9 @@ class ParachainStakeActionsComponentFactory(
         resourceManager = resourceManager,
         assetWithChain = assetWithChain,
         hostContext = hostContext,
-        router = router
+        router = router,
+        validationExecutor = validationExecutor,
+        unbondValidationSystem = unbondPreliminaryValidationSystem
     )
 }
 
@@ -53,6 +62,9 @@ private class ParachainStakeActionsComponent(
 
     private val assetWithChain: SingleAssetSharedState.AssetWithChain,
     private val hostContext: ComponentHostContext,
+
+    private val unbondValidationSystem: ParachainStakingUnbondPreliminaryValidationSystem,
+    private val validationExecutor: ValidationExecutor
 ) : StakeActionsComponent,
     CoroutineScope by hostContext.scope,
     WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(hostContext.scope) {
@@ -79,7 +91,7 @@ private class ParachainStakeActionsComponent(
         when (action.id) {
             SYSTEM_MANAGE_VALIDATORS -> router.openCurrentCollators()
             SYSTEM_MANAGE_STAKING_BOND_MORE -> router.openStartStaking()
-            SYSTEM_MANAGE_STAKING_UNBOND -> router.openUnbond()
+            SYSTEM_MANAGE_STAKING_UNBOND -> openUnbondIfValid()
         }
     }
 
@@ -98,6 +110,17 @@ private class ParachainStakeActionsComponent(
 
         val collatorsCount = delegatorState.delegations.size.format()
         add(ManageStakeAction.collators(resourceManager, collatorsCount))
+    }
+
+    private fun openUnbondIfValid() = launch {
+        validationExecutor.requireValid(
+            validationSystem = unbondValidationSystem,
+            payload = ParachainStakingUnbondPreliminaryValidationPayload,
+            errorDisplayer = hostContext.errorDisplayer,
+            validationFailureTransformerDefault = { unbondPreliminaryValidationFailure(it, resourceManager) },
+        ) {
+            router.openUnbond()
+        }
     }
 }
 

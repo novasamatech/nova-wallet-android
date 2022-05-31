@@ -17,6 +17,9 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbon
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.flow.ParachainStakingUnbondValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.flow.RemainingUnbondValidationFactory
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.flow.parachainStakingUnbond
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.preliminary.AnyAvailableCollatorForUnbondValidationFactory
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.preliminary.ParachainStakingUnbondPreliminaryValidationSystem
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.preliminary.parachainStakingPreliminaryUnbond
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.ParachainStakingHintsUseCase
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.hints.ParachainStakingUnbondHintsMixinFactory
 
@@ -37,6 +40,21 @@ class ParachainStakingUnbondModule {
         interactor: ParachainStakingUnbondInteractor,
         delegatorStateUseCase: DelegatorStateUseCase,
     ) = NoExistingDelegationRequestsToCollatorValidationFactory(interactor, delegatorStateUseCase)
+
+    @Provides
+    @FeatureScope
+    fun provideAnyAvailableCollatorsToUnbondValidationFactory(
+        delegatorStateRepository: DelegatorStateRepository,
+        delegatorStateUseCase: DelegatorStateUseCase,
+    ) = AnyAvailableCollatorForUnbondValidationFactory(delegatorStateRepository, delegatorStateUseCase)
+
+    @Provides
+    @FeatureScope
+    fun providePreliminaryValidationSystem(
+       anyAvailableCollatorForUnbondValidationFactory: AnyAvailableCollatorForUnbondValidationFactory
+    ): ParachainStakingUnbondPreliminaryValidationSystem = ValidationSystem.parachainStakingPreliminaryUnbond(
+        anyAvailableCollatorForUnbondValidationFactory = anyAvailableCollatorForUnbondValidationFactory
+    )
 
     @Provides
     @FeatureScope

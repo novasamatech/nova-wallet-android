@@ -25,7 +25,7 @@ import kotlinx.android.synthetic.main.item_validator.view.itemValidatorName
 import kotlinx.android.synthetic.main.item_validator.view.itemValidatorSubtitleLabel
 import kotlinx.android.synthetic.main.item_validator.view.itemValidatorSubtitleValue
 
-private val INACTIVE_COLOR = R.color.white_30
+private val INACTIVE_COLOR = R.color.white_32
 
 class ChooseStakedCollatorBottomSheet(
     context: Context,

@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.common.validati
 import io.novafoundation.nova.common.base.TitleAndMessage
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.preliminary.ParachainStakingUnbondPreliminaryValidationFailure
 import io.novafoundation.nova.feature_staking_impl.domain.validations.setup.SetupStakingPayload
 import io.novafoundation.nova.feature_staking_impl.domain.validations.setup.SetupStakingValidationFailure
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
@@ -31,4 +32,16 @@ fun stakingValidationFailure(
     }
 
     return title to message
+}
+
+fun unbondPreliminaryValidationFailure(
+    reason: ParachainStakingUnbondPreliminaryValidationFailure,
+    resourceManager: ResourceManager
+): TitleAndMessage {
+    return when(reason) {
+        ParachainStakingUnbondPreliminaryValidationFailure.NoAvailableCollators -> {
+            resourceManager.getString(R.string.staking_parachain_no_unbond_collators_title) to
+                resourceManager.getString(R.string.staking_parachain_no_unbond_collators_message)
+        }
+    }
 }
