@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm
+package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.confirm
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
@@ -14,21 +14,20 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorsUseCase
-import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
-import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.StartParachainStakingInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationPayload
-import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationSystem
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.ParachainStakingUnbondInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.flow.ParachainStakingUnbondValidationPayload
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.flow.ParachainStakingUnbondValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.collators.collatorAddressModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.details.parachain
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select.model.mapCollatorParcelModelToCollator
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.mappers.mapCollatorToDetailsParcelModel
-import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.hints.ConfirmStartParachainStakingHintsMixinFactory
-import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.model.ConfirmStartParachainStakingPayload
-import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.startParachainStakingValidationFailure
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.confirm.model.ParachainStakingUnbondConfirmPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.hints.ParachainStakingUnbondHintsMixinFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.parachainStakingUnbondPayloadAutoFix
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.parachainStakingUnbondValidationFailure
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
@@ -44,38 +43,30 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.math.BigDecimal
 
-class ConfirmStartParachainStakingViewModel(
+class ParachainStakingUnbondConfirmViewModel(
     private val router: ParachainStakingRouter,
     private val addressIconGenerator: AddressIconGenerator,
-    private val selectedAccountUseCase: SelectedAccountUseCase,
     private val resourceManager: ResourceManager,
-    private val validationSystem: StartParachainStakingValidationSystem,
-    private val interactor: StartParachainStakingInteractor,
+    private val validationSystem: ParachainStakingUnbondValidationSystem,
+    private val interactor: ParachainStakingUnbondInteractor,
     private val feeLoaderMixin: FeeLoaderMixin.Presentation,
     private val externalActions: ExternalActions.Presentation,
     private val selectedAssetState: SingleAssetSharedState,
     private val validationExecutor: ValidationExecutor,
-    private val assetUseCase: AssetUseCase,
     private val collatorsUseCase: CollatorsUseCase,
-    private val delegatorStateUseCase: DelegatorStateUseCase,
+    private val payload: ParachainStakingUnbondConfirmPayload,
+    selectedAccountUseCase: SelectedAccountUseCase,
+    assetUseCase: AssetUseCase,
     walletUiUseCase: WalletUiUseCase,
-    private val payload: ConfirmStartParachainStakingPayload,
-    hintsMixinFactory: ConfirmStartParachainStakingHintsMixinFactory,
+    hintsMixinFactory: ParachainStakingUnbondHintsMixinFactory,
 ) : BaseViewModel(),
     Retriable,
     Validatable by validationExecutor,
     FeeLoaderMixin by feeLoaderMixin,
     ExternalActions by externalActions {
 
-    private val delegatorStateFlow = delegatorStateUseCase.currentDelegatorStateFlow()
-        .shareInBackground()
-
-    val hintsMixin = hintsMixinFactory.create(
-        coroutineScope = this,
-        delegatorStateFlow = delegatorStateFlow
-    )
+    val hintsMixin = hintsMixinFactory.create(coroutineScope = this)
 
     private val assetFlow = assetUseCase.currentAssetFlow()
         .shareInBackground()
@@ -91,15 +82,6 @@ class ConfirmStartParachainStakingViewModel(
             name = null
         )
     }.shareInBackground()
-
-    val title = delegatorStateFlow.map {
-        if (it is DelegatorState.Delegator) {
-            resourceManager.getString(R.string.staking_bond_more_v1_9_0)
-        } else {
-            resourceManager.getString(R.string.staking_start_title)
-        }
-    }
-        .shareInBackground()
 
     val amountModel = assetFlow.map { asset ->
         mapAmountToAmountModel(payload.amount, asset)
@@ -146,39 +128,35 @@ class ConfirmStartParachainStakingViewModel(
         feeLoaderMixin.setFee(payload.fee)
     }
 
-    private fun sendTransactionIfValid() = requireFee { fee ->
-        launch {
-            val payload = StartParachainStakingValidationPayload(
-                amount = payload.amount,
-                fee = payload.fee,
-                collator = collator(),
-                asset = assetFlow.first()
-            )
+    private fun sendTransactionIfValid() = launch {
+        val payload = ParachainStakingUnbondValidationPayload(
+            amount = payload.amount,
+            fee = payload.fee,
+            collator = collator(),
+            asset = assetFlow.first()
+        )
 
-            validationExecutor.requireValid(
-                validationSystem = validationSystem,
-                payload = payload,
-                validationFailureTransformer = { startParachainStakingValidationFailure(it, resourceManager) },
-                progressConsumer = _showNextProgress.progressConsumer()
-            ) {
-                sendTransaction()
-            }
+        validationExecutor.requireValid(
+            validationSystem = validationSystem,
+            payload = payload,
+            validationFailureTransformer = { parachainStakingUnbondValidationFailure(it, resourceManager) },
+            autoFixPayload = ::parachainStakingUnbondPayloadAutoFix,
+            progressConsumer = _showNextProgress.progressConsumer()
+        ) {
+            sendTransaction()
         }
     }
+
 
     private fun sendTransaction() = launch {
         val token = assetFlow.first().token
         val amountInPlanks = token.planksFromAmount(payload.amount)
 
-        interactor.delegate(
+        interactor.unbond(
             amount = amountInPlanks,
             collator = payload.collator.accountIdHex.fromHex()
         )
-            .onFailure {
-                it.printStackTrace()
-
-                showError(it)
-            }
+            .onFailure(::showError)
             .onSuccess {
                 showMessage(resourceManager.getString(R.string.common_transaction_submitted))
 
@@ -187,9 +165,4 @@ class ConfirmStartParachainStakingViewModel(
 
         _showNextProgress.value = false
     }
-
-    private fun requireFee(block: (BigDecimal) -> Unit) = feeLoaderMixin.requireFee(
-        block,
-        onError = { title, message -> showError(title, message) }
-    )
 }

@@ -3,13 +3,13 @@ package io.novafoundation.nova.feature_staking_impl.presentation.parachainStakin
 import io.novafoundation.nova.common.base.TitleAndMessage
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.flow.ParachainStakingUnbondPayload
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.flow.ParachainStakingUnbondValidationFailure
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.flow.ParachainStakingUnbondValidationFailure.AlreadyHasDelegationRequestToCollator
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.flow.ParachainStakingUnbondValidationFailure.NotEnoughBalanceToPayFees
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.flow.ParachainStakingUnbondValidationFailure.NotEnoughBondedToUnbond
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.flow.ParachainStakingUnbondValidationFailure.NotPositiveAmount
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.flow.ParachainStakingUnbondValidationFailure.TooLowRemainingBond
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.flow.ParachainStakingUnbondValidationPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 
 fun parachainStakingUnbondValidationFailure(
@@ -54,7 +54,7 @@ fun parachainStakingUnbondValidationFailure(
     }
 }
 
-fun parachainStakingUnbondPayloadAutoFix(payload: ParachainStakingUnbondPayload, reason: ParachainStakingUnbondValidationFailure) = when (reason) {
+fun parachainStakingUnbondPayloadAutoFix(payload: ParachainStakingUnbondValidationPayload, reason: ParachainStakingUnbondValidationFailure) = when (reason) {
     is TooLowRemainingBond.WillBeAddedToUnbondings -> payload.copy(amount = reason.newAmount)
     else -> payload
 }

@@ -9,6 +9,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddA
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.ConfirmStartParachainStakingFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.model.ConfirmStartParachainStakingPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.confirm.ParachainStakingUnbondConfirmFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.confirm.model.ParachainStakingUnbondConfirmPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.ValidatorDetailsFragment
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -48,4 +50,9 @@ class ParachainStakingNavigator(
     override fun openCurrentCollators() = performNavigation(R.id.action_mainFragment_to_currentCollatorsFragment)
 
     override fun openUnbond() = performNavigation(R.id.action_mainFragment_to_startParachainUnbondGraph)
+
+    override fun openConfirmUnbond(payload: ParachainStakingUnbondConfirmPayload) = performNavigation(
+        actionId = R.id.action_parachainStakingUnbondFragment_to_parachainStakingUnbondConfirmFragment,
+        args = ParachainStakingUnbondConfirmFragment.getBundle(payload)
+    )
 }

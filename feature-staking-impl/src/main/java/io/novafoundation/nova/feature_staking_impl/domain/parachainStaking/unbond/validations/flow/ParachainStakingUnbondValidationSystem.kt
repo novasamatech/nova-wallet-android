@@ -5,8 +5,8 @@ import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_wallet_api.domain.validation.positiveAmount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 
-typealias ParachainStakingUnbondValidationSystem = ValidationSystem<ParachainStakingUnbondPayload, ParachainStakingUnbondValidationFailure>
-typealias ParachainStakingUnbondValidation = Validation<ParachainStakingUnbondPayload, ParachainStakingUnbondValidationFailure>
+typealias ParachainStakingUnbondValidationSystem = ValidationSystem<ParachainStakingUnbondValidationPayload, ParachainStakingUnbondValidationFailure>
+typealias ParachainStakingUnbondValidation = Validation<ParachainStakingUnbondValidationPayload, ParachainStakingUnbondValidationFailure>
 
 fun ValidationSystem.Companion.parachainStakingUnbond(
     remainingUnbondValidationFactory: RemainingUnbondValidationFactory,
