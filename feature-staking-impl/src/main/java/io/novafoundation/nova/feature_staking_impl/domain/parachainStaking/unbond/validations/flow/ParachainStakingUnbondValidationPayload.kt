@@ -4,7 +4,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.commo
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import java.math.BigDecimal
 
-data class ParachainStakingUnbondPayload(
+data class ParachainStakingUnbondValidationPayload(
     val amount: BigDecimal,
     val fee: BigDecimal,
     val collator: Collator,

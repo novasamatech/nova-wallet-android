@@ -12,7 +12,7 @@ class NoExistingDelegationRequestsToCollatorValidationFactory(
     private val delegatorStateUseCase: DelegatorStateUseCase,
 ) {
 
-    fun ValidationSystemBuilder<ParachainStakingUnbondPayload, ParachainStakingUnbondValidationFailure>.noExistingDelegationRequestsToCollator() {
+    fun ValidationSystemBuilder<ParachainStakingUnbondValidationPayload, ParachainStakingUnbondValidationFailure>.noExistingDelegationRequestsToCollator() {
         validate(NoExistingDelegationRequestsToCollatorValidation(interactor, delegatorStateUseCase))
     }
 }
@@ -22,7 +22,7 @@ class NoExistingDelegationRequestsToCollatorValidation(
     private val delegatorStateUseCase: DelegatorStateUseCase,
 ) : ParachainStakingUnbondValidation {
 
-    override suspend fun validate(value: ParachainStakingUnbondPayload): ValidationStatus<ParachainStakingUnbondValidationFailure> {
+    override suspend fun validate(value: ParachainStakingUnbondValidationPayload): ValidationStatus<ParachainStakingUnbondValidationFailure> {
         val delegatorState = delegatorStateUseCase.currentDelegatorState()
         val collatorId = value.collator.accountIdHex.fromHex()
 

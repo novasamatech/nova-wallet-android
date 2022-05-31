@@ -6,6 +6,7 @@ import androidx.core.content.ContextCompat
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.common.utils.daysFromMillis
+import io.novafoundation.nova.common.utils.format
 import io.novafoundation.nova.common.utils.formatDateTime
 import io.novafoundation.nova.common.utils.getDrawableCompat
 import io.novafoundation.nova.common.utils.readText
@@ -74,21 +75,12 @@ class ResourceManagerImpl(
     }
 
     override fun formatDuration(duration: Duration, estimated: Boolean): String {
-        val withoutPrefix = duration.toComponents { days, hours, _, _, _ ->
-            val daysPart = getQuantityString(R.plurals.staking_main_lockup_period_value, days, days)
-            val hoursPart = getQuantityString(R.plurals.common_hours_format, hours, hours)
-
-            listOfNotNull(
-                daysPart.takeIf { days != 0 },
-                hoursPart.takeIf { hours != 0 }
-            ).joinToString(separator = " ")
-        }
-
-        return if (estimated) {
-            "~$withoutPrefix"
-        } else {
-            withoutPrefix
-        }
+        return duration.format(
+            estimated = estimated,
+            daysFormat = { getQuantityString(R.plurals.staking_main_lockup_period_value, it, it) },
+            hoursFormat = { getQuantityString(R.plurals.common_hours_format, it, it) },
+            timeFormat = null
+        )
     }
 
     override fun getDrawable(id: Int): Drawable {

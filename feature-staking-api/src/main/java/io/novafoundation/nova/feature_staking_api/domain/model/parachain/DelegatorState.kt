@@ -44,7 +44,7 @@ fun DelegatorState.hasDelegation(collatorId: AccountId): Boolean = this is Deleg
 
 class DelegatorBond(
     val owner: AccountId,
-    val balance: Balance,
+    val balance: BalanceOf,
 )
 
 class ScheduledDelegationRequest(

@@ -5,6 +5,8 @@ interface Identifiable {
     val identifier: String
 }
 
+fun <T : Identifiable> List<T>.findById(other: Identifiable?): T? = find { it.identifier == other?.identifier }
+
 object CollectionDiffer {
 
     data class Diff<T>(

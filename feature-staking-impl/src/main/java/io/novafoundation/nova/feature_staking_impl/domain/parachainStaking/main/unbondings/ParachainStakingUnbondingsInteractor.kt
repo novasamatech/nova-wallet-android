@@ -24,7 +24,7 @@ class ParachainStakingUnbondingsInteractor(
 
     fun unbondingsFlow(delegatorState: DelegatorState.Delegator): Flow<Unbondings> = flow {
         val chainId = delegatorState.chain.id
-        val scheduledRequests = delegatorStateRepository.scheduledDelegationRequests(delegatorState)
+        val scheduledRequests = delegatorStateRepository.scheduledDelegationRequests(delegatorState).values
 
         val unbondingsFlow = currentRoundRepository.currentRoundInfoFlow(chainId).map { currentRoundInfo ->
             val currentRoundIndex = currentRoundInfo.current
