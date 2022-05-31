@@ -51,8 +51,6 @@ class MinimumDelegationValidation(
         val minimumTotalStakeAmount = token.amountFromPlanks(minimumTotalStakeInPlanks)
 
         val minStakeToGetRewards = token.amountFromPlanks(value.collator.minimumStakeToGetRewards.orZero())
-        val maxAllowedDelegators = stakingConstantsRepository.maxTotalDelegatorsPerCollator(chainId)
-        val maxRewardedDelegators = stakingConstantsRepository.maxRewardedDelegatorsPerCollator(chainId)
 
         val candidateMetadata = candidatesRepository.getCandidateMetadata(chainId, collatorId)
         val lowestBottomDelegationAmount = token.amountFromPlanks(candidateMetadata.lowestBottomDelegationAmount)
@@ -80,12 +78,12 @@ class MinimumDelegationValidation(
             }
 
             // collator is full so we need strictly greater amount then minimum stake
-            candidateMetadata.isFull(maxAllowedDelegators) && value.amount + stakedInSelectedCollator <= lowestBottomDelegationAmount -> {
+            candidateMetadata.isFull() && value.amount + stakedInSelectedCollator <= lowestBottomDelegationAmount -> {
                 validationError(TooLowDelegation(lowestBottomDelegationAmount, asset, strictGreaterThan = true))
             }
 
             // collator's top is full but we can still join bottom delegations
-            candidateMetadata.isRewardedListFull(maxRewardedDelegators) && value.amount + stakedInSelectedCollator <= minStakeToGetRewards -> {
+            candidateMetadata.isRewardedListFull() && value.amount + stakedInSelectedCollator <= minStakeToGetRewards -> {
                 validationWarning(WontReceiveRewards(minStakeToGetRewards, asset))
             }
 

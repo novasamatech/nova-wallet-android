@@ -7,7 +7,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.collator.search.SearchCollatorsInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorConstantsUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.Collator
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.recommendations.CollatorRecommendationConfig
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.recommendations.CollatorRecommendatorFactory
@@ -38,7 +38,7 @@ class SearchCollatorViewModel(
     private val selectCollatorInterScreenResponder: SelectCollatorInterScreenResponder,
     private val collatorRecommendatorFactory: CollatorRecommendatorFactory,
     private val singleAssetSharedState: SingleAssetSharedState,
-    private val collatorConstantsUseCase: CollatorConstantsUseCase,
+    private val collatorsUseCase: CollatorsUseCase,
     resourceManager: ResourceManager,
     tokenUseCase: TokenUseCase,
 ) : SearchStakeTargetViewModel<Collator>(resourceManager) {
@@ -99,7 +99,7 @@ class SearchCollatorViewModel(
             val payload = withContext(Dispatchers.Default) {
                 val parcel = mapCollatorToDetailsParcelModel(item.stakeTarget)
 
-                StakeTargetDetailsPayload.parachain(parcel, collatorConstantsUseCase)
+                StakeTargetDetailsPayload.parachain(parcel, collatorsUseCase)
             }
 
             router.openCollatorDetails(payload)

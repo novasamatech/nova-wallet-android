@@ -2,7 +2,9 @@ package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main
 
 import io.novafoundation.nova.common.utils.anyIs
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
+import io.novafoundation.nova.feature_staking_api.domain.model.parachain.delegatedCollatorIds
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.RoundDurationEstimator
+import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CandidatesRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CurrentRoundRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.ParachainStakingConstantsRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.systemForcedMinStake
@@ -16,6 +18,7 @@ import java.math.BigInteger
 
 class ParachainStakingStakeSummaryInteractor(
     private val currentRoundRepository: CurrentRoundRepository,
+    private val candidatesRepository: CandidatesRepository,
     private val parachainStakingConstantsRepository: ParachainStakingConstantsRepository,
     private val roundDurationEstimator: RoundDurationEstimator,
 ) {
@@ -23,12 +26,13 @@ class ParachainStakingStakeSummaryInteractor(
     suspend fun delegatorStatusFlow(delegatorState: DelegatorState.Delegator): Flow<DelegatorStatus> {
         val chainId = delegatorState.chain.id
         val systemForcedMinStake = parachainStakingConstantsRepository.systemForcedMinStake(chainId)
-        val maxRewardedDelegatorsPerCollator = parachainStakingConstantsRepository.maxRewardedDelegatorsPerCollator(chainId)
 
         return currentRoundRepository.currentRoundInfoFlow(chainId).transformLatest { currentRoundInfo ->
             val snapshots = currentRoundRepository.collatorsSnapshot(chainId, currentRoundInfo.current)
+            val delegatedIds = delegatorState.delegatedCollatorIds()
+            val candidateMetadatas = candidatesRepository.getCandidatesMetadata(chainId, delegatedIds)
 
-            val delegationStates = delegatorState.delegationStatesIn(snapshots, systemForcedMinStake, maxRewardedDelegatorsPerCollator).values
+            val delegationStates = delegatorState.delegationStatesIn(snapshots, candidateMetadatas, systemForcedMinStake).values
 
             when {
                 delegationStates.anyIs(DelegationState.ACTIVE) -> emit(DelegatorStatus.Active)

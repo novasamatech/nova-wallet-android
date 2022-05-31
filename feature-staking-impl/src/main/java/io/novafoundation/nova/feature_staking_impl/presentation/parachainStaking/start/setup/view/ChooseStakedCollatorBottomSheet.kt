@@ -26,7 +26,7 @@ class ChooseStakedCollatorBottomSheet(
     payload: Payload<SelectCollatorModel>,
     stakedCollatorSelected: ClickHandler<SelectCollatorModel>,
     onCancel: () -> Unit,
-    private val newCollatorClicked: () -> Unit
+    private val newCollatorClicked: ClickHandler<Unit>?
 ) : DynamicListBottomSheet<SelectCollatorModel>(
     context = context,
     payload = payload,
@@ -41,20 +41,26 @@ class ChooseStakedCollatorBottomSheet(
         setTitle(R.string.staking_parachain_collator)
         setDividerVisible(false)
 
-        val newCollatorAction = AccentActionView(context).apply {
-            layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
-
-            setDismissingClickListener { newCollatorClicked() }
-
-            setText(R.string.staking_parachain_new_collator)
-            setIcon(R.drawable.ic_add_circle)
-        }
-
-        container.addAfter(titleView, newCollatorAction)
+        maybeAddNewCollatorButton()
     }
 
     override fun holderCreator(): HolderCreator<SelectCollatorModel> = { parentViewGroup ->
         ViewHolder(parentViewGroup.inflateChild(R.layout.item_select_staked_collator))
+    }
+
+    private fun maybeAddNewCollatorButton() {
+        if (newCollatorClicked != null) {
+            val newCollatorAction = AccentActionView(context).apply {
+                layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
+
+                setDismissingClickListener { newCollatorClicked.invoke(Unit) }
+
+                setText(R.string.staking_parachain_new_collator)
+                setIcon(R.drawable.ic_add_circle)
+            }
+
+            container.addAfter(titleView, newCollatorAction)
+        }
     }
 }
 

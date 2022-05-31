@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import java.math.BigInteger
 
@@ -17,11 +18,14 @@ sealed class DelegatorState(
         chain: Chain,
         val delegations: List<DelegatorBond>,
         val total: Balance,
-        val status: DelegatorStatus,
+        val lessTotal: Balance,
     ) : DelegatorState(chain)
 
     class None(chain: Chain) : DelegatorState(chain)
 }
+
+val DelegatorState.Delegator.activeBonded: BigInteger
+    get() = total - lessTotal
 
 val DelegatorState.delegationsCount
     get() = when (this) {
@@ -29,18 +33,14 @@ val DelegatorState.delegationsCount
         is DelegatorState.None -> 0
     }
 
+fun DelegatorState.Delegator.delegatedCollatorIds() = delegations.map { it.owner }
+fun DelegatorState.Delegator.delegatedCollatorIdsHex() = delegations.map { it.owner.toHexString() }
+
 fun DelegatorState.delegationAmountTo(collatorId: AccountId): BalanceOf? {
     return castOrNull<DelegatorState.Delegator>()?.delegations?.find { it.owner.contentEquals(collatorId) }?.balance
 }
 
 fun DelegatorState.hasDelegation(collatorId: AccountId): Boolean = this is DelegatorState.Delegator && delegations.any { it.owner.contentEquals(collatorId) }
-
-sealed class DelegatorStatus {
-
-    object Active : DelegatorStatus()
-
-    class Leaving(val roundIndex: RoundIndex) : DelegatorStatus()
-}
 
 class DelegatorBond(
     val owner: AccountId,

@@ -16,8 +16,8 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.reposit
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.ParachainStakingConstantsRepository
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.collator.current.CurrentCollatorInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.collator.current.RealCurrentCollatorInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorConstantsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorProvider
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.current.CurrentCollatorsViewModel
@@ -47,7 +47,7 @@ class CurrentCollatorsModule {
         iconGenerator: AddressIconGenerator,
         currentCollatorsInteractor: CurrentCollatorInteractor,
         selectedChainStale: StakingSharedState,
-        collatorConstantsUseCase: CollatorConstantsUseCase,
+        collatorsUseCase: CollatorsUseCase,
         delegatorStateUseCase: DelegatorStateUseCase,
         tokenUseCase: TokenUseCase,
     ): ViewModel {
@@ -59,7 +59,7 @@ class CurrentCollatorsModule {
             selectedChainStale = selectedChainStale,
             delegatorStateUseCase = delegatorStateUseCase,
             tokenUseCase = tokenUseCase,
-            collatorConstantsUseCase = collatorConstantsUseCase
+            collatorsUseCase = collatorsUseCase
         )
     }
 

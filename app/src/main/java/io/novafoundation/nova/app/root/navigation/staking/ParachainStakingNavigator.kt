@@ -46,4 +46,6 @@ class ParachainStakingNavigator(
         get() = commonNavigator.currentStackEntryLifecycle
 
     override fun openCurrentCollators() = performNavigation(R.id.action_mainFragment_to_currentCollatorsFragment)
+
+    override fun openUnbond() = performNavigation(R.id.action_mainFragment_to_startParachainUnbondGraph)
 }

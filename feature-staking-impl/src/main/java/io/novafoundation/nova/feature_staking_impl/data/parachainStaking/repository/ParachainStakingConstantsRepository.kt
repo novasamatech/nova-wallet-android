@@ -11,8 +11,6 @@ interface ParachainStakingConstantsRepository {
 
     suspend fun maxRewardedDelegatorsPerCollator(chainId: ChainId): BigInteger
 
-    suspend fun maxTotalDelegatorsPerCollator(chainId: ChainId): BigInteger
-
     suspend fun minimumDelegation(chainId: ChainId): BigInteger
 
     suspend fun minimumDelegatorStake(chainId: ChainId): BigInteger
@@ -36,12 +34,8 @@ class RuntimeParachainStakingConstantsRepository(
         return numberConstant(chainId, "MaxTopDelegationsPerCandidate")
     }
 
-    override suspend fun maxTotalDelegatorsPerCollator(chainId: ChainId): BigInteger {
-        return numberConstant(chainId, "MaxBottomDelegationsPerCandidate") + maxRewardedDelegatorsPerCollator(chainId)
-    }
-
     override suspend fun minimumDelegation(chainId: ChainId): BigInteger {
-        return numberConstant(chainId, "MinDelegatorStk")
+        return numberConstant(chainId, "MinDelegation")
     }
 
     override suspend fun minimumDelegatorStake(chainId: ChainId): BigInteger {

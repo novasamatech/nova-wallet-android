@@ -37,3 +37,29 @@ fun ExtrinsicBuilder.delegatorBondMore(
         )
     )
 }
+
+fun ExtrinsicBuilder.scheduleRevokeDelegation(
+    collatorId: AccountId
+): ExtrinsicBuilder {
+    return call(
+        moduleName = Modules.PARACHAIN_STAKING,
+        callName = "schedule_revoke_delegation",
+        arguments = mapOf(
+            "collator" to collatorId,
+        )
+    )
+}
+
+fun ExtrinsicBuilder.scheduleBondLess(
+    collatorId: AccountId,
+    amount: Balance,
+): ExtrinsicBuilder {
+    return call(
+        moduleName = Modules.PARACHAIN_STAKING,
+        callName = "schedule_delegator_bond_less",
+        arguments = mapOf(
+            "candidate" to collatorId,
+            "less" to amount
+        )
+    )
+}

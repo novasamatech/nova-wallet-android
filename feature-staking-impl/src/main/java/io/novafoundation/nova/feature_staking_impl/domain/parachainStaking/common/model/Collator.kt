@@ -14,6 +14,9 @@ class Collator(
     val apr: BigDecimal?,
 )
 
+val Collator.isElected
+    get() = snapshot != null
+
 fun CollatorSnapshot.minimumStake(
     systemForcedMinStake: BigInteger,
     maxRewardableDelegatorsPerCollator: BigInteger

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/staking_parachain_unbond"
+    app:startDestination="@id/parachainStakingUnbondFragment">
+
+
+    <fragment
+        android:id="@+id/parachainStakingUnbondFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.setup.ParachainStakingUnbondFragment"
+        android:label="ParachainStakingUnbondFragment" />
+</navigation>

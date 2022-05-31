@@ -11,6 +11,7 @@ class Token(
 ) {
     // TODO move out of the class when Context Receivers will be stable
     fun BigDecimal.toPlanks() = planksFromAmount(this)
+    fun BigInteger.toAmount() = amountFromPlanks(this)
 
     fun fiatAmount(tokenAmount: BigDecimal): BigDecimal = dollarRate?.multiply(tokenAmount) ?: BigDecimal.ZERO
 }

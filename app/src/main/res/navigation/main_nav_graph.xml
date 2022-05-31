@@ -266,6 +266,14 @@
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_mainFragment_to_startParachainUnbondGraph"
+            app:destination="@id/staking_parachain_unbond"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
 
@@ -899,6 +907,8 @@
     <include app:graph="@navigation/nfts_nav_graph" />
 
     <include app:graph="@navigation/staking_parachain_start_graph" />
+
+    <include app:graph="@navigation/staking_parachain_unbond" />
 
     <fragment
         android:id="@+id/assetFiltersFragment"

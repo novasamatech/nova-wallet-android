@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings
 
+import io.novafoundation.nova.common.data.network.runtime.binding.bindCollectionEnum
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -9,13 +10,33 @@ class CandidateMetadata(
     val totalCounted: Balance,
     val delegationCount: BigInteger,
     val lowestBottomDelegationAmount: Balance,
+    val highestBottomDelegationAmount: Balance,
+    val lowestTopDelegationAmount: Balance,
+    val topCapacity: CapacityStatus,
+    val bottomCapacity: CapacityStatus,
 )
 
-fun CandidateMetadata.isFull(maxAllowedDelegators: BigInteger): Boolean {
-    return delegationCount == maxAllowedDelegators
+enum class CapacityStatus {
+    Full, Empty, Partial
 }
-fun CandidateMetadata.isRewardedListFull(maxRewardedCollators: BigInteger): Boolean {
-    return totalCounted >= maxRewardedCollators
+
+fun CandidateMetadata.isFull(): Boolean {
+    return bottomCapacity == CapacityStatus.Full
+}
+fun CandidateMetadata.isRewardedListFull(): Boolean {
+    return topCapacity == CapacityStatus.Full
+}
+
+fun CandidateMetadata.isBottomDelegationsNotEmpty(): Boolean {
+    return bottomCapacity != CapacityStatus.Empty
+}
+
+fun CandidateMetadata.minimumStakeToGetRewards(techMinimumStake: Balance): Balance {
+    return if (topCapacity == CapacityStatus.Full) {
+        lowestTopDelegationAmount
+    } else {
+        techMinimumStake
+    }
 }
 
 fun bindCandidateMetadata(decoded: Any?): CandidateMetadata {
@@ -23,7 +44,11 @@ fun bindCandidateMetadata(decoded: Any?): CandidateMetadata {
         CandidateMetadata(
             totalCounted = bindNumber(struct["totalCounted"]),
             delegationCount = bindNumber(struct["delegationCount"]),
-            lowestBottomDelegationAmount = bindNumber(struct["lowestBottomDelegationAmount"])
+            lowestBottomDelegationAmount = bindNumber(struct["lowestBottomDelegationAmount"]),
+            lowestTopDelegationAmount = bindNumber(struct["lowestTopDelegationAmount"]),
+            highestBottomDelegationAmount = bindNumber(struct["highestBottomDelegationAmount"]),
+            topCapacity = bindCollectionEnum(struct["topCapacity"]),
+            bottomCapacity = bindCollectionEnum(struct["bottomCapacity"])
         )
     }
 }

@@ -23,11 +23,12 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.reposit
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.RuntimeParachainStakingConstantsRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRewardsRepository
 import io.novafoundation.nova.feature_staking_impl.di.staking.parachain.start.StartParachainStakingFlowModule
-import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorConstantsUseCase
+import io.novafoundation.nova.feature_staking_impl.di.staking.parachain.unbond.ParachainStakingUnbondModule
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorProvider
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
-import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.RealCollatorConstantsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.RealCollatorProvider
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.RealCollatorsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.recommendations.CollatorRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.ParachainNetworkInfoInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.stakeSummary.ParachainStakingStakeSummaryInteractor
@@ -42,7 +43,7 @@ import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
-@Module(includes = [StartParachainStakingFlowModule::class])
+@Module(includes = [StartParachainStakingFlowModule::class, ParachainStakingUnbondModule::class])
 class ParachainStakingModule {
 
     @Provides
@@ -152,15 +153,17 @@ class ParachainStakingModule {
     fun provideCollatorConstantsUseCase(
         parachainStakingConstantsRepository: ParachainStakingConstantsRepository,
         stakingSharedState: StakingSharedState,
-    ): CollatorConstantsUseCase = RealCollatorConstantsUseCase(stakingSharedState, parachainStakingConstantsRepository)
+        collatorProvider: CollatorProvider,
+    ): CollatorsUseCase = RealCollatorsUseCase(stakingSharedState, parachainStakingConstantsRepository, collatorProvider)
 
     @Provides
     @FeatureScope
     fun provideStakeSummaryInteractor(
         currentRoundRepository: CurrentRoundRepository,
         parachainStakingConstantsRepository: ParachainStakingConstantsRepository,
-        roundDurationEstimator: RoundDurationEstimator
-    ) = ParachainStakingStakeSummaryInteractor(currentRoundRepository, parachainStakingConstantsRepository, roundDurationEstimator)
+        roundDurationEstimator: RoundDurationEstimator,
+        candidatesRepository: CandidatesRepository
+    ) = ParachainStakingStakeSummaryInteractor(currentRoundRepository, candidatesRepository, parachainStakingConstantsRepository, roundDurationEstimator)
 
     @Provides
     @FeatureScope

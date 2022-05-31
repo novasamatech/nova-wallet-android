@@ -12,16 +12,12 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CandidatesRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.DelegatorStateRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.ParachainStakingConstantsRepository
-import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.systemForcedMinStake
-import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorProvider
-import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.Collator
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chainAndAsset
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.primitives.FixedByteArray
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.skipAliases
@@ -38,12 +34,6 @@ interface StartParachainStakingInteractor {
 
     suspend fun delegate(amount: BigInteger, collator: AccountId): Result<*>
 
-    suspend fun getCollatorById(collatorId: AccountId): Collator
-
-    suspend fun defaultMinimumStake(): BigInteger
-
-    suspend fun getSelectedCollators(delegatorState: DelegatorState): List<Collator>
-
     suspend fun checkDelegationsLimit(delegatorState: DelegatorState): DelegationsLimit
 }
 
@@ -52,7 +42,6 @@ class RealStartParachainStakingInteractor(
     private val extrinsicService: ExtrinsicService,
     private val chainRegistry: ChainRegistry,
     private val singleAssetSharedState: SingleAssetSharedState,
-    private val collatorProvider: CollatorProvider,
     private val stakingConstantsRepository: ParachainStakingConstantsRepository,
     private val delegatorStateRepository: DelegatorStateRepository,
     private val candidatesRepository: CandidatesRepository,
@@ -109,28 +98,6 @@ class RealStartParachainStakingInteractor(
             }
                 .filterIsInstance<ExtrinsicStatus.InBlock>()
                 .first()
-        }
-    }
-
-    override suspend fun getCollatorById(collatorId: AccountId): Collator {
-        val chainId = singleAssetSharedState.chainId()
-
-        return collatorProvider.electedCollator(chainId, collatorId)!!
-    }
-
-    override suspend fun defaultMinimumStake(): BigInteger {
-        return stakingConstantsRepository.systemForcedMinStake(singleAssetSharedState.chainId())
-    }
-
-    override suspend fun getSelectedCollators(delegatorState: DelegatorState): List<Collator> {
-        return when (delegatorState) {
-            is DelegatorState.Delegator -> {
-                val stakedCollatorsIds = delegatorState.delegations.map { it.owner.toHexString() }
-
-                val collatorSource = CollatorProvider.CollatorSource.Custom(stakedCollatorsIds)
-                collatorProvider.getCollators(delegatorState.chain.id, collatorSource)
-            }
-            is DelegatorState.None -> emptyList()
         }
     }
 

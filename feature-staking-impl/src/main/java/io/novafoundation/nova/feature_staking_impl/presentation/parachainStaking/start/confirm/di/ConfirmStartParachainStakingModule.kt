@@ -16,7 +16,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
-import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorConstantsUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.StartParachainStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationSystem
@@ -49,7 +49,7 @@ class ConfirmStartParachainStakingModule {
         selectedAccountUseCase: SelectedAccountUseCase,
         resourceManager: ResourceManager,
         validationSystem: StartParachainStakingValidationSystem,
-        collatorConstantsUseCase: CollatorConstantsUseCase,
+        collatorsUseCase: CollatorsUseCase,
         validationExecutor: ValidationExecutor,
         assetUseCase: AssetUseCase,
         interactor: StartParachainStakingInteractor,
@@ -76,7 +76,7 @@ class ConfirmStartParachainStakingModule {
             walletUiUseCase = walletUiUseCase,
             payload = payload,
             hintsMixinFactory = hintsMixinFactory,
-            collatorConstantsUseCase = collatorConstantsUseCase,
+            collatorsUseCase = collatorsUseCase,
             delegatorStateUseCase = delegatorStateUseCase
         )
     }
