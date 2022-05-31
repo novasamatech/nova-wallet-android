@@ -13,17 +13,22 @@ class CandidateMetadata(
     val highestBottomDelegationAmount: Balance,
     val lowestTopDelegationAmount: Balance,
     val topCapacity: CapacityStatus,
+    val bottomCapacity: CapacityStatus,
 )
 
 enum class CapacityStatus {
     Full, Empty, Partial
 }
 
-fun CandidateMetadata.isFull(maxAllowedDelegators: BigInteger): Boolean {
-    return delegationCount == maxAllowedDelegators
+fun CandidateMetadata.isFull(): Boolean {
+    return bottomCapacity == CapacityStatus.Full
 }
 fun CandidateMetadata.isRewardedListFull(): Boolean {
     return topCapacity == CapacityStatus.Full
+}
+
+fun CandidateMetadata.isBottomDelegationsNotEmpty(): Boolean {
+    return bottomCapacity != CapacityStatus.Empty
 }
 
 fun CandidateMetadata.minimumStakeToGetRewards(techMinimumStake: Balance): Balance {
@@ -42,7 +47,8 @@ fun bindCandidateMetadata(decoded: Any?): CandidateMetadata {
             lowestBottomDelegationAmount = bindNumber(struct["lowestBottomDelegationAmount"]),
             lowestTopDelegationAmount = bindNumber(struct["lowestTopDelegationAmount"]),
             highestBottomDelegationAmount = bindNumber(struct["highestBottomDelegationAmount"]),
-            topCapacity = bindCollectionEnum(struct["topCapacity"])
+            topCapacity = bindCollectionEnum(struct["topCapacity"]),
+            bottomCapacity = bindCollectionEnum(struct["bottomCapacity"])
         )
     }
 }
