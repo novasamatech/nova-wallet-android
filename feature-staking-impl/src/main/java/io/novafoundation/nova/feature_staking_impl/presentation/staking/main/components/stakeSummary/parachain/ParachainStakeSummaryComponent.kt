@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.co
 
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
+import io.novafoundation.nova.feature_staking_api.domain.model.parachain.activeBonded
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.stakeSummary.DelegatorStatus
@@ -61,7 +62,7 @@ private class ParachainStakeSummaryComponent(
 
             hostContext.assetFlow.mapLatest { asset ->
                 StakeSummaryModel(
-                    totalStaked = mapAmountToAmountModel(delegatorState.total, asset),
+                    totalStaked = mapAmountToAmountModel(delegatorState.activeBonded, asset),
                     status = status
                 )
             }
