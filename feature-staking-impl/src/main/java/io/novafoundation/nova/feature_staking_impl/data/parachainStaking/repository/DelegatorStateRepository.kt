@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository
 
+import io.novafoundation.nova.common.utils.mapValuesNotNull
 import io.novafoundation.nova.common.utils.parachainStaking
+import io.novafoundation.nova.feature_staking_api.domain.api.AccountIdMap
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.ScheduledDelegationRequest
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.bindDelegationRequests
@@ -14,7 +16,10 @@ import kotlinx.coroutines.flow.Flow
 
 interface DelegatorStateRepository {
 
-    suspend fun scheduledDelegationRequests(delegatorState: DelegatorState.Delegator): List<ScheduledDelegationRequest>
+    /**
+     * Returns mapping from collator id to scheduled delegation request
+     */
+    suspend fun scheduledDelegationRequests(delegatorState: DelegatorState.Delegator): AccountIdMap<ScheduledDelegationRequest>
 
     suspend fun scheduledDelegationRequest(delegatorState: DelegatorState.Delegator, collatorId: AccountId): ScheduledDelegationRequest?
 
@@ -36,7 +41,7 @@ class RealDelegatorStateRepository(
     private val remoteStorage: StorageDataSource,
 ) : DelegatorStateRepository {
 
-    override suspend fun scheduledDelegationRequests(delegatorState: DelegatorState.Delegator): List<ScheduledDelegationRequest> {
+    override suspend fun scheduledDelegationRequests(delegatorState: DelegatorState.Delegator): AccountIdMap<ScheduledDelegationRequest> {
         return remoteStorage.query(delegatorState.chain.id) {
             val keyArguments = delegatorState.delegations.map { listOf(it.owner) }
 
@@ -46,10 +51,8 @@ class RealDelegatorStateRepository(
                 binding = { dynamicInstance, _ -> bindDelegationRequests(dynamicInstance) }
             )
 
-            delegatorState.delegations.mapNotNull { delegation ->
-                val collatorDelegationRequests = delegationRequestsByCollator[delegation.owner.toHexString()]
-
-                collatorDelegationRequests?.find { it.delegator.contentEquals(delegatorState.accountId) }
+            delegationRequestsByCollator.mapValuesNotNull { (_, pendingRequests) ->
+                pendingRequests.find { it.delegator.contentEquals(delegatorState.accountId) }
             }
         }
     }

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model
 
+import io.novafoundation.nova.common.utils.Identifiable
 import io.novafoundation.nova.feature_staking_api.domain.model.Identity
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.CollatorSnapshot
 import java.math.BigDecimal
@@ -12,7 +13,10 @@ class Collator(
     val snapshot: CollatorSnapshot?,
     val minimumStakeToGetRewards: BigInteger?,
     val apr: BigDecimal?,
-)
+) : Identifiable {
+
+    override val identifier: String = accountIdHex
+}
 
 val Collator.isElected
     get() = snapshot != null

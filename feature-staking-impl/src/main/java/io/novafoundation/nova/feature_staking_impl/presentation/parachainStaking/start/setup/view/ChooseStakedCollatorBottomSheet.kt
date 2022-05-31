@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.DiffUtil
 import io.novafoundation.nova.common.utils.addAfter
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.makeGone
+import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.view.AccentActionView
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.ClickHandler
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
@@ -20,6 +21,11 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import kotlinx.android.synthetic.main.item_select_staked_collator.view.itemSelectStakedCollatorCheck
 import kotlinx.android.synthetic.main.item_select_staked_collator.view.itemSelectStakedCollatorCollator
 import kotlinx.android.synthetic.main.item_validator.view.itemValidatorInfo
+import kotlinx.android.synthetic.main.item_validator.view.itemValidatorName
+import kotlinx.android.synthetic.main.item_validator.view.itemValidatorSubtitleLabel
+import kotlinx.android.synthetic.main.item_validator.view.itemValidatorSubtitleValue
+
+private val INACTIVE_COLOR = R.color.white_30
 
 class ChooseStakedCollatorBottomSheet(
     context: Context,
@@ -71,17 +77,26 @@ private class ViewHolder(containerView: View) : DynamicListSheetAdapter.Holder<S
         containerView.itemSelectStakedCollatorCollator.background = null
     }
 
-    override fun bind(item: SelectCollatorModel, isSelected: Boolean, handler: DynamicListSheetAdapter.Handler<SelectCollatorModel>) {
+    override fun bind(item: SelectCollatorModel, isSelected: Boolean, handler: DynamicListSheetAdapter.Handler<SelectCollatorModel>) = with(containerView) {
         super.bind(item, isSelected, handler)
 
-        containerView.itemSelectStakedCollatorCollator.bindSelectedCollator(item)
-        containerView.itemSelectStakedCollatorCheck.isChecked = isSelected
+        itemSelectStakedCollatorCollator.bindSelectedCollator(item)
+        itemSelectStakedCollatorCheck.isChecked = isSelected
+
+        val primaryTextColor = if (item.active) R.color.white else INACTIVE_COLOR
+        val secondaryTextColor = if (item.active) R.color.white_64 else INACTIVE_COLOR
+
+        with(itemSelectStakedCollatorCollator) {
+            itemValidatorName.setTextColorRes(primaryTextColor)
+            itemValidatorSubtitleLabel.setTextColorRes(secondaryTextColor)
+            itemValidatorSubtitleValue.setTextColorRes(primaryTextColor)
+        }
     }
 }
 
 private class DiffCallback : DiffUtil.ItemCallback<SelectCollatorModel>() {
     override fun areContentsTheSame(oldItem: SelectCollatorModel, newItem: SelectCollatorModel): Boolean {
-        return oldItem.staked == newItem.staked
+        return oldItem.staked == newItem.staked && oldItem.active != newItem.active
     }
 
     override fun areItemsTheSame(oldItem: SelectCollatorModel, newItem: SelectCollatorModel): Boolean {

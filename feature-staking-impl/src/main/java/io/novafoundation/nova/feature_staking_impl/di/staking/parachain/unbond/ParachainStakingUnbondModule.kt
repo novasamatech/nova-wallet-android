@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CandidatesRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.DelegatorStateRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.ParachainStakingConstantsRepository
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.ParachainStakingUnbondInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.RealParachainStakingUnbondInteractor
@@ -54,11 +55,13 @@ class ParachainStakingUnbondModule {
         delegatorStateUseCase: DelegatorStateUseCase,
         stakingSharedState: StakingSharedState,
         delegatorStateRepository: DelegatorStateRepository,
+        collatorsUseCase: CollatorsUseCase,
     ): ParachainStakingUnbondInteractor = RealParachainStakingUnbondInteractor(
         extrinsicService = extrinsicService,
         delegatorStateUseCase = delegatorStateUseCase,
         selectedAssetSharedState = stakingSharedState,
-        delegatorStateRepository = delegatorStateRepository
+        delegatorStateRepository = delegatorStateRepository,
+        collatorsUseCase = collatorsUseCase
     )
 
     @Provides

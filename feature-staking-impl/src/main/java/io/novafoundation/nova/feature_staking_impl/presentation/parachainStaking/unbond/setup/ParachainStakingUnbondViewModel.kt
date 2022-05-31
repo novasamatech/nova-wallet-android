@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.mixin.api.Retriable
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.findById
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.validation.ValidationExecutor
@@ -20,11 +21,13 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.commo
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.Collator
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.ParachainStakingUnbondInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.UnbondingCollator
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.flow.ParachainStakingUnbondValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.flow.ParachainStakingUnbondValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select.model.mapCollatorToCollatorParcelModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.selectCollators.mapCollatorToSelectCollatorModel
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.selectCollators.mapUnbondingCollatorToSelectCollatorModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.model.SelectCollatorModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.confirm.model.ParachainStakingUnbondConfirmPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.hints.ParachainStakingUnbondHintsMixinFactory
@@ -76,7 +79,7 @@ class ParachainStakingUnbondViewModel(
         .shareInBackground()
 
     private val alreadyStakedCollatorsFlow = currentDelegatorStateFlow
-        .mapLatest(collatorsUseCase::getSelectedCollators)
+        .mapLatest(interactor::getSelectedCollators)
         .shareInBackground()
 
     private val selectedCollatorFlow = singleReplaySharedFlow<Collator>()
@@ -145,15 +148,7 @@ class ParachainStakingUnbondViewModel(
         val delegatorState = currentDelegatorStateFlow.first()
         val alreadyStakedCollators = alreadyStakedCollatorsFlow.first()
 
-        val asset = assetFlow.first()
-        val selectedCollator = selectedCollatorFlow.first()
-
-        val payload = withContext(Dispatchers.Default) {
-            val collatorModels = alreadyStakedCollators.map { mapCollatorToSelectCollatorModel(it, delegatorState, asset, addressIconGenerator) }
-            val selected = collatorModels.find { it.collator.accountIdHex == selectedCollator.accountIdHex }
-
-            DynamicListBottomSheet.Payload(collatorModels, selected)
-        }
+        val payload = createSelectCollatorPayload(alreadyStakedCollators, delegatorState)
 
         val newCollator = chooseCollatorAction.awaitAction(payload)
         setCollatorIfCanUnbond(newCollator, delegatorState)
@@ -165,6 +160,28 @@ class ParachainStakingUnbondViewModel(
 
     fun backClicked() {
         router.back()
+    }
+
+    private suspend fun createSelectCollatorPayload(
+        alreadyStakedCollators: List<UnbondingCollator>,
+        delegatorState: DelegatorState
+    ): DynamicListBottomSheet.Payload<SelectCollatorModel> {
+        val asset = assetFlow.first()
+        val selectedCollator = selectedCollatorFlow.first()
+
+        return withContext(Dispatchers.Default) {
+            val collatorModels = alreadyStakedCollators.map {
+                mapUnbondingCollatorToSelectCollatorModel(
+                    unbondingCollator = it,
+                    chain = delegatorState.chain,
+                    asset = asset,
+                    addressIconGenerator = addressIconGenerator
+                )
+            }
+            val selected = collatorModels.findById(selectedCollator)
+
+            DynamicListBottomSheet.Payload(collatorModels, selected)
+        }
     }
 
     private suspend fun setCollatorIfCanUnbond(newCollator: SelectCollatorModel, delegatorState: DelegatorState) {
@@ -180,11 +197,12 @@ class ParachainStakingUnbondViewModel(
         }
     }
 
-    private fun setInitialCollator() = launch {
-        val alreadyStakedCollators = alreadyStakedCollatorsFlow.first()
+    private fun setInitialCollator() = launch(Dispatchers.Default) {
+        val collatorsWithoutUnbonding = alreadyStakedCollatorsFlow.first()
+            .filterNot { it.hasPendingUnbonding }
 
-        if (alreadyStakedCollators.isNotEmpty()) {
-            selectedCollatorFlow.emit(alreadyStakedCollators.first())
+        if (collatorsWithoutUnbonding.isNotEmpty()) {
+            selectedCollatorFlow.emit(collatorsWithoutUnbonding.first().collator)
         }
     }
 

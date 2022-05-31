@@ -37,7 +37,9 @@ class RemainingUnbondValidation(
     private val delegatorStateUseCase: DelegatorStateUseCase,
 ) : ParachainStakingUnbondValidation {
 
-    override suspend fun validate(value: ParachainStakingUnbondValidationPayload): ValidationStatus<ParachainStakingUnbondValidationFailure> = with(value.asset.token) {
+    override suspend fun validate(
+        value: ParachainStakingUnbondValidationPayload
+    ): ValidationStatus<ParachainStakingUnbondValidationFailure> = with(value.asset.token) {
         val asset = value.asset
         val chainId = configuration.chainId
 

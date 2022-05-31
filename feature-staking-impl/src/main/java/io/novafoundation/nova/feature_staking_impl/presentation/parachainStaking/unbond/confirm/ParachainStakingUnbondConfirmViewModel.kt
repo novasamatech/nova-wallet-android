@@ -147,7 +147,6 @@ class ParachainStakingUnbondConfirmViewModel(
         }
     }
 
-
     private fun sendTransaction() = launch {
         val token = assetFlow.first().token
         val amountInPlanks = token.planksFromAmount(payload.amount)

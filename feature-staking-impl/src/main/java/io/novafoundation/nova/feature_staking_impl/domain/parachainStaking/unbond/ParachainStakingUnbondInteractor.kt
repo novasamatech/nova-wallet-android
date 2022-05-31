@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_staking_api.domain.model.parachain.delegat
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.calls.scheduleBondLess
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.calls.scheduleRevokeDelegation
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.DelegatorStateRepository
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
@@ -23,6 +24,8 @@ interface ParachainStakingUnbondInteractor {
     suspend fun unbond(amount: BigInteger, collator: AccountId): Result<*>
 
     suspend fun canUnbond(fromCollator: AccountId, delegatorState: DelegatorState): Boolean
+
+    suspend fun getSelectedCollators(delegatorState: DelegatorState): List<UnbondingCollator>
 }
 
 class RealParachainStakingUnbondInteractor(
@@ -30,6 +33,7 @@ class RealParachainStakingUnbondInteractor(
     private val delegatorStateUseCase: DelegatorStateUseCase,
     private val delegatorStateRepository: DelegatorStateRepository,
     private val selectedAssetSharedState: SingleAssetSharedState,
+    private val collatorsUseCase: CollatorsUseCase,
 ) : ParachainStakingUnbondInteractor {
 
     override suspend fun estimateFee(amount: BigInteger, collatorId: AccountId): BigInteger {
@@ -56,6 +60,24 @@ class RealParachainStakingUnbondInteractor(
                 scheduledDelegationRequest == null // can unbond only if there is no scheduled request already
             }
             is DelegatorState.None -> false
+        }
+    }
+
+    override suspend fun getSelectedCollators(delegatorState: DelegatorState): List<UnbondingCollator> = withContext(Dispatchers.Default) {
+        when (delegatorState) {
+            is DelegatorState.Delegator -> {
+                val collators = collatorsUseCase.getSelectedCollators(delegatorState)
+                val unbondings = delegatorStateRepository.scheduledDelegationRequests(delegatorState)
+
+                collators.map { selectedCollator ->
+                    UnbondingCollator(
+                        selectedCollator = selectedCollator,
+                        hasPendingUnbonding = selectedCollator.collator.accountIdHex in unbondings
+                    )
+                }
+            }
+
+            is DelegatorState.None -> emptyList()
         }
     }
 
