@@ -65,7 +65,6 @@ class StakeSummaryView @JvmOverloads constructor(
             if (status is Status.Waiting) {
                 stakeSummaryStatus.startTimer(
                     millis = status.timeLeft,
-                    daysPlurals = R.plurals.staking_main_lockup_period_value,
                     customMessageFormat = status.textRes
                 )
             } else {

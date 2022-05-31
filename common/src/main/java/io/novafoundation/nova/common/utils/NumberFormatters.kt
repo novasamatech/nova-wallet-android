@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalTime::class)
+
 package io.novafoundation.nova.common.utils
 
 import android.content.Context
@@ -11,6 +13,8 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
 
 private const val DECIMAL_PATTERN_BASE = "###,###."
 
@@ -157,3 +161,37 @@ fun currencyFormatter() = CompoundNumberFormatter(
         trillionAbbreviation
     )
 )
+
+fun Duration.format(
+    estimated: Boolean,
+    context: Context
+): String = format(
+    estimated = estimated,
+    daysFormat = { context.resources.getQuantityString(R.plurals.staking_main_lockup_period_value, it, it) },
+    hoursFormat = { context.resources.getQuantityString(R.plurals.common_hours_format, it, it) },
+    timeFormat = { hours, minutes, seconds -> "%02d:%02d:%02d".format(hours, minutes, seconds) }
+)
+
+typealias TimeFormatter = (hours: Int, minutes: Int, seconds: Int) -> String
+
+inline fun Duration.format(
+    estimated: Boolean,
+    daysFormat: (days: Int) -> String,
+    hoursFormat: (hours: Int) -> String,
+    noinline timeFormat: TimeFormatter?
+): String {
+    val withoutPrefix = toComponents { days, hours, minutes, seconds, _ ->
+        when {
+            days > 0 && hours > 0 -> "${daysFormat(days)} ${hoursFormat(hours)}"
+            days > 0 -> daysFormat(days)
+            timeFormat != null -> timeFormat(hours, minutes, seconds)
+            else -> hoursFormat(hours)
+        }
+    }
+
+    return if (estimated) {
+        "~$withoutPrefix"
+    } else {
+        withoutPrefix
+    }
+}
