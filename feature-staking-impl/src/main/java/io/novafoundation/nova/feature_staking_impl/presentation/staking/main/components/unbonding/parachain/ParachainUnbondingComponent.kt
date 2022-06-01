@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.unbondings.ParachainStakingUnbondingsInteractor
+import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.common.parachainStaking.loadDelegatingState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.UnbondingAction
@@ -21,6 +22,7 @@ import kotlinx.coroutines.flow.combine
 class ParachainUnbondingComponentFactory(
     private val delegatorStateUseCase: DelegatorStateUseCase,
     private val interactor: ParachainStakingUnbondingsInteractor,
+    private val router: ParachainStakingRouter,
 ) {
 
     fun create(
@@ -30,7 +32,8 @@ class ParachainUnbondingComponentFactory(
         assetWithChain = assetWithChain,
         hostContext = hostContext,
         delegatorStateUseCase = delegatorStateUseCase,
-        interactor = interactor
+        interactor = interactor,
+        router = router
     )
 }
 
@@ -40,6 +43,7 @@ private class ParachainUnbondingComponent(
 
     private val assetWithChain: AssetWithChain,
     private val hostContext: ComponentHostContext,
+    private val router: ParachainStakingRouter
 ) : UnbondingComponent,
     CoroutineScope by hostContext.scope,
     WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(hostContext.scope) {
@@ -54,7 +58,10 @@ private class ParachainUnbondingComponent(
         .shareInBackground()
 
     override fun onAction(action: UnbondingAction) {
-        // TODO
+       when(action) {
+           UnbondingAction.RebondClicked -> {} // TODO rebond
+           UnbondingAction.RedeemClicked -> router.openRedeem()
+       }
     }
 
     private fun delegatorSummaryStateFlow(delegatorState: DelegatorState.Delegator): Flow<UnbondingState> {

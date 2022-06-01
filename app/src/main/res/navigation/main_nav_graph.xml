@@ -274,6 +274,14 @@
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_mainFragment_to_parachainStakingRedeemFragment"
+            app:destination="@id/parachainStakingRedeemFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
 
@@ -925,4 +933,10 @@
         android:id="@+id/currentCollatorsFragment"
         android:name="io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.current.CurrentCollatorsFragment"
         android:label="CurrentCollatorsFragment" />
+
+    <fragment
+        android:id="@+id/parachainStakingRedeemFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.redeem.ParachainStakingRedeemFragment"
+        android:label="ParachainStakingRedeemFragment" />
+
 </navigation>

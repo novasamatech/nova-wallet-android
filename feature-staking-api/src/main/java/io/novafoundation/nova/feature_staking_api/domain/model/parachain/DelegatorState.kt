@@ -53,6 +53,8 @@ class ScheduledDelegationRequest(
     val action: DelegationAction
 )
 
+fun ScheduledDelegationRequest.redeemableIn(roundIndex: RoundIndex): Boolean = whenExecutable <= roundIndex
+
 sealed class DelegationAction(val amount: Balance) {
     class Revoke(amount: Balance) : DelegationAction(amount)
 

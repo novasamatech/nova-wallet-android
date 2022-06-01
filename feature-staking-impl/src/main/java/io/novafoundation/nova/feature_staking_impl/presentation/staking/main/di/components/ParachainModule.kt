@@ -78,9 +78,11 @@ class ParachainModule {
     fun provideParachainUnbondingsFactory(
         delegatorStateUseCase: DelegatorStateUseCase,
         interactor: ParachainStakingUnbondingsInteractor,
+        router: ParachainStakingRouter,
     ) = ParachainUnbondingComponentFactory(
         delegatorStateUseCase = delegatorStateUseCase,
-        interactor = interactor
+        interactor = interactor,
+        router = router
     )
 
     @Provides
