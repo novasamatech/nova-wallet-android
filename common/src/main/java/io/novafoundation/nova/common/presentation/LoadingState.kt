@@ -22,7 +22,7 @@ interface LoadingView<T> {
 }
 
 fun <T> LoadingView<T>.showLoadingState(loadingState: LoadingState<T>) {
-    when(loadingState) {
+    when (loadingState) {
         is LoadingState.Loaded -> showData(loadingState.data)
         is LoadingState.Loading -> showLoading()
     }

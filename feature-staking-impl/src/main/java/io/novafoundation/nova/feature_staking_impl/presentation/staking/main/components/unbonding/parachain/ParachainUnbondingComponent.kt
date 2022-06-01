@@ -58,10 +58,10 @@ private class ParachainUnbondingComponent(
         .shareInBackground()
 
     override fun onAction(action: UnbondingAction) {
-       when(action) {
-           UnbondingAction.RebondClicked -> {} // TODO rebond
-           UnbondingAction.RedeemClicked -> router.openRedeem()
-       }
+        when (action) {
+            UnbondingAction.RebondClicked -> {} // TODO rebond
+            UnbondingAction.RedeemClicked -> router.openRedeem()
+        }
     }
 
     private fun delegatorSummaryStateFlow(delegatorState: DelegatorState.Delegator): Flow<UnbondingState> {

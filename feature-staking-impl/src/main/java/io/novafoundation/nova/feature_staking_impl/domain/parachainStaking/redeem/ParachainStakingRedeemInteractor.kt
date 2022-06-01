@@ -28,7 +28,7 @@ class RealParachainStakingRedeemInteractor(
     private val extrinsicService: ExtrinsicService,
     private val currentRoundRepository: CurrentRoundRepository,
     private val delegatorStateRepository: DelegatorStateRepository,
-): ParachainStakingRedeemInteractor {
+) : ParachainStakingRedeemInteractor {
 
     override suspend fun estimateFee(delegatorState: DelegatorState): BigInteger = withContext(Dispatchers.Default) {
         extrinsicService.estimateFee(delegatorState.chain) {
@@ -48,7 +48,6 @@ class RealParachainStakingRedeemInteractor(
         }
     }
 
-
     private suspend fun ExtrinsicBuilder.redeem(delegatorState: DelegatorState) {
         val redeemableUnbondings = getRedeemableUnbondings(delegatorState)
 
@@ -61,7 +60,7 @@ class RealParachainStakingRedeemInteractor(
     }
 
     private suspend fun getRedeemableUnbondings(delegatorState: DelegatorState): AccountIdMap<ScheduledDelegationRequest> {
-        return when(delegatorState) {
+        return when (delegatorState) {
             is DelegatorState.Delegator -> {
                 val currentRound = currentRoundRepository.currentRoundInfo(delegatorState.chain.id).current
                 val scheduledRequests = delegatorStateRepository.scheduledDelegationRequests(delegatorState)

@@ -7,7 +7,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.redee
 import io.novafoundation.nova.feature_wallet_api.domain.validation.notSufficientBalanceToPayFeeErrorMessage
 
 fun parachainStakingRedeemValidationFailure(reason: ParachainStakingRedeemValidationFailure, resourceManager: ResourceManager): TitleAndMessage {
-    return when(reason) {
+    return when (reason) {
         NotEnoughBalanceToPayFees -> resourceManager.notSufficientBalanceToPayFeeErrorMessage()
     }
 }
