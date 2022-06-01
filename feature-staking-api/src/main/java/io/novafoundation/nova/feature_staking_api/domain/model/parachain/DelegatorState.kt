@@ -48,14 +48,16 @@ class DelegatorBond(
 )
 
 class ScheduledDelegationRequest(
+    val collator: AccountId,
     val delegator: AccountId,
     val whenExecutable: RoundIndex,
     val action: DelegationAction
 )
 
 fun ScheduledDelegationRequest.redeemableIn(roundIndex: RoundIndex): Boolean = whenExecutable <= roundIndex
+fun ScheduledDelegationRequest.unbondingIn(roundIndex: RoundIndex): Boolean = whenExecutable > roundIndex
 
-sealed class DelegationAction(val amount: Balance) {
+sealed class DelegationAction(val amount: BalanceOf) {
     class Revoke(amount: Balance) : DelegationAction(amount)
 
     class Decrease(amount: Balance) : DelegationAction(amount)

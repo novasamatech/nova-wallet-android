@@ -44,7 +44,7 @@ abstract class DynamicListBottomSheet<T>(
     override val dialogInterface: DialogInterface
         get() = this
 
-    class Payload<T>(val data: List<T>, val selected: T? = null)
+    open class Payload<out T>(val data: List<T>, val selected: T? = null)
 
     protected val container: LinearLayout
         get() = dynamicListSheetItemContainer

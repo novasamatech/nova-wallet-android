@@ -8,10 +8,12 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.reposit
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chainAndAsset
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.withContext
 
 class DelegatorStateUseCase(
     private val delegatorStateRepository: DelegatorStateRepository,
@@ -41,13 +43,13 @@ class DelegatorStateUseCase(
         delegatorStateFlow(it, chain, asset)
     }
 
-    suspend fun currentDelegatorState(): DelegatorState {
+    suspend fun currentDelegatorState(): DelegatorState = withContext(Dispatchers.Default) {
         val account = accountRepository.getSelectedMetaAccount()
         val (chain, asset) = singleAssetSharedState.chainAndAsset()
 
         val accountId = account.accountIdIn(chain)
 
-        return if (accountId != null) {
+        if (accountId != null) {
             delegatorStateRepository.getDelegationState(chain, asset, accountId)
         } else {
             DelegatorState.None(chain)

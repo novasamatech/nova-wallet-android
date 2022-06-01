@@ -53,13 +53,13 @@ suspend fun mapCollatorToCollatorModel(
             val formattedMinStake = mapAmountToAmountModel(it, token).token
 
             StakeTargetModel.Subtitle(
-                label = resourceManager.getString(R.string.staking_min_stake).withSubtitleSLabelSuffix(),
+                label = resourceManager.getString(R.string.staking_min_stake).withSubtitleLabelSuffix(),
                 value = ColoredText(formattedMinStake, R.color.white),
             )
         }
 
         else -> StakeTargetModel.Subtitle(
-            label = resourceManager.getString(R.string.staking_rewards).withSubtitleSLabelSuffix(),
+            label = resourceManager.getString(R.string.staking_rewards).withSubtitleLabelSuffix(),
             value = rewardsToColoredText(collator.apr)!!
         )
     }
@@ -110,4 +110,4 @@ fun mapCollatorToDetailsParcelModel(
     )
 }
 
-private fun String.withSubtitleSLabelSuffix() = "$this:"
+fun String.withSubtitleLabelSuffix() = "$this:"

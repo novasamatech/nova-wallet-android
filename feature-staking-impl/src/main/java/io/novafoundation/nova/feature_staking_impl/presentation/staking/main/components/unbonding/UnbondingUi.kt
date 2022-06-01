@@ -4,6 +4,8 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
+import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.ChooseStakedStakeTargetsBottomSheet
+import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.ChooseStakedStakeTargetsBottomSheet.SelectionStyle
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.rebond.ChooseRebondKindBottomSheet
 
 fun BaseFragment<*>.setupUnbondingComponent(component: UnbondingComponent, view: UnbondingsView) {
@@ -12,6 +14,16 @@ fun BaseFragment<*>.setupUnbondingComponent(component: UnbondingComponent, view:
             is UnbondingEvent.ChooseRebondKind -> {
                 ChooseRebondKindBottomSheet(requireContext(), it.value)
                     .show()
+            }
+            is UnbondingEvent.ChooseRebondTarget -> {
+                ChooseStakedStakeTargetsBottomSheet(
+                    context = requireContext(),
+                    payload = it.value.payload,
+                    stakedCollatorSelected = it.value.onSuccess,
+                    onCancel = it.value.onCancel,
+                    newStakeTargetClicked = null,
+                    selectionStyle = SelectionStyle.Arrow
+                ).show()
             }
         }
     }

@@ -14,7 +14,7 @@ import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.view.ChooseStakedCollatorBottomSheet
+import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.ChooseStakedStakeTargetsBottomSheet
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
@@ -75,12 +75,12 @@ class ParachainStakingUnbondFragment : BaseFragment<ParachainStakingUnbondViewMo
         viewModel.transferable.observe(parachainStakingUnbondTransferable::showAmount)
 
         viewModel.chooseCollatorAction.awaitableActionLiveData.observeEvent { action ->
-            ChooseStakedCollatorBottomSheet(
+            ChooseStakedStakeTargetsBottomSheet(
                 context = requireContext(),
                 payload = action.payload,
                 stakedCollatorSelected = action.onSuccess,
                 onCancel = action.onCancel,
-                newCollatorClicked = null
+                newStakeTargetClicked = null
             ).show()
         }
     }

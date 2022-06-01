@@ -171,5 +171,6 @@ class ParachainStakingModule {
         delegatorStateRepository: DelegatorStateRepository,
         currentRoundRepository: CurrentRoundRepository,
         roundDurationEstimator: RoundDurationEstimator,
-    ) = ParachainStakingUnbondingsInteractor(delegatorStateRepository, currentRoundRepository, roundDurationEstimator)
+        identityRepository: IdentityRepository
+    ) = ParachainStakingUnbondingsInteractor(delegatorStateRepository, currentRoundRepository, roundDurationEstimator, identityRepository)
 }

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.di
 
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
@@ -79,10 +80,12 @@ class ParachainModule {
         delegatorStateUseCase: DelegatorStateUseCase,
         interactor: ParachainStakingUnbondingsInteractor,
         router: ParachainStakingRouter,
+        addressIconGenerator: AddressIconGenerator
     ) = ParachainUnbondingComponentFactory(
         delegatorStateUseCase = delegatorStateUseCase,
         interactor = interactor,
-        router = router
+        router = router,
+        addressIconGenerator = addressIconGenerator
     )
 
     @Provides

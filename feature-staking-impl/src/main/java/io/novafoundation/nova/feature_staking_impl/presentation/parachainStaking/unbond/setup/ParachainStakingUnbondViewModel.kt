@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_staking_impl.presentation.parachainStakin
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
-import io.novafoundation.nova.common.mixin.actionAwaitable.selectingOneOf
 import io.novafoundation.nova.common.mixin.api.Retriable
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
@@ -13,7 +12,6 @@ import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
-import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.delegationAmountTo
 import io.novafoundation.nova.feature_staking_impl.R
@@ -25,6 +23,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbon
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.flow.ParachainStakingUnbondValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.flow.ParachainStakingUnbondValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.ChooseStakedStakeTargetsBottomSheet
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select.model.mapCollatorToCollatorParcelModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.selectCollators.mapCollatorToSelectCollatorModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.selectCollators.mapUnbondingCollatorToSelectCollatorModel
@@ -107,7 +106,7 @@ class ParachainStakingUnbondViewModel(
         mapCollatorToSelectCollatorModel(selectedCollator, currentDelegatorState, asset, addressIconGenerator)
     }.shareInBackground()
 
-    val chooseCollatorAction = actionAwaitableMixinFactory.selectingOneOf<SelectCollatorModel>()
+    val chooseCollatorAction = actionAwaitableMixinFactory.create<ChooseStakedStakeTargetsBottomSheet.Payload<SelectCollatorModel>, SelectCollatorModel>()
 
     val minimumStake = selectedCollatorFlow.map {
         val minimumStake = it.minimumStakeToGetRewards ?: collatorsUseCase.defaultMinimumStake()
@@ -165,7 +164,7 @@ class ParachainStakingUnbondViewModel(
     private suspend fun createSelectCollatorPayload(
         alreadyStakedCollators: List<UnbondingCollator>,
         delegatorState: DelegatorState
-    ): DynamicListBottomSheet.Payload<SelectCollatorModel> {
+    ): ChooseStakedStakeTargetsBottomSheet.Payload<SelectCollatorModel> {
         val asset = assetFlow.first()
         val selectedCollator = selectedCollatorFlow.first()
 
@@ -180,15 +179,15 @@ class ParachainStakingUnbondViewModel(
             }
             val selected = collatorModels.findById(selectedCollator)
 
-            DynamicListBottomSheet.Payload(collatorModels, selected)
+            ChooseStakedStakeTargetsBottomSheet.Payload(collatorModels, selected)
         }
     }
 
     private suspend fun setCollatorIfCanUnbond(newCollator: SelectCollatorModel, delegatorState: DelegatorState) {
-        val collarAccountId = newCollator.collator.accountIdHex.fromHex()
+        val collarAccountId = newCollator.payload.accountIdHex.fromHex()
 
         if (interactor.canUnbond(collarAccountId, delegatorState)) {
-            selectedCollatorFlow.emit(newCollator.collator)
+            selectedCollatorFlow.emit(newCollator.payload)
         } else {
             showError(
                 title = resourceManager.getString(R.string.staking_parachain_unbond_already_exists_title),

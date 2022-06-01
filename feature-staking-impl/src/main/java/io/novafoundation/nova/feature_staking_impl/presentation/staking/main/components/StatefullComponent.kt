@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
+import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
 import io.novafoundation.nova.feature_staking_impl.R
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -42,6 +43,7 @@ interface AwaitableEvent<P, R> {
 }
 
 typealias ChooseOneOfAwaitableEvent<E> = AwaitableEvent<List<E>, E>
+typealias ChooseOneOfManyAwaitableEvent<E> = AwaitableEvent<DynamicListBottomSheet.Payload<E>, E>
 
 suspend fun <A : AwaitableEvent<P, R>, P, R> MutableLiveData<out Event<in A>>.awaitAction(
     payload: P,

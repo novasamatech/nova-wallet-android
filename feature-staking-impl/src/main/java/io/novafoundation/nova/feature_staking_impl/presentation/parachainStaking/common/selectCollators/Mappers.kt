@@ -7,7 +7,7 @@ import io.novafoundation.nova.feature_staking_api.domain.model.parachain.delegat
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.Collator
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.SelectedCollator
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.UnbondingCollator
-import io.novafoundation.nova.feature_staking_impl.presentation.common.collators.collatorAddressModel
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.collators.collatorAddressModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.model.SelectCollatorModel
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -78,8 +78,8 @@ suspend fun mapCollatorToSelectCollatorModel(
 
     return SelectCollatorModel(
         addressModel = addressModel,
-        staked = stakedAmountModel,
-        collator = collator,
+        amount = stakedAmountModel,
+        payload = collator,
         active = active
     )
 }
