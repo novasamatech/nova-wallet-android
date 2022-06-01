@@ -19,7 +19,7 @@ class CollatorParcelModel(
     val address: String,
     val identity: IdentityParcelModel?,
     val snapshot: CollatorSnapshotParcelModel?,
-    val minimumStakeToGetRewards: BigInteger?,
+    val minimumStakeToGetRewards: BigInteger,
     val apr: BigDecimal?,
 ) : Parcelable {
 
