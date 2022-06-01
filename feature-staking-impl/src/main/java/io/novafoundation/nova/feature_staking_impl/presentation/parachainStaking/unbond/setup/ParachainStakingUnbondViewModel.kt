@@ -220,10 +220,10 @@ class ParachainStakingUnbondViewModel(
                 validationFailureTransformer = { parachainStakingUnbondValidationFailure(it, resourceManager) },
                 autoFixPayload = ::parachainStakingUnbondPayloadAutoFix,
                 progressConsumer = validationInProgress.progressConsumer()
-            ) {
+            ) { fixedPayload ->
                 validationInProgress.value = false
 
-                goToNextStep(fee = fee, amount = payload.amount, collator = payload.collator)
+                goToNextStep(fee = fee, amount = fixedPayload.amount, collator = fixedPayload.collator)
             }
         }
     }
