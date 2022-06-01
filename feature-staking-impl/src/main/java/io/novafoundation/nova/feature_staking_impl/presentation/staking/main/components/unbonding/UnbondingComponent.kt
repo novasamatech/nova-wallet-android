@@ -20,7 +20,6 @@ typealias UnbondingComponent = StatefullComponent<LoadingState<UnbondingState>, 
 typealias ChooseOneOfStakedTargetsAction<E> = ActionAwaitableMixin.Action<ChooseStakedStakeTargetsBottomSheet.Payload<E>, E>
 typealias ChooseOneOfStakedTargetsEvent<E> = AwaitableEvent<ChooseStakedStakeTargetsBottomSheet.Payload<E>, E>
 
-
 sealed class UnbondingState {
 
     companion object
