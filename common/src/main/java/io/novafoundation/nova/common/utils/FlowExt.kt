@@ -139,12 +139,14 @@ fun EditText.bindTo(flow: MutableSharedFlow<String>, scope: CoroutineScope) {
     }
 }
 
-inline fun MutableStateFlow<Boolean>.withFlagSet(action: () -> Unit) {
+inline fun <R> MutableStateFlow<Boolean>.withFlagSet(action: () -> R): R {
     value = true
 
-    action()
+    val result = action()
 
     value = false
+
+    return result
 }
 
 fun CompoundButton.bindTo(flow: MutableStateFlow<Boolean>, scope: CoroutineScope) {

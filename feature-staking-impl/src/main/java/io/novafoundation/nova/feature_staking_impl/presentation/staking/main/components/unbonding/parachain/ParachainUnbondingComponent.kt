@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.utils.castOrNull
+import io.novafoundation.nova.common.utils.withFlagSet
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_impl.R
@@ -27,6 +28,7 @@ import io.novafoundation.nova.runtime.state.SingleAssetSharedState.AssetWithChai
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -80,9 +82,12 @@ private class ParachainUnbondingComponent(
         }
     }
 
+    private val cancelLoadingFlow = MutableStateFlow(false)
+
     private fun handleRebond() = launch {
+
         val delegatorState = delegatorStateUseCase.currentDelegatorState().castOrNull<DelegatorState.Delegator>() ?: return@launch
-        val payload = createRebondChooserPayload(delegatorState)
+        val payload = cancelLoadingFlow.withFlagSet { createRebondChooserPayload(delegatorState) }
 
         val selected = events.awaitAction(payload, UnbondingEvent::ChooseRebondTarget).payload as DelegationRequestWithCollatorInfo
 
@@ -119,9 +124,10 @@ private class ParachainUnbondingComponent(
     private fun delegatorSummaryStateFlow(delegatorState: DelegatorState.Delegator): Flow<UnbondingState> {
         return combine(
             interactor.unbondingsFlow(delegatorState),
-            hostContext.assetFlow
-        ) { unbondings, asset ->
-            UnbondingState.from(unbondings, asset)
+            hostContext.assetFlow,
+            cancelLoadingFlow
+        ) { unbondings, asset, cancelLoading ->
+            UnbondingState.from(unbondings, asset, cancelLoading)
         }
     }
 }

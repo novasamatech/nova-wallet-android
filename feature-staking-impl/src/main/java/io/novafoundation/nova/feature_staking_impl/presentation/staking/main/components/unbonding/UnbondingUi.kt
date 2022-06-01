@@ -28,6 +28,8 @@ fun BaseFragment<*>.setupUnbondingComponent(component: UnbondingComponent, view:
         }
     }
 
+    view.prepareForProgress(viewLifecycleOwner)
+
     view.onCancelClicked { component.onAction(UnbondingAction.RebondClicked) }
     view.onRedeemClicked { component.onAction(UnbondingAction.RedeemClicked) }
 

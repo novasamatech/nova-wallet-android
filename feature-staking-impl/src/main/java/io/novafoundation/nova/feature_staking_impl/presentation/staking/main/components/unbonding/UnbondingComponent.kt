@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.ChooseOneOfAwaitableAction
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.Identifiable
+import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.ChooseStakedStakeTargetsBottomSheet
 import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.SelectStakeTargetModel
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.AwaitableEvent
@@ -26,9 +27,9 @@ sealed class UnbondingState {
 
     object Empty : UnbondingState()
 
-    class HaveUnbondings(
+    data class HaveUnbondings(
         val redeemEnabled: Boolean,
-        val cancelEnabled: Boolean,
+        val cancelState: ButtonState,
         val unbondings: List<UnbondingModel>
     ) : UnbondingState()
 }
