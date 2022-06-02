@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.presentation.showLoadingState
@@ -24,6 +25,7 @@ import kotlinx.android.synthetic.main.fragment_parachain_staking_rebond.parachai
 import kotlinx.android.synthetic.main.fragment_parachain_staking_rebond.parachainStakingRebondConfirm
 import kotlinx.android.synthetic.main.fragment_parachain_staking_rebond.parachainStakingRebondContainer
 import kotlinx.android.synthetic.main.fragment_parachain_staking_rebond.parachainStakingRebondExtrinsicInfo
+import kotlinx.android.synthetic.main.fragment_parachain_staking_rebond.parachainStakingRebondHints
 import kotlinx.android.synthetic.main.fragment_parachain_staking_rebond.parachainStakingRebondToolbar
 
 class ParachainStakingRebondFragment : BaseFragment<ParachainStakingRebondViewModel>() {
@@ -71,6 +73,7 @@ class ParachainStakingRebondFragment : BaseFragment<ParachainStakingRebondViewMo
         observeValidations(viewModel)
         setupExternalActions(viewModel)
         setupFeeLoading(viewModel, parachainStakingRebondExtrinsicInfo.fee)
+        observeHints(viewModel.hintsMixin, parachainStakingRebondHints)
 
         viewModel.showNextProgress.observe(parachainStakingRebondConfirm::setProgress)
 

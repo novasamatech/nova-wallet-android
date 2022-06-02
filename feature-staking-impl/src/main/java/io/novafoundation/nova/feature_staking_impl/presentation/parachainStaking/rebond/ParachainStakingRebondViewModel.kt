@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.parachainStakin
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Retriable
 import io.novafoundation.nova.common.mixin.api.Validatable
+import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.withLoading
@@ -49,6 +50,7 @@ class ParachainStakingRebondViewModel(
     private val delegatorStateUseCase: DelegatorStateUseCase,
     private val payload: ParachainStakingRebondPayload,
     private val collatorsUseCase: CollatorsUseCase,
+    resourcesHintsMixinFactory: ResourcesHintsMixinFactory,
     selectedAccountUseCase: SelectedAccountUseCase,
     assetUseCase: AssetUseCase,
     walletUiUseCase: WalletUiUseCase,
@@ -71,6 +73,11 @@ class ParachainStakingRebondViewModel(
     }
         .withLoading()
         .shareInBackground()
+
+    val hintsMixin = resourcesHintsMixinFactory.create(
+        coroutineScope = this,
+        hintsRes = listOf(R.string.staking_parachain_rebond_hint)
+    )
 
     private val collator = flowOf {
         collatorsUseCase.getCollator(payload.collatorId)

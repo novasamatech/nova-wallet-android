@@ -9,6 +9,7 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.ValidationSystem
@@ -69,6 +70,7 @@ class ParachainStakingRebondModule {
         selectedAccountUseCase: SelectedAccountUseCase,
         assetUseCase: AssetUseCase,
         walletUiUseCase: WalletUiUseCase,
+        resourcesHintsMixinFactory: ResourcesHintsMixinFactory,
     ): ViewModel {
         return ParachainStakingRebondViewModel(
             router = router,
@@ -84,7 +86,8 @@ class ParachainStakingRebondModule {
             selectedAccountUseCase = selectedAccountUseCase,
             assetUseCase = assetUseCase,
             walletUiUseCase = walletUiUseCase,
-            validationSystem = validationSystem
+            validationSystem = validationSystem,
+            resourcesHintsMixinFactory = resourcesHintsMixinFactory
         )
     }
 
