@@ -7,4 +7,4 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 class ParachainStakingRebondPayload(
     val collatorId: AccountId
-): Parcelable
+) : Parcelable
