@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.di.staking.parachain
 
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -154,7 +155,8 @@ class ParachainStakingModule {
         parachainStakingConstantsRepository: ParachainStakingConstantsRepository,
         stakingSharedState: StakingSharedState,
         collatorProvider: CollatorProvider,
-    ): CollatorsUseCase = RealCollatorsUseCase(stakingSharedState, parachainStakingConstantsRepository, collatorProvider)
+        addressIconGenerator: AddressIconGenerator
+    ): CollatorsUseCase = RealCollatorsUseCase(stakingSharedState, parachainStakingConstantsRepository, collatorProvider, addressIconGenerator)
 
     @Provides
     @FeatureScope

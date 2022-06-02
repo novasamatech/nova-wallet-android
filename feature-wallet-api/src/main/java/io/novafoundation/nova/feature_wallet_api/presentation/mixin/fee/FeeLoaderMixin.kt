@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee
 import androidx.lifecycle.LiveData
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Retriable
+import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
@@ -87,7 +88,9 @@ fun <I> FeeLoaderMixin.Presentation.connectWith(
             feeConstructor = { feeConstructor(it, input) },
             onRetryCancelled = onRetryCancelled
         )
-    }.launchIn(scope)
+    }
+        .inBackground()
+        .launchIn(scope)
 }
 
 fun <I1, I2> FeeLoaderMixin.Presentation.connectWith(
@@ -106,5 +109,7 @@ fun <I1, I2> FeeLoaderMixin.Presentation.connectWith(
             feeConstructor = { feeConstructor(it, input1, input2) },
             onRetryCancelled = onRetryCancelled
         )
-    }.launchIn(scope)
+    }
+        .inBackground()
+        .launchIn(scope)
 }
