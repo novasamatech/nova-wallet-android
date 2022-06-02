@@ -29,7 +29,6 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
-import kotlin.experimental.ExperimentalTypeInference
 
 inline fun <T, R> Flow<List<T>>.mapList(crossinline mapper: suspend (T) -> R) = map { list ->
     list.map { item -> mapper(item) }
@@ -82,16 +81,6 @@ fun <T, R> Flow<T>.withLoadingSingle(sourceSupplier: suspend (T) -> R): Flow<Loa
         val newSource = LoadingState.Loaded(sourceSupplier(item))
 
         emit(newSource)
-    }
-}
-
-@OptIn(ExperimentalTypeInference::class)
-fun <T, R> Flow<T>.scanWithoutInitial(initial: R, @BuilderInference operation: suspend (accumulator: R, value: T) -> R): Flow<R> = flow {
-    var accumulator: R = initial
-
-    collect { value ->
-        accumulator = operation(accumulator, value)
-        emit(accumulator)
     }
 }
 
