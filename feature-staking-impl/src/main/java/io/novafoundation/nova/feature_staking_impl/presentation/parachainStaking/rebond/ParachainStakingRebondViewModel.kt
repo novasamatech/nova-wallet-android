@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.rebond
 
-import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Retriable
 import io.novafoundation.nova.common.mixin.api.Validatable
@@ -8,6 +7,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -15,6 +15,8 @@ import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rebond.ParachainStakingRebondInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rebond.validations.ParachainStakingRebondValidationPayload
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rebond.validations.ParachainStakingRebondValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.details.parachain
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.mappers.mapCollatorToDetailsParcelModel
@@ -37,9 +39,8 @@ import java.math.BigDecimal
 
 class ParachainStakingRebondViewModel(
     private val router: ParachainStakingRouter,
-    private val addressIconGenerator: AddressIconGenerator,
     private val resourceManager: ResourceManager,
-//    private val validationSystem: ParachainStakingRedeemValidationSystem,
+    private val validationSystem: ParachainStakingRebondValidationSystem,
     private val interactor: ParachainStakingRebondInteractor,
     private val feeLoaderMixin: FeeLoaderMixin.Presentation,
     private val externalActions: ExternalActions.Presentation,
@@ -119,19 +120,19 @@ class ParachainStakingRebondViewModel(
 
     private fun sendTransactionIfValid() = requireFee { fee ->
         launch {
-//            val payload = ParachainStakingRedeemValidationPayload(
-//                fee = fee,
-//                asset = assetFlow.first()
-//            )
-//
-//            validationExecutor.requireValid(
-//                validationSystem = validationSystem,
-//                payload = payload,
-//                validationFailureTransformer = { parachainStakingRedeemValidationFailure(it, resourceManager) },
-//                progressConsumer = _showNextProgress.progressConsumer()
-//            ) {
-//                sendTransaction()
-//            }
+            val payload = ParachainStakingRebondValidationPayload(
+                fee = fee,
+                asset = assetFlow.first()
+            )
+
+            validationExecutor.requireValid(
+                validationSystem = validationSystem,
+                payload = payload,
+                validationFailureTransformer = { parachainStakingRebondValidationFailure(it, resourceManager) },
+                progressConsumer = _showNextProgress.progressConsumer()
+            ) {
+                sendTransaction()
+            }
         }
     }
 

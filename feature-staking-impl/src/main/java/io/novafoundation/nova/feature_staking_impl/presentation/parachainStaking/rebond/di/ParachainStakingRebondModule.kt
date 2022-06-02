@@ -6,12 +6,12 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
-import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
@@ -22,6 +22,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.commo
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rebond.ParachainStakingRebondInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rebond.RealParachainStakingRebondInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rebond.validations.ParachainStakingRebondValidationSystem
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rebond.validations.parachainStakingRebond
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.rebond.ParachainStakingRebondViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.rebond.model.ParachainStakingRebondPayload
@@ -31,11 +33,11 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoade
 @Module(includes = [ViewModelModule::class])
 class ParachainStakingRebondModule {
 
-//    @Provides
-//    @ScreenScope
-//    fun provideValidationSystem(): ParachainStakingRedeemValidationSystem {
-//        return ValidationSystem.parachainStakingRedeem()
-//    }
+    @Provides
+    @ScreenScope
+    fun provideValidationSystem(): ParachainStakingRebondValidationSystem {
+        return ValidationSystem.parachainStakingRebond()
+    }
 
     @Provides
     @ScreenScope
@@ -54,9 +56,8 @@ class ParachainStakingRebondModule {
     @ViewModelKey(ParachainStakingRebondViewModel::class)
     fun provideViewModel(
         router: ParachainStakingRouter,
-        addressIconGenerator: AddressIconGenerator,
         resourceManager: ResourceManager,
-//    private val validationSystem: ParachainStakingRedeemValidationSystem,
+        validationSystem: ParachainStakingRebondValidationSystem,
         interactor: ParachainStakingRebondInteractor,
         feeLoaderMixin: FeeLoaderMixin.Presentation,
         externalActions: ExternalActions.Presentation,
@@ -71,7 +72,6 @@ class ParachainStakingRebondModule {
     ): ViewModel {
         return ParachainStakingRebondViewModel(
             router = router,
-            addressIconGenerator = addressIconGenerator,
             resourceManager = resourceManager,
             interactor = interactor,
             feeLoaderMixin = feeLoaderMixin,
@@ -83,7 +83,8 @@ class ParachainStakingRebondModule {
             collatorsUseCase = collatorsUseCase,
             selectedAccountUseCase = selectedAccountUseCase,
             assetUseCase = assetUseCase,
-            walletUiUseCase = walletUiUseCase
+            walletUiUseCase = walletUiUseCase,
+            validationSystem = validationSystem
         )
     }
 
