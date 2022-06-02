@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.common.collators
+package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.collators
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel

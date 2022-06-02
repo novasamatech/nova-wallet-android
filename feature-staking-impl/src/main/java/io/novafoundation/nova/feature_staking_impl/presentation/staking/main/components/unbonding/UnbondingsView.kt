@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.lifecycle.LifecycleOwner
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
@@ -45,8 +46,12 @@ class UnbondingsView @JvmOverloads constructor(
                 unbondingsAdapter.submitList(state.unbondings)
 
                 unbondingRedeem.isEnabled = state.redeemEnabled
-                unbondingCancel.isEnabled = state.cancelEnabled
+                unbondingCancel.setState(state.cancelState)
             }
         }
+    }
+
+    fun prepareForProgress(lifecycleOwner: LifecycleOwner) {
+        unbondingCancel.prepareForProgress(lifecycleOwner)
     }
 }

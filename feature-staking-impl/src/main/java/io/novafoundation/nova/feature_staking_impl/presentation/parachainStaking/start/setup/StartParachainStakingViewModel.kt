@@ -12,7 +12,6 @@ import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
-import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.delegationAmountTo
 import io.novafoundation.nova.feature_staking_impl.R
@@ -25,6 +24,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.ChooseStakedStakeTargetsBottomSheet
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenRequester
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.openRequest
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select.model.mapCollatorParcelModelToCollator
@@ -127,7 +127,7 @@ class StartParachainStakingViewModel(
         currentDelegationAmount + enteredAmount
     }
 
-    val chooseCollatorAction = actionAwaitableMixinFactory.create<DynamicListBottomSheet.Payload<SelectCollatorModel>, ChooseCollatorResponse>()
+    val chooseCollatorAction = actionAwaitableMixinFactory.create<ChooseStakedStakeTargetsBottomSheet.Payload<SelectCollatorModel>, ChooseCollatorResponse>()
 
     val minimumStake = selectedCollatorFlow.map {
         val minimumStake = it?.minimumStakeToGetRewards ?: collatorsUseCase.defaultMinimumStake()
@@ -190,7 +190,7 @@ class StartParachainStakingViewModel(
 
             when (val response = chooseCollatorAction.awaitAction(payload)) {
                 ChooseCollatorResponse.New -> openSelectNewCollatorCheckingLimits(delegatorState)
-                is ChooseCollatorResponse.Existing -> selectedCollatorFlow.value = response.collatorModel.collator
+                is ChooseCollatorResponse.Existing -> selectedCollatorFlow.value = response.collatorModel.payload
             }
         }
     }
@@ -218,7 +218,7 @@ class StartParachainStakingViewModel(
     private suspend fun createSelectCollatorPayload(
         alreadyStakedCollators: List<SelectedCollator>,
         delegatorState: DelegatorState
-    ): DynamicListBottomSheet.Payload<SelectCollatorModel> {
+    ): ChooseStakedStakeTargetsBottomSheet.Payload<SelectCollatorModel> {
         val asset = assetFlow.first()
         val selectedCollator = selectedCollatorFlow.first()
 
@@ -233,7 +233,7 @@ class StartParachainStakingViewModel(
             }
             val selected = collatorModels.findById(selectedCollator)
 
-            DynamicListBottomSheet.Payload(collatorModels, selected)
+            ChooseStakedStakeTargetsBottomSheet.Payload(collatorModels, selected)
         }
     }
 

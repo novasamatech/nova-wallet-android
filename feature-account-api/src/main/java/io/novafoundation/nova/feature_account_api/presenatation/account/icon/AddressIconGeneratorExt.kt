@@ -72,6 +72,18 @@ suspend fun AddressIconGenerator.createAccountAddressModel(
 
 suspend fun AddressIconGenerator.createAccountAddressModel(
     chain: Chain,
+    accountId: ByteArray,
+    name: String? = null,
+) = createAddressModel(
+    chain = chain,
+    address = chain.addressOf(accountId),
+    sizeInDp = AddressIconGenerator.SIZE_SMALL,
+    accountName = name,
+    background = AddressIconGenerator.BACKGROUND_TRANSPARENT
+)
+
+suspend fun AddressIconGenerator.createAccountAddressModel(
+    chain: Chain,
     account: MetaAccount,
     name: String? = account.name
 ) = createAddressModel(

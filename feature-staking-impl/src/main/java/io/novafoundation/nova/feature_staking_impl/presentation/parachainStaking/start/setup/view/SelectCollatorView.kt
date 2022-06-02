@@ -3,12 +3,15 @@ package io.novafoundation.nova.feature_staking_impl.presentation.parachainStakin
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.SelectStakeTargetModel
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.mappers.withSubtitleLabelSuffix
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.model.SelectCollatorModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import kotlinx.android.synthetic.main.item_validator.view.itemValidationCheck
@@ -51,18 +54,18 @@ class SelectCollatorView @JvmOverloads constructor(
     }
 }
 
-fun View.bindSelectedCollator(selectedCollator: SelectCollatorModel) {
+fun View.bindSelectedCollator(selectedCollator: SelectStakeTargetModel<*>) {
     itemValidatorName.text = selectedCollator.addressModel.nameOrAddress
     itemValidatorIcon.setImageDrawable(selectedCollator.addressModel.image)
 
-    bindStaked(selectedCollator.staked)
+    bindStaked(selectedCollator.amount, selectedCollator.amountLabelRes)
 }
 
-private fun View.bindStaked(staked: AmountModel?) {
+private fun View.bindStaked(staked: AmountModel?, @StringRes label: Int) {
     itemValidatorSubtitleGroup.setVisible(staked != null)
 
     if (staked != null) {
-        itemValidatorSubtitleLabel.setText(R.string.wallet_balance_bonded)
+        itemValidatorSubtitleLabel.text = context.getString(label).withSubtitleLabelSuffix()
         itemValidatorSubtitleValue.text = staked.token
     }
 }

@@ -8,6 +8,7 @@ typealias ChooseOneOfManyAwaitable<E> = ActionAwaitableMixin<DynamicListBottomSh
 typealias ConfirmationAwaitable<P> = ActionAwaitableMixin.Presentation<P, Unit>
 
 typealias ChooseOneOfAwaitableAction<E> = ActionAwaitableMixin.Action<List<E>, E>
+typealias ChooseOneOfManyAwaitableAction<E> = ActionAwaitableMixin.Action<DynamicListBottomSheet.Payload<E>, E>
 
 interface ActionAwaitableMixin<P, R> {
 

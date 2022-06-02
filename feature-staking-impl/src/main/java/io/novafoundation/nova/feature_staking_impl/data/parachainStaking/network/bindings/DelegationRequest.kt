@@ -8,11 +8,15 @@ import io.novafoundation.nova.common.data.network.runtime.binding.getTyped
 import io.novafoundation.nova.common.data.network.runtime.binding.incompatible
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegationAction
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.ScheduledDelegationRequest
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.DictEnum
 
-fun bindDelegationRequests(instance: Any?) = instance?.let { bindList(instance, ::bindDelegationRequest) }.orEmpty()
+fun bindDelegationRequests(instance: Any?, collatorId: AccountId) = instance?.let {
+    bindList(instance) { listElement -> bindDelegationRequest(collatorId, listElement) }
+}.orEmpty()
 
 private fun bindDelegationRequest(
+    collatorId: AccountId,
     instance: Any?,
 ): ScheduledDelegationRequest {
     val delegationRequestStruct = instance.castToStruct()
@@ -20,7 +24,8 @@ private fun bindDelegationRequest(
     return ScheduledDelegationRequest(
         delegator = bindAccountId(delegationRequestStruct["delegator"]),
         whenExecutable = bindRoundIndex(delegationRequestStruct["whenExecutable"]),
-        action = bindDelegationAction(delegationRequestStruct.getTyped("action"))
+        action = bindDelegationAction(delegationRequestStruct.getTyped("action")),
+        collator = collatorId
     )
 }
 

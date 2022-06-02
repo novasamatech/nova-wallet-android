@@ -1,13 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.model
 
-import io.novafoundation.nova.common.address.AddressModel
-import io.novafoundation.nova.common.utils.Identifiable
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.Collator
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
+import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.SelectStakeTargetModel
 
-class SelectCollatorModel(
-    val addressModel: AddressModel,
-    val staked: AmountModel?,
-    val collator: Collator,
-    val active: Boolean,
-) : Identifiable by collator
+typealias SelectCollatorModel = SelectStakeTargetModel<Collator>

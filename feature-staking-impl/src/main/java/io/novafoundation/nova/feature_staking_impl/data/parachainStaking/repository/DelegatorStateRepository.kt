@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.bindDelegatorState
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
+import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
@@ -48,7 +49,7 @@ class RealDelegatorStateRepository(
             val delegationRequestsByCollator = runtime.metadata.parachainStaking().storage("DelegationScheduledRequests").entries(
                 keyArguments,
                 keyExtractor = { (collatorId: AccountId) -> collatorId.toHexString() },
-                binding = { dynamicInstance, _ -> bindDelegationRequests(dynamicInstance) }
+                binding = { dynamicInstance, collatorId -> bindDelegationRequests(dynamicInstance, collatorId.fromHex()) }
             )
 
             delegationRequestsByCollator.mapValuesNotNull { (_, pendingRequests) ->
@@ -61,7 +62,7 @@ class RealDelegatorStateRepository(
         return remoteStorage.query(delegatorState.chain.id) {
             val allCollatorDelegationRequests = runtime.metadata.parachainStaking().storage("DelegationScheduledRequests").query(
                 collatorId,
-                binding = ::bindDelegationRequests
+                binding = { bindDelegationRequests(it, collatorId) }
             )
 
             allCollatorDelegationRequests.find { it.delegator.contentEquals(delegatorState.accountId) }

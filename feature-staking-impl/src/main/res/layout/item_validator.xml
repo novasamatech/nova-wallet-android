@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="44dp"
+    android:layout_height="wrap_content"
     android:animateLayoutChanges="true"
     android:background="@drawable/bg_primary_list_item"
     android:gravity="center_vertical"
@@ -39,8 +39,10 @@
 
     <ImageView
         android:id="@+id/itemValidatorIcon"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp"
         android:layout_gravity="center_vertical"
         android:layout_marginStart="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -88,7 +90,7 @@
         app:layout_constraintTop_toTopOf="@+id/itemValidatorSubtitleLabel"
         app:layout_constraintVertical_bias="0.0"
         tools:text="29.75%"
-        tools:textColor="@color/green" />
+        android:textColor="@color/white" />
 
     <TextView
         android:id="@+id/itemValidatorScoringPrimary"
