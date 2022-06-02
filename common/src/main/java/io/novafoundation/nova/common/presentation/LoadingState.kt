@@ -14,6 +14,20 @@ sealed class LoadingState<T> {
     data class Loaded<T>(val data: T) : LoadingState<T>()
 }
 
+interface LoadingView<T> {
+
+    fun showData(data: T)
+
+    fun showLoading()
+}
+
+fun <T> LoadingView<T>.showLoadingState(loadingState: LoadingState<T>) {
+    when (loadingState) {
+        is LoadingState.Loaded -> showData(loadingState.data)
+        is LoadingState.Loading -> showLoading()
+    }
+}
+
 @Suppress("UNCHECKED_CAST")
 inline fun <T, R> LoadingState<T>.map(mapper: (T) -> R): LoadingState<R> {
     return when (this) {

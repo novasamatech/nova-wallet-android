@@ -1,8 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.unbondings
 
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
-import io.novafoundation.nova.feature_staking_api.domain.model.parachain.RoundIndex
-import io.novafoundation.nova.feature_staking_api.domain.model.parachain.ScheduledDelegationRequest
+import io.novafoundation.nova.feature_staking_api.domain.model.parachain.redeemableIn
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.RoundDurationEstimator
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CurrentRoundRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.DelegatorStateRepository
@@ -31,7 +30,7 @@ class ParachainStakingUnbondingsInteractor(
             val durationCalculator = roundDurationEstimator.createDurationCalculator(chainId)
 
             val unbondingsList = scheduledRequests.map { scheduledDelegationRequest ->
-                val status = if (scheduledDelegationRequest.isRedeemable(currentRoundIndex)) {
+                val status = if (scheduledDelegationRequest.redeemableIn(currentRoundIndex)) {
                     Unbonding.Status.Redeemable
                 } else {
                     val calculatedDuration = durationCalculator.timeTillRound(scheduledDelegationRequest.whenExecutable)
@@ -52,9 +51,5 @@ class ParachainStakingUnbondingsInteractor(
         }
 
         emitAll(unbondingsFlow)
-    }
-
-    private fun ScheduledDelegationRequest.isRedeemable(currentRoundIndex: RoundIndex): Boolean {
-        return whenExecutable <= currentRoundIndex
     }
 }

@@ -1,9 +1,11 @@
 package io.novafoundation.nova.feature_wallet_api.domain.validation
 
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.DefaultFailureLevel
 import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
+import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -46,6 +48,9 @@ fun <P, E> ValidationSystemBuilder<P, E>.sufficientBalance(
         availableBalanceProducer = available
     )
 )
+
+fun ResourceManager.notSufficientBalanceToPayFeeErrorMessage() = getString(R.string.common_not_enough_funds_title) to
+    getString(R.string.common_not_enough_funds_message)
 
 fun <P> EnoughToPayFeesValidation.Companion.assetBalanceProducer(
     walletRepository: WalletRepository,

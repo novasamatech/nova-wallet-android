@@ -26,4 +26,6 @@ interface ParachainStakingRouter {
 
     fun openUnbond()
     fun openConfirmUnbond(payload: ParachainStakingUnbondConfirmPayload)
+
+    fun openRedeem()
 }

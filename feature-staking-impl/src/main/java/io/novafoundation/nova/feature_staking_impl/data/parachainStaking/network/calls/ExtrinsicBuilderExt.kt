@@ -63,3 +63,17 @@ fun ExtrinsicBuilder.scheduleBondLess(
         )
     )
 }
+
+fun ExtrinsicBuilder.executeDelegationRequest(
+    delegator: AccountId,
+    collatorId: AccountId
+): ExtrinsicBuilder {
+    return call(
+        moduleName = Modules.PARACHAIN_STAKING,
+        callName = "execute_delegation_request",
+        arguments = mapOf(
+            "delegator" to delegator,
+            "candidate" to collatorId
+        )
+    )
+}

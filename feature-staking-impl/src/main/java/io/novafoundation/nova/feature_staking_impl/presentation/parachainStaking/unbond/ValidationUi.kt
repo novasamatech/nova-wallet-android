@@ -10,6 +10,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbon
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.flow.ParachainStakingUnbondValidationFailure.NotPositiveAmount
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.flow.ParachainStakingUnbondValidationFailure.TooLowRemainingBond
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.flow.ParachainStakingUnbondValidationPayload
+import io.novafoundation.nova.feature_wallet_api.domain.validation.notSufficientBalanceToPayFeeErrorMessage
+import io.novafoundation.nova.feature_wallet_api.domain.validation.positiveAmountErrorMessage
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 
 fun parachainStakingUnbondValidationFailure(
@@ -17,10 +19,7 @@ fun parachainStakingUnbondValidationFailure(
     resourceManager: ResourceManager
 ): TitleAndMessage {
     return when (failure) {
-        NotEnoughBalanceToPayFees -> {
-            resourceManager.getString(R.string.common_not_enough_funds_title) to
-                resourceManager.getString(R.string.common_not_enough_funds_message)
-        }
+        NotEnoughBalanceToPayFees -> resourceManager.notSufficientBalanceToPayFeeErrorMessage()
 
         is TooLowRemainingBond -> {
             val minimumRequired = mapAmountToAmountModel(failure.minimumRequired, failure.asset).token
@@ -37,10 +36,7 @@ fun parachainStakingUnbondValidationFailure(
             }
         }
 
-        NotPositiveAmount -> {
-            resourceManager.getString(R.string.common_amount_low) to
-                resourceManager.getString(R.string.common_zero_amount_error)
-        }
+        NotPositiveAmount -> resourceManager.positiveAmountErrorMessage()
 
         AlreadyHasDelegationRequestToCollator -> {
             resourceManager.getString(R.string.staking_parachain_unbond_already_exists_title) to

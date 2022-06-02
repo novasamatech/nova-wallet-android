@@ -11,7 +11,7 @@ class Collator(
     val address: String,
     val identity: Identity?,
     val snapshot: CollatorSnapshot?,
-    val minimumStakeToGetRewards: BigInteger?,
+    val minimumStakeToGetRewards: BigInteger,
     val apr: BigDecimal?,
 ) : Identifiable {
 

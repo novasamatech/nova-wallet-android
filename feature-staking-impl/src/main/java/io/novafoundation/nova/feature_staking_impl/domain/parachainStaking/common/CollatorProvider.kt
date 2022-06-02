@@ -68,14 +68,14 @@ class RealCollatorProvider(
 
         return requestedCollatorIdsHex.map { accountIdHex ->
             val collatorSnapshot = snapshots[accountIdHex]
-            val candidateMetadata = candidateMetadatas[accountIdHex]
+            val candidateMetadata = candidateMetadatas.getValue(accountIdHex)
 
             Collator(
                 accountIdHex = accountIdHex,
                 address = chain.addressOf(accountIdHex.fromHex()),
                 identity = identities[accountIdHex],
                 snapshot = collatorSnapshot,
-                minimumStakeToGetRewards = candidateMetadata?.minimumStakeToGetRewards(systemForcedMinimumStake),
+                minimumStakeToGetRewards = candidateMetadata.minimumStakeToGetRewards(systemForcedMinimumStake),
                 apr = rewardCalculator.getAprOrEstimate(accountIdHex, candidateMetadatas)
             )
         }

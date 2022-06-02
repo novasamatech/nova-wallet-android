@@ -55,4 +55,6 @@ class ParachainStakingNavigator(
         actionId = R.id.action_parachainStakingUnbondFragment_to_parachainStakingUnbondConfirmFragment,
         args = ParachainStakingUnbondConfirmFragment.getBundle(payload)
     )
+
+    override fun openRedeem() = performNavigation(R.id.action_mainFragment_to_parachainStakingRedeemFragment)
 }
