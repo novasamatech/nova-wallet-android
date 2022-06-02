@@ -28,7 +28,7 @@ class ScheduledDelegationRequestsUpdater(
     private val stakingSharedState: StakingSharedState,
     private val remoteStorageDataSource: StorageDataSource,
     private val chainRegistry: ChainRegistry,
-): ParachainStakingUpdater {
+) : ParachainStakingUpdater {
 
     override suspend fun listenForUpdates(storageSubscriptionBuilder: SubscriptionBuilder): Flow<Updater.SideEffect> {
         val account = scope.getAccount()
@@ -54,7 +54,7 @@ class ScheduledDelegationRequestsUpdater(
     private suspend fun fetchUnbondings(
         delegatorState: DelegatorState,
         blockHash: String
-    ): Map<String, String?>? = when(delegatorState) {
+    ): Map<String, String?>? = when (delegatorState) {
         is DelegatorState.Delegator -> {
             val delegatorIdsArgs = delegatorState.delegations.map { it.owner }.wrapSingleArgumentKeys()
 

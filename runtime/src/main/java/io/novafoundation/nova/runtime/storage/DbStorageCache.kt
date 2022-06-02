@@ -44,9 +44,9 @@ class DbStorageCache(
     }
 
     override suspend fun observeEntries(keys: List<String>, chainId: String): Flow<List<StorageEntry>> {
-       return storageDao.observeEntries(chainId, keys)
-           .filter { it.size == keys.size }
-           .mapList { mapStorageEntryFromLocal(it) }
+        return storageDao.observeEntries(chainId, keys)
+            .filter { it.size == keys.size }
+            .mapList { mapStorageEntryFromLocal(it) }
     }
 
     override suspend fun observeEntries(keyPrefix: String, chainId: String): Flow<List<StorageEntry>> {

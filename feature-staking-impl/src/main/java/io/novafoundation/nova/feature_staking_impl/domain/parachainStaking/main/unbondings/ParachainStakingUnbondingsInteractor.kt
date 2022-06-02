@@ -90,5 +90,5 @@ class ParachainStakingUnbondingsInteractor(
         emitAll(unbondingsFlow)
     }
 
-    private fun ScheduledDelegationRequest.uniqueId() = "${collator.toHexString()}:${action.amount}:${whenExecutable}"
+    private fun ScheduledDelegationRequest.uniqueId() = "${collator.toHexString()}:${action.amount}:$whenExecutable"
 }

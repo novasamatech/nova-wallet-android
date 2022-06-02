@@ -69,7 +69,7 @@ class UnbondInteractor(
                     }
 
                     Unbonding(
-                        id = "${index}:${unbonding.era}:${unbonding.amount}",
+                        id = "$index:${unbonding.era}:${unbonding.amount}",
                         amount = unbonding.amount,
                         status = progressState,
                     )
