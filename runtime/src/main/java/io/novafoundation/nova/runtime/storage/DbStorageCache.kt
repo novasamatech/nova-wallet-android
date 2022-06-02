@@ -43,6 +43,12 @@ class DbStorageCache(
             .distinctUntilChangedBy(StorageEntry::content)
     }
 
+    override suspend fun observeEntries(keys: List<String>, chainId: String): Flow<List<StorageEntry>> {
+       return storageDao.observeEntries(chainId, keys)
+           .filter { it.size == keys.size }
+           .mapList { mapStorageEntryFromLocal(it) }
+    }
+
     override suspend fun observeEntries(keyPrefix: String, chainId: String): Flow<List<StorageEntry>> {
         return storageDao.observeEntries(chainId, keyPrefix)
             .mapList { mapStorageEntryFromLocal(it) }
@@ -56,10 +62,7 @@ class DbStorageCache(
     }
 
     override suspend fun getEntries(fullKeys: List<String>, chainId: String): List<StorageEntry> {
-        return storageDao.observeEntries(chainId, fullKeys)
-            .filter { it.size == fullKeys.size }
-            .mapList { mapStorageEntryFromLocal(it) }
-            .first()
+        return observeEntries(fullKeys, chainId).first()
     }
 
     override suspend fun getKeys(keyPrefix: String, chainId: String): List<String> {

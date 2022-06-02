@@ -21,11 +21,21 @@ interface StorageQueryContext {
         binding: DynamicInstanceBinder<V>
     ): Flow<V>
 
+    suspend fun <K, V> StorageEntry.observe(
+        keysArguments: List<List<Any?>>,
+        keyExtractor: (StorageKeyComponents) -> K,
+        binding: DynamicInstanceBinderWithKey<K, V>
+    ): Flow<Map<K, V>>
+
     suspend fun <K, V> StorageEntry.entries(
         vararg prefixArgs: Any?,
         keyExtractor: (StorageKeyComponents) -> K,
         binding: DynamicInstanceBinderWithKey<K, V>
     ): Map<K, V>
+
+    suspend fun StorageEntry.entriesRaw(
+        keysArguments: List<List<Any?>>
+    ): Map<String, String?>
 
     suspend fun <K, V> StorageEntry.entries(
         keysArguments: List<List<Any?>>,

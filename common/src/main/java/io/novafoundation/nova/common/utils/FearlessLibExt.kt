@@ -4,6 +4,7 @@ import io.emeraldpay.polkaj.scale.ScaleCodecReader
 import io.emeraldpay.polkaj.scale.ScaleCodecWriter
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNullableNumberConstant
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumberConstant
+import io.novafoundation.nova.common.data.network.runtime.binding.fromHexOrIncompatible
 import io.novafoundation.nova.core.model.Node
 import jp.co.soramitsu.fearless_utils.encrypt.junction.BIP32JunctionDecoder
 import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.Mnemonic
@@ -14,6 +15,7 @@ import jp.co.soramitsu.fearless_utils.hash.Hasher.blake2b256
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
 import jp.co.soramitsu.fearless_utils.runtime.metadata.RuntimeMetadata
+import jp.co.soramitsu.fearless_utils.runtime.metadata.fullName
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module.Constant
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module.MetadataFunction
@@ -81,6 +83,12 @@ fun <S : Schema<S>> EncodableStruct<S>.hash(): String {
 
 fun String.extrinsicHash(): String {
     return fromHex().blake2b256().toHexString(withPrefix = true)
+}
+
+fun StorageEntry.decodeValue(value: String?, runtimeSnapshot: RuntimeSnapshot) = value?.let {
+    val type = type.value ?: throw IllegalStateException("Unknown value type for storage ${this.fullName}")
+
+    type.fromHexOrIncompatible(it, runtimeSnapshot)
 }
 
 fun String.toHexAccountId(): String = toAccountId().toHexString()
