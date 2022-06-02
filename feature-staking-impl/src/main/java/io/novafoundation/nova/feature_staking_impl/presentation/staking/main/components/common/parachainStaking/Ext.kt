@@ -37,6 +37,8 @@ fun <T> DelegatorStateUseCase.loadDelegatingState(
                 val summaryFlow = stateProducer(delegatorState).map { LoadingState.Loaded(it) }
 
                 emitAll(summaryFlow)
+            } else {
+                emit(null)
             }
         }
 
