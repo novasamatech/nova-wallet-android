@@ -5,6 +5,7 @@ import dagger.Provides
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.CompoundStakingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.alerts.AlertsComponentFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.alerts.parachain.ParachainAlertsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.alerts.relaychain.RelaychainAlertsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.NetworkInfoComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.parachain.ParachainNetworkInfoComponentFactory
@@ -32,8 +33,9 @@ class ComponentsModule {
     @ScreenScope
     fun provideAlertsComponentFactory(
         relaychainComponentFactory: RelaychainAlertsComponentFactory,
+        parachainComponentFactory: ParachainAlertsComponentFactory,
         compoundStakingComponentFactory: CompoundStakingComponentFactory,
-    ) = AlertsComponentFactory(relaychainComponentFactory, compoundStakingComponentFactory)
+    ) = AlertsComponentFactory(relaychainComponentFactory, parachainComponentFactory, compoundStakingComponentFactory)
 
     @Provides
     @ScreenScope

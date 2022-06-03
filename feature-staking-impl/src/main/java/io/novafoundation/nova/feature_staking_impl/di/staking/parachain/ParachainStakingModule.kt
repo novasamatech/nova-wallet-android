@@ -32,6 +32,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.commo
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.RealCollatorsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.recommendations.CollatorRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.ParachainNetworkInfoInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.alerts.ParachainStakingAlertsInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.alerts.RealParachainStakingAlertsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.stakeSummary.ParachainStakingStakeSummaryInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.unbondings.ParachainStakingUnbondingsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.userRewards.ParachainStakingUserRewardsInteractor
@@ -175,4 +177,15 @@ class ParachainStakingModule {
         roundDurationEstimator: RoundDurationEstimator,
         identityRepository: IdentityRepository
     ) = ParachainStakingUnbondingsInteractor(delegatorStateRepository, currentRoundRepository, roundDurationEstimator, identityRepository)
+
+    @Provides
+    @FeatureScope
+    fun provideAlertsInteractor(
+        candidatesRepository: CandidatesRepository,
+        currentRoundRepository: CurrentRoundRepository,
+        delegatorStateRepository: DelegatorStateRepository,
+        parachainStakingConstantsRepository: ParachainStakingConstantsRepository
+    ): ParachainStakingAlertsInteractor {
+        return RealParachainStakingAlertsInteractor(candidatesRepository, currentRoundRepository, delegatorStateRepository, parachainStakingConstantsRepository)
+    }
 }
