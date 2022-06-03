@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.ChooseStakedStakeTargetsBottomSheet
 import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.SelectStakeTargetModel
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.rebond.model.ParachainStakingRebondPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.awaitAction
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.common.parachainStaking.loadDelegatingState
@@ -87,11 +88,12 @@ private class ParachainUnbondingComponent(
     private fun handleRebond() = launch {
 
         val delegatorState = delegatorStateUseCase.currentDelegatorState().castOrNull<DelegatorState.Delegator>() ?: return@launch
-        val payload = cancelLoadingFlow.withFlagSet { createRebondChooserPayload(delegatorState) }
+        val chooserPayload = cancelLoadingFlow.withFlagSet { createRebondChooserPayload(delegatorState) }
 
-        val selected = events.awaitAction(payload, UnbondingEvent::ChooseRebondTarget).payload as DelegationRequestWithCollatorInfo
+        val selected = events.awaitAction(chooserPayload, UnbondingEvent::ChooseRebondTarget).payload as DelegationRequestWithCollatorInfo
 
-        hostContext.errorDisplayer(NotImplementedError("TODO - show rebond for ${selected.collatorIdentity?.display}"))
+        val rebondPayload = ParachainStakingRebondPayload(selected.request.collator)
+        router.openRebond(rebondPayload)
     }
 
     private suspend fun createRebondChooserPayload(

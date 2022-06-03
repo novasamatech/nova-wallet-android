@@ -41,7 +41,7 @@ class FeeLoaderProvider(
         retryScope: CoroutineScope,
         feeConstructor: suspend (Token) -> BigInteger,
         onRetryCancelled: () -> Unit,
-    ): Unit = withContext(Dispatchers.Default) {
+    ): Unit = withContext(Dispatchers.IO) {
         feeLiveData.postValue(FeeStatus.Loading)
 
         val token = tokenFlow.first()

@@ -181,7 +181,8 @@ class AccountFeatureModule {
     @FeatureScope
     fun provideAccountUseCase(
         accountRepository: AccountRepository,
-    ) = SelectedAccountUseCase(accountRepository)
+        addressIconGenerator: AddressIconGenerator
+    ) = SelectedAccountUseCase(accountRepository, addressIconGenerator)
 
     @Provides
     @FeatureScope

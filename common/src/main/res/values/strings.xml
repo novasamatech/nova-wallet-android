@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="staking_parachain_rebond_hint">Returned tokens will be counted from the next round</string>
+
   <string name="staking_parachain_no_unbond_collators_title">No collators available for unstake</string>
   <string name="staking_parachain_no_unbond_collators_message">You have pending unstake requests for all of your collators.</string>
 

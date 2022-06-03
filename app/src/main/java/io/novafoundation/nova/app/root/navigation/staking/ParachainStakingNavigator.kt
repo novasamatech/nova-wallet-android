@@ -7,6 +7,8 @@ import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.app.root.navigation.Navigator
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.rebond.ParachainStakingRebondFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.rebond.model.ParachainStakingRebondPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.ConfirmStartParachainStakingFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.model.ConfirmStartParachainStakingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.confirm.ParachainStakingUnbondConfirmFragment
@@ -57,4 +59,9 @@ class ParachainStakingNavigator(
     )
 
     override fun openRedeem() = performNavigation(R.id.action_mainFragment_to_parachainStakingRedeemFragment)
+
+    override fun openRebond(payload: ParachainStakingRebondPayload) = performNavigation(
+        actionId = R.id.action_mainFragment_to_parachainStakingRebondFragment,
+        args = ParachainStakingRebondFragment.getBundle(payload)
+    )
 }

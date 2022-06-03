@@ -77,3 +77,15 @@ fun ExtrinsicBuilder.executeDelegationRequest(
         )
     )
 }
+
+fun ExtrinsicBuilder.cancelDelegationRequest(
+    collatorId: AccountId
+): ExtrinsicBuilder {
+    return call(
+        moduleName = Modules.PARACHAIN_STAKING,
+        callName = "cancel_delegation_request",
+        arguments = mapOf(
+            "candidate" to collatorId,
+        )
+    )
+}
