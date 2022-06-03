@@ -5,12 +5,11 @@ import io.novafoundation.nova.feature_staking_api.domain.model.parachain.Delegat
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.CandidateMetadata
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.CollatorSnapshot
-import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.minimumStakeToGetRewards
+import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.isStakeEnoughToEarnRewards
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.Collator
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.isElected
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import java.math.BigInteger
 
 enum class DelegationState {
     COLLATOR_NOT_ACTIVE, TOO_LOW_STAKE, WAITING, ACTIVE
@@ -25,7 +24,7 @@ fun DelegatorState.Delegator.delegationStatesFor(
         when {
             !delegatedCollator.isElected -> DelegationState.COLLATOR_NOT_ACTIVE
             delegatedCollator.snapshot!!.hasDelegator(accountId) -> DelegationState.ACTIVE
-            delegation.balance < delegatedCollator.minimumStakeToGetRewards -> DelegationState.TOO_LOW_STAKE
+            !delegatedCollator.candidateMetadata.isStakeEnoughToEarnRewards(delegation.balance) -> DelegationState.TOO_LOW_STAKE
             else -> DelegationState.WAITING
         }
     }
@@ -34,7 +33,6 @@ fun DelegatorState.Delegator.delegationStatesFor(
 fun DelegatorState.Delegator.delegationStatesIn(
     snapshots: AccountIdMap<CollatorSnapshot>,
     candidateMetadatas: AccountIdMap<CandidateMetadata>,
-    systemForcedMinStake: BigInteger,
 ): Map<DelegatorBond, DelegationState> {
     return delegations.associateWith { delegation ->
         val collator = snapshots[delegation.owner.toHexString()]
@@ -43,7 +41,7 @@ fun DelegatorState.Delegator.delegationStatesIn(
         when {
             collator == null -> DelegationState.COLLATOR_NOT_ACTIVE
             collator.hasDelegator(accountId) -> DelegationState.ACTIVE
-            delegation.balance < candidateMetadata.minimumStakeToGetRewards(systemForcedMinStake) -> DelegationState.TOO_LOW_STAKE
+            !candidateMetadata.isStakeEnoughToEarnRewards(delegation.balance) -> DelegationState.TOO_LOW_STAKE
             else -> DelegationState.WAITING
         }
     }

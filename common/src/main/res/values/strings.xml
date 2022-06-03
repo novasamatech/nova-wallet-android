@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="parachain_staking_change_collator">Change collator</string>
+  <string name="parachain_staking_alerts_change_collator_message">One of your collators is not selected in the current round</string>
+
+  <string name="parachain_staking_alerts_redeem_message">Your unstaking period for %s has passed. Don’t forget to redeem your tokens</string>
+  <string name="parachain_staking_alerts_bond_more_message">One of your collators is not generating rewards</string>
+
   <string name="staking_parachain_rebond_hint">Returned tokens will be counted from the next round</string>
 
   <string name="staking_parachain_no_unbond_collators_title">No collators available for unstake</string>
@@ -495,7 +501,7 @@
   <string name="staking_alert_bond_more_title">Bond more tokens.</string>
   <string name="staking_alert_change_validators">Change your validators.</string>
   <string name="staking_alert_no_alerts_now">Everything is fine now. Alerts will appear here.</string>
-  <string name="staking_alert_redeem_title">Redeem unstaked tokens.</string>
+  <string name="staking_alert_redeem_title">Redeem unstaked tokens</string>
   <string name="staking_alert_start_next_era_message">Please wait for the next era to start.</string>
   <string name="staking_alert_title">Alerts</string>
   <string name="staking_already_controller_title">Already controller</string>

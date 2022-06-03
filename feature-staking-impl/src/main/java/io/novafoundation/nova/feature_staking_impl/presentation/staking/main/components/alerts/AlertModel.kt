@@ -1,9 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.alerts
 
-import androidx.annotation.DrawableRes
-
 class AlertModel(
-    @DrawableRes val icon: Int,
     val title: String,
     val extraMessage: String,
     val type: Type

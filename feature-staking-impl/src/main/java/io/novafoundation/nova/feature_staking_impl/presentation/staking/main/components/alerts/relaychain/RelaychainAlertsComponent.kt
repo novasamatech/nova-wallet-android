@@ -59,9 +59,6 @@ class RelaychainAlertsComponentFactory(
     )
 }
 
-private val WARNING_ICON = R.drawable.ic_warning_filled
-private val WAITING_ICON = R.drawable.ic_time_24
-
 private class RelaychainAlertsComponent(
     private val stakingInteractor: StakingInteractor,
     private val alertsInteractor: AlertsInteractor,
@@ -97,7 +94,6 @@ private class RelaychainAlertsComponent(
         return when (alert) {
             Alert.ChangeValidators -> {
                 AlertModel(
-                    WARNING_ICON,
                     resourceManager.getString(R.string.staking_alert_change_validators),
                     resourceManager.getString(R.string.staking_nominator_status_alert_no_validators),
                     AlertModel.Type.CallToAction { router.openCurrentValidators() }
@@ -106,7 +102,6 @@ private class RelaychainAlertsComponent(
 
             is Alert.RedeemTokens -> {
                 AlertModel(
-                    WARNING_ICON,
                     resourceManager.getString(R.string.staking_alert_redeem_title),
                     formatAlertTokenAmount(alert.amount, alert.token),
                     AlertModel.Type.CallToAction(::redeemAlertClicked)
@@ -117,7 +112,6 @@ private class RelaychainAlertsComponent(
                 val existentialDepositDisplay = formatAlertTokenAmount(alert.minimalStake, alert.token)
 
                 AlertModel(
-                    WARNING_ICON,
                     resourceManager.getString(R.string.staking_alert_bond_more_title),
                     resourceManager.getString(R.string.staking_alert_bond_more_message, existentialDepositDisplay),
                     AlertModel.Type.CallToAction(::bondMoreAlertClicked)
@@ -125,13 +119,11 @@ private class RelaychainAlertsComponent(
             }
 
             is Alert.WaitingForNextEra -> AlertModel(
-                WAITING_ICON,
                 resourceManager.getString(R.string.staking_nominator_status_alert_waiting_message),
                 resourceManager.getString(R.string.staking_alert_start_next_era_message),
                 AlertModel.Type.Info
             )
             Alert.SetValidators -> AlertModel(
-                WARNING_ICON,
                 resourceManager.getString(R.string.staking_set_validators_title),
                 resourceManager.getString(R.string.staking_set_validators_message),
                 AlertModel.Type.CallToAction { router.openCurrentValidators() }

@@ -31,6 +31,14 @@ fun CandidateMetadata.isBottomDelegationsNotEmpty(): Boolean {
     return bottomCapacity != CapacityStatus.Empty
 }
 
+fun CandidateMetadata.isStakeEnoughToEarnRewards(stake: BigInteger): Boolean {
+    return if (isRewardedListFull()) {
+        stake > lowestTopDelegationAmount
+    } else {
+        true
+    }
+}
+
 fun CandidateMetadata.minimumStakeToGetRewards(techMinimumStake: Balance): Balance {
     return if (topCapacity == CapacityStatus.Full) {
         lowestTopDelegationAmount

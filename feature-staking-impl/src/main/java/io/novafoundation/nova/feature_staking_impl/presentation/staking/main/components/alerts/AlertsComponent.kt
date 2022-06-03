@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.CompoundStakingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.StatefullComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.UnsupportedComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.alerts.parachain.ParachainAlertsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.alerts.relaychain.RelaychainAlertsComponentFactory
 
 typealias AlertsComponent = StatefullComponent<AlertsState, AlertsEvent, AlertsAction>
@@ -17,6 +17,7 @@ typealias AlertsAction = Nothing
 
 class AlertsComponentFactory(
     private val relaychainComponentFactory: RelaychainAlertsComponentFactory,
+    private val parachainAlertsComponentFactory: ParachainAlertsComponentFactory,
     private val compoundStakingComponentFactory: CompoundStakingComponentFactory,
 ) {
 
@@ -24,7 +25,7 @@ class AlertsComponentFactory(
         hostContext: ComponentHostContext
     ): AlertsComponent = compoundStakingComponentFactory.create(
         relaychainComponentCreator = relaychainComponentFactory::create,
-        parachainComponentCreator = { _, _ -> UnsupportedComponent() },
+        parachainComponentCreator = parachainAlertsComponentFactory::create,
         hostContext = hostContext
     )
 }
