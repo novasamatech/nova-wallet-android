@@ -16,6 +16,12 @@ interface StorageCache {
     suspend fun observeEntry(key: String, chainId: String): Flow<StorageEntry>
 
     /**
+     * First result will be emitted when all keys are found in the cache
+     * Thus, result.size == fullKeys.size
+     */
+    suspend fun observeEntries(keys: List<String>, chainId: String): Flow<List<StorageEntry>>
+
+    /**
      * Should be not empty
      */
     suspend fun observeEntries(keyPrefix: String, chainId: String): Flow<List<StorageEntry>>
@@ -34,4 +40,10 @@ interface StorageCache {
      * Thus, result.size == fullKeys.size
      */
     suspend fun getEntries(fullKeys: List<String>, chainId: String): List<StorageEntry>
+}
+
+suspend fun StorageCache.insert(entries: Map<String, String?>, chainId: String) {
+    val changes = entries.map { (key, value) -> StorageEntry(key, value) }
+
+    insert(changes, chainId)
 }

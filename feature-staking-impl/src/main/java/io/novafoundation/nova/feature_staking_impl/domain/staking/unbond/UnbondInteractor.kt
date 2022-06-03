@@ -56,11 +56,11 @@ class UnbondInteractor(
                 stakingRepository.ledgerFlow(stash),
                 stakingRepository.observeActiveEraIndex(stash.chain.id)
             ) { ledger, activeEraIndex ->
-                val unbondings = ledger.unlocking.map {
-                    val progressState = if (it.isRedeemableIn(activeEraIndex)) {
+                val unbondings = ledger.unlocking.mapIndexed { index, unbonding ->
+                    val progressState = if (unbonding.isRedeemableIn(activeEraIndex)) {
                         Unbonding.Status.Redeemable
                     } else {
-                        val leftTime = calculator.calculate(destinationEra = it.era)
+                        val leftTime = calculator.calculate(destinationEra = unbonding.era)
 
                         Unbonding.Status.Unbonding(
                             timeLeft = leftTime.toLong(),
@@ -69,7 +69,8 @@ class UnbondInteractor(
                     }
 
                     Unbonding(
-                        amount = it.amount,
+                        id = "$index:${unbonding.era}:${unbonding.amount}",
+                        amount = unbonding.amount,
                         status = progressState,
                     )
                 }

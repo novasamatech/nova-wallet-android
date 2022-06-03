@@ -15,10 +15,14 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.blockhain.updaters.DelegatorStateUpdater
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.blockhain.updaters.InflationConfigUpdater
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.blockhain.updaters.ParachainBondInfoUpdater
+import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.blockhain.updaters.ScheduledDelegationRequestsUpdater
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.blockhain.updaters.TotalDelegatedUpdater
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CurrentRoundRepository
 import io.novafoundation.nova.feature_staking_impl.di.staking.common.CommonStakingUpdatersModule
+import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.storage.source.StorageDataSource
+import javax.inject.Named
 
 @Module(includes = [CommonStakingUpdatersModule::class])
 class ParachainStakingUpdatersModule {
@@ -114,6 +118,22 @@ class ParachainStakingUpdatersModule {
     )
 
     @Provides
+    @FeatureScope
+    fun provideScheduledDelegationRequestsUpdater(
+        scope: AccountUpdateScope,
+        storageCache: StorageCache,
+        stakingSharedState: StakingSharedState,
+        chainRegistry: ChainRegistry,
+        @Named(REMOTE_STORAGE_SOURCE) storageDataSource: StorageDataSource,
+    ) = ScheduledDelegationRequestsUpdater(
+        scope = scope,
+        storageCache = storageCache,
+        stakingSharedState = stakingSharedState,
+        chainRegistry = chainRegistry,
+        remoteStorageDataSource = storageDataSource
+    )
+
+    @Provides
     @Parachain
     @FeatureScope
     fun provideRelaychainStakingUpdaters(
@@ -125,6 +145,7 @@ class ParachainStakingUpdatersModule {
         parachainBondInfoUpdater: ParachainBondInfoUpdater,
         totalIssuanceUpdater: TotalIssuanceUpdater,
         collatorCommissionUpdater: CollatorCommissionUpdater,
+        scheduledDelegationRequestsUpdater: ScheduledDelegationRequestsUpdater,
     ): List<Updater> = listOf(
         delegatorStateUpdater,
         currentRoundUpdater,
@@ -133,6 +154,7 @@ class ParachainStakingUpdatersModule {
         inflationConfigUpdater,
         parachainBondInfoUpdater,
         totalIssuanceUpdater,
-        collatorCommissionUpdater
+        collatorCommissionUpdater,
+        scheduledDelegationRequestsUpdater
     )
 }

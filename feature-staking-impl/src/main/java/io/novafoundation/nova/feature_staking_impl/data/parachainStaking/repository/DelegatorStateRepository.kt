@@ -14,6 +14,7 @@ import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 interface DelegatorStateRepository {
 
@@ -21,6 +22,8 @@ interface DelegatorStateRepository {
      * Returns mapping from collator id to scheduled delegation request
      */
     suspend fun scheduledDelegationRequests(delegatorState: DelegatorState.Delegator): AccountIdMap<ScheduledDelegationRequest>
+
+    fun scheduledDelegationRequestsFlow(delegatorState: DelegatorState.Delegator): Flow<Collection<ScheduledDelegationRequest>>
 
     suspend fun scheduledDelegationRequest(delegatorState: DelegatorState.Delegator, collatorId: AccountId): ScheduledDelegationRequest?
 
@@ -43,7 +46,7 @@ class RealDelegatorStateRepository(
 ) : DelegatorStateRepository {
 
     override suspend fun scheduledDelegationRequests(delegatorState: DelegatorState.Delegator): AccountIdMap<ScheduledDelegationRequest> {
-        return remoteStorage.query(delegatorState.chain.id) {
+        return localStorage.query(delegatorState.chain.id) {
             val keyArguments = delegatorState.delegations.map { listOf(it.owner) }
 
             val delegationRequestsByCollator = runtime.metadata.parachainStaking().storage("DelegationScheduledRequests").entries(
@@ -52,14 +55,25 @@ class RealDelegatorStateRepository(
                 binding = { dynamicInstance, collatorId -> bindDelegationRequests(dynamicInstance, collatorId.fromHex()) }
             )
 
-            delegationRequestsByCollator.mapValuesNotNull { (_, pendingRequests) ->
-                pendingRequests.find { it.delegator.contentEquals(delegatorState.accountId) }
-            }
+            delegationRequestsByCollator.byDelegator(delegatorState.accountId)
         }
     }
 
+    override fun scheduledDelegationRequestsFlow(delegatorState: DelegatorState.Delegator): Flow<Collection<ScheduledDelegationRequest>> {
+        return localStorage.subscribe(delegatorState.chain.id) {
+            val keyArguments = delegatorState.delegations.map { listOf(it.owner) }
+
+            runtime.metadata.parachainStaking().storage("DelegationScheduledRequests").observe(
+                keyArguments,
+                keyExtractor = { (collatorId: AccountId) -> collatorId.toHexString() },
+                binding = { dynamicInstance, collatorId -> bindDelegationRequests(dynamicInstance, collatorId.fromHex()) }
+            )
+        }
+            .map { delegationRequestsByCollator -> delegationRequestsByCollator.byDelegator(delegatorState.accountId).values }
+    }
+
     override suspend fun scheduledDelegationRequest(delegatorState: DelegatorState.Delegator, collatorId: AccountId): ScheduledDelegationRequest? {
-        return remoteStorage.query(delegatorState.chain.id) {
+        return localStorage.query(delegatorState.chain.id) {
             val allCollatorDelegationRequests = runtime.metadata.parachainStaking().storage("DelegationScheduledRequests").query(
                 collatorId,
                 binding = { bindDelegationRequests(it, collatorId) }
@@ -85,5 +99,9 @@ class RealDelegatorStateRepository(
                 binding = { bindDelegatorState(it, accountId, chain) }
             )
         }
+    }
+
+    private fun Map<String, List<ScheduledDelegationRequest>>.byDelegator(delegator: AccountId) = mapValuesNotNull { (_, pendingRequests) ->
+        pendingRequests.find { it.delegator.contentEquals(delegator) }
     }
 }

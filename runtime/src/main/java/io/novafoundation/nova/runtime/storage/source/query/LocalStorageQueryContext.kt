@@ -33,10 +33,7 @@ class LocalStorageQueryContext(
     }
 
     override suspend fun queryKeys(keys: List<String>, at: BlockHash?): Map<String, String?> {
-        return storageCache.getEntries(keys, chainId).associateBy(
-            keySelector = StorageEntry::storageKey,
-            valueTransform = StorageEntry::content
-        )
+        return storageCache.getEntries(keys, chainId).toMap()
     }
 
     override suspend fun queryKey(key: String, at: BlockHash?): String? {
@@ -46,4 +43,13 @@ class LocalStorageQueryContext(
     override suspend fun observeKey(key: String): Flow<String?> {
         return storageCache.observeEntry(key, chainId).map { it.content }
     }
+
+    override suspend fun observeKeys(keys: List<String>): Flow<Map<String, String?>> {
+        return storageCache.observeEntries(keys, chainId).map { it.toMap() }
+    }
+
+    private fun List<StorageEntry>.toMap() = associateBy(
+        keySelector = StorageEntry::storageKey,
+        valueTransform = StorageEntry::content
+    )
 }

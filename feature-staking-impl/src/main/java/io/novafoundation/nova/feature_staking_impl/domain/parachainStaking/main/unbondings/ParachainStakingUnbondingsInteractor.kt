@@ -16,9 +16,9 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.unbond.from
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import kotlin.time.ExperimentalTime
 
@@ -57,9 +57,11 @@ class ParachainStakingUnbondingsInteractor(
 
     fun unbondingsFlow(delegatorState: DelegatorState.Delegator): Flow<Unbondings> = flow {
         val chainId = delegatorState.chain.id
-        val scheduledRequests = delegatorStateRepository.scheduledDelegationRequests(delegatorState).values
 
-        val unbondingsFlow = currentRoundRepository.currentRoundInfoFlow(chainId).map { currentRoundInfo ->
+        val unbondingsFlow = combine(
+            delegatorStateRepository.scheduledDelegationRequestsFlow(delegatorState),
+            currentRoundRepository.currentRoundInfoFlow(chainId)
+        ) { scheduledRequests, currentRoundInfo ->
             val currentRoundIndex = currentRoundInfo.current
             val durationCalculator = roundDurationEstimator.createDurationCalculator(chainId)
 
@@ -76,6 +78,7 @@ class ParachainStakingUnbondingsInteractor(
                 }
 
                 Unbonding(
+                    id = scheduledDelegationRequest.uniqueId(),
                     amount = scheduledDelegationRequest.action.amount,
                     status = status
                 )
@@ -86,4 +89,6 @@ class ParachainStakingUnbondingsInteractor(
 
         emitAll(unbondingsFlow)
     }
+
+    private fun ScheduledDelegationRequest.uniqueId() = "${collator.toHexString()}:${action.amount}:$whenExecutable"
 }

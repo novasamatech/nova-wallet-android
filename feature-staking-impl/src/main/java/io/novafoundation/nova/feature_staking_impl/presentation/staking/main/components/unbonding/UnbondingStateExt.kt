@@ -21,17 +21,17 @@ fun UnbondingState.Companion.from(
                     unbondings.anythingToUnbond -> ButtonState.NORMAL
                     else -> ButtonState.DISABLED
                 },
-                unbondings = unbondings.unbondings.mapIndexed { idx, unbonding ->
-                    mapUnbondingToUnbondingModel(idx, unbonding, asset)
+                unbondings = unbondings.unbondings.map { unbonding ->
+                    mapUnbondingToUnbondingModel(unbonding, asset)
                 }
             )
         }
     }
 }
 
-private fun mapUnbondingToUnbondingModel(index: Int, unbonding: Unbonding, asset: Asset): UnbondingModel {
+private fun mapUnbondingToUnbondingModel(unbonding: Unbonding, asset: Asset): UnbondingModel {
     return UnbondingModel(
-        index = index,
+        id = unbonding.id,
         status = unbonding.status,
         amountModel = mapAmountToAmountModel(unbonding.amount, asset)
     )

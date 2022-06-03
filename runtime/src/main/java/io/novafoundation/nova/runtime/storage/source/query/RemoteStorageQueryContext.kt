@@ -39,4 +39,8 @@ class RemoteStorageQueryContext(
         return socketService.subscriptionFlow(SubscribeStorageRequest(key))
             .map { it.storageChange().getSingleChange() }
     }
+
+    override suspend fun observeKeys(keys: List<String>): Flow<Map<String, String?>> {
+        TODO("Not yet needed")
+    }
 }

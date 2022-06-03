@@ -5,6 +5,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import io.novafoundation.nova.common.list.PayloadGenerator
+import io.novafoundation.nova.common.list.resolvePayload
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.removeCompoundDrawables
 import io.novafoundation.nova.common.utils.setDrawableEnd
@@ -26,6 +28,16 @@ class UnbondingsAdapter : ListAdapter<UnbondingModel, UnbondingsHolder>(Unbondin
         return UnbondingsHolder(view)
     }
 
+    override fun onBindViewHolder(holder: UnbondingsHolder, position: Int, payloads: MutableList<Any>) {
+        val item = getItem(position)
+
+        resolvePayload(holder, position, payloads) {
+            when (it) {
+                UnbondingModel::status -> holder.bindStatus(item)
+            }
+        }
+    }
+
     @ExperimentalTime
     override fun onBindViewHolder(holder: UnbondingsHolder, position: Int) {
         val item = getItem(position)
@@ -38,34 +50,42 @@ class UnbondingsHolder(override val containerView: View) : RecyclerView.ViewHold
 
     @ExperimentalTime
     fun bind(unbonding: UnbondingModel) = with(containerView) {
-        with(unbonding) {
-            when (status) {
-                Unbonding.Status.Redeemable -> {
-                    itemUnbondStatus.setTextColorRes(R.color.green)
-                    itemUnbondStatus.removeCompoundDrawables()
-                    itemUnbondStatus.stopTimer()
-                    itemUnbondStatus.setText(R.string.wallet_balance_redeemable)
-                }
-                is Unbonding.Status.Unbonding -> {
-                    itemUnbondStatus.setTextColorRes(R.color.white_64)
-                    itemUnbondStatus.setDrawableEnd(R.drawable.ic_time_16, paddingInDp = 4, tint = R.color.white_48)
+        bindStatus(unbonding)
 
-                    itemUnbondStatus.startTimer(status.timeLeft, status.calculatedAt)
-                }
+        itemUnbondAmount.text = unbonding.amountModel.token
+    }
+
+    fun bindStatus(unbonding: UnbondingModel) = with(containerView) {
+        when (val status = unbonding.status) {
+            Unbonding.Status.Redeemable -> {
+                itemUnbondStatus.setTextColorRes(R.color.green)
+                itemUnbondStatus.removeCompoundDrawables()
+                itemUnbondStatus.stopTimer()
+                itemUnbondStatus.setText(R.string.wallet_balance_redeemable)
             }
+            is Unbonding.Status.Unbonding -> {
+                itemUnbondStatus.setTextColorRes(R.color.white_64)
+                itemUnbondStatus.setDrawableEnd(R.drawable.ic_time_16, paddingInDp = 4, tint = R.color.white_48)
 
-            itemUnbondAmount.text = unbonding.amountModel.token
+                itemUnbondStatus.startTimer(status.timeLeft, status.calculatedAt)
+            }
         }
     }
 }
 
+private val PAYLOAD_GENERATOR = PayloadGenerator(UnbondingModel::status)
+
 private class UnbondingModelDiffCallback : DiffUtil.ItemCallback<UnbondingModel>() {
 
     override fun areItemsTheSame(oldItem: UnbondingModel, newItem: UnbondingModel): Boolean {
-        return oldItem == newItem
+        return oldItem.id == newItem.id
     }
 
     override fun areContentsTheSame(oldItem: UnbondingModel, newItem: UnbondingModel): Boolean {
-        return true
+        return oldItem == newItem
+    }
+
+    override fun getChangePayload(oldItem: UnbondingModel, newItem: UnbondingModel): Any? {
+        return PAYLOAD_GENERATOR.diff(oldItem, newItem)
     }
 }
