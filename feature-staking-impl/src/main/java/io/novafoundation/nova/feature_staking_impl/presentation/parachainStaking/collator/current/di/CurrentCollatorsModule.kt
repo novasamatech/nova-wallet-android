@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CurrentRoundRepository
@@ -50,6 +51,7 @@ class CurrentCollatorsModule {
         collatorsUseCase: CollatorsUseCase,
         delegatorStateUseCase: DelegatorStateUseCase,
         tokenUseCase: TokenUseCase,
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
     ): ViewModel {
         return CurrentCollatorsViewModel(
             router = router,
@@ -59,7 +61,8 @@ class CurrentCollatorsModule {
             selectedChainStale = selectedChainStale,
             delegatorStateUseCase = delegatorStateUseCase,
             tokenUseCase = tokenUseCase,
-            collatorsUseCase = collatorsUseCase
+            collatorsUseCase = collatorsUseCase,
+            actionAwaitableMixinFactory = actionAwaitableMixinFactory
         )
     }
 

@@ -22,7 +22,7 @@ class ParachainStakingNavigator(
     private val commonNavigator: Navigator,
 ) : BaseNavigator(navigationHolder), ParachainStakingRouter {
 
-    override fun openStartStaking() = performNavigation(R.id.action_mainFragment_to_startParachainStakingGraph)
+    override fun openStartStaking() = performNavigation(R.id.action_open_startParachainStakingGraph)
 
     override fun openConfirmStartStaking(payload: ConfirmStartParachainStakingPayload) = performNavigation(
         actionId = R.id.action_startParachainStakingFragment_to_confirmStartParachainStakingFragment,
@@ -51,7 +51,7 @@ class ParachainStakingNavigator(
 
     override fun openCurrentCollators() = performNavigation(R.id.action_mainFragment_to_currentCollatorsFragment)
 
-    override fun openUnbond() = performNavigation(R.id.action_mainFragment_to_startParachainUnbondGraph)
+    override fun openUnbond() = performNavigation(R.id.action_open_parachainUnbondGraph)
 
     override fun openConfirmUnbond(payload: ParachainStakingUnbondConfirmPayload) = performNavigation(
         actionId = R.id.action_parachainStakingUnbondFragment_to_parachainStakingUnbondConfirmFragment,
