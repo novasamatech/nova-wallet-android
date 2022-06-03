@@ -69,7 +69,8 @@ class ConfirmStartParachainStakingViewModel(
     FeeLoaderMixin by feeLoaderMixin,
     ExternalActions by externalActions {
 
-    private val delegatorStateFlow = delegatorStateUseCase.currentDelegatorStateFlow()
+    // Take state only once since subscribing to it might cause switch to Delegator state while waiting for tx confirmation
+    private val delegatorStateFlow = flowOf { delegatorStateUseCase.currentDelegatorState() }
         .shareInBackground()
 
     val hintsMixin = hintsMixinFactory.create(

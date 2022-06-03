@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rede
 
 import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.extrinsic.submitExtrinsicAndWaitBlockInclusion
 import io.novafoundation.nova.feature_staking_api.domain.api.AccountIdMap
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.ScheduledDelegationRequest
@@ -43,7 +44,7 @@ class RealParachainStakingRedeemInteractor(
     }
 
     override suspend fun redeem(delegatorState: DelegatorState): Result<*> = withContext(Dispatchers.Default) {
-        extrinsicService.submitExtrinsic(delegatorState.chain) {
+        extrinsicService.submitExtrinsicAndWaitBlockInclusion(delegatorState.chain) {
             redeem(delegatorState)
         }
     }

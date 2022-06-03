@@ -36,6 +36,16 @@ class ExtrinsicService(
         return submitExtrinsic(chain, accountId, formExtrinsic)
     }
 
+    suspend fun submitAndWatchExtrinsic(
+        chain: Chain,
+        formExtrinsic: suspend ExtrinsicBuilder.() -> Unit,
+    ): Flow<ExtrinsicStatus> {
+        val account = accountRepository.getSelectedMetaAccount()
+        val accountId = account.accountIdIn(chain)!!
+
+        return submitAndWatchExtrinsic(chain, accountId, formExtrinsic)
+    }
+
     suspend fun submitExtrinsic(
         chain: Chain,
         accountId: ByteArray,
