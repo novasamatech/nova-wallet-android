@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbo
 
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.extrinsic.submitExtrinsicAndWaitBlockInclusion
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.delegationAmountTo
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.calls.scheduleBondLess
@@ -47,7 +48,7 @@ class RealParachainStakingUnbondInteractor(
     override suspend fun unbond(amount: BigInteger, collator: AccountId): Result<*> = withContext(Dispatchers.IO) {
         val chain = selectedAssetSharedState.chain()
 
-        extrinsicService.submitExtrinsic(chain) {
+        extrinsicService.submitExtrinsicAndWaitBlockInclusion(chain) {
             unbond(amount, collator)
         }
     }
