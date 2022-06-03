@@ -12,8 +12,6 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CandidatesRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CurrentRoundRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.DelegatorStateRepository
-import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.ParachainStakingConstantsRepository
-import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.systemForcedMinStake
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegationState
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.delegationStatesIn
 import kotlinx.coroutines.flow.Flow
@@ -31,7 +29,6 @@ interface ParachainStakingAlertsInteractor {
 private class AlertCalculationContext(
     val snapshots: AccountIdMap<CollatorSnapshot>,
     val delegatedCollatorsMetadata: AccountIdMap<CandidateMetadata>,
-    val systemForcedMinStake: BigInteger,
     val scheduledDelegationRequests: Collection<ScheduledDelegationRequest>,
     val currentRound: BigInteger,
     val delegatorState: DelegatorState.Delegator
@@ -43,14 +40,12 @@ class RealParachainStakingAlertsInteractor(
     private val candidatesRepository: CandidatesRepository,
     private val currentRoundRepository: CurrentRoundRepository,
     private val delegatorStateRepository: DelegatorStateRepository,
-    private val parachainStakingConstantsRepository: ParachainStakingConstantsRepository
-): ParachainStakingAlertsInteractor {
+) : ParachainStakingAlertsInteractor {
 
-    override fun alertsFlow(delegatorState: DelegatorState.Delegator) : Flow<List<ParachainStakingAlert>> {
+    override fun alertsFlow(delegatorState: DelegatorState.Delegator): Flow<List<ParachainStakingAlert>> {
         return flow {
             val chainId = delegatorState.chain.id
             val candidateMetadatas = candidatesRepository.getCandidatesMetadata(chainId, delegatorState.delegatedCollatorIds())
-            val minStake = parachainStakingConstantsRepository.systemForcedMinStake(chainId)
 
             val innerFlow = currentRoundRepository.currentRoundInfoFlow(chainId).flatMapLatest { currentRoundInfo ->
                 val currentRound = currentRoundInfo.current
@@ -60,7 +55,6 @@ class RealParachainStakingAlertsInteractor(
                     val alertContext = AlertCalculationContext(
                         snapshots = snapshots,
                         delegatedCollatorsMetadata = candidateMetadatas,
-                        systemForcedMinStake = minStake,
                         scheduledDelegationRequests = scheduledDelegationRequests,
                         currentRound = currentRound,
                         delegatorState = delegatorState
@@ -76,7 +70,7 @@ class RealParachainStakingAlertsInteractor(
 
     private fun collatorsAlerts(context: AlertCalculationContext): List<ParachainStakingAlert> {
         val delegationStates = context.delegatorState
-            .delegationStatesIn(context.snapshots, context.delegatedCollatorsMetadata, context.systemForcedMinStake)
+            .delegationStatesIn(context.snapshots, context.delegatedCollatorsMetadata)
             .values
 
         return listOfNotNull(
@@ -97,7 +91,7 @@ class RealParachainStakingAlertsInteractor(
         }
     }
 
-    private val alertProducers : List<AlertProducer> = listOf(
+    private val alertProducers: List<AlertProducer> = listOf(
         ::collatorsAlerts,
         ::redeemAlert
     )

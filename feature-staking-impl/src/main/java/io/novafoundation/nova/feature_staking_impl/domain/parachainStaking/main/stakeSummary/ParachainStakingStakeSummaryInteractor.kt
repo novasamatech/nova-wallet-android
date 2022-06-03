@@ -6,8 +6,6 @@ import io.novafoundation.nova.feature_staking_api.domain.model.parachain.delegat
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.RoundDurationEstimator
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CandidatesRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CurrentRoundRepository
-import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.ParachainStakingConstantsRepository
-import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.systemForcedMinStake
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegationState
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.delegationStatesIn
 import kotlinx.coroutines.flow.Flow
@@ -19,20 +17,18 @@ import java.math.BigInteger
 class ParachainStakingStakeSummaryInteractor(
     private val currentRoundRepository: CurrentRoundRepository,
     private val candidatesRepository: CandidatesRepository,
-    private val parachainStakingConstantsRepository: ParachainStakingConstantsRepository,
     private val roundDurationEstimator: RoundDurationEstimator,
 ) {
 
     suspend fun delegatorStatusFlow(delegatorState: DelegatorState.Delegator): Flow<DelegatorStatus> {
         val chainId = delegatorState.chain.id
-        val systemForcedMinStake = parachainStakingConstantsRepository.systemForcedMinStake(chainId)
 
         return currentRoundRepository.currentRoundInfoFlow(chainId).transformLatest { currentRoundInfo ->
             val snapshots = currentRoundRepository.collatorsSnapshot(chainId, currentRoundInfo.current)
             val delegatedIds = delegatorState.delegatedCollatorIds()
             val candidateMetadatas = candidatesRepository.getCandidatesMetadata(chainId, delegatedIds)
 
-            val delegationStates = delegatorState.delegationStatesIn(snapshots, candidateMetadatas, systemForcedMinStake).values
+            val delegationStates = delegatorState.delegationStatesIn(snapshots, candidateMetadatas).values
 
             when {
                 delegationStates.anyIs(DelegationState.ACTIVE) -> emit(DelegatorStatus.Active)

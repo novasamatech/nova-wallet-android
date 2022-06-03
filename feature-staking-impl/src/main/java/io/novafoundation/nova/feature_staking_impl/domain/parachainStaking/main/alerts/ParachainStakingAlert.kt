@@ -4,9 +4,9 @@ import java.math.BigInteger
 
 sealed class ParachainStakingAlert {
 
-    object ChangeCollator: ParachainStakingAlert()
+    object ChangeCollator : ParachainStakingAlert()
 
-    object StakeMore: ParachainStakingAlert()
+    object StakeMore : ParachainStakingAlert()
 
-    class RedeemTokens(val redeemableAmount: BigInteger): ParachainStakingAlert()
+    class RedeemTokens(val redeemableAmount: BigInteger) : ParachainStakingAlert()
 }

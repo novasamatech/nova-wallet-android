@@ -29,7 +29,7 @@ class ParachainAlertsComponentFactory(
     private val resourceManager: ResourceManager,
     private val router: ParachainStakingRouter
 
-    ) {
+) {
 
     fun create(
         assetWithChain: SingleAssetSharedState.AssetWithChain,
@@ -55,7 +55,6 @@ private class ParachainAlertsComponent(
 ) : AlertsComponent,
     CoroutineScope by hostContext.scope,
     WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(hostContext.scope) {
-
 
     override val events = MutableLiveData<Event<AlertsEvent>>()
 
@@ -96,7 +95,7 @@ private class ParachainAlertsComponent(
                 )
             }
 
-            ParachainStakingAlert.StakeMore ->  AlertModel(
+            ParachainStakingAlert.StakeMore -> AlertModel(
                 title = resourceManager.getString(R.string.staking_bond_more_v1_9_0),
                 extraMessage = resourceManager.getString(R.string.parachain_staking_alerts_bond_more_message),
                 type = AlertModel.Type.CallToAction { router.openCurrentCollators() }

@@ -78,6 +78,7 @@ class RealCollatorProvider(
                 identity = identities[accountIdHex],
                 snapshot = collatorSnapshot,
                 minimumStakeToGetRewards = candidateMetadata.minimumStakeToGetRewards(systemForcedMinimumStake),
+                candidateMetadata = candidateMetadata,
                 apr = rewardCalculator.getAprOrEstimate(accountIdHex, candidateMetadatas)
             )
         }
