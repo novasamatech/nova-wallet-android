@@ -122,7 +122,7 @@ class CurrentCollatorsViewModel(
 
     override fun changeClicked() {
         launch {
-            when(selectManageCollatorsAction.awaitAction()) {
+            when (selectManageCollatorsAction.awaitAction()) {
                 ManageCollatorsAction.BOND_MORE -> router.openStartStaking()
                 ManageCollatorsAction.UNBOND -> router.openUnbond()
             }

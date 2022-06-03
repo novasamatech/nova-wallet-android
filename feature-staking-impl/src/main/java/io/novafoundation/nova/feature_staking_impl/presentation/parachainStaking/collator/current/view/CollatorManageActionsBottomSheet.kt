@@ -11,7 +11,7 @@ class CollatorManageActionsBottomSheet(
     context: Context,
     private val itemSelected: (ManageCollatorsAction) -> Unit,
     onCancel: (() -> Unit)? = null,
-    ): FixedListBottomSheet(context, onCancel) {
+) : FixedListBottomSheet(context, onCancel) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

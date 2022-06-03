@@ -21,7 +21,6 @@ class CurrentCollatorsFragment : CurrentStakeTargetsFragment<CurrentCollatorsVie
     override fun subscribe(viewModel: CurrentCollatorsViewModel) {
         super.subscribe(viewModel)
 
-
         viewModel.selectManageCollatorsAction.awaitableActionLiveData.observeEvent {
             CollatorManageActionsBottomSheet(
                 context = requireContext(),
