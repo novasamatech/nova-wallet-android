@@ -33,7 +33,7 @@ fun CandidateMetadata.isRewardedListFull(): Boolean {
 }
 
 val CandidateMetadata.isActive
-    get() =  status == CollatorStatus.Active
+    get() = status == CollatorStatus.Active
 
 fun CandidateMetadata.isBottomDelegationsNotEmpty(): Boolean {
     return bottomCapacity != CapacityStatus.Empty
