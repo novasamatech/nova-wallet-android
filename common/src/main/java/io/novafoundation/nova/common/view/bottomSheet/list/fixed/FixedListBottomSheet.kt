@@ -19,7 +19,10 @@ import kotlinx.android.synthetic.main.bottom_sheeet_fixed_list.fixedListSheetIte
 import kotlinx.android.synthetic.main.bottom_sheeet_fixed_list.fixedListSheetTitle
 import kotlinx.android.synthetic.main.item_sheet_iconic_label.view.itemExternalActionContent
 
-abstract class FixedListBottomSheet(context: Context) :
+abstract class FixedListBottomSheet(
+    context: Context,
+    private val onCancel: (() -> Unit)? = null,
+) :
     BottomSheetDialog(context, R.style.BottomSheetDialog), DialogExtensions {
 
     init {
@@ -32,6 +35,8 @@ abstract class FixedListBottomSheet(context: Context) :
     @CallSuper
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        setOnCancelListener { onCancel?.invoke() }
     }
 
     final override fun setContentView(layoutResId: Int) {

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="parachain_staking_manage_collators">Manage collators</string>
+
   <string name="parachain_staking_change_collator">Change collator</string>
   <string name="parachain_staking_alerts_change_collator_message">One of your collators is not selected in the current round</string>
 

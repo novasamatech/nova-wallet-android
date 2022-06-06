@@ -3,6 +3,8 @@ package io.novafoundation.nova.feature_staking_impl.presentation.parachainStakin
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.list.toValueList
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.mixin.actionAwaitable.awaitAction
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
@@ -26,6 +28,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.currentSt
 import io.novafoundation.nova.feature_staking_impl.presentation.common.currentStakeTargets.model.SelectedStakeTargetStatusModel
 import io.novafoundation.nova.feature_staking_impl.presentation.common.currentStakeTargets.model.Waiting
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.formatStakeTargetRewardsOrNull
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.current.model.ManageCollatorsAction
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.details.parachain
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.mappers.mapCollatorToDetailsParcelModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
@@ -53,6 +56,7 @@ class CurrentCollatorsViewModel(
     private val selectedChainStale: SingleAssetSharedState,
     private val delegatorStateUseCase: DelegatorStateUseCase,
     private val collatorsUseCase: CollatorsUseCase,
+    private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     tokenUseCase: TokenUseCase,
 ) : CurrentStakeTargetsViewModel() {
 
@@ -93,6 +97,36 @@ class CurrentCollatorsViewModel(
 
     override val titleFlow: Flow<String> = flowOf {
         resourceManager.getString(R.string.staking_parachain_your_collators)
+    }
+
+    val selectManageCollatorsAction = actionAwaitableMixinFactory.create<Unit, ManageCollatorsAction>()
+
+    override fun stakeTargetInfoClicked(address: String) {
+        launch {
+            val payload = withContext(Dispatchers.Default) {
+                val allCollators = flattenCurrentCollators.first()
+                val selectedCollator = allCollators.first { it.collator.address == address }
+
+                val stakeTarget = mapCollatorToDetailsParcelModel(selectedCollator.collator, selectedCollator.delegationStatus)
+
+                StakeTargetDetailsPayload.parachain(stakeTarget, collatorsUseCase)
+            }
+
+            router.openCollatorDetails(payload)
+        }
+    }
+
+    override fun backClicked() {
+        router.back()
+    }
+
+    override fun changeClicked() {
+        launch {
+            when (selectManageCollatorsAction.awaitAction()) {
+                ManageCollatorsAction.BOND_MORE -> router.openStartStaking()
+                ManageCollatorsAction.UNBOND -> router.openUnbond()
+            }
+        }
     }
 
     private suspend fun mapDelegatedCollatorToUiModel(
@@ -137,28 +171,5 @@ class CurrentCollatorsViewModel(
             title = resourceManager.getString(R.string.staking_parachain_your_collators_waiting_title, statusGroup.numberOfCollators),
             description = R.string.staking_parachain_your_collators_waiting
         )
-    }
-
-    override fun stakeTargetInfoClicked(address: String) {
-        launch {
-            val payload = withContext(Dispatchers.Default) {
-                val allCollators = flattenCurrentCollators.first()
-                val selectedCollator = allCollators.first { it.collator.address == address }
-
-                val stakeTarget = mapCollatorToDetailsParcelModel(selectedCollator.collator, selectedCollator.delegationStatus)
-
-                StakeTargetDetailsPayload.parachain(stakeTarget, collatorsUseCase)
-            }
-
-            router.openCollatorDetails(payload)
-        }
-    }
-
-    override fun backClicked() {
-        router.back()
-    }
-
-    override fun changeClicked() {
-        showMessage("TODO")
     }
 }
