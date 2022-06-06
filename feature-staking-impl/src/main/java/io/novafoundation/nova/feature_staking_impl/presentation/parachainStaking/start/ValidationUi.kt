@@ -42,5 +42,10 @@ fun startParachainStakingValidationFailure(
             resourceManager.getString(R.string.common_amount_low) to
                 resourceManager.getString(R.string.common_zero_amount_error)
         }
+
+        StartParachainStakingValidationFailure.CollatorIsNotActive -> {
+            resourceManager.getString(R.string.parachain_staking_not_active_collator_title) to
+                resourceManager.getString(R.string.parachain_staking_not_active_collator_message)
+        }
     }
 }

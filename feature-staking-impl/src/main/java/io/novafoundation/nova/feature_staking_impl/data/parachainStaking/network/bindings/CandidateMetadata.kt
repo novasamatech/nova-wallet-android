@@ -14,10 +14,15 @@ class CandidateMetadata(
     val lowestTopDelegationAmount: Balance,
     val topCapacity: CapacityStatus,
     val bottomCapacity: CapacityStatus,
+    val status: CollatorStatus,
 )
 
 enum class CapacityStatus {
     Full, Empty, Partial
+}
+
+enum class CollatorStatus {
+    Active, Idle, Leaving
 }
 
 fun CandidateMetadata.isFull(): Boolean {
@@ -26,6 +31,9 @@ fun CandidateMetadata.isFull(): Boolean {
 fun CandidateMetadata.isRewardedListFull(): Boolean {
     return topCapacity == CapacityStatus.Full
 }
+
+val CandidateMetadata.isActive
+    get() =  status == CollatorStatus.Active
 
 fun CandidateMetadata.isBottomDelegationsNotEmpty(): Boolean {
     return bottomCapacity != CapacityStatus.Empty
@@ -56,7 +64,8 @@ fun bindCandidateMetadata(decoded: Any?): CandidateMetadata {
             lowestTopDelegationAmount = bindNumber(struct["lowestTopDelegationAmount"]),
             highestBottomDelegationAmount = bindNumber(struct["highestBottomDelegationAmount"]),
             topCapacity = bindCollectionEnum(struct["topCapacity"]),
-            bottomCapacity = bindCollectionEnum(struct["bottomCapacity"])
+            bottomCapacity = bindCollectionEnum(struct["bottomCapacity"]),
+            status = bindCollectionEnum(struct["status"])
         )
     }
 }

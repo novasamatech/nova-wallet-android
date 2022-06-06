@@ -5,6 +5,7 @@ import io.novafoundation.nova.feature_staking_api.domain.model.parachain.Delegat
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.CandidateMetadata
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.CapacityStatus
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.CollatorSnapshot
+import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.CollatorStatus
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.Collator
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapIdentityParcelModelToIdentity
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapIdentityToIdentityParcelModel
@@ -49,6 +50,7 @@ class CollatorParcelModel(
         val lowestTopDelegationAmount: BigInteger,
         val topCapacity: CapacityStatus,
         val bottomCapacity: CapacityStatus,
+        val status: CollatorStatus,
     ) : Parcelable
 }
 
@@ -89,7 +91,8 @@ private fun mapCandidateMetadataToParcelModel(candidateMetadata: CandidateMetada
             highestBottomDelegationAmount = highestBottomDelegationAmount,
             lowestTopDelegationAmount = lowestTopDelegationAmount,
             topCapacity = topCapacity,
-            bottomCapacity = bottomCapacity
+            bottomCapacity = bottomCapacity,
+            status = status
         )
     }
 }
@@ -103,7 +106,8 @@ private fun mapCandidateMetadataFromParcelModel(candidateMetadata: CandidateMeta
             highestBottomDelegationAmount = highestBottomDelegationAmount,
             lowestTopDelegationAmount = lowestTopDelegationAmount,
             topCapacity = topCapacity,
-            bottomCapacity = bottomCapacity
+            bottomCapacity = bottomCapacity,
+            status = status
         )
     }
 }
