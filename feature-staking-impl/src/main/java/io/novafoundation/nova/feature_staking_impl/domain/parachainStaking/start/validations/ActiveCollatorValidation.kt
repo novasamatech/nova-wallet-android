@@ -14,6 +14,6 @@ class ActiveCollatorValidation : StartParachainStakingValidation {
     }
 }
 
-fun ValidationSystemBuilder<StartParachainStakingValidationPayload, StartParachainStakingValidationFailure>.activeCollatorValidation() {
+fun ValidationSystemBuilder<StartParachainStakingValidationPayload, StartParachainStakingValidationFailure>.activeCollator() {
     validate(ActiveCollatorValidation())
 }

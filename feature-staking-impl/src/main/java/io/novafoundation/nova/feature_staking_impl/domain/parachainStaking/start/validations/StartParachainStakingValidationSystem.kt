@@ -10,12 +10,17 @@ typealias StartParachainStakingValidation = Validation<StartParachainStakingVali
 
 fun ValidationSystem.Companion.parachainStakingStart(
     minimumDelegationValidationFactory: MinimumDelegationValidationFactory,
+    noPendingRevokeValidationFactory: NoPendingRevokeValidationFactory,
 ): StartParachainStakingValidationSystem = ValidationSystem {
     with(minimumDelegationValidationFactory) {
         minimumDelegation()
     }
 
-    activeCollatorValidation()
+    with(noPendingRevokeValidationFactory) {
+        noPendingRevoke()
+    }
+
+    activeCollator()
 
     positiveAmount(
         amount = { it.amount },

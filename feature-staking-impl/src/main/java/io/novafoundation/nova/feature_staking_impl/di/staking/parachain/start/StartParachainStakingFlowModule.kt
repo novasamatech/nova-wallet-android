@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.commo
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.RealStartParachainStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.StartParachainStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.MinimumDelegationValidationFactory
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.NoPendingRevokeValidationFactory
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.parachainStakingStart
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -31,9 +32,17 @@ class StartParachainStakingFlowModule {
 
     @Provides
     @FeatureScope
+    fun provideNoPendingRevokeValidationFactory(
+        delegatorStateRepository: DelegatorStateRepository,
+        delegatorStateUseCase: DelegatorStateUseCase,
+    ) = NoPendingRevokeValidationFactory(delegatorStateRepository, delegatorStateUseCase)
+
+    @Provides
+    @FeatureScope
     fun provideValidationSystem(
         minimumDelegationValidationFactory: MinimumDelegationValidationFactory,
-    ): StartParachainStakingValidationSystem = ValidationSystem.parachainStakingStart(minimumDelegationValidationFactory)
+        noPendingRevokeValidationFactory: NoPendingRevokeValidationFactory,
+    ): StartParachainStakingValidationSystem = ValidationSystem.parachainStakingStart(minimumDelegationValidationFactory, noPendingRevokeValidationFactory)
 
     @Provides
     @FeatureScope

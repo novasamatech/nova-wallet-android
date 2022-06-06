@@ -42,6 +42,8 @@ fun DelegatorState.delegationAmountTo(collatorId: AccountId): BalanceOf? {
 
 fun DelegatorState.hasDelegation(collatorId: AccountId): Boolean = this is DelegatorState.Delegator && delegations.any { it.owner.contentEquals(collatorId) }
 
+fun DelegatorState.asDelegator(): DelegatorState.Delegator? = castOrNull<DelegatorState.Delegator>()
+
 class DelegatorBond(
     val owner: AccountId,
     val balance: BalanceOf,
