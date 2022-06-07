@@ -370,7 +370,7 @@
   <string name="sr25519_selection_title">Schnorrkel</string>
   <string name="staking_about">О стейкинге</string>
   <string name="staking_account_is_used_as_controller">Выбранный аккаунт уже используется в качестве контроллера.</string>
-  <string name="staking_active_delegators">Активные дегегаторы</string>
+  <string name="staking_active_delegators">Активные делегаторы</string>
   <string name="staking_add_controller">Чтобы выполнить это действие, добавьте контроллер аккаунт %s в приложение</string>
   <string name="staking_alert_bond_more_message">В настоящее время стейкинг неактивен. \nТекущая минимальная ставка %s .</string>
   <string name="staking_alert_bond_more_title">Застейкайте ещё токенов</string>
@@ -452,7 +452,7 @@
   <string name="staking_nominator_status_waiting">Ожидание следующей Эры</string>
   <string name="staking_nominator_status_waiting_format">ожидание следующей эры (%s)</string>
   <string name="staking_parachain_collator">Коллатор</string>
-  <string name="staking_parachain_collator_details_oversubscribed">Минимальная стейк коллатора выше, чем ваша делегация. Вы не будете получать вознаграждения от этого коллатора.</string>
+  <string name="staking_parachain_collator_details_oversubscribed">Минимальный стейк коллатора выше, чем ваша делегация. Вы не будете получать вознаграждения от этого коллатора.</string>
   <string name="staking_parachain_collator_info">Информация о коллаторе</string>
   <string name="staking_parachain_collator_own_stake">Собственный стейк коллатора</string>
   <string name="staking_parachain_collators_number_format">Коллаторы: %s</string>
@@ -470,8 +470,8 @@
   <string name="staking_parachain_select_collator_hint">Выберите коллатора...</string>
   <string name="staking_parachain_stake_more_hint">Вы получите увеличенное вознаграждение, начиная со следующего раунда</string>
   <string name="staking_parachain_status_inactive_message">Вы не получите награды за этот раунд, так как ни одна из ваших делегаций не активна.</string>
-  <string name="staking_parachain_unbond_already_exists_message">Вы уже выводите токены из стейка у этого коллатора. На одного коллатора можно иметь только одну запрос на вывод.</string>
-  <string name="staking_parachain_unbond_already_exists_title">Вы не можете вывоести токены из стейка у выбранного коллатора</string>
+  <string name="staking_parachain_unbond_already_exists_message">Вы уже выводите токены из стейка у этого коллатора. На одного коллатора можно иметь только один запрос на вывод.</string>
+  <string name="staking_parachain_unbond_already_exists_title">Вы не можете вывести токены из стейка у выбранного коллатора</string>
   <string name="staking_parachain_wont_receive_rewards_message">Ваш стейк должен быть больше минимального (%s) для этого коллатора.</string>
   <string name="staking_parachain_wont_receive_rewards_title">Вы не будете получать награды</string>
   <string name="staking_parachain_your_collaotrs_no_rewards">Некоторые из ваших коллаторов либо не выбраны сетью, либо имеют более высокий минимальный стейк, чем ваш. Вы не получите вознаграждение в этом раунде, стейкая с ними.</string>
