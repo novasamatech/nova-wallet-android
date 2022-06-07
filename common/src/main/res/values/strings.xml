@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
   <string name="parachain_staking_cannot_stake_with_collator">Cannot stake with this collator</string>
-  <string name="parachain_staking_not_active_collator_message">Selected collator showed intention to stop participating in the staking.</string>
+  <string name="parachain_staking_not_active_collator_message">The selected collator showed intention to stop participating in the staking.</string>
 
   <string name="parachain_staking_collator_cannot_bond_more">Cannot add stake to this collator</string>
   <string name="parachain_staking_pending_revoke_message">You cannot add stake to collator for which you are unstaking all tokens.</string>
@@ -32,7 +32,7 @@
   <string name="staking_parachain_new_collator">New collator</string>
   <string name="staking_parachain_collator_details_oversubscribed">Collator\'s minimum stake is higher than your delegation. You will not receive rewards from the collator.</string>
 
-  <string name="staking_parachain_your_collaotrs_no_rewards">Some of your collators are either not elected or have higher minimum stake than your staked amount. You will not receive reward in this round staking with them.</string>
+  <string name="staking_parachain_your_collaotrs_no_rewards">Some of your collators are either not elected or have a higher minimum stake than your staked amount. You will not receive a reward in this round staking with them.</string>
   <string name="staking_parachain_your_collators_active">Your stake is assigned to next collators</string>
   <string name="staking_parachain_your_collators_elected">Active collators without producing rewards</string>
   <string name="staking_parachain_your_collators_inactive">Collators without enough stake to be elected</string>
@@ -68,19 +68,15 @@
   <string name="staking_parachain_collator">Collator</string>
   <string name="staking_parachain_select_collator">Select collator</string>
 
-<!--  <string name="staking_reward_info_avg">Average APY</string>-->
-<!--  <string name="staking_reward_info_max">Maximum APY</string>-->
-
   <string name="common_average">Average</string>
   <string name="common_maximum">Maximum</string>
 
-<!--  <string name="staking_reward_info_title">Earnings with restake</string>-->
   <string name="staking_reward_info_title_restake">Earnings with restake</string>
   <string name="staking_reward_info_title_transferrable">Earnings without restake</string>
 
 
   <string name="staking_active_delegators">Active delegators</string>
-  <string name="staking_parachain_delegator_status_active_message">One or more of your collators have been elected by network.</string>
+  <string name="staking_parachain_delegator_status_active_message">One or more of your collators have been elected by the network.</string>
 
   <string name="dapp_list_placeholder">List of DApps will appear here</string>
 
