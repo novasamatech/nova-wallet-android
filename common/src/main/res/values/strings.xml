@@ -4,7 +4,7 @@
   <string name="parachain_staking_not_active_collator_message">Selected collator showed intention to stop participating in the staking.</string>
 
   <string name="parachain_staking_collator_cannot_bond_more">Cannot add stake to this collator</string>
-  <string name="parachain_staking_pending_revoke_message">You cannot add stake to collator that you have pending unstake requests for.</string>
+  <string name="parachain_staking_pending_revoke_message">You cannot add stake to collator for which you are unstaking all tokens.</string>
 
   <string name="parachain_staking_manage_collators">Manage collators</string>
 
