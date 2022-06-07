@@ -52,7 +52,7 @@ class ParachainStakingUnbondingsInteractor(
                 request = requests.getValue(it),
                 collatorIdentity = identities[it]
             )
-        }
+        }.sortedBy { it.request.whenExecutable }
     }
 
     fun unbondingsFlow(delegatorState: DelegatorState.Delegator): Flow<Unbondings> = flow {
@@ -65,24 +65,26 @@ class ParachainStakingUnbondingsInteractor(
             val currentRoundIndex = currentRoundInfo.current
             val durationCalculator = roundDurationEstimator.createDurationCalculator(chainId)
 
-            val unbondingsList = scheduledRequests.map { scheduledDelegationRequest ->
-                val status = if (scheduledDelegationRequest.redeemableIn(currentRoundIndex)) {
-                    Unbonding.Status.Redeemable
-                } else {
-                    val calculatedDuration = durationCalculator.timeTillRound(scheduledDelegationRequest.whenExecutable)
+            val unbondingsList = scheduledRequests
+                .sortedBy { it.whenExecutable }
+                .map { scheduledDelegationRequest ->
+                    val status = if (scheduledDelegationRequest.redeemableIn(currentRoundIndex)) {
+                        Unbonding.Status.Redeemable
+                    } else {
+                        val calculatedDuration = durationCalculator.timeTillRound(scheduledDelegationRequest.whenExecutable)
 
-                    Unbonding.Status.Unbonding(
-                        timeLeft = calculatedDuration.duration.toLongMilliseconds(),
-                        calculatedAt = calculatedDuration.calculatedAt
+                        Unbonding.Status.Unbonding(
+                            timeLeft = calculatedDuration.duration.toLongMilliseconds(),
+                            calculatedAt = calculatedDuration.calculatedAt
+                        )
+                    }
+
+                    Unbonding(
+                        id = scheduledDelegationRequest.uniqueId(),
+                        amount = scheduledDelegationRequest.action.amount,
+                        status = status
                     )
                 }
-
-                Unbonding(
-                    id = scheduledDelegationRequest.uniqueId(),
-                    amount = scheduledDelegationRequest.action.amount,
-                    status = status
-                )
-            }
 
             Unbondings.from(unbondingsList)
         }
