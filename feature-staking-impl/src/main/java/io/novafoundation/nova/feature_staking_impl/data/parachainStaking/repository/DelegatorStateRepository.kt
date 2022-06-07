@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.utils.parachainStaking
 import io.novafoundation.nova.feature_staking_api.domain.api.AccountIdMap
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.ScheduledDelegationRequest
+import io.novafoundation.nova.feature_staking_api.domain.model.parachain.hasDelegation
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.bindDelegationRequests
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.bindDelegatorState
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -73,6 +74,8 @@ class RealDelegatorStateRepository(
     }
 
     override suspend fun scheduledDelegationRequest(delegatorState: DelegatorState.Delegator, collatorId: AccountId): ScheduledDelegationRequest? {
+        if (!delegatorState.hasDelegation(collatorId)) return null
+
         return localStorage.query(delegatorState.chain.id) {
             val allCollatorDelegationRequests = runtime.metadata.parachainStaking().storage("DelegationScheduledRequests").query(
                 collatorId,
