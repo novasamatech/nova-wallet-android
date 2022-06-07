@@ -29,7 +29,6 @@ import io.novafoundation.nova.core_db.dao.TokenDao
 import io.novafoundation.nova.core_db.migrations.AddAdditionalFieldToChains_12_13
 import io.novafoundation.nova.core_db.migrations.AddBuyProviders_7_8
 import io.novafoundation.nova.core_db.migrations.AddChainColor_4_5
-import io.novafoundation.nova.core_db.migrations.AddChainToTotalRewards_12_13
 import io.novafoundation.nova.core_db.migrations.AddDAppAuthorizations_1_2
 import io.novafoundation.nova.core_db.migrations.AddFavouriteDApps_9_10
 import io.novafoundation.nova.core_db.migrations.AddNfts_5_6
@@ -38,6 +37,7 @@ import io.novafoundation.nova.core_db.migrations.AssetTypes_2_3
 import io.novafoundation.nova.core_db.migrations.BetterChainDiffing_8_9
 import io.novafoundation.nova.core_db.migrations.ChangeAsset_3_4
 import io.novafoundation.nova.core_db.migrations.ChangeDAppAuthorization_10_11
+import io.novafoundation.nova.core_db.migrations.FixMigrationConflicts_13_14
 import io.novafoundation.nova.core_db.migrations.RemoveChainForeignKeyFromChainAccount_11_12
 import io.novafoundation.nova.core_db.model.AccountLocal
 import io.novafoundation.nova.core_db.model.AccountStakingLocal
@@ -61,7 +61,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
 import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
 
 @Database(
-    version = 13,
+    version = 14,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -116,7 +116,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(AddDAppAuthorizations_1_2, AssetTypes_2_3, ChangeAsset_3_4)
                     .addMigrations(AddChainColor_4_5, AddNfts_5_6, AddSitePhishing_6_7, AddBuyProviders_7_8, BetterChainDiffing_8_9)
                     .addMigrations(AddFavouriteDApps_9_10, ChangeDAppAuthorization_10_11, RemoveChainForeignKeyFromChainAccount_11_12)
-                    .addMigrations(AddAdditionalFieldToChains_12_13)
+                    .addMigrations(AddAdditionalFieldToChains_12_13, FixMigrationConflicts_13_14)
                     .fallbackToDestructiveMigration()
                     .build()
             }
