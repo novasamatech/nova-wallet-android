@@ -28,7 +28,7 @@ infix fun BigDecimal.hasTheSaveValueAs(another: BigDecimal) = compareTo(another)
 val BigDecimal.isNonNegative: Boolean
     get() = signum() >= 0
 
-fun BigInteger?.orZero() = this ?: BigInteger.ZERO
+fun BigInteger?.orZero(): BigInteger = this ?: BigInteger.ZERO
 
 fun Long.daysFromMillis() = TimeUnit.MILLISECONDS.toDays(this)
 

@@ -1,6 +1,7 @@
 package io.novafoundation.nova.runtime.extrinsic
 
 import io.novafoundation.nova.common.data.mappers.mapCryptoTypeToEncryption
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.addressOf
@@ -61,6 +62,7 @@ class ExtrinsicBuilderFactory(
         val mortality = mortalityConstructor.constructMortality(chain.id)
 
         return ExtrinsicBuilder(
+            tip = chain.additional?.defaultTip.orZero(),
             runtime = runtime,
             keypair = keypair,
             nonce = nonce,
