@@ -46,7 +46,7 @@ val FixMigrationConflicts_13_14 = object : Migration(13, 14) {
     private fun isMigratingFromMaster(database: SupportSQLiteDatabase): Boolean {
         return runCatching {
             // check for column added in astar hotfix (master)
-            database.execSQL("SELECT additional FROM chains LIMIT 1")
+            database.query("SELECT additional FROM chains LIMIT 1")
         }.fold(
             onSuccess = { true },
             onFailure = { false }
