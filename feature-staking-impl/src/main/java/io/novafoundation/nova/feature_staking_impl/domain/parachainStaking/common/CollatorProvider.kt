@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.comm
 
 import io.novafoundation.nova.feature_staking_api.domain.api.AccountIdMap
 import io.novafoundation.nova.feature_staking_api.domain.api.IdentityRepository
-import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.CandidateMetadata
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.CollatorSnapshot
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.minimumStakeToGetRewards
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CandidatesRepository
@@ -12,7 +11,6 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.reposit
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.systemForcedMinStake
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorProvider.CollatorSource
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.Collator
-import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculator
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -20,7 +18,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import java.math.BigDecimal
 
 interface CollatorProvider {
 
@@ -79,16 +76,9 @@ class RealCollatorProvider(
                 snapshot = collatorSnapshot,
                 minimumStakeToGetRewards = candidateMetadata.minimumStakeToGetRewards(systemForcedMinimumStake),
                 candidateMetadata = candidateMetadata,
-                apr = rewardCalculator.getAprOrEstimate(accountIdHex, candidateMetadatas)
+                apr = rewardCalculator.collatorApr(accountIdHex)
             )
         }
-    }
-
-    private fun ParachainStakingRewardCalculator.getAprOrEstimate(
-        accountIdHex: String,
-        missingCollatorMetadatas: AccountIdMap<CandidateMetadata>
-    ): BigDecimal {
-        return collatorApr(accountIdHex) ?: estimateApr(missingCollatorMetadatas.getValue(accountIdHex).totalCounted)
     }
 }
 
