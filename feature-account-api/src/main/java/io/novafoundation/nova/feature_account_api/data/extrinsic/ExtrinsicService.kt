@@ -2,7 +2,9 @@ package io.novafoundation.nova.feature_account_api.data.extrinsic
 
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.data.secrets.v2.getAccountSecrets
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.takeWhileInclusive
+import io.novafoundation.nova.common.utils.tip
 import io.novafoundation.nova.feature_account_api.data.secrets.keypair
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -10,11 +12,14 @@ import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.cryptoTypeIn
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
+import io.novafoundation.nova.runtime.extrinsic.create
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import jp.co.soramitsu.fearless_utils.encrypt.keypair.Keypair
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHex
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Extrinsic
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import kotlinx.coroutines.flow.Flow
 import java.math.BigInteger
@@ -87,12 +92,16 @@ class ExtrinsicService(
         formExtrinsic: suspend ExtrinsicBuilder.() -> Unit,
     ): BigInteger {
         val extrinsicBuilder = extrinsicBuilderFactory.create(chain)
-
         extrinsicBuilder.formExtrinsic()
-
         val extrinsic = extrinsicBuilder.build()
 
-        return rpcCalls.getExtrinsicFee(chain.id, extrinsic)
+        val extrinsicType = Extrinsic.create(extrinsicBuilder.runtime)
+        val decodedExtrinsic = extrinsicType.fromHex(extrinsicBuilder.runtime, extrinsic)
+
+        val tip = decodedExtrinsic.tip().orZero()
+        val baseFee = rpcCalls.getExtrinsicFee(chain.id, extrinsic)
+
+        return tip + baseFee
     }
 
     suspend fun estimateFee(chainId: ChainId, extrinsic: String): BigInteger {

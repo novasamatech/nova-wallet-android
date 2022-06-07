@@ -26,6 +26,7 @@ import io.novafoundation.nova.core_db.dao.PhishingSitesDao
 import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.core_db.dao.StorageDao
 import io.novafoundation.nova.core_db.dao.TokenDao
+import io.novafoundation.nova.core_db.migrations.AddAdditionalFieldToChains_12_13
 import io.novafoundation.nova.core_db.migrations.AddBuyProviders_7_8
 import io.novafoundation.nova.core_db.migrations.AddChainColor_4_5
 import io.novafoundation.nova.core_db.migrations.AddChainToTotalRewards_12_13
@@ -115,7 +116,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(AddDAppAuthorizations_1_2, AssetTypes_2_3, ChangeAsset_3_4)
                     .addMigrations(AddChainColor_4_5, AddNfts_5_6, AddSitePhishing_6_7, AddBuyProviders_7_8, BetterChainDiffing_8_9)
                     .addMigrations(AddFavouriteDApps_9_10, ChangeDAppAuthorization_10_11, RemoveChainForeignKeyFromChainAccount_11_12)
-                    .addMigrations(AddChainToTotalRewards_12_13)
+                    .addMigrations(AddAdditionalFieldToChains_12_13)
                     .fallbackToDestructiveMigration()
                     .build()
             }

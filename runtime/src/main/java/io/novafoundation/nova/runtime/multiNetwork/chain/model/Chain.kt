@@ -27,12 +27,17 @@ data class Chain(
     val isTestNet: Boolean,
     val hasCrowdloans: Boolean,
     val parentId: String?,
+    val additional: Additional?
 ) : Identifiable {
 
     companion object // extensions
 
     val assetsBySymbol = assets.associateBy(Asset::symbol)
     val assetsById = assets.associateBy(Asset::id)
+
+    data class Additional(
+        val defaultTip: BigInteger?,
+    )
 
     data class Types(
         val url: String,

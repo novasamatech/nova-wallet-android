@@ -18,7 +18,8 @@ class ChainLocal(
     val prefix: Int,
     val isEthereumBased: Boolean,
     val isTestNet: Boolean,
-    val hasCrowdloans: Boolean
+    val hasCrowdloans: Boolean,
+    val additional: String?,
 ) {
 
     class TypesConfig(

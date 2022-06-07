@@ -12,5 +12,6 @@ data class ChainRemote(
     val addressPrefix: Int,
     val types: ChainTypesInfo?,
     val options: List<String>?,
-    val parentId: String?
+    val parentId: String?,
+    val additional: Map<String, Any?>?,
 )
