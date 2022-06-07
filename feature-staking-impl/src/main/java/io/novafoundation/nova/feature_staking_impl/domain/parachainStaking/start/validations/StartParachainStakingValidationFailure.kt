@@ -9,6 +9,10 @@ sealed class StartParachainStakingValidationFailure {
 
     object NotEnoughBalanceToPayFees : StartParachainStakingValidationFailure()
 
+    object PendingRevoke : StartParachainStakingValidationFailure()
+
+    object CollatorIsNotActive : StartParachainStakingValidationFailure()
+
     sealed class TooLowStake(val minimumStake: BigDecimal, val asset: Asset) : StartParachainStakingValidationFailure() {
 
         class TooLowDelegation(minimumStake: BigDecimal, asset: Asset, val strictGreaterThan: Boolean) : TooLowStake(minimumStake, asset)

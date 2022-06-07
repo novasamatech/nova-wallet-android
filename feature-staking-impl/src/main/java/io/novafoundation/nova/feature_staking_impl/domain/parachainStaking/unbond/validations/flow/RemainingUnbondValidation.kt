@@ -79,8 +79,9 @@ class RemainingUnbondValidation(
             // warn users if they will loose rewards by doing this unbond
             candidateMetadata.isRewardedListFull() && // only relevant if rewarded list is full
                 candidateMetadata.isBottomDelegationsNotEmpty() && // there are delegators who can potentially kick user out from rewarded set
-                stakedInSelectedCollator > minStakeToGetRewards && // if user currently receives rewards
-                stakedInSelectedCollator - value.amount < highestBottomDelegationAmount // but will stop doing so after unbond
+                stakedInSelectedCollator >= minStakeToGetRewards && // if user currently receives rewards
+                stakedInSelectedCollator - value.amount < highestBottomDelegationAmount && // but will stop doing so after unbond
+                !isUnbondingAll // only in case user unbonds not the whole amount
             -> {
                 validationWarning(WontReceiveRewards(minStakeToGetRewards, asset))
             }

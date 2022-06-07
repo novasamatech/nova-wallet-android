@@ -14,10 +14,9 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.commo
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.RealStartParachainStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.StartParachainStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.MinimumDelegationValidationFactory
-import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationFailure
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.NoPendingRevokeValidationFactory
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationSystem
-import io.novafoundation.nova.feature_wallet_api.domain.validation.positiveAmount
-import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.parachainStakingStart
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module
@@ -33,25 +32,17 @@ class StartParachainStakingFlowModule {
 
     @Provides
     @FeatureScope
+    fun provideNoPendingRevokeValidationFactory(
+        delegatorStateRepository: DelegatorStateRepository,
+        delegatorStateUseCase: DelegatorStateUseCase,
+    ) = NoPendingRevokeValidationFactory(delegatorStateRepository, delegatorStateUseCase)
+
+    @Provides
+    @FeatureScope
     fun provideValidationSystem(
         minimumDelegationValidationFactory: MinimumDelegationValidationFactory,
-    ): StartParachainStakingValidationSystem = ValidationSystem {
-        with(minimumDelegationValidationFactory) {
-            minimumDelegation()
-        }
-
-        positiveAmount(
-            amount = { it.amount },
-            error = { StartParachainStakingValidationFailure.NotPositiveAmount }
-        )
-
-        sufficientBalance(
-            fee = { it.fee },
-            amount = { it.amount },
-            available = { it.asset.transferable },
-            error = { StartParachainStakingValidationFailure.NotEnoughBalanceToPayFees }
-        )
-    }
+        noPendingRevokeValidationFactory: NoPendingRevokeValidationFactory,
+    ): StartParachainStakingValidationSystem = ValidationSystem.parachainStakingStart(minimumDelegationValidationFactory, noPendingRevokeValidationFactory)
 
     @Provides
     @FeatureScope

@@ -2,8 +2,11 @@ package io.novafoundation.nova.runtime.network.updaters
 
 import android.util.Log
 import io.novafoundation.nova.common.data.holders.ChainIdHolder
+import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
+import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.utils.LOG_TAG
+import io.novafoundation.nova.common.utils.decodeValue
 import io.novafoundation.nova.common.utils.system
 import io.novafoundation.nova.common.utils.timestamp
 import io.novafoundation.nova.common.utils.zipWithPrevious
@@ -18,8 +21,8 @@ import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import java.math.BigInteger
@@ -27,6 +30,12 @@ import java.math.BigInteger
 data class SampledBlockTime(
     val sampleSize: BigInteger,
     val averageBlockTime: BigInteger,
+)
+
+private data class BlockTimeUpdate(
+    val at: BlockHash,
+    val blockNumber: BlockNumber,
+    val timestamp: BigInteger,
 )
 
 class BlockTimeUpdater(
@@ -47,19 +56,25 @@ class BlockTimeUpdater(
 
         return storageSubscriptionBuilder.subscribe(blockNumberKey)
             .drop(1) // ignore fist subscription value since it comes immediately
-            .distinctUntilChangedBy { it.value }
             .map {
-                remoteStorageSource.query(chainId, at = it.block) {
+                val timestamp = remoteStorageSource.query(chainId, at = it.block) {
                     runtime.metadata.timestamp().storage("Now").query(binding = ::bindNumber)
                 }
+
+                val blockNumber = bindNumber(storage.decodeValue(it.value, runtime))
+
+                BlockTimeUpdate(at = it.block, blockNumber = blockNumber, timestamp = timestamp)
             }
             .zipWithPrevious()
-            .onEach { (previousTime, currentTime) ->
-                if (previousTime != null) {
-                    val blockTime = currentTime - previousTime
+            .filter { (previous, current) ->
+                previous != null && current.blockNumber - previous.blockNumber == BigInteger.ONE
+            }
+            .onEach { (previousUpdate, currentUpdate) ->
+                val blockTime = currentUpdate.timestamp - previousUpdate!!.timestamp
 
-                    updateSampledBlockTime(chainId, blockTime)
-                }
+                Log.d(LOG_TAG, "New block time update: $blockTime, source: $currentUpdate")
+
+                updateSampledBlockTime(chainId, blockTime)
             }.noSideAffects()
     }
 
@@ -72,8 +87,6 @@ class BlockTimeUpdater(
             sampleSize = adjustedSampleSize,
             averageBlockTime = adjustedAverage
         )
-
-        Log.d(LOG_TAG, "Adding new sampled time ($newSampledTime): $adjustedSampledBlockTime in $chainId")
 
         sampledBlockTimeStorage.put(chainId, adjustedSampledBlockTime)
     }
