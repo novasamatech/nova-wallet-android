@@ -74,6 +74,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
@@ -198,7 +199,8 @@ class StakingFeatureModule {
     fun provideAuraConsensus(
         chainRegistry: ChainRegistry,
         @Named(REMOTE_STORAGE_SOURCE) storageDataSource: StorageDataSource,
-    ): ConsensusRepository = AuraRepository(chainRegistry, storageDataSource)
+        rpcCalls: RpcCalls
+    ): ConsensusRepository = AuraRepository(chainRegistry, storageDataSource, rpcCalls)
 
     @Provides
     @IntoSet
