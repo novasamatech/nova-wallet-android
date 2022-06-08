@@ -92,6 +92,7 @@
   <string name="common_apply">Применить</string>
   <string name="common_attention">Внимание!</string>
   <string name="common_available_format">Доступно: %s</string>
+  <string name="common_average">Средний</string>
   <string name="common_balance">Баланс</string>
   <string name="common_bonus">Бонус</string>
   <string name="common_call">Вызов</string>
@@ -116,6 +117,7 @@
   <string name="common_done">Готово</string>
   <string name="common_edit">Редактировать</string>
   <string name="common_email_chooser_title">Выберите приложение для работы с почтой</string>
+  <string name="common_enter_amount">Введите сумму...</string>
   <string name="common_error_general_title">Ошибка</string>
   <string name="common_event">Событие</string>
   <string name="common_existential_warning_message_v2_2_0">Ваша учетная запись будет удалена из сети после операции, так как ваш баланс опустится ниже минимального</string>
@@ -136,6 +138,8 @@
   <string name="common_learn_more">Узнать больше</string>
   <string name="common_learn_more_v2_2_0">Узнать больше</string>
   <string name="common_left">%s осталось</string>
+  <string name="common_maximum">Максимальный</string>
+  <string name="common_missing_account_title">%s аккаунт отсутствует</string>
   <string name="common_module">Модуль</string>
   <string name="common_network">Сеть</string>
   <string name="common_next">Далее</string>
@@ -145,6 +149,7 @@
   <string name="common_ok">OK</string>
   <string name="common_options_title">Выберите опцию</string>
   <string name="common_paste">Вставить</string>
+  <string name="common_per_year_format">%s / год</string>
   <string name="common_price">Цена</string>
   <string name="common_proceed">Продолжить</string>
   <string name="common_reject">Отклонить</string>
@@ -316,6 +321,17 @@
   <string name="onboarding_restore_wallet">У меня уже есть кошелёк</string>
   <string name="onboarding_terms_and_conditions_1_v2_2_0">Продолжая вы соглашаетесь с нашими\nУсловиями использования и Политикой конфиденциальности</string>
   <string name="onboarding_terms_and_conditions_2">Условиями использования</string>
+  <string name="parachain_staking_alerts_bond_more_message">Один из ваших коллаторов не генерирует награды</string>
+  <string name="parachain_staking_alerts_change_collator_message">Один из ваших коллаторов не выбран в текущем раунде</string>
+  <string name="parachain_staking_alerts_redeem_message">Ваш период разблокировки %s истек. Не забудьте забрать разблокированные токены</string>
+  <string name="parachain_staking_cannot_stake_with_collator">Невозможно застейкать с выбранным коллатором</string>
+  <string name="parachain_staking_change_collator">Смена коллатора</string>
+  <string name="parachain_staking_collator_cannot_bond_more">Невозможно добавить стейк в выбранного коллатора</string>
+  <string name="parachain_staking_manage_collators">Управление коллаторами</string>
+  <string name="parachain_staking_not_active_collator_message">Выбранный коллатор намерен прекратить участие в стекинге.</string>
+  <string name="parachain_staking_pending_revoke_message">Вы не можете добавить стейк в коллатора, для которого вы разблокируете все токены.</string>
+  <string name="parachain_staking_unbond_no_rewards">Ваш стейк будет меньше минимального (%s) для этого коллатора.</string>
+  <string name="parachain_staking_unstake_all">Оставшийся стейк опустится ниже минимального значения сети (%s) и также будет добавлен к сумме вывода</string>
   <string name="pincode_biometry_dialog_title">Биометрия</string>
   <string name="pincode_changed_message">PIN-код успешно изменен</string>
   <string name="pincode_confirm_your_pin_code">Подтвердите свой PIN-код</string>
@@ -354,6 +370,7 @@
   <string name="sr25519_selection_title">Schnorrkel</string>
   <string name="staking_about">О стейкинге</string>
   <string name="staking_account_is_used_as_controller">Выбранный аккаунт уже используется в качестве контроллера.</string>
+  <string name="staking_active_delegators">Активные делегаторы</string>
   <string name="staking_add_controller">Чтобы выполнить это действие, добавьте контроллер аккаунт %s в приложение</string>
   <string name="staking_alert_bond_more_message">В настоящее время стейкинг неактивен. \nТекущая минимальная ставка %s .</string>
   <string name="staking_alert_bond_more_title">Застейкайте ещё токенов</string>
@@ -386,6 +403,7 @@
   <string name="staking_custom_proceed_button_disabled_title">Выбрать валидаторов (макс. %d)</string>
   <string name="staking_custom_proceed_button_enabled_title" formatted="false">Показать выбранных: %d (макс. %d)</string>
   <string name="staking_custom_validators_list_title">Выберите валидаторов</string>
+  <string name="staking_custom_validators_settings_sort_apr">Примерная награда (% APR)</string>
   <string name="staking_custom_validators_settings_sort_apy">Примерное вознаграждение (% APY)</string>
   <string name="staking_custom_validators_update_list">Обновить свой список</string>
   <string name="staking_era_title">эра %s</string>
@@ -418,6 +436,8 @@
   <string name="staking_max_format" formatted="false">%s (макс. %s )</string>
   <string name="staking_max_nominators_reached_message">Достигнуто максимальное количество номинаторов</string>
   <string name="staking_max_nominators_reached_title">Невозможно начать стейкинг</string>
+  <string name="staking_min_stake">Мин. стейк</string>
+  <string name="staking_missing_account_message">Вы должны добавить %s аккаунт в кошелек для того, чтобы начать стекинг</string>
   <string name="staking_month_period_title">Eжемесячно</string>
   <string name="staking_nominated">Номинировано:</string>
   <string name="staking_nominations_rewarded_format">%s вознаграждены</string>
@@ -431,6 +451,36 @@
   <string name="staking_nominator_status_inactive">Неактивен</string>
   <string name="staking_nominator_status_waiting">Ожидание следующей Эры</string>
   <string name="staking_nominator_status_waiting_format">ожидание следующей эры (%s)</string>
+  <string name="staking_parachain_collator">Коллатор</string>
+  <string name="staking_parachain_collator_details_oversubscribed">Минимальный стейк коллатора выше, чем ваша делегация. Вы не будете получать вознаграждения от этого коллатора.</string>
+  <string name="staking_parachain_collator_info">Информация о коллаторе</string>
+  <string name="staking_parachain_collator_own_stake">Собственный стейк коллатора</string>
+  <string name="staking_parachain_collators_number_format">Коллаторы: %s</string>
+  <string name="staking_parachain_delegator_status_active_message">Один или несколько ваших коллаторов были избраны сетью.</string>
+  <string name="staking_parachain_delegators">Делегаторы</string>
+  <string name="staking_parachain_max_delegations_message">Вы достигли максимального количества делегаций - %d коллаторов</string>
+  <string name="staking_parachain_max_delegations_title">Вы не можете выбрать нового коллатора</string>
+  <string name="staking_parachain_new_collator">Новый коллатор</string>
+  <string name="staking_parachain_next_round_format">ожидание следующего раунда (%s)</string>
+  <string name="staking_parachain_no_unbond_collators_message">У вас есть запросы на вывод из стейка для всех ваших коллаторов.</string>
+  <string name="staking_parachain_no_unbond_collators_title">Нет коллаторов, доступных для вывода токенов из стейка</string>
+  <string name="staking_parachain_rebond_hint">Возвращенные токены будут учитываться со следующего раунда</string>
+  <string name="staking_parachain_reward_frequency_hint">Застейканые токены приносят вознаграждение раз в раунд (%s)</string>
+  <string name="staking_parachain_select_collator">Выберите коллатора</string>
+  <string name="staking_parachain_select_collator_hint">Выберите коллатора...</string>
+  <string name="staking_parachain_stake_more_hint">Вы получите увеличенное вознаграждение, начиная со следующего раунда</string>
+  <string name="staking_parachain_status_inactive_message">Вы не получите награды за этот раунд, так как ни одна из ваших делегаций не активна.</string>
+  <string name="staking_parachain_unbond_already_exists_message">Вы уже выводите токены из стейка у этого коллатора. На одного коллатора можно иметь только один запрос на вывод.</string>
+  <string name="staking_parachain_unbond_already_exists_title">Вы не можете вывести токены из стейка у выбранного коллатора</string>
+  <string name="staking_parachain_wont_receive_rewards_message">Ваш стейк должен быть больше минимального (%s) для этого коллатора.</string>
+  <string name="staking_parachain_wont_receive_rewards_title">Вы не будете получать награды</string>
+  <string name="staking_parachain_your_collaotrs_no_rewards">Некоторые из ваших коллаторов либо не выбраны сетью, либо имеют более высокий минимальный стейк, чем ваш. Вы не получите вознаграждение в этом раунде, стейкая с ними.</string>
+  <string name="staking_parachain_your_collators">Ваши коллаторы</string>
+  <string name="staking_parachain_your_collators_active">Ваш стейк назначен следующим коллаторам</string>
+  <string name="staking_parachain_your_collators_elected">Активные коллаторы, не производящие вам наград</string>
+  <string name="staking_parachain_your_collators_inactive">Коллаторы, не имеющие достаточного стейка для избрания сетью</string>
+  <string name="staking_parachain_your_collators_waiting">Коллаторы, стекинг в которых начнется в следующем раунде</string>
+  <string name="staking_parachain_your_collators_waiting_title">Ожидающие коллаторы (%s)</string>
   <string name="staking_payout">Выплата</string>
   <string name="staking_payout_expired">Срок выплаты истёк</string>
   <plurals name="staking_payouts_days_left">
@@ -439,7 +489,6 @@
     <item quantity="many">%d дней</item>
     <item quantity="other">%d дней</item>
   </plurals>
-  <string name="staking_pending_rewards_info">Валидаторы выплачивают вознаграждения каждые 2–5 дней. Однако, вы можете инициировать выплату самостоятельно, особенно, если срок вознаграждения истекает. В этом случае придётся заплатить комиссию.</string>
   <string name="staking_pending_rewards_subtitle">Вы можете выплатить их самостоятельно, когда они близки к истечению, но вы заплатите комиссию</string>
   <string name="staking_pending_rewards_title">Вознаграждения выплачиваются каждые 2–3 дня валидаторами</string>
   <string name="staking_rebond">Вернуть в стейк</string>
@@ -465,14 +514,14 @@
   <string name="staking_reward_details_era">Эра</string>
   <string name="staking_reward_details_title">Детали награды</string>
   <string name="staking_reward_details_validator">Валидатор</string>
-  <string name="staking_reward_info_avg">Средний APY</string>
-  <string name="staking_reward_info_max">Максимальный APY</string>
-  <string name="staking_reward_info_title">Доходность с реинвестированием</string>
+  <string name="staking_reward_info_title_restake">Доходность с реинвестированием</string>
+  <string name="staking_reward_info_title_transferrable">Заработок без реинвестирования</string>
   <string name="staking_reward_payouts_empty_rewards">Прекрасно! Все вознаграждения выплачены.</string>
   <string name="staking_reward_payouts_empty_rewards_v2_2_0">Замечательно! Все вознаграждения выплачены</string>
   <string name="staking_reward_payouts_payout_all">Выплатить все (%s)</string>
   <string name="staking_reward_payouts_title">Ожидаемые вознаграждения</string>
   <string name="staking_reward_payouts_title_v2_2_0">Невыплаченные награды</string>
+  <string name="staking_rewards">Награды</string>
   <string name="staking_rewards_about">О наградах</string>
   <string name="staking_rewards_apy">Вознаграждение (APY)</string>
   <string name="staking_rewards_destination_title_v2_0_0">Назначение наград</string>
@@ -481,12 +530,13 @@
   <string name="staking_select_recommended">Выбрать рекомендованных</string>
   <string name="staking_selected_validators_count_v1.9.1" formatted="false">выбрано %d (макс. %d)</string>
   <string name="staking_selected_validators_mask">Валидаторы (%d)</string>
-  <string name="staking_set_controller_subtitle">Выберите другой аккаунт в качестве контроллера, чтобы делегировать ей операции по управлению стекингом</string>
+  <string name="staking_set_controller_subtitle">Выберите другой аккаунт в качестве контроллера, чтобы делегировать ему операции по управлению стекингом</string>
   <string name="staking_set_controller_title">Улучшите безопасность стекинга</string>
   <string name="staking_set_validators">Установить валидаторов</string>
   <string name="staking_set_validators_message">Валидаторы не выбраны</string>
   <string name="staking_set_validators_title">Выберите валидаторов для начала стейкинга</string>
   <string name="staking_setup_amount_too_low">Нельзя застейкать меньше минимального значения (%s)</string>
+  <string name="staking_setup_amount_too_low_strict">Минимальный стейк должен быть больше чем %s</string>
   <string name="staking_setup_restake">Увеличения стейка</string>
   <string name="staking_setup_restake_v2_2_0">Увеличивать стейк</string>
   <string name="staking_setup_reward_destination_section_title">Использовать вознаграждения для</string>
@@ -499,7 +549,7 @@
   <string name="staking_start_change_validators_custom_subtitle_v2_2_0">Тщательно выбирайте своих валидаторов, чтобы они действовали профессионально и честно. Принятие решения исключительно на основе прибыльности может привести к уменьшению наград или даже потере стейка</string>
   <string name="staking_start_change_validators_custom_title">Стейкинг с выбранными валидаторами</string>
   <string name="staking_start_change_validators_recommended_subtitle">Nova Wallet выберет лучших валидаторов по критериям безопасности и прибыльности</string>
-  <string name="staking_start_change_validators_recommended_title">Стейкинг с рекоммендованными валидаторами</string>
+  <string name="staking_start_change_validators_recommended_title">Стекинг с рекомендованными валидаторами</string>
   <string name="staking_start_title">Начать стейкинг</string>
   <string name="staking_stash">Стэш</string>
   <string name="staking_stash_can_hint">С помощью стэш аккаунта можно застейкать больше и установить контроллер аккаунт</string>
@@ -531,6 +581,7 @@
   <string name="staking_unbonding_limit_reached_message">Вы достигли лимита запросов на вывод из стейка ( %d активных запросов).</string>
   <string name="staking_unbonding_limit_reached_title">Достигнут лимит запросов на вывод из стейка</string>
   <string name="staking_unbonding_period_v1_9_0">Время вывода</string>
+  <string name="staking_unstake_all_question">Вывести из стейка всё?</string>
   <string name="staking_validator_apy_percent">Примерное вознаграждение (% APY)</string>
   <string name="staking_validator_estimated_reward">Примерное вознаграждение</string>
   <string name="staking_validator_info_title">Информация о валидаторе</string>

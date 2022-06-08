@@ -10,21 +10,22 @@ import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.toggle
 import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
+import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.ValidatorsAdapter
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.ValidatorsAdapter.Mode.EDIT
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.ValidatorsAdapter.Mode.VIEW
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.StakeTargetAdapter
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.StakeTargetAdapter.Mode.EDIT
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.StakeTargetAdapter.Mode.VIEW
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorModel
 import kotlinx.android.synthetic.main.fragment_review_custom_validators.reviewCustomValidatorsAccounts
 import kotlinx.android.synthetic.main.fragment_review_custom_validators.reviewCustomValidatorsList
 import kotlinx.android.synthetic.main.fragment_review_custom_validators.reviewCustomValidatorsNext
 import kotlinx.android.synthetic.main.fragment_review_custom_validators.reviewCustomValidatorsToolbar
 
-class ReviewCustomValidatorsFragment : BaseFragment<ReviewCustomValidatorsViewModel>(), ValidatorsAdapter.ItemHandler {
+class ReviewCustomValidatorsFragment : BaseFragment<ReviewCustomValidatorsViewModel>(), StakeTargetAdapter.ItemHandler<Validator> {
 
-    private val adapter: ValidatorsAdapter by lazy(LazyThreadSafetyMode.NONE) {
-        ValidatorsAdapter(this)
+    private val adapter by lazy(LazyThreadSafetyMode.NONE) {
+        StakeTargetAdapter(this)
     }
 
     override fun onCreateView(
@@ -82,7 +83,7 @@ class ReviewCustomValidatorsFragment : BaseFragment<ReviewCustomValidatorsViewMo
         }
     }
 
-    override fun validatorInfoClicked(validatorModel: ValidatorModel) {
+    override fun stakeTargetInfoClicked(validatorModel: ValidatorModel) {
         viewModel.validatorInfoClicked(validatorModel)
     }
 
@@ -90,7 +91,7 @@ class ReviewCustomValidatorsFragment : BaseFragment<ReviewCustomValidatorsViewMo
         viewModel.deleteClicked(validatorModel)
     }
 
-    override fun validatorClicked(validatorModel: ValidatorModel) {
+    override fun stakeTargetClicked(validatorModel: ValidatorModel) {
         viewModel.validatorInfoClicked(validatorModel)
     }
 }

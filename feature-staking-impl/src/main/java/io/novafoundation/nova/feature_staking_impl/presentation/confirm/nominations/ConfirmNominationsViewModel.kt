@@ -8,13 +8,15 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValidatorToValidatorDetailsParcelModel
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValidatorToValidatorModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorModel
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.findSelectedValidator
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.relaychain
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
@@ -23,6 +25,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ConfirmNominationsViewModel(
+    private val interactor: StakingInteractor,
     private val router: StakingRouter,
     private val addressIconGenerator: AddressIconGenerator,
     private val resourceManager: ResourceManager,
@@ -49,9 +52,10 @@ class ConfirmNominationsViewModel(
 
     fun validatorInfoClicked(validatorModel: ValidatorModel) {
         viewModelScope.launch {
-            validators.findSelectedValidator(validatorModel.accountIdHex)?.let {
-                router.openValidatorDetails(mapValidatorToValidatorDetailsParcelModel(it))
-            }
+            val stakeTarget = mapValidatorToValidatorDetailsParcelModel(validatorModel.stakeTarget)
+            val payload = StakeTargetDetailsPayload.relaychain(stakeTarget, interactor)
+
+            router.openValidatorDetails(payload)
         }
     }
 

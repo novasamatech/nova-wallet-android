@@ -1,5 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="parachain_staking_cannot_stake_with_collator">Cannot stake with this collator</string>
+  <string name="parachain_staking_not_active_collator_message">The selected collator showed intention to stop participating in the staking.</string>
+
+  <string name="parachain_staking_collator_cannot_bond_more">Cannot add stake to this collator</string>
+  <string name="parachain_staking_pending_revoke_message">You cannot add stake to collator for which you are unstaking all tokens.</string>
+
+  <string name="parachain_staking_manage_collators">Manage collators</string>
+
+  <string name="parachain_staking_change_collator">Change collator</string>
+  <string name="parachain_staking_alerts_change_collator_message">One of your collators is not selected in the current round</string>
+
+  <string name="parachain_staking_alerts_redeem_message">Your unstaking period for %s has passed. Don’t forget to redeem your tokens</string>
+  <string name="parachain_staking_alerts_bond_more_message">One of your collators is not generating rewards</string>
+
+  <string name="staking_parachain_rebond_hint">Returned tokens will be counted from the next round</string>
+
+  <string name="staking_parachain_no_unbond_collators_title">No collators available for unstake</string>
+  <string name="staking_parachain_no_unbond_collators_message">You have pending unstake requests for all of your collators.</string>
+
+  <string name="staking_unstake_all_question">Unstake all?</string>
+  <string name="parachain_staking_unstake_all">Remaining staking balance will drop under minimum network value (%s) and will also be added to the unstaking amount</string>
+  <string name="parachain_staking_unbond_no_rewards">Your stake will be less than the minimum stake (%s) for this collator.</string>
+
+  <string name="staking_parachain_unbond_already_exists_message">You are already unstaking tokens from this collator. You can only have one pending unstake per collator</string>
+  <string name="staking_parachain_unbond_already_exists_title">You cannot unstake from this collator</string>
+  <string name="staking_parachain_stake_more_hint">You will get increased rewards starting from the next round</string>
+  <string name="staking_parachain_max_delegations_title">You can\'t select a new collator</string>
+  <string name="staking_parachain_max_delegations_message">You have reached the maximum number of delegations of %d collators</string>
+
+  <string name="staking_parachain_new_collator">New collator</string>
+  <string name="staking_parachain_collator_details_oversubscribed">Collator\'s minimum stake is higher than your delegation. You will not receive rewards from the collator.</string>
+
+  <string name="staking_parachain_your_collaotrs_no_rewards">Some of your collators are either not elected or have a higher minimum stake than your staked amount. You will not receive a reward in this round staking with them.</string>
+  <string name="staking_parachain_your_collators_active">Your stake is assigned to next collators</string>
+  <string name="staking_parachain_your_collators_elected">Active collators without producing rewards</string>
+  <string name="staking_parachain_your_collators_inactive">Collators without enough stake to be elected</string>
+  <string name="staking_parachain_your_collators_waiting">Collators that will enact in the next round</string>
+  <string name="staking_parachain_your_collators_waiting_title">Pending collators (%s)</string>
+
+  <string name="staking_parachain_your_collators">Your collators</string>
+
+  <string name="staking_parachain_next_round_format">waiting for the next round (%s)</string>
+  <string name="staking_parachain_status_inactive_message">You will not receive rewards for this round since none of your delegations is active.</string>
+
+  <string name="staking_parachain_collator_info">Collator info</string>
+  <string name="staking_parachain_delegators">Delegators</string>
+  <string name="staking_custom_validators_settings_sort_apr">Estimated rewards (% APR)</string>
+
+  <string name="staking_parachain_collator_own_stake">Collator\'s own stake</string>
+  <string name="staking_parachain_collators_number_format">Collators: %s</string>
+  <string name="staking_rewards">Rewards</string>
+  <string name="staking_min_stake">Min. stake</string>
+
+  <string name="staking_parachain_reward_frequency_hint">Tokens in stake produce rewards each round (%s)</string>
+  <string name="staking_setup_amount_too_low_strict">Minimum stake should be greater than %s</string>
+
+  <string name="common_missing_account_title">%s account is missing</string>
+  <string name="staking_missing_account_message">You should add %s account to the wallet in order to start staking</string>
+
+  <string name="common_enter_amount">Enter amount…</string>
+  <string name="staking_parachain_select_collator_hint">Select collator…</string>
+  <string name="staking_parachain_wont_receive_rewards_title">You will not receive rewards</string>
+  <string name="staking_parachain_wont_receive_rewards_message">Your stake must be greater than the minimum stake (%s) for this collator.</string>
+  <string name="common_per_year_format">%s / year</string>
+
+  <string name="staking_parachain_collator">Collator</string>
+  <string name="staking_parachain_select_collator">Select collator</string>
+
+  <string name="common_average">Average</string>
+  <string name="common_maximum">Maximum</string>
+
+  <string name="staking_reward_info_title_restake">Earnings with restake</string>
+  <string name="staking_reward_info_title_transferrable">Earnings without restake</string>
+
+
+  <string name="staking_active_delegators">Active delegators</string>
+  <string name="staking_parachain_delegator_status_active_message">One or more of your collators have been elected by the network.</string>
+
   <string name="dapp_list_placeholder">List of DApps will appear here</string>
 
   <string name="dapp_authorized_remove_title">Remove from Authorized?</string>
@@ -427,7 +505,7 @@
   <string name="staking_alert_bond_more_title">Bond more tokens.</string>
   <string name="staking_alert_change_validators">Change your validators.</string>
   <string name="staking_alert_no_alerts_now">Everything is fine now. Alerts will appear here.</string>
-  <string name="staking_alert_redeem_title">Redeem unstaked tokens.</string>
+  <string name="staking_alert_redeem_title">Redeem unstaked tokens</string>
   <string name="staking_alert_start_next_era_message">Please wait for the next era to start.</string>
   <string name="staking_alert_title">Alerts</string>
   <string name="staking_already_controller_title">Already controller</string>
@@ -516,9 +594,7 @@
   <string name="staking_reward_details_era">Era</string>
   <string name="staking_reward_details_title">Reward details</string>
   <string name="staking_reward_details_validator">Validator</string>
-  <string name="staking_reward_info_avg">Average APY</string>
-  <string name="staking_reward_info_max">Maximum APY</string>
-  <string name="staking_reward_info_title">Earnings with restake</string>
+
   <string name="staking_reward_payouts_empty_rewards">Perfect! All rewards are paid.</string>
   <string name="staking_reward_payouts_empty_rewards_v2_2_0">Awesome! You have no unpaid rewards</string>
   <string name="staking_reward_payouts_payout_all">Payout all (%s)</string>

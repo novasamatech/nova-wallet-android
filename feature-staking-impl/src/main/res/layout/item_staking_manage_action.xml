@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center_vertical"
     tools:orientation="horizontal"
+    tools:gravity="center_vertical"
     tools:parentTag="android.widget.LinearLayout">
 
     <ImageView
@@ -23,18 +23,25 @@
         style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
         android:layout_marginStart="12dp"
         android:layout_marginEnd="12dp"
         android:layout_weight="1"
         android:textColor="@color/white"
         tools:text="Stake more" />
 
+    <io.novafoundation.nova.common.view.CounterView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:id="@+id/itemManageStakingActionBadge"
+        android:layout_marginEnd="8dp"
+        tools:text="24" />
+
     <ImageView
-        android:layout_marginEnd="16dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        app:tint="@color/white_48"
-        android:src="@drawable/ic_chevron_right" />
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/ic_chevron_right"
+        app:tint="@color/white_48" />
 </merge>

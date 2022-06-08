@@ -8,14 +8,22 @@ import java.io.InputStream
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.concurrent.TimeUnit
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 private val PERCENTAGE_MULTIPLIER = 100.toBigDecimal()
 
 fun BigDecimal.fractionToPercentage() = this * PERCENTAGE_MULTIPLIER
 
 fun Float.percentageToFraction() = this / 100f
+fun Double.percentageToFraction() = this / 100
 
 infix fun Int.floorMod(divisor: Int) = Math.floorMod(this, divisor)
+
+/**
+ * Compares two BigDecimals taking into account only values but not scale unlike `==` operator
+ */
+infix fun BigDecimal.hasTheSaveValueAs(another: BigDecimal) = compareTo(another) == 0
 
 val BigDecimal.isNonNegative: Boolean
     get() = signum() >= 0
@@ -24,7 +32,7 @@ fun BigInteger?.orZero(): BigInteger = this ?: BigInteger.ZERO
 
 fun Long.daysFromMillis() = TimeUnit.MILLISECONDS.toDays(this)
 
-inline fun <T> List<T>.sumByBigInteger(extractor: (T) -> BigInteger) = fold(BigInteger.ZERO) { acc, element ->
+inline fun <T> Collection<T>.sumByBigInteger(extractor: (T) -> BigInteger) = fold(BigInteger.ZERO) { acc, element ->
     acc + extractor(element)
 }
 
@@ -49,6 +57,8 @@ fun <T> Result<T>.requireValue() = getOrThrow()!!
 fun InputStream.readText() = bufferedReader().use { it.readText() }
 
 fun <T> List<T>.second() = get(1)
+
+fun <E : Enum<E>> Collection<Enum<E>>.anyIs(value: E) = any { it == value }
 
 fun Int.quantize(factor: Int) = this - this % factor
 
@@ -91,8 +101,8 @@ fun <T> List<T>.cycle(): Sequence<T> {
     return generateSequence { this[i++ % this.size] }
 }
 
-inline fun <T> CoroutineScope.lazyAsync(crossinline producer: suspend () -> T) = lazy {
-    async { producer() }
+inline fun <T> CoroutineScope.lazyAsync(context: CoroutineContext = EmptyCoroutineContext, crossinline producer: suspend () -> T) = lazy {
+    async(context) { producer() }
 }
 
 inline fun <T> Iterable<T>.filterToSet(predicate: (T) -> Boolean): Set<T> = filterTo(mutableSetOf(), predicate)

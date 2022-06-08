@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindi
 
 import io.novafoundation.nova.common.data.network.runtime.binding.HelperBinding
 import io.novafoundation.nova.common.data.network.runtime.binding.UseCaseBinding
+import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.data.network.runtime.binding.incompatible
 import io.novafoundation.nova.common.data.network.runtime.binding.requireType
 import io.novafoundation.nova.common.data.network.runtime.binding.returnType
@@ -21,7 +22,7 @@ IndividualExposure: {
 }
  */
 @HelperBinding
-fun bindIndividualExposure(dynamicInstance: Any?, runtime: RuntimeSnapshot): IndividualExposure {
+private fun bindIndividualExposure(dynamicInstance: Any?): IndividualExposure {
     requireType<Struct.Instance>(dynamicInstance)
 
     val who = dynamicInstance.get<ByteArray>("who") ?: incompatible()
@@ -41,12 +42,19 @@ fun bindIndividualExposure(dynamicInstance: Any?, runtime: RuntimeSnapshot): Ind
 fun bindExposure(scale: String, runtime: RuntimeSnapshot): Exposure {
     val type = runtime.metadata.staking().storage("ErasStakers").returnType()
 
-    val decoded = type.fromHexOrNull(runtime, scale) as? Struct.Instance ?: incompatible()
+    val decoded = type.fromHexOrNull(runtime, scale)
+
+    return bindExposure(decoded)
+}
+
+@UseCaseBinding
+fun bindExposure(instance: Any?): Exposure {
+    val decoded = instance.castToStruct()
 
     val total = decoded.get<BigInteger>("total") ?: incompatible()
     val own = decoded.get<BigInteger>("own") ?: incompatible()
 
-    val others = decoded.get<List<*>>("others")?.map { bindIndividualExposure(it, runtime) } ?: incompatible()
+    val others = decoded.get<List<*>>("others")?.map { bindIndividualExposure(it) } ?: incompatible()
 
     return Exposure(total, own, others)
 }

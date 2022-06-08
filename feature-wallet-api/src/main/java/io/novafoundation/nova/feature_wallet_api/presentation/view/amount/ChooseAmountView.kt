@@ -29,8 +29,8 @@ class ChooseAmountView @JvmOverloads constructor(
         chooseAmountBalanceLabel.setTextOrHide(label)
     }
 
-    fun setBalance(balance: String) {
-        chooseAmountBalance.text = balance
+    fun setBalance(balance: String?) {
+        chooseAmountBalance.setTextOrHide(balance)
     }
 
     fun loadAssetImage(imageUrl: String) {
@@ -48,6 +48,7 @@ class ChooseAmountView @JvmOverloads constructor(
 
 fun ChooseAmountView.setChooseAmountModel(chooseAmountModel: ChooseAmountModel) {
     setBalanceLabel(chooseAmountModel.balanceLabel)
+
     setBalance(chooseAmountModel.balance)
 
     chooseAmountInput.setChooseAmountInputModel(chooseAmountModel.input)

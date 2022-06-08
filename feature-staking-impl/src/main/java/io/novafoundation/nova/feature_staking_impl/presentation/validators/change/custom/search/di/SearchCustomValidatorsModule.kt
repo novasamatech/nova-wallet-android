@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.validators.current.search.SearchCustomValidatorsInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -31,6 +32,7 @@ class SearchCustomValidatorsModule {
         setupStakingSharedState: SetupStakingSharedState,
         searchCustomValidatorsInteractor: SearchCustomValidatorsInteractor,
         validatorRecommendatorFactory: ValidatorRecommendatorFactory,
+        stakingInteractor: StakingInteractor,
         tokenUseCase: TokenUseCase,
         selectedAssetState: StakingSharedState
     ): ViewModel {
@@ -38,6 +40,7 @@ class SearchCustomValidatorsModule {
             router,
             addressIconGenerator,
             searchCustomValidatorsInteractor,
+            stakingInteractor,
             resourceManager,
             setupStakingSharedState,
             validatorRecommendatorFactory,

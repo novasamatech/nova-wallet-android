@@ -4,6 +4,7 @@ import io.emeraldpay.polkaj.scale.ScaleCodecReader
 import io.emeraldpay.polkaj.scale.ScaleCodecWriter
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNullableNumberConstant
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumberConstant
+import io.novafoundation.nova.common.data.network.runtime.binding.fromHexOrIncompatible
 import io.novafoundation.nova.core.model.Node
 import jp.co.soramitsu.fearless_utils.encrypt.junction.BIP32JunctionDecoder
 import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.Mnemonic
@@ -16,6 +17,7 @@ import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Extrins
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.SignedExtras
 import jp.co.soramitsu.fearless_utils.runtime.metadata.RuntimeMetadata
+import jp.co.soramitsu.fearless_utils.runtime.metadata.fullName
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module.Constant
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module.MetadataFunction
@@ -66,6 +68,8 @@ fun <T> DataType<T>.toByteArray(value: T): ByteArray {
     return stream.toByteArray()
 }
 
+fun RuntimeSnapshot.isParachain() = metadata.hasModule(Modules.PARACHAIN_SYSTEM)
+
 typealias StructBuilderWithContext<S> = S.(EncodableStruct<S>) -> Unit
 
 operator fun <S : Schema<S>> S.invoke(block: StructBuilderWithContext<S>? = null): EncodableStruct<S> {
@@ -82,6 +86,12 @@ fun <S : Schema<S>> EncodableStruct<S>.hash(): String {
 
 fun String.extrinsicHash(): String {
     return fromHex().blake2b256().toHexString(withPrefix = true)
+}
+
+fun StorageEntry.decodeValue(value: String?, runtimeSnapshot: RuntimeSnapshot) = value?.let {
+    val type = type.value ?: throw IllegalStateException("Unknown value type for storage ${this.fullName}")
+
+    type.fromHexOrIncompatible(it, runtimeSnapshot)
 }
 
 fun String.toHexAccountId(): String = toAccountId().toHexString()
@@ -115,10 +125,15 @@ fun RuntimeMetadata.babe() = module(Modules.BABE)
 fun RuntimeMetadata.babeOrNull() = moduleOrNull(Modules.BABE)
 
 fun RuntimeMetadata.timestampOrNull() = moduleOrNull(Modules.TIMESTAMP)
+fun RuntimeMetadata.timestamp() = module(Modules.TIMESTAMP)
 
 fun RuntimeMetadata.slots() = module(Modules.SLOTS)
 
 fun RuntimeMetadata.session() = module(Modules.SESSION)
+
+fun RuntimeMetadata.parachainStaking() = module(Modules.PARACHAIN_STAKING)
+
+fun RuntimeMetadata.identity() = module(Modules.IDENTITY)
 
 fun RuntimeMetadata.firstExistingModule(vararg options: String): String {
     return options.first(::hasModule)
@@ -158,4 +173,10 @@ object Modules {
     const val CURRENCIES = "Currencies"
 
     const val UNIQUES = "Uniques"
+
+    const val PARACHAIN_STAKING = "ParachainStaking"
+
+    const val PARACHAIN_SYSTEM = "ParachainSystem"
+
+    const val IDENTITY = "Identity"
 }

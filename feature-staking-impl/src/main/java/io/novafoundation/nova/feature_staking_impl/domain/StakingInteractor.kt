@@ -16,7 +16,7 @@ import io.novafoundation.nova.feature_staking_api.domain.model.Exposure
 import io.novafoundation.nova.feature_staking_api.domain.model.IndividualExposure
 import io.novafoundation.nova.feature_staking_api.domain.model.RewardDestination
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingAccount
-import io.novafoundation.nova.feature_staking_api.domain.model.StakingState
+import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.mappers.mapAccountToStakingAccount
 import io.novafoundation.nova.feature_staking_impl.data.model.Payout
@@ -31,11 +31,13 @@ import io.novafoundation.nova.feature_staking_impl.domain.model.PendingPayoutsSt
 import io.novafoundation.nova.feature_staking_impl.domain.model.StakeSummary
 import io.novafoundation.nova.feature_staking_impl.domain.model.StakingPeriod
 import io.novafoundation.nova.feature_staking_impl.domain.model.StashNoneStatus
+import io.novafoundation.nova.feature_staking_impl.domain.model.TotalReward
 import io.novafoundation.nova.feature_staking_impl.domain.model.ValidatorStatus
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.ext.accountIdOf
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
@@ -52,6 +54,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.math.BigInteger
 import kotlin.time.ExperimentalTime
+import kotlin.time.days
 
 const val HOURS_IN_DAY = 24
 
@@ -64,6 +67,7 @@ class EraRelativeInfo(
 
 val ERA_OFFSET = 1.toBigInteger()
 
+@OptIn(ExperimentalTime::class)
 class StakingInteractor(
     private val walletRepository: WalletRepository,
     private val accountRepository: AccountRepository,
@@ -124,9 +128,13 @@ class StakingInteractor(
         }
     }
 
-    suspend fun syncStakingRewards(stakingState: StakingState.Stash) = withContext(Dispatchers.IO) {
+    suspend fun syncStakingRewards(
+        stakingState: StakingState.Stash,
+        chain: Chain,
+        chainAsset: Chain.Asset
+    ) = withContext(Dispatchers.IO) {
         runCatching {
-            stakingRewardsRepository.sync(stakingState.stashAddress, stakingState.chain)
+            stakingRewardsRepository.sync(stakingState.stashAddress, chain, chainAsset)
         }
     }
 
@@ -171,24 +179,32 @@ class StakingInteractor(
         }
     }
 
-    fun observeUserRewards(state: StakingState.Stash) = stakingRewardsRepository.totalRewardFlow(state.stashAddress)
+    fun observeUserRewards(
+        state: StakingState.Stash,
+        chain: Chain,
+        chainAsset: Chain.Asset
+    ): Flow<TotalReward> {
+        return stakingRewardsRepository.totalRewardFlow(state.stashAddress, chain.id, chainAsset.id)
+    }
 
-    suspend fun observeNetworkInfoState(chainId: ChainId): Flow<NetworkInfo> = withContext(Dispatchers.Default) {
+    fun observeNetworkInfoState(chainId: ChainId): Flow<NetworkInfo> = flow {
         val lockupPeriod = getLockupPeriodInDays(chainId)
 
-        stakingRepository.electedExposuresInActiveEra(chainId).map { exposuresMap ->
+        val innerFlow = stakingRepository.electedExposuresInActiveEra(chainId).map { exposuresMap ->
             val exposures = exposuresMap.values
 
             val minimumNominatorBond = stakingRepository.minimumNominatorBond(chainId)
 
             NetworkInfo(
-                lockupPeriodInDays = lockupPeriod,
+                lockupPeriod = lockupPeriod.days,
                 minimumStake = minimumStake(exposures, minimumNominatorBond),
                 totalStake = totalStake(exposures),
                 stakingPeriod = StakingPeriod.Unlimited,
                 nominatorsCount = activeNominators(chainId, exposures),
             )
         }
+
+        emitAll(innerFlow)
     }
 
     suspend fun getLockupPeriodInDays() = withContext(Dispatchers.Default) {
@@ -240,15 +256,6 @@ class StakingInteractor(
                     chainAsset = chainAsset
                 )
             )
-        }
-    }
-
-    fun selectedAccountProjectionFlow(): Flow<StakingAccount> {
-        return combine(
-            stakingSharedState.assetWithChain,
-            accountRepository.selectedMetaAccountFlow()
-        ) { (chain, _), account ->
-            mapAccountToStakingAccount(chain, account)
         }
     }
 

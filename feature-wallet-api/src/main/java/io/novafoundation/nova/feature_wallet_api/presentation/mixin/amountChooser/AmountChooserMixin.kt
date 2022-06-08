@@ -7,6 +7,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.math.BigDecimal
+import java.math.BigInteger
 
 interface AmountChooserMixin : CoroutineScope {
 
@@ -26,6 +27,13 @@ interface AmountChooserMixin : CoroutineScope {
     }
 
     interface Factory {
+
+        fun create(
+            scope: CoroutineScope,
+            assetFlow: Flow<Asset>,
+            availableBalanceFlow: Flow<BigInteger>,
+            @StringRes balanceLabel: Int?,
+        ): AmountChooserProvider
 
         fun create(
             scope: CoroutineScope,

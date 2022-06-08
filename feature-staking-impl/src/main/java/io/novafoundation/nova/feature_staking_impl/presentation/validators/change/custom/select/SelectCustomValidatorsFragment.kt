@@ -11,9 +11,10 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.scrollToTopWhenItemsShuffled
 import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
+import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.ValidatorsAdapter
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.StakeTargetAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorModel
 import kotlinx.android.synthetic.main.fragment_select_custom_validators.selectCustomValidatorsClearFilters
 import kotlinx.android.synthetic.main.fragment_select_custom_validators.selectCustomValidatorsContainer
@@ -25,9 +26,11 @@ import kotlinx.android.synthetic.main.fragment_select_custom_validators.selectCu
 import kotlinx.android.synthetic.main.fragment_select_custom_validators.selectCustomValidatorsSorting
 import kotlinx.android.synthetic.main.fragment_select_custom_validators.selectCustomValidatorsToolbar
 
-class SelectCustomValidatorsFragment : BaseFragment<SelectCustomValidatorsViewModel>(), ValidatorsAdapter.ItemHandler {
+class SelectCustomValidatorsFragment : BaseFragment<SelectCustomValidatorsViewModel>(), StakeTargetAdapter.ItemHandler<Validator> {
 
-    lateinit var adapter: ValidatorsAdapter
+    val adapter by lazy(LazyThreadSafetyMode.NONE) {
+        StakeTargetAdapter(this)
+    }
 
     var filterAction: ImageView? = null
 
@@ -46,7 +49,6 @@ class SelectCustomValidatorsFragment : BaseFragment<SelectCustomValidatorsViewMo
             }
         }
 
-        adapter = ValidatorsAdapter(this)
         selectCustomValidatorsList.adapter = adapter
         selectCustomValidatorsList.setHasFixedSize(true)
 
@@ -110,11 +112,11 @@ class SelectCustomValidatorsFragment : BaseFragment<SelectCustomValidatorsViewMo
         }
     }
 
-    override fun validatorInfoClicked(validatorModel: ValidatorModel) {
+    override fun stakeTargetInfoClicked(validatorModel: ValidatorModel) {
         viewModel.validatorInfoClicked(validatorModel)
     }
 
-    override fun validatorClicked(validatorModel: ValidatorModel) {
+    override fun stakeTargetClicked(validatorModel: ValidatorModel) {
         viewModel.validatorClicked(validatorModel)
     }
 }

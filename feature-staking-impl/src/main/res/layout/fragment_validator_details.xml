@@ -1,111 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black"
     android:fitsSystemWindows="true"
     android:overScrollMode="never"
-    xmlns:tools="http://schemas.android.com/tools"
     android:scrollbars="none">
 
     <LinearLayout
+        android:id="@+id/validatorDetailsContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/validatorDetailsContainer"
         android:orientation="vertical">
 
         <io.novafoundation.nova.common.view.Toolbar
             android:id="@+id/validatorDetailsToolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:dividerVisible="false"
-            app:titleText="@string/staking_validator_info_title" />
+            app:dividerVisible="false" />
 
         <io.novafoundation.nova.feature_account_api.view.AddressView
             android:id="@+id/validatorAccountInfo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
             android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
             app:actionIcon="@drawable/ic_info_16" />
 
         <io.novafoundation.nova.common.view.TableView
             android:layout_width="match_parent"
-            app:title="@string/staking_title"
+            android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
             android:layout_marginTop="12dp"
-            android:layout_height="wrap_content">
+            android:layout_marginEnd="16dp"
+            app:title="@string/staking_title">
 
             <io.novafoundation.nova.common.view.TableCellView
+                android:id="@+id/validatorStakingStatus"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/validatorStakingStatus"
                 app:title="@string/common_status" />
 
             <io.novafoundation.nova.common.view.TableCellView
+                android:id="@+id/validatorStakingStakers"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/validatorStakingNominators"
-                app:title="@string/staking_validator_nominators" />
+                tools:title="Stakers" />
 
             <io.novafoundation.nova.common.view.TableCellView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:titleIcon="@drawable/ic_info_16"
                 android:id="@+id/validatorStakingTotalStake"
-                app:title="@string/staking_validator_total_stake" />
-
-            <io.novafoundation.nova.common.view.TableCellView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:title="@string/staking_validator_total_stake"
+                app:titleIcon="@drawable/ic_info_16" />
+
+            <io.novafoundation.nova.common.view.TableCellView
+                android:id="@+id/validatorStakingMinimumStake"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:title="@string/staking_main_minimum_stake_title"
+                tools:visibility="visible" />
+
+            <io.novafoundation.nova.common.view.TableCellView
                 android:id="@+id/validatorStakingEstimatedReward"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 app:title="@string/staking_validator_estimated_reward" />
 
         </io.novafoundation.nova.common.view.TableView>
 
         <io.novafoundation.nova.common.view.TableView
-            android:layout_width="match_parent"
-            app:title="@string/identity_title"
             android:id="@+id/validatorIdentity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
             android:layout_marginTop="12dp"
-            android:layout_height="wrap_content">
+            android:layout_marginEnd="16dp"
+            app:title="@string/identity_title">
 
             <io.novafoundation.nova.common.view.TableCellView
+                android:id="@+id/validatorIdentityLegalName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/validatorIdentityLegalName"
                 app:title="@string/identity_legal_name_title" />
 
             <io.novafoundation.nova.common.view.TableCellView
+                android:id="@+id/validatorIdentityEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryValueStyle="link"
-                android:id="@+id/validatorIdentityEmail"
                 app:title="@string/identity_email_title" />
 
             <io.novafoundation.nova.common.view.TableCellView
+                android:id="@+id/validatorIdentityWeb"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryValueStyle="link"
-                android:id="@+id/validatorIdentityWeb"
                 app:title="@string/identity_web_title" />
 
             <io.novafoundation.nova.common.view.TableCellView
+                android:id="@+id/validatorIdentityTwitter"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryValueStyle="link"
-                android:id="@+id/validatorIdentityTwitter"
                 app:title="@string/settings_twitter" />
 
             <io.novafoundation.nova.common.view.TableCellView
+                android:id="@+id/validatorIdentityElementName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/validatorIdentityElementName"
                 app:title="@string/identity_riot_name_title" />
 
         </io.novafoundation.nova.common.view.TableView>

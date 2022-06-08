@@ -17,6 +17,7 @@ class ValidatorStakeModel(
 
     class ActiveStakeModel(
         val totalStake: AmountModel,
+        val minimumStake: AmountModel?,
         val nominatorsCount: String,
         val maxNominations: String?,
         val apy: String

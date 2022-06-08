@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+import androidx.annotation.StringRes
 import androidx.core.view.updateMarginsRelative
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.view.TableCellView
@@ -20,8 +21,9 @@ class ValidatorStakeBottomSheet(
 
     class Payload(
         val own: AmountModel,
-        val nominators: AmountModel,
+        val stakers: AmountModel,
         val total: AmountModel,
+        @StringRes val stakersLabel: Int
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,8 +38,8 @@ class ValidatorStakeBottomSheet(
         }
 
         item(createCellView()) {
-            it.setTitle(R.string.staking_validator_nominators)
-            it.showAmount(payload.nominators)
+            it.setTitle(payload.stakersLabel)
+            it.showAmount(payload.stakers)
         }
 
         item(createCellView()) {

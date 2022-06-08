@@ -1,8 +1,8 @@
 buildscript {
     ext {
         // App version
-        versionName = '2.7.1'
-        versionCode = 20
+        versionName = '2.8.0'
+        versionCode = 21
 
         applicationId = "io.novafoundation.nova"
         releaseApplicationSuffix = "market"
@@ -43,6 +43,7 @@ buildscript {
         junitVersion = '4.12'
         mockitoVersion = '3.12.4'
         robolectricVersion = '4.1'
+        allureVersion = '2.4.0'
 
         bouncyCastleVersion = '1.65'
 
@@ -154,6 +155,11 @@ buildscript {
         androidTestRulesDep = 'androidx.test:rules:1.4.0'
         androidJunitDep = 'androidx.test.ext:junit:1.1.3'
 
+        allureKotlinModel = "io.qameta.allure:allure-kotlin-model:$allureVersion"
+        allureKotlinCommons = "io.qameta.allure:allure-kotlin-commons:$allureVersion"
+        allureKotlinJunit4 = "io.qameta.allure:allure-kotlin-junit4:$allureVersion"
+        allureKotlinAndroid = "io.qameta.allure:allure-kotlin-android:$allureVersion"
+
         roomTestsDep = "androidx.room:room-testing:$architectureComponentVersion"
     }
 
@@ -161,6 +167,7 @@ buildscript {
         google()
         jcenter()
         maven { url "https://plugins.gradle.org/m2/" }
+        mavenCentral()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.6.0'

@@ -9,7 +9,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.mod
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.confirm.ConfirmRebondPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.confirm.parcel.ConfirmRewardDestinationPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.confirm.ConfirmUnbondPayload
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.ValidatorDetailsParcelModel
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 
 interface StakingRouter {
 
@@ -27,7 +27,7 @@ interface StakingRouter {
 
     fun openReviewCustomValidators()
 
-    fun openValidatorDetails(validatorDetails: ValidatorDetailsParcelModel)
+    fun openValidatorDetails(payload: StakeTargetDetailsPayload)
 
     fun openConfirmStaking()
 

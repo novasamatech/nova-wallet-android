@@ -25,6 +25,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValid
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.select.model.ContinueButtonState
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.setCustomValidators
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.relaychain
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -153,13 +155,16 @@ class SelectCustomValidatorsViewModel(
         router.openReviewCustomValidators()
     }
 
-    fun validatorInfoClicked(validatorModel: ValidatorModel) {
-        router.openValidatorDetails(mapValidatorToValidatorDetailsParcelModel(validatorModel.validator))
+    fun validatorInfoClicked(validatorModel: ValidatorModel) = launch {
+        val stakeTarget = mapValidatorToValidatorDetailsParcelModel(validatorModel.stakeTarget)
+        val payload = StakeTargetDetailsPayload.relaychain(stakeTarget, interactor)
+
+        router.openValidatorDetails(payload)
     }
 
     fun validatorClicked(validatorModel: ValidatorModel) {
         mutateSelected {
-            it.toggle(validatorModel.validator)
+            it.toggle(validatorModel.stakeTarget)
         }
     }
 

@@ -6,6 +6,11 @@ import io.novafoundation.nova.common.data.network.rpc.retrieveAllValues
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
+import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.storage.SubscribeStorageRequest
+import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.storage.storageChange
+import jp.co.soramitsu.fearless_utils.wsrpc.subscriptionFlow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class RemoteStorageQueryContext(
     private val bulkRetriever: BulkRetriever,
@@ -28,5 +33,14 @@ class RemoteStorageQueryContext(
 
     override suspend fun queryKey(key: String, at: BlockHash?): String? {
         return bulkRetriever.queryKey(socketService, key, at)
+    }
+
+    override suspend fun observeKey(key: String): Flow<String?> {
+        return socketService.subscriptionFlow(SubscribeStorageRequest(key))
+            .map { it.storageChange().getSingleChange() }
+    }
+
+    override suspend fun observeKeys(keys: List<String>): Flow<Map<String, String?>> {
+        TODO("Not yet needed")
     }
 }

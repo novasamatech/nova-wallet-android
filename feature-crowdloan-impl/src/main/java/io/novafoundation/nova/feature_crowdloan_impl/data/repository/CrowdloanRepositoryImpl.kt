@@ -49,7 +49,7 @@ class CrowdloanRepositoryImpl(
         return remoteStorage.query(chainId) {
             runtime.metadata.crowdloan().storage("Funds").entries(
                 keyExtractor = { (paraId: BigInteger) -> paraId },
-                binding = { scale, paraId -> bindFundInfo(scale!!, runtime, paraId) }
+                binding = { instance, paraId -> bindFundInfo(instance, runtime, paraId) }
             )
         }
     }
@@ -58,8 +58,8 @@ class CrowdloanRepositoryImpl(
         return remoteStorage.query(chainId) {
             runtime.metadata.slots().storage("Leases").singleArgumentEntries(
                 keysArguments = funds.keys,
-                binding = { scale, paraId ->
-                    val leases = scale?.let { bindLeases(it, runtime) }
+                binding = { decoded, paraId ->
+                    val leases = decoded?.let { bindLeases(it) }
                     val fund = funds.getValue(paraId)
 
                     leases?.let { isWinner(leases, fund) } ?: false

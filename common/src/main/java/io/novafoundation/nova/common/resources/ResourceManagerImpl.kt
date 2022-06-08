@@ -6,12 +6,15 @@ import androidx.core.content.ContextCompat
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.common.utils.daysFromMillis
+import io.novafoundation.nova.common.utils.format
 import io.novafoundation.nova.common.utils.formatDateTime
 import io.novafoundation.nova.common.utils.getDrawableCompat
 import io.novafoundation.nova.common.utils.readText
+import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.milliseconds
 
+@OptIn(ExperimentalTime::class)
 @ApplicationScope
 class ResourceManagerImpl(
     private val contextManager: ContextManager
@@ -69,6 +72,15 @@ class ResourceManagerImpl(
                 DateUtils.formatElapsedTime(inSeconds)
             }
         }
+    }
+
+    override fun formatDuration(duration: Duration, estimated: Boolean): String {
+        return duration.format(
+            estimated = estimated,
+            daysFormat = { getQuantityString(R.plurals.staking_main_lockup_period_value, it, it) },
+            hoursFormat = { getQuantityString(R.plurals.common_hours_format, it, it) },
+            timeFormat = null
+        )
     }
 
     override fun getDrawable(id: Int): Drawable {

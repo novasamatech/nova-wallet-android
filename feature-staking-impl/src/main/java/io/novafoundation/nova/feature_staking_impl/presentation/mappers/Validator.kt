@@ -16,14 +16,15 @@ import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settin
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.sortings.APYSorting
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.sortings.TotalStakeSorting
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.sortings.ValidatorOwnStakeSorting
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.StakeTargetModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorModel
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.model.ValidatorAlert
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.model.ValidatorDetailsModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.model.ValidatorStakeModel
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.model.ValidatorStakeModel.ActiveStakeModel
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.ValidatorDetailsParcelModel
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.ValidatorStakeParcelModel
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.ValidatorStakeParcelModel.Active.NominatorInfo
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.StakeTargetDetailsParcelModel
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.StakeTargetStakeParcelModel
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.StakeTargetStakeParcelModel.Active.UserStakeInfo
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
@@ -32,6 +33,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToA
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
+import java.math.BigDecimal
 import java.math.BigInteger
 
 private const val ICON_SIZE_DP = 24
@@ -65,7 +67,7 @@ suspend fun mapValidatorToValidatorModel(
 
     return with(validator) {
         val scoring = when (sorting) {
-            APYSorting -> formatValidatorApy(validator)?.let(ValidatorModel.Scoring::OneField)
+            APYSorting -> rewardsToScoring(electedInfo?.apy)
 
             TotalStakeSorting -> stakeToScoring(electedInfo?.totalStake, token)
 
@@ -77,22 +79,27 @@ suspend fun mapValidatorToValidatorModel(
         ValidatorModel(
             accountIdHex = accountIdHex,
             slashed = slashed,
-            image = addressModel.image,
-            address = addressModel.address,
+            addressModel = addressModel,
             scoring = scoring,
-            title = addressModel.nameOrAddress,
             isChecked = isChecked,
-            validator = validator
+            stakeTarget = validator,
+            subtitle = null // TODO relaychain subtitles
         )
     }
 }
 
-private fun stakeToScoring(stakeInPlanks: BigInteger?, token: Token): ValidatorModel.Scoring.TwoFields? {
+fun rewardsToScoring(rewardsGain: BigDecimal?) = rewardsToColoredText(rewardsGain)?.let(StakeTargetModel.Scoring::OneField)
+
+fun rewardsToColoredText(rewardsGain: BigDecimal?) = formatStakeTargetRewardsOrNull(rewardsGain)?.let {
+    StakeTargetModel.ColoredText(it, R.color.green)
+}
+
+fun stakeToScoring(stakeInPlanks: BigInteger?, token: Token): StakeTargetModel.Scoring.TwoFields? {
     if (stakeInPlanks == null) return null
 
     val stake = token.amountFromPlanks(stakeInPlanks)
 
-    return ValidatorModel.Scoring.TwoFields(
+    return StakeTargetModel.Scoring.TwoFields(
         primary = stake.formatTokenAmount(token.configuration),
         secondary = token.fiatAmount(stake).formatAsCurrency()
     )
@@ -100,18 +107,18 @@ private fun stakeToScoring(stakeInPlanks: BigInteger?, token: Token): ValidatorM
 
 fun mapValidatorToValidatorDetailsParcelModel(
     validator: Validator,
-): ValidatorDetailsParcelModel {
+): StakeTargetDetailsParcelModel {
     return mapValidatorToValidatorDetailsParcelModel(validator, nominationStatus = null)
 }
 
 fun mapValidatorToValidatorDetailsWithStakeFlagParcelModel(
     nominatedValidator: NominatedValidator,
-): ValidatorDetailsParcelModel = mapValidatorToValidatorDetailsParcelModel(nominatedValidator.validator, nominatedValidator.status)
+): StakeTargetDetailsParcelModel = mapValidatorToValidatorDetailsParcelModel(nominatedValidator.validator, nominatedValidator.status)
 
 private fun mapValidatorToValidatorDetailsParcelModel(
     validator: Validator,
     nominationStatus: NominatedValidator.Status?,
-): ValidatorDetailsParcelModel {
+): StakeTargetDetailsParcelModel {
     return with(validator) {
         val identityModel = identity?.let(::mapIdentityToIdentityParcelModel)
 
@@ -119,20 +126,21 @@ private fun mapValidatorToValidatorDetailsParcelModel(
             val nominators = it.nominatorStakes.map(::mapNominatorToNominatorParcelModel)
 
             val nominatorInfo = (nominationStatus as? NominatedValidator.Status.Active)?.let { activeStatus ->
-                NominatorInfo(willBeRewarded = activeStatus.willUserBeRewarded)
+                UserStakeInfo(willBeRewarded = activeStatus.willUserBeRewarded)
             }
 
-            ValidatorStakeParcelModel.Active(
+            StakeTargetStakeParcelModel.Active(
                 totalStake = it.totalStake,
                 ownStake = it.ownStake,
-                nominators = nominators,
-                apy = it.apy,
+                stakers = nominators,
+                minimumStake = null,
+                rewards = it.apy,
                 isOversubscribed = it.isOversubscribed,
-                nominatorInfo = nominatorInfo
+                userStakeInfo = nominatorInfo
             )
-        } ?: ValidatorStakeParcelModel.Inactive
+        } ?: StakeTargetStakeParcelModel.Inactive
 
-        ValidatorDetailsParcelModel(
+        StakeTargetDetailsParcelModel(
             accountIdHex = accountIdHex,
             isSlashed = validator.slashed,
             stake = stakeModel,
@@ -142,21 +150,22 @@ private fun mapValidatorToValidatorDetailsParcelModel(
 }
 
 @OptIn(ExperimentalStdlibApi::class)
-fun mapValidatorDetailsToErrors(
-    validator: ValidatorDetailsParcelModel,
+fun mapStakeTargetDetailsToErrors(
+    stakeTarget: StakeTargetDetailsParcelModel,
+    displayConfig: StakeTargetDetailsPayload.DisplayConfig,
 ): List<ValidatorAlert> {
     return buildList {
-        if (validator.isSlashed) {
+        if (stakeTarget.isSlashed) {
             add(ValidatorAlert.Slashed)
         }
 
-        if (validator.stake is ValidatorStakeParcelModel.Active && validator.stake.isOversubscribed) {
-            val nominatorInfo = validator.stake.nominatorInfo
+        if (stakeTarget.stake is StakeTargetStakeParcelModel.Active && stakeTarget.stake.isOversubscribed) {
+            val nominatorInfo = stakeTarget.stake.userStakeInfo
 
             if (nominatorInfo == null || nominatorInfo.willBeRewarded) {
                 add(ValidatorAlert.Oversubscribed.UserNotInvolved)
             } else {
-                add(ValidatorAlert.Oversubscribed.UserMissedReward)
+                add(ValidatorAlert.Oversubscribed.UserMissedReward(displayConfig.oversubscribedWarningText))
             }
         }
     }
@@ -164,9 +173,9 @@ fun mapValidatorDetailsToErrors(
 
 suspend fun mapValidatorDetailsParcelToValidatorDetailsModel(
     chain: Chain,
-    validator: ValidatorDetailsParcelModel,
+    validator: StakeTargetDetailsParcelModel,
     asset: Asset,
-    maxNominators: Int,
+    displayConfig: StakeTargetDetailsPayload.DisplayConfig,
     iconGenerator: AddressIconGenerator,
     resourceManager: ResourceManager,
 ): ValidatorDetailsModel {
@@ -179,7 +188,7 @@ suspend fun mapValidatorDetailsParcelToValidatorDetailsModel(
 
         val stake = when (val stake = validator.stake) {
 
-            ValidatorStakeParcelModel.Inactive -> ValidatorStakeModel(
+            StakeTargetStakeParcelModel.Inactive -> ValidatorStakeModel(
                 status = ValidatorStakeModel.Status(
                     text = resourceManager.getString(R.string.staking_nominator_status_inactive),
                     icon = R.drawable.ic_time_16,
@@ -188,12 +197,13 @@ suspend fun mapValidatorDetailsParcelToValidatorDetailsModel(
                 activeStakeModel = null
             )
 
-            is ValidatorStakeParcelModel.Active -> {
+            is StakeTargetStakeParcelModel.Active -> {
                 val totalStakeModel = mapAmountToAmountModel(stake.totalStake, asset)
 
-                val nominatorsCount = stake.nominators.size
-                val apyPercentageFormatted = stake.apy.fractionToPercentage().formatAsPercentage()
-                val apyWithLabel = resourceManager.getString(R.string.staking_apy, apyPercentageFormatted)
+                val nominatorsCount = stake.stakers.size
+                val rewardsWithLabel = displayConfig.rewardSuffix.format(resourceManager, stake.rewards)
+
+                val formattedMaxStakers = displayConfig.rewardedStakersPerStakeTarget.format()
 
                 ValidatorStakeModel(
                     status = ValidatorStakeModel.Status(
@@ -201,11 +211,12 @@ suspend fun mapValidatorDetailsParcelToValidatorDetailsModel(
                         icon = R.drawable.ic_checkmark_circle_16,
                         iconTint = R.color.green
                     ),
-                    activeStakeModel = ActiveStakeModel(
+                    activeStakeModel = ValidatorStakeModel.ActiveStakeModel(
                         totalStake = totalStakeModel,
+                        minimumStake = stake.minimumStake?.let { mapAmountToAmountModel(it, asset) },
                         nominatorsCount = nominatorsCount.format(),
-                        maxNominations = resourceManager.getString(R.string.staking_nominations_rewarded_format, maxNominators.format()),
-                        apy = apyWithLabel
+                        maxNominations = resourceManager.getString(R.string.staking_nominations_rewarded_format, formattedMaxStakers),
+                        apy = rewardsWithLabel
                     )
                 )
             }
@@ -219,4 +230,7 @@ suspend fun mapValidatorDetailsParcelToValidatorDetailsModel(
     }
 }
 
-fun formatValidatorApy(validator: Validator) = validator.electedInfo?.apy?.fractionToPercentage()?.formatAsPercentage()
+fun formatStakeTargetRewards(rewardsRate: BigDecimal) = rewardsRate.fractionToPercentage().formatAsPercentage()
+fun formatStakeTargetRewardsOrNull(rewardsRate: BigDecimal?) = rewardsRate?.let(::formatStakeTargetRewards)
+
+fun formatValidatorApy(validator: Validator) = formatStakeTargetRewardsOrNull(validator.electedInfo?.apy)

@@ -7,10 +7,25 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
+import io.novafoundation.nova.feature_staking_impl.di.staking.UpdatersModule
+import io.novafoundation.nova.feature_staking_impl.di.staking.parachain.ParachainStakingModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.unbond.StakingUnbondModule
+import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.confirm.di.ConfirmStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.confirm.nominations.di.ConfirmNominationsComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.current.di.CurrentCollatorsComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.search.di.SearchCollatorComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select.di.SelectCollatorComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.settings.SelectCollatorSettingsInterScreenCommunicator
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.settings.di.SelectCollatorSettingsComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.rebond.di.ParachainStakingRebondComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.redeem.di.ParachainStakingRedeemComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.di.ConfirmStartParachainStakingComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.di.StartParachainStakingComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.confirm.di.ParachainStakingUnbondConfirmComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.setup.di.ParachainStakingUnbondComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.di.ConfirmPayoutComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.detail.di.PayoutDetailsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.list.di.PayoutsListComponent
@@ -45,13 +60,16 @@ import io.novafoundation.nova.runtime.di.RuntimeApi
     ],
     modules = [
         StakingFeatureModule::class,
-        StakingUpdatersModule::class,
+        UpdatersModule::class,
         StakingValidationModule::class,
-        StakingUnbondModule::class
+        StakingUnbondModule::class,
+        ParachainStakingModule::class
     ]
 )
 @FeatureScope
 interface StakingFeatureComponent : StakingFeatureApi {
+
+    // relaychain staking
 
     fun searchCustomValidatorsComponentFactory(): SearchCustomValidatorsComponent.Factory
 
@@ -107,11 +125,38 @@ interface StakingFeatureComponent : StakingFeatureApi {
 
     fun confirmRewardDestinationFactory(): ConfirmRewardDestinationComponent.Factory
 
+    // parachain staking
+
+    fun startParachainStakingFactory(): StartParachainStakingComponent.Factory
+
+    fun confirmStartParachainStakingFactory(): ConfirmStartParachainStakingComponent.Factory
+
+    fun selectCollatorFactory(): SelectCollatorComponent.Factory
+
+    fun selectCollatorSettingsFactory(): SelectCollatorSettingsComponent.Factory
+
+    fun searchCollatorFactory(): SearchCollatorComponent.Factory
+
+    fun currentCollatorsFactory(): CurrentCollatorsComponent.Factory
+
+    fun parachainStakingUnbondSetupFactory(): ParachainStakingUnbondComponent.Factory
+
+    fun parachainStakingUnbondConfirmFactory(): ParachainStakingUnbondConfirmComponent.Factory
+
+    fun parachainStakingRedeemFactory(): ParachainStakingRedeemComponent.Factory
+
+    fun parachainStakingRebondFactory(): ParachainStakingRebondComponent.Factory
+
     @Component.Factory
     interface Factory {
 
         fun create(
             @BindsInstance router: StakingRouter,
+
+            @BindsInstance parachainStaking: ParachainStakingRouter,
+            @BindsInstance selectCollatorInterScreenCommunicator: SelectCollatorInterScreenCommunicator,
+            @BindsInstance selectCollatorSettingsInterScreenCommunicator: SelectCollatorSettingsInterScreenCommunicator,
+
             deps: StakingFeatureDependencies
         ): StakingFeatureComponent
     }

@@ -4,6 +4,7 @@ import io.novafoundation.nova.feature_account_api.data.mappers.stubNetwork
 import io.novafoundation.nova.feature_account_api.domain.model.Account
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
+import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingAccount
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
@@ -13,7 +14,7 @@ fun mapAccountToStakingAccount(account: Account) = with(account) {
 
 fun mapAccountToStakingAccount(chain: Chain, metaAccount: MetaAccount) = with(metaAccount) {
     StakingAccount(
-        address = addressIn(chain)!!, // TODO may be null in ethereum
+        address = addressIn(chain) ?: metaAccount.defaultSubstrateAddress,
         name = name,
         network = stubNetwork(chain.id),
     )

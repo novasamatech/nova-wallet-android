@@ -4,8 +4,8 @@ import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_staking_api.domain.api.EraTimeCalculatorFactory
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
-import io.novafoundation.nova.feature_staking_api.domain.model.StakingState
 import io.novafoundation.nova.feature_staking_api.domain.model.isRedeemableIn
+import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.calls.chill
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.calls.unbond
 import io.novafoundation.nova.feature_staking_impl.domain.model.Unbonding
@@ -48,7 +48,7 @@ class UnbondInteractor(
         }
     }
 
-    fun unbondingsFlow(stakingState: StakingState.Stash): Flow<UnboningsdState> {
+    fun unbondingsFlow(stakingState: StakingState.Stash): Flow<Unbondings> {
         return flowOf(stakingState).flatMapLatest { stash ->
             val calculator = eraTimeCalculator.create(stakingState.chain.id)
 
@@ -56,11 +56,11 @@ class UnbondInteractor(
                 stakingRepository.ledgerFlow(stash),
                 stakingRepository.observeActiveEraIndex(stash.chain.id)
             ) { ledger, activeEraIndex ->
-                val unbondings = ledger.unlocking.map {
-                    val progressState = if (it.isRedeemableIn(activeEraIndex)) {
+                val unbondings = ledger.unlocking.mapIndexed { index, unbonding ->
+                    val progressState = if (unbonding.isRedeemableIn(activeEraIndex)) {
                         Unbonding.Status.Redeemable
                     } else {
-                        val leftTime = calculator.calculate(destinationEra = it.era)
+                        val leftTime = calculator.calculate(destinationEra = unbonding.era)
 
                         Unbonding.Status.Unbonding(
                             timeLeft = leftTime.toLong(),
@@ -69,16 +69,13 @@ class UnbondInteractor(
                     }
 
                     Unbonding(
-                        amount = it.amount,
+                        id = "$index:${unbonding.era}:${unbonding.amount}",
+                        amount = unbonding.amount,
                         status = progressState,
                     )
                 }
 
-                UnboningsdState(
-                    unbondings = unbondings,
-                    anythingToRedeem = unbondings.any { it.status is Unbonding.Status.Redeemable },
-                    anythingToUnbond = unbondings.any { it.status is Unbonding.Status.Unbonding }
-                )
+                Unbondings.from(unbondings)
             }
         }
     }

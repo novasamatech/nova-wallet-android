@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.validators
 
 import io.novafoundation.nova.common.utils.toHexAccountId
-import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import io.novafoundation.nova.feature_staking_api.domain.api.AccountIdMap
 import io.novafoundation.nova.feature_staking_api.domain.api.IdentityRepository
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
@@ -13,6 +12,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculat
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import jp.co.soramitsu.fearless_utils.extensions.fromHex
 
 sealed class ValidatorSource {
 
@@ -49,7 +49,7 @@ class ValidatorProvider(
         val identities = identityRepository.getIdentitiesFromIds(chainId, requestedValidatorIds)
         val slashes = stakingRepository.getSlashes(chainId, requestedValidatorIds)
 
-        val rewardCalculator = rewardCalculatorFactory.create(electedValidatorExposures, validatorPrefs)
+        val rewardCalculator = rewardCalculatorFactory.create(chainId, electedValidatorExposures, validatorPrefs)
         val maxNominators = stakingConstantsRepository.maxRewardedNominatorPerValidator(chainId)
 
         return requestedValidatorIds.map { accountIdHex ->

@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_staking_impl.data.network.subquery.request
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.response.totalReward
 import io.novafoundation.nova.feature_staking_impl.domain.model.TotalReward
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
@@ -17,13 +18,13 @@ class SubqueryStakingRewardsDataSource(
     private val stakingTotalRewardDao: StakingTotalRewardDao,
 ) : StakingRewardsDataSource {
 
-    override fun totalRewardsFlow(accountAddress: String): Flow<TotalReward> {
-        return stakingTotalRewardDao.observeTotalRewards(accountAddress)
+    override fun totalRewardsFlow(accountAddress: String, chainId: ChainId, chainAssetId: Int): Flow<TotalReward> {
+        return stakingTotalRewardDao.observeTotalRewards(accountAddress, chainId, chainAssetId)
             .filterNotNull()
             .map(::mapTotalRewardLocalToTotalReward)
     }
 
-    override suspend fun sync(accountAddress: String, chain: Chain) {
+    override suspend fun sync(accountAddress: String, chain: Chain, chainAsset: Chain.Asset) {
         val stakingExternalApi = chain.externalApi?.staking ?: return
 
         val response = stakingApi.getTotalReward(
@@ -32,6 +33,13 @@ class SubqueryStakingRewardsDataSource(
         )
         val totalResult = response.data.totalReward
 
-        stakingTotalRewardDao.insert(TotalRewardLocal(accountAddress, totalResult))
+        val totalRewardLocal = TotalRewardLocal(
+            accountAddress = accountAddress,
+            chainId = chain.id,
+            chainAssetId = chainAsset.id,
+            totalReward = totalResult
+        )
+
+        stakingTotalRewardDao.insert(totalRewardLocal)
     }
 }

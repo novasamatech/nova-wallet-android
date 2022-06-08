@@ -33,5 +33,7 @@ dependencies {
     implementation project(':runtime')
     implementation project(':common')
 
+    implementation project(":feature-wallet-api")
+
     api project(':core-api')
 }

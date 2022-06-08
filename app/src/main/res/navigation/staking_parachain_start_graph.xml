@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/staking_parachain_start_graph"
+    app:startDestination="@id/startParachainStakingFragment">
+
+    <action
+        android:id="@+id/action_return_to_start_staking"
+        app:enterAnim="@anim/fragment_close_enter"
+        app:exitAnim="@anim/fragment_close_exit"
+        app:popEnterAnim="@anim/fragment_open_enter"
+        app:popExitAnim="@anim/fragment_open_exit"
+        app:popUpTo="@id/startParachainStakingFragment" />
+
+    <fragment
+        android:id="@+id/startParachainStakingFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.StartParachainStakingFragment"
+        android:label="StartParachainStakingFragment"
+        tools:layout="@layout/fragment_parachain_staking_start">
+
+        <action
+            android:id="@+id/action_startParachainStakingFragment_to_confirmStartParachainStakingFragment"
+            app:destination="@id/confirmStartParachainStakingFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_startParachainStakingFragment_to_selectCollatorFragment"
+            app:destination="@id/selectCollatorFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/confirmStartParachainStakingFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.ConfirmStartParachainStakingFragment"
+        android:label="ConfirmStartParachainStakingFragment"
+        tools:layout="@layout/fragment_parachain_staking_start_confirm" />
+
+    <fragment
+        android:id="@+id/selectCollatorFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select.SelectCollatorFragment"
+        android:label="SelectCollatorFragment"
+        tools:layout="@layout/fragment_parachain_staking_select_collator">
+
+        <action
+            android:id="@+id/action_selectCollatorFragment_to_selectCollatorSettingsFragment"
+            app:destination="@id/selectCollatorSettingsFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_selectCollatorFragment_to_searchCollatorFragment"
+            app:destination="@id/searchCollatorFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/selectCollatorSettingsFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.settings.SelectCollatorSettingsFragment"
+        android:label="SelectCollatorSettingsFragment"
+        tools:layout="@layout/fragment_parachain_staking_select_collator_settings" />
+
+    <fragment
+        android:id="@+id/searchCollatorFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.search.SearchCollatorFragment"
+        android:label="SearchCollatorFragment"
+        tools:layout="@layout/fragment_search_custom_validators" />
+
+</navigation>

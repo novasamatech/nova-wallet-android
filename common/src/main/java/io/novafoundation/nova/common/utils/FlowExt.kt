@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
@@ -138,12 +139,14 @@ fun EditText.bindTo(flow: MutableSharedFlow<String>, scope: CoroutineScope) {
     }
 }
 
-inline fun MutableStateFlow<Boolean>.withFlagSet(action: () -> Unit) {
+inline fun <R> MutableStateFlow<Boolean>.withFlagSet(action: () -> R): R {
     value = true
 
-    action()
+    val result = action()
 
     value = false
+
+    return result
 }
 
 fun CompoundButton.bindTo(flow: MutableStateFlow<Boolean>, scope: CoroutineScope) {
@@ -158,6 +161,28 @@ fun CompoundButton.bindTo(flow: MutableStateFlow<Boolean>, scope: CoroutineScope
     setOnCheckedChangeListener { _, newValue ->
         if (flow.value != newValue) {
             flow.value = newValue
+        }
+    }
+}
+
+fun <T : Enum<T>> RadioGroup.bindTo(flow: MutableStateFlow<T>, scope: LifecycleCoroutineScope, valueToViewId: Map<T, Int>) {
+    val viewIdToValue = valueToViewId.reversed()
+
+    setOnCheckedChangeListener { _, checkedId ->
+        val newValue = viewIdToValue.getValue(checkedId)
+
+        if (flow.value != newValue) {
+            flow.value = newValue
+        }
+    }
+
+    scope.launchWhenResumed {
+        flow.collect {
+            val newCheckedId = valueToViewId.getValue(it)
+
+            if (newCheckedId != checkedRadioButtonId) {
+                check(newCheckedId)
+            }
         }
     }
 }
@@ -217,3 +242,5 @@ fun <E> SendChannel<E>.safeOffer(value: E): Boolean {
 }
 
 fun <T> Map<out T, MutableStateFlow<Boolean>>.checkEnabled(key: T) = get(key)?.value ?: false
+
+suspend inline fun <reified T> Flow<T?>.firstNotNull(): T = first { it != null } as T

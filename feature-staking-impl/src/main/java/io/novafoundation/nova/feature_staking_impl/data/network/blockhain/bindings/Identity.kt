@@ -3,6 +3,8 @@ package io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindi
 import io.novafoundation.nova.common.data.network.runtime.binding.HelperBinding
 import io.novafoundation.nova.common.data.network.runtime.binding.UseCaseBinding
 import io.novafoundation.nova.common.data.network.runtime.binding.cast
+import io.novafoundation.nova.common.data.network.runtime.binding.castToList
+import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.data.network.runtime.binding.incompatible
 import io.novafoundation.nova.common.utils.second
 import io.novafoundation.nova.feature_staking_api.domain.model.Identity
@@ -34,13 +36,21 @@ IdentityInfo: {
 }
  */
 
-@UseCaseBinding
 fun bindIdentity(
     scale: String,
     runtime: RuntimeSnapshot,
     type: Type<*>
-): Identity {
+) {
     val decoded = type.fromHexOrNull(runtime, scale) as? Struct.Instance ?: incompatible()
+
+    bindIdentity(decoded)
+}
+
+@UseCaseBinding
+fun bindIdentity(
+    dynamic: Any?,
+): Identity {
+    val decoded = dynamic.castToStruct()
 
     val identityInfo = decoded.get<Struct.Instance>("info") ?: incompatible()
 
@@ -59,18 +69,14 @@ fun bindIdentity(
 }
 
 @UseCaseBinding
-fun bindSuperOf(
-    scale: String,
-    runtime: RuntimeSnapshot,
-    type: Type<*>
-): SuperOf {
-    val decoded = type.fromHexOrNull(runtime, scale) as? List<*> ?: incompatible()
+fun bindSuperOf(decoded: Any): SuperOf {
+    val asList = decoded.castToList()
 
-    val parentId: ByteArray = decoded.first().cast()
+    val parentId: ByteArray = asList.first().cast()
 
     return SuperOf(
         parentIdHex = parentId.toHexString(),
-        childName = bindData(decoded.second()).asString()
+        childName = bindData(asList.second()).asString()
     )
 }
 

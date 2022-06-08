@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/staking_parachain_unbond"
+    app:startDestination="@id/parachainStakingUnbondFragment">
+
+    <fragment
+        android:id="@+id/parachainStakingUnbondFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.setup.ParachainStakingUnbondFragment"
+        android:label="ParachainStakingUnbondFragment">
+
+        <action
+            android:id="@+id/action_parachainStakingUnbondFragment_to_parachainStakingUnbondConfirmFragment"
+            app:destination="@id/parachainStakingUnbondConfirmFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/parachainStakingUnbondConfirmFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.confirm.ParachainStakingUnbondConfirmFragment"
+        android:label="ParachainStakingUnbondConfirmFragment" />
+</navigation>

@@ -2,11 +2,8 @@ package io.novafoundation.nova.feature_staking_impl.data.repository
 
 import io.novafoundation.nova.common.data.network.runtime.binding.NonNullBinderWithType
 import io.novafoundation.nova.common.data.network.runtime.binding.returnType
-import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.babe
-import io.novafoundation.nova.common.utils.balances
 import io.novafoundation.nova.common.utils.constant
-import io.novafoundation.nova.common.utils.hasModule
 import io.novafoundation.nova.common.utils.numberConstant
 import io.novafoundation.nova.common.utils.session
 import io.novafoundation.nova.common.utils.staking
@@ -18,9 +15,9 @@ import io.novafoundation.nova.feature_staking_api.domain.model.EraIndex
 import io.novafoundation.nova.feature_staking_api.domain.model.Nominations
 import io.novafoundation.nova.feature_staking_api.domain.model.SlashingSpans
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingLedger
-import io.novafoundation.nova.feature_staking_api.domain.model.StakingState
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingStory
 import io.novafoundation.nova.feature_staking_api.domain.model.ValidatorPrefs
+import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindActiveEra
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindCurrentEra
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindCurrentIndex
@@ -36,7 +33,6 @@ import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindin
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindSlashDeferDuration
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindSlashingSpans
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindStakingLedger
-import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindTotalInsurance
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindValidatorPrefs
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.activeEraStorageKey
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingStoriesDataSource
@@ -62,7 +58,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.withContext
 import java.math.BigInteger
@@ -122,16 +117,6 @@ class StakingRepositoryImpl(
         return runtime.metadata.babe().numberConstant("ExpectedBlockTime", runtime)
     }
 
-    override fun stakingAvailableFlow(chainId: ChainId): Flow<Boolean> {
-        return chainRegistry.getRuntimeProvider(chainId).observe().map { it.metadata.hasModule(Modules.STAKING) }
-    }
-
-    override suspend fun getTotalIssuance(chainId: ChainId): BigInteger = localStorage.queryNonNull(
-        keyBuilder = { it.metadata.balances().storage("TotalIssuance").storageKey() },
-        binding = ::bindTotalInsurance,
-        chainId = chainId
-    )
-
     override suspend fun getActiveEraIndex(chainId: ChainId): EraIndex = localStorage.queryNonNull(
         keyBuilder = { it.metadata.activeEraStorageKey() },
         binding = ::bindActiveEra,
@@ -164,7 +149,7 @@ class StakingRepositoryImpl(
         runtime.metadata.staking().storage("ErasStakers").entries(
             eraIndex,
             keyExtractor = { (_: BigInteger, accountId: ByteArray) -> accountId.toHexString() },
-            binding = { scale, _ -> bindExposure(scale!!, runtime) }
+            binding = { instance, _ -> bindExposure(instance) }
         )
     }
 
@@ -176,16 +161,13 @@ class StakingRepositoryImpl(
             runtime.metadata.staking().storage("Validators").entries(
                 keysArguments = accountIdsHex.map(String::fromHex).wrapSingleArgumentKeys(),
                 keyExtractor = { (accountId: AccountId) -> accountId.toHexString() },
-                binding = { scale, _ -> scale?.let { bindValidatorPrefs(scale, runtime) } }
+                binding = { decoded, _ -> decoded?.let { bindValidatorPrefs(decoded) } }
             )
         }
     }
 
     override suspend fun getSlashes(chainId: ChainId, accountIdsHex: List<String>): AccountIdMap<Boolean> = withContext(Dispatchers.Default) {
         remoteStorage.query(chainId) {
-            val storage = runtime.metadata.staking().storage("SlashingSpans")
-            val returnType = storage.type.value!!
-
             val activeEraIndex = getActiveEraIndex(chainId)
 
             val slashDeferDurationConstant = runtime.metadata.staking().constant("SlashDeferDuration")
@@ -194,8 +176,8 @@ class StakingRepositoryImpl(
             runtime.metadata.staking().storage("SlashingSpans").entries(
                 keysArguments = accountIdsHex.map(String::fromHex).wrapSingleArgumentKeys(),
                 keyExtractor = { (accountId: AccountId) -> accountId.toHexString() },
-                binding = { scale, _ ->
-                    val span = scale?.let { bindSlashingSpans(it, runtime, returnType) }
+                binding = { decoded, _ ->
+                    val span = decoded?.let { bindSlashingSpans(it) }
 
                     isSlashed(span, activeEraIndex, slashDeferDuration)
                 }

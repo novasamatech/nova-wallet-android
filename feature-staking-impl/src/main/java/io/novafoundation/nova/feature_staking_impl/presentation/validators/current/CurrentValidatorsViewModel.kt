@@ -1,28 +1,30 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.validators.current
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
-import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.list.toValueList
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.toHexAccountId
 import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_staking_api.domain.model.NominatedValidator
-import io.novafoundation.nova.feature_staking_api.domain.model.StakingState
+import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validators.current.CurrentValidatorsInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess
-import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess.ReadyToSubmit.SelectionMethod
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
+import io.novafoundation.nova.feature_staking_impl.presentation.common.currentStakeTargets.CurrentStakeTargetsViewModel
+import io.novafoundation.nova.feature_staking_impl.presentation.common.currentStakeTargets.model.SelectedStakeTargetModel
+import io.novafoundation.nova.feature_staking_impl.presentation.common.currentStakeTargets.model.SelectedStakeTargetStatusModel
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.formatValidatorApy
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValidatorToValidatorDetailsWithStakeFlagParcelModel
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.current.model.NominatedValidatorModel
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.current.model.NominatedValidatorStatusModel
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.current.model.NominatedValidatorStatusModel.TitleConfig
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.relaychain
+import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.addressOf
@@ -31,6 +33,7 @@ import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
@@ -47,7 +50,8 @@ class CurrentValidatorsViewModel(
     private val currentValidatorsInteractor: CurrentValidatorsInteractor,
     private val setupStakingSharedState: SetupStakingSharedState,
     private val selectedAssetState: SingleAssetSharedState,
-) : BaseViewModel() {
+    tokenUseCase: TokenUseCase,
+) : CurrentStakeTargetsViewModel() {
 
     private val groupedCurrentValidatorsFlow = stakingInteractor.selectedAccountStakingStateFlow()
         .filterIsInstance<StakingState.Stash>()
@@ -60,11 +64,10 @@ class CurrentValidatorsViewModel(
         .inBackground()
         .share()
 
-    val tokenFlow = stakingInteractor.currentAssetFlow()
-        .map { it.token }
-        .share()
+    private val tokenFlow = tokenUseCase.currentTokenFlow()
+        .shareInBackground()
 
-    val currentValidatorModelsLiveData = groupedCurrentValidatorsFlow.combine(tokenFlow) { gropedList, token ->
+    override val currentStakeTargetsFlow = groupedCurrentValidatorsFlow.combine(tokenFlow) { gropedList, token ->
         val chain = selectedAssetState.chain()
 
         gropedList.mapKeys { (statusGroup, _) -> mapNominatedValidatorStatusToUiModel(statusGroup) }
@@ -72,22 +75,64 @@ class CurrentValidatorsViewModel(
             .toListWithHeaders()
     }
         .withLoading()
-        .inBackground()
-        .asLiveData()
+        .shareInBackground()
 
-    val shouldShowOversubscribedNoRewardWarning = groupedCurrentValidatorsFlow.map { groupedList ->
-        val (_, validators) = groupedList.entries.firstOrNull { (group, _) -> group is NominatedValidator.Status.Group.Active } ?: return@map false
+    override val warningFlow = groupedCurrentValidatorsFlow.map { groupedList ->
+        val (_, validators) = groupedList.entries.firstOrNull { (group, _) -> group is NominatedValidator.Status.Group.Active } ?: return@map null
 
-        validators.any { (it.status as NominatedValidator.Status.Active).willUserBeRewarded.not() }
+        val shouldShowWarning = validators.any { (it.status as NominatedValidator.Status.Active).willUserBeRewarded.not() }
+
+        if (shouldShowWarning) {
+            resourceManager.getString(R.string.staking_your_oversubscribed_message)
+        } else {
+            null
+        }
     }
-        .inBackground()
-        .share()
+
+    override val titleFlow: Flow<String> = flowOf {
+        resourceManager.getString(R.string.staking_your_validators)
+    }
+
+    override fun backClicked() {
+        router.back()
+    }
+
+    override fun changeClicked() {
+        launch {
+            val currentState = setupStakingSharedState.get<SetupStakingProcess.Initial>()
+
+            val currentValidators = flattenCurrentValidators.first().map(NominatedValidator::validator)
+
+            val newState = currentState.changeValidatorsFlow()
+                .next(currentValidators, SetupStakingProcess.ReadyToSubmit.SelectionMethod.CUSTOM)
+
+            setupStakingSharedState.set(newState)
+
+            router.openStartChangeValidators()
+        }
+    }
+
+    override fun stakeTargetInfoClicked(address: String) {
+        launch {
+            val payload = withContext(Dispatchers.Default) {
+                val accountId = address.toHexAccountId()
+                val allValidators = flattenCurrentValidators.first()
+
+                val nominatedValidator = allValidators.first { it.validator.accountIdHex == accountId }
+
+                val stakeTarget = mapValidatorToValidatorDetailsWithStakeFlagParcelModel(nominatedValidator)
+                StakeTargetDetailsPayload.relaychain(stakeTarget, stakingInteractor)
+            }
+
+            router.openValidatorDetails(payload)
+        }
+    }
 
     private suspend fun mapNominatedValidatorToUiModel(
         chain: Chain,
         nominatedValidator: NominatedValidator,
         token: Token
-    ): NominatedValidatorModel {
+    ): SelectedStakeTargetModel {
         val validator = nominatedValidator.validator
 
         val nominationAmount = (nominatedValidator.status as? NominatedValidator.Status.Active)?.let { activeStatus ->
@@ -96,7 +141,7 @@ class CurrentValidatorsViewModel(
 
         val validatorAddress = chain.addressOf(validator.accountIdHex.fromHex())
 
-        return NominatedValidatorModel(
+        return SelectedStakeTargetModel(
             addressModel = iconGenerator.createAccountAddressModel(
                 chain = chain,
                 address = validatorAddress,
@@ -110,8 +155,8 @@ class CurrentValidatorsViewModel(
     }
 
     private fun mapNominatedValidatorStatusToUiModel(statusGroup: NominatedValidator.Status.Group) = when (statusGroup) {
-        is NominatedValidator.Status.Group.Active -> NominatedValidatorStatusModel(
-            TitleConfig(
+        is NominatedValidator.Status.Group.Active -> SelectedStakeTargetStatusModel(
+            SelectedStakeTargetStatusModel.TitleConfig(
                 text = resourceManager.getString(R.string.staking_your_elected_format, statusGroup.numberOfValidators),
                 iconRes = R.drawable.ic_checkmark_circle_16,
                 iconTintRes = R.color.green,
@@ -120,8 +165,8 @@ class CurrentValidatorsViewModel(
             description = resourceManager.getString(R.string.staking_your_allocated_description_v2_2_0)
         )
 
-        is NominatedValidator.Status.Group.Inactive -> NominatedValidatorStatusModel(
-            TitleConfig(
+        is NominatedValidator.Status.Group.Inactive -> SelectedStakeTargetStatusModel(
+            SelectedStakeTargetStatusModel.TitleConfig(
                 text = resourceManager.getString(R.string.staking_your_not_elected_format, statusGroup.numberOfValidators),
                 iconRes = R.drawable.ic_time_16,
                 iconTintRes = R.color.white_64,
@@ -130,13 +175,13 @@ class CurrentValidatorsViewModel(
             description = resourceManager.getString(R.string.staking_your_inactive_description_v2_2_0)
         )
 
-        is NominatedValidator.Status.Group.Elected -> NominatedValidatorStatusModel(
+        is NominatedValidator.Status.Group.Elected -> SelectedStakeTargetStatusModel(
             null,
             description = resourceManager.getString(R.string.staking_your_not_allocated_description_v2_2_0)
         )
 
-        is NominatedValidator.Status.Group.WaitingForNextEra -> NominatedValidatorStatusModel(
-            TitleConfig(
+        is NominatedValidator.Status.Group.WaitingForNextEra -> SelectedStakeTargetStatusModel(
+            SelectedStakeTargetStatusModel.TitleConfig(
                 text = resourceManager.getString(
                     R.string.staking_custom_header_validators_title,
                     statusGroup.numberOfValidators,
@@ -148,37 +193,5 @@ class CurrentValidatorsViewModel(
             ),
             description = resourceManager.getString(R.string.staking_your_validators_changing_title)
         )
-    }
-
-    fun changeClicked() {
-        launch {
-            val currentState = setupStakingSharedState.get<SetupStakingProcess.Initial>()
-
-            val currentValidators = flattenCurrentValidators.first().map(NominatedValidator::validator)
-
-            val newState = currentState.changeValidatorsFlow()
-                .next(currentValidators, SelectionMethod.CUSTOM)
-
-            setupStakingSharedState.set(newState)
-
-            router.openStartChangeValidators()
-        }
-    }
-
-    fun backClicked() {
-        router.back()
-    }
-
-    fun validatorInfoClicked(address: String) = launch {
-        val payload = withContext(Dispatchers.Default) {
-            val accountId = address.toHexAccountId()
-            val allValidators = flattenCurrentValidators.first()
-
-            val nominatedValidator = allValidators.first { it.validator.accountIdHex == accountId }
-
-            mapValidatorToValidatorDetailsWithStakeFlagParcelModel(nominatedValidator)
-        }
-
-        router.openValidatorDetails(payload)
     }
 }

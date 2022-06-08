@@ -4,6 +4,8 @@ import android.graphics.drawable.Drawable
 import androidx.annotation.ColorRes
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AddressModel
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.invoke
 import io.novafoundation.nova.runtime.ext.accountIdOf
@@ -63,6 +65,30 @@ suspend fun AddressIconGenerator.createAccountAddressModel(
 ) = createAddressModel(
     chain = chain,
     address = address,
+    sizeInDp = AddressIconGenerator.SIZE_SMALL,
+    accountName = name,
+    background = AddressIconGenerator.BACKGROUND_TRANSPARENT
+)
+
+suspend fun AddressIconGenerator.createAccountAddressModel(
+    chain: Chain,
+    accountId: ByteArray,
+    name: String? = null,
+) = createAddressModel(
+    chain = chain,
+    address = chain.addressOf(accountId),
+    sizeInDp = AddressIconGenerator.SIZE_SMALL,
+    accountName = name,
+    background = AddressIconGenerator.BACKGROUND_TRANSPARENT
+)
+
+suspend fun AddressIconGenerator.createAccountAddressModel(
+    chain: Chain,
+    account: MetaAccount,
+    name: String? = account.name
+) = createAddressModel(
+    chain = chain,
+    address = account.addressIn(chain) ?: throw IllegalArgumentException("No address found for ${account.name} in ${chain.name}"),
     sizeInDp = AddressIconGenerator.SIZE_SMALL,
     accountName = name,
     background = AddressIconGenerator.BACKGROUND_TRANSPARENT

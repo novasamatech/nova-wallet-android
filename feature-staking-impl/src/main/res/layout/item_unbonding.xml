@@ -5,44 +5,19 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <ImageView
-        android:id="@+id/itemUnbondingIcon"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        android:background="@drawable/bg_icon_round_white"
-        android:padding="6dp"
-        android:src="@drawable/ic_staking_filled"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/white_64" />
-
-    <TextView
-        android:id="@+id/itemUnbondUnstake"
-        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="9dp"
-        android:text="@string/staking_unbond_v1_9_0"
-        android:textColor="@color/white_64"
-        app:layout_constraintStart_toEndOf="@id/itemUnbondingIcon"
-        app:layout_constraintTop_toTopOf="parent" />
-
 
     <TextView
         android:id="@+id/itemUnbondAmount"
         style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
         android:textColor="@color/white"
-        app:layout_constraintBottom_toBottomOf="@id/itemUnbondUnstake"
-        app:layout_constraintStart_toEndOf="@id/itemUnbondUnstake"
-        app:layout_constraintTop_toTopOf="@id/itemUnbondUnstake"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         tools:text="0.1 KSM" />
 
     <TextView
@@ -50,11 +25,13 @@
         style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
-        app:layout_constraintStart_toStartOf="@+id/itemUnbondUnstake"
-        app:layout_constraintTop_toBottomOf="@+id/itemUnbondUnstake"
+        android:layout_marginEnd="16dp"
+        android:gravity="center_vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:drawableEnd="@drawable/ic_time_16"
         tools:drawablePadding="4dp"
-        tools:drawableStart="@drawable/ic_time_16"
         tools:drawableTint="@color/white_48"
         tools:text="4 days left"
         tools:textColor="@color/white_64" />

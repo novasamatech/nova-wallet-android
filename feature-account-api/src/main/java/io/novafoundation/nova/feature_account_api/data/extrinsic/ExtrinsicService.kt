@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.utils.tip
 import io.novafoundation.nova.feature_account_api.data.secrets.keypair
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.cryptoTypeIn
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
@@ -29,6 +30,26 @@ class ExtrinsicService(
     private val secretStoreV2: SecretStoreV2,
     private val extrinsicBuilderFactory: ExtrinsicBuilderFactory,
 ) {
+
+    suspend fun submitExtrinsic(
+        chain: Chain,
+        formExtrinsic: suspend ExtrinsicBuilder.() -> Unit,
+    ): Result<*> {
+        val account = accountRepository.getSelectedMetaAccount()
+        val accountId = account.accountIdIn(chain)!!
+
+        return submitExtrinsic(chain, accountId, formExtrinsic)
+    }
+
+    suspend fun submitAndWatchExtrinsic(
+        chain: Chain,
+        formExtrinsic: suspend ExtrinsicBuilder.() -> Unit,
+    ): Flow<ExtrinsicStatus> {
+        val account = accountRepository.getSelectedMetaAccount()
+        val accountId = account.accountIdIn(chain)!!
+
+        return submitAndWatchExtrinsic(chain, accountId, formExtrinsic)
+    }
 
     suspend fun submitExtrinsic(
         chain: Chain,

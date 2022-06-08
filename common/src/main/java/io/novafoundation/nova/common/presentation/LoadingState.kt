@@ -14,6 +14,20 @@ sealed class LoadingState<T> {
     data class Loaded<T>(val data: T) : LoadingState<T>()
 }
 
+interface LoadingView<T> {
+
+    fun showData(data: T)
+
+    fun showLoading()
+}
+
+fun <T> LoadingView<T>.showLoadingState(loadingState: LoadingState<T>) {
+    when (loadingState) {
+        is LoadingState.Loaded -> showData(loadingState.data)
+        is LoadingState.Loading -> showLoading()
+    }
+}
+
 @Suppress("UNCHECKED_CAST")
 inline fun <T, R> LoadingState<T>.map(mapper: (T) -> R): LoadingState<R> {
     return when (this) {
@@ -36,6 +50,8 @@ fun <T, V> Flow<LoadingState<T>>.flatMapLoading(mapper: (T) -> Flow<V>): Flow<Lo
 inline fun <T, V> Flow<LoadingState<T>>.mapLoading(crossinline mapper: suspend (T) -> V): Flow<LoadingState<V>> {
     return map { loadingState -> loadingState.map { mapper(it) } }
 }
+
+fun <T> T?.toLoadingState(): LoadingState<T> = if (this == null) LoadingState.Loading() else LoadingState.Loaded(this)
 
 @Suppress("UNCHECKED_CAST")
 fun <T1, T2, R> combineLoading(

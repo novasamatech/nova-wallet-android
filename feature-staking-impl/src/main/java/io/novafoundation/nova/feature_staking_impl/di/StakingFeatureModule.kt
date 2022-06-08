@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_staking_api.domain.api.EraTimeCalculatorFa
 import io.novafoundation.nova.feature_staking_api.domain.api.IdentityRepository
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.data.common.repository.CommonStakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.StakingApi
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.SubQueryValidatorSetFetcher
 import io.novafoundation.nova.feature_staking_impl.data.repository.IdentityRepositoryImpl
@@ -32,6 +33,7 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.St
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingStoriesDataSource
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingStoriesDataSourceImpl
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.SubqueryStakingRewardsDataSource
+import io.novafoundation.nova.feature_staking_impl.di.staking.common.CommonsStakingModule
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.alerts.AlertsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.payout.PayoutInteractor
@@ -51,6 +53,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStak
 import io.novafoundation.nova.feature_staking_impl.presentation.common.hints.StakingHintsUseCase
 import io.novafoundation.nova.feature_staking_impl.presentation.common.rewardDestination.RewardDestinationMixin
 import io.novafoundation.nova.feature_staking_impl.presentation.common.rewardDestination.RewardDestinationProvider
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.CompoundStakingComponentFactory
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.AssetUseCaseImpl
@@ -68,7 +71,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
-@Module
+@Module(includes = [CommonsStakingModule::class])
 class StakingFeatureModule {
 
     @Provides
@@ -153,12 +156,8 @@ class StakingFeatureModule {
     @Provides
     @FeatureScope
     fun provideIdentityRepository(
-        bulkRetriever: BulkRetriever,
-        chainRegistry: ChainRegistry,
-    ): IdentityRepository = IdentityRepositoryImpl(
-        bulkRetriever,
-        chainRegistry
-    )
+        @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource
+    ): IdentityRepository = IdentityRepositoryImpl(remoteStorageSource)
 
     @Provides
     @FeatureScope
@@ -210,8 +209,9 @@ class StakingFeatureModule {
     @FeatureScope
     fun provideRewardCalculatorFactory(
         repository: StakingRepository,
+        commonStakingRepository: CommonStakingRepository,
         sharedState: StakingSharedState
-    ) = RewardCalculatorFactory(repository, sharedState)
+    ) = RewardCalculatorFactory(repository, commonStakingRepository, sharedState)
 
     @Provides
     @FeatureScope
@@ -378,4 +378,10 @@ class StakingFeatureModule {
         resourceManager: ResourceManager,
         stakingInteractor: StakingInteractor
     ) = StakingHintsUseCase(resourceManager, stakingInteractor)
+
+    @Provides
+    @FeatureScope
+    fun provideCompoundStatefullComponent(
+        sharedState: StakingSharedState,
+    ) = CompoundStakingComponentFactory(sharedState)
 }

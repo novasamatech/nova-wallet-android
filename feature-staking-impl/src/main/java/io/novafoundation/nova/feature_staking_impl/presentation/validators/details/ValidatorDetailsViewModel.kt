@@ -11,27 +11,26 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapStakeTargetDetailsToErrors
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValidatorDetailsParcelToValidatorDetailsModel
-import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValidatorDetailsToErrors
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.NominatorParcelModel
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.ValidatorDetailsParcelModel
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.ValidatorStakeParcelModel
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.StakeTargetStakeParcelModel
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.StakerParcelModel
+import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class ValidatorDetailsViewModel(
-    private val interactor: StakingInteractor,
+    private val assetUseCase: AssetUseCase,
     private val router: StakingRouter,
-    private val validator: ValidatorDetailsParcelModel,
+    private val payload: StakeTargetDetailsPayload,
     private val iconGenerator: AddressIconGenerator,
     private val externalActions: ExternalActions.Presentation,
     private val appLinksProvider: AppLinksProvider,
@@ -39,21 +38,25 @@ class ValidatorDetailsViewModel(
     private val selectedAssetState: SingleAssetSharedState,
 ) : BaseViewModel(), ExternalActions.Presentation by externalActions {
 
-    private val assetFlow = interactor.currentAssetFlow()
+    private val stakeTarget = payload.stakeTarget
+    val displayConfig = payload.displayConfig
+
+    private val assetFlow = assetUseCase.currentAssetFlow()
         .share()
 
-    private val maxNominators = flowOf { interactor.maxRewardedNominators() }
-        .inBackground()
-
-    val validatorDetails = maxNominators.combine(assetFlow) { maxNominators, asset ->
-        val chain = selectedAssetState.chain()
-
-        mapValidatorDetailsParcelToValidatorDetailsModel(chain, validator, asset, maxNominators, iconGenerator, resourceManager)
+    val stakeTargetDetails = assetFlow.map { asset ->
+        mapValidatorDetailsParcelToValidatorDetailsModel(
+            chain = selectedAssetState.chain(),
+            validator = stakeTarget,
+            asset = asset,
+            displayConfig = payload.displayConfig,
+            iconGenerator = iconGenerator,
+            resourceManager = resourceManager
+        )
     }
-        .inBackground()
-        .share()
+        .shareInBackground()
 
-    val errorFlow = flowOf { mapValidatorDetailsToErrors(validator) }
+    val errorFlow = flowOf { mapStakeTargetDetailsToErrors(stakeTarget, displayConfig) }
         .inBackground()
         .share()
 
@@ -68,45 +71,46 @@ class ValidatorDetailsViewModel(
     }
 
     fun totalStakeClicked() = launch {
-        val validatorStake = validator.stake
+        val validatorStake = stakeTarget.stake
         val asset = assetFlow.first()
         val payload = calculatePayload(asset, validatorStake)
 
         _totalStakeEvent.value = Event(payload)
     }
 
-    private suspend fun calculatePayload(asset: Asset, validatorStake: ValidatorStakeParcelModel) = withContext(Dispatchers.Default) {
-        require(validatorStake is ValidatorStakeParcelModel.Active)
+    private suspend fun calculatePayload(asset: Asset, stakeTargetStake: StakeTargetStakeParcelModel) = withContext(Dispatchers.Default) {
+        require(stakeTargetStake is StakeTargetStakeParcelModel.Active)
 
-        val nominatorsStake = validatorStake.nominators.sumByBigInteger(NominatorParcelModel::value)
+        val nominatorsStake = stakeTargetStake.stakers.sumByBigInteger(StakerParcelModel::value)
 
         ValidatorStakeBottomSheet.Payload(
-            own = mapAmountToAmountModel(validatorStake.ownStake, asset),
-            nominators = mapAmountToAmountModel(nominatorsStake, asset),
-            total = mapAmountToAmountModel(validatorStake.totalStake, asset)
+            own = mapAmountToAmountModel(stakeTargetStake.ownStake, asset),
+            stakers = mapAmountToAmountModel(nominatorsStake, asset),
+            total = mapAmountToAmountModel(stakeTargetStake.totalStake, asset),
+            stakersLabel = payload.displayConfig.stakersLabelRes
         )
     }
 
     fun webClicked() {
-        validator.identity?.web?.let {
+        stakeTarget.identity?.web?.let {
             showBrowser(it)
         }
     }
 
     fun emailClicked() {
-        validator.identity?.email?.let {
+        stakeTarget.identity?.email?.let {
             _openEmailEvent.value = Event(it)
         }
     }
 
     fun twitterClicked() {
-        validator.identity?.twitter?.let {
+        stakeTarget.identity?.twitter?.let {
             showBrowser(appLinksProvider.getTwitterAccountUrl(it))
         }
     }
 
     fun accountActionsClicked() = launch {
-        val address = validatorDetails.first().addressModel.address
+        val address = stakeTargetDetails.first().addressModel.address
         val chain = selectedAssetState.chain()
 
         externalActions.showExternalActions(ExternalActions.Type.Address(address), chain)

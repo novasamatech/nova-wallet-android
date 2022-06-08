@@ -16,3 +16,5 @@ fun bindBlockNumber(scale: String, runtime: RuntimeSnapshot): BlockNumber {
 
     return bindNumber(dynamicInstance)
 }
+
+fun bindBlockNumber(dynamic: Any?) = bindNumber(dynamic)

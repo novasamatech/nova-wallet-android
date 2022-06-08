@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.staking.rewardDestina
 
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_staking_api.domain.model.RewardDestination
-import io.novafoundation.nova.feature_staking_api.domain.model.StakingState
+import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.calls.setPayee
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

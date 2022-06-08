@@ -1,12 +1,34 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.mappers
 
+import io.novafoundation.nova.common.utils.castOrNull
+import io.novafoundation.nova.feature_staking_api.domain.model.ChildIdentity
 import io.novafoundation.nova.feature_staking_api.domain.model.Identity
+import io.novafoundation.nova.feature_staking_api.domain.model.RootIdentity
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.model.IdentityModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.IdentityParcelModel
 
 fun mapIdentityToIdentityParcelModel(identity: Identity): IdentityParcelModel {
     return with(identity) {
-        IdentityParcelModel(display, legal, web, riot, email, pgpFingerprint, image, twitter)
+        val childInfo = identity.castOrNull<ChildIdentity>()?.let {
+            IdentityParcelModel.ChildInfo(
+                parentSeparateDisplay = it.parentIdentity.display,
+                childName = it.childName
+            )
+        }
+
+        IdentityParcelModel(display, legal, web, riot, email, pgpFingerprint, image, twitter, childInfo)
+    }
+}
+
+fun mapIdentityParcelModelToIdentity(identity: IdentityParcelModel): Identity {
+    return with(identity) {
+        if (childInfo != null) {
+            val parent = RootIdentity(childInfo.parentSeparateDisplay, legal, web, riot, email, pgpFingerprint, image, twitter)
+
+            ChildIdentity(childInfo.childName, parent)
+        } else {
+            RootIdentity(display, legal, web, riot, email, pgpFingerprint, image, twitter)
+        }
     }
 }
 
