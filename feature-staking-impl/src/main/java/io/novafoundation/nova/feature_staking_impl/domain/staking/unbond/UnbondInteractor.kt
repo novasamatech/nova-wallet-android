@@ -2,12 +2,12 @@ package io.novafoundation.nova.feature_staking_impl.domain.staking.unbond
 
 import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
-import io.novafoundation.nova.feature_staking_api.domain.api.EraTimeCalculatorFactory
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.domain.model.isRedeemableIn
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.calls.chill
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.calls.unbond
+import io.novafoundation.nova.feature_staking_impl.domain.common.EraTimeCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.model.Unbonding
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import kotlinx.coroutines.Dispatchers
@@ -19,9 +19,9 @@ import kotlinx.coroutines.withContext
 import java.math.BigInteger
 
 class UnbondInteractor(
-    private val extrinsicService: ExtrinsicService,
-    private val stakingRepository: StakingRepository,
-    private val eraTimeCalculator: EraTimeCalculatorFactory,
+        private val extrinsicService: ExtrinsicService,
+        private val stakingRepository: StakingRepository,
+        private val eraTimeCalculator: EraTimeCalculatorFactory,
 ) {
 
     suspend fun estimateFee(

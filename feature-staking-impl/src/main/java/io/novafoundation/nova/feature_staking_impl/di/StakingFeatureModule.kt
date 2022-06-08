@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.di
 
 import dagger.Module
 import dagger.Provides
+import dagger.multibindings.IntoSet
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.AppLinksProvider
@@ -17,7 +18,6 @@ import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
-import io.novafoundation.nova.feature_staking_api.domain.api.EraTimeCalculatorFactory
 import io.novafoundation.nova.feature_staking_api.domain.api.IdentityRepository
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
@@ -26,9 +26,14 @@ import io.novafoundation.nova.feature_staking_impl.data.network.subquery.Staking
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.SubQueryValidatorSetFetcher
 import io.novafoundation.nova.feature_staking_impl.data.repository.IdentityRepositoryImpl
 import io.novafoundation.nova.feature_staking_impl.data.repository.PayoutRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.RealSessionRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.SessionRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRepositoryImpl
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRewardsRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.AuraRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.BabeRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.ConsensusRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingRewardsDataSource
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingStoriesDataSource
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingStoriesDataSourceImpl
@@ -36,6 +41,7 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.Su
 import io.novafoundation.nova.feature_staking_impl.di.staking.common.CommonsStakingModule
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.alerts.AlertsInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.common.EraTimeCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.payout.PayoutInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.RecommendationSettingsProviderFactory
@@ -68,6 +74,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
@@ -186,10 +193,35 @@ class StakingFeatureModule {
     )
 
     @Provides
+    @IntoSet
+    @FeatureScope
+    fun provideAuraConsensus(
+        chainRegistry: ChainRegistry,
+        @Named(REMOTE_STORAGE_SOURCE) storageDataSource: StorageDataSource,
+    ): ConsensusRepository = AuraRepository(chainRegistry, storageDataSource)
+
+    @Provides
+    @IntoSet
+    @FeatureScope
+    fun provideBabeConsensus(
+        chainRegistry: ChainRegistry,
+        @Named(REMOTE_STORAGE_SOURCE) storageDataSource: StorageDataSource,
+    ): ConsensusRepository = BabeRepository(storageDataSource, chainRegistry)
+
+    @Provides
+    @FeatureScope
+    fun provideSessionRepository(
+        @Named(REMOTE_STORAGE_SOURCE) storageDataSource: StorageDataSource,
+    ): SessionRepository = RealSessionRepository(storageDataSource)
+
+    @Provides
     @FeatureScope
     fun provideEraTimeCalculatorFactory(
         stakingRepository: StakingRepository,
-    ) = EraTimeCalculatorFactory(stakingRepository)
+        sessionRepository: SessionRepository,
+        chainStateRepository: ChainStateRepository,
+        consensuses: Set<@JvmSuppressWildcards ConsensusRepository>
+    ) = EraTimeCalculatorFactory(stakingRepository, sessionRepository, chainStateRepository, consensuses)
 
     @Provides
     @FeatureScope

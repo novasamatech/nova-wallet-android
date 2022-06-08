@@ -2,10 +2,8 @@ package io.novafoundation.nova.feature_staking_impl.data.repository
 
 import io.novafoundation.nova.common.data.network.runtime.binding.NonNullBinderWithType
 import io.novafoundation.nova.common.data.network.runtime.binding.returnType
-import io.novafoundation.nova.common.utils.babe
 import io.novafoundation.nova.common.utils.constant
 import io.novafoundation.nova.common.utils.numberConstant
-import io.novafoundation.nova.common.utils.session
 import io.novafoundation.nova.common.utils.staking
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.model.AccountStakingLocal
@@ -20,8 +18,6 @@ import io.novafoundation.nova.feature_staking_api.domain.model.ValidatorPrefs
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindActiveEra
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindCurrentEra
-import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindCurrentIndex
-import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindCurrentSlot
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindErasStartSessionIndex
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindExposure
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindHistoryDepth
@@ -71,31 +67,6 @@ class StakingRepositoryImpl(
     private val stakingStoriesDataSource: StakingStoriesDataSource,
 ) : StakingRepository {
 
-    override suspend fun sessionLength(chainId: ChainId): BigInteger {
-        val runtime = runtimeFor(chainId)
-
-        return runtime.metadata.babe().numberConstant("EpochDuration", runtime) // How many blocks per session
-    }
-
-    override suspend fun currentSessionIndex(chainId: ChainId) = remoteStorage.queryNonNull(
-        // Current session index
-        keyBuilder = { it.metadata.session().storage("CurrentIndex").storageKey() },
-        binding = ::bindCurrentIndex,
-        chainId = chainId
-    )
-
-    override suspend fun currentSlot(chainId: ChainId) = remoteStorage.queryNonNull(
-        keyBuilder = { it.metadata.babe().storage("CurrentSlot").storageKey() },
-        binding = ::bindCurrentSlot,
-        chainId = chainId
-    )
-
-    override suspend fun genesisSlot(chainId: ChainId) = remoteStorage.queryNonNull(
-        keyBuilder = { it.metadata.babe().storage("GenesisSlot").storageKey() },
-        binding = ::bindCurrentSlot,
-        chainId = chainId
-    )
-
     override suspend fun eraStartSessionIndex(chainId: ChainId, currentEra: BigInteger): EraIndex {
         val runtime = runtimeFor(chainId)
         return remoteStorage.queryNonNull( // Index of session from with the era started
@@ -109,12 +80,6 @@ class StakingRepositoryImpl(
         val runtime = runtimeFor(chainId)
 
         return runtime.metadata.staking().numberConstant("SessionsPerEra", runtime) // How many sessions per era
-    }
-
-    override suspend fun blockCreationTime(chainId: ChainId): BigInteger {
-        val runtime = runtimeFor(chainId)
-
-        return runtime.metadata.babe().numberConstant("ExpectedBlockTime", runtime)
     }
 
     override suspend fun getActiveEraIndex(chainId: ChainId): EraIndex = localStorage.queryNonNull(

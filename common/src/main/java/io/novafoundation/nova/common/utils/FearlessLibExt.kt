@@ -122,6 +122,8 @@ fun RuntimeMetadata.crowdloan() = module(Modules.CROWDLOAN)
 fun RuntimeMetadata.uniques() = module(Modules.UNIQUES)
 
 fun RuntimeMetadata.babe() = module(Modules.BABE)
+fun RuntimeMetadata.aura() = module(Modules.AURA)
+
 fun RuntimeMetadata.babeOrNull() = moduleOrNull(Modules.BABE)
 
 fun RuntimeMetadata.timestampOrNull() = moduleOrNull(Modules.TIMESTAMP)
@@ -164,6 +166,7 @@ object Modules {
     const val SYSTEM = "System"
     const val CROWDLOAN = "Crowdloan"
     const val BABE = "Babe"
+    const val AURA = "Elections"
     const val TIMESTAMP = "Timestamp"
     const val SLOTS = "Slots"
     const val SESSION = "Session"

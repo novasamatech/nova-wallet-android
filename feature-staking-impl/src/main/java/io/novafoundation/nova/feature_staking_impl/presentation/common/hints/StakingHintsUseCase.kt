@@ -14,12 +14,10 @@ class StakingHintsUseCase(
     }
 
     suspend fun unstakingDurationHint(): String {
-        val lockupPeriod = stakingInteractor.getLockupPeriodInDays()
+        val lockupPeriod = stakingInteractor.getLockupDuration()
+        val formattedDuration =  resourceManager.formatDuration(lockupPeriod)
 
-        return resourceManager.getString(
-            R.string.staking_hint_unstake_format_v2_2_0,
-            resourceManager.getQuantityString(R.plurals.staking_main_lockup_period_value, lockupPeriod, lockupPeriod)
-        )
+        return  resourceManager.getString(R.string.staking_hint_unstake_format_v2_2_0, formattedDuration)
     }
 
     fun noRewardDurationUnstakingHint(): String {
