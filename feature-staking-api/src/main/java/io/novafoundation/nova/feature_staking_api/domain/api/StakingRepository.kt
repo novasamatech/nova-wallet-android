@@ -71,12 +71,3 @@ suspend fun StakingRepository.historicalEras(chainId: ChainId): List<BigInteger>
 
     return historicalRange.map(Int::toBigInteger)
 }
-
-// @OptIn(ExperimentalTime::class)
-// suspend fun StakingRepository.erasPerDay(chainId: ChainId): Int {
-//    val blockCreationTime = blockCreationTime(chainId)
-//    val sessionPerEra = eraLength(chainId)
-//    val blocksPerSession = sessionLength(chainId)
-//
-//
-// }
