@@ -19,9 +19,9 @@ import kotlinx.coroutines.withContext
 import java.math.BigInteger
 
 class UnbondInteractor(
-        private val extrinsicService: ExtrinsicService,
-        private val stakingRepository: StakingRepository,
-        private val eraTimeCalculator: EraTimeCalculatorFactory,
+    private val extrinsicService: ExtrinsicService,
+    private val stakingRepository: StakingRepository,
+    private val eraTimeCalculator: EraTimeCalculatorFactory,
 ) {
 
     suspend fun estimateFee(

@@ -61,7 +61,6 @@ class EraTimeCalculator(
         return inMillis.milliseconds
     }
 
-
     fun calculateTillEraSet(destinationEra: EraIndex): BigInteger {
         val sessionDuration = sessionLength * blockCreationTime
         val tillEraStart = calculate(destinationEra)

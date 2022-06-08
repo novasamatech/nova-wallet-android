@@ -16,8 +16,7 @@ interface SessionRepository {
 
 class RealSessionRepository(
     private val remoteStorage: StorageDataSource
-): SessionRepository {
-
+) : SessionRepository {
 
     override suspend fun currentSessionIndex(chainId: ChainId) = remoteStorage.queryNonNull(
         // Current session index
