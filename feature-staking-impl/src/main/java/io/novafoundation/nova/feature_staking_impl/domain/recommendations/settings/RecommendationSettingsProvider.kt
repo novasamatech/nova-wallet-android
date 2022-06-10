@@ -1,30 +1,35 @@
 package io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings
 
+import io.novafoundation.nova.common.utils.RuntimeDependent
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.filters.HasIdentityFilter
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.filters.NotBlockedFilter
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.filters.NotOverSubscribedFilter
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.filters.NotSlashedFilter
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.postprocessors.RemoveClusteringPostprocessor
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.sortings.APYSorting
+import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class RecommendationSettingsProvider(
     maximumRewardedNominators: Int,
+    private val runtimeSnapshot: RuntimeSnapshot,
     private val maximumValidatorsPerNominator: Int
 ) {
 
-    private val alwaysEnabledFilters = listOf(
-        NotBlockedFilter
+    private val alwaysEnabledFilters = runtimeSnapshot.availableDependents<RecommendationFilter>(
+        NotBlockedFilter,
     )
 
-    private val customizableFilters = listOf(
+    private val customizableFilters = runtimeSnapshot.availableDependents(
         NotSlashedFilter,
         HasIdentityFilter,
         NotOverSubscribedFilter(maximumRewardedNominators)
     )
 
-    private val allPostProcessors = listOf(
+    val allAvailableFilters = alwaysEnabledFilters + customizableFilters
+
+    val allPostProcessors = runtimeSnapshot.availableDependents(
         RemoveClusteringPostprocessor
     )
 
@@ -70,4 +75,8 @@ class RecommendationSettingsProvider(
         postProcessors = allPostProcessors,
         limit = null
     )
+
+    private fun <T: RuntimeDependent> RuntimeSnapshot.availableDependents(vararg candidates: T): List<T> {
+        return candidates.filter { it.availableIn(this) }
+    }
 }

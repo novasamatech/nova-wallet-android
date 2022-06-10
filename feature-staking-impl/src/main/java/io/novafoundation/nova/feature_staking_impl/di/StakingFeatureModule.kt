@@ -281,9 +281,11 @@ class StakingFeatureModule {
         stakingConstantsRepository: StakingConstantsRepository,
         computationalCache: ComputationalCache,
         sharedState: StakingSharedState,
+        chainRegistry: ChainRegistry,
     ) = RecommendationSettingsProviderFactory(
         computationalCache,
         stakingConstantsRepository,
+        chainRegistry,
         sharedState
     )
 

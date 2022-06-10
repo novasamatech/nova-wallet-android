@@ -8,6 +8,8 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.format
+import io.novafoundation.nova.common.utils.makeGone
+import io.novafoundation.nova.common.utils.makeVisible
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.time.ExperimentalTime
 import kotlin.time.milliseconds
@@ -71,4 +73,16 @@ fun <K> CompoundButton.bindFromMap(key: K, map: Map<out K, MutableStateFlow<Bool
     val source = map[key] ?: error("Cannot find $key source")
 
     bindTo(source, lifecycleScope)
+}
+
+fun <K> Switch.bindFromMapOrHide(key: K, map: Map<out K, MutableStateFlow<Boolean>>, lifecycleScope: LifecycleCoroutineScope) {
+    val source = map[key]
+
+    if (source != null) {
+        field.bindTo(source, lifecycleScope)
+
+        makeVisible()
+    } else {
+        makeGone()
+    }
 }
