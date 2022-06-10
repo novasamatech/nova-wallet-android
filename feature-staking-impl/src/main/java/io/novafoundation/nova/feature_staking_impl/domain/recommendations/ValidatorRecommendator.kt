@@ -13,7 +13,7 @@ class ValidatorRecommendator(val availableValidators: List<Validator>) {
             .sortedWith(settings.sorting)
 
         val postprocessed = settings.postProcessors.fold(all) { acc, postProcessor ->
-            postProcessor(acc)
+            postProcessor.apply(acc)
         }
 
         settings.limit?.let(postprocessed::take) ?: postprocessed

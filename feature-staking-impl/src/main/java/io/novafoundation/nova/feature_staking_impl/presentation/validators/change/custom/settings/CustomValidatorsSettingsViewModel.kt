@@ -2,9 +2,11 @@ package io.novafoundation.nova.feature_staking_impl.presentation.validators.chan
 
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
+import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.common.utils.reversed
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.RecommendationSettings
@@ -50,6 +52,14 @@ class CustomValidatorsSettingsViewModel(
 
     private val defaultSettingsFlow = flow { emit(recommendationSettingsProvider().defaultSelectCustomSettings()) }
         .share()
+
+    val allAvailableFilters = flowOf {
+        recommendationSettingsProvider().allAvailableFilters.mapToSet { it::class.java }
+    }.shareInBackground()
+
+    val availablePostProcessors = flowOf {
+        recommendationSettingsProvider().allPostProcessors.mapToSet { it::class.java }
+    }.shareInBackground()
 
     val filtersEnabledMap = createClassEnabledMap(
         HasIdentityFilter::class.java,

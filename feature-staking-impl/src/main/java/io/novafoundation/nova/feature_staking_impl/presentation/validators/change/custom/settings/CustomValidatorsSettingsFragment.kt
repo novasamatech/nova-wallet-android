@@ -9,6 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.bindTo
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.common.view.bindFromMap
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
@@ -58,12 +59,10 @@ class CustomValidatorsSettingsFragment : BaseFragment<CustomValidatorsSettingsVi
     }
 
     override fun subscribe(viewModel: CustomValidatorsSettingsViewModel) {
-        customValidatorSettingsSort.bindTo(viewModel.selectedSortingIdFlow, lifecycleScope)
+        bindFilters(viewModel)
+        bindPostprocessors(viewModel)
 
-        customValidatorSettingsFilterIdentity.field.bindFilter(HasIdentityFilter::class.java)
-        customValidatorSettingsFilterSlashes.field.bindFilter(NotSlashedFilter::class.java)
-        customValidatorSettingsFilterOverSubscribed.field.bindFilter(NotOverSubscribedFilter::class.java)
-        customValidatorSettingsFilterClustering.field.bindPostProcessor(RemoveClusteringPostprocessor::class.java)
+        customValidatorSettingsSort.bindTo(viewModel.selectedSortingIdFlow, lifecycleScope)
 
         viewModel.isResetButtonEnabled.observe(customValidatorSettingsToolbar.rightActionText::setEnabled)
         viewModel.isApplyButtonEnabled.observe {
@@ -73,6 +72,36 @@ class CustomValidatorsSettingsFragment : BaseFragment<CustomValidatorsSettingsVi
         viewModel.tokenNameFlow.observe {
             customValidatorSettingsSortTotalStake.text = getString(R.string.staking_validator_total_stake_token, it)
             customValidatorSettingsSortOwnStake.text = getString(R.string.staking_filter_title_own_stake_token, it)
+        }
+    }
+
+    private fun bindFilters(viewModel: CustomValidatorsSettingsViewModel) {
+        val filterToView = listOf(
+            HasIdentityFilter::class.java to customValidatorSettingsFilterIdentity,
+            NotSlashedFilter::class.java to customValidatorSettingsFilterSlashes,
+            NotOverSubscribedFilter::class.java to customValidatorSettingsFilterOverSubscribed,
+        )
+
+        filterToView.onEach { (filterClass, view) -> view.field.bindFilter(filterClass) }
+
+        viewModel.allAvailableFilters.observe { availableFilters ->
+            filterToView.onEach { (filterClass, view) ->
+                view.setVisible(filterClass in availableFilters)
+            }
+        }
+    }
+
+    private fun bindPostprocessors(viewModel: CustomValidatorsSettingsViewModel) {
+        val postProcessorToView = listOf(
+            RemoveClusteringPostprocessor::class.java to customValidatorSettingsFilterClustering
+        )
+
+        postProcessorToView.onEach { (postProcessorClass, view) -> view.field.bindPostProcessor(postProcessorClass) }
+
+        viewModel.availablePostProcessors.observe { availablePostProcessors ->
+            postProcessorToView.onEach { (postProcessorClass, view) ->
+                view.setVisible(postProcessorClass in availablePostProcessors)
+            }
         }
     }
 
