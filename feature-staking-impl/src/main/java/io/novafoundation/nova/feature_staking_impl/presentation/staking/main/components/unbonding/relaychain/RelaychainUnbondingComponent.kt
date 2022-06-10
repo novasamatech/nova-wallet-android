@@ -124,8 +124,8 @@ private class RelaychainUnbondingComponent(
         val chosenKind = events.awaitAction(rebondKinds(), UnbondingEvent::ChooseRebondKind)
 
         when (chosenKind.id) {
-            REBOND_KIND_ALL -> openConfirmRebond(unbondInteractor::newestUnbondingAmount)
-            REBOND_KIND_LAST -> openConfirmRebond(unbondInteractor::allUnbondingsAmount)
+            REBOND_KIND_ALL -> openConfirmRebond(unbondInteractor::allUnbondingsAmount)
+            REBOND_KIND_LAST -> openConfirmRebond(unbondInteractor::newestUnbondingAmount)
             REBOND_KIND_CUSTOM -> router.openCustomRebond()
         }
     }
