@@ -7,7 +7,7 @@ import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 typealias RecommendationFilter = PalletBasedFilter<Validator>
 typealias RecommendationSorting = Comparator<Validator>
 
-interface RecommendationPostProcessor: RuntimeDependent {
+interface RecommendationPostProcessor : RuntimeDependent {
 
     fun apply(original: List<Validator>): List<Validator>
 }

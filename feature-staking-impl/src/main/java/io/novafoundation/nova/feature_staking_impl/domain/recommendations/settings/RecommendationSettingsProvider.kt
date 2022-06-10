@@ -76,7 +76,7 @@ class RecommendationSettingsProvider(
         limit = null
     )
 
-    private fun <T: RuntimeDependent> RuntimeSnapshot.availableDependents(vararg candidates: T): List<T> {
+    private fun <T : RuntimeDependent> RuntimeSnapshot.availableDependents(vararg candidates: T): List<T> {
         return candidates.filter { it.availableIn(this) }
     }
 }

@@ -77,9 +77,9 @@ class CustomValidatorsSettingsFragment : BaseFragment<CustomValidatorsSettingsVi
 
     private fun bindFilters(viewModel: CustomValidatorsSettingsViewModel) {
         val filterToView = listOf(
-                HasIdentityFilter::class.java to customValidatorSettingsFilterIdentity,
-                NotSlashedFilter::class.java to customValidatorSettingsFilterSlashes,
-                NotOverSubscribedFilter::class.java to customValidatorSettingsFilterOverSubscribed,
+            HasIdentityFilter::class.java to customValidatorSettingsFilterIdentity,
+            NotSlashedFilter::class.java to customValidatorSettingsFilterSlashes,
+            NotOverSubscribedFilter::class.java to customValidatorSettingsFilterOverSubscribed,
         )
 
         filterToView.onEach { (filterClass, view) -> view.field.bindFilter(filterClass) }
@@ -97,7 +97,6 @@ class CustomValidatorsSettingsFragment : BaseFragment<CustomValidatorsSettingsVi
         )
 
         postProcessorToView.onEach { (postProcessorClass, view) -> view.field.bindPostProcessor(postProcessorClass) }
-
 
         viewModel.availablePostProcessors.observe { availablePostProcessors ->
             postProcessorToView.onEach { (postProcessorClass, view) ->
