@@ -59,11 +59,9 @@ private class ConfirmStakeHintsMixin(
     }
 
     private suspend fun rewardPeriodHint(): String {
-        val hours = interactor.getEraHoursLength()
+        val eraDuration = interactor.getEraDuration()
+        val formattedDuration = resourceManager.formatDuration(eraDuration)
 
-        return resourceManager.getString(
-            R.string.staking_hint_rewards_format_v2_2_0,
-            resourceManager.getQuantityString(R.plurals.common_hours_format, hours, hours)
-        )
+        return resourceManager.getString(R.string.staking_hint_rewards_format_v2_2_0, formattedDuration)
     }
 }

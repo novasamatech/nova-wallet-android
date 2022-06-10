@@ -14,28 +14,12 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import java.math.BigInteger
-import kotlin.math.floor
-import kotlin.time.DurationUnit
-import kotlin.time.ExperimentalTime
-import kotlin.time.days
 
 interface StakingRepository {
 
-    suspend fun currentSessionIndex(chainId: ChainId): BigInteger
-
-    suspend fun currentSlot(chainId: ChainId): BigInteger
-
-    suspend fun genesisSlot(chainId: ChainId): BigInteger
-
     suspend fun eraStartSessionIndex(chainId: ChainId, currentEra: BigInteger): EraIndex
 
-    suspend fun sessionLength(chainId: ChainId): BigInteger
-
     suspend fun eraLength(chainId: ChainId): BigInteger
-
-    // TODO migrate all usages to better block time estimation for relaychain staking
-    @Deprecated("Deprecated in favour of ChainStateRepository.predictedBlockTime")
-    suspend fun blockCreationTime(chainId: ChainId): BigInteger
 
     suspend fun getActiveEraIndex(chainId: ChainId): EraIndex
 
@@ -86,17 +70,4 @@ suspend fun StakingRepository.historicalEras(chainId: ChainId): List<BigInteger>
     val historicalRange = (currentEra - historyDepth) until activeEra
 
     return historicalRange.map(Int::toBigInteger)
-}
-
-@OptIn(ExperimentalTime::class)
-suspend fun StakingRepository.erasPerDay(chainId: ChainId): Int {
-    val blockCreationTime = blockCreationTime(chainId)
-    val sessionPerEra = eraLength(chainId)
-    val blocksPerSession = sessionLength(chainId)
-
-    val eraDuration = (blockCreationTime * sessionPerEra * blocksPerSession).toDouble()
-
-    val dayDuration = 1.days.toDouble(DurationUnit.MILLISECONDS)
-
-    return floor(dayDuration / eraDuration).toInt()
 }
