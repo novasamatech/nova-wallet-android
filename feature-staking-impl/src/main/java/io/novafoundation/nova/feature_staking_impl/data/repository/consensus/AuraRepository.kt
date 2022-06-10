@@ -5,7 +5,7 @@ import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.aura
 import io.novafoundation.nova.common.utils.hasModule
 import io.novafoundation.nova.common.utils.numberConstant
-import io.novafoundation.nova.common.utils.timestamp
+import io.novafoundation.nova.common.utils.system
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
@@ -34,30 +34,14 @@ class AuraRepository(
     }
 
     override suspend fun currentSlot(chainId: ChainId) = remoteStorage.query(chainId) {
-        val now = runtime.metadata.timestamp().storage("Now").query(binding = ::bindNumber)
+        val bestBlock = runtime.metadata.system().storage("Number").query(binding = ::bindNumber)
 
-        slotFromTimestamp(now, runtime)
+        bestBlock
     }
 
-    override suspend fun genesisSlot(chainId: ChainId): BigInteger {
-        val genesisSlotBlockNumber = BigInteger.ONE
-        val genesisSlotBlockHash = rpcCalls.getBlockHash(chainId, genesisSlotBlockNumber)
-
-        return remoteStorage.query(chainId, at = genesisSlotBlockHash) {
-            val genesisSlotTimestamp = runtime.metadata.timestamp().storage("Now").query(binding = ::bindNumber)
-
-            slotFromTimestamp(genesisSlotTimestamp, runtime)
-        }
-    }
+    override suspend fun genesisSlot(chainId: ChainId): BigInteger = BigInteger.ZERO
 
     private suspend fun runtimeFor(chainId: ChainId): RuntimeSnapshot {
         return chainRegistry.getRuntime(chainId)
-    }
-
-    private fun slotFromTimestamp(timestamp: BigInteger, runtime: RuntimeSnapshot): BigInteger {
-        val blockDuration = runtime.metadata.timestamp().numberConstant("MinimumPeriod", runtime)
-        val slotDuration = blockDuration * 2.toBigInteger()
-
-        return timestamp / slotDuration
     }
 }
