@@ -30,6 +30,7 @@ class ValidatorProvider(
 
     suspend fun getValidators(
         chain: Chain,
+        chainAsset: Chain.Asset,
         source: ValidatorSource,
         cachedExposures: AccountIdMap<Exposure>? = null,
     ): List<Validator> {
@@ -49,7 +50,7 @@ class ValidatorProvider(
         val identities = identityRepository.getIdentitiesFromIds(chainId, requestedValidatorIds)
         val slashes = stakingRepository.getSlashes(chainId, requestedValidatorIds)
 
-        val rewardCalculator = rewardCalculatorFactory.create(chainId, electedValidatorExposures, validatorPrefs)
+        val rewardCalculator = rewardCalculatorFactory.create(chainAsset, electedValidatorExposures, validatorPrefs)
         val maxNominators = stakingConstantsRepository.maxRewardedNominatorPerValidator(chainId)
 
         return requestedValidatorIds.map { accountIdHex ->

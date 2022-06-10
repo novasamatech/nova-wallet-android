@@ -8,8 +8,13 @@ import io.novafoundation.nova.feature_staking_api.domain.model.ValidatorPrefs
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.common.repository.CommonStakingRepository
 import io.novafoundation.nova.feature_staking_impl.domain.error.accountIdNotFound
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.ALEPH_ZERO
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN
+import io.novafoundation.nova.runtime.state.chainAsset
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.math.BigInteger
 
 class RewardCalculatorFactory(
     private val stakingRepository: StakingRepository,
@@ -19,11 +24,11 @@ class RewardCalculatorFactory(
 ) {
 
     suspend fun create(
-        chainId: String,
+        chainAsset: Chain.Asset,
         exposures: AccountIdMap<Exposure>,
         validatorsPrefs: AccountIdMap<ValidatorPrefs?>
     ): RewardCalculator = withContext(Dispatchers.Default) {
-        val totalIssuance = commonStakingRepository.getTotalIssuance(chainId)
+        val totalIssuance = commonStakingRepository.getTotalIssuance(chainAsset.chainId)
 
         val validators = exposures.keys.mapNotNull { accountIdHex ->
             val exposure = exposures[accountIdHex] ?: accountIdNotFound(accountIdHex)
@@ -36,22 +41,28 @@ class RewardCalculatorFactory(
             )
         }
 
-        RewardCalculator(
-            validators = validators,
-            totalIssuance = totalIssuance
-        )
+        chainAsset.createRewardCalculator(validators, totalIssuance)
     }
 
     @Deprecated(
-        message = "Deprecated in favour of create(chainId: String)",
-        replaceWith = ReplaceWith(expression = "create(chainId)")
+        message = "Deprecated in favour of create(chainId: String)"
     )
-    suspend fun create(): RewardCalculator = create(sharedState.chainId())
+    suspend fun create(): RewardCalculator = create(sharedState.chainAsset())
 
-    suspend fun create(chainId: String): RewardCalculator = withContext(Dispatchers.Default) {
+    suspend fun create(chainAsset: Chain.Asset): RewardCalculator = withContext(Dispatchers.Default) {
+        val chainId = chainAsset.chainId
+
         val exposures = stakingRepository.getActiveElectedValidatorsExposures(chainId)
         val validatorsPrefs = stakingRepository.getValidatorPrefs(chainId, exposures.keys.toList())
 
-        create(chainId, exposures, validatorsPrefs)
+        create(chainAsset, exposures, validatorsPrefs)
+    }
+
+    private fun Chain.Asset.createRewardCalculator(validators: List<RewardCalculationTarget>, totalIssuance: BigInteger): RewardCalculator {
+        return when(staking) {
+            RELAYCHAIN -> RewardCurveInflationRewardCalculator(validators, totalIssuance)
+            ALEPH_ZERO -> AlephZeroRewardCalculator(validators, totalIssuance, chainAsset = this)
+            else -> throw IllegalStateException("Unknown staking type in RelaychainRewardFactory")
+        }
     }
 }

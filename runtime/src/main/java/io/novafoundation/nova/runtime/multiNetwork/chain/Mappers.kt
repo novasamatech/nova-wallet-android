@@ -35,6 +35,7 @@ private fun mapStakingStringToStakingType(stakingString: String?): Chain.Asset.S
         null -> Chain.Asset.StakingType.UNSUPPORTED
         "relaychain" -> Chain.Asset.StakingType.RELAYCHAIN
         "parachain" -> Chain.Asset.StakingType.PARACHAIN
+        "aleph-zero" -> Chain.Asset.StakingType.ALEPH_ZERO
         else -> Chain.Asset.StakingType.UNSUPPORTED
     }
 }
