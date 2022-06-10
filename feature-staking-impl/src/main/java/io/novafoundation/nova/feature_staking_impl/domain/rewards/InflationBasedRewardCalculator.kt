@@ -108,13 +108,3 @@ abstract class InflationBasedRewardCalculator(
         return dailyPercentage * days
     }
 }
-
-suspend fun RewardCalculator.maxCompoundAPY() = calculateMaxPeriodReturns(DAYS_IN_YEAR)
-
-suspend fun RewardCalculator.calculateMaxPeriodReturns(
-    days: Int,
-) = calculateReturns(
-    amount = BigDecimal.ONE,
-    days = days,
-    isCompound = true,
-).gainFraction
