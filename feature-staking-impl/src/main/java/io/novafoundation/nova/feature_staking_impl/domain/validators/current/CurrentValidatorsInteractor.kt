@@ -12,6 +12,8 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConsta
 import io.novafoundation.nova.feature_staking_impl.domain.common.isWaiting
 import io.novafoundation.nova.feature_staking_impl.domain.validators.ValidatorProvider
 import io.novafoundation.nova.feature_staking_impl.domain.validators.ValidatorSource
+import io.novafoundation.nova.runtime.state.SingleAssetSharedState
+import io.novafoundation.nova.runtime.state.chainAndAsset
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -22,6 +24,7 @@ class CurrentValidatorsInteractor(
     private val stakingRepository: StakingRepository,
     private val stakingConstantsRepository: StakingConstantsRepository,
     private val validatorProvider: ValidatorProvider,
+    private val selectedAssetSharedState: SingleAssetSharedState,
 ) {
 
     suspend fun nominatedValidatorsFlow(
@@ -31,7 +34,8 @@ class CurrentValidatorsInteractor(
             return flowOf(emptyGroupedList())
         }
 
-        val chainId = nominatorState.chain.id
+        val (chain, chainAsset) = selectedAssetSharedState.chainAndAsset()
+        val chainId = chain.id
 
         return stakingRepository.observeActiveEraIndex(chainId).map { activeEra ->
             val stashId = nominatorState.stashId
@@ -49,7 +53,8 @@ class CurrentValidatorsInteractor(
             val maxRewardedNominators = stakingConstantsRepository.maxRewardedNominatorPerValidator(chainId)
 
             val groupedByStatusClass = validatorProvider.getValidators(
-                chain = nominatorState.chain,
+                chain = chain,
+                chainAsset = chainAsset,
                 source = ValidatorSource.Custom(nominatedValidatorIds.toList()),
                 cachedExposures = exposures
             )

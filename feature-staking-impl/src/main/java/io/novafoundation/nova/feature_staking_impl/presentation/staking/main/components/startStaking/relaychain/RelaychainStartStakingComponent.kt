@@ -71,7 +71,7 @@ private class RelaychainStartStakingComponent(
 
     private val currentSetupProgress = setupStakingSharedState.get<SetupStakingProcess.Initial>()
 
-    private val rewardCalculator = async { rewardCalculatorFactory.create(assetWithChain.chain.id) }
+    private val rewardCalculator = async { rewardCalculatorFactory.create(assetWithChain.asset) }
 
     val selectedAccountStakingStateFlow = hostContext.selectedAccount.flatMapLatest {
         stakingInteractor.selectedAccountStakingStateFlow(it, assetWithChain)

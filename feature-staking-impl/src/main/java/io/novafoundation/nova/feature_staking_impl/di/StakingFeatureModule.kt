@@ -389,8 +389,12 @@ class StakingFeatureModule {
         stakingRepository: StakingRepository,
         stakingConstantsRepository: StakingConstantsRepository,
         validatorProvider: ValidatorProvider,
+        stahingSharedState: StakingSharedState,
     ) = CurrentValidatorsInteractor(
-        stakingRepository, stakingConstantsRepository, validatorProvider
+        stakingRepository,
+        stakingConstantsRepository,
+        validatorProvider,
+        stahingSharedState
     )
 
     @Provides
