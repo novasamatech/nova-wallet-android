@@ -13,7 +13,7 @@ private val IGNORED_COMMISSION_THRESHOLD = 1.toBigDecimal()
 abstract class InflationBasedRewardCalculator(
     private val validators: List<RewardCalculationTarget>,
     private val totalIssuance: BigInteger,
-): RewardCalculator {
+) : RewardCalculator {
 
     abstract fun calculateYearlyInflation(stakedPortion: Double): Double
 

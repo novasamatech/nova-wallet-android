@@ -17,7 +17,7 @@ private const val DECAY_RATE = 0.05
 class RewardCurveInflationRewardCalculator(
     validators: List<RewardCalculationTarget>,
     totalIssuance: BigInteger,
-): InflationBasedRewardCalculator(validators, totalIssuance) {
+) : InflationBasedRewardCalculator(validators, totalIssuance) {
 
     override fun calculateYearlyInflation(stakedPortion: Double): Double {
         return MINIMUM_INFLATION + if (stakedPortion in 0.0..STAKED_PORTION_IDEAL) {

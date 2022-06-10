@@ -33,4 +33,3 @@ fun AlephZeroRewardCalculator(
         yearlyMint = yearlyMintPlanks
     )
 }
-
