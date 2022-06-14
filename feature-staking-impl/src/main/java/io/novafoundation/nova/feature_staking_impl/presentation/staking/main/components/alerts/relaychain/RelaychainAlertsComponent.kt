@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.alerts.relaychain
 
 import androidx.lifecycle.MutableLiveData
-import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
@@ -156,7 +155,7 @@ private class RelaychainAlertsComponent(
         validationSystem: StakeActionsValidationSystem,
         action: () -> Unit,
     ) = launch {
-        val stakingState = (state.first() as? LoadingState.Loaded)?.data
+        val stakingState = selectedAccountStakingStateFlow.first()
         val stashState = stakingState as? StakingState.Stash ?: return@launch
 
         hostContext.validationExecutor.requireValid(
