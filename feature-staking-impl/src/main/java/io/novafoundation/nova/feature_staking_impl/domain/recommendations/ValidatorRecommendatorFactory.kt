@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.validators.ValidatorProvider
 import io.novafoundation.nova.feature_staking_impl.domain.validators.ValidatorSource
-import io.novafoundation.nova.runtime.state.chain
+import io.novafoundation.nova.runtime.state.chainAndAsset
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -23,7 +23,9 @@ class ValidatorRecommendatorFactory(
     }
 
     private suspend fun loadValidators(lifecycle: Lifecycle) = computationalCache.useCache(ELECTED_VALIDATORS_CACHE, lifecycle) {
-        validatorProvider.getValidators(sharedState.chain(), ValidatorSource.Elected)
+        val (chain, chainAsset) = sharedState.chainAndAsset()
+
+        validatorProvider.getValidators(chain, chainAsset, ValidatorSource.Elected)
     }
 
     suspend fun create(lifecycle: Lifecycle): ValidatorRecommendator = withContext(Dispatchers.IO) {

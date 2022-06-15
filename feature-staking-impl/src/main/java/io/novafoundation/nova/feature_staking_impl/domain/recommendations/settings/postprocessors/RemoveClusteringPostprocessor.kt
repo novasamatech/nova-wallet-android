@@ -1,16 +1,19 @@
 package io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.postprocessors
 
+import io.novafoundation.nova.common.utils.Modules
+import io.novafoundation.nova.common.utils.hasModule
 import io.novafoundation.nova.feature_staking_api.domain.model.ChildIdentity
 import io.novafoundation.nova.feature_staking_api.domain.model.Identity
 import io.novafoundation.nova.feature_staking_api.domain.model.RootIdentity
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.RecommendationPostProcessor
+import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 
 private const val MAX_PER_CLUSTER = 2
 
 object RemoveClusteringPostprocessor : RecommendationPostProcessor {
 
-    override fun invoke(original: List<Validator>): List<Validator> {
+    override fun apply(original: List<Validator>): List<Validator> {
         val clusterCounter = mutableMapOf<Identity, Int>()
 
         return original.filter { validator ->
@@ -22,6 +25,10 @@ object RemoveClusteringPostprocessor : RecommendationPostProcessor {
                 currentCounter < MAX_PER_CLUSTER
             } ?: true
         }
+    }
+
+    override fun availableIn(runtime: RuntimeSnapshot): Boolean {
+        return runtime.metadata.hasModule(Modules.IDENTITY)
     }
 
     private fun Validator.clusterIdentity(): Identity? {

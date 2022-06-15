@@ -6,11 +6,8 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_staking_api.domain.api.AccountIdMap
-import io.novafoundation.nova.feature_staking_api.domain.api.EraTimeCalculator
-import io.novafoundation.nova.feature_staking_api.domain.api.EraTimeCalculatorFactory
 import io.novafoundation.nova.feature_staking_api.domain.api.IdentityRepository
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
-import io.novafoundation.nova.feature_staking_api.domain.api.erasPerDay
 import io.novafoundation.nova.feature_staking_api.domain.api.getActiveElectedValidatorsExposures
 import io.novafoundation.nova.feature_staking_api.domain.model.Exposure
 import io.novafoundation.nova.feature_staking_api.domain.model.IndividualExposure
@@ -23,6 +20,8 @@ import io.novafoundation.nova.feature_staking_impl.data.model.Payout
 import io.novafoundation.nova.feature_staking_impl.data.repository.PayoutRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRewardsRepository
+import io.novafoundation.nova.feature_staking_impl.domain.common.EraTimeCalculator
+import io.novafoundation.nova.feature_staking_impl.domain.common.EraTimeCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.common.isWaiting
 import io.novafoundation.nova.feature_staking_impl.domain.model.NetworkInfo
 import io.novafoundation.nova.feature_staking_impl.domain.model.NominatorStatus
@@ -53,8 +52,8 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.math.BigInteger
+import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
-import kotlin.time.days
 
 const val HOURS_IN_DAY = 24
 
@@ -85,10 +84,11 @@ class StakingInteractor(
         runCatching {
             val currentStakingState = selectedAccountStakingStateFlow().first()
             val chainId = currentStakingState.chain.id
+            val calculator = getEraTimeCalculator()
 
             require(currentStakingState is StakingState.Stash)
 
-            val erasPerDay = stakingRepository.erasPerDay(chainId)
+            val erasPerDay = calculator.erasPerDay()
             val activeEraIndex = stakingRepository.getActiveEraIndex(chainId)
             val historyDepth = stakingRepository.getHistoryDepth(chainId)
 
@@ -97,7 +97,6 @@ class StakingInteractor(
             val allValidatorAddresses = payouts.map(Payout::validatorAddress).distinct()
             val identityMapping = identityRepository.getIdentitiesFromAddresses(currentStakingState.chain, allValidatorAddresses)
 
-            val calculator = getEraTimeCalculator()
             val pendingPayouts = payouts.map {
                 val relativeInfo = eraRelativeInfo(it.era, activeEraIndex, historyDepth, erasPerDay)
 
@@ -188,7 +187,7 @@ class StakingInteractor(
     }
 
     fun observeNetworkInfoState(chainId: ChainId): Flow<NetworkInfo> = flow {
-        val lockupPeriod = getLockupPeriodInDays(chainId)
+        val lockupPeriod = getLockupDuration(chainId)
 
         val innerFlow = stakingRepository.electedExposuresInActiveEra(chainId).map { exposuresMap ->
             val exposures = exposuresMap.values
@@ -196,7 +195,7 @@ class StakingInteractor(
             val minimumNominatorBond = stakingRepository.minimumNominatorBond(chainId)
 
             NetworkInfo(
-                lockupPeriod = lockupPeriod.days,
+                lockupPeriod = lockupPeriod,
                 minimumStake = minimumStake(exposures, minimumNominatorBond),
                 totalStake = totalStake(exposures),
                 stakingPeriod = StakingPeriod.Unlimited,
@@ -207,14 +206,12 @@ class StakingInteractor(
         emitAll(innerFlow)
     }
 
-    suspend fun getLockupPeriodInDays() = withContext(Dispatchers.Default) {
-        getLockupPeriodInDays(stakingSharedState.chainId())
+    suspend fun getLockupDuration() = withContext(Dispatchers.Default) {
+        getLockupDuration(stakingSharedState.chainId())
     }
 
-    suspend fun getEraHoursLength(): Int = withContext(Dispatchers.Default) {
-        val chainId = stakingSharedState.chainId()
-
-        HOURS_IN_DAY / stakingRepository.erasPerDay(chainId)
+    suspend fun getEraDuration() = withContext(Dispatchers.Default) {
+        getEraTimeCalculator().eraDuration()
     }
 
     fun selectionStateFlow() = combineToPair(
@@ -346,8 +343,11 @@ class StakingInteractor(
         return exposures.sumOf(Exposure::total)
     }
 
-    private suspend fun getLockupPeriodInDays(chainId: ChainId): Int {
-        return stakingConstantsRepository.lockupPeriodInEras(chainId).toInt() / stakingRepository.erasPerDay(chainId)
+    private suspend fun getLockupDuration(chainId: ChainId): Duration {
+        val eraCalculator = getEraTimeCalculator()
+        val eraDuration = eraCalculator.eraDuration()
+
+        return eraDuration * stakingConstantsRepository.lockupPeriodInEras(chainId).toInt()
     }
 
     private class StatusResolutionContext(

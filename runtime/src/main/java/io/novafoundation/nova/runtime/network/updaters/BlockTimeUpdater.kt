@@ -72,8 +72,6 @@ class BlockTimeUpdater(
             .onEach { (previousUpdate, currentUpdate) ->
                 val blockTime = currentUpdate.timestamp - previousUpdate!!.timestamp
 
-                Log.d(LOG_TAG, "New block time update: $blockTime, source: $currentUpdate")
-
                 updateSampledBlockTime(chainId, blockTime)
             }.noSideAffects()
     }
@@ -87,6 +85,8 @@ class BlockTimeUpdater(
             sampleSize = adjustedSampleSize,
             averageBlockTime = adjustedAverage
         )
+
+        Log.d(LOG_TAG, "New block time update: $newSampledTime, adjustedAverage: $adjustedSampledBlockTime")
 
         sampledBlockTimeStorage.put(chainId, adjustedSampledBlockTime)
     }
