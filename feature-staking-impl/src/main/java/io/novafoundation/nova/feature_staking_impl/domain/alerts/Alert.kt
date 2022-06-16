@@ -9,7 +9,12 @@ sealed class Alert {
 
     class BondMoreTokens(val minimalStake: BigDecimal, val token: Token) : Alert()
 
-    object ChangeValidators : Alert()
+    class ChangeValidators(val reason: Reason): Alert() {
+
+        enum class Reason {
+            NONE_ELECTED, OVERSUBSCRIBED
+        }
+    }
 
     object WaitingForNextEra : Alert()
 
