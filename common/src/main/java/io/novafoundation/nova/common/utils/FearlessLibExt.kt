@@ -148,6 +148,7 @@ fun StorageEntry.splitKeyToComponents(runtime: RuntimeSnapshot, key: String): Co
 fun String.networkType() = Node.NetworkType.findByAddressByte(addressPrefix())!!
 
 fun RuntimeMetadata.hasModule(name: String) = moduleOrNull(name) != null
+fun RuntimeMetadata.hasConstant(module: String, constant: String) = moduleOrNull(module)?.constantOrNull(constant) != null
 
 fun SeedFactory.createSeed32(length: Mnemonic.Length, password: String?) = cropSeedTo32Bytes(createSeed(length, password))
 
