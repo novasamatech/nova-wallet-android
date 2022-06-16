@@ -93,7 +93,7 @@ private class RelaychainAlertsComponent(
     private fun mapAlertToAlertModel(alert: Alert): AlertModel {
         return when (alert) {
             is Alert.ChangeValidators -> {
-                val message = when(alert.reason) {
+                val message = when (alert.reason) {
                     Reason.NONE_ELECTED -> R.string.staking_nominator_status_alert_no_validators
                     Reason.OVERSUBSCRIBED -> R.string.staking_your_oversubscribed_message
                 }
