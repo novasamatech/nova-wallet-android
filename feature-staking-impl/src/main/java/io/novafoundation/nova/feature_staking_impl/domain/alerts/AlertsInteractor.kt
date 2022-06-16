@@ -5,6 +5,7 @@ import io.novafoundation.nova.feature_staking_api.domain.model.Exposure
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
+import io.novafoundation.nova.feature_staking_impl.domain.alerts.Alert.ChangeValidators.Reason
 import io.novafoundation.nova.feature_staking_impl.domain.common.isWaiting
 import io.novafoundation.nova.feature_staking_impl.domain.isNominationActive
 import io.novafoundation.nova.feature_staking_impl.domain.minimumStake
@@ -12,6 +13,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletReposit
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.runtime.state.chainAndAsset
+import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -60,11 +62,18 @@ class AlertsInteractor(
 
     private fun produceChangeValidatorsAlert(context: AlertContext): Alert? {
         return requireState(context.stakingState) { nominatorState: StakingState.Stash.Nominator ->
-            Alert.ChangeValidators.takeIf {
+            val targets = nominatorState.nominations.targets.map { it.toHexString() }
+
+            when {
+                // none of nominated validators were elected
+                targets.intersect(context.exposures.keys).isEmpty() -> Alert.ChangeValidators(Reason.NONE_ELECTED)
+
                 // staking is inactive
                 context.isStakingActive(nominatorState.stashId).not() &&
                     // there is no pending change
-                    nominatorState.nominations.isWaiting(context.activeEra).not()
+                    nominatorState.nominations.isWaiting(context.activeEra).not() -> Alert.ChangeValidators(Reason.OVERSUBSCRIBED)
+
+                else -> null
             }
         }
     }
