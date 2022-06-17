@@ -27,7 +27,7 @@ import java.math.BigInteger
 private val FALLBACK_BLOCK_TIME_MILLIS_RELAYCHAIN = (6 * 1000).toBigInteger()
 private val FALLBACK_BLOCK_TIME_MILLIS_PARACHAIN = 2.toBigInteger() * FALLBACK_BLOCK_TIME_MILLIS_RELAYCHAIN
 
-private val PERIOD_VALIDITY_THRESHOLD = 500.toBigInteger()
+private val PERIOD_VALIDITY_THRESHOLD = 100.toBigInteger()
 
 private val REQUIRED_SAMPLED_BLOCKS = 10.toBigInteger()
 

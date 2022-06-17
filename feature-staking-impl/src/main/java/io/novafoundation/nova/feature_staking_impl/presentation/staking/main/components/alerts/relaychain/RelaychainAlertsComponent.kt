@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.Stakin
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.alerts.Alert
+import io.novafoundation.nova.feature_staking_impl.domain.alerts.Alert.ChangeValidators.Reason
 import io.novafoundation.nova.feature_staking_impl.domain.alerts.AlertsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.StakeActionsValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.StakeActionsValidationSystem
@@ -91,10 +92,15 @@ private class RelaychainAlertsComponent(
 
     private fun mapAlertToAlertModel(alert: Alert): AlertModel {
         return when (alert) {
-            Alert.ChangeValidators -> {
+            is Alert.ChangeValidators -> {
+                val message = when (alert.reason) {
+                    Reason.NONE_ELECTED -> R.string.staking_nominator_status_alert_no_validators
+                    Reason.OVERSUBSCRIBED -> R.string.staking_your_oversubscribed_message
+                }
+
                 AlertModel(
                     resourceManager.getString(R.string.staking_alert_change_validators),
-                    resourceManager.getString(R.string.staking_nominator_status_alert_no_validators),
+                    resourceManager.getString(message),
                     AlertModel.Type.CallToAction { router.openCurrentValidators() }
                 )
             }
