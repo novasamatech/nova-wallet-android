@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.astar
 
-import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.ParaId
+import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.blockhain.extrinsic.addMemo
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.isValidAddress

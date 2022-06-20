@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding
 
+import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountId
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct

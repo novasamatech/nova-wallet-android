@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_crowdloan_impl.data.network.blockhain.extrinsic
 
-import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.ParaId
+import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import java.math.BigInteger
 

@@ -3,6 +3,8 @@ package io.novafoundation.nova.feature_wallet_api.di
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
+import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
@@ -30,4 +32,8 @@ interface WalletFeatureApi {
     fun provideAmountChooserFactory(): AmountChooserMixin.Factory
 
     val phishingValidationFactory: PhishingValidationFactory
+
+    val crossChainTransfersRepository: CrossChainTransfersRepository
+
+    val crossChainWeigher: CrossChainWeigher
 }

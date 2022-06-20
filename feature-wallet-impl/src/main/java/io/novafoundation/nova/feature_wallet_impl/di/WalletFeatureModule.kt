@@ -12,10 +12,13 @@ import io.novafoundation.nova.core_db.dao.AssetDao
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.dao.PhishingAddressDao
 import io.novafoundation.nova.core_db.dao.TokenDao
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
+import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
 import io.novafoundation.nova.feature_wallet_api.di.Wallet
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
@@ -29,8 +32,11 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.WssSub
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.BalancesUpdateSystem
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.balance.PaymentUpdaterFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.coingecko.CoingeckoApi
+import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.CrossChainConfigApi
+import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.RealCrossChainWeigher
 import io.novafoundation.nova.feature_wallet_impl.data.network.phishing.PhishingApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
+import io.novafoundation.nova.feature_wallet_impl.data.repository.RealCrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RuntimeWalletConstants
 import io.novafoundation.nova.feature_wallet_impl.data.repository.TokenRepositoryImpl
 import io.novafoundation.nova.feature_wallet_impl.data.repository.WalletRepositoryImpl
@@ -165,4 +171,24 @@ class WalletFeatureModule {
     fun provideFeeLoaderMixinFactory(resourceManager: ResourceManager): FeeLoaderMixin.Factory {
         return FeeLoaderProviderFactory(resourceManager)
     }
+
+    @Provides
+    @FeatureScope
+    fun provideCrossChainConfigApi(
+        apiCreator: NetworkApiCreator
+    ): CrossChainConfigApi = apiCreator.create(CrossChainConfigApi::class.java)
+
+    @Provides
+    @FeatureScope
+    fun provideCrossChainRepository(
+        api: CrossChainConfigApi,
+        @Named(REMOTE_STORAGE_SOURCE) storageDataSource: StorageDataSource,
+    ): CrossChainTransfersRepository = RealCrossChainTransfersRepository(api, storageDataSource)
+
+    @Provides
+    @FeatureScope
+    fun provideCrossChainWeigher(
+       extrinsicService: ExtrinsicService,
+       chainRegistry: ChainRegistry
+    ): CrossChainWeigher = RealCrossChainWeigher(extrinsicService, chainRegistry)
 }

@@ -115,6 +115,9 @@ fun Chain.isValidAddress(address: String): Boolean {
     }.getOrDefault(false)
 }
 
+val Chain.isParachain
+    get() = parentId != null
+
 fun Chain.multiAddressOf(address: String): MultiAddress = multiAddressOf(accountIdOf(address))
 
 fun Chain.availableExplorersFor(field: ExplorerTemplateExtractor) = explorers.filter { field(it) != null }

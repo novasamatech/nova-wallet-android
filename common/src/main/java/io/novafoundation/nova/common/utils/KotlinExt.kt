@@ -50,6 +50,8 @@ fun <K, V> Map<K, V>.reversed() = HashMap<V, K>().also { newMap ->
     entries.forEach { newMap[it.value] = it.key }
 }
 
+fun <T> Iterable<T>.isAscending(comparator: Comparator<T>) = zipWithNext().all { (first, second) -> comparator.compare(first, second) < 0 }
+
 fun <T> Result<T>.requireException() = exceptionOrNull()!!
 
 fun <T> Result<T>.requireValue() = getOrThrow()!!
