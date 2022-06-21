@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.crosschain
 
 import io.novafoundation.nova.common.data.network.runtime.binding.Weight
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainFee
@@ -25,6 +26,13 @@ class RealCrossChainWeigher(
     private val chainRegistry: ChainRegistry
 ) : CrossChainWeigher {
 
+    override suspend fun estimateRequiredDestWeight(transferConfiguration: CrossChainTransferConfiguration): Weight {
+        val destinationWeight = transferConfiguration.destinationFee.estimatedWeight()
+        val reserveWeight = transferConfiguration.reserveFee?.estimatedWeight().orZero()
+
+        return destinationWeight.max(reserveWeight)
+    }
+
     override suspend fun estimateFee(transferConfiguration: CrossChainTransferConfiguration): CrossChainFee {
         val destinationFee = with(transferConfiguration) {
             feeFor(destinationFee)
@@ -42,14 +50,13 @@ class RealCrossChainWeigher(
 
     private suspend fun CrossChainTransferConfiguration.feeFor(feeConfig: CrossChainFeeConfiguration): BigInteger? {
         val chain = chainRegistry.getChain(feeConfig.chainId)
-        val instructionTypes = feeConfig.xcmFeeType.instructions
-        val maxWeight = feeConfig.instructionWeight * instructionTypes.size.toBigInteger()
+        val maxWeight = feeConfig.estimatedWeight()
 
         return when (val mode = feeConfig.xcmFeeType.mode) {
             is Mode.Proportional -> mode.weightToFee(maxWeight)
 
             Mode.Standard -> {
-                val xcmMessage = xcmMessage(instructionTypes, chain)
+                val xcmMessage = xcmMessage(feeConfig.xcmFeeType.instructions, chain)
 
                 // xcmPallet.execute() has weight equal to maxWeight + XCM_EXECUTE_WEIGHT_OVERHEAD.
                 // For more accurate calculations we should subtract overhead value from the maxWeight to adjust resulting weight
@@ -64,6 +71,12 @@ class RealCrossChainWeigher(
 
             Mode.Unknown -> null
         }
+    }
+
+    private fun CrossChainFeeConfiguration.estimatedWeight(): Weight {
+        val instructionTypes = xcmFeeType.instructions
+
+        return instructionWeight * instructionTypes.size.toBigInteger()
     }
 
     private fun CrossChainTransferConfiguration.xcmMessage(
