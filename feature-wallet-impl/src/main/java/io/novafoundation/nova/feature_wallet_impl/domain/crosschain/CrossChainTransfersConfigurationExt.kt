@@ -82,15 +82,20 @@ fun CrossChainTransfersConfiguration.transferConfiguration(
     val assetTransfers = assetTransfers(originAsset) ?: return null
     val destination = assetTransfers.xcmTransfers.find { it.destination.chainId == destinationChain.id } ?: return null
 
+    val reserveAssetLocation = assetLocations.getValue(assetTransfers.assetLocation)
+    val hasReserveFee = reserveAssetLocation.chainId !in setOf(originChain.id, destinationChain.id)
+    val reserveFee = if (hasReserveFee) {
+        // reserve fee must be present if there is at least one non-reserve transfer
+        matchInstructions(reserveAssetLocation.reserveFee!!, reserveAssetLocation.chainId)
+    } else {
+        null
+    }
+
     return CrossChainTransferConfiguration(
         assetLocation = originAssetLocationOf(assetTransfers),
         destinationChainLocation = destinationLocation(originChain, destinationParaId),
         destinationFee = matchInstructions(destination.destination.fee, destination.destination.chainId),
-        reserveFee = assetTransfers.reserveFee?.let {
-            val reserveChainId = assetLocations.getValue(assetTransfers.assetLocation).chainId
-
-            matchInstructions(it, reserveChainId)
-        }
+        reserveFee = reserveFee
     )
 }
 

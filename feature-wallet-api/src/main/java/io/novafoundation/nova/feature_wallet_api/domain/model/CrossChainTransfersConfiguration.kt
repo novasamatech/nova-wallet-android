@@ -18,6 +18,7 @@ class CrossChainTransfersConfiguration(
 
     class ReserveLocation(
         val chainId: ChainId,
+        val reserveFee: XcmFee<String>?,
         val multiLocation: MultiLocation
     )
 
@@ -25,7 +26,6 @@ class CrossChainTransfersConfiguration(
         val assetId: ChainAssetId,
         val assetLocation: String,
         val assetLocationPath: AssetLocationPath,
-        val reserveFee: XcmFee<String>?,
         val xcmTransfers: List<XcmTransfer>
     )
 
@@ -68,7 +68,7 @@ enum class XcmTransferType {
 }
 
 enum class XCMInstructionType {
-    ReserveAssetDeposited, ClearOrigin, BuyExecution, DepositAsset, WithdrawAsset
+    ReserveAssetDeposited, ClearOrigin, BuyExecution, DepositAsset, WithdrawAsset, DepositReserveAsset
 }
 
 class MultiLocation(

@@ -7,6 +7,11 @@ import java.math.BigInteger
 
 typealias XcmMultiAssets = List<XcmMultiAsset>
 
+sealed class VersionedXcm {
+
+    class V2(val message: XcmV2): VersionedXcm()
+}
+
 class XcmV2(val instructions: List<XcmV2Instruction>)
 
 sealed class XcmV2Instruction {
@@ -24,6 +29,13 @@ sealed class XcmV2Instruction {
     object ClearOrigin : XcmV2Instruction()
 
     class ReserveAssetDeposited(val assets: XcmMultiAssets) : XcmV2Instruction()
+
+    class DepositReserveAsset(
+        val assets: XcmMultiAssetFilter,
+        val maxAssets: BigInteger,
+        val dest: MultiLocation,
+        val xcm: XcmV2
+    ): XcmV2Instruction()
 }
 
 sealed class XcmMultiAssetFilter {

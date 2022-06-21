@@ -3,6 +3,8 @@ package io.novafoundation.nova
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.orZero
+import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainFee
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_impl.domain.crosschain.transferConfiguration
@@ -43,6 +45,13 @@ class CrossChainTransfersIntegrationTest : BaseIntegrationTest() {
         to = "Kusama"
     )
 
+    @Test
+    fun testParachainToParachainNonReserve() = performFeeTest(
+        from = "Karura",
+        what = "BNC",
+        to = "Moonriver"
+    )
+
     private fun performFeeTest(
         from: String,
         to: String,
@@ -63,10 +72,23 @@ class CrossChainTransfersIntegrationTest : BaseIntegrationTest() {
                 destinationParaId = chainTransfersRepository.paraId(destinationChain.id)
             )!!
 
-            val feeResponse = crossChainWeigher.estimateFee(crossChainTransfer)
+            val crossChainFee = crossChainWeigher.estimateFee(crossChainTransfer)
 
-            error("Destination Fee: ${asssetInOrigin.formatAmount(feeResponse.destination!!)}")
+            error(crossChainFee.formatWith(asssetInOrigin))
         }
+    }
+
+    private fun CrossChainFee.formatWith(
+        transferringAsset: Chain.Asset
+    ): String {
+        fun BigInteger?.formatAmount() = this?.let { transferringAsset.formatAmount(it) }
+
+        return """
+            
+            Destination Fee: ${destination?.formatAmount()}
+            Reserve Fee: ${reserve?.formatAmount()}
+            Total XCM Fee: ${(reserve.orZero() + destination.orZero()).formatAmount()}
+        """.trimIndent()
     }
 
     private fun Chain.Asset.formatAmount(planks: BigInteger) = "${amountFromPlanks(planks)} $symbol"

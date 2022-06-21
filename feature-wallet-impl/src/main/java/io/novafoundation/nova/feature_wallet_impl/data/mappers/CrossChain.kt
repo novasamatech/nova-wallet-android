@@ -47,6 +47,7 @@ fun mapCrossChainConfigFromRemote(remote: CrossChainTransfersConfigRemote): Cros
 private fun mapReserveLocationFromRemote(reserveLocationRemote: ReserveLocationRemote): ReserveLocation {
     return ReserveLocation(
         chainId = reserveLocationRemote.chainId,
+        reserveFee = reserveLocationRemote.reserveFee?.let(::mapXcmFeeFromRemote),
         multiLocation = mapJunctionsRemoteToMultiLocation(reserveLocationRemote.multiLocation)
     )
 }
@@ -67,7 +68,6 @@ private fun mapAssetTransfersFromRemote(remote: CrossChainOriginAssetRemote): As
         assetId = remote.assetId,
         assetLocationPath = assetLocationPath,
         assetLocation = remote.assetLocation,
-        reserveFee = remote.reserveFee?.let(::mapXcmFeeFromRemote),
         xcmTransfers = remote.xcmTransfers.map(::mapXcmTransferFromRemote)
     )
 }

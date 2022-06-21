@@ -12,6 +12,7 @@ class CrossChainTransfersConfigRemote(
 
 class ReserveLocationRemote(
     val chainId: ChainId,
+    val reserveFee: XcmFeeRemote?,
     val multiLocation: JunctionsRemote
 )
 
@@ -25,7 +26,6 @@ class CrossChainOriginAssetRemote(
     val assetLocation: String,
     val assetLocationPath: AssetLocationPathRemote,
     val xcmTransfers: List<XcmTransferRemote>,
-    val reserveFee: XcmFeeRemote?
 )
 
 class XcmTransferRemote(

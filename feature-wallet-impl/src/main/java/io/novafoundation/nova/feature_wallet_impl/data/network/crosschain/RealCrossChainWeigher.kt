@@ -30,10 +30,13 @@ class RealCrossChainWeigher(
             feeFor(destinationFee)
         }
 
+        val reserveFee = with(transferConfiguration) {
+            reserveFee?.let { feeFor(it) }
+        }
+
         return CrossChainFee(
-            origin = BigInteger.ZERO, // TODO construct origin extrinsic
             destination = destinationFee,
-            reserve = null // TODO reserve fee
+            reserve = reserveFee
         )
     }
 
@@ -66,10 +69,10 @@ class RealCrossChainWeigher(
     private fun CrossChainTransferConfiguration.xcmMessage(
         instructionTypes: List<XCMInstructionType>,
         chain: Chain,
-    ): XcmV2 {
+    ): VersionedXcm {
         val instructions = instructionTypes.map { instructionType -> xcmInstruction(instructionType, chain) }
 
-        return XcmV2(instructions)
+        return VersionedXcm.V2(XcmV2(instructions))
     }
 
     private fun CrossChainTransferConfiguration.xcmInstruction(
@@ -82,6 +85,7 @@ class RealCrossChainWeigher(
             XCMInstructionType.BuyExecution -> buyExecution()
             XCMInstructionType.DepositAsset -> depositAsset(chain)
             XCMInstructionType.WithdrawAsset -> withdrawAsset()
+            XCMInstructionType.DepositReserveAsset -> depositReserveAsset()
         }
     }
 
@@ -115,6 +119,15 @@ class RealCrossChainWeigher(
             assets = listOf(
                 sendingAssetAmountOf(Balance.ZERO)
             )
+        )
+    }
+
+    private fun CrossChainTransferConfiguration.depositReserveAsset(): XcmV2Instruction {
+        return XcmV2Instruction.DepositReserveAsset(
+            assets = XcmMultiAssetFilter.Wild.All,
+            maxAssets = BigInteger.ONE,
+            dest = destinationChainLocation,
+            xcm = XcmV2(emptyList())
         )
     }
 

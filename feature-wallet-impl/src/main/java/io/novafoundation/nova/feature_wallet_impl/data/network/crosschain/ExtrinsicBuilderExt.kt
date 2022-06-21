@@ -11,7 +11,7 @@ import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 
 fun ExtrinsicBuilder.xcmExecute(
-    message: XcmV2,
+    message: VersionedXcm,
     maxWeight: Weight,
 ): ExtrinsicBuilder {
     val moduleName = runtime.metadata.firstExistingModule("XcmPallet", "PolkadotXcm", "KusamaXcm")
@@ -26,10 +26,14 @@ fun ExtrinsicBuilder.xcmExecute(
     )
 }
 
-private fun XcmV2.toEncodableInstance() = DictEnum.Entry(
-    name = "V2",
-    value = instructions.map(XcmV2Instruction::toEncodableInstance)
-)
+private fun VersionedXcm.toEncodableInstance() = when(this) {
+    is VersionedXcm.V2 -> DictEnum.Entry(
+        name = "V2",
+        value = message.toEncodableInstance()
+    )
+}
+
+private fun XcmV2.toEncodableInstance(): Any = instructions.map(XcmV2Instruction::toEncodableInstance)
 
 private fun XcmMultiAssets.toEncodableInstance() = map(XcmMultiAsset::toEncodableInstance)
 private fun XcmMultiAsset.toEncodableInstance() = structOf(
@@ -78,6 +82,15 @@ private fun XcmV2Instruction.toEncodableInstance() = when (this) {
     is XcmV2Instruction.ReserveAssetDeposited -> DictEnum.Entry(
         name = "ReserveAssetDeposited",
         value = assets.toEncodableInstance()
+    )
+    is XcmV2Instruction.DepositReserveAsset -> DictEnum.Entry(
+        name = "DepositReserveAsset",
+        value = structOf(
+            "assets" to assets.toEncodableInstance(),
+            "max_assets" to maxAssets,
+            "dest" to dest.toEncodableInstance(),
+            "xcm" to xcm.toEncodableInstance()
+        )
     )
 }
 

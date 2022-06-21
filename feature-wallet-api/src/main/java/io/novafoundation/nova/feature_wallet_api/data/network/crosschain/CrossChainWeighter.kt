@@ -4,7 +4,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfer
 import java.math.BigInteger
 
 data class CrossChainFee(
-    val origin: BigInteger,
     val reserve: BigInteger?,
     val destination: BigInteger?
 )
