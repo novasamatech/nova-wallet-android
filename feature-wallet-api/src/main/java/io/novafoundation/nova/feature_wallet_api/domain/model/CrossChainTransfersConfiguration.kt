@@ -93,9 +93,9 @@ class MultiLocation(
 
         class PalletInstance(val index: BigInteger) : Junction()
 
-        class AccountKey20(val accountId: AccountId): Junction()
+        class AccountKey20(val accountId: AccountId) : Junction()
 
-        class AccountId32(val accountId: AccountId): Junction()
+        class AccountId32(val accountId: AccountId) : Junction()
     }
 }
 

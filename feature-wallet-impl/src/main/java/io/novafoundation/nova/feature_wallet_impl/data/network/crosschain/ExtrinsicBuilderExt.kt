@@ -81,7 +81,7 @@ private fun XcmV2Instruction.toEncodableInstance() = when (this) {
     )
 }
 
-private fun WeightLimit.toEncodableInstance() = when(this) {
+private fun WeightLimit.toEncodableInstance() = when (this) {
     is WeightLimit.Limited -> DictEnum.Entry("Limited", weight)
     WeightLimit.Unlimited -> DictEnum.Entry("Unlimited", null)
 }
@@ -131,4 +131,3 @@ private fun AccountId.toJunctionAccountIdInstance() = structOf(
     "network" to DictEnum.Entry("Any", null),
     "id" to this
 )
-

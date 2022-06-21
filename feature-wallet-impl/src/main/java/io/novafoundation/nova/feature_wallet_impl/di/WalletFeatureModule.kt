@@ -188,7 +188,7 @@ class WalletFeatureModule {
     @Provides
     @FeatureScope
     fun provideCrossChainWeigher(
-       extrinsicService: ExtrinsicService,
-       chainRegistry: ChainRegistry
+        extrinsicService: ExtrinsicService,
+        chainRegistry: ChainRegistry
     ): CrossChainWeigher = RealCrossChainWeigher(extrinsicService, chainRegistry)
 }

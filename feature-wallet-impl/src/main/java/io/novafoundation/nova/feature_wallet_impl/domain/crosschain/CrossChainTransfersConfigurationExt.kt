@@ -20,7 +20,7 @@ import java.math.BigInteger
 fun MultiLocation.localView(): MultiLocation {
     return MultiLocation(
         parents = BigInteger.ZERO,
-        interior = when(val interior = interior) {
+        interior = when (val interior = interior) {
             MultiLocation.Interior.Here -> interior
 
             is MultiLocation.Interior.Junctions -> interior.junctions.takeLastWhile { it !is Junction.ParachainId }
@@ -53,12 +53,12 @@ operator fun MultiLocation.plus(suffix: MultiLocation): MultiLocation {
 }
 
 private val MultiLocation.Interior.junctionList: List<Junction>
-    get() = when(this) {
+    get() = when (this) {
         MultiLocation.Interior.Here -> emptyList()
         is MultiLocation.Interior.Junctions -> junctions
     }
 
-fun List<Junction>.toInterior() = when(size) {
+fun List<Junction>.toInterior() = when (size) {
     0 -> MultiLocation.Interior.Here
     else -> MultiLocation.Interior.Junctions(this)
 }
@@ -93,7 +93,6 @@ fun CrossChainTransfersConfiguration.transferConfiguration(
         }
     )
 }
-
 
 private fun CrossChainTransfersConfiguration.matchInstructions(
     xcmFee: XcmFee<String>,
@@ -148,7 +147,7 @@ private fun SiblingParachain(paraId: ParaId): MultiLocation {
 }
 
 private fun CrossChainTransfersConfiguration.originAssetLocationOf(assetTransfers: CrossChainTransfersConfiguration.AssetTransfers): MultiLocation {
-    return when(val path = assetTransfers.assetLocationPath) {
+    return when (val path = assetTransfers.assetLocationPath) {
         is AssetLocationPath.Absolute -> assetLocations.getValue(assetTransfers.assetLocation).multiLocation.childView()
         is AssetLocationPath.Relative -> assetLocations.getValue(assetTransfers.assetLocation).multiLocation.localView()
         is AssetLocationPath.Concrete -> path.multiLocation

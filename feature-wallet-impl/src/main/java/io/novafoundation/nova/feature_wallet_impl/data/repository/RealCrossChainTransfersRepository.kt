@@ -17,7 +17,7 @@ import kotlinx.coroutines.withContext
 class RealCrossChainTransfersRepository(
     private val api: CrossChainConfigApi,
     private val remoteStorageSource: StorageDataSource
-): CrossChainTransfersRepository {
+) : CrossChainTransfersRepository {
 
     override suspend fun paraId(chaniId: ChainId): ParaId? {
         return remoteStorageSource.query(chaniId) {
@@ -26,7 +26,7 @@ class RealCrossChainTransfersRepository(
     }
 
     override suspend fun getConfiguration(): CrossChainTransfersConfiguration = withContext(Dispatchers.Default) {
-       val remote = retryUntilDone { api.getCrossChainConfig() }
+        val remote = retryUntilDone { api.getCrossChainConfig() }
 
         mapCrossChainConfigFromRemote(remote)
     }

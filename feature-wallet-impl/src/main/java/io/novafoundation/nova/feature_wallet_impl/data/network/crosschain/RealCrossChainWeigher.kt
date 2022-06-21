@@ -42,7 +42,7 @@ class RealCrossChainWeigher(
         val instructionTypes = feeConfig.xcmFeeType.instructions
         val maxWeight = feeConfig.instructionWeight * instructionTypes.size.toBigInteger()
 
-        return when(val mode = feeConfig.xcmFeeType.mode) {
+        return when (val mode = feeConfig.xcmFeeType.mode) {
             is Mode.Proportional -> mode.weightToFee(maxWeight)
 
             Mode.Standard -> {
