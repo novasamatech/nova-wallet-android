@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.crosschain
 
 import io.novafoundation.nova.common.data.network.runtime.binding.Weight
-import io.novafoundation.nova.common.data.network.runtime.model.FeeResponse
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainFee
@@ -18,8 +17,6 @@ import io.novafoundation.nova.feature_wallet_impl.domain.crosschain.weightToFee
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger
-
-private val WEIGHT_PER_INSTRUCTION = 200_000_000L.toBigInteger()
 
 class RealCrossChainWeigher(
     private val extrinsicService: ExtrinsicService,
@@ -41,21 +38,21 @@ class RealCrossChainWeigher(
     private suspend fun CrossChainTransferConfiguration.feeFor(feeConfig: CrossChainFeeConfiguration): BigInteger? {
         val chain = chainRegistry.getChain(feeConfig.chainId)
         val instructionTypes = feeConfig.xcmFeeType.instructions
+        val maxWeight = feeConfig.instructionWeight * instructionTypes.size.toBigInteger()
 
-        val xcmMessage = xcmMessage(instructionTypes, chain)
-        val maxWeight = WEIGHT_PER_INSTRUCTION * instructionTypes.size.toBigInteger()
+        return when(val mode = feeConfig.xcmFeeType.mode) {
+            is Mode.Proportional -> mode.weightToFee(maxWeight)
 
-        val paymentInfo = extrinsicService.paymentInfo(chain) {
-            xcmExecute(xcmMessage, maxWeight = maxWeight)
-        }
+            Mode.Standard -> {
+                val xcmMessage = xcmMessage(instructionTypes, chain)
 
-        return feeConfig.calculateFee(paymentInfo)
-    }
+                val paymentInfo = extrinsicService.paymentInfo(chain) {
+                    xcmExecute(xcmMessage, maxWeight = maxWeight)
+                }
 
-    private fun CrossChainFeeConfiguration.calculateFee(nodeResponse: FeeResponse): BigInteger? {
-        return when (val mode = xcmFeeType.mode) {
-            is Mode.Proportional -> mode.weightToFee(nodeResponse.weight.toBigInteger())
-            Mode.Standard -> nodeResponse.partialFee
+                paymentInfo.partialFee
+            }
+
             Mode.Unknown -> null
         }
     }

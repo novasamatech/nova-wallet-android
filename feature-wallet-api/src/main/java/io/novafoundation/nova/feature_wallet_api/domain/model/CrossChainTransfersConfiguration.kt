@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_wallet_api.domain.model
 
 import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
+import io.novafoundation.nova.common.data.network.runtime.binding.Weight
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration.XcmFee
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -11,6 +12,7 @@ class CrossChainTransfersConfiguration(
     // Reserves locations from the Relaychain point of view
     val assetLocations: Map<String, ReserveLocation>,
     val feeInstructions: Map<String, List<XCMInstructionType>>,
+    val instructionBaseWeights: Map<String, Weight>,
     val chains: Map<ChainId, List<AssetTransfers>>
 ) {
 
@@ -106,6 +108,7 @@ class CrossChainTransferConfiguration(
 
 class CrossChainFeeConfiguration(
     val chainId: ChainId,
+    val instructionWeight: Weight,
     val xcmFeeType: XcmFee<List<XCMInstructionType>>
 )
 

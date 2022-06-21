@@ -1,10 +1,12 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.crosschain
 
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import java.math.BigInteger
 
 class CrossChainTransfersConfigRemote(
     val assetsLocation: Map<String, ReserveLocationRemote>,
     val instructions: Map<String, List<String>>,
+    val networkBaseWeight: Map<String, BigInteger>,
     val chains: List<CrossChainOriginChainRemote>
 )
 

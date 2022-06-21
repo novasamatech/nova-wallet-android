@@ -101,6 +101,7 @@ private fun CrossChainTransfersConfiguration.matchInstructions(
 ): CrossChainFeeConfiguration {
     return CrossChainFeeConfiguration(
         chainId = chainId,
+        instructionWeight = instructionBaseWeights.getValue(chainId),
         xcmFeeType = XcmFee(
             mode = xcmFee.mode,
             instructions = feeInstructions.getValue(xcmFee.instructions),

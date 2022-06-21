@@ -39,6 +39,7 @@ fun mapCrossChainConfigFromRemote(remote: CrossChainTransfersConfigRemote): Cros
     return CrossChainTransfersConfiguration(
         assetLocations = assetsLocations,
         feeInstructions = feeInstructions,
+        instructionBaseWeights = remote.networkBaseWeight,
         chains = chains
     )
 }
