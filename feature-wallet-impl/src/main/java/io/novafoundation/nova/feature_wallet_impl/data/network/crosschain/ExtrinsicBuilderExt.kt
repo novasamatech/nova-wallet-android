@@ -26,7 +26,7 @@ fun ExtrinsicBuilder.xcmExecute(
     )
 }
 
-private fun VersionedXcm.toEncodableInstance() = when(this) {
+private fun VersionedXcm.toEncodableInstance() = when (this) {
     is VersionedXcm.V2 -> DictEnum.Entry(
         name = "V2",
         value = message.toEncodableInstance()

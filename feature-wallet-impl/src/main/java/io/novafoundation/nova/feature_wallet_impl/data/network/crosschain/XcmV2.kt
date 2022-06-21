@@ -9,7 +9,7 @@ typealias XcmMultiAssets = List<XcmMultiAsset>
 
 sealed class VersionedXcm {
 
-    class V2(val message: XcmV2): VersionedXcm()
+    class V2(val message: XcmV2) : VersionedXcm()
 }
 
 class XcmV2(val instructions: List<XcmV2Instruction>)
@@ -35,7 +35,7 @@ sealed class XcmV2Instruction {
         val maxAssets: BigInteger,
         val dest: MultiLocation,
         val xcm: XcmV2
-    ): XcmV2Instruction()
+    ) : XcmV2Instruction()
 }
 
 sealed class XcmMultiAssetFilter {
