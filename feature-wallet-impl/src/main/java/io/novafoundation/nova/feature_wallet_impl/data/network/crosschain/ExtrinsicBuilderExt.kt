@@ -14,7 +14,7 @@ fun ExtrinsicBuilder.xcmExecute(
     message: XcmV2,
     maxWeight: Weight,
 ): ExtrinsicBuilder {
-    val moduleName = runtime.metadata.firstExistingModule("PalletXcm", "PolkadotXcm", "KusamaXcm")
+    val moduleName = runtime.metadata.firstExistingModule("XcmPallet", "PolkadotXcm", "KusamaXcm")
 
     return call(
         moduleName = moduleName,

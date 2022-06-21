@@ -23,26 +23,50 @@ class CrossChainTransfersIntegrationTest : BaseIntegrationTest() {
     private val crossChainWeigher = walletApi.crossChainWeigher
 
     @Test
-    fun testCrossChainConfig() = runBlocking {
-        val moonriverChain = chainRegistry.findChain { it.name == "Moonriver" }!!
-        val karInMoonriver = moonriverChain.assetsBySymbol.getValue("xcKAR")
+    fun testParachainToParachain() = performFeeTest(
+        from = "Moonriver",
+        what = "xcKAR",
+        to = "Karura"
+    )
 
-        val karuraChain = chainRegistry.findChain { it.name == "Karura" }!!
+    @Test
+    fun testRelaychainToParachain() = performFeeTest(
+        from = "Kusama",
+        what = "KSM",
+        to = "Moonriver"
+    )
 
-        val crossChainConfig = chainTransfersRepository.getConfiguration()
+    @Test
+    fun testParachainToRelaychain() = performFeeTest(
+        from = "Moonriver",
+        what = "xcKSM",
+        to = "Kusama"
+    )
 
-        val crossChainTransfer = crossChainConfig.transferConfiguration(
-            originChain = moonriverChain,
-            originAsset = karInMoonriver,
-            destinationChain = karuraChain,
-            destinationParaId = chainTransfersRepository.paraId(karuraChain.id)
-        )!!
+    private fun performFeeTest(
+        from: String,
+        to: String,
+        what: String
+    ) {
+        runBlocking {
+            val originChain = chainRegistry.findChain { it.name == from }!!
+            val asssetInOrigin = originChain.assetsBySymbol.getValue(what)
 
-        val feeResponse = crossChainWeigher.estimateFee(crossChainTransfer)
+            val destinationChain = chainRegistry.findChain { it.name == to }!!
 
-        error("Destination Fee: ${karInMoonriver.formatAmount(feeResponse.destination!!)}")
+            val crossChainConfig = chainTransfersRepository.getConfiguration()
 
-        Unit
+            val crossChainTransfer = crossChainConfig.transferConfiguration(
+                originChain = originChain,
+                originAsset = asssetInOrigin,
+                destinationChain = destinationChain,
+                destinationParaId = chainTransfersRepository.paraId(destinationChain.id)
+            )!!
+
+            val feeResponse = crossChainWeigher.estimateFee(crossChainTransfer)
+
+            error("Destination Fee: ${asssetInOrigin.formatAmount(feeResponse.destination!!)}")
+        }
     }
 
     private fun Chain.Asset.formatAmount(planks: BigInteger) = "${amountFromPlanks(planks)} $symbol"
