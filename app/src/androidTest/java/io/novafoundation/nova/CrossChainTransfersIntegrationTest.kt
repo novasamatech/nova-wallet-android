@@ -6,8 +6,8 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainFee
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
+import io.novafoundation.nova.feature_wallet_api.domain.implementations.transferConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
-import io.novafoundation.nova.feature_wallet_impl.domain.crosschain.transferConfiguration
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.findChain
 import kotlinx.coroutines.runBlocking

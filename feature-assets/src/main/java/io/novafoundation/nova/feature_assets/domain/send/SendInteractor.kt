@@ -2,12 +2,15 @@ package io.novafoundation.nova.feature_assets.domain.send
 
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
+import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
+import io.novafoundation.nova.feature_wallet_api.domain.implementations.availableDestinationChains
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.RecipientSearchResult
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -16,6 +19,7 @@ class SendInteractor(
     private val chainRegistry: ChainRegistry,
     private val walletRepository: WalletRepository,
     private val assetSourceRegistry: AssetSourceRegistry,
+    private val crossChainTransfersRepository: CrossChainTransfersRepository
 ) {
 
     // TODO wallet
@@ -60,6 +64,14 @@ class SendInteractor(
             .onSuccess { hash ->
                 walletRepository.insertPendingTransfer(hash, transfer, fee)
             }
+    }
+
+    suspend fun availableCrossChainDestinations(origin: Chain.Asset): List<Chain> {
+        val configuration = crossChainTransfersRepository.getConfiguration()
+
+        val chainsById = chainRegistry.chainsById.first()
+
+        return configuration.availableDestinationChains(origin).mapNotNull(chainsById::get)
     }
 
     fun validationSystemFor(asset: Chain.Asset) = assetSourceRegistry.sourceFor(asset).transfers.validationSystem

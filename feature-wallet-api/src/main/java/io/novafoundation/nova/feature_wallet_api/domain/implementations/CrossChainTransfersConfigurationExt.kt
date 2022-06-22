@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_wallet_impl.domain.crosschain
+package io.novafoundation.nova.feature_wallet_api.domain.implementations
 
 import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import io.novafoundation.nova.common.data.network.runtime.binding.Weight

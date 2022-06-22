@@ -8,12 +8,14 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
+import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
+import io.novafoundation.nova.feature_account_api.view.ChainChipModel
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
@@ -33,11 +35,13 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.requireFee
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import kotlin.time.ExperimentalTime
@@ -59,7 +63,7 @@ class SelectSendViewModel(
     Validatable by validationExecutor,
     WithFeeLoaderMixin {
 
-    private val chain by lazyAsync { chainRegistry.getChain(assetPayload.chainId) }
+    private val originChain by lazyAsync { chainRegistry.getChain(assetPayload.chainId) }
     private val chainAsset by lazyAsync { chainRegistry.asset(assetPayload.chainId, assetPayload.chainAssetId) }
 
     val addressInputMixin = addressInputMixinFactory.create(
@@ -68,13 +72,30 @@ class SelectSendViewModel(
         coroutineScope = this
     )
 
-    val chainUi = flowOf {
-        mapChainToUi(chain())
+    val originChainUi = flowOf {
+        mapChainToUi(originChain())
     }
-        .inBackground()
-        .share()
+        .shareInBackground()
 
-    val title = flowOf {
+    private val destinationChain = singleReplaySharedFlow<Chain>()
+
+    private val availableCrossChainDestinations = flowOf {
+        sendInteractor.availableCrossChainDestinations(chainAsset())
+    }
+        .onStart { emit(emptyList()) }
+        .shareInBackground()
+
+    val destinationChainChipModel = combine(
+        availableCrossChainDestinations,
+        destinationChain
+    ) { availableDestinations, currentDestination ->
+        ChainChipModel(
+            chainUi = mapChainToUi(currentDestination),
+            changeable = availableDestinations.isNotEmpty()
+        )
+    }
+
+    val sendFromText = flowOf {
         resourceManager.getString(R.string.wallet_send_tokens_on, chainAsset().symbol)
     }
         .inBackground()
@@ -147,8 +168,10 @@ class SelectSendViewModel(
         router.back()
     }
 
-    private fun setInitialState() {
+    private fun setInitialState()  = launch {
         initialRecipientAddress?.let { addressInputMixin.inputFlow.value = it }
+
+        destinationChain.emit(originChain())
     }
 
     @OptIn(ExperimentalTime::class)
@@ -192,7 +215,7 @@ class SelectSendViewModel(
     }
 
     private suspend fun buildTransfer(amount: BigDecimal, address: String): AssetTransfer {
-        val chain = chain()
+        val chain = originChain()
 
         return AssetTransfer(
             sender = selectedAccount.first(),

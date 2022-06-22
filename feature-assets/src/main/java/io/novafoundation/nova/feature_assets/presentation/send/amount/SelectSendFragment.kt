@@ -17,11 +17,12 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 import kotlinx.android.synthetic.main.fragment_select_send.chooseAmountContainer
 import kotlinx.android.synthetic.main.fragment_select_send.selectSendAmount
-import kotlinx.android.synthetic.main.fragment_select_send.selectSendChain
+import kotlinx.android.synthetic.main.fragment_select_send.selectSendDestinationChain
 import kotlinx.android.synthetic.main.fragment_select_send.selectSendFee
+import kotlinx.android.synthetic.main.fragment_select_send.selectSendFromTitle
 import kotlinx.android.synthetic.main.fragment_select_send.selectSendNext
+import kotlinx.android.synthetic.main.fragment_select_send.selectSendOriginChain
 import kotlinx.android.synthetic.main.fragment_select_send.selectSendRecipient
-import kotlinx.android.synthetic.main.fragment_select_send.selectSendTitle
 import kotlinx.android.synthetic.main.fragment_select_send.selectSendToolbar
 
 private const val KEY_ADDRESS = "KEY_ADDRESS"
@@ -68,8 +69,11 @@ class SelectSendFragment : BaseFragment<SelectSendViewModel>() {
         setupAmountChooser(viewModel.amountChooserMixin, selectSendAmount)
         setupAddressInput(viewModel.addressInputMixin, selectSendRecipient)
 
-        viewModel.chainUi.observe(selectSendChain::setChain)
+        viewModel.originChainUi.observe(selectSendOriginChain::setChain)
+        viewModel.destinationChainChipModel.observe(selectSendDestinationChain::setModel)
+
         viewModel.continueButtonStateLiveData.observe(selectSendNext::setState)
-        viewModel.title.observe(selectSendTitle::setText)
+
+        viewModel.sendFromText.observe(selectSendFromTitle::setText)
     }
 }

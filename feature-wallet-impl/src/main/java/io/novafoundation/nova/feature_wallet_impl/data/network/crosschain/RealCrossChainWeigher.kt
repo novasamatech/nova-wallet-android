@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainFee
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
+import io.novafoundation.nova.feature_wallet_api.domain.implementations.weightToFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainFeeConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration.XcmFee.Mode
@@ -14,7 +15,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.MultiLocation.Junc
 import io.novafoundation.nova.feature_wallet_api.domain.model.XCMInstructionType
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.XcmMultiAsset.Fungibility
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.XcmMultiAsset.Id
-import io.novafoundation.nova.feature_wallet_impl.domain.crosschain.weightToFee
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger

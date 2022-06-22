@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_wallet_impl.data.mappers
 
 import io.novafoundation.nova.common.utils.asGsonParsedNumber
+import io.novafoundation.nova.feature_wallet_api.domain.implementations.toInterior
 import io.novafoundation.nova.feature_wallet_api.domain.model.AssetLocationPath
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration.AssetTransfers
@@ -19,7 +20,6 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.Reserv
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.XcmDestinationRemote
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.XcmFeeRemote
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.XcmTransferRemote
-import io.novafoundation.nova.feature_wallet_impl.domain.crosschain.toInterior
 import java.math.BigInteger
 
 fun mapCrossChainConfigFromRemote(remote: CrossChainTransfersConfigRemote): CrossChainTransfersConfiguration {

@@ -25,17 +25,33 @@
         app:flexWrap="wrap">
 
         <TextView
-            android:id="@+id/selectSendTitle"
+            android:id="@+id/selectSendFromTitle"
             style="@style/TextAppearance.NovaFoundation.Bold.Title2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="8dp"
             android:includeFontPadding="false"
-            tools:text="Send KSM on" />
+            tools:text="Send KSM from" />
 
         <io.novafoundation.nova.feature_account_api.view.ChainChipView
-            android:id="@+id/selectSendChain"
+            android:id="@+id/selectSendOriginChain"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            style="@style/TextAppearance.NovaFoundation.Bold.Title2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:includeFontPadding="false"
+            android:text="@string/wallet_send_tokens_to"/>
+
+        <io.novafoundation.nova.feature_account_api.view.ChainChipView
+            android:id="@+id/selectSendDestinationChain"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp" />
