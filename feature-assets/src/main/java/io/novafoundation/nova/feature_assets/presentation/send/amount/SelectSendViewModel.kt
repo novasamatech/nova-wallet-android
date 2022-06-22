@@ -2,6 +2,8 @@ package io.novafoundation.nova.feature_assets.presentation.send.amount
 
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.list.headers.TextHeader
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
@@ -22,6 +24,8 @@ import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.WalletRouter
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
+import io.novafoundation.nova.feature_assets.presentation.send.amount.view.CrossChainDestinationModel
+import io.novafoundation.nova.feature_assets.presentation.send.amount.view.SelectCrossChainDestinationBottomSheet
 import io.novafoundation.nova.feature_assets.presentation.send.mapAssetTransferValidationFailureToUI
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
@@ -36,6 +40,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.requireF
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -43,6 +48,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import kotlin.time.ExperimentalTime
 
@@ -58,6 +64,7 @@ class SelectSendViewModel(
     private val selectedAccountUseCase: SelectedAccountUseCase,
     private val resourceManager: ResourceManager,
     private val addressInputMixinFactory: AddressInputMixinFactory,
+    private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     amountChooserMixinFactory: AmountChooserMixin.Factory
 ) : BaseViewModel(),
     Validatable by validationExecutor,
@@ -94,6 +101,8 @@ class SelectSendViewModel(
             changeable = availableDestinations.isNotEmpty()
         )
     }
+
+    val chooseDestinationChain = actionAwaitableMixinFactory.create<SelectCrossChainDestinationBottomSheet.Payload, Chain>()
 
     val sendFromText = flowOf {
         resourceManager.getString(R.string.wallet_send_tokens_on, chainAsset().symbol)
@@ -168,6 +177,22 @@ class SelectSendViewModel(
         router.back()
     }
 
+    fun destinationChainClicked() = launch {
+        val destinations = availableCrossChainDestinations.first()
+        if (destinations.isEmpty()) return@launch
+
+        val payload = withContext(Dispatchers.Default) {
+            SelectCrossChainDestinationBottomSheet.Payload(
+                destinations = buildDestinationsMap(destinations),
+                selectedChain = destinationChain.first()
+            )
+        }
+
+        val newDestinationChain = chooseDestinationChain.awaitAction(payload)
+
+        destinationChain.emit(newDestinationChain)
+    }
+
     private fun setInitialState()  = launch {
         initialRecipientAddress?.let { addressInputMixin.inputFlow.value = it }
 
@@ -224,5 +249,31 @@ class SelectSendViewModel(
             chainAsset = chainAsset(),
             amount = amount
         )
+    }
+
+    @OptIn(ExperimentalStdlibApi::class)
+    private suspend fun buildDestinationsMap(crossChainDestinations: List<Chain>): Map<TextHeader, List<CrossChainDestinationModel>> {
+        val crossChainDestinationModels = crossChainDestinations.map {
+            CrossChainDestinationModel(
+                chain = it,
+                chainUi = mapChainToUi(it)
+            )
+        }
+        val onChainDestination = CrossChainDestinationModel(
+            chain = originChain(),
+            chainUi = originChainUi.first()
+        )
+
+        return buildMap {
+            put(
+                TextHeader(resourceManager.getString(R.string.wallet_send_on_chain)),
+                listOf(onChainDestination)
+            )
+
+            put(
+                TextHeader(resourceManager.getString(R.string.wallet_send_cross_chain)),
+                crossChainDestinationModels
+            )
+        }
     }
 }

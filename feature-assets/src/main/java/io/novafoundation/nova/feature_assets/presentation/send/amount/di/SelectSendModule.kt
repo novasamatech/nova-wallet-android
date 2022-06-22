@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -39,8 +40,9 @@ class SelectSendModule {
         amountChooserMixinFactory: AmountChooserMixin.Factory,
         addressInputMixinFactory: AddressInputMixinFactory,
         assetPayload: AssetPayload,
-        recipientAddress: String?
-    ): ViewModel {
+        recipientAddress: String?,
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+        ): ViewModel {
         return SelectSendViewModel(
             interactor = interactor,
             router = router,
@@ -53,7 +55,8 @@ class SelectSendModule {
             validationExecutor = validationExecutor,
             selectedAccountUseCase = selectedAccountUseCase,
             addressInputMixinFactory = addressInputMixinFactory,
-            initialRecipientAddress = recipientAddress
+            initialRecipientAddress = recipientAddress,
+            actionAwaitableMixinFactory = actionAwaitableMixinFactory
         )
     }
 

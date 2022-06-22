@@ -9,7 +9,7 @@
         android:id="@+id/itemAssetGroupLabel"
         style="@style/TextAppearance.NovaFoundation.SemiBold.Caps1"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="22dp"
         android:layout_gravity="center_vertical"
         android:includeFontPadding="false"
         android:paddingStart="32dp"

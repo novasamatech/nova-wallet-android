@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
-
+  <string name="wallet_send_on_chain">On-chain</string>
+  <string name="wallet_send_cross_chain">Cross-chain</string>
+  <string name="wallet_send_recipient_network">Recipient network</string>
   <string name="wallet_send_tokens_to">to</string>
 
 <!--  <string name="wallet_send_tokens_on">Send %s on</string>-->

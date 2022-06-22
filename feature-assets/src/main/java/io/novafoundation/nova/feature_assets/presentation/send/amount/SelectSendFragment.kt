@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
+import io.novafoundation.nova.feature_assets.presentation.send.amount.view.SelectCrossChainDestinationBottomSheet
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 import kotlinx.android.synthetic.main.fragment_select_send.chooseAmountContainer
@@ -51,6 +52,8 @@ class SelectSendFragment : BaseFragment<SelectSendViewModel>() {
         selectSendNext.setOnClickListener { viewModel.nextClicked() }
 
         selectSendToolbar.setHomeButtonListener { viewModel.backClicked() }
+
+        selectSendDestinationChain.setOnClickListener { viewModel.destinationChainClicked() }
     }
 
     override fun inject() {
@@ -68,6 +71,15 @@ class SelectSendFragment : BaseFragment<SelectSendViewModel>() {
         setupFeeLoading(viewModel, selectSendFee)
         setupAmountChooser(viewModel.amountChooserMixin, selectSendAmount)
         setupAddressInput(viewModel.addressInputMixin, selectSendRecipient)
+
+        viewModel.chooseDestinationChain.awaitableActionLiveData.observeEvent {
+            SelectCrossChainDestinationBottomSheet(
+                context = requireContext(),
+                payload = it.payload,
+                onSelected = it.onSuccess,
+                onCancelled = it.onCancel
+            ).show()
+        }
 
         viewModel.originChainUi.observe(selectSendOriginChain::setChain)
         viewModel.destinationChainChipModel.observe(selectSendDestinationChain::setModel)
