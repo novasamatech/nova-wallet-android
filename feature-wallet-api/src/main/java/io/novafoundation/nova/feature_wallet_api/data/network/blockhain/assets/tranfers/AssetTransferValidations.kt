@@ -64,4 +64,4 @@ val AssetTransferPayload.amountInCommissionAsset: BigInteger
     }
 
 val AssetTransfer.amountInPlanks
-    get() = chainAsset.planksFromAmount(amount)
+    get() = originChainAsset.planksFromAmount(amount)

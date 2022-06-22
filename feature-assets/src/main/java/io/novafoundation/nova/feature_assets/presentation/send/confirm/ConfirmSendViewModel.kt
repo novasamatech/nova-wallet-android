@@ -133,7 +133,7 @@ class ConfirmSendViewModel(
         val payload = buildValidationPayload()
 
         validationExecutor.requireValid(
-            validationSystem = sendInteractor.validationSystemFor(payload.transfer.chainAsset),
+            validationSystem = sendInteractor.validationSystemFor(payload.transfer.originChainAsset),
             payload = payload,
             progressConsumer = _transferSubmittingLiveData.progressConsumer(),
             validationFailureTransformer = { mapAssetTransferValidationFailureToUI(resourceManager, it) }
@@ -174,8 +174,9 @@ class ConfirmSendViewModel(
             transfer = AssetTransfer(
                 sender = currentAccount.first(),
                 recipient = transferDraft.recipientAddress,
-                chain = chain,
-                chainAsset = chainAsset,
+                originChain = chain,
+                destinationChain = chain, // TODO cross chain confirm
+                originChainAsset = chainAsset,
                 amount = transferDraft.amount
             ),
             fee = transferDraft.fee,

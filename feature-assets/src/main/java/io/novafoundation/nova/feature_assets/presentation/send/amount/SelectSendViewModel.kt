@@ -73,18 +73,18 @@ class SelectSendViewModel(
     private val originChain by lazyAsync { chainRegistry.getChain(assetPayload.chainId) }
     private val chainAsset by lazyAsync { chainRegistry.asset(assetPayload.chainId, assetPayload.chainAssetId) }
 
-    val addressInputMixin = addressInputMixinFactory.create(
-        chainId = assetPayload.chainId,
-        errorDisplayer = ::showError,
-        coroutineScope = this
-    )
-
     val originChainUi = flowOf {
         mapChainToUi(originChain())
     }
         .shareInBackground()
 
     private val destinationChain = singleReplaySharedFlow<Chain>()
+
+    val addressInputMixin = addressInputMixinFactory.create(
+        chainFlow = destinationChain,
+        errorDisplayer = ::showError,
+        coroutineScope = this
+    )
 
     private val availableCrossChainDestinations = flowOf {
         sendInteractor.availableCrossChainDestinations(chainAsset())
@@ -240,13 +240,12 @@ class SelectSendViewModel(
     }
 
     private suspend fun buildTransfer(amount: BigDecimal, address: String): AssetTransfer {
-        val chain = originChain()
-
         return AssetTransfer(
             sender = selectedAccount.first(),
             recipient = address,
-            chain = chain,
-            chainAsset = chainAsset(),
+            originChain = originChain(),
+            originChainAsset = chainAsset(),
+            destinationChain = destinationChain.first(),
             amount = amount
         )
     }

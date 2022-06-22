@@ -104,6 +104,7 @@ class CrossChainTransferConfiguration(
     val destinationChainLocation: MultiLocation,
     val destinationFee: CrossChainFeeConfiguration,
     val reserveFee: CrossChainFeeConfiguration?,
+    val transferType: XcmTransferType
 )
 
 class CrossChainFeeConfiguration(

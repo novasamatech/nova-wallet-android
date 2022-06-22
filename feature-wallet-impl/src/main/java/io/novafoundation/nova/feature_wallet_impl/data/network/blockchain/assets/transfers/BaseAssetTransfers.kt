@@ -51,15 +51,15 @@ abstract class BaseAssetTransfers(
     protected abstract val transferFunctions: List<Pair<String, String>>
 
     override suspend fun performTransfer(transfer: AssetTransfer): Result<String> {
-        val senderAccountId = transfer.sender.accountIdIn(transfer.chain)!!
+        val senderAccountId = transfer.sender.accountIdIn(transfer.originChain)!!
 
-        return extrinsicService.submitExtrinsic(transfer.chain, senderAccountId) {
+        return extrinsicService.submitExtrinsic(transfer.originChain, senderAccountId) {
             transfer(transfer)
         }
     }
 
     override suspend fun calculateFee(transfer: AssetTransfer): BigInteger {
-        return extrinsicService.estimateFee(transfer.chain) {
+        return extrinsicService.estimateFee(transfer.originChain) {
             transfer(transfer)
         }
     }
@@ -73,7 +73,7 @@ abstract class BaseAssetTransfers(
     }
 
     private suspend fun existentialDepositForUsedAsset(transfer: AssetTransfer): BigDecimal {
-        return existentialDeposit(transfer.chain, transfer.chainAsset)
+        return existentialDeposit(transfer.originChain, transfer.originChainAsset)
     }
 
     private suspend fun existentialDeposit(chain: Chain, asset: Chain.Asset): BigDecimal {
@@ -106,14 +106,14 @@ abstract class BaseAssetTransfers(
     private fun AssetTransfersValidationSystemBuilder.notPhishingRecipient() = notPhishingAccount(
         factory = phishingValidationFactory,
         address = { it.transfer.recipient },
-        chain = { it.transfer.chain },
+        chain = { it.transfer.originChain },
         warning = AssetTransferValidationFailure::PhishingRecipient
     )
 
     private fun AssetTransfersValidationSystemBuilder.validAddress() = validAddress(
         address = { it.transfer.recipient },
-        chain = { it.transfer.chain },
-        error = { AssetTransferValidationFailure.InvalidRecipientAddress(it.transfer.chain) }
+        chain = { it.transfer.originChain },
+        error = { AssetTransferValidationFailure.InvalidRecipientAddress(it.transfer.originChain) }
     )
 
     protected fun AssetTransfersValidationSystemBuilder.positiveAmount() = positiveAmount(
@@ -151,7 +151,7 @@ abstract class BaseAssetTransfers(
     protected fun AssetTransfersValidationSystemBuilder.sufficientCommissionBalanceToStayAboveED() = enoughTotalToStayAboveED(
         fee = { it.fee },
         total = { it.commissionAsset.total },
-        existentialDeposit = { existentialDeposit(it.transfer.chain, it.commissionAsset.token.configuration) },
+        existentialDeposit = { existentialDeposit(it.transfer.originChain, it.commissionAsset.token.configuration) },
         error = { AssetTransferValidationFailure.NotEnoughFunds.InCommissionAsset(commissionAsset = it.commissionAsset.token.configuration) }
     )
 

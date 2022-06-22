@@ -79,5 +79,5 @@ class SendInteractor(
     suspend fun areTransfersEnabled(asset: Chain.Asset) = assetSourceRegistry.sourceFor(asset).transfers.areTransfersEnabled(asset)
 
     private fun getAssetTransfers(transfer: AssetTransfer) =
-        assetSourceRegistry.sourceFor(transfer.chainAsset).transfers
+        assetSourceRegistry.sourceFor(transfer.originChainAsset).transfers
 }

@@ -5,24 +5,21 @@ import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.utils.inBackground
-import io.novafoundation.nova.common.utils.invoke
-import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.utils.systemCall.ScanQrCodeCall
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.utils.systemCall.onSystemCallFailure
 import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.runtime.ext.accountIdOf
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class AddressInputMixinFactory(
-    private val chainRegistry: ChainRegistry,
     private val addressIconGenerator: AddressIconGenerator,
     private val systemCallExecutor: SystemCallExecutor,
     private val clipboardManager: ClipboardManager,
@@ -31,12 +28,11 @@ class AddressInputMixinFactory(
 ) {
 
     fun create(
-        chainId: ChainId,
+        chainFlow: Flow<Chain>,
         errorDisplayer: (cause: String) -> Unit,
         coroutineScope: CoroutineScope
     ): AddressInputMixin = AddressInputMixinProvider(
-        chainId = chainId,
-        chainRegistry = chainRegistry,
+        chainFlow = chainFlow,
         addressIconGenerator = addressIconGenerator,
         systemCallExecutor = systemCallExecutor,
         clipboardManager = clipboardManager,
@@ -48,8 +44,7 @@ class AddressInputMixinFactory(
 }
 
 class AddressInputMixinProvider(
-    private val chainId: ChainId,
-    private val chainRegistry: ChainRegistry,
+    private val chainFlow: Flow<Chain>,
     private val addressIconGenerator: AddressIconGenerator,
     private val systemCallExecutor: SystemCallExecutor,
     private val clipboardManager: ClipboardManager,
@@ -61,17 +56,13 @@ class AddressInputMixinProvider(
     CoroutineScope by coroutineScope,
     WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(coroutineScope) {
 
-    private val chain by coroutineScope.lazyAsync {
-        chainRegistry.getChain(chainId)
-    }
-
     private val clipboardFlow = clipboardManager.observePrimaryClip()
         .inBackground()
         .share()
 
     override val inputFlow = MutableStateFlow("")
 
-    override val state = combine(inputFlow, clipboardFlow, ::createState)
+    override val state = combine(chainFlow, inputFlow, clipboardFlow, ::createState)
         .inBackground()
         .share()
 
@@ -90,7 +81,7 @@ class AddressInputMixinProvider(
     override fun scanClicked() {
         launch {
             systemCallExecutor.executeSystemCall(ScanQrCodeCall()).mapCatching {
-                qrSharingFactory.create(chain()).decode(it).address
+                qrSharingFactory.create(chainFlow.first()).decode(it).address
             }.onSuccess { address ->
                 inputFlow.value = address
             }.onSystemCallFailure {
@@ -99,10 +90,10 @@ class AddressInputMixinProvider(
         }
     }
 
-    private suspend fun createState(input: String, clipboard: String?): AddressInputState {
+    private suspend fun createState(chain: Chain, input: String, clipboard: String?): AddressInputState {
         val iconState = runCatching {
             val icon = addressIconGenerator.createAddressIcon(
-                accountId = chain().accountIdOf(address = input),
+                accountId = chain.accountIdOf(address = input),
                 sizeInDp = AddressIconGenerator.SIZE_MEDIUM,
                 backgroundColorRes = AddressIconGenerator.BACKGROUND_TRANSPARENT
             )

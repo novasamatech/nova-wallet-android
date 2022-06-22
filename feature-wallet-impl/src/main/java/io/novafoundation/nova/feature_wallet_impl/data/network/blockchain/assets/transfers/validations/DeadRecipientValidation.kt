@@ -20,13 +20,13 @@ class DeadRecipientValidation(
 ) : AssetTransfersValidation {
 
     override suspend fun validate(value: AssetTransferPayload): ValidationStatus<AssetTransferValidationFailure> {
-        val chain = value.transfer.chain
+        val chain = value.transfer.destinationChain
         val chainAsset = assetToCheck(value).token.configuration
 
         val balanceSource = assetSourceRegistry.sourceFor(chainAsset).balance
 
         val existentialDeposit = balanceSource.existentialDeposit(chain, chainAsset)
-        val recipientAccountId = value.transfer.chain.accountIdOf(value.transfer.recipient)
+        val recipientAccountId = value.transfer.destinationChain.accountIdOf(value.transfer.recipient)
 
         val recipientBalance = balanceSource.queryTotalBalance(chain, chainAsset, recipientAccountId)
 
