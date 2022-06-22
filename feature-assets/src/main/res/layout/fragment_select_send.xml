@@ -44,9 +44,9 @@
             style="@style/TextAppearance.NovaFoundation.Bold.Title2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
+            app:layout_wrapBefore="true"
             android:includeFontPadding="false"
             android:text="@string/wallet_send_tokens_to"/>
 
@@ -96,7 +96,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        app:title="Cross chain fee"
         android:layout_marginEnd="16dp"
         app:dividerVisible="false" />
 
