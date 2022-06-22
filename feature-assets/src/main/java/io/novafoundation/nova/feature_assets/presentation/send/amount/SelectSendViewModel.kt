@@ -32,9 +32,10 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure.WillRemoveAccount
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.requireFee
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -44,12 +45,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
+import java.math.BigInteger
 import kotlin.time.ExperimentalTime
 
 class SelectSendViewModel(
@@ -67,8 +67,7 @@ class SelectSendViewModel(
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     amountChooserMixinFactory: AmountChooserMixin.Factory
 ) : BaseViewModel(),
-    Validatable by validationExecutor,
-    WithFeeLoaderMixin {
+    Validatable by validationExecutor {
 
     private val originChain by lazyAsync { chainRegistry.getChain(assetPayload.chainId) }
     private val chainAsset by lazyAsync { chainRegistry.asset(assetPayload.chainId, assetPayload.chainAssetId) }
@@ -124,7 +123,8 @@ class SelectSendViewModel(
         .inBackground()
         .share()
 
-    override val feeLoaderMixin: FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(commissionAssetFlow)
+    val originFeeMixin: FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(commissionAssetFlow)
+    val crossChainFeeMixin: FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(assetFlow)
 
     val amountChooserMixin: AmountChooserMixin.Presentation = amountChooserMixinFactory.create(
         scope = this,
@@ -147,13 +147,19 @@ class SelectSendViewModel(
     init {
         setInitialState()
 
-        listenFee()
+        setupFees()
+
+        syncCrossChainConfig()
     }
 
-    fun nextClicked() = feeLoaderMixin.requireFee(this) { fee ->
+    fun nextClicked() = originFeeMixin.requireFee(this) { fee ->
         launch {
             val payload = AssetTransferPayload(
-                transfer = buildTransfer(amountChooserMixin.amount.first(), addressInputMixin.inputFlow.first()),
+                transfer = buildTransfer(
+                    destinationChain = destinationChain.first(),
+                    amount = amountChooserMixin.amount.first(),
+                    address = addressInputMixin.inputFlow.first()
+                ),
                 fee = fee,
                 commissionAsset = commissionAssetFlow.first(),
                 usedAsset = assetFlow.first()
@@ -199,11 +205,29 @@ class SelectSendViewModel(
         destinationChain.emit(originChain())
     }
 
+    private fun syncCrossChainConfig() = launch {
+        sendInteractor.syncCrossChainConfig()
+    }
+
     @OptIn(ExperimentalTime::class)
-    private fun listenFee() {
-        amountChooserMixin.backPressuredAmount
-            .mapLatest(::loadFee)
-            .launchIn(viewModelScope)
+    private fun setupFees() {
+        originFeeMixin.setupFee { transfer -> sendInteractor.getOriginFee(transfer) }
+        crossChainFeeMixin.setupFee { transfer -> sendInteractor.getCrossChainFee(transfer) }
+    }
+
+    private fun FeeLoaderMixin.Presentation.setupFee(
+        feeConstructor: suspend Token.(transfer: AssetTransfer) -> BigInteger?
+    ) {
+        connectWith(
+            inputSource1 = amountChooserMixin.backPressuredAmount,
+            inputSource2 = destinationChain,
+            scope = viewModelScope,
+            feeConstructor = { amount, destinationChain ->
+                val transfer = buildTransfer(destinationChain, amount, addressInputMixin.inputFlow.first())
+
+                feeConstructor(transfer)
+            }
+        )
     }
 
     private fun openConfirmScreen(validPayload: AssetTransferPayload) = launch {
@@ -229,23 +253,13 @@ class SelectSendViewModel(
         else -> payload
     }
 
-    private suspend fun loadFee(amount: BigDecimal) {
-        feeLoaderMixin.loadFeeSuspending(
-            retryScope = viewModelScope,
-            feeConstructor = {
-                sendInteractor.getTransferFee(buildTransfer(amount, addressInputMixin.inputFlow.first()))
-            },
-            onRetryCancelled = ::backClicked
-        )
-    }
-
-    private suspend fun buildTransfer(amount: BigDecimal, address: String): AssetTransfer {
+    private suspend fun buildTransfer(destinationChain: Chain, amount: BigDecimal, address: String): AssetTransfer {
         return AssetTransfer(
             sender = selectedAccount.first(),
             recipient = address,
             originChain = originChain(),
             originChainAsset = chainAsset(),
-            destinationChain = destinationChain.first(),
+            destinationChain = destinationChain,
             amount = amount
         )
     }

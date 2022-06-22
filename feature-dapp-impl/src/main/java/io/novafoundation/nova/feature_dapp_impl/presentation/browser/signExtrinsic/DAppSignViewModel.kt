@@ -42,7 +42,7 @@ class DAppSignViewModel(
     private val commissionTokenFlow = interactor.commissionTokenFlow()
         ?.shareInBackground()
 
-    override val feeLoaderMixin: FeeLoaderMixin.Presentation? = commissionTokenFlow?.let {
+    override val originFeeMixin: FeeLoaderMixin.Presentation? = commissionTokenFlow?.let {
         feeLoaderMixinFactory.create(
             tokenFlow = it,
             configuration = FeeLoaderMixin.Configuration(showZeroFiat = false)
@@ -107,7 +107,7 @@ class DAppSignViewModel(
     }
 
     private fun maybeLoadFee() {
-        feeLoaderMixin?.loadFee(
+        originFeeMixin?.loadFee(
             coroutineScope = this,
             feeConstructor = { interactor.calculateFee() },
             onRetryCancelled = {}

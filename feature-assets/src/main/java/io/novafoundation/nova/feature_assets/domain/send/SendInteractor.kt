@@ -1,10 +1,16 @@
 package io.novafoundation.nova.feature_assets.domain.send
 
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.isCrossChain
+import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
+import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.availableDestinationChains
+import io.novafoundation.nova.feature_wallet_api.domain.implementations.transferConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.RecipientSearchResult
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -19,6 +25,8 @@ class SendInteractor(
     private val chainRegistry: ChainRegistry,
     private val walletRepository: WalletRepository,
     private val assetSourceRegistry: AssetSourceRegistry,
+    private val crossChainWeigher: CrossChainWeigher,
+    private val crossChainTransactor: CrossChainTransactor,
     private val crossChainTransfersRepository: CrossChainTransfersRepository
 ) {
 
@@ -52,18 +60,45 @@ class SendInteractor(
         return /*walletRepository.isAccountIdFromPhishingList(address)*/ false
     }
 
-    suspend fun getTransferFee(transfer: AssetTransfer): BigInteger = withContext(Dispatchers.Default) {
-        getAssetTransfers(transfer).calculateFee(transfer)
+    suspend fun syncCrossChainConfig() = kotlin.runCatching {
+        crossChainTransfersRepository.syncConfiguration()
+    }
+
+    suspend fun getOriginFee(transfer: AssetTransfer): BigInteger = withContext(Dispatchers.Default) {
+        if (transfer.isCrossChain) {
+            val config = crossChainTransfersRepository.getConfiguration().configurationFor(transfer)!!
+
+            crossChainTransactor.estimateOriginFee(config, transfer)
+        } else {
+            getAssetTransfers(transfer).calculateFee(transfer)
+        }
+    }
+
+    suspend fun getCrossChainFee(transfer: AssetTransfer): BigInteger? = if (transfer.isCrossChain) {
+        withContext(Dispatchers.Default) {
+            val config = crossChainTransfersRepository.getConfiguration().configurationFor(transfer)!!
+            val crossChainFee = crossChainWeigher.estimateFee(config)
+
+            crossChainFee.reserve.orZero() + crossChainFee.destination.orZero()
+        }
+    } else {
+       null
     }
 
     suspend fun performTransfer(
         transfer: AssetTransfer,
         fee: BigDecimal
-    ): Result<String> = withContext(Dispatchers.Default) {
-        getAssetTransfers(transfer).performTransfer(transfer)
-            .onSuccess { hash ->
-                walletRepository.insertPendingTransfer(hash, transfer, fee)
-            }
+    ): Result<*> = withContext(Dispatchers.Default) {
+        if (transfer.isCrossChain) {
+            val config = crossChainTransfersRepository.getConfiguration().configurationFor(transfer)!!
+
+            crossChainTransactor.performTransfer(config, transfer)
+        } else {
+            getAssetTransfers(transfer).performTransfer(transfer)
+                .onSuccess { hash ->
+                    walletRepository.insertPendingTransfer(hash, transfer, fee)
+                }
+        }
     }
 
     suspend fun availableCrossChainDestinations(origin: Chain.Asset): List<Chain> {
@@ -74,10 +109,17 @@ class SendInteractor(
         return configuration.availableDestinationChains(origin).mapNotNull(chainsById::get)
     }
 
+    // TODO cross chain validation system
     fun validationSystemFor(asset: Chain.Asset) = assetSourceRegistry.sourceFor(asset).transfers.validationSystem
 
     suspend fun areTransfersEnabled(asset: Chain.Asset) = assetSourceRegistry.sourceFor(asset).transfers.areTransfersEnabled(asset)
 
-    private fun getAssetTransfers(transfer: AssetTransfer) =
-        assetSourceRegistry.sourceFor(transfer.originChainAsset).transfers
+    private fun getAssetTransfers(transfer: AssetTransfer) = assetSourceRegistry.sourceFor(transfer.originChainAsset).transfers
+
+    private suspend fun CrossChainTransfersConfiguration.configurationFor(transfer: AssetTransfer) = transferConfiguration(
+        originChain = transfer.originChain,
+        originAsset = transfer.originChainAsset,
+        destinationChain = transfer.destinationChain,
+        destinationParaId = crossChainTransfersRepository.paraId(transfer.destinationChain.id)
+    )
 }

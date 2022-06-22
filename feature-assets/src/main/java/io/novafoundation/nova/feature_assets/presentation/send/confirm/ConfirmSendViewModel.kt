@@ -70,7 +70,7 @@ class ConfirmSendViewModel(
         .inBackground()
         .share()
 
-    override val feeLoaderMixin: FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(commissionAssetFlow)
+    override val originFeeMixin: FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(commissionAssetFlow)
 
     private val currentAccount = selectedAccountUseCase.selectedMetaAccountFlow()
         .inBackground()
@@ -143,7 +143,7 @@ class ConfirmSendViewModel(
     }
 
     private fun setInitialState() = launch {
-        feeLoaderMixin.setFee(transferDraft.fee)
+        originFeeMixin.setFee(transferDraft.fee)
     }
 
     private suspend fun createAddressModel(address: String, resolveName: Boolean) =

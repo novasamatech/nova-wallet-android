@@ -14,6 +14,9 @@ data class AssetTransfer(
     val amount: BigDecimal,
 )
 
+val AssetTransfer.isCrossChain
+    get() = originChain.id != destinationChain.id
+
 interface AssetTransfers {
 
     val validationSystem: AssetTransfersValidationSystem

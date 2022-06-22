@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainFeeConfi
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration.XcmFee
+import io.novafoundation.nova.feature_wallet_api.domain.model.Junctions
 import io.novafoundation.nova.feature_wallet_api.domain.model.MultiLocation
 import io.novafoundation.nova.feature_wallet_api.domain.model.MultiLocation.Junction
 import io.novafoundation.nova.feature_wallet_api.domain.model.XcmTransferType
@@ -72,6 +73,17 @@ fun CrossChainTransfersConfiguration.availableDestinationChains(origin: Chain.As
         .filter { it.type != XcmTransferType.UNKNOWN }
         .map { it.destination.chainId }
 }
+
+fun ByteArray.accountIdToMultiLocation() = MultiLocation(
+    parents = BigInteger.ZERO,
+    interior = Junctions(
+        when(size) {
+            32 -> Junction.AccountId32(this)
+            20 -> Junction.AccountKey20(this)
+            else -> throw IllegalArgumentException("Unsupported account id length: $size")
+        }
+    )
+)
 
 fun CrossChainTransfersConfiguration.transferConfiguration(
     originChain: Chain,

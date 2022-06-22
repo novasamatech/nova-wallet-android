@@ -71,6 +71,8 @@ enum class XCMInstructionType {
     ReserveAssetDeposited, ClearOrigin, BuyExecution, DepositAsset, WithdrawAsset, DepositReserveAsset
 }
 
+fun Junctions(vararg junctions: MultiLocation.Junction) = MultiLocation.Interior.Junctions(junctions.toList())
+
 class MultiLocation(
     val parents: BigInteger,
     val interior: Interior

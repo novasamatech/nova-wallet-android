@@ -144,6 +144,8 @@ fun RuntimeMetadata.firstExistingModule(vararg options: String): String {
     return options.first(::hasModule)
 }
 
+fun RuntimeMetadata.xcmPalletName() = firstExistingModule("XcmPallet", "PolkadotXcm")
+
 fun StorageEntry.splitKeyToComponents(runtime: RuntimeSnapshot, key: String): ComponentHolder {
     return ComponentHolder(splitKey(runtime, key))
 }
@@ -190,4 +192,5 @@ object Modules {
     const val IDENTITY = "Identity"
 
     const val PARACHAIN_INFO = "ParachainInfo"
+    const val X_TOKENS = "XTokens"
 }

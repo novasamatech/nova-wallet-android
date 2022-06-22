@@ -112,8 +112,8 @@ abstract class BaseAssetTransfers(
 
     private fun AssetTransfersValidationSystemBuilder.validAddress() = validAddress(
         address = { it.transfer.recipient },
-        chain = { it.transfer.originChain },
-        error = { AssetTransferValidationFailure.InvalidRecipientAddress(it.transfer.originChain) }
+        chain = { it.transfer.destinationChain },
+        error = { AssetTransferValidationFailure.InvalidRecipientAddress(it.transfer.destinationChain) }
     )
 
     protected fun AssetTransfersValidationSystemBuilder.positiveAmount() = positiveAmount(

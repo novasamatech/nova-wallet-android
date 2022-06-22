@@ -83,11 +83,20 @@
         android:layout_marginEnd="16dp" />
 
     <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
-        android:id="@+id/selectSendFee"
+        android:id="@+id/selectSendOriginFee"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="12dp"
+        android:layout_marginEnd="16dp"
+        app:dividerVisible="false" />
+
+    <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
+        android:id="@+id/selectSendCrossChainFee"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        app:title="Cross chain fee"
         android:layout_marginEnd="16dp"
         app:dividerVisible="false" />
 

@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
 import io.novafoundation.nova.feature_wallet_api.di.Wallet
@@ -33,6 +34,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.update
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.balance.PaymentUpdaterFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.coingecko.CoingeckoApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.CrossChainConfigApi
+import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.RealCrossChainTransactor
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.RealCrossChainWeigher
 import io.novafoundation.nova.feature_wallet_impl.data.network.phishing.PhishingApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
@@ -191,4 +193,11 @@ class WalletFeatureModule {
         extrinsicService: ExtrinsicService,
         chainRegistry: ChainRegistry
     ): CrossChainWeigher = RealCrossChainWeigher(extrinsicService, chainRegistry)
+
+    @Provides
+    @FeatureScope
+    fun provideCrossChainTransactor(
+        weigher: CrossChainWeigher,
+        extrinsicService: ExtrinsicService
+    ): CrossChainTransactor = RealCrossChainTransactor(weigher, extrinsicService)
 }
