@@ -95,7 +95,8 @@ fun CrossChainTransfersConfiguration.transferConfiguration(
         assetLocation = originAssetLocationOf(assetTransfers),
         destinationChainLocation = destinationLocation(originChain, destinationParaId),
         destinationFee = matchInstructions(destination.destination.fee, destination.destination.chainId),
-        reserveFee = reserveFee
+        reserveFee = reserveFee,
+        transferType = destination.type
     )
 }
 
