@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_crowdloan_impl.data.repository
 
+import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.crowdloan
 import io.novafoundation.nova.common.utils.hasModule
@@ -8,7 +9,6 @@ import io.novafoundation.nova.common.utils.slots
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.DirectContribution
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.FundInfo
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.LeaseEntry
-import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.ParaId
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.bindContribution
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.bindFundInfo
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.bindLeases

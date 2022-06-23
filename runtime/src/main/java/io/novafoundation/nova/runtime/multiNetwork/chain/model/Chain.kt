@@ -5,6 +5,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainGradientParser
 import java.math.BigInteger
 
 typealias ChainId = String
+typealias ChainAssetId = Int
 typealias StringTemplate = String
 
 typealias ExplorerTemplateExtractor = (Chain.Explorer) -> StringTemplate?
@@ -46,7 +47,7 @@ data class Chain(
 
     data class Asset(
         val iconUrl: String?,
-        val id: Int,
+        val id: ChainAssetId,
         val priceId: String?,
         val chainId: ChainId,
         val symbol: String,

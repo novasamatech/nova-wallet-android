@@ -1,12 +1,12 @@
 package io.novafoundation.nova.feature_crowdloan_impl.domain.contribute
 
 import android.os.Parcelable
+import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
-import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.ParaId
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRepository
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ParachainMetadata
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.hasWonAuction
