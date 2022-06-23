@@ -20,8 +20,6 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger
 
-private val XCM_EXECUTE_WEIGHT_OVERHEAD = 100_000_000.toBigInteger()
-
 class RealCrossChainWeigher(
     private val extrinsicService: ExtrinsicService,
     private val chainRegistry: ChainRegistry
@@ -59,12 +57,8 @@ class RealCrossChainWeigher(
             Mode.Standard -> {
                 val xcmMessage = xcmMessage(feeConfig.xcmFeeType.instructions, chain)
 
-                // xcmPallet.execute() has weight equal to maxWeight + XCM_EXECUTE_WEIGHT_OVERHEAD.
-                // For more accurate calculations we should subtract overhead value from the maxWeight to adjust resulting weight
-                val maxWeightForXcmExecute = maxWeight - XCM_EXECUTE_WEIGHT_OVERHEAD
-
                 val paymentInfo = extrinsicService.paymentInfo(chain) {
-                    xcmExecute(xcmMessage, maxWeight = maxWeightForXcmExecute)
+                    xcmExecute(xcmMessage, maxWeight)
                 }
 
                 paymentInfo.partialFee
