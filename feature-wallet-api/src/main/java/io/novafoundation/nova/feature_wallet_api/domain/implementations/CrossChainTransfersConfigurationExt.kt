@@ -77,7 +77,7 @@ fun CrossChainTransfersConfiguration.availableDestinationChains(origin: Chain.As
 fun ByteArray.accountIdToMultiLocation() = MultiLocation(
     parents = BigInteger.ZERO,
     interior = Junctions(
-        when(size) {
+        when (size) {
             32 -> Junction.AccountId32(this)
             20 -> Junction.AccountKey20(this)
             else -> throw IllegalArgumentException("Unsupported account id length: $size")

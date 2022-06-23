@@ -70,7 +70,6 @@ fun Context.getPrimaryColor() = getColorFromAttr(R.attr.colorPrimary)
 @ColorInt
 fun Context.getAccentColor() = getColorFromAttr(R.attr.colorAccent)
 
-
 @ColorRes
 fun Context.getColorResFromAttr(
     @AttrRes attrColor: Int,

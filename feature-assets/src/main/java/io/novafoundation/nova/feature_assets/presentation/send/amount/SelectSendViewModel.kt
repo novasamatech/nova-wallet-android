@@ -203,7 +203,7 @@ class SelectSendViewModel(
         destinationChain.emit(newDestinationChain)
     }
 
-    private fun setInitialState()  = launch {
+    private fun setInitialState() = launch {
         initialRecipientAddress?.let { addressInputMixin.inputFlow.value = it }
 
         destinationChain.emit(originChain())

@@ -42,7 +42,7 @@ class SelectSendModule {
         assetPayload: AssetPayload,
         recipientAddress: String?,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-        ): ViewModel {
+    ): ViewModel {
         return SelectSendViewModel(
             interactor = interactor,
             router = router,

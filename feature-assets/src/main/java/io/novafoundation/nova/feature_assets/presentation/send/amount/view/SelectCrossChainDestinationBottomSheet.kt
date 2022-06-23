@@ -55,7 +55,6 @@ class CrossChainDestinationModel(
     val chainUi: ChainUi
 )
 
-
 class CrossChainDestinationAdapter(
     private val handler: Handler,
     private val selectedChain: Chain,

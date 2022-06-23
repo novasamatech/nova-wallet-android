@@ -31,7 +31,8 @@ class ReferentialEqualityDiffCallBack<T> : DiffUtil.ItemCallback<T>() {
     }
 }
 
-abstract class BaseDynamicListBottomSheet(context: Context) : BottomSheetDialog(context, R.style.BottomSheetDialog),
+abstract class BaseDynamicListBottomSheet(context: Context) :
+    BottomSheetDialog(context, R.style.BottomSheetDialog),
     WithContextExtensions by WithContextExtensions(context),
     DialogExtensions {
 

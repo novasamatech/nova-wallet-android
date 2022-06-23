@@ -84,7 +84,7 @@ class SendInteractor(
             crossChainFee.reserve.orZero() + crossChainFee.destination.orZero()
         }
     } else {
-       null
+        null
     }
 
     suspend fun performTransfer(
@@ -114,7 +114,7 @@ class SendInteractor(
     }
 
     fun validationSystemFor(transfer: AssetTransfer) = if (transfer.isCrossChain) {
-        ValidationSystem {  } // TODO cross chain validation system
+        ValidationSystem { } // TODO cross chain validation system
     } else {
         assetSourceRegistry.sourceFor(transfer.originChainAsset).transfers.validationSystem
     }

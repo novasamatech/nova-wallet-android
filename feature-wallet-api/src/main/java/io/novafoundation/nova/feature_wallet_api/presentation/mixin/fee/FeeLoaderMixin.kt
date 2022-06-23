@@ -22,7 +22,7 @@ sealed class FeeStatus {
 
     class Loaded(val feeModel: FeeModel) : FeeStatus()
 
-    object NoFee: FeeStatus()
+    object NoFee : FeeStatus()
 
     object Error : FeeStatus()
 }
