@@ -7,8 +7,10 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -20,11 +22,22 @@ import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.WalletRouter
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.confirm.ConfirmSendViewModel
+import io.novafoundation.nova.feature_assets.presentation.send.confirm.hints.ConfirmSendHintsMixinFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
 class ConfirmSendModule {
+
+    @Provides
+    @ScreenScope
+    fun provideHintsFactory(
+        resourcesHintsMixinFactory: ResourcesHintsMixinFactory,
+        transferDraft: TransferDraft
+    ) = ConfirmSendHintsMixinFactory(
+        resourcesHintsMixinFactory = resourcesHintsMixinFactory,
+        transferDraft = transferDraft
+    )
 
     @Provides
     @IntoMap
@@ -43,6 +56,7 @@ class ConfirmSendModule {
         transferDraft: TransferDraft,
         chainRegistry: ChainRegistry,
         walletUiUseCase: WalletUiUseCase,
+        confirmSendHintsMixinFactory: ConfirmSendHintsMixinFactory
     ): ViewModel {
         return ConfirmSendViewModel(
             interactor = interactor,
@@ -57,7 +71,8 @@ class ConfirmSendModule {
             validationExecutor = validationExecutor,
             walletUiUseCase = walletUiUseCase,
             feeLoaderMixinFactory = feeLoaderMixinFactory,
-            transferDraft = transferDraft
+            transferDraft = transferDraft,
+            hintsFactory = confirmSendHintsMixinFactory
         )
     }
 

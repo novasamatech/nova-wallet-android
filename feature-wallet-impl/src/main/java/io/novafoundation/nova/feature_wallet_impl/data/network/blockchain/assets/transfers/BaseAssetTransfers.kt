@@ -143,13 +143,13 @@ abstract class BaseAssetTransfers(
     )
 
     protected fun AssetTransfersValidationSystemBuilder.sufficientTransferableBalanceToPayFee() = sufficientBalance(
-        fee = { it.fee },
+        fee = { it.originFee },
         available = { it.commissionAsset.transferable },
         error = { AssetTransferValidationFailure.NotEnoughFunds.InCommissionAsset(commissionAsset = it.commissionAsset.token.configuration) }
     )
 
     protected fun AssetTransfersValidationSystemBuilder.sufficientCommissionBalanceToStayAboveED() = enoughTotalToStayAboveED(
-        fee = { it.fee },
+        fee = { it.originFee },
         total = { it.commissionAsset.total },
         existentialDeposit = { existentialDeposit(it.transfer.originChain, it.commissionAsset.token.configuration) },
         error = { AssetTransferValidationFailure.NotEnoughFunds.InCommissionAsset(commissionAsset = it.commissionAsset.token.configuration) }

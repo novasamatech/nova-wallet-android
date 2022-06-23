@@ -38,6 +38,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoade
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.requireFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.requireOptionalFee
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -152,29 +153,32 @@ class SelectSendViewModel(
         syncCrossChainConfig()
     }
 
-    fun nextClicked() = originFeeMixin.requireFee(this) { fee ->
-        launch {
-            val payload = AssetTransferPayload(
-                transfer = buildTransfer(
-                    destinationChain = destinationChain.first(),
-                    amount = amountChooserMixin.amount.first(),
-                    address = addressInputMixin.inputFlow.first()
-                ),
-                fee = fee,
-                commissionAsset = commissionAssetFlow.first(),
-                usedAsset = assetFlow.first()
-            )
+    fun nextClicked() = originFeeMixin.requireFee(this) { originFee ->
+        crossChainFeeMixin.requireOptionalFee(this) { crossChainFee ->
+            launch {
+                val payload = AssetTransferPayload(
+                    transfer = buildTransfer(
+                        destinationChain = destinationChain.first(),
+                        amount = amountChooserMixin.amount.first(),
+                        address = addressInputMixin.inputFlow.first()
+                    ),
+                    originFee = originFee,
+                    crossChainFee = crossChainFee,
+                    commissionAsset = commissionAssetFlow.first(),
+                    usedAsset = assetFlow.first()
+                )
 
-            validationExecutor.requireValid(
-                validationSystem = sendInteractor.validationSystemFor(chainAsset()),
-                payload = payload,
-                progressConsumer = sendInProgressFlow.progressConsumer(),
-                autoFixPayload = ::autoFixValidationPayload,
-                validationFailureTransformer = { mapAssetTransferValidationFailureToUI(resourceManager, it) }
-            ) {
-                sendInProgressFlow.value = false
+                validationExecutor.requireValid(
+                    validationSystem = sendInteractor.validationSystemFor(payload.transfer),
+                    payload = payload,
+                    progressConsumer = sendInProgressFlow.progressConsumer(),
+                    autoFixPayload = ::autoFixValidationPayload,
+                    validationFailureTransformer = { mapAssetTransferValidationFailureToUI(resourceManager, it) }
+                ) {
+                    sendInProgressFlow.value = false
 
-                openConfirmScreen(it)
+                    openConfirmScreen(it)
+                }
             }
         }
     }
@@ -233,9 +237,11 @@ class SelectSendViewModel(
     private fun openConfirmScreen(validPayload: AssetTransferPayload) = launch {
         val transferDraft = TransferDraft(
             amount = validPayload.transfer.amount,
-            fee = validPayload.fee,
+            originFee = validPayload.originFee,
             assetPayload = assetPayload,
-            recipientAddress = validPayload.transfer.recipient
+            recipientAddress = validPayload.transfer.recipient,
+            crossChainFee = validPayload.crossChainFee,
+            destinationChain = validPayload.transfer.destinationChain.id
         )
 
         router.openConfirmTransfer(transferDraft)

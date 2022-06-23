@@ -13,6 +13,7 @@ interface CrossChainTransactor {
 
     suspend fun performTransfer(
         configuration: CrossChainTransferConfiguration,
-        transfer: AssetTransfer
+        transfer: AssetTransfer,
+        crossChainFee: BigInteger,
     ): Result<*>
 }

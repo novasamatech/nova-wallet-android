@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.xcmPalletName
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.accountIdToMultiLocation
@@ -23,23 +24,28 @@ class RealCrossChainTransactor(
 
     override suspend fun estimateOriginFee(configuration: CrossChainTransferConfiguration, transfer: AssetTransfer): BigInteger {
         return extrinsicService.estimateFee(transfer.originChain) {
-            crossChainTransfer(configuration, transfer)
+            crossChainTransfer(configuration, transfer, crossChainFee = Balance.ZERO)
         }
     }
 
-    override suspend fun performTransfer(configuration: CrossChainTransferConfiguration, transfer: AssetTransfer): Result<*> {
+    override suspend fun performTransfer(
+        configuration: CrossChainTransferConfiguration,
+        transfer: AssetTransfer,
+        crossChainFee: BigInteger
+    ): Result<*> {
         return extrinsicService.submitExtrinsic(transfer.originChain) {
-            crossChainTransfer(configuration, transfer)
+            crossChainTransfer(configuration, transfer, crossChainFee)
         }
     }
 
     private suspend fun ExtrinsicBuilder.crossChainTransfer(
         configuration: CrossChainTransferConfiguration,
         transfer: AssetTransfer,
+        crossChainFee: BigInteger
     ) {
         when (configuration.transferType) {
-            XcmTransferType.X_TOKENS -> xTokensTransfer(configuration, transfer)
-            XcmTransferType.XCM_PALLET -> xcmPalletTransfer(configuration, transfer)
+            XcmTransferType.X_TOKENS -> xTokensTransfer(configuration, transfer, crossChainFee)
+            XcmTransferType.XCM_PALLET -> xcmPalletTransfer(configuration, transfer, crossChainFee)
             XcmTransferType.UNKNOWN -> throw IllegalArgumentException("Unknown transfer type")
         }
     }
@@ -47,8 +53,9 @@ class RealCrossChainTransactor(
     private suspend fun ExtrinsicBuilder.xTokensTransfer(
         configuration: CrossChainTransferConfiguration,
         assetTransfer: AssetTransfer,
+        crossChainFee: BigInteger
     ) {
-        val multiAsset = configuration.multiAssetFor(assetTransfer)
+        val multiAsset = configuration.multiAssetFor(assetTransfer, crossChainFee)
         val fullDestinationLocation = configuration.destinationChainLocation + assetTransfer.beneficiaryLocation()
 
         call(
@@ -65,8 +72,9 @@ class RealCrossChainTransactor(
     private suspend fun ExtrinsicBuilder.xcmPalletTransfer(
         configuration: CrossChainTransferConfiguration,
         assetTransfer: AssetTransfer,
+        crossChainFee: BigInteger
     ) {
-        val multiAsset = configuration.multiAssetFor(assetTransfer)
+        val multiAsset = configuration.multiAssetFor(assetTransfer, crossChainFee)
 
         call(
             moduleName = runtime.metadata.xcmPalletName(),
@@ -81,8 +89,12 @@ class RealCrossChainTransactor(
         )
     }
 
-    private fun CrossChainTransferConfiguration.multiAssetFor(transfer: AssetTransfer): XcmMultiAsset {
-        val planks = transfer.originChainAsset.planksFromAmount(transfer.amount)
+    private fun CrossChainTransferConfiguration.multiAssetFor(
+        transfer: AssetTransfer,
+        crossChainFee: BigInteger
+    ): XcmMultiAsset {
+        // we add cross chain fee top of entered amount so received amount will be no less than entered one
+        val planks = transfer.originChainAsset.planksFromAmount(transfer.amount) + crossChainFee
 
         return XcmMultiAsset.from(assetLocation, planks)
     }

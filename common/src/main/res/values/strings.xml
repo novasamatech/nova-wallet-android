@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="wallet_send_confirm_hint">Cross-chain fee is added on top of entered amount. Recipient may receive part of cross-chain fee</string>
+
+  <string name="wallet_send_to_network">To network</string>
+  <string name="wallet_send_from_network">From network</string>
   <string name="wallet_send_cross_chain_fee">Cross-chain fee</string>
 
   <string name="wallet_send_on_chain">On-chain</string>

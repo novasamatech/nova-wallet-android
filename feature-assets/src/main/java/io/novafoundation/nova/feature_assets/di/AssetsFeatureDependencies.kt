@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.QrCodeGenerator
@@ -124,4 +125,6 @@ interface AssetsFeatureDependencies {
     val crossChainTraRepository: CrossChainTransfersRepository
     val crossChainWeigher: CrossChainWeigher
     val crossChainTransactor: CrossChainTransactor
+
+    val resourcesHintsMixinFactory: ResourcesHintsMixinFactory
 }

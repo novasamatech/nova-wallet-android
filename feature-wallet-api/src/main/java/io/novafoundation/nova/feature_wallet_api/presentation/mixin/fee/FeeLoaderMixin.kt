@@ -49,10 +49,15 @@ interface FeeLoaderMixin : Retriable {
             onRetryCancelled: () -> Unit,
         )
 
-        suspend fun setFee(fee: BigDecimal)
+        suspend fun setFee(fee: BigDecimal?)
 
         fun requireFee(
             block: (BigDecimal) -> Unit,
+            onError: (title: String, message: String) -> Unit,
+        )
+
+        fun requireOptionalFee(
+            block: (BigDecimal?) -> Unit,
             onError: (title: String, message: String) -> Unit,
         )
     }
@@ -74,6 +79,15 @@ fun FeeLoaderMixin.Presentation.requireFee(
     block: (BigDecimal) -> Unit,
 ) {
     requireFee(block) { title, message ->
+        viewModel.showError(title, message)
+    }
+}
+
+fun FeeLoaderMixin.Presentation.requireOptionalFee(
+    viewModel: BaseViewModel,
+    block: (BigDecimal?) -> Unit,
+) {
+    requireOptionalFee(block) { title, message ->
         viewModel.showError(title, message)
     }
 }

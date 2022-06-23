@@ -66,11 +66,15 @@ class FeeLoaderProvider(
         }
     }
 
-    override suspend fun setFee(fee: BigDecimal) {
-        val token = tokenFlow.first()
-        val feeModel = mapFeeToFeeModel(fee, token, includeZeroFiat = configuration.showZeroFiat)
+    override suspend fun setFee(fee: BigDecimal?) {
+        if (fee != null) {
+            val token = tokenFlow.first()
+            val feeModel = mapFeeToFeeModel(fee, token, includeZeroFiat = configuration.showZeroFiat)
 
-        feeLiveData.postValue(FeeStatus.Loaded(feeModel))
+            feeLiveData.postValue(FeeStatus.Loaded(feeModel))
+        } else {
+            feeLiveData.postValue(FeeStatus.NoFee)
+        }
     }
 
     override fun requireFee(
@@ -83,6 +87,20 @@ class FeeLoaderProvider(
             block(feeStatus.feeModel.fee)
         } else {
             onError(
+                resourceManager.getString(R.string.fee_not_yet_loaded_title),
+                resourceManager.getString(R.string.fee_not_yet_loaded_message)
+            )
+        }
+    }
+
+    override fun requireOptionalFee(
+        block: (BigDecimal?) -> Unit,
+        onError: (title: String, message: String) -> Unit
+    ) {
+        when (val status = feeLiveData.value) {
+            is FeeStatus.Loaded -> block(status.feeModel.fee)
+            is FeeStatus.NoFee -> block(null)
+            else -> onError(
                 resourceManager.getString(R.string.fee_not_yet_loaded_title),
                 resourceManager.getString(R.string.fee_not_yet_loaded_message)
             )
