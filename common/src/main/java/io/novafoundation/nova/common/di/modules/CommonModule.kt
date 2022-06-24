@@ -221,5 +221,5 @@ class CommonModule {
 
     @Provides
     @ApplicationScope
-    fun provideFileCache(fileProvider: FileProvider) : FileCache = InternalFileSystemCache(fileProvider)
+    fun provideFileCache(fileProvider: FileProvider): FileCache = InternalFileSystemCache(fileProvider)
 }

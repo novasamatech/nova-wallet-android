@@ -62,7 +62,7 @@ internal class InternalFileSystemCache(
         }
     }
 
-    private fun notifyCallbacks(fileName: String, value: String){
+    private fun notifyCallbacks(fileName: String, value: String) {
         val callbacks = synchronized(this) { callbacks[fileName]?.toMutableList() }
 
         callbacks?.forEach { it.invoke(value) }
