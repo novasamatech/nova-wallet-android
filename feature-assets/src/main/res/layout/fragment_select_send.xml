@@ -43,9 +43,11 @@
         <TextView
             style="@style/TextAppearance.NovaFoundation.Bold.Title2"
             android:layout_width="wrap_content"
+            android:id="@+id/selectSendToTitle"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
+            android:visibility="gone"
             app:layout_wrapBefore="true"
             android:includeFontPadding="false"
             android:text="@string/wallet_send_tokens_to"/>
@@ -53,6 +55,7 @@
         <io.novafoundation.nova.feature_account_api.view.ChainChipView
             android:id="@+id/selectSendDestinationChain"
             android:layout_width="wrap_content"
+            android:visibility="gone"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp" />
     </com.google.android.flexbox.FlexboxLayout>

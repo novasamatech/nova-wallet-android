@@ -22,9 +22,9 @@ import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.WalletRouter
+import io.novafoundation.nova.feature_assets.presentation.send.TransferDirectionModel
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.confirm.hints.ConfirmSendHintsMixinFactory
-import io.novafoundation.nova.feature_assets.presentation.send.confirm.model.TransferDirectionModel
 import io.novafoundation.nova.feature_assets.presentation.send.isCrossChain
 import io.novafoundation.nova.feature_assets.presentation.send.mapAssetTransferValidationFailureToUI
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer

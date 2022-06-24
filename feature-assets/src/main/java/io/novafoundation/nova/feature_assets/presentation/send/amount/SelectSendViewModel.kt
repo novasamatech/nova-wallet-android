@@ -17,12 +17,12 @@ import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
-import io.novafoundation.nova.feature_account_api.view.ChainChipModel
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.WalletRouter
+import io.novafoundation.nova.feature_assets.presentation.send.TransferDirectionModel
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.amount.view.CrossChainDestinationModel
 import io.novafoundation.nova.feature_assets.presentation.send.amount.view.SelectCrossChainDestinationBottomSheet
@@ -71,12 +71,7 @@ class SelectSendViewModel(
     Validatable by validationExecutor {
 
     private val originChain by lazyAsync { chainRegistry.getChain(assetPayload.chainId) }
-    private val chainAsset by lazyAsync { chainRegistry.asset(assetPayload.chainId, assetPayload.chainAssetId) }
-
-    val originChainUi = flowOf {
-        mapChainToUi(originChain())
-    }
-        .shareInBackground()
+    private val originChainAsset by lazyAsync { chainRegistry.asset(assetPayload.chainId, assetPayload.chainAssetId) }
 
     private val destinationChain = singleReplaySharedFlow<Chain>()
 
@@ -87,28 +82,18 @@ class SelectSendViewModel(
     )
 
     private val availableCrossChainDestinations = flowOf {
-        sendInteractor.availableCrossChainDestinations(chainAsset())
+        sendInteractor.availableCrossChainDestinations(originChainAsset())
     }
         .onStart { emit(emptyList()) }
         .shareInBackground()
 
-    val destinationChainChipModel = combine(
+    val transferDirectionModel = combine(
         availableCrossChainDestinations,
-        destinationChain
-    ) { availableDestinations, currentDestination ->
-        ChainChipModel(
-            chainUi = mapChainToUi(currentDestination),
-            changeable = availableDestinations.isNotEmpty()
-        )
-    }
+        destinationChain,
+        ::buildTransferDirectionModel
+    ).shareInBackground()
 
     val chooseDestinationChain = actionAwaitableMixinFactory.create<SelectCrossChainDestinationBottomSheet.Payload, Chain>()
-
-    val sendFromText = flowOf {
-        resourceManager.getString(R.string.wallet_send_tokens_on, chainAsset().symbol)
-    }
-        .inBackground()
-        .share()
 
     private val selectedAccount = selectedAccountUseCase.selectedMetaAccountFlow()
         .inBackground()
@@ -264,10 +249,31 @@ class SelectSendViewModel(
             sender = selectedAccount.first(),
             recipient = address,
             originChain = originChain(),
-            originChainAsset = chainAsset(),
+            originChainAsset = originChainAsset(),
             destinationChain = destinationChain,
             amount = amount
         )
+    }
+
+    private suspend fun buildTransferDirectionModel(
+        availableCrossChainDestinations: List<Chain>,
+        destinationChain: Chain
+    ): TransferDirectionModel {
+        val chainSymbol = originChainAsset().symbol
+
+        return if (availableCrossChainDestinations.isEmpty()) {
+            TransferDirectionModel(
+                originChainUi = mapChainToUi(originChain()),
+                originChainLabel = resourceManager.getString(R.string.wallet_send_tokens_on, chainSymbol),
+                destinationChainUi = null
+            )
+        } else {
+            TransferDirectionModel(
+                originChainUi = mapChainToUi(originChain()),
+                originChainLabel = resourceManager.getString(R.string.wallet_send_tokens_from, chainSymbol),
+                destinationChainUi = mapChainToUi(destinationChain)
+            )
+        }
     }
 
     @OptIn(ExperimentalStdlibApi::class)
@@ -280,7 +286,7 @@ class SelectSendViewModel(
         }
         val onChainDestination = CrossChainDestinationModel(
             chain = originChain(),
-            chainUi = originChainUi.first()
+            chainUi = transferDirectionModel.first().originChainUi
         )
 
         return buildMap {
