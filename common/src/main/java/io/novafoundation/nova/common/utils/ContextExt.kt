@@ -70,6 +70,19 @@ fun Context.getPrimaryColor() = getColorFromAttr(R.attr.colorPrimary)
 @ColorInt
 fun Context.getAccentColor() = getColorFromAttr(R.attr.colorAccent)
 
+@ColorRes
+fun Context.getColorResFromAttr(
+    @AttrRes attrColor: Int,
+    typedValue: TypedValue = TypedValue(),
+    resolveRefs: Boolean = true
+): Int {
+    theme.resolveAttribute(attrColor, typedValue, resolveRefs)
+    return typedValue.resourceId
+}
+
+@ColorRes
+fun Context.getAccentColorRes() = getColorResFromAttr(R.attr.colorAccent)
+
 fun Context.themed(@StyleRes themeId: Int): Context = ContextThemeWrapper(this, themeId)
 
 interface WithContextExtensions {

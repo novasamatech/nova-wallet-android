@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_wallet_api.presentation.view
 import android.content.Context
 import android.util.AttributeSet
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.TableCellView
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
 
@@ -19,6 +20,8 @@ class FeeView @JvmOverloads constructor(
     }
 
     fun setFeeStatus(feeStatus: FeeStatus) {
+        setVisible(feeStatus !is FeeStatus.NoFee)
+
         when (feeStatus) {
             is FeeStatus.Loading -> {
                 showProgress()
@@ -29,6 +32,7 @@ class FeeView @JvmOverloads constructor(
             is FeeStatus.Loaded -> {
                 showAmount(feeStatus.feeModel.display)
             }
+            FeeStatus.NoFee -> {}
         }
     }
 }

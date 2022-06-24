@@ -27,8 +27,8 @@ class NativeAssetTransfers(
 
     override fun ExtrinsicBuilder.transfer(transfer: AssetTransfer) {
         nativeTransfer(
-            accountId = transfer.chain.accountIdOrDefault(transfer.recipient),
-            amount = transfer.chainAsset.planksFromAmount(transfer.amount)
+            accountId = transfer.originChain.accountIdOrDefault(transfer.recipient),
+            amount = transfer.originChainAsset.planksFromAmount(transfer.amount)
         )
     }
 

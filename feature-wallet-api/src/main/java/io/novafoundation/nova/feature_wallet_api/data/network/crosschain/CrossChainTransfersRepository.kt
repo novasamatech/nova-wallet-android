@@ -8,5 +8,7 @@ interface CrossChainTransfersRepository {
 
     suspend fun paraId(chaniId: ChainId): ParaId?
 
+    suspend fun syncConfiguration()
+
     suspend fun getConfiguration(): CrossChainTransfersConfiguration
 }

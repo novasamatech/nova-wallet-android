@@ -29,8 +29,8 @@ class OrmlAssetTransfers(
 
     override fun ExtrinsicBuilder.transfer(transfer: AssetTransfer) {
         ormlTransfer(
-            chainAsset = transfer.chainAsset,
-            target = transfer.chain.accountIdOrDefault(transfer.recipient),
+            chainAsset = transfer.originChainAsset,
+            target = transfer.originChain.accountIdOrDefault(transfer.recipient),
             amount = transfer.amountInPlanks
         )
     }

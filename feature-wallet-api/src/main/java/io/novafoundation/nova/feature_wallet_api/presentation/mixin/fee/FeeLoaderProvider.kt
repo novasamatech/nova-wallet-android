@@ -39,52 +39,26 @@ class FeeLoaderProvider(
 
     override suspend fun loadFeeSuspending(
         retryScope: CoroutineScope,
-        feeConstructor: suspend (Token) -> BigInteger,
+        feeConstructor: suspend (Token) -> BigInteger?,
         onRetryCancelled: () -> Unit,
     ): Unit = withContext(Dispatchers.IO) {
         feeLiveData.postValue(FeeStatus.Loading)
 
         val token = tokenFlow.first()
 
-        val feeResult = runCatching {
+        val value = runCatching {
             feeConstructor(token)
-        }
-
-        val value = if (feeResult.isSuccess) {
-            val feeInPlanks = feeResult.getOrThrow()
-            val fee = token.amountFromPlanks(feeInPlanks)
-            val feeModel = mapFeeToFeeModel(fee, token, includeZeroFiat = configuration.showZeroFiat)
-
-            FeeStatus.Loaded(feeModel)
-        } else {
-            val exception = feeResult.exceptionOrNull()
-
-            if (exception is CancellationException) {
-                null
-            } else {
-                retryEvent.postValue(
-                    Event(
-                        RetryPayload(
-                            title = resourceManager.getString(R.string.choose_amount_network_error),
-                            message = resourceManager.getString(R.string.choose_amount_error_fee),
-                            onRetry = { loadFee(retryScope, feeConstructor, onRetryCancelled) },
-                            onCancel = onRetryCancelled
-                        )
-                    )
-                )
-
-                exception?.printStackTrace()
-
-                FeeStatus.Error
-            }
-        }
+        }.fold(
+            onSuccess = { feeInPlanks -> onFeeLoaded(token, feeInPlanks) },
+            onFailure = { exception -> onError(exception, retryScope, feeConstructor, onRetryCancelled) }
+        )
 
         value?.run { feeLiveData.postValue(this) }
     }
 
     override fun loadFee(
         coroutineScope: CoroutineScope,
-        feeConstructor: suspend (Token) -> BigInteger,
+        feeConstructor: suspend (Token) -> BigInteger?,
         onRetryCancelled: () -> Unit,
     ) {
         coroutineScope.launch {
@@ -92,11 +66,15 @@ class FeeLoaderProvider(
         }
     }
 
-    override suspend fun setFee(fee: BigDecimal) {
-        val token = tokenFlow.first()
-        val feeModel = mapFeeToFeeModel(fee, token, includeZeroFiat = configuration.showZeroFiat)
+    override suspend fun setFee(fee: BigDecimal?) {
+        if (fee != null) {
+            val token = tokenFlow.first()
+            val feeModel = mapFeeToFeeModel(fee, token, includeZeroFiat = configuration.showZeroFiat)
 
-        feeLiveData.postValue(FeeStatus.Loaded(feeModel))
+            feeLiveData.postValue(FeeStatus.Loaded(feeModel))
+        } else {
+            feeLiveData.postValue(FeeStatus.NoFee)
+        }
     }
 
     override fun requireFee(
@@ -113,5 +91,55 @@ class FeeLoaderProvider(
                 resourceManager.getString(R.string.fee_not_yet_loaded_message)
             )
         }
+    }
+
+    override fun requireOptionalFee(
+        block: (BigDecimal?) -> Unit,
+        onError: (title: String, message: String) -> Unit
+    ) {
+        when (val status = feeLiveData.value) {
+            is FeeStatus.Loaded -> block(status.feeModel.fee)
+            is FeeStatus.NoFee -> block(null)
+            else -> onError(
+                resourceManager.getString(R.string.fee_not_yet_loaded_title),
+                resourceManager.getString(R.string.fee_not_yet_loaded_message)
+            )
+        }
+    }
+
+    private fun onFeeLoaded(
+        token: Token,
+        feeInPlanks: BigInteger?
+    ): FeeStatus = if (feeInPlanks != null) {
+        val fee = token.amountFromPlanks(feeInPlanks)
+        val feeModel = mapFeeToFeeModel(fee, token, includeZeroFiat = configuration.showZeroFiat)
+
+        FeeStatus.Loaded(feeModel)
+    } else {
+        FeeStatus.NoFee
+    }
+
+    fun onError(
+        exception: Throwable,
+        retryScope: CoroutineScope,
+        feeConstructor: suspend (Token) -> BigInteger?,
+        onRetryCancelled: () -> Unit,
+    ) = if (exception !is CancellationException) {
+        retryEvent.postValue(
+            Event(
+                RetryPayload(
+                    title = resourceManager.getString(R.string.choose_amount_network_error),
+                    message = resourceManager.getString(R.string.choose_amount_error_fee),
+                    onRetry = { loadFee(retryScope, feeConstructor, onRetryCancelled) },
+                    onCancel = onRetryCancelled
+                )
+            )
+        )
+
+        exception.printStackTrace()
+
+        FeeStatus.Error
+    } else {
+        null
     }
 }

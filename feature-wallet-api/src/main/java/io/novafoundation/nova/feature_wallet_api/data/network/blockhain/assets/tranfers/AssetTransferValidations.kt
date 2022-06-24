@@ -41,7 +41,8 @@ sealed class AssetTransferValidationFailure {
 
 data class AssetTransferPayload(
     val transfer: AssetTransfer,
-    val fee: BigDecimal,
+    val originFee: BigDecimal,
+    val crossChainFee: BigDecimal?,
     val commissionAsset: Asset,
     val usedAsset: Asset
 )
@@ -51,7 +52,7 @@ val AssetTransferPayload.sendingCommissionAsset
 
 val AssetTransferPayload.feeInUsedAsset: BigDecimal
     get() = if (sendingCommissionAsset) {
-        fee
+        originFee
     } else {
         BigDecimal.ZERO
     }
@@ -64,4 +65,4 @@ val AssetTransferPayload.amountInCommissionAsset: BigInteger
     }
 
 val AssetTransfer.amountInPlanks
-    get() = chainAsset.planksFromAmount(amount)
+    get() = originChainAsset.planksFromAmount(amount)

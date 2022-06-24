@@ -1,23 +1,21 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.crosschain
 
 import io.novafoundation.nova.common.data.network.runtime.binding.Weight
-import io.novafoundation.nova.common.utils.firstExistingModule
 import io.novafoundation.nova.common.utils.structOf
+import io.novafoundation.nova.common.utils.xcmPalletName
 import io.novafoundation.nova.feature_wallet_api.domain.model.MultiLocation
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.XcmMultiAsset.Fungibility
+import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.DictEnum
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 
 fun ExtrinsicBuilder.xcmExecute(
     message: VersionedXcm,
     maxWeight: Weight,
 ): ExtrinsicBuilder {
-    val moduleName = runtime.metadata.firstExistingModule("XcmPallet", "PolkadotXcm")
-
     return call(
-        moduleName = moduleName,
+        moduleName = runtime.metadata.xcmPalletName(),
         callName = "execute",
         arguments = mapOf(
             "message" to message.toEncodableInstance(),
@@ -94,7 +92,7 @@ private fun XcmV2Instruction.toEncodableInstance() = when (this) {
     )
 }
 
-private fun WeightLimit.toEncodableInstance() = when (this) {
+fun WeightLimit.toEncodableInstance() = when (this) {
     is WeightLimit.Limited -> DictEnum.Entry("Limited", weight)
     WeightLimit.Unlimited -> DictEnum.Entry("Unlimited", null)
 }
@@ -109,12 +107,31 @@ private fun XcmMultiAssetFilter.toEncodableInstance() = when (this) {
     )
 }
 
-private fun MultiLocation.toEncodableInstance() = Struct.Instance(
-    mapOf(
-        "parents" to parents,
-        "interior" to interior.toEncodableInstance()
-    )
+fun MultiLocation.toEncodableInstance() = structOf(
+    "parents" to parents,
+    "interior" to interior.toEncodableInstance()
 )
+
+fun VersionedMultiAssets.toEncodableInstance() = when (this) {
+    is VersionedMultiAssets.V1 -> DictEnum.Entry(
+        name = "V1",
+        value = assets.toEncodableInstance()
+    )
+}
+
+fun VersionedMultiAsset.toEncodableInstance() = when (this) {
+    is VersionedMultiAsset.V1 -> DictEnum.Entry(
+        name = "V1",
+        value = asset.toEncodableInstance()
+    )
+}
+
+fun VersionedMultiLocation.toEncodableInstance() = when (this) {
+    is VersionedMultiLocation.V1 -> DictEnum.Entry(
+        name = "V1",
+        value = multiLocation.toEncodableInstance()
+    )
+}
 
 private fun MultiLocation.Interior.toEncodableInstance() = when (this) {
     MultiLocation.Interior.Here -> DictEnum.Entry("Here", null)
@@ -133,14 +150,14 @@ private fun MultiLocation.Interior.toEncodableInstance() = when (this) {
 }
 
 private fun MultiLocation.Junction.toEncodableInstance() = when (this) {
-    is MultiLocation.Junction.GeneralKey -> DictEnum.Entry("GeneralKey", key.encodeToByteArray())
+    is MultiLocation.Junction.GeneralKey -> DictEnum.Entry("GeneralKey", key.fromHex())
     is MultiLocation.Junction.PalletInstance -> DictEnum.Entry("PalletInstance", index)
     is MultiLocation.Junction.ParachainId -> DictEnum.Entry("Parachain", id)
-    is MultiLocation.Junction.AccountKey20 -> DictEnum.Entry("AccountKey20", accountId.toJunctionAccountIdInstance())
-    is MultiLocation.Junction.AccountId32 -> DictEnum.Entry("AccountId32", accountId.toJunctionAccountIdInstance())
+    is MultiLocation.Junction.AccountKey20 -> DictEnum.Entry("AccountKey20", accountId.toJunctionAccountIdInstance(accountIdKey = "key"))
+    is MultiLocation.Junction.AccountId32 -> DictEnum.Entry("AccountId32", accountId.toJunctionAccountIdInstance(accountIdKey = "id"))
 }
 
-private fun AccountId.toJunctionAccountIdInstance() = structOf(
+private fun AccountId.toJunctionAccountIdInstance(accountIdKey: String) = structOf(
     "network" to DictEnum.Entry("Any", null),
-    "id" to this
+    accountIdKey to this
 )

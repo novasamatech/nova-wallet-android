@@ -23,16 +23,19 @@ import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.WalletRouter
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
+import io.novafoundation.nova.feature_assets.presentation.send.confirm.hints.ConfirmSendHintsMixinFactory
+import io.novafoundation.nova.feature_assets.presentation.send.confirm.model.TransferDirectionModel
+import io.novafoundation.nova.feature_assets.presentation.send.isCrossChain
 import io.novafoundation.nova.feature_assets.presentation.send.mapAssetTransferValidationFailureToUI
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountSign
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -52,15 +55,17 @@ class ConfirmSendViewModel(
     private val resourceManager: ResourceManager,
     private val validationExecutor: ValidationExecutor,
     private val walletUiUseCase: WalletUiUseCase,
+    private val hintsFactory: ConfirmSendHintsMixinFactory,
     feeLoaderMixinFactory: FeeLoaderMixin.Factory,
     val transferDraft: TransferDraft,
 ) : BaseViewModel(),
     ExternalActions by externalActions,
-    Validatable by validationExecutor,
-    WithFeeLoaderMixin {
+    Validatable by validationExecutor {
 
-    private val chain by lazyAsync { chainRegistry.getChain(transferDraft.assetPayload.chainId) }
-    private val chainAsset by lazyAsync { chainRegistry.asset(transferDraft.assetPayload.chainId, transferDraft.assetPayload.chainAssetId) }
+    private val originChain by lazyAsync { chainRegistry.getChain(transferDraft.assetPayload.chainId) }
+    private val originAsset by lazyAsync { chainRegistry.asset(transferDraft.assetPayload.chainId, transferDraft.assetPayload.chainAssetId) }
+
+    private val destinationChain by lazyAsync { chainRegistry.getChain(transferDraft.destinationChain) }
 
     private val assetFlow = interactor.assetFlow(transferDraft.assetPayload.chainId, transferDraft.assetPayload.chainAssetId)
         .inBackground()
@@ -70,20 +75,31 @@ class ConfirmSendViewModel(
         .inBackground()
         .share()
 
-    override val feeLoaderMixin: FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(commissionAssetFlow)
+    val originFeeMixin: FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(commissionAssetFlow)
+    val crossChainFeeMixin: FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(assetFlow)
+
+    val hintsMixin = hintsFactory.create(this)
 
     private val currentAccount = selectedAccountUseCase.selectedMetaAccountFlow()
         .inBackground()
         .share()
 
     val recipientModel = flowOf {
-        createAddressModel(transferDraft.recipientAddress, resolveName = true)
+        createAddressModel(
+            address = transferDraft.recipientAddress,
+            chain = destinationChain(),
+            resolveName = true
+        )
     }
         .inBackground()
         .share()
 
     val senderModel = currentAccount.mapLatest { metaAccount ->
-        createAddressModel(metaAccount.requireAddressIn(chain()), resolveName = false)
+        createAddressModel(
+            address = metaAccount.requireAddressIn(originChain()),
+            chain = originChain(),
+            resolveName = false
+        )
     }
         .inBackground()
         .share()
@@ -92,8 +108,8 @@ class ConfirmSendViewModel(
         mapAmountToAmountModel(transferDraft.amount, asset, tokenAmountSign = AmountSign.NEGATIVE)
     }
 
-    val chainUi = flowOf { mapChainToUi(chain()) }
-        .share()
+    val transferDirectionModel = flowOf { createTransferDirectionModel() }
+        .shareInBackground()
 
     val wallet = walletUiUseCase.selectedWalletUiFlow()
         .inBackground()
@@ -126,37 +142,46 @@ class ConfirmSendViewModel(
     }
 
     private suspend fun showExternalActions(address: String) {
-        externalActions.showExternalActions(ExternalActions.Type.Address(address), chain())
+        externalActions.showExternalActions(ExternalActions.Type.Address(address), originChain())
     }
 
     fun submitClicked() = launch {
         val payload = buildValidationPayload()
 
         validationExecutor.requireValid(
-            validationSystem = sendInteractor.validationSystemFor(payload.transfer.chainAsset),
+            validationSystem = sendInteractor.validationSystemFor(payload.transfer),
             payload = payload,
             progressConsumer = _transferSubmittingLiveData.progressConsumer(),
             validationFailureTransformer = { mapAssetTransferValidationFailureToUI(resourceManager, it) }
         ) { validPayload ->
-            performTransfer(validPayload.transfer, validPayload.fee)
+            performTransfer(validPayload.transfer, validPayload.originFee, validPayload.crossChainFee)
         }
     }
 
     private fun setInitialState() = launch {
-        feeLoaderMixin.setFee(transferDraft.fee)
+        originFeeMixin.setFee(transferDraft.originFee)
+        crossChainFeeMixin.setFee(transferDraft.crossChainFee)
     }
 
-    private suspend fun createAddressModel(address: String, resolveName: Boolean) =
+    private suspend fun createAddressModel(
+        address: String,
+        chain: Chain,
+        resolveName: Boolean
+    ) =
         addressIconGenerator.createAddressModel(
-            chain = chain(),
+            chain = chain,
             sizeInDp = AddressIconGenerator.SIZE_MEDIUM,
             address = address,
             background = AddressIconGenerator.BACKGROUND_TRANSPARENT,
             addressDisplayUseCase = addressDisplayUseCase.takeIf { resolveName }
         )
 
-    private fun performTransfer(transfer: AssetTransfer, fee: BigDecimal) = launch {
-        sendInteractor.performTransfer(transfer, fee)
+    private fun performTransfer(
+        transfer: AssetTransfer,
+        originFee: BigDecimal,
+        crossChainFee: BigDecimal?
+    ) = launch {
+        sendInteractor.performTransfer(transfer, originFee, crossChainFee)
             .onSuccess {
                 showMessage(resourceManager.getString(R.string.common_transaction_submitted))
 
@@ -167,20 +192,36 @@ class ConfirmSendViewModel(
     }
 
     private suspend fun buildValidationPayload(): AssetTransferPayload {
-        val chain = chain()
-        val chainAsset = chainAsset()
+        val chain = originChain()
+        val chainAsset = originAsset()
 
         return AssetTransferPayload(
             transfer = AssetTransfer(
                 sender = currentAccount.first(),
                 recipient = transferDraft.recipientAddress,
-                chain = chain,
-                chainAsset = chainAsset,
+                originChain = chain,
+                destinationChain = destinationChain(),
+                originChainAsset = chainAsset,
                 amount = transferDraft.amount
             ),
-            fee = transferDraft.fee,
+            originFee = transferDraft.originFee,
             commissionAsset = commissionAssetFlow.first(),
-            usedAsset = assetFlow.first()
+            usedAsset = assetFlow.first(),
+            crossChainFee = transferDraft.crossChainFee
+        )
+    }
+
+    private suspend fun createTransferDirectionModel() = if (transferDraft.isCrossChain) {
+        TransferDirectionModel(
+            originChainUi = mapChainToUi(originChain()),
+            originChainLabel = resourceManager.getString(R.string.wallet_send_from_network),
+            destinationChainUi = mapChainToUi(destinationChain())
+        )
+    } else {
+        TransferDirectionModel(
+            originChainUi = mapChainToUi(originChain()),
+            originChainLabel = resourceManager.getString(R.string.common_network),
+            destinationChainUi = null
         )
     }
 }

@@ -8,10 +8,14 @@ import java.math.BigInteger
 data class AssetTransfer(
     val sender: MetaAccount,
     val recipient: String,
-    val chain: Chain,
-    val chainAsset: Chain.Asset,
+    val originChain: Chain,
+    val originChainAsset: Chain.Asset,
+    val destinationChain: Chain,
     val amount: BigDecimal,
 )
+
+val AssetTransfer.isCrossChain
+    get() = originChain.id != destinationChain.id
 
 interface AssetTransfers {
 

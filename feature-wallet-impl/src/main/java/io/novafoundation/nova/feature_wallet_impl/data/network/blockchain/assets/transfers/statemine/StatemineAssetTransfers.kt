@@ -31,12 +31,12 @@ class StatemineAssetTransfers(
     override val transferFunctions = listOf(Modules.ASSETS to "transfer")
 
     override fun ExtrinsicBuilder.transfer(transfer: AssetTransfer) {
-        val chainAssetType = transfer.chainAsset.type
+        val chainAssetType = transfer.originChainAsset.type
         require(chainAssetType is Chain.Asset.Type.Statemine)
 
         statemineTransfer(
             assetId = chainAssetType.id,
-            target = transfer.chain.accountIdOrDefault(transfer.recipient),
+            target = transfer.originChain.accountIdOrDefault(transfer.recipient),
             amount = transfer.amountInPlanks
         )
     }

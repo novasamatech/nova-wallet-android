@@ -46,10 +46,28 @@ sealed class XcmMultiAssetFilter {
     }
 }
 
+sealed class VersionedMultiAssets {
+
+    class V1(val assets: XcmMultiAssets) : VersionedMultiAssets()
+}
+
+sealed class VersionedMultiAsset {
+
+    class V1(val asset: XcmMultiAsset) : VersionedMultiAsset()
+}
+
+sealed class VersionedMultiLocation {
+    class V1(val multiLocation: MultiLocation) : VersionedMultiLocation()
+}
+
+fun MultiLocation.versioned() = VersionedMultiLocation.V1(this)
+
 class XcmMultiAsset(
     val id: Id,
     val fungibility: Fungibility,
 ) {
+
+    companion object;
 
     sealed class Id {
 
@@ -61,6 +79,14 @@ class XcmMultiAsset(
         class Fungible(val amount: Balance) : Fungibility()
     }
 }
+
+fun XcmMultiAsset.Companion.from(
+    multiLocation: MultiLocation,
+    amount: Balance
+) = XcmMultiAsset(
+    id = XcmMultiAsset.Id.Concrete(multiLocation),
+    fungibility = XcmMultiAsset.Fungibility.Fungible(amount)
+)
 
 sealed class WeightLimit {
 

@@ -6,20 +6,19 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainFee
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
+import io.novafoundation.nova.feature_wallet_api.domain.implementations.accountIdToMultiLocation
+import io.novafoundation.nova.feature_wallet_api.domain.implementations.weightToFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainFeeConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration.XcmFee.Mode
 import io.novafoundation.nova.feature_wallet_api.domain.model.MultiLocation
-import io.novafoundation.nova.feature_wallet_api.domain.model.MultiLocation.Junction
 import io.novafoundation.nova.feature_wallet_api.domain.model.XCMInstructionType
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.XcmMultiAsset.Fungibility
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.XcmMultiAsset.Id
-import io.novafoundation.nova.feature_wallet_impl.domain.crosschain.weightToFee
+import io.novafoundation.nova.runtime.ext.emptyAccountId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger
-
-private val XCM_EXECUTE_WEIGHT_OVERHEAD = 100_000_000.toBigInteger()
 
 class RealCrossChainWeigher(
     private val extrinsicService: ExtrinsicService,
@@ -58,12 +57,8 @@ class RealCrossChainWeigher(
             Mode.Standard -> {
                 val xcmMessage = xcmMessage(feeConfig.xcmFeeType.instructions, chain)
 
-                // xcmPallet.execute() has weight equal to maxWeight + XCM_EXECUTE_WEIGHT_OVERHEAD.
-                // For more accurate calculations we should subtract overhead value from the maxWeight to adjust resulting weight
-                val maxWeightForXcmExecute = maxWeight - XCM_EXECUTE_WEIGHT_OVERHEAD
-
                 val paymentInfo = extrinsicService.paymentInfo(chain) {
-                    xcmExecute(xcmMessage, maxWeight = maxWeightForXcmExecute)
+                    xcmExecute(xcmMessage, maxWeight)
                 }
 
                 paymentInfo.partialFee
@@ -151,13 +146,5 @@ class RealCrossChainWeigher(
         )
     }
 
-    private fun Chain.emptyBeneficiaryMultiLocation(): MultiLocation = MultiLocation(
-        parents = BigInteger.ZERO,
-        interior = MultiLocation.Interior.Junctions(
-            junctions = listOf(
-                if (isEthereumBased) Junction.AccountKey20(ByteArray(20))
-                else Junction.AccountId32(ByteArray(32))
-            )
-        )
-    )
+    private fun Chain.emptyBeneficiaryMultiLocation(): MultiLocation = emptyAccountId().accountIdToMultiLocation()
 }
