@@ -78,7 +78,8 @@ class SelectSendViewModel(
     private val destinationChain = singleReplaySharedFlow<ChainWithAsset>()
 
     val addressInputMixin = addressInputMixinFactory.create(
-        chainFlow = destinationChain.map { it.chain },
+        originChain = originChain,
+        destinationChainFlow = destinationChain.map { it.chain },
         errorDisplayer = ::showError,
         coroutineScope = this
     )

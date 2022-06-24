@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="wallet_send_myself">Myself</string>
+
   <string name="wallet_send_cannot_pay_network_fee">You don’t have enough balance to pay the network fee of %s.\nTransferable balance: %s</string>
   <string name="wallet_send_cannot_pay_cross_chain_fee">You don’t have enough balance to pay the Cross-chain fee of %s.\nRemaining balance after transfer: %s</string>
 

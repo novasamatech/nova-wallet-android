@@ -253,12 +253,14 @@ class AccountFeatureModule {
         clipboardManager: ClipboardManager,
         multiChainQrSharingFactory: MultiChainQrSharingFactory,
         resourceManager: ResourceManager,
+        accountUseCase: SelectedAccountUseCase
     ) = AddressInputMixinFactory(
         addressIconGenerator = addressIconGenerator,
         systemCallExecutor = systemCallExecutor,
         clipboardManager = clipboardManager,
         qrSharingFactory = multiChainQrSharingFactory,
-        resourceManager = resourceManager
+        resourceManager = resourceManager,
+        accountUseCase = accountUseCase
     )
 
     @Provides

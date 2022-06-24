@@ -13,6 +13,7 @@ fun BaseFragment<*>.setupAddressInput(
     onScanClicked { mixin.scanClicked() }
     onPasteClicked { mixin.pasteClicked() }
     onClearClicked { mixin.clearClicked() }
+    onMyselfClicked { mixin.myselfClicked() }
 
     mixin.state.observe(::setState)
 }

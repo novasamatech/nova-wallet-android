@@ -14,4 +14,6 @@ interface AddressInputMixin {
     fun clearClicked()
 
     fun scanClicked()
+
+    fun myselfClicked()
 }

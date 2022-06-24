@@ -37,6 +37,20 @@
         android:textColorHint="@color/white_32" />
 
     <TextView
+        android:id="@+id/addressInputMyself"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:paddingStart="12dp"
+        android:paddingTop="6dp"
+        android:paddingRight="12dp"
+        android:paddingBottom="8dp"
+        android:textColor="@color/accentBlue"
+        tools:background="@color/white_8"
+        android:text="@string/wallet_send_myself" />
+
+    <TextView
         android:id="@+id/addressInputPaste"
         style="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
         android:layout_width="wrap_content"
