@@ -95,6 +95,8 @@ class MultiLocation(
 
         class PalletInstance(val index: BigInteger) : Junction()
 
+        class GeneralIndex(val index: BigInteger) : Junction()
+
         class AccountKey20(val accountId: AccountId) : Junction()
 
         class AccountId32(val accountId: AccountId) : Junction()
@@ -120,10 +122,12 @@ val MultiLocation.Junction.order
         is MultiLocation.Junction.ParachainId -> 0
 
         // All of these are on the same "level" - mutually exhaustive
-        is MultiLocation.Junction.GeneralKey,
         is MultiLocation.Junction.PalletInstance,
         is MultiLocation.Junction.AccountKey20,
         is MultiLocation.Junction.AccountId32 -> 1
+
+        is MultiLocation.Junction.GeneralKey,
+        is MultiLocation.Junction.GeneralIndex -> 2
     }
 
 private fun List<MultiLocation.Junction>.sorted(): List<MultiLocation.Junction> {

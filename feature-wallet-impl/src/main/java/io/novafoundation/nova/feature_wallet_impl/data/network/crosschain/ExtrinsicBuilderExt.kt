@@ -155,6 +155,7 @@ private fun MultiLocation.Junction.toEncodableInstance() = when (this) {
     is MultiLocation.Junction.ParachainId -> DictEnum.Entry("Parachain", id)
     is MultiLocation.Junction.AccountKey20 -> DictEnum.Entry("AccountKey20", accountId.toJunctionAccountIdInstance(accountIdKey = "key"))
     is MultiLocation.Junction.AccountId32 -> DictEnum.Entry("AccountId32", accountId.toJunctionAccountIdInstance(accountIdKey = "id"))
+    is MultiLocation.Junction.GeneralIndex -> DictEnum.Entry("GeneralIndex", index)
 }
 
 private fun AccountId.toJunctionAccountIdInstance(accountIdKey: String) = structOf(

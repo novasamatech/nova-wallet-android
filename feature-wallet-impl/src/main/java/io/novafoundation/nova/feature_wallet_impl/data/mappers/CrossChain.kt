@@ -145,6 +145,7 @@ private fun mapJunctionFromRemote(type: String, value: Any?): Junction {
         "parachainId" -> Junction.ParachainId(value.asGsonParsedNumber())
         "generalKey" -> Junction.GeneralKey(value as String)
         "palletInstance" -> Junction.PalletInstance(value.asGsonParsedNumber())
+        "generalIndex" -> Junction.GeneralIndex(value.asGsonParsedNumber())
         else -> throw IllegalArgumentException("Unknown junction type: $type")
     }
 }
