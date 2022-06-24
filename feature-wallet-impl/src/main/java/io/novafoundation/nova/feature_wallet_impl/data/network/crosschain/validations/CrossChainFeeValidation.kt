@@ -9,7 +9,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystemBuilder
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.originFeeInUsedAsset
 
-class CrossChainFeeValidation: AssetTransfersValidation {
+class CrossChainFeeValidation : AssetTransfersValidation {
 
     override suspend fun validate(value: AssetTransferPayload): ValidationStatus<AssetTransferValidationFailure> {
         val remainingBalanceAfterTransfer = value.originUsedAsset.transferable - value.transfer.amount - value.originFeeInUsedAsset

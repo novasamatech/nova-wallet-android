@@ -84,7 +84,7 @@ private suspend fun AssetSourceRegistry.existentialDeposit(chain: Chain, asset: 
     return asset.amountFromPlanks(inPlanks)
 }
 
-private fun Chain.Asset.existentialDepositError(amount: BigDecimal): WillRemoveAccount = when(type) {
+private fun Chain.Asset.existentialDepositError(amount: BigDecimal): WillRemoveAccount = when (type) {
     Chain.Asset.Type.Native -> WillRemoveAccount.WillBurnDust
     is Chain.Asset.Type.Orml -> WillRemoveAccount.WillBurnDust
     is Chain.Asset.Type.Statemine -> WillRemoveAccount.WillTransferDust(amount)

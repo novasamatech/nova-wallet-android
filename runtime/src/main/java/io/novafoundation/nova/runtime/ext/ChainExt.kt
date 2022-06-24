@@ -169,7 +169,7 @@ fun Chain.Asset.requireOrml(): Type.Orml {
 }
 
 fun Chain.Asset.isSelfSufficient(): Boolean {
-    return when(type) {
+    return when (type) {
         Type.Native -> true
         is Type.Orml -> true
         is Type.Statemine -> type.selfSufficient

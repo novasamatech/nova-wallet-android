@@ -38,13 +38,13 @@ sealed class AssetTransferValidationFailure {
             val transferableBalance: BigDecimal,
         ) : NotEnoughFunds()
 
-        class ToStayAboveED(val commissionAsset: Chain.Asset): NotEnoughFunds()
+        class ToStayAboveED(val commissionAsset: Chain.Asset) : NotEnoughFunds()
 
         class ToPayCrossChainFee(
             val usedAsset: Chain.Asset,
             val fee: BigDecimal,
             val remainingBalanceAfterTransfer: BigDecimal,
-        ): NotEnoughFunds()
+        ) : NotEnoughFunds()
     }
 
     class InvalidRecipientAddress(val chain: Chain) : AssetTransferValidationFailure()
