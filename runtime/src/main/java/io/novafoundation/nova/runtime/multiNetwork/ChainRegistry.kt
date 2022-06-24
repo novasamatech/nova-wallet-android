@@ -31,6 +31,11 @@ data class ChainService(
     val connection: ChainConnection
 )
 
+data class ChainWithAsset(
+    val chain: Chain,
+    val asset: Chain.Asset
+)
+
 class ChainRegistry(
     private val runtimeProviderPool: RuntimeProviderPool,
     private val connectionPool: ConnectionPool,
@@ -99,10 +104,10 @@ suspend fun ChainRegistry.chainWithAssetOrNull(chainId: String, assetId: Int): P
     return chain to chainAsset
 }
 
-suspend fun ChainRegistry.chainWithAsset(chainId: String, assetId: Int): Pair<Chain, Chain.Asset> {
+suspend fun ChainRegistry.chainWithAsset(chainId: String, assetId: Int): ChainWithAsset {
     val chain = chainsById.first().getValue(chainId)
 
-    return chain to chain.assetsById.getValue(assetId)
+    return ChainWithAsset(chain, chain.assetsById.getValue(assetId))
 }
 
 suspend fun ChainRegistry.asset(chainId: String, assetId: Int): Chain.Asset {

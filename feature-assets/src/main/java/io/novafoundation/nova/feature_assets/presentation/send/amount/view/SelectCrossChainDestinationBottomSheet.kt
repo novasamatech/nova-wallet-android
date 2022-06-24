@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.BaseDynamicLi
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.ClickHandler
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.android.synthetic.main.item_chain_chooser.view.itemChainChooserChain
 import kotlinx.android.synthetic.main.item_chain_chooser.view.itemChainChooserCheck
@@ -21,7 +22,7 @@ import kotlinx.android.synthetic.main.item_chain_chooser_group.view.itemChainCho
 class SelectCrossChainDestinationBottomSheet(
     context: Context,
     private val payload: Payload,
-    private val onSelected: ClickHandler<Chain>,
+    private val onSelected: ClickHandler<ChainWithAsset>,
     private val onCancelled: () -> Unit
 ) : BaseDynamicListBottomSheet(context), CrossChainDestinationAdapter.Handler {
 
@@ -44,14 +45,14 @@ class SelectCrossChainDestinationBottomSheet(
         adapter.submitList(payload.destinations.toListWithHeaders())
     }
 
-    override fun chainClicked(chain: Chain) {
-        onSelected(chain)
+    override fun itemClicked(chainWithAsset: ChainWithAsset) {
+        onSelected(chainWithAsset)
         dismiss()
     }
 }
 
 class CrossChainDestinationModel(
-    val chain: Chain,
+    val chainWithAsset: ChainWithAsset,
     val chainUi: ChainUi
 )
 
@@ -62,7 +63,7 @@ class CrossChainDestinationAdapter(
 
     interface Handler {
 
-        fun chainClicked(chain: Chain)
+        fun itemClicked(chainWithAsset: ChainWithAsset)
     }
 
     override fun createGroupViewHolder(parent: ViewGroup): GroupedListHolder {
@@ -78,7 +79,7 @@ class CrossChainDestinationAdapter(
     }
 
     override fun bindChild(holder: GroupedListHolder, child: CrossChainDestinationModel) {
-        val isSelected = child.chain.id == selectedChain.id
+        val isSelected = child.chainWithAsset.chain.id == selectedChain.id
 
         (holder as ItemHolder).bind(child, isSelected, handler)
     }
@@ -101,7 +102,7 @@ private class ItemHolder(parent: ViewGroup) : GroupedListHolder(parent.inflateCh
         itemChainChooserChain.setChain(item.chainUi)
         itemChainChooserCheck.isChecked = isSelected
 
-        setOnClickListener { handler.chainClicked(item.chain) }
+        setOnClickListener { handler.itemClicked(item.chainWithAsset) }
     }
 }
 

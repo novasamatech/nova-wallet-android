@@ -62,16 +62,17 @@ class ConfirmSendViewModel(
     ExternalActions by externalActions,
     Validatable by validationExecutor {
 
-    private val originChain by lazyAsync { chainRegistry.getChain(transferDraft.assetPayload.chainId) }
-    private val originAsset by lazyAsync { chainRegistry.asset(transferDraft.assetPayload.chainId, transferDraft.assetPayload.chainAssetId) }
+    private val originChain by lazyAsync { chainRegistry.getChain(transferDraft.origin.chainId) }
+    private val originAsset by lazyAsync { chainRegistry.asset(transferDraft.origin.chainId, transferDraft.origin.chainAssetId) }
 
-    private val destinationChain by lazyAsync { chainRegistry.getChain(transferDraft.destinationChain) }
+    private val destinationChain by lazyAsync { chainRegistry.getChain(transferDraft.destination.chainId) }
+    private val destinationChainAsset by lazyAsync { chainRegistry.asset(transferDraft.destination.chainId, transferDraft.destination.chainAssetId) }
 
-    private val assetFlow = interactor.assetFlow(transferDraft.assetPayload.chainId, transferDraft.assetPayload.chainAssetId)
+    private val assetFlow = interactor.assetFlow(transferDraft.origin.chainId, transferDraft.origin.chainAssetId)
         .inBackground()
         .share()
 
-    private val commissionAssetFlow = interactor.commissionAssetFlow(transferDraft.assetPayload.chainId)
+    private val commissionAssetFlow = interactor.commissionAssetFlow(transferDraft.origin.chainId)
         .inBackground()
         .share()
 
@@ -201,12 +202,13 @@ class ConfirmSendViewModel(
                 recipient = transferDraft.recipientAddress,
                 originChain = chain,
                 destinationChain = destinationChain(),
+                destinationChainAsset = destinationChainAsset(),
                 originChainAsset = chainAsset,
                 amount = transferDraft.amount
             ),
             originFee = transferDraft.originFee,
-            commissionAsset = commissionAssetFlow.first(),
-            usedAsset = assetFlow.first(),
+            originCommissionAsset = commissionAssetFlow.first(),
+            originUsedAsset = assetFlow.first(),
             crossChainFee = transferDraft.crossChainFee
         )
     }

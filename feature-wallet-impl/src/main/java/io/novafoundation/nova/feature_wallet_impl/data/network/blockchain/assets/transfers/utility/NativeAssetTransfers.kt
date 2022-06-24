@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure.WillRemoveAccount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystem
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.nativeTransfer
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
@@ -21,9 +20,7 @@ class NativeAssetTransfers(
     phishingValidationFactory: PhishingValidationFactory,
 ) : BaseAssetTransfers(chainRegistry, assetSourceRegistry, extrinsicService, phishingValidationFactory) {
 
-    override val validationSystem: AssetTransfersValidationSystem = defaultValidationSystem(
-        removeAccountBehavior = { WillRemoveAccount.WillBurnDust }
-    )
+    override val validationSystem: AssetTransfersValidationSystem = defaultValidationSystem()
 
     override fun ExtrinsicBuilder.transfer(transfer: AssetTransfer) {
         nativeTransfer(

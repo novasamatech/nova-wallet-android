@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.XcmTransferType
 import io.novafoundation.nova.feature_wallet_api.domain.model.order
 import io.novafoundation.nova.runtime.ext.isParachain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import java.math.BigInteger
 
@@ -66,12 +67,12 @@ fun List<Junction>.toInterior() = when (size) {
 
 fun MultiLocation.childView() = MultiLocation(parents + BigInteger.ONE, interior)
 
-fun CrossChainTransfersConfiguration.availableDestinationChains(origin: Chain.Asset): List<ChainId> {
+fun CrossChainTransfersConfiguration.availableDestinations(origin: Chain.Asset): List<Pair<ChainId, ChainAssetId>> {
     val assetTransfers = assetTransfers(origin) ?: return emptyList()
 
     return assetTransfers.xcmTransfers
         .filter { it.type != XcmTransferType.UNKNOWN }
-        .map { it.destination.chainId }
+        .map { it.destination.chainId to it.destination.assetId }
 }
 
 fun ByteArray.accountIdToMultiLocation() = MultiLocation(

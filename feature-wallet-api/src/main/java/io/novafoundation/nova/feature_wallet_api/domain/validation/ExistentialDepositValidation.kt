@@ -6,13 +6,13 @@ import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.common.validation.validOrWarning
 import java.math.BigDecimal
 
-typealias ExistentialDepositError<E> = (remainingAmount: BigDecimal) -> E
+typealias ExistentialDepositError<E, P> = (remainingAmount: BigDecimal, payload: P) -> E
 
 class ExistentialDepositValidation<P, E>(
     private val totalBalanceProducer: AmountProducer<P>,
     private val feeProducer: AmountProducer<P>,
     private val extraAmountProducer: AmountProducer<P>,
-    private val errorProducer: ExistentialDepositError<E>,
+    private val errorProducer: ExistentialDepositError<E, P>,
     private val existentialDeposit: AmountProducer<P>
 ) : Validation<P, E> {
 
@@ -26,7 +26,7 @@ class ExistentialDepositValidation<P, E>(
         val remainingAmount = totalBalance - fee - extraAmount
 
         return validOrWarning(remainingAmount >= existentialDeposit) {
-            errorProducer(remainingAmount)
+            errorProducer(remainingAmount, value)
         }
     }
 }
@@ -36,7 +36,7 @@ fun <P, E> ValidationSystemBuilder<P, E>.doNotCrossExistentialDeposit(
     fee: AmountProducer<P> = { BigDecimal.ZERO },
     extraAmount: AmountProducer<P> = { BigDecimal.ZERO },
     existentialDeposit: AmountProducer<P>,
-    error: ExistentialDepositError<E>,
+    error: ExistentialDepositError<E, P>,
 ) = validate(
     ExistentialDepositValidation(
         totalBalanceProducer = totalBalance,

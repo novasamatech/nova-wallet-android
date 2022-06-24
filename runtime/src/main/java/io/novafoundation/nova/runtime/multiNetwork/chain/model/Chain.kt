@@ -61,7 +61,10 @@ data class Chain(
         sealed class Type {
             object Native : Type()
 
-            data class Statemine(val id: BigInteger) : Type()
+            data class Statemine(
+                val id: BigInteger,
+                val selfSufficient: Boolean
+            ) : Type()
 
             data class Orml(
                 val currencyIdScale: String,

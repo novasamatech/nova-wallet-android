@@ -26,6 +26,7 @@ import io.novafoundation.nova.feature_wallet_api.di.Wallet
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
@@ -202,6 +203,8 @@ class WalletFeatureModule {
     @FeatureScope
     fun provideCrossChainTransactor(
         weigher: CrossChainWeigher,
-        extrinsicService: ExtrinsicService
-    ): CrossChainTransactor = RealCrossChainTransactor(weigher, extrinsicService)
+        extrinsicService: ExtrinsicService,
+        assetSourceRegistry: AssetSourceRegistry,
+        phishingValidationFactory: PhishingValidationFactory
+    ): CrossChainTransactor = RealCrossChainTransactor(weigher, extrinsicService, assetSourceRegistry, phishingValidationFactory)
 }

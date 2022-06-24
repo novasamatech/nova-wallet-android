@@ -1,39 +1,32 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers
 
 import io.novafoundation.nova.common.validation.ValidationSystem
-import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure.WillRemoveAccount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfers
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystem
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.amountInCommissionAsset
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.amountInPlanks
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.feeInUsedAsset
-import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
-import io.novafoundation.nova.feature_wallet_api.domain.validation.ExistentialDepositError
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystemBuilder
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.originFeeInUsedAsset
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
-import io.novafoundation.nova.feature_wallet_api.domain.validation.doNotCrossExistentialDeposit
-import io.novafoundation.nova.feature_wallet_api.domain.validation.enoughTotalToStayAboveED
-import io.novafoundation.nova.feature_wallet_api.domain.validation.notPhishingAccount
-import io.novafoundation.nova.feature_wallet_api.domain.validation.positiveAmount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
-import io.novafoundation.nova.feature_wallet_api.domain.validation.validAddress
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.notDeadRecipient
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.doNotCrossExistentialDeposit
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.notDeadRecipientInCommissionAsset
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.notDeadRecipientInUsedAsset
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.notPhishingRecipient
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.positiveAmount
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.sufficientCommissionBalanceToStayAboveED
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.sufficientTransferableBalanceToPayOriginFee
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.validAddress
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import jp.co.soramitsu.fearless_utils.runtime.metadata.callOrNull
 import jp.co.soramitsu.fearless_utils.runtime.metadata.moduleOrNull
-import java.math.BigDecimal
 import java.math.BigInteger
-
-typealias AssetTransfersValidationSystemBuilder = ValidationSystemBuilder<AssetTransferPayload, AssetTransferValidationFailure>
 
 abstract class BaseAssetTransfers(
     private val chainRegistry: ChainRegistry,
@@ -72,96 +65,36 @@ abstract class BaseAssetTransfers(
         }
     }
 
-    private suspend fun existentialDepositForUsedAsset(transfer: AssetTransfer): BigDecimal {
-        return existentialDeposit(transfer.originChain, transfer.originChainAsset)
-    }
-
-    private suspend fun existentialDeposit(chain: Chain, asset: Chain.Asset): BigDecimal {
-        val inPlanks = assetSourceRegistry.sourceFor(asset).balance
-            .existentialDeposit(chain, asset)
-
-        return asset.amountFromPlanks(inPlanks)
-    }
-
-    protected fun defaultValidationSystem(
-        removeAccountBehavior: ExistentialDepositError<WillRemoveAccount>
-    ): AssetTransfersValidationSystem = ValidationSystem {
+    protected fun defaultValidationSystem(): AssetTransfersValidationSystem = ValidationSystem {
         validAddress()
 
-        notPhishingRecipient()
+        notPhishingRecipient(phishingValidationFactory)
 
         positiveAmount()
 
-        sufficientTransferableBalanceToPayFee()
+        sufficientTransferableBalanceToPayOriginFee()
         sufficientBalanceInUsedAsset()
 
-        sufficientCommissionBalanceToStayAboveED()
+        sufficientCommissionBalanceToStayAboveED(assetSourceRegistry)
 
-        notDeadRecipientInUsedAsset()
-        notDeadRecipientInCommissionAsset()
+        notDeadRecipientInUsedAsset(assetSourceRegistry)
+        notDeadRecipientInCommissionAsset(assetSourceRegistry)
 
-        doNotCrossExistentialDeposit(removeAccountBehavior)
+        doNotCrossExistentialDeposit()
     }
-
-    private fun AssetTransfersValidationSystemBuilder.notPhishingRecipient() = notPhishingAccount(
-        factory = phishingValidationFactory,
-        address = { it.transfer.recipient },
-        chain = { it.transfer.originChain },
-        warning = AssetTransferValidationFailure::PhishingRecipient
-    )
-
-    private fun AssetTransfersValidationSystemBuilder.validAddress() = validAddress(
-        address = { it.transfer.recipient },
-        chain = { it.transfer.destinationChain },
-        error = { AssetTransferValidationFailure.InvalidRecipientAddress(it.transfer.destinationChain) }
-    )
-
-    protected fun AssetTransfersValidationSystemBuilder.positiveAmount() = positiveAmount(
-        amount = { it.transfer.amount },
-        error = { AssetTransferValidationFailure.NonPositiveAmount }
-    )
 
     protected fun AssetTransfersValidationSystemBuilder.sufficientBalanceInUsedAsset() = sufficientBalance(
         amount = { it.transfer.amount },
-        available = { it.usedAsset.transferable },
+        available = { it.originUsedAsset.transferable },
         error = { AssetTransferValidationFailure.NotEnoughFunds.InUsedAsset },
-        fee = { it.feeInUsedAsset }
+        fee = { it.originFeeInUsedAsset }
     )
 
-    protected fun AssetTransfersValidationSystemBuilder.notDeadRecipientInUsedAsset() = notDeadRecipient(
+
+
+    protected fun AssetTransfersValidationSystemBuilder.doNotCrossExistentialDeposit() = doNotCrossExistentialDeposit(
         assetSourceRegistry = assetSourceRegistry,
-        assetToCheck = { it.usedAsset },
-        addingAmount = { it.transfer.amountInPlanks },
-        failure = { AssetTransferValidationFailure.DeadRecipient.InUsedAsset }
-    )
-
-    protected fun AssetTransfersValidationSystemBuilder.notDeadRecipientInCommissionAsset() = notDeadRecipient(
-        assetSourceRegistry = assetSourceRegistry,
-        assetToCheck = { it.commissionAsset },
-        addingAmount = { it.amountInCommissionAsset },
-        failure = { AssetTransferValidationFailure.DeadRecipient.InCommissionAsset(commissionAsset = it.commissionAsset.token.configuration) }
-    )
-
-    protected fun AssetTransfersValidationSystemBuilder.sufficientTransferableBalanceToPayFee() = sufficientBalance(
-        fee = { it.originFee },
-        available = { it.commissionAsset.transferable },
-        error = { AssetTransferValidationFailure.NotEnoughFunds.InCommissionAsset(commissionAsset = it.commissionAsset.token.configuration) }
-    )
-
-    protected fun AssetTransfersValidationSystemBuilder.sufficientCommissionBalanceToStayAboveED() = enoughTotalToStayAboveED(
-        fee = { it.originFee },
-        total = { it.commissionAsset.total },
-        existentialDeposit = { existentialDeposit(it.transfer.originChain, it.commissionAsset.token.configuration) },
-        error = { AssetTransferValidationFailure.NotEnoughFunds.InCommissionAsset(commissionAsset = it.commissionAsset.token.configuration) }
-    )
-
-    protected fun AssetTransfersValidationSystemBuilder.doNotCrossExistentialDeposit(
-        error: ExistentialDepositError<WillRemoveAccount>,
-    ) = doNotCrossExistentialDeposit(
-        totalBalance = { it.usedAsset.total },
-        fee = { it.feeInUsedAsset },
+        fee = { it.originFeeInUsedAsset },
         extraAmount = { it.transfer.amount },
-        existentialDeposit = { existentialDepositForUsedAsset(it.transfer) },
-        error = error
     )
 }

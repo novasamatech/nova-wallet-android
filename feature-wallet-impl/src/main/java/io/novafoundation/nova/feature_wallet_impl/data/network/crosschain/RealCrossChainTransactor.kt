@@ -1,9 +1,16 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.crosschain
 
 import io.novafoundation.nova.common.utils.Modules
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.xcmPalletName
+import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystem
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystemBuilder
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.originFeeInUsedAsset
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
@@ -13,14 +20,49 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfer
 import io.novafoundation.nova.feature_wallet_api.domain.model.MultiLocation
 import io.novafoundation.nova.feature_wallet_api.domain.model.XcmTransferType
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
+import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
+import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.doNotCrossExistentialDeposit
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.notDeadRecipientInCommissionAsset
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.notDeadRecipientInUsedAsset
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.notPhishingRecipient
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.positiveAmount
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.sufficientCommissionBalanceToStayAboveED
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.sufficientTransferableBalanceToPayOriginFee
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.validAddress
+import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.validations.canPayCrossChainFee
 import io.novafoundation.nova.runtime.ext.accountIdOrDefault
+import io.novafoundation.nova.runtime.ext.commissionAsset
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import java.math.BigInteger
 
 class RealCrossChainTransactor(
     private val weigher: CrossChainWeigher,
     private val extrinsicService: ExtrinsicService,
+    private val assetSourceRegistry: AssetSourceRegistry,
+    private val phishingValidationFactory: PhishingValidationFactory
 ) : CrossChainTransactor {
+
+    override val validationSystem: AssetTransfersValidationSystem = ValidationSystem {
+        positiveAmount()
+
+        validAddress()
+        notPhishingRecipient(phishingValidationFactory)
+
+        notDeadRecipientInCommissionAsset(assetSourceRegistry)
+        notDeadRecipientInUsedAsset(assetSourceRegistry)
+
+        sufficientCommissionBalanceToStayAboveED(assetSourceRegistry)
+
+        sufficientTransferableBalanceToPayOriginFee()
+        canPayCrossChainFee()
+
+        doNotCrossExistentialDeposit(
+            assetSourceRegistry = assetSourceRegistry,
+            fee = { it.originFeeInUsedAsset },
+            extraAmount = { it.transfer.amount + it.crossChainFee.orZero() }
+        )
+    }
 
     override suspend fun estimateOriginFee(configuration: CrossChainTransferConfiguration, transfer: AssetTransfer): BigInteger {
         return extrinsicService.estimateFee(transfer.originChain) {
@@ -104,4 +146,16 @@ class RealCrossChainTransactor(
 
         return accountId.accountIdToMultiLocation()
     }
+
+    protected fun AssetTransfersValidationSystemBuilder.sufficientTransferableBalanceToPayCrossChainFee() = sufficientBalance(
+        fee = { it.originFee },
+        available = { it.originCommissionAsset.transferable },
+        error = {
+            AssetTransferValidationFailure.NotEnoughFunds.InCommissionAsset(
+                commissionAsset = it.transfer.originChain.commissionAsset,
+                transferableBalance = it.originCommissionAsset.transferable,
+                fee = it.originFee
+            )
+        }
+    )
 }
