@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
+import io.novafoundation.nova.common.interfaces.FileCache
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -102,4 +103,6 @@ interface WalletFeatureDependencies {
     fun validationExecutor(): ValidationExecutor
 
     fun eventsRepository(): EventsRepository
+
+    val fileCache: FileCache
 }

@@ -1,11 +1,13 @@
 package io.novafoundation.nova.feature_wallet_impl.di
 
+import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.common.interfaces.FileCache
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.core_db.dao.AssetDao
@@ -185,7 +187,9 @@ class WalletFeatureModule {
     fun provideCrossChainRepository(
         api: CrossChainConfigApi,
         @Named(REMOTE_STORAGE_SOURCE) storageDataSource: StorageDataSource,
-    ): CrossChainTransfersRepository = RealCrossChainTransfersRepository(api, storageDataSource)
+        fileCache: FileCache,
+        gson: Gson
+    ): CrossChainTransfersRepository = RealCrossChainTransfersRepository(api, storageDataSource, fileCache, gson)
 
     @Provides
     @FeatureScope

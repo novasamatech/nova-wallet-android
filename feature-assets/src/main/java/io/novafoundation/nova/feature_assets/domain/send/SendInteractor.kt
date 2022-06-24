@@ -18,7 +18,9 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -105,12 +107,12 @@ class SendInteractor(
         }
     }
 
-    suspend fun availableCrossChainDestinations(origin: Chain.Asset): List<Chain> {
-        val configuration = crossChainTransfersRepository.getConfiguration()
+    fun availableCrossChainDestinationsFlow(origin: Chain.Asset): Flow<List<Chain>> {
+        return crossChainTransfersRepository.configurationFlow().map { configuration ->
+            val chainsById = chainRegistry.chainsById.first()
 
-        val chainsById = chainRegistry.chainsById.first()
-
-        return configuration.availableDestinationChains(origin).mapNotNull(chainsById::get)
+            configuration.availableDestinationChains(origin).mapNotNull(chainsById::get)
+        }
     }
 
     fun validationSystemFor(transfer: AssetTransfer) = if (transfer.isCrossChain) {

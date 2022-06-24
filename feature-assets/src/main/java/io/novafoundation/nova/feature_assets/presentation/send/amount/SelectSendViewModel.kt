@@ -6,7 +6,6 @@ import io.novafoundation.nova.common.list.headers.TextHeader
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
@@ -45,7 +44,9 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -81,8 +82,9 @@ class SelectSendViewModel(
         coroutineScope = this
     )
 
-    private val availableCrossChainDestinations = flowOf {
-        sendInteractor.availableCrossChainDestinations(originChainAsset())
+    private val availableCrossChainDestinations = flow {
+        val origin = originChainAsset()
+        emitAll(sendInteractor.availableCrossChainDestinationsFlow(origin))
     }
         .onStart { emit(emptyList()) }
         .shareInBackground()

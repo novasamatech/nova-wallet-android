@@ -24,7 +24,9 @@ import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferencesImpl
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptionUtil
 import io.novafoundation.nova.common.di.scope.ApplicationScope
+import io.novafoundation.nova.common.interfaces.FileCache
 import io.novafoundation.nova.common.interfaces.FileProvider
+import io.novafoundation.nova.common.interfaces.InternalFileSystemCache
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableProvider
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
@@ -216,4 +218,8 @@ class CommonModule {
     fun resourcesHintsMixinFactory(
         resourceManager: ResourceManager,
     ) = ResourcesHintsMixinFactory(resourceManager)
+
+    @Provides
+    @ApplicationScope
+    fun provideFileCache(fileProvider: FileProvider) : FileCache = InternalFileSystemCache(fileProvider)
 }
