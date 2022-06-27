@@ -63,7 +63,6 @@ data class Chain(
 
             data class Statemine(
                 val id: BigInteger,
-                val selfSufficient: Boolean
             ) : Type()
 
             data class Orml(

@@ -168,15 +168,6 @@ fun Chain.Asset.requireOrml(): Type.Orml {
     return type
 }
 
-fun Chain.Asset.isSelfSufficient(): Boolean {
-    return when (type) {
-        Type.Native -> true
-        is Type.Orml -> true
-        is Type.Statemine -> type.selfSufficient
-        Type.Unsupported -> false
-    }
-}
-
 fun Chain.Asset.ormlCurrencyId(runtime: RuntimeSnapshot): Any? {
     val ormlType = requireOrml()
 

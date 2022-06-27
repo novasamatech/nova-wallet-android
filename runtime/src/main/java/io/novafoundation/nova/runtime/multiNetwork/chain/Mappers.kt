@@ -70,8 +70,6 @@ private const val ASSET_ORML = "orml"
 private const val ASSET_UNSUPPORTED = "unsupported"
 
 private const val STATEMINE_EXTRAS_ID = "assetId"
-private const val STATEMINE_EXTRAS_SELF_SUFFICIENT = "selfSufficient"
-private const val STATEMINE_SELF_SUFFICIENT_DEFAULT = false
 
 private const val ORML_EXTRAS_CURRENCY_ID_SCALE = "currencyIdScale"
 private const val ORML_EXTRAS_CURRENCY_TYPE = "currencyIdType"
@@ -91,9 +89,8 @@ private fun mapChainAssetTypeFromRaw(type: String?, typeExtras: Map<String, Any?
         null, ASSET_NATIVE -> Chain.Asset.Type.Native
         ASSET_STATEMINE -> {
             val id = typeExtras?.get(STATEMINE_EXTRAS_ID)?.asGsonParsedNumberOrNull()
-            val selfSufficient = typeExtras?.get(STATEMINE_EXTRAS_SELF_SUFFICIENT) as? Boolean ?: STATEMINE_SELF_SUFFICIENT_DEFAULT
 
-            Chain.Asset.Type.Statemine(id!!, selfSufficient)
+            Chain.Asset.Type.Statemine(id!!)
         }
         ASSET_ORML -> {
             Chain.Asset.Type.Orml(

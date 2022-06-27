@@ -8,17 +8,14 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
-import java.math.BigInteger
 
 class UnsupportedAssetBalance : AssetBalance {
 
-    override suspend fun existentialDeposit(chain: Chain, chainAsset: Chain.Asset): BigInteger {
-        throw UnsupportedOperationException("UnsupportedBalanceSource")
-    }
+    override suspend fun isSelfSufficient(chainAsset: Chain.Asset) = unsupported()
 
-    override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {
-        throw UnsupportedOperationException("UnsupportedBalanceSource")
-    }
+    override suspend fun existentialDeposit(chain: Chain, chainAsset: Chain.Asset) = unsupported()
+
+    override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId) = unsupported()
 
     override suspend fun startSyncingBalance(
         chain: Chain,
@@ -29,4 +26,6 @@ class UnsupportedAssetBalance : AssetBalance {
     ): Flow<BlockHash> {
         return emptyFlow()
     }
+
+    private fun unsupported(): Nothing = throw UnsupportedOperationException("Unsupported balance source")
 }

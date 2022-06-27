@@ -13,7 +13,6 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PlanksProducer
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.commissionAsset
-import io.novafoundation.nova.runtime.ext.isSelfSufficient
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger
 
@@ -21,7 +20,7 @@ class DeadRecipientValidation(
     private val assetSourceRegistry: AssetSourceRegistry,
     private val addingAmount: PlanksProducer<AssetTransferPayload>,
     private val assetToCheck: (AssetTransferPayload) -> Chain.Asset,
-    private val skipIf: (AssetTransferPayload) -> Boolean,
+    private val skipIf: suspend (AssetTransferPayload) -> Boolean,
     private val failure: (AssetTransferPayload) -> AssetTransferValidationFailure.DeadRecipient,
 ) : AssetTransfersValidation {
 
@@ -52,9 +51,11 @@ fun AssetTransfersValidationSystemBuilder.notDeadRecipientInCommissionAsset(
     assetSourceRegistry = assetSourceRegistry,
     assetToCheck = { it.transfer.destinationChain.commissionAsset },
     addingAmount = { it.receivingAmountInCommissionAsset },
-    skipIf = { it.transfer.destinationChainAsset.isSelfSufficient() },
+    skipIf = { assetSourceRegistry.isAssetSelfSufficient(it.transfer.destinationChainAsset) },
     failure = { AssetTransferValidationFailure.DeadRecipient.InCommissionAsset(commissionAsset = it.transfer.destinationChain.commissionAsset) }
 )
+
+private suspend fun AssetSourceRegistry.isAssetSelfSufficient(asset: Chain.Asset) = sourceFor(asset).balance.isSelfSufficient(asset)
 
 fun AssetTransfersValidationSystemBuilder.notDeadRecipientInUsedAsset(
     assetSourceRegistry: AssetSourceRegistry
@@ -70,7 +71,7 @@ fun AssetTransfersValidationSystemBuilder.notDeadRecipient(
     failure: (AssetTransferPayload) -> AssetTransferValidationFailure.DeadRecipient,
     assetToCheck: (AssetTransferPayload) -> Chain.Asset,
     addingAmount: PlanksProducer<AssetTransferPayload> = { BigInteger.ZERO },
-    skipIf: (AssetTransferPayload) -> Boolean = { false }
+    skipIf: suspend (AssetTransferPayload) -> Boolean = { false }
 ) = validate(
     DeadRecipientValidation(
         assetSourceRegistry = assetSourceRegistry,

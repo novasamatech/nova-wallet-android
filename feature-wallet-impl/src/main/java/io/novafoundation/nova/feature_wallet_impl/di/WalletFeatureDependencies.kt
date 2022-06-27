@@ -15,6 +15,7 @@ import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.AssetDao
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.dao.PhishingAddressDao
@@ -105,4 +106,6 @@ interface WalletFeatureDependencies {
     fun eventsRepository(): EventsRepository
 
     val fileCache: FileCache
+
+    val storageCache: StorageCache
 }
