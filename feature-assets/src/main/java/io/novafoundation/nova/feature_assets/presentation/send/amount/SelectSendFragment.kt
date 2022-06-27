@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.makeGone
+import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.setupAddressInput
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
@@ -26,6 +27,7 @@ import kotlinx.android.synthetic.main.fragment_select_send.selectSendNext
 import kotlinx.android.synthetic.main.fragment_select_send.selectSendOriginChain
 import kotlinx.android.synthetic.main.fragment_select_send.selectSendOriginFee
 import kotlinx.android.synthetic.main.fragment_select_send.selectSendRecipient
+import kotlinx.android.synthetic.main.fragment_select_send.selectSendToTitle
 import kotlinx.android.synthetic.main.fragment_select_send.selectSendToolbar
 
 private const val KEY_ADDRESS = "KEY_ADDRESS"
@@ -56,6 +58,7 @@ class SelectSendFragment : BaseFragment<SelectSendViewModel>() {
         selectSendToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         selectSendDestinationChain.setOnClickListener { viewModel.destinationChainClicked() }
+        selectSendDestinationChain.setChangeable(true)
 
         selectSendCrossChainFee.makeGone() // gone inititally
         selectSendCrossChainFee.setTitle(R.string.wallet_send_cross_chain_fee)
@@ -89,11 +92,20 @@ class SelectSendFragment : BaseFragment<SelectSendViewModel>() {
             ).show()
         }
 
-        viewModel.originChainUi.observe(selectSendOriginChain::setChain)
-        viewModel.destinationChainChipModel.observe(selectSendDestinationChain::setModel)
+        viewModel.transferDirectionModel.observe {
+            selectSendOriginChain.setChain(it.originChainUi)
+            selectSendFromTitle.text = it.originChainLabel
+
+            if (it.destinationChainUi != null) {
+                selectSendDestinationChain.setChain(it.destinationChainUi)
+                selectSendDestinationChain.makeVisible()
+                selectSendToTitle.makeVisible()
+            } else {
+                selectSendToTitle.makeGone()
+                selectSendDestinationChain.makeGone()
+            }
+        }
 
         viewModel.continueButtonStateLiveData.observe(selectSendNext::setState)
-
-        viewModel.sendFromText.observe(selectSendFromTitle::setText)
     }
 }

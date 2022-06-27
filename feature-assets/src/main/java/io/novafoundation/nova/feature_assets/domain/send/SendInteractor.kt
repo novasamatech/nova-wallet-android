@@ -1,24 +1,26 @@
 package io.novafoundation.nova.feature_assets.domain.send
 
 import io.novafoundation.nova.common.utils.orZero
-import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.isCrossChain
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
-import io.novafoundation.nova.feature_wallet_api.domain.implementations.availableDestinationChains
+import io.novafoundation.nova.feature_wallet_api.domain.implementations.availableDestinations
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.transferConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.RecipientSearchResult
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -105,16 +107,21 @@ class SendInteractor(
         }
     }
 
-    suspend fun availableCrossChainDestinations(origin: Chain.Asset): List<Chain> {
-        val configuration = crossChainTransfersRepository.getConfiguration()
+    fun availableCrossChainDestinationsFlow(origin: Chain.Asset): Flow<List<ChainWithAsset>> {
+        return crossChainTransfersRepository.configurationFlow().map { configuration ->
+            val chainsById = chainRegistry.chainsById.first()
 
-        val chainsById = chainRegistry.chainsById.first()
+            configuration.availableDestinations(origin).mapNotNull { (chainId, assetId) ->
+                val chain = chainsById[chainId] ?: return@mapNotNull null
+                val asset = chain.assetsById[assetId] ?: return@mapNotNull null
 
-        return configuration.availableDestinationChains(origin).mapNotNull(chainsById::get)
+                ChainWithAsset(chain, asset)
+            }
+        }
     }
 
     fun validationSystemFor(transfer: AssetTransfer) = if (transfer.isCrossChain) {
-        ValidationSystem { } // TODO cross chain validation system
+        crossChainTransactor.validationSystem
     } else {
         assetSourceRegistry.sourceFor(transfer.originChainAsset).transfers.validationSystem
     }

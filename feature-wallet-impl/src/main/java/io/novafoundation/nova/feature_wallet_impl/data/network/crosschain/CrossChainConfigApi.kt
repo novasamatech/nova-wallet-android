@@ -6,5 +6,5 @@ import retrofit2.http.GET
 interface CrossChainConfigApi {
 
     @GET(BuildConfig.CROSS_CHAIN_CONFIG_URL)
-    suspend fun getCrossChainConfig(): CrossChainTransfersConfigRemote
+    suspend fun getCrossChainConfig(): String
 }

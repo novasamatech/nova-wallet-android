@@ -1,11 +1,13 @@
 package io.novafoundation.nova.feature_wallet_impl.di
 
+import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.common.interfaces.FileCache
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.core_db.dao.AssetDao
@@ -24,6 +26,7 @@ import io.novafoundation.nova.feature_wallet_api.di.Wallet
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
@@ -185,7 +188,9 @@ class WalletFeatureModule {
     fun provideCrossChainRepository(
         api: CrossChainConfigApi,
         @Named(REMOTE_STORAGE_SOURCE) storageDataSource: StorageDataSource,
-    ): CrossChainTransfersRepository = RealCrossChainTransfersRepository(api, storageDataSource)
+        fileCache: FileCache,
+        gson: Gson
+    ): CrossChainTransfersRepository = RealCrossChainTransfersRepository(api, storageDataSource, fileCache, gson)
 
     @Provides
     @FeatureScope
@@ -198,6 +203,8 @@ class WalletFeatureModule {
     @FeatureScope
     fun provideCrossChainTransactor(
         weigher: CrossChainWeigher,
-        extrinsicService: ExtrinsicService
-    ): CrossChainTransactor = RealCrossChainTransactor(weigher, extrinsicService)
+        extrinsicService: ExtrinsicService,
+        assetSourceRegistry: AssetSourceRegistry,
+        phishingValidationFactory: PhishingValidationFactory
+    ): CrossChainTransactor = RealCrossChainTransactor(weigher, extrinsicService, assetSourceRegistry, phishingValidationFactory)
 }

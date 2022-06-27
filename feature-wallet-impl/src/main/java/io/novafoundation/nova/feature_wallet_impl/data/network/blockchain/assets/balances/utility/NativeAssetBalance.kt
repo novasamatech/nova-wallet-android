@@ -31,6 +31,10 @@ class NativeAssetBalance(
     private val substrateRemoteSource: SubstrateRemoteSource,
 ) : AssetBalance {
 
+    override suspend fun isSelfSufficient(chainAsset: Chain.Asset): Boolean {
+        return true
+    }
+
     override suspend fun existentialDeposit(chain: Chain, chainAsset: Chain.Asset): BigInteger {
         val runtime = chainRegistry.getRuntime(chain.id)
 

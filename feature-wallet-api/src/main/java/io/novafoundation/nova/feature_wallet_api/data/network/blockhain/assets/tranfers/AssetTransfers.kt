@@ -11,6 +11,7 @@ data class AssetTransfer(
     val originChain: Chain,
     val originChainAsset: Chain.Asset,
     val destinationChain: Chain,
+    val destinationChainAsset: Chain.Asset,
     val amount: BigDecimal,
 )
 

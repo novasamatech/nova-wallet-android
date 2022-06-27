@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossCh
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.transferConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.findChain
 import kotlinx.coroutines.runBlocking
@@ -81,7 +82,7 @@ class CrossChainTransfersIntegrationTest : BaseIntegrationTest() {
     private fun CrossChainFee.formatWith(
         transferringAsset: Chain.Asset
     ): String {
-        fun BigInteger?.formatAmount() = this?.let { transferringAsset.formatAmount(it) }
+        fun BigInteger?.formatAmount() = this?.let { it.formatPlanks(transferringAsset) }
 
         return """
             
@@ -90,6 +91,4 @@ class CrossChainTransfersIntegrationTest : BaseIntegrationTest() {
             Total XCM Fee: ${(reserve.orZero() + destination.orZero()).formatAmount()}
         """.trimIndent()
     }
-
-    private fun Chain.Asset.formatAmount(planks: BigInteger) = "${amountFromPlanks(planks)} $symbol"
 }

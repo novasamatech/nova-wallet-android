@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_account_api.R
 import kotlinx.android.synthetic.main.view_address_input.view.addressInputAddress
 import kotlinx.android.synthetic.main.view_address_input.view.addressInputClear
 import kotlinx.android.synthetic.main.view_address_input.view.addressInputIdenticon
+import kotlinx.android.synthetic.main.view_address_input.view.addressInputMyself
 import kotlinx.android.synthetic.main.view_address_input.view.addressInputPaste
 import kotlinx.android.synthetic.main.view_address_input.view.addressInputScan
 
@@ -44,6 +45,7 @@ class AddressInputField @JvmOverloads constructor(
         addressInputScan.setVisible(state.scanShown)
         addressInputPaste.setVisible(state.pasteShown)
         addressInputClear.setVisible(state.clearShown)
+        addressInputMyself.setVisible(state.myselfShown)
     }
 
     fun onPasteClicked(listener: OnClickListener) {
@@ -56,6 +58,10 @@ class AddressInputField @JvmOverloads constructor(
 
     fun onScanClicked(listener: OnClickListener) {
         addressInputScan.setOnClickListener(listener)
+    }
+
+    fun onMyselfClicked(listener: OnClickListener) {
+        addressInputMyself.setOnClickListener(listener)
     }
 
     private fun setIdenticonState(state: AddressInputState.IdenticonState) {
@@ -74,7 +80,10 @@ class AddressInputField @JvmOverloads constructor(
     private fun setBackgrounds() = with(context) {
         background = context.getInputBackground()
 
-        addressInputPaste.background = addRipple(getRoundedCornerDrawable(R.color.white_8))
-        addressInputScan.background = addRipple(getRoundedCornerDrawable(R.color.white_8))
+        addressInputPaste.background = buttonBackground()
+        addressInputMyself.background = buttonBackground()
+        addressInputScan.background = buttonBackground()
     }
+
+    private fun Context.buttonBackground() = addRipple(getRoundedCornerDrawable(R.color.white_8))
 }

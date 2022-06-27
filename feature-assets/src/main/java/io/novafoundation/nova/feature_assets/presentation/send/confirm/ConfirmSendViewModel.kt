@@ -22,9 +22,9 @@ import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.WalletRouter
+import io.novafoundation.nova.feature_assets.presentation.send.TransferDirectionModel
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.confirm.hints.ConfirmSendHintsMixinFactory
-import io.novafoundation.nova.feature_assets.presentation.send.confirm.model.TransferDirectionModel
 import io.novafoundation.nova.feature_assets.presentation.send.isCrossChain
 import io.novafoundation.nova.feature_assets.presentation.send.mapAssetTransferValidationFailureToUI
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
@@ -36,6 +36,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToA
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -62,16 +63,17 @@ class ConfirmSendViewModel(
     ExternalActions by externalActions,
     Validatable by validationExecutor {
 
-    private val originChain by lazyAsync { chainRegistry.getChain(transferDraft.assetPayload.chainId) }
-    private val originAsset by lazyAsync { chainRegistry.asset(transferDraft.assetPayload.chainId, transferDraft.assetPayload.chainAssetId) }
+    private val originChain by lazyAsync { chainRegistry.getChain(transferDraft.origin.chainId) }
+    private val originAsset by lazyAsync { chainRegistry.asset(transferDraft.origin.chainId, transferDraft.origin.chainAssetId) }
 
-    private val destinationChain by lazyAsync { chainRegistry.getChain(transferDraft.destinationChain) }
+    private val destinationChain by lazyAsync { chainRegistry.getChain(transferDraft.destination.chainId) }
+    private val destinationChainAsset by lazyAsync { chainRegistry.asset(transferDraft.destination.chainId, transferDraft.destination.chainAssetId) }
 
-    private val assetFlow = interactor.assetFlow(transferDraft.assetPayload.chainId, transferDraft.assetPayload.chainAssetId)
+    private val assetFlow = interactor.assetFlow(transferDraft.origin.chainId, transferDraft.origin.chainAssetId)
         .inBackground()
         .share()
 
-    private val commissionAssetFlow = interactor.commissionAssetFlow(transferDraft.assetPayload.chainId)
+    private val commissionAssetFlow = interactor.commissionAssetFlow(transferDraft.origin.chainId)
         .inBackground()
         .share()
 
@@ -134,15 +136,18 @@ class ConfirmSendViewModel(
     }
 
     fun recipientAddressClicked() = launch {
-        showExternalActions(transferDraft.recipientAddress)
+        showExternalActions(transferDraft.recipientAddress, destinationChain)
     }
 
     fun senderAddressClicked() = launch {
-        showExternalActions(senderModel.first().address)
+        showExternalActions(senderModel.first().address, originChain)
     }
 
-    private suspend fun showExternalActions(address: String) {
-        externalActions.showExternalActions(ExternalActions.Type.Address(address), originChain())
+    private suspend fun showExternalActions(
+        address: String,
+        chain: Deferred<Chain>,
+    ) {
+        externalActions.showExternalActions(ExternalActions.Type.Address(address), chain())
     }
 
     fun submitClicked() = launch {
@@ -201,12 +206,13 @@ class ConfirmSendViewModel(
                 recipient = transferDraft.recipientAddress,
                 originChain = chain,
                 destinationChain = destinationChain(),
+                destinationChainAsset = destinationChainAsset(),
                 originChainAsset = chainAsset,
                 amount = transferDraft.amount
             ),
             originFee = transferDraft.originFee,
-            commissionAsset = commissionAssetFlow.first(),
-            usedAsset = assetFlow.first(),
+            originCommissionAsset = commissionAssetFlow.first(),
+            originUsedAsset = assetFlow.first(),
             crossChainFee = transferDraft.crossChainFee
         )
     }

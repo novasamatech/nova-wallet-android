@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.base.TitleAndMessage
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 
 fun mapAssetTransferValidationFailureToUI(
     resourceManager: ResourceManager,
@@ -24,7 +25,11 @@ fun mapAssetTransferValidationFailureToUI(
         }
         is AssetTransferValidationFailure.NotEnoughFunds.InCommissionAsset -> {
             resourceManager.getString(R.string.common_not_enough_funds_title) to
-                resourceManager.getString(R.string.wallet_send_insufficient_balance_commission, failure.commissionAsset.symbol)
+                resourceManager.getString(
+                    R.string.wallet_send_cannot_pay_network_fee,
+                    failure.fee.formatTokenAmount(failure.commissionAsset),
+                    failure.transferableBalance.formatTokenAmount(failure.commissionAsset)
+                )
         }
         AssetTransferValidationFailure.WillRemoveAccount.WillBurnDust -> {
             resourceManager.getString(R.string.wallet_send_existential_warning_title) to
@@ -45,6 +50,18 @@ fun mapAssetTransferValidationFailureToUI(
         AssetTransferValidationFailure.NonPositiveAmount -> {
             resourceManager.getString(R.string.common_error_general_title) to
                 resourceManager.getString(R.string.common_zero_amount_error)
+        }
+        is AssetTransferValidationFailure.NotEnoughFunds.ToPayCrossChainFee -> {
+            resourceManager.getString(R.string.common_not_enough_funds_title) to
+                resourceManager.getString(
+                    R.string.wallet_send_cannot_pay_cross_chain_fee,
+                    failure.fee.formatTokenAmount(failure.usedAsset),
+                    failure.remainingBalanceAfterTransfer.formatTokenAmount(failure.usedAsset)
+                )
+        }
+        is AssetTransferValidationFailure.NotEnoughFunds.ToStayAboveED -> {
+            resourceManager.getString(R.string.common_not_enough_funds_title) to
+                resourceManager.getString(R.string.wallet_send_insufficient_balance_commission, failure.commissionAsset.symbol)
         }
     }
 }

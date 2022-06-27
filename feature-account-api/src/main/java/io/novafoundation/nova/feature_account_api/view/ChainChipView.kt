@@ -40,10 +40,13 @@ class ChainChipView @JvmOverloads constructor(
 
     fun setModel(chainChipModel: ChainChipModel) {
         setChain(chainChipModel.chainUi)
+        setChangeable(chainChipModel.changeable)
+    }
 
-        itemAssetGroupLabel.isEnabled = chainChipModel.changeable
+    fun setChangeable(changeable: Boolean) {
+        itemAssetGroupLabel.isEnabled = changeable
 
-        if (chainChipModel.changeable) {
+        if (changeable) {
             val accentColorRes = context.getAccentColorRes()
 
             itemAssetGroupLabel.setTextColorRes(accentColorRes)

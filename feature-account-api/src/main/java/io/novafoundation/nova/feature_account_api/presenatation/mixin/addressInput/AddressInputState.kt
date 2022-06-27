@@ -6,7 +6,8 @@ class AddressInputState(
     val iconState: IdenticonState,
     val pasteShown: Boolean,
     val scanShown: Boolean,
-    val clearShown: Boolean
+    val clearShown: Boolean,
+    val myselfShown: Boolean,
 ) {
 
     sealed class IdenticonState {
