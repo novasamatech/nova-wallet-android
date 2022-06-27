@@ -36,6 +36,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToA
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -135,15 +136,18 @@ class ConfirmSendViewModel(
     }
 
     fun recipientAddressClicked() = launch {
-        showExternalActions(transferDraft.recipientAddress)
+        showExternalActions(transferDraft.recipientAddress, destinationChain)
     }
 
     fun senderAddressClicked() = launch {
-        showExternalActions(senderModel.first().address)
+        showExternalActions(senderModel.first().address, originChain)
     }
 
-    private suspend fun showExternalActions(address: String) {
-        externalActions.showExternalActions(ExternalActions.Type.Address(address), originChain())
+    private suspend fun showExternalActions(
+        address: String,
+        chain: Deferred<Chain>,
+    ) {
+        externalActions.showExternalActions(ExternalActions.Type.Address(address), chain())
     }
 
     fun submitClicked() = launch {
