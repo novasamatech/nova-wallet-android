@@ -45,8 +45,8 @@ fun AssetTransfersValidationSystemBuilder.sufficientCommissionBalanceToStayAbove
 ) = enoughTotalToStayAboveED(
     fee = { it.originFee },
     total = { it.originCommissionAsset.total },
-    existentialDeposit = { assetSourceRegistry.existentialDeposit(it.transfer.originChain, it.transfer.originChainAsset) },
-    error = { AssetTransferValidationFailure.NotEnoughFunds.ToStayAboveED(commissionAsset = it.transfer.originChainAsset) }
+    existentialDeposit = { assetSourceRegistry.existentialDeposit(it.transfer.originChain, it.transfer.originChain.commissionAsset) },
+    error = { AssetTransferValidationFailure.NotEnoughFunds.ToStayAboveED(it.transfer.originChain.commissionAsset) }
 )
 
 fun AssetTransfersValidationSystemBuilder.doNotCrossExistentialDeposit(
