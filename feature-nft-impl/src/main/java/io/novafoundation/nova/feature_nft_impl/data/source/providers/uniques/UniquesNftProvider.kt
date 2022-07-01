@@ -64,7 +64,7 @@ class UniquesNftProvider(
             val totalIssuances = multiQueryResults.getValue(classStorage)
                 .mapKeys { (keyComponents, _) -> keyComponents.component1<BigInteger>() }
                 .mapValues { (_, parsedValue) ->
-                    bindNumber(parsedValue.cast<Struct.Instance>()["instances"])
+                    bindNumber(parsedValue.cast<Struct.Instance>()["items"])
                 }
 
             val instancesMetadatas = multiQueryResults.getValue(instanceMetadataStorage)
