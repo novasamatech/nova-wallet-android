@@ -21,6 +21,8 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            buildConfigField "String", "CROSS_CHAIN_CONFIG_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/xcm/transfers.json\""
         }
     }
 
