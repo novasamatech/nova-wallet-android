@@ -18,6 +18,8 @@ import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
 private const val CACHE_NAME = "RealCrossChainTransfersRepository.CrossChainConfig"
@@ -29,9 +31,17 @@ class RealCrossChainTransfersRepository(
     private val gson: Gson
 ) : CrossChainTransfersRepository {
 
-    override suspend fun paraId(chaniId: ChainId): ParaId? {
-        return remoteStorageSource.query(chaniId) {
-            runtime.metadata.parachainInfoOrNull()?.storage("ParachainId")?.query(binding = ::bindNumber)
+    private val paraIdCacheMutex = Mutex()
+    private val paraIdCache = mutableMapOf<ChainId, ParaId?>()
+
+    override suspend fun paraId(chainId: ChainId): ParaId? = paraIdCacheMutex.withLock {
+        if (chainId in paraIdCache) {
+            paraIdCache.getValue(chainId)
+        } else {
+            remoteStorageSource.query(chainId) {
+                runtime.metadata.parachainInfoOrNull()?.storage("ParachainId")?.query(binding = ::bindNumber)
+            }
+                .also { paraIdCache[chainId] = it }
         }
     }
 

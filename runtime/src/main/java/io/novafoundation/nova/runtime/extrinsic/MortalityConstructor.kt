@@ -1,9 +1,13 @@
 package io.novafoundation.nova.runtime.extrinsic
 
+import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Era
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.withContext
 import java.lang.Integer.min
 
 private const val FALLBACK_MAX_HASH_COUNT = 250
@@ -17,16 +21,16 @@ class MortalityConstructor(
     private val chainStateRepository: ChainStateRepository,
 ) {
 
-    suspend fun constructMortality(chainId: ChainId): Mortality {
-        val finalizedHash = rpcCalls.getFinalizedHead(chainId)
+    suspend fun constructMortality(chainId: ChainId): Mortality = withContext(Dispatchers.IO) {
+        val finalizedHash = async { rpcCalls.getFinalizedHead(chainId) }
 
-        val bestHeader = rpcCalls.getBlockHeader(chainId)
-        val finalizedHeader = rpcCalls.getBlockHeader(chainId, finalizedHash)
+        val bestHeader = async { rpcCalls.getBlockHeader(chainId) }
+        val finalizedHeader = async { rpcCalls.getBlockHeader(chainId, finalizedHash()) }
 
-        val currentHeader = bestHeader.parentHash?.let { rpcCalls.getBlockHeader(chainId, it) } ?: bestHeader
+        val currentHeader = async { bestHeader().parentHash?.let { rpcCalls.getBlockHeader(chainId, it) } ?: bestHeader() }
 
-        val currentNumber = currentHeader.number
-        val finalizedNumber = finalizedHeader.number
+        val currentNumber = currentHeader().number
+        val finalizedNumber = finalizedHeader().number
 
         val startBlockNumber = if (currentNumber - finalizedNumber > MAX_FINALITY_LAG) currentNumber else finalizedNumber
 
@@ -43,6 +47,6 @@ class MortalityConstructor(
 
         val eraBlockHash = rpcCalls.getBlockHash(chainId, eraBlockNumber.toBigInteger())
 
-        return Mortality(era, eraBlockHash)
+        Mortality(era, eraBlockHash)
     }
 }

@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface CrossChainTransfersRepository {
 
-    suspend fun paraId(chaniId: ChainId): ParaId?
+    suspend fun paraId(chainId: ChainId): ParaId?
 
     suspend fun syncConfiguration()
 
