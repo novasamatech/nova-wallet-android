@@ -2,14 +2,17 @@ package io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.
 
 import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationSystem
+import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
+import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
 import java.math.BigInteger
 
 typealias AssetTransfersValidationSystem = ValidationSystem<AssetTransferPayload, AssetTransferValidationFailure>
 typealias AssetTransfersValidation = Validation<AssetTransferPayload, AssetTransferValidationFailure>
+typealias AssetTransfersValidationSystemBuilder = ValidationSystemBuilder<AssetTransferPayload, AssetTransferValidationFailure>
 
 sealed class AssetTransferValidationFailure {
 
@@ -29,7 +32,19 @@ sealed class AssetTransferValidationFailure {
     sealed class NotEnoughFunds : AssetTransferValidationFailure() {
         object InUsedAsset : NotEnoughFunds()
 
-        class InCommissionAsset(val commissionAsset: Chain.Asset) : NotEnoughFunds()
+        class InCommissionAsset(
+            val commissionAsset: Chain.Asset,
+            val fee: BigDecimal,
+            val transferableBalance: BigDecimal,
+        ) : NotEnoughFunds()
+
+        class ToStayAboveED(val commissionAsset: Chain.Asset) : NotEnoughFunds()
+
+        class ToPayCrossChainFee(
+            val usedAsset: Chain.Asset,
+            val fee: BigDecimal,
+            val remainingBalanceAfterTransfer: BigDecimal,
+        ) : NotEnoughFunds()
     }
 
     class InvalidRecipientAddress(val chain: Chain) : AssetTransferValidationFailure()
@@ -41,27 +56,38 @@ sealed class AssetTransferValidationFailure {
 
 data class AssetTransferPayload(
     val transfer: AssetTransfer,
-    val fee: BigDecimal,
-    val commissionAsset: Asset,
-    val usedAsset: Asset
+    val originFee: BigDecimal,
+    val crossChainFee: BigDecimal?,
+    val originCommissionAsset: Asset,
+    val originUsedAsset: Asset
 )
 
-val AssetTransferPayload.sendingCommissionAsset
-    get() = usedAsset.token.configuration == commissionAsset.token.configuration
+val AssetTransferPayload.isSendingCommissionAsset
+    get() = transfer.originChainAsset == transfer.originChain.commissionAsset
 
-val AssetTransferPayload.feeInUsedAsset: BigDecimal
-    get() = if (sendingCommissionAsset) {
-        fee
+val AssetTransferPayload.isReceivingCommissionAsset
+    get() = transfer.destinationChainAsset == transfer.destinationChain.commissionAsset
+
+val AssetTransferPayload.originFeeInUsedAsset: BigDecimal
+    get() = if (isSendingCommissionAsset) {
+        originFee
     } else {
         BigDecimal.ZERO
     }
 
-val AssetTransferPayload.amountInCommissionAsset: BigInteger
-    get() = if (sendingCommissionAsset) {
+val AssetTransferPayload.receivingAmountInCommissionAsset: BigInteger
+    get() = if (isReceivingCommissionAsset) {
         transfer.amountInPlanks
     } else {
         BigInteger.ZERO
     }
 
+val AssetTransferPayload.sendingAmountInCommissionAsset: BigDecimal
+    get() = if (isSendingCommissionAsset) {
+        transfer.amount
+    } else {
+        0.toBigDecimal()
+    }
+
 val AssetTransfer.amountInPlanks
-    get() = chainAsset.planksFromAmount(amount)
+    get() = originChainAsset.planksFromAmount(amount)

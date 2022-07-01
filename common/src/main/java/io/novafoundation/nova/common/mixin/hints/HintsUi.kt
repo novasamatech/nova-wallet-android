@@ -23,14 +23,16 @@ class HintsView @JvmOverloads constructor(
     fun setHints(hints: List<String>) {
         removeAllViews()
 
-        hints.map { hint ->
+        hints.mapIndexed { index, hint ->
             TextView(context).apply {
                 setTextAppearance(R.style.TextAppearance_NovaFoundation_Regular_Caption1)
 
                 setDrawableStart(R.drawable.ic_nova, widthInDp = 16, paddingInDp = 8, tint = R.color.white_48)
                 text = hint
 
-                updatePadding(top = 8.dp)
+                if (index > 0) {
+                    updatePadding(top = 8.dp)
+                }
             }
         }.forEach(::addView)
     }

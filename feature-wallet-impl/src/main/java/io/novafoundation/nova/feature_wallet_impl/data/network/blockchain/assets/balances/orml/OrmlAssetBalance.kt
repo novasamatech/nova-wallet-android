@@ -26,6 +26,10 @@ class OrmlAssetBalance(
     private val chainRegistry: ChainRegistry,
 ) : AssetBalance {
 
+    override suspend fun isSelfSufficient(chainAsset: Chain.Asset): Boolean {
+        return true
+    }
+
     override suspend fun existentialDeposit(chain: Chain, chainAsset: Chain.Asset): BigInteger {
         return chainAsset.requireOrml().existentialDeposit
     }

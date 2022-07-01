@@ -14,19 +14,28 @@ import java.math.BigInteger
 
 class AssetDetails(
     val isFrozen: Boolean,
+    val isSufficient: Boolean,
     val minimumBalance: BigInteger
 )
+
+@UseCaseBinding
+fun bindAssetDetails(decoded: Any?): AssetDetails {
+    val dynamicInstance = decoded.cast<Struct.Instance>()
+
+    return AssetDetails(
+        isFrozen = bindBoolean(dynamicInstance["isFrozen"]),
+        isSufficient = bindBoolean(dynamicInstance["isSufficient"]),
+        minimumBalance = bindNumber(dynamicInstance["minBalance"])
+    )
+}
 
 @UseCaseBinding
 fun bindAssetDetails(scale: String, runtime: RuntimeSnapshot): AssetDetails {
     val type = runtime.metadata.assets().storage("Asset").returnType()
 
-    val dynamicInstance = type.fromHexOrNull(runtime, scale).cast<Struct.Instance>()
+    val dynamicInstance = type.fromHexOrNull(runtime, scale)
 
-    return AssetDetails(
-        isFrozen = bindBoolean(dynamicInstance["isFrozen"]),
-        minimumBalance = bindNumber(dynamicInstance["minBalance"])
-    )
+    return bindAssetDetails(dynamicInstance)
 }
 
 class AssetAccount(

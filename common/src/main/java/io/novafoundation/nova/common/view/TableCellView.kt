@@ -42,7 +42,8 @@ open class TableCellView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : ConstraintLayout(context, attrs, defStyle) {
+    defStyleRes: Int = 0,
+) : ConstraintLayout(context, attrs, defStyle, defStyleRes) {
 
     enum class FieldStyle {
         TEXT, LINK

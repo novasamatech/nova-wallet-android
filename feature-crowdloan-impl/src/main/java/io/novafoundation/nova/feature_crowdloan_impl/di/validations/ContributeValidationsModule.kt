@@ -60,7 +60,7 @@ class ContributeValidationsModule {
 
             it.asset.token.amountFromPlanks(inPlanks)
         },
-        errorProducer = { ContributeValidationFailure.ExistentialDepositCrossed },
+        errorProducer = { _, _ -> ContributeValidationFailure.ExistentialDepositCrossed },
     )
 
     @Provides

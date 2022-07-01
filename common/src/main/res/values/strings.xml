@@ -1,5 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="wallet_send_myself">Myself</string>
+
+  <string name="wallet_send_cannot_pay_network_fee">You don’t have enough balance to pay the network fee of %s.\nTransferable balance: %s</string>
+  <string name="wallet_send_cannot_pay_cross_chain_fee">You don’t have enough balance to pay the Cross-chain fee of %s.\nRemaining balance after transfer: %s</string>
+
+  <string name="wallet_send_confirm_hint">Cross-chain fee is added on top of entered amount. Recipient may receive part of cross-chain fee</string>
+
+  <string name="wallet_send_to_network">To network</string>
+  <string name="wallet_send_from_network">From network</string>
+  <string name="wallet_send_cross_chain_fee">Cross-chain fee</string>
+
+  <string name="wallet_send_on_chain">On-chain</string>
+  <string name="wallet_send_cross_chain">Cross-chain</string>
+  <string name="wallet_send_recipient_network">Recipient network</string>
+  <string name="wallet_send_tokens_to">to</string>
+
+  <string name="wallet_send_tokens_on">Send %s on</string>
+  <string name="wallet_send_tokens_from">Send %s from</string>
+
   <string name="parachain_staking_cannot_stake_with_collator">Cannot stake with this collator</string>
   <string name="parachain_staking_not_active_collator_message">The selected collator showed intention to stop participating in the staking.</string>
 
@@ -144,7 +163,6 @@
 
   <string name="common_cannot_open_link">Cannot open this link</string>
 
-  <string name="wallet_send_tokens_on">Send %s on</string>
 
   <string name="common_validation_invalid_address_title">Invalid recipient</string>
   <string name="common_validation_invalid_address_message">Recipient should be a valid %s address</string>

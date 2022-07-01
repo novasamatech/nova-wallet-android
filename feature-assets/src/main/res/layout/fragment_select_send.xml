@@ -25,18 +25,37 @@
         app:flexWrap="wrap">
 
         <TextView
-            android:id="@+id/selectSendTitle"
+            android:id="@+id/selectSendFromTitle"
             style="@style/TextAppearance.NovaFoundation.Bold.Title2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="8dp"
             android:includeFontPadding="false"
-            tools:text="Send KSM on" />
+            tools:text="Send KSM from" />
 
         <io.novafoundation.nova.feature_account_api.view.ChainChipView
-            android:id="@+id/selectSendChain"
+            android:id="@+id/selectSendOriginChain"
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            style="@style/TextAppearance.NovaFoundation.Bold.Title2"
+            android:layout_width="wrap_content"
+            android:id="@+id/selectSendToTitle"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:visibility="gone"
+            app:layout_wrapBefore="true"
+            android:includeFontPadding="false"
+            android:text="@string/wallet_send_tokens_to"/>
+
+        <io.novafoundation.nova.feature_account_api.view.ChainChipView
+            android:id="@+id/selectSendDestinationChain"
+            android:layout_width="wrap_content"
+            android:visibility="gone"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp" />
     </com.google.android.flexbox.FlexboxLayout>
@@ -67,11 +86,19 @@
         android:layout_marginEnd="16dp" />
 
     <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
-        android:id="@+id/selectSendFee"
+        android:id="@+id/selectSendOriginFee"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="12dp"
+        android:layout_marginEnd="16dp"
+        app:dividerVisible="false" />
+
+    <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
+        android:id="@+id/selectSendCrossChainFee"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         app:dividerVisible="false" />
 

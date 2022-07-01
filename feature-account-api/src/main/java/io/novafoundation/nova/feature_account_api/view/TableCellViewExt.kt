@@ -3,6 +3,8 @@ package io.novafoundation.nova.feature_account_api.view
 import androidx.core.view.setPadding
 import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.utils.dp
+import io.novafoundation.nova.common.utils.makeGone
+import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.view.TableCellView
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.feature_account_api.presenatation.chain.toDrawable
@@ -19,4 +21,14 @@ fun TableCellView.showChain(chainUi: ChainUi) {
     loadImage(chainUi.icon)
 
     showValue(chainUi.name)
+}
+
+fun TableCellView.showChainOrHide(chainUi: ChainUi?) {
+    if (chainUi != null) {
+        makeVisible()
+
+        showChain(chainUi)
+    } else {
+        makeGone()
+    }
 }

@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure.WillRemoveAccount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystem
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.amountInPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
@@ -24,19 +23,17 @@ class StatemineAssetTransfers(
     phishingValidationFactory: PhishingValidationFactory,
 ) : BaseAssetTransfers(chainRegistry, assetSourceRegistry, extrinsicService, phishingValidationFactory) {
 
-    override val validationSystem: AssetTransfersValidationSystem = defaultValidationSystem(
-        removeAccountBehavior = WillRemoveAccount::WillTransferDust
-    )
+    override val validationSystem: AssetTransfersValidationSystem = defaultValidationSystem()
 
     override val transferFunctions = listOf(Modules.ASSETS to "transfer")
 
     override fun ExtrinsicBuilder.transfer(transfer: AssetTransfer) {
-        val chainAssetType = transfer.chainAsset.type
+        val chainAssetType = transfer.originChainAsset.type
         require(chainAssetType is Chain.Asset.Type.Statemine)
 
         statemineTransfer(
             assetId = chainAssetType.id,
-            target = transfer.chain.accountIdOrDefault(transfer.recipient),
+            target = transfer.originChain.accountIdOrDefault(transfer.recipient),
             amount = transfer.amountInPlanks
         )
     }

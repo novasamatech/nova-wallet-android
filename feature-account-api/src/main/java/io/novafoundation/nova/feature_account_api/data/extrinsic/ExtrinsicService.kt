@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_account_api.data.extrinsic
 
+import io.novafoundation.nova.common.data.network.runtime.model.FeeResponse
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.data.secrets.v2.getAccountSecrets
 import io.novafoundation.nova.common.utils.orZero
@@ -87,6 +88,17 @@ class ExtrinsicService(
         return extrinsicBuilder.build(useBatchAll = true)
     }
 
+    suspend fun paymentInfo(
+        chain: Chain,
+        formExtrinsic: suspend ExtrinsicBuilder.() -> Unit,
+    ): FeeResponse {
+        val extrinsic = extrinsicBuilderFactory.create(chain)
+            .also { it.formExtrinsic() }
+            .build()
+
+        return rpcCalls.getExtrinsicFee(chain.id, extrinsic)
+    }
+
     suspend fun estimateFee(
         chain: Chain,
         formExtrinsic: suspend ExtrinsicBuilder.() -> Unit,
@@ -99,13 +111,13 @@ class ExtrinsicService(
         val decodedExtrinsic = extrinsicType.fromHex(extrinsicBuilder.runtime, extrinsic)
 
         val tip = decodedExtrinsic.tip().orZero()
-        val baseFee = rpcCalls.getExtrinsicFee(chain.id, extrinsic)
+        val baseFee = rpcCalls.getExtrinsicFee(chain.id, extrinsic).partialFee
 
         return tip + baseFee
     }
 
     suspend fun estimateFee(chainId: ChainId, extrinsic: String): BigInteger {
-        return rpcCalls.getExtrinsicFee(chainId, extrinsic)
+        return rpcCalls.getExtrinsicFee(chainId, extrinsic).partialFee
     }
 
     private suspend fun SecretStoreV2.getKeypairFor(
