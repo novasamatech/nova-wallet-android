@@ -78,7 +78,7 @@ class RealCrossChainWeigher(
         instructionTypes: List<XCMInstructionType>,
         chain: Chain,
     ): VersionedXcm {
-        val instructions = instructionTypes.map { instructionType -> xcmInstruction(instructionType, chain) }
+        val instructions = instructionTypes.mapNotNull { instructionType -> xcmInstruction(instructionType, chain) }
 
         return VersionedXcm.V2(XcmV2(instructions))
     }
@@ -86,7 +86,7 @@ class RealCrossChainWeigher(
     private fun CrossChainTransferConfiguration.xcmInstruction(
         instructionType: XCMInstructionType,
         chain: Chain,
-    ): XcmV2Instruction {
+    ): XcmV2Instruction? {
         return when (instructionType) {
             XCMInstructionType.ReserveAssetDeposited -> reserveAssetDeposited()
             XCMInstructionType.ClearOrigin -> clearOrigin()
@@ -94,10 +94,18 @@ class RealCrossChainWeigher(
             XCMInstructionType.DepositAsset -> depositAsset(chain)
             XCMInstructionType.WithdrawAsset -> withdrawAsset()
             XCMInstructionType.DepositReserveAsset -> depositReserveAsset()
+            XCMInstructionType.ReceiveTeleportedAsset -> receiveTeleportedAsset()
+            XCMInstructionType.UNKNOWN -> null
         }
     }
 
     private fun CrossChainTransferConfiguration.reserveAssetDeposited() = XcmV2Instruction.ReserveAssetDeposited(
+        assets = listOf(
+            sendingAssetAmountOf(BigInteger.ZERO)
+        )
+    )
+
+    private fun CrossChainTransferConfiguration.receiveTeleportedAsset() = XcmV2Instruction.ReceiveTeleportedAsset(
         assets = listOf(
             sendingAssetAmountOf(BigInteger.ZERO)
         )
