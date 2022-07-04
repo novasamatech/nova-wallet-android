@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.utils.firstExistingModule
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure.WillRemoveAccount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystem
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.amountInPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
@@ -29,8 +28,8 @@ class OrmlAssetTransfers(
 
     override fun ExtrinsicBuilder.transfer(transfer: AssetTransfer) {
         ormlTransfer(
-            chainAsset = transfer.chainAsset,
-            target = transfer.chain.accountIdOrDefault(transfer.recipient),
+            chainAsset = transfer.originChainAsset,
+            target = transfer.originChain.accountIdOrDefault(transfer.recipient),
             amount = transfer.amountInPlanks
         )
     }
@@ -45,9 +44,7 @@ class OrmlAssetTransfers(
         return chainAsset.requireOrml().transfersEnabled && super.areTransfersEnabled(chainAsset)
     }
 
-    override val validationSystem: AssetTransfersValidationSystem = defaultValidationSystem(
-        removeAccountBehavior = { WillRemoveAccount.WillBurnDust }
-    )
+    override val validationSystem: AssetTransfersValidationSystem = defaultValidationSystem()
 
     private fun ExtrinsicBuilder.ormlTransfer(
         chainAsset: Chain.Asset,

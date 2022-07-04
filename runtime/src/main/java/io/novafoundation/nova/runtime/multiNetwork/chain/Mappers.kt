@@ -1,7 +1,7 @@
 package io.novafoundation.nova.runtime.multiNetwork.chain
 
 import com.google.gson.Gson
-import io.novafoundation.nova.common.utils.asGsonParsedNumber
+import io.novafoundation.nova.common.utils.asGsonParsedNumberOrNull
 import io.novafoundation.nova.common.utils.fromJson
 import io.novafoundation.nova.common.utils.fromJsonOrNull
 import io.novafoundation.nova.common.utils.parseArbitraryObject
@@ -88,7 +88,7 @@ private fun mapChainAssetTypeFromRaw(type: String?, typeExtras: Map<String, Any?
     when (type) {
         null, ASSET_NATIVE -> Chain.Asset.Type.Native
         ASSET_STATEMINE -> {
-            val id = typeExtras?.get(STATEMINE_EXTRAS_ID)?.asGsonParsedNumber()
+            val id = typeExtras?.get(STATEMINE_EXTRAS_ID)?.asGsonParsedNumberOrNull()
 
             Chain.Asset.Type.Statemine(id!!)
         }

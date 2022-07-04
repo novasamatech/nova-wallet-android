@@ -280,17 +280,17 @@ class WalletRepositoryImpl(
         fee: BigDecimal,
         source: OperationLocal.Source,
     ): OperationLocal {
-        val senderAddress = transfer.sender.addressIn(transfer.chain)!!
+        val senderAddress = transfer.sender.addressIn(transfer.originChain)!!
 
         return OperationLocal.manualTransfer(
             hash = hash,
             address = senderAddress,
-            chainAssetId = transfer.chainAsset.id,
-            chainId = transfer.chainAsset.chainId,
+            chainAssetId = transfer.originChainAsset.id,
+            chainId = transfer.originChainAsset.chainId,
             amount = transfer.amountInPlanks,
             senderAddress = senderAddress,
             receiverAddress = transfer.recipient,
-            fee = transfer.chain.commissionAsset.planksFromAmount(fee),
+            fee = transfer.originChain.commissionAsset.planksFromAmount(fee),
             status = OperationLocal.Status.PENDING,
             source = source
         )

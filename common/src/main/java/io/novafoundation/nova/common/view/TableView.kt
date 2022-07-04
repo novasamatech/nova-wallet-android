@@ -76,6 +76,7 @@ open class TableView @JvmOverloads constructor(
 
         tableChildren.forEach {
             it.setDividerColor(R.color.white_8)
+            it.setDividerVisible(true)
             it.updatePadding(start = 16.dp, end = 16.dp)
         }
 

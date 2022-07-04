@@ -35,12 +35,10 @@ class RpcCalls(
     private val chainRegistry: ChainRegistry,
 ) {
 
-    suspend fun getExtrinsicFee(chainId: ChainId, extrinsic: String): BigInteger {
+    suspend fun getExtrinsicFee(chainId: ChainId, extrinsic: String): FeeResponse {
         val request = FeeCalculationRequest(extrinsic)
 
-        val feeResponse = socketFor(chainId).executeAsync(request, mapper = pojo<FeeResponse>().nonNull())
-
-        return feeResponse.partialFee
+        return socketFor(chainId).executeAsync(request, mapper = pojo<FeeResponse>().nonNull())
     }
 
     suspend fun submitExtrinsic(chainId: ChainId, extrinsic: String): String {

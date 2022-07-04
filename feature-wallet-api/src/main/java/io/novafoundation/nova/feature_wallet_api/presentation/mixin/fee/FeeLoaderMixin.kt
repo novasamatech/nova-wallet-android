@@ -22,6 +22,8 @@ sealed class FeeStatus {
 
     class Loaded(val feeModel: FeeModel) : FeeStatus()
 
+    object NoFee : FeeStatus()
+
     object Error : FeeStatus()
 }
 
@@ -37,20 +39,25 @@ interface FeeLoaderMixin : Retriable {
 
         suspend fun loadFeeSuspending(
             retryScope: CoroutineScope,
-            feeConstructor: suspend (Token) -> BigInteger,
+            feeConstructor: suspend (Token) -> BigInteger?,
             onRetryCancelled: () -> Unit,
         )
 
         fun loadFee(
             coroutineScope: CoroutineScope,
-            feeConstructor: suspend (Token) -> BigInteger,
+            feeConstructor: suspend (Token) -> BigInteger?,
             onRetryCancelled: () -> Unit,
         )
 
-        suspend fun setFee(fee: BigDecimal)
+        suspend fun setFee(fee: BigDecimal?)
 
         fun requireFee(
             block: (BigDecimal) -> Unit,
+            onError: (title: String, message: String) -> Unit,
+        )
+
+        fun requireOptionalFee(
+            block: (BigDecimal?) -> Unit,
             onError: (title: String, message: String) -> Unit,
         )
     }
@@ -76,6 +83,15 @@ fun FeeLoaderMixin.Presentation.requireFee(
     }
 }
 
+fun FeeLoaderMixin.Presentation.requireOptionalFee(
+    viewModel: BaseViewModel,
+    block: (BigDecimal?) -> Unit,
+) {
+    requireOptionalFee(block) { title, message ->
+        viewModel.showError(title, message)
+    }
+}
+
 fun <I> FeeLoaderMixin.Presentation.connectWith(
     inputSource: Flow<I>,
     scope: CoroutineScope,
@@ -97,7 +113,7 @@ fun <I1, I2> FeeLoaderMixin.Presentation.connectWith(
     inputSource1: Flow<I1>,
     inputSource2: Flow<I2>,
     scope: CoroutineScope,
-    feeConstructor: suspend Token.(input1: I1, input2: I2) -> BigInteger,
+    feeConstructor: suspend Token.(input1: I1, input2: I2) -> BigInteger?,
     onRetryCancelled: () -> Unit = {}
 ) {
     combine(

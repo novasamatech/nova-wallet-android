@@ -10,6 +10,8 @@ import java.math.BigInteger
 
 interface AssetBalance {
 
+    suspend fun isSelfSufficient(chainAsset: Chain.Asset): Boolean
+
     suspend fun existentialDeposit(
         chain: Chain,
         chainAsset: Chain.Asset

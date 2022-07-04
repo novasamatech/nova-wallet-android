@@ -4,7 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.math.BigInteger
 
-fun Any?.asGsonParsedNumber(): BigInteger? = when (this) {
+fun Any?.asGsonParsedNumberOrNull(): BigInteger? = when (this) {
     // gson parses integers as double when type is not specified
     is Double -> toLong().toBigInteger()
     is Long -> toBigInteger()
@@ -12,6 +12,9 @@ fun Any?.asGsonParsedNumber(): BigInteger? = when (this) {
     is String -> toBigIntegerOrNull()
     else -> null
 }
+
+fun Any?.asGsonParsedNumber(): BigInteger = asGsonParsedNumberOrNull()
+    ?: throw IllegalArgumentException("Failed to convert gson-parsed object to number")
 
 fun Gson.parseArbitraryObject(src: String): Map<String, Any?>? {
     val typeToken = object : TypeToken<Map<String, Any?>>() {}

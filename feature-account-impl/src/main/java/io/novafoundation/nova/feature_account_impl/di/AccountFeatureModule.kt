@@ -248,19 +248,19 @@ class AccountFeatureModule {
     @Provides
     @FeatureScope
     fun provideAddressInputMixinFactory(
-        chainRegistry: ChainRegistry,
         addressIconGenerator: AddressIconGenerator,
         systemCallExecutor: SystemCallExecutor,
         clipboardManager: ClipboardManager,
         multiChainQrSharingFactory: MultiChainQrSharingFactory,
         resourceManager: ResourceManager,
+        accountUseCase: SelectedAccountUseCase
     ) = AddressInputMixinFactory(
-        chainRegistry = chainRegistry,
         addressIconGenerator = addressIconGenerator,
         systemCallExecutor = systemCallExecutor,
         clipboardManager = clipboardManager,
         qrSharingFactory = multiChainQrSharingFactory,
-        resourceManager = resourceManager
+        resourceManager = resourceManager,
+        accountUseCase = accountUseCase
     )
 
     @Provides
