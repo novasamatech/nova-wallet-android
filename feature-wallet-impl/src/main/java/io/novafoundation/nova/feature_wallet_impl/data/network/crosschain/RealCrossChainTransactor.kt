@@ -7,9 +7,7 @@ import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystem
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystemBuilder
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.originFeeInUsedAsset
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
@@ -21,7 +19,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.MultiLocation
 import io.novafoundation.nova.feature_wallet_api.domain.model.XcmTransferType
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
-import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.doNotCrossExistentialDeposit
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.notDeadRecipientInCommissionAsset
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.notDeadRecipientInUsedAsset
@@ -32,7 +29,6 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.validAddress
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.validations.canPayCrossChainFee
 import io.novafoundation.nova.runtime.ext.accountIdOrDefault
-import io.novafoundation.nova.runtime.ext.commissionAsset
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import java.math.BigInteger
 
@@ -87,7 +83,8 @@ class RealCrossChainTransactor(
     ) {
         when (configuration.transferType) {
             XcmTransferType.X_TOKENS -> xTokensTransfer(configuration, transfer, crossChainFee)
-            XcmTransferType.XCM_PALLET -> xcmPalletTransfer(configuration, transfer, crossChainFee)
+            XcmTransferType.XCM_PALLET_RESERVE -> xcmPalletReserveTransfer(configuration, transfer, crossChainFee)
+            XcmTransferType.XCM_PALLET_TELEPORT -> xcmPalletTeleport(configuration, transfer, crossChainFee)
             XcmTransferType.UNKNOWN -> throw IllegalArgumentException("Unknown transfer type")
         }
     }
@@ -111,16 +108,43 @@ class RealCrossChainTransactor(
         )
     }
 
-    private suspend fun ExtrinsicBuilder.xcmPalletTransfer(
+    private suspend fun ExtrinsicBuilder.xcmPalletReserveTransfer(
         configuration: CrossChainTransferConfiguration,
         assetTransfer: AssetTransfer,
         crossChainFee: BigInteger
+    ) {
+        xcmPalletTransfer(
+            configuration = configuration,
+            assetTransfer = assetTransfer,
+            crossChainFee = crossChainFee,
+            callName = "limited_reserve_transfer_assets"
+        )
+    }
+
+    private suspend fun ExtrinsicBuilder.xcmPalletTeleport(
+        configuration: CrossChainTransferConfiguration,
+        assetTransfer: AssetTransfer,
+        crossChainFee: BigInteger
+    ) {
+        xcmPalletTransfer(
+            configuration = configuration,
+            assetTransfer = assetTransfer,
+            crossChainFee = crossChainFee,
+            callName = "limited_teleport_assets"
+        )
+    }
+
+    private suspend fun ExtrinsicBuilder.xcmPalletTransfer(
+        configuration: CrossChainTransferConfiguration,
+        assetTransfer: AssetTransfer,
+        crossChainFee: BigInteger,
+        callName: String
     ) {
         val multiAsset = configuration.multiAssetFor(assetTransfer, crossChainFee)
 
         call(
             moduleName = runtime.metadata.xcmPalletName(),
-            callName = "limited_reserve_transfer_assets",
+            callName = callName,
             arguments = mapOf(
                 "dest" to configuration.destinationChainLocation.versioned().toEncodableInstance(),
                 "beneficiary" to assetTransfer.beneficiaryLocation().versioned().toEncodableInstance(),
@@ -146,16 +170,4 @@ class RealCrossChainTransactor(
 
         return accountId.accountIdToMultiLocation()
     }
-
-    protected fun AssetTransfersValidationSystemBuilder.sufficientTransferableBalanceToPayCrossChainFee() = sufficientBalance(
-        fee = { it.originFee },
-        available = { it.originCommissionAsset.transferable },
-        error = {
-            AssetTransferValidationFailure.NotEnoughFunds.InCommissionAsset(
-                commissionAsset = it.transfer.originChain.commissionAsset,
-                transferableBalance = it.originCommissionAsset.transferable,
-                fee = it.originFee
-            )
-        }
-    )
 }

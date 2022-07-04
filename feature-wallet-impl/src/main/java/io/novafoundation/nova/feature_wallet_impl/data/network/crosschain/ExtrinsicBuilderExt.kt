@@ -90,6 +90,10 @@ private fun XcmV2Instruction.toEncodableInstance() = when (this) {
             "xcm" to xcm.toEncodableInstance()
         )
     )
+    is XcmV2Instruction.ReceiveTeleportedAsset -> DictEnum.Entry(
+        name = "ReceiveTeleportedAsset",
+        value = assets.toEncodableInstance()
+    )
 }
 
 fun WeightLimit.toEncodableInstance() = when (this) {
