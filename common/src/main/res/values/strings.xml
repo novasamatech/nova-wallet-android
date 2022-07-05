@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <plurals name="common_minutes_format">
+    <item quantity="one">%d minute</item>
+    <item quantity="other">%d minutes</item>
+  </plurals>
   <string name="wallet_send_myself">Myself</string>
 
   <string name="wallet_send_cannot_pay_network_fee">You don’t have enough balance to pay the network fee of %s.\nTransferable balance: %s</string>

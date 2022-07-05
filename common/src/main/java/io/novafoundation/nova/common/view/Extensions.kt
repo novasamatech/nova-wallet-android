@@ -1,5 +1,6 @@
 package io.novafoundation.nova.common.view
 
+import android.content.Context
 import android.os.CountDownTimer
 import android.widget.CompoundButton
 import android.widget.TextView
@@ -11,6 +12,7 @@ import io.novafoundation.nova.common.utils.format
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.milliseconds
 
@@ -33,7 +35,7 @@ fun TextView.startTimer(
 
     val newTimer = object : CountDownTimer(millis - timePassedSinceCalculation, 1000) {
         override fun onTick(millisUntilFinished: Long) {
-            val formattedTime = millisUntilFinished.milliseconds.format(estimated = false, context)
+            val formattedTime = millisUntilFinished.milliseconds.formatTimer(context)
 
             val message = customMessageFormat?.let {
                 resources.getString(customMessageFormat, formattedTime)
@@ -46,7 +48,7 @@ fun TextView.startTimer(
             if (onFinish != null) {
                 onFinish(this@startTimer)
             } else {
-                this@startTimer.text = 0L.milliseconds.format(estimated = false, context)
+                this@startTimer.text = 0L.milliseconds.formatTimer(context)
             }
 
             cancel()
@@ -59,6 +61,15 @@ fun TextView.startTimer(
 
     setTag(TIMER_TAG, newTimer)
 }
+
+@OptIn(ExperimentalTime::class)
+private fun Duration.formatTimer(
+    context: Context
+) = format(
+    estimated = false,
+    context = context,
+    timeFormat = { hours, minutes, seconds -> "%02d:%02d:%02d".format(hours, minutes, seconds) }
+)
 
 fun TextView.stopTimer() {
     val currentTimer = getTag(TIMER_TAG)

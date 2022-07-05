@@ -77,8 +77,7 @@ class ResourceManagerImpl(
     override fun formatDuration(duration: Duration, estimated: Boolean): String {
         return duration.format(
             estimated = estimated,
-            daysFormat = { getQuantityString(R.plurals.staking_main_lockup_period_value, it, it) },
-            hoursFormat = { getQuantityString(R.plurals.common_hours_format, it, it) },
+            context = contextManager.getContext(),
             timeFormat = null
         )
     }
