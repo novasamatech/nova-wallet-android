@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.utils.switchMap
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.ALEPH_ZERO
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.PARACHAIN
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN_AURA
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.UNSUPPORTED
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState.AssetWithChain
@@ -72,7 +73,7 @@ private class CompoundStakingComponent<S, E, A>(
     private fun createDelegate(assetWithChain: AssetWithChain): StatefullComponent<S, E, A> {
         return when (assetWithChain.asset.staking) {
             UNSUPPORTED -> UnsupportedComponent()
-            RELAYCHAIN, ALEPH_ZERO -> relaychainComponentCreator(assetWithChain, childHostContext)
+            RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO -> relaychainComponentCreator(assetWithChain, childHostContext)
             PARACHAIN -> parachainComponentCreator(assetWithChain, childHostContext)
         }
     }

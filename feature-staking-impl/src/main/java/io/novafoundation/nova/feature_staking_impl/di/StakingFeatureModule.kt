@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_staking_impl.di
 
 import dagger.Module
 import dagger.Provides
-import dagger.multibindings.IntoSet
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.AppLinksProvider
@@ -31,9 +30,10 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.SessionReposi
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRepositoryImpl
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRewardsRepository
-import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.AuraRepository
-import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.BabeRepository
-import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.ConsensusRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.AuraSession
+import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.BabeSession
+import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.ElectionsSessionRegistry
+import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.RealElectionsSessionRegistry
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingRewardsDataSource
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingStoriesDataSource
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingStoriesDataSourceImpl
@@ -193,20 +193,25 @@ class StakingFeatureModule {
     )
 
     @Provides
-    @IntoSet
     @FeatureScope
     fun provideAuraConsensus(
         chainRegistry: ChainRegistry,
         @Named(REMOTE_STORAGE_SOURCE) storageDataSource: StorageDataSource,
-    ): ConsensusRepository = AuraRepository(chainRegistry, storageDataSource)
+    ) = AuraSession(chainRegistry, storageDataSource)
 
     @Provides
-    @IntoSet
     @FeatureScope
     fun provideBabeConsensus(
         chainRegistry: ChainRegistry,
         @Named(REMOTE_STORAGE_SOURCE) storageDataSource: StorageDataSource,
-    ): ConsensusRepository = BabeRepository(storageDataSource, chainRegistry)
+    ) = BabeSession(storageDataSource, chainRegistry)
+
+    @Provides
+    @FeatureScope
+    fun provideElectionsSessionRegistry(
+        auraSession: AuraSession,
+        babeSession: BabeSession
+    ): ElectionsSessionRegistry = RealElectionsSessionRegistry(babeSession, auraSession)
 
     @Provides
     @FeatureScope
@@ -220,8 +225,8 @@ class StakingFeatureModule {
         stakingRepository: StakingRepository,
         sessionRepository: SessionRepository,
         chainStateRepository: ChainStateRepository,
-        consensuses: Set<@JvmSuppressWildcards ConsensusRepository>
-    ) = EraTimeCalculatorFactory(stakingRepository, sessionRepository, chainStateRepository, consensuses)
+        electionsSessionRegistry: ElectionsSessionRegistry,
+    ) = EraTimeCalculatorFactory(stakingRepository, sessionRepository, chainStateRepository, electionsSessionRegistry)
 
     @Provides
     @FeatureScope

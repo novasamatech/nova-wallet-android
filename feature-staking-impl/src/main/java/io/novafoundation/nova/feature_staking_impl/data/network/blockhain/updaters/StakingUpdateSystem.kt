@@ -6,6 +6,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.ALEPH_ZERO
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.PARACHAIN
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN_AURA
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.UNSUPPORTED
 import io.novafoundation.nova.runtime.network.updaters.SingleChainUpdateSystem
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
@@ -21,7 +22,7 @@ class StakingUpdateSystem(
     override fun getUpdaters(chain: Chain, chainAsset: Chain.Asset): List<Updater> {
         return commonUpdaters + when (chainAsset.staking) {
             UNSUPPORTED -> emptyList()
-            RELAYCHAIN, ALEPH_ZERO -> relaychainUpdaters
+            RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO -> relaychainUpdaters
             PARACHAIN -> parachainUpdaters
         }
     }
