@@ -15,10 +15,10 @@ interface ElectionsSessionRegistry {
 class RealElectionsSessionRegistry(
     private val babeSession: BabeSession,
     private val auraSession: AuraSession
-): ElectionsSessionRegistry {
+) : ElectionsSessionRegistry {
 
     override fun electionsSessionFor(chainAsset: Chain.Asset): ElectionsSession {
-        return when(chainAsset.staking) {
+        return when (chainAsset.staking) {
             RELAYCHAIN -> babeSession
             RELAYCHAIN_AURA, ALEPH_ZERO -> auraSession
             UNSUPPORTED, PARACHAIN -> throw IllegalArgumentException("Unsupported staking type in RealStakingSessionRegistry")

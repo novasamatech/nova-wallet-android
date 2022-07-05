@@ -157,11 +157,11 @@ fun String.networkType() = Node.NetworkType.findByAddressByte(addressPrefix())!!
 
 fun RuntimeMetadata.hasModule(name: String) = moduleOrNull(name) != null
 fun RuntimeMetadata.hasConstant(module: String, constant: String) = moduleOrNull(module)?.constantOrNull(constant) != null
-//fun RuntimeMetadata.hasAnyConstant(module: String, constants: List<String>): Boolean {
+// fun RuntimeMetadata.hasAnyConstant(module: String, constants: List<String>): Boolean {
 //    val module = moduleOrNull(module) ?: return false
 //
 //    return constants.any { module.co }
-//}
+// }
 
 fun SeedFactory.createSeed32(length: Mnemonic.Length, password: String?) = cropSeedTo32Bytes(createSeed(length, password))
 
