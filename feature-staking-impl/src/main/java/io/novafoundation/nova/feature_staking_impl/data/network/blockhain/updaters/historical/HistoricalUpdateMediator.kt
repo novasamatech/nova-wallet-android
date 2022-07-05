@@ -24,6 +24,8 @@ import java.math.BigInteger
 interface HistoricalUpdater {
 
     fun constructHistoricalKey(runtime: RuntimeSnapshot, era: BigInteger): String
+
+    fun constructKeyPrefix(runtime: RuntimeSnapshot): String
 }
 
 class HistoricalUpdateMediator(
@@ -48,10 +50,14 @@ class HistoricalUpdateMediator(
 
                 val missingKeys = allKeysNeeded.filter { it !in keysInDataBase }
 
-                missingKeys
-            }.filter { it.isNotEmpty() }
-            .onEach {
-                bulkRetriever.fetchValuesToCache(storageSubscriptionBuilder.socketService, it, storageCache, chainId)
+                allKeysNeeded to missingKeys
+            }
+            .filter { (_, missing) -> missing.isNotEmpty() }
+            .onEach { (allNeeded, missing) ->
+                val prefixes = historicalUpdaters.map { it.constructKeyPrefix(runtime) }
+                prefixes.onEach { storageCache.removeByPrefixExcept(prefixKey = it, fullKeyExceptions = allNeeded, chainId) }
+
+                bulkRetriever.fetchValuesToCache(storageSubscriptionBuilder.socketService, missing, storageCache, chainId)
             }
             .noSideAffects()
     }

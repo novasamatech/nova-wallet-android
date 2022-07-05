@@ -11,4 +11,8 @@ class HistoricalValidatorRewardPointsUpdater : HistoricalUpdater {
     override fun constructHistoricalKey(runtime: RuntimeSnapshot, era: BigInteger): String {
         return runtime.metadata.staking().storage("ErasRewardPoints").storageKey(runtime, era)
     }
+
+    override fun constructKeyPrefix(runtime: RuntimeSnapshot): String {
+        return runtime.metadata.staking().storage("ErasRewardPoints").storageKey(runtime)
+    }
 }
