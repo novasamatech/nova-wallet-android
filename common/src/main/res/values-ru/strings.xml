@@ -139,6 +139,12 @@
   <string name="common_learn_more_v2_2_0">Узнать больше</string>
   <string name="common_left">%s осталось</string>
   <string name="common_maximum">Максимальный</string>
+  <plurals name="common_minutes_format">
+    <item quantity="one">%d минута</item>
+    <item quantity="few">%d минуты</item>
+    <item quantity="many">%d минут</item>
+    <item quantity="other">%d минута</item>
+  </plurals>
   <string name="common_missing_account_title">%s аккаунт отсутствует</string>
   <string name="common_module">Модуль</string>
   <string name="common_network">Сеть</string>
