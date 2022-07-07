@@ -1,8 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.data.repository.consensus
 
-import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.babe
-import io.novafoundation.nova.common.utils.hasModule
 import io.novafoundation.nova.common.utils.numberConstant
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindCurrentSlot
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -15,19 +13,15 @@ import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
 import java.math.BigInteger
 
-class BabeRepository(
+class BabeSession(
     private val remoteStorage: StorageDataSource,
     private val chainRegistry: ChainRegistry,
-) : ConsensusRepository {
+) : ElectionsSession {
 
     override suspend fun sessionLength(chainId: ChainId): BigInteger {
         val runtime = runtimeFor(chainId)
 
         return runtime.metadata.babe().numberConstant("EpochDuration", runtime)
-    }
-
-    override suspend fun consensusAvailable(chainId: ChainId): Boolean {
-        return runtimeFor(chainId).metadata.hasModule(Modules.BABE)
     }
 
     override suspend fun currentSlot(chainId: ChainId) = remoteStorage.queryNonNull(

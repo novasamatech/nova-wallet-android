@@ -34,14 +34,25 @@ class CurrentRoundCollatorsUpdater(
         val runtime = chainRegistry.getRuntime(chainId)
 
         return currentRoundRepository.currentRoundInfoFlow(chainId)
-            .map { collatorSnapshotPrefix(runtime, it.current) }
+            .map { runtime.collatorSnapshotPrefixFor(it.current) }
             .filterNot { storageCache.isPrefixInCache(it, chainId) }
+            .onEach { cleanupPreviousRounds(runtime, chainId) }
             .onEach { updateCollatorsPerRound(it, storageSubscriptionBuilder.socketService, chainId) }
             .noSideAffects()
     }
 
-    private fun collatorSnapshotPrefix(runtime: RuntimeSnapshot, roundIndex: RoundIndex): String {
-        return runtime.metadata.parachainStaking().storage("AtStake").storageKey(runtime, roundIndex)
+    private suspend fun cleanupPreviousRounds(runtimeSnapshot: RuntimeSnapshot, chainId: String) {
+        val prefix = runtimeSnapshot.collatorSnapshotPrefix()
+
+        storageCache.removeByPrefix(prefix, chainId)
+    }
+
+    private fun RuntimeSnapshot.collatorSnapshotPrefix(): String {
+        return metadata.parachainStaking().storage("AtStake").storageKey(this)
+    }
+
+    private fun RuntimeSnapshot.collatorSnapshotPrefixFor(roundIndex: RoundIndex): String {
+        return metadata.parachainStaking().storage("AtStake").storageKey(this, roundIndex)
     }
 
     private suspend fun updateCollatorsPerRound(

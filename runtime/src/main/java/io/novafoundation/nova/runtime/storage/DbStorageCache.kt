@@ -36,6 +36,14 @@ class DbStorageCache(
         storageDao.insert(mapped)
     }
 
+    override suspend fun removeByPrefix(prefixKey: String, chainId: String) {
+        storageDao.removeByPrefix(prefix = prefixKey, chainId = chainId)
+    }
+
+    override suspend fun removeByPrefixExcept(prefixKey: String, fullKeyExceptions: List<String>, chainId: String) {
+        storageDao.removeByPrefixExcept(prefixKey, fullKeyExceptions, chainId)
+    }
+
     override suspend fun observeEntry(key: String, chainId: String): Flow<StorageEntry> {
         return storageDao.observeEntry(chainId, key)
             .filterNotNull()

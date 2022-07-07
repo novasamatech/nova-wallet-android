@@ -10,7 +10,10 @@ import io.novafoundation.nova.feature_staking_impl.data.common.repository.Common
 import io.novafoundation.nova.feature_staking_impl.domain.error.accountIdNotFound
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.ALEPH_ZERO
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.PARACHAIN
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN_AURA
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.UNSUPPORTED
 import io.novafoundation.nova.runtime.state.chainAsset
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -60,9 +63,9 @@ class RewardCalculatorFactory(
 
     private fun Chain.Asset.createRewardCalculator(validators: List<RewardCalculationTarget>, totalIssuance: BigInteger): RewardCalculator {
         return when (staking) {
-            RELAYCHAIN -> RewardCurveInflationRewardCalculator(validators, totalIssuance)
+            RELAYCHAIN, RELAYCHAIN_AURA -> RewardCurveInflationRewardCalculator(validators, totalIssuance)
             ALEPH_ZERO -> AlephZeroRewardCalculator(validators, totalIssuance, chainAsset = this)
-            else -> throw IllegalStateException("Unknown staking type in RelaychainRewardFactory")
+            UNSUPPORTED, PARACHAIN -> throw IllegalStateException("Unknown staking type in RelaychainRewardFactory")
         }
     }
 }
