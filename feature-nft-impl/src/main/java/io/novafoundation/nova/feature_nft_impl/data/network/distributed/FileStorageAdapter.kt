@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_nft_impl.data.network.distributed
 
 enum class FileStorage(val prefix: String, val defaultHttpsGateway: String?) {
-    IPFS("ipfs://ipfs/", "https://rmrk.mypinata.cloud/ipfs/"),
+    IPFS("ipfs://ipfs/", "https://ipfs.rmrk.link/ipfs/"),
     HTTPS("https://", null),
     HTTP("http://", null);
 
