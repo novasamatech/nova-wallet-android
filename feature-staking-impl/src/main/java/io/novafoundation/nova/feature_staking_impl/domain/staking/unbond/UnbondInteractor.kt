@@ -50,7 +50,7 @@ class UnbondInteractor(
 
     fun unbondingsFlow(stakingState: StakingState.Stash): Flow<Unbondings> {
         return flowOf(stakingState).flatMapLatest { stash ->
-            val calculator = eraTimeCalculator.create(stakingState.chain.id)
+            val calculator = eraTimeCalculator.create(stakingState.chainAsset)
 
             combine(
                 stakingRepository.ledgerFlow(stash),

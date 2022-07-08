@@ -13,6 +13,13 @@ interface StorageCache {
 
     suspend fun insert(entries: List<StorageEntry>, chainId: String)
 
+    suspend fun removeByPrefix(prefixKey: String, chainId: String)
+    suspend fun removeByPrefixExcept(
+        prefixKey: String,
+        fullKeyExceptions: List<String>,
+        chainId: String
+    )
+
     suspend fun observeEntry(key: String, chainId: String): Flow<StorageEntry>
 
     /**

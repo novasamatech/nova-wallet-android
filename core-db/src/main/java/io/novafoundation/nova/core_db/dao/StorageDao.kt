@@ -25,6 +25,18 @@ abstract class StorageDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insert(entries: List<StorageEntryLocal>)
 
+    @Query("DELETE FROM storage WHERE chainId = :chainId AND storageKey LIKE :prefix || '%'")
+    abstract suspend fun removeByPrefix(prefix: String, chainId: String)
+
+    @Query(
+        """
+        DELETE FROM storage WHERE chainId = :chainId
+        AND storageKey LIKE :prefix || '%'
+        AND storageKey NOT IN (:exceptionFullKeys)
+        """
+    )
+    abstract suspend fun removeByPrefixExcept(prefix: String, exceptionFullKeys: List<String>, chainId: String)
+
     @Query(SELECT_FULL_KEY_QUERY)
     abstract fun observeEntry(chainId: String, fullKey: String): Flow<StorageEntryLocal?>
 

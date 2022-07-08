@@ -64,11 +64,11 @@ sealed class AssetLocationPath {
 }
 
 enum class XcmTransferType {
-    X_TOKENS, XCM_PALLET, UNKNOWN
+    X_TOKENS, XCM_PALLET_RESERVE, XCM_PALLET_TELEPORT, UNKNOWN
 }
 
 enum class XCMInstructionType {
-    ReserveAssetDeposited, ClearOrigin, BuyExecution, DepositAsset, WithdrawAsset, DepositReserveAsset
+    ReserveAssetDeposited, ClearOrigin, BuyExecution, DepositAsset, WithdrawAsset, DepositReserveAsset, ReceiveTeleportedAsset, UNKNOWN
 }
 
 fun Junctions(vararg junctions: MultiLocation.Junction) = MultiLocation.Interior.Junctions(junctions.toList())

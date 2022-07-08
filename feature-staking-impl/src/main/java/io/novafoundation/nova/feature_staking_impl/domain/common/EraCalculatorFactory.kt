@@ -3,8 +3,8 @@ package io.novafoundation.nova.feature_staking_impl.domain.common
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.domain.model.EraIndex
 import io.novafoundation.nova.feature_staking_impl.data.repository.SessionRepository
-import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.ConsensusRepository
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.ElectionsSessionRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import java.math.BigInteger
 import kotlin.math.floor
@@ -72,11 +72,12 @@ class EraTimeCalculatorFactory(
     private val stakingRepository: StakingRepository,
     private val sessionRepository: SessionRepository,
     private val chainStateRepository: ChainStateRepository,
-    private val consensuses: Collection<ConsensusRepository>
+    private val electionsSessionRegistry: ElectionsSessionRegistry,
 ) {
 
-    suspend fun create(chainId: ChainId): EraTimeCalculator {
-        val consensus = consensuses.find { it.consensusAvailable(chainId) } ?: throw NotImplementedError("Unknown consensus for $chainId")
+    suspend fun create(chainAsset: Chain.Asset): EraTimeCalculator {
+        val chainId = chainAsset.chainId
+        val electionsSession = electionsSessionRegistry.electionsSessionFor(chainAsset)
 
         val activeEra = stakingRepository.getActiveEraIndex(chainId)
 
@@ -85,9 +86,9 @@ class EraTimeCalculatorFactory(
             eraLength = stakingRepository.eraLength(chainId),
             blockCreationTime = chainStateRepository.predictedBlockTime(chainId),
             currentSessionIndex = sessionRepository.currentSessionIndex(chainId),
-            sessionLength = consensus.sessionLength(chainId),
-            currentSlot = consensus.currentSlot(chainId),
-            genesisSlot = consensus.genesisSlot(chainId),
+            sessionLength = electionsSession.sessionLength(chainId),
+            currentSlot = electionsSession.currentSlot(chainId),
+            genesisSlot = electionsSession.genesisSlot(chainId),
             eraStartSessionIndex = stakingRepository.eraStartSessionIndex(chainId, activeEra),
             activeEra = activeEra
         )

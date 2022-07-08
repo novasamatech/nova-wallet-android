@@ -27,12 +27,14 @@ fun bindPerbill(dynamic: Any?): Perbill {
     return bindPerbill(dynamic.cast())
 }
 
+private const val BLOCKED_DEFAULT = false
+
 fun bindValidatorPrefs(decoded: Any?): ValidatorPrefs {
     val asStruct = decoded.castToStruct()
 
     return ValidatorPrefs(
         commission = bindPerbill(asStruct.getTyped("commission")),
-        blocked = asStruct.getTyped("blocked")
+        blocked = asStruct["blocked"] ?: BLOCKED_DEFAULT
     )
 }
 

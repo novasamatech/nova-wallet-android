@@ -275,7 +275,7 @@ class StakingInteractor(
     }
 
     private suspend fun getEraTimeCalculator(): EraTimeCalculator {
-        return factory.create(stakingSharedState.chainId())
+        return factory.create(stakingSharedState.chainAsset())
     }
 
     private fun eraRelativeInfo(

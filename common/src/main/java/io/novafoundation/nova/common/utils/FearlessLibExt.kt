@@ -102,6 +102,9 @@ fun Extrinsic.DecodedInstance.tip(): BigInteger? = signature?.signedExtras?.get(
 fun Module.constant(name: String) = constantOrNull(name) ?: throw NoSuchElementException()
 
 fun Module.numberConstant(name: String, runtimeSnapshot: RuntimeSnapshot) = bindNumberConstant(constant(name), runtimeSnapshot)
+fun Module.numberConstantOrNull(name: String, runtimeSnapshot: RuntimeSnapshot) = constantOrNull(name)?.let {
+    bindNumberConstant(it, runtimeSnapshot)
+}
 fun Module.optionalNumberConstant(name: String, runtimeSnapshot: RuntimeSnapshot) = bindNullableNumberConstant(constant(name), runtimeSnapshot)
 
 fun Constant.asNumber(runtimeSnapshot: RuntimeSnapshot) = bindNumberConstant(this, runtimeSnapshot)
@@ -123,7 +126,7 @@ fun RuntimeMetadata.crowdloan() = module(Modules.CROWDLOAN)
 fun RuntimeMetadata.uniques() = module(Modules.UNIQUES)
 
 fun RuntimeMetadata.babe() = module(Modules.BABE)
-fun RuntimeMetadata.aura() = module(Modules.AURA)
+fun RuntimeMetadata.elections() = module(Modules.ELECTIONS)
 
 fun RuntimeMetadata.babeOrNull() = moduleOrNull(Modules.BABE)
 
@@ -174,7 +177,7 @@ object Modules {
     const val SYSTEM = "System"
     const val CROWDLOAN = "Crowdloan"
     const val BABE = "Babe"
-    const val AURA = "Elections"
+    const val ELECTIONS = "Elections"
     const val TIMESTAMP = "Timestamp"
     const val SLOTS = "Slots"
     const val SESSION = "Session"

@@ -29,6 +29,7 @@ sealed class XcmV2Instruction {
     object ClearOrigin : XcmV2Instruction()
 
     class ReserveAssetDeposited(val assets: XcmMultiAssets) : XcmV2Instruction()
+    class ReceiveTeleportedAsset(val assets: XcmMultiAssets) : XcmV2Instruction()
 
     class DepositReserveAsset(
         val assets: XcmMultiAssetFilter,

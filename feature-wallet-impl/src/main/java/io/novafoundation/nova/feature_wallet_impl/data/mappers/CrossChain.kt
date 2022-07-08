@@ -82,7 +82,8 @@ private fun mapXcmTransferFromRemote(remote: XcmTransferRemote): XcmTransfer {
 private fun mapXcmTransferTypeFromRemote(remote: String): XcmTransferType {
     return when (remote) {
         "xtokens" -> XcmTransferType.X_TOKENS
-        "xcmpallet" -> XcmTransferType.XCM_PALLET
+        "xcmpallet" -> XcmTransferType.XCM_PALLET_RESERVE
+        "xcmpallet-teleport" -> XcmTransferType.XCM_PALLET_TELEPORT
         else -> XcmTransferType.UNKNOWN
     }
 }
@@ -131,7 +132,9 @@ private fun mapJunctionsRemoteToMultiLocation(
     }
 }
 
-private fun mapXcmInstructionFromRemote(instruction: String): XCMInstructionType = enumValueOf(instruction)
+private fun mapXcmInstructionFromRemote(instruction: String): XCMInstructionType = runCatching {
+    enumValueOf<XCMInstructionType>(instruction)
+}.getOrDefault(XCMInstructionType.UNKNOWN)
 
 private fun mapJunctionsRemoteToInterior(
     junctionsRemote: JunctionsRemote

@@ -168,9 +168,9 @@ class StakingRepositoryImpl(
                 val accessInfo = accountStaking.stakingAccessInfo
 
                 if (accessInfo == null) {
-                    flowOf(StakingState.NonStash(chain, accountStaking.accountId))
+                    flowOf(StakingState.NonStash(chain, chainAsset, accountStaking.accountId))
                 } else {
-                    observeStashState(chain, accessInfo, accountId)
+                    observeStashState(chain, chainAsset, accessInfo, accountId)
                 }
             }
     }
@@ -241,6 +241,7 @@ class StakingRepositoryImpl(
 
     private fun observeStashState(
         chain: Chain,
+        chainAsset: Chain.Asset,
         accessInfo: AccountStakingLocal.AccessInfo,
         accountId: AccountId,
     ): Flow<StakingState.Stash> {
@@ -253,13 +254,13 @@ class StakingRepositoryImpl(
         ) { nominations, prefs ->
             when {
                 prefs != null -> StakingState.Stash.Validator(
-                    chain, accountId, controllerId, stashId, prefs
+                    chain, chainAsset, accountId, controllerId, stashId, prefs
                 )
                 nominations != null -> StakingState.Stash.Nominator(
-                    chain, accountId, controllerId, stashId, nominations
+                    chain, chainAsset, accountId, controllerId, stashId, nominations
                 )
 
-                else -> StakingState.Stash.None(chain, accountId, controllerId, stashId)
+                else -> StakingState.Stash.None(chain, chainAsset, accountId, controllerId, stashId)
             }
         }
     }
