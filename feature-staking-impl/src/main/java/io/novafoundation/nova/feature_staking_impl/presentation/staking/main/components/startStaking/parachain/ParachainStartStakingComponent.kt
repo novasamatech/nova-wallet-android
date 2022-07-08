@@ -74,7 +74,7 @@ private class ParachainStartStakingComponent(
     private val hostContext: ComponentHostContext,
 ) : BaseStartStakingComponent(assetWithChain, hostContext, resourceManager) {
 
-    private val rewardCalculator = async { rewardCalculatorFactory.create(assetWithChain.chain.id) }
+    private val rewardCalculator = async { rewardCalculatorFactory.create(assetWithChain.asset) }
 
     private val delegatorStateFlow = hostContext.selectedAccount.flatMapLatest {
         delegatorStateUseCase.delegatorStateFlow(it, assetWithChain.chain, assetWithChain.asset)

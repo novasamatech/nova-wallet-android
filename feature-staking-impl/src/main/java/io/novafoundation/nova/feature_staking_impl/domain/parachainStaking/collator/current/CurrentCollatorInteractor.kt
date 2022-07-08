@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.delegatedCollatorIdsHex
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CurrentRoundRepository
-import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.ParachainStakingConstantsRepository
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorProvider
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorProvider.CollatorSource
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegationState
@@ -21,7 +20,6 @@ interface CurrentCollatorInteractor {
 }
 
 class RealCurrentCollatorInteractor(
-    private val parachainStakingConstantsRepository: ParachainStakingConstantsRepository,
     private val currentRoundRepository: CurrentRoundRepository,
     private val collatorProvider: CollatorProvider,
 ) : CurrentCollatorInteractor {
@@ -33,7 +31,7 @@ class RealCurrentCollatorInteractor(
             val snapshots = currentRoundRepository.collatorsSnapshot(chainId, currentRoundInfo.current)
 
             val delegationAccountIds = delegatorState.delegatedCollatorIdsHex()
-            val collatorsById = collatorProvider.getCollators(chainId, CollatorSource.Custom(delegationAccountIds), snapshots)
+            val collatorsById = collatorProvider.getCollators(delegatorState.chainAsset, CollatorSource.Custom(delegationAccountIds), snapshots)
                 .associateBy { it.accountIdHex }
 
             val delegationStates = delegatorState.delegationStatesFor(collatorsById)

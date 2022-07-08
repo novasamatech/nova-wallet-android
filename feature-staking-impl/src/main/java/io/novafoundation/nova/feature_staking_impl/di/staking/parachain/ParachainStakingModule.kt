@@ -22,8 +22,10 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.reposit
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.RealRewardsRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.RewardsRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.RuntimeParachainStakingConstantsRepository
+import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.turing.TuringStakingRewardsRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRewardsRepository
 import io.novafoundation.nova.feature_staking_impl.di.staking.parachain.start.StartParachainStakingFlowModule
+import io.novafoundation.nova.feature_staking_impl.di.staking.parachain.turing.TuringStakingModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.parachain.unbond.ParachainStakingUnbondModule
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorProvider
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorsUseCase
@@ -46,7 +48,7 @@ import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
-@Module(includes = [StartParachainStakingFlowModule::class, ParachainStakingUnbondModule::class])
+@Module(includes = [StartParachainStakingFlowModule::class, ParachainStakingUnbondModule::class, TuringStakingModule::class])
 class ParachainStakingModule {
 
     @Provides
@@ -94,7 +96,8 @@ class ParachainStakingModule {
         rewardsRepository: RewardsRepository,
         commonStakingRepository: CommonStakingRepository,
         currentRoundRepository: CurrentRoundRepository,
-    ) = ParachainStakingRewardCalculatorFactory(rewardsRepository, currentRoundRepository, commonStakingRepository)
+        turingStakingRewardsRepository: TuringStakingRewardsRepository,
+    ) = ParachainStakingRewardCalculatorFactory(rewardsRepository, currentRoundRepository, commonStakingRepository, turingStakingRewardsRepository)
 
     @Provides
     @FeatureScope

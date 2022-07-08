@@ -11,17 +11,19 @@ import java.math.BigInteger
 
 sealed class DelegatorState(
     val chain: Chain,
+    val chainAsset: Chain.Asset,
 ) {
 
     class Delegator(
         val accountId: AccountId,
         chain: Chain,
+        chainAsset: Chain.Asset,
         val delegations: List<DelegatorBond>,
         val total: Balance,
         val lessTotal: Balance,
-    ) : DelegatorState(chain)
+    ) : DelegatorState(chain, chainAsset)
 
-    class None(chain: Chain) : DelegatorState(chain)
+    class None(chain: Chain, chainAsset: Chain.Asset) : DelegatorState(chain, chainAsset)
 }
 
 val DelegatorState.Delegator.activeBonded: BigInteger

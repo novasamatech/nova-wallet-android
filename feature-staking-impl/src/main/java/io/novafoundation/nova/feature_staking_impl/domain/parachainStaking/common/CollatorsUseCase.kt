@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.commo
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.collators.collatorAddressModel
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
+import io.novafoundation.nova.runtime.state.chainAsset
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.Dispatchers
@@ -54,7 +55,7 @@ class RealCollatorsUseCase(
     }
 
     override suspend fun getCollator(collatorId: AccountId): Collator = withContext(Dispatchers.IO) {
-        collatorProvider.getCollator(singleAssetSharedState.chainId(), collatorId)
+        collatorProvider.getCollator(singleAssetSharedState.chainAsset(), collatorId)
     }
 
     override suspend fun getSelectedCollators(delegatorState: DelegatorState): List<SelectedCollator> {
@@ -68,7 +69,7 @@ class RealCollatorsUseCase(
 
                 val collatorSource = CollatorProvider.CollatorSource.Custom(stakedCollatorsIds)
 
-                collatorProvider.getCollators(delegatorState.chain.id, collatorSource)
+                collatorProvider.getCollators(delegatorState.chainAsset, collatorSource)
                     .map { collator ->
                         SelectedCollator(
                             collator = collator,

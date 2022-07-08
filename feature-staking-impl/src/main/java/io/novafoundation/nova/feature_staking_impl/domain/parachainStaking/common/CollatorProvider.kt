@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.commo
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
@@ -29,7 +29,7 @@ interface CollatorProvider {
     }
 
     suspend fun getCollators(
-        chainId: ChainId,
+        chainAsset: Chain.Asset,
         collatorSource: CollatorSource,
         cachedSnapshots: AccountIdMap<CollatorSnapshot>? = null
     ): List<Collator>
@@ -45,11 +45,12 @@ class RealCollatorProvider(
 ) : CollatorProvider {
 
     override suspend fun getCollators(
-        chainId: ChainId,
+        chainAsset: Chain.Asset,
         collatorSource: CollatorSource,
         cachedSnapshots: AccountIdMap<CollatorSnapshot>?
     ): List<Collator> {
-        val chain = chainRegistry.getChain(chainId)
+        val chainId = chainAsset.chainId
+        val chain = chainRegistry.getChain(chainAsset.chainId)
 
         val snapshots = cachedSnapshots ?: currentRoundRepository.collatorsSnapshotInCurrentRound(chainId)
 
@@ -63,7 +64,7 @@ class RealCollatorProvider(
         val identities = identityRepository.getIdentitiesFromIds(chainId, requestedCollatorIdsHex)
 
         val systemForcedMinimumStake = parachainStakingConstantsRepository.systemForcedMinStake(chainId)
-        val rewardCalculator = rewardCalculatorFactory.create(chainId, snapshots)
+        val rewardCalculator = rewardCalculatorFactory.create(chainAsset, snapshots)
 
         return requestedCollatorIdsHex.map { accountIdHex ->
             val collatorSnapshot = snapshots[accountIdHex]
@@ -82,7 +83,7 @@ class RealCollatorProvider(
     }
 }
 
-suspend fun CollatorProvider.getCollator(chainId: ChainId, collatorId: AccountId): Collator = getCollators(
-    chainId = chainId,
+suspend fun CollatorProvider.getCollator(chainAsset: Chain.Asset, collatorId: AccountId): Collator = getCollators(
+    chainAsset = chainAsset,
     collatorSource = CollatorSource.Custom(listOf(collatorId.toHexString())),
 ).first()

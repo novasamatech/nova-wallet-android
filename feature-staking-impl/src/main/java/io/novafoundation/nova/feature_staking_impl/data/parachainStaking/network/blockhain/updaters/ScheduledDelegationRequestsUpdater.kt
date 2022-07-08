@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.bindDelegatorState
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
-import io.novafoundation.nova.runtime.state.chain
+import io.novafoundation.nova.runtime.state.chainAndAsset
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.wrapSingleArgumentKeys
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
@@ -32,7 +32,7 @@ class ScheduledDelegationRequestsUpdater(
 
     override suspend fun listenForUpdates(storageSubscriptionBuilder: SubscriptionBuilder): Flow<Updater.SideEffect> {
         val account = scope.getAccount()
-        val chain = stakingSharedState.chain()
+        val (chain, asset) = stakingSharedState.chainAndAsset()
         val runtime = chainRegistry.getRuntime(chain.id)
 
         val accountId = account.accountIdIn(chain) ?: return emptyFlow()
@@ -42,7 +42,7 @@ class ScheduledDelegationRequestsUpdater(
 
         return storageSubscriptionBuilder.subscribe(key).map {
             val dynamicInstance = storage.decodeValue(it.value, runtime)
-            val delegationState = bindDelegatorState(dynamicInstance, accountId, chain)
+            val delegationState = bindDelegatorState(dynamicInstance, accountId, chain, asset)
 
             fetchUnbondings(delegationState, it.block)?.let { unbondings ->
                 storageCache.insert(unbondings, chain.id)

@@ -13,6 +13,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Staki
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.PARACHAIN
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN_AURA
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.TURING
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.UNSUPPORTED
 import io.novafoundation.nova.runtime.state.chainAsset
 import kotlinx.coroutines.Dispatchers
@@ -65,7 +66,7 @@ class RewardCalculatorFactory(
         return when (staking) {
             RELAYCHAIN, RELAYCHAIN_AURA -> RewardCurveInflationRewardCalculator(validators, totalIssuance)
             ALEPH_ZERO -> AlephZeroRewardCalculator(validators, totalIssuance, chainAsset = this)
-            UNSUPPORTED, PARACHAIN -> throw IllegalStateException("Unknown staking type in RelaychainRewardFactory")
+            UNSUPPORTED, PARACHAIN, TURING -> throw IllegalStateException("Unknown staking type in RelaychainRewardFactory")
         }
     }
 }
