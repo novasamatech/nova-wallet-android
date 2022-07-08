@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
 interface FileCache {
@@ -24,6 +26,7 @@ internal class InternalFileSystemCache(
 ) : FileCache {
 
     private val callbacks: MutableMap<String, MutableList<OnCacheValueChanged>> = mutableMapOf()
+    private val fileMutex: Mutex = Mutex()
 
     override suspend fun updateCache(fileName: String, value: String) {
         fileProvider.writeCache(fileName, value)
@@ -69,18 +72,22 @@ internal class InternalFileSystemCache(
     }
 
     private suspend fun FileProvider.readCache(fileName: String): String? = withContext(Dispatchers.IO) {
-        val file = getFileInInternalCacheStorage(fileName)
+        fileMutex.withLock {
+            val file = getFileInInternalCacheStorage(fileName)
 
-        if (file.exists()) {
-            file.readText()
-        } else {
-            null
+            if (file.exists()) {
+                file.readText()
+            } else {
+                null
+            }
         }
     }
 
     private suspend fun FileProvider.writeCache(fileName: String, value: String) = withContext(Dispatchers.IO) {
-        val file = getFileInInternalCacheStorage(fileName)
+        fileMutex.withLock {
+            val file = getFileInInternalCacheStorage(fileName)
 
-        file.writeText(value)
+            file.writeText(value)
+        }
     }
 }
