@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.detai
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
+import io.novafoundation.nova.runtime.state.chainAsset
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.mapLatest
@@ -47,9 +48,9 @@ class SearchCollatorViewModel(
         .share()
 
     private val electedCollators by lazyAsync {
-        val chainId = singleAssetSharedState.chainId()
+        val chainAsset = singleAssetSharedState.chainAsset()
 
-        collatorRecommendatorFactory.create(router.currentStackEntryLifecycle, chainId)
+        collatorRecommendatorFactory.create(router.currentStackEntryLifecycle, chainAsset)
             .recommendations(CollatorRecommendationConfig.DEFAULT)
     }
 

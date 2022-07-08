@@ -9,6 +9,8 @@ import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdateSystem
 import io.novafoundation.nova.feature_staking_impl.di.staking.parachain.Parachain
 import io.novafoundation.nova.feature_staking_impl.di.staking.parachain.ParachainStakingUpdatersModule
+import io.novafoundation.nova.feature_staking_impl.di.staking.parachain.turing.Turing
+import io.novafoundation.nova.feature_staking_impl.di.staking.parachain.turing.TuringStakingUpdatersModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.relaychain.Relaychain
 import io.novafoundation.nova.feature_staking_impl.di.staking.relaychain.RelaychainStakingUpdatersModule
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
@@ -19,7 +21,11 @@ import io.novafoundation.nova.runtime.storage.SampledBlockTimeStorage
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
-@Module(includes = [RelaychainStakingUpdatersModule::class, ParachainStakingUpdatersModule::class])
+@Module(includes = [
+    RelaychainStakingUpdatersModule::class,
+    ParachainStakingUpdatersModule::class,
+    TuringStakingUpdatersModule::class
+])
 class UpdatersModule {
 
     @Provides
@@ -27,6 +33,7 @@ class UpdatersModule {
     fun provideStakingUpdateSystem(
         @Relaychain relaychainUpdaters: List<@JvmSuppressWildcards Updater>,
         @Parachain parachainUpdaters: List<@JvmSuppressWildcards Updater>,
+        @Turing turingUpdaters: List<@JvmSuppressWildcards Updater>,
         blockTimeUpdater: BlockTimeUpdater,
         blockNumberUpdater: BlockNumberUpdater,
         chainRegistry: ChainRegistry,
@@ -36,7 +43,8 @@ class UpdatersModule {
         parachainUpdaters = parachainUpdaters,
         commonUpdaters = listOf(blockTimeUpdater, blockNumberUpdater),
         chainRegistry = chainRegistry,
-        singleAssetSharedState = singleAssetSharedState
+        singleAssetSharedState = singleAssetSharedState,
+        turingExtraUpdaters = turingUpdaters
     )
 
     @Provides

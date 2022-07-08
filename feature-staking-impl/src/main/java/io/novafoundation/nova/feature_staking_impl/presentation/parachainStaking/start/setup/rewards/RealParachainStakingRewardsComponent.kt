@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.ParachainStakingRewardsComponent.State
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
+import io.novafoundation.nova.runtime.state.chainAsset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -47,7 +48,7 @@ private class RealParachainStakingRewardsComponent(
 ) : ParachainStakingRewardsComponent, CoroutineScope by parentScope {
 
     private val rewardCalculator by lazyAsync {
-        rewardCalculatorFactory.create(singleAssetSharedState.chainId())
+        rewardCalculatorFactory.create(singleAssetSharedState.chainAsset())
     }
 
     override val events = MutableLiveData<Event<Nothing>>()

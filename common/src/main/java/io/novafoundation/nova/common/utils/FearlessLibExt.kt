@@ -139,6 +139,8 @@ fun RuntimeMetadata.session() = module(Modules.SESSION)
 
 fun RuntimeMetadata.parachainStaking() = module(Modules.PARACHAIN_STAKING)
 
+fun RuntimeMetadata.vesting() = module(Modules.VESTING)
+
 fun RuntimeMetadata.identity() = module(Modules.IDENTITY)
 
 fun RuntimeMetadata.parachainInfoOrNull() = moduleOrNull(Modules.PARACHAIN_INFO)
@@ -172,6 +174,7 @@ fun GenericCall.Instance.instanceOf(functionCandidate: MetadataFunction): Boolea
 fun structOf(vararg pairs: Pair<String, Any?>) = Struct.Instance(mapOf(*pairs))
 
 object Modules {
+    const val VESTING: String = "Vesting"
     const val STAKING = "Staking"
     const val BALANCES = "Balances"
     const val SYSTEM = "System"

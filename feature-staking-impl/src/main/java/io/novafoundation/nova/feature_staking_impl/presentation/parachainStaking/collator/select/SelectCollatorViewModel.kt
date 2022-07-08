@@ -29,6 +29,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
+import io.novafoundation.nova.runtime.state.chainAsset
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -52,7 +53,7 @@ class SelectCollatorViewModel(
 ) : BaseViewModel() {
 
     private val collatorRecommendator by lazyAsync {
-        collatorRecommendatorFactory.create(router.currentStackEntryLifecycle, selectedAssetState.chainId())
+        collatorRecommendatorFactory.create(router.currentStackEntryLifecycle, selectedAssetState.chainAsset())
     }
 
     private val recommendationConfigFlow = MutableStateFlow(defaultConfig())

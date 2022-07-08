@@ -14,11 +14,12 @@ import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
 fun bindDelegatorState(
     dynamicInstance: Any?,
     accountId: AccountId,
-    chain: Chain
+    chain: Chain,
+    chainAsset: Chain.Asset,
 ): DelegatorState {
     return when (dynamicInstance) {
-        null -> DelegatorState.None(chain)
-        is Struct.Instance -> bindDelegator(dynamicInstance, accountId, chain)
+        null -> DelegatorState.None(chain, chainAsset)
+        is Struct.Instance -> bindDelegator(dynamicInstance, accountId, chain, chainAsset)
         else -> incompatible()
     }
 }
@@ -26,11 +27,13 @@ fun bindDelegatorState(
 private fun bindDelegator(
     struct: Struct.Instance,
     accountId: AccountId,
-    chain: Chain
+    chain: Chain,
+    chainAsset: Chain.Asset,
 ): DelegatorState.Delegator {
     return DelegatorState.Delegator(
         accountId = accountId,
         chain = chain,
+        chainAsset = chainAsset,
         delegations = bindList(struct["delegations"], ::bindBond),
         total = bindNumber(struct["total"]),
         lessTotal = bindNumber(struct["lessTotal"])
