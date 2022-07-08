@@ -28,7 +28,7 @@ class ParachainStakingRewardCalculatorFactory(
     ): ParachainStakingRewardCalculator {
         val chainId = chainAsset.chainId
 
-        return when(chainAsset.staking) {
+        return when (chainAsset.staking) {
             PARACHAIN -> defaultCalculator(chainId, snapshots)
             TURING -> turingCalculator(chainId, snapshots)
             RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO, UNSUPPORTED -> {

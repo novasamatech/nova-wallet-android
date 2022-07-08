@@ -21,11 +21,13 @@ import io.novafoundation.nova.runtime.storage.SampledBlockTimeStorage
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
-@Module(includes = [
-    RelaychainStakingUpdatersModule::class,
-    ParachainStakingUpdatersModule::class,
-    TuringStakingUpdatersModule::class
-])
+@Module(
+    includes = [
+        RelaychainStakingUpdatersModule::class,
+        ParachainStakingUpdatersModule::class,
+        TuringStakingUpdatersModule::class
+    ]
+)
 class UpdatersModule {
 
     @Provides

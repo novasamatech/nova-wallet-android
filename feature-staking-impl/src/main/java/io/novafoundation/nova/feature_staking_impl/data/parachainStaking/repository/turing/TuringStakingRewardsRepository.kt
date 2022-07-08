@@ -14,7 +14,7 @@ interface TuringStakingRewardsRepository {
 
 class RealTuringStakingRewardsRepository(
     private val localStorage: StorageDataSource
-): TuringStakingRewardsRepository {
+) : TuringStakingRewardsRepository {
 
     override suspend fun additionalIssuance(chainId: ChainId): Balance {
         return localStorage.query(chainId) {
