@@ -6,6 +6,7 @@ import java.math.BigInteger
 class SingularV2CollectionRemote(
     val metadata: String?,
     val issuer: String,
+    val max: Int?
 )
 
 class SingularV2NftRemote(

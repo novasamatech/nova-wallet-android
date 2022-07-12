@@ -55,12 +55,15 @@ class RmrkV2NftProvider(
         val metadataLink = nft.metadataRaw!!.decodeToString().adoptFileStorageLinkToHttps()
         val metadata = singularV2Api.getIpfsMetadata(metadataLink)
 
+        val collection = singularV2Api.getCollection(nft.collectionId).first()
+
         nftDao.updateNft(nft.identifier) { local ->
             // media fetched during initial sync (prerender) has more priority than one from metadata
             val image = local.media ?: metadata.image?.adoptFileStorageLinkToHttps()
 
             local.copy(
                 media = image,
+                issuanceTotal = collection.max,
                 name = metadata.name,
                 label = metadata.description,
                 wholeDetailsLoaded = true
