@@ -42,7 +42,6 @@ class RmrkV2NftProvider(
                 media = it.image?.adoptFileStorageLinkToHttps(),
                 price = it.price,
                 type = NftLocal.Type.RMRK2,
-                issuanceTotal = null,
                 issuanceMyEdition = it.edition,
                 wholeDetailsLoaded = false,
             )
