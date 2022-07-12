@@ -55,8 +55,8 @@ fun mapAssetTransferValidationFailureToUI(
             resourceManager.getString(R.string.common_not_enough_funds_title) to
                 resourceManager.getString(
                     R.string.wallet_send_cannot_pay_cross_chain_fee,
-                    failure.fee.formatTokenAmount(failure.usedAsset),
-                    failure.remainingBalanceAfterTransfer.formatTokenAmount(failure.usedAsset)
+                    failure.fee.formatTokenAmount(failure.crossChainFeeAsset),
+                    failure.remainingBalanceAfterTransfer.formatTokenAmount(failure.crossChainFeeAsset)
                 )
         }
         is AssetTransferValidationFailure.NotEnoughFunds.ToStayAboveED -> {

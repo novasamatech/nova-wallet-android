@@ -42,7 +42,8 @@ class CrossChainTransfersConfiguration(
 
     class XcmFee<I>(
         val mode: Mode,
-        val instructions: I
+        val instructions: I,
+        val asset: XcmFeeAsset?
     ) {
         sealed class Mode {
             object Standard : Mode()
@@ -52,6 +53,13 @@ class CrossChainTransfersConfiguration(
             object Unknown : Mode()
         }
     }
+
+    class XcmFeeAsset(
+        val originAssetId: Int,
+        val destAssetId: Int,
+        val location: String,
+        val locationPath: AssetLocationPath,
+    )
 }
 
 sealed class AssetLocationPath {
@@ -61,6 +69,8 @@ sealed class AssetLocationPath {
     object Absolute : AssetLocationPath()
 
     class Concrete(val multiLocation: MultiLocation) : AssetLocationPath()
+
+    object Unknown : AssetLocationPath()
 }
 
 enum class XcmTransferType {
@@ -105,6 +115,7 @@ class MultiLocation(
 
 class CrossChainTransferConfiguration(
     val assetLocation: MultiLocation,
+    val customFeeAssetLocation: MultiLocation?,
     val destinationChainLocation: MultiLocation,
     val destinationFee: CrossChainFeeConfiguration,
     val reserveFee: CrossChainFeeConfiguration?,

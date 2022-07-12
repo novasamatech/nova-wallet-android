@@ -89,6 +89,8 @@ fun XcmMultiAsset.Companion.from(
     fungibility = XcmMultiAsset.Fungibility.Fungible(amount)
 )
 
+fun XcmMultiAsset.versioned() = VersionedMultiAsset.V1(this)
+
 sealed class WeightLimit {
 
     object Unlimited : WeightLimit()

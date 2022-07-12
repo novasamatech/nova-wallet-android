@@ -116,6 +116,8 @@ suspend fun ChainRegistry.asset(chainId: String, assetId: Int): Chain.Asset {
     return chain.assetsById.getValue(assetId)
 }
 
+suspend fun ChainRegistry.asset(fullId: Chain.Asset.FullId) = asset(fullId.chainId, fullId.assetId)
+
 suspend inline fun ChainRegistry.findChain(predicate: (Chain) -> Boolean): Chain? = currentChains.first().firstOrNull(predicate)
 
 suspend fun ChainRegistry.getRuntime(chainId: String) = getRuntimeProvider(chainId).get()

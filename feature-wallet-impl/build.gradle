@@ -14,7 +14,7 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField "String", "CROSS_CHAIN_CONFIG_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/xcm/v2/transfers_dev.json\""
+        buildConfigField "String", "CROSS_CHAIN_CONFIG_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/7821f3ba8f4c42bf10c71ebb433952d1414b7481/xcm/v2/transfers_dev.json\""
     }
 
     buildTypes {

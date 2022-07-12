@@ -12,7 +12,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.originFeeInUsedAsset
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.doNotCrossExistentialDeposit
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.doNotCrossExistentialDepositInUsedAsset
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.notDeadRecipientInCommissionAsset
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.notDeadRecipientInUsedAsset
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.notPhishingRecipient
@@ -90,7 +90,7 @@ abstract class BaseAssetTransfers(
         fee = { it.originFeeInUsedAsset }
     )
 
-    protected fun AssetTransfersValidationSystemBuilder.doNotCrossExistentialDeposit() = doNotCrossExistentialDeposit(
+    protected fun AssetTransfersValidationSystemBuilder.doNotCrossExistentialDeposit() = doNotCrossExistentialDepositInUsedAsset(
         assetSourceRegistry = assetSourceRegistry,
         fee = { it.originFeeInUsedAsset },
         extraAmount = { it.transfer.amount },

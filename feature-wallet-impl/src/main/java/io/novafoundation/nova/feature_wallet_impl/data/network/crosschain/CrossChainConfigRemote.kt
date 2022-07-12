@@ -41,7 +41,8 @@ class XcmDestinationRemote(
 
 class XcmFeeRemote(
     val mode: Mode,
-    val instructions: String
+    val instructions: String,
+    val asset: FeeAssetRemote?,
 ) {
 
     class Mode(
@@ -49,6 +50,13 @@ class XcmFeeRemote(
         val value: String?
     )
 }
+
+class FeeAssetRemote(
+    val originAssetId: Int,
+    val destAssetId: Int,
+    val location: String,
+    val locationPath: AssetLocationPathRemote,
+)
 
 class AssetLocationPathRemote(
     val type: String,

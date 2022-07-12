@@ -29,6 +29,7 @@ import io.novafoundation.nova.feature_assets.presentation.send.isCrossChain
 import io.novafoundation.nova.feature_assets.presentation.send.mapAssetTransferValidationFailureToUI
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.TransferFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountSign
@@ -70,21 +71,24 @@ class ConfirmSendViewModel(
     private val destinationChainAsset by lazyAsync { chainRegistry.asset(transferDraft.destination.chainId, transferDraft.destination.chainAssetId) }
 
     private val assetFlow = interactor.assetFlow(transferDraft.origin.chainId, transferDraft.origin.chainAssetId)
-        .inBackground()
-        .share()
+        .shareInBackground()
 
-    private val commissionAssetFlow = interactor.commissionAssetFlow(transferDraft.origin.chainId)
-        .inBackground()
-        .share()
+    private val originFeeAssetFlow = interactor.commissionAssetFlow(transferDraft.origin.chainId)
+        .shareInBackground()
 
-    val originFeeMixin: FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(commissionAssetFlow)
-    val crossChainFeeMixin: FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(assetFlow)
+    private val crossChainFeeAssetFlow = sendInteractor.crossChainFeeAssetFlow(
+        originChainId = transferDraft.origin.chainId,
+        originAsset = transferDraft.origin.chainAssetId,
+        destinationChainId = transferDraft.destination.chainId
+    ).shareInBackground()
+
+    val originFeeMixin: FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(originFeeAssetFlow)
+    val crossChainFeeMixin: FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(crossChainFeeAssetFlow)
 
     val hintsMixin = hintsFactory.create(this)
 
     private val currentAccount = selectedAccountUseCase.selectedMetaAccountFlow()
-        .inBackground()
-        .share()
+        .shareInBackground()
 
     val recipientModel = flowOf {
         createAddressModel(
@@ -159,7 +163,11 @@ class ConfirmSendViewModel(
             progressConsumer = _transferSubmittingLiveData.progressConsumer(),
             validationFailureTransformer = { mapAssetTransferValidationFailureToUI(resourceManager, it) }
         ) { validPayload ->
-            performTransfer(validPayload.transfer, validPayload.originFee, validPayload.crossChainFee)
+            performTransfer(
+                transfer = validPayload.transfer,
+                originFee = validPayload.originFee.amount,
+                crossChainFee = validPayload.crossChainFee?.amount
+            )
         }
     }
 
@@ -210,10 +218,17 @@ class ConfirmSendViewModel(
                 originChainAsset = chainAsset,
                 amount = transferDraft.amount
             ),
-            originFee = transferDraft.originFee,
-            originCommissionAsset = commissionAssetFlow.first(),
+            originFee = TransferFee(
+                amount = transferDraft.originFee,
+                asset = originFeeAssetFlow.first()
+            ),
+            crossChainFee = transferDraft.crossChainFee?.let {
+                TransferFee(
+                    amount = it,
+                    asset = crossChainFeeAssetFlow.first()
+                )
+            },
             originUsedAsset = assetFlow.first(),
-            crossChainFee = transferDraft.crossChainFee
         )
     }
 

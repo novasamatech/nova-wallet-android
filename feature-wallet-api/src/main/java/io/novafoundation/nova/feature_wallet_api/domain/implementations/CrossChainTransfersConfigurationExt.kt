@@ -86,6 +86,23 @@ fun ByteArray.accountIdToMultiLocation() = MultiLocation(
     )
 )
 
+fun CrossChainTransfersConfiguration.crossChainFeeAssetId(
+    originChainId: ChainId,
+    originAssetId: ChainAssetId,
+    destinationChainId: ChainId,
+): Chain.Asset.FullId? {
+    val assetTransfers = assetTransfers(originChainId, originAssetId) ?: return null
+    val destination = assetTransfers.findDestination(destinationChainId) ?: return null
+
+    // default to used asset for paying cross-chain fee
+    val assetId = destination.destination.fee.asset?.originAssetId ?: originAssetId
+
+    return Chain.Asset.FullId(
+        chainId = originChainId,
+        assetId = assetId
+    )
+}
+
 fun CrossChainTransfersConfiguration.transferConfiguration(
     originChain: Chain,
     originAsset: Chain.Asset,
@@ -93,25 +110,38 @@ fun CrossChainTransfersConfiguration.transferConfiguration(
     destinationParaId: ParaId? // null in case destination is relaychain
 ): CrossChainTransferConfiguration? {
     val assetTransfers = assetTransfers(originAsset) ?: return null
-    val destination = assetTransfers.xcmTransfers.find { it.destination.chainId == destinationChain.id } ?: return null
+    val destination = assetTransfers.findDestination(destinationChain.id) ?: return null
 
-    val reserveAssetLocation = assetLocations.getValue(assetTransfers.assetLocation)
-    val hasReserveFee = reserveAssetLocation.chainId !in setOf(originChain.id, destinationChain.id)
+    val customFeeConfiguration = destination.destination.fee.asset
+    val customFeeAssetLocation = customFeeConfiguration?.let {
+        assetLocationOf(it.locationPath, it.location)
+    }
+
+    val feeReserveLocationId = customFeeConfiguration?.location ?: assetTransfers.assetLocation
+    val feeReserveLocation = assetLocations.getValue(feeReserveLocationId)
+
+    val hasReserveFee = feeReserveLocation.chainId !in setOf(originChain.id, destinationChain.id)
+
     val reserveFee = if (hasReserveFee) {
         // reserve fee must be present if there is at least one non-reserve transfer
-        matchInstructions(reserveAssetLocation.reserveFee!!, reserveAssetLocation.chainId)
+        matchInstructions(feeReserveLocation.reserveFee!!, feeReserveLocation.chainId)
     } else {
         null
     }
 
     return CrossChainTransferConfiguration(
         assetLocation = originAssetLocationOf(assetTransfers),
+        customFeeAssetLocation = customFeeAssetLocation,
         destinationChainLocation = destinationLocation(originChain, destinationParaId),
         destinationFee = matchInstructions(destination.destination.fee, destination.destination.chainId),
         reserveFee = reserveFee,
         transferType = destination.type
     )
 }
+
+private fun CrossChainTransfersConfiguration.AssetTransfers.findDestination(
+    destinationChainId: ChainId
+) = xcmTransfers.find { it.destination.chainId == destinationChainId }
 
 private fun CrossChainTransfersConfiguration.matchInstructions(
     xcmFee: XcmFee<String>,
@@ -123,6 +153,7 @@ private fun CrossChainTransfersConfiguration.matchInstructions(
         xcmFeeType = XcmFee(
             mode = xcmFee.mode,
             instructions = feeInstructions.getValue(xcmFee.instructions),
+            asset = xcmFee.asset,
         )
     )
 }
@@ -165,14 +196,29 @@ private fun SiblingParachain(paraId: ParaId): MultiLocation {
     )
 }
 
-private fun CrossChainTransfersConfiguration.originAssetLocationOf(assetTransfers: CrossChainTransfersConfiguration.AssetTransfers): MultiLocation {
-    return when (val path = assetTransfers.assetLocationPath) {
-        is AssetLocationPath.Absolute -> assetLocations.getValue(assetTransfers.assetLocation).multiLocation.childView()
-        is AssetLocationPath.Relative -> assetLocations.getValue(assetTransfers.assetLocation).multiLocation.localView()
-        is AssetLocationPath.Concrete -> path.multiLocation
+private fun CrossChainTransfersConfiguration.assetLocationOf(
+    assetLocationPath: AssetLocationPath,
+    assetLocation: String
+): MultiLocation {
+    return when (assetLocationPath) {
+        is AssetLocationPath.Absolute -> assetLocations.getValue(assetLocation).multiLocation.childView()
+        is AssetLocationPath.Relative -> assetLocations.getValue(assetLocation).multiLocation.localView()
+        is AssetLocationPath.Concrete -> assetLocationPath.multiLocation
+        AssetLocationPath.Unknown -> throw java.lang.UnsupportedOperationException("Unknown location path type")
     }
 }
 
+private fun CrossChainTransfersConfiguration.originAssetLocationOf(assetTransfers: CrossChainTransfersConfiguration.AssetTransfers): MultiLocation {
+    return assetLocationOf(assetTransfers.assetLocationPath, assetTransfers.assetLocation)
+}
+
 private fun CrossChainTransfersConfiguration.assetTransfers(origin: Chain.Asset): CrossChainTransfersConfiguration.AssetTransfers? {
-    return chains[origin.chainId]?.find { it.assetId == origin.id }
+    return assetTransfers(origin.chainId, origin.id)
+}
+
+private fun CrossChainTransfersConfiguration.assetTransfers(
+    originChainId: ChainId,
+    originAssetId: ChainAssetId,
+): CrossChainTransfersConfiguration.AssetTransfers? {
+    return chains[originChainId]?.find { it.assetId == originAssetId }
 }

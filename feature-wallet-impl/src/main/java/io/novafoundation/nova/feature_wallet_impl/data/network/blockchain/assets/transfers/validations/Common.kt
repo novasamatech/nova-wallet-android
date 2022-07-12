@@ -43,13 +43,13 @@ fun AssetTransfersValidationSystemBuilder.validAddress() = validAddress(
 fun AssetTransfersValidationSystemBuilder.sufficientCommissionBalanceToStayAboveED(
     assetSourceRegistry: AssetSourceRegistry
 ) = enoughTotalToStayAboveED(
-    fee = { it.originFee },
-    total = { it.originCommissionAsset.total },
+    fee = { it.originFee.amount },
+    total = { it.originFee.asset.total },
     existentialDeposit = { assetSourceRegistry.existentialDeposit(it.transfer.originChain, it.transfer.originChain.commissionAsset) },
     error = { AssetTransferValidationFailure.NotEnoughFunds.ToStayAboveED(it.transfer.originChain.commissionAsset) }
 )
 
-fun AssetTransfersValidationSystemBuilder.doNotCrossExistentialDeposit(
+fun AssetTransfersValidationSystemBuilder.doNotCrossExistentialDepositInUsedAsset(
     assetSourceRegistry: AssetSourceRegistry,
     fee: AmountProducer<AssetTransferPayload>,
     extraAmount: AmountProducer<AssetTransferPayload>,
@@ -62,14 +62,14 @@ fun AssetTransfersValidationSystemBuilder.doNotCrossExistentialDeposit(
 )
 
 fun AssetTransfersValidationSystemBuilder.sufficientTransferableBalanceToPayOriginFee() = sufficientBalance(
-    fee = { it.originFee },
-    available = { it.originCommissionAsset.transferable },
+    fee = { it.originFee.amount },
+    available = { it.originFee.asset.transferable },
     amount = { it.sendingAmountInCommissionAsset },
     error = {
         AssetTransferValidationFailure.NotEnoughFunds.InCommissionAsset(
             commissionAsset = it.transfer.originChain.commissionAsset,
-            transferableBalance = it.originCommissionAsset.transferable,
-            fee = it.originFee
+            transferableBalance = it.originFee.asset.transferable,
+            fee = it.originFee.amount
         )
     }
 )

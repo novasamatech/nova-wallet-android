@@ -30,6 +30,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure.WillRemoveAccount
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.TransferFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
@@ -46,6 +47,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
@@ -110,12 +112,19 @@ class SelectSendViewModel(
         .inBackground()
         .share()
 
-    private val commissionAssetFlow = interactor.commissionAssetFlow(assetPayload.chainId)
-        .inBackground()
-        .share()
+    private val originFeeAssetFlow = interactor.commissionAssetFlow(assetPayload.chainId)
+        .shareInBackground()
 
-    val originFeeMixin: FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(commissionAssetFlow)
-    val crossChainFeeMixin: FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(assetFlow)
+    private val crossChainFeeAssetFlow = destinationChain.flatMapLatest {
+        sendInteractor.crossChainFeeAssetFlow(
+            originChainId = assetPayload.chainId,
+            originAsset = assetPayload.chainAssetId,
+            destinationChainId = it.chain.id
+        )
+    }
+
+    val originFeeMixin: FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(originFeeAssetFlow)
+    val crossChainFeeMixin: FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(crossChainFeeAssetFlow)
 
     val amountChooserMixin: AmountChooserMixin.Presentation = amountChooserMixinFactory.create(
         scope = this,
@@ -152,9 +161,16 @@ class SelectSendViewModel(
                         amount = amountChooserMixin.amount.first(),
                         address = addressInputMixin.inputFlow.first()
                     ),
-                    originFee = originFee,
-                    crossChainFee = crossChainFee,
-                    originCommissionAsset = commissionAssetFlow.first(),
+                    originFee = TransferFee(
+                        amount = originFee,
+                        asset = originFeeAssetFlow.first()
+                    ),
+                    crossChainFee = crossChainFee?.let {
+                        TransferFee(
+                            amount = it,
+                            asset = crossChainFeeAssetFlow.first()
+                        )
+                    },
                     originUsedAsset = assetFlow.first()
                 )
 
@@ -227,14 +243,14 @@ class SelectSendViewModel(
     private fun openConfirmScreen(validPayload: AssetTransferPayload) = launch {
         val transferDraft = TransferDraft(
             amount = validPayload.transfer.amount,
-            originFee = validPayload.originFee,
+            originFee = validPayload.originFee.amount,
             origin = assetPayload,
             destination = AssetPayload(
                 chainId = validPayload.transfer.destinationChain.id,
                 chainAssetId = validPayload.transfer.destinationChainAsset.id
             ),
             recipientAddress = validPayload.transfer.recipient,
-            crossChainFee = validPayload.crossChainFee
+            crossChainFee = validPayload.crossChainFee?.amount
         )
 
         router.openConfirmTransfer(transferDraft)

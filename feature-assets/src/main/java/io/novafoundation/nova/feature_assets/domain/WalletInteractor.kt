@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Balances
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.OperationsPageChange
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.flow.Flow
 
@@ -41,3 +42,6 @@ interface WalletInteractor {
         filters: Set<TransactionFilter>
     ): Result<CursorPage<Operation>>
 }
+
+
+fun WalletInteractor.assetFlow(fullAssetId: Chain.Asset.FullId) = assetFlow(fullAssetId.chainId, fullAssetId.assetId)

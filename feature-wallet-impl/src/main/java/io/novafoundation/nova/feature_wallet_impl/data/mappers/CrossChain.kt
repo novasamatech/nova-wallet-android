@@ -8,11 +8,13 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfer
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration.ReserveLocation
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration.XcmDestination
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration.XcmFee
+import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration.XcmFeeAsset
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration.XcmTransfer
 import io.novafoundation.nova.feature_wallet_api.domain.model.MultiLocation
 import io.novafoundation.nova.feature_wallet_api.domain.model.MultiLocation.Junction
 import io.novafoundation.nova.feature_wallet_api.domain.model.XCMInstructionType
 import io.novafoundation.nova.feature_wallet_api.domain.model.XcmTransferType
+import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.AssetLocationPathRemote
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.CrossChainOriginAssetRemote
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.CrossChainTransfersConfigRemote
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.JunctionsRemote
@@ -53,23 +55,25 @@ private fun mapReserveLocationFromRemote(reserveLocationRemote: ReserveLocationR
 }
 
 private fun mapAssetTransfersFromRemote(remote: CrossChainOriginAssetRemote): AssetTransfers {
-    val assetLocationPath = when (remote.assetLocationPath.type) {
-        "absolute" -> AssetLocationPath.Absolute
-        "relative" -> AssetLocationPath.Relative
-        "concrete" -> {
-            val junctionsRemote = remote.assetLocationPath.path!!
-
-            AssetLocationPath.Concrete(mapJunctionsRemoteToMultiLocation(junctionsRemote))
-        }
-        else -> throw IllegalArgumentException("Unknown asset type")
-    }
-
     return AssetTransfers(
         assetId = remote.assetId,
-        assetLocationPath = assetLocationPath,
+        assetLocationPath = mapLocationPathFromRemote(remote.assetLocationPath),
         assetLocation = remote.assetLocation,
         xcmTransfers = remote.xcmTransfers.map(::mapXcmTransferFromRemote)
     )
+}
+
+private fun mapLocationPathFromRemote(remote: AssetLocationPathRemote): AssetLocationPath {
+    return when (remote.type) {
+        "absolute" -> AssetLocationPath.Absolute
+        "relative" -> AssetLocationPath.Relative
+        "concrete" -> {
+            val junctionsRemote = remote.path!!
+
+            AssetLocationPath.Concrete(mapJunctionsRemoteToMultiLocation(junctionsRemote))
+        }
+        else -> AssetLocationPath.Unknown
+    }
 }
 
 private fun mapXcmTransferFromRemote(remote: XcmTransferRemote): XcmTransfer {
@@ -109,7 +113,15 @@ private fun mapXcmFeeFromRemote(
 
     return XcmFee(
         mode = mode,
-        instructions = remote.instructions
+        instructions = remote.instructions,
+        asset = remote.asset?.let {
+            XcmFeeAsset(
+                originAssetId = it.originAssetId,
+                destAssetId = it.destAssetId,
+                location = it.location,
+                locationPath = mapLocationPathFromRemote(it.locationPath)
+            )
+        }
     )
 }
 

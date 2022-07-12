@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_assets.domain.send
 
 import io.novafoundation.nova.common.utils.orZero
+import io.novafoundation.nova.feature_assets.domain.WalletInteractor
+import io.novafoundation.nova.feature_assets.domain.assetFlow
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.isCrossChain
@@ -8,18 +10,24 @@ import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossCh
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.availableDestinations
+import io.novafoundation.nova.feature_wallet_api.domain.implementations.crossChainFeeAssetId
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.transferConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.RecipientSearchResult
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
+import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
@@ -31,7 +39,8 @@ class SendInteractor(
     private val assetSourceRegistry: AssetSourceRegistry,
     private val crossChainWeigher: CrossChainWeigher,
     private val crossChainTransactor: CrossChainTransactor,
-    private val crossChainTransfersRepository: CrossChainTransfersRepository
+    private val crossChainTransfersRepository: CrossChainTransfersRepository,
+    private val walletInteractor: WalletInteractor,
 ) {
 
     // TODO wallet
@@ -89,14 +98,35 @@ class SendInteractor(
         null
     }
 
+    fun crossChainFeeAssetFlow(
+        originChainId: ChainId,
+        originAsset: ChainAssetId,
+        destinationChainId: ChainId
+    ): Flow<Asset> {
+        return flow {
+            val fullAssetId = crossChainTransfersRepository.getConfiguration().crossChainFeeAssetId(
+                originChainId = originChainId,
+                originAssetId = originAsset,
+                destinationChainId = destinationChainId
+            )
+
+            if (fullAssetId != null) {
+                emitAll(walletInteractor.assetFlow(fullAssetId))
+            }
+        }
+    }
+
     suspend fun performTransfer(
         transfer: AssetTransfer,
         originFee: BigDecimal,
         crossChainFee: BigDecimal?,
     ): Result<*> = withContext(Dispatchers.Default) {
         if (transfer.isCrossChain) {
-            val crossChainFeePlanks = transfer.originChainAsset.planksFromAmount(crossChainFee!!)
-            val config = crossChainTransfersRepository.getConfiguration().configurationFor(transfer)!!
+            val crossChainTransfersConfiguration = crossChainTransfersRepository.getConfiguration()
+            val crossChainFeeAssetId = crossChainTransfersConfiguration.crossChainFeeAsset(transfer)
+            val crossChainFeePlanks = crossChainFeeAssetId.planksFromAmount(crossChainFee!!)
+
+            val config = crossChainTransfersConfiguration.configurationFor(transfer)!!
 
             crossChainTransactor.performTransfer(config, transfer, crossChainFeePlanks)
         } else {
@@ -136,4 +166,14 @@ class SendInteractor(
         destinationChain = transfer.destinationChain,
         destinationParaId = crossChainTransfersRepository.paraId(transfer.destinationChain.id)
     )
+
+    private suspend fun CrossChainTransfersConfiguration.crossChainFeeAsset(transfer: AssetTransfer): Chain.Asset {
+        val fullAssetId = crossChainFeeAssetId(
+            originChainId = transfer.originChain.id,
+            originAssetId = transfer.originChainAsset.id,
+            destinationChainId = transfer.destinationChain.id
+        )!!
+
+        return chainRegistry.asset(fullAssetId)
+    }
 }

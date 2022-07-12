@@ -41,7 +41,7 @@ sealed class AssetTransferValidationFailure {
         class ToStayAboveED(val commissionAsset: Chain.Asset) : NotEnoughFunds()
 
         class ToPayCrossChainFee(
-            val usedAsset: Chain.Asset,
+            val crossChainFeeAsset: Chain.Asset,
             val fee: BigDecimal,
             val remainingBalanceAfterTransfer: BigDecimal,
         ) : NotEnoughFunds()
@@ -56,24 +56,44 @@ sealed class AssetTransferValidationFailure {
 
 data class AssetTransferPayload(
     val transfer: AssetTransfer,
-    val originFee: BigDecimal,
-    val crossChainFee: BigDecimal?,
-    val originCommissionAsset: Asset,
+    val originFee: TransferFee,
+    val crossChainFee: TransferFee?,
     val originUsedAsset: Asset
 )
 
-val AssetTransferPayload.isSendingCommissionAsset
-    get() = transfer.originChainAsset == transfer.originChain.commissionAsset
+class TransferFee(
+    val amount: BigDecimal,
+    val asset: Asset,
+)
 
 val AssetTransferPayload.isReceivingCommissionAsset
     get() = transfer.destinationChainAsset == transfer.destinationChain.commissionAsset
 
 val AssetTransferPayload.originFeeInUsedAsset: BigDecimal
-    get() = if (isSendingCommissionAsset) {
-        originFee
+    get() = originFeeIn(transfer.originChainAsset)
+
+
+fun AssetTransferPayload.crossChainFeeIn(asset: Chain.Asset): BigDecimal {
+    return crossChainFee.amountIn(asset)
+}
+
+fun AssetTransferPayload.originFeeIn(asset: Chain.Asset): BigDecimal {
+    return originFee.amountIn(asset)
+}
+
+private fun TransferFee?.amountIn(otherAsset: Chain.Asset): BigDecimal = when {
+    this == null -> BigDecimal.ZERO
+    otherAsset == asset.token.configuration -> amount
+    else -> BigDecimal.ZERO
+}
+
+fun AssetTransferPayload.sendingAmountIn(asset: Chain.Asset): BigDecimal {
+    return if (asset == transfer.originChainAsset) {
+        transfer.amount
     } else {
         BigDecimal.ZERO
     }
+}
 
 val AssetTransferPayload.receivingAmountInCommissionAsset: BigInteger
     get() = if (isReceivingCommissionAsset) {
@@ -83,11 +103,7 @@ val AssetTransferPayload.receivingAmountInCommissionAsset: BigInteger
     }
 
 val AssetTransferPayload.sendingAmountInCommissionAsset: BigDecimal
-    get() = if (isSendingCommissionAsset) {
-        transfer.amount
-    } else {
-        0.toBigDecimal()
-    }
+    get() = sendingAmountIn(transfer.originChain.commissionAsset)
 
 val AssetTransfer.amountInPlanks
     get() = originChainAsset.planksFromAmount(amount)

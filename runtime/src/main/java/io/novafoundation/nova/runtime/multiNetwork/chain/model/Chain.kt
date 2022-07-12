@@ -58,6 +58,8 @@ data class Chain(
         val name: String,
     ) : Identifiable {
 
+        class FullId(val chainId: ChainId, val assetId: ChainAssetId)
+
         sealed class Type {
             object Native : Type()
 
