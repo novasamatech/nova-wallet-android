@@ -1,15 +1,28 @@
 package io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV2.network.singular
 
 import com.google.gson.annotations.SerializedName
+import java.math.BigInteger
 
 class SingularV2CollectionRemote(
     val metadata: String?,
     val issuer: String,
 )
 
+class SingularV2NftRemote(
+    val id: String,
+    @SerializedName("forsale")
+    val price: BigInteger?,
+    val collectionId: String,
+    @SerializedName("sn")
+    val edition: String,
+    val image: String?, // prerender, non-null if nft is composable
+    val metadata: String,
+)
+
 class SingularV2CollectionMetadata(
     val name: String,
+    val description: String?,
 
     @SerializedName("image", alternate = ["mediaUri"])
-    val image: String
+    val image: String?
 )

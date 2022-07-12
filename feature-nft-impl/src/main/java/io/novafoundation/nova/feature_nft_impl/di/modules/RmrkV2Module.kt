@@ -7,18 +7,11 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.dao.NftDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV2.RmrkV2NftProvider
-import io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV2.network.kanaria.KanariaApi
 import io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV2.network.singular.SingularV2Api
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module
 class RmrkV2Module {
-
-    @Provides
-    @FeatureScope
-    fun provideKanariaApi(networkApiCreator: NetworkApiCreator): KanariaApi {
-        return networkApiCreator.create(KanariaApi::class.java, KanariaApi.BASE_URL)
-    }
 
     @Provides
     @FeatureScope
@@ -31,8 +24,7 @@ class RmrkV2Module {
     fun provideNftProvider(
         accountRepository: AccountRepository,
         chainRegistry: ChainRegistry,
-        kanariaApi: KanariaApi,
         singularV2Api: SingularV2Api,
         nftDao: NftDao
-    ) = RmrkV2NftProvider(chainRegistry, accountRepository, kanariaApi, singularV2Api, nftDao)
+    ) = RmrkV2NftProvider(chainRegistry, accountRepository, singularV2Api, nftDao)
 }
