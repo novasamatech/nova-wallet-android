@@ -78,7 +78,7 @@ data class Chain(
         enum class StakingType {
             UNSUPPORTED,
             RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO, // relaychain like
-            PARACHAIN, // parachain-staking like
+            PARACHAIN, TURING // parachain-staking like
         }
 
         override val identifier = "$chainId:$id"

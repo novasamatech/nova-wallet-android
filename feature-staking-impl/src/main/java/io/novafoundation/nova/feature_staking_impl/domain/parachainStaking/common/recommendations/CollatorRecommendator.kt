@@ -5,7 +5,7 @@ import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorProvider
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorProvider.CollatorSource
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.Collator
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 class CollatorRecommendator(private val allCollators: List<Collator>) {
 
@@ -21,8 +21,8 @@ class CollatorRecommendatorFactory(
     private val computationalCache: ComputationalCache
 ) {
 
-    suspend fun create(lifecycle: Lifecycle, chainId: ChainId) = computationalCache.useCache(COLLATORS_CACHE, lifecycle) {
-        val collators = collatorProvider.getCollators(chainId, CollatorSource.Elected)
+    suspend fun create(lifecycle: Lifecycle, chainAsset: Chain.Asset) = computationalCache.useCache(COLLATORS_CACHE, lifecycle) {
+        val collators = collatorProvider.getCollators(chainAsset, CollatorSource.Elected)
 
         CollatorRecommendator(collators)
     }

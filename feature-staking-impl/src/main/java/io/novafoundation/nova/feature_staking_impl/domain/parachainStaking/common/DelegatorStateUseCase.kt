@@ -32,7 +32,7 @@ class DelegatorStateUseCase(
             if (accountId != null) {
                 emitAll(delegatorStateRepository.observeDelegatorState(chain, chainAsset, accountId))
             } else {
-                emit(DelegatorState.None(chain))
+                emit(DelegatorState.None(chain, chainAsset))
             }
         }
     }
@@ -52,7 +52,7 @@ class DelegatorStateUseCase(
         if (accountId != null) {
             delegatorStateRepository.getDelegationState(chain, asset, accountId)
         } else {
-            DelegatorState.None(chain)
+            DelegatorState.None(chain, asset)
         }
     }
 }

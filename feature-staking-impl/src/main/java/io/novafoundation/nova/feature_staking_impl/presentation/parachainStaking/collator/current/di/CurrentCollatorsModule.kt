@@ -14,7 +14,6 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CurrentRoundRepository
-import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.ParachainStakingConstantsRepository
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.collator.current.CurrentCollatorInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.collator.current.RealCurrentCollatorInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorProvider
@@ -30,11 +29,9 @@ class CurrentCollatorsModule {
     @Provides
     @ScreenScope
     fun provideInteractor(
-        parachainStakingConstantsRepository: ParachainStakingConstantsRepository,
         currentRoundRepository: CurrentRoundRepository,
         collatorProvider: CollatorProvider,
     ): CurrentCollatorInteractor = RealCurrentCollatorInteractor(
-        parachainStakingConstantsRepository = parachainStakingConstantsRepository,
         currentRoundRepository = currentRoundRepository,
         collatorProvider = collatorProvider
     )

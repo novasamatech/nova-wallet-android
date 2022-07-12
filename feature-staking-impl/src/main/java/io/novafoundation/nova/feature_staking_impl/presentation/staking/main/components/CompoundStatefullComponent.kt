@@ -10,6 +10,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Staki
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.PARACHAIN
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN_AURA
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.TURING
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.UNSUPPORTED
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState.AssetWithChain
@@ -74,7 +75,7 @@ private class CompoundStakingComponent<S, E, A>(
         return when (assetWithChain.asset.staking) {
             UNSUPPORTED -> UnsupportedComponent()
             RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO -> relaychainComponentCreator(assetWithChain, childHostContext)
-            PARACHAIN -> parachainComponentCreator(assetWithChain, childHostContext)
+            PARACHAIN, TURING -> parachainComponentCreator(assetWithChain, childHostContext)
         }
     }
 }

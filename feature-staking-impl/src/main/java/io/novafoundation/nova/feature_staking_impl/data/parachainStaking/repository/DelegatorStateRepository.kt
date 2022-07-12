@@ -90,7 +90,7 @@ class RealDelegatorStateRepository(
         return localStorage.subscribe(chain.id) {
             runtime.metadata.parachainStaking().storage("DelegatorState").observe(
                 accountId,
-                binding = { bindDelegatorState(it, accountId, chain) }
+                binding = { bindDelegatorState(it, accountId, chain, chainAsset) }
             )
         }
     }
@@ -99,7 +99,7 @@ class RealDelegatorStateRepository(
         return localStorage.query(chain.id) {
             runtime.metadata.parachainStaking().storage("DelegatorState").query(
                 accountId,
-                binding = { bindDelegatorState(it, accountId, chain) }
+                binding = { bindDelegatorState(it, accountId, chain, chainAsset) }
             )
         }
     }

@@ -5,6 +5,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Staki
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.PARACHAIN
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN_AURA
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.TURING
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.UNSUPPORTED
 
 interface ElectionsSessionRegistry {
@@ -21,7 +22,7 @@ class RealElectionsSessionRegistry(
         return when (chainAsset.staking) {
             RELAYCHAIN -> babeSession
             RELAYCHAIN_AURA, ALEPH_ZERO -> auraSession
-            UNSUPPORTED, PARACHAIN -> throw IllegalArgumentException("Unsupported staking type in RealStakingSessionRegistry")
+            UNSUPPORTED, PARACHAIN, TURING -> throw IllegalArgumentException("Unsupported staking type in RealStakingSessionRegistry")
         }
     }
 }
