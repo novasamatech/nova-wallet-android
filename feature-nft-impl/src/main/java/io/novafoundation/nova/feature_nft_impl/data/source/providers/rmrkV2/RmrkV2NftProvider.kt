@@ -13,7 +13,6 @@ import io.novafoundation.nova.feature_nft_impl.data.mappers.nftIssuance
 import io.novafoundation.nova.feature_nft_impl.data.mappers.nftPrice
 import io.novafoundation.nova.feature_nft_impl.data.network.distributed.FileStorageAdapter.adoptFileStorageLinkToHttps
 import io.novafoundation.nova.feature_nft_impl.data.source.NftProvider
-import io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV2.network.kanaria.KanariaApi
 import io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV2.network.singular.SingularV2Api
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -24,14 +23,13 @@ import kotlinx.coroutines.flow.Flow
 class RmrkV2NftProvider(
     private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
-    private val kanariaApi: KanariaApi,
     private val singularV2Api: SingularV2Api,
     private val nftDao: NftDao
 ) : NftProvider {
 
     override suspend fun initialNftsSync(chain: Chain, metaAccount: MetaAccount, forceOverwrite: Boolean) {
         val address = metaAccount.addressIn(chain)!!
-        val nfts = kanariaApi.getBirds(address) + kanariaApi.getItems(address)
+        val nfts = singularV2Api.getAccountNfts(address)
 
         val toSave = nfts.map {
             NftLocal(
@@ -41,14 +39,11 @@ class RmrkV2NftProvider(
                 collectionId = it.collectionId,
                 instanceId = null,
                 metadata = it.metadata.encodeToByteArray(),
-                name = it.name,
-                label = it.description,
-                media = it.image,
+                media = it.image?.adoptFileStorageLinkToHttps(),
                 price = it.price,
                 type = NftLocal.Type.RMRK2,
-                issuanceTotal = null,
                 issuanceMyEdition = it.edition,
-                wholeDetailsLoaded = it.image != null // null in case of items, will require metadata fetch from ipfs on full sync
+                wholeDetailsLoaded = false,
             )
         }
 
@@ -57,11 +52,19 @@ class RmrkV2NftProvider(
 
     override suspend fun nftFullSync(nft: Nft) {
         val metadataLink = nft.metadataRaw!!.decodeToString().adoptFileStorageLinkToHttps()
-        val metadata = kanariaApi.getIpfsMetadata(metadataLink)
+        val metadata = singularV2Api.getIpfsMetadata(metadataLink)
+
+        val collection = singularV2Api.getCollection(nft.collectionId).first()
 
         nftDao.updateNft(nft.identifier) { local ->
+            // media fetched during initial sync (prerender) has more priority than one from metadata
+            val image = local.media ?: metadata.image?.adoptFileStorageLinkToHttps()
+
             local.copy(
-                media = metadata.image.adoptFileStorageLinkToHttps(),
+                media = image,
+                issuanceTotal = collection.max,
+                name = metadata.name,
+                label = metadata.description,
                 wholeDetailsLoaded = true
             )
         }
