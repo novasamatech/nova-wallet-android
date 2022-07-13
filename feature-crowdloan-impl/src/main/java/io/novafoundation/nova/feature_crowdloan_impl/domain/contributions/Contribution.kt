@@ -7,7 +7,6 @@ import io.novafoundation.nova.feature_crowdloan_api.data.repository.ParachainMet
 import java.math.BigInteger
 import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalTime::class)
 class Contribution(
     val amount: BigInteger,
     val paraId: ParaId,
