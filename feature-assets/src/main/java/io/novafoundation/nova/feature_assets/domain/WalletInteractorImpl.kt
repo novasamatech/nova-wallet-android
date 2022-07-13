@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.OperationsPageChange
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.ext.defaultComparatorFrom
+import io.novafoundation.nova.runtime.ext.isUtilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -60,7 +61,8 @@ class WalletInteractorImpl(
                 val assetsByChain = assets.groupBy { chains.getValue(it.token.configuration.chainId) }
                     .mapValues { (_, assets) ->
                         assets.sortedWith(
-                            compareByDescending<Asset> { it.token.fiatAmount(it.total) }
+                            compareByDescending<Asset> { it.token.configuration.isUtilityAsset } // utility assets first
+                                .thenByDescending { it.token.fiatAmount(it.total) }
                                 .thenBy { it.token.configuration.symbol }
                         )
                     }.mapKeys { (chain, assets) ->
@@ -163,17 +165,17 @@ class WalletInteractorImpl(
         groupedAssets: GroupedList<AssetGroup, Asset>
     ):
         Balances {
-            val (totalFiat, lockedFiat) = assets.fold(BigDecimal.ZERO to BigDecimal.ZERO) { (total, locked), asset ->
-                val assetTotalFiat = asset.token.fiatAmount(asset.total)
-                val assetLockedFiat = asset.token.fiatAmount(asset.locked)
+        val (totalFiat, lockedFiat) = assets.fold(BigDecimal.ZERO to BigDecimal.ZERO) { (total, locked), asset ->
+            val assetTotalFiat = asset.token.fiatAmount(asset.total)
+            val assetLockedFiat = asset.token.fiatAmount(asset.locked)
 
-                (total + assetTotalFiat) to (locked + assetLockedFiat)
-            }
-
-            return Balances(
-                assets = groupedAssets,
-                totalBalanceFiat = totalFiat,
-                lockedBalanceFiat = lockedFiat
-            )
+            (total + assetTotalFiat) to (locked + assetLockedFiat)
         }
+
+        return Balances(
+            assets = groupedAssets,
+            totalBalanceFiat = totalFiat,
+            lockedBalanceFiat = lockedFiat
+        )
+    }
 }
