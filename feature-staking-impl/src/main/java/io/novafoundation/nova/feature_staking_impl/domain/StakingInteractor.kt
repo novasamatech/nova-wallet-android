@@ -88,7 +88,6 @@ class StakingInteractor(
 
             require(currentStakingState is StakingState.Stash)
 
-            val erasPerDay = calculator.erasPerDay()
             val activeEraIndex = stakingRepository.getActiveEraIndex(chainId)
             val historyDepth = stakingRepository.getHistoryDepth(chainId)
 
@@ -98,9 +97,9 @@ class StakingInteractor(
             val identityMapping = identityRepository.getIdentitiesFromAddresses(currentStakingState.chain, allValidatorAddresses)
 
             val pendingPayouts = payouts.map {
-                val relativeInfo = eraRelativeInfo(it.era, activeEraIndex, historyDepth, erasPerDay)
+                val erasLeft = remainingEras(createdAtEra = it.era, activeEraIndex, historyDepth)
 
-                val closeToExpire = relativeInfo.erasLeft < historyDepth / 2.toBigInteger()
+                val closeToExpire = erasLeft < historyDepth / 2.toBigInteger()
 
                 val leftTime = calculator.calculateTillEraSet(destinationEra = it.era + historyDepth + ERA_OFFSET).toLong()
                 val currentTimestamp = System.currentTimeMillis()
@@ -278,19 +277,14 @@ class StakingInteractor(
         return factory.create(stakingSharedState.chainAsset())
     }
 
-    private fun eraRelativeInfo(
+    private fun remainingEras(
         createdAtEra: BigInteger,
         activeEra: BigInteger,
         lifespanInEras: BigInteger,
-        erasPerDay: Int,
-    ): EraRelativeInfo {
+    ): BigInteger {
         val erasPast = activeEra - createdAtEra
-        val erasLeft = lifespanInEras - erasPast
 
-        val daysPast = erasPast.toInt() / erasPerDay
-        val daysLeft = erasLeft.toInt() / erasPerDay
-
-        return EraRelativeInfo(daysLeft, daysPast, erasLeft, erasPast)
+        return lifespanInEras - erasPast
     }
 
     private suspend fun <S> observeStakeSummary(
