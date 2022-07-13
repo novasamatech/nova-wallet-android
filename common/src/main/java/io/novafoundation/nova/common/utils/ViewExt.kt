@@ -167,8 +167,8 @@ fun ImageView.setImageTintRes(@ColorRes tintRes: Int) {
     imageTintList = ColorStateList.valueOf(context.getColor(tintRes))
 }
 
-fun ImageView.setImageTint(@ColorInt tint: Int) {
-    imageTintList = ColorStateList.valueOf(tint)
+fun ImageView.setImageTint(@ColorInt tint: Int?) {
+    imageTintList = tint?.let { ColorStateList.valueOf(it) }
 }
 
 inline fun View.doOnGlobalLayout(crossinline action: () -> Unit) {

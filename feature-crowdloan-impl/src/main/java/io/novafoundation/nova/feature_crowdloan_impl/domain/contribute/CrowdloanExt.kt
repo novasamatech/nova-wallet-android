@@ -56,7 +56,7 @@ private fun isCrowdloanActive(
         !hasWonAuction
 }
 
-private fun leasePeriodInMillis(
+fun leasePeriodInMillis(
     blocksPerLeasePeriod: BigInteger,
     currentBlockNumber: BigInteger,
     endingLeasePeriod: BigInteger,

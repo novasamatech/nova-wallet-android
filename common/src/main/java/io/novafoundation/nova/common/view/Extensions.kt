@@ -9,6 +9,7 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.format
+import io.novafoundation.nova.common.utils.formatting.TimerValue
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +18,12 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.milliseconds
 
 private val TIMER_TAG = R.string.common_time_left
+
+fun TextView.startTimer(
+    value: TimerValue,
+    @StringRes customMessageFormat: Int? = null,
+    onFinish: ((view: TextView) -> Unit)? = null
+) = startTimer(value.millis, value.millisCalculatedAt, customMessageFormat, onFinish)
 
 @OptIn(ExperimentalTime::class)
 fun TextView.startTimer(
