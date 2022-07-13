@@ -11,7 +11,6 @@ import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.leasePeri
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
-import kotlin.time.ExperimentalTime
 
 class ContributionsInteractor(
     private val externalContributionSource: ExternalContributionSource,
@@ -21,7 +20,6 @@ class ContributionsInteractor(
     private val chainStateRepository: ChainStateRepository,
 ) {
 
-    @OptIn(ExperimentalTime::class)
     suspend fun getUserContributions(): List<Contribution> {
         val chain = selectedAssetState.chain()
         val metaAccount = accountRepository.getSelectedMetaAccount()
