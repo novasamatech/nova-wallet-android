@@ -19,11 +19,12 @@ fun mapAssetToAssetModel(
 
     return with(asset) {
         AssetModel(
-            asset.token.configuration.chainId,
-            asset.token.configuration.id,
-            token.configuration.iconUrl,
-            token.configuration.symbol,
-            formattedAmount
+            chainId = asset.token.configuration.chainId,
+            chainAssetId = asset.token.configuration.id,
+            imageUrl = token.configuration.iconUrl,
+            tokenName = token.configuration.name,
+            tokenSymbol = token.configuration.symbol,
+            assetBalance = formattedAmount
         )
     }
 }

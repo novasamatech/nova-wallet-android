@@ -7,6 +7,7 @@ data class AssetModel(
     val chainAssetId: Int,
     val imageUrl: String?,
     val tokenName: String,
+    val tokenSymbol: String,
     val assetBalance: String
 ) {
 

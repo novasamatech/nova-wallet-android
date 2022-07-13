@@ -17,7 +17,10 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Balances
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.OperationsPageChange
 import io.novafoundation.nova.runtime.ext.commissionAsset
+import io.novafoundation.nova.runtime.ext.defaultComparatorFrom
+import io.novafoundation.nova.runtime.ext.isUtilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
 import kotlinx.coroutines.Dispatchers
@@ -53,12 +56,13 @@ class WalletInteractorImpl(
 
                 val assetGroupComparator = compareByDescending(AssetGroup::groupBalanceFiat)
                     .thenByDescending { it.zeroBalance } // non-zero balances first
-                    .thenBy { it.chain.name } // SortedMap will collapse keys that are equal according to the comparator - need another field to compare by
+                    .then(Chain.defaultComparatorFrom(AssetGroup::chain))
 
                 val assetsByChain = assets.groupBy { chains.getValue(it.token.configuration.chainId) }
                     .mapValues { (_, assets) ->
                         assets.sortedWith(
-                            compareByDescending<Asset> { it.token.fiatAmount(it.total) }
+                            compareByDescending<Asset> { it.token.configuration.isUtilityAsset } // utility assets first
+                                .thenByDescending { it.token.fiatAmount(it.total) }
                                 .thenBy { it.token.configuration.symbol }
                         )
                     }.mapKeys { (chain, assets) ->
