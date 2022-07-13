@@ -16,11 +16,11 @@ val Chain.testnetsLastAscendingOrder
         0
     }
 
-val Chain.alpabeticalOrder
+val Chain.alphabeticalOrder
     get() = name
 
 fun <K> Chain.Companion.defaultComparatorFrom(extractor: (K) -> Chain): Comparator<K> = Comparator.comparing(extractor, defaultComparator())
 
 fun Chain.Companion.defaultComparator(): Comparator<Chain> = compareBy<Chain> { it.relaychainsFirstAscendingOrder }
     .thenBy { it.testnetsLastAscendingOrder }
-    .thenBy { it.alpabeticalOrder }
+    .thenBy { it.alphabeticalOrder }
