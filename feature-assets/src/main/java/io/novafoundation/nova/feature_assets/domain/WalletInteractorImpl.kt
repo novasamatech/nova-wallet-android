@@ -16,6 +16,9 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.AssetGroup
 import io.novafoundation.nova.feature_wallet_api.domain.model.Balances
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.OperationsPageChange
+import io.novafoundation.nova.feature_wallet_api.domain.utils.alpabeticalOrder
+import io.novafoundation.nova.feature_wallet_api.domain.utils.relaychainsFirstAscendingOrder
+import io.novafoundation.nova.feature_wallet_api.domain.utils.testnetsLastAscendingOrder
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -53,7 +56,9 @@ class WalletInteractorImpl(
 
                 val assetGroupComparator = compareByDescending(AssetGroup::groupBalanceFiat)
                     .thenByDescending { it.zeroBalance } // non-zero balances first
-                    .thenBy { it.chain.name } // SortedMap will collapse keys that are equal according to the comparator - need another field to compare by
+                    .thenBy { it.chain.relaychainsFirstAscendingOrder }
+                    .thenBy { it.chain.testnetsLastAscendingOrder }
+                    .thenBy { it.chain.alpabeticalOrder }
 
                 val assetsByChain = assets.groupBy { chains.getValue(it.token.configuration.chainId) }
                     .mapValues { (_, assets) ->
