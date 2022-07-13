@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.domain.model.hasChainAccountIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.SecretType
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountInChain.From
+import io.novafoundation.nova.runtime.ext.defaultComparatorFrom
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.Dispatchers
@@ -51,7 +52,7 @@ class AccountDetailsInteractor(
                 from = if (metaAccount.hasChainAccountIn(chain.id)) From.CHAIN_ACCOUNT else From.META_ACCOUNT
             )
         }
-            .sortedBy { it.hasChainAccount }
+            .sortedWith(accountInChainComparator())
             .groupBy(AccountInChain::from)
             .toSortedMap(compareBy(From::ordering))
     }
@@ -73,6 +74,11 @@ class AccountDetailsInteractor(
 
     private val AccountInChain.hasChainAccount
         get() = projection != null
+
+    private fun accountInChainComparator(): Comparator<AccountInChain> {
+        return compareBy<AccountInChain> { it.hasChainAccount }
+            .then(Chain.defaultComparatorFrom(AccountInChain::chain))
+    }
 }
 
 private val From.ordering
