@@ -11,6 +11,7 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepo
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RuntimeVersionsRepository
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
+import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
 import io.novafoundation.nova.runtime.storage.SampledBlockTimeStorage
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -53,4 +54,6 @@ interface RuntimeApi {
     val multiChainQrSharingFactory: MultiChainQrSharingFactory
 
     val sampledBlockTime: SampledBlockTimeStorage
+
+    val parachainInfoRepository: ParachainInfoRepository
 }
