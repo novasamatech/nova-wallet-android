@@ -87,10 +87,12 @@ class StakingFeatureModule {
         walletRepository: WalletRepository,
         accountRepository: AccountRepository,
         sharedState: StakingSharedState,
+        chainRegistry: ChainRegistry,
     ): AssetUseCase = AssetUseCaseImpl(
         walletRepository,
         accountRepository,
-        sharedState
+        sharedState,
+        chainRegistry
     )
 
     @Provides
