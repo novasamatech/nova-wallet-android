@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.hideSoftKeyboard
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.showSoftKeyboard
 import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.feature_assets.R
@@ -24,6 +25,7 @@ import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import kotlinx.android.synthetic.main.fragment_asset_search.searchAssetContainer
 import kotlinx.android.synthetic.main.fragment_asset_search.searchAssetList
 import kotlinx.android.synthetic.main.fragment_asset_search.searchAssetSearch
+import kotlinx.android.synthetic.main.fragment_asset_search.searchAssetsPlaceholder
 import javax.inject.Inject
 
 class AssetSearchFragment :
@@ -77,9 +79,12 @@ class AssetSearchFragment :
     override fun subscribe(viewModel: AssetSearchViewModel) {
         searchAssetSearch.searchInput.content.bindTo(viewModel.query, lifecycleScope)
 
-        viewModel.searchResults.observe {
+        viewModel.searchResults.observe { data ->
+            searchAssetsPlaceholder.setVisible(data.isEmpty())
+            searchAssetList.setVisible(data.isNotEmpty())
+
             assetsAdapter.submitListPreservingViewPoint(
-                data = it,
+                data = data,
                 into = searchAssetList,
                 extraDiffCompletedCallback = { searchAssetList.invalidateItemDecorations() }
             )

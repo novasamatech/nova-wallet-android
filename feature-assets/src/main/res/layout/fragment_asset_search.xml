@@ -6,8 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:background="@drawable/drawable_background_image"
-    android:id="@+id/searchAssetContainer"
-    tools:background="@color/black">
+    android:id="@+id/searchAssetContainer">
 
     <io.novafoundation.nova.common.view.SearchToolbar
         android:layout_width="match_parent"
@@ -27,4 +26,14 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         android:id="@+id/searchAssetList"
         tools:listitem="@layout/item_asset" />
+
+    <io.novafoundation.nova.common.view.PlaceholderView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:visibility="gone"
+        android:id="@+id/searchAssetsPlaceholder"
+        android:text="@string/assets_search_placeholder"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp" />
 </LinearLayout>
