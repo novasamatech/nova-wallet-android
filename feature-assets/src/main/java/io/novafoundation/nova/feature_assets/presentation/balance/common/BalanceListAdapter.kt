@@ -1,10 +1,9 @@
-package io.novafoundation.nova.feature_assets.presentation.balance.list.view
+package io.novafoundation.nova.feature_assets.presentation.balance.common
 
 import android.view.View
 import android.view.ViewGroup
 import coil.ImageLoader
 import coil.load
-import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.common.list.BaseGroupedDiffCallback
 import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
@@ -14,6 +13,7 @@ import io.novafoundation.nova.common.utils.format
 import io.novafoundation.nova.common.utils.formatAsCurrency
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.setTextColorRes
+import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.AssetGroupUi
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import kotlinx.android.synthetic.main.item_asset.view.itemAssetBalance

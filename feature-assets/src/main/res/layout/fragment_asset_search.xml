@@ -5,22 +5,35 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:id="@+id/searchDappSearhContainer"
-    tools:background="@color/black">
+    android:background="@drawable/drawable_background_image"
+    android:id="@+id/searchAssetContainer">
 
     <io.novafoundation.nova.common.view.SearchToolbar
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/dapp_search_hint"
-        android:id="@+id/searchDappSearch" />
+        android:hint="@string/assets_search_hint"
+        android:id="@+id/searchAssetSearch" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
+        android:paddingTop="12dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
         android:layout_height="0dp"
         android:paddingBottom="24dp"
         android:clipToPadding="false"
         android:layout_weight="1"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        android:id="@+id/searchDappList"
-        tools:listitem="@layout/item_dapp" />
+        android:id="@+id/searchAssetList"
+        tools:listitem="@layout/item_asset" />
+
+    <io.novafoundation.nova.common.view.PlaceholderView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:visibility="gone"
+        android:id="@+id/searchAssetsPlaceholder"
+        android:text="@string/assets_search_placeholder"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp" />
 </LinearLayout>

@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_assets.presentation.balance.list.view
+package io.novafoundation.nova.feature_assets.presentation.balance.common
 
 import android.content.Context
 import android.graphics.Canvas
@@ -10,13 +10,23 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.utils.dp
+import io.novafoundation.nova.common.view.shape.addRipple
+import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
+import io.novafoundation.nova.feature_assets.R
 import kotlin.math.roundToInt
 
+/**
+ * Note - clients are required to call [RecyclerView.invalidateItemDecorations] in [ListAdapter.submitList]  callback due to issues with DiffUtil.
+ * The issue is that this decoration does not currently support partial list updates and assumes it will be iterated over whole list
+ * TODO update decoration to not require this invalidation
+ */
 class AssetGroupingDecoration(
     private val background: Drawable,
     private val assetsAdapter: ListAdapter<*, *>,
     context: Context,
 ) : RecyclerView.ItemDecoration() {
+
+    companion object;
 
     private val bounds = Rect()
     private val groupOuterSpacing = 8.dp(context)
@@ -103,6 +113,22 @@ class AssetGroupingDecoration(
     }
 
     private fun shouldSkip(viewHolder: RecyclerView.ViewHolder): Boolean {
-        return viewHolder.bindingAdapterPosition == RecyclerView.NO_POSITION || viewHolder is HeaderHolder
+        return viewHolder.bindingAdapterPosition == RecyclerView.NO_POSITION ||
+            (viewHolder !is AssetViewHolder && viewHolder !is AssetGroupViewHolder)
     }
+}
+
+fun AssetGroupingDecoration.Companion.applyDefaultTo(
+    recyclerView: RecyclerView,
+    adapter: ListAdapter<*, *>
+) {
+    val groupBackground = with(recyclerView.context) {
+        addRipple(getRoundedCornerDrawable(R.color.blurColor))
+    }
+    val decoration = AssetGroupingDecoration(
+        background = groupBackground,
+        assetsAdapter = adapter,
+        context = recyclerView.context,
+    )
+    recyclerView.addItemDecoration(decoration)
 }

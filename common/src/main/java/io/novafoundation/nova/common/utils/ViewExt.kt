@@ -308,11 +308,17 @@ fun <I> View.useInputValue(input: Input<I>, onValue: (I) -> Unit) {
     input.valueOrNull?.let(onValue)
 }
 
-fun <T> ListAdapter<T, *>.submitListPreservingViewPoint(data: List<T>, into: RecyclerView) {
+fun <T> ListAdapter<T, *>.submitListPreservingViewPoint(
+    data: List<T>,
+    into: RecyclerView,
+    extraDiffCompletedCallback: (() -> Unit)? = null
+) {
     val recyclerViewState = into.layoutManager!!.onSaveInstanceState()
 
     submitList(data) {
         into.layoutManager!!.onRestoreInstanceState(recyclerViewState)
+
+        extraDiffCompletedCallback?.invoke()
     }
 }
 

@@ -390,6 +390,10 @@ class Navigator(
         navController?.navigate(R.id.action_mainFragment_to_assetFiltersFragment)
     }
 
+    override fun openAssetSearch() {
+        navController?.navigate(R.id.action_mainFragment_to_assetSearchFragment)
+    }
+
     override fun openNfts() {
         navController?.navigate(R.id.action_mainFragment_to_nfts_nav_graph)
     }
@@ -422,7 +426,13 @@ class Navigator(
     override fun openAssetDetails(assetPayload: AssetPayload) {
         val bundle = BalanceDetailFragment.getBundle(assetPayload)
 
-        navController?.navigate(R.id.action_mainFragment_to_balanceDetailFragment, bundle)
+        val action = when (navController?.currentDestination?.id) {
+            R.id.mainFragment -> R.id.action_mainFragment_to_balanceDetailFragment
+            R.id.assetSearchFragment -> R.id.action_assetSearchFragment_to_balanceDetailFragment
+            else -> null
+        }
+
+        action?.let { navController?.navigate(it, bundle) }
     }
 
     override fun openAddNode() {
