@@ -70,6 +70,8 @@
   <string name="accounts_add_wallet">Добавить кошелёк</string>
   <string name="accounts_change_chain_account">Изменить аккаунт %s</string>
   <string name="accounts_change_chain_secrets">Изменить аккаунт</string>
+  <string name="assets_search_hint">Поиск по названию сети или токена</string>
+  <string name="assets_search_placeholder">Не найдено сетей или токенов с\nуказаным именем</string>
   <string name="buy_completed">Покупка совершена! Ожидайте до 60 минут. Вы можете отслеживать статус по электронной почте.</string>
   <string name="choose_amount_asset">Токен</string>
   <string name="choose_amount_available_balance">Свободный баланс</string>
@@ -215,6 +217,8 @@
   <string name="crowdloan_contribution">Тип вклада</string>
   <string name="crowdloan_contribution_format">Вы вложили: %s</string>
   <string name="crowdloan_contributions_placeholder">Ваши взносы\n появятся здесь</string>
+  <string name="crowdloan_contributions_returns_in">Вернется через %s</string>
+  <string name="crowdloan_contributions_to_be_returned">Ожидает возвращения парачейном</string>
   <string name="crowdloan_contributions_with_source" formatted="false">%s (через %s)</string>
   <string name="crowdloan_crowdloan">Краудлоуны</string>
   <string name="crowdloan_empty_bonus_title">Получите специальный бонус</string>
@@ -699,6 +703,7 @@
   <string name="wallet_send_tokens_to">в</string>
   <string name="wallet_send_total_title">Всего</string>
   <string name="wallet_sender">Отправитель</string>
+  <string name="wallet_tokens">Токены</string>
   <string name="wallet_transfer_details_send_back">Отправить этому контакту</string>
   <string name="wallet_transfer_details_title">Детали перевода</string>
   <string name="wallet_your_balance">Ваш баланс</string>
