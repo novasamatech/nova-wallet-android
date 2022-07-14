@@ -15,7 +15,6 @@ import io.novafoundation.nova.common.view.recyclerview.item.OperationListItem
 import io.novafoundation.nova.common.view.startTimer
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contributions.model.ContributionModel
 import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_contribution.view.itemContributionIcon
 
 class UserContributionsAdapter(
     private val imageLoader: ImageLoader,
@@ -86,9 +85,7 @@ class ContributionHolder(
     }
 
     fun unbind() {
-        with(containerView) {
-            itemContributionIcon.clear()
-        }
+        containerView.icon.clear()
     }
 
     fun bindAmount(item: ContributionModel) {
