@@ -34,7 +34,6 @@ class AssetSearchInteractor(
     private val chainRegistry: ChainRegistry,
 ) {
 
-
     fun searchAssetsFlow(
         queryFlow: Flow<String>
     ): Flow<Map<AssetGroup, List<Asset>>> {

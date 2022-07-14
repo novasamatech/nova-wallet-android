@@ -4,7 +4,7 @@ typealias GroupedList<K, V> = Map<K, List<V>>
 
 fun <K, V> emptyGroupedList() = emptyMap<K, V>()
 
-fun <K: Any, V: Any> GroupedList<K, V>.toListWithHeaders(): List<Any> = flatMap { (groupKey, values) ->
+fun <K : Any, V : Any> GroupedList<K, V>.toListWithHeaders(): List<Any> = flatMap { (groupKey, values) ->
     listOf(groupKey) + values
 }
 

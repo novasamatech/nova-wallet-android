@@ -12,7 +12,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.flow.Flow
 import java.math.BigDecimal
 
-
 class Balances(
     val assets: GroupedList<AssetGroup, Asset>,
     val totalBalanceFiat: BigDecimal,
