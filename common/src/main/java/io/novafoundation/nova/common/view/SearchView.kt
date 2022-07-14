@@ -28,14 +28,6 @@ class SearchView @JvmOverloads constructor(
     val content: EditText
         get() = searchContent
 
-    fun setHint(hint: String?) {
-        content.hint = hint
-    }
-
-    fun setIcon(@DrawableRes icon: Int?) {
-        searchContent.setDrawableStart(icon, widthInDp = 16, paddingInDp = 6, tint = R.color.white_32)
-    }
-
     init {
         View.inflate(context, R.layout.view_search, this)
 
@@ -51,6 +43,14 @@ class SearchView @JvmOverloads constructor(
         }
 
         attrs?.let(::applyAttrs)
+    }
+
+    fun setHint(hint: String?) {
+        content.hint = hint
+    }
+
+    fun setIcon(@DrawableRes icon: Int?) {
+        searchContent.setDrawableStart(icon, widthInDp = 16, paddingInDp = 6, tint = R.color.white_32)
     }
 
     private fun applyAttrs(attributeSet: AttributeSet) = context.useAttributes(attributeSet, R.styleable.SearchView) {

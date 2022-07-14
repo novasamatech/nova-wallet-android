@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="assets_search_hint">Search by network or token</string>
+
   <string name="crowdloan_contributions_returns_in">Returns in %s</string>
   <string name="crowdloan_contributions_to_be_returned">To be returned by parachain</string>
 

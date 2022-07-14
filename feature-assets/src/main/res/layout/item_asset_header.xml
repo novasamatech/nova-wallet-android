@@ -35,12 +35,12 @@
         app:layout_constraintTop_toBottomOf="@id/balanceListTotalTitle" />
 
     <io.novafoundation.nova.feature_assets.presentation.balance.list.view.GoToNftsView
+        android:id="@+id/balanceListNfts"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:id="@+id/balanceListNfts"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/balanceListTotalBalance" />
 
     <TextView
@@ -56,13 +56,24 @@
         app:layout_constraintTop_toBottomOf="@id/balanceListNfts"
         app:layout_goneMarginBottom="20dp" />
 
-    <io.novafoundation.nova.common.view.ManageButton
+    <io.novafoundation.nova.common.view.IconButton
         android:id="@+id/balanceListManage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:src="@drawable/ic_options"
         app:layout_constraintBottom_toBottomOf="@+id/balanceListAssetTitle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/balanceListAssetTitle" />
+
+    <io.novafoundation.nova.common.view.IconButton
+        android:id="@+id/balanceListSearch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:src="@drawable/ic_search"
+        app:layout_constraintBottom_toBottomOf="@+id/balanceListManage"
+        app:layout_constraintEnd_toStartOf="@+id/balanceListManage"
+        app:layout_constraintTop_toTopOf="@+id/balanceListManage" />
 
     <io.novafoundation.nova.common.view.PlaceholderView
         android:id="@+id/balanceListAssetPlaceholder"

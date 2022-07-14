@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 
 abstract class CurrentStakeTargetsViewModel : BaseViewModel() {
 
-    abstract val currentStakeTargetsFlow: Flow<LoadingState<List<Any?>>>
+    abstract val currentStakeTargetsFlow: Flow<LoadingState<List<Any>>>
 
     abstract val warningFlow: Flow<String?>
 

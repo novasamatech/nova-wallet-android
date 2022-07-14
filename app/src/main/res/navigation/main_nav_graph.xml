@@ -292,6 +292,15 @@
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+
+
+        <action
+            android:id="@+id/action_mainFragment_to_assetSearchFragment"
+            app:destination="@id/assetSearchFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
 
@@ -953,5 +962,21 @@
         android:id="@+id/parachainStakingRebondFragment"
         android:name="io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.rebond.ParachainStakingRebondFragment"
         android:label="ParachainStakingRebondFragment" />
+
+
+    <fragment
+        android:id="@+id/assetSearchFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.balance.search.AssetSearchFragment"
+        android:label="AssetSearchFragment">
+
+        <action
+            android:id="@+id/action_assetSearchFragment_to_balanceDetailFragment"
+            app:destination="@id/balanceDetailFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@id/mainFragment" />
+    </fragment>
 
 </navigation>
