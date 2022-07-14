@@ -78,7 +78,11 @@ class AssetSearchFragment :
         searchAssetSearch.searchInput.content.bindTo(viewModel.query, lifecycleScope)
 
         viewModel.searchResults.observe {
-            assetsAdapter.submitListPreservingViewPoint(it, searchAssetList)
+            assetsAdapter.submitListPreservingViewPoint(
+                data = it,
+                into = searchAssetList,
+                extraDiffCompletedCallback = { searchAssetList.invalidateItemDecorations() }
+            )
         }
     }
 

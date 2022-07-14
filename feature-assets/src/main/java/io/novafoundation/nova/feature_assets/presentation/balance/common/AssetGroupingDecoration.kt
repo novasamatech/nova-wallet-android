@@ -15,6 +15,11 @@ import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_assets.R
 import kotlin.math.roundToInt
 
+/**
+ * Note - clients are required to call [RecyclerView.invalidateItemDecorations] in [ListAdapter.submitList]  callback due to issues with DiffUtil.
+ * The issue is that this decoration does not currently support partial list updates and assumes it will be iterated over whole list
+ * TODO update decoration to not require this invalidation
+ */
 class AssetGroupingDecoration(
     private val background: Drawable,
     private val assetsAdapter: ListAdapter<*, *>,
