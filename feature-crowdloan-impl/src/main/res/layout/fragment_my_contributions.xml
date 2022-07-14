@@ -32,7 +32,7 @@
         android:visibility="gone"
         tools:visibility="visible"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/item_contribution" />
+        tools:listitem="@layout/item_operation_list_item" />
 
     <ProgressBar
         android:id="@+id/myContributionsProgress"
