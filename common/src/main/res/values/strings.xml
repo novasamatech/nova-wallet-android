@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="crowdloan_contributions_returns_in">Returns in %s</string>
+  <string name="crowdloan_contributions_to_be_returned">To be returned by parachain</string>
+
   <plurals name="common_minutes_format">
     <item quantity="one">%d minute</item>
     <item quantity="other">%d minutes</item>

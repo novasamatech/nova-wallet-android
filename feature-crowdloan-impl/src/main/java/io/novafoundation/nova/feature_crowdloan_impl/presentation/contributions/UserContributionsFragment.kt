@@ -61,7 +61,7 @@ class UserContributionsFragment : BaseFragment<UserContributionsViewModel>() {
 
     override fun subscribe(viewModel: UserContributionsViewModel) {
 
-        viewModel.userContributionsFlow.observe { loadingState ->
+        viewModel.contributionsModelsFlow.observe { loadingState ->
             myContributionsList.setVisible(loadingState is LoadingState.Loaded && loadingState.data.isNotEmpty())
             myContributionsPlaceholder.setVisible(loadingState is LoadingState.Loaded && loadingState.data.isEmpty())
             myContributionsProgress.setVisible(loadingState is LoadingState.Loading)

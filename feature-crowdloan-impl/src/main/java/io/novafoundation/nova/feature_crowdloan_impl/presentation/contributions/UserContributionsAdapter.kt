@@ -1,29 +1,28 @@
 package io.novafoundation.nova.feature_crowdloan_impl.presentation.contributions
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.ImageLoader
 import coil.clear
+import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
 import io.novafoundation.nova.common.utils.images.setIcon
-import io.novafoundation.nova.common.utils.inflateChild
-import io.novafoundation.nova.feature_crowdloan_impl.R
+import io.novafoundation.nova.common.utils.setTextOrHide
+import io.novafoundation.nova.common.view.recyclerview.item.OperationListItem
+import io.novafoundation.nova.common.view.startTimer
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contributions.model.ContributionModel
 import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_contribution.view.itemContributionAmount
 import kotlinx.android.synthetic.main.item_contribution.view.itemContributionIcon
-import kotlinx.android.synthetic.main.item_contribution.view.itemContributionName
 
 class UserContributionsAdapter(
     private val imageLoader: ImageLoader,
 ) : ListAdapter<ContributionModel, ContributionHolder>(ContributionCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContributionHolder {
-        return ContributionHolder(imageLoader, parent.inflateChild(R.layout.item_contribution))
+        return ContributionHolder(imageLoader, OperationListItem(parent.context))
     }
 
     override fun onBindViewHolder(holder: ContributionHolder, position: Int) {
@@ -64,14 +63,24 @@ private object ContributionCallback : DiffUtil.ItemCallback<ContributionModel>()
 
 class ContributionHolder(
     private val imageLoader: ImageLoader,
-    override val containerView: View,
+    override val containerView: OperationListItem,
 ) : RecyclerView.ViewHolder(containerView), LayoutContainer {
+
+    init {
+        containerView.setIconStyle(OperationListItem.IconStyle.DEFAULT)
+    }
 
     fun bind(
         item: ContributionModel,
     ) = with(containerView) {
-        itemContributionIcon.setIcon(item.icon, imageLoader)
-        itemContributionName.text = item.title
+        icon.setIcon(item.icon, imageLoader)
+
+        header.text = item.title
+        subHeader.startTimer(
+            value = item.returnsIn,
+            customMessageFormat = R.string.crowdloan_contributions_returns_in,
+            onFinish = { subHeader.setText(R.string.crowdloan_contributions_to_be_returned) }
+        )
 
         bindAmount(item)
     }
@@ -83,6 +92,7 @@ class ContributionHolder(
     }
 
     fun bindAmount(item: ContributionModel) {
-        containerView.itemContributionAmount.text = item.amount
+        containerView.valuePrimary.text = item.amount.token
+        containerView.valueSecondary.setTextOrHide(item.amount.fiat)
     }
 }

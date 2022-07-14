@@ -14,6 +14,8 @@ import io.novafoundation.nova.feature_crowdloan_impl.data.repository.contributio
 import io.novafoundation.nova.feature_crowdloan_impl.data.repository.contributions.source.ParallelContributionSource
 import io.novafoundation.nova.feature_crowdloan_impl.data.source.contribution.ExternalContributionSource
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contributions.ContributionsInteractor
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
+import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
 
 @Module
 class ContributionsModule {
@@ -23,7 +25,8 @@ class ContributionsModule {
     @IntoSet
     fun acalaLiquidSource(
         acalaApi: AcalaApi,
-    ): ExternalContributionSource = LiquidAcalaContributionSource(acalaApi)
+        parachainInfoRepository: ParachainInfoRepository
+    ): ExternalContributionSource = LiquidAcalaContributionSource(acalaApi, parachainInfoRepository)
 
     @Provides
     @FeatureScope
@@ -45,10 +48,12 @@ class ContributionsModule {
         crowdloanRepository: CrowdloanRepository,
         accountRepository: AccountRepository,
         crowdloanSharedState: CrowdloanSharedState,
+        chainStateRepository: ChainStateRepository,
     ) = ContributionsInteractor(
         externalContributionSource = externalContributionsSource,
         crowdloanRepository = crowdloanRepository,
         accountRepository = accountRepository,
-        selectedAssetState = crowdloanSharedState
+        selectedAssetState = crowdloanSharedState,
+        chainStateRepository = chainStateRepository
     )
 }
