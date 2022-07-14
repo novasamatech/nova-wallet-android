@@ -25,8 +25,6 @@ private val Match.matchFound
     get() = this != Match.NONE
 private val Match.isFullMatch
     get() = this == Match.FULL
-private val Match.atLeastPrefixMatch
-    get() = this >= Match.PREFIX
 
 class AssetSearchInteractor(
     private val walletRepository: WalletRepository,
