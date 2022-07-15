@@ -7,7 +7,7 @@ class LeasePeriodToBlocksConverter(
     private val blocksPerLease: BigInteger,
     private val blocksOffset: BigInteger
 ) {
-    
+
     fun startBlockFor(leasePeriod: BigInteger): BlockNumber {
         return blocksPerLease * leasePeriod + blocksOffset
     }

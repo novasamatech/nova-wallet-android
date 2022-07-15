@@ -11,8 +11,6 @@ import kotlinx.coroutines.flow.Flow
 import java.math.BigDecimal
 import java.math.BigInteger
 
-
-
 interface CrowdloanRepository {
 
     suspend fun isCrowdloansAvailable(chainId: ChainId): Boolean
