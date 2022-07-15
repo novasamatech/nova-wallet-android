@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.bindi
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.bindFundInfo
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.bindLeases
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRepository
+import io.novafoundation.nova.feature_crowdloan_api.data.repository.LeasePeriodToBlocksConverter
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ParachainMetadata
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.parachain.ParachainMetadataApi
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.parachain.mapParachainMetadataRemoteToParachainMetadata
@@ -84,10 +85,14 @@ class CrowdloanRepositoryImpl(
         }
     }
 
-    override suspend fun blocksPerLeasePeriod(chainId: ChainId): BigInteger {
+    override suspend fun leasePeriodToBlocksConverter(chainId: ChainId): LeasePeriodToBlocksConverter {
         val runtime = runtimeFor(chainId)
+        val slots = runtime.metadata.slots()
 
-        return runtime.metadata.slots().numberConstant("LeasePeriod", runtime)
+        return LeasePeriodToBlocksConverter(
+            blocksPerLease = slots.numberConstant("LeasePeriod", runtime),
+            blocksOffset = slots.numberConstant("LeaseOffset", runtime)
+        )
     }
 
     override fun fundInfoFlow(chainId: ChainId, parachainId: ParaId): Flow<FundInfo> {

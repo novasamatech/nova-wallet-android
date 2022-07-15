@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validati
 import io.novafoundation.nova.common.validation.DefaultFailureLevel
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRepository
-import io.novafoundation.nova.feature_crowdloan_impl.domain.common.leaseIndexFromBlock
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 
 class CrowdloanNotEndedValidation(
@@ -15,9 +14,9 @@ class CrowdloanNotEndedValidation(
         val chainId = value.asset.token.configuration.chainId
         val currentBlock = chainStateRepository.currentBlock(chainId)
 
-        val blocksPerLease = crowdloanRepository.blocksPerLeasePeriod(chainId)
+        val leasePeriodToBlocksConverter = crowdloanRepository.leasePeriodToBlocksConverter(chainId)
 
-        val currentLeaseIndex = leaseIndexFromBlock(currentBlock, blocksPerLease)
+        val currentLeaseIndex = leasePeriodToBlocksConverter.leaseIndexFromBlock(currentBlock)
 
         return when {
             currentBlock >= value.crowdloan.fundInfo.end -> crowdloanEndedFailure()

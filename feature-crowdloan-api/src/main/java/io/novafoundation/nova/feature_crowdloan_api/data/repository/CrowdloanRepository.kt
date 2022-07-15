@@ -23,7 +23,7 @@ interface CrowdloanRepository {
 
     suspend fun getContribution(chainId: ChainId, accountId: AccountId, paraId: ParaId, trieIndex: TrieIndex): DirectContribution?
 
-    suspend fun blocksPerLeasePeriod(chainId: ChainId): BigInteger
+    suspend fun leasePeriodToBlocksConverter(chainId: ChainId): LeasePeriodToBlocksConverter
 
     fun fundInfoFlow(chainId: ChainId, parachainId: ParaId): Flow<FundInfo>
 

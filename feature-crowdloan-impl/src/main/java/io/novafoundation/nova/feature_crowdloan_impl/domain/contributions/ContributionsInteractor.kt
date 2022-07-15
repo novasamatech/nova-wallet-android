@@ -36,12 +36,12 @@ class ContributionsInteractor(
         val fundInfos = crowdloanRepository.allFundInfos(chain.id)
 
         val expectedBlockTime = chainStateRepository.expectedBlockTimeInMillis(chain.id)
-        val blocksPerLeasePeriod = crowdloanRepository.blocksPerLeasePeriod(chain.id)
+        val blocksPerLeasePeriod = crowdloanRepository.leasePeriodToBlocksConverter(chain.id)
         val currentBlockNumber = chainStateRepository.currentBlock(chain.id)
 
         fun FundInfo.returnDuration(): TimerValue {
             val millis = leasePeriodInMillis(
-                blocksPerLeasePeriod = blocksPerLeasePeriod,
+                leasePeriodToBlocksConverter = blocksPerLeasePeriod,
                 currentBlockNumber = currentBlockNumber,
                 endingLeasePeriod = lastSlot,
                 expectedBlockTimeInMillis = expectedBlockTime,
