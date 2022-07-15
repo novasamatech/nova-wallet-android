@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.Flow
 import java.math.BigDecimal
 import java.math.BigInteger
 
+
+
 interface CrowdloanRepository {
 
     suspend fun isCrowdloansAvailable(chainId: ChainId): Boolean
@@ -23,7 +25,7 @@ interface CrowdloanRepository {
 
     suspend fun getContribution(chainId: ChainId, accountId: AccountId, paraId: ParaId, trieIndex: TrieIndex): DirectContribution?
 
-    suspend fun blocksPerLeasePeriod(chainId: ChainId): BigInteger
+    suspend fun leasePeriodToBlocksConverter(chainId: ChainId): LeasePeriodToBlocksConverter
 
     fun fundInfoFlow(chainId: ChainId, parachainId: ParaId): Flow<FundInfo>
 

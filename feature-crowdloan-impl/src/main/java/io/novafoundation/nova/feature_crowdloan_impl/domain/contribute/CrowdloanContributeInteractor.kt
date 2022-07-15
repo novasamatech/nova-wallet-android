@@ -48,7 +48,7 @@ class CrowdloanContributeInteractor(
         val accountId = selectedMetaAccount.accountIdIn(chain)!! // TODO optional for ethereum chains
 
         val expectedBlockTime = chainStateRepository.expectedBlockTimeInMillis(chain.id)
-        val blocksPerLeasePeriod = crowdloanRepository.blocksPerLeasePeriod(chain.id)
+        val leasePeriodToBlocksConverter = crowdloanRepository.leasePeriodToBlocksConverter(chain.id)
 
         combine(
             crowdloanRepository.fundInfoFlow(chain.id, parachainId),
@@ -63,7 +63,7 @@ class CrowdloanContributeInteractor(
                 parachainId = parachainId,
                 currentBlockNumber = blockNumber,
                 expectedBlockTimeInMillis = expectedBlockTime,
-                blocksPerLeasePeriod = blocksPerLeasePeriod,
+                leasePeriodToBlocksConverter = leasePeriodToBlocksConverter,
                 contribution = contribution,
                 hasWonAuction = hasWonAuction
             )

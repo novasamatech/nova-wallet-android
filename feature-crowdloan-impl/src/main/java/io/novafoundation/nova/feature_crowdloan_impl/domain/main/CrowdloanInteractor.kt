@@ -89,7 +89,7 @@ class CrowdloanInteractor(
             val winnerInfo = crowdloanRepository.getWinnerInfo(chainId, fundInfos)
 
             val expectedBlockTime = chainStateRepository.expectedBlockTimeInMillis(chainId)
-            val blocksPerLeasePeriod = crowdloanRepository.blocksPerLeasePeriod(chainId)
+            val leasePeriodToBlocksConverter = crowdloanRepository.leasePeriodToBlocksConverter(chainId)
 
             fundInfos.values
                 .map { fundInfo ->
@@ -101,7 +101,7 @@ class CrowdloanInteractor(
                         parachainId = paraId,
                         currentBlockNumber = currentBlockNumber,
                         expectedBlockTimeInMillis = expectedBlockTime,
-                        blocksPerLeasePeriod = blocksPerLeasePeriod,
+                        leasePeriodToBlocksConverter = leasePeriodToBlocksConverter,
                         contribution = directContributions[paraId],
                         hasWonAuction = winnerInfo.getValue(paraId)
                     )
