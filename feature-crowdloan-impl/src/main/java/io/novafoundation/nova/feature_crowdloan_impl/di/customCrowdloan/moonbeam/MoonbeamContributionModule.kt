@@ -7,11 +7,11 @@ import dagger.multibindings.IntoSet
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
-import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_crowdloan_impl.data.CrowdloanSharedState
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.moonbeam.MoonbeamApi
@@ -43,16 +43,16 @@ class MoonbeamContributionModule {
         moonbeamApi: MoonbeamApi,
         selectedAssetSharedState: CrowdloanSharedState,
         httpExceptionHandler: HttpExceptionHandler,
-        secretStoreV2: SecretStoreV2,
         chainRegistry: ChainRegistry,
+        signerProvider: SignerProvider
     ) = MoonbeamCrowdloanInteractor(
-        accountRepository,
-        extrinsicService,
-        moonbeamApi,
-        selectedAssetSharedState,
-        chainRegistry,
-        httpExceptionHandler,
-        secretStoreV2
+        accountRepository = accountRepository,
+        extrinsicService = extrinsicService,
+        moonbeamApi = moonbeamApi,
+        selectedChainAssetState = selectedAssetSharedState,
+        chainRegistry = chainRegistry,
+        httpExceptionHandler = httpExceptionHandler,
+        signerProvider = signerProvider
     )
 
     @Provides

@@ -5,9 +5,9 @@ import dagger.Provides
 import dagger.multibindings.IntoSet
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
-import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_crowdloan_impl.data.CrowdloanSharedState
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.acala.AcalaApi
@@ -33,11 +33,18 @@ class AcalaContributionModule {
     fun provideAcalaInteractor(
         acalaApi: AcalaApi,
         httpExceptionHandler: HttpExceptionHandler,
-        secretStoreV2: SecretStoreV2,
         selectAssetSharedState: CrowdloanSharedState,
         chainRegistry: ChainRegistry,
         accountRepository: AccountRepository,
-    ) = AcalaContributeInteractor(acalaApi, httpExceptionHandler, accountRepository, secretStoreV2, chainRegistry, selectAssetSharedState)
+        signerProvider: SignerProvider
+    ) = AcalaContributeInteractor(
+        acalaApi = acalaApi,
+        httpExceptionHandler = httpExceptionHandler,
+        accountRepository = accountRepository,
+        chainRegistry = chainRegistry,
+        selectedAssetState = selectAssetSharedState,
+        signerProvider = signerProvider
+    )
 
     @Provides
     @FeatureScope
