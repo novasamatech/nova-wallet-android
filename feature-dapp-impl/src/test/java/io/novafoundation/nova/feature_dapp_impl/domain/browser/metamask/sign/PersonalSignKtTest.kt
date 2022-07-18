@@ -18,7 +18,7 @@ class PersonalSignKtTest {
     // call to reference package-private implementation via reflection.
     // It is not good approach to use this as our actual implementation since reflection is unsafe and slow
     private fun expectedSign(message: ByteArray): ByteArray {
-        val method = Sign::class.java.getDeclaredMethod("getEthereumMessageHash")
+        val method = Sign::class.java.getDeclaredMethod("getEthereumMessageHash", ByteArray::class.java)
         method.isAccessible = true
 
         return method.invoke(null, message) as ByteArray
