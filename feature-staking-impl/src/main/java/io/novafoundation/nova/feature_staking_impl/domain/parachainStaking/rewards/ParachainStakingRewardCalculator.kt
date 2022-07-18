@@ -95,7 +95,7 @@ class RealParachainStakingRewardCalculator(
     }
 
     private fun calculatorApr(collatorStake: Double): Double {
-        return annualReturn * (1 - bondConfig.percentageAsFraction()) * (averageStake / collatorStake) * (1 - collatorCommission.toDouble())
+        return annualReturn * (1 - bondConfig.percentageAsFraction() - collatorCommission.toDouble()) * (averageStake / collatorStake)
     }
 
     private fun ParachainBondConfig.percentageAsFraction() = percent.toDouble().percentageToFraction()
