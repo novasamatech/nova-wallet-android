@@ -49,7 +49,7 @@ class RealParachainStakingRewardCalculator(
 
     private val annualReturn = annualInflation.toDouble() / stakedPortion
 
-    private val averageStake = totalStaked.toDouble() / collators.size
+    private val averageStake = collators.map { it.totalStake.toDouble() }.average()
 
     private val aprByCollator = collators.associateBy(
         keySelector = ParachainStakingRewardTarget::accountIdHex,
