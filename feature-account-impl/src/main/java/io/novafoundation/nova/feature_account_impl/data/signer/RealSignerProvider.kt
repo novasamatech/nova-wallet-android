@@ -7,7 +7,7 @@ import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.Signer
 
 internal class RealSignerProvider(
     private val secretsSignerFactory: SecretsSignerFactory,
-): SignerProvider {
+) : SignerProvider {
 
     override fun signerFor(metaAccount: MetaAccount): Signer {
         return secretsSignerFactory.create(metaAccount)
