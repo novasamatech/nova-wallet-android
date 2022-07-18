@@ -24,8 +24,9 @@ fun groupAndSortAssetsByNetwork(
     return assets.groupBy { chainsById.getValue(it.token.configuration.chainId) }
         .mapValues { (_, assets) ->
             assets.sortedWith(
-                compareByDescending<Asset> { it.token.configuration.isUtilityAsset } // utility assets first
-                    .thenByDescending { it.token.fiatAmount(it.total) }
+                compareByDescending<Asset> { it.token.fiatAmount(it.total) }
+                    .thenByDescending { it.total }
+                    .thenByDescending { it.token.configuration.isUtilityAsset } // utility assets first
                     .thenBy { it.token.configuration.symbol }
             )
         }.mapKeys { (chain, assets) ->
