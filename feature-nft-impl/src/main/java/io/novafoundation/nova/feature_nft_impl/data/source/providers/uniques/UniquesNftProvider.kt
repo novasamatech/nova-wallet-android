@@ -165,7 +165,7 @@ class UniquesNftProvider(
                     owner = metaAccount.accountIdIn(chain)!!,
                     creator = classIssuer,
                     media = nftLocal.media,
-                    name = nftLocal.name!!,
+                    name = nftLocal.name ?: nftLocal.instanceId!!,
                     description = nftLocal.label,
                     issuance = nftIssuance(nftLocal),
                     price = nftLocal.price,

@@ -164,7 +164,7 @@ class BalanceListViewModel(
     private fun mapNftPreviewToUi(nftPreview: Nft): NftPreviewUi {
         return when (val details = nftPreview.details) {
             Nft.Details.Loadable -> LoadingState.Loading()
-            is Nft.Details.Loaded -> LoadingState.Loaded(details.metadata?.media)
+            is Nft.Details.Loaded -> LoadingState.Loaded(details.media)
         }
     }
 }

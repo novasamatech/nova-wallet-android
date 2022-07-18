@@ -61,16 +61,10 @@ fun mapNftLocalToNft(
     val details = if (nftLocal.wholeDetailsLoaded) {
         val issuance = nftIssuance(nftLocal)
 
-        val metadata = nftLocal.metadata?.let {
-            Nft.Metadata(
-                name = nftLocal.name!!,
-                label = nftLocal.label,
-                media = nftLocal.media
-            )
-        }
-
         Nft.Details.Loaded(
-            metadata = metadata,
+            name = nftLocal.name,
+            label = nftLocal.label,
+            media = nftLocal.media,
             price = nftPrice(nftLocal),
             issuance = issuance,
         )

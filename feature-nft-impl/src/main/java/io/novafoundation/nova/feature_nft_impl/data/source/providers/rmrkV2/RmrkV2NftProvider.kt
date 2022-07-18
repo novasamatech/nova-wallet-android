@@ -37,9 +37,14 @@ class RmrkV2NftProvider(
                 metaId = metaAccount.id,
                 chainId = chain.id,
                 collectionId = it.collectionId,
-                instanceId = null,
-                metadata = it.metadata.encodeToByteArray(),
+                instanceId = it.id,
+                metadata = it.metadata?.encodeToByteArray(),
                 media = it.image?.adoptFileStorageLinkToHttps(),
+
+                // let name default to symbol and label to edition in case full sync wont be able to determine them from metadata
+                name = it.symbol,
+                label = it.edition,
+
                 price = it.price,
                 type = NftLocal.Type.RMRK2,
                 issuanceMyEdition = it.edition,
@@ -51,20 +56,23 @@ class RmrkV2NftProvider(
     }
 
     override suspend fun nftFullSync(nft: Nft) {
-        val metadataLink = nft.metadataRaw!!.decodeToString().adoptFileStorageLinkToHttps()
-        val metadata = singularV2Api.getIpfsMetadata(metadataLink)
+        val metadata = nft.metadataRaw?.let {
+            val metadataLink = it.decodeToString().adoptFileStorageLinkToHttps()
+
+            singularV2Api.getIpfsMetadata(metadataLink)
+        }
 
         val collection = singularV2Api.getCollection(nft.collectionId).first()
 
         nftDao.updateNft(nft.identifier) { local ->
             // media fetched during initial sync (prerender) has more priority than one from metadata
-            val image = local.media ?: metadata.image?.adoptFileStorageLinkToHttps()
+            val image = local.media ?: metadata?.image?.adoptFileStorageLinkToHttps()
 
             local.copy(
                 media = image,
                 issuanceTotal = collection.max,
-                name = metadata.name,
-                label = metadata.description,
+                name = metadata?.name ?: local.name,
+                label = metadata?.description ?: local.label,
                 wholeDetailsLoaded = true
             )
         }
