@@ -7,21 +7,25 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.common.view.ChipActionsModel
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.data.repository.WatchWalletSuggestion
 import io.novafoundation.nova.feature_account_impl.domain.watchOnly.create.CreateWatchWalletInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class CreateWatchWalletViewModel(
     private val router: AccountRouter,
     private val addressInputMixinFactory: AddressInputMixinFactory,
     private val interactor: CreateWatchWalletInteractor,
+    private val accountInteractor: AccountInteractor,
     private val resourceManager: ResourceManager
 ) : BaseViewModel() {
 
@@ -68,8 +72,28 @@ class CreateWatchWalletViewModel(
         router.back()
     }
 
-    fun nextClicked() {
-        showMessage("TODO")
+    fun nextClicked() = launch {
+        val result = withContext(Dispatchers.Default) {
+            interactor.createWallet(
+                name = nameInput.value,
+                substrateAddress = substrateAddressInput.inputFlow.value,
+                evmAddress = evmAddressInput.inputFlow.value
+            )
+        }
+
+        result
+            .onSuccess{ continueBasedOnCodeStatus() }
+            .onFailure { it.printStackTrace(); showError(it) }
+    }
+
+    fun walletSuggestionClicked(index: Int) {
+        launch {
+            val suggestion = walletSuggestions.first()[index]
+
+            nameInput.value = suggestion.name
+            substrateAddressInput.inputFlow.value = suggestion.substrateAddress
+            evmAddressInput.inputFlow.value= suggestion.evmAddress.orEmpty()
+        }
     }
 
     private suspend fun AddressInputMixin.isAddressValid(input: String) = getInputSpec().isValidAddress(input)
@@ -82,13 +106,11 @@ class CreateWatchWalletViewModel(
         return ChipActionsModel(action = walletSuggestion.name)
     }
 
-    fun walletSuggestionClicked(index: Int) {
-        launch {
-            val suggestion = walletSuggestions.first()[index]
-
-            nameInput.value = suggestion.name
-            substrateAddressInput.inputFlow.value = suggestion.substrateAddress
-            evmAddressInput.inputFlow.value= suggestion.evmAddress.orEmpty()
+    private suspend fun continueBasedOnCodeStatus() {
+        if (accountInteractor.isCodeSet()) {
+            router.openMain()
+        } else {
+            router.openCreatePincode()
         }
     }
 }

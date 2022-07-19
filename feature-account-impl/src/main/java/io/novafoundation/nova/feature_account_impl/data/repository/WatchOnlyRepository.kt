@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.data.repository
 
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
+import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
 class WatchWalletSuggestion(
@@ -14,8 +15,8 @@ interface WatchOnlyRepository {
     suspend fun addWatchWallet(
         name: String,
         substrateAccountId: AccountId,
-        ethereumAccountId: AccountId
-    )
+        ethereumAccountId: AccountId?
+    ): Long
 
     suspend fun watchWalletSuggestions(): List<WatchWalletSuggestion>
 }
@@ -27,9 +28,21 @@ class RealWatchOnlyRepository(
     override suspend fun addWatchWallet(
         name: String,
         substrateAccountId: AccountId,
-        ethereumAccountId: AccountId
-    ) {
-        TODO("Not yet implemented")
+        ethereumAccountId: AccountId?
+    ): Long {
+        val metaAccount = MetaAccountLocal(
+            substratePublicKey = null,
+            substrateCryptoType = null,
+            substrateAccountId = substrateAccountId,
+            ethereumPublicKey = null,
+            ethereumAddress = ethereumAccountId,
+            name = name,
+            isSelected = false,
+            position = accountDao.nextAccountPosition(),
+            type = MetaAccountLocal.Type.WATCH_ONLY
+        )
+
+        return accountDao.insertMetaAccount(metaAccount)
     }
 
     override suspend fun watchWalletSuggestions(): List<WatchWalletSuggestion> {

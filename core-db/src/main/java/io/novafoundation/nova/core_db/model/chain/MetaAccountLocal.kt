@@ -49,7 +49,7 @@ class MetaAccountLocal(
     var id: Long = 0
 
     enum class Type {
-        SECRETS
+        SECRETS, WATCH_ONLY
     }
 }
 

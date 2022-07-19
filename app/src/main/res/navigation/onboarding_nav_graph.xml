@@ -70,6 +70,17 @@
         android:id="@+id/createWatchWalletFragment"
         tools:layout="@layout/fragment_create_watch_wallet"
         android:name="io.novafoundation.nova.feature_account_impl.presentation.watchOnly.create.CreateWatchWalletFragment"
-        android:label="CreateWatchWalletFragment" />
+        android:label="CreateWatchWalletFragment">
+
+        <action
+            android:id="@+id/action_watchWalletFragment_to_pincodeFragment"
+            app:destination="@id/pincodeFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@id/welcomeFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
 
 </navigation>

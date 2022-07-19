@@ -30,7 +30,7 @@ interface LightMetaAccount {
     val type: Type
 
     enum class Type {
-        SECRETS
+        SECRETS, WATCH_ONLY
     }
 }
 

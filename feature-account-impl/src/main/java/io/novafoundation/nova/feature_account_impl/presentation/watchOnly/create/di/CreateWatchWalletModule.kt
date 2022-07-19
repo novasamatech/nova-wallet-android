@@ -10,6 +10,8 @@ import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_account_impl.data.repository.WatchOnlyRepository
 import io.novafoundation.nova.feature_account_impl.domain.watchOnly.create.CreateWatchWalletInteractor
@@ -23,8 +25,9 @@ class CreateWatchWalletModule {
     @Provides
     @ScreenScope
     fun provideInteractor(
-        repository: WatchOnlyRepository
-    ): CreateWatchWalletInteractor  = RealCreateWatchWalletInteractor(repository)
+        watchOnlyRepository: WatchOnlyRepository,
+        accountRepository: AccountRepository
+    ): CreateWatchWalletInteractor  = RealCreateWatchWalletInteractor(watchOnlyRepository, accountRepository)
 
     @Provides
     @IntoMap
@@ -33,9 +36,10 @@ class CreateWatchWalletModule {
         router: AccountRouter,
         addressInputMixinFactory: AddressInputMixinFactory,
         interactor: CreateWatchWalletInteractor,
+        accountInteractor: AccountInteractor,
         resourceManager: ResourceManager
     ): ViewModel {
-        return CreateWatchWalletViewModel(router, addressInputMixinFactory, interactor, resourceManager)
+        return CreateWatchWalletViewModel(router, addressInputMixinFactory, interactor, accountInteractor, resourceManager)
     }
 
     @Provides
