@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
+import io.novafoundation.nova.feature_account_impl.di.modules.ExportModule
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.AdvancedEncryptionCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.di.AdvancedEncryptionComponent
@@ -26,6 +27,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.node.details.di.
 import io.novafoundation.nova.feature_account_impl.presentation.node.list.di.NodesComponent
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.di.PinCodeComponent
 import io.novafoundation.nova.feature_account_impl.presentation.settings.di.SettingsComponent
+import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.create.di.CreateWatchWalletComponent
 import io.novafoundation.nova.runtime.di.RuntimeApi
 
 @Component(
@@ -75,6 +77,8 @@ interface AccountFeatureComponent : AccountFeatureApi {
     fun exportJsonConfirmFactory(): ExportJsonConfirmComponent.Factory
 
     fun inject(receiver: ShareCompletedReceiver)
+
+    fun createWatchOnlyComponentFactory(): CreateWatchWalletComponent.Factory
 
     @Component.Factory
     interface Factory {

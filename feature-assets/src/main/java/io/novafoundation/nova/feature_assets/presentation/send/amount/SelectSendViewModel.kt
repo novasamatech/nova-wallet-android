@@ -77,12 +77,16 @@ class SelectSendViewModel(
 
     private val destinationChain = singleReplaySharedFlow<ChainWithAsset>()
 
-    val addressInputMixin = addressInputMixinFactory.create(
-        originChain = originChain,
-        destinationChainFlow = destinationChain.map { it.chain },
-        errorDisplayer = ::showError,
-        coroutineScope = this
-    )
+    val addressInputMixin = with(addressInputMixinFactory) {
+        val destinationChain = destinationChain.map { it.chain }
+
+        create(
+            inputSpecProvider = singleChainInputSpec(destinationChain),
+            myselfBehaviorProvider = crossChainOnlyMyself(originChain, destinationChain),
+            errorDisplayer = this@SelectSendViewModel::showError,
+            coroutineScope = this@SelectSendViewModel
+        )
+    }
 
     private val availableCrossChainDestinations = flow {
         val origin = originChainAsset()

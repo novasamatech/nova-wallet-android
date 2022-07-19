@@ -36,6 +36,14 @@
             app:popExitAnim="@anim/fragment_close_exit"
             android:id="@+id/action_welcomeFragment_to_mnemonic_nav_graph"
             app:destination="@id/mnemonic_nav_graph" />
+
+        <action
+            android:id="@+id/action_welcomeFragment_to_createWatchWalletFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:destination="@id/createWatchWalletFragment" />
     </fragment>
 
 
@@ -58,5 +66,10 @@
     <include app:graph="@navigation/mnemonic_nav_graph" />
 
     <include app:graph="@navigation/import_nav_graph" />
+    <fragment
+        android:id="@+id/createWatchWalletFragment"
+        tools:layout="@layout/fragment_create_watch_wallet"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.watchOnly.create.CreateWatchWalletFragment"
+        android:label="CreateWatchWalletFragment" />
 
 </navigation>

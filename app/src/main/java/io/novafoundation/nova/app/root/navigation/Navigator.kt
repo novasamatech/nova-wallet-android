@@ -482,6 +482,10 @@ class Navigator(
         navController?.navigate(R.id.action_mainFragment_to_pinCodeFragment, bundle)
     }
 
+    override fun openCreateWatchWallet() {
+        navController?.navigate(R.id.action_welcomeFragment_to_createWatchWalletFragment)
+    }
+
     override fun withPinCodeCheckRequired(
         delayedNavigation: DelayedNavigation,
         createMode: Boolean,

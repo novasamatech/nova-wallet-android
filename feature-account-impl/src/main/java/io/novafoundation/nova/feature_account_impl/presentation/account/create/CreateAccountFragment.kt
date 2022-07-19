@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.hideSoftKeyboard
@@ -17,7 +16,6 @@ import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.imp
 import kotlinx.android.synthetic.main.fragment_create_account.createAccountNameField
 import kotlinx.android.synthetic.main.fragment_create_account.nextBtn
 import kotlinx.android.synthetic.main.fragment_create_account.toolbar
-import javax.inject.Inject
 
 class CreateAccountFragment : BaseFragment<CreateAccountViewModel>() {
 
@@ -32,9 +30,6 @@ class CreateAccountFragment : BaseFragment<CreateAccountViewModel>() {
             }
         }
     }
-
-    @Inject
-    lateinit var imageLoader: ImageLoader
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_create_account, container, false)

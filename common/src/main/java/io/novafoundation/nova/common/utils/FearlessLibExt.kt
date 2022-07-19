@@ -49,6 +49,8 @@ fun StorageEntry.defaultInHex() = default.toHexString(withPrefix = true)
 
 fun ByteArray.toAddress(networkType: Node.NetworkType) = toAddress(networkType.runtimeConfiguration.addressByte)
 
+fun String.isValidSS58Address() = runCatching { toAccountId() }.isSuccess
+
 fun String.removeHexPrefix() = removePrefix("0x")
 
 fun <T> DataType<T>.fromHex(hex: String): T {
