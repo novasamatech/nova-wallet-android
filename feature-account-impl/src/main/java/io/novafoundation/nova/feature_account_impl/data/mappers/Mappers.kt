@@ -86,6 +86,12 @@ fun mapNodeLocalToNode(nodeLocal: NodeLocal): Node {
     }
 }
 
+private fun mapMetaAccountTypeFromLocal(local: MetaAccountLocal.Type): LightMetaAccount.Type {
+    return when(local) {
+        MetaAccountLocal.Type.SECRETS -> LightMetaAccount.Type.SECRETS
+    }
+}
+
 fun mapMetaAccountLocalToLightMetaAccount(
     metaAccountLocal: MetaAccountLocal
 ): LightMetaAccount = with(metaAccountLocal) {
@@ -97,7 +103,8 @@ fun mapMetaAccountLocalToLightMetaAccount(
         ethereumAddress = ethereumAddress,
         ethereumPublicKey = ethereumPublicKey,
         isSelected = isSelected,
-        name = name
+        name = name,
+        type = mapMetaAccountTypeFromLocal(type)
     )
 }
 
@@ -131,7 +138,8 @@ fun mapMetaAccountLocalToMetaAccount(
             ethereumAddress = ethereumAddress,
             ethereumPublicKey = ethereumPublicKey,
             isSelected = isSelected,
-            name = name
+            name = name,
+            type = mapMetaAccountTypeFromLocal(type)
         )
     }
 }

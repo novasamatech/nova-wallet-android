@@ -24,6 +24,7 @@ class MetaAccountLocal(
     val name: String,
     val isSelected: Boolean,
     val position: Int,
+    val type: Type,
 ) {
 
     companion object Table {
@@ -46,6 +47,10 @@ class MetaAccountLocal(
 
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
+
+    enum class Type {
+        SECRETS
+    }
 }
 
 @Entity(
