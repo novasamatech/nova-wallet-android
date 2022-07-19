@@ -21,7 +21,7 @@ class MetaAccountOrdering(
 
 interface LightMetaAccount {
     val id: Long
-    val substratePublicKey: ByteArray
+    val substratePublicKey: ByteArray?
     val substrateCryptoType: CryptoType
     val substrateAccountId: ByteArray
     val ethereumAddress: ByteArray?
@@ -37,7 +37,7 @@ interface LightMetaAccount {
 
 fun LightMetaAccount(
     id: Long,
-    substratePublicKey: ByteArray,
+    substratePublicKey: ByteArray?,
     substrateCryptoType: CryptoType,
     substrateAccountId: ByteArray,
     ethereumAddress: ByteArray?,
@@ -47,7 +47,7 @@ fun LightMetaAccount(
     type: LightMetaAccount.Type,
 ) = object : LightMetaAccount {
     override val id: Long = id
-    override val substratePublicKey: ByteArray = substratePublicKey
+    override val substratePublicKey: ByteArray? = substratePublicKey
     override val substrateCryptoType: CryptoType = substrateCryptoType
     override val substrateAccountId: ByteArray = substrateAccountId
     override val ethereumAddress: ByteArray? = ethereumAddress
@@ -60,7 +60,7 @@ fun LightMetaAccount(
 class MetaAccount(
     override val id: Long,
     val chainAccounts: Map<ChainId, ChainAccount>,
-    override val substratePublicKey: ByteArray,
+    override val substratePublicKey: ByteArray?,
     override val substrateCryptoType: CryptoType,
     override val substrateAccountId: ByteArray,
     override val ethereumAddress: ByteArray?,
