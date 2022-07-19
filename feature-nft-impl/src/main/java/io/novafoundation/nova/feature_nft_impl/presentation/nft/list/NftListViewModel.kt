@@ -78,9 +78,9 @@ class NftListViewModel(
                 LoadingState.Loaded(
                     NftListItem.Content(
                         issuance = issuanceFormatted,
-                        title = details.metadata?.name ?: pricedNft.nft.instanceId ?: pricedNft.nft.collectionId,
+                        title = details.name ?: pricedNft.nft.instanceId ?: pricedNft.nft.collectionId,
                         price = amountModel,
-                        media = details.metadata?.media
+                        media = details.media
                     )
                 )
             }

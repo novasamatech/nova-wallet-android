@@ -17,7 +17,8 @@ class SingularV2NftRemote(
     @SerializedName("sn")
     val edition: String,
     val image: String?, // prerender, non-null if nft is composable
-    val metadata: String,
+    val metadata: String?,
+    val symbol: String,
 )
 
 class SingularV2CollectionMetadata(
