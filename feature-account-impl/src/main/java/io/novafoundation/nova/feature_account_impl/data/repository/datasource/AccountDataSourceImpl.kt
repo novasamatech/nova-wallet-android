@@ -217,7 +217,7 @@ class AccountDataSourceImpl(
         secretStoreV2.clearSecrets(metaId, chainAccountIds)
     }
 
-    override suspend fun insertMetaAccount(
+    override suspend fun insertMetaAccountFromSecrets(
         name: String,
         substrateCryptoType: CryptoType,
         secrets: EncodableStruct<MetaAccountSecrets>
@@ -233,7 +233,8 @@ class AccountDataSourceImpl(
             ethereumAddress = ethereumPublicKey?.asEthereumPublicKey()?.toAccountId()?.value,
             name = name,
             isSelected = false,
-            position = metaAccountDao.nextAccountPosition()
+            position = metaAccountDao.nextAccountPosition(),
+            type = MetaAccountLocal.Type.SECRETS
         )
 
         val metaId = metaAccountDao.insertMetaAccount(metaAccountLocal)

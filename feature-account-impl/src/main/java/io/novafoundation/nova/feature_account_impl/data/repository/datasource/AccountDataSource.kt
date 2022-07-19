@@ -62,7 +62,7 @@ interface AccountDataSource : SecretStoreV1 {
     /**
      * @return id of inserted meta account
      */
-    suspend fun insertMetaAccount(
+    suspend fun insertMetaAccountFromSecrets(
         name: String,
         substrateCryptoType: CryptoType,
         secrets: EncodableStruct<MetaAccountSecrets>

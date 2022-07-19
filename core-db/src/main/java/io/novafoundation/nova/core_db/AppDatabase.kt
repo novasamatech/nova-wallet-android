@@ -7,6 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import io.novafoundation.nova.core_db.converters.CryptoTypeConverters
 import io.novafoundation.nova.core_db.converters.LongMathConverters
+import io.novafoundation.nova.core_db.converters.MetaAccountTypeConverters
 import io.novafoundation.nova.core_db.converters.NetworkTypeConverters
 import io.novafoundation.nova.core_db.converters.NftTypeConverters
 import io.novafoundation.nova.core_db.converters.OperationConverters
@@ -31,6 +32,7 @@ import io.novafoundation.nova.core_db.migrations.AddBuyProviders_7_8
 import io.novafoundation.nova.core_db.migrations.AddChainColor_4_5
 import io.novafoundation.nova.core_db.migrations.AddDAppAuthorizations_1_2
 import io.novafoundation.nova.core_db.migrations.AddFavouriteDApps_9_10
+import io.novafoundation.nova.core_db.migrations.AddMetaAccountType_14_15
 import io.novafoundation.nova.core_db.migrations.AddNfts_5_6
 import io.novafoundation.nova.core_db.migrations.AddSitePhishing_6_7
 import io.novafoundation.nova.core_db.migrations.AssetTypes_2_3
@@ -61,7 +63,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
 import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
 
 @Database(
-    version = 14,
+    version = 15,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -95,7 +97,8 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
     TokenConverters::class,
     OperationConverters::class,
     CryptoTypeConverters::class,
-    NftTypeConverters::class
+    NftTypeConverters::class,
+    MetaAccountTypeConverters::class
 )
 
 abstract class AppDatabase : RoomDatabase() {
@@ -116,7 +119,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(AddDAppAuthorizations_1_2, AssetTypes_2_3, ChangeAsset_3_4)
                     .addMigrations(AddChainColor_4_5, AddNfts_5_6, AddSitePhishing_6_7, AddBuyProviders_7_8, BetterChainDiffing_8_9)
                     .addMigrations(AddFavouriteDApps_9_10, ChangeDAppAuthorization_10_11, RemoveChainForeignKeyFromChainAccount_11_12)
-                    .addMigrations(AddAdditionalFieldToChains_12_13, FixMigrationConflicts_13_14)
+                    .addMigrations(AddAdditionalFieldToChains_12_13, FixMigrationConflicts_13_14, AddMetaAccountType_14_15)
                     .fallbackToDestructiveMigration()
                     .build()
             }

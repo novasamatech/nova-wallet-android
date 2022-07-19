@@ -28,6 +28,11 @@ interface LightMetaAccount {
     val ethereumPublicKey: ByteArray?
     val isSelected: Boolean
     val name: String
+    val type: Type
+
+    enum class Type {
+        SECRETS
+    }
 }
 
 fun LightMetaAccount(
@@ -39,6 +44,7 @@ fun LightMetaAccount(
     ethereumPublicKey: ByteArray?,
     isSelected: Boolean,
     name: String,
+    type: LightMetaAccount.Type,
 ) = object : LightMetaAccount {
     override val id: Long = id
     override val substratePublicKey: ByteArray = substratePublicKey
@@ -48,6 +54,7 @@ fun LightMetaAccount(
     override val ethereumPublicKey: ByteArray? = ethereumPublicKey
     override val isSelected: Boolean = isSelected
     override val name: String = name
+    override val type: LightMetaAccount.Type = type
 }
 
 class MetaAccount(
@@ -60,6 +67,7 @@ class MetaAccount(
     override val ethereumPublicKey: ByteArray?,
     override val isSelected: Boolean,
     override val name: String,
+    override val type: LightMetaAccount.Type,
 ) : LightMetaAccount {
 
     class ChainAccount(

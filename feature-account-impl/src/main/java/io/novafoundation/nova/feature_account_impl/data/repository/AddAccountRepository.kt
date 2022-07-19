@@ -96,7 +96,7 @@ class AddAccountRepository(
                 )
 
                 transformingInsertionErrors {
-                    accountDataSource.insertMetaAccount(
+                    accountDataSource.insertMetaAccountFromSecrets(
                         name = addAccountType.name,
                         substrateCryptoType = substrateCryptoType,
                         secrets = secrets
