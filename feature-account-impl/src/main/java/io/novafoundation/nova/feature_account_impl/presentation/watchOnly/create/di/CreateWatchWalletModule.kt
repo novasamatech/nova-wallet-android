@@ -27,7 +27,7 @@ class CreateWatchWalletModule {
     fun provideInteractor(
         watchOnlyRepository: WatchOnlyRepository,
         accountRepository: AccountRepository
-    ): CreateWatchWalletInteractor  = RealCreateWatchWalletInteractor(watchOnlyRepository, accountRepository)
+    ): CreateWatchWalletInteractor = RealCreateWatchWalletInteractor(watchOnlyRepository, accountRepository)
 
     @Provides
     @IntoMap

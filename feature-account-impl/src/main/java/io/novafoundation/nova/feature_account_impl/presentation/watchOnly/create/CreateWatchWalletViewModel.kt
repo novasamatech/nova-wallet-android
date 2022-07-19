@@ -82,7 +82,7 @@ class CreateWatchWalletViewModel(
         }
 
         result
-            .onSuccess{ continueBasedOnCodeStatus() }
+            .onSuccess { continueBasedOnCodeStatus() }
             .onFailure { it.printStackTrace(); showError(it) }
     }
 
@@ -92,7 +92,7 @@ class CreateWatchWalletViewModel(
 
             nameInput.value = suggestion.name
             substrateAddressInput.inputFlow.value = suggestion.substrateAddress
-            evmAddressInput.inputFlow.value= suggestion.evmAddress.orEmpty()
+            evmAddressInput.inputFlow.value = suggestion.evmAddress.orEmpty()
         }
     }
 

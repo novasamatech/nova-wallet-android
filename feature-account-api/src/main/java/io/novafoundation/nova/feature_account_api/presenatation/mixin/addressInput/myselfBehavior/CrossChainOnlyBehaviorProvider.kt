@@ -13,7 +13,7 @@ class CrossChainOnlyBehaviorProvider(
     private val accountUseCase: SelectedAccountUseCase,
     private val originChain: Deferred<Chain>,
     destinationChain: Flow<Chain>,
-): MyselfBehaviorProvider {
+) : MyselfBehaviorProvider {
 
     override val behavior: Flow<MyselfBehavior> = destinationChain.map { it ->
         Behavior(originChain = originChain(), destinationChain = it)
@@ -22,7 +22,7 @@ class CrossChainOnlyBehaviorProvider(
     private inner class Behavior(
         private val originChain: Chain,
         private val destinationChain: Chain
-    ): MyselfBehavior {
+    ) : MyselfBehavior {
 
         override suspend fun myselfAvailable(): Boolean {
             val metaAccount = accountUseCase.getSelectedMetaAccount()

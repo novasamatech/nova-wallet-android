@@ -42,5 +42,4 @@ val NullableSubstratePublicKey_15_16 = object : Migration(15, 16) {
         // delete old
         database.execSQL("DROP TABLE meta_accounts_old")
     }
-
 }

@@ -6,7 +6,6 @@ import io.novafoundation.nova.feature_account_impl.data.repository.WatchOnlyRepo
 import io.novafoundation.nova.feature_account_impl.data.repository.WatchWalletSuggestion
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
 
-
 interface CreateWatchWalletInteractor {
 
     suspend fun createWallet(
@@ -18,11 +17,10 @@ interface CreateWatchWalletInteractor {
     suspend fun suggestions(): List<WatchWalletSuggestion>
 }
 
-
 class RealCreateWatchWalletInteractor(
     private val repository: WatchOnlyRepository,
     private val accountRepository: AccountRepository,
-): CreateWatchWalletInteractor {
+) : CreateWatchWalletInteractor {
 
     override suspend fun createWallet(name: String, substrateAddress: String, evmAddress: String) = runCatching {
         val substrateAccountId = substrateAddress.toAccountId()

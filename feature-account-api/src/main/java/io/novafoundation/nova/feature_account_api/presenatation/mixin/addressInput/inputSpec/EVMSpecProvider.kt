@@ -11,11 +11,11 @@ import kotlinx.coroutines.flow.flowOf
 
 class EVMSpecProvider(
     private val addressIconGenerator: AddressIconGenerator
-): AddressInputSpecProvider {
+) : AddressInputSpecProvider {
 
     override val spec: Flow<AddressInputSpec> = flowOf(Spec())
 
-    private inner class Spec: AddressInputSpec {
+    private inner class Spec : AddressInputSpec {
 
         override fun isValidAddress(input: String): Boolean {
             return input.asEthereumAddress().isValid()

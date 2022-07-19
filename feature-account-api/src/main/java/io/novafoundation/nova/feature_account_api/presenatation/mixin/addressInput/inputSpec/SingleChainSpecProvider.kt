@@ -11,11 +11,11 @@ import kotlinx.coroutines.flow.map
 class SingleChainSpecProvider(
     private val addressIconGenerator: AddressIconGenerator,
     targetChain: Flow<Chain>,
-): AddressInputSpecProvider {
+) : AddressInputSpecProvider {
 
     override val spec: Flow<AddressInputSpec> = targetChain.map(::Spec)
 
-    private inner class Spec(private val targetChain: Chain): AddressInputSpec {
+    private inner class Spec(private val targetChain: Chain) : AddressInputSpec {
 
         override fun isValidAddress(input: String): Boolean {
             return targetChain.isValidAddress(input)

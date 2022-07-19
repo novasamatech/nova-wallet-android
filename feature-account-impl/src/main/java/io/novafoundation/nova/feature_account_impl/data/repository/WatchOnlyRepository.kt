@@ -23,7 +23,7 @@ interface WatchOnlyRepository {
 
 class RealWatchOnlyRepository(
     private val accountDao: MetaAccountDao
-): WatchOnlyRepository {
+) : WatchOnlyRepository {
 
     override suspend fun addWatchWallet(
         name: String,

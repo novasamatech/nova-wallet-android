@@ -8,14 +8,13 @@ import io.novafoundation.nova.common.list.BaseViewHolder
 import io.novafoundation.nova.common.utils.inflateChild
 import kotlinx.android.synthetic.main.item_chip_action.view.itemChipAction
 
-
 class ChipActionsModel(
     val action: String
 )
 
 class ChipActionsAdapter(
     private val handler: Handler
-): BaseListAdapter<ChipActionsModel, ChipActionsViewHolder>(DiffCallback()) {
+) : BaseListAdapter<ChipActionsModel, ChipActionsViewHolder>(DiffCallback()) {
 
     fun interface Handler {
 

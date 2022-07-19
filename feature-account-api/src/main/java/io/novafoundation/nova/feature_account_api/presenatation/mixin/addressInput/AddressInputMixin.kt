@@ -4,7 +4,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInp
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
-
 interface AddressInputMixin {
 
     suspend fun getInputSpec(): AddressInputSpec
