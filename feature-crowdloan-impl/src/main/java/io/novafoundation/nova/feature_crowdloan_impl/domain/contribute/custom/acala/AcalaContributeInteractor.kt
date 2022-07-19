@@ -2,8 +2,8 @@ package io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.a
 
 import io.novafoundation.nova.common.base.BaseException
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
-import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
-import io.novafoundation.nova.feature_account_api.data.secrets.sign
+import io.novafoundation.nova.common.utils.asHexString
+import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.acala.AcalaApi
@@ -22,15 +22,17 @@ import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.chainAndAsset
 import io.novafoundation.nova.runtime.state.chainAsset
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
+import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadRaw
+import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.fromUtf8
 import java.math.BigDecimal
 
 class AcalaContributeInteractor(
     private val acalaApi: AcalaApi,
     private val httpExceptionHandler: HttpExceptionHandler,
     private val accountRepository: AccountRepository,
-    private val secretStoreV2: SecretStoreV2,
     private val chainRegistry: ChainRegistry,
     private val selectedAssetState: SingleAssetSharedState,
+    private val signerProvider: SignerProvider,
 ) {
 
     suspend fun registerContributionOffChain(
@@ -40,15 +42,18 @@ class AcalaContributeInteractor(
     ): Result<Unit> = runCatching {
         httpExceptionHandler.wrap {
             val selectedMetaAccount = accountRepository.getSelectedMetaAccount()
+            val signer = signerProvider.signerFor(selectedMetaAccount)
 
             val (chain, chainAsset) = selectedAssetState.chainAndAsset()
-
-            val statement = getStatement(chain).statement
 
             val accountIdInCurrentChain = selectedMetaAccount.accountIdIn(chain)!!
             // api requires polkadot address even in rococo testnet
             val addressInPolkadot = chainRegistry.getChain(ChainGeneses.POLKADOT).addressOf(accountIdInCurrentChain)
             val amountInPlanks = chainAsset.planksFromAmount(amount)
+
+            val statement = getStatement(chain).statement
+
+            val signerPayload = SignerPayloadRaw.fromUtf8(statement, accountIdInCurrentChain)
 
             when (contributionType) {
                 ContributionType.DIRECT -> {
@@ -56,7 +61,7 @@ class AcalaContributeInteractor(
                         address = addressInPolkadot,
                         amount = amountInPlanks,
                         referral = referralCode,
-                        signature = secretStoreV2.sign(selectedMetaAccount, chain, statement)
+                        signature = signer.signRaw(signerPayload).asHexString()
                     )
 
                     acalaApi.directContribute(

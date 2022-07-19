@@ -9,6 +9,8 @@ import io.novafoundation.nova.runtime.ext.toEthereumAddress
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.encrypt.MultiChainEncryption
+import jp.co.soramitsu.fearless_utils.extensions.asEthereumPublicKey
+import jp.co.soramitsu.fearless_utils.extensions.toAccountId
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAddress
 
@@ -132,24 +134,30 @@ fun MetaAccount.multiChainEncryptionIn(chain: Chain): MultiChainEncryption {
     }
 }
 
+fun MetaAccount.ethereumAccountId() = ethereumPublicKey?.asEthereumPublicKey()?.toAccountId()?.value
+
 /**
  * Returns [MultiChainEncryption] for given [accountId] inside this meta account
  * @throws NoSuchElementException in case no matching [accountId] found inside meta account
  */
 fun MetaAccount.multiChainEncryptionFor(accountId: ByteArray): MultiChainEncryption {
     return when {
-        ethereumPublicKey.contentEquals(accountId) -> MultiChainEncryption.Ethereum
+        substrateAccountId.contentEquals(accountId) -> MultiChainEncryption.substrateFrom(substrateCryptoType)
+        ethereumAccountId().contentEquals(accountId) -> MultiChainEncryption.Ethereum
         else -> {
-            val cryptoType = when {
-                substrateAccountId.contentEquals(accountId) -> substrateCryptoType
-                else -> chainAccounts.values.first { it.accountId.contentEquals(accountId) }.cryptoType
+            val chainAccount = chainAccounts.values.first { it.accountId.contentEquals(accountId) }
+
+            if (chainAccount.chain.isEthereumBased) {
+                MultiChainEncryption.Ethereum
+            } else {
+                MultiChainEncryption.substrateFrom(chainAccount.cryptoType)
             }
-
-            val encryptionType = mapCryptoTypeToEncryption(cryptoType)
-
-            MultiChainEncryption.Substrate(encryptionType)
         }
     }
+}
+
+private fun MultiChainEncryption.Companion.substrateFrom(cryptoType: CryptoType): MultiChainEncryption.Substrate {
+    return MultiChainEncryption.Substrate(mapCryptoTypeToEncryption(cryptoType))
 }
 
 fun MetaAccount.chainAccountFor(chainId: ChainId) = chainAccounts.getValue(chainId)

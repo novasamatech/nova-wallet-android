@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindNullableNu
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumberConstant
 import io.novafoundation.nova.common.data.network.runtime.binding.fromHexOrIncompatible
 import io.novafoundation.nova.core.model.Node
+import jp.co.soramitsu.fearless_utils.encrypt.SignatureWrapper
 import jp.co.soramitsu.fearless_utils.encrypt.junction.BIP32JunctionDecoder
 import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.Mnemonic
 import jp.co.soramitsu.fearless_utils.encrypt.seed.SeedFactory
@@ -172,6 +173,8 @@ fun GenericCall.Instance.oneOf(vararg functionCandidates: MetadataFunction): Boo
 fun GenericCall.Instance.instanceOf(functionCandidate: MetadataFunction): Boolean = function == functionCandidate
 
 fun structOf(vararg pairs: Pair<String, Any?>) = Struct.Instance(mapOf(*pairs))
+
+fun SignatureWrapper.asHexString() = signature.toHexString(withPrefix = true)
 
 object Modules {
     const val VESTING: String = "Vesting"

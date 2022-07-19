@@ -1,17 +1,23 @@
 package io.novafoundation.nova.feature_dapp_impl.data.network.ethereum
 
-import jp.co.soramitsu.fearless_utils.encrypt.keypair.Keypair
+import jp.co.soramitsu.fearless_utils.encrypt.SignatureWrapper
+import jp.co.soramitsu.fearless_utils.extensions.toHexString
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.Signer
+import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadRaw
 import kotlinx.coroutines.future.asDeferred
 import okhttp3.OkHttpClient
-import org.web3j.crypto.Credentials
-import org.web3j.crypto.ECKeyPair
 import org.web3j.crypto.RawTransaction
+import org.web3j.crypto.Sign.SignatureData
+import org.web3j.crypto.TransactionEncoder
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.core.DefaultBlockParameterName
 import org.web3j.protocol.core.Request
 import org.web3j.protocol.core.Response
 import org.web3j.protocol.core.methods.request.Transaction
 import org.web3j.protocol.http.HttpService
+import org.web3j.rlp.RlpEncoder
+import org.web3j.rlp.RlpList
 import org.web3j.tx.RawTransactionManager
 import java.math.BigInteger
 
@@ -26,7 +32,8 @@ interface EthereumApi {
 
     suspend fun sendTransaction(
         transaction: RawTransaction,
-        keypair: Keypair,
+        signer: Signer,
+        accountId: AccountId,
         ethereumChainId: Long,
     ): String
 
@@ -79,14 +86,21 @@ private class Web3JEthereumApi(
         )
     }
 
+    /**
+     * Ethereum signing is adopted from [TransactionEncoder.signMessage] and [RawTransactionManager.sign]
+     */
     override suspend fun sendTransaction(
         transaction: RawTransaction,
-        keypair: Keypair,
+        signer: Signer,
+        accountId: AccountId,
         ethereumChainId: Long,
     ): String {
-        val credentials = Credentials.create(ECKeyPair.create(keypair.privateKey))
-        val transactionManager = RawTransactionManager(web3, credentials, ethereumChainId)
-        val transactionData = transactionManager.sign(transaction)
+        val encodedTx = TransactionEncoder.encode(transaction, ethereumChainId)
+        val signerPayload = SignerPayloadRaw(encodedTx, accountId)
+        val signatureData = signer.signRaw(signerPayload).toSignatureData()
+
+        val eip155SignatureData: SignatureData = TransactionEncoder.createEip155SignatureData(signatureData, ethereumChainId)
+        val transactionData = transaction.encodeWith(eip155SignatureData).toHexString(withPrefix = true)
 
         return sendTransaction(transactionData)
     }
@@ -115,6 +129,18 @@ private class Web3JEthereumApi(
 
     private suspend fun estimateGasLimit(tx: Transaction): BigInteger {
         return web3.ethEstimateGas(tx).sendSuspend().amountUsed
+    }
+
+    private fun SignatureWrapper.toSignatureData(): SignatureData {
+        require(this is SignatureWrapper.Ecdsa)
+
+        return SignatureData(v, r, s)
+    }
+
+    private fun RawTransaction.encodeWith(signatureData: SignatureData): ByteArray {
+        val values = TransactionEncoder.asRlpValues(this, signatureData)
+        val rlpList = RlpList(values)
+        return RlpEncoder.encode(rlpList)
     }
 
     private suspend fun <S, T : Response<*>> Request<S, T>.sendSuspend() = sendAsync().asDeferred().await()
