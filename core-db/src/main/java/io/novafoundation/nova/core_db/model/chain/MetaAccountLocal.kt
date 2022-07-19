@@ -17,7 +17,7 @@ import io.novafoundation.nova.core.model.CryptoType
 )
 class MetaAccountLocal(
     val substratePublicKey: ByteArray?,
-    val substrateCryptoType: CryptoType,
+    val substrateCryptoType: CryptoType?,
     val substrateAccountId: ByteArray,
     val ethereumPublicKey: ByteArray?,
     val ethereumAddress: ByteArray?,

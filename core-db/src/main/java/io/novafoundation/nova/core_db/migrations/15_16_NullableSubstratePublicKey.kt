@@ -16,7 +16,7 @@ val NullableSubstratePublicKey_15_16 = object : Migration(15, 16) {
             CREATE TABLE IF NOT EXISTS `meta_accounts` (
                 `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 `substratePublicKey` BLOB,
-                `substrateCryptoType` TEXT NOT NULL,
+                `substrateCryptoType` TEXT,
                 `substrateAccountId` BLOB NOT NULL,
                 `ethereumPublicKey` BLOB,
                 `ethereumAddress` BLOB,

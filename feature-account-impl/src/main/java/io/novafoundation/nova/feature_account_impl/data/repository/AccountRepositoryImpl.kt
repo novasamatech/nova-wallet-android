@@ -215,7 +215,7 @@ class AccountRepositoryImpl(
                 seed = secrets.seed(),
                 password = password,
                 name = metaAccount.name,
-                multiChainEncryption = metaAccount.multiChainEncryptionIn(chain),
+                multiChainEncryption = metaAccount.multiChainEncryptionIn(chain)!!,
                 genesisHash = chain.genesisHash,
                 address = address
             )
