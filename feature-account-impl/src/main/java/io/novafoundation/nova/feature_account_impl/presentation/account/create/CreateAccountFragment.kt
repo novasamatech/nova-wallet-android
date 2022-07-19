@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.hideSoftKeyboard
-import io.novafoundation.nova.common.utils.nameInputFilters
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_impl.R
@@ -42,8 +41,6 @@ class CreateAccountFragment : BaseFragment<CreateAccountViewModel>() {
             createAccountNameField.hideSoftKeyboard()
             viewModel.nextClicked()
         }
-
-        createAccountNameField.content.filters = nameInputFilters()
     }
 
     override fun inject() {

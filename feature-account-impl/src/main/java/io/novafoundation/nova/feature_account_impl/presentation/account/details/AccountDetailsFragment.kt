@@ -8,7 +8,6 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.bindTo
-import io.novafoundation.nova.common.utils.nameInputFilters
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.actions.copyAddressClicked
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
@@ -51,7 +50,6 @@ class AccountDetailsFragment : BaseFragment<AccountDetailsViewModel>(), ChainAcc
             viewModel.backClicked()
         }
 
-        accountDetailsNameField.content.filters = nameInputFilters()
         accountDetailsChainAccounts.setHasFixedSize(true)
         accountDetailsChainAccounts.adapter = adapter
     }
