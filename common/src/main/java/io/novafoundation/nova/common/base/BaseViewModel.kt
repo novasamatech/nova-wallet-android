@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import io.novafoundation.nova.common.base.errors.SigningCancelledException
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.validation.ProgressConsumer
@@ -41,7 +42,9 @@ open class BaseViewModel : ViewModel(), CoroutineScope, WithCoroutineScopeExtens
     }
 
     fun showError(throwable: Throwable) {
-        throwable.message?.let(this::showError)
+        if (!shouldIgnore(throwable)) {
+            throwable.message?.let(this::showError)
+        }
     }
 
     override val coroutineContext: CoroutineContext
@@ -81,4 +84,6 @@ open class BaseViewModel : ViewModel(), CoroutineScope, WithCoroutineScopeExtens
         progressConsumer = progressConsumer,
         block = block
     )
+
+    private fun shouldIgnore(exception: Throwable) = exception is SigningCancelledException
 }

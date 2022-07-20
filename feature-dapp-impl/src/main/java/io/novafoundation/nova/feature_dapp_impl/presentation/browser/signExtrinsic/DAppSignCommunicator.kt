@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrin
 import android.os.Parcelable
 import io.novafoundation.nova.common.navigation.InterScreenRequester
 import io.novafoundation.nova.common.navigation.InterScreenResponder
-import io.novafoundation.nova.feature_account_api.data.signer.SigningCancelledException
+import io.novafoundation.nova.common.base.errors.SigningCancelledException
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator.Response
 import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.flow.filter
