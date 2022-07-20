@@ -21,43 +21,43 @@ class ResourceManagerImpl(
 ) : ResourceManager {
 
     override fun loadRawString(res: Int): String {
-        return contextManager.getContext().resources
+        return contextManager.getApplicationContext().resources
             .openRawResource(res)
             .readText()
     }
 
     override fun getString(res: Int): String {
-        return contextManager.getContext().getString(res)
+        return contextManager.getApplicationContext().getString(res)
     }
 
     override fun getString(res: Int, vararg arguments: Any): String {
-        return contextManager.getContext().getString(res, *arguments)
+        return contextManager.getApplicationContext().getString(res, *arguments)
     }
 
     override fun getColor(res: Int): Int {
-        return ContextCompat.getColor(contextManager.getContext(), res)
+        return ContextCompat.getColor(contextManager.getApplicationContext(), res)
     }
 
     override fun getQuantityString(id: Int, quantity: Int): String {
-        return contextManager.getContext().resources.getQuantityString(id, quantity)
+        return contextManager.getApplicationContext().resources.getQuantityString(id, quantity)
     }
 
     override fun getQuantityString(id: Int, quantity: Int, vararg arguments: Any): String {
-        return contextManager.getContext().resources.getQuantityString(id, quantity, *arguments)
+        return contextManager.getApplicationContext().resources.getQuantityString(id, quantity, *arguments)
     }
 
     override fun measureInPx(dp: Int): Int {
-        val px = contextManager.getContext().resources.displayMetrics.density * dp
+        val px = contextManager.getApplicationContext().resources.displayMetrics.density * dp
 
         return px.toInt()
     }
 
     override fun formatDate(timestamp: Long): String {
-        return timestamp.formatDateTime(contextManager.getContext()).toString()
+        return timestamp.formatDateTime(contextManager.getApplicationContext()).toString()
     }
 
     override fun formatTime(timestamp: Long): String {
-        return DateUtils.formatDateTime(contextManager.getContext(), timestamp, DateUtils.FORMAT_SHOW_TIME)
+        return DateUtils.formatDateTime(contextManager.getApplicationContext(), timestamp, DateUtils.FORMAT_SHOW_TIME)
     }
 
     @OptIn(ExperimentalTime::class)
@@ -77,12 +77,12 @@ class ResourceManagerImpl(
     override fun formatDuration(duration: Duration, estimated: Boolean): String {
         return duration.format(
             estimated = estimated,
-            context = contextManager.getContext(),
+            context = contextManager.getApplicationContext(),
             timeFormat = null
         )
     }
 
     override fun getDrawable(id: Int): Drawable {
-        return contextManager.getContext().getDrawableCompat(id)
+        return contextManager.getApplicationContext().getDrawableCompat(id)
     }
 }

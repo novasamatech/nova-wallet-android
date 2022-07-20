@@ -19,7 +19,7 @@ interface DAppSignInteractor {
 
     suspend fun calculateFee(): BigInteger
 
-    suspend fun performOperation(): DAppSignCommunicator.Response
+    suspend fun performOperation(): DAppSignCommunicator.Response?
 
     suspend fun readableOperationContent(): String
 
