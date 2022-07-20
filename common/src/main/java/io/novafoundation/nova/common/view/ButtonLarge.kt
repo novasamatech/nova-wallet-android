@@ -63,7 +63,7 @@ class ButtonLarge @kotlin.jvm.JvmOverloads constructor(
     }
 
     private fun setStyle(style: Style) = with(context) {
-        val backgroundColor = when(style) {
+        val backgroundColor = when (style) {
             Style.PRIMARY -> getColorFromAttr(R.attr.colorAccent)
             Style.SECONDARY -> getColor(R.color.white_16)
         }
@@ -71,6 +71,6 @@ class ButtonLarge @kotlin.jvm.JvmOverloads constructor(
         val rippleColor = getColorFromAttr(R.attr.colorControlHighlight)
         val baseBackground = context.getRoundedCornerDrawableFromColors(backgroundColor)
 
-        background = addRipple(baseBackground, rippleColor=rippleColor)
+        background = addRipple(baseBackground, rippleColor = rippleColor)
     }
 }
