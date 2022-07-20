@@ -15,7 +15,7 @@
         android:layout_width="88dp"
         android:layout_height="88dp"
         android:layout_marginTop="20dp"
-        android:src="@drawable/ic_key" />
+        android:src="@drawable/ic_key_missing" />
 
     <TextView
         style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
