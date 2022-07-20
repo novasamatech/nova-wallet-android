@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_dapp_impl.domain.browser.signExtrinsic.Con
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.signExtrinsic.DAppSignInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.signExtrinsic.convertingToAmount
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.failedSigningIfNotCancelled
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskChain
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskSendTransactionRequest
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskSendTransactionRequest.Payload
@@ -141,17 +142,17 @@ class MetamaskSignInteractor(
         tx.fee()
     }
 
-    override suspend fun performOperation(): DAppSignCommunicator.Response = withContext(Dispatchers.Default) {
+    override suspend fun performOperation(): DAppSignCommunicator.Response? = withContext(Dispatchers.Default) {
         runCatching {
             when (payload) {
                 is Payload.SendTx -> sendTx(payload.transaction)
                 is Payload.SignTypedMessage -> signTypedMessage(payload.message)
                 is Payload.PersonalSign -> personalSign(payload.message)
             }
-        }.getOrElse {
-            Log.e(LOG_TAG, "Failed to sign tx from Metamask", it)
+        }.getOrElse { error ->
+            Log.e(LOG_TAG, "Failed to sign tx from Metamask", error)
 
-            DAppSignCommunicator.Response.SigningFailed(request.id)
+            error.failedSigningIfNotCancelled(request.id)
         }
     }
 

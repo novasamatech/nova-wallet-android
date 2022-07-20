@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="common_ok_back">Okay, back</string>
+
+  <string name="account_watch_key_missing_title">Oops! Key is missing</string>
+  <string name="account_watch_key_missing_description">Your wallet is watch-only, meaning that you cannot do any operations with it</string>
+
   <string name="account_add_watch_wallet">Add watch-only wallet</string>
   
   <string name="account_enter_wallet_nickname">Enter wallet nickname...</string>

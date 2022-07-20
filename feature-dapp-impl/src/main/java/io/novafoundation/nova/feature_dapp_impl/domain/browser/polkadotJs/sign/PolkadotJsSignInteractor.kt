@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_dapp_impl.domain.browser.signExtrinsic.Con
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.signExtrinsic.DAppSignInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.signExtrinsic.convertingToAmount
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator.Response
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.failedSigningIfNotCancelled
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.PolkadotJsSignRequest
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.SignerPayload
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.maybeSignExtrinsic
@@ -119,7 +120,7 @@ class PolkadotJsSignInteractor(
         }
     }
 
-    override suspend fun performOperation(): Response = withContext(Dispatchers.Default) {
+    override suspend fun performOperation(): Response? = withContext(Dispatchers.Default) {
         runCatching {
             when (signerPayload) {
                 is SignerPayload.Json -> signExtrinsic(signerPayload)
@@ -129,8 +130,8 @@ class PolkadotJsSignInteractor(
             onSuccess = { signature ->
                 Response.Signed(request.id, signature)
             },
-            onFailure = {
-                Response.SigningFailed(request.id)
+            onFailure = { error ->
+                error.failedSigningIfNotCancelled(request.id)
             }
         )
     }
@@ -145,7 +146,7 @@ class PolkadotJsSignInteractor(
     override suspend fun calculateFee(): BigInteger = withContext(Dispatchers.Default) {
         require(signerPayload is SignerPayload.Json)
 
-        val extrinsicBuilder = signerPayload.toExtrinsicBuilderWithoutCall()
+        val extrinsicBuilder = signerPayload.toExtrinsicBuilderWithoutCall(forFee = true)
         val runtime = chainRegistry.getRuntime(signerPayload.chain().id)
 
         val extrinsic = when (val callRepresentation = signerPayload.callRepresentation(runtime)) {
@@ -197,7 +198,7 @@ class PolkadotJsSignInteractor(
 
     private suspend fun signExtrinsic(extrinsicPayload: SignerPayload.Json): String {
         val runtime = chainRegistry.getRuntime(extrinsicPayload.chain().id)
-        val extrinsicBuilder = extrinsicPayload.toExtrinsicBuilderWithoutCall()
+        val extrinsicBuilder = extrinsicPayload.toExtrinsicBuilderWithoutCall(forFee = false)
 
         return when (val callRepresentation = extrinsicPayload.callRepresentation(runtime)) {
             is CallRepresentation.Instance -> extrinsicBuilder.call(callRepresentation.call).buildSignature()
@@ -205,7 +206,9 @@ class PolkadotJsSignInteractor(
         }
     }
 
-    private suspend fun SignerPayload.Json.toExtrinsicBuilderWithoutCall(): ExtrinsicBuilder {
+    private suspend fun SignerPayload.Json.toExtrinsicBuilderWithoutCall(
+        forFee: Boolean
+    ): ExtrinsicBuilder {
         val chain = chain()
         val runtime = chainRegistry.getRuntime(genesisHash)
         val parsedExtrinsic = parseDAppExtrinsic(runtime, this)
@@ -214,7 +217,11 @@ class PolkadotJsSignInteractor(
         val metaAccount = accountRepository.getSelectedMetaAccount()
         val accountId = chain.accountIdOf(address)
 
-        val signer = signerProvider.signerFor(metaAccount)
+        val signer = if (forFee) {
+            signerProvider.feeSigner(chain)
+        } else {
+            signerProvider.signerFor(metaAccount)
+        }
 
         return with(parsedExtrinsic) {
             ExtrinsicBuilder(

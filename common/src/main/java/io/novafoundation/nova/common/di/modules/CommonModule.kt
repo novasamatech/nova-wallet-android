@@ -156,7 +156,7 @@ class CommonModule {
     @Provides
     @ApplicationScope
     fun provideFileProvider(contextManager: ContextManager): FileProvider {
-        return FileProviderImpl(contextManager.getContext())
+        return FileProviderImpl(contextManager.getApplicationContext())
     }
 
     @Provides
@@ -207,7 +207,9 @@ class CommonModule {
 
     @Provides
     @ApplicationScope
-    fun provideSystemCallExecutor(): SystemCallExecutor = SystemCallExecutor()
+    fun provideSystemCallExecutor(
+        contextManager: ContextManager
+    ): SystemCallExecutor = SystemCallExecutor(contextManager)
 
     @Provides
     @ApplicationScope

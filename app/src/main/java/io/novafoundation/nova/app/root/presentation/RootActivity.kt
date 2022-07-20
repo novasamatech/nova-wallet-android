@@ -10,6 +10,7 @@ import io.novafoundation.nova.app.root.di.RootComponent
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.common.base.BaseActivity
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.utils.EventObserver
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.showToast
@@ -26,6 +27,9 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
     lateinit var navigationHolder: NavigationHolder
     @Inject
     lateinit var systemCallExecutor: SystemCallExecutor
+
+    @Inject
+    lateinit var contextManager: ContextManager
 
     override fun inject() {
         FeatureUtils.getFeature<RootComponent>(this, RootApi::class.java)
@@ -51,8 +55,8 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        systemCallExecutor.attachActivity(this)
-        navigationHolder.attach(navController, this)
+        navigationHolder.attach(navController)
+        contextManager.attachActivity(this)
 
         rootNetworkBar.setOnApplyWindowInsetsListener { view, insets ->
             view.updatePadding(top = insets.systemWindowInsetTop)
@@ -68,7 +72,7 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
     override fun onDestroy() {
         super.onDestroy()
 
-        systemCallExecutor.detachActivity()
+        contextManager.detachActivity()
         navigationHolder.detach()
     }
 
