@@ -132,7 +132,7 @@ class MoonbeamCrowdloanInteractor(
             val agreeRemarkRequest = AgreeRemarkRequest(currentAddress, signedHash)
             val remark = httpExceptionHandler.wrap { moonbeamApi.agreeRemark(parachainMetadata, agreeRemarkRequest) }.remark
 
-            val finalizedStatus = extrinsicService.submitAndWatchExtrinsic(chain, metaAccount.accountIdIn(chain)!!) {
+            val finalizedStatus = extrinsicService.submitAndWatchExtrinsicAnySuitableWallet(chain, metaAccount.accountIdIn(chain)!!) {
                 systemRemark(remark.encodeToByteArray())
             }
                 .filterIsInstance<ExtrinsicStatus.Finalized>()

@@ -28,27 +28,27 @@ class RealExtrinsicService(
     private val signerProvider: SignerProvider,
 ) : ExtrinsicService {
 
-    override suspend fun submitExtrinsic(
+    override suspend fun submitExtrinsicWithSelectedWallet(
         chain: Chain,
         formExtrinsic: suspend ExtrinsicBuilder.() -> Unit,
     ): Result<*> {
         val account = accountRepository.getSelectedMetaAccount()
         val accountId = account.accountIdIn(chain)!!
 
-        return submitExtrinsic(chain, accountId, formExtrinsic)
+        return submitExtrinsicWithAnySuitableWallet(chain, accountId, formExtrinsic)
     }
 
-    override suspend fun submitAndWatchExtrinsic(
+    override suspend fun submitAndWatchExtrinsicWithSelectedWallet(
         chain: Chain,
         formExtrinsic: suspend ExtrinsicBuilder.() -> Unit,
     ): Flow<ExtrinsicStatus> {
         val account = accountRepository.getSelectedMetaAccount()
         val accountId = account.accountIdIn(chain)!!
 
-        return submitAndWatchExtrinsic(chain, accountId, formExtrinsic)
+        return submitAndWatchExtrinsicAnySuitableWallet(chain, accountId, formExtrinsic)
     }
 
-    override suspend fun submitExtrinsic(
+    override suspend fun submitExtrinsicWithAnySuitableWallet(
         chain: Chain,
         accountId: ByteArray,
         formExtrinsic: suspend ExtrinsicBuilder.() -> Unit,
@@ -58,7 +58,7 @@ class RealExtrinsicService(
         rpcCalls.submitExtrinsic(chain.id, extrinsic)
     }
 
-    override suspend fun submitAndWatchExtrinsic(
+    override suspend fun submitAndWatchExtrinsicAnySuitableWallet(
         chain: Chain,
         accountId: ByteArray,
         formExtrinsic: suspend ExtrinsicBuilder.() -> Unit,

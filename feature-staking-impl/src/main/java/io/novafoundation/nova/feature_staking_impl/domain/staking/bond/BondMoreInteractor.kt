@@ -29,7 +29,7 @@ class BondMoreInteractor(
             val chain = stakingSharedState.chain()
             val accountId = chain.accountIdOf(accountAddress)
 
-            extrinsicService.submitExtrinsic(chain, accountId) {
+            extrinsicService.submitExtrinsicWithAnySuitableWallet(chain, accountId) {
                 bondMore(amount)
             }
         }

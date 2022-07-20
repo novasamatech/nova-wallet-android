@@ -104,7 +104,7 @@ class CrowdloanContributeInteractor(
         ) { submission, chain, account ->
             val accountId = account.accountIdIn(chain)!!
 
-            extrinsicService.submitExtrinsic(chain, accountId, submission)
+            extrinsicService.submitExtrinsicWithAnySuitableWallet(chain, accountId, submission)
         }.getOrThrow()
 
         txHash

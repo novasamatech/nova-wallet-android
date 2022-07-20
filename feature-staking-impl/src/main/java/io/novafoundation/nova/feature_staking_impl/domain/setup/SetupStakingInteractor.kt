@@ -57,7 +57,7 @@ class SetupStakingInteractor(
         val accountId = chain.accountIdOf(controllerAddress)
 
         runCatching {
-            extrinsicService.submitExtrinsic(chain, accountId) {
+            extrinsicService.submitExtrinsicWithAnySuitableWallet(chain, accountId) {
                 formExtrinsic(chain, chainAsset, controllerAddress, validatorAccountIds, bondPayload)
             }
         }
