@@ -65,12 +65,14 @@ class WelcomeFragment : BaseFragment<WelcomeViewModel>() {
     }
 
     private fun configureTermsAndPrivacy(sourceText: String, terms: String, privacy: String) {
+        val linkColor = requireContext().getColor(R.color.white)
+
         termsTv.text = createSpannable(sourceText) {
-            clickable(terms) {
+            clickable(terms, linkColor) {
                 viewModel.termsClicked()
             }
 
-            clickable(privacy) {
+            clickable(privacy, linkColor) {
                 viewModel.privacyClicked()
             }
         }
