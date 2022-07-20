@@ -27,7 +27,7 @@ class SecretsSigner(
 ) : Signer {
 
     override suspend fun signRaw(payload: SignerPayloadRaw): SignatureWrapper {
-        val multiChainEncryption = metaAccount.multiChainEncryptionFor(payload.accountId)
+        val multiChainEncryption = metaAccount.multiChainEncryptionFor(payload.accountId)!!
 
         val keypair = secretStoreV2.getKeypair(
             metaAccount = metaAccount,

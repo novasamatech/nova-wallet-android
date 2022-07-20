@@ -11,5 +11,7 @@ interface OnboardingRouter {
 
     fun openImportAccountScreen(payload: ImportAccountPayload)
 
+    fun openCreateWatchWallet()
+
     fun back()
 }

@@ -320,7 +320,8 @@
     </style>
 
     <style name="Widget.Nova.Input.Text" parent="Widget.Nova.Input.EditText">
-        <item name="android:textAppearance">@style/TextAppearance.NovaFoundation.Body1</item>
+        <item name="android:textAppearance">@style/TextAppearance.NovaFoundation.Regular.SubHeadline</item>
+        <item name="android:textColorHint">@color/white_32</item>
         <item name="android:paddingStart">12dp</item>
         <item name="android:paddingEnd">12dp</item>
         <item name="android:paddingTop">14dp</item>

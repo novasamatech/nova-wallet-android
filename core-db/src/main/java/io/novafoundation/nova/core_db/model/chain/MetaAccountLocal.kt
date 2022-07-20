@@ -16,8 +16,8 @@ import io.novafoundation.nova.core.model.CryptoType
     ]
 )
 class MetaAccountLocal(
-    val substratePublicKey: ByteArray,
-    val substrateCryptoType: CryptoType,
+    val substratePublicKey: ByteArray?,
+    val substrateCryptoType: CryptoType?,
     val substrateAccountId: ByteArray,
     val ethereumPublicKey: ByteArray?,
     val ethereumAddress: ByteArray?,
@@ -49,7 +49,7 @@ class MetaAccountLocal(
     var id: Long = 0
 
     enum class Type {
-        SECRETS
+        SECRETS, WATCH_ONLY
     }
 }
 

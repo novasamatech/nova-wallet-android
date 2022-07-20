@@ -58,6 +58,15 @@
             android:layout_margin="@dimen/x1"
             android:text="@string/onboarding_restore_wallet" />
 
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/welcomeAddWatchWallet"
+            style="@style/Widget.Nova.Button.Iconic"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableEnd="@drawable/ic_search"
+            android:layout_margin="@dimen/x1"
+            android:text="@string/account_add_watch_wallet" />
+
     </LinearLayout>
 
     <TextView

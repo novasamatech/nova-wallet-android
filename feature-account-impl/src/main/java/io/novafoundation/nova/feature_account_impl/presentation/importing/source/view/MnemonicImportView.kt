@@ -5,7 +5,6 @@ import android.util.AttributeSet
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.coroutineScope
 import io.novafoundation.nova.common.utils.bindTo
-import io.novafoundation.nova.common.utils.nameInputFilters
 import io.novafoundation.nova.common.view.shape.getIdleDrawable
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.importing.source.model.MnemonicImportSource
@@ -28,8 +27,6 @@ class MnemonicImportView @JvmOverloads constructor(
 
     init {
         importMnemonicContentContainer.background = context.getIdleDrawable()
-
-        importMnemonicUsernameInput.content.filters = nameInputFilters()
     }
 
     override fun observeSource(source: MnemonicImportSource, lifecycleOwner: LifecycleOwner) {

@@ -5,15 +5,20 @@ import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.utils.inBackground
-import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.systemCall.ScanQrCodeCall
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.utils.systemCall.onSystemCallFailure
 import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
-import io.novafoundation.nova.feature_account_api.domain.model.addressIn
-import io.novafoundation.nova.feature_account_api.domain.model.hasAccountIn
-import io.novafoundation.nova.runtime.ext.accountIdOf
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.inputSpec.AddressInputSpec
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.inputSpec.AddressInputSpecProvider
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.inputSpec.EVMSpecProvider
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.inputSpec.SingleChainSpecProvider
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.inputSpec.SubstrateSpecProvider
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.myselfBehavior.CrossChainOnlyBehaviorProvider
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.myselfBehavior.MyselfBehavior
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.myselfBehavior.MyselfBehaviorProvider
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.myselfBehavior.NoMyselfBehaviorProvider
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import kotlinx.coroutines.CoroutineScope
@@ -36,15 +41,13 @@ class AddressInputMixinFactory(
 ) {
 
     fun create(
-        originChain: Deferred<Chain>,
-        destinationChainFlow: Flow<Chain>,
+        inputSpecProvider: AddressInputSpecProvider,
+        myselfBehaviorProvider: MyselfBehaviorProvider,
         errorDisplayer: (cause: String) -> Unit,
         coroutineScope: CoroutineScope
     ): AddressInputMixin = AddressInputMixinProvider(
-        originChain = originChain,
-        destinationChainFlow = destinationChainFlow,
-        accountUseCase = accountUseCase,
-        addressIconGenerator = addressIconGenerator,
+        specProvider = inputSpecProvider,
+        myselfBehaviorProvider = myselfBehaviorProvider,
         systemCallExecutor = systemCallExecutor,
         clipboardManager = clipboardManager,
         qrSharingFactory = qrSharingFactory,
@@ -52,14 +55,38 @@ class AddressInputMixinFactory(
         errorDisplayer = errorDisplayer,
         coroutineScope = coroutineScope
     )
+
+    // address input
+
+    fun singleChainInputSpec(
+        destinationChainFlow: Flow<Chain>
+    ): AddressInputSpecProvider = SingleChainSpecProvider(
+        addressIconGenerator = addressIconGenerator,
+        targetChain = destinationChainFlow
+    )
+
+    fun substrateInputSpec(): AddressInputSpecProvider = SubstrateSpecProvider(addressIconGenerator)
+
+    fun evmInputSpec(): AddressInputSpecProvider = EVMSpecProvider(addressIconGenerator)
+
+    // myself behavior
+
+    fun crossChainOnlyMyself(
+        originChain: Deferred<Chain>,
+        destinationChainFlow: Flow<Chain>
+    ): MyselfBehaviorProvider = CrossChainOnlyBehaviorProvider(
+        accountUseCase = accountUseCase,
+        originChain = originChain,
+        destinationChain = destinationChainFlow
+    )
+
+    fun noMyself(): MyselfBehaviorProvider = NoMyselfBehaviorProvider()
 }
 
 class AddressInputMixinProvider(
-    private val originChain: Deferred<Chain>,
-    private val destinationChainFlow: Flow<Chain>,
-    private val addressIconGenerator: AddressIconGenerator,
+    private val specProvider: AddressInputSpecProvider,
+    private val myselfBehaviorProvider: MyselfBehaviorProvider,
     private val systemCallExecutor: SystemCallExecutor,
-    private val accountUseCase: SelectedAccountUseCase,
     private val clipboardManager: ClipboardManager,
     private val qrSharingFactory: MultiChainQrSharingFactory,
     private val resourceManager: ResourceManager,
@@ -75,9 +102,12 @@ class AddressInputMixinProvider(
 
     override val inputFlow = MutableStateFlow("")
 
-    override val state = combine(destinationChainFlow, inputFlow, clipboardFlow, ::createState)
-        .inBackground()
-        .share()
+    override suspend fun getInputSpec(): AddressInputSpec {
+        return specProvider.spec.first()
+    }
+
+    override val state = combine(myselfBehaviorProvider.behavior, specProvider.spec, inputFlow, clipboardFlow, ::createState)
+        .shareInBackground()
 
     override fun pasteClicked() {
         launch {
@@ -94,7 +124,9 @@ class AddressInputMixinProvider(
     override fun scanClicked() {
         launch {
             systemCallExecutor.executeSystemCall(ScanQrCodeCall()).mapCatching {
-                qrSharingFactory.create(destinationChainFlow.first()).decode(it).address
+                val spec = specProvider.spec.first()
+
+                qrSharingFactory.create(spec::isValidAddress).decode(it).address
             }.onSuccess { address ->
                 inputFlow.value = address
             }.onSystemCallFailure {
@@ -105,39 +137,30 @@ class AddressInputMixinProvider(
 
     override fun myselfClicked() {
         launch {
-            val destinationChain = destinationChainFlow.first()
-            val metaAccount = accountUseCase.getSelectedMetaAccount()
+            val myself = myselfBehaviorProvider.behavior.first().myself() ?: return@launch
 
-            val address = metaAccount.addressIn(destinationChain) ?: return@launch
-
-            inputFlow.value = address
+            inputFlow.value = myself
         }
     }
 
-    private suspend fun createState(chain: Chain, input: String, clipboard: String?): AddressInputState {
-        val iconState = runCatching {
-            val icon = addressIconGenerator.createAddressIcon(
-                accountId = chain.accountIdOf(address = input),
-                sizeInDp = AddressIconGenerator.SIZE_MEDIUM,
-                backgroundColorRes = AddressIconGenerator.BACKGROUND_TRANSPARENT
+    private suspend fun createState(
+        myselfBehavior: MyselfBehavior,
+        inputSpec: AddressInputSpec,
+        input: String,
+        clipboard: String?
+    ): AddressInputState {
+        val iconState = inputSpec.generateIcon(input)
+            .fold(
+                onSuccess = { AddressInputState.IdenticonState.Address(it) },
+                onFailure = { AddressInputState.IdenticonState.Placeholder }
             )
-
-            AddressInputState.IdenticonState.Address(icon)
-        }.getOrDefault(AddressInputState.IdenticonState.Placeholder)
 
         return AddressInputState(
             iconState = iconState,
             pasteShown = input.isEmpty() && clipboard != null,
             scanShown = input.isEmpty(),
             clearShown = input.isNotEmpty(),
-            myselfShown = input.isEmpty() && myselfAvailable(destination = chain)
+            myselfShown = input.isEmpty() && myselfBehavior.myselfAvailable()
         )
-    }
-
-    private suspend fun myselfAvailable(destination: Chain): Boolean {
-        val originChain = originChain()
-        val metaAccount = accountUseCase.getSelectedMetaAccount()
-
-        return originChain.id != destination.id && metaAccount.hasAccountIn(destination)
     }
 }
