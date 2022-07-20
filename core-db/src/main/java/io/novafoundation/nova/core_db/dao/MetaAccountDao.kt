@@ -28,6 +28,7 @@ private const val FIND_BY_ADDRESS_QUERY = """
                 INNER JOIN chain_accounts as c ON m.id = c.metaId
                 WHERE  c.accountId = :accountId
             )
+        ORDER BY (CASE WHEN isSelected THEN 0 ELSE 1 END)
     """
 
 @Dao

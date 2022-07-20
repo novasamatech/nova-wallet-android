@@ -10,23 +10,23 @@ import java.math.BigInteger
 
 interface ExtrinsicService {
 
-    suspend fun submitExtrinsic(
+    suspend fun submitExtrinsicWithSelectedWallet(
         chain: Chain,
         formExtrinsic: suspend ExtrinsicBuilder.() -> Unit,
     ): Result<*>
 
-    suspend fun submitAndWatchExtrinsic(
+    suspend fun submitAndWatchExtrinsicWithSelectedWallet(
         chain: Chain,
         formExtrinsic: suspend ExtrinsicBuilder.() -> Unit,
     ): Flow<ExtrinsicStatus>
 
-    suspend fun submitExtrinsic(
+    suspend fun submitExtrinsicWithAnySuitableWallet(
         chain: Chain,
         accountId: ByteArray,
         formExtrinsic: suspend ExtrinsicBuilder.() -> Unit,
     ): Result<String>
 
-    suspend fun submitAndWatchExtrinsic(
+    suspend fun submitAndWatchExtrinsicAnySuitableWallet(
         chain: Chain,
         accountId: ByteArray,
         formExtrinsic: suspend ExtrinsicBuilder.() -> Unit,

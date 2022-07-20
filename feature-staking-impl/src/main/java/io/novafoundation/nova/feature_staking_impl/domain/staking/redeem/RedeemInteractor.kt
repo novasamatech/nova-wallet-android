@@ -24,7 +24,7 @@ class RedeemInteractor(
 
     suspend fun redeem(stakingState: StakingState.Stash, asset: Asset): Result<RedeemConsequences> {
         return withContext(Dispatchers.IO) {
-            extrinsicService.submitExtrinsic(stakingState.chain, stakingState.controllerId) {
+            extrinsicService.submitExtrinsicWithAnySuitableWallet(stakingState.chain, stakingState.controllerId) {
                 withdrawUnbonded(getSlashingSpansNumber(stakingState))
             }.map {
                 RedeemConsequences(

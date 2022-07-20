@@ -6,11 +6,11 @@ import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 
-suspend fun ExtrinsicService.submitExtrinsicAndWaitBlockInclusion(
+suspend fun ExtrinsicService.submitExtrinsicWithSelectedWalletAndWaitBlockInclusion(
     chain: Chain,
     formExtrinsic: suspend ExtrinsicBuilder.() -> Unit,
 ): Result<*> = runCatching {
-    submitAndWatchExtrinsic(chain, formExtrinsic)
+    submitAndWatchExtrinsicWithSelectedWallet(chain, formExtrinsic)
         .filterIsInstance<ExtrinsicStatus.InBlock>()
         .first()
 }

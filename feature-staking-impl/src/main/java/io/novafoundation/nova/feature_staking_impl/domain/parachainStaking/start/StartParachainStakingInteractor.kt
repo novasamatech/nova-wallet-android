@@ -79,7 +79,7 @@ class RealStartParachainStakingInteractor(
 
             val currentDelegationState = delegatorStateRepository.getDelegationState(chain, chainAsset, accountId)
 
-            extrinsicService.submitAndWatchExtrinsic(chain, accountId) {
+            extrinsicService.submitAndWatchExtrinsicAnySuitableWallet(chain, accountId) {
                 if (currentDelegationState.hasDelegation(collator)) {
                     delegatorBondMore(
                         candidate = collator,

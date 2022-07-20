@@ -42,7 +42,7 @@ class UnbondInteractor(
         amount: BigInteger
     ): Result<String> {
         return withContext(Dispatchers.IO) {
-            extrinsicService.submitExtrinsic(stashState.chain, stashState.controllerId) {
+            extrinsicService.submitExtrinsicWithAnySuitableWallet(stashState.chain, stashState.controllerId) {
                 constructUnbondExtrinsic(stashState, currentBondedBalance, amount)
             }
         }

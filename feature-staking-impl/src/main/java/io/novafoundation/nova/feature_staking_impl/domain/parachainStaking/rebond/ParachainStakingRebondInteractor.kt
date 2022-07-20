@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rebo
 
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
-import io.novafoundation.nova.feature_account_api.data.extrinsic.submitExtrinsicAndWaitBlockInclusion
+import io.novafoundation.nova.feature_account_api.data.extrinsic.submitExtrinsicWithSelectedWalletAndWaitBlockInclusion
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.calls.cancelDelegationRequest
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.DelegatorStateRepository
@@ -49,7 +49,7 @@ class RealParachainStakingRebondInteractor(
     }
 
     override suspend fun rebond(collatorId: AccountId): Result<*> = withContext(Dispatchers.IO) {
-        extrinsicService.submitExtrinsicAndWaitBlockInclusion(selectedAssetState.chain()) {
+        extrinsicService.submitExtrinsicWithSelectedWalletAndWaitBlockInclusion(selectedAssetState.chain()) {
             cancelDelegationRequest(collatorId)
         }
     }
