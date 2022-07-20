@@ -16,6 +16,7 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.ScrollView
 import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
@@ -247,6 +248,16 @@ private fun RecyclerView.wasAtBeginningBeforeInsertion(insertedCount: Int) =
 
 fun RecyclerView.findFirstVisiblePosition(): Int {
     return (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+}
+
+fun ScrollView.scrollOnFocusTo(vararg focusableTargets: View) {
+    val listener = View.OnFocusChangeListener { view, hasFocus ->
+        if (hasFocus) {
+            postToSelf { scrollTo(view.left, view.top) }
+        }
+    }
+
+    focusableTargets.forEach { it.onFocusChangeListener = listener }
 }
 
 fun TextView.setCompoundDrawableTint(@ColorRes tintRes: Int) {
