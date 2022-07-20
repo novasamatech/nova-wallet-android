@@ -8,7 +8,7 @@ import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadRaw
 
 class WatchOnlySigner(
     private val watchOnlySigningPresenter: WatchOnlySigningPresenter
-): Signer {
+) : Signer {
 
     override suspend fun signRaw(payload: SignerPayloadRaw): SignatureWrapper {
         watchOnlySigningPresenter.presentSigningNotPossible()

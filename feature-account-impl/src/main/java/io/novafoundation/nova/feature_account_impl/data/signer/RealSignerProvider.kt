@@ -15,7 +15,7 @@ internal class RealSignerProvider(
 ) : SignerProvider {
 
     override fun signerFor(metaAccount: MetaAccount): Signer {
-        return when(metaAccount.type) {
+        return when (metaAccount.type) {
             LightMetaAccount.Type.SECRETS -> secretsSignerFactory.create(metaAccount)
             LightMetaAccount.Type.WATCH_ONLY -> watchOnlySigner
         }

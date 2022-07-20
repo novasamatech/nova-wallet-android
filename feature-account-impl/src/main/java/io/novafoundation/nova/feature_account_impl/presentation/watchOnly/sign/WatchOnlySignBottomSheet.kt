@@ -9,7 +9,7 @@ import kotlinx.android.synthetic.main.watch_only_sign_bottom_sheet.watchOnlySign
 class WatchOnlySignBottomSheet(
     context: Context,
     private val onSuccess: () -> Unit
-): BottomSheetDialog(context, R.style.BottomSheetDialog) {
+) : BottomSheetDialog(context, R.style.BottomSheetDialog) {
 
     init {
         setContentView(R.layout.watch_only_sign_bottom_sheet)
@@ -17,7 +17,6 @@ class WatchOnlySignBottomSheet(
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
 
         setOnDismissListener { onSuccess() }
 
