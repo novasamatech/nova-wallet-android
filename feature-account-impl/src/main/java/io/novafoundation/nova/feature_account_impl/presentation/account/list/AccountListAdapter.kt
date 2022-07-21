@@ -3,13 +3,16 @@ package io.novafoundation.nova.feature_account_impl.presentation.account.list
 import android.animation.LayoutTransition
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+import io.novafoundation.nova.common.list.BaseGroupedDiffCallback
+import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
+import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.inflateChild
-import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.common.view.ChipLabelModel
+import io.novafoundation.nova.common.view.ChipLabelView
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.account.model.MetaAccountUi
 import kotlinx.android.synthetic.main.item_account.view.itemAccountArrow
@@ -23,7 +26,7 @@ import kotlinx.android.synthetic.main.item_account.view.itemAccountTitle
 class AccountsAdapter(
     private val accountItemHandler: AccountItemHandler,
     initialMode: Mode
-) : ListAdapter<MetaAccountUi, AccountHolder>(MetaAccountUiDiffCallback()) {
+) : GroupedListAdapter<ChipLabelModel, MetaAccountUi>(DiffCallback()) {
 
     private var mode: Mode = initialMode
 
@@ -44,28 +47,53 @@ class AccountsAdapter(
         notifyItemRangeChanged(0, itemCount, mode)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AccountHolder {
+    override fun createGroupViewHolder(parent: ViewGroup): GroupedListHolder {
+        val view = ChipLabelView(parent.context)
+
+        return AccountTypeHolder(view)
+    }
+
+    override fun createChildViewHolder(parent: ViewGroup): GroupedListHolder {
         return AccountHolder(parent.inflateChild(R.layout.item_account))
     }
 
-    override fun onBindViewHolder(holder: AccountHolder, position: Int) {
-        holder.bind(mode, getItem(position), accountItemHandler)
+    override fun bindGroup(holder: GroupedListHolder, group: ChipLabelModel) {
+        (holder as AccountTypeHolder).bind(group)
     }
 
-    override fun onBindViewHolder(holder: AccountHolder, position: Int, payloads: MutableList<Any>) {
-        val item = getItem(position)
+    override fun bindChild(holder: GroupedListHolder, child: MetaAccountUi) {
+        (holder as AccountHolder).bind(mode, child, accountItemHandler)
+    }
+
+    override fun bindChild(holder: GroupedListHolder, position: Int, child: MetaAccountUi, payloads: List<Any>) {
+        require(holder is AccountHolder)
 
         resolvePayload(
             holder, position, payloads,
-            onUnknownPayload = { holder.bindMode(mode, item, accountItemHandler) },
+            onUnknownPayload = { holder.bindMode(mode, child, accountItemHandler) },
             onDiffCheck = {
                 when (it) {
-                    MetaAccountUi::name -> holder.bindName(item)
-                    MetaAccountUi::totalBalance -> holder.bindTotalBalance(item)
-                    MetaAccountUi::isSelected -> holder.bindMode(mode, item, accountItemHandler)
+                    MetaAccountUi::name -> holder.bindName(child)
+                    MetaAccountUi::totalBalance -> holder.bindTotalBalance(child)
+                    MetaAccountUi::isSelected -> holder.bindMode(mode, child, accountItemHandler)
                 }
             }
         )
+    }
+}
+
+class AccountTypeHolder(override val containerView: ChipLabelView): GroupedListHolder(containerView) {
+
+    init {
+        val context = containerView.context
+
+        containerView.layoutParams = ViewGroup.MarginLayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
+            setMargins(16.dp(context), 16.dp(context), 0, 8.dp(context))
+        }
+    }
+
+    fun bind(item: ChipLabelModel) {
+        containerView.setModel(item)
     }
 }
 
@@ -108,15 +136,24 @@ class AccountHolder(view: View) : GroupedListHolder(view) {
         when (mode) {
             AccountsAdapter.Mode.VIEW -> {
                 itemAccountArrow.visibility = View.VISIBLE
-                itemAccountDelete.visibility = View.GONE
 
+                itemAccountDelete.visibility = View.GONE
                 itemAccountDelete.setOnClickListener(null)
+
                 setOnClickListener { handler.itemClicked(accountModel) }
             }
             AccountsAdapter.Mode.EDIT -> {
                 itemAccountArrow.visibility = View.INVISIBLE
-                itemAccountDelete.setVisible(!accountModel.isSelected, falseState = View.INVISIBLE)
-                itemAccountDelete.setOnClickListener { handler.deleteClicked(accountModel) }
+                itemAccountDelete.visibility = View.VISIBLE
+
+                if (accountModel.isSelected) {
+                    itemAccountDelete.setImageResource(R.drawable.ic_checkmark)
+                    itemAccountDelete.setOnClickListener(null)
+                } else {
+                    itemAccountDelete.setOnClickListener {  handler.deleteClicked(accountModel) }
+                    itemAccountDelete.setImageResource(R.drawable.ic_delete_symbol)
+                }
+
                 setOnClickListener(null)
             }
         }
@@ -127,17 +164,24 @@ private object MetaAccountPayloadGenerator : PayloadGenerator<MetaAccountUi>(
     MetaAccountUi::name, MetaAccountUi::totalBalance, MetaAccountUi::isSelected
 )
 
-private class MetaAccountUiDiffCallback : DiffUtil.ItemCallback<MetaAccountUi>() {
+private class DiffCallback : BaseGroupedDiffCallback<ChipLabelModel, MetaAccountUi>(ChipLabelModel::class.java) {
+    override fun areGroupItemsTheSame(oldItem: ChipLabelModel, newItem: ChipLabelModel): Boolean {
+        return oldItem.title == newItem.title
+    }
 
-    override fun areItemsTheSame(oldItem: MetaAccountUi, newItem: MetaAccountUi): Boolean {
+    override fun areGroupContentsTheSame(oldItem: ChipLabelModel, newItem: ChipLabelModel): Boolean {
+        return oldItem.iconRes == newItem.iconRes
+    }
+
+    override fun areChildItemsTheSame(oldItem: MetaAccountUi, newItem: MetaAccountUi): Boolean {
         return oldItem.id == newItem.id
     }
 
-    override fun areContentsTheSame(oldItem: MetaAccountUi, newItem: MetaAccountUi): Boolean {
+    override fun areChildContentsTheSame(oldItem: MetaAccountUi, newItem: MetaAccountUi): Boolean {
         return oldItem.name == newItem.name && oldItem.totalBalance == newItem.totalBalance && oldItem.isSelected == newItem.isSelected
     }
 
-    override fun getChangePayload(oldItem: MetaAccountUi, newItem: MetaAccountUi): Any? {
+    override fun getChildChangePayload(oldItem: MetaAccountUi, newItem: MetaAccountUi): Any? {
         return MetaAccountPayloadGenerator.diff(oldItem, newItem)
     }
 }

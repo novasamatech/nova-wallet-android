@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.domain
 
+import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.common.utils.amountFromPlanks
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.sumByBigDecimal
@@ -9,6 +10,7 @@ import io.novafoundation.nova.core.model.Node
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.Account
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountWithAssetBalance
@@ -75,7 +77,7 @@ class AccountInteractorImpl(
         return accountRepository.getMetaAccount(metaId)
     }
 
-    override fun metaAccountsFlow(): Flow<List<MetaAccountWithTotalBalance>> {
+    override fun metaAccountsFlow(): Flow<GroupedList<LightMetaAccount.Type, MetaAccountWithTotalBalance>> {
         return accountRepository.metaAccountsWithBalancesFlow().map { accountsWithBalances ->
             accountsWithBalances.groupBy(MetaAccountWithAssetBalance::metaId)
                 .map { (metaId, balances) ->
@@ -91,10 +93,13 @@ class AccountInteractorImpl(
                         metaId = metaId,
                         totalBalance = totalBalance,
                         name = first.name,
+                        type = first.type,
                         isSelected = first.isSelected,
                         substrateAccountId = first.substrateAccountId
                     )
                 }
+                .groupBy(MetaAccountWithTotalBalance::type)
+                .toSortedMap(metaAccountTypeComparator())
         }
     }
 
@@ -200,5 +205,12 @@ class AccountInteractorImpl(
 
     override suspend fun deleteNode(nodeId: Int) {
         return accountRepository.deleteNode(nodeId)
+    }
+
+    private fun metaAccountTypeComparator() = compareBy<LightMetaAccount.Type> {
+        when(it) {
+            LightMetaAccount.Type.SECRETS -> 0
+            LightMetaAccount.Type.WATCH_ONLY -> 1
+        }
     }
 }

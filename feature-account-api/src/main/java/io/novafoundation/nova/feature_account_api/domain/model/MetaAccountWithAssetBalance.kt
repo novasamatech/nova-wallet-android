@@ -7,6 +7,7 @@ class MetaAccountWithAssetBalance(
     val metaId: Long,
     val name: String,
     val isSelected: Boolean,
+    val type: LightMetaAccount.Type,
     val substrateAccountId: ByteArray,
     val freeInPlanks: BigInteger,
     val reservedInPlanks: BigInteger,
@@ -17,6 +18,7 @@ class MetaAccountWithAssetBalance(
 class MetaAccountWithTotalBalance(
     val metaId: Long,
     val name: String,
+    val type: LightMetaAccount.Type,
     val isSelected: Boolean,
     val substrateAccountId: ByteArray,
     val totalBalance: BigDecimal

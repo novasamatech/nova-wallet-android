@@ -2,13 +2,15 @@ package io.novafoundation.nova.feature_account_impl.presentation.account.list
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.awaitAction
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingOrDenyingAction
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatAsCurrency
-import io.novafoundation.nova.common.utils.mapList
+import io.novafoundation.nova.common.view.ChipLabelModel
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountWithTotalBalance
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_impl.R
@@ -32,7 +34,12 @@ class AccountListViewModel(
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
 ) : BaseViewModel() {
 
-    val walletsFlow = accountInteractor.metaAccountsFlow().mapList(::mapMetaAccountToUi)
+    val walletsFlow = accountInteractor.metaAccountsFlow().map { list ->
+        list.toListWithHeaders(
+            keyMapper = ::mapMetaAccountTypeToUi,
+            valueMapper = { mapMetaAccountToUi(it) }
+        )
+    }
         .shareInBackground()
 
     val mode = MutableStateFlow(Mode.VIEW)
@@ -89,6 +96,14 @@ class AccountListViewModel(
             isSelected = isSelected,
             picture = icon,
             totalBalance = totalBalance.formatAsCurrency()
+        )
+    }
+
+    private fun mapMetaAccountTypeToUi(type: Type): ChipLabelModel? = when(type) {
+        Type.SECRETS -> null
+        Type.WATCH_ONLY -> ChipLabelModel(
+            iconRes = R.drawable.ic_watch,
+            title = resourceManager.getString(R.string.account_watch_only)
         )
     }
 }

@@ -100,6 +100,7 @@ fun mapMetaAccountWithBalanceFromLocal(local: MetaAccountWithBalanceLocal): Meta
         MetaAccountWithAssetBalance(
             metaId = id,
             name = name,
+            type = mapMetaAccountTypeFromLocal(type),
             isSelected = isSelected,
             substrateAccountId = substrateAccountId,
             freeInPlanks = freeInPlanks,
