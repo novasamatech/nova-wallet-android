@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.utils.filterNotNull
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.core.model.Node
 import io.novafoundation.nova.core.model.Node.NetworkType
+import io.novafoundation.nova.core_db.dao.MetaAccountWithBalanceLocal
 import io.novafoundation.nova.core_db.model.NodeLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.JoinedMetaAccountInfo
@@ -14,6 +15,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.Account
 import io.novafoundation.nova.feature_account_api.domain.model.AddAccountType
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountWithAssetBalance
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_impl.R
@@ -93,20 +95,19 @@ private fun mapMetaAccountTypeFromLocal(local: MetaAccountLocal.Type): LightMeta
     }
 }
 
-fun mapMetaAccountLocalToLightMetaAccount(
-    metaAccountLocal: MetaAccountLocal
-): LightMetaAccount = with(metaAccountLocal) {
-    LightMetaAccount(
-        id = id,
-        substratePublicKey = substratePublicKey,
-        substrateCryptoType = substrateCryptoType,
-        substrateAccountId = substrateAccountId,
-        ethereumAddress = ethereumAddress,
-        ethereumPublicKey = ethereumPublicKey,
-        isSelected = isSelected,
-        name = name,
-        type = mapMetaAccountTypeFromLocal(type)
-    )
+fun mapMetaAccountWithBalanceFromLocal(local: MetaAccountWithBalanceLocal): MetaAccountWithAssetBalance {
+    return with(local) {
+        MetaAccountWithAssetBalance(
+            metaId = id,
+            name = name,
+            isSelected = isSelected,
+            substrateAccountId = substrateAccountId,
+            freeInPlanks = freeInPlanks,
+            reservedInPlanks = reservedInPlanks,
+            precision = precision,
+            dollarRate = dollarRate
+        )
+    }
 }
 
 fun mapMetaAccountLocalToMetaAccount(

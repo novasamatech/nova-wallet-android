@@ -32,10 +32,6 @@ interface AccountRouter : SecureRouter {
 
     fun openAccountDetails(metaAccountId: Long)
 
-    fun openEditAccounts()
-
-    fun backToMainScreen()
-
     fun openNodeDetails(nodeId: Int)
 
     fun openAddNode()

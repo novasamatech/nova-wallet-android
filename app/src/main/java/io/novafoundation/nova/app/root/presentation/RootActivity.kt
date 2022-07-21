@@ -17,7 +17,6 @@ import io.novafoundation.nova.common.utils.showToast
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.splash.presentation.SplashBackgroundHolder
-import kotlinx.android.synthetic.main.activity_root.mainView
 import kotlinx.android.synthetic.main.activity_root.rootNetworkBar
 import javax.inject.Inject
 
@@ -115,7 +114,7 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
     }
 
     override fun removeSplashBackground() {
-        mainView.setBackgroundResource(R.color.black)
+        window.setBackgroundDrawableResource(R.color.black)
     }
 
     override fun changeLanguage() {

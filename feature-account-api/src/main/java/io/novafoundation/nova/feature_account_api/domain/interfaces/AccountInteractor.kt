@@ -4,8 +4,8 @@ import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.core.model.Language
 import io.novafoundation.nova.core.model.Node
 import io.novafoundation.nova.feature_account_api.domain.model.Account
-import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountWithTotalBalance
 import io.novafoundation.nova.feature_account_api.domain.model.PreferredCryptoType
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.Mnemonic
@@ -33,7 +33,7 @@ interface AccountInteractor {
 
     suspend fun getMetaAccount(metaId: Long): MetaAccount
 
-    fun lightMetaAccountsFlow(): Flow<List<LightMetaAccount>>
+    fun metaAccountsFlow(): Flow<List<MetaAccountWithTotalBalance>>
 
     fun selectedMetaAccountFlow(): Flow<MetaAccount>
 

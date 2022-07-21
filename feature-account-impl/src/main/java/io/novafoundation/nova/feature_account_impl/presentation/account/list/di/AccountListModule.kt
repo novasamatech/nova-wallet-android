@@ -7,25 +7,17 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.address.AddressIconGenerator
-import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.AccountChosenNavDirection
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.AccountListViewModel
-import io.novafoundation.nova.feature_account_impl.presentation.account.mixin.api.AccountListingMixin
-import io.novafoundation.nova.feature_account_impl.presentation.account.mixin.impl.AccountListingProvider
 
 @Module(includes = [ViewModelModule::class])
 class AccountListModule {
-
-    @Provides
-    @ScreenScope
-    fun provideAccountListingMixin(
-        interactor: AccountInteractor,
-        addressIconGenerator: AddressIconGenerator
-    ): AccountListingMixin = AccountListingProvider(interactor, addressIconGenerator)
 
     @Provides
     @IntoMap
@@ -33,10 +25,12 @@ class AccountListModule {
     fun provideViewModel(
         interactor: AccountInteractor,
         router: AccountRouter,
-        accountListingMixin: AccountListingMixin,
+        addressIconGenerator: AddressIconGenerator,
+        resourceManager: ResourceManager,
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         accountChosenNavDirection: AccountChosenNavDirection,
     ): ViewModel {
-        return AccountListViewModel(interactor, router, accountChosenNavDirection, accountListingMixin)
+        return AccountListViewModel(interactor, router, accountChosenNavDirection, addressIconGenerator, resourceManager, actionAwaitableMixinFactory)
     }
 
     @Provides

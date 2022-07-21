@@ -20,13 +20,13 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
 import io.novafoundation.nova.core_db.model.chain.MetaAccountPositionUpdate
 import io.novafoundation.nova.feature_account_api.domain.model.Account
 import io.novafoundation.nova.feature_account_api.domain.model.AuthType
-import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountWithAssetBalance
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapChainAccountToAccount
-import io.novafoundation.nova.feature_account_impl.data.mappers.mapMetaAccountLocalToLightMetaAccount
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapMetaAccountLocalToMetaAccount
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapMetaAccountToAccount
+import io.novafoundation.nova.feature_account_impl.data.mappers.mapMetaAccountWithBalanceFromLocal
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapNodeLocalToNode
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.migration.AccountDataMigration
 import io.novafoundation.nova.runtime.ext.accountIdOf
@@ -169,9 +169,9 @@ class AccountDataSourceImpl(
         }
     }
 
-    override fun lightMetaAccountsFlow(): Flow<List<LightMetaAccount>> {
-        return metaAccountDao.metaAccountsFlow().mapList {
-            mapMetaAccountLocalToLightMetaAccount(it)
+    override fun metaAccountsWithBalancesFlow(): Flow<List<MetaAccountWithAssetBalance>> {
+        return metaAccountDao.metaAccountsWithBalanceFlow().mapList {
+            mapMetaAccountWithBalanceFromLocal(it)
         }
     }
 

@@ -12,7 +12,6 @@ import io.novafoundation.nova.feature_account_impl.presentation.AdvancedEncrypti
 import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.di.AdvancedEncryptionComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.create.di.CreateAccountComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.di.AccountDetailsComponent
-import io.novafoundation.nova.feature_account_impl.presentation.account.edit.di.AccountEditComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.di.AccountListComponent
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ShareCompletedReceiver
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.di.ExportJsonConfirmComponent
@@ -57,8 +56,6 @@ interface AccountFeatureComponent : AccountFeatureApi {
     fun confirmMnemonicComponentFactory(): ConfirmMnemonicComponent.Factory
 
     fun accountsComponentFactory(): AccountListComponent.Factory
-
-    fun editAccountsComponentFactory(): AccountEditComponent.Factory
 
     fun accountDetailsComponentFactory(): AccountDetailsComponent.Factory
 
