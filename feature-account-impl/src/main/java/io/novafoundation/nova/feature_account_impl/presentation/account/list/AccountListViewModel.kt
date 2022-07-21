@@ -99,7 +99,7 @@ class AccountListViewModel(
         )
     }
 
-    private fun mapMetaAccountTypeToUi(type: Type): ChipLabelModel? = when(type) {
+    private fun mapMetaAccountTypeToUi(type: Type): ChipLabelModel? = when (type) {
         Type.SECRETS -> null
         Type.WATCH_ONLY -> ChipLabelModel(
             iconRes = R.drawable.ic_watch,

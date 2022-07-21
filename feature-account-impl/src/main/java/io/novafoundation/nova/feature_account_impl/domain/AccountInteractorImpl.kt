@@ -82,7 +82,7 @@ class AccountInteractorImpl(
             accountsWithBalances.groupBy(MetaAccountWithAssetBalance::metaId)
                 .map { (metaId, balances) ->
                     val totalBalance = balances.sumByBigDecimal {
-                        val totalInPlanks =  it.freeInPlanks + it.reservedInPlanks
+                        val totalInPlanks = it.freeInPlanks + it.reservedInPlanks
 
                         totalInPlanks.amountFromPlanks(it.precision) * it.dollarRate.orZero()
                     }
@@ -208,7 +208,7 @@ class AccountInteractorImpl(
     }
 
     private fun metaAccountTypeComparator() = compareBy<LightMetaAccount.Type> {
-        when(it) {
+        when (it) {
             LightMetaAccount.Type.SECRETS -> 0
             LightMetaAccount.Type.WATCH_ONLY -> 1
         }

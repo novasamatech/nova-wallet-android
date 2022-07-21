@@ -23,4 +23,3 @@ class MetaAccountWithTotalBalance(
     val substrateAccountId: ByteArray,
     val totalBalance: BigDecimal
 )
-

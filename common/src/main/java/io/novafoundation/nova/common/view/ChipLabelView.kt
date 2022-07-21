@@ -11,7 +11,7 @@ import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 
 class ChipLabelModel(
-    @DrawableRes val iconRes:  Int,
+    @DrawableRes val iconRes: Int,
     val title: String
 )
 

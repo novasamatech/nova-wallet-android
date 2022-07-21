@@ -22,7 +22,6 @@ import kotlinx.android.synthetic.main.item_account.view.itemAccountIcon
 import kotlinx.android.synthetic.main.item_account.view.itemAccountSubtitle
 import kotlinx.android.synthetic.main.item_account.view.itemAccountTitle
 
-
 class AccountsAdapter(
     private val accountItemHandler: AccountItemHandler,
     initialMode: Mode
@@ -82,7 +81,7 @@ class AccountsAdapter(
     }
 }
 
-class AccountTypeHolder(override val containerView: ChipLabelView): GroupedListHolder(containerView) {
+class AccountTypeHolder(override val containerView: ChipLabelView) : GroupedListHolder(containerView) {
 
     init {
         val context = containerView.context
@@ -150,7 +149,7 @@ class AccountHolder(view: View) : GroupedListHolder(view) {
                     itemAccountDelete.setImageResource(R.drawable.ic_checkmark)
                     itemAccountDelete.setOnClickListener(null)
                 } else {
-                    itemAccountDelete.setOnClickListener {  handler.deleteClicked(accountModel) }
+                    itemAccountDelete.setOnClickListener { handler.deleteClicked(accountModel) }
                     itemAccountDelete.setImageResource(R.drawable.ic_delete_symbol)
                 }
 
@@ -185,4 +184,3 @@ private class DiffCallback : BaseGroupedDiffCallback<ChipLabelModel, MetaAccount
         return MetaAccountPayloadGenerator.diff(oldItem, newItem)
     }
 }
-

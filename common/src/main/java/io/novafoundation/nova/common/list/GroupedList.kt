@@ -8,7 +8,7 @@ fun <K : Any, V : Any> GroupedList<K, V>.toListWithHeaders(): List<Any> = flatMa
     listOf(groupKey) + values
 }
 
-inline fun <K1, K2: Any, V1, V2: Any> GroupedList<K1, V1>.toListWithHeaders(
+inline fun <K1, K2 : Any, V1, V2 : Any> GroupedList<K1, V1>.toListWithHeaders(
     keyMapper: (K1) -> K2?,
     valueMapper: (V1) -> V2
 ) = flatMap { (key, values) ->
