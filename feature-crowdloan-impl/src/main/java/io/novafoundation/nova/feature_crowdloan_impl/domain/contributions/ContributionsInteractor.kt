@@ -1,10 +1,14 @@
 package io.novafoundation.nova.feature_crowdloan_impl.domain.contributions
 
+import io.novafoundation.nova.common.utils.formatting.TimerValue
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
+import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.FundInfo
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRepository
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.getContributions
 import io.novafoundation.nova.feature_crowdloan_impl.data.source.contribution.ExternalContributionSource
+import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.leasePeriodInMillis
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
 
@@ -13,6 +17,7 @@ class ContributionsInteractor(
     private val crowdloanRepository: CrowdloanRepository,
     private val accountRepository: AccountRepository,
     private val selectedAssetState: SingleAssetSharedState,
+    private val chainStateRepository: ChainStateRepository,
 ) {
 
     suspend fun getUserContributions(): List<Contribution> {
@@ -30,15 +35,33 @@ class ContributionsInteractor(
 
         val fundInfos = crowdloanRepository.allFundInfos(chain.id)
 
+        val expectedBlockTime = chainStateRepository.expectedBlockTimeInMillis(chain.id)
+        val blocksPerLeasePeriod = crowdloanRepository.leasePeriodToBlocksConverter(chain.id)
+        val currentBlockNumber = chainStateRepository.currentBlock(chain.id)
+
+        fun FundInfo.returnDuration(): TimerValue {
+            val millis = leasePeriodInMillis(
+                leasePeriodToBlocksConverter = blocksPerLeasePeriod,
+                currentBlockNumber = currentBlockNumber,
+                endingLeasePeriod = lastSlot,
+                expectedBlockTimeInMillis = expectedBlockTime,
+            )
+
+            return TimerValue(millis, millisCalculatedAt = System.currentTimeMillis())
+        }
+
         val directContributions = crowdloanRepository.getContributions(chain.id, accountId, fundInfos)
             .mapNotNull { (paraId, directContribution) ->
                 directContribution?.let {
+                    val fundInfo = fundInfos.getValue(paraId)
+
                     Contribution(
                         amount = it.amount,
                         paraId = paraId,
-                        fundInfo = fundInfos.getValue(paraId),
+                        fundInfo = fundInfo,
                         sourceName = null,
-                        parachainMetadata = parachainMetadatas[paraId]
+                        parachainMetadata = parachainMetadatas[paraId],
+                        returnsIn = fundInfo.returnDuration()
                     )
                 }
             }
@@ -48,12 +71,15 @@ class ContributionsInteractor(
             accountId = accountId
         )
             .map {
+                val fundInfo = fundInfos.getValue(it.paraId)
+
                 Contribution(
                     amount = it.amount,
                     parachainMetadata = parachainMetadatas[it.paraId],
                     sourceName = it.sourceName,
-                    fundInfo = fundInfos.getValue(it.paraId),
-                    paraId = it.paraId
+                    fundInfo = fundInfo,
+                    paraId = it.paraId,
+                    returnsIn = fundInfo.returnDuration()
                 )
             }
 

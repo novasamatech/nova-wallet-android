@@ -20,6 +20,8 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RemoteEven
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RuntimeVersionsRepository
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
+import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
+import io.novafoundation.nova.runtime.repository.RealParachainInfoRepository
 import io.novafoundation.nova.runtime.storage.DbStorageCache
 import io.novafoundation.nova.runtime.storage.PrefsSampledBlockTimeStorage
 import io.novafoundation.nova.runtime.storage.SampledBlockTimeStorage
@@ -118,4 +120,10 @@ class RuntimeModule {
     @Provides
     @ApplicationScope
     fun provideMultiChainQrSharingFactory() = MultiChainQrSharingFactory()
+
+    @Provides
+    @ApplicationScope
+    fun provideParachainInfoRepository(
+        @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource
+    ): ParachainInfoRepository = RealParachainInfoRepository(remoteStorageSource)
 }

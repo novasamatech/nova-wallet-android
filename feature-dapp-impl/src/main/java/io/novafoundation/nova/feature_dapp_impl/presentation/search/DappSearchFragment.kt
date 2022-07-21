@@ -18,7 +18,9 @@ import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
 import io.novafoundation.nova.feature_dapp_impl.domain.search.DappSearchResult
-import kotlinx.android.synthetic.main.fragment_search_dapp.*
+import kotlinx.android.synthetic.main.fragment_search_dapp.searchDappList
+import kotlinx.android.synthetic.main.fragment_search_dapp.searchDappSearch
+import kotlinx.android.synthetic.main.fragment_search_dapp.searchDappSearhContainer
 import javax.inject.Inject
 
 class DappSearchFragment : BaseBottomSheetFragment<DAppSearchViewModel>(), SearchDappAdapter.Handler {
@@ -46,7 +48,7 @@ class DappSearchFragment : BaseBottomSheetFragment<DAppSearchViewModel>(), Searc
     }
 
     override fun initViews() {
-        searchDappSearhGroup.applyStatusBarInsets()
+        searchDappSearch.applyStatusBarInsets()
         searchDappSearhContainer.applyInsetter {
             type(ime = true) {
                 padding()
@@ -55,14 +57,14 @@ class DappSearchFragment : BaseBottomSheetFragment<DAppSearchViewModel>(), Searc
         searchDappList.adapter = adapter
         searchDappList.setHasFixedSize(true)
 
-        searchDappCancel.setOnClickListener {
+        searchDappSearch.cancel.setOnClickListener {
             viewModel.cancelClicked()
 
             hideKeyboard()
         }
 
-        searhDappQuery.requestFocus()
-        searhDappQuery.content.showSoftKeyboard()
+        searchDappSearch.searchInput.requestFocus()
+        searchDappSearch.searchInput.content.showSoftKeyboard()
     }
 
     override fun inject() {
@@ -73,12 +75,12 @@ class DappSearchFragment : BaseBottomSheetFragment<DAppSearchViewModel>(), Searc
     }
 
     override fun subscribe(viewModel: DAppSearchViewModel) {
-        searhDappQuery.content.bindTo(viewModel.query, lifecycleScope)
+        searchDappSearch.searchInput.content.bindTo(viewModel.query, lifecycleScope)
 
         viewModel.searchResults.observe(::submitListPreservingViewPoint)
 
         viewModel.selectQueryTextEvent.observeEvent {
-            searhDappQuery.content.selectAll()
+            searchDappSearch.searchInput.content.selectAll()
         }
     }
 
@@ -89,7 +91,7 @@ class DappSearchFragment : BaseBottomSheetFragment<DAppSearchViewModel>(), Searc
     }
 
     private fun hideKeyboard() {
-        searhDappQuery.hideSoftKeyboard()
+        searchDappSearch.searchInput.hideSoftKeyboard()
     }
 
     private fun submitListPreservingViewPoint(data: List<Any?>) {

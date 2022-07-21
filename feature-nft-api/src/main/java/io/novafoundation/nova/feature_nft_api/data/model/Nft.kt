@@ -20,17 +20,13 @@ class Nft(
         class Loaded(
             val price: BigInteger?,
             val issuance: Issuance,
-            val metadata: Metadata?
+            val name: String?,
+            val label: String?,
+            val media: String?,
         ) : Details()
 
         object Loadable : Details()
     }
-
-    class Metadata(
-        val name: String,
-        val label: String?,
-        val media: String?,
-    )
 
     sealed class Issuance {
         class Unlimited(val edition: String) : Issuance()

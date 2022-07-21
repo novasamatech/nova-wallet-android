@@ -25,6 +25,7 @@ import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
+import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
@@ -81,4 +82,6 @@ interface CrowdloanFeatureDependencies {
     fun customDialogDisplayer(): CustomDialogDisplayer.Presentation
 
     fun feeLoaderMixinFactory(): FeeLoaderMixin.Factory
+
+    val parachainInfoRepository: ParachainInfoRepository
 }

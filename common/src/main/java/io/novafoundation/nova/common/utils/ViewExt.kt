@@ -167,8 +167,8 @@ fun ImageView.setImageTintRes(@ColorRes tintRes: Int) {
     imageTintList = ColorStateList.valueOf(context.getColor(tintRes))
 }
 
-fun ImageView.setImageTint(@ColorInt tint: Int) {
-    imageTintList = ColorStateList.valueOf(tint)
+fun ImageView.setImageTint(@ColorInt tint: Int?) {
+    imageTintList = tint?.let { ColorStateList.valueOf(it) }
 }
 
 inline fun View.doOnGlobalLayout(crossinline action: () -> Unit) {
@@ -308,11 +308,17 @@ fun <I> View.useInputValue(input: Input<I>, onValue: (I) -> Unit) {
     input.valueOrNull?.let(onValue)
 }
 
-fun <T> ListAdapter<T, *>.submitListPreservingViewPoint(data: List<T>, into: RecyclerView) {
+fun <T> ListAdapter<T, *>.submitListPreservingViewPoint(
+    data: List<T>,
+    into: RecyclerView,
+    extraDiffCompletedCallback: (() -> Unit)? = null
+) {
     val recyclerViewState = into.layoutManager!!.onSaveInstanceState()
 
     submitList(data) {
         into.layoutManager!!.onRestoreInstanceState(recyclerViewState)
+
+        extraDiffCompletedCallback?.invoke()
     }
 }
 

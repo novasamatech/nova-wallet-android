@@ -75,7 +75,7 @@ abstract class InflationBasedRewardCalculator(
         days: Int,
         isCompound: Boolean,
     ) = withContext(Dispatchers.Default) {
-        val dailyPercentage = maxAPY / DAYS_IN_YEAR
+        val dailyPercentage = (maxAPY + 1).pow(1.0 / DAYS_IN_YEAR) - 1
 
         calculateReward(amount.toDouble(), days, dailyPercentage, isCompound)
     }

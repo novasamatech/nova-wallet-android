@@ -3,17 +3,16 @@ package io.novafoundation.nova.feature_assets.domain
 import io.novafoundation.nova.common.data.model.CursorPage
 import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.common.utils.applyFilters
-import io.novafoundation.nova.common.utils.sumByBigDecimal
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_assets.data.repository.assetFilters.AssetFiltersRepository
+import io.novafoundation.nova.feature_assets.domain.common.AssetGroup
+import io.novafoundation.nova.feature_assets.domain.common.groupAndSortAssetsByNetwork
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.domain.model.AssetGroup
-import io.novafoundation.nova.feature_wallet_api.domain.model.Balances
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.OperationsPageChange
 import io.novafoundation.nova.runtime.ext.commissionAsset
@@ -50,26 +49,9 @@ class WalletInteractorImpl(
         }
             .map { assets ->
                 val chains = chainRegistry.chainsById.first()
+                val groupedAssets = groupAndSortAssetsByNetwork(assets, chains)
 
-                val assetGroupComparator = compareByDescending(AssetGroup::groupBalanceFiat)
-                    .thenByDescending { it.zeroBalance } // non-zero balances first
-                    .thenBy { it.chain.name } // SortedMap will collapse keys that are equal according to the comparator - need another field to compare by
-
-                val assetsByChain = assets.groupBy { chains.getValue(it.token.configuration.chainId) }
-                    .mapValues { (_, assets) ->
-                        assets.sortedWith(
-                            compareByDescending<Asset> { it.token.fiatAmount(it.total) }
-                                .thenBy { it.token.configuration.symbol }
-                        )
-                    }.mapKeys { (chain, assets) ->
-                        AssetGroup(
-                            chain = chain,
-                            groupBalanceFiat = assets.sumByBigDecimal { it.token.fiatAmount(it.total) },
-                            zeroBalance = assets.any { it.total > BigDecimal.ZERO }
-                        )
-                    }.toSortedMap(assetGroupComparator)
-
-                balancesFromAssets(assets, assetsByChain)
+                balancesFromAssets(assets, groupedAssets)
             }
     }
 

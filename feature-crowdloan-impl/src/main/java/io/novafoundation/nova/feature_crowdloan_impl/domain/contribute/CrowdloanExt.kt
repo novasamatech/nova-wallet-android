@@ -3,8 +3,8 @@ package io.novafoundation.nova.feature_crowdloan_impl.domain.contribute
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.DirectContribution
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.FundInfo
+import io.novafoundation.nova.feature_crowdloan_api.data.repository.LeasePeriodToBlocksConverter
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ParachainMetadata
-import io.novafoundation.nova.feature_crowdloan_impl.domain.common.leaseIndexFromBlock
 import io.novafoundation.nova.feature_crowdloan_impl.domain.main.Crowdloan
 import java.math.BigInteger
 import java.math.MathContext
@@ -15,13 +15,13 @@ fun mapFundInfoToCrowdloan(
     parachainId: BigInteger,
     currentBlockNumber: BlockNumber,
     expectedBlockTimeInMillis: BigInteger,
-    blocksPerLeasePeriod: BigInteger,
+    leasePeriodToBlocksConverter: LeasePeriodToBlocksConverter,
     contribution: DirectContribution?,
     hasWonAuction: Boolean,
 ): Crowdloan {
-    val leasePeriodInMillis = leasePeriodInMillis(blocksPerLeasePeriod, currentBlockNumber, fundInfo.lastSlot, expectedBlockTimeInMillis)
+    val leasePeriodInMillis = leasePeriodInMillis(leasePeriodToBlocksConverter, currentBlockNumber, fundInfo.lastSlot, expectedBlockTimeInMillis)
 
-    val state = if (isCrowdloanActive(fundInfo, currentBlockNumber, blocksPerLeasePeriod, hasWonAuction)) {
+    val state = if (isCrowdloanActive(fundInfo, currentBlockNumber, leasePeriodToBlocksConverter, hasWonAuction)) {
         val remainingTime = expectedRemainingTime(currentBlockNumber, fundInfo.end, expectedBlockTimeInMillis)
 
         Crowdloan.State.Active(remainingTime)
@@ -44,26 +44,26 @@ fun mapFundInfoToCrowdloan(
 private fun isCrowdloanActive(
     fundInfo: FundInfo,
     currentBlockNumber: BigInteger,
-    blocksPerLeasePeriod: BigInteger,
+    leasePeriodToBlocksConverter: LeasePeriodToBlocksConverter,
     hasWonAuction: Boolean,
 ): Boolean {
     return currentBlockNumber < fundInfo.end && // crowdloan is not ended
         // first slot is not yet passed
-        leaseIndexFromBlock(currentBlockNumber, blocksPerLeasePeriod) <= fundInfo.firstSlot &&
+        leasePeriodToBlocksConverter.leaseIndexFromBlock(currentBlockNumber) <= fundInfo.firstSlot &&
         // cap is not reached
         fundInfo.raised < fundInfo.cap &&
         // crowdloan considered closed if parachain already won auction
         !hasWonAuction
 }
 
-private fun leasePeriodInMillis(
-    blocksPerLeasePeriod: BigInteger,
+fun leasePeriodInMillis(
+    leasePeriodToBlocksConverter: LeasePeriodToBlocksConverter,
     currentBlockNumber: BigInteger,
     endingLeasePeriod: BigInteger,
     expectedBlockTimeInMillis: BigInteger
 ): Long {
     val unlockedAtPeriod = endingLeasePeriod + BigInteger.ONE // next period after end one
-    val unlockedAtBlock = blocksPerLeasePeriod * unlockedAtPeriod
+    val unlockedAtBlock = leasePeriodToBlocksConverter.startBlockFor(unlockedAtPeriod)
 
     return expectedRemainingTime(
         currentBlockNumber,

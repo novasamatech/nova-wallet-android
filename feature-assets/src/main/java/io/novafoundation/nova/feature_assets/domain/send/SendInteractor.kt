@@ -17,6 +17,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -31,7 +32,8 @@ class SendInteractor(
     private val assetSourceRegistry: AssetSourceRegistry,
     private val crossChainWeigher: CrossChainWeigher,
     private val crossChainTransactor: CrossChainTransactor,
-    private val crossChainTransfersRepository: CrossChainTransfersRepository
+    private val crossChainTransfersRepository: CrossChainTransfersRepository,
+    private val parachainInfoRepository: ParachainInfoRepository,
 ) {
 
     // TODO wallet
@@ -57,11 +59,6 @@ class SendInteractor(
             myAccounts = emptyList(),
             contacts = emptyList()
         )
-    }
-
-    // TODO wallet phishing
-    suspend fun isAddressFromPhishingList(address: String): Boolean {
-        return /*walletRepository.isAccountIdFromPhishingList(address)*/ false
     }
 
     suspend fun syncCrossChainConfig() = kotlin.runCatching {
@@ -134,6 +131,6 @@ class SendInteractor(
         originChain = transfer.originChain,
         originAsset = transfer.originChainAsset,
         destinationChain = transfer.destinationChain,
-        destinationParaId = crossChainTransfersRepository.paraId(transfer.destinationChain.id)
+        destinationParaId = parachainInfoRepository.paraId(transfer.destinationChain.id)
     )
 }

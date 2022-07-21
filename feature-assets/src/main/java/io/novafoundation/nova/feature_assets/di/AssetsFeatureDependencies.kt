@@ -38,6 +38,7 @@ import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
+import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import jp.co.soramitsu.fearless_utils.encrypt.Signer
 import jp.co.soramitsu.fearless_utils.icon.IconGenerator
@@ -127,4 +128,6 @@ interface AssetsFeatureDependencies {
     val crossChainTransactor: CrossChainTransactor
 
     val resourcesHintsMixinFactory: ResourcesHintsMixinFactory
+
+    val parachainInfoRepository: ParachainInfoRepository
 }

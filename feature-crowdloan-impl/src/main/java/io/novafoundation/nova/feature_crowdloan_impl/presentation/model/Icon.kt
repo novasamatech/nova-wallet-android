@@ -15,6 +15,6 @@ suspend fun generateCrowdloanIcon(
     } else {
         val icon = iconGenerator.createAddressIcon(depositorAddress, AddressIconGenerator.SIZE_BIG)
 
-        return Icon.FromDrawable(icon)
+        Icon.FromDrawable(icon)
     }
 }

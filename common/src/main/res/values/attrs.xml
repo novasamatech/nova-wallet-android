@@ -147,4 +147,12 @@
 
         <attr name="android:text" />
     </declare-styleable>
+
+    <declare-styleable name="IconButton">
+        <attr name="android:src" />
+    </declare-styleable>
+
+    <declare-styleable name="SearchToolbar">
+        <attr name="android:hint" />
+    </declare-styleable>
 </resources>

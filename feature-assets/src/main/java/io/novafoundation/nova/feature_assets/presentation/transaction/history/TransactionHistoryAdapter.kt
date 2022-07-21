@@ -13,17 +13,12 @@ import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setTextColorRes
+import io.novafoundation.nova.common.view.recyclerview.item.OperationListItem
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.model.OperationModel
 import io.novafoundation.nova.feature_assets.presentation.model.OperationStatusAppearance
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.model.DayHeader
 import kotlinx.android.synthetic.main.item_day_header.view.itemDayHeader
-import kotlinx.android.synthetic.main.item_transaction.view.itemTransactionAmount
-import kotlinx.android.synthetic.main.item_transaction.view.itemTransactionHeader
-import kotlinx.android.synthetic.main.item_transaction.view.itemTransactionIcon
-import kotlinx.android.synthetic.main.item_transaction.view.itemTransactionStatus
-import kotlinx.android.synthetic.main.item_transaction.view.itemTransactionSubHeader
-import kotlinx.android.synthetic.main.item_transaction.view.itemTransactionTime
 
 class TransactionHistoryAdapter(
     private val handler: Handler,
@@ -40,7 +35,7 @@ class TransactionHistoryAdapter(
     }
 
     override fun createChildViewHolder(parent: ViewGroup): GroupedListHolder {
-        return TransactionHolder(parent.inflateChild(R.layout.item_transaction), imageLoader)
+        return TransactionHolder(OperationListItem(parent.context), imageLoader)
     }
 
     override fun bindGroup(holder: GroupedListHolder, group: DayHeader) {
@@ -52,36 +47,39 @@ class TransactionHistoryAdapter(
     }
 }
 
-class TransactionHolder(view: View, private val imageLoader: ImageLoader) : GroupedListHolder(view) {
+class TransactionHolder(
+    override val containerView: OperationListItem,
+    private val imageLoader: ImageLoader
+) : GroupedListHolder(containerView) {
+
+    init {
+        containerView.setIconStyle(OperationListItem.IconStyle.BORDERED_CIRCLE)
+    }
 
     fun bind(item: OperationModel, handler: TransactionHistoryAdapter.Handler) {
         with(containerView) {
-            with(item) {
-                itemTransactionHeader.text = header
+            header.text = item.header
 
-                itemTransactionAmount.setTextColorRes(amountColorRes)
-                itemTransactionAmount.text = amount
+            valuePrimary.setTextColorRes(item.amountColorRes)
+            valuePrimary.text = item.amount
 
-                itemTransactionTime.text = formattedTime
+            valueSecondary.text = item.formattedTime
+            subHeader.text = item.subHeader
+            icon.setIcon(item.operationIcon, imageLoader)
 
-                itemTransactionSubHeader.text = subHeader
-
-                if (statusAppearance != OperationStatusAppearance.COMPLETED) {
-                    itemTransactionStatus.makeVisible()
-                    itemTransactionStatus.setImageResource(statusAppearance.icon)
-                } else {
-                    itemTransactionStatus.makeGone()
-                }
-
-                setOnClickListener { handler.transactionClicked(this) }
+            if (item.statusAppearance != OperationStatusAppearance.COMPLETED) {
+                status.makeVisible()
+                status.setImageResource(item.statusAppearance.icon)
+            } else {
+                status.makeGone()
             }
 
-            itemTransactionIcon.setIcon(item.operationIcon, imageLoader)
+            setOnClickListener { handler.transactionClicked(item) }
         }
     }
 
     override fun unbind() {
-        containerView.itemTransactionIcon.clear()
+        containerView.icon.clear()
     }
 }
 

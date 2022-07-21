@@ -7,11 +7,8 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.Ele
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import java.math.BigInteger
-import kotlin.math.floor
 import kotlin.time.Duration
-import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
-import kotlin.time.days
 import kotlin.time.milliseconds
 
 @OptIn(ExperimentalTime::class)
@@ -45,14 +42,6 @@ class EraTimeCalculator(
         } else {
             eraRemained * blockCreationTime - deltaTime
         }
-    }
-
-    fun erasPerDay(): Int {
-        val eraDuration = (blockCreationTime * eraLength * sessionLength).toDouble()
-
-        val dayDuration = 1.days.toDouble(DurationUnit.MILLISECONDS)
-
-        return floor(dayDuration / eraDuration).toInt()
     }
 
     fun eraDuration(): Duration {

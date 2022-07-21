@@ -6,27 +6,23 @@ import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.createAddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.format
 import io.novafoundation.nova.common.utils.formatAsCurrency
 import io.novafoundation.nova.common.utils.inBackground
-import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress
-import io.novafoundation.nova.feature_assets.data.mappers.mappers.mapAssetToAssetModel
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.list.AssetsListInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.WalletRouter
-import io.novafoundation.nova.feature_assets.presentation.balance.list.model.AssetGroupUi
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mapGroupedAssetsToUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.NftPreviewUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.TotalBalanceModel
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
-import io.novafoundation.nova.feature_wallet_api.domain.model.AssetGroup
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -91,15 +87,10 @@ class BalanceListViewModel(
         .inBackground()
         .share()
 
-    val assetsFlow = balancesFlow.map { balances ->
-        balances.assets
-            .mapKeys { (assetGroup, _) -> mapAssetGroupToUi(assetGroup) }
-            .mapValues { (_, assets) -> assets.map(::mapAssetToAssetModel) }
-            .toListWithHeaders()
-    }
+    val assetsFlow = balancesFlow.map { it.assets }
+        .mapGroupedAssetsToUi()
         .distinctUntilChanged()
-        .inBackground()
-        .share()
+        .shareInBackground()
 
     val totalBalanceFlow = balancesFlow.map {
         TotalBalanceModel(
@@ -158,6 +149,10 @@ class BalanceListViewModel(
         router.openNfts()
     }
 
+    fun searchClicked() {
+        router.openAssetSearch()
+    }
+
     private suspend fun syncWith(syncActions: List<SyncAction>, metaAccount: MetaAccount) = if (syncActions.size == 1) {
         val syncAction = syncActions.first()
         syncAction(metaAccount)
@@ -169,12 +164,7 @@ class BalanceListViewModel(
     private fun mapNftPreviewToUi(nftPreview: Nft): NftPreviewUi {
         return when (val details = nftPreview.details) {
             Nft.Details.Loadable -> LoadingState.Loading()
-            is Nft.Details.Loaded -> LoadingState.Loaded(details.metadata?.media)
+            is Nft.Details.Loaded -> LoadingState.Loaded(details.media)
         }
     }
-
-    private fun mapAssetGroupToUi(assetGroup: AssetGroup) = AssetGroupUi(
-        chainUi = mapChainToUi(assetGroup.chain),
-        groupBalanceFiat = assetGroup.groupBalanceFiat.formatAsCurrency()
-    )
 }

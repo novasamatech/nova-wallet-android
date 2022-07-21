@@ -88,7 +88,7 @@ class ConfirmContributeFragment : BaseFragment<ConfirmContributeViewModel>() {
 
         viewModel.assetModelFlow.observe {
             confirmContributeAmount.setAssetBalance(it.assetBalance)
-            confirmContributeAmount.setAssetName(it.tokenName)
+            confirmContributeAmount.setAssetName(it.tokenSymbol)
             confirmContributeAmount.loadAssetImage(it.imageUrl)
         }
 

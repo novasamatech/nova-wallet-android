@@ -7,17 +7,16 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ConcatAdapter
 import coil.ImageLoader
 import dev.chrisbanes.insetter.applyInsetter
-import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.hideKeyboard
-import io.novafoundation.nova.common.view.shape.addRipple
-import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
+import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
-import io.novafoundation.nova.feature_assets.presentation.balance.list.view.AssetGroupingDecoration
+import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetGroupingDecoration
+import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
+import io.novafoundation.nova.feature_assets.presentation.balance.common.applyDefaultTo
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.AssetsHeaderAdapter
-import io.novafoundation.nova.feature_assets.presentation.balance.list.view.BalanceListAdapter
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import kotlinx.android.synthetic.main.fragment_balance_list.balanceListAssets
 import kotlinx.android.synthetic.main.fragment_balance_list.walletContainer
@@ -63,15 +62,8 @@ class BalanceListFragment :
         balanceListAssets.setHasFixedSize(true)
         balanceListAssets.adapter = adapter
 
-        val groupBackground = with(requireContext()) {
-            addRipple(getRoundedCornerDrawable(R.color.blurColor))
-        }
-        val decoration = AssetGroupingDecoration(
-            background = groupBackground,
-            assetsAdapter = assetsAdapter,
-            context = requireContext(),
-        )
-        balanceListAssets.addItemDecoration(decoration)
+        AssetGroupingDecoration.applyDefaultTo(balanceListAssets, assetsAdapter)
+
         // modification animations only harm here
         balanceListAssets.itemAnimator = null
 
@@ -114,6 +106,10 @@ class BalanceListFragment :
 
     override fun manageClicked() {
         viewModel.manageClicked()
+    }
+
+    override fun searchClicked() {
+        viewModel.searchClicked()
     }
 
     override fun avatarClicked() {
