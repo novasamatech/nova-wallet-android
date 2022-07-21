@@ -4,23 +4,22 @@ import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.address.createAddressModel
-import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
+import io.novafoundation.nova.common.utils.asHexString
 import io.novafoundation.nova.common.utils.bigIntegerFromHex
 import io.novafoundation.nova.common.utils.intFromHex
 import io.novafoundation.nova.common.validation.EmptyValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
-import io.novafoundation.nova.feature_account_api.data.secrets.getKeypair
-import io.novafoundation.nova.feature_account_api.data.secrets.signSubstrate
+import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_api.domain.model.multiChainEncryptionIn
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.signExtrinsic.ConfirmDAppOperationValidationFailure
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.signExtrinsic.ConfirmDAppOperationValidationSystem
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.signExtrinsic.DAppSignInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.signExtrinsic.convertingToAmount
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator.Response
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.failedSigningIfNotCancelled
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.PolkadotJsSignRequest
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.SignerPayload
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.maybeSignExtrinsic
@@ -36,14 +35,14 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getChainOrNull
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHex
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.EraType
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Extrinsic.EncodingInstance.CallRepresentation
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.instances.AddressInstanceConstructor
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
+import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadRaw
+import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.fromHex
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
 import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.chain.RuntimeVersion
 import kotlinx.coroutines.Dispatchers
@@ -57,23 +56,23 @@ class PolkadotJsSignInteractorFactory(
     private val extrinsicService: ExtrinsicService,
     private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
-    private val secretStoreV2: SecretStoreV2,
     private val tokenRepository: TokenRepository,
     private val extrinsicGson: Gson,
     private val addressIconGenerator: AddressIconGenerator,
     private val walletRepository: WalletRepository,
+    private val signerProvider: SignerProvider,
 ) {
 
     fun create(request: PolkadotJsSignRequest) = PolkadotJsSignInteractor(
         extrinsicService = extrinsicService,
         chainRegistry = chainRegistry,
         accountRepository = accountRepository,
-        secretStoreV2 = secretStoreV2,
         tokenRepository = tokenRepository,
         extrinsicGson = extrinsicGson,
         addressIconGenerator = addressIconGenerator,
         request = request,
-        walletRepository = walletRepository
+        walletRepository = walletRepository,
+        signerProvider = signerProvider
     )
 }
 
@@ -81,12 +80,12 @@ class PolkadotJsSignInteractor(
     private val extrinsicService: ExtrinsicService,
     private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
-    private val secretStoreV2: SecretStoreV2,
     private val tokenRepository: TokenRepository,
     private val extrinsicGson: Gson,
     private val addressIconGenerator: AddressIconGenerator,
     private val request: PolkadotJsSignRequest,
     private val walletRepository: WalletRepository,
+    private val signerProvider: SignerProvider
 ) : DAppSignInteractor {
 
     val signerPayload = request.payload
@@ -121,7 +120,7 @@ class PolkadotJsSignInteractor(
         }
     }
 
-    override suspend fun performOperation(): Response = withContext(Dispatchers.Default) {
+    override suspend fun performOperation(): Response? = withContext(Dispatchers.Default) {
         runCatching {
             when (signerPayload) {
                 is SignerPayload.Json -> signExtrinsic(signerPayload)
@@ -131,8 +130,8 @@ class PolkadotJsSignInteractor(
             onSuccess = { signature ->
                 Response.Signed(request.id, signature)
             },
-            onFailure = {
-                Response.SigningFailed(request.id)
+            onFailure = { error ->
+                error.failedSigningIfNotCancelled(request.id)
             }
         )
     }
@@ -147,7 +146,7 @@ class PolkadotJsSignInteractor(
     override suspend fun calculateFee(): BigInteger = withContext(Dispatchers.Default) {
         require(signerPayload is SignerPayload.Json)
 
-        val extrinsicBuilder = signerPayload.toExtrinsicBuilderWithoutCall()
+        val extrinsicBuilder = signerPayload.toExtrinsicBuilderWithoutCall(forFee = true)
         val runtime = chainRegistry.getRuntime(signerPayload.chain().id)
 
         val extrinsic = when (val callRepresentation = signerPayload.callRepresentation(runtime)) {
@@ -191,17 +190,15 @@ class PolkadotJsSignInteractor(
 
         // assumption - extension has access only to selected meta account
         val metaAccount = accountRepository.getSelectedMetaAccount()
+        val signer = signerProvider.signerFor(metaAccount)
+        val payload = SignerPayloadRaw.fromHex(signBytesPayload.data, substrateAccountId)
 
-        return secretStoreV2.signSubstrate(
-            metaAccount = metaAccount,
-            accountId = substrateAccountId,
-            message = signBytesPayload.data.fromHex()
-        ).toHexString(withPrefix = true)
+        return signer.signRaw(payload).asHexString()
     }
 
     private suspend fun signExtrinsic(extrinsicPayload: SignerPayload.Json): String {
         val runtime = chainRegistry.getRuntime(extrinsicPayload.chain().id)
-        val extrinsicBuilder = extrinsicPayload.toExtrinsicBuilderWithoutCall()
+        val extrinsicBuilder = extrinsicPayload.toExtrinsicBuilderWithoutCall(forFee = false)
 
         return when (val callRepresentation = extrinsicPayload.callRepresentation(runtime)) {
             is CallRepresentation.Instance -> extrinsicBuilder.call(callRepresentation.call).buildSignature()
@@ -209,7 +206,9 @@ class PolkadotJsSignInteractor(
         }
     }
 
-    private suspend fun SignerPayload.Json.toExtrinsicBuilderWithoutCall(): ExtrinsicBuilder {
+    private suspend fun SignerPayload.Json.toExtrinsicBuilderWithoutCall(
+        forFee: Boolean
+    ): ExtrinsicBuilder {
         val chain = chain()
         val runtime = chainRegistry.getRuntime(genesisHash)
         val parsedExtrinsic = parseDAppExtrinsic(runtime, this)
@@ -218,21 +217,24 @@ class PolkadotJsSignInteractor(
         val metaAccount = accountRepository.getSelectedMetaAccount()
         val accountId = chain.accountIdOf(address)
 
-        val keypair = secretStoreV2.getKeypair(metaAccount, chain, accountId)
+        val signer = if (forFee) {
+            signerProvider.feeSigner(chain)
+        } else {
+            signerProvider.signerFor(metaAccount)
+        }
 
         return with(parsedExtrinsic) {
             ExtrinsicBuilder(
                 runtime = runtime,
-                keypair = keypair,
                 nonce = nonce,
                 runtimeVersion = RuntimeVersion(
                     specVersion = specVersion,
                     transactionVersion = transactionVersion
                 ),
+                signer = signer,
+                accountId = accountId,
                 genesisHash = genesisHash,
-                multiChainEncryption = metaAccount.multiChainEncryptionIn(chain),
                 customSignedExtensions = CustomSignedExtensions.extensionsWithValues(runtime),
-                accountIdentifier = AddressInstanceConstructor.constructInstance(runtime.typeRegistry, accountId),
                 blockHash = blockHash,
                 era = era,
                 tip = tip

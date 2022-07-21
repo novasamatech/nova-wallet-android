@@ -1,6 +1,7 @@
 package io.novafoundation.nova.common.resources
 
 import android.content.Context
+import androidx.appcompat.app.AppCompatActivity
 import io.novafoundation.nova.common.data.storage.PreferencesImpl
 import io.novafoundation.nova.common.di.modules.SHARED_PREFERENCES_FILE
 import io.novafoundation.nova.common.utils.SingletonHolder
@@ -16,10 +17,24 @@ class ContextManager private constructor(
     private val LANGUAGE_PART_INDEX = 0
     private val COUNTRY_PART_INDEX = 1
 
+    private var activity: AppCompatActivity? = null
+
     companion object : SingletonHolder<ContextManager, Context, LanguagesHolder>(::ContextManager)
 
-    fun getContext(): Context {
+    fun getApplicationContext(): Context {
         return context
+    }
+
+    fun getActivity(): AppCompatActivity? {
+        return activity
+    }
+
+    fun attachActivity(activity: AppCompatActivity) {
+        this.activity = activity
+    }
+
+    fun detachActivity() {
+        this.activity = null
     }
 
     fun setLocale(context: Context): Context {

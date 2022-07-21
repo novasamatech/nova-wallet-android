@@ -29,6 +29,7 @@ import io.novafoundation.nova.feature_account_impl.data.mappers.mapNodeLocalToNo
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSource
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSource
 import io.novafoundation.nova.runtime.ext.genesisHash
+import io.novafoundation.nova.runtime.ext.isValidAddress
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedEncoder
@@ -214,7 +215,7 @@ class AccountRepositoryImpl(
                 seed = secrets.seed(),
                 password = password,
                 name = metaAccount.name,
-                multiChainEncryption = metaAccount.multiChainEncryptionIn(chain),
+                multiChainEncryption = metaAccount.multiChainEncryptionIn(chain)!!,
                 genesisHash = chain.genesisHash,
                 address = address
             )
@@ -280,7 +281,7 @@ class AccountRepositoryImpl(
             name = account.name
         )
 
-        val qrSharing = multiChainQrSharingFactory.create(chain)
+        val qrSharing = multiChainQrSharingFactory.create(addressValidator = chain::isValidAddress)
 
         return qrSharing.encode(payload)
     }

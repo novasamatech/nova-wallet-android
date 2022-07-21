@@ -135,6 +135,7 @@ class Navigator(
             R.id.splashFragment -> navController?.navigate(R.id.action_splash_to_pin, bundle)
             R.id.importAccountFragment -> navController?.navigate(R.id.action_importAccountFragment_to_pincodeFragment, bundle)
             R.id.confirmMnemonicFragment -> navController?.navigate(R.id.action_confirmMnemonicFragment_to_pincodeFragment, bundle)
+            R.id.createWatchWalletFragment -> navController?.navigate(R.id.action_watchWalletFragment_to_pincodeFragment, bundle)
         }
     }
 
@@ -480,6 +481,10 @@ class Navigator(
         val action = PinCodeAction.Change
         val bundle = PincodeFragment.getPinCodeBundle(action)
         navController?.navigate(R.id.action_mainFragment_to_pinCodeFragment, bundle)
+    }
+
+    override fun openCreateWatchWallet() {
+        navController?.navigate(R.id.action_welcomeFragment_to_createWatchWalletFragment)
     }
 
     override fun withPinCodeCheckRequired(

@@ -1,13 +1,15 @@
 package io.novafoundation.nova.common.utils.systemCall
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
+import io.novafoundation.nova.common.resources.ContextManager
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class SystemCallExecutor {
+class SystemCallExecutor(
+    private val contextManager: ContextManager
+) {
 
     private class PendingRequest<T>(
         val continuation: Continuation<Result<T>>,
@@ -16,19 +18,9 @@ class SystemCallExecutor {
 
     private val ongoingRequests = ConcurrentHashMap<Int, PendingRequest<Any?>>()
 
-    var activity: AppCompatActivity? = null
-
-    fun attachActivity(newActivity: AppCompatActivity) {
-        activity = newActivity
-    }
-
-    fun detachActivity() {
-        activity = null
-    }
-
     @Suppress("UNCHECKED_CAST") // type-safety is guaranteed by PendingRequest<T>
     suspend fun <T> executeSystemCall(systemCall: SystemCall<T>) = suspendCoroutine<Result<T>> { continuation ->
-        activity?.let {
+        contextManager.getActivity()?.let {
             val request = systemCall.createRequest(it)
 
             it.startActivityForResult(request.intent, request.requestCode)

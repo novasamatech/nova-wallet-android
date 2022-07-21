@@ -4,9 +4,9 @@ import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.address.AddressIconGenerator
-import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_dapp_impl.BuildConfig
 import io.novafoundation.nova.feature_dapp_impl.data.network.ethereum.EthereumApiFactory
@@ -107,16 +107,16 @@ class MetamaskModule {
         metamaskInteractor: MetamaskInteractor,
         chainRegistry: ChainRegistry,
         accountRepository: AccountRepository,
-        secretStoreV2: SecretStoreV2,
         tokenRepository: TokenRepository,
         @ExtrinsicSerialization extrinsicGson: Gson,
         addressIconGenerator: AddressIconGenerator,
-        ethereumApiFactory: EthereumApiFactory
+        ethereumApiFactory: EthereumApiFactory,
+        signerProvider: SignerProvider
     ) = MetamaskSignInteractorFactory(
         metamaskInteractor = metamaskInteractor,
         chainRegistry = chainRegistry,
         accountRepository = accountRepository,
-        secretStoreV2 = secretStoreV2,
+        signerProvider = signerProvider,
         tokenRepository = tokenRepository,
         extrinsicGson = extrinsicGson,
         addressIconGenerator = addressIconGenerator,

@@ -25,7 +25,7 @@ class ChangeRewardDestinationInteractor(
         stashState: StakingState.Stash,
         rewardDestination: RewardDestination,
     ): Result<String> = withContext(Dispatchers.IO) {
-        extrinsicService.submitExtrinsic(stashState.chain, stashState.controllerId) {
+        extrinsicService.submitExtrinsicWithAnySuitableWallet(stashState.chain, stashState.controllerId) {
             setPayee(rewardDestination)
         }
     }

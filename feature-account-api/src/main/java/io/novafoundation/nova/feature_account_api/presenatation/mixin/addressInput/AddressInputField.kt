@@ -8,6 +8,7 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getInputBackground
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
@@ -37,6 +38,8 @@ class AddressInputField @JvmOverloads constructor(
         setAddStatesFromChildren(true)
 
         setBackgrounds()
+
+        attrs?.let(::applyAttributes)
     }
 
     fun setState(state: AddressInputState) {
@@ -86,4 +89,9 @@ class AddressInputField @JvmOverloads constructor(
     }
 
     private fun Context.buttonBackground() = addRipple(getRoundedCornerDrawable(R.color.white_8))
+
+    private fun applyAttributes(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.AddressInputField) {
+        val hint = it.getString(R.styleable.AddressInputField_android_hint)
+        hint?.let { content.hint = hint }
+    }
 }

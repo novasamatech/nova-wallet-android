@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
@@ -84,4 +85,6 @@ interface CrowdloanFeatureDependencies {
     fun feeLoaderMixinFactory(): FeeLoaderMixin.Factory
 
     val parachainInfoRepository: ParachainInfoRepository
+
+    val signerProvider: SignerProvider
 }

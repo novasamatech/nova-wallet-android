@@ -6,7 +6,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.coroutineScope
 import io.novafoundation.nova.common.utils.EventObserver
 import io.novafoundation.nova.common.utils.bindTo
-import io.novafoundation.nova.common.utils.nameInputFilters
 import io.novafoundation.nova.common.utils.observe
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_account_impl.R
@@ -27,10 +26,6 @@ class JsonImportView @JvmOverloads constructor(
             nameInput = importJsonUsernameInput,
             visibilityDependent = emptyList()
         )
-
-    init {
-        importJsonUsernameInput.editText!!.filters = nameInputFilters()
-    }
 
     override fun observeSource(source: JsonImportSource, lifecycleOwner: LifecycleOwner) {
         val scope = lifecycleOwner.lifecycle.coroutineScope

@@ -2,12 +2,12 @@ package io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.m
 
 import android.util.Log
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
-import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.utils.LOG_TAG
+import io.novafoundation.nova.common.utils.asHexString
 import io.novafoundation.nova.common.utils.sha256
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
-import io.novafoundation.nova.feature_account_api.data.secrets.sign
+import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
@@ -31,6 +31,8 @@ import io.novafoundation.nova.runtime.state.chain
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
+import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadRaw
+import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.fromUtf8
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
@@ -49,7 +51,7 @@ class MoonbeamCrowdloanInteractor(
     private val selectedChainAssetState: SingleAssetSharedState,
     private val chainRegistry: ChainRegistry,
     private val httpExceptionHandler: HttpExceptionHandler,
-    private val secretStoreV2: SecretStoreV2,
+    private val signerProvider: SignerProvider,
 ) {
 
     fun getTermsLink() = "https://github.com/moonbeam-foundation/crowdloan-self-attestation/blob/main/moonbeam/README.md"
@@ -117,15 +119,20 @@ class MoonbeamCrowdloanInteractor(
             val metaAccount = accountRepository.getSelectedMetaAccount()
 
             val currentAddress = metaAccount.addressIn(chain)!!
+            val accountId = metaAccount.accountIdIn(chain)!!
 
             val legalText = httpExceptionHandler.wrap { moonbeamApi.getLegalText() }
             val legalHash = legalText.encodeToByteArray().sha256().toHexString(withPrefix = false)
-            val signedHash = secretStoreV2.sign(metaAccount, chain, legalHash)
+
+            val signer = signerProvider.signerFor(metaAccount)
+            val signerPayload = SignerPayloadRaw.fromUtf8(legalHash, accountId)
+
+            val signedHash = signer.signRaw(signerPayload).asHexString()
 
             val agreeRemarkRequest = AgreeRemarkRequest(currentAddress, signedHash)
             val remark = httpExceptionHandler.wrap { moonbeamApi.agreeRemark(parachainMetadata, agreeRemarkRequest) }.remark
 
-            val finalizedStatus = extrinsicService.submitAndWatchExtrinsic(chain, metaAccount.accountIdIn(chain)!!) {
+            val finalizedStatus = extrinsicService.submitAndWatchExtrinsicAnySuitableWallet(chain, metaAccount.accountIdIn(chain)!!) {
                 systemRemark(remark.encodeToByteArray())
             }
                 .filterIsInstance<ExtrinsicStatus.Finalized>()

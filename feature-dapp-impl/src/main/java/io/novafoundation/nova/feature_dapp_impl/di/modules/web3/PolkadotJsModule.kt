@@ -4,10 +4,10 @@ import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.address.AddressIconGenerator
-import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.polkadotJs.PolkadotJsExtensionInteractor
@@ -94,19 +94,19 @@ class PolkadotJsModule {
         extrinsicService: ExtrinsicService,
         chainRegistry: ChainRegistry,
         accountRepository: AccountRepository,
-        secretStoreV2: SecretStoreV2,
         tokenRepository: TokenRepository,
         @ExtrinsicSerialization extrinsicGson: Gson,
         addressIconGenerator: AddressIconGenerator,
-        walletRepository: WalletRepository
+        walletRepository: WalletRepository,
+        signerProvider: SignerProvider
     ) = PolkadotJsSignInteractorFactory(
         extrinsicService = extrinsicService,
         chainRegistry = chainRegistry,
         accountRepository = accountRepository,
-        secretStoreV2 = secretStoreV2,
         tokenRepository = tokenRepository,
         extrinsicGson = extrinsicGson,
         addressIconGenerator = addressIconGenerator,
-        walletRepository = walletRepository
+        walletRepository = walletRepository,
+        signerProvider = signerProvider
     )
 }

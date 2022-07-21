@@ -32,7 +32,7 @@ class PayoutInteractor(
             val chain = stakingSharedState.chain()
             val accountId = chain.accountIdOf(payload.originAddress)
 
-            extrinsicService.submitExtrinsic(chain, accountId) {
+            extrinsicService.submitExtrinsicWithAnySuitableWallet(chain, accountId) {
                 payload.payoutStakersCalls.forEach {
                     payoutStakers(it.era, it.validatorAddress.toAccountId())
                 }

@@ -99,11 +99,13 @@ class DAppSignViewModel(
     }
 
     private fun performOperation() = launch {
-        val response = interactor.performOperation()
+        interactor.performOperation()?.let { response ->
+            responder.respond(response)
 
-        responder.respond(response)
+            exit()
+        }
 
-        exit()
+        _performingOperationInProgress.value = false
     }
 
     private fun maybeLoadFee() {

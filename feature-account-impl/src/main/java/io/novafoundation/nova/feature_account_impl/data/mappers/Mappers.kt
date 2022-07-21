@@ -86,6 +86,13 @@ fun mapNodeLocalToNode(nodeLocal: NodeLocal): Node {
     }
 }
 
+private fun mapMetaAccountTypeFromLocal(local: MetaAccountLocal.Type): LightMetaAccount.Type {
+    return when (local) {
+        MetaAccountLocal.Type.SECRETS -> LightMetaAccount.Type.SECRETS
+        MetaAccountLocal.Type.WATCH_ONLY -> LightMetaAccount.Type.WATCH_ONLY
+    }
+}
+
 fun mapMetaAccountLocalToLightMetaAccount(
     metaAccountLocal: MetaAccountLocal
 ): LightMetaAccount = with(metaAccountLocal) {
@@ -97,7 +104,8 @@ fun mapMetaAccountLocalToLightMetaAccount(
         ethereumAddress = ethereumAddress,
         ethereumPublicKey = ethereumPublicKey,
         isSelected = isSelected,
-        name = name
+        name = name,
+        type = mapMetaAccountTypeFromLocal(type)
     )
 }
 
@@ -131,21 +139,22 @@ fun mapMetaAccountLocalToMetaAccount(
             ethereumAddress = ethereumAddress,
             ethereumPublicKey = ethereumPublicKey,
             isSelected = isSelected,
-            name = name
+            name = name,
+            type = mapMetaAccountTypeFromLocal(type)
         )
     }
 }
 
+@Deprecated("Accounts are deprecated")
 fun mapMetaAccountToAccount(chain: Chain, metaAccount: MetaAccount): Account? {
     return metaAccount.addressIn(chain)?.let { address ->
-
         val accountId = chain.hexAccountIdOf(address)
 
         Account(
             address = address,
             name = metaAccount.name,
             accountIdHex = accountId,
-            cryptoType = metaAccount.substrateCryptoType,
+            cryptoType = metaAccount.substrateCryptoType ?: CryptoType.SR25519,
             position = 0,
             network = stubNetwork(chain.id),
         )

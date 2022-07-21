@@ -18,6 +18,7 @@ import io.novafoundation.nova.core_db.dao.AccountDao
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.dao.NodeDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -29,6 +30,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserProvider
+import io.novafoundation.nova.feature_account_impl.data.extrinsic.RealExtrinsicService
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSource
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSourceImpl
 import io.novafoundation.nova.feature_account_impl.data.repository.AccountRepositoryImpl
@@ -37,6 +39,8 @@ import io.novafoundation.nova.feature_account_impl.data.repository.datasource.Ac
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSourceImpl
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.migration.AccountDataMigration
 import io.novafoundation.nova.feature_account_impl.data.secrets.AccountSecretsFactory
+import io.novafoundation.nova.feature_account_impl.di.modules.SignersModule
+import io.novafoundation.nova.feature_account_impl.di.modules.WatchOnlyModule
 import io.novafoundation.nova.feature_account_impl.domain.AccountInteractorImpl
 import io.novafoundation.nova.feature_account_impl.domain.NodeHostValidator
 import io.novafoundation.nova.feature_account_impl.domain.account.add.AddAccountInteractor
@@ -53,21 +57,21 @@ import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedDecoder
 import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedEncoder
 
-@Module
+@Module(includes = [SignersModule::class, WatchOnlyModule::class])
 class AccountFeatureModule {
 
     @Provides
     @FeatureScope
     fun provideExtrinsicService(
         accountRepository: AccountRepository,
-        secretStoreV2: SecretStoreV2,
         rpcCalls: RpcCalls,
         extrinsicBuilderFactory: ExtrinsicBuilderFactory,
-    ): ExtrinsicService = ExtrinsicService(
+        signerProvider: SignerProvider
+    ): ExtrinsicService = RealExtrinsicService(
         rpcCalls,
         accountRepository,
-        secretStoreV2,
-        extrinsicBuilderFactory
+        extrinsicBuilderFactory,
+        signerProvider
     )
 
     @Provides

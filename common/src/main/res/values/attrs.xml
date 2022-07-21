@@ -155,4 +155,14 @@
     <declare-styleable name="SearchToolbar">
         <attr name="android:hint" />
     </declare-styleable>
+    
+    <declare-styleable name="ButtonLarge">
+        <attr name="icon" />
+        <attr name="title" />
+        <attr name="subTitle" format="string" />
+        <attr name="buttonLargeStyle" format="enum">
+            <enum name="primary" value="0" />
+            <enum name="secondary" value="1" />
+        </attr>
+    </declare-styleable>
 </resources>

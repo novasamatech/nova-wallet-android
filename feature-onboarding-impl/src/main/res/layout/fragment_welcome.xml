@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/novabg_welcome_screen">
+    android:background="@drawable/bg_welcome">
 
     <ImageView
         android:id="@+id/back"
@@ -21,44 +21,53 @@
 
     <ImageView
         android:id="@+id/logoImg"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="193dp"
+        android:layout_height="260dp"
         android:src="@drawable/drawable_nova_logo"
-        app:layout_constraintBottom_toTopOf="@id/buttonsView"
+        app:layout_constraintBottom_toTopOf="@+id/guideline"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
-        android:id="@+id/buttonsView"
+    <io.novafoundation.nova.common.view.ButtonLarge
+        android:id="@+id/createAccountBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="10dp"
+        app:buttonLargeStyle="primary"
+        app:icon="@drawable/ic_add_circle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline"
+        app:title="@string/onboarding_create_wallet" />
+
+    <io.novafoundation.nova.common.view.ButtonLarge
+        android:id="@+id/importAccountBtn"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="44dp"
-        android:orientation="vertical"
-        android:padding="@dimen/x1"
-        app:layout_constraintBottom_toTopOf="@id/termsTv"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        android:layout_marginTop="10dp"
+        app:buttonLargeStyle="secondary"
+        app:icon="@drawable/ic_key"
+        app:layout_constraintEnd_toEndOf="@+id/createAccountBtn"
+        app:layout_constraintStart_toStartOf="@+id/createAccountBtn"
+        app:layout_constraintTop_toBottomOf="@+id/createAccountBtn"
+        app:subTitle="@string/account_import_wallet_subtitle"
+        app:title="@string/account_import_wallet_title" />
 
-        <io.novafoundation.nova.common.view.PrimaryButton
-            android:id="@+id/createAccountBtn"
-            style="@style/Widget.Nova.Button.Iconic"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:drawableEnd="@drawable/ic_add_circle"
-            android:layout_margin="@dimen/x1"
-            android:text="@string/onboarding_create_wallet" />
-
-        <io.novafoundation.nova.common.view.PrimaryButton
-            android:id="@+id/importAccountBtn"
-            style="@style/Widget.Nova.Button.Iconic"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:drawableEnd="@drawable/ic_key"
-            android:layout_margin="@dimen/x1"
-            android:text="@string/onboarding_restore_wallet" />
-
-    </LinearLayout>
+    <io.novafoundation.nova.common.view.ButtonLarge
+        android:id="@+id/welcomeAddWatchWallet"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        app:buttonLargeStyle="secondary"
+        app:icon="@drawable/ic_watch"
+        app:layout_constraintEnd_toEndOf="@+id/importAccountBtn"
+        app:layout_constraintStart_toStartOf="@+id/importAccountBtn"
+        app:layout_constraintTop_toBottomOf="@+id/importAccountBtn"
+        app:subTitle="@string/account_add_watch_only_description"
+        app:title="@string/account_add_watch_wallet" />
 
     <TextView
         android:id="@+id/termsTv"
@@ -67,13 +76,20 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/x2"
         android:layout_marginEnd="@dimen/x2"
-        android:layout_marginBottom="40dp"
+        android:layout_marginBottom="8dp"
         android:gravity="center"
         android:text="@string/onboarding_terms_and_conditions_1_v2_2_0"
-        android:textColor="@color/white"
+        android:textColor="@color/white_64"
         android:textColorLink="@color/colorAccent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.6" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

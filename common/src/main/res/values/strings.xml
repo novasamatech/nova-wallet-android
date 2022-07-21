@@ -1,5 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="account_import_wallet_title">Import wallet</string>
+  <string name="account_import_wallet_subtitle">Nova is compatible with all apps</string>
+
+  <string name="account_add_watch_only_description">Track any wallet by its address</string>
+
+  <string name="common_ok_back">Okay, back</string>
+
+  <string name="account_watch_key_missing_title">Oops! Key is missing</string>
+  <string name="account_watch_key_missing_description">Your wallet is watch-only, meaning that you cannot do any operations with it</string>
+
+  <string name="account_add_watch_wallet">Add watch-only wallet</string>
+  
+  <string name="account_enter_wallet_nickname">Enter wallet nickname...</string>
+  <string name="accoount_enter_substrate_address">Enter valid substrate address...</string>
+  <string name="accoount_enter_evm_address">Evm address must be valid or empty...</string>
+
+  <string name="common_substrate_address">Substrate Address</string>
+  <string name="account_watch_add_substrate_address_description">Polkadot, Kusama, Karura, KILT and 50+ networks</string>
+
+  <string name="common_evm_address">EVM address</string>
+  <string name="account_watch_add_evm_address_optional">EVM address (Optional)</string>
+  <string name="account_watch_add_evm_address_description">Moonbeam, Moonriver and other networks</string>
+
+  <string name="account_watch_add_presets">Preset wallets</string>
+  <string name="account_watch_add_subtitle">Track the activity of any wallet without injecting your private key to Nova Wallet</string>
+
   <string name="wallet_tokens">Tokens</string>
 
   <string name="assets_search_hint">Search by network or token</string>

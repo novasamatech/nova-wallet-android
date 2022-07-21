@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.di
+package io.novafoundation.nova.feature_account_impl.di.modules
 
 import dagger.Module
 import dagger.Provides
