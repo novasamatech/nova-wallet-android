@@ -39,7 +39,7 @@ class SelectedAccountUseCase(
         )
 
         val typeIcon = when(it.type) {
-            LightMetaAccount.Type.SECRETS -> null // no icon for secrets acount
+            LightMetaAccount.Type.SECRETS -> null // no icon for secrets account
             LightMetaAccount.Type.WATCH_ONLY -> R.drawable.ic_watch
         }
 
