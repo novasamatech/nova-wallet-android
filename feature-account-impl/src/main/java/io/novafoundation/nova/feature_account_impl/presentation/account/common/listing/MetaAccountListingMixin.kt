@@ -6,4 +6,3 @@ interface MetaAccountListingMixin {
 
     val metaAccountsFlow: Flow<List<Any>>
 }
-

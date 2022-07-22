@@ -15,7 +15,7 @@ class DAppNavigator(
     navigationHolder: NavigationHolder,
 ) : BaseNavigator(navigationHolder), DAppRouter {
 
-    override fun openChangeAccount() = performNavigation(R.id.action_open_accounts,)
+    override fun openChangeAccount() = performNavigation(R.id.action_open_switch_accounts)
 
     override fun openDAppBrowser(initialUrl: String) = performNavigation(
         cases = arrayOf(

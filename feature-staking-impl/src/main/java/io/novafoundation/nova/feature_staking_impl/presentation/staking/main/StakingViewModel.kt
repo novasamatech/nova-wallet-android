@@ -79,7 +79,7 @@ class StakingViewModel(
     }
 
     fun avatarClicked() {
-        router.openChangeAccount()
+        router.openSwitchWallet()
     }
 
     private fun currentAddressModelFlow(): Flow<AddressModel> {

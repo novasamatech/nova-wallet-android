@@ -10,7 +10,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddA
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountListingMixinFactory
-import io.novafoundation.nova.feature_account_impl.presentation.account.list.AccountsAdapter.Mode
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.AccountsAdapter.Mode
 import io.novafoundation.nova.feature_account_impl.presentation.account.model.MetaAccountUi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map

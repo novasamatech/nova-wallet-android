@@ -35,7 +35,7 @@ private class MetaAccountListingProvider(
     private val resourceManager: ResourceManager,
     private val accountInteractor: AccountInteractor,
     coroutineScope: CoroutineScope
-    ): MetaAccountListingMixin, WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(coroutineScope) {
+) : MetaAccountListingMixin, WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(coroutineScope) {
 
     override val metaAccountsFlow = accountInteractor.metaAccountsFlow().map { list ->
         list.toListWithHeaders(

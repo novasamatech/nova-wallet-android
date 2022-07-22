@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
-import io.novafoundation.nova.common.address.createAddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.Event
@@ -13,7 +12,6 @@ import io.novafoundation.nova.common.utils.formatAsCurrency
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.list.AssetsListInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
@@ -64,10 +62,8 @@ class BalanceListViewModel(
     private val selectedMetaAccount = selectedAccountUseCase.selectedMetaAccountFlow()
         .share()
 
-    val currentAddressModelFlow = selectedMetaAccount
-        .map { addressIconGenerator.createAddressModel(it.defaultSubstrateAddress, CURRENT_ICON_SIZE, it.name) }
-        .inBackground()
-        .share()
+    val selectedWalletModelFlow = selectedAccountUseCase.selectedWalletModelFlow()
+        .shareInBackground()
 
     private val nftsPreviews = assetsListInteractor.observeNftPreviews()
         .inBackground()
@@ -138,7 +134,7 @@ class BalanceListViewModel(
     }
 
     fun avatarClicked() {
-        router.openChangeAccount()
+        router.openSwitchWallet()
     }
 
     fun manageClicked() {

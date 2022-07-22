@@ -35,7 +35,7 @@ interface StakingRouter {
 
     fun returnToMain()
 
-    fun openChangeAccount()
+    fun openSwitchWallet()
 
     fun openStory(story: StakingStoryModel)
 

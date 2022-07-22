@@ -24,7 +24,7 @@ interface WalletRouter {
 
     fun openRewardDetail(reward: OperationParcelizeModel.Reward)
 
-    fun openChangeAccount()
+    fun openSwitchWallet()
 
     fun openReceive(assetPayload: AssetPayload)
 

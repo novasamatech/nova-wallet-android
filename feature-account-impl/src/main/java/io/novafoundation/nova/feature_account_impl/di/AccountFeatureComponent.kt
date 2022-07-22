@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.advanced
 import io.novafoundation.nova.feature_account_impl.presentation.account.create.di.CreateAccountComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.di.AccountDetailsComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.di.AccountListComponent
+import io.novafoundation.nova.feature_account_impl.presentation.account.select.di.AccountSwitchComponent
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ShareCompletedReceiver
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.di.ExportJsonConfirmComponent
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.password.di.ExportJsonPasswordComponent
@@ -56,6 +57,8 @@ interface AccountFeatureComponent : AccountFeatureApi {
     fun confirmMnemonicComponentFactory(): ConfirmMnemonicComponent.Factory
 
     fun accountsComponentFactory(): AccountListComponent.Factory
+
+    fun switchAccountComponentFactory(): AccountSwitchComponent.Factory
 
     fun accountDetailsComponentFactory(): AccountDetailsComponent.Factory
 

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="account_select_wallet">Select wallet</string>
+
   <string name="account_watch_only">watch-only</string>
 
   <string name="account_import_wallet_title">Import wallet</string>

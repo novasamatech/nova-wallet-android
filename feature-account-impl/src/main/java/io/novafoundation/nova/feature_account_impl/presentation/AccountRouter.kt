@@ -22,6 +22,7 @@ interface AccountRouter : SecureRouter {
     fun back()
 
     fun openWallets()
+    fun openSwitchWallet()
 
     fun openNodes()
 

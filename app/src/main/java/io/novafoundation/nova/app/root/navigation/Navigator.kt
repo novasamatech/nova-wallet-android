@@ -366,7 +366,11 @@ class Navigator(
     }
 
     override fun openWallets() {
-        navController?.navigate(R.id.action_open_accounts,)
+        navController?.navigate(R.id.action_open_accounts)
+    }
+
+    override fun openSwitchWallet() {
+        navController?.navigate(R.id.action_open_switch_accounts)
     }
 
     override fun openNodes() {
@@ -375,11 +379,6 @@ class Navigator(
 
     override fun openLanguages() {
         navController?.navigate(R.id.action_mainFragment_to_languagesFragment)
-    }
-
-    override fun openChangeAccount() {
-        // TODO switch wallets
-        openWallets()
     }
 
     override fun openReceive(assetPayload: AssetPayload) {
