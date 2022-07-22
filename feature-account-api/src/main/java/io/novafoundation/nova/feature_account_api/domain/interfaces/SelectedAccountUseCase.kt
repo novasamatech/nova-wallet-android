@@ -38,7 +38,7 @@ class SelectedAccountUseCase(
             sizeInDp = AddressIconGenerator.SIZE_BIG,
         )
 
-        val typeIcon = when(it.type) {
+        val typeIcon = when (it.type) {
             LightMetaAccount.Type.SECRETS -> null // no icon for secrets account
             LightMetaAccount.Type.WATCH_ONLY -> R.drawable.ic_watch
         }
