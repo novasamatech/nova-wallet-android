@@ -7,6 +7,8 @@ import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBo
 typealias ChooseOneOfManyAwaitable<E> = ActionAwaitableMixin<DynamicListBottomSheet.Payload<E>, E>
 typealias ConfirmationAwaitable<P> = ActionAwaitableMixin.Presentation<P, Unit>
 
+typealias ConfirmOrDenyAwaitable<P> = ActionAwaitableMixin.Presentation<P, Boolean>
+
 typealias ChooseOneOfAwaitableAction<E> = ActionAwaitableMixin.Action<List<E>, E>
 typealias ChooseOneOfManyAwaitableAction<E> = ActionAwaitableMixin.Action<DynamicListBottomSheet.Payload<E>, E>
 
@@ -33,5 +35,6 @@ interface ActionAwaitableMixin<P, R> {
 
 fun <T> ActionAwaitableMixin.Factory.selectingOneOf() = create<DynamicListBottomSheet.Payload<T>, T>()
 fun <P> ActionAwaitableMixin.Factory.confirmingAction(): ConfirmationAwaitable<P> = create()
+fun <P> ActionAwaitableMixin.Factory.confirmingOrDenyingAction(): ConfirmOrDenyAwaitable<P> = create()
 
 suspend fun <R> ActionAwaitableMixin.Presentation<Unit, R>.awaitAction() = awaitAction(Unit)

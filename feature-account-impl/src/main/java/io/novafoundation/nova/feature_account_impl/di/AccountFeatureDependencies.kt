@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.di.modules.Caching
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ContextManager
@@ -87,4 +88,6 @@ interface AccountFeatureDependencies {
     val multiChainQrSharingFactory: MultiChainQrSharingFactory
 
     val contextManager: ContextManager
+
+    val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
 }

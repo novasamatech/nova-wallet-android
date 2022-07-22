@@ -412,14 +412,6 @@ class Navigator(
         navController?.navigate(R.id.action_open_account_details, extras)
     }
 
-    override fun openEditAccounts() {
-        navController?.navigate(R.id.action_accountsFragment_to_editAccountsFragment)
-    }
-
-    override fun backToMainScreen() {
-        navController?.navigate(R.id.action_editAccountsFragment_to_mainFragment)
-    }
-
     override fun openNodeDetails(nodeId: Int) {
         navController?.navigate(R.id.action_nodesFragment_to_nodeDetailsFragment, NodeDetailsFragment.getBundle(nodeId))
     }

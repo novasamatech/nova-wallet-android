@@ -15,9 +15,10 @@
         android:orientation="vertical">
 
         <io.novafoundation.nova.common.view.Toolbar
-            android:id="@+id/novaToolbar"
+            android:id="@+id/accountListToolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:dividerVisible="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -29,6 +30,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
+            android:paddingTop="8dp"
             android:paddingBottom="82dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toTopOf="@+id/addAccount"

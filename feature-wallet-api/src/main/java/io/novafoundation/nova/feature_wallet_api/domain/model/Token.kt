@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_wallet_api.domain.model
 
+import io.novafoundation.nova.common.utils.amountFromPlanks
+import io.novafoundation.nova.common.utils.planksFromAmount
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -20,6 +22,6 @@ fun Token.amountFromPlanks(amountInPlanks: BigInteger) = configuration.amountFro
 
 fun Token.planksFromAmount(amount: BigDecimal): BigInteger = configuration.planksFromAmount(amount)
 
-fun Chain.Asset.amountFromPlanks(amountInPlanks: BigInteger) = amountInPlanks.toBigDecimal(scale = precision)
+fun Chain.Asset.amountFromPlanks(amountInPlanks: BigInteger) = amountInPlanks.amountFromPlanks(precision)
 
-fun Chain.Asset.planksFromAmount(amount: BigDecimal): BigInteger = amount.scaleByPowerOfTen(precision).toBigInteger()
+fun Chain.Asset.planksFromAmount(amount: BigDecimal): BigInteger = amount.planksFromAmount(precision)
