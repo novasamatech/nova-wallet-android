@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_crowdloan_impl.domain.main
 
 import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.common.utils.flowOf
-import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRepository
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.getContributions
@@ -21,15 +21,14 @@ import kotlin.time.ExperimentalTime
 typealias GroupedCrowdloans = GroupedList<KClass<out Crowdloan.State>, Crowdloan>
 
 class CrowdloanInteractor(
-    private val accountRepository: AccountRepository,
     private val crowdloanRepository: CrowdloanRepository,
     private val chainStateRepository: ChainStateRepository,
     private val externalContributionsSource: ExternalContributionSource,
 ) {
 
-    fun crowdloansFlow(chain: Chain): Flow<List<Crowdloan>> {
+    fun crowdloansFlow(chain: Chain, account: MetaAccount): Flow<List<Crowdloan>> {
         return flow {
-            val accountId = currentAccountIdIn(chain)
+            val accountId = account.accountIdIn(chain)!!
 
             emitAll(crowdloanListFlow(chain, accountId))
         }
@@ -40,9 +39,9 @@ class CrowdloanInteractor(
             .toSortedMap(Crowdloan.State.STATE_CLASS_COMPARATOR)
     }
 
-    fun externalContributions(chain: Chain): Flow<Int> {
+    fun externalContributions(chain: Chain, account: MetaAccount): Flow<Int> {
         return flowOf {
-            val accountId = currentAccountIdIn(chain)
+            val accountId = account.accountIdIn(chain)!!
 
             loadExternalContributions(chain, accountId)
         }
@@ -55,11 +54,6 @@ class CrowdloanInteractor(
         val directContributions = crowdloans.count { it.myContribution != null }
 
         return directContributions + externalContributions
-    }
-
-    private suspend fun currentAccountIdIn(chain: Chain): AccountId {
-        val metaAccount = accountRepository.getSelectedMetaAccount()
-        return metaAccount.accountIdIn(chain)!! // TODO ethereum
     }
 
     @OptIn(ExperimentalTime::class)

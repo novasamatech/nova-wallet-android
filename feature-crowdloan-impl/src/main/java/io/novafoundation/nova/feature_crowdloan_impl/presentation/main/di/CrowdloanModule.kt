@@ -32,10 +32,12 @@ class CrowdloanModule {
     fun provideCrowdloanMixinFactory(
         crowdloanSharedState: CrowdloanSharedState,
         interactor: CrowdloanInteractor,
+        selectedAccountUseCase: SelectedAccountUseCase,
     ): StatefulCrowdloanMixin.Factory {
         return StatefulCrowdloanProviderFactory(
             singleAssetSharedState = crowdloanSharedState,
-            interactor = interactor
+            interactor = interactor,
+            selectedAccountUseCase = selectedAccountUseCase,
         )
     }
 
