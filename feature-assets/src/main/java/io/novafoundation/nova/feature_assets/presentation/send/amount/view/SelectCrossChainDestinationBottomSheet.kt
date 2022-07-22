@@ -34,7 +34,6 @@ class SelectCrossChainDestinationBottomSheet(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setDividerVisible(false)
         setTitle(R.string.wallet_send_recipient_network)
 
         setOnCancelListener { onCancelled() }

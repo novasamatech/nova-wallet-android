@@ -19,13 +19,6 @@ private const val ARG_DIRECTION = "ARG_DIRECTION"
 class AccountListFragment : BaseFragment<AccountListViewModel>(), AccountsAdapter.AccountItemHandler {
     private lateinit var adapter: AccountsAdapter
 
-    companion object {
-
-        fun getBundle(accountChosenNavDirection: AccountChosenNavDirection) = Bundle().apply {
-            putSerializable(ARG_DIRECTION, accountChosenNavDirection)
-        }
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -45,19 +38,17 @@ class AccountListFragment : BaseFragment<AccountListViewModel>(), AccountsAdapte
     }
 
     override fun inject() {
-        val accountChosenNavDirection = argument<AccountChosenNavDirection>(ARG_DIRECTION)
-
         FeatureUtils.getFeature<AccountFeatureComponent>(
             requireContext(),
             AccountFeatureApi::class.java
         )
             .accountsComponentFactory()
-            .create(this, accountChosenNavDirection)
+            .create(this)
             .inject(this)
     }
 
     override fun subscribe(viewModel: AccountListViewModel) {
-        viewModel.walletsFlow.observe(adapter::submitList)
+        viewModel.walletsListingMixin.metaAccountsFlow.observe(adapter::submitList)
         viewModel.mode.observe(adapter::setMode)
 
         viewModel.toolbarAction.observe(accountListToolbar::setTextRight)

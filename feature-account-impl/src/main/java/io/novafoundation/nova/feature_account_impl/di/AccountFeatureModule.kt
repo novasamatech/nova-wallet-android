@@ -47,6 +47,7 @@ import io.novafoundation.nova.feature_account_impl.domain.account.add.AddAccount
 import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountDetailsInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.wallet.WalletUiUseCaseImpl
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherMixin
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherProvider
@@ -275,4 +276,12 @@ class AccountFeatureModule {
     ): WalletUiUseCase {
         return WalletUiUseCaseImpl(accountRepository, addressIconGenerator)
     }
+
+    @Provides
+    @FeatureScope
+    fun provideAccountListingMixinFactory(
+        addressIconGenerator: AddressIconGenerator,
+        resourceManager: ResourceManager,
+        accountInteractor: AccountInteractor
+    ) = MetaAccountListingMixinFactory(addressIconGenerator, resourceManager, accountInteractor)
 }

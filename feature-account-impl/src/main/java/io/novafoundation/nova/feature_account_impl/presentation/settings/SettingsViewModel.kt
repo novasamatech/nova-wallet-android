@@ -15,7 +15,6 @@ import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.account.list.AccountChosenNavDirection
 import io.novafoundation.nova.feature_account_impl.presentation.language.mapper.mapLanguageToLanguageModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -60,7 +59,7 @@ class SettingsViewModel(
     val openEmailEvent: LiveData<Event<String>> = _openEmailEvent
 
     fun walletsClicked() {
-        router.openAccounts(AccountChosenNavDirection.MAIN)
+        router.openWallets()
     }
 
     fun networksClicked() {

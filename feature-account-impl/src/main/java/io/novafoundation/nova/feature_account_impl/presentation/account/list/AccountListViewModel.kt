@@ -1,46 +1,30 @@
 package io.novafoundation.nova.feature_account_impl.presentation.account.list
 
-import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.awaitAction
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingOrDenyingAction
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.formatAsCurrency
-import io.novafoundation.nova.common.view.ChipLabelModel
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
-import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type
-import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountWithTotalBalance
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.AccountsAdapter.Mode
 import io.novafoundation.nova.feature_account_impl.presentation.account.model.MetaAccountUi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-enum class AccountChosenNavDirection {
-    BACK, MAIN
-}
-
 class AccountListViewModel(
     private val accountInteractor: AccountInteractor,
     private val accountRouter: AccountRouter,
-    private val accountChosenNavDirection: AccountChosenNavDirection,
-    private val addressIconGenerator: AddressIconGenerator,
     private val resourceManager: ResourceManager,
-    private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+    private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+    private val accountListingMixinFactory: MetaAccountListingMixinFactory,
 ) : BaseViewModel() {
 
-    val walletsFlow = accountInteractor.metaAccountsFlow().map { list ->
-        list.toListWithHeaders(
-            keyMapper = ::mapMetaAccountTypeToUi,
-            valueMapper = { mapMetaAccountToUi(it) }
-        )
-    }
-        .shareInBackground()
+    val walletsListingMixin = accountListingMixinFactory.create(this)
 
     val mode = MutableStateFlow(Mode.VIEW)
 
@@ -81,29 +65,5 @@ class AccountListViewModel(
 
     fun addAccountClicked() {
         accountRouter.openAddAccount(AddAccountPayload.MetaAccount)
-    }
-
-    private suspend fun mapMetaAccountToUi(metaAccount: MetaAccountWithTotalBalance) = with(metaAccount) {
-        val icon = addressIconGenerator.createAddressIcon(
-            accountId = metaAccount.substrateAccountId,
-            sizeInDp = AddressIconGenerator.SIZE_MEDIUM,
-            backgroundColorRes = AddressIconGenerator.BACKGROUND_TRANSPARENT
-        )
-
-        MetaAccountUi(
-            id = metaId,
-            name = name,
-            isSelected = isSelected,
-            picture = icon,
-            totalBalance = totalBalance.formatAsCurrency()
-        )
-    }
-
-    private fun mapMetaAccountTypeToUi(type: Type): ChipLabelModel? = when (type) {
-        Type.SECRETS -> null
-        Type.WATCH_ONLY -> ChipLabelModel(
-            iconRes = R.drawable.ic_watch,
-            title = resourceManager.getString(R.string.account_watch_only)
-        )
     }
 }
