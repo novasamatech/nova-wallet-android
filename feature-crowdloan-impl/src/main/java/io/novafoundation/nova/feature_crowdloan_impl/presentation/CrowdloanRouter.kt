@@ -29,4 +29,6 @@ interface CrowdloanRouter {
     fun openAddAccount(payload: AddAccountPayload)
 
     fun openUserContributions()
+
+    fun openSwitchWallet()
 }

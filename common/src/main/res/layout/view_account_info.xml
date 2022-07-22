@@ -65,6 +65,7 @@
         android:background="@drawable/bg_primary_list_item"
         android:clickable="true"
         android:focusable="true"
+        app:tint="@color/white_48"
         android:padding="@dimen/x1"
         android:src="@drawable/ic_copy"
         app:layout_constraintBottom_toBottomOf="parent"

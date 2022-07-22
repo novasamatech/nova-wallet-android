@@ -17,9 +17,9 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.common.DappModel
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.favourites.setupRemoveFavouritesConfirmation
 import kotlinx.android.synthetic.main.fragment_dapp_main.dappMainCategorizedDapps
 import kotlinx.android.synthetic.main.fragment_dapp_main.dappMainContainer
-import kotlinx.android.synthetic.main.fragment_dapp_main.dappMainIcon
 import kotlinx.android.synthetic.main.fragment_dapp_main.dappMainManage
 import kotlinx.android.synthetic.main.fragment_dapp_main.dappMainSearch
+import kotlinx.android.synthetic.main.fragment_dapp_main.dappMainSelectedWallet
 
 class MainDAppFragment : BaseFragment<MainDAppViewModel>(), DappListAdapter.Handler {
 
@@ -34,7 +34,7 @@ class MainDAppFragment : BaseFragment<MainDAppViewModel>(), DappListAdapter.Hand
     override fun initViews() {
         dappMainContainer.applyStatusBarInsets()
 
-        dappMainIcon.setOnClickListener { viewModel.accountIconClicked() }
+        dappMainSelectedWallet.setOnClickListener { viewModel.accountIconClicked() }
 
         dappMainCategorizedDapps.setOnCategoryChangedListener {
             viewModel.categorySelected(it)
@@ -61,7 +61,7 @@ class MainDAppFragment : BaseFragment<MainDAppViewModel>(), DappListAdapter.Hand
         observeBrowserEvents(viewModel)
         setupRemoveFavouritesConfirmation(viewModel.removeFavouriteConfirmationAwaitable)
 
-        viewModel.currentAddressIconFlow.observe(dappMainIcon::setImageDrawable)
+        viewModel.selectedWalletFlow.observe(dappMainSelectedWallet::setModel)
 
         viewModel.shownDAppsStateFlow.observe { state ->
             when (state) {
