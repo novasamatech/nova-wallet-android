@@ -5,6 +5,9 @@ import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.hasAccountIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.SecretType
@@ -12,7 +15,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherMixin.Presentation
-import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherMixin.Presentation.Mode
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 class AddAccountLauncherProvider(
@@ -37,12 +39,26 @@ class AddAccountLauncherProvider(
         router.openImportAccountScreen(ImportAccountPayload(secretType, chainAccountPayload))
     }
 
-    override fun initiateLaunch(chain: Chain, metaAccountId: Long, mode: Mode) {
-        val chainAccountPayload = AddAccountPayload.ChainAccount(chain.id, metaAccountId)
+    override fun initiateLaunch(chain: Chain, metaAccount: MetaAccount) {
+        when (metaAccount.type) {
+            LightMetaAccount.Type.SECRETS -> launchAddFromSecrets(chain, metaAccount)
+            LightMetaAccount.Type.WATCH_ONLY -> launchAddWatchOnly(chain, metaAccount)
+        }
+    }
 
-        val titleTemplate = when (mode) {
-            Mode.CHANGE -> R.string.accounts_change_chain_account
-            Mode.ADD -> R.string.accounts_add_chain_account
+    private fun launchAddWatchOnly(chain: Chain, metaAccount: MetaAccount) {
+        val chainAccountPayload = AddAccountPayload.ChainAccount(chain.id, metaAccount.id)
+
+        // TODO open add watch only screen
+    }
+
+    private fun launchAddFromSecrets(chain: Chain, metaAccount: MetaAccount) {
+        val chainAccountPayload = AddAccountPayload.ChainAccount(chain.id, metaAccount.id)
+
+        val titleTemplate = if (metaAccount.hasAccountIn(chain)) {
+            R.string.accounts_change_chain_account
+        } else {
+            R.string.accounts_add_chain_account
         }
         val title = resourceManager.getString(titleTemplate, chain.name)
 

@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Widget.Nova.DappIcon.Big" parent="">
-        <item name="android:layout_width">88dp</item>
-        <item name="android:layout_height">88dp</item>
-        <item name="android:background">@drawable/dapp_icon_background_big</item>
-        <item name="android:padding">16dp</item>
-    </style>
+
 
     <style name="GoNextTransactionDetailsTextAppearance">
         <item name="android:textColor">@color/white_64</item>

@@ -11,7 +11,7 @@
 
     <ImageView
         android:id="@+id/confirmSignExtinsicIcon"
-        style="@style/Widget.Nova.DappIcon.Big"
+        style="@style/Widget.Nova.Icon.Big"
         android:layout_marginTop="20dp"
         tools:src="@drawable/ic_earth" />
 

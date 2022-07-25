@@ -21,7 +21,6 @@ class ImportTypeChooserBottomSheet(
         super.onCreate(savedInstanceState)
 
         setTitle(R.string.account_select_secret_source)
-        setTitleDividerVisible(false)
 
         item(
             type = SecretType.MNEMONIC,

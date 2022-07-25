@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
+import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import io.novafoundation.nova.common.R
@@ -20,10 +21,11 @@ class AlertView @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : LinearLayout(context, attrs, defStyle), WithContextExtensions by WithContextExtensions(context) {
 
-    enum class Style(@DrawableRes val iconRes: Int, val backgroundColorRes: Int) {
-        WARNING(R.drawable.ic_warning_filled, R.color.yellow_12),
-        ERROR(R.drawable.ic_slash, R.color.red_12)
+    enum class StylePreset {
+        WARNING, ERROR
     }
+
+    class Style(@DrawableRes val iconRes: Int, @ColorRes val backgroundColorRes: Int)
 
     init {
         View.inflate(context, R.layout.view_alert, this)
@@ -36,8 +38,12 @@ class AlertView @JvmOverloads constructor(
     }
 
     fun setStyle(style: Style) {
-        background = getRoundedCornerDrawable(fillColorRes = style.backgroundColorRes)
-        alertIcon.setImageResource(style.iconRes)
+        setStyleBackground(style.backgroundColorRes)
+        setStyleIcon(style.iconRes)
+    }
+
+    fun setStylePreset(preset: StylePreset) {
+        setStyle(styleFromPreset(preset))
     }
 
     fun setText(text: String) {
@@ -48,11 +54,29 @@ class AlertView @JvmOverloads constructor(
         alertMessage.setText(textRes)
     }
 
+    private fun setStyleBackground(@ColorRes colorRes: Int) {
+        background = getRoundedCornerDrawable(fillColorRes = colorRes)
+    }
+
+    private fun setStyleIcon(@DrawableRes iconRes: Int) {
+        alertIcon.setImageResource(iconRes)
+    }
+
     private fun applyAttrs(attributeSet: AttributeSet) = context.useAttributes(attributeSet, R.styleable.AlertView) {
-        val style = it.getEnum(R.styleable.AlertView_style, Style.WARNING)
-        setStyle(style)
+        val stylePreset = it.getEnum(R.styleable.AlertView_style, StylePreset.WARNING)
+        val styleFromPreset = styleFromPreset(stylePreset)
+
+        val backgroundColorRes = it.getResourceId(R.styleable.AlertView_styleBackgroundColor, styleFromPreset.backgroundColorRes)
+        val iconRes = it.getResourceId(R.styleable.AlertView_styleIcon, styleFromPreset.iconRes)
+
+        setStyle(Style(iconRes, backgroundColorRes))
 
         val text = it.getString(R.styleable.AlertView_android_text)
         text?.let(::setText)
+    }
+
+    private fun styleFromPreset(preset: StylePreset) = when (preset) {
+        StylePreset.WARNING -> Style(R.drawable.ic_warning_filled, R.color.yellow_12)
+        StylePreset.ERROR -> Style(R.drawable.ic_slash, R.color.red_12)
     }
 }

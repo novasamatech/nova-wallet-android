@@ -123,8 +123,10 @@ fun TextView.setDrawableEnd(
     paddingInDp: Int = 0,
     @ColorRes tint: Int? = null,
 ) {
+    val (start, top, _, bottom) = compoundDrawablesRelative
+
     setCompoundDrawable(drawableRes, widthInDp, heightInDp, tint, paddingInDp) {
-        setCompoundDrawablesRelative(null, null, it, null)
+        setCompoundDrawablesRelative(start, top, it, bottom)
     }
 }
 
@@ -135,22 +137,11 @@ fun TextView.setDrawableStart(
     paddingInDp: Int = 0,
     @ColorRes tint: Int? = null,
 ) {
+    val (_, top, end, bottom) = compoundDrawablesRelative
+
     setCompoundDrawable(drawableRes, widthInDp, heightInDp, tint, paddingInDp) {
-        setCompoundDrawablesRelative(it, null, null, null)
+        setCompoundDrawablesRelative(it, top, end, bottom)
     }
-}
-
-fun TextView.setDrawableStart(
-    drawable: Drawable,
-    paddingInDp: Int,
-    widthInDp: Int? = null,
-    heightInDp: Int? = widthInDp,
-) {
-    compoundDrawablePadding = paddingInDp.dp(context)
-
-    drawable.updateDimensions(context, widthInDp, heightInDp)
-
-    setCompoundDrawablesRelative(drawable, null, null, null)
 }
 
 private fun Drawable.updateDimensions(
