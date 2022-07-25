@@ -19,6 +19,8 @@ import jp.co.soramitsu.fearless_utils.runtime.metadata.RuntimeMetadataReader
 import jp.co.soramitsu.fearless_utils.runtime.metadata.builder.VersionedRuntimeBuilder
 import jp.co.soramitsu.fearless_utils.runtime.metadata.v14.RuntimeMetadataSchemaV14
 import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
 
@@ -39,16 +41,25 @@ class RuntimeFactory(
     private val runtimeFilesCache: RuntimeFilesCache,
     private val chainDao: ChainDao,
     private val gson: Gson,
+    private val concurrencyLimit: Int = 10
 ) {
 
     private val dispatcher = Executors.newCachedThreadPool().asCoroutineDispatcher()
+    private val semaphore = Semaphore(concurrencyLimit)
+
+    suspend fun constructRuntime(
+        chainId: String,
+        typesUsage: TypesUsage,
+    ): ConstructedRuntime = semaphore.withPermit {
+        constructRuntimeInternal(chainId, typesUsage)
+    }
 
     /**
      * @throws BaseTypesNotInCacheException
      * @throws ChainInfoNotInCacheException
      * @throws NoRuntimeVersionException
      */
-    suspend fun constructRuntime(
+    private suspend fun constructRuntimeInternal(
         chainId: String,
         typesUsage: TypesUsage,
     ): ConstructedRuntime = withContext(dispatcher) {
