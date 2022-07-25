@@ -7,8 +7,8 @@ import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainFee
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.transferConfiguration
-import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
+import io.novafoundation.nova.runtime.di.RuntimeApi
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.findChain
 import kotlinx.coroutines.runBlocking
@@ -22,8 +22,15 @@ class CrossChainTransfersIntegrationTest : BaseIntegrationTest() {
         WalletFeatureApi::class.java
     )
 
+    private val runtimeApi = FeatureUtils.getFeature<RuntimeApi>(
+        ApplicationProvider.getApplicationContext<Context>(),
+        RuntimeApi::class.java
+    )
+
     private val chainTransfersRepository = walletApi.crossChainTransfersRepository
     private val crossChainWeigher = walletApi.crossChainWeigher
+
+    private val parachainInfoRepository = runtimeApi.parachainInfoRepository
 
     @Test
     fun testParachainToParachain() = performFeeTest(
@@ -70,7 +77,7 @@ class CrossChainTransfersIntegrationTest : BaseIntegrationTest() {
                 originChain = originChain,
                 originAsset = asssetInOrigin,
                 destinationChain = destinationChain,
-                destinationParaId = null // Replaced by null
+                destinationParaId = parachainInfoRepository.paraId(originChain.id)
             )!!
 
             val crossChainFee = crossChainWeigher.estimateFee(crossChainTransfer)
