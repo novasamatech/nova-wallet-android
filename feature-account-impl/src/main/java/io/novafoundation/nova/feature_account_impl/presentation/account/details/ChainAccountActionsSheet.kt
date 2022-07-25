@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_account_impl.presentation.account.details
 
 import android.content.Context
 import android.os.Bundle
+import androidx.annotation.StringRes
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.view.bottomSheet.list.fixed.item
 import io.novafoundation.nova.feature_account_api.presenatation.actions.CopyCallback
@@ -22,14 +23,22 @@ class ChainAccountActionsSheet(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        item(R.drawable.ic_staking_operations, R.string.accounts_change_chain_secrets) {
-            onChange(payload.chain)
-        }
+        val type = payload.type
 
-        if (payload.type !is ExternalActions.Type.None) {
-            item(R.drawable.ic_share_arrow_white_24, R.string.account_export) {
+        if (type is ExternalActions.Type.Address && type.address != null) {
+            item(R.drawable.ic_share_arrow_white_24, R.string.account_export, showArrow = true) {
                 onExport(payload.chain)
             }
+
+            changeAccountItem(R.string.accounts_change_chain_secrets)
+        } else {
+            changeAccountItem(R.string.account_add_account)
+        }
+    }
+
+    private fun changeAccountItem(@StringRes labelRes: Int) {
+        item(R.drawable.ic_staking_operations, labelRes, showArrow = true) {
+            onChange(payload.chain)
         }
     }
 }

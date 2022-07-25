@@ -1,9 +1,11 @@
 package io.novafoundation.nova.feature_account_api.presenatation.actions
 
+import android.graphics.drawable.Drawable
 import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ExplorerTemplateExtractor
@@ -14,17 +16,17 @@ interface ExternalActions : Browserable {
     class Payload(
         val type: Type,
         val chain: Chain,
-        @StringRes val copyLabelRes: Int?,
+        val chainUi: ChainUi?,
+        val icon: Drawable?,
+        @StringRes val copyLabelRes: Int,
     )
 
     sealed class Type(
-        val primaryValue: String,
-        val explorerTemplateExtractor: ExplorerTemplateExtractor?,
+        val primaryValue: String?,
+        val explorerTemplateExtractor: ExplorerTemplateExtractor,
     ) {
 
-        class None(primaryValue: String) : Type(primaryValue, explorerTemplateExtractor = null)
-
-        class Address(val address: String) : Type(address, explorerTemplateExtractor = Chain.Explorer::account)
+        class Address(val address: String?) : Type(address, explorerTemplateExtractor = Chain.Explorer::account)
 
         class Extrinsic(val hash: String) : Type(hash, explorerTemplateExtractor = Chain.Explorer::extrinsic)
 
@@ -39,11 +41,11 @@ interface ExternalActions : Browserable {
 
     interface Presentation : ExternalActions, Browserable.Presentation {
 
-        fun showExternalActions(type: Type, chain: Chain)
+        suspend fun showExternalActions(type: Type, chain: Chain)
     }
 }
 
-fun ExternalActions.Presentation.showAddressActions(accountId: AccountId, chain: Chain) = showExternalActions(
+suspend fun ExternalActions.Presentation.showAddressActions(accountId: AccountId, chain: Chain) = showExternalActions(
     type = ExternalActions.Type.Address(chain.addressOf(accountId)),
     chain = chain
 )

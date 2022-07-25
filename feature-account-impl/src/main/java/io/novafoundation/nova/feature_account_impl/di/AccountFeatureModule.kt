@@ -166,8 +166,9 @@ class AccountFeatureModule {
     fun provideExternalAccountActions(
         clipboardManager: ClipboardManager,
         resourceManager: ResourceManager,
+        addressIconGenerator: AddressIconGenerator
     ): ExternalActions.Presentation {
-        return ExternalActionsProvider(clipboardManager, resourceManager)
+        return ExternalActionsProvider(clipboardManager, resourceManager, addressIconGenerator)
     }
 
     @Provides

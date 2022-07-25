@@ -30,7 +30,6 @@ class ValidatorStakeBottomSheet(
         super.onCreate(savedInstanceState)
 
         setTitle(R.string.staking_validator_total_stake)
-        setTitleDividerVisible(false)
 
         item(createCellView()) {
             it.setTitle(R.string.staking_validator_own_stake)

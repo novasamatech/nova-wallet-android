@@ -17,7 +17,6 @@ class CollatorManageActionsBottomSheet(
         super.onCreate(savedInstanceState)
 
         setTitle(R.string.parachain_staking_manage_collators)
-        setTitleDividerVisible(false)
 
         ManageCollatorsAction.values().forEach {
             item(it)

@@ -18,7 +18,7 @@
 
     <ImageView
         android:id="@+id/addToFavouritesIcon"
-        style="@style/Widget.Nova.DappIcon.Big"
+        style="@style/Widget.Nova.Icon.Big"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="12dp"
         tools:src="@drawable/ic_earth" />

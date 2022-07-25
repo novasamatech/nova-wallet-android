@@ -18,7 +18,6 @@ import io.novafoundation.nova.feature_account_impl.domain.account.details.Accoun
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountInChain
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherMixin
-import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherMixin.Presentation.Mode
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -111,13 +110,9 @@ class AccountDetailsViewModel(
     fun chainAccountClicked(item: AccountInChainUi) = launch {
         val chain = chainRegistry.getChain(item.chainUi.id)
 
-        if (item.address != null) {
-            val type = ExternalActions.Type.Address(item.address)
+        val type = ExternalActions.Type.Address(item.address)
 
-            externalActions.showExternalActions(type, chain)
-        } else {
-            addAccountLauncherMixin.initiateLaunch(chain, metaId, Mode.ADD)
-        }
+        externalActions.showExternalActions(type, chain)
     }
 
     fun exportClicked(inChain: Chain) = launch {
@@ -145,6 +140,8 @@ class AccountDetailsViewModel(
     }
 
     fun changeChainAccountClicked(inChain: Chain) {
-        addAccountLauncherMixin.initiateLaunch(inChain, metaId, Mode.CHANGE)
+        launch {
+            addAccountLauncherMixin.initiateLaunch(inChain, metaAccount())
+        }
     }
 }
