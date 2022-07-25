@@ -45,13 +45,13 @@ class ExternalActionsProvider(
         }
 
         // only show chain button for address as for now
-        val chainUi = when(type) {
+        val chainUi = when (type) {
             is ExternalActions.Type.Address -> mapChainToUi(chain)
             else -> null
         }
 
         // only show icon for address as for now
-        val icon = when(type) {
+        val icon = when (type) {
             is ExternalActions.Type.Address -> if (type.address != null) {
                 addressIconGenerator.createAccountAddressModel(chain, type.address, name = null).image
             } else {

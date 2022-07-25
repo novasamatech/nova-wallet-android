@@ -40,7 +40,7 @@ class AddAccountLauncherProvider(
     }
 
     override fun initiateLaunch(chain: Chain, metaAccount: MetaAccount) {
-        when(metaAccount.type) {
+        when (metaAccount.type) {
             LightMetaAccount.Type.SECRETS -> launchAddFromSecrets(chain, metaAccount)
             LightMetaAccount.Type.WATCH_ONLY -> launchAddWatchOnly(chain, metaAccount)
         }

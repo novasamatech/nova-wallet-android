@@ -35,7 +35,7 @@ class ChainAccountActionsSheet(
 
     private fun showAvailableAccountActions() {
         availableAccountActions.forEach {
-            when(it) {
+            when (it) {
                 AccountAction.EXPORT -> maybeShowExport()
                 AccountAction.CHANGE -> maybeShowChange()
             }

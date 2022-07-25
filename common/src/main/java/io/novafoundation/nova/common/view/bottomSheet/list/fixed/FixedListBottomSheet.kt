@@ -124,5 +124,5 @@ fun FixedListBottomSheet.item(
     showArrow: Boolean = false,
     onClick: (View) -> Unit
 ) {
-    item(icon, context.getString(titleRes),showArrow, onClick)
+    item(icon, context.getString(titleRes), showArrow, onClick)
 }
