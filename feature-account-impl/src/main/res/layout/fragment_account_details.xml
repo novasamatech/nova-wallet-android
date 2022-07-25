@@ -42,7 +42,6 @@
         android:id="@+id/accountDetailsChainAccounts"
         android:layout_height="match_parent"
         app:layoutManager="io.novafoundation.nova.common.view.recyclerview.LinearLayoutManagerFixed"
-        android:layout_marginTop="16dp"
         tools:listitem="@layout/item_chain_acount" />
 
 </LinearLayout>

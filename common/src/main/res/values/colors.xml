@@ -5,7 +5,7 @@
     <color name="colorSelected">@color/colorPrimaryDark</color>
     <color name="colorAccent">#FF009A</color>
     <color name="white">#fff</color>
-    <color name="colorHint">#ccc</color>
+    <color name="colorHint">@color/white_64</color>
     <color name="black">#000</color>
     <color name="gray1">#CCCCCC</color>
     <color name="gray2">#888888</color>

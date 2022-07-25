@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:paddingBottom="4dp"
     android:background="@drawable/bg_primary_list_item"
     tools:background="@color/black">
 
@@ -21,11 +22,12 @@
 
     <TextView
         android:id="@+id/chainAccountChainName"
-        style="@style/TextAppearance.NovaFoundation.Body1"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="@color/white"
         android:layout_marginStart="12dp"
-        android:layout_marginTop="7dp"
+        android:layout_marginTop="5dp"
         android:includeFontPadding="false"
         app:layout_constraintStart_toEndOf="@+id/chainAccountChainIcon"
         app:layout_constraintTop_toTopOf="parent"
@@ -44,7 +46,7 @@
 
     <TextView
         android:id="@+id/chainAccountAccountAddress"
-        style="@style/TextAppearance.NovaFoundation.Body2"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
@@ -54,7 +56,7 @@
         android:ellipsize="middle"
         android:includeFontPadding="false"
         android:singleLine="true"
-        android:textColor="@color/black2"
+        android:textColor="@color/white_64"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/labeledTextAction"
         app:layout_constraintHorizontal_bias="0.0"
@@ -73,18 +75,8 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="12dp"
         android:src="@drawable/ic_more"
-        android:visibility="visible"
+        app:tint="@color/white_32"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <View
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:background="@color/dividerGray"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
