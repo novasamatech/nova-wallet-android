@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.SecretType
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
@@ -17,6 +18,7 @@ import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountDetailsInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountInChain
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_impl.presentation.account.details.ChainAccountActionsSheet.AccountAction
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherMixin
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -53,6 +55,10 @@ class AccountDetailsViewModel(
     val accountNameFlow: MutableStateFlow<String> = MutableStateFlow("")
 
     private val metaAccount = async(Dispatchers.Default) { interactor.getMetaAccount(metaId) }
+
+    val availableAccountActions = flowOf {
+        availableAccountActions(metaAccount().type)
+    }.shareInBackground()
 
     val chainAccountProjections = flowOf { interactor.getChainProjections(metaAccount()) }
         .map { groupedList ->
@@ -127,6 +133,19 @@ class AccountDetailsViewModel(
         }
     }
 
+    fun changeChainAccountClicked(inChain: Chain) {
+        launch {
+            addAccountLauncherMixin.initiateLaunch(inChain, metaAccount())
+        }
+    }
+
+    private fun availableAccountActions(accountType: LightMetaAccount.Type): Set<AccountAction> {
+        return when(accountType) {
+            LightMetaAccount.Type.SECRETS -> setOf(AccountAction.EXPORT, AccountAction.CHANGE)
+            LightMetaAccount.Type.WATCH_ONLY -> setOf(AccountAction.CHANGE)
+        }
+    }
+
     private fun exportTypeChosen(type: SecretType, chain: Chain) {
         val exportPayload = ExportPayload(metaId, chain.id)
 
@@ -137,11 +156,5 @@ class AccountDetailsViewModel(
         }
 
         accountRouter.withPinCodeCheckRequired(navigationAction)
-    }
-
-    fun changeChainAccountClicked(inChain: Chain) {
-        launch {
-            addAccountLauncherMixin.initiateLaunch(inChain, metaAccount())
-        }
     }
 }

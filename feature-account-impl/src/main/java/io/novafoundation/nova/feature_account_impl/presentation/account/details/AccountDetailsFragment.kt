@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.add
 import kotlinx.android.synthetic.main.fragment_account_details.accountDetailsChainAccounts
 import kotlinx.android.synthetic.main.fragment_account_details.accountDetailsNameField
 import kotlinx.android.synthetic.main.fragment_account_details.accountDetailsToolbar
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 private const val ACCOUNT_ID_KEY = "ACCOUNT_ADDRESS_KEY"
@@ -74,7 +75,8 @@ class AccountDetailsFragment : BaseFragment<AccountDetailsViewModel>(), ChainAcc
                 onCopy = viewModel::copyAddressClicked,
                 onViewExternal = viewModel::viewExternalClicked,
                 onChange = viewModel::changeChainAccountClicked,
-                onExport = viewModel::exportClicked
+                onExport = viewModel::exportClicked,
+                availableAccountActions = viewModel.availableAccountActions.first()
             )
         }
         setupImportTypeChooser(viewModel)
