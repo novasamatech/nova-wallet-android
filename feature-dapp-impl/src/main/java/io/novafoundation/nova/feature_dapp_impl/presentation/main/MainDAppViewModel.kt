@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_dapp_impl.presentation.main
 
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.address.AddressIconGenerator
-import io.novafoundation.nova.common.address.createAddressIcon
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
@@ -12,7 +11,6 @@ import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.indexOfFirstOrNull
 import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
-import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress
 import io.novafoundation.nova.feature_dapp_api.data.model.DappCategory
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.data.mappers.mapDappModelToDApp
@@ -45,10 +43,8 @@ class MainDAppViewModel(
 
     val removeFavouriteConfirmationAwaitable = actionAwaitableMixinFactory.confirmingAction<RemoveFavouritesPayload>()
 
-    val currentAddressIconFlow = selectedAccountUseCase.selectedMetaAccountFlow()
-        .map { addressIconGenerator.createAddressIcon(it.defaultSubstrateAddress, AddressIconGenerator.SIZE_BIG) }
-        .inBackground()
-        .share()
+    val selectedWalletFlow = selectedAccountUseCase.selectedWalletModelFlow()
+        .shareInBackground()
 
     private val groupedDAppsFlow = dappInteractor.observeDAppsByCategory()
         .inBackground()

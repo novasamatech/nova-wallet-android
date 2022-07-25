@@ -37,8 +37,6 @@ interface AccountInteractor {
 
     fun metaAccountsFlow(): Flow<GroupedList<LightMetaAccount.Type, MetaAccountWithTotalBalance>>
 
-    fun selectedMetaAccountFlow(): Flow<MetaAccount>
-
     suspend fun selectMetaAccount(metaId: Long)
 
     suspend fun deleteAccount(metaId: Long)

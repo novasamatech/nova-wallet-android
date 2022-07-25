@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.account.list
+package io.novafoundation.nova.feature_account_impl.presentation.account.common.listing
 
 import android.animation.LayoutTransition
 import android.view.View
@@ -16,6 +16,7 @@ import io.novafoundation.nova.common.view.ChipLabelView
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.account.model.MetaAccountUi
 import kotlinx.android.synthetic.main.item_account.view.itemAccountArrow
+import kotlinx.android.synthetic.main.item_account.view.itemAccountCheck
 import kotlinx.android.synthetic.main.item_account.view.itemAccountContainer
 import kotlinx.android.synthetic.main.item_account.view.itemAccountDelete
 import kotlinx.android.synthetic.main.item_account.view.itemAccountIcon
@@ -30,7 +31,7 @@ class AccountsAdapter(
     private var mode: Mode = initialMode
 
     enum class Mode {
-        VIEW, EDIT
+        VIEW, EDIT, SWITCH
     }
 
     interface AccountItemHandler {
@@ -139,12 +140,15 @@ class AccountHolder(view: View) : GroupedListHolder(view) {
                 itemAccountDelete.visibility = View.GONE
                 itemAccountDelete.setOnClickListener(null)
 
+                itemAccountCheck.visibility = View.GONE
+
                 setOnClickListener { handler.itemClicked(accountModel) }
             }
+
             AccountsAdapter.Mode.EDIT -> {
                 itemAccountArrow.visibility = View.INVISIBLE
-                itemAccountDelete.visibility = View.VISIBLE
 
+                itemAccountDelete.visibility = View.VISIBLE
                 if (accountModel.isSelected) {
                     itemAccountDelete.setImageResource(R.drawable.ic_checkmark)
                     itemAccountDelete.setOnClickListener(null)
@@ -153,7 +157,20 @@ class AccountHolder(view: View) : GroupedListHolder(view) {
                     itemAccountDelete.setImageResource(R.drawable.ic_delete_symbol)
                 }
 
+                itemAccountCheck.visibility = View.GONE
+
                 setOnClickListener(null)
+            }
+
+            AccountsAdapter.Mode.SWITCH -> {
+                itemAccountArrow.visibility = View.GONE
+
+                itemAccountDelete.visibility = View.GONE
+
+                itemAccountCheck.visibility = View.VISIBLE
+                itemAccountCheck.isChecked = accountModel.isSelected
+
+                setOnClickListener { handler.itemClicked(accountModel) }
             }
         }
     }

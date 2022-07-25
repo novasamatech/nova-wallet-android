@@ -22,10 +22,19 @@
             android:layout_marginStart="17dp"
             android:layout_marginTop="25dp"
             android:text="@string/crowdloan_crowdloan"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toStartOf="@+id/crowdloanAvatar"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <io.novafoundation.nova.feature_account_api.view.SelectedWalletView
+            android:layout_width="wrap_content"
+            android:id="@+id/crowdloanAvatar"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="25dp"
+            android:layout_marginEnd="16dp" />
 
         <io.novafoundation.nova.feature_wallet_api.presentation.view.AssetSelectorView
             android:id="@+id/crowdloanAssetSelector"

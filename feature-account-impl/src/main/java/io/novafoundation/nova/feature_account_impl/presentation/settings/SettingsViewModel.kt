@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_account_impl.presentation.settings
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.mixin.api.Browserable
@@ -13,12 +12,10 @@ import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
+import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.account.list.AccountChosenNavDirection
 import io.novafoundation.nova.feature_account_impl.presentation.language.mapper.mapLanguageToLanguageModel
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class SettingsViewModel(
@@ -27,18 +24,11 @@ class SettingsViewModel(
     private val appLinksProvider: AppLinksProvider,
     private val resourceManager: ResourceManager,
     private val appVersionProvider: AppVersionProvider,
-    private val addressIconGenerator: AddressIconGenerator,
+    private val selectedAccountUseCase: SelectedAccountUseCase,
 ) : BaseViewModel(), Browserable {
 
-    val selectedAccountFlow = interactor.selectedMetaAccountFlow()
-        .inBackground()
-        .share()
-
-    val accountIconFlow = selectedAccountFlow.map {
-        addressIconGenerator.createAddressIcon(it.substrateAccountId, AddressIconGenerator.SIZE_BIG)
-    }
-        .inBackground()
-        .share()
+    val selectedWalletModel = selectedAccountUseCase.selectedWalletModelFlow()
+        .shareInBackground()
 
     val selectedLanguageFlow = flowOf {
         val language = interactor.getSelectedLanguage()
@@ -60,7 +50,7 @@ class SettingsViewModel(
     val openEmailEvent: LiveData<Event<String>> = _openEmailEvent
 
     fun walletsClicked() {
-        router.openAccounts(AccountChosenNavDirection.MAIN)
+        router.openWallets()
     }
 
     fun networksClicked() {
@@ -112,7 +102,13 @@ class SettingsViewModel(
     }
 
     fun accountActionsClicked() = launch {
-        router.openAccountDetails(selectedAccountFlow.first().id)
+        val selectedWalletId = selectedAccountUseCase.getSelectedMetaAccount().id
+
+        router.openAccountDetails(selectedWalletId)
+    }
+
+    fun selectedWalletClicked() {
+        router.openSwitchWallet()
     }
 
     private fun openLink(link: String) {

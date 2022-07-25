@@ -103,10 +103,6 @@ class AccountInteractorImpl(
         }
     }
 
-    override fun selectedMetaAccountFlow(): Flow<MetaAccount> {
-        return accountRepository.selectedMetaAccountFlow()
-    }
-
     override suspend fun selectMetaAccount(metaId: Long) {
         accountRepository.selectMetaAccount(metaId)
     }

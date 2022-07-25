@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.mixin.MixinFactory
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core.updater.UpdateSystem
+import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_crowdloan_impl.data.CrowdloanSharedState
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomContributeManager
 import io.novafoundation.nova.feature_crowdloan_impl.domain.main.CrowdloanInteractor
@@ -31,10 +32,12 @@ class CrowdloanModule {
     fun provideCrowdloanMixinFactory(
         crowdloanSharedState: CrowdloanSharedState,
         interactor: CrowdloanInteractor,
+        selectedAccountUseCase: SelectedAccountUseCase,
     ): StatefulCrowdloanMixin.Factory {
         return StatefulCrowdloanProviderFactory(
             singleAssetSharedState = crowdloanSharedState,
-            interactor = interactor
+            interactor = interactor,
+            selectedAccountUseCase = selectedAccountUseCase,
         )
     }
 
@@ -51,6 +54,7 @@ class CrowdloanModule {
         customDialogDisplayer: CustomDialogDisplayer.Presentation,
         customContributeManager: CustomContributeManager,
         statefulCrowdloanMixinFactory: StatefulCrowdloanMixin.Factory,
+        selectedAccountUseCase: SelectedAccountUseCase,
     ): ViewModel {
         return CrowdloanViewModel(
             iconGenerator,
@@ -58,6 +62,7 @@ class CrowdloanModule {
             crowdloanSharedState,
             router,
             customContributeManager,
+            selectedAccountUseCase,
             crowdloanUpdateSystem,
             assetSelectorFactory,
             statefulCrowdloanMixinFactory,

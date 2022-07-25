@@ -6,13 +6,11 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
-import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.MixinFactory
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
-import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdateSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.StakingViewModel
@@ -44,13 +42,10 @@ class StakingModule {
         stakeActionsComponentFactory: StakeActionsComponentFactory,
         networkInfoComponentFactory: NetworkInfoComponentFactory,
 
-        addressIconGenerator: AddressIconGenerator,
         router: StakingRouter,
 
         validationExecutor: ValidationExecutor,
         stakingUpdateSystem: StakingUpdateSystem,
-
-        singleAssetSharedState: StakingSharedState
     ): ViewModel {
         return StakingViewModel(
             selectedAccountUseCase = selectedAccountUseCase,
@@ -62,11 +57,9 @@ class StakingModule {
             userRewardsComponentFactory = userRewardsComponentFactory,
             stakeActionsComponentFactory = stakeActionsComponentFactory,
             networkInfoComponentFactory = networkInfoComponentFactory,
-            addressIconGenerator = addressIconGenerator,
             router = router,
             validationExecutor = validationExecutor,
             stakingUpdateSystem = stakingUpdateSystem,
-            singleAssetSharedState = singleAssetSharedState
         )
     }
 

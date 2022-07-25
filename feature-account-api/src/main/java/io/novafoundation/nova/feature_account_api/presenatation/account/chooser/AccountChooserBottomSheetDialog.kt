@@ -33,7 +33,6 @@ class AccountChooserBottomSheetDialog(
         super.onCreate(savedInstanceState)
 
         setTitle(title)
-        setDividerVisible(false)
     }
 
     override fun holderCreator(): HolderCreator<AddressModel> = { parent ->

@@ -14,8 +14,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.add.Impo
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.create.CreateAccountFragment
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.AccountDetailsFragment
-import io.novafoundation.nova.feature_account_impl.presentation.account.list.AccountChosenNavDirection
-import io.novafoundation.nova.feature_account_impl.presentation.account.list.AccountListFragment
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ExportJsonConfirmFragment
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ExportJsonConfirmPayload
@@ -367,8 +365,12 @@ class Navigator(
         navController?.navigate(R.id.open_extrinsic_detail, bundle)
     }
 
-    override fun openAccounts(accountChosenNavDirection: AccountChosenNavDirection) {
-        navController?.navigate(R.id.action_open_accounts, AccountListFragment.getBundle(accountChosenNavDirection))
+    override fun openWallets() {
+        navController?.navigate(R.id.action_open_accounts)
+    }
+
+    override fun openSwitchWallet() {
+        navController?.navigate(R.id.action_open_switch_accounts)
     }
 
     override fun openNodes() {
@@ -377,10 +379,6 @@ class Navigator(
 
     override fun openLanguages() {
         navController?.navigate(R.id.action_mainFragment_to_languagesFragment)
-    }
-
-    override fun openChangeAccount() {
-        openAccounts(AccountChosenNavDirection.BACK)
     }
 
     override fun openReceive(assetPayload: AssetPayload) {

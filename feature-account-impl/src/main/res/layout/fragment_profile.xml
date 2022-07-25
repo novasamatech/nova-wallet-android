@@ -13,40 +13,47 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:orientation="vertical">
 
-        <TextView
-            style="@style/TextAppearance.NovaFoundation.Header1"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/x2"
-            android:layout_marginTop="10dp"
-            android:text="@string/profile_settings_title"
-            android:textColor="@color/white" />
+            android:orientation="horizontal">
 
+            <TextView
+                style="@style/TextAppearance.NovaFoundation.Header1"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="16dp"
+                android:layout_height="wrap_content"
+                android:text="@string/profile_settings_title"
+                android:textColor="@color/white" />
+
+            <io.novafoundation.nova.feature_account_api.view.SelectedWalletView
+                android:layout_width="wrap_content"
+                android:id="@+id/settingsAvatar"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
 
         <io.novafoundation.nova.common.view.AccountInfoView
             android:id="@+id/accountView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/x2"
             android:layout_marginTop="16dp"
-            android:layout_marginEnd="@dimen/x2"
             app:accountActionIcon="@drawable/ic_info_24"
             app:textVisible="false" />
 
         <io.novafoundation.nova.feature_account_impl.presentation.settings.view.SettingsGroupHeaderView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
             android:text="@string/settings_general" />
 
         <io.novafoundation.nova.feature_account_impl.presentation.settings.view.SettingsGroupView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp">
+            android:layout_height="wrap_content">
 
             <io.novafoundation.nova.feature_account_impl.presentation.settings.view.SettingsItemView
                 android:id="@+id/settingsWallets"
@@ -68,15 +75,11 @@
         <io.novafoundation.nova.feature_account_impl.presentation.settings.view.SettingsGroupHeaderView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
             android:text="@string/settings_preferences" />
 
         <io.novafoundation.nova.feature_account_impl.presentation.settings.view.SettingsGroupView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp">
+            android:layout_height="wrap_content">
 
             <io.novafoundation.nova.feature_account_impl.presentation.settings.view.SettingsItemView
                 android:id="@+id/settingsLanguage"
@@ -90,15 +93,11 @@
         <io.novafoundation.nova.feature_account_impl.presentation.settings.view.SettingsGroupHeaderView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
             android:text="@string/settings_security" />
 
         <io.novafoundation.nova.feature_account_impl.presentation.settings.view.SettingsGroupView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp">
+            android:layout_height="wrap_content">
 
             <io.novafoundation.nova.feature_account_impl.presentation.settings.view.SettingsItemView
                 android:id="@+id/settingsPin"
@@ -111,15 +110,11 @@
         <io.novafoundation.nova.feature_account_impl.presentation.settings.view.SettingsGroupHeaderView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
             android:text="@string/settings_community" />
 
         <io.novafoundation.nova.feature_account_impl.presentation.settings.view.SettingsGroupView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp">
+            android:layout_height="wrap_content">
 
             <io.novafoundation.nova.feature_account_impl.presentation.settings.view.SettingsItemView
                 android:id="@+id/settingsTelegram"
@@ -146,15 +141,11 @@
         <io.novafoundation.nova.feature_account_impl.presentation.settings.view.SettingsGroupHeaderView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
             android:text="@string/settings_support" />
 
         <io.novafoundation.nova.feature_account_impl.presentation.settings.view.SettingsGroupView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp">
+            android:layout_height="wrap_content">
 
             <io.novafoundation.nova.feature_account_impl.presentation.settings.view.SettingsItemView
                 android:id="@+id/settingsRateUs"
@@ -175,15 +166,11 @@
         <io.novafoundation.nova.feature_account_impl.presentation.settings.view.SettingsGroupHeaderView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
             android:text="@string/about_title" />
 
         <io.novafoundation.nova.feature_account_impl.presentation.settings.view.SettingsGroupView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp">
+            android:layout_height="wrap_content">
 
             <io.novafoundation.nova.feature_account_impl.presentation.settings.view.SettingsItemView
                 android:id="@+id/settingsWebsite"

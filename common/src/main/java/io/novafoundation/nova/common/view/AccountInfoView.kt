@@ -6,10 +6,9 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
-import io.novafoundation.nova.common.view.shape.addRipple
-import io.novafoundation.nova.common.view.shape.getIdleDrawable
 import kotlinx.android.synthetic.main.view_account_info.view.accountAction
 import kotlinx.android.synthetic.main.view_account_info.view.accountAddressText
 import kotlinx.android.synthetic.main.view_account_info.view.accountIcon
@@ -19,12 +18,12 @@ class AccountInfoView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
-) : ConstraintLayout(context, attrs, defStyleAttr) {
+) : ConstraintLayout(context, attrs, defStyleAttr), WithContextExtensions by WithContextExtensions(context) {
 
     init {
         View.inflate(context, R.layout.view_account_info, this)
 
-        background = with(context) { addRipple(getIdleDrawable()) }
+        background = getRoundedCornerDrawable(strokeColorRes = R.color.white_32).withRipple()
 
         isFocusable = true
         isClickable = true

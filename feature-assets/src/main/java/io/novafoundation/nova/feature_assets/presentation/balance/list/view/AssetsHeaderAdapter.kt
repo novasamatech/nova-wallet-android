@@ -3,9 +3,9 @@ package io.novafoundation.nova.feature_assets.presentation.balance.list.view
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedWalletModel
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.NftPreviewUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.TotalBalanceModel
@@ -31,7 +31,7 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<H
     }
 
     private var totalBalance: TotalBalanceModel? = null
-    private var addressModel: AddressModel? = null
+    private var selectedWalletModel: SelectedWalletModel? = null
     private var nftCountLabel: String? = null
     private var nftPreviews: List<NftPreviewUi>? = null
 
@@ -53,8 +53,8 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<H
         notifyItemChanged(0, Payload.TOTAL_BALANCE)
     }
 
-    fun setAddress(addressModel: AddressModel) {
-        this.addressModel = addressModel
+    fun setSelectedWallet(walletModel: SelectedWalletModel) {
+        this.selectedWalletModel = walletModel
 
         notifyItemChanged(0, Payload.ADDRESS)
     }
@@ -70,7 +70,7 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<H
             payloads.filterIsInstance<Payload>().forEach {
                 when (it) {
                     Payload.TOTAL_BALANCE -> holder.bindTotalBalance(totalBalance)
-                    Payload.ADDRESS -> holder.bindAddress(addressModel)
+                    Payload.ADDRESS -> holder.bindAddress(selectedWalletModel)
                     Payload.NFT_COUNT -> holder.bindNftCount(nftCountLabel)
                     Payload.NFT_PREVIEWS -> holder.bindNftPreviews(nftPreviews)
                 }
@@ -79,7 +79,7 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<H
     }
 
     override fun onBindViewHolder(holder: HeaderHolder, position: Int) {
-        holder.bind(totalBalance, addressModel, nftCountLabel, nftPreviews)
+        holder.bind(totalBalance, selectedWalletModel, nftCountLabel, nftPreviews)
     }
 
     override fun getItemCount(): Int {
@@ -107,7 +107,7 @@ class HeaderHolder(
 
     fun bind(
         totalBalance: TotalBalanceModel?,
-        addressModel: AddressModel?,
+        addressModel: SelectedWalletModel?,
         nftCount: String?,
         nftPreviews: List<NftPreviewUi>?
     ) {
@@ -132,8 +132,9 @@ class HeaderHolder(
         }
     }
 
-    fun bindAddress(addressModel: AddressModel?) = addressModel?.let {
+    fun bindAddress(walletModel: SelectedWalletModel?) = walletModel?.let {
         containerView.balanceListTotalTitle.text = it.name
-        containerView.balanceListAvatar.setImageDrawable(it.image)
+
+        containerView.balanceListAvatar.setModel(it)
     }
 }

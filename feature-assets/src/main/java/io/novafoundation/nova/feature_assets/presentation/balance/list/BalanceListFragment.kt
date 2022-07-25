@@ -90,7 +90,7 @@ class BalanceListFragment :
         }
 
         viewModel.totalBalanceFlow.observe(headerAdapter::setTotalBalance)
-        viewModel.currentAddressModelFlow.observe(headerAdapter::setAddress)
+        viewModel.selectedWalletModelFlow.observe(headerAdapter::setSelectedWallet)
 
         viewModel.nftCountFlow.observe(headerAdapter::setNftCountLabel)
         viewModel.nftPreviewsUi.observe(headerAdapter::setNftPreviews)

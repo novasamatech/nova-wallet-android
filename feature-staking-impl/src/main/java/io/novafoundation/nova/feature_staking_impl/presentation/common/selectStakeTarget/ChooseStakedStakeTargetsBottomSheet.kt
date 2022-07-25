@@ -60,7 +60,6 @@ class ChooseStakedStakeTargetsBottomSheet<T : Identifiable>(
         super.onCreate(savedInstanceState)
 
         setTitle(payload.titleRes)
-        setDividerVisible(false)
 
         maybeAddNewCollatorButton()
     }
@@ -83,7 +82,7 @@ class ChooseStakedStakeTargetsBottomSheet<T : Identifiable>(
                 setIcon(R.drawable.ic_add_circle)
             }
 
-            container.addAfter(titleView, newCollatorAction)
+            container.addAfter(headerView, newCollatorAction)
         }
     }
 }

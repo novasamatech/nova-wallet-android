@@ -9,22 +9,14 @@ import io.novafoundation.nova.common.view.dialog.warningDialog
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.AccountsAdapter
 import io.novafoundation.nova.feature_account_impl.presentation.account.model.MetaAccountUi
 import kotlinx.android.synthetic.main.fragment_accounts.accountListToolbar
 import kotlinx.android.synthetic.main.fragment_accounts.accountsList
 import kotlinx.android.synthetic.main.fragment_accounts.addAccount
 
-private const val ARG_DIRECTION = "ARG_DIRECTION"
-
 class AccountListFragment : BaseFragment<AccountListViewModel>(), AccountsAdapter.AccountItemHandler {
     private lateinit var adapter: AccountsAdapter
-
-    companion object {
-
-        fun getBundle(accountChosenNavDirection: AccountChosenNavDirection) = Bundle().apply {
-            putSerializable(ARG_DIRECTION, accountChosenNavDirection)
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,19 +37,17 @@ class AccountListFragment : BaseFragment<AccountListViewModel>(), AccountsAdapte
     }
 
     override fun inject() {
-        val accountChosenNavDirection = argument<AccountChosenNavDirection>(ARG_DIRECTION)
-
         FeatureUtils.getFeature<AccountFeatureComponent>(
             requireContext(),
             AccountFeatureApi::class.java
         )
             .accountsComponentFactory()
-            .create(this, accountChosenNavDirection)
+            .create(this)
             .inject(this)
     }
 
     override fun subscribe(viewModel: AccountListViewModel) {
-        viewModel.walletsFlow.observe(adapter::submitList)
+        viewModel.walletsListingMixin.metaAccountsFlow.observe(adapter::submitList)
         viewModel.mode.observe(adapter::setMode)
 
         viewModel.toolbarAction.observe(accountListToolbar::setTextRight)
