@@ -5,7 +5,6 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.default
-import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.nativeTransfer
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.runtime.di.RuntimeApi
@@ -13,10 +12,12 @@ import io.novafoundation.nova.runtime.di.RuntimeComponent
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
+import jp.co.soramitsu.fearless_utils.encrypt.MultiChainEncryption
 import jp.co.soramitsu.fearless_utils.encrypt.junction.BIP32JunctionDecoder
 import jp.co.soramitsu.fearless_utils.encrypt.keypair.Keypair
 import jp.co.soramitsu.fearless_utils.encrypt.keypair.ethereum.EthereumKeypairFactory
 import jp.co.soramitsu.fearless_utils.encrypt.seed.ethereum.EthereumSeedFactory
+import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.KeyPairSigner
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -54,9 +55,10 @@ class MoonbaseSendIntagrationTest {
         externalRequirementFlow.emit(ChainConnection.ExternalRequirement.ALLOWED)
         val chain = chainRegistry.getChain("91bc6e169807aaa54802737e1c504b2577d4fafedd5a02c10293b1cd60e39527")
 
-        val accountId = chain.accountIdOf("0x5eC0aa4d0dFF013E30978f954ca81779e8966d3A")
+        val accountId = chain.accountIdOf("0x0c7485f4AA235347BDE0168A59f6c73C7A42ff2C")
+        val signer = KeyPairSigner(keypair, MultiChainEncryption.Ethereum)
 
-        val extrinsic = extrinsicBuilderFactory.create(chain, keypair, CryptoType.ECDSA)
+        val extrinsic = extrinsicBuilderFactory.create(chain, signer, accountId)
             .nativeTransfer(accountId, chain.utilityAsset.planksFromAmount(BigDecimal.ONE), keepAlive = true)
             .build()
 
