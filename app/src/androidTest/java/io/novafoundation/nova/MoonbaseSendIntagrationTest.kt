@@ -56,7 +56,7 @@ class MoonbaseSendIntagrationTest {
 
         val accountId = chain.accountIdOf("0x5eC0aa4d0dFF013E30978f954ca81779e8966d3A")
 
-        val extrinsic = extrinsicBuilderFactory.create(chain, keypair, CryptoType.ECDSA)
+        val extrinsic = extrinsicBuilderFactory.createForFee(chain) //Replaced by dummy
             .nativeTransfer(accountId, chain.utilityAsset.planksFromAmount(BigDecimal.ONE), keepAlive = true)
             .build()
 

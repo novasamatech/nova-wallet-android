@@ -70,7 +70,7 @@ class CrossChainTransfersIntegrationTest : BaseIntegrationTest() {
                 originChain = originChain,
                 originAsset = asssetInOrigin,
                 destinationChain = destinationChain,
-                destinationParaId = chainTransfersRepository.paraId(destinationChain.id)
+                destinationParaId = null // Replaced by null
             )!!
 
             val crossChainFee = crossChainWeigher.estimateFee(crossChainTransfer)
