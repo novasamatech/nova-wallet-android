@@ -23,6 +23,8 @@ class SingleChainSpecProvider(
 
         override suspend fun generateIcon(input: String): Result<Drawable> {
             return runCatching {
+                require(targetChain.isValidAddress(input))
+
                 addressIconGenerator.createAddressIcon(
                     accountId = targetChain.accountIdOf(address = input),
                     sizeInDp = AddressIconGenerator.SIZE_MEDIUM,

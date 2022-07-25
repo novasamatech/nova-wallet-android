@@ -27,6 +27,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.node.details.di.
 import io.novafoundation.nova.feature_account_impl.presentation.node.list.di.NodesComponent
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.di.PinCodeComponent
 import io.novafoundation.nova.feature_account_impl.presentation.settings.di.SettingsComponent
+import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.change.di.ChangeWatchAccountComponent
 import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.create.di.CreateWatchWalletComponent
 import io.novafoundation.nova.runtime.di.RuntimeApi
 
@@ -79,6 +80,7 @@ interface AccountFeatureComponent : AccountFeatureApi {
     fun inject(receiver: ShareCompletedReceiver)
 
     fun createWatchOnlyComponentFactory(): CreateWatchWalletComponent.Factory
+    fun changeWatchAccountComponentFactory(): ChangeWatchAccountComponent.Factory
 
     @Component.Factory
     interface Factory {

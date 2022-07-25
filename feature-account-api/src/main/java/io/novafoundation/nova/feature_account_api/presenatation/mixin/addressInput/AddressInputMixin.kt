@@ -20,3 +20,5 @@ interface AddressInputMixin {
 
     fun myselfClicked()
 }
+
+suspend fun AddressInputMixin.isAddressValid(input: String) = getInputSpec().isValidAddress(input)

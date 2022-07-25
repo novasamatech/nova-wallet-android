@@ -163,6 +163,7 @@ fun mapMetaAccountToAccount(chain: Chain, metaAccount: MetaAccount): Account? {
     }
 }
 
+@Deprecated("Accounts are deprecated")
 fun mapChainAccountToAccount(
     parent: MetaAccount,
     chainAccount: MetaAccount.ChainAccount,
@@ -173,7 +174,7 @@ fun mapChainAccountToAccount(
         address = chain.addressOf(chainAccount.accountId),
         name = parent.name,
         accountIdHex = chainAccount.accountId.toHexString(),
-        cryptoType = chainAccount.cryptoType,
+        cryptoType = chainAccount.cryptoType ?: CryptoType.SR25519,
         position = 0,
         network = stubNetwork(chain.id),
     )
