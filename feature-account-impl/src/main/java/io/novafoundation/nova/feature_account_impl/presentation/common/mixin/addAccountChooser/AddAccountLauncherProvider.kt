@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.hasAccountIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
@@ -39,6 +40,19 @@ class AddAccountLauncherProvider(
     }
 
     override fun initiateLaunch(chain: Chain, metaAccount: MetaAccount) {
+        when(metaAccount.type) {
+            LightMetaAccount.Type.SECRETS -> launchAddFromSecrets(chain, metaAccount)
+            LightMetaAccount.Type.WATCH_ONLY -> launchAddWatchOnly(chain, metaAccount)
+        }
+    }
+
+    private fun launchAddWatchOnly(chain: Chain, metaAccount: MetaAccount) {
+        val chainAccountPayload = AddAccountPayload.ChainAccount(chain.id, metaAccount.id)
+
+        // TODO open add watch only screen
+    }
+
+    private fun launchAddFromSecrets(chain: Chain, metaAccount: MetaAccount) {
         val chainAccountPayload = AddAccountPayload.ChainAccount(chain.id, metaAccount.id)
 
         val titleTemplate = if (metaAccount.hasAccountIn(chain)) {
