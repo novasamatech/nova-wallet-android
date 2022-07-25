@@ -72,9 +72,9 @@ class MetaAccount(
     class ChainAccount(
         val metaId: Long,
         val chain: Chain,
-        val publicKey: ByteArray,
+        val publicKey: ByteArray?,
         val accountId: ByteArray,
-        val cryptoType: CryptoType,
+        val cryptoType: CryptoType?,
     )
 }
 
@@ -140,11 +140,12 @@ fun MetaAccount.multiChainEncryptionFor(accountId: ByteArray): MultiChainEncrypt
         ethereumAccountId().contentEquals(accountId) -> MultiChainEncryption.Ethereum
         else -> {
             val chainAccount = chainAccounts.values.firstOrNull { it.accountId.contentEquals(accountId) } ?: return null
+            val cryptoType = chainAccount.cryptoType ?: return null
 
             if (chainAccount.chain.isEthereumBased) {
                 MultiChainEncryption.Ethereum
             } else {
-                MultiChainEncryption.substrateFrom(chainAccount.cryptoType)
+                MultiChainEncryption.substrateFrom(cryptoType)
             }
         }
     }

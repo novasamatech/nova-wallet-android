@@ -385,7 +385,6 @@
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
 
-
         <action
             android:id="@+id/action_accountDetailsFragment_to_import_nav_graph"
             app:destination="@id/import_nav_graph"
@@ -393,7 +392,21 @@
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_accountDetailsFragment_to_changeWatchAccountFragment"
+            app:destination="@id/changeWatchAccountFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
+
+    <fragment
+        android:id="@+id/changeWatchAccountFragment"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.watchOnly.change.ChangeWatchAccountFragment"
+        android:label="ChangeWatchAccountFragment"
+        tools:layout="@layout/fragment_change_watch_wallet" />
 
     <include app:graph="@navigation/mnemonic_nav_graph" />
 

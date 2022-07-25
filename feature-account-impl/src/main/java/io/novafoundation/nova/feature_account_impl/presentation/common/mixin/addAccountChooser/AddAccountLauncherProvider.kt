@@ -49,7 +49,7 @@ class AddAccountLauncherProvider(
     private fun launchAddWatchOnly(chain: Chain, metaAccount: MetaAccount) {
         val chainAccountPayload = AddAccountPayload.ChainAccount(chain.id, metaAccount.id)
 
-        // TODO open add watch only screen
+       router.openChangeWatchAccount(chainAccountPayload)
     }
 
     private fun launchAddFromSecrets(chain: Chain, metaAccount: MetaAccount) {

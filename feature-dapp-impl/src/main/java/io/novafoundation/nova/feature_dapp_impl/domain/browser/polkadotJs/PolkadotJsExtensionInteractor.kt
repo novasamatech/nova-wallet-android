@@ -38,7 +38,7 @@ class PolkadotJsExtensionInteractor(
                 address = chain.addressOf(chainAccount.accountId),
                 genesisHash = chain.genesisHash.requireHexPrefix(),
                 name = "${metaAccount.name} (${chain.name})",
-                encryption = mapCryptoTypeToEncryption(chainAccount.cryptoType)
+                encryption = chainAccount.cryptoType?.let(::mapCryptoTypeToEncryption)
             )
         }
 

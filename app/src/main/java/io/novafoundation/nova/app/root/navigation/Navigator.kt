@@ -28,6 +28,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.node.details.Nod
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.PinCodeAction
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.PincodeFragment
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.ToolbarConfiguration
+import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.change.ChangeWatchAccountFragment
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.WalletRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.BalanceDetailFragment
@@ -428,6 +429,12 @@ class Navigator(
 
     override fun openAddNode() {
         navController?.navigate(R.id.action_nodesFragment_to_addNodeFragment)
+    }
+
+    override fun openChangeWatchAccount(payload: AddAccountPayload.ChainAccount) {
+        val bundle = ChangeWatchAccountFragment.getBundle(payload)
+
+        navController?.navigate(R.id.action_accountDetailsFragment_to_changeWatchAccountFragment, bundle)
     }
 
     override fun openAddAccount(payload: AddAccountPayload) {

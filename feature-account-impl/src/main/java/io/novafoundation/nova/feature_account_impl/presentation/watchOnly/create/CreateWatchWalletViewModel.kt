@@ -8,8 +8,8 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.common.view.ChipActionsModel
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
-import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.isAddressValid
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.data.repository.WatchWalletSuggestion
 import io.novafoundation.nova.feature_account_impl.domain.watchOnly.create.CreateWatchWalletInteractor
@@ -95,8 +95,6 @@ class CreateWatchWalletViewModel(
             evmAddressInput.inputFlow.value = suggestion.evmAddress.orEmpty()
         }
     }
-
-    private suspend fun AddressInputMixin.isAddressValid(input: String) = getInputSpec().isValidAddress(input)
 
     private fun disabledStateFrom(@StringRes reason: Int): DescriptiveButtonState {
         return DescriptiveButtonState.Disabled(resourceManager.getString(reason))

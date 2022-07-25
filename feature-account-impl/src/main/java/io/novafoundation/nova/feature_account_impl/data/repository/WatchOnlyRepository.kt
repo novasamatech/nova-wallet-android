@@ -1,7 +1,9 @@
 package io.novafoundation.nova.feature_account_impl.data.repository
 
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
+import io.novafoundation.nova.core_db.model.chain.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
 class WatchWalletSuggestion(
@@ -11,6 +13,12 @@ class WatchWalletSuggestion(
 )
 
 interface WatchOnlyRepository {
+
+    suspend fun changeWatchChainAccount(
+        metaId: Long,
+        chainId: ChainId,
+        accountId: AccountId
+    )
 
     suspend fun addWatchWallet(
         name: String,
@@ -24,6 +32,22 @@ interface WatchOnlyRepository {
 class RealWatchOnlyRepository(
     private val accountDao: MetaAccountDao
 ) : WatchOnlyRepository {
+
+    override suspend fun changeWatchChainAccount(
+        metaId: Long,
+        chainId: ChainId,
+        accountId: AccountId
+    ) {
+        val chainAccount = ChainAccountLocal(
+            metaId = metaId,
+            chainId = chainId,
+            accountId = accountId,
+            cryptoType = null,
+            publicKey = null
+        )
+
+        accountDao.insertChainAccount(chainAccount)
+    }
 
     override suspend fun addWatchWallet(
         name: String,

@@ -36,6 +36,8 @@ interface AccountRouter : SecureRouter {
 
     fun openAddNode()
 
+    fun openChangeWatchAccount(payload: AddAccountPayload.ChainAccount)
+
     @PinRequired
     fun exportMnemonicAction(exportPayload: ExportPayload): DelayedNavigation
 

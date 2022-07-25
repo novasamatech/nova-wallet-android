@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="accoount_enter_chain_address_format">Enter valid %s address...</string>
+  <string name="account_chain_address_format">%s address</string>
+
   <string name="account_details_watch_only_alert">This is watch-only wallet, Nova can show you balances and other information, but you cannot perform any transactions with this wallet</string>
   <string name="account_add_account">Add account</string>
 
