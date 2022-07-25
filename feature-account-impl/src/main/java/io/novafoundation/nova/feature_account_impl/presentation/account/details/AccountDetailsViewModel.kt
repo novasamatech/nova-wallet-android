@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
+import io.novafoundation.nova.common.view.AlertView
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.SecretType
@@ -19,6 +20,8 @@ import io.novafoundation.nova.feature_account_impl.domain.account.details.Accoun
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountInChain
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.ChainAccountActionsSheet.AccountAction
+import io.novafoundation.nova.feature_account_impl.presentation.account.details.model.AccountInChainUi
+import io.novafoundation.nova.feature_account_impl.presentation.account.details.model.AccountTypeAlert
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherMixin
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -58,6 +61,10 @@ class AccountDetailsViewModel(
 
     val availableAccountActions = flowOf {
         availableAccountActions(metaAccount().type)
+    }.shareInBackground()
+
+    val typeAlert = flowOf {
+        accountTypeAlertFor(metaAccount().type)
     }.shareInBackground()
 
     val chainAccountProjections = flowOf { interactor.getChainProjections(metaAccount()) }
@@ -140,9 +147,22 @@ class AccountDetailsViewModel(
     }
 
     private fun availableAccountActions(accountType: LightMetaAccount.Type): Set<AccountAction> {
-        return when(accountType) {
+        return when (accountType) {
             LightMetaAccount.Type.SECRETS -> setOf(AccountAction.EXPORT, AccountAction.CHANGE)
             LightMetaAccount.Type.WATCH_ONLY -> setOf(AccountAction.CHANGE)
+        }
+    }
+
+    private fun accountTypeAlertFor(accountType: LightMetaAccount.Type): AccountTypeAlert? {
+        return when (accountType) {
+            LightMetaAccount.Type.WATCH_ONLY -> AccountTypeAlert(
+                style = AlertView.Style(
+                    backgroundColorRes = R.color.white_12,
+                    iconRes = R.drawable.ic_watch
+                ),
+                text = resourceManager.getString(R.string.account_details_watch_only_alert)
+            )
+            LightMetaAccount.Type.SECRETS -> null
         }
     }
 

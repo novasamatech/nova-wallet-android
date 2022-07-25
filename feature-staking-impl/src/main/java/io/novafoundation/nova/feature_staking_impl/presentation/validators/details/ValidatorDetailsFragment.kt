@@ -149,12 +149,12 @@ class ValidatorDetailsFragment : BaseFragment<ValidatorDetailsViewModel>() {
 
     private fun createAlertView(alert: ValidatorAlert): AlertView {
         val style = when (alert.severity) {
-            ValidatorAlert.Severity.WARNING -> AlertView.Style.WARNING
-            ValidatorAlert.Severity.ERROR -> AlertView.Style.ERROR
+            ValidatorAlert.Severity.WARNING -> AlertView.StylePreset.WARNING
+            ValidatorAlert.Severity.ERROR -> AlertView.StylePreset.ERROR
         }
 
         return AlertView(requireContext()).also { alertView ->
-            alertView.setStyle(style)
+            alertView.setStylePreset(style)
             alertView.setText(alert.descriptionRes)
 
             alertView.layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT).also { params ->
