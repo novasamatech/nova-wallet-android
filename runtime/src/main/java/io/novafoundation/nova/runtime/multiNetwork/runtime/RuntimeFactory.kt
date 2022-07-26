@@ -44,7 +44,7 @@ class RuntimeFactory(
     private val concurrencyLimit: Int = 1
 ) {
 
-    private val dispatcher = newLimitedThreadPoolExecutor(1).asCoroutineDispatcher()
+    private val dispatcher = newLimitedThreadPoolExecutor(concurrencyLimit).asCoroutineDispatcher()
     private val semaphore = Semaphore(concurrencyLimit)
 
     suspend fun constructRuntime(
