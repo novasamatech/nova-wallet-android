@@ -2,6 +2,7 @@ package io.novafoundation.nova.runtime.multiNetwork.runtime
 
 import com.google.gson.Gson
 import io.novafoundation.nova.common.utils.md5
+import io.novafoundation.nova.common.utils.newLimitedThreadPoolExecutor
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.TypesUsage
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
@@ -18,7 +19,7 @@ import jp.co.soramitsu.fearless_utils.runtime.definitions.v14.TypesParserV14
 import jp.co.soramitsu.fearless_utils.runtime.metadata.RuntimeMetadataReader
 import jp.co.soramitsu.fearless_utils.runtime.metadata.builder.VersionedRuntimeBuilder
 import jp.co.soramitsu.fearless_utils.runtime.metadata.v14.RuntimeMetadataSchemaV14
-import kotlinx.coroutines.newSingleThreadContext
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
@@ -43,7 +44,7 @@ class RuntimeFactory(
     private val concurrencyLimit: Int = 1
 ) {
 
-    private val dispatcher = newSingleThreadContext("runtime-factory-dispatcher")
+    private val dispatcher = newLimitedThreadPoolExecutor(1).asCoroutineDispatcher()
     private val semaphore = Semaphore(concurrencyLimit)
 
     suspend fun constructRuntime(
