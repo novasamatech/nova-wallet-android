@@ -58,7 +58,6 @@ class ChainSyncServiceTest {
         parentId = null,
         externalApi = null,
         explorers = emptyList(),
-        color = null,
         additional = emptyMap()
     )
 
