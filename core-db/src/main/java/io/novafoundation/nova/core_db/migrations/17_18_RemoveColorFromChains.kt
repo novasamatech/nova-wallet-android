@@ -7,8 +7,6 @@ val RemoveColorFromChains_17_18 = object : Migration(17, 18) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.beginTransaction()
 
-        database.execSQL("PRAGMA foreign_keys=true")
-
         // rename
         database.execSQL("ALTER TABLE chains RENAME TO chains_old")
 
