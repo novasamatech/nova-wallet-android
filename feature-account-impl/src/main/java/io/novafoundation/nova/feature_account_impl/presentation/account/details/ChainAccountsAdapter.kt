@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_account_impl.presentation.account.details
 import android.view.View
 import android.view.ViewGroup
 import coil.ImageLoader
-import coil.load
 import io.novafoundation.nova.common.list.BaseGroupedDiffCallback
 import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
@@ -11,6 +10,7 @@ import io.novafoundation.nova.common.list.headers.TextHeader
 import io.novafoundation.nova.common.list.headers.TextHeaderHolder
 import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.feature_account_api.presenatation.chain.loadChainIcon
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.model.AccountInChainUi
 import kotlinx.android.synthetic.main.item_chain_acount.view.chainAccountAccountAddress
@@ -52,7 +52,7 @@ class ChainAccountHolder(view: View) : GroupedListHolder(view) {
         handler: ChainAccountsAdapter.Handler,
         imageLoader: ImageLoader
     ) = with(containerView) {
-        chainAccountChainIcon.load(item.chainUi.icon, imageLoader)
+        chainAccountChainIcon.loadChainIcon(item.chainUi.icon, imageLoader)
         chainAccountChainName.text = item.chainUi.name
 
         chainAccountAccountIcon.setImageDrawable(item.accountIcon)

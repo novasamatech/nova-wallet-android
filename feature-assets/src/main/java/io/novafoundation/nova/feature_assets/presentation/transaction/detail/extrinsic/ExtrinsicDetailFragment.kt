@@ -4,12 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import coil.ImageLoader
-import coil.load
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.formatDateTime
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenIcon
 import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_account_api.view.showChain
 import io.novafoundation.nova.feature_assets.R
@@ -89,10 +89,10 @@ class ExtrinsicDetailFragment : BaseFragment<ExtrinsicDetailViewModel>() {
 
         viewModel.senderAddressModelFlow.observe(extrinsicDetailSender::showAddress)
 
-        viewModel.chainUi.observe {
-            extrinsicDetailNetwork.showChain(it)
+        viewModel.chainUi.observe(extrinsicDetailNetwork::showChain)
 
-            extrinsicDetailIcon.load(it.icon, imageLoader)
+        viewModel.operationIcon.observe {
+            extrinsicDetailIcon.loadTokenIcon(it, imageLoader)
         }
     }
 }

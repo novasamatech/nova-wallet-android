@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_assets.presentation.receive
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -18,6 +17,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.receive.ReceiveInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.WalletRouter
@@ -56,12 +56,13 @@ class ReceiveViewModel(
 
     val receiver = selectedAccountUseCase.selectedMetaAccountFlow()
         .map {
-            val (chain, _) = chainWithAssetAsync()
+            val (chain, chainAsset) = chainWithAssetAsync()
             val address = it.addressIn(chain)!!
 
             TokenReceiver(
                 addressModel = addressIconGenerator.createAddressModel(chain, address, AddressIconGenerator.SIZE_BIG, it.name),
                 chain = mapChainToUi(chain),
+                chainAssetIcon = chainAsset.iconUrl
             )
         }
         .inBackground()

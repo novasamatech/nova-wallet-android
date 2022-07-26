@@ -92,11 +92,22 @@ open class TableCellView @JvmOverloads constructor(
         image.makeVisible()
     }
 
-    fun loadImage(url: String?) {
+    fun loadImage(
+        url: String?,
+        @DrawableRes placeholderRes: Int? = null,
+        roundedCornersDp: Int? = 10
+    ) {
         url?.let {
             image.makeVisible()
             image.load(url, imageLoader) {
-                transformations(RoundedCornersTransformation(10.dpF(context)))
+                roundedCornersDp?.let {
+                    transformations(RoundedCornersTransformation(roundedCornersDp.dpF(context)))
+                }
+
+                placeholderRes?.let {
+                    placeholder(it)
+                    error(it)
+                }
             }
         }
     }

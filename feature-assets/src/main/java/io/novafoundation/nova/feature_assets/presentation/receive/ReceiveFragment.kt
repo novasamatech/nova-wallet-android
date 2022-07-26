@@ -5,13 +5,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import coil.ImageLoader
-import coil.load
-import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenIcon
+import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
@@ -72,7 +72,7 @@ class ReceiveFragment : BaseFragment<ReceiveViewModel>() {
 
         viewModel.receiver.observe {
             receiveFrom.setTextIcon(it.addressModel.image)
-            receiveFrom.primaryIcon.load(it.chain.icon, imageLoader)
+            receiveFrom.primaryIcon.loadTokenIcon(it.chainAssetIcon, imageLoader)
             receiveFrom.setMessage(it.addressModel.address)
             receiveFrom.setLabel(it.chain.name)
         }
