@@ -18,11 +18,10 @@ import jp.co.soramitsu.fearless_utils.runtime.definitions.v14.TypesParserV14
 import jp.co.soramitsu.fearless_utils.runtime.metadata.RuntimeMetadataReader
 import jp.co.soramitsu.fearless_utils.runtime.metadata.builder.VersionedRuntimeBuilder
 import jp.co.soramitsu.fearless_utils.runtime.metadata.v14.RuntimeMetadataSchemaV14
-import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
-import java.util.concurrent.Executors
 
 class ConstructedRuntime(
     val runtime: RuntimeSnapshot,
@@ -41,10 +40,10 @@ class RuntimeFactory(
     private val runtimeFilesCache: RuntimeFilesCache,
     private val chainDao: ChainDao,
     private val gson: Gson,
-    private val concurrencyLimit: Int = 10
+    private val concurrencyLimit: Int = 1
 ) {
 
-    private val dispatcher = Executors.newCachedThreadPool().asCoroutineDispatcher()
+    private val dispatcher = newSingleThreadContext("runtime-factory-dispatcher")
     private val semaphore = Semaphore(concurrencyLimit)
 
     suspend fun constructRuntime(
