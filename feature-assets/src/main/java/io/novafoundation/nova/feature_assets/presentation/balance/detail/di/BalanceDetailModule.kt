@@ -10,7 +10,9 @@ import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnly.WatchOnlyMissingKeysPresenter
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
@@ -60,7 +62,9 @@ class BalanceDetailModule {
         router: WalletRouter,
         transactionHistoryMixin: TransactionHistoryMixin,
         buyMixinFactory: BuyMixinFactory,
-        assetPayload: AssetPayload
+        assetPayload: AssetPayload,
+        accountUseCase: SelectedAccountUseCase,
+        missingKeysPresenter: WatchOnlyMissingKeysPresenter
     ): ViewModel {
         return BalanceDetailViewModel(
             interactor = interactor,
@@ -68,7 +72,9 @@ class BalanceDetailModule {
             router = router,
             assetPayload = assetPayload,
             buyMixinFactory = buyMixinFactory,
-            transactionHistoryMixin = transactionHistoryMixin
+            transactionHistoryMixin = transactionHistoryMixin,
+            accountUseCase = accountUseCase,
+            missingKeysPresenter = missingKeysPresenter
         )
     }
 

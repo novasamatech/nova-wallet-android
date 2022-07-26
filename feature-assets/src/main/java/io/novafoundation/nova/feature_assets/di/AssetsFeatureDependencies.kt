@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnly.WatchOnlyMissingKeysPresenter
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
@@ -130,4 +131,6 @@ interface AssetsFeatureDependencies {
     val resourcesHintsMixinFactory: ResourcesHintsMixinFactory
 
     val parachainInfoRepository: ParachainInfoRepository
+
+    val watchOnlyMissingKeysPresenter: WatchOnlyMissingKeysPresenter
 }

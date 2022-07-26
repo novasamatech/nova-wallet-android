@@ -27,6 +27,7 @@ interface BuyMixin {
 fun BaseFragment<*>.setupBuyIntegration(
     mixin: BuyMixin,
     buyButton: View,
+    customBuyClick: (() -> Unit)? = null
 ) {
     mixin.integrateWithBuyProviderEvent.observeEvent {
         with(it) {
@@ -45,7 +46,7 @@ fun BaseFragment<*>.setupBuyIntegration(
         ).show()
     }
 
-    buyButton.setOnClickListener { mixin.buyClicked() }
+    buyButton.setOnClickListener { if (customBuyClick != null) customBuyClick() else mixin.buyClicked() }
 
     mixin.buyEnabled.observe(buyButton::setEnabled)
 }

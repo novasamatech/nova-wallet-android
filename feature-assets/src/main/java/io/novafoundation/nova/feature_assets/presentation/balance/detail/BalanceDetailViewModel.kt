@@ -6,6 +6,9 @@ import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
+import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnly.WatchOnlyMissingKeysPresenter
 import io.novafoundation.nova.feature_assets.data.mappers.mappers.mapAssetToAssetModel
 import io.novafoundation.nova.feature_assets.data.mappers.mappers.mapTokenToTokenModel
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
@@ -32,6 +35,8 @@ class BalanceDetailViewModel(
     private val assetPayload: AssetPayload,
     buyMixinFactory: BuyMixinFactory,
     private val transactionHistoryMixin: TransactionHistoryMixin,
+    private val accountUseCase: SelectedAccountUseCase,
+    private val missingKeysPresenter: WatchOnlyMissingKeysPresenter,
 ) : BaseViewModel(),
     TransactionHistoryUi by transactionHistoryMixin {
 
@@ -96,12 +101,27 @@ class BalanceDetailViewModel(
         router.openSend(assetPayload)
     }
 
-    fun receiveClicked() {
+    fun receiveClicked() = requireSecretsWallet {
         router.openReceive(assetPayload)
+    }
+
+    fun buyClicked() = requireSecretsWallet {
+        buyMixin.buyClicked()
     }
 
     fun lockedInfoClicked() = launch {
         _showLockedDetailsEvent.value = Event(assetModel.first())
+    }
+
+    private fun requireSecretsWallet(action: () -> Unit) {
+        launch {
+            val metaAccount = accountUseCase.getSelectedMetaAccount()
+
+            when (metaAccount.type) {
+                LightMetaAccount.Type.SECRETS -> action()
+                LightMetaAccount.Type.WATCH_ONLY -> missingKeysPresenter.presentNoKeysFound()
+            }
+        }
     }
 
     private fun mapAssetToUi(asset: Asset): AssetDetailsModel {

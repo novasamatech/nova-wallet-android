@@ -107,7 +107,11 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
 
         viewModel.state.observe(transfersContainer::showState)
 
-        setupBuyIntegration(viewModel.buyMixin, buyButton = balanceDetaiActions.buy)
+        setupBuyIntegration(
+            mixin = viewModel.buyMixin,
+            buyButton = balanceDetaiActions.buy,
+            customBuyClick = { viewModel.buyClicked() }
+        )
 
         viewModel.assetDetailsModel.observe { asset ->
             balanceDetailTokenIcon.load(asset.token.configuration.iconUrl, imageLoader)
