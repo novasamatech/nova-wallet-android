@@ -13,7 +13,8 @@ val RemoveColorFromChains_17_18 = object : Migration(17, 18) {
         database.execSQL("ALTER TABLE chains RENAME TO chains_old")
 
         // new table
-        database.execSQL("""
+        database.execSQL(
+            """
             CREATE TABLE IF NOT EXISTS `chains` (
             `id` TEXT NOT NULL,
             `parentId` TEXT,
@@ -34,7 +35,8 @@ val RemoveColorFromChains_17_18 = object : Migration(17, 18) {
             `crowdloans_type` TEXT,
             PRIMARY KEY(`id`)
         )
-        """.trimIndent())
+            """.trimIndent()
+        )
 
         // insert to new from old
         database.execSQL(
@@ -53,5 +55,4 @@ val RemoveColorFromChains_17_18 = object : Migration(17, 18) {
         database.setTransactionSuccessful()
         database.endTransaction()
     }
-
 }

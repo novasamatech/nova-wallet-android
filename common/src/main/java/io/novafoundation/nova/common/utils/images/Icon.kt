@@ -12,7 +12,7 @@ sealed class Icon {
 
     class FromDrawable(val data: Drawable) : Icon()
 
-    class FromDrawableRes(@DrawableRes val res: Int): Icon()
+    class FromDrawableRes(@DrawableRes val res: Int) : Icon()
 }
 
 fun ImageView.setIcon(icon: Icon, imageLoader: ImageLoader) {
