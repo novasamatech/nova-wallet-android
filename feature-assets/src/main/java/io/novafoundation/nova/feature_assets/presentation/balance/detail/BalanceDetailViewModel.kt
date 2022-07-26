@@ -113,11 +113,11 @@ class BalanceDetailViewModel(
         _showLockedDetailsEvent.value = Event(assetModel.first())
     }
 
-    private fun requireSecretsWallet(action: () -> Unit): Unit {
+    private fun requireSecretsWallet(action: () -> Unit) {
         launch {
             val metaAccount = accountUseCase.getSelectedMetaAccount()
 
-            when(metaAccount.type) {
+            when (metaAccount.type) {
                 LightMetaAccount.Type.SECRETS -> action()
                 LightMetaAccount.Type.WATCH_ONLY -> missingKeysPresenter.presentNoKeysFound()
             }

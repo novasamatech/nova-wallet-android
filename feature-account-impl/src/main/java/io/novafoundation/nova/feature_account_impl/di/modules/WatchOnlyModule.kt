@@ -19,7 +19,6 @@ class WatchOnlyModule {
         contextManager: ContextManager
     ): WatchOnlyMissingKeysPresenter = RealWatchOnlyMissingKeysPresenter(contextManager)
 
-
     @Provides
     @FeatureScope
     fun provideWatchOnlyRepository(
