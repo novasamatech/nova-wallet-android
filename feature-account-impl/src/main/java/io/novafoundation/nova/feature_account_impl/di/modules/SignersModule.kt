@@ -4,13 +4,11 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
+import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnly.WatchOnlyMissingKeysPresenter
 import io.novafoundation.nova.feature_account_impl.data.signer.RealSignerProvider
 import io.novafoundation.nova.feature_account_impl.data.signer.secrets.SecretsSignerFactory
 import io.novafoundation.nova.feature_account_impl.data.signer.watchOnly.WatchOnlySigner
-import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.sign.RealWatchOnlySigningPresenter
-import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.sign.WatchOnlySigningPresenter
 
 @Module
 class SignersModule {
@@ -21,14 +19,8 @@ class SignersModule {
 
     @Provides
     @FeatureScope
-    fun provideWatchOnlySigningPresenter(
-        contextManager: ContextManager
-    ): WatchOnlySigningPresenter = RealWatchOnlySigningPresenter(contextManager)
-
-    @Provides
-    @FeatureScope
     fun provideWatchOnlySigner(
-        watchOnlySigningPresenter: WatchOnlySigningPresenter
+        watchOnlySigningPresenter: WatchOnlyMissingKeysPresenter
     ) = WatchOnlySigner(watchOnlySigningPresenter)
 
     @Provides
