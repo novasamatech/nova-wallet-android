@@ -6,7 +6,7 @@
 
     <item
         android:width="193dp"
-        android:height="260dp"
+        android:height="265dp"
         android:gravity="center"
         android:drawable="@drawable/drawable_nova_logo" />
 

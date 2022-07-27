@@ -22,7 +22,7 @@
     <ImageView
         android:id="@+id/logoImg"
         android:layout_width="193dp"
-        android:layout_height="260dp"
+        android:layout_height="265dp"
         android:src="@drawable/drawable_nova_logo"
         app:layout_constraintBottom_toTopOf="@+id/guideline"
         app:layout_constraintEnd_toEndOf="parent"
