@@ -1,13 +1,11 @@
 package io.novafoundation.nova.feature_account_api.view
 
-import androidx.core.view.setPadding
 import io.novafoundation.nova.common.address.AddressModel
-import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.view.TableCellView
+import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
-import io.novafoundation.nova.feature_account_api.presenatation.chain.toDrawable
 
 fun TableCellView.showAddress(addressModel: AddressModel) {
     setImage(addressModel.image)
@@ -16,9 +14,11 @@ fun TableCellView.showAddress(addressModel: AddressModel) {
 }
 
 fun TableCellView.showChain(chainUi: ChainUi) {
-    image.background = chainUi.gradient.toDrawable(context, cornerRadiusDp = 6)
-    image.setPadding(1.5f.dp(context))
-    loadImage(chainUi.icon)
+    loadImage(
+        url = chainUi.icon,
+        placeholderRes = R.drawable.bg_chain_placeholder,
+        roundedCornersDp = null
+    )
 
     showValue(chainUi.name)
 }

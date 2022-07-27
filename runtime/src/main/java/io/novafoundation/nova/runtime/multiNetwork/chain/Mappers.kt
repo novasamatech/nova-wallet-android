@@ -10,7 +10,6 @@ import io.novafoundation.nova.core_db.model.chain.ChainExplorerLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.JoinedChainInfo
-import io.novafoundation.nova.runtime.multiNetwork.ChainGradientParser
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.BuyProviderArguments
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.BuyProviderId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -133,7 +132,7 @@ fun mapChainRemoteToChain(
 
     val assets = chainRemote.assets.map {
         Chain.Asset(
-            iconUrl = it.icon ?: chainRemote.icon,
+            iconUrl = it.icon,
             chainId = chainRemote.chainId,
             id = it.assetId,
             symbol = it.symbol,
@@ -184,7 +183,6 @@ fun mapChainRemoteToChain(
             id = chainId,
             parentId = parentId,
             name = name,
-            color = ChainGradientParser.parse(color),
             assets = assets,
             types = types,
             nodes = nodes,
@@ -214,7 +212,7 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
         val buyProviders = it.buyProviders?.let<String, Map<BuyProviderId, BuyProviderArguments>?>(gson::fromJsonOrNull).orEmpty()
 
         Chain.Asset(
-            iconUrl = it.icon ?: chainLocal.chain.icon,
+            iconUrl = it.icon,
             id = it.id,
             symbol = it.symbol,
             precision = it.precision,
@@ -261,7 +259,6 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
             id = id,
             parentId = parentId,
             name = name,
-            color = ChainGradientParser.parse(color),
             assets = assets,
             types = types,
             nodes = nodes,
@@ -337,7 +334,6 @@ fun mapChainToChainLocal(chain: Chain, gson: Gson): ChainLocal {
         ChainLocal(
             id = id,
             parentId = parentId,
-            color = ChainGradientParser.encode(color),
             name = name,
             types = types,
             icon = icon,

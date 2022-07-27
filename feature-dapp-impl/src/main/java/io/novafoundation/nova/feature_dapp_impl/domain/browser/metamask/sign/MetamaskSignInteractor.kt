@@ -12,7 +12,6 @@ import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.validation.EmptyValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
-import io.novafoundation.nova.feature_account_api.data.mappers.mapGradientToUi
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
@@ -244,7 +243,6 @@ class MetamaskSignInteractor(
         return ChainUi(
             id = metamaskChain.chainId,
             name = metamaskChain.chainName,
-            gradient = mapGradientToUi(Chain.Gradient.Default),
             icon = metamaskChain.iconUrls?.firstOrNull()
         )
     }

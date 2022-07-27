@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_assets.presentation.WalletRouter
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.asset
 import kotlinx.coroutines.launch
 
 class ExtrinsicDetailViewModel(
@@ -29,6 +30,10 @@ class ExtrinsicDetailViewModel(
         chainRegistry.getChain(operation.chainId)
     }
 
+    private val chainAsset by lazyAsync {
+        chainRegistry.asset(operation.chainId, operation.chainAssetId)
+    }
+
     val senderAddressModelFlow = flowOf {
         getIcon(operation.originAddress)
     }
@@ -40,6 +45,10 @@ class ExtrinsicDetailViewModel(
     }
         .inBackground()
         .share()
+
+    val operationIcon = flowOf {
+        chainAsset().iconUrl
+    }.shareInBackground()
 
     private suspend fun getIcon(address: String) = addressIconGenerator.createAddressModel(
         chain = chain(),

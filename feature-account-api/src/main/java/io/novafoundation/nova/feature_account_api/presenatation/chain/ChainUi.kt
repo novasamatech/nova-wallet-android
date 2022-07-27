@@ -1,32 +1,25 @@
 package io.novafoundation.nova.feature_account_api.presenatation.chain
 
-import android.content.Context
-import io.novafoundation.nova.common.view.shape.gradientDrawable
+import android.widget.ImageView
+import coil.ImageLoader
+import coil.load
+import io.novafoundation.nova.feature_account_api.R
 
 data class ChainUi(
     val id: String,
     val name: String,
-    val gradient: GradientUi,
     val icon: String?
 )
 
-@Suppress("ArrayInDataClass", "EqualsOrHashCode")
-data class GradientUi(
-    val angle: Int,
-    val colors: IntArray,
-    val positions: FloatArray
-) {
-
-    override fun equals(other: Any?): Boolean {
-        return other is GradientUi && angle == other.angle &&
-            colors.contentEquals(other.colors) &&
-            positions.contentEquals(other.positions)
+fun ImageView.loadChainIcon(icon: String?, imageLoader: ImageLoader) {
+    load(icon, imageLoader) {
+        placeholder(R.drawable.bg_chain_placeholder)
+        error(R.drawable.bg_chain_placeholder)
     }
 }
 
-fun GradientUi.toDrawable(context: Context, cornerRadiusDp: Int = 8) = context.gradientDrawable(
-    colors = colors,
-    offsets = positions,
-    angle = angle,
-    cornerRadiusDp = cornerRadiusDp
-)
+fun ImageView.loadTokenIcon(icon: String?, imageLoader: ImageLoader) {
+    load(icon, imageLoader) {
+        fallback(R.drawable.ic_nova)
+    }
+}

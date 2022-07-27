@@ -5,7 +5,6 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
 import coil.ImageLoader
-import coil.load
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.getAccentColorRes
 import io.novafoundation.nova.common.utils.setDrawableEnd
@@ -13,7 +12,7 @@ import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
-import io.novafoundation.nova.feature_account_api.presenatation.chain.toDrawable
+import io.novafoundation.nova.feature_account_api.presenatation.chain.loadChainIcon
 import kotlinx.android.synthetic.main.view_chain_chip.view.itemAssetGroupLabel
 import kotlinx.android.synthetic.main.view_chain_chip.view.itemAssetGroupLabelIcon
 
@@ -60,7 +59,6 @@ class ChainChipView @JvmOverloads constructor(
     fun setChain(chainUi: ChainUi) {
         itemAssetGroupLabel.text = chainUi.name
 
-        itemAssetGroupLabelIcon.load(chainUi.icon, imageLoader)
-        itemAssetGroupLabelIcon.background = chainUi.gradient.toDrawable(context)
+        itemAssetGroupLabelIcon.loadChainIcon(chainUi.icon, imageLoader)
     }
 }

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_assets.presentation.model
 
 import android.os.Parcelable
 import androidx.annotation.DrawableRes
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.android.parcel.Parcelize
 
@@ -23,6 +24,7 @@ sealed class OperationParcelizeModel : Parcelable {
     @Parcelize
     class Extrinsic(
         val chainId: ChainId,
+        val chainAssetId: ChainAssetId,
         val time: Long,
         val originAddress: String,
         val hash: String,

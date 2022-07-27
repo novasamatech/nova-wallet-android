@@ -6,12 +6,12 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.lifecycle.LifecycleCoroutineScope
 import coil.ImageLoader
-import coil.load
 import io.novafoundation.nova.common.utils.addAfter
 import io.novafoundation.nova.common.utils.observeInLifecycle
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.LabeledTextView
+import io.novafoundation.nova.feature_account_api.presenatation.chain.loadChainIcon
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ParachainMetadata
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.ContributeValidation
@@ -52,7 +52,7 @@ abstract class MainFlowMoonbeamCustomization(
                 titleView.text = it.title
 
                 rewardDestinationView.primaryIcon.setVisible(true)
-                rewardDestinationView.primaryIcon.load(it.chain.icon, imageLoader)
+                rewardDestinationView.primaryIcon.loadChainIcon(it.chain.icon, imageLoader)
                 rewardDestinationView.setTextIcon(it.addressModel.image)
                 rewardDestinationView.setMessage(it.addressModel.address)
                 rewardDestinationView.setLabel(it.chain.name)
