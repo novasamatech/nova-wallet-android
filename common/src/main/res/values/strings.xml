@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="account_delete_confirmation_description">Make sure you have exported your wallet before proceeding.</string>
+<!--  <string name="account_delete_confirmation_description">Make sure you have exported your account before proceeding.</string>-->
+  <string name="account_delete_confirmation_title">Forget wallet?</string>
+<!--  <string name="account_delete_confirmation_title">Forget account?</string>-->
+
   <string name="accoount_enter_chain_address_format">Enter valid %s address...</string>
   <string name="account_chain_address_format">%s address</string>
 
@@ -287,8 +292,6 @@
   <string name="account_creation_info">Mnemonic is used to recover access to account. Write it down, we will not be able to recover your account without it!</string>
   <string name="account_custom_secret">Accounts with a changed secret</string>
   <string name="account_delete_confirm">Forget</string>
-  <string name="account_delete_confirmation_description">Make sure you have exported your account before proceeding.</string>
-  <string name="account_delete_confirmation_title">Forget account?</string>
   <string name="account_derivation_path_ethereum_invalid_title">Invalid Ethereum derivation path</string>
   <string name="account_derivation_path_substrate_invalid_title">Invalid Substrate derivation path</string>
   <string name="account_error_try_another_one">Please, try another one.</string>
