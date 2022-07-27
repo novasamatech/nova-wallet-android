@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
   <string name="account_delete_confirmation_description">Make sure you have exported your wallet before proceeding.</string>
-<!--  <string name="account_delete_confirmation_description">Make sure you have exported your account before proceeding.</string>-->
   <string name="account_delete_confirmation_title">Forget wallet?</string>
-<!--  <string name="account_delete_confirmation_title">Forget account?</string>-->
 
   <string name="accoount_enter_chain_address_format">Enter valid %s address...</string>
   <string name="account_chain_address_format">%s address</string>
