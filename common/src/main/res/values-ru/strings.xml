@@ -700,8 +700,8 @@
   <string name="wallet_search_empty_title">Убедитесь, что адрес\nиз правильной сети</string>
   <string name="wallet_search_empty_title_v2_2_0">Неверный формат адреса.\nУбедитесь, что адрес \nсоответствует сети</string>
   <string name="wallet_send_balance_minimal">Минимальный баланс</string>
-  <string name="wallet_send_cannot_pay_cross_chain_fee" formatted="false">У вас недостаточно токенов для оплаты межсетевой комиссии в размере %s.\nОстаток баланса после перевода: %s</string>
-  <string name="wallet_send_cannot_pay_network_fee" formatted="false">У вас недостаточно токенов, чтобы оплатить комиссию сети в размере %s.\n Доступный баланс: %s</string>
+  <string name="wallet_send_cannot_pay_cross_chain_fee">У вас недостаточно токенов для оплаты межсетевой комиссии в размере %s.\nОстаток баланса после перевода: %s</string>
+  <string name="wallet_send_cannot_pay_network_fee">У вас недостаточно токенов, чтобы оплатить комиссию сети в размере %s.\n Доступный баланс: %s</string>
   <string name="wallet_send_confirm_hint">Межсетевая комиссия добавляется к введенной сумме. Получатель может получить часть межсетевой комиссии</string>
   <string name="wallet_send_confirm_transfer">Подтвердить</string>
   <string name="wallet_send_cross_chain">Между сетями</string>
