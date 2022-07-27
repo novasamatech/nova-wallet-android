@@ -42,6 +42,7 @@ private const val META_ACCOUNTS_WITH_BALANCE_QUERY = """
     INNER JOIN assets as a ON  a.metaId = m.id
     INNER JOIN chain_assets AS ca ON a.assetId = ca.id AND a.chainId = ca.chainId
     INNER JOIN tokens as t ON t.symbol = ca.symbol
+    ORDER BY m.position
 """
 
 @Dao
