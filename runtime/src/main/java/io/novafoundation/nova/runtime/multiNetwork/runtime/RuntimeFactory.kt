@@ -2,6 +2,7 @@ package io.novafoundation.nova.runtime.multiNetwork.runtime
 
 import com.google.gson.Gson
 import io.novafoundation.nova.common.utils.md5
+import io.novafoundation.nova.common.utils.newLimitedThreadPoolExecutor
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.TypesUsage
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
@@ -19,8 +20,9 @@ import jp.co.soramitsu.fearless_utils.runtime.metadata.RuntimeMetadataReader
 import jp.co.soramitsu.fearless_utils.runtime.metadata.builder.VersionedRuntimeBuilder
 import jp.co.soramitsu.fearless_utils.runtime.metadata.v14.RuntimeMetadataSchemaV14
 import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
-import java.util.concurrent.Executors
 
 class ConstructedRuntime(
     val runtime: RuntimeSnapshot,
@@ -39,16 +41,25 @@ class RuntimeFactory(
     private val runtimeFilesCache: RuntimeFilesCache,
     private val chainDao: ChainDao,
     private val gson: Gson,
+    private val concurrencyLimit: Int = 1
 ) {
 
-    private val dispatcher = Executors.newCachedThreadPool().asCoroutineDispatcher()
+    private val dispatcher = newLimitedThreadPoolExecutor(concurrencyLimit).asCoroutineDispatcher()
+    private val semaphore = Semaphore(concurrencyLimit)
+
+    suspend fun constructRuntime(
+        chainId: String,
+        typesUsage: TypesUsage,
+    ): ConstructedRuntime = semaphore.withPermit {
+        constructRuntimeInternal(chainId, typesUsage)
+    }
 
     /**
      * @throws BaseTypesNotInCacheException
      * @throws ChainInfoNotInCacheException
      * @throws NoRuntimeVersionException
      */
-    suspend fun constructRuntime(
+    private suspend fun constructRuntimeInternal(
         chainId: String,
         typesUsage: TypesUsage,
     ): ConstructedRuntime = withContext(dispatcher) {
