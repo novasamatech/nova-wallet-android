@@ -72,14 +72,9 @@ class RealWatchOnlyRepository(
     override suspend fun watchWalletSuggestions(): List<WatchWalletSuggestion> {
         return listOf(
             WatchWalletSuggestion(
-                name = "\uD83C\uDF0C Nova Foundation \uD83C\uDF0C",
-                substrateAddress = "H3cSNjAW86NfTecufGPhxutea8KrEcZdPa4XgVKfhTMugej",
-                evmAddress = null
-            ),
-            WatchWalletSuggestion(
-                name = "✨\uD83D\uDC4D✨ Day7 ✨\uD83D\uDC4D✨",
-                substrateAddress = "Day71GSJAxUUiFic8bVaWoAczR3Ue3jNonBZthVHp2BKzyJ",
-                evmAddress = null
+                name = "\uD83C\uDF0C NOVA",
+                substrateAddress = "1ChFWeNRLarAPRCTM3bfJmncJbSAbSS9yqjueWz7jX7iTVZ",
+                evmAddress = "0x7Aa98AEb3AfAcf10021539d5412c7ac6AfE0fb00"
             )
         )
     }
