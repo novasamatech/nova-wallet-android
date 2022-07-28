@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.account.details
+package io.novafoundation.nova.feature_account_impl.presentation.account.details.list
 
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.list.headers.TextHeader
 import io.novafoundation.nova.common.list.headers.TextHeaderHolder
 import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadChainIcon
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.model.AccountInChainUi
@@ -17,6 +18,7 @@ import kotlinx.android.synthetic.main.item_chain_acount.view.chainAccountAccount
 import kotlinx.android.synthetic.main.item_chain_acount.view.chainAccountAccountIcon
 import kotlinx.android.synthetic.main.item_chain_acount.view.chainAccountChainIcon
 import kotlinx.android.synthetic.main.item_chain_acount.view.chainAccountChainName
+import kotlinx.android.synthetic.main.item_chain_acount.view.labeledTextAction
 
 class ChainAccountsAdapter(
     private val handler: Handler,
@@ -58,7 +60,12 @@ class ChainAccountHolder(view: View) : GroupedListHolder(view) {
         chainAccountAccountIcon.setImageDrawable(item.accountIcon)
         chainAccountAccountAddress.text = item.addressOrHint
 
-        setOnClickListener { handler.chainAccountClicked(item) }
+        labeledTextAction.setVisible(item.actionsAvailable)
+        if (item.actionsAvailable) {
+            setOnClickListener { handler.chainAccountClicked(item) }
+        } else {
+            setOnClickListener(null)
+        }
     }
 }
 

@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.list.headers.TextHeader
 import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.filterToSet
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
@@ -32,6 +33,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -70,9 +72,10 @@ class AccountDetailsViewModel(
 
     val chainAccountProjections = flowOf { interactor.getChainProjections(metaAccount()) }
         .map { groupedList ->
-            groupedList.mapKeys { (from, _) -> mapFromToTextHeader(from) }
-                .mapValues { (_, accounts) -> accounts.map { mapChainAccountProjectionToUi(metaAccount(), it) } }
-                .toListWithHeaders()
+            groupedList.toListWithHeaders(
+                keyMapper = { mapFromToTextHeader(it) },
+                valueMapper = { mapChainAccountProjectionToUi(metaAccount(), it) }
+            )
         }
         .inBackground()
         .share()
@@ -98,7 +101,13 @@ class AccountDetailsViewModel(
             .launchIn(viewModelScope)
     }
 
-    private fun mapFromToTextHeader(from: AccountInChain.From): TextHeader {
+    private suspend fun mapFromToTextHeader(from: AccountInChain.From): TextHeader? {
+        val availableActions = availableAccountActions.first()
+
+        // it is not possible to add chain account for this type of wallet
+        // so do not show groups since there will only be one group (shared secrets)
+        if (AccountAction.CHANGE !in availableActions) return null
+
         val resId = when (from) {
             AccountInChain.From.META_ACCOUNT -> R.string.account_shared_secret
             AccountInChain.From.CHAIN_ACCOUNT -> R.string.account_custom_secret
@@ -118,15 +127,22 @@ class AccountDetailsViewModel(
             iconGenerator.createAddressIcon(it.accountId, AddressIconGenerator.SIZE_SMALL, backgroundColorRes = R.color.account_icon_dark)
         } ?: resourceManager.getDrawable(R.drawable.ic_warning_filled)
 
+        val availableActionsForChain = availableActionsFor(accountInChain)
+        val canViewAddresses = accountInChain.projection != null
+        val canDoAnyActions = availableActionsForChain.isNotEmpty() || canViewAddresses
+
         AccountInChainUi(
             chainUi = mapChainToUi(chain),
             addressOrHint = addressOrHint,
             address = projection?.address,
-            accountIcon = accountIcon
+            accountIcon = accountIcon,
+            actionsAvailable = canDoAnyActions
         )
     }
 
     fun chainAccountClicked(item: AccountInChainUi) = launch {
+        if (!item.actionsAvailable) return@launch
+
         val chain = chainRegistry.getChain(item.chainUi.id)
 
         val type = ExternalActions.Type.Address(item.address)
@@ -190,5 +206,14 @@ class AccountDetailsViewModel(
         }
 
         accountRouter.withPinCodeCheckRequired(navigationAction)
+    }
+
+    private suspend fun availableActionsFor(accountInChain: AccountInChain): Set<AccountAction> {
+        return availableAccountActions.first().filterToSet { action ->
+            when (action) {
+                AccountAction.CHANGE -> true
+                AccountAction.EXPORT -> accountInChain.projection != null
+            }
+        }
     }
 }
