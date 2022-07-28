@@ -206,7 +206,8 @@ class AccountInteractorImpl(
     private fun metaAccountTypeComparator() = compareBy<LightMetaAccount.Type> {
         when (it) {
             LightMetaAccount.Type.SECRETS -> 0
-            LightMetaAccount.Type.WATCH_ONLY -> 1
+            LightMetaAccount.Type.PARITY_SIGNER -> 1
+            LightMetaAccount.Type.WATCH_ONLY -> 2
         }
     }
 }

@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="account_details_parity_signer_not_supported">Not supported by Parity Signer</string>
+  <string name="account_details_parity_signer_alert">This wallet is paired with Parity Signer. Nova will help you to form any operations you want, and you will be requested to sign them using Parity Signer</string>
+  <string name="account_parity_signer">parity signer</string>
+  
   <string name="account_delete_confirmation_description">Make sure you have exported your wallet before proceeding.</string>
   <string name="account_delete_confirmation_title">Forget wallet?</string>
 

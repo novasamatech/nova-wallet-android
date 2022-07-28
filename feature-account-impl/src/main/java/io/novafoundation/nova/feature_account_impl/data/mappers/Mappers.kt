@@ -92,6 +92,7 @@ private fun mapMetaAccountTypeFromLocal(local: MetaAccountLocal.Type): LightMeta
     return when (local) {
         MetaAccountLocal.Type.SECRETS -> LightMetaAccount.Type.SECRETS
         MetaAccountLocal.Type.WATCH_ONLY -> LightMetaAccount.Type.WATCH_ONLY
+        MetaAccountLocal.Type.PARITY_SIGNER -> LightMetaAccount.Type.PARITY_SIGNER
     }
 }
 

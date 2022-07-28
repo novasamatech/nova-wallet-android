@@ -18,6 +18,7 @@ internal class RealSignerProvider(
         return when (metaAccount.type) {
             LightMetaAccount.Type.SECRETS -> secretsSignerFactory.create(metaAccount)
             LightMetaAccount.Type.WATCH_ONLY -> watchOnlySigner
+            LightMetaAccount.Type.PARITY_SIGNER -> watchOnlySigner // TODO signer sign flow
         }
     }
 
