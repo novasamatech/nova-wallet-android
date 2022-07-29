@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm
 import io.novafoundation.nova.feature_account_impl.presentation.node.add.di.AddNodeComponent
 import io.novafoundation.nova.feature_account_impl.presentation.node.details.di.NodeDetailsComponent
 import io.novafoundation.nova.feature_account_impl.presentation.node.list.di.NodesComponent
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.start.di.StartImportParitySignerComponent
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.di.PinCodeComponent
 import io.novafoundation.nova.feature_account_impl.presentation.settings.di.SettingsComponent
 import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.change.di.ChangeWatchAccountComponent
@@ -81,6 +82,8 @@ interface AccountFeatureComponent : AccountFeatureApi {
 
     fun createWatchOnlyComponentFactory(): CreateWatchWalletComponent.Factory
     fun changeWatchAccountComponentFactory(): ChangeWatchAccountComponent.Factory
+
+    fun startImportParitySignerComponentFactory(): StartImportParitySignerComponent.Factory
 
     @Component.Factory
     interface Factory {

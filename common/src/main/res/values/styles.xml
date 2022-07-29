@@ -272,6 +272,16 @@
         <item name="android:background">@drawable/bg_icon_big</item>
         <item name="android:padding">16dp</item>
     </style>
+    
+    <style name="Widget.Nova.Text.Number" parent="">
+        <item name="android:textAppearance">@style/TextAppearance.NovaFoundation.Regular.Body</item>
+        <item name="android:textColor">@color/white_64</item>
+        <item name="android:background">@drawable/bg_round_number</item>
+        <item name="android:gravity">center</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:layout_width">32dp</item>
+        <item name="android:layout_height">32dp</item>
+    </style>
 
     <style name="Widget.Nova.ActionButton" parent="TextAppearance.AppCompat.Body2">
         <item name="android:paddingTop">12dp</item>

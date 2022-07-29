@@ -13,5 +13,7 @@ interface OnboardingRouter {
 
     fun openCreateWatchWallet()
 
+    fun openStartImportParitySigner()
+
     fun back()
 }
