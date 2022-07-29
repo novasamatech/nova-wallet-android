@@ -14,7 +14,7 @@ import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.common.utils.getDrawableCompat
 
-typealias OnFramingRectChangeListener  = (Rect) -> Unit
+typealias OnFramingRectChangeListener = (Rect) -> Unit
 
 class QrViewFinderView @JvmOverloads constructor(
     context: Context,

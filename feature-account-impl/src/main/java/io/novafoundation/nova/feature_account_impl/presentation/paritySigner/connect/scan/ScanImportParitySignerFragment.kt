@@ -97,7 +97,7 @@ class ScanImportParitySignerFragment : BaseFragment<ScanImportParitySignerViewMo
     }
 
     override fun barcodeResult(result: BarcodeResult) {
-       viewModel.scanned(result.toString())
+        viewModel.scanned(result.toString())
     }
 
     override fun possibleResultPoints(resultPoints: MutableList<ResultPoint>?) {}

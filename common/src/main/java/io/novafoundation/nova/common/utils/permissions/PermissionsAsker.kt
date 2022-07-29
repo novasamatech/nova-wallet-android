@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 
 typealias Permission = String
 
-
 interface PermissionsAsker {
     enum class PermissionDeniedAction {
         RETRY, BACK
@@ -16,9 +15,7 @@ interface PermissionsAsker {
 
     val showPermissionsDenied: ActionAwaitableMixin<PermissionDeniedLevel, PermissionDeniedAction>
 
-    interface Presentation: PermissionsAsker {
+    interface Presentation : PermissionsAsker {
         suspend fun requirePermissionsOrExit(vararg permissions: Permission): Boolean
     }
 }
-
-
