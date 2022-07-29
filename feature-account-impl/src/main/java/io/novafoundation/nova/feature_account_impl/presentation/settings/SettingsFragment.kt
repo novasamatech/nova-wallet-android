@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import kotlinx.android.synthetic.main.fragment_profile.accountView
 import kotlinx.android.synthetic.main.fragment_profile.settingsAppVersion
+import kotlinx.android.synthetic.main.fragment_profile.settingsAvatar
 import kotlinx.android.synthetic.main.fragment_profile.settingsContainer
 import kotlinx.android.synthetic.main.fragment_profile.settingsEmail
 import kotlinx.android.synthetic.main.fragment_profile.settingsGithub
@@ -62,6 +63,8 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
         settingsRateUs.setOnClickListener { viewModel.rateUsClicked() }
 
         settingsPin.setOnClickListener { viewModel.changePinCodeClicked() }
+
+        settingsAvatar.setOnClickListener { viewModel.selectedWalletClicked() }
     }
 
     override fun inject() {
@@ -77,11 +80,12 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
     override fun subscribe(viewModel: SettingsViewModel) {
         observeBrowserEvents(viewModel)
 
-        viewModel.selectedAccountFlow.observe { account ->
-            accountView.setTitle(account.name)
-        }
+        viewModel.selectedWalletModel.observe {
+            settingsAvatar.setModel(it)
 
-        viewModel.accountIconFlow.observe(accountView::setAccountIcon)
+            accountView.setAccountIcon(it.walletIcon)
+            accountView.setTitle(it.name)
+        }
 
         viewModel.selectedLanguageFlow.observe {
             settingsLanguage.setValue(it.displayName)

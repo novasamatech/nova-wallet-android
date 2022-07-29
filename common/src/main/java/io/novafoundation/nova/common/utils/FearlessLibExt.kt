@@ -6,10 +6,13 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindNullableNu
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumberConstant
 import io.novafoundation.nova.common.data.network.runtime.binding.fromHexOrIncompatible
 import io.novafoundation.nova.core.model.Node
+import jp.co.soramitsu.fearless_utils.encrypt.SignatureWrapper
 import jp.co.soramitsu.fearless_utils.encrypt.junction.BIP32JunctionDecoder
 import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.Mnemonic
 import jp.co.soramitsu.fearless_utils.encrypt.seed.SeedFactory
+import jp.co.soramitsu.fearless_utils.extensions.asEthereumAddress
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
+import jp.co.soramitsu.fearless_utils.extensions.toAccountId
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.hash.Hasher.blake2b256
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
@@ -47,6 +50,8 @@ fun BIP32JunctionDecoder.default() = decode(DEFAULT_DERIVATION_PATH)
 fun StorageEntry.defaultInHex() = default.toHexString(withPrefix = true)
 
 fun ByteArray.toAddress(networkType: Node.NetworkType) = toAddress(networkType.runtimeConfiguration.addressByte)
+
+fun String.isValidSS58Address() = runCatching { toAccountId() }.isSuccess
 
 fun String.removeHexPrefix() = removePrefix("0x")
 
@@ -172,6 +177,10 @@ fun GenericCall.Instance.oneOf(vararg functionCandidates: MetadataFunction): Boo
 fun GenericCall.Instance.instanceOf(functionCandidate: MetadataFunction): Boolean = function == functionCandidate
 
 fun structOf(vararg pairs: Pair<String, Any?>) = Struct.Instance(mapOf(*pairs))
+
+fun SignatureWrapper.asHexString() = signature.toHexString(withPrefix = true)
+
+fun String.ethereumAddressToAccountId() = asEthereumAddress().toAccountId().value
 
 object Modules {
     const val VESTING: String = "Vesting"

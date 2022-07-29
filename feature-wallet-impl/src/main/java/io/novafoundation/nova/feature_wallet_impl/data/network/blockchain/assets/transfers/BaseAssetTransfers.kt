@@ -46,7 +46,7 @@ abstract class BaseAssetTransfers(
     override suspend fun performTransfer(transfer: AssetTransfer): Result<String> {
         val senderAccountId = transfer.sender.accountIdIn(transfer.originChain)!!
 
-        return extrinsicService.submitExtrinsic(transfer.originChain, senderAccountId) {
+        return extrinsicService.submitExtrinsicWithAnySuitableWallet(transfer.originChain, senderAccountId) {
             transfer(transfer)
         }
     }

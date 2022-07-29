@@ -71,7 +71,7 @@ class RealCrossChainTransactor(
         transfer: AssetTransfer,
         crossChainFee: BigInteger
     ): Result<*> {
-        return extrinsicService.submitExtrinsic(transfer.originChain) {
+        return extrinsicService.submitExtrinsicWithSelectedWallet(transfer.originChain) {
             crossChainTransfer(configuration, transfer, crossChainFee)
         }
     }

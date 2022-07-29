@@ -3,9 +3,10 @@ package io.novafoundation.nova.common.view.bottomSheet.list.dynamic
 import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
+import android.view.View
 import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.annotation.CallSuper
+import androidx.annotation.DrawableRes
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -14,8 +15,9 @@ import io.novafoundation.nova.common.utils.DialogExtensions
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.setVisible
 import kotlinx.android.synthetic.main.bottom_sheet_dynamic_list.dynamicListSheetContent
-import kotlinx.android.synthetic.main.bottom_sheet_dynamic_list.dynamicListSheetDivider
+import kotlinx.android.synthetic.main.bottom_sheet_dynamic_list.dynamicListSheetHeader
 import kotlinx.android.synthetic.main.bottom_sheet_dynamic_list.dynamicListSheetItemContainer
+import kotlinx.android.synthetic.main.bottom_sheet_dynamic_list.dynamicListSheetRightAction
 import kotlinx.android.synthetic.main.bottom_sheet_dynamic_list.dynamicListSheetTitle
 
 typealias ClickHandler<T> = (T) -> Unit
@@ -42,8 +44,8 @@ abstract class BaseDynamicListBottomSheet(context: Context) :
     protected val container: LinearLayout
         get() = dynamicListSheetItemContainer
 
-    protected val titleView: TextView
-        get() = dynamicListSheetTitle
+    protected val headerView: View
+        get() = dynamicListSheetHeader
 
     protected val recyclerView: RecyclerView
         get() = dynamicListSheetContent
@@ -62,8 +64,13 @@ abstract class BaseDynamicListBottomSheet(context: Context) :
         dynamicListSheetTitle.setText(titleId)
     }
 
-    fun setDividerVisible(visible: Boolean) {
-        dynamicListSheetDivider.setVisible(visible)
+    fun setupRightAction(
+        @DrawableRes drawableRes: Int,
+        onClickListener: View.OnClickListener
+    ) {
+        dynamicListSheetRightAction.setImageResource(drawableRes)
+        dynamicListSheetRightAction.setVisible(true)
+        dynamicListSheetRightAction.setOnClickListener(onClickListener)
     }
 }
 

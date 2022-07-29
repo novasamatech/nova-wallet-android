@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.utils.filterNotNull
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.core.model.Node
 import io.novafoundation.nova.core.model.Node.NetworkType
+import io.novafoundation.nova.core_db.dao.MetaAccountWithBalanceLocal
 import io.novafoundation.nova.core_db.model.NodeLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.JoinedMetaAccountInfo
@@ -14,6 +15,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.Account
 import io.novafoundation.nova.feature_account_api.domain.model.AddAccountType
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountWithAssetBalance
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_impl.R
@@ -86,19 +88,27 @@ fun mapNodeLocalToNode(nodeLocal: NodeLocal): Node {
     }
 }
 
-fun mapMetaAccountLocalToLightMetaAccount(
-    metaAccountLocal: MetaAccountLocal
-): LightMetaAccount = with(metaAccountLocal) {
-    LightMetaAccount(
-        id = id,
-        substratePublicKey = substratePublicKey,
-        substrateCryptoType = substrateCryptoType,
-        substrateAccountId = substrateAccountId,
-        ethereumAddress = ethereumAddress,
-        ethereumPublicKey = ethereumPublicKey,
-        isSelected = isSelected,
-        name = name
-    )
+private fun mapMetaAccountTypeFromLocal(local: MetaAccountLocal.Type): LightMetaAccount.Type {
+    return when (local) {
+        MetaAccountLocal.Type.SECRETS -> LightMetaAccount.Type.SECRETS
+        MetaAccountLocal.Type.WATCH_ONLY -> LightMetaAccount.Type.WATCH_ONLY
+    }
+}
+
+fun mapMetaAccountWithBalanceFromLocal(local: MetaAccountWithBalanceLocal): MetaAccountWithAssetBalance {
+    return with(local) {
+        MetaAccountWithAssetBalance(
+            metaId = id,
+            name = name,
+            type = mapMetaAccountTypeFromLocal(type),
+            isSelected = isSelected,
+            substrateAccountId = substrateAccountId,
+            freeInPlanks = freeInPlanks,
+            reservedInPlanks = reservedInPlanks,
+            precision = precision,
+            dollarRate = dollarRate
+        )
+    }
 }
 
 fun mapMetaAccountLocalToMetaAccount(
@@ -131,27 +141,29 @@ fun mapMetaAccountLocalToMetaAccount(
             ethereumAddress = ethereumAddress,
             ethereumPublicKey = ethereumPublicKey,
             isSelected = isSelected,
-            name = name
+            name = name,
+            type = mapMetaAccountTypeFromLocal(type)
         )
     }
 }
 
+@Deprecated("Accounts are deprecated")
 fun mapMetaAccountToAccount(chain: Chain, metaAccount: MetaAccount): Account? {
     return metaAccount.addressIn(chain)?.let { address ->
-
         val accountId = chain.hexAccountIdOf(address)
 
         Account(
             address = address,
             name = metaAccount.name,
             accountIdHex = accountId,
-            cryptoType = metaAccount.substrateCryptoType,
+            cryptoType = metaAccount.substrateCryptoType ?: CryptoType.SR25519,
             position = 0,
             network = stubNetwork(chain.id),
         )
     }
 }
 
+@Deprecated("Accounts are deprecated")
 fun mapChainAccountToAccount(
     parent: MetaAccount,
     chainAccount: MetaAccount.ChainAccount,
@@ -162,7 +174,7 @@ fun mapChainAccountToAccount(
         address = chain.addressOf(chainAccount.accountId),
         name = parent.name,
         accountIdHex = chainAccount.accountId.toHexString(),
-        cryptoType = chainAccount.cryptoType,
+        cryptoType = chainAccount.cryptoType ?: CryptoType.SR25519,
         position = 0,
         network = stubNetwork(chain.id),
     )

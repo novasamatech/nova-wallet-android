@@ -16,14 +16,15 @@ import io.novafoundation.nova.core.model.CryptoType
     ]
 )
 class MetaAccountLocal(
-    val substratePublicKey: ByteArray,
-    val substrateCryptoType: CryptoType,
+    val substratePublicKey: ByteArray?,
+    val substrateCryptoType: CryptoType?,
     val substrateAccountId: ByteArray,
     val ethereumPublicKey: ByteArray?,
     val ethereumAddress: ByteArray?,
     val name: String,
     val isSelected: Boolean,
     val position: Int,
+    val type: Type,
 ) {
 
     companion object Table {
@@ -46,6 +47,10 @@ class MetaAccountLocal(
 
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
+
+    enum class Type {
+        SECRETS, WATCH_ONLY
+    }
 }
 
 @Entity(
@@ -71,9 +76,9 @@ class MetaAccountLocal(
 class ChainAccountLocal(
     val metaId: Long,
     val chainId: String,
-    val publicKey: ByteArray,
+    val publicKey: ByteArray?,
     val accountId: ByteArray,
-    val cryptoType: CryptoType,
+    val cryptoType: CryptoType?,
 )
 
 interface JoinedMetaAccountInfo {

@@ -29,7 +29,7 @@ class ControllerInteractor(
             val chain = sharedStakingSate.chain()
             val accountId = chain.accountIdOf(stashAccountAddress)
 
-            extrinsicService.submitExtrinsic(chain, accountId) {
+            extrinsicService.submitExtrinsicWithAnySuitableWallet(chain, accountId) {
                 setController(chain.multiAddressOf(controllerAccountAddress))
             }
         }

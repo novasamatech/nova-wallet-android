@@ -18,7 +18,7 @@
         android:layout_height="88dp"
         android:layout_marginTop="17dp"
         android:padding="12dp"
-        android:background="@drawable/dapp_icon_background_big"
+        android:background="@drawable/bg_icon_big"
         android:src="@drawable/ic_warning_filled" />
 
     <TextView

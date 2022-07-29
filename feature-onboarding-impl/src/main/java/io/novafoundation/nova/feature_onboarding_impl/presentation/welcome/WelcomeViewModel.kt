@@ -51,4 +51,8 @@ class WelcomeViewModel(
     fun backClicked() {
         router.back()
     }
+
+    fun addWatchWalletClicked() {
+        router.openCreateWatchWallet()
+    }
 }

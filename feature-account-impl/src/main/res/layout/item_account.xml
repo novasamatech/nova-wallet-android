@@ -2,67 +2,102 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/itemAccountContainer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/bg_primary_list_item"
-    tools:background="@color/black">
+    android:animateLayoutChanges="true"
+    android:background="@drawable/bg_primary_list_item">
 
     <ImageView
-        android:id="@+id/accountCheck"
+        android:id="@+id/itemAccountDelete"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:src="@drawable/ic_checkmark"
-        app:layout_constraintBottom_toBottomOf="@+id/accountIcon"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/accountIcon" />
-
-    <ImageView
-        android:id="@+id/accountIcon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:src="@drawable/ic_delete_symbol"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/accountCheck"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/itemAccountIcon"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/itemAccountDelete"
         app:layout_constraintTop_toTopOf="parent"
-        tools:layout_height="24dp"
-        tools:layout_width="24dp"
+        app:layout_goneMarginStart="16dp"
         tools:src="@color/colorAccent" />
 
     <TextView
-        android:id="@+id/accountTitle"
-        style="@style/TextAppearance.NovaFoundation.Body1"
+        android:id="@+id/itemAccountTitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="5dp"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:layout_marginEnd="16dp"
+        android:includeFontPadding="false"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toTopOf="@+id/itemAccountSubtitle"
+        app:layout_constraintEnd_toStartOf="@+id/itemAccountEndBarrier"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/itemAccountIcon"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="✨👍✨ Day7 ✨👍✨" />
+
+    <TextView
+        android:id="@+id/itemAccountSubtitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:includeFontPadding="false"
-        android:textColor="@color/white"
+        android:layout_marginBottom="5dp"
+        android:textColor="@color/white_64"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/accountInfo"
-        app:layout_constraintStart_toEndOf="@+id/accountIcon"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/itemAccountEndBarrier"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/itemAccountIcon"
+        app:layout_constraintTop_toBottomOf="@+id/itemAccountTitle"
         app:layout_constraintVertical_chainStyle="packed"
-        tools:text="Account Name" />
+        tools:text="$11,529.26" />
 
     <ImageView
-        android:background="@drawable/bg_primary_list_item"
-        android:id="@+id/accountInfo"
+        android:id="@+id/itemAccountArrow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:src="@drawable/ic_info_24"
-        android:tint="@color/white"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/ic_chevron_right"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/white_48" />
+
+    <RadioButton
+        android:id="@+id/itemAccountCheck"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginEnd="16dp"
+        android:buttonTint="@color/tint_radio_button"
+        android:clickable="false"
+        android:duplicateParentState="true"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/dividerGray"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/itemAccountEndBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="left"
+        app:constraint_referenced_ids="itemAccountCheck, itemAccountArrow" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

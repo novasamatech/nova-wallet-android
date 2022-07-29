@@ -1,7 +1,6 @@
 package io.novafoundation.nova.runtime.multiNetwork.chain.model
 
 import io.novafoundation.nova.common.utils.Identifiable
-import io.novafoundation.nova.runtime.multiNetwork.ChainGradientParser
 import java.math.BigInteger
 
 typealias ChainId = String
@@ -16,7 +15,6 @@ typealias BuyProviderArguments = Map<String, Any?>
 data class Chain(
     val id: ChainId,
     val name: String,
-    val color: Gradient?,
     val assets: List<Asset>,
     val nodes: List<Node>,
     val explorers: List<Explorer>,
@@ -112,19 +110,6 @@ data class Chain(
         data class Section(val type: Type, val url: String) {
             enum class Type {
                 SUBQUERY, GITHUB, UNKNOWN
-            }
-        }
-    }
-
-    data class Gradient(
-        val angle: Float,
-        val colors: List<String>,
-        val positionsPercent: List<Float>
-    ) {
-
-        companion object {
-            val Default by lazy {
-                ChainGradientParser.parse("linear-gradient(315deg, #434852 0%, #787F92 100%)")!!
             }
         }
     }

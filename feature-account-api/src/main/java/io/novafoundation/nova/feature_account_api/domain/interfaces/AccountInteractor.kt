@@ -1,11 +1,13 @@
 package io.novafoundation.nova.feature_account_api.domain.interfaces
 
+import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.core.model.Language
 import io.novafoundation.nova.core.model.Node
 import io.novafoundation.nova.feature_account_api.domain.model.Account
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountWithTotalBalance
 import io.novafoundation.nova.feature_account_api.domain.model.PreferredCryptoType
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.Mnemonic
@@ -33,9 +35,7 @@ interface AccountInteractor {
 
     suspend fun getMetaAccount(metaId: Long): MetaAccount
 
-    fun lightMetaAccountsFlow(): Flow<List<LightMetaAccount>>
-
-    fun selectedMetaAccountFlow(): Flow<MetaAccount>
+    fun metaAccountsFlow(): Flow<GroupedList<LightMetaAccount.Type, MetaAccountWithTotalBalance>>
 
     suspend fun selectMetaAccount(metaId: Long)
 

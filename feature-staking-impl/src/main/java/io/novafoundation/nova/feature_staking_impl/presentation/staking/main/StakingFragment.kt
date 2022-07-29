@@ -74,8 +74,6 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
         setupStartStakingComponent(viewModel.startStakingComponent, stakingEstimate)
         setupAlertsComponent(viewModel.alertsComponent, stakingAlertsInfo)
 
-        viewModel.currentAddressModelFlow.observe {
-            stakingAvatar.setImageDrawable(it.image)
-        }
+        viewModel.selectedWalletFlow.observe(stakingAvatar::setModel)
     }
 }

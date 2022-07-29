@@ -5,13 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import coil.ImageLoader
-import coil.load
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyBarMargin
 import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.common.utils.setTextColorRes
+import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenIcon
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
@@ -107,10 +107,14 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
 
         viewModel.state.observe(transfersContainer::showState)
 
-        setupBuyIntegration(viewModel.buyMixin, buyButton = balanceDetaiActions.buy)
+        setupBuyIntegration(
+            mixin = viewModel.buyMixin,
+            buyButton = balanceDetaiActions.buy,
+            customBuyClick = { viewModel.buyClicked() }
+        )
 
         viewModel.assetDetailsModel.observe { asset ->
-            balanceDetailTokenIcon.load(asset.token.configuration.iconUrl, imageLoader)
+            balanceDetailTokenIcon.loadTokenIcon(asset.token.configuration.iconUrl, imageLoader)
             balanceDetailTokenName.text = asset.token.configuration.symbol
 
             balanceDetailRate.text = asset.token.dollarRate

@@ -16,6 +16,7 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.ScrollView
 import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
@@ -122,8 +123,10 @@ fun TextView.setDrawableEnd(
     paddingInDp: Int = 0,
     @ColorRes tint: Int? = null,
 ) {
+    val (start, top, _, bottom) = compoundDrawablesRelative
+
     setCompoundDrawable(drawableRes, widthInDp, heightInDp, tint, paddingInDp) {
-        setCompoundDrawablesRelative(null, null, it, null)
+        setCompoundDrawablesRelative(start, top, it, bottom)
     }
 }
 
@@ -134,22 +137,11 @@ fun TextView.setDrawableStart(
     paddingInDp: Int = 0,
     @ColorRes tint: Int? = null,
 ) {
+    val (_, top, end, bottom) = compoundDrawablesRelative
+
     setCompoundDrawable(drawableRes, widthInDp, heightInDp, tint, paddingInDp) {
-        setCompoundDrawablesRelative(it, null, null, null)
+        setCompoundDrawablesRelative(it, top, end, bottom)
     }
-}
-
-fun TextView.setDrawableStart(
-    drawable: Drawable,
-    paddingInDp: Int,
-    widthInDp: Int? = null,
-    heightInDp: Int? = widthInDp,
-) {
-    compoundDrawablePadding = paddingInDp.dp(context)
-
-    drawable.updateDimensions(context, widthInDp, heightInDp)
-
-    setCompoundDrawablesRelative(drawable, null, null, null)
 }
 
 private fun Drawable.updateDimensions(
@@ -247,6 +239,16 @@ private fun RecyclerView.wasAtBeginningBeforeInsertion(insertedCount: Int) =
 
 fun RecyclerView.findFirstVisiblePosition(): Int {
     return (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+}
+
+fun ScrollView.scrollOnFocusTo(vararg focusableTargets: View) {
+    val listener = View.OnFocusChangeListener { view, hasFocus ->
+        if (hasFocus) {
+            postToSelf { scrollTo(view.left, view.top) }
+        }
+    }
+
+    focusableTargets.forEach { it.onFocusChangeListener = listener }
 }
 
 fun TextView.setCompoundDrawableTint(@ColorRes tintRes: Int) {

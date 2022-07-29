@@ -14,8 +14,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.add.Impo
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.create.CreateAccountFragment
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.AccountDetailsFragment
-import io.novafoundation.nova.feature_account_impl.presentation.account.list.AccountChosenNavDirection
-import io.novafoundation.nova.feature_account_impl.presentation.account.list.AccountListFragment
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ExportJsonConfirmFragment
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ExportJsonConfirmPayload
@@ -30,6 +28,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.node.details.Nod
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.PinCodeAction
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.PincodeFragment
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.ToolbarConfiguration
+import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.change.ChangeWatchAccountFragment
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.WalletRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.BalanceDetailFragment
@@ -135,6 +134,7 @@ class Navigator(
             R.id.splashFragment -> navController?.navigate(R.id.action_splash_to_pin, bundle)
             R.id.importAccountFragment -> navController?.navigate(R.id.action_importAccountFragment_to_pincodeFragment, bundle)
             R.id.confirmMnemonicFragment -> navController?.navigate(R.id.action_confirmMnemonicFragment_to_pincodeFragment, bundle)
+            R.id.createWatchWalletFragment -> navController?.navigate(R.id.action_watchWalletFragment_to_pincodeFragment, bundle)
         }
     }
 
@@ -366,8 +366,12 @@ class Navigator(
         navController?.navigate(R.id.open_extrinsic_detail, bundle)
     }
 
-    override fun openAccounts(accountChosenNavDirection: AccountChosenNavDirection) {
-        navController?.navigate(R.id.action_open_accounts, AccountListFragment.getBundle(accountChosenNavDirection))
+    override fun openWallets() {
+        navController?.navigate(R.id.action_open_accounts)
+    }
+
+    override fun openSwitchWallet() {
+        navController?.navigate(R.id.action_open_switch_accounts)
     }
 
     override fun openNodes() {
@@ -376,10 +380,6 @@ class Navigator(
 
     override fun openLanguages() {
         navController?.navigate(R.id.action_mainFragment_to_languagesFragment)
-    }
-
-    override fun openChangeAccount() {
-        openAccounts(AccountChosenNavDirection.BACK)
     }
 
     override fun openReceive(assetPayload: AssetPayload) {
@@ -411,14 +411,6 @@ class Navigator(
         navController?.navigate(R.id.action_open_account_details, extras)
     }
 
-    override fun openEditAccounts() {
-        navController?.navigate(R.id.action_accountsFragment_to_editAccountsFragment)
-    }
-
-    override fun backToMainScreen() {
-        navController?.navigate(R.id.action_editAccountsFragment_to_mainFragment)
-    }
-
     override fun openNodeDetails(nodeId: Int) {
         navController?.navigate(R.id.action_nodesFragment_to_nodeDetailsFragment, NodeDetailsFragment.getBundle(nodeId))
     }
@@ -437,6 +429,12 @@ class Navigator(
 
     override fun openAddNode() {
         navController?.navigate(R.id.action_nodesFragment_to_addNodeFragment)
+    }
+
+    override fun openChangeWatchAccount(payload: AddAccountPayload.ChainAccount) {
+        val bundle = ChangeWatchAccountFragment.getBundle(payload)
+
+        navController?.navigate(R.id.action_accountDetailsFragment_to_changeWatchAccountFragment, bundle)
     }
 
     override fun openAddAccount(payload: AddAccountPayload) {
@@ -480,6 +478,10 @@ class Navigator(
         val action = PinCodeAction.Change
         val bundle = PincodeFragment.getPinCodeBundle(action)
         navController?.navigate(R.id.action_mainFragment_to_pinCodeFragment, bundle)
+    }
+
+    override fun openCreateWatchWallet() {
+        navController?.navigate(R.id.action_welcomeFragment_to_createWatchWalletFragment)
     }
 
     override fun withPinCodeCheckRequired(

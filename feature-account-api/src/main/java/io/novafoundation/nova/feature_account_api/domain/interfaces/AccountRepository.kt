@@ -4,9 +4,9 @@ import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.core.model.Language
 import io.novafoundation.nova.core.model.Node
 import io.novafoundation.nova.feature_account_api.domain.model.Account
-import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountWithAssetBalance
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.Mnemonic
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
@@ -37,7 +37,7 @@ interface AccountRepository {
 
     suspend fun allMetaAccounts(): List<MetaAccount>
 
-    fun lightMetaAccountsFlow(): Flow<List<LightMetaAccount>>
+    fun metaAccountsWithBalancesFlow(): Flow<List<MetaAccountWithAssetBalance>>
     suspend fun selectMetaAccount(metaId: Long)
 
     suspend fun updateMetaAccountName(metaId: Long, newName: String)

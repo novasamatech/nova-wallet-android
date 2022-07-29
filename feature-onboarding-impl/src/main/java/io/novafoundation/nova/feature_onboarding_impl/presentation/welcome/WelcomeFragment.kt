@@ -20,6 +20,7 @@ import kotlinx.android.synthetic.main.fragment_welcome.back
 import kotlinx.android.synthetic.main.fragment_welcome.createAccountBtn
 import kotlinx.android.synthetic.main.fragment_welcome.importAccountBtn
 import kotlinx.android.synthetic.main.fragment_welcome.termsTv
+import kotlinx.android.synthetic.main.fragment_welcome.welcomeAddWatchWallet
 
 class WelcomeFragment : BaseFragment<WelcomeViewModel>() {
 
@@ -57,19 +58,21 @@ class WelcomeFragment : BaseFragment<WelcomeViewModel>() {
         termsTv.highlightColor = Color.TRANSPARENT
 
         createAccountBtn.setOnClickListener { viewModel.createAccountClicked() }
-
         importAccountBtn.setOnClickListener { viewModel.importAccountClicked() }
+        welcomeAddWatchWallet.setOnClickListener { viewModel.addWatchWalletClicked() }
 
         back.setOnClickListener { viewModel.backClicked() }
     }
 
     private fun configureTermsAndPrivacy(sourceText: String, terms: String, privacy: String) {
+        val linkColor = requireContext().getColor(R.color.white)
+
         termsTv.text = createSpannable(sourceText) {
-            clickable(terms) {
+            clickable(terms, linkColor) {
                 viewModel.termsClicked()
             }
 
-            clickable(privacy) {
+            clickable(privacy, linkColor) {
                 viewModel.privacyClicked()
             }
         }

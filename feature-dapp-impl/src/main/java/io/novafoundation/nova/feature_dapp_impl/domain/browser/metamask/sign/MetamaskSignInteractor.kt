@@ -4,18 +4,15 @@ import android.util.Log
 import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AddressModel
-import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.utils.LOG_TAG
+import io.novafoundation.nova.common.utils.asHexString
 import io.novafoundation.nova.common.utils.parseArbitraryObject
 import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.validation.EmptyValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
-import io.novafoundation.nova.feature_account_api.data.mappers.mapGradientToUi
-import io.novafoundation.nova.feature_account_api.data.secrets.getEthereumKeypair
-import io.novafoundation.nova.feature_account_api.data.secrets.signEthereum
-import io.novafoundation.nova.feature_account_api.data.secrets.signEthereumPrefixed
+import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
@@ -27,6 +24,7 @@ import io.novafoundation.nova.feature_dapp_impl.domain.browser.signExtrinsic.Con
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.signExtrinsic.DAppSignInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.signExtrinsic.convertingToAmount
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.failedSigningIfNotCancelled
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskChain
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskSendTransactionRequest
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskSendTransactionRequest.Payload
@@ -43,7 +41,8 @@ import io.novafoundation.nova.runtime.multiNetwork.findChain
 import jp.co.soramitsu.fearless_utils.extensions.asEthereumAddress
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.extensions.toAccountId
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
+import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.Signer
+import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadRaw
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
@@ -57,11 +56,11 @@ class MetamaskSignInteractorFactory(
     private val metamaskInteractor: MetamaskInteractor,
     private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
-    private val secretStoreV2: SecretStoreV2,
     private val tokenRepository: TokenRepository,
     private val extrinsicGson: Gson,
     private val addressIconGenerator: AddressIconGenerator,
     private val ethereumApiFactory: EthereumApiFactory,
+    private val signerProvider: SignerProvider
 ) {
 
     fun create(request: MetamaskSendTransactionRequest) = MetamaskSignInteractor(
@@ -73,7 +72,7 @@ class MetamaskSignInteractorFactory(
         metamaskInteractor = metamaskInteractor,
         ethereumApiFactory = ethereumApiFactory,
         accountRepository = accountRepository,
-        secretStoreV2 = secretStoreV2
+        signerProvider = signerProvider
     )
 }
 
@@ -85,8 +84,8 @@ class MetamaskSignInteractor(
     private val tokenRepository: TokenRepository,
     private val chainRegistry: ChainRegistry,
     private val extrinsicGson: Gson,
-    private val secretStoreV2: SecretStoreV2,
     private val accountRepository: AccountRepository,
+    private val signerProvider: SignerProvider,
 ) : DAppSignInteractor {
 
     private val mostRecentFormedTx = singleReplaySharedFlow<RawTransaction>()
@@ -142,17 +141,17 @@ class MetamaskSignInteractor(
         tx.fee()
     }
 
-    override suspend fun performOperation(): DAppSignCommunicator.Response = withContext(Dispatchers.Default) {
+    override suspend fun performOperation(): DAppSignCommunicator.Response? = withContext(Dispatchers.Default) {
         runCatching {
             when (payload) {
                 is Payload.SendTx -> sendTx(payload.transaction)
                 is Payload.SignTypedMessage -> signTypedMessage(payload.message)
                 is Payload.PersonalSign -> personalSign(payload.message)
             }
-        }.getOrElse {
-            Log.e(LOG_TAG, "Failed to sign tx from Metamask", it)
+        }.getOrElse { error ->
+            Log.e(LOG_TAG, "Failed to sign tx from Metamask", error)
 
-            DAppSignCommunicator.Response.SigningFailed(request.id)
+            error.failedSigningIfNotCancelled(request.id)
         }
     }
 
@@ -189,12 +188,10 @@ class MetamaskSignInteractor(
         val tx = ethereumApi.formTransaction(basedOn)
 
         val originAccountId = originAccountId()
-        val metaAccount = accountRepository.getSelectedMetaAccount()
-        val keypair = secretStoreV2.getEthereumKeypair(metaAccount, originAccountId)
 
         val chainId = request.payload.chain.chainId.removeHexPrefix().toLong(16)
 
-        val txHash = ethereumApi.sendTransaction(tx, keypair, chainId)
+        val txHash = ethereumApi.sendTransaction(tx, resolveSigner(), originAccountId, chainId)
 
         return DAppSignCommunicator.Response.Sent(request.id, txHash)
     }
@@ -206,23 +203,18 @@ class MetamaskSignInteractor(
     }
 
     private suspend fun personalSign(message: PersonalSignMessage): DAppSignCommunicator.Response.Signed {
-        val messageBytes = message.data.fromHex()
+        val personalSignMessage = message.data.fromHex().asEthereumPersonalSignMessage()
+        val payload = SignerPayloadRaw(personalSignMessage, originAccountId(), skipMessageHashing = true)
 
-        val signature = secretStoreV2.signEthereumPrefixed(
-            metaAccount = accountRepository.getSelectedMetaAccount(),
-            accountId = originAccountId(),
-            message = messageBytes
-        ).toHexString(withPrefix = true)
+        val signature = resolveSigner().signRaw(payload).asHexString()
 
         return DAppSignCommunicator.Response.Signed(request.id, signature)
     }
 
     private suspend fun signMessage(message: ByteArray): String {
-        return secretStoreV2.signEthereum(
-            metaAccount = accountRepository.getSelectedMetaAccount(),
-            accountId = originAccountId(),
-            message = message
-        ).toHexString(withPrefix = true)
+        val signerPayload = SignerPayloadRaw(message, originAccountId(), skipMessageHashing = true)
+
+        return resolveSigner().signRaw(signerPayload).asHexString()
     }
 
     private fun personalSignReadableContent(payload: Payload.PersonalSign): String {
@@ -247,13 +239,10 @@ class MetamaskSignInteractor(
         }
     }
 
-    private fun originAccountId() = payload.originAddress.asEthereumAddress().toAccountId().value
-
     private fun mapMetamaskChainToUi(metamaskChain: MetamaskChain): ChainUi {
         return ChainUi(
             id = metamaskChain.chainId,
             name = metamaskChain.chainName,
-            gradient = mapGradientToUi(Chain.Gradient.Default),
             icon = metamaskChain.iconUrls?.firstOrNull()
         )
     }
@@ -288,5 +277,13 @@ class MetamaskSignInteractor(
         )
     }
 
+    private suspend fun resolveSigner(): Signer {
+        val metaAccount = accountRepository.getSelectedMetaAccount()
+
+        return signerProvider.signerFor(metaAccount)
+    }
+
     private fun RawTransaction.fee() = gasLimit * gasPrice
+
+    private fun originAccountId() = payload.originAddress.asEthereumAddress().toAccountId().value
 }

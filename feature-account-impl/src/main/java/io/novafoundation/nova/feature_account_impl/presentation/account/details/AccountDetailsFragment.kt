@@ -8,24 +8,29 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.bindTo
-import io.novafoundation.nova.common.utils.nameInputFilters
+import io.novafoundation.nova.common.utils.makeGone
+import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.actions.copyAddressClicked
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.setupImportTypeChooser
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
+import io.novafoundation.nova.feature_account_impl.presentation.account.details.model.AccountInChainUi
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.ui.setupAddAccountLauncher
 import kotlinx.android.synthetic.main.fragment_account_details.accountDetailsChainAccounts
 import kotlinx.android.synthetic.main.fragment_account_details.accountDetailsNameField
 import kotlinx.android.synthetic.main.fragment_account_details.accountDetailsToolbar
+import kotlinx.android.synthetic.main.fragment_account_details.accountDetailsTypeAlert
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 private const val ACCOUNT_ID_KEY = "ACCOUNT_ADDRESS_KEY"
 
 class AccountDetailsFragment : BaseFragment<AccountDetailsViewModel>(), ChainAccountsAdapter.Handler {
 
-    @Inject lateinit var imageLoader: ImageLoader
+    @Inject
+    lateinit var imageLoader: ImageLoader
 
     private val adapter by lazy(LazyThreadSafetyMode.NONE) {
         ChainAccountsAdapter(this, imageLoader)
@@ -51,7 +56,6 @@ class AccountDetailsFragment : BaseFragment<AccountDetailsViewModel>(), ChainAcc
             viewModel.backClicked()
         }
 
-        accountDetailsNameField.content.filters = nameInputFilters()
         accountDetailsChainAccounts.setHasFixedSize(true)
         accountDetailsChainAccounts.adapter = adapter
     }
@@ -76,7 +80,8 @@ class AccountDetailsFragment : BaseFragment<AccountDetailsViewModel>(), ChainAcc
                 onCopy = viewModel::copyAddressClicked,
                 onViewExternal = viewModel::viewExternalClicked,
                 onChange = viewModel::changeChainAccountClicked,
-                onExport = viewModel::exportClicked
+                onExport = viewModel::exportClicked,
+                availableAccountActions = viewModel.availableAccountActions.first()
             )
         }
         setupImportTypeChooser(viewModel)
@@ -85,6 +90,16 @@ class AccountDetailsFragment : BaseFragment<AccountDetailsViewModel>(), ChainAcc
         accountDetailsNameField.content.bindTo(viewModel.accountNameFlow, viewLifecycleOwner.lifecycleScope)
 
         viewModel.chainAccountProjections.observe { adapter.submitList(it) }
+
+        viewModel.typeAlert.observe {
+            if (it != null) {
+                accountDetailsTypeAlert.makeVisible()
+                accountDetailsTypeAlert.setText(it.text)
+                accountDetailsTypeAlert.setStyle(it.style)
+            } else {
+                accountDetailsTypeAlert.makeGone()
+            }
+        }
     }
 
     override fun chainAccountClicked(item: AccountInChainUi) {

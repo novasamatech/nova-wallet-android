@@ -44,9 +44,7 @@
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit"
             app:popUpTo="@id/welcomeFragment"
-            app:popUpToInclusive="true">
-
-        </action>
+            app:popUpToInclusive="true" />
 
     </fragment>
 

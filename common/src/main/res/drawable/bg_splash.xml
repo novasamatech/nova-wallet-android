@@ -2,11 +2,12 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android"
     android:opacity="opaque">
 
-    <item android:drawable="@drawable/novabg_welcome_screen" />
+    <item android:drawable="@drawable/bg_welcome" />
 
     <item
+        android:width="193dp"
+        android:height="265dp"
         android:gravity="center"
-        
         android:drawable="@drawable/drawable_nova_logo" />
 
 </layer-list>

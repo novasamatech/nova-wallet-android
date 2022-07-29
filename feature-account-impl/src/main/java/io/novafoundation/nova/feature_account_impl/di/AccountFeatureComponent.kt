@@ -6,13 +6,14 @@ import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
+import io.novafoundation.nova.feature_account_impl.di.modules.ExportModule
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.AdvancedEncryptionCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.di.AdvancedEncryptionComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.create.di.CreateAccountComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.di.AccountDetailsComponent
-import io.novafoundation.nova.feature_account_impl.presentation.account.edit.di.AccountEditComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.di.AccountListComponent
+import io.novafoundation.nova.feature_account_impl.presentation.account.select.di.AccountSwitchComponent
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ShareCompletedReceiver
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.di.ExportJsonConfirmComponent
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.password.di.ExportJsonPasswordComponent
@@ -26,6 +27,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.node.details.di.
 import io.novafoundation.nova.feature_account_impl.presentation.node.list.di.NodesComponent
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.di.PinCodeComponent
 import io.novafoundation.nova.feature_account_impl.presentation.settings.di.SettingsComponent
+import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.change.di.ChangeWatchAccountComponent
+import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.create.di.CreateWatchWalletComponent
 import io.novafoundation.nova.runtime.di.RuntimeApi
 
 @Component(
@@ -56,7 +59,7 @@ interface AccountFeatureComponent : AccountFeatureApi {
 
     fun accountsComponentFactory(): AccountListComponent.Factory
 
-    fun editAccountsComponentFactory(): AccountEditComponent.Factory
+    fun switchAccountComponentFactory(): AccountSwitchComponent.Factory
 
     fun accountDetailsComponentFactory(): AccountDetailsComponent.Factory
 
@@ -75,6 +78,9 @@ interface AccountFeatureComponent : AccountFeatureApi {
     fun exportJsonConfirmFactory(): ExportJsonConfirmComponent.Factory
 
     fun inject(receiver: ShareCompletedReceiver)
+
+    fun createWatchOnlyComponentFactory(): CreateWatchWalletComponent.Factory
+    fun changeWatchAccountComponentFactory(): ChangeWatchAccountComponent.Factory
 
     @Component.Factory
     interface Factory {

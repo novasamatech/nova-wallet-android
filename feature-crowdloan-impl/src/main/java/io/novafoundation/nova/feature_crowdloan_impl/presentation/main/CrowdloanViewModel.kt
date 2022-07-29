@@ -16,6 +16,7 @@ import io.novafoundation.nova.common.utils.formatAsPercentage
 import io.novafoundation.nova.common.utils.fractionToPercentage
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.core.updater.UpdateSystem
+import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.data.CrowdloanSharedState
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomContributeManager
@@ -47,6 +48,7 @@ class CrowdloanViewModel(
     private val crowdloanSharedState: CrowdloanSharedState,
     private val router: CrowdloanRouter,
     private val customContributeManager: CustomContributeManager,
+    private val selectedAccountUseCase: SelectedAccountUseCase,
     crowdloanUpdateSystem: UpdateSystem,
     assetSelectorFactory: MixinFactory<AssetSelectorMixin.Presentation>,
     statefulCrowdloanMixinFactory: StatefulCrowdloanMixin.Factory,
@@ -84,6 +86,9 @@ class CrowdloanViewModel(
         .mapLoading { it.format() }
         .inBackground()
         .share()
+
+    val selectedWalletModel = selectedAccountUseCase.selectedWalletModelFlow()
+        .shareInBackground()
 
     init {
         crowdloanUpdateSystem.start()
@@ -167,5 +172,9 @@ class CrowdloanViewModel(
 
     fun myContributionsClicked() {
         router.openUserContributions()
+    }
+
+    fun avatarClicked() {
+        router.openSwitchWallet()
     }
 }

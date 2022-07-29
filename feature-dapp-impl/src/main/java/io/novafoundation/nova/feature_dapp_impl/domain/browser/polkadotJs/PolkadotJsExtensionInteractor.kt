@@ -25,7 +25,7 @@ class PolkadotJsExtensionInteractor(
             address = metaAccount.defaultSubstrateAddress,
             genesisHash = null,
             name = metaAccount.name,
-            encryption = mapCryptoTypeToEncryption(metaAccount.substrateCryptoType)
+            encryption = metaAccount.substrateCryptoType?.let { mapCryptoTypeToEncryption(it) }
         )
 
         val customAccounts = metaAccount.chainAccounts.mapNotNull { (chainId, chainAccount) ->
@@ -38,7 +38,7 @@ class PolkadotJsExtensionInteractor(
                 address = chain.addressOf(chainAccount.accountId),
                 genesisHash = chain.genesisHash.requireHexPrefix(),
                 name = "${metaAccount.name} (${chain.name})",
-                encryption = mapCryptoTypeToEncryption(chainAccount.cryptoType)
+                encryption = chainAccount.cryptoType?.let(::mapCryptoTypeToEncryption)
             )
         }
 

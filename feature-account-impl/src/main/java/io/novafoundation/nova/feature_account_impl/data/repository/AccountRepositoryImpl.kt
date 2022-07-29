@@ -18,9 +18,9 @@ import io.novafoundation.nova.feature_account_api.data.secrets.keypair
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.Account
 import io.novafoundation.nova.feature_account_api.domain.model.AuthType
-import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountWithAssetBalance
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.domain.model.multiChainEncryptionIn
@@ -29,6 +29,7 @@ import io.novafoundation.nova.feature_account_impl.data.mappers.mapNodeLocalToNo
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSource
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSource
 import io.novafoundation.nova.runtime.ext.genesisHash
+import io.novafoundation.nova.runtime.ext.isValidAddress
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedEncoder
@@ -122,8 +123,8 @@ class AccountRepositoryImpl(
         return accountDataSource.allMetaAccounts()
     }
 
-    override fun lightMetaAccountsFlow(): Flow<List<LightMetaAccount>> {
-        return accountDataSource.lightMetaAccountsFlow()
+    override fun metaAccountsWithBalancesFlow(): Flow<List<MetaAccountWithAssetBalance>> {
+        return accountDataSource.metaAccountsWithBalancesFlow()
     }
 
     override suspend fun selectMetaAccount(metaId: Long) {
@@ -214,7 +215,7 @@ class AccountRepositoryImpl(
                 seed = secrets.seed(),
                 password = password,
                 name = metaAccount.name,
-                multiChainEncryption = metaAccount.multiChainEncryptionIn(chain),
+                multiChainEncryption = metaAccount.multiChainEncryptionIn(chain)!!,
                 genesisHash = chain.genesisHash,
                 address = address
             )
@@ -280,7 +281,7 @@ class AccountRepositoryImpl(
             name = account.name
         )
 
-        val qrSharing = multiChainQrSharingFactory.create(chain)
+        val qrSharing = multiChainQrSharingFactory.create(addressValidator = chain::isValidAddress)
 
         return qrSharing.encode(payload)
     }

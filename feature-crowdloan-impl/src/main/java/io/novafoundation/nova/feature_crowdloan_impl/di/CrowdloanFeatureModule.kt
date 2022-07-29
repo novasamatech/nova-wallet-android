@@ -105,12 +105,10 @@ class CrowdloanFeatureModule {
     @Provides
     @FeatureScope
     fun provideCrowdloanInteractor(
-        accountRepository: AccountRepository,
         crowdloanRepository: CrowdloanRepository,
         chainStateRepository: ChainStateRepository,
         externalContributionSource: ExternalContributionSource,
     ) = CrowdloanInteractor(
-        accountRepository,
         crowdloanRepository,
         chainStateRepository,
         externalContributionSource

@@ -127,7 +127,7 @@ suspend fun mapOperationToOperationModel(
                     amountColorRes = amountColor,
                     header = operationType.formattedCall(),
                     statusAppearance = statusAppearance,
-                    operationIcon = chain.icon.asIcon(),
+                    operationIcon = operation.chainAsset.iconUrl?.asIcon() ?: R.drawable.ic_nova.asIcon(),
                     subHeader = operationType.formattedModule()
                 )
             }
@@ -183,6 +183,7 @@ suspend fun mapOperationToParcel(
             is Operation.Type.Extrinsic -> {
                 OperationParcelizeModel.Extrinsic(
                     chainId = chainAsset.chainId,
+                    chainAssetId = chainAsset.id,
                     time = time,
                     originAddress = address,
                     hash = operationType.hash,

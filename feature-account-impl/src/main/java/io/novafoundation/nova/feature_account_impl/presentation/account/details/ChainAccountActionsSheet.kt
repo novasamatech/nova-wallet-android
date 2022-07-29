@@ -2,7 +2,9 @@ package io.novafoundation.nova.feature_account_impl.presentation.account.details
 
 import android.content.Context
 import android.os.Bundle
+import androidx.annotation.StringRes
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.common.view.bottomSheet.list.fixed.item
 import io.novafoundation.nova.feature_account_api.presenatation.actions.CopyCallback
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -15,21 +17,54 @@ class ChainAccountActionsSheet(
     payload: ExternalActions.Payload,
     onCopy: CopyCallback,
     onViewExternal: ExternalViewCallback,
+    private val availableAccountActions: Set<AccountAction>,
     private val onChange: (inChain: Chain) -> Unit,
     private val onExport: (inChain: Chain) -> Unit,
 ) : ExternalActionsSheet(context, payload, onCopy, onViewExternal) {
 
+    enum class AccountAction {
+        EXPORT,
+        CHANGE
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        item(R.drawable.ic_staking_operations, R.string.accounts_change_chain_secrets) {
-            onChange(payload.chain)
-        }
+        showAvailableAccountActions()
+    }
 
-        if (payload.type !is ExternalActions.Type.None) {
-            item(R.drawable.ic_share_arrow_white_24, R.string.account_export) {
+    private fun showAvailableAccountActions() {
+        availableAccountActions.forEach {
+            when (it) {
+                AccountAction.EXPORT -> maybeShowExport()
+                AccountAction.CHANGE -> maybeShowChange()
+            }
+        }
+    }
+
+    private fun maybeShowExport() {
+        accountAddress()?.let {
+            item(R.drawable.ic_share_arrow_white_24, R.string.account_export, showArrow = true) {
                 onExport(payload.chain)
             }
         }
     }
+
+    private fun maybeShowChange() {
+        val address = accountAddress()
+
+        if (address != null) {
+            changeAccountItem(R.string.accounts_change_chain_secrets)
+        } else {
+            changeAccountItem(R.string.account_add_account)
+        }
+    }
+
+    private fun changeAccountItem(@StringRes labelRes: Int) {
+        item(R.drawable.ic_staking_operations, labelRes, showArrow = true) {
+            onChange(payload.chain)
+        }
+    }
+
+    private fun accountAddress() = payload.type.castOrNull<ExternalActions.Type.Address>()?.address
 }

@@ -1,47 +1,61 @@
 package io.novafoundation.nova.feature_account_impl.presentation.account.list
 
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.mixin.actionAwaitable.awaitAction
+import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingOrDenyingAction
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
+import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.account.mixin.api.AccountListingMixin
-import io.novafoundation.nova.feature_account_impl.presentation.account.model.LightMetaAccountUi
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountListingMixinFactory
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.AccountsAdapter.Mode
+import io.novafoundation.nova.feature_account_impl.presentation.account.model.MetaAccountUi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-
-enum class AccountChosenNavDirection {
-    BACK, MAIN
-}
 
 class AccountListViewModel(
     private val accountInteractor: AccountInteractor,
     private val accountRouter: AccountRouter,
-    private val accountChosenNavDirection: AccountChosenNavDirection,
-    accountListingMixin: AccountListingMixin,
+    private val resourceManager: ResourceManager,
+    private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+    private val accountListingMixinFactory: MetaAccountListingMixinFactory,
 ) : BaseViewModel() {
 
-    val accountsFlow = accountListingMixin.accountsFlow()
-        .inBackground()
-        .share()
+    val walletsListingMixin = accountListingMixinFactory.create(this)
 
-    fun infoClicked(accountModel: LightMetaAccountUi) {
+    val mode = MutableStateFlow(Mode.VIEW)
+
+    val toolbarAction = mode.map {
+        if (it == Mode.VIEW) {
+            resourceManager.getString(R.string.common_edit)
+        } else {
+            resourceManager.getString(R.string.common_done)
+        }
+    }
+        .shareInBackground()
+
+    val confirmAccountDeletion = actionAwaitableMixinFactory.confirmingOrDenyingAction<Unit>()
+
+    fun accountClicked(accountModel: MetaAccountUi) {
         accountRouter.openAccountDetails(accountModel.id)
     }
 
     fun editClicked() {
-        accountRouter.openEditAccounts()
+        val newMode = if (mode.value == Mode.VIEW) Mode.EDIT else Mode.VIEW
+
+        mode.value = newMode
     }
 
-    fun selectAccountClicked(account: LightMetaAccountUi) = launch {
-        accountInteractor.selectMetaAccount(account.id)
+    fun deleteClicked(account: MetaAccountUi) = launch {
+        if (account.isSelected) return@launch
 
-        dispatchNavigation()
-    }
+        val deleteConfirmed = confirmAccountDeletion.awaitAction()
 
-    private fun dispatchNavigation() {
-        when (accountChosenNavDirection) {
-            AccountChosenNavDirection.BACK -> accountRouter.back()
-            AccountChosenNavDirection.MAIN -> accountRouter.returnToWallet()
+        if (deleteConfirmed) {
+            accountInteractor.deleteAccount(account.id)
         }
     }
 

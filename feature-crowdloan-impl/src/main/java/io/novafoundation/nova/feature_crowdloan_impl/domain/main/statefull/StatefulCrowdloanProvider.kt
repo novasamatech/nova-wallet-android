@@ -3,8 +3,9 @@ package io.novafoundation.nova.feature_crowdloan_impl.domain.main.statefull
 import io.novafoundation.nova.common.presentation.combineLoading
 import io.novafoundation.nova.common.presentation.mapLoading
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
-import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.withLoading
+import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_crowdloan_impl.domain.main.CrowdloanInteractor
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.selectedChainFlow
@@ -13,12 +14,14 @@ import kotlinx.coroutines.CoroutineScope
 class StatefulCrowdloanProviderFactory(
     private val singleAssetSharedState: SingleAssetSharedState,
     private val interactor: CrowdloanInteractor,
+    private val selectedAccountUseCase: SelectedAccountUseCase,
 ) : StatefulCrowdloanMixin.Factory {
 
     override fun create(scope: CoroutineScope): StatefulCrowdloanMixin {
         return StatefulCrowdloanProvider(
             singleAssetSharedState = singleAssetSharedState,
             interactor = interactor,
+            selectedAccountUseCase = selectedAccountUseCase,
             coroutineScope = scope
         )
     }
@@ -26,6 +29,7 @@ class StatefulCrowdloanProviderFactory(
 
 class StatefulCrowdloanProvider(
     singleAssetSharedState: SingleAssetSharedState,
+    selectedAccountUseCase: SelectedAccountUseCase,
     private val interactor: CrowdloanInteractor,
     coroutineScope: CoroutineScope,
 ) : StatefulCrowdloanMixin,
@@ -33,28 +37,31 @@ class StatefulCrowdloanProvider(
     WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(coroutineScope) {
 
     private val selectedChain = singleAssetSharedState.selectedChainFlow()
-        .inBackground()
-        .share()
+        .shareInBackground()
 
-    private val crowdloansIntermediateState = selectedChain.withLoading(interactor::crowdloansFlow)
-        .inBackground()
-        .share()
+    private val selectedAccount = selectedAccountUseCase.selectedMetaAccountFlow()
+        .shareInBackground()
 
-    private val externalContributionsIntermediateState = selectedChain.withLoading(interactor::externalContributions)
-        .inBackground()
-        .share()
+    private val chainAndAccount = combineToPair(selectedChain, selectedAccount)
+
+    private val crowdloansIntermediateState = chainAndAccount.withLoading { (chain, account) ->
+        interactor.crowdloansFlow(chain, account)
+    }
+
+    private val externalContributionsIntermediateState = chainAndAccount.withLoading { (chain, account) ->
+        interactor.externalContributions(chain, account)
+    }
+        .shareInBackground()
 
     override val groupedCrowdloansFlow = crowdloansIntermediateState.mapLoading {
         interactor.groupCrowdloans(it)
     }
-        .inBackground()
-        .share()
+        .shareInBackground()
 
     override val allUserContributions = combineLoading(
         crowdloansIntermediateState,
         externalContributionsIntermediateState,
         interactor::allUserContributions
     )
-        .inBackground()
-        .share()
+        .shareInBackground()
 }

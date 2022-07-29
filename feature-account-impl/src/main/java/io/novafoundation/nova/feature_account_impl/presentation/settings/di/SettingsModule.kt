@@ -6,13 +6,13 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
-import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
+import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.settings.SettingsViewModel
 
@@ -28,7 +28,7 @@ class SettingsModule {
         appLinksProvider: AppLinksProvider,
         resourceManager: ResourceManager,
         appVersionProvider: AppVersionProvider,
-        addressIconGenerator: AddressIconGenerator,
+        selectedAccountUseCase: SelectedAccountUseCase
     ): ViewModel {
         return SettingsViewModel(
             interactor,
@@ -36,7 +36,7 @@ class SettingsModule {
             appLinksProvider,
             resourceManager,
             appVersionProvider,
-            addressIconGenerator
+            selectedAccountUseCase
         )
     }
 

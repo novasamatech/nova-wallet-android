@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    style="@style/TextAppearance.NovaFoundation.CapsTitle2"
+    style="@style/TextAppearance.NovaFoundation.SemiBold.Caps"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingStart="16dp"
-    android:paddingTop="9dp"
-    android:paddingBottom="10dp"
+    android:paddingTop="24dp"
+    android:paddingBottom="12dp"
     android:id="@+id/textHeader"
-    android:textColor="@color/black1"
+    android:textColor="@color/white_64"
     tools:background="@color/black"
     tools:text="@tools:sample/lorem[2]">
 

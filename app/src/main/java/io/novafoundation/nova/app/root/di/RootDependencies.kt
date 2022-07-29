@@ -2,6 +2,7 @@ package io.novafoundation.nova.app.root.di
 
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
+import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.core.updater.UpdateSystem
@@ -41,4 +42,6 @@ interface RootDependencies {
     fun chainRegistry(): ChainRegistry
 
     val systemCallExecutor: SystemCallExecutor
+
+    val contextManager: ContextManager
 }
