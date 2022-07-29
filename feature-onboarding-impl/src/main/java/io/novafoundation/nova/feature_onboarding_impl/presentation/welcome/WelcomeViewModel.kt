@@ -55,4 +55,8 @@ class WelcomeViewModel(
     fun addWatchWalletClicked() {
         router.openCreateWatchWallet()
     }
+
+    fun connectHardwareWalletClicked() {
+        router.openStartImportParitySigner()
+    }
 }
