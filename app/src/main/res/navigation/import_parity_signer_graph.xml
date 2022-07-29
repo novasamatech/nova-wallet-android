@@ -9,5 +9,20 @@
         tools:layout="@layout/fragment_start_import_parity_signer"
         android:id="@+id/startImportParitySignerFragment"
         android:name="io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.start.StartImportParitySignerFragment"
-        android:label="StartImportParitySignerFragment" />
+        android:label="StartImportParitySignerFragment" >
+
+        <action
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            android:id="@+id/action_startImportParitySignerFragment_to_scanImportParitySignerFragment"
+            app:destination="@id/scanImportParitySignerFragment" />
+    </fragment>
+
+    <fragment
+        tools:layout="@layout/fragment_scan_import_parity_signer"
+        android:id="@+id/scanImportParitySignerFragment"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.scan.ScanImportParitySignerFragment"
+        android:label="ScanImportParitySignerFragment" />
 </navigation>
