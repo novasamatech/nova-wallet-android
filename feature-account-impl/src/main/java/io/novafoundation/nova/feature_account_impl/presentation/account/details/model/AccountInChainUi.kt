@@ -7,5 +7,6 @@ class AccountInChainUi(
     val chainUi: ChainUi,
     val addressOrHint: String,
     val address: String?,
-    val accountIcon: Drawable
+    val accountIcon: Drawable,
+    val actionsAvailable: Boolean
 )

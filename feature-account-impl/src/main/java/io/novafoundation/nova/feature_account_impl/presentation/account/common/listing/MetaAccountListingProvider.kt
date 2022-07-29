@@ -67,5 +67,9 @@ private class MetaAccountListingProvider(
             iconRes = R.drawable.ic_watch,
             title = resourceManager.getString(R.string.account_watch_only)
         )
+        LightMetaAccount.Type.PARITY_SIGNER -> ChipLabelModel(
+            iconRes = R.drawable.ic_parity_signer,
+            title = resourceManager.getString(R.string.account_parity_signer)
+        )
     }
 }
