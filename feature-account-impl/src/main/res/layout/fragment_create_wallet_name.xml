@@ -31,14 +31,22 @@
         android:text="@string/account_create_name_subtitle_v2_2_0"
         android:textColor="@color/black1" />
 
-    <io.novafoundation.nova.common.view.InputField
+    <TextView
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/account_wallet_nickname"
+        android:textColor="@color/white_64" />
+
+    <io.novafoundation.nova.common.view.input.TextInputView
         android:id="@+id/createWalletNameInput"
-        style="@style/Widget.Nova.Input.Primary.External"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/x2"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="@dimen/x2"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
         android:hint="@string/account_wallet_nickname" />
 
     <TextView
@@ -47,8 +55,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/x2"
-        android:layout_marginEnd="@dimen/x2"
         android:layout_marginTop="12dp"
+        android:layout_marginEnd="@dimen/x2"
         android:text="@string/wallet_nickname_create_caption_v2_2_0"
         android:textColor="@color/black1" />
 

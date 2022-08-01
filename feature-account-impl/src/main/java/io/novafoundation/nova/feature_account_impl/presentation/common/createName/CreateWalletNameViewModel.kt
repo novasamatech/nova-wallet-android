@@ -11,13 +11,13 @@ import kotlinx.coroutines.flow.map
 abstract class CreateWalletNameViewModel(
     private val router: ReturnableRouter,
     private val resourceManager: ResourceManager
-): BaseViewModel() {
+) : BaseViewModel() {
 
     val name = MutableStateFlow("")
 
     val continueState = name.map {
         if (it.isNotEmpty()) {
-           DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_continue))
+            DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_continue))
         } else {
             DescriptiveButtonState.Disabled(resourceManager.getString(R.string.account_enter_wallet_nickname))
         }
@@ -30,6 +30,6 @@ abstract class CreateWalletNameViewModel(
     }
 
     fun nextClicked() {
-       proceed(name.value)
+        proceed(name.value)
     }
 }

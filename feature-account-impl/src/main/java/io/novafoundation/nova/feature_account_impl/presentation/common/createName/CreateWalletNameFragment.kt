@@ -32,6 +32,6 @@ abstract class CreateWalletNameFragment<V : CreateWalletNameViewModel> : BaseFra
     override fun subscribe(viewModel: V) {
         viewModel.continueState.observe(createWalletNameContinue::setState)
 
-        createWalletNameInput.content.bindTo(viewModel.name, viewLifecycleOwner.lifecycleScope)
+        createWalletNameInput.bindTo(viewModel.name, viewLifecycleOwner.lifecycleScope)
     }
 }
