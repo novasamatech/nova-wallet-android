@@ -23,15 +23,15 @@ import io.novafoundation.nova.common.utils.permissions.setupPermissionAsker
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
-import kotlinx.android.synthetic.main.fragment_scan_import_parity_signer.scanImportParitySigneContainer
-import kotlinx.android.synthetic.main.fragment_scan_import_parity_signer.scanImportParitySigneScanner
-import kotlinx.android.synthetic.main.fragment_scan_import_parity_signer.scanImportParitySigneViewFinder
-import kotlinx.android.synthetic.main.fragment_scan_import_parity_signer.scanImportParitySigneViewTitle
+import kotlinx.android.synthetic.main.fragment_import_parity_signer_scan.scanImportParitySigneContainer
+import kotlinx.android.synthetic.main.fragment_import_parity_signer_scan.scanImportParitySigneScanner
+import kotlinx.android.synthetic.main.fragment_import_parity_signer_scan.scanImportParitySigneViewFinder
+import kotlinx.android.synthetic.main.fragment_import_parity_signer_scan.scanImportParitySigneViewTitle
 
 class ScanImportParitySignerFragment : BaseFragment<ScanImportParitySignerViewModel>(), BarcodeCallback {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_scan_import_parity_signer, container, false)
+        return inflater.inflate(R.layout.fragment_import_parity_signer_scan, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

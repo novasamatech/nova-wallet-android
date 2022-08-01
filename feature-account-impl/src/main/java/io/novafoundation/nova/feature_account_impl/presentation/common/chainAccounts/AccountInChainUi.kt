@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.account.details.model
+package io.novafoundation.nova.feature_account_impl.presentation.common.chainAccounts
 
 import android.graphics.drawable.Drawable
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi

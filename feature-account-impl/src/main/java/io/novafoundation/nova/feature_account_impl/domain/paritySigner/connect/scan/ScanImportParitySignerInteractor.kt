@@ -8,10 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class ParitySignerAccount(
-    val publicKey: ByteArray,
     val accountId: AccountId,
-    val address: String,
-    val name: String?,
 )
 
 interface ScanImportParitySignerInteractor {
@@ -27,12 +24,7 @@ class RealScanImportParitySignerInteractor(
         withContext(Dispatchers.Default) {
             val parsed = addressQrFormat.decode(scanResult)
 
-            ParitySignerAccount(
-                name = parsed.name,
-                publicKey = parsed.publicKey!!,
-                address = parsed.address,
-                accountId = parsed.address.toAccountId()
-            )
+            ParitySignerAccount(parsed.address.toAccountId())
         }
     }
 }

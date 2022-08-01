@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.add.Impo
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ExportJsonConfirmPayload
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.ConfirmMnemonicPayload
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerAccountPayload
 
 interface AccountRouter : SecureRouter, ReturnableRouter {
 
@@ -57,4 +58,5 @@ interface AccountRouter : SecureRouter, ReturnableRouter {
     fun openChangePinCode()
 
     fun openScanImportParitySigner()
+    fun openPreviewImportParitySigner(payload: ParitySignerAccountPayload)
 }

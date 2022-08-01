@@ -6,7 +6,7 @@
     app:startDestination="@id/startImportParitySignerFragment">
 
     <fragment
-        tools:layout="@layout/fragment_start_import_parity_signer"
+        tools:layout="@layout/fragment_import_parity_signer_start"
         android:id="@+id/startImportParitySignerFragment"
         android:name="io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.start.StartImportParitySignerFragment"
         android:label="StartImportParitySignerFragment" >
@@ -21,8 +21,23 @@
     </fragment>
 
     <fragment
-        tools:layout="@layout/fragment_scan_import_parity_signer"
+        tools:layout="@layout/fragment_import_parity_signer_scan"
         android:id="@+id/scanImportParitySignerFragment"
         android:name="io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.scan.ScanImportParitySignerFragment"
-        android:label="ScanImportParitySignerFragment" />
+        android:label="ScanImportParitySignerFragment" >
+
+        <action
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            android:id="@+id/action_scanImportParitySignerFragment_to_previewImportParitySignerFragment"
+            app:destination="@id/previewImportParitySignerFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/previewImportParitySignerFragment"
+        tools:layout="@layout/fragment_import_parity_signer_preview"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.preview.PreviewImportParitySignerFragment"
+        android:label="PreviewImportParitySignerFragment" />
 </navigation>

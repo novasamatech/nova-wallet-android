@@ -10,13 +10,13 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
-import kotlinx.android.synthetic.main.fragment_start_import_parity_signer.startImportParitySignerScanQrCode
-import kotlinx.android.synthetic.main.fragment_start_import_parity_signer.startImportParitySignerToolbar
+import kotlinx.android.synthetic.main.fragment_import_parity_signer_start.startImportParitySignerScanQrCode
+import kotlinx.android.synthetic.main.fragment_import_parity_signer_start.startImportParitySignerToolbar
 
 class StartImportParitySignerFragment : BaseFragment<StartImportParitySignerViewModel>() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_start_import_parity_signer, container, false)
+        return inflater.inflate(R.layout.fragment_import_parity_signer_start, container, false)
     }
 
     override fun initViews() {
