@@ -25,6 +25,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.backup.
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.ConfirmMnemonicFragment
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.ConfirmMnemonicPayload
 import io.novafoundation.nova.feature_account_impl.presentation.node.details.NodeDetailsFragment
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerAccountPayload
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.preview.PreviewImportParitySignerFragment
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.PinCodeAction
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.PincodeFragment
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.ToolbarConfiguration
@@ -482,6 +484,12 @@ class Navigator(
 
     override fun openScanImportParitySigner() {
         navController?.navigate(R.id.action_startImportParitySignerFragment_to_scanImportParitySignerFragment)
+    }
+
+    override fun openPreviewImportParitySigner(payload: ParitySignerAccountPayload) {
+        val bundle = PreviewImportParitySignerFragment.getBundle(payload)
+
+        navController?.navigate(R.id.action_scanImportParitySignerFragment_to_previewImportParitySignerFragment, bundle)
     }
 
     override fun openCreateWatchWallet() {

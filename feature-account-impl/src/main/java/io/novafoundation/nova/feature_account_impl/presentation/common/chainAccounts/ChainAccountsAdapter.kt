@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.account.details.list
+package io.novafoundation.nova.feature_account_impl.presentation.common.chainAccounts
 
 import android.view.View
 import android.view.ViewGroup
@@ -13,7 +13,6 @@ import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadChainIcon
 import io.novafoundation.nova.feature_account_impl.R
-import io.novafoundation.nova.feature_account_impl.presentation.account.details.model.AccountInChainUi
 import kotlinx.android.synthetic.main.item_chain_acount.view.chainAccountAccountAddress
 import kotlinx.android.synthetic.main.item_chain_acount.view.chainAccountAccountIcon
 import kotlinx.android.synthetic.main.item_chain_acount.view.chainAccountChainIcon

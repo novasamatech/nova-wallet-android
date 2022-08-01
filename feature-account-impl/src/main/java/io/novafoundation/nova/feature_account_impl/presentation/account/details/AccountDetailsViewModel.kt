@@ -22,8 +22,8 @@ import io.novafoundation.nova.feature_account_impl.domain.account.details.Accoun
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountInChain
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.ChainAccountActionsSheet.AccountAction
-import io.novafoundation.nova.feature_account_impl.presentation.account.details.model.AccountInChainUi
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.model.AccountTypeAlert
+import io.novafoundation.nova.feature_account_impl.presentation.common.chainAccounts.AccountInChainUi
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherMixin
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry

@@ -9,8 +9,10 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.common.utils.sendEvent
 import io.novafoundation.nova.feature_account_impl.R
+import io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.scan.ParitySignerAccount
 import io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.scan.ScanImportParitySignerInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerAccountPayload
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -39,7 +41,7 @@ class ScanImportParitySignerViewModel(
         val parseResult = interactor.decodeScanResult(result)
 
         parseResult
-            .onSuccess { showMessage("Scanned account: ${it.address}") }
+            .onSuccess(::openPreview)
             .onFailure {
                 showMessage(resourceManager.getString(R.string.account_parity_signer_import_scan_invalid_qr))
 
@@ -48,6 +50,12 @@ class ScanImportParitySignerViewModel(
 
                 _resetScanningEvent.sendEvent()
             }
+    }
+
+    private fun openPreview(signerAccount: ParitySignerAccount) {
+        val payload = ParitySignerAccountPayload(signerAccount.accountId)
+
+        router.openPreviewImportParitySigner(payload)
     }
 
     private fun requirePermissions() = launch {

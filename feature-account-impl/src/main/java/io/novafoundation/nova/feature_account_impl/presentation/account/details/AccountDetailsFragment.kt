@@ -17,8 +17,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExt
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.setupImportTypeChooser
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
-import io.novafoundation.nova.feature_account_impl.presentation.account.details.list.ChainAccountsAdapter
-import io.novafoundation.nova.feature_account_impl.presentation.account.details.model.AccountInChainUi
+import io.novafoundation.nova.feature_account_impl.presentation.common.chainAccounts.AccountInChainUi
+import io.novafoundation.nova.feature_account_impl.presentation.common.chainAccounts.ChainAccountsAdapter
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.ui.setupAddAccountLauncher
 import kotlinx.android.synthetic.main.fragment_account_details.accountDetailsChainAccounts
 import kotlinx.android.synthetic.main.fragment_account_details.accountDetailsNameField
