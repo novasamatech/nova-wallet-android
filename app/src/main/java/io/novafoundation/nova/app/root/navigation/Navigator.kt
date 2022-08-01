@@ -480,6 +480,10 @@ class Navigator(
         navController?.navigate(R.id.action_mainFragment_to_pinCodeFragment, bundle)
     }
 
+    override fun openScanImportParitySigner() {
+        navController?.navigate(R.id.action_startImportParitySignerFragment_to_scanImportParitySignerFragment)
+    }
+
     override fun openCreateWatchWallet() {
         navController?.navigate(R.id.action_welcomeFragment_to_createWatchWalletFragment)
     }

@@ -12,6 +12,6 @@ class StartImportParitySignerViewModel(
     }
 
     fun scanQrCodeClicked() {
-        showMessage("TODO")
+        router.openScanImportParitySigner()
     }
 }

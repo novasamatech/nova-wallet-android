@@ -17,6 +17,7 @@ import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.LanguagesHolder
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.vibration.DeviceVibrator
@@ -90,4 +91,6 @@ interface AccountFeatureDependencies {
     val contextManager: ContextManager
 
     val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+
+    val permissionsAskerFactory: PermissionsAskerFactory
 }
