@@ -23,7 +23,7 @@ class PreviewImportParitySignerViewModel(
     private val payload: ParitySignerAccountPayload,
     private val externalActions: ExternalActions.Presentation,
     private val chainRegistry: ChainRegistry,
-) : BaseViewModel(), ExternalActions by externalActions{
+) : BaseViewModel(), ExternalActions by externalActions {
 
     val chainAccountProjections = flowOf { interactor.deriveSubstrateChainAccounts(payload.accountId) }
         .mapList(::mapParitySignerAccountInChainToUi)

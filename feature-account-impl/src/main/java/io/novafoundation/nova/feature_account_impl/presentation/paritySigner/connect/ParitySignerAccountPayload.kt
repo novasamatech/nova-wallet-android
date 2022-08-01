@@ -6,4 +6,4 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 class ParitySignerAccountPayload(
     val accountId: ByteArray,
-): Parcelable
+) : Parcelable

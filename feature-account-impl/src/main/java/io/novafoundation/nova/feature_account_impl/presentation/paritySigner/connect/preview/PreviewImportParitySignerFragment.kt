@@ -19,7 +19,6 @@ import kotlinx.android.synthetic.main.fragment_import_parity_signer_preview.prev
 import kotlinx.android.synthetic.main.fragment_import_parity_signer_preview.previewImportParitySignerToolbar
 import javax.inject.Inject
 
-
 class PreviewImportParitySignerFragment : BaseFragment<PreviewImportParitySignerViewModel>(), ChainAccountsAdapter.Handler {
 
     @Inject
