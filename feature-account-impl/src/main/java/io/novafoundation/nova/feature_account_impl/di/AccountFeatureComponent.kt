@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm
 import io.novafoundation.nova.feature_account_impl.presentation.node.add.di.AddNodeComponent
 import io.novafoundation.nova.feature_account_impl.presentation.node.details.di.NodeDetailsComponent
 import io.novafoundation.nova.feature_account_impl.presentation.node.list.di.NodesComponent
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.finish.di.FinishImportParitySignerComponent
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.preview.di.PreviewImportParitySignerComponent
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.scan.di.ScanImportParitySignerComponent
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.start.di.StartImportParitySignerComponent
@@ -88,6 +89,7 @@ interface AccountFeatureComponent : AccountFeatureApi {
     fun startImportParitySignerComponentFactory(): StartImportParitySignerComponent.Factory
     fun scanImportParitySignerComponentFactory(): ScanImportParitySignerComponent.Factory
     fun previewImportParitySignerComponentFactory(): PreviewImportParitySignerComponent.Factory
+    fun finishImportParitySignerComponentFactory(): FinishImportParitySignerComponent.Factory
 
     @Component.Factory
     interface Factory {

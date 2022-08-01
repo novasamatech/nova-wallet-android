@@ -39,5 +39,33 @@
         android:id="@+id/previewImportParitySignerFragment"
         tools:layout="@layout/fragment_import_parity_signer_preview"
         android:name="io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.preview.PreviewImportParitySignerFragment"
-        android:label="PreviewImportParitySignerFragment" />
+        android:label="PreviewImportParitySignerFragment" >
+
+
+        <action
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            android:id="@+id/action_previewImportParitySignerFragment_to_finishImportParitySignerFragment"
+            app:destination="@id/finishImportParitySignerFragment" />
+    </fragment>
+
+
+    <fragment
+        android:id="@+id/finishImportParitySignerFragment"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.finish.FinishImportParitySignerFragment"
+        android:label="FinishImportParitySignerFragment">
+
+        <action
+            android:id="@+id/action_finishImportParitySignerFragment_to_pincodeFragment"
+            app:destination="@id/pincodeFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@id/welcomeFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
 </navigation>

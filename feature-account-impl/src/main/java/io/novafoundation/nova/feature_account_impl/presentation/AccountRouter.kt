@@ -59,4 +59,5 @@ interface AccountRouter : SecureRouter, ReturnableRouter {
 
     fun openScanImportParitySigner()
     fun openPreviewImportParitySigner(payload: ParitySignerAccountPayload)
+    fun openFinishImportParitySigner(payload: ParitySignerAccountPayload)
 }

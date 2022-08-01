@@ -4,7 +4,6 @@ import androidx.fragment.app.Fragment
 import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
-import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_impl.presentation.account.create.CreateAccountFragment
 
 @Subcomponent(
@@ -20,7 +19,6 @@ interface CreateAccountComponent {
 
         fun create(
             @BindsInstance fragment: Fragment,
-            @BindsInstance payload: AddAccountPayload
         ): CreateAccountComponent
     }
 

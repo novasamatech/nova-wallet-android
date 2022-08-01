@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
-  <string name="account_parity_signer_import_preview_title">Here is your accounts</string>
+  <string name="account_parity_signer_import_preview_title">Here are your accounts</string>
   <string name="account_parity_signer_import_preview_description">Following accounts have been successfully read from Parity Signer</string>
 
   <string name="account_parity_signer_import_scan_invalid_qr">Invalid QR code, please make sure you are scanning QR code from Parity Signer</string>
