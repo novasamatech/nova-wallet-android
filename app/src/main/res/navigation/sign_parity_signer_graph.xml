@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/sign_parity_signer_graph"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@id/showSignParitySignerFragment">
+
+
+    <fragment
+        android:id="@+id/showSignParitySignerFragment"
+        tools:layout="@layout/fragment_sign_parity_signer_show"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.show.ShowSignParitySignerFragment"
+        android:label="FinishImportParitySignerFragment" />
+</navigation>
