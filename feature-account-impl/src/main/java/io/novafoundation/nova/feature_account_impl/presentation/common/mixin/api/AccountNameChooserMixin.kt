@@ -1,16 +1,17 @@
 package io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api
 
-import androidx.lifecycle.LiveData
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 interface AccountNameChooserMixin {
 
-    val nameState: LiveData<State>
+    val nameState: StateFlow<State>
 
     fun nameChanged(newName: String)
 
     interface Presentation : AccountNameChooserMixin {
 
-        val nameValid: LiveData<Boolean>
+        val nameValid: Flow<Boolean>
     }
 
     sealed class State {

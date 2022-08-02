@@ -59,7 +59,7 @@
         android:id="@+id/createAccountFragment"
         android:name="io.novafoundation.nova.feature_account_impl.presentation.account.create.CreateAccountFragment"
         android:label="fragment_create_account"
-        tools:layout="@layout/fragment_create_account">
+        tools:layout="@layout/fragment_create_wallet_name">
 
         <action
             app:enterAnim="@anim/fragment_open_enter"

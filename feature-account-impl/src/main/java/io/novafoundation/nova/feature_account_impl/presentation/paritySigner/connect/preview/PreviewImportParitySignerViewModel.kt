@@ -56,6 +56,6 @@ class PreviewImportParitySignerViewModel(
     }
 
     fun continueClicked() {
-        showMessage("TODO")
+        accountRouter.openFinishImportParitySigner(payload)
     }
 }
