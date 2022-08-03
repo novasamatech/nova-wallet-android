@@ -1,19 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:background="@color/black"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:orientation="vertical"
+    tools:background="@color/black">
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/signParitySignerShowToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:dividerVisible="false"
+        app:titleText="@string/account_parity_signer_sign_title" />
+
+    <io.novafoundation.nova.common.view.LabeledTextView
+        android:id="@+id/signParitySignerShowAddress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        app:actionIcon="@drawable/ic_info_24"
+        android:layout_marginEnd="16dp" />
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="63" />
+
+    <TextView
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/account_parity_signer_scan_with" />
 
     <ImageView
         android:id="@+id/signParitySignerShowQr"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        tools:background="@color/white" />
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="280"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="24dp"
+        android:padding="8dp"
+        android:adjustViewBounds="true"
+        android:scaleType="centerInside"
+        tools:background="@color/white"
+        tools:layout_width="315dp" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <TextView
+        android:id="@+id/signParitySignerShowTimer"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="24dp"
+        tools:text="QR code is valid for 5 min 39 sec" />
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="43" />
+
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/signParitySignerShowHaveError"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="@string/account_parity_signer_sign_have_error"
+        app:appearance="secondary" />
+
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/signParitySignerShowContinue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="@string/common_continue" />
+</LinearLayout>

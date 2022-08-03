@@ -15,7 +15,7 @@ interface ParitySignerSignInterScreenResponder : InterScreenResponder<Request, R
 
 interface ParitySignerSignInterScreenCommunicator : ParitySignerSignInterScreenRequester, ParitySignerSignInterScreenResponder {
 
-    @kotlinx.android.parcel.Parcelize
+    @Parcelize
     class Request(val id: String) : Parcelable
 
     sealed class Response : Parcelable {
@@ -37,3 +37,5 @@ suspend fun ParitySignerSignInterScreenRequester.awaitConfirmation(request: Requ
 
     return responsesForRequest.first()
 }
+
+fun Request.cancelled() = Response.Cancelled(id)

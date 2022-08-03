@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.invoke
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
 suspend fun AddressIconGenerator.createAddressModel(
     chain: Chain,
@@ -99,3 +100,9 @@ suspend fun AddressIconGenerator.createAccountAddressModel(
     address: String,
     addressDisplayUseCase: AddressDisplayUseCase,
 ) = createAccountAddressModel(chain, address, addressDisplayUseCase(chain, address))
+
+suspend fun AddressIconGenerator.createAccountAddressModel(
+    chain: Chain,
+    accountId: AccountId,
+    addressDisplayUseCase: AddressDisplayUseCase,
+) = createAccountAddressModel(chain, accountId, addressDisplayUseCase.invoke(accountId))
