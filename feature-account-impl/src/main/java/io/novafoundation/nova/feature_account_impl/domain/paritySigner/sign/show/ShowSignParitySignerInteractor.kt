@@ -18,7 +18,6 @@ interface ShowSignParitySignerInteractor {
     suspend fun extrinsicValidityPeriod(payload: SignerPayloadExtrinsic): TimerValue
 
     suspend fun qrCodeContent(payload: SignerPayloadExtrinsic): ParitySignerSignRequest
-
 }
 
 class ParitySignerSignRequest(
@@ -27,7 +26,7 @@ class ParitySignerSignRequest(
 
 class RealShowSignParitySignerInteractor(
     private val mortalityConstructor: MortalityConstructor,
-): ShowSignParitySignerInteractor {
+) : ShowSignParitySignerInteractor {
 
     override suspend fun extrinsicValidityPeriod(payload: SignerPayloadExtrinsic): TimerValue {
         return TimerValue(

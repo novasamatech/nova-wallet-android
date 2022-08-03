@@ -2,12 +2,16 @@ package io.novafoundation.nova.feature_account_impl.presentation.paritySigner.si
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.utils.SharedState
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.domain.paritySigner.sign.show.ShowSignParitySignerInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.ParitySignerSignInterScreenCommunicator
@@ -17,9 +21,13 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.genesisHash
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlin.time.ExperimentalTime
+import kotlin.time.milliseconds
 
 class ShowSignParitySignerViewModel(
     private val router: AccountRouter,
@@ -31,8 +39,12 @@ class ShowSignParitySignerViewModel(
     private val chainRegistry: ChainRegistry,
     private val addressIconGenerator: AddressIconGenerator,
     private val addressDisplayUseCase: AddressDisplayUseCase,
-    private val externalActions: ExternalActions.Presentation
+    private val externalActions: ExternalActions.Presentation,
+    private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+    private val resourceManager: ResourceManager,
 ) : BaseViewModel(), ExternalActions by externalActions {
+
+    val acknowledgeExpired = actionAwaitableMixinFactory.confirmingAction<String>()
 
     val chain = flowOf {
         val signPayload = signSharedState.get()!!
@@ -56,7 +68,9 @@ class ShowSignParitySignerViewModel(
     }.shareInBackground()
 
     val validityPeriod = flowOf {
-        interactor.extrinsicValidityPeriod(signSharedState.get()!!)
+        val timerValue = interactor.extrinsicValidityPeriod(signSharedState.get()!!)
+
+        ValidityPeriod(timerValue)
     }.shareInBackground()
 
     fun backClicked() {
@@ -65,11 +79,20 @@ class ShowSignParitySignerViewModel(
         router.back()
     }
 
-    fun timerFinished() {
-        showMessage("TODO - timer expired")
+    @OptIn(ExperimentalTime::class)
+    fun timerFinished() = launch {
+        val message = withContext(Dispatchers.Default) {
+            val validityPeriodMillis = validityPeriod.first().period.millis
+            val durationFormatted = resourceManager.formatDuration(validityPeriodMillis.milliseconds, estimated = false)
+            resourceManager.getString(R.string.account_parity_signer_sign_qr_code_expired_descrition, durationFormatted)
+        }
+
+        acknowledgeExpired.awaitAction(message)
+
+        backClicked()
     }
 
-    fun addressClicked()  = launch {
+    fun addressClicked() = launch {
         val address = addressModel.first().address
         val chain = chain.first()
 

@@ -10,6 +10,8 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.utils.SharedState
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
@@ -45,7 +47,9 @@ class ShowSignParitySignerModule {
         addressIconGenerator: AddressIconGenerator,
         addressDisplayUseCase: AddressDisplayUseCase,
         router: AccountRouter,
-        externalActions: ExternalActions.Presentation
+        externalActions: ExternalActions.Presentation,
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+        resourceManager: ResourceManager
     ): ViewModel {
         return ShowSignParitySignerViewModel(
             router = router,
@@ -57,7 +61,9 @@ class ShowSignParitySignerModule {
             chainRegistry = chainRegistry,
             addressIconGenerator = addressIconGenerator,
             addressDisplayUseCase = addressDisplayUseCase,
-            externalActions
+            externalActions = externalActions,
+            actionAwaitableMixinFactory = actionAwaitableMixinFactory,
+            resourceManager = resourceManager
         )
     }
 

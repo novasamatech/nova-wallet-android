@@ -22,14 +22,16 @@ private val TIMER_TAG = R.string.common_time_left
 fun TextView.startTimer(
     value: TimerValue,
     @StringRes customMessageFormat: Int? = null,
+    onTick: ((view: TextView, millisUntilFinished: Long) -> Unit)? = null,
     onFinish: ((view: TextView) -> Unit)? = null
-) = startTimer(value.millis, value.millisCalculatedAt, customMessageFormat, onFinish)
+) = startTimer(value.millis, value.millisCalculatedAt, customMessageFormat, onTick, onFinish)
 
 @OptIn(ExperimentalTime::class)
 fun TextView.startTimer(
     millis: Long,
     millisCalculatedAt: Long? = null,
     @StringRes customMessageFormat: Int? = null,
+    onTick: ((view: TextView, millisUntilFinished: Long) -> Unit)? = null,
     onFinish: ((view: TextView) -> Unit)? = null
 ) {
     val timePassedSinceCalculation = if (millisCalculatedAt != null) System.currentTimeMillis() - millisCalculatedAt else 0L
@@ -49,6 +51,8 @@ fun TextView.startTimer(
             } ?: formattedTime
 
             this@startTimer.text = message
+
+            onTick?.invoke(this@startTimer, millisUntilFinished)
         }
 
         override fun onFinish() {

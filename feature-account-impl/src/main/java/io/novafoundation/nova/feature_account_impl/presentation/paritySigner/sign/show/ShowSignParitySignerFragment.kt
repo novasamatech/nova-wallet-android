@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.setTextColorRes
+import io.novafoundation.nova.common.view.dialog.errorDialog
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.common.view.startTimer
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
@@ -20,7 +22,6 @@ import kotlinx.android.synthetic.main.fragment_sign_parity_signer_show.signParit
 import kotlinx.android.synthetic.main.fragment_sign_parity_signer_show.signParitySignerShowToolbar
 
 class ShowSignParitySignerFragment : BaseFragment<ShowSignParitySignerViewModel>() {
-
 
     companion object {
 
@@ -67,16 +68,31 @@ class ShowSignParitySignerFragment : BaseFragment<ShowSignParitySignerViewModel>
             signParitySignerShowAddress.setPrimaryIcon(it.image)
         }
 
-        viewModel.validityPeriod.observe {
+        viewModel.validityPeriod.observe { validityPeriod ->
             signParitySignerShowTimer.startTimer(
-                value = it,
+                value = validityPeriod.period,
                 customMessageFormat = R.string.account_parity_signer_sign_qr_code_valid_format,
+                onTick = { view, _ ->
+                    val textColorRes = if (validityPeriod.closeToExpire()) R.color.red else R.color.white_64
+
+                    view.setTextColorRes(textColorRes)
+                },
                 onFinish = { view ->
                     viewModel.timerFinished()
 
                     view.setText(R.string.account_parity_signer_sign_qr_code_expired)
                 }
             )
+        }
+
+        viewModel.acknowledgeExpired.awaitableActionLiveData.observeEvent {
+            errorDialog(
+                context = requireContext(),
+                onConfirm = { it.onSuccess(Unit) }
+            ) {
+                setTitle(R.string.account_parity_signer_sign_qr_code_expired)
+                setMessage(it.payload)
+            }
         }
     }
 }

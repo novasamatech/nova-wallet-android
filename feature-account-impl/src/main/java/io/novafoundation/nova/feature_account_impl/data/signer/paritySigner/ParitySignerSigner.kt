@@ -16,7 +16,7 @@ import java.util.UUID
 class ParitySignerSigner(
     private val signingSharedState: MutableSharedState<SignerPayloadExtrinsic>,
     private val signFlowRequester: ParitySignerSignInterScreenRequester,
-): Signer {
+) : Signer {
 
     override suspend fun signExtrinsic(payloadExtrinsic: SignerPayloadExtrinsic): SignatureWrapper {
         signingSharedState.set(payloadExtrinsic)
