@@ -14,8 +14,9 @@ class AppLinksProvider(
     val payoutsLearnMore: String,
     val recommendedValidatorsLearnMore: String,
     val twitterAccountTemplate: String,
-    val setControllerLearnMore: String
+    val setControllerLearnMore: String,
 
+    val paritySignerTroubleShooting: String,
 ) {
 
     fun getTwitterAccountUrl(

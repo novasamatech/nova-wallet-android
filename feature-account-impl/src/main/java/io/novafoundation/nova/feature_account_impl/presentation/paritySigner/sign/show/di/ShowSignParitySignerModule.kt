@@ -7,6 +7,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
@@ -49,7 +50,8 @@ class ShowSignParitySignerModule {
         router: AccountRouter,
         externalActions: ExternalActions.Presentation,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-        resourceManager: ResourceManager
+        resourceManager: ResourceManager,
+        appLinksProvider: AppLinksProvider
     ): ViewModel {
         return ShowSignParitySignerViewModel(
             router = router,
@@ -63,7 +65,8 @@ class ShowSignParitySignerModule {
             addressDisplayUseCase = addressDisplayUseCase,
             externalActions = externalActions,
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
-            resourceManager = resourceManager
+            resourceManager = resourceManager,
+            appLinksProvider = appLinksProvider
         )
     }
 

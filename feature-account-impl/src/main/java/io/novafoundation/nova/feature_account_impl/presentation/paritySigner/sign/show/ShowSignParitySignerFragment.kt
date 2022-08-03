@@ -17,6 +17,8 @@ import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.ParitySignerSignInterScreenCommunicator
 import kotlinx.android.synthetic.main.fragment_sign_parity_signer_show.signParitySignerShowAddress
+import kotlinx.android.synthetic.main.fragment_sign_parity_signer_show.signParitySignerShowContinue
+import kotlinx.android.synthetic.main.fragment_sign_parity_signer_show.signParitySignerShowHaveError
 import kotlinx.android.synthetic.main.fragment_sign_parity_signer_show.signParitySignerShowQr
 import kotlinx.android.synthetic.main.fragment_sign_parity_signer_show.signParitySignerShowTimer
 import kotlinx.android.synthetic.main.fragment_sign_parity_signer_show.signParitySignerShowToolbar
@@ -50,6 +52,9 @@ class ShowSignParitySignerFragment : BaseFragment<ShowSignParitySignerViewModel>
         signParitySignerShowQr.clipToOutline = true // for round corners
 
         signParitySignerShowAddress.setWholeClickListener { viewModel.addressClicked() }
+
+        signParitySignerShowHaveError.setOnClickListener { viewModel.troublesClicked() }
+        signParitySignerShowContinue.setOnClickListener { viewModel.continueClicked() }
     }
 
     override fun inject() {
