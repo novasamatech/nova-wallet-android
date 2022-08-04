@@ -35,7 +35,7 @@ class QrCodeExpiredPresentableFactory(
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val router: AccountRouter,
     private val responder: ParitySignerSignInterScreenResponder,
-    ) {
+) {
 
     fun create(
         request: ParitySignerSignInterScreenCommunicator.Request

@@ -138,4 +138,3 @@ class ScanView @JvmOverloads constructor(
         subTitle?.let(::setSubtitle)
     }
 }
-

@@ -15,9 +15,9 @@ class ScanImportParitySignerViewModel(
     permissionsAsker: PermissionsAsker.Presentation,
     private val interactor: ScanImportParitySignerInteractor,
     private val resourceManager: ResourceManager
-) : ScanQrViewModel(permissionsAsker)  {
+) : ScanQrViewModel(permissionsAsker) {
 
-   fun backClicked() {
+    fun backClicked() {
         router.back()
     }
 

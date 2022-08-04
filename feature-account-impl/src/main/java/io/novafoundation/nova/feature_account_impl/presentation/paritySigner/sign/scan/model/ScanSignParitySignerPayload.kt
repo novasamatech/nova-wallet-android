@@ -10,13 +10,13 @@ import kotlinx.android.parcel.Parcelize
 class ScanSignParitySignerPayload(
     val request: ParitySignerSignInterScreenCommunicator.Request,
     val validityPeriod: ValidityPeriodParcel
-): Parcelable
+) : Parcelable
 
 @Parcelize
 class ValidityPeriodParcel(
     val periodInMillis: Long,
     val calculatedAt: Long
-): Parcelable
+) : Parcelable
 
 fun mapValidityPeriodToParcel(validityPeriod: ValidityPeriod): ValidityPeriodParcel {
     return ValidityPeriodParcel(
