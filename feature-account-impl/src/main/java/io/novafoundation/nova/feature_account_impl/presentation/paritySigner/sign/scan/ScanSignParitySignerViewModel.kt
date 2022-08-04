@@ -31,7 +31,7 @@ class ScanSignParitySignerViewModel(
 
     val invalidQrConfirmation = actionAwaitableMixinFactory.confirmingAction<Unit>()
 
-    val qrCodeExpiredPresentable = qrCodeExpiredPresentableFactory.create(this)
+    val qrCodeExpiredPresentable = qrCodeExpiredPresentableFactory.create(payload.request)
 
     private val validityPeriod = mapValidityPeriodFromParcel(payload.validityPeriod)
     val validityPeriodFlow = flowOf(validityPeriod)

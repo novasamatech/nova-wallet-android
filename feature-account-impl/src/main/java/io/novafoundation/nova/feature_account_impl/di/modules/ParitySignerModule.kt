@@ -12,6 +12,7 @@ import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.feature_account_impl.data.repository.ParitySignerRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.RealParitySignerRepository
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.ParitySignerSignInterScreenCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.common.QrCodeExpiredPresentableFactory
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
 
@@ -40,5 +41,6 @@ class ParitySignerModule {
         resourceManager: ResourceManager,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         router: AccountRouter,
-    ) = QrCodeExpiredPresentableFactory(resourceManager, actionAwaitableMixinFactory, router)
+        communicator: ParitySignerSignInterScreenCommunicator
+    ) = QrCodeExpiredPresentableFactory(resourceManager, actionAwaitableMixinFactory, router, communicator)
 }

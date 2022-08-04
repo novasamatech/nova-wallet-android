@@ -50,7 +50,7 @@ class ShowSignParitySignerViewModel(
 
     override val openBrowserEvent = mediatorLiveData<Event<String>> { updateFrom(externalActions.openBrowserEvent) }
 
-    val qrCodeExpiredPresentable = qrCodeExpiredPresentableFactory.create(this)
+    val qrCodeExpiredPresentable = qrCodeExpiredPresentableFactory.create(request)
 
     val chain = flowOf {
         val signPayload = signSharedState.getOrThrow()

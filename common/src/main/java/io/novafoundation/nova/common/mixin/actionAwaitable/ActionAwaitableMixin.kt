@@ -39,4 +39,4 @@ fun <P> ActionAwaitableMixin.Factory.confirmingOrDenyingAction(): ConfirmOrDenyA
 
 suspend fun <R> ActionAwaitableMixin.Presentation<Unit, R>.awaitAction() = awaitAction(Unit)
 
-fun ActionAwaitableMixin<*, *>.hasAlredyTriggered(): Boolean = awaitableActionLiveData.value != null
+fun ActionAwaitableMixin<*, *>.hasAlreadyTriggered(): Boolean = awaitableActionLiveData.value != null
