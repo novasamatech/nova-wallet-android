@@ -2,8 +2,10 @@ package io.novafoundation.nova.common.utils
 
 interface SharedState<T> {
 
-    fun get(): T?
+    fun getOrNull(): T?
 }
+
+fun <T> SharedState<T>.getOrThrow(): T = getOrNull() ?: throw IllegalStateException("State is null")
 
 interface MutableSharedState<T> : SharedState<T> {
 
@@ -18,7 +20,7 @@ class DefaultMutableSharedState<T> : MutableSharedState<T> {
     private var value: T? = null
 
     @Synchronized
-    override fun get(): T? {
+    override fun getOrNull(): T? {
         return value
     }
 

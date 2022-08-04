@@ -1,6 +1,7 @@
 package io.novafoundation.nova.common.presentation.scan
 
 import android.view.WindowManager
+import androidx.annotation.CallSuper
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.permissions.setupPermissionAsker
 
@@ -8,10 +9,12 @@ abstract class ScanQrFragment<V : ScanQrViewModel> : BaseFragment<V>() {
 
     abstract val scanView: ScanView
 
+    @CallSuper
     override fun initViews() {
         startScanning()
     }
 
+    @CallSuper
     override fun subscribe(viewModel: V) {
         viewModel.scanningAvailable.observe { scanningAvailable ->
             if (scanningAvailable) {

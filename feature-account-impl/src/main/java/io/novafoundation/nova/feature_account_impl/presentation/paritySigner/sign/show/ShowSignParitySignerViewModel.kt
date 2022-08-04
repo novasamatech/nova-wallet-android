@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.utils.SharedState
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.getOrThrow
 import io.novafoundation.nova.common.utils.mediatorLiveData
 import io.novafoundation.nova.common.utils.updateFrom
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
@@ -23,6 +24,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.ParitySignerSignInterScreenCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.ParitySignerSignInterScreenResponder
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.cancelled
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan.model.ScanSignParitySignerPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
@@ -56,14 +58,14 @@ class ShowSignParitySignerViewModel(
     val acknowledgeExpired = actionAwaitableMixinFactory.confirmingAction<String>()
 
     val chain = flowOf {
-        val signPayload = signSharedState.get()!!
+        val signPayload = signSharedState.getOrThrow()
         val chainId = signPayload.genesisHash.toHexString()
 
         chainRegistry.getChain(chainId)
     }.shareInBackground()
 
     val qrCode = flowOf {
-        val signPayload = signSharedState.get()!!
+        val signPayload = signSharedState.getOrThrow()
 
         val qrContent = interactor.qrCodeContent(signPayload)
 
@@ -71,13 +73,13 @@ class ShowSignParitySignerViewModel(
     }.shareInBackground()
 
     val addressModel = chain.map { chain ->
-        val signPayload = signSharedState.get()!!
+        val signPayload = signSharedState.getOrThrow()
 
         addressIconGenerator.createAccountAddressModel(chain, signPayload.accountId, addressDisplayUseCase)
     }.shareInBackground()
 
     val validityPeriod = flowOf {
-        val timerValue = interactor.extrinsicValidityPeriod(signSharedState.get()!!)
+        val timerValue = interactor.extrinsicValidityPeriod(signSharedState.getOrThrow())
 
         ValidityPeriod(timerValue)
     }.shareInBackground()
@@ -89,7 +91,9 @@ class ShowSignParitySignerViewModel(
     }
 
     fun continueClicked() {
-        showMessage("TODO")
+        val payload = ScanSignParitySignerPayload(request)
+
+        router.openScanParitySignerSignature(payload)
     }
 
     fun troublesClicked() {

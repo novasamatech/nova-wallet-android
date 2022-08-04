@@ -30,6 +30,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.con
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.preview.di.PreviewImportParitySignerComponent
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.scan.di.ScanImportParitySignerComponent
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.start.di.StartImportParitySignerComponent
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan.di.ScanSignParitySignerComponent
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.show.di.ShowSignParitySignerComponent
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.di.PinCodeComponent
 import io.novafoundation.nova.feature_account_impl.presentation.settings.di.SettingsComponent
@@ -94,6 +95,7 @@ interface AccountFeatureComponent : AccountFeatureApi {
     fun finishImportParitySignerComponentFactory(): FinishImportParitySignerComponent.Factory
 
     fun showSignParitySignerComponentFactory(): ShowSignParitySignerComponent.Factory
+    fun scanSignParitySignerComponentFactory(): ScanSignParitySignerComponent.Factory
 
     @Component.Factory
     interface Factory {
