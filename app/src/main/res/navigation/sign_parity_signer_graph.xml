@@ -31,6 +31,7 @@
     </fragment>
 
     <fragment
+        app:useAdd="true"
         android:id="@+id/scanSignParitySignerFragment"
         android:name="io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan.ScanSignParitySignerFragment"
         android:label="ScanSignParitySignerFragment"
