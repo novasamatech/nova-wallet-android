@@ -168,4 +168,9 @@
             <enum name="secondary" value="1" />
         </attr>
     </declare-styleable>
+
+    <declare-styleable name="ScanView">
+        <attr name="title" />
+        <attr name="subTitle" />
+    </declare-styleable>
 </resources>
