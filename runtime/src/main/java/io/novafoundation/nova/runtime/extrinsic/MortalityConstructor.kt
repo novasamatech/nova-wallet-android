@@ -21,7 +21,7 @@ class MortalityConstructor(
     private val chainStateRepository: ChainStateRepository,
 ) {
 
-    fun mortalPeriodMillis(): Long = 10_000
+    fun mortalPeriodMillis(): Long = MORTAL_PERIOD.toLong()
 
     suspend fun constructMortality(chainId: ChainId): Mortality = withContext(Dispatchers.IO) {
         val finalizedHash = async { rpcCalls.getFinalizedHead(chainId) }
