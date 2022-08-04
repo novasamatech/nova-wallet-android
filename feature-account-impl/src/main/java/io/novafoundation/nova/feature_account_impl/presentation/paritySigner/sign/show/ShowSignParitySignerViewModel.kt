@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
+import io.novafoundation.nova.common.mixin.actionAwaitable.hasAlredyTriggered
 import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
@@ -101,16 +102,20 @@ class ShowSignParitySignerViewModel(
     }
 
     @OptIn(ExperimentalTime::class)
-    fun timerFinished() = launch {
-        val message = withContext(Dispatchers.Default) {
-            val validityPeriodMillis = validityPeriod.first().period.millis
-            val durationFormatted = resourceManager.formatDuration(validityPeriodMillis.milliseconds, estimated = false)
-            resourceManager.getString(R.string.account_parity_signer_sign_qr_code_expired_descrition, durationFormatted)
+    fun timerFinished() {
+        if (acknowledgeExpired.hasAlredyTriggered()) return
+
+        launch {
+            val message = withContext(Dispatchers.Default) {
+                val validityPeriodMillis = validityPeriod.first().period.millis
+                val durationFormatted = resourceManager.formatDuration(validityPeriodMillis.milliseconds, estimated = false)
+                resourceManager.getString(R.string.account_parity_signer_sign_qr_code_expired_descrition, durationFormatted)
+            }
+
+            acknowledgeExpired.awaitAction(message)
+
+            backClicked()
         }
-
-        acknowledgeExpired.awaitAction(message)
-
-        backClicked()
     }
 
     fun addressClicked() = launch {
