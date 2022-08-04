@@ -12,6 +12,12 @@ on:
       release_notes:
         description: 'Release notes'
         required: true
+      release_draft:
+        description: 'Would it be a draft release?'
+        type: boolean
+        required: true
+        default: true
+
 
 jobs:
   build:
@@ -78,7 +84,7 @@ jobs:
           release_name: ${{ github.event.inputs.release_name }}
           body: |
             ${{ github.event.inputs.release_notes }}
-          draft: false
+          draft: ${{ github.event.inputs.release_draft }}
           prerelease: false
           repo: stepanLav/helpful-utils
 
