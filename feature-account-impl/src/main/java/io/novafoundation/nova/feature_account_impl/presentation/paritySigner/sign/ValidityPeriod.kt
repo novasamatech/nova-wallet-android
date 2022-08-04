@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.show
+package io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign
 
 import io.novafoundation.nova.common.utils.formatting.TimerValue
 import kotlin.time.ExperimentalTime

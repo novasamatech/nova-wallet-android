@@ -42,6 +42,9 @@ class ScanView @JvmOverloads constructor(
         attrs?.let(::applyAttributes)
     }
 
+    val subtitle: TextView
+        get() = viewScanSubtitle
+
     fun resume() {
         viewScanScanner.resume()
     }
