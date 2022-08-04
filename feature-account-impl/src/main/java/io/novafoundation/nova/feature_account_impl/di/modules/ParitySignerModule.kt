@@ -4,6 +4,7 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.DefaultMutableSharedState
 import io.novafoundation.nova.common.utils.MutableSharedState
@@ -14,6 +15,8 @@ import io.novafoundation.nova.feature_account_impl.data.repository.RealParitySig
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.ParitySignerSignInterScreenCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.common.QrCodeExpiredPresentableFactory
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.notSupported.ParitySignerSigningNotSupportedPresentable
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.notSupported.RealParitySignerSigningNotSupportedPresentable
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
 
 @Module
@@ -43,4 +46,10 @@ class ParitySignerModule {
         router: AccountRouter,
         communicator: ParitySignerSignInterScreenCommunicator
     ) = QrCodeExpiredPresentableFactory(resourceManager, actionAwaitableMixinFactory, router, communicator)
+
+    @Provides
+    @FeatureScope
+    fun provideSigningNotSupportedPresentable(
+        contextManager: ContextManager
+    ): ParitySignerSigningNotSupportedPresentable = RealParitySignerSigningNotSupportedPresentable(contextManager)
 }

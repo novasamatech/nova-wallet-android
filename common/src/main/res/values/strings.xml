@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="account_parity_signer_not_supported_title">Signing is not supported</string>
+  <string name="account_parity_signer_not_supported_subtitle">Parity Signer does not support signing arbitrary messages — only transactions</string>
+
   <string name="common_invalid_qr">QR code is invalid</string>
   <string name="account_parity_signer_sign_qr_invalid_message">Please make sure you are scanning QR code for currently signing operation</string>
 
@@ -26,8 +29,8 @@
   <string name="common_permission_permissions_denied_message">Requested permissions are required to use this screen. You should enable them in Settings.</string>
   <string name="common_to_settings">Open Settings</string>
 
-  <string name="account_parity_signer_scan_from">Scan the QR code provided by Parity Signer</string>
-  <string name="account_parity_signer_scan_with">Scan the QR code with Parity Signer</string>
+  <string name="account_parity_signer_scan_from">Scan the QR code from the Parity Signer</string>
+  <string name="account_parity_signer_scan_with">Scan the QR code with the Parity Signer</string>
 
   <string name="account_welcome_hardware_wallet_title">Connect hardware wallet</string>
   <string name="account_welcome_hardware_wallet_subtitle">Use Parity Signer</string>
