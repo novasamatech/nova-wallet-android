@@ -11,9 +11,10 @@ class AcknowledgeSigningNotSupportedBottomSheet(
     context: Context,
     private val onConfirm: () -> Unit
 ) : ActionNotAllowedBottomSheet(
-    context = context,
-    onSuccess =  onConfirm,
-), DialogExtensions {
+        context = context,
+        onSuccess = onConfirm,
+    ),
+    DialogExtensions {
 
     override val dialogInterface: DialogInterface
         get() = this
