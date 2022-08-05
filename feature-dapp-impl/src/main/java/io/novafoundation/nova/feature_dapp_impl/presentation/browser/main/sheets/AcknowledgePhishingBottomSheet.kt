@@ -12,9 +12,10 @@ class AcknowledgePhishingBottomSheet(
     context: Context,
     private val confirmation: DappPendingConfirmation<*>,
 ) : ActionNotAllowedBottomSheet(
-    context = context,
-    onSuccess = { confirmation.onConfirm() }
-), DialogExtensions {
+        context = context,
+        onSuccess = { confirmation.onConfirm() }
+    ),
+    DialogExtensions {
 
     override val dialogInterface: DialogInterface
         get() = this
@@ -25,6 +26,6 @@ class AcknowledgePhishingBottomSheet(
         title.setText(R.string.dapp_phishing_title)
         subtitle.setText(R.string.dapp_phishing_subtitle)
 
-        applyBigIconStyle(R.drawable.ic_warning_filled)
+        applySolidIconStyle(R.drawable.ic_warning_filled)
     }
 }

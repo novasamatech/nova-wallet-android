@@ -11,9 +11,10 @@ class AcknowledgeSigningNotSupportedBottomSheet(
     context: Context,
     private val onConfirm: () -> Unit
 ) : ActionNotAllowedBottomSheet(
-    context = context,
-    onSuccess =  onConfirm,
-), DialogExtensions {
+        context = context,
+        onSuccess = onConfirm,
+    ),
+    DialogExtensions {
 
     override val dialogInterface: DialogInterface
         get() = this
@@ -24,6 +25,6 @@ class AcknowledgeSigningNotSupportedBottomSheet(
         title.setText(R.string.account_parity_signer_not_supported_title)
         subtitle.setText(R.string.account_parity_signer_not_supported_subtitle)
 
-        applyBigIconStyle(R.drawable.ic_parity_signer)
+        applySolidIconStyle(R.drawable.ic_parity_signer)
     }
 }

@@ -272,6 +272,10 @@
         <item name="android:background">@drawable/bg_icon_big</item>
         <item name="android:padding">12dp</item>
     </style>
+
+    <style name="Widget.Nova.Icon.Big.Dashed">
+        <item name="android:background">@drawable/bg_icon_big_dashed</item>
+    </style>
     
     <style name="Widget.Nova.Text.Number" parent="">
         <item name="android:textAppearance">@style/TextAppearance.NovaFoundation.Regular.Body</item>
