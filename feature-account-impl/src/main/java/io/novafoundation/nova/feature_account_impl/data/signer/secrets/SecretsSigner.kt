@@ -10,6 +10,7 @@ import jp.co.soramitsu.fearless_utils.encrypt.SignatureWrapper
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.KeyPairSigner
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.Signer
+import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadRaw
 
 class SecretsSignerFactory(
@@ -26,18 +27,28 @@ class SecretsSigner(
     private val secretStoreV2: SecretStoreV2
 ) : Signer {
 
+    override suspend fun signExtrinsic(payloadExtrinsic: SignerPayloadExtrinsic): SignatureWrapper {
+        val delegate = createDelegate(payloadExtrinsic.accountId)
+
+        return delegate.signExtrinsic(payloadExtrinsic)
+    }
+
     override suspend fun signRaw(payload: SignerPayloadRaw): SignatureWrapper {
-        val multiChainEncryption = metaAccount.multiChainEncryptionFor(payload.accountId)!!
+        val delegate = createDelegate(payload.accountId)
+
+        return delegate.signRaw(payload)
+    }
+
+    private suspend fun createDelegate(accountId: AccountId): KeyPairSigner {
+        val multiChainEncryption = metaAccount.multiChainEncryptionFor(accountId)!!
 
         val keypair = secretStoreV2.getKeypair(
             metaAccount = metaAccount,
-            accountId = payload.accountId,
+            accountId = accountId,
             isEthereumBased = multiChainEncryption is MultiChainEncryption.Ethereum
         )
 
-        val keypairSigner = KeyPairSigner(keypair, multiChainEncryption)
-
-        return keypairSigner.signRaw(payload)
+        return KeyPairSigner(keypair, multiChainEncryption)
     }
 
     private suspend fun SecretStoreV2.getKeypair(

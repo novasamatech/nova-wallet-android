@@ -17,10 +17,9 @@ class QrCodeGenerator(
         private const val PADDING_SIZE = 2
     }
 
-    suspend fun generateQrBitmap(input: String): Bitmap {
+    suspend fun generateQrBitmap(input: String, useUtf8Hint: Boolean = true): Bitmap {
         return withContext(Dispatchers.Default) {
             val hints = HashMap<EncodeHintType, String>()
-            hints[EncodeHintType.CHARACTER_SET] = "UTF-8"
             val qrCode = Encoder.encode(input, ErrorCorrectionLevel.H, hints)
             val byteMatrix = qrCode.matrix
             val width = byteMatrix.width + PADDING_SIZE

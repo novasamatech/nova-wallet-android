@@ -17,6 +17,7 @@ import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.LanguagesHolder
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.validation.ValidationExecutor
@@ -25,6 +26,7 @@ import io.novafoundation.nova.core_db.dao.AccountDao
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.dao.NodeDao
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
+import io.novafoundation.nova.runtime.extrinsic.MortalityConstructor
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
@@ -93,4 +95,8 @@ interface AccountFeatureDependencies {
     val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
 
     val permissionsAskerFactory: PermissionsAskerFactory
+
+    val qrCodeGenerator: QrCodeGenerator
+
+    val mortalityConstructor: MortalityConstructor
 }

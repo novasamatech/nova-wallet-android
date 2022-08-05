@@ -3,11 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:gravity="center_horizontal"
     android:orientation="vertical"
     tools:background="@color/black">
 
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 
     <ImageView
         android:id="@+id/confirmSignExtinsicIcon"
@@ -75,9 +79,41 @@
         android:id="@+id/confirmSignExtinsicDetails"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="14dp"
         android:text="@string/transaction_details_title"
         android:textAppearance="@style/GoNextTransactionDetailsTextAppearance"
         app:actionIcon="@drawable/ic_chevron_right"
         app:dividerVisible="false" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:orientation="horizontal">
+
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/confirmDAppActionReject"
+            style="@style/Widget.Nova.Button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_weight="1"
+            android:text="@string/common_reject"
+            android:theme="@style/NegativeAccent" />
+
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/confirmDAppActionAllow"
+            style="@style/Widget.Nova.Button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_weight="1"
+            android:text="@string/common_allow"
+            android:theme="@style/AccentBlue" />
+    </LinearLayout>
 </LinearLayout>
