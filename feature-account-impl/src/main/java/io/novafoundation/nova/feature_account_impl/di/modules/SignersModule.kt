@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.Pari
 import io.novafoundation.nova.feature_account_impl.data.signer.secrets.SecretsSignerFactory
 import io.novafoundation.nova.feature_account_impl.data.signer.watchOnly.WatchOnlySigner
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.ParitySignerSignInterScreenCommunicator
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.notSupported.ParitySignerSigningNotSupportedPresentable
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
 
 @Module
@@ -31,8 +32,9 @@ class SignersModule {
     @FeatureScope
     fun provideParitySignerSigner(
         signingSharedState: MutableSharedState<SignerPayloadExtrinsic>,
-        communicator: ParitySignerSignInterScreenCommunicator
-    ) = ParitySignerSigner(signingSharedState, communicator)
+        communicator: ParitySignerSignInterScreenCommunicator,
+        signingNotSupportedPresentable: ParitySignerSigningNotSupportedPresentable
+    ) = ParitySignerSigner(signingSharedState, communicator, signingNotSupportedPresentable)
 
     @Provides
     @FeatureScope

@@ -2,26 +2,20 @@ package io.novafoundation.nova.feature_account_impl.presentation.watchOnly.sign
 
 import android.content.Context
 import android.os.Bundle
-import com.google.android.material.bottomsheet.BottomSheetDialog
+import io.novafoundation.nova.common.view.bottomSheet.ActionNotAllowedBottomSheet
 import io.novafoundation.nova.feature_account_impl.R
-import kotlinx.android.synthetic.main.watch_only_sign_bottom_sheet.watchOnlySignButton
 
 class WatchOnlySignBottomSheet(
     context: Context,
-    private val onSuccess: () -> Unit
-) : BottomSheetDialog(context, R.style.BottomSheetDialog) {
-
-    init {
-        setContentView(R.layout.watch_only_sign_bottom_sheet)
-    }
+    onSuccess: () -> Unit
+) : ActionNotAllowedBottomSheet(context, onSuccess) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setOnDismissListener { onSuccess() }
+        title.setText(R.string.account_watch_key_missing_title)
+        subtitle.setText(R.string.account_watch_key_missing_description)
 
-        watchOnlySignButton.setOnClickListener {
-            dismiss()
-        }
+        image.setImageResource(R.drawable.ic_key_missing)
     }
 }
