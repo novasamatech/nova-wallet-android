@@ -27,6 +27,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.node.details.Nod
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerAccountPayload
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.finish.FinishImportParitySignerFragment
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.preview.PreviewImportParitySignerFragment
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan.ScanSignParitySignerFragment
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan.model.ScanSignParitySignerPayload
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.PinCodeAction
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.PincodeFragment
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.ToolbarConfiguration
@@ -497,6 +499,16 @@ class Navigator(
         val bundle = FinishImportParitySignerFragment.getBundle(payload)
 
         navController?.navigate(R.id.action_previewImportParitySignerFragment_to_finishImportParitySignerFragment, bundle)
+    }
+
+    override fun openScanParitySignerSignature(payload: ScanSignParitySignerPayload) {
+        val bundle = ScanSignParitySignerFragment.getBundle(payload)
+
+        navController?.navigate(R.id.action_showSignParitySignerFragment_to_scanSignParitySignerFragment, bundle)
+    }
+
+    override fun finishParitySignerFlow() {
+        navController?.navigate(R.id.action_finish_parity_signer_flow)
     }
 
     override fun openCreateWatchWallet() {

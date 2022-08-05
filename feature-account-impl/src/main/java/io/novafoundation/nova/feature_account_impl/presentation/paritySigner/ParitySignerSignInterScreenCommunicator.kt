@@ -39,3 +39,4 @@ suspend fun ParitySignerSignInterScreenRequester.awaitConfirmation(request: Requ
 }
 
 fun Request.cancelled() = Response.Cancelled(id)
+fun Request.signed(signature: ByteArray) = Response.Signed(signature, id)

@@ -11,8 +11,6 @@ import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
-import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
-import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.utils.SharedState
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
@@ -21,6 +19,7 @@ import io.novafoundation.nova.feature_account_impl.domain.paritySigner.sign.show
 import io.novafoundation.nova.feature_account_impl.domain.paritySigner.sign.show.ShowSignParitySignerInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.ParitySignerSignInterScreenCommunicator
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.common.QrCodeExpiredPresentableFactory
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.show.ShowSignParitySignerViewModel
 import io.novafoundation.nova.runtime.extrinsic.MortalityConstructor
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -49,9 +48,8 @@ class ShowSignParitySignerModule {
         addressDisplayUseCase: AddressDisplayUseCase,
         router: AccountRouter,
         externalActions: ExternalActions.Presentation,
-        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-        resourceManager: ResourceManager,
-        appLinksProvider: AppLinksProvider
+        appLinksProvider: AppLinksProvider,
+        qrCodeExpiredPresentableFactory: QrCodeExpiredPresentableFactory
     ): ViewModel {
         return ShowSignParitySignerViewModel(
             router = router,
@@ -64,9 +62,8 @@ class ShowSignParitySignerModule {
             addressIconGenerator = addressIconGenerator,
             addressDisplayUseCase = addressDisplayUseCase,
             externalActions = externalActions,
-            actionAwaitableMixinFactory = actionAwaitableMixinFactory,
-            resourceManager = resourceManager,
-            appLinksProvider = appLinksProvider
+            appLinksProvider = appLinksProvider,
+            qrCodeExpiredPresentableFactory = qrCodeExpiredPresentableFactory
         )
     }
 
