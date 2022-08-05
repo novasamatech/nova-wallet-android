@@ -25,6 +25,6 @@ class AcknowledgePhishingBottomSheet(
         title.setText(R.string.dapp_phishing_title)
         subtitle.setText(R.string.dapp_phishing_subtitle)
 
-        applyBigIconStyle(R.drawable.ic_warning_filled)
+        applySolidIconStyle(R.drawable.ic_warning_filled)
     }
 }

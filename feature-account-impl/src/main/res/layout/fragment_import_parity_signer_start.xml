@@ -30,15 +30,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
-                android:layout_marginEnd="16dp"
                 android:text="@string/account_parity_signer_import_start_title"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
                 android:id="@+id/startImportParitySignerNovaLogo"
-                android:layout_width="90dp"
-                android:layout_height="90dp"
+                style="@style/Widget.Nova.Icon.Big"
                 android:layout_marginTop="31dp"
                 android:layout_marginEnd="15dp"
                 android:src="@drawable/ic_nova_wallet"

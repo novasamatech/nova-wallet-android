@@ -16,6 +16,6 @@ class WatchOnlySignBottomSheet(
         title.setText(R.string.account_watch_key_missing_title)
         subtitle.setText(R.string.account_watch_key_missing_description)
 
-        image.setImageResource(R.drawable.ic_key_missing)
+        applyDashedIconStyle(R.drawable.ic_key_missing)
     }
 }

@@ -51,9 +51,15 @@ open class ActionNotAllowedBottomSheet(
         super.setContentView(layoutResId)
     }
 
-    protected fun applyBigIconStyle(@DrawableRes src: Int) = with(image) {
+    protected fun applySolidIconStyle(@DrawableRes src: Int) = with(image) {
         setPadding(12.dp)
         setBackgroundResource(R.drawable.bg_icon_big)
+        setImageResource(src)
+    }
+
+    protected fun applyDashedIconStyle(@DrawableRes src: Int) = with(image) {
+        setPadding(12.dp)
+        setBackgroundResource(R.drawable.bg_icon_big_dashed)
         setImageResource(src)
     }
 }
