@@ -52,11 +52,12 @@ fun warningDialog(
 fun errorDialog(
     context: Context,
     onConfirm: DialogClickHandler? = null,
+    @StringRes confirmTextRes: Int = R.string.common_ok,
     decorator: DialogDecorator? = null
 ) {
     dialog(context) {
         setTitle(R.string.common_error_general_title)
-        setPositiveButton(R.string.common_ok) { _, _ -> onConfirm?.invoke() }
+        setPositiveButton(confirmTextRes) { _, _ -> onConfirm?.invoke() }
 
         decorator?.invoke(this)
     }

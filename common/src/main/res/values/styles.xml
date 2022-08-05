@@ -270,7 +270,7 @@
         <item name="android:layout_width">88dp</item>
         <item name="android:layout_height">88dp</item>
         <item name="android:background">@drawable/bg_icon_big</item>
-        <item name="android:padding">16dp</item>
+        <item name="android:padding">12dp</item>
     </style>
     
     <style name="Widget.Nova.Text.Number" parent="">

@@ -25,10 +25,13 @@ import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm
 import io.novafoundation.nova.feature_account_impl.presentation.node.add.di.AddNodeComponent
 import io.novafoundation.nova.feature_account_impl.presentation.node.details.di.NodeDetailsComponent
 import io.novafoundation.nova.feature_account_impl.presentation.node.list.di.NodesComponent
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.ParitySignerSignInterScreenCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.finish.di.FinishImportParitySignerComponent
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.preview.di.PreviewImportParitySignerComponent
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.scan.di.ScanImportParitySignerComponent
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.start.di.StartImportParitySignerComponent
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan.di.ScanSignParitySignerComponent
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.show.di.ShowSignParitySignerComponent
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.di.PinCodeComponent
 import io.novafoundation.nova.feature_account_impl.presentation.settings.di.SettingsComponent
 import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.change.di.ChangeWatchAccountComponent
@@ -91,12 +94,16 @@ interface AccountFeatureComponent : AccountFeatureApi {
     fun previewImportParitySignerComponentFactory(): PreviewImportParitySignerComponent.Factory
     fun finishImportParitySignerComponentFactory(): FinishImportParitySignerComponent.Factory
 
+    fun showSignParitySignerComponentFactory(): ShowSignParitySignerComponent.Factory
+    fun scanSignParitySignerComponentFactory(): ScanSignParitySignerComponent.Factory
+
     @Component.Factory
     interface Factory {
 
         fun create(
             @BindsInstance accountRouter: AccountRouter,
             @BindsInstance advancedEncryptionCommunicator: AdvancedEncryptionCommunicator,
+            @BindsInstance paritySignerSignInterScreenCommunicator: ParitySignerSignInterScreenCommunicator,
             deps: AccountFeatureDependencies
         ): AccountFeatureComponent
     }

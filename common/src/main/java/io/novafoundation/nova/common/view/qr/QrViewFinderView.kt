@@ -27,7 +27,9 @@ class QrViewFinderView @JvmOverloads constructor(
 
     // Cache the framingRect so that we can still draw it after the preview
     // stopped.
-    private var framingRect: Rect? = null
+    var framingRect: Rect? = null
+        private set
+
     private val framingPath = Path()
 
     private var cameraPreview: CameraPreview? = null
