@@ -76,9 +76,9 @@
   <string name="account_parity_signer_import_preview_title">Вот ваши аккаунты</string>
   <string name="account_parity_signer_import_scan_invalid_qr">Неверный QR-код, пожалуйста, убедитесь, что вы сканируете QR-код из Parity Signer</string>
   <string name="account_parity_signer_import_start_select_top">Убедитесь, что выбрали самый верхний</string>
-  <string name="account_parity_signer_import_start_step_1"><font color="#FFFFFF"> Откройте приложение Parity Signer </font> на смартфоне.</string>
-  <string name="account_parity_signer_import_start_step_2"><font color="#FFFFFF"> Перейдите на вкладку «Ключи». Выберите сид, затем аккаунт </font> , который вы хотите добавить в Nova Wallet.</string>
-  <string name="account_parity_signer_import_start_step_3">Parity Signer предоставит вам <font color="#FFFFFF"> QR-код для сканирования </font></string>
+  <string name="account_parity_signer_import_start_step_1"><font color="#FFFFFF">Откройте приложение Parity Signer</font> на смартфоне.</string>
+  <string name="account_parity_signer_import_start_step_2"><font color="#FFFFFF">Перейдите на вкладку «Ключи». Выберите сид, затем аккаунт</font>, который вы хотите добавить в Nova Wallet.</string>
+  <string name="account_parity_signer_import_start_step_3">Parity Signer предоставит вам <font color="#FFFFFF">QR-код для сканирования</font></string>
   <string name="account_parity_signer_import_start_title">Добавить кошелек из Parity Signer</string>
   <string name="account_parity_signer_not_supported_subtitle">Parity Signer не поддерживает подписание произвольных сообщений — только транзакции</string>
   <string name="account_parity_signer_not_supported_title">Подписание не поддерживается</string>
