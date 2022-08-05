@@ -1,7 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<io.novafoundation.nova.common.presentation.scan.ScanView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/scanImportParitySignerScan"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    app:title="@string/account_parity_signer_scan_from" />
+    android:layout_height="match_parent">
+
+    <io.novafoundation.nova.common.presentation.scan.ScanView
+        android:id="@+id/scanImportParitySignerScan"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:title="@string/account_parity_signer_scan_from" />
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:dividerVisible="false"
+        android:id="@+id/scanImportParitySignerScanToolbar"
+        app:contentBackground="@android:color/transparent" />
+</FrameLayout>
