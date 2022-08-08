@@ -38,6 +38,8 @@ import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAddress
 import java.io.ByteArrayOutputStream
 import java.math.BigInteger
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 
 val BIP32JunctionDecoder.DEFAULT_DERIVATION_PATH: String
     get() = "//44//60//0/0/0"
@@ -54,6 +56,13 @@ fun ByteArray.toAddress(networkType: Node.NetworkType) = toAddress(networkType.r
 fun String.isValidSS58Address() = runCatching { toAccountId() }.isSuccess
 
 fun String.removeHexPrefix() = removePrefix("0x")
+
+fun Short.toByteArray(byteOrder: ByteOrder = ByteOrder.BIG_ENDIAN): ByteArray {
+    val buffer = ByteBuffer.allocate(2)
+    buffer.order(byteOrder)
+    buffer.putShort(this)
+    return buffer.array()
+}
 
 fun <T> DataType<T>.fromHex(hex: String): T {
     val codecReader = ScaleCodecReader(hex.fromHex())

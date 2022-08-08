@@ -4,6 +4,7 @@
     android:layout_height="wrap_content"
     android:gravity="center_horizontal"
     android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
     android:paddingStart="16dp"
     android:paddingEnd="16dp">
 
@@ -14,13 +15,15 @@
     <ImageView
         android:layout_width="88dp"
         android:layout_height="88dp"
-        android:layout_marginTop="20dp"
-        android:src="@drawable/ic_key_missing" />
+        tools:src="@color/white"
+        android:id="@+id/actionNotAllowedImage"
+        android:layout_marginTop="20dp" />
 
     <TextView
         style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@+id/actionNotAllowedTitle"
         android:layout_marginTop="24dp"
         android:text="@string/account_watch_key_missing_title" />
 
@@ -28,6 +31,7 @@
         style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/actionNotAllowedSubtitle"
         android:layout_marginTop="8dp"
         android:gravity="center"
         android:text="@string/account_watch_key_missing_description"
@@ -36,7 +40,7 @@
     <io.novafoundation.nova.common.view.PrimaryButton
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/watchOnlySignButton"
+        android:id="@+id/actionNotAllowedOk"
         android:layout_marginTop="24dp"
         android:layout_marginBottom="16dp"
         android:text="@string/common_ok_back" />
