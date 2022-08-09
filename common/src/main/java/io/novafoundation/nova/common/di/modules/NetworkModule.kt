@@ -43,13 +43,14 @@ class NetworkModule {
             twitterAccountTemplate = BuildConfig.TWITTER_ACCOUNT_TEMPLATE,
             setControllerLearnMore = BuildConfig.SET_CONTROLLER_LEARN_MORE,
             recommendedValidatorsLearnMore = BuildConfig.RECOMMENDED_VALIDATORS_LEARN_MORE,
+            paritySignerTroubleShooting = BuildConfig.PARITY_SIGNER_TROUBLESHOOTING,
             telegram = BuildConfig.TELEGRAM_URL,
             twitter = BuildConfig.TWITTER_URL,
             rateApp = BuildConfig.RATE_URL,
             website = BuildConfig.WEBSITE_URL,
             github = BuildConfig.GITHUB_URL,
             email = BuildConfig.EMAIL,
-            youtube = BuildConfig.YOUTUBE_URL
+            youtube = BuildConfig.YOUTUBE_URL,
         )
     }
 

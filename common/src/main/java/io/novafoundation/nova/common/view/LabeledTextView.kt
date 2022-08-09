@@ -104,6 +104,11 @@ class LabeledTextView @JvmOverloads constructor(
         labeledTextIcon.setImageDrawable(icon)
     }
 
+    fun setPrimaryIcon(icon: Drawable) {
+        primaryIcon.makeVisible()
+        primaryIcon.setImageDrawable(icon)
+    }
+
     fun setActionClickListener(listener: (View) -> Unit) {
         labeledTextAction.setOnClickListener(listener)
     }

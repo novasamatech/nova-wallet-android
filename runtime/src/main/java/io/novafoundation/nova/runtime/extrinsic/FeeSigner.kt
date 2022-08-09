@@ -10,6 +10,7 @@ import jp.co.soramitsu.fearless_utils.encrypt.keypair.ethereum.EthereumKeypairFa
 import jp.co.soramitsu.fearless_utils.encrypt.keypair.substrate.SubstrateKeypairFactory
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.KeyPairSigner
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.Signer
+import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadRaw
 
 private val FAKE_CRYPTO_TYPE = EncryptionType.ECDSA
@@ -17,6 +18,12 @@ private val FAKE_CRYPTO_TYPE = EncryptionType.ECDSA
 class FeeSigner(private val chain: Chain) : Signer {
 
     private val keypair = generateFakeKeyPair()
+
+    override suspend fun signExtrinsic(payloadExtrinsic: SignerPayloadExtrinsic): SignatureWrapper {
+        val signer = KeyPairSigner(keypair, multiChainEncryption())
+
+        return signer.signExtrinsic(payloadExtrinsic)
+    }
 
     override suspend fun signRaw(payload: SignerPayloadRaw): SignatureWrapper {
         val signer = KeyPairSigner(keypair, multiChainEncryption())

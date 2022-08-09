@@ -2,8 +2,10 @@ package io.novafoundation.nova.feature_account_impl.presentation.common.mixin.im
 
 import android.view.View
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.utils.observeInLifecycle
 import io.novafoundation.nova.common.utils.onTextChanged
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.InputField
@@ -28,7 +30,7 @@ fun setupAccountNameChooserUi(
         viewModel.accountNameChooser.nameChanged(it)
     }
 
-    viewModel.accountNameChooser.nameState.observe(owner) { state ->
+    viewModel.accountNameChooser.nameState.observeInLifecycle(owner.lifecycleScope) { state ->
         val isVisible = state is AccountNameChooserMixin.State.Input
 
         ui.setVisible(isVisible)

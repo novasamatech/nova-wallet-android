@@ -12,11 +12,11 @@
   <string name="about_website_v2_2_0">Сайт</string>
   <string name="accoount_enter_chain_address_format">Введите действительный %s адрес...</string>
   <string name="accoount_enter_evm_address">EVM Адрес  должен быть действительным или пустым...</string>
-  <string name="accoount_enter_substrate_address">Введите действительный Substrate адрес...</string>
+  <string name="accoount_enter_substrate_address">Введите действительный substrate адрес...</string>
   <string name="account_add_account">Добавить аккаунт</string>
   <string name="account_add_already_exists_message">Аккаунт уже существует. Пожалуйста, попробуйте другой.</string>
   <string name="account_add_watch_only_description">Отследить любой кошелек по его адресу</string>
-  <string name="account_add_watch_wallet">Добавить watch-only кошелек</string>
+  <string name="account_add_watch_wallet">Добавить watch-only кошелёк</string>
   <string name="account_backup_mnemonic_field_title">Мнемоническая фраза</string>
   <string name="account_backup_mnemonic_title">Запишите фразу и храните её в надежном месте</string>
   <string name="account_backup_secret_caption">Пожалуйста, убедитесь, что ваша фраза записана корректно и разборчиво.</string>
@@ -37,6 +37,8 @@
   <string name="account_delete_confirmation_title">Забыть кошелек?</string>
   <string name="account_derivation_path_ethereum_invalid_title">Некорректный путь деривации для Ethereum</string>
   <string name="account_derivation_path_substrate_invalid_title">Некорректный путь деривации для Substrate</string>
+  <string name="account_details_parity_signer_alert">Этот кошелек работает в паре с Parity Signer. Nova поможет вам сформировать любые операции, которые вы хотите, и вам будет предложено подписать их с помощью Parity Signer</string>
+  <string name="account_details_parity_signer_not_supported">Не поддерживается Parity Signer</string>
   <string name="account_details_watch_only_alert">Это watch-only кошелек, Nova может показать вам баланс и другую информацию, но вы не можете выполнять какие-либо транзакции с этим кошельком.</string>
   <string name="account_enter_wallet_nickname">Введите имя кошелька...</string>
   <string name="account_error_try_another_one">Пожалуйста, попробуйте другой.</string>
@@ -69,6 +71,25 @@
   <string name="account_needed_message">У вас нет учетной записи в этой сети, вы можете создать или импортировать учетную запись.</string>
   <string name="account_needed_title">Необходим аккаунт</string>
   <string name="account_no_chain_projection">Аккаунт не найден</string>
+  <string name="account_parity_signer">Parity Signer</string>
+  <string name="account_parity_signer_import_preview_description">Следующие аккаунты были успешно считаны с Parity Signer</string>
+  <string name="account_parity_signer_import_preview_title">Вот ваши аккаунты</string>
+  <string name="account_parity_signer_import_scan_invalid_qr">Неверный QR-код, пожалуйста, убедитесь, что вы сканируете QR-код из Parity Signer</string>
+  <string name="account_parity_signer_import_start_select_top">Убедитесь, что выбрали самый верхний</string>
+  <string name="account_parity_signer_import_start_step_1"><font color="#FFFFFF">Откройте приложение Parity Signer</font> на смартфоне.</string>
+  <string name="account_parity_signer_import_start_step_2"><font color="#FFFFFF">Перейдите на вкладку «Ключи». Выберите сид, затем аккаунт</font>, который вы хотите добавить в Nova Wallet.</string>
+  <string name="account_parity_signer_import_start_step_3">Parity Signer предоставит вам <font color="#FFFFFF">QR-код для сканирования</font></string>
+  <string name="account_parity_signer_import_start_title">Добавить кошелек из Parity Signer</string>
+  <string name="account_parity_signer_not_supported_subtitle">Parity Signer не поддерживает подписание произвольных сообщений — только транзакции</string>
+  <string name="account_parity_signer_not_supported_title">Подписание не поддерживается</string>
+  <string name="account_parity_signer_scan_from">Отсканируйте QR-код из Parity Signer</string>
+  <string name="account_parity_signer_scan_with">Отсканируйте QR-код с помощью Parity Signer</string>
+  <string name="account_parity_signer_sign_have_error">У меня ошибка в Parity Signer</string>
+  <string name="account_parity_signer_sign_qr_code_expired">Срок действия QR-кода истек</string>
+  <string name="account_parity_signer_sign_qr_code_expired_descrition">В целях безопасности сгенерированные операции действительны только в течение %s.\nПожалуйста, сгенерируйте новый QR-код и подпишите его с помощью Parity Signer</string>
+  <string name="account_parity_signer_sign_qr_code_valid_format">QR-код действителен в течение %s</string>
+  <string name="account_parity_signer_sign_qr_invalid_message">Убедитесь, что вы сканируете QR-код для текущей подписываемой операции.</string>
+  <string name="account_parity_signer_sign_title">Подписать с Parity Signer</string>
   <string name="account_private_key">Приватный ключ</string>
   <string name="account_restore_account">У меня уже есть аккаунт</string>
   <string name="account_seed_hex_symbols">64 шест. символа</string>
@@ -86,6 +107,8 @@
   <string name="account_watch_key_missing_description">Ваш кошелек доступен только для просмотра, то есть вы не можете выполнять с ним никаких операций</string>
   <string name="account_watch_key_missing_title">Упс! Ключ отсутствует</string>
   <string name="account_watch_only">watch-only</string>
+  <string name="account_welcome_hardware_wallet_subtitle">Использовать Parity Signer</string>
+  <string name="account_welcome_hardware_wallet_title">Подключить аппаратный кошелек</string>
   <string name="accounts_add_chain_account">Добавить %s аккаунт</string>
   <string name="accounts_add_wallet">Добавить кошелёк</string>
   <string name="accounts_change_chain_account">Изменить аккаунт %s</string>
@@ -112,6 +135,7 @@
   <string name="common_amount_low">Сумма слишком мала</string>
   <string name="common_applied">Применено</string>
   <string name="common_apply">Применить</string>
+  <string name="common_ask_again">Запросить еще раз</string>
   <string name="common_attention">Внимание!</string>
   <string name="common_available_format">Доступно: %s</string>
   <string name="common_average">Средний</string>
@@ -158,6 +182,7 @@
   <string name="common_i_understand">Понятно</string>
   <string name="common_info">Информация</string>
   <string name="common_input_error_set_password">Установите пароль...</string>
+  <string name="common_invalid_qr">QR-код недействителен</string>
   <string name="common_learn_more">Узнать больше</string>
   <string name="common_learn_more_v2_2_0">Узнать больше</string>
   <string name="common_left">%s осталось</string>
@@ -180,6 +205,10 @@
   <string name="common_options_title">Выберите опцию</string>
   <string name="common_paste">Вставить</string>
   <string name="common_per_year_format">%s / год</string>
+  <string name="common_permission_permissions_denied_message">Для использования этого экрана необходимы запрашиваемые разрешения. Вы должны включить их в Настройках.</string>
+  <string name="common_permission_permissions_denied_title">Отказано в разрешениях</string>
+  <string name="common_permission_permissions_needed_message">Для использования этого экрана требуются запрашиваемые разрешения.</string>
+  <string name="common_permission_permissions_needed_title">Необходимы разрешения</string>
   <string name="common_price">Цена</string>
   <string name="common_proceed">Продолжить</string>
   <string name="common_reject">Отклонить</string>
@@ -197,8 +226,10 @@
   <string name="common_substrate_address">Substrate адрес</string>
   <string name="common_time_left">Оставшееся время</string>
   <string name="common_title">Заголовок</string>
+  <string name="common_to_settings">Открыть Настройки</string>
   <string name="common_transaction_id">ID транзакции</string>
   <string name="common_transaction_submitted">Транзакция отправлена</string>
+  <string name="common_try_again">Попробовать снова</string>
   <string name="common_type">Тип</string>
   <string name="common_undefined_error_message">Пожалуйста, попробуйте снова с другими входными данными. Если ошибка повторяется, то свяжитесь со службой поддержки.</string>
   <string name="common_unknown">Неизвестно</string>

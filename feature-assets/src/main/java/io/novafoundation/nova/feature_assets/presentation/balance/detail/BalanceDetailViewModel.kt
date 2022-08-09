@@ -7,7 +7,7 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
-import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type
 import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnly.WatchOnlyMissingKeysPresenter
 import io.novafoundation.nova.feature_assets.data.mappers.mappers.mapAssetToAssetModel
 import io.novafoundation.nova.feature_assets.data.mappers.mappers.mapTokenToTokenModel
@@ -118,8 +118,8 @@ class BalanceDetailViewModel(
             val metaAccount = accountUseCase.getSelectedMetaAccount()
 
             when (metaAccount.type) {
-                LightMetaAccount.Type.SECRETS -> action()
-                LightMetaAccount.Type.WATCH_ONLY -> missingKeysPresenter.presentNoKeysFound()
+                Type.SECRETS, Type.PARITY_SIGNER -> action()
+                Type.WATCH_ONLY -> missingKeysPresenter.presentNoKeysFound()
             }
         }
     }

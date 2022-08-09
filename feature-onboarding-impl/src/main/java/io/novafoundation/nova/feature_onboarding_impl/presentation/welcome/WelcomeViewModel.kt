@@ -27,7 +27,7 @@ class WelcomeViewModel(
 
     fun createAccountClicked() {
         when (addAccountPayload) {
-            is AddAccountPayload.MetaAccount -> router.openCreateAccount(addAccountPayload)
+            is AddAccountPayload.MetaAccount -> router.openCreateAccount()
             is AddAccountPayload.ChainAccount -> router.openMnemonicScreen(accountName = null, addAccountPayload)
         }
     }
@@ -54,5 +54,9 @@ class WelcomeViewModel(
 
     fun addWatchWalletClicked() {
         router.openCreateWatchWallet()
+    }
+
+    fun connectHardwareWalletClicked() {
+        router.openStartImportParitySigner()
     }
 }

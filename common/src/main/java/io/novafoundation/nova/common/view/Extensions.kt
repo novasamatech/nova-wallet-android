@@ -5,6 +5,7 @@ import android.os.CountDownTimer
 import android.widget.CompoundButton
 import android.widget.TextView
 import androidx.annotation.StringRes
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleCoroutineScope
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.bindTo
@@ -12,6 +13,7 @@ import io.novafoundation.nova.common.utils.format
 import io.novafoundation.nova.common.utils.formatting.TimerValue
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
+import io.novafoundation.nova.common.utils.onDestroy
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
@@ -22,14 +24,18 @@ private val TIMER_TAG = R.string.common_time_left
 fun TextView.startTimer(
     value: TimerValue,
     @StringRes customMessageFormat: Int? = null,
+    lifecycle: Lifecycle? = null,
+    onTick: ((view: TextView, millisUntilFinished: Long) -> Unit)? = null,
     onFinish: ((view: TextView) -> Unit)? = null
-) = startTimer(value.millis, value.millisCalculatedAt, customMessageFormat, onFinish)
+) = startTimer(value.millis, value.millisCalculatedAt, lifecycle, customMessageFormat, onTick, onFinish)
 
 @OptIn(ExperimentalTime::class)
 fun TextView.startTimer(
     millis: Long,
     millisCalculatedAt: Long? = null,
+    lifecycle: Lifecycle? = null,
     @StringRes customMessageFormat: Int? = null,
+    onTick: ((view: TextView, millisUntilFinished: Long) -> Unit)? = null,
     onFinish: ((view: TextView) -> Unit)? = null
 ) {
     val timePassedSinceCalculation = if (millisCalculatedAt != null) System.currentTimeMillis() - millisCalculatedAt else 0L
@@ -49,6 +55,8 @@ fun TextView.startTimer(
             } ?: formattedTime
 
             this@startTimer.text = message
+
+            onTick?.invoke(this@startTimer, millisUntilFinished)
         }
 
         override fun onFinish() {
@@ -62,6 +70,10 @@ fun TextView.startTimer(
 
             setTag(TIMER_TAG, null)
         }
+    }
+
+    lifecycle?.onDestroy {
+        newTimer.cancel()
     }
 
     newTimer.start()

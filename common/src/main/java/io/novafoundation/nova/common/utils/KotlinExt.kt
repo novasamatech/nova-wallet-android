@@ -171,3 +171,5 @@ fun ByteArray?.optionalContentEquals(other: ByteArray?): Boolean {
 fun Uri.Builder.appendNullableQueryParameter(name: String, value: String?) = apply {
     value?.let { appendQueryParameter(name, value) }
 }
+
+fun ByteArray.dropBytes(count: Int) = copyOfRange(count, size)

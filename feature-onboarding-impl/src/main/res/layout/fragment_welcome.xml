@@ -24,7 +24,7 @@
         android:layout_width="193dp"
         android:layout_height="265dp"
         android:src="@drawable/drawable_nova_logo"
-        app:layout_constraintBottom_toTopOf="@+id/guideline"
+        app:layout_constraintBottom_toTopOf="@+id/createAccountBtn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -38,9 +38,9 @@
         android:layout_marginBottom="10dp"
         app:buttonLargeStyle="primary"
         app:icon="@drawable/ic_add_circle"
+        app:layout_constraintBottom_toTopOf="@+id/importAccountBtn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline"
         app:title="@string/onboarding_create_wallet" />
 
     <io.novafoundation.nova.common.view.ButtonLarge
@@ -48,24 +48,40 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
         app:buttonLargeStyle="secondary"
         app:icon="@drawable/ic_key"
+        app:layout_constraintBottom_toTopOf="@+id/welcomeConnectHardwareWallet"
         app:layout_constraintEnd_toEndOf="@+id/createAccountBtn"
         app:layout_constraintStart_toStartOf="@+id/createAccountBtn"
-        app:layout_constraintTop_toBottomOf="@+id/createAccountBtn"
         app:subTitle="@string/account_import_wallet_subtitle"
         app:title="@string/account_import_wallet_title" />
+
+    <io.novafoundation.nova.common.view.ButtonLarge
+        android:id="@+id/welcomeConnectHardwareWallet"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        app:buttonLargeStyle="secondary"
+        app:icon="@drawable/ic_hardware"
+        app:layout_constraintBottom_toTopOf="@+id/welcomeAddWatchWallet"
+        app:layout_constraintEnd_toEndOf="@+id/importAccountBtn"
+        app:layout_constraintStart_toStartOf="@+id/importAccountBtn"
+        app:subTitle="@string/account_welcome_hardware_wallet_subtitle"
+        app:title="@string/account_welcome_hardware_wallet_title" />
 
     <io.novafoundation.nova.common.view.ButtonLarge
         android:id="@+id/welcomeAddWatchWallet"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginBottom="16dp"
         app:buttonLargeStyle="secondary"
         app:icon="@drawable/ic_watch"
-        app:layout_constraintEnd_toEndOf="@+id/importAccountBtn"
-        app:layout_constraintStart_toStartOf="@+id/importAccountBtn"
-        app:layout_constraintTop_toBottomOf="@+id/importAccountBtn"
+        app:layout_constraintBottom_toTopOf="@+id/termsTv"
+        app:layout_constraintEnd_toEndOf="@+id/welcomeConnectHardwareWallet"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/welcomeConnectHardwareWallet"
         app:subTitle="@string/account_add_watch_only_description"
         app:title="@string/account_add_watch_wallet" />
 
@@ -85,11 +101,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.6" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
