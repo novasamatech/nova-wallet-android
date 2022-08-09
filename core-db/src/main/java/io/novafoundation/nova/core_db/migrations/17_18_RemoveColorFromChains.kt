@@ -5,8 +5,6 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 val RemoveColorFromChains_17_18 = object : Migration(17, 18) {
     override fun migrate(database: SupportSQLiteDatabase) {
-        database.beginTransaction()
-
         // rename
         database.execSQL("ALTER TABLE chains RENAME TO chains_old")
 
@@ -49,8 +47,5 @@ val RemoveColorFromChains_17_18 = object : Migration(17, 18) {
 
         // delete old
         database.execSQL("DROP TABLE chains_old")
-
-        database.setTransactionSuccessful()
-        database.endTransaction()
     }
 }
