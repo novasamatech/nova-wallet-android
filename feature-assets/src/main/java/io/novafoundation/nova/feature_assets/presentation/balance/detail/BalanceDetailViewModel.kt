@@ -9,27 +9,25 @@ import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnly.WatchOnlyMissingKeysPresenter
-import io.novafoundation.nova.feature_assets.data.mappers.mappers.mapAssetToAssetModel
 import io.novafoundation.nova.feature_assets.data.mappers.mappers.mapTokenToTokenModel
+import io.novafoundation.nova.feature_assets.domain.BalanceLocksInteractor
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.WalletRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy.BuyMixinFactory
-import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
+import io.novafoundation.nova.feature_assets.presentation.model.BalanceLocksModel
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryMixin
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryUi
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLocks
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 
 class BalanceDetailViewModel(
-    private val interactor: WalletInteractor,
+    private val walletInteractor: WalletInteractor,
+    private val balanceLocksInteractor: BalanceLocksInteractor,
     private val sendInteractor: SendInteractor,
     private val router: WalletRouter,
     private val assetPayload: AssetPayload,
@@ -43,10 +41,14 @@ class BalanceDetailViewModel(
     private val _hideRefreshEvent = MutableLiveData<Event<Unit>>()
     val hideRefreshEvent: LiveData<Event<Unit>> = _hideRefreshEvent
 
-    private val _showLockedDetailsEvent = MutableLiveData<Event<AssetModel>>()
-    val showFrozenDetailsEvent: LiveData<Event<AssetModel>> = _showLockedDetailsEvent
+    private val _showLockedDetailsEvent = MutableLiveData<Event<BalanceLocksModel>>()
+    val showLockedDetailsEvent: LiveData<Event<BalanceLocksModel>> = _showLockedDetailsEvent
 
-    private val assetFlow = interactor.assetFlow(assetPayload.chainId, assetPayload.chainAssetId)
+    private val assetFlow = walletInteractor.assetFlow(assetPayload.chainId, assetPayload.chainAssetId)
+        .inBackground()
+        .share()
+
+    private val balanceLocksFlow = balanceLocksInteractor.balanceLocksFlow(assetPayload.chainId, assetPayload.chainAssetId)
         .inBackground()
         .share()
 
@@ -55,9 +57,14 @@ class BalanceDetailViewModel(
         .inBackground()
         .share()
 
-    private val assetModel = assetFlow
-        .map { mapAssetToAssetModel(it) }
+    private val lockedBalanceModel = balanceLocksFlow
+        .map { mapBalanceLocksToUi(it, assetFlow.first()) }
         .inBackground()
+        .share()
+
+    val lockedBalanceAvailability = lockedBalanceModel
+        .map { isBalanceLocksAvailable(it) }
+        .flowOn(Dispatchers.Main)
         .share()
 
     val buyMixin = buyMixinFactory.create(scope = this, assetPayload)
@@ -67,6 +74,11 @@ class BalanceDetailViewModel(
     }
         .inBackground()
         .share()
+
+    init {
+        balanceLocksInteractor.runBalanceLocksUpdate()
+            .launchIn(this)
+    }
 
     override fun onCleared() {
         super.onCleared()
@@ -84,7 +96,7 @@ class BalanceDetailViewModel(
 
     fun sync() {
         viewModelScope.launch {
-            val deferredAssetSync = async { interactor.syncAssetsRates() }
+            val deferredAssetSync = async { walletInteractor.syncAssetsRates() }
             val deferredTransactionsSync = async { transactionHistoryMixin.syncFirstOperationsPage() }
 
             awaitAll(deferredAssetSync, deferredTransactionsSync)
@@ -110,7 +122,14 @@ class BalanceDetailViewModel(
     }
 
     fun lockedInfoClicked() = launch {
-        _showLockedDetailsEvent.value = Event(assetModel.first())
+        val balanceLocks = lockedBalanceModel.first()
+        if (balanceLocks != null) {
+            _showLockedDetailsEvent.value = Event(balanceLocks)
+        }
+    }
+
+    private fun isBalanceLocksAvailable(balanceLocks: BalanceLocksModel?): Boolean {
+        return balanceLocks != null
     }
 
     private fun requireSecretsWallet(action: () -> Unit) {
@@ -130,6 +149,16 @@ class BalanceDetailViewModel(
             total = mapAmountToAmountModel(asset.total, asset),
             transferable = mapAmountToAmountModel(asset.transferable, asset),
             locked = mapAmountToAmountModel(asset.locked, asset)
+        )
+    }
+
+    private fun mapBalanceLocksToUi(balanceLocks: BalanceLocks?, asset: Asset): BalanceLocksModel? {
+        if (balanceLocks == null) return null
+
+        return BalanceLocksModel(
+            balanceLocks.locks.map {
+                BalanceLocksModel.Lock(it.id, mapAmountToAmountModel(it.amount, asset))
+            }
         )
     }
 }

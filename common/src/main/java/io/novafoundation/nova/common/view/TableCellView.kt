@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.View
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.ColorRes
@@ -16,18 +17,7 @@ import coil.load
 import coil.transform.RoundedCornersTransformation
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.dpF
-import io.novafoundation.nova.common.utils.getAccentColor
-import io.novafoundation.nova.common.utils.getEnum
-import io.novafoundation.nova.common.utils.getResourceIdOrNull
-import io.novafoundation.nova.common.utils.makeGone
-import io.novafoundation.nova.common.utils.makeVisible
-import io.novafoundation.nova.common.utils.postToSelf
-import io.novafoundation.nova.common.utils.setDrawableEnd
-import io.novafoundation.nova.common.utils.setTextColorRes
-import io.novafoundation.nova.common.utils.setTextOrHide
-import io.novafoundation.nova.common.utils.setVisible
-import io.novafoundation.nova.common.utils.useAttributes
+import io.novafoundation.nova.common.utils.*
 import kotlinx.android.synthetic.main.view_table_cell.view.tableCellContent
 import kotlinx.android.synthetic.main.view_table_cell.view.tableCellImage
 import kotlinx.android.synthetic.main.view_table_cell.view.tableCellTitle
@@ -47,6 +37,31 @@ open class TableCellView @JvmOverloads constructor(
 
     enum class FieldStyle {
         TEXT, LINK
+    }
+
+    companion object {
+        fun <T> buildFixedList(list: List<T>, builder: (item: T) -> TableCellView): List<TableCellView> {
+            val cellList = list.map {
+                builder(it)
+            }
+
+            if (cellList.isNotEmpty()) {
+                cellList.last().setDividerVisible(false)
+            }
+
+            return cellList
+        }
+
+        fun createTableCellView(context: Context): TableCellView {
+            return TableCellView(context).apply {
+                layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+
+                setDividerColor(R.color.white_24)
+
+                valueSecondary.setTextColorRes(R.color.white_64)
+                title.setTextColorRes(R.color.white_64)
+            }
+        }
     }
 
     val title: TextView

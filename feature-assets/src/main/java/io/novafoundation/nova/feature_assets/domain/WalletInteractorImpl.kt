@@ -20,12 +20,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.withIndex
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 
@@ -141,19 +136,18 @@ class WalletInteractorImpl(
     private fun balancesFromAssets(
         assets: List<Asset>,
         groupedAssets: GroupedList<AssetGroup, Asset>
-    ):
-        Balances {
-            val (totalFiat, lockedFiat) = assets.fold(BigDecimal.ZERO to BigDecimal.ZERO) { (total, locked), asset ->
-                val assetTotalFiat = asset.token.fiatAmount(asset.total)
-                val assetLockedFiat = asset.token.fiatAmount(asset.locked)
+    ): Balances {
+        val (totalFiat, lockedFiat) = assets.fold(BigDecimal.ZERO to BigDecimal.ZERO) { (total, locked), asset ->
+            val assetTotalFiat = asset.token.fiatAmount(asset.total)
+            val assetLockedFiat = asset.token.fiatAmount(asset.locked)
 
-                (total + assetTotalFiat) to (locked + assetLockedFiat)
-            }
-
-            return Balances(
-                assets = groupedAssets,
-                totalBalanceFiat = totalFiat,
-                lockedBalanceFiat = lockedFiat
-            )
+            (total + assetTotalFiat) to (locked + assetLockedFiat)
         }
+
+        return Balances(
+            assets = groupedAssets,
+            totalBalanceFiat = totalFiat,
+            lockedBalanceFiat = lockedFiat
+        )
+    }
 }

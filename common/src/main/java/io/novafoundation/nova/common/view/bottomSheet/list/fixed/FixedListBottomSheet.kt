@@ -12,11 +12,7 @@ import androidx.annotation.LayoutRes
 import androidx.annotation.StringRes
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import io.novafoundation.nova.common.R
-import io.novafoundation.nova.common.utils.DialogExtensions
-import io.novafoundation.nova.common.utils.inflateChild
-import io.novafoundation.nova.common.utils.setDrawableEnd
-import io.novafoundation.nova.common.utils.setDrawableStart
-import io.novafoundation.nova.common.utils.setTextOrHide
+import io.novafoundation.nova.common.utils.*
 import kotlinx.android.synthetic.main.bottom_sheeet_fixed_list.fixedListSheetItemContainer
 import kotlinx.android.synthetic.main.bottom_sheeet_fixed_list.fixedListSheetTitle
 import kotlinx.android.synthetic.main.item_sheet_iconic_label.view.itemExternalActionContent
@@ -80,10 +76,19 @@ abstract class FixedListBottomSheet(
         container.addView(view)
     }
 
+    fun addItem(view: View) {
+        val container = viewConfiguration.container(this)
+        container.addView(view)
+    }
+
     fun <T : View> item(view: T, builder: (T) -> Unit) {
         builder.invoke(view)
 
         viewConfiguration.container(this).addView(view)
+    }
+
+    fun getCommonPadding(): Int {
+        return 16.dp(context)
     }
 }
 
