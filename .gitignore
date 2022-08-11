@@ -15,3 +15,12 @@ app/*.apk
 *.jks
 !develop_key.jks
 .java-version
+
+# ignore database schemas
+/core-db/schemas/io.novafoundation.nova.core_db.AppDatabase/*.json
+
+# database schemas exceptions
+!/core-db/schemas/io.novafoundation.nova.core_db.AppDatabase/1.json
+!/core-db/schemas/io.novafoundation.nova.core_db.AppDatabase/2.json
+!/core-db/schemas/io.novafoundation.nova.core_db.AppDatabase/8.json
+!/core-db/schemas/io.novafoundation.nova.core_db.AppDatabase/9.json
