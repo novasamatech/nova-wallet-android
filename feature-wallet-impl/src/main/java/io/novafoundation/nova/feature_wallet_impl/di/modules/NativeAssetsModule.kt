@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_wallet_impl.di.modules
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSource
@@ -13,8 +14,11 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.utility.NativeAssetBalance
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.utility.NativeAssetHistory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.utility.NativeAssetTransfers
+import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
+import io.novafoundation.nova.runtime.storage.source.StorageDataSource
+import javax.inject.Named
 import javax.inject.Qualifier
 
 @Qualifier
@@ -29,7 +33,9 @@ class NativeAssetsModule {
         chainRegistry: ChainRegistry,
         assetCache: AssetCache,
         substrateRemoteSource: SubstrateRemoteSource,
-    ) = NativeAssetBalance(chainRegistry, assetCache, substrateRemoteSource)
+        @Named(LOCAL_STORAGE_SOURCE) storageDataSource: StorageDataSource,
+        storageCache: StorageCache
+    ) = NativeAssetBalance(chainRegistry, assetCache, substrateRemoteSource, storageDataSource, storageCache)
 
     @Provides
     @FeatureScope
