@@ -9,7 +9,9 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLocks
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 
 class BalanceLocksInteractorImpl(
     private val updateSystem: UpdateSystem,

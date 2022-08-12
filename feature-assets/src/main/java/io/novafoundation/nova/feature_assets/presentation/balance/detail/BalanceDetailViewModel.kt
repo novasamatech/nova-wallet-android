@@ -4,11 +4,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnly.WatchOnlyMissingKeysPresenter
+import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.data.mappers.mappers.mapTokenToTokenModel
 import io.novafoundation.nova.feature_assets.domain.BalanceLocksInteractor
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
@@ -22,8 +24,14 @@ import io.novafoundation.nova.feature_assets.presentation.transaction.history.mi
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLocks
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import java.util.Locale
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 class BalanceDetailViewModel(
     private val walletInteractor: WalletInteractor,
@@ -35,6 +43,7 @@ class BalanceDetailViewModel(
     private val transactionHistoryMixin: TransactionHistoryMixin,
     private val accountUseCase: SelectedAccountUseCase,
     private val missingKeysPresenter: WatchOnlyMissingKeysPresenter,
+    private val resourceManager: ResourceManager,
 ) : BaseViewModel(),
     TransactionHistoryUi by transactionHistoryMixin {
 
@@ -64,7 +73,7 @@ class BalanceDetailViewModel(
 
     val lockedBalanceAvailability = lockedBalanceModel
         .map { isBalanceLocksAvailable(it) }
-        .flowOn(Dispatchers.Main)
+        .inBackground()
         .share()
 
     val buyMixin = buyMixinFactory.create(scope = this, assetPayload)
@@ -157,8 +166,21 @@ class BalanceDetailViewModel(
 
         return BalanceLocksModel(
             balanceLocks.locks.map {
-                BalanceLocksModel.Lock(it.id, mapAmountToAmountModel(it.amount, asset))
+                BalanceLocksModel.Lock(
+                    mapBalanceLockIdToUi(it.id),
+                    mapAmountToAmountModel(it.amount, asset)
+                )
             }
         )
+    }
+
+    private fun mapBalanceLockIdToUi(id: String): String {
+        return when (id) {
+            "staking" -> resourceManager.getString(R.string.wallet_balance_locks_staking)
+            "democrac" -> resourceManager.getString(R.string.wallet_balance_locks_democrac)
+            "vesting" -> resourceManager.getString(R.string.wallet_balance_locks_vesting)
+            "phrelect" -> resourceManager.getString(R.string.wallet_balance_locks_phrelect)
+            else -> id.capitalize(Locale.getDefault())
+        }
     }
 }

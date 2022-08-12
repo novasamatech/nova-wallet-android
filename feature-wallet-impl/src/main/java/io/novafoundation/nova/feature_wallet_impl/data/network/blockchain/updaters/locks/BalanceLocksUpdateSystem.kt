@@ -12,7 +12,10 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getSocket
 import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.storage.subscribeUsing
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.onCompletion
 
 class BalanceLocksUpdateSystemFactoryImpl(
     private val chainRegistry: ChainRegistry,
@@ -42,16 +45,15 @@ class BalanceLocksUpdateSystem(
         val socket = chainRegistry.getSocket(chainId)
         val subscriptionBuilder = StorageSubscriptionBuilder.create(socket)
 
-        kotlin.runCatching {
-            updater.listenForUpdates(subscriptionBuilder)
+        try {
+            val updaterFlow = updater.listenForUpdates(subscriptionBuilder)
+            val cancelable = socket.subscribeUsing(subscriptionBuilder.build())
+            updaterFlow.onCompletion {
+                cancelable.cancel()
+            }
+        } catch (e: Exception) {
+            Log.e(logTag, "Failed to start $selfName for ${chain.name}: ${e.message}")
+            emptyFlow()
         }
-            .onSuccess {
-                val cancelable = socket.subscribeUsing(subscriptionBuilder.build())
-                it.onCompletion {
-                    cancelable.cancel()
-                }
-            }.onFailure {
-                Log.e(logTag, "Failed to start $selfName for ${chain.name}: ${it.message}")
-            }.getOrNull() ?: emptyFlow()
     }
 }

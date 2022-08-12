@@ -12,7 +12,12 @@ import kotlinx.coroutines.flow.emptyFlow
 class UnsupportedAssetBalance : AssetBalance {
     override suspend fun queryBalanceLocks(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId) = unsupported()
 
-    override suspend fun startSyncingBalanceLocks(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId, subscriptionBuilder: SubscriptionBuilder) = unsupported()
+    override suspend fun startSyncingBalanceLocks(
+        chain: Chain,
+        chainAsset: Chain.Asset,
+        accountId: AccountId,
+        subscriptionBuilder: SubscriptionBuilder
+    ) = unsupported()
 
     override suspend fun isSelfSufficient(chainAsset: Chain.Asset) = unsupported()
 

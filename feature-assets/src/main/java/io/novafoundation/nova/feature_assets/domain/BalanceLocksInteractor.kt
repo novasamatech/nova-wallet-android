@@ -5,7 +5,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLocks
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.flow.Flow
 
-
 interface BalanceLocksInteractor {
 
     fun balanceLocksFlow(chainId: ChainId, chainAssetId: Int): Flow<BalanceLocks?>

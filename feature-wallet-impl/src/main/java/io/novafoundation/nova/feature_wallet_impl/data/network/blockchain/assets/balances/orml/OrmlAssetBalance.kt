@@ -23,7 +23,6 @@ import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
 import java.math.BigInteger
 
@@ -43,19 +42,18 @@ class OrmlAssetBalance(
         }
     }
 
-    override suspend fun startSyncingBalanceLocks(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId, subscriptionBuilder: SubscriptionBuilder): Flow<*> {
+    override suspend fun startSyncingBalanceLocks(
+        chain: Chain,
+        chainAsset: Chain.Asset,
+        accountId: AccountId,
+        subscriptionBuilder: SubscriptionBuilder
+    ): Flow<*> {
         val runtime = chainRegistry.getRuntime(chain.id)
 
-        val key = try {
-            val currencyId = chainAsset.ormlCurrencyId(runtime)
-            runtime.metadata.tokens()
-                .storage("Locks")
-                .storageKey(runtime, accountId, currencyId)
-        } catch (e: Exception) {
-            Log.e(LOG_TAG, "Failed to construct account storage key: ${e.message} in ${chain.name}")
-
-            return emptyFlow<Nothing>()
-        }
+        val currencyId = chainAsset.ormlCurrencyId(runtime)
+        val key = runtime.metadata.tokens()
+            .storage("Locks")
+            .storageKey(runtime, accountId, currencyId)
 
         return subscriptionBuilder.subscribe(key)
             .map { change ->

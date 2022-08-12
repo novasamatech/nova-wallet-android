@@ -52,13 +52,7 @@ class NativeAssetBalance(
     ): Flow<*> {
         val runtime = chainRegistry.getRuntime(chain.id)
 
-        val key = try {
-            runtime.metadata.balances().storage("Locks").storageKey(runtime, accountId)
-        } catch (e: Exception) {
-            Log.e(LOG_TAG, "Failed to construct account storage key: ${e.message} in ${chain.name}")
-
-            return emptyFlow<Nothing>()
-        }
+        val key = runtime.metadata.balances().storage("Locks").storageKey(runtime, accountId)
 
         return subscriptionBuilder.subscribe(key)
             .map { change ->

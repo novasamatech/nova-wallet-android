@@ -12,7 +12,12 @@ import androidx.annotation.LayoutRes
 import androidx.annotation.StringRes
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import io.novafoundation.nova.common.R
-import io.novafoundation.nova.common.utils.*
+import io.novafoundation.nova.common.utils.DialogExtensions
+import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.setDrawableEnd
+import io.novafoundation.nova.common.utils.setDrawableStart
+import io.novafoundation.nova.common.utils.setTextOrHide
+import io.novafoundation.nova.common.utils.dp
 import kotlinx.android.synthetic.main.bottom_sheeet_fixed_list.fixedListSheetItemContainer
 import kotlinx.android.synthetic.main.bottom_sheeet_fixed_list.fixedListSheetTitle
 import kotlinx.android.synthetic.main.item_sheet_iconic_label.view.itemExternalActionContent

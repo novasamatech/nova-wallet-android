@@ -25,18 +25,20 @@ class LockedTokensBottomSheet(
     }
 
     private fun createViewItems(locks: List<BalanceLocksModel.Lock>): List<TableCellView> {
-        return TableCellView.buildFixedList(locks) {
-            val view = TableCellView.createTableCellView(context)
-            view.setTitle(it.formattedId(context))
-            view.setDividerColor(R.color.white_8)
-            view.showAmount(it.amount)
-            view.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+        return TableCellView.buildFixedList(locks) { createViewItem(it) }
+    }
+
+    private fun createViewItem(lock: BalanceLocksModel.Lock): TableCellView {
+        return TableCellView.createTableCellView(context).apply {
+            setTitle(lock.name)
+            setDividerColor(R.color.white_8)
+            showAmount(lock.amount)
+            updateLayoutParams<ViewGroup.MarginLayoutParams> {
                 updateMargins(
                     left = getCommonPadding(),
                     right = getCommonPadding()
                 )
             }
-            view
         }
     }
 }

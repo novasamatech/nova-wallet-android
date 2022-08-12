@@ -44,7 +44,6 @@ class BalanceDetailModule {
         return balanceLocksUpdateSystemFactory.create(assetPayload.chainId, assetPayload.chainAssetId)
     }
 
-
     @Provides
     @ScreenScope
     fun provideBalanceLocksInteractor(
@@ -98,7 +97,8 @@ class BalanceDetailModule {
         buyMixinFactory: BuyMixinFactory,
         assetPayload: AssetPayload,
         accountUseCase: SelectedAccountUseCase,
-        missingKeysPresenter: WatchOnlyMissingKeysPresenter
+        missingKeysPresenter: WatchOnlyMissingKeysPresenter,
+        resourceManager: ResourceManager
     ): ViewModel {
         return BalanceDetailViewModel(
             walletInteractor = walletInteractor,
@@ -109,7 +109,8 @@ class BalanceDetailModule {
             buyMixinFactory = buyMixinFactory,
             transactionHistoryMixin = transactionHistoryMixin,
             accountUseCase = accountUseCase,
-            missingKeysPresenter = missingKeysPresenter
+            missingKeysPresenter = missingKeysPresenter,
+            resourceManager = resourceManager
         )
     }
 
