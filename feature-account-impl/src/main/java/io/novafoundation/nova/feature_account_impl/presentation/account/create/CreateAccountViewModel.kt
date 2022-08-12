@@ -1,31 +1,16 @@
 package io.novafoundation.nova.feature_account_impl.presentation.account.create
 
-import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.mixin.MixinFactory
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
-import io.novafoundation.nova.feature_account_impl.data.mappers.mapNameChooserStateToOptionalName
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.AccountNameChooserMixin
-import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.WithAccountNameChooserMixin
+import io.novafoundation.nova.feature_account_impl.presentation.common.createName.CreateWalletNameViewModel
 
 class CreateAccountViewModel(
     private val router: AccountRouter,
-    private val payload: AddAccountPayload,
-    accountNameChooserFactory: MixinFactory<AccountNameChooserMixin.Presentation>,
-) : BaseViewModel(),
-    WithAccountNameChooserMixin {
+    private val resourceManager: ResourceManager,
+) : CreateWalletNameViewModel(router, resourceManager) {
 
-    override val accountNameChooser: AccountNameChooserMixin.Presentation = accountNameChooserFactory.create(scope = this)
-
-    val nextButtonEnabledLiveData = accountNameChooser.nameValid
-
-    fun homeButtonClicked() {
-        router.back()
-    }
-
-    fun nextClicked() {
-        val nameState = accountNameChooser.nameState.value!!
-
-        router.openMnemonicScreen(mapNameChooserStateToOptionalName(nameState), payload)
+    override fun proceed(name: String) {
+        router.openMnemonicScreen(name, AddAccountPayload.MetaAccount)
     }
 }

@@ -33,6 +33,9 @@ val Chain.typesUsage: TypesUsage
 val Chain.utilityAsset
     get() = assets.first(Chain.Asset::isUtilityAsset)
 
+val Chain.isSubstrateBased
+    get() = !isEthereumBased
+
 val Chain.commissionAsset
     get() = utilityAsset
 

@@ -7,6 +7,7 @@ import androidx.lifecycle.lifecycleScope
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.list.setGroupedListSpacings
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
@@ -16,7 +17,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExt
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.setupImportTypeChooser
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
-import io.novafoundation.nova.feature_account_impl.presentation.account.details.model.AccountInChainUi
+import io.novafoundation.nova.feature_account_impl.presentation.common.chainAccounts.AccountInChainUi
+import io.novafoundation.nova.feature_account_impl.presentation.common.chainAccounts.ChainAccountsAdapter
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.ui.setupAddAccountLauncher
 import kotlinx.android.synthetic.main.fragment_account_details.accountDetailsChainAccounts
 import kotlinx.android.synthetic.main.fragment_account_details.accountDetailsNameField
@@ -58,6 +60,12 @@ class AccountDetailsFragment : BaseFragment<AccountDetailsViewModel>(), ChainAcc
 
         accountDetailsChainAccounts.setHasFixedSize(true)
         accountDetailsChainAccounts.adapter = adapter
+        accountDetailsChainAccounts.setGroupedListSpacings(
+            groupTopSpacing = 24,
+            groupBottomSpacing = 12,
+            firstItemTopSpacing = 16,
+            itemBottomSpacing = 4,
+        )
     }
 
     override fun inject() {

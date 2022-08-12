@@ -5,13 +5,15 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.add.Impo
 
 interface OnboardingRouter {
 
-    fun openCreateAccount(addAccountPayload: AddAccountPayload.MetaAccount)
+    fun openCreateAccount()
 
     fun openMnemonicScreen(accountName: String?, payload: AddAccountPayload)
 
     fun openImportAccountScreen(payload: ImportAccountPayload)
 
     fun openCreateWatchWallet()
+
+    fun openStartImportParitySigner()
 
     fun back()
 }

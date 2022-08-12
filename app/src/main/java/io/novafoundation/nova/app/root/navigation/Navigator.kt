@@ -12,7 +12,6 @@ import io.novafoundation.nova.common.utils.postToUiThread
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportAccountPayload
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.account.create.CreateAccountFragment
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.AccountDetailsFragment
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ExportJsonConfirmFragment
@@ -25,6 +24,11 @@ import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.backup.
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.ConfirmMnemonicFragment
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.ConfirmMnemonicPayload
 import io.novafoundation.nova.feature_account_impl.presentation.node.details.NodeDetailsFragment
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerAccountPayload
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.finish.FinishImportParitySignerFragment
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.preview.PreviewImportParitySignerFragment
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan.ScanSignParitySignerFragment
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan.model.ScanSignParitySignerPayload
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.PinCodeAction
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.PincodeFragment
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.ToolbarConfiguration
@@ -105,8 +109,8 @@ class Navigator(
         navController?.navigate(R.id.action_splash_to_pin, bundle)
     }
 
-    override fun openCreateAccount(addAccountPayload: AddAccountPayload.MetaAccount) {
-        navController?.navigate(R.id.action_welcomeFragment_to_createAccountFragment, CreateAccountFragment.getBundle(addAccountPayload))
+    override fun openCreateAccount() {
+        navController?.navigate(R.id.action_welcomeFragment_to_createAccountFragment)
     }
 
     override fun openMain() {
@@ -135,6 +139,7 @@ class Navigator(
             R.id.importAccountFragment -> navController?.navigate(R.id.action_importAccountFragment_to_pincodeFragment, bundle)
             R.id.confirmMnemonicFragment -> navController?.navigate(R.id.action_confirmMnemonicFragment_to_pincodeFragment, bundle)
             R.id.createWatchWalletFragment -> navController?.navigate(R.id.action_watchWalletFragment_to_pincodeFragment, bundle)
+            R.id.finishImportParitySignerFragment -> navController?.navigate(R.id.action_finishImportParitySignerFragment_to_pincodeFragment, bundle)
         }
     }
 
@@ -480,8 +485,38 @@ class Navigator(
         navController?.navigate(R.id.action_mainFragment_to_pinCodeFragment, bundle)
     }
 
+    override fun openScanImportParitySigner() {
+        navController?.navigate(R.id.action_startImportParitySignerFragment_to_scanImportParitySignerFragment)
+    }
+
+    override fun openPreviewImportParitySigner(payload: ParitySignerAccountPayload) {
+        val bundle = PreviewImportParitySignerFragment.getBundle(payload)
+
+        navController?.navigate(R.id.action_scanImportParitySignerFragment_to_previewImportParitySignerFragment, bundle)
+    }
+
+    override fun openFinishImportParitySigner(payload: ParitySignerAccountPayload) {
+        val bundle = FinishImportParitySignerFragment.getBundle(payload)
+
+        navController?.navigate(R.id.action_previewImportParitySignerFragment_to_finishImportParitySignerFragment, bundle)
+    }
+
+    override fun openScanParitySignerSignature(payload: ScanSignParitySignerPayload) {
+        val bundle = ScanSignParitySignerFragment.getBundle(payload)
+
+        navController?.navigate(R.id.action_showSignParitySignerFragment_to_scanSignParitySignerFragment, bundle)
+    }
+
+    override fun finishParitySignerFlow() {
+        navController?.navigate(R.id.action_finish_parity_signer_flow)
+    }
+
     override fun openCreateWatchWallet() {
         navController?.navigate(R.id.action_welcomeFragment_to_createWatchWalletFragment)
+    }
+
+    override fun openStartImportParitySigner() {
+        navController?.navigate(R.id.action_welcomeFragment_to_import_parity_signer_graph)
     }
 
     override fun withPinCodeCheckRequired(

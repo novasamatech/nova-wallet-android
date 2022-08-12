@@ -2,14 +2,17 @@ package io.novafoundation.nova.feature_account_impl.presentation
 
 import io.novafoundation.nova.common.navigation.DelayedNavigation
 import io.novafoundation.nova.common.navigation.PinRequired
+import io.novafoundation.nova.common.navigation.ReturnableRouter
 import io.novafoundation.nova.common.navigation.SecureRouter
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportAccountPayload
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ExportJsonConfirmPayload
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.ConfirmMnemonicPayload
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerAccountPayload
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan.model.ScanSignParitySignerPayload
 
-interface AccountRouter : SecureRouter {
+interface AccountRouter : SecureRouter, ReturnableRouter {
 
     fun openMain()
 
@@ -18,8 +21,6 @@ interface AccountRouter : SecureRouter {
     fun openMnemonicScreen(accountName: String?, payload: AddAccountPayload)
 
     fun openConfirmMnemonicOnCreate(confirmMnemonicPayload: ConfirmMnemonicPayload)
-
-    fun back()
 
     fun openWallets()
     fun openSwitchWallet()
@@ -56,4 +57,11 @@ interface AccountRouter : SecureRouter {
     fun finishExportFlow()
 
     fun openChangePinCode()
+
+    fun openScanImportParitySigner()
+    fun openPreviewImportParitySigner(payload: ParitySignerAccountPayload)
+    fun openFinishImportParitySigner(payload: ParitySignerAccountPayload)
+
+    fun openScanParitySignerSignature(payload: ScanSignParitySignerPayload)
+    fun finishParitySignerFlow()
 }

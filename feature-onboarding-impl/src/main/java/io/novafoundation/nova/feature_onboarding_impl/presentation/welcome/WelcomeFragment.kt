@@ -21,6 +21,7 @@ import kotlinx.android.synthetic.main.fragment_welcome.createAccountBtn
 import kotlinx.android.synthetic.main.fragment_welcome.importAccountBtn
 import kotlinx.android.synthetic.main.fragment_welcome.termsTv
 import kotlinx.android.synthetic.main.fragment_welcome.welcomeAddWatchWallet
+import kotlinx.android.synthetic.main.fragment_welcome.welcomeConnectHardwareWallet
 
 class WelcomeFragment : BaseFragment<WelcomeViewModel>() {
 
@@ -60,6 +61,7 @@ class WelcomeFragment : BaseFragment<WelcomeViewModel>() {
         createAccountBtn.setOnClickListener { viewModel.createAccountClicked() }
         importAccountBtn.setOnClickListener { viewModel.importAccountClicked() }
         welcomeAddWatchWallet.setOnClickListener { viewModel.addWatchWalletClicked() }
+        welcomeConnectHardwareWallet.setOnClickListener { viewModel.connectHardwareWalletClicked() }
 
         back.setOnClickListener { viewModel.backClicked() }
     }

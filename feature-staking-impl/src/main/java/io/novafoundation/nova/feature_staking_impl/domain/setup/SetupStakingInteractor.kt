@@ -1,8 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.domain.setup
 
-import jp.co.soramitsu.fearless_utils.extensions.fromHex
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_staking_api.domain.model.RewardDestination
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
@@ -12,6 +9,9 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.multiAddressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import jp.co.soramitsu.fearless_utils.extensions.fromHex
+import jp.co.soramitsu.fearless_utils.extensions.toHexString
+import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
@@ -52,14 +52,12 @@ class SetupStakingInteractor(
         controllerAddress: String,
         validatorAccountIds: List<String>,
         bondPayload: BondPayload?,
-    ) = withContext(Dispatchers.Default) {
+    ): Result<String> = withContext(Dispatchers.Default) {
         val (chain, chainAsset) = stakingSharedState.assetWithChain.first()
         val accountId = chain.accountIdOf(controllerAddress)
 
-        runCatching {
-            extrinsicService.submitExtrinsicWithAnySuitableWallet(chain, accountId) {
-                formExtrinsic(chain, chainAsset, controllerAddress, validatorAccountIds, bondPayload)
-            }
+        extrinsicService.submitExtrinsicWithAnySuitableWallet(chain, accountId) {
+            formExtrinsic(chain, chainAsset, controllerAddress, validatorAccountIds, bondPayload)
         }
     }
 

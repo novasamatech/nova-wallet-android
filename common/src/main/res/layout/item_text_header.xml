@@ -5,8 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingStart="16dp"
-    android:paddingTop="24dp"
-    android:paddingBottom="12dp"
     android:id="@+id/textHeader"
     android:textColor="@color/white_64"
     tools:background="@color/black"

@@ -12,35 +12,41 @@
         tools:layout="@layout/fragment_dapp_browser">
 
         <action
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
             android:id="@+id/action_DAppBrowserFragment_to_ConfirmSignExtrinsicFragment"
             app:destination="@id/ConfirmSignExtrinsicFragment" />
 
         <action
+            android:id="@+id/action_DAppBrowserFragment_to_dappSearchFragment"
+            app:destination="@id/dappSearchFragment"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit"
-            android:id="@+id/action_DAppBrowserFragment_to_dappSearchFragment"
-            app:destination="@id/dappSearchFragment" />
+            app:popExitAnim="@anim/fragment_close_exit" />
 
         <action
+            android:id="@+id/action_DAppBrowserFragment_to_addToFavouritesFragment"
+            app:destination="@id/addToFavouritesFragment"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit"
-            android:id="@+id/action_DAppBrowserFragment_to_addToFavouritesFragment"
-            app:destination="@id/addToFavouritesFragment" />
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
-    <dialog
+    <fragment
         android:id="@+id/ConfirmSignExtrinsicFragment"
         android:name="io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignExtrinsicFragment"
         android:label="ConfirmSignExtrinsicFragment"
+        app:useAdd="true"
         tools:layout="@layout/bottom_sheet_confirm_sign_extrinsic">
+
         <action
             android:id="@+id/action_ConfirmSignExtrinsicFragment_to_extrinsicDetailsFragment"
             app:destination="@id/extrinsicDetailsFragment" />
-    </dialog>
+    </fragment>
 
     <dialog
         android:id="@+id/extrinsicDetailsFragment"
@@ -49,16 +55,16 @@
         tools:layout="@layout/fragment_dapp_extrinsic_details" />
 
     <fragment
-        app:useAdd="true"
         android:id="@+id/dappSearchFragment"
         android:name="io.novafoundation.nova.feature_dapp_impl.presentation.search.DappSearchFragment"
         android:label="DappSearchFragment"
+        app:useAdd="true"
         tools:layout="@layout/fragment_search_dapp" />
 
     <fragment
-        app:useAdd="true"
         android:id="@+id/addToFavouritesFragment"
-        tools:layout="@layout/fragment_add_to_favourites"
         android:name="io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites.AddToFavouritesFragment"
-        android:label="AddToFavouritesFragment" />
+        android:label="AddToFavouritesFragment"
+        app:useAdd="true"
+        tools:layout="@layout/fragment_add_to_favourites" />
 </navigation>

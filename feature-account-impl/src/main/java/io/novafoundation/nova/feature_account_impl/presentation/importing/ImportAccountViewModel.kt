@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.presentation.importing
 
 import android.content.Intent
-import androidx.lifecycle.asFlow
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.MixinFactory
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -50,7 +49,7 @@ class ImportAccountViewModel(
 
     private val nextButtonEnabledFlow = combine(
         importSource.fieldsValidFlow,
-        accountNameChooser.nameValid.asFlow(),
+        accountNameChooser.nameValid,
     ) { fieldsValid, nameValid -> fieldsValid and nameValid }
 
     val nextButtonState = nextButtonEnabledFlow.combine(importInProgressFlow) { enabled, inProgress ->

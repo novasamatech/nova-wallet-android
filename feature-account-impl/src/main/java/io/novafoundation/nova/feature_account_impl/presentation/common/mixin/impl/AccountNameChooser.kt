@@ -1,12 +1,12 @@
 package io.novafoundation.nova.feature_account_impl.presentation.common.mixin.impl
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.map
 import io.novafoundation.nova.common.mixin.MixinFactory
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.AccountNameChooserMixin
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 
 class AccountNameChooserFactory(
     private val payload: AddAccountPayload,
@@ -25,9 +25,9 @@ class AccountNameChooserProvider(
         nameState.value = maybeInputOf(newName)
     }
 
-    override val nameState = MutableLiveData(maybeInputOf(""))
+    override val nameState = MutableStateFlow(maybeInputOf(""))
 
-    override val nameValid: LiveData<Boolean> = nameState.map {
+    override val nameValid: Flow<Boolean> = nameState.map {
         when (it) {
             is AccountNameChooserMixin.State.NoInput -> true
             is AccountNameChooserMixin.State.Input -> it.value.isNotEmpty()
