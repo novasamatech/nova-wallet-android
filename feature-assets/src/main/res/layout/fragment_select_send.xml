@@ -41,33 +41,55 @@
             android:layout_marginBottom="8dp" />
 
         <TextView
+            android:id="@+id/selectSendToTitle"
             style="@style/TextAppearance.NovaFoundation.Bold.Title2"
             android:layout_width="wrap_content"
-            android:id="@+id/selectSendToTitle"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
-            android:visibility="gone"
-            app:layout_wrapBefore="true"
             android:includeFontPadding="false"
-            android:text="@string/wallet_send_tokens_to"/>
+            android:text="@string/wallet_send_tokens_to"
+            android:visibility="gone"
+            app:layout_wrapBefore="true" />
 
         <io.novafoundation.nova.feature_account_api.view.ChainChipView
             android:id="@+id/selectSendDestinationChain"
             android:layout_width="wrap_content"
-            android:visibility="gone"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="8dp"
+            android:visibility="gone" />
     </com.google.android.flexbox.FlexboxLayout>
 
-    <TextView
-        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
-        android:layout_width="wrap_content"
+    <FrameLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
-        android:text="@string/wallet_recipient"
-        android:textColor="@color/white_64" />
+        android:paddingHorizontal="16dp">
+
+        <TextView
+            style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:text="@string/wallet_recipient"
+            android:textColor="@color/white_64" />
+
+        <TextView
+            style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:gravity="center"
+            android:text="@string/wallet_select"
+            android:textColor="@color/accentBlue"
+            app:drawableEndCompat="@drawable/ic_chevron_down_16"
+            app:drawableStartCompat="@drawable/ic_users"
+            app:drawableTint="@color/accentBlue"
+            tools:drawableEnd="@drawable/ic_chevron_down_16"
+            tools:drawableStart="@drawable/ic_users"
+            tools:drawableTint="@color/accentBlue" />
+
+    </FrameLayout>
 
     <io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputField
         android:id="@+id/selectSendRecipient"
