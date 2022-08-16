@@ -63,32 +63,53 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:paddingHorizontal="16dp">
+        android:layout_marginTop="4dp"
+        android:clipChildren="false"
+        android:paddingStart="16dp"
+        android:paddingEnd="12dp">
 
         <TextView
             style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="start"
+            android:layout_gravity="start|bottom"
+            android:layout_marginBottom="4dp"
             android:text="@string/wallet_recipient"
             android:textColor="@color/white_64" />
 
-        <TextView
-            style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        <LinearLayout
             android:id="@+id/selectWallet"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:gravity="center"
-            android:text="@string/wallet_select"
-            android:textColor="@color/accentBlue"
-            app:drawableEndCompat="@drawable/ic_chevron_down_16"
-            app:drawableStartCompat="@drawable/ic_users"
-            app:drawableTint="@color/accentBlue"
-            tools:drawableEnd="@drawable/ic_chevron_down_16"
-            tools:drawableStart="@drawable/ic_users"
-            tools:drawableTint="@color/accentBlue" />
+            android:layout_height="24dp"
+            android:layout_gravity="end|center_vertical"
+            android:background="@drawable/bg_button_primary"
+            android:orientation="horizontal"
+            android:padding="4dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="5dp"
+                app:srcCompat="@drawable/ic_users"
+                app:tint="@color/accentBlue"
+                tools:tint="@color/accentBlue" />
+
+            <TextView
+                style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:text="@string/wallet_select"
+                android:textColor="@color/accentBlue"
+                app:drawableEndCompat="@drawable/ic_chevron_down_16"
+                app:drawableTint="@color/accentBlue"
+                tools:drawableEnd="@drawable/ic_chevron_down_16"
+                tools:drawableTint="@color/accentBlue" />
+
+        </LinearLayout>
 
     </FrameLayout>
 
@@ -97,7 +118,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="4dp"
         android:layout_marginEnd="16dp" />
 
     <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.ChooseAmountView

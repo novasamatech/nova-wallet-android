@@ -18,7 +18,7 @@ class SelectWalletViewModel(
     private val selectWalletResponder: SelectWalletResponder,
     private val accountInteractor: AccountInteractor,
     private val request: SelectWalletRequester.Request,
-) : WalletListViewModel(accountListingMixinFactory), MetaAccountSelectRules {
+) : WalletListViewModel(), MetaAccountSelectRules {
 
     override val walletsListingMixin: MetaAccountListingMixin = accountListingMixinFactory.create(this, this)
 

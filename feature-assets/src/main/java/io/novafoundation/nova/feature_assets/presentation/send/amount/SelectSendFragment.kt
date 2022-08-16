@@ -59,7 +59,10 @@ class SelectSendFragment : BaseFragment<SelectSendViewModel>() {
         selectSendToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         selectSendDestinationChain.setOnClickListener { viewModel.destinationChainClicked() }
+
+        selectWallet.background = getRoundedCornerDrawable(cornerSizeDp = 8).withRipple()
         selectWallet.setOnClickListener { viewModel.selectRecipientWallet() }
+
         selectSendDestinationChain.setChangeable(true)
 
         selectSendCrossChainFee.makeGone() // gone inititally
