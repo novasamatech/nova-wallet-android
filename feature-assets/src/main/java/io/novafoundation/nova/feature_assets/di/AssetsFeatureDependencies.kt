@@ -28,6 +28,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdateSystemFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
@@ -112,6 +113,8 @@ interface AssetsFeatureDependencies {
     fun amountChooserFactory(): AmountChooserMixin.Factory
 
     fun walletConstants(): WalletConstants
+
+    fun balanceLocksUpdateSystemFactory(): BalanceLocksUpdateSystemFactory
 
     val assetsSourceRegistry: AssetSourceRegistry
 

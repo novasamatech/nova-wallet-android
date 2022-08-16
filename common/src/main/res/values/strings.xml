@@ -824,8 +824,12 @@
   <string name="wallet_balance_details_total">Total balance</string>
   <string name="wallet_balance_details_total_after">Total after transfer</string>
   <string name="wallet_balance_frozen">Frozen</string>
-  <string name="wallet_balance_locked_template">Locked %s</string>
+  <string name="wallet_balance_locked_template">Locked</string>
   <string name="wallet_balance_locked">Locked</string>
+  <string name="wallet_balance_locks_staking">Staking</string>
+  <string name="wallet_balance_locks_democrac">Democracy</string>
+  <string name="wallet_balance_locks_vesting">Vesting</string>
+  <string name="wallet_balance_locks_phrelect">Elections</string>
   <string name="wallet_balance_redeemable">Redeemable</string>
   <string name="wallet_balance_reserved">Reserved</string>
   <string name="wallet_balance_transferable">Transferable</string>
@@ -857,4 +861,5 @@
   <string name="wallet_transfer_details_title">Transfer details</string>
   <string name="wallet_your_balance">Your balance</string>
   <string name="yesterday">Yesterday</string>
+
 </resources>
