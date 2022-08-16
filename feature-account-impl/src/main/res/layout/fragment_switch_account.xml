@@ -2,13 +2,13 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/switchAccountItemContainer"
+    android:id="@+id/walletListItemContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
     <View
-        android:id="@+id/switchAccountPuller"
+        android:id="@+id/walletListPuller"
         style="@style/Widget.Nova.Puller"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="4dp" />
@@ -21,7 +21,7 @@
         tools:ignore="UseCompoundDrawables">
 
         <TextView
-            android:id="@+id/switchAccountTitle"
+            android:id="@+id/walletListTitle"
             style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -31,18 +31,16 @@
             android:text="@string/account_select_wallet" />
 
         <ImageView
-            android:id="@+id/switchAccountRightAction"
+            android:id="@+id/walletListBarAction"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="12dp"
-            android:src="@drawable/ic_settings_outline"
-            app:tint="@color/actions_color"
-            tools:src="@drawable/ic_settings_outline" />
+            app:tint="@color/actions_color" />
     </LinearLayout>
 
     <androidx.core.widget.NestedScrollView
-        android:id="@+id/switchAccountScrollView"
+        android:id="@+id/walletListScrollView"
         android:layout_width="match_parent"
         android:paddingBottom="16dp"
         android:clipToPadding="false"
@@ -51,7 +49,7 @@
         android:layout_weight="1">
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/switchAccountContent"
+                android:id="@+id/walletListContent"
                 android:overScrollMode="never"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

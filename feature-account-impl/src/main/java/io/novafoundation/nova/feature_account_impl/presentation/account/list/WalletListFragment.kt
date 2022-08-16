@@ -1,19 +1,19 @@
-package io.novafoundation.nova.feature_account_impl.presentation.account.select
+package io.novafoundation.nova.feature_account_impl.presentation.account.list
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.DrawableRes
 import io.novafoundation.nova.common.base.BaseBottomSheetFragment
-import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
-import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.AccountsAdapter
 import io.novafoundation.nova.feature_account_impl.presentation.account.model.MetaAccountUi
-import kotlinx.android.synthetic.main.fragment_switch_account.switchAccountContent
-import kotlinx.android.synthetic.main.fragment_switch_account.switchAccountRightAction
+import kotlinx.android.synthetic.main.fragment_switch_account.walletListContent
+import kotlinx.android.synthetic.main.fragment_switch_account.walletListBarAction
 
-class AccountSwitchFragment : BaseBottomSheetFragment<AccountSwitchViewModel>(), AccountsAdapter.AccountItemHandler {
+abstract class WalletListFragment<T : WalletListViewModel> : BaseBottomSheetFragment<T>(),
+    AccountsAdapter.AccountItemHandler {
 
     private val adapter by lazy(LazyThreadSafetyMode.NONE) {
         AccountsAdapter(this, initialMode = viewModel.mode)
@@ -26,24 +26,10 @@ class AccountSwitchFragment : BaseBottomSheetFragment<AccountSwitchViewModel>(),
     ) = layoutInflater.inflate(R.layout.fragment_switch_account, container, false)
 
     override fun initViews() {
-        switchAccountRightAction.setOnClickListener {
-            viewModel.settingsClicked()
-        }
-
-        switchAccountContent.adapter = adapter
+        walletListContent.adapter = adapter
     }
 
-    override fun inject() {
-        FeatureUtils.getFeature<AccountFeatureComponent>(
-            requireContext(),
-            AccountFeatureApi::class.java
-        )
-            .switchAccountComponentFactory()
-            .create(this)
-            .inject(this)
-    }
-
-    override fun subscribe(viewModel: AccountSwitchViewModel) {
+    override fun subscribe(viewModel: T) {
         viewModel.walletsListingMixin.metaAccountsFlow.observe(adapter::submitList)
     }
 
@@ -53,5 +39,13 @@ class AccountSwitchFragment : BaseBottomSheetFragment<AccountSwitchViewModel>(),
 
     override fun deleteClicked(accountModel: MetaAccountUi) {
         // no delete possible
+    }
+
+    fun setActionIcon(@DrawableRes drawableRes: Int) {
+        walletListBarAction.setImageResource(drawableRes)
+    }
+
+    fun setActionClickListener(listener: View.OnClickListener?) {
+        walletListBarAction.setOnClickListener(listener)
     }
 }

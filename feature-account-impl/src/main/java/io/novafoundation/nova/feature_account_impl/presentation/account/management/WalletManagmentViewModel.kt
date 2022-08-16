@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.account.list
+package io.novafoundation.nova.feature_account_impl.presentation.account.management
 
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-class AccountListViewModel(
+class WalletManagmentViewModel(
     private val accountInteractor: AccountInteractor,
     private val accountRouter: AccountRouter,
     private val resourceManager: ResourceManager,

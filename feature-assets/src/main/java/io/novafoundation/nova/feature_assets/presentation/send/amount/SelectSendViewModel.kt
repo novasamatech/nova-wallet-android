@@ -14,7 +14,10 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.domain.model.addressIn
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.SelectWalletRequester
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
@@ -41,23 +44,27 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.requireO
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.asset
+import java.math.BigDecimal
+import java.math.BigInteger
+import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.math.BigDecimal
-import java.math.BigInteger
-import kotlin.time.ExperimentalTime
 
 class SelectSendViewModel(
     private val interactor: WalletInteractor,
     private val sendInteractor: SendInteractor,
+    private val accountInteractor: AccountInteractor,
     private val router: WalletRouter,
     private val assetPayload: AssetPayload,
     private val initialRecipientAddress: String?,
@@ -68,7 +75,8 @@ class SelectSendViewModel(
     private val resourceManager: ResourceManager,
     private val addressInputMixinFactory: AddressInputMixinFactory,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-    amountChooserMixinFactory: AmountChooserMixin.Factory
+    amountChooserMixinFactory: AmountChooserMixin.Factory,
+    private val selectWalletRequester: SelectWalletRequester
 ) : BaseViewModel(),
     Validatable by validationExecutor {
 
@@ -79,7 +87,6 @@ class SelectSendViewModel(
 
     val addressInputMixin = with(addressInputMixinFactory) {
         val destinationChain = destinationChain.map { it.chain }
-
         create(
             inputSpecProvider = singleChainInputSpec(destinationChain),
             myselfBehaviorProvider = crossChainOnlyMyself(originChain, destinationChain),
@@ -95,6 +102,7 @@ class SelectSendViewModel(
     }
         .onStart { emit(emptyList()) }
         .shareInBackground()
+
 
     val transferDirectionModel = combine(
         availableCrossChainDestinations,
@@ -140,6 +148,8 @@ class SelectSendViewModel(
     }
 
     init {
+        subscribeOnSelectWallet()
+
         setInitialState()
 
         setupFees()
@@ -195,6 +205,28 @@ class SelectSendViewModel(
         val newDestinationChain = chooseDestinationChain.awaitAction(payload)
 
         destinationChain.emit(newDestinationChain)
+    }
+
+    fun selectRecipientWallet() {
+        launch {
+            val currentAddress = addressInputMixin.inputFlow.value
+            val request = SelectWalletRequester.Request(destinationChain.first().chain.id, currentAddress)
+            selectWalletRequester.openRequest(request)
+        }
+    }
+
+    private fun subscribeOnSelectWallet() {
+        selectWalletRequester.responseFlow
+            .map {
+                val metaAccount = accountInteractor.getMetaAccount(it.metaAccountId)
+                val currentDestination = destinationChain.first().chain
+                metaAccount.addressIn(currentDestination)
+            }
+            .filterNotNull()
+            .onEach { address ->
+                addressInputMixin.inputFlow.value = address
+            }
+            .launchIn(this)
     }
 
     private fun setInitialState() = launch {

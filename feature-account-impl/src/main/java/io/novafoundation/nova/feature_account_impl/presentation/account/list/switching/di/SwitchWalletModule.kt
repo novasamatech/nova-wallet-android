@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.account.list.di
+package io.novafoundation.nova.feature_account_impl.presentation.account.list.switching.di
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
@@ -8,34 +8,34 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
-import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
-import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountListingMixinFactory
-import io.novafoundation.nova.feature_account_impl.presentation.account.list.AccountListViewModel
+import io.novafoundation.nova.feature_account_impl.presentation.account.list.switching.SwitchWalletViewModel
 
 @Module(includes = [ViewModelModule::class])
-class AccountListModule {
+class SwitchWalletModule {
 
     @Provides
     @IntoMap
-    @ViewModelKey(AccountListViewModel::class)
+    @ViewModelKey(SwitchWalletViewModel::class)
     fun provideViewModel(
-        interactor: AccountInteractor,
+        accountInteractor: AccountInteractor,
         router: AccountRouter,
-        resourceManager: ResourceManager,
-        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-        metaAccountListingMixinFactory: MetaAccountListingMixinFactory
+        accountListingMixinFactory: MetaAccountListingMixinFactory,
     ): ViewModel {
-        return AccountListViewModel(interactor, router, resourceManager, actionAwaitableMixinFactory, metaAccountListingMixinFactory)
+        return SwitchWalletViewModel(
+            accountInteractor = accountInteractor,
+            router = router,
+            accountListingMixinFactory = accountListingMixinFactory,
+        )
     }
 
     @Provides
     fun provideViewModelCreator(
         fragment: Fragment,
         viewModelFactory: ViewModelProvider.Factory
-    ): AccountListViewModel {
-        return ViewModelProvider(fragment, viewModelFactory).get(AccountListViewModel::class.java)
+    ): SwitchWalletViewModel {
+        return ViewModelProvider(fragment, viewModelFactory).get(SwitchWalletViewModel::class.java)
     }
 }

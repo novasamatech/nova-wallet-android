@@ -20,11 +20,15 @@ class MetaAccountListingMixinFactory(
     private val accountInteractor: AccountInteractor,
 ) {
 
-    fun create(coroutineScope: CoroutineScope): MetaAccountListingMixin {
+    fun create(
+        coroutineScope: CoroutineScope,
+        itemSelectRules: MetaAccountSelectRules = CurrentMetaAccountSelectRules()
+    ): MetaAccountListingMixin {
         return MetaAccountListingProvider(
             addressIconGenerator = addressIconGenerator,
             resourceManager = resourceManager,
             accountInteractor = accountInteractor,
+            itemSelectRules = itemSelectRules,
             coroutineScope = coroutineScope
         )
     }
@@ -34,7 +38,8 @@ private class MetaAccountListingProvider(
     private val addressIconGenerator: AddressIconGenerator,
     private val resourceManager: ResourceManager,
     private val accountInteractor: AccountInteractor,
-    coroutineScope: CoroutineScope
+    private val itemSelectRules: MetaAccountSelectRules,
+    coroutineScope: CoroutineScope,
 ) : MetaAccountListingMixin, WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(coroutineScope) {
 
     override val metaAccountsFlow = accountInteractor.metaAccountsFlow().map { list ->
@@ -55,7 +60,7 @@ private class MetaAccountListingProvider(
         MetaAccountUi(
             id = metaId,
             name = name,
-            isSelected = isSelected,
+            isSelected = itemSelectRules.select(this),
             picture = icon,
             totalBalance = totalBalance.formatAsCurrency()
         )
@@ -71,5 +76,11 @@ private class MetaAccountListingProvider(
             iconRes = R.drawable.ic_parity_signer,
             title = resourceManager.getString(R.string.account_parity_signer)
         )
+    }
+}
+
+class CurrentMetaAccountSelectRules : MetaAccountSelectRules {
+    override suspend fun select(metaAccountWithBalance: MetaAccountWithTotalBalance): Boolean {
+        return metaAccountWithBalance.isSelected
     }
 }

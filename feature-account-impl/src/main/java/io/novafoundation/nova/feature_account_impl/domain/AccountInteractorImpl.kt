@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrderi
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountWithAssetBalance
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountWithTotalBalance
 import io.novafoundation.nova.feature_account_api.domain.model.PreferredCryptoType
+import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_impl.domain.errors.NodeAlreadyExistsException
 import io.novafoundation.nova.feature_account_impl.domain.errors.UnsupportedNetworkException
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -201,6 +202,12 @@ class AccountInteractorImpl(
 
     override suspend fun deleteNode(nodeId: Int) {
         return accountRepository.deleteNode(nodeId)
+    }
+
+    override suspend fun getChainAddress(metaId: Long, chainId: ChainId): String? {
+        val metaAccount = getMetaAccount(metaId)
+        val chain = chainRegistry.getChain(chainId)
+        return metaAccount.addressIn(chain)
     }
 
     private fun metaAccountTypeComparator() = compareBy<LightMetaAccount.Type> {

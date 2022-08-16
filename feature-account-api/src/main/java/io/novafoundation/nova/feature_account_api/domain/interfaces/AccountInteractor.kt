@@ -64,4 +64,6 @@ interface AccountInteractor {
     suspend fun selectNode(nodeId: Int)
 
     suspend fun deleteNode(nodeId: Int)
+
+    suspend fun getChainAddress(metaId: Long, chainId: ChainId): String?
 }

@@ -29,6 +29,7 @@ import kotlinx.android.synthetic.main.fragment_select_send.selectSendOriginFee
 import kotlinx.android.synthetic.main.fragment_select_send.selectSendRecipient
 import kotlinx.android.synthetic.main.fragment_select_send.selectSendToTitle
 import kotlinx.android.synthetic.main.fragment_select_send.selectSendToolbar
+import kotlinx.android.synthetic.main.fragment_select_send.selectWallet
 
 private const val KEY_ADDRESS = "KEY_ADDRESS"
 private const val KEY_ASSET_PAYLOAD = "KEY_ASSET_PAYLOAD"
@@ -58,6 +59,7 @@ class SelectSendFragment : BaseFragment<SelectSendViewModel>() {
         selectSendToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         selectSendDestinationChain.setOnClickListener { viewModel.destinationChainClicked() }
+        selectWallet.setOnClickListener { viewModel.selectRecipientWallet() }
         selectSendDestinationChain.setChangeable(true)
 
         selectSendCrossChainFee.makeGone() // gone inititally
