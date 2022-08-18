@@ -18,15 +18,6 @@ class AssetDetailBalancesView @JvmOverloads constructor(
 
     val locked = item(R.string.wallet_balance_locked).apply {
         setDividerVisible(false)
-    }
-
-    fun setLockedClickable(clickable: Boolean) {
-        locked.isFocusable = clickable
-        locked.isClickable = clickable
-        if (clickable) {
-            locked.title.setDrawableEnd(R.drawable.ic_info_16, paddingInDp = 4)
-        } else {
-            locked.title.setDrawableEnd(null)
-        }
+        title.setDrawableEnd(io.novafoundation.nova.feature_assets.R.drawable.ic_info_16, paddingInDp = 4)
     }
 }

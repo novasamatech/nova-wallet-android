@@ -19,17 +19,20 @@ class LockedTokensBottomSheet(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setTitle(R.string.wallet_balance_locked_template)
+        setTitle(R.string.wallet_balance_locked)
         val viewItems = createViewItems(balanceLocks.locks)
         viewItems.forEach { addItem(it) }
     }
 
     private fun createViewItems(locks: List<BalanceLocksModel.Lock>): List<TableCellView> {
-        return TableCellView.buildFixedList(locks) { createViewItem(it) }
+        return locks.map {
+            createViewItem(it)
+        }
     }
 
     private fun createViewItem(lock: BalanceLocksModel.Lock): TableCellView {
         return TableCellView.createTableCellView(context).apply {
+            setDividerVisible(false)
             setTitle(lock.name)
             setDividerColor(R.color.white_8)
             showAmount(lock.amount)

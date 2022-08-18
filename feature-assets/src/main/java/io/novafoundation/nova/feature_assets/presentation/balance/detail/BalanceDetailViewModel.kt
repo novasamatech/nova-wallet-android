@@ -71,11 +71,6 @@ class BalanceDetailViewModel(
         .inBackground()
         .share()
 
-    val lockedBalanceAvailability = lockedBalanceModel
-        .map { isBalanceLocksAvailable(it) }
-        .inBackground()
-        .share()
-
     val buyMixin = buyMixinFactory.create(scope = this, assetPayload)
 
     val sendEnabled = assetFlow.map {
@@ -132,13 +127,7 @@ class BalanceDetailViewModel(
 
     fun lockedInfoClicked() = launch {
         val balanceLocks = lockedBalanceModel.first()
-        if (balanceLocks != null) {
-            _showLockedDetailsEvent.value = Event(balanceLocks)
-        }
-    }
-
-    private fun isBalanceLocksAvailable(balanceLocks: BalanceLocksModel?): Boolean {
-        return balanceLocks != null
+        _showLockedDetailsEvent.value = Event(balanceLocks)
     }
 
     private fun requireSecretsWallet(action: () -> Unit) {
@@ -161,25 +150,32 @@ class BalanceDetailViewModel(
         )
     }
 
-    private fun mapBalanceLocksToUi(balanceLocks: BalanceLocks?, asset: Asset): BalanceLocksModel? {
-        if (balanceLocks == null) return null
+    private fun mapBalanceLocksToUi(balanceLocks: BalanceLocks?, asset: Asset): BalanceLocksModel {
+        val locks = arrayListOf<BalanceLocksModel.Lock>()
 
-        return BalanceLocksModel(
-            balanceLocks.locks.map {
+        if (balanceLocks != null) {
+            locks += balanceLocks.locks.map {
                 BalanceLocksModel.Lock(
                     mapBalanceLockIdToUi(it.id),
                     mapAmountToAmountModel(it.amount, asset)
                 )
             }
+        }
+
+        locks += BalanceLocksModel.Lock(
+            resourceManager.getString(R.string.assets_balance_details_locks_reserved),
+            mapAmountToAmountModel(asset.reserved, asset)
         )
+
+        return BalanceLocksModel(locks)
     }
 
     private fun mapBalanceLockIdToUi(id: String): String {
         return when (id) {
-            "staking" -> resourceManager.getString(R.string.wallet_balance_locks_staking)
-            "democrac" -> resourceManager.getString(R.string.wallet_balance_locks_democrac)
-            "vesting" -> resourceManager.getString(R.string.wallet_balance_locks_vesting)
-            "phrelect" -> resourceManager.getString(R.string.wallet_balance_locks_phrelect)
+            "staking" -> resourceManager.getString(R.string.assets_balance_details_locks_staking)
+            "democrac" -> resourceManager.getString(R.string.assets_balance_details_locks_democrac)
+            "vesting" -> resourceManager.getString(R.string.assets_balance_details_locks_vesting)
+            "phrelect" -> resourceManager.getString(R.string.assets_balance_details_locks_phrelect)
             else -> id.capitalize(Locale.getDefault())
         }
     }
