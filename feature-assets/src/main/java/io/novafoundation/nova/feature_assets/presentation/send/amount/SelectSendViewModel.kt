@@ -14,10 +14,9 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
-import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
+import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
-import io.novafoundation.nova.feature_account_api.domain.model.addressIn
-import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.SelectWalletRequester
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.SelectAddressRequester
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
@@ -51,7 +50,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
@@ -64,7 +62,7 @@ import kotlinx.coroutines.withContext
 class SelectSendViewModel(
     private val interactor: WalletInteractor,
     private val sendInteractor: SendInteractor,
-    private val accountInteractor: AccountInteractor,
+    private val metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
     private val router: WalletRouter,
     private val assetPayload: AssetPayload,
     private val initialRecipientAddress: String?,
@@ -76,7 +74,7 @@ class SelectSendViewModel(
     private val addressInputMixinFactory: AddressInputMixinFactory,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
-    private val selectWalletRequester: SelectWalletRequester
+    private val selectAddressRequester: SelectAddressRequester
 ) : BaseViewModel(),
     Validatable by validationExecutor {
 
@@ -103,6 +101,10 @@ class SelectSendViewModel(
         .onStart { emit(emptyList()) }
         .shareInBackground()
 
+    val isSelectAddressAvailable = destinationChain
+        .map { metaAccountGroupingInteractor.hasAvailableMetaAccountsForDestination(it.chain.id) }
+        .inBackground()
+        .share()
 
     val transferDirectionModel = combine(
         availableCrossChainDestinations,
@@ -148,7 +150,7 @@ class SelectSendViewModel(
     }
 
     init {
-        subscribeOnSelectWallet()
+        subscribeOnSelectAddress()
 
         setInitialState()
 
@@ -210,21 +212,16 @@ class SelectSendViewModel(
     fun selectRecipientWallet() {
         launch {
             val currentAddress = addressInputMixin.inputFlow.value
-            val request = SelectWalletRequester.Request(destinationChain.first().chain.id, currentAddress)
-            selectWalletRequester.openRequest(request)
+            val currentDestination = destinationChain.first().chain
+            val request = SelectAddressRequester.Request(currentDestination.id, currentAddress)
+            selectAddressRequester.openRequest(request)
         }
     }
 
-    private fun subscribeOnSelectWallet() {
-        selectWalletRequester.responseFlow
-            .map {
-                val metaAccount = accountInteractor.getMetaAccount(it.metaAccountId)
-                val currentDestination = destinationChain.first().chain
-                metaAccount.addressIn(currentDestination)
-            }
-            .filterNotNull()
-            .onEach { address ->
-                addressInputMixin.inputFlow.value = address
+    private fun subscribeOnSelectAddress() {
+        selectAddressRequester.responseFlow
+            .onEach {
+                addressInputMixin.inputFlow.value = it.selectedAddress
             }
             .launchIn(this)
     }

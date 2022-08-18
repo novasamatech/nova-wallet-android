@@ -4,7 +4,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInter
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.AccountsAdapter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountListingMixin
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountListingMixinFactory
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountWithBalanceListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.WalletListViewModel
 import io.novafoundation.nova.feature_account_impl.presentation.account.model.MetaAccountUi
 import kotlinx.coroutines.launch
@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 class SwitchWalletViewModel(
     private val accountInteractor: AccountInteractor,
     private val router: AccountRouter,
-    accountListingMixinFactory: MetaAccountListingMixinFactory,
+    accountListingMixinFactory: MetaAccountWithBalanceListingMixinFactory,
 ) : WalletListViewModel() {
 
     override val walletsListingMixin: MetaAccountListingMixin = accountListingMixinFactory.create(this)

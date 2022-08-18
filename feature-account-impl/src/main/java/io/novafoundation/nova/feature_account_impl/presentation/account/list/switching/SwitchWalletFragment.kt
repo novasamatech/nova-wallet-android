@@ -10,6 +10,7 @@ class SwitchWalletFragment : WalletListFragment<SwitchWalletViewModel>() {
 
     override fun initViews() {
         super.initViews()
+        setTitleRes(R.string.account_select_wallet)
         setActionIcon(R.drawable.ic_settings_outline)
         setActionClickListener { viewModel.settingsClicked() }
     }

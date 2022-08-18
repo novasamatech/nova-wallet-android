@@ -27,8 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="17dp"
-            android:layout_weight="1"
-            android:text="@string/account_select_wallet" />
+            android:layout_weight="1" />
 
         <ImageView
             android:id="@+id/walletListBarAction"
@@ -42,20 +41,20 @@
     <androidx.core.widget.NestedScrollView
         android:id="@+id/walletListScrollView"
         android:layout_width="match_parent"
-        android:paddingBottom="16dp"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:clipToPadding="false"
         android:overScrollMode="never"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        android:paddingBottom="16dp">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/walletListContent"
-                android:overScrollMode="never"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:itemCount="1"
-                tools:listitem="@layout/item_account" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/walletListContent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:overScrollMode="never"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:itemCount="1"
+            tools:listitem="@layout/item_account" />
 
     </androidx.core.widget.NestedScrollView>
 </LinearLayout>

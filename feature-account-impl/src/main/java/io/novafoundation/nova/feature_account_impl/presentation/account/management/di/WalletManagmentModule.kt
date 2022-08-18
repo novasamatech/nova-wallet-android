@@ -12,7 +12,7 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountListingMixinFactory
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountWithBalanceListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.management.WalletManagmentViewModel
 
 @Module(includes = [ViewModelModule::class])
@@ -26,7 +26,7 @@ class WalletManagmentModule {
         router: AccountRouter,
         resourceManager: ResourceManager,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-        metaAccountListingMixinFactory: MetaAccountListingMixinFactory
+        metaAccountListingMixinFactory: MetaAccountWithBalanceListingMixinFactory
     ): ViewModel {
         return WalletManagmentViewModel(interactor, router, resourceManager, actionAwaitableMixinFactory, metaAccountListingMixinFactory)
     }

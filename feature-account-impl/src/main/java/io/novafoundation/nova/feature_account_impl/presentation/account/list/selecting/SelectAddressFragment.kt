@@ -3,20 +3,26 @@ package io.novafoundation.nova.feature_account_impl.presentation.account.list.se
 import android.os.Bundle
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
-import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.SelectWalletRequester
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.SelectAddressRequester
+import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.WalletListFragment
 
-class SelectWalletFragment : WalletListFragment<SelectWalletViewModel>() {
+class SelectAddressFragment : WalletListFragment<SelectAddressViewModel>() {
 
     companion object {
         private const val KEY_REQUEST = "KEY_REQUEST"
 
-        fun getBundle(request: SelectWalletRequester.Request): Bundle {
+        fun getBundle(request: SelectAddressRequester.Request): Bundle {
             return Bundle().apply {
                 putParcelable(KEY_REQUEST, request)
             }
         }
+    }
+
+    override fun initViews() {
+        super.initViews()
+        setTitleRes(R.string.account_select_address_title)
     }
 
     override fun inject() {
@@ -24,7 +30,7 @@ class SelectWalletFragment : WalletListFragment<SelectWalletViewModel>() {
             requireContext(),
             AccountFeatureApi::class.java
         )
-            .selectWalletComponentFactory()
+            .selectAddressComponentFactory()
             .create(this, argument(KEY_REQUEST))
             .inject(this)
     }

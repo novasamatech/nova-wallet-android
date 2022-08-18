@@ -6,14 +6,14 @@ import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
-import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.SelectWalletCommunicator
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.SelectAddressCommunicator
 import io.novafoundation.nova.feature_account_impl.di.modules.ExportModule
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.AdvancedEncryptionCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.di.AdvancedEncryptionComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.create.di.CreateAccountComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.di.AccountDetailsComponent
-import io.novafoundation.nova.feature_account_impl.presentation.account.list.selecting.di.SelectWalletComponent
+import io.novafoundation.nova.feature_account_impl.presentation.account.list.selecting.di.SelectAddressComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.management.di.WalletManagmentComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.switching.di.SwitchWalletComponent
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ShareCompletedReceiver
@@ -70,7 +70,7 @@ interface AccountFeatureComponent : AccountFeatureApi {
 
     fun switchWalletComponentFactory(): SwitchWalletComponent.Factory
 
-    fun selectWalletComponentFactory(): SelectWalletComponent.Factory
+    fun selectAddressComponentFactory(): SelectAddressComponent.Factory
 
     fun accountDetailsComponentFactory(): AccountDetailsComponent.Factory
 
@@ -108,7 +108,7 @@ interface AccountFeatureComponent : AccountFeatureApi {
             @BindsInstance accountRouter: AccountRouter,
             @BindsInstance advancedEncryptionCommunicator: AdvancedEncryptionCommunicator,
             @BindsInstance paritySignerSignInterScreenCommunicator: ParitySignerSignInterScreenCommunicator,
-            @BindsInstance selectWalletCommunicator: SelectWalletCommunicator,
+            @BindsInstance selectAddressCommunicator: SelectAddressCommunicator,
             deps: AccountFeatureDependencies
         ): AccountFeatureComponent
     }

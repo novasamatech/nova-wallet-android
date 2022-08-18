@@ -7,22 +7,22 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.android.parcel.Parcelize
 
 
-interface SelectWalletRequester : InterScreenRequester<SelectWalletRequester.Request, SelectWalletResponder.Response> {
+interface SelectAddressRequester : InterScreenRequester<SelectAddressRequester.Request, SelectAddressResponder.Response> {
 
     @Parcelize
     class Request(
         val chainId: ChainId,
-        val chainAddress: String
+        val initialAddress: String?
     ) : Parcelable
 }
 
-interface SelectWalletResponder : InterScreenResponder<SelectWalletRequester.Request, SelectWalletResponder.Response> {
+interface SelectAddressResponder : InterScreenResponder<SelectAddressRequester.Request, SelectAddressResponder.Response> {
 
     @Parcelize
     class Response(
-        val metaAccountId: Long
+        val selectedAddress: String
     ) : Parcelable
 }
 
 
-interface SelectWalletCommunicator : SelectWalletRequester, SelectWalletResponder
+interface SelectAddressCommunicator : SelectAddressRequester, SelectAddressResponder

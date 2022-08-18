@@ -10,7 +10,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountListingMixinFactory
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountWithBalanceListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.switching.SwitchWalletViewModel
 
 @Module(includes = [ViewModelModule::class])
@@ -20,9 +20,9 @@ class SwitchWalletModule {
     @IntoMap
     @ViewModelKey(SwitchWalletViewModel::class)
     fun provideViewModel(
-        accountInteractor: AccountInteractor,
-        router: AccountRouter,
-        accountListingMixinFactory: MetaAccountListingMixinFactory,
+            accountInteractor: AccountInteractor,
+            router: AccountRouter,
+            accountListingMixinFactory: MetaAccountWithBalanceListingMixinFactory,
     ): ViewModel {
         return SwitchWalletViewModel(
             accountInteractor = accountInteractor,

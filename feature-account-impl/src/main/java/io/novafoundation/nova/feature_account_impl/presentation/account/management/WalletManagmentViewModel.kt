@@ -9,7 +9,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInter
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountListingMixinFactory
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountWithBalanceListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.AccountsAdapter.Mode
 import io.novafoundation.nova.feature_account_impl.presentation.account.model.MetaAccountUi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +21,7 @@ class WalletManagmentViewModel(
     private val accountRouter: AccountRouter,
     private val resourceManager: ResourceManager,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-    private val accountListingMixinFactory: MetaAccountListingMixinFactory,
+    private val accountListingMixinFactory: MetaAccountWithBalanceListingMixinFactory,
 ) : BaseViewModel() {
 
     val walletsListingMixin = accountListingMixinFactory.create(this)

@@ -81,11 +81,11 @@
 
     <action
         android:id="@+id/action_open_switch_wallet"
-        app:destination="@id/switchAccountsFragment" />
+        app:destination="@id/switchWalletFragment" />
 
     <action
         android:id="@+id/action_open_select_wallet"
-        app:destination="@id/selectAccountsFragment" />
+        app:destination="@id/selectAddressFragment" />
 
     <action
         android:id="@+id/action_open_accounts"
@@ -326,15 +326,15 @@
         tools:layout="@layout/fragment_accounts" />
 
     <dialog
-        android:id="@+id/switchAccountsFragment"
+        android:id="@+id/switchWalletFragment"
         android:name="io.novafoundation.nova.feature_account_impl.presentation.account.list.switching.SwitchWalletFragment"
         android:label="SwitchWalletFragment"
         tools:layout="@layout/bottom_sheet_dynamic_list" />
 
     <dialog
-        android:id="@+id/selectAccountsFragment"
-        android:name="io.novafoundation.nova.feature_account_impl.presentation.account.list.selecting.SelectWalletFragment"
-        android:label="SelectWalletFragment"
+        android:id="@+id/selectAddressFragment"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.account.list.selecting.SelectAddressFragment"
+        android:label="SelectAddressFragment"
         tools:layout="@layout/bottom_sheet_dynamic_list" />
 
     <fragment

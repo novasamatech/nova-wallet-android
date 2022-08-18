@@ -11,9 +11,9 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
-import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
+import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
-import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.SelectWalletCommunicator
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.SelectAddressCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
@@ -33,7 +33,7 @@ class SelectSendModule {
     fun provideViewModel(
         interactor: WalletInteractor,
         sendInteractor: SendInteractor,
-        accountInteractor: AccountInteractor,
+        metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
         validationExecutor: ValidationExecutor,
         selectedAccountUseCase: SelectedAccountUseCase,
         router: WalletRouter,
@@ -45,11 +45,11 @@ class SelectSendModule {
         assetPayload: AssetPayload,
         recipientAddress: String?,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-        selectWalletCommunicator: SelectWalletCommunicator
+        selectAddressCommunicator: SelectAddressCommunicator
     ): ViewModel {
         return SelectSendViewModel(
             interactor = interactor,
-            accountInteractor = accountInteractor,
+            metaAccountGroupingInteractor = metaAccountGroupingInteractor,
             router = router,
             assetPayload = assetPayload,
             chainRegistry = chainRegistry,
@@ -62,7 +62,7 @@ class SelectSendModule {
             addressInputMixinFactory = addressInputMixinFactory,
             initialRecipientAddress = recipientAddress,
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
-            selectWalletRequester = selectWalletCommunicator
+            selectAddressRequester = selectAddressCommunicator
         )
     }
 

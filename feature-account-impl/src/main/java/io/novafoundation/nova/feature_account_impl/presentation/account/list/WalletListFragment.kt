@@ -5,12 +5,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import io.novafoundation.nova.common.base.BaseBottomSheetFragment
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.AccountsAdapter
 import io.novafoundation.nova.feature_account_impl.presentation.account.model.MetaAccountUi
-import kotlinx.android.synthetic.main.fragment_switch_account.walletListContent
-import kotlinx.android.synthetic.main.fragment_switch_account.walletListBarAction
+import kotlinx.android.synthetic.main.fragment_wallet_list.walletListContent
+import kotlinx.android.synthetic.main.fragment_wallet_list.walletListBarAction
+import kotlinx.android.synthetic.main.fragment_wallet_list.walletListTitle
 
 abstract class WalletListFragment<T : WalletListViewModel> : BaseBottomSheetFragment<T>(),
     AccountsAdapter.AccountItemHandler {
@@ -23,7 +25,7 @@ abstract class WalletListFragment<T : WalletListViewModel> : BaseBottomSheetFrag
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ) = layoutInflater.inflate(R.layout.fragment_switch_account, container, false)
+    ) = layoutInflater.inflate(R.layout.fragment_wallet_list, container, false)
 
     override fun initViews() {
         walletListContent.adapter = adapter
@@ -39,6 +41,10 @@ abstract class WalletListFragment<T : WalletListViewModel> : BaseBottomSheetFrag
 
     override fun deleteClicked(accountModel: MetaAccountUi) {
         // no delete possible
+    }
+
+    fun setTitleRes(@StringRes titleRes: Int) {
+        walletListTitle.setText(titleRes)
     }
 
     fun setActionIcon(@DrawableRes drawableRes: Int) {

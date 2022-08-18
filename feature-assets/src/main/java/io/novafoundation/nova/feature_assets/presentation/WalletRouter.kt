@@ -27,7 +27,7 @@ interface WalletRouter {
 
     fun openSwitchWallet()
 
-    fun openSelectWallet(arguments: Bundle)
+    fun openSelectAddress(arguments: Bundle)
 
     fun openReceive(assetPayload: AssetPayload)
 

@@ -5,46 +5,40 @@ import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.utils.formatAsCurrency
-import io.novafoundation.nova.common.view.ChipLabelModel
-import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
-import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
+import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountWithTotalBalance
-import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.account.model.MetaAccountUi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.map
 
-class MetaAccountListingMixinFactory(
+class MetaAccountWithBalanceListingMixinFactory(
     private val addressIconGenerator: AddressIconGenerator,
     private val resourceManager: ResourceManager,
-    private val accountInteractor: AccountInteractor,
+    private val metaAccountGroupingInteractor: MetaAccountGroupingInteractor
 ) {
 
     fun create(
-        coroutineScope: CoroutineScope,
-        itemSelectRules: MetaAccountSelectRules = CurrentMetaAccountSelectRules()
+        coroutineScope: CoroutineScope
     ): MetaAccountListingMixin {
-        return MetaAccountListingProvider(
+        return MetaAccountWithBalanceListingMixin(
             addressIconGenerator = addressIconGenerator,
             resourceManager = resourceManager,
-            accountInteractor = accountInteractor,
-            itemSelectRules = itemSelectRules,
+            metaAccountGroupingInteractor = metaAccountGroupingInteractor,
             coroutineScope = coroutineScope
         )
     }
 }
 
-private class MetaAccountListingProvider(
+private class MetaAccountWithBalanceListingMixin(
     private val addressIconGenerator: AddressIconGenerator,
     private val resourceManager: ResourceManager,
-    private val accountInteractor: AccountInteractor,
-    private val itemSelectRules: MetaAccountSelectRules,
+    private val metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
     coroutineScope: CoroutineScope,
 ) : MetaAccountListingMixin, WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(coroutineScope) {
 
-    override val metaAccountsFlow = accountInteractor.metaAccountsFlow().map { list ->
+    override val metaAccountsFlow = metaAccountGroupingInteractor.metaAccountsWithTotalBalanceFlow().map { list ->
         list.toListWithHeaders(
-            keyMapper = ::mapMetaAccountTypeToUi,
+            keyMapper = { mapMetaAccountTypeToUi(it, resourceManager) },
             valueMapper = { mapMetaAccountToUi(it) }
         )
     }
@@ -59,28 +53,12 @@ private class MetaAccountListingProvider(
 
         MetaAccountUi(
             id = metaId,
-            name = name,
-            isSelected = itemSelectRules.select(this),
+            title = name,
+            subtitle = totalBalance.formatAsCurrency(),
+            isSelected = metaAccount.isSelected,
+            isClickable = true,
             picture = icon,
-            totalBalance = totalBalance.formatAsCurrency()
+            subtitleIconRes = null,
         )
-    }
-
-    private fun mapMetaAccountTypeToUi(type: LightMetaAccount.Type): ChipLabelModel? = when (type) {
-        LightMetaAccount.Type.SECRETS -> null
-        LightMetaAccount.Type.WATCH_ONLY -> ChipLabelModel(
-            iconRes = R.drawable.ic_watch,
-            title = resourceManager.getString(R.string.account_watch_only)
-        )
-        LightMetaAccount.Type.PARITY_SIGNER -> ChipLabelModel(
-            iconRes = R.drawable.ic_parity_signer,
-            title = resourceManager.getString(R.string.account_parity_signer)
-        )
-    }
-}
-
-class CurrentMetaAccountSelectRules : MetaAccountSelectRules {
-    override suspend fun select(metaAccountWithBalance: MetaAccountWithTotalBalance): Boolean {
-        return metaAccountWithBalance.isSelected
     }
 }
