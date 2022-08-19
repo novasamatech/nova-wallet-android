@@ -24,11 +24,11 @@ class BleLedgerDeviceDiscoveryService(
 
     @SuppressLint("MissingPermission")
     override fun startDiscovery() {
-        val scanFilters = listOf(
+        val scanFilters = LedgerBleManager.supportedLedgerDevices.map {
             ScanFilter.Builder()
-                .setServiceUuid(ParcelUuid(LedgerBleManager.SERVICE_UUID))
+                .setServiceUuid(ParcelUuid(it.serviceUuid))
                 .build()
-        )
+        }
         val scanSettings = ScanSettings.Builder().build()
         scanCallback = LedgerScanCallback()
 
