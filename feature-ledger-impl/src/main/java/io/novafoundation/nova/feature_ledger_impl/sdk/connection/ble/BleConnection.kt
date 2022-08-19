@@ -52,4 +52,3 @@ class BleConnection(
         "Wrong device connected"
     }
 }
-

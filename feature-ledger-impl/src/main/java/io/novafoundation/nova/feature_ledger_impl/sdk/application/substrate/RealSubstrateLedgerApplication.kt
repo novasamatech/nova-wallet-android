@@ -112,14 +112,13 @@ class RealSubstrateLedgerApplication(
 
     private fun defaultCryptoScheme() = CryptoScheme.ED25519
 
-
     private fun getConfig(chainId: ChainId): SubstrateApplicationConfig {
         return supportedApplications.find { it.chainId == chainId }
             ?: throw SubstrateLedgerApplicationError.UnsupportedApp(chainId)
     }
 
     private fun buildDerivationPath(coin: Int, accountIndex: Int): ByteArray {
-        val pathAsString = "//44//${coin}//0/0/${accountIndex}"
+        val pathAsString = "//44//$coin//0/0/$accountIndex"
         val junctions = BIP32JunctionDecoder.decode(pathAsString).junctions
 
         return junctions.encodeToByteArray()

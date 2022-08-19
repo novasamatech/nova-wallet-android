@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.combine
 
 class CompoundLedgerDiscoveryService(
     private val delegates: List<LedgerDeviceDiscoveryService>
-): LedgerDeviceDiscoveryService {
+) : LedgerDeviceDiscoveryService {
 
     override val discoveredDevices: Flow<List<LedgerDevice>> by lazy {
         combine(

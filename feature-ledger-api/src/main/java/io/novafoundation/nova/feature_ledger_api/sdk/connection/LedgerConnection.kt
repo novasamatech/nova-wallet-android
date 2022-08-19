@@ -19,6 +19,3 @@ interface LedgerConnection {
 
     val receiveChannel: Channel<ByteArray>
 }
-
-
-

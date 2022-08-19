@@ -18,5 +18,3 @@ suspend fun LedgerDeviceDiscoveryService.findDevice(id: String): LedgerDevice? {
 
     return devices.find { it.id == id }
 }
-
-
