@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.account.list.di
+package io.novafoundation.nova.feature_account_impl.presentation.account.management.di
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
@@ -12,30 +12,30 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountListingMixinFactory
-import io.novafoundation.nova.feature_account_impl.presentation.account.list.AccountListViewModel
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountWithBalanceListingMixinFactory
+import io.novafoundation.nova.feature_account_impl.presentation.account.management.WalletManagmentViewModel
 
 @Module(includes = [ViewModelModule::class])
-class AccountListModule {
+class WalletManagmentModule {
 
     @Provides
     @IntoMap
-    @ViewModelKey(AccountListViewModel::class)
+    @ViewModelKey(WalletManagmentViewModel::class)
     fun provideViewModel(
         interactor: AccountInteractor,
         router: AccountRouter,
         resourceManager: ResourceManager,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-        metaAccountListingMixinFactory: MetaAccountListingMixinFactory
+        metaAccountListingMixinFactory: MetaAccountWithBalanceListingMixinFactory
     ): ViewModel {
-        return AccountListViewModel(interactor, router, resourceManager, actionAwaitableMixinFactory, metaAccountListingMixinFactory)
+        return WalletManagmentViewModel(interactor, router, resourceManager, actionAwaitableMixinFactory, metaAccountListingMixinFactory)
     }
 
     @Provides
     fun provideViewModelCreator(
         fragment: Fragment,
         viewModelFactory: ViewModelProvider.Factory
-    ): AccountListViewModel {
-        return ViewModelProvider(fragment, viewModelFactory).get(AccountListViewModel::class.java)
+    ): WalletManagmentViewModel {
+        return ViewModelProvider(fragment, viewModelFactory).get(WalletManagmentViewModel::class.java)
     }
 }

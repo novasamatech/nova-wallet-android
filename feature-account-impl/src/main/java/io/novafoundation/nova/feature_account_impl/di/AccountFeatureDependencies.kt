@@ -30,8 +30,8 @@ import io.novafoundation.nova.runtime.extrinsic.MortalityConstructor
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
-import jp.co.soramitsu.fearless_utils.icon.IconGenerator
 import java.util.Random
+import jp.co.soramitsu.fearless_utils.icon.IconGenerator
 
 interface AccountFeatureDependencies {
 

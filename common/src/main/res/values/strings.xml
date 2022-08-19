@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="assets_select_send_your_wallets">Your wallets</string>
+
   <string name="assets_balance_details_locks_reserved">Reserved</string>
   <string name="assets_balance_details_locks_staking">Staking</string>
   <string name="assets_balance_details_locks_democrac">Democracy</string>

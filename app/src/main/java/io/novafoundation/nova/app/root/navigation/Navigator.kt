@@ -376,7 +376,11 @@ class Navigator(
     }
 
     override fun openSwitchWallet() {
-        navController?.navigate(R.id.action_open_switch_accounts)
+        navController?.navigate(R.id.action_open_switch_wallet)
+    }
+
+    override fun openSelectAddress(arguments: Bundle) {
+        navController?.navigate(R.id.action_open_select_wallet, arguments)
     }
 
     override fun openNodes() {

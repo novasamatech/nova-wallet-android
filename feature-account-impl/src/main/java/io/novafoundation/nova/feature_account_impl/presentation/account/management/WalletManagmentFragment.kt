@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.account.list
+package io.novafoundation.nova.feature_account_impl.presentation.account.management
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -15,7 +15,7 @@ import kotlinx.android.synthetic.main.fragment_accounts.accountListToolbar
 import kotlinx.android.synthetic.main.fragment_accounts.accountsList
 import kotlinx.android.synthetic.main.fragment_accounts.addAccount
 
-class AccountListFragment : BaseFragment<AccountListViewModel>(), AccountsAdapter.AccountItemHandler {
+class WalletManagmentFragment : BaseFragment<WalletManagmentViewModel>(), AccountsAdapter.AccountItemHandler {
     private lateinit var adapter: AccountsAdapter
 
     override fun onCreateView(
@@ -41,12 +41,12 @@ class AccountListFragment : BaseFragment<AccountListViewModel>(), AccountsAdapte
             requireContext(),
             AccountFeatureApi::class.java
         )
-            .accountsComponentFactory()
+            .walletManagmentComponentFactory()
             .create(this)
             .inject(this)
     }
 
-    override fun subscribe(viewModel: AccountListViewModel) {
+    override fun subscribe(viewModel: WalletManagmentViewModel) {
         viewModel.walletsListingMixin.metaAccountsFlow.observe(adapter::submitList)
         viewModel.mode.observe(adapter::setMode)
 
