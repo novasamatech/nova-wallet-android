@@ -12,6 +12,7 @@ fun BaseFragment<*>.setupUserRewardsComponent(component: UserRewardsComponent, v
         when (userRewardsState) {
             is LoadingState.Loaded -> view.showValue(userRewardsState.data)
             is LoadingState.Loading -> view.showLoading()
+            null -> {}
         }
     }
 }
