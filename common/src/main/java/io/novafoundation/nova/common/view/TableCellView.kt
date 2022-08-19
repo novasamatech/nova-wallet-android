@@ -51,18 +51,6 @@ open class TableCellView @JvmOverloads constructor(
     }
 
     companion object {
-        fun <T> buildFixedList(list: List<T>, builder: (item: T) -> TableCellView): List<TableCellView> {
-            val cellList = list.map {
-                builder(it)
-            }
-
-            if (cellList.isNotEmpty()) {
-                cellList.last().setDividerVisible(false)
-            }
-
-            return cellList
-        }
-
         fun createTableCellView(context: Context): TableCellView {
             return TableCellView(context).apply {
                 layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)

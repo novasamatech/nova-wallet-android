@@ -2,6 +2,12 @@
 <resources>
   <string name="assets_select_send_your_wallets">Your wallets</string>
 
+  <string name="assets_balance_details_locks_reserved">Reserved</string>
+  <string name="assets_balance_details_locks_staking">Staking</string>
+  <string name="assets_balance_details_locks_democrac">Democracy</string>
+  <string name="assets_balance_details_locks_vesting">Vesting</string>
+  <string name="assets_balance_details_locks_phrelect">Elections</string>
+
   <string name="account_parity_signer_not_supported_title">Signing is not supported</string>
   <string name="account_parity_signer_not_supported_subtitle">Parity Signer does not support signing arbitrary messages — only transactions</string>
 
@@ -17,7 +23,6 @@
   <string name="account_parity_signer_sign_have_error">I have an error in Parity Signer</string>
 
   <string name="account_parity_signer_sign_title">Sign with Parity Signer</string>
-  
   <string name="account_parity_signer_import_preview_title">Here are your accounts</string>
   <string name="account_parity_signer_import_preview_description">Following accounts have been successfully read from Parity Signer</string>
 
@@ -46,7 +51,6 @@
   <string name="account_details_parity_signer_not_supported">Not supported by Parity Signer</string>
   <string name="account_details_parity_signer_alert">This wallet is paired with Parity Signer. Nova will help you to form any operations you want, and you will be requested to sign them using Parity Signer</string>
   <string name="account_parity_signer">Parity Signer</string>
-  
   <string name="account_delete_confirmation_description">Make sure you have exported your wallet before proceeding.</string>
   <string name="account_delete_confirmation_title">Forget wallet?</string>
 
@@ -71,7 +75,6 @@
   <string name="account_watch_key_missing_description">Your wallet is watch-only, meaning that you cannot do any operations with it</string>
 
   <string name="account_add_watch_wallet">Add watch-only wallet</string>
-  
   <string name="account_enter_wallet_nickname">Enter wallet nickname...</string>
   <string name="accoount_enter_substrate_address">Enter valid substrate address...</string>
   <string name="accoount_enter_evm_address">Evm address must be valid or empty...</string>
@@ -825,12 +828,7 @@
   <string name="wallet_balance_details_total">Total balance</string>
   <string name="wallet_balance_details_total_after">Total after transfer</string>
   <string name="wallet_balance_frozen">Frozen</string>
-  <string name="wallet_balance_locked_template">Locked</string>
   <string name="wallet_balance_locked">Locked</string>
-  <string name="wallet_balance_locks_staking">Staking</string>
-  <string name="wallet_balance_locks_democrac">Democracy</string>
-  <string name="wallet_balance_locks_vesting">Vesting</string>
-  <string name="wallet_balance_locks_phrelect">Elections</string>
   <string name="wallet_balance_redeemable">Redeemable</string>
   <string name="wallet_balance_reserved">Reserved</string>
   <string name="wallet_balance_transferable">Transferable</string>
