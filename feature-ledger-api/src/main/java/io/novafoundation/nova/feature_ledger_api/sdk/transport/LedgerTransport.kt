@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_ledger_api.sdk.transport
 
+import io.novafoundation.nova.common.utils.bigEndianBytes
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 
 interface LedgerTransport {
@@ -16,7 +17,18 @@ suspend fun LedgerTransport.send(
     data: ByteArray,
     device: LedgerDevice
 ): ByteArray {
-    val bytes = ubyteArrayOf(cla, ins, p1, p2).toByteArray() + data
+    var message = ubyteArrayOf(cla, ins, p1, p2)
 
-    return exchange(bytes, device)
+    if (data.isNotEmpty()) {
+        if (data.size < 256) {
+            message += data.size.toUByte()
+        } else {
+            message += 0x00u
+            message += data.size.toShort().bigEndianBytes.toUByteArray()
+        }
+
+        message += data.toUByteArray()
+    }
+
+    return exchange(message.toByteArray(), device)
 }
