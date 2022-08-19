@@ -1,6 +1,5 @@
 package io.novafoundation.nova.common.interfaces
 
-import io.novafoundation.nova.common.utils.safeOffer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
@@ -38,7 +37,7 @@ internal class InternalFileSystemCache(
     override fun observeCachedValue(fileName: String): Flow<String> {
         return callbackFlow<String?> {
             val callback: OnCacheValueChanged = {
-                safeOffer(it)
+                trySend(it)
             }
 
             putCallback(fileName, callback)

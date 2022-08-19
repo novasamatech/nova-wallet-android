@@ -2,7 +2,6 @@ package io.novafoundation.nova.common.resources
 
 import android.content.ClipData
 import android.content.ClipDescription.MIMETYPE_TEXT_PLAIN
-import io.novafoundation.nova.common.utils.safeOffer
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -20,7 +19,7 @@ class ClipboardManager(
         send(getFromClipboard())
 
         val listener = NativeClipboardManager.OnPrimaryClipChangedListener {
-            safeOffer(getFromClipboard())
+            trySend(getFromClipboard())
         }
 
         clipboardManager.addPrimaryClipChangedListener(listener)
