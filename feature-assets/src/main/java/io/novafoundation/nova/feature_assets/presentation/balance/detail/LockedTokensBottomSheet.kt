@@ -25,9 +25,7 @@ class LockedTokensBottomSheet(
     }
 
     private fun createViewItems(locks: List<BalanceLocksModel.Lock>): List<TableCellView> {
-        return locks.map {
-            createViewItem(it)
-        }
+        return locks.map(::createViewItem)
     }
 
     private fun createViewItem(lock: BalanceLocksModel.Lock): TableCellView {

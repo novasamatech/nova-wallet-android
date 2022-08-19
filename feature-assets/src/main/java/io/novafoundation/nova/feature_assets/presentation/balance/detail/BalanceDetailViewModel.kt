@@ -150,24 +150,26 @@ class BalanceDetailViewModel(
         )
     }
 
+    @OptIn(ExperimentalStdlibApi::class)
     private fun mapBalanceLocksToUi(balanceLocks: BalanceLocks?, asset: Asset): BalanceLocksModel {
-        val locks = arrayListOf<BalanceLocksModel.Lock>()
-
-        if (balanceLocks != null) {
-            locks += balanceLocks.locks.map {
-                BalanceLocksModel.Lock(
-                    mapBalanceLockIdToUi(it.id),
-                    mapAmountToAmountModel(it.amount, asset)
-                )
-            }
+        val mappedLocks = balanceLocks?.locks?.map {
+            BalanceLocksModel.Lock(
+                mapBalanceLockIdToUi(it.id),
+                mapAmountToAmountModel(it.amount, asset)
+            )
         }
 
-        locks += BalanceLocksModel.Lock(
+        val reservedBalance = BalanceLocksModel.Lock(
             resourceManager.getString(R.string.assets_balance_details_locks_reserved),
             mapAmountToAmountModel(asset.reserved, asset)
         )
 
-        return BalanceLocksModel(locks)
+        return BalanceLocksModel(
+            buildList {
+                mappedLocks?.let { addAll(it) }
+                add(reservedBalance)
+            }
+        )
     }
 
     private fun mapBalanceLockIdToUi(id: String): String {
