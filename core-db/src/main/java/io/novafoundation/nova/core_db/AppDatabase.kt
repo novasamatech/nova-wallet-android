@@ -6,6 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import io.novafoundation.nova.core_db.converters.CryptoTypeConverters
+import io.novafoundation.nova.core_db.converters.CurrencyConverters
 import io.novafoundation.nova.core_db.converters.LongMathConverters
 import io.novafoundation.nova.core_db.converters.MetaAccountTypeConverters
 import io.novafoundation.nova.core_db.converters.NetworkTypeConverters
@@ -16,6 +17,7 @@ import io.novafoundation.nova.core_db.dao.AccountDao
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.dao.AssetDao
 import io.novafoundation.nova.core_db.dao.ChainDao
+import io.novafoundation.nova.core_db.dao.CurrencyDao
 import io.novafoundation.nova.core_db.dao.DappAuthorizationDao
 import io.novafoundation.nova.core_db.dao.FavouriteDAppsDao
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
@@ -47,6 +49,7 @@ import io.novafoundation.nova.core_db.migrations.WatchOnlyChainAccounts_16_17
 import io.novafoundation.nova.core_db.model.AccountLocal
 import io.novafoundation.nova.core_db.model.AccountStakingLocal
 import io.novafoundation.nova.core_db.model.AssetLocal
+import io.novafoundation.nova.core_db.model.CurrencyLocal
 import io.novafoundation.nova.core_db.model.DappAuthorizationLocal
 import io.novafoundation.nova.core_db.model.FavouriteDAppLocal
 import io.novafoundation.nova.core_db.model.NftLocal
@@ -91,7 +94,8 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
 
         PhishingSiteLocal::class,
 
-        FavouriteDAppLocal::class
+        FavouriteDAppLocal::class,
+        CurrencyLocal::class
     ],
 )
 @TypeConverters(
@@ -101,7 +105,8 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
     OperationConverters::class,
     CryptoTypeConverters::class,
     NftTypeConverters::class,
-    MetaAccountTypeConverters::class
+    MetaAccountTypeConverters::class,
+    CurrencyConverters::class
 )
 
 abstract class AppDatabase : RoomDatabase() {
@@ -160,4 +165,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun phishingSitesDao(): PhishingSitesDao
 
     abstract fun favouriteDAppsDao(): FavouriteDAppsDao
+
+    abstract fun currencyDao(): CurrencyDao
 }
