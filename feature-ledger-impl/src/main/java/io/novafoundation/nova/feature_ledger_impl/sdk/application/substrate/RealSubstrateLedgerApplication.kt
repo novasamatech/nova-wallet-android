@@ -12,7 +12,7 @@ import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.Subst
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.transport.LedgerTransport
 import io.novafoundation.nova.feature_ledger_api.sdk.transport.send
-import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.DisplayVerificationDialog.YES
+import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.DisplayVerificationDialog.NO
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.encrypt.json.copyBytes
 import jp.co.soramitsu.fearless_utils.encrypt.junction.BIP32JunctionDecoder
@@ -53,7 +53,7 @@ class RealSubstrateLedgerApplication(
 
     override suspend fun getAccount(device: LedgerDevice, chainId: ChainId, accountIndex: Int): LedgerSubstrateAccount {
         val applicationConfig = getConfig(chainId)
-        val displayVerificationDialog = YES
+        val displayVerificationDialog = NO
 
         val rawResponse = transport.send(
             cla = applicationConfig.cla,
