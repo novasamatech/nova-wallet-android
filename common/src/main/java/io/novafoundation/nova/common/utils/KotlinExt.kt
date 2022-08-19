@@ -4,9 +4,11 @@ import android.net.Uri
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
+import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.util.UUID
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -173,3 +175,12 @@ fun Uri.Builder.appendNullableQueryParameter(name: String, value: String?) = app
 }
 
 fun ByteArray.dropBytes(count: Int) = copyOfRange(count, size)
+fun ByteArray.dropBytesLast(count: Int) = copyOfRange(0, size - count)
+
+fun ByteArray.chunked(count: Int): List<ByteArray> = toList().chunked(count).map { it.toByteArray() }
+
+fun buildByteArray(block: (ByteArrayOutputStream) -> Unit): ByteArray = ByteArrayOutputStream().apply {
+    block(this)
+}.toByteArray()
+
+fun String.toUuid() = UUID.fromString(this)

@@ -64,6 +64,14 @@ fun Short.toByteArray(byteOrder: ByteOrder = ByteOrder.BIG_ENDIAN): ByteArray {
     return buffer.array()
 }
 
+val Short.bigEndianBytes
+    get() = toByteArray(ByteOrder.BIG_ENDIAN)
+
+fun ByteArray.toBigEndianShort(): Short = ByteBuffer.wrap(this).order(ByteOrder.BIG_ENDIAN).short
+fun ByteArray.toBigEndianU16(): UShort = toBigEndianShort().toUShort()
+
+fun ByteArray.toBigEndianU32(): UInt = ByteBuffer.wrap(this).order(ByteOrder.BIG_ENDIAN).int.toUInt()
+
 fun <T> DataType<T>.fromHex(hex: String): T {
     val codecReader = ScaleCodecReader(hex.fromHex())
 
