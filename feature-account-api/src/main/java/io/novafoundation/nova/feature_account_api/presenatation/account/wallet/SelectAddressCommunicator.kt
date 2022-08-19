@@ -6,7 +6,6 @@ import io.novafoundation.nova.common.navigation.InterScreenResponder
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.android.parcel.Parcelize
 
-
 interface SelectAddressRequester : InterScreenRequester<SelectAddressRequester.Request, SelectAddressResponder.Response> {
 
     @Parcelize
@@ -19,10 +18,7 @@ interface SelectAddressRequester : InterScreenRequester<SelectAddressRequester.R
 interface SelectAddressResponder : InterScreenResponder<SelectAddressRequester.Request, SelectAddressResponder.Response> {
 
     @Parcelize
-    class Response(
-        val selectedAddress: String
-    ) : Parcelable
+    class Response(val selectedAddress: String) : Parcelable
 }
-
 
 interface SelectAddressCommunicator : SelectAddressRequester, SelectAddressResponder

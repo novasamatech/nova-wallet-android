@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_account_impl.presentation.account.list.sw
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.AccountsAdapter
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountListingMixin
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountWithBalanceListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.WalletListViewModel
 import io.novafoundation.nova.feature_account_impl.presentation.account.model.MetaAccountUi
@@ -15,7 +14,7 @@ class SwitchWalletViewModel(
     accountListingMixinFactory: MetaAccountWithBalanceListingMixinFactory,
 ) : WalletListViewModel() {
 
-    override val walletsListingMixin: MetaAccountListingMixin = accountListingMixinFactory.create(this)
+    override val walletsListingMixin = accountListingMixinFactory.create(this)
 
     override val mode: AccountsAdapter.Mode = AccountsAdapter.Mode.SWITCH
 

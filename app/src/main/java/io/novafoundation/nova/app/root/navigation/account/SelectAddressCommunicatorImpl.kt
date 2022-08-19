@@ -8,8 +8,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.S
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.selecting.SelectAddressFragment
 import io.novafoundation.nova.feature_assets.presentation.WalletRouter
 
-class SelectAddressCommunicatorImpl(private val router: WalletRouter, navigationHolder: NavigationHolder)
-    : BaseInterScreenCommunicator<SelectAddressRequester.Request, SelectAddressResponder.Response>(navigationHolder),
+class SelectAddressCommunicatorImpl(private val router: WalletRouter, navigationHolder: NavigationHolder) :
+    BaseInterScreenCommunicator<SelectAddressRequester.Request, SelectAddressResponder.Response>(navigationHolder),
     SelectAddressCommunicator {
 
     override fun openRequest(request: SelectAddressRequester.Request) {

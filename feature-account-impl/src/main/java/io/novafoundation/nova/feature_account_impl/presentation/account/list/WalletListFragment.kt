@@ -14,7 +14,8 @@ import kotlinx.android.synthetic.main.fragment_wallet_list.walletListContent
 import kotlinx.android.synthetic.main.fragment_wallet_list.walletListBarAction
 import kotlinx.android.synthetic.main.fragment_wallet_list.walletListTitle
 
-abstract class WalletListFragment<T : WalletListViewModel> : BaseBottomSheetFragment<T>(),
+abstract class WalletListFragment<T : WalletListViewModel> :
+    BaseBottomSheetFragment<T>(),
     AccountsAdapter.AccountItemHandler {
 
     private val adapter by lazy(LazyThreadSafetyMode.NONE) {

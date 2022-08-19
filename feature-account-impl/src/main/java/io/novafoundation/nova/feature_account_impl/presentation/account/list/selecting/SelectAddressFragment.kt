@@ -22,7 +22,7 @@ class SelectAddressFragment : WalletListFragment<SelectAddressViewModel>() {
 
     override fun initViews() {
         super.initViews()
-        setTitleRes(R.string.account_select_address_title)
+        setTitleRes(R.string.assets_select_send_your_wallets)
     }
 
     override fun inject() {

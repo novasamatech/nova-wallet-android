@@ -5,7 +5,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.S
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.SelectAddressResponder
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.AccountsAdapter
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountListingMixin
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountWithChainAddressListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.WalletListViewModel
 import io.novafoundation.nova.feature_account_impl.presentation.account.model.MetaAccountUi
@@ -19,7 +18,7 @@ class SelectAddressViewModel(
     private val request: SelectAddressRequester.Request,
 ) : WalletListViewModel() {
 
-    override val walletsListingMixin: MetaAccountListingMixin = accountListingMixinFactory.create(coroutineScope = this, request.chainId, request.initialAddress)
+    override val walletsListingMixin = accountListingMixinFactory.create(this, request.chainId, request.initialAddress)
 
     override val mode: AccountsAdapter.Mode = AccountsAdapter.Mode.SWITCH
 

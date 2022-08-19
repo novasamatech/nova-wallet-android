@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
-import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
@@ -14,7 +14,6 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.model.Me
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 class MetaAccountWithChainAddressListingMixinFactory(
@@ -51,9 +50,7 @@ private class MetaAccountWithChainAddressListingMixin(
     coroutineScope: CoroutineScope,
 ) : MetaAccountListingMixin, WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(coroutineScope) {
 
-    private val chainFlow = flowOf {
-        chainRegistry.getChain(chainId)
-    }
+    private val chainFlow by coroutineScope.lazyAsync { chainRegistry.getChain(chainId) }
 
     override val metaAccountsFlow = metaAccountGroupingInteractor.getControlledMetaAccountsFlow().map { list ->
         list.toListWithHeaders(
@@ -64,7 +61,7 @@ private class MetaAccountWithChainAddressListingMixin(
         .shareInBackground()
 
     private suspend fun mapMetaAccountToUi(metaAccount: MetaAccount): MetaAccountUi {
-        val accountId = metaAccount.accountIdIn(chainFlow.first())
+        val accountId = metaAccount.accountIdIn(chainFlow.await())
 
         val icon = addressIconGenerator.createAddressIcon(
             accountId = accountId ?: metaAccount.substrateAccountId,
@@ -72,7 +69,7 @@ private class MetaAccountWithChainAddressListingMixin(
             backgroundColorRes = AddressIconGenerator.BACKGROUND_TRANSPARENT
         )
 
-        val chainAddress = metaAccount.addressIn(chainFlow.first())
+        val chainAddress = metaAccount.addressIn(chainFlow.await())
         val isSelected = chainAddress != null && chainAddress == selectedAddress
 
         return MetaAccountUi(
@@ -87,6 +84,6 @@ private class MetaAccountWithChainAddressListingMixin(
     }
 
     private fun mapSubtitle(address: String?): String {
-        return address ?: resourceManager.getString(R.string.account_select_address_account_not_found)
+        return address ?: resourceManager.getString(R.string.account_no_chain_projection)
     }
 }

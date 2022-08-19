@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_account_impl.domain
 
 import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.common.utils.amountFromPlanks
+import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.sumByBigDecimal
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -14,7 +15,6 @@ import io.novafoundation.nova.feature_account_api.domain.model.hasAccountIn
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 
 class MetaAccountGroupingInteractorImpl(
@@ -48,11 +48,10 @@ class MetaAccountGroupingInteractorImpl(
         }
     }
 
-    override fun getControlledMetaAccountsFlow(): Flow<GroupedList<LightMetaAccount.Type, MetaAccount>> = flow {
-        val result = getControlledMetaAccounts()
+    override fun getControlledMetaAccountsFlow(): Flow<GroupedList<LightMetaAccount.Type, MetaAccount>> = flowOf {
+        getControlledMetaAccounts()
             .groupBy(MetaAccount::type)
             .toSortedMap(metaAccountTypeComparator())
-        emit(result)
     }
 
     override suspend fun hasAvailableMetaAccountsForDestination(chainId: ChainId): Boolean {

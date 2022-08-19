@@ -20,9 +20,9 @@ class SwitchWalletModule {
     @IntoMap
     @ViewModelKey(SwitchWalletViewModel::class)
     fun provideViewModel(
-            accountInteractor: AccountInteractor,
-            router: AccountRouter,
-            accountListingMixinFactory: MetaAccountWithBalanceListingMixinFactory,
+        accountInteractor: AccountInteractor,
+        router: AccountRouter,
+        accountListingMixinFactory: MetaAccountWithBalanceListingMixinFactory,
     ): ViewModel {
         return SwitchWalletViewModel(
             accountInteractor = accountInteractor,

@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
-  <string name="account_select_address_title">Your wallets</string>
-  <string name="account_select_address_account_not_found">Account is not found</string>
   <string name="assets_select_send_your_wallets">Your wallets</string>
 
   <string name="account_parity_signer_not_supported_title">Signing is not supported</string>

@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.view.ChipLabelModel
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_impl.R
 
-
 fun mapMetaAccountTypeToUi(type: LightMetaAccount.Type, resourceManager: ResourceManager): ChipLabelModel? = when (type) {
     LightMetaAccount.Type.SECRETS -> null
     LightMetaAccount.Type.WATCH_ONLY -> ChipLabelModel(
