@@ -173,4 +173,13 @@
         <attr name="title" />
         <attr name="subTitle" />
     </declare-styleable>
+
+    <declare-styleable name="InstructionStepView">
+        <attr name="step_number" format="string" />
+        <attr name="step_text" format="string" />
+    </declare-styleable>
+
+    <declare-styleable name="NovaConnectView">
+        <attr name="target_image" format="reference" />
+    </declare-styleable>
 </resources>
