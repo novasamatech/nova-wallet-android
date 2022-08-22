@@ -23,7 +23,7 @@ class NovaConnectView @JvmOverloads constructor(
     }
 
     private fun applyAttributes(attributeSet: AttributeSet) = context.useAttributes(attributeSet, R.styleable.NovaConnectView) {
-        val targetImage = it.getDrawable(R.styleable.NovaConnectView_target_image)
+        val targetImage = it.getDrawable(R.styleable.NovaConnectView_targetImage)
         viewNovaConnectTargetIcon.setImageDrawable(targetImage)
     }
 }

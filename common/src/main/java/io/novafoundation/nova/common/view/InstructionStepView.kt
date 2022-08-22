@@ -25,11 +25,11 @@ class InstructionStepView @JvmOverloads constructor(
     }
 
     private fun applyAttributes(attributeSet: AttributeSet) = context.useAttributes(attributeSet, R.styleable.InstructionStepView) {
-        val stepNumber = it.getString(R.styleable.InstructionStepView_step_number)
+        val stepNumber = it.getString(R.styleable.InstructionStepView_stepNumber)
         instructionStepIndicator.text = stepNumber
 
         // use getResourceId() instead of getString() since resources might contain spans which will be lost if getString() is used
-        val stepText = it.getResourceIdOrThrow(R.styleable.InstructionStepView_step_text)
+        val stepText = it.getResourceIdOrThrow(R.styleable.InstructionStepView_stepText)
         instructionStepText.setText(stepText)
     }
 }

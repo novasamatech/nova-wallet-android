@@ -2,12 +2,13 @@ package io.novafoundation.nova.app.root.navigation
 
 import android.os.Bundle
 import androidx.annotation.IdRes
+import io.novafoundation.nova.common.navigation.ReturnableRouter
 
 abstract class BaseNavigator(
     private val navigationHolder: NavigationHolder
-) {
+): ReturnableRouter {
 
-    fun back() {
+    override fun back() {
         navigationHolder.executeBack()
     }
 

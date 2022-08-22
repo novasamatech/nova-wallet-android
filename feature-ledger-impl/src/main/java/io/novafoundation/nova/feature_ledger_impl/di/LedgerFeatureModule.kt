@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_ledger_impl
+package io.novafoundation.nova.feature_ledger_impl.di
 
 import dagger.Module
 

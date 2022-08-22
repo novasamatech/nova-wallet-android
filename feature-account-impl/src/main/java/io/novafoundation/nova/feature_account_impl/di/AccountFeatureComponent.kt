@@ -36,7 +36,6 @@ import io.novafoundation.nova.feature_account_impl.presentation.pincode.di.PinCo
 import io.novafoundation.nova.feature_account_impl.presentation.settings.di.SettingsComponent
 import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.change.di.ChangeWatchAccountComponent
 import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.create.di.CreateWatchWalletComponent
-import io.novafoundation.nova.feature_ledger_api.di.LedgerFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 
 @Component(
@@ -114,7 +113,6 @@ interface AccountFeatureComponent : AccountFeatureApi {
             CommonApi::class,
             RuntimeApi::class,
             DbApi::class,
-            LedgerFeatureApi::class
         ]
     )
     interface AccountFeatureDependenciesComponent : AccountFeatureDependencies

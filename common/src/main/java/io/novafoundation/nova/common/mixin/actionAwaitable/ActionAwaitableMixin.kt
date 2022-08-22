@@ -37,6 +37,8 @@ fun <T> ActionAwaitableMixin.Factory.selectingOneOf() = create<DynamicListBottom
 fun <P> ActionAwaitableMixin.Factory.confirmingAction(): ConfirmationAwaitable<P> = create()
 fun <P> ActionAwaitableMixin.Factory.confirmingOrDenyingAction(): ConfirmOrDenyAwaitable<P> = create()
 
+fun <T> ActionAwaitableMixin.Factory.fixedSelectionOf() = create<Unit, T>()
+
 suspend fun <R> ActionAwaitableMixin.Presentation<Unit, R>.awaitAction() = awaitAction(Unit)
 
 fun ActionAwaitableMixin<*, *>.hasAlreadyTriggered(): Boolean = awaitableActionLiveData.value != null
