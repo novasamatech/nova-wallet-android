@@ -10,7 +10,7 @@ import io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.model
 class SelectHardwareWalletBottomSheet(
     context: Context,
     private val onSuccess: (HardwareWalletModel) -> Unit
-): FixedListBottomSheet(context) {
+) : FixedListBottomSheet(context) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

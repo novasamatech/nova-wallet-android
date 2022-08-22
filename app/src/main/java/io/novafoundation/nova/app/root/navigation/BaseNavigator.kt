@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.navigation.ReturnableRouter
 
 abstract class BaseNavigator(
     private val navigationHolder: NavigationHolder
-): ReturnableRouter {
+) : ReturnableRouter {
 
     override fun back() {
         navigationHolder.executeBack()
