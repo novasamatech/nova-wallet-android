@@ -5,14 +5,14 @@ import io.novafoundation.nova.common.utils.checkEnabled
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_assets.domain.assets.filters.AssetFiltersInteractor
-import io.novafoundation.nova.feature_assets.presentation.WalletRouter
+import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class AssetFiltersViewModel(
     private val interactor: AssetFiltersInteractor,
-    private val router: WalletRouter,
+    private val router: AssetsRouter,
 ) : BaseViewModel() {
 
     private val initialFilters = flowOf { interactor.currentFilters() }

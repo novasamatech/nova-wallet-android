@@ -11,7 +11,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractor
-import io.novafoundation.nova.feature_assets.presentation.WalletRouter
+import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.search.AssetSearchViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -36,7 +36,7 @@ class AssetSearchModule {
     @IntoMap
     @ViewModelKey(AssetSearchViewModel::class)
     fun provideViewModel(
-        router: WalletRouter,
+        router: AssetsRouter,
         interactor: AssetSearchInteractor,
     ): ViewModel {
         return AssetSearchViewModel(

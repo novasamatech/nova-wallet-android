@@ -8,7 +8,7 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
-import io.novafoundation.nova.feature_assets.presentation.WalletRouter
+import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProviderFactory
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.TransactionHistoryFilterViewModel
 
@@ -19,7 +19,7 @@ class TransactionHistoryFilterModule {
     @IntoMap
     @ViewModelKey(TransactionHistoryFilterViewModel::class)
     fun provideViewModel(
-        router: WalletRouter,
+        router: AssetsRouter,
         historyFiltersProviderFactory: HistoryFiltersProviderFactory
     ): ViewModel {
         return TransactionHistoryFilterViewModel(router, historyFiltersProviderFactory)

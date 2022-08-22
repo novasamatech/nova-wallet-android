@@ -57,6 +57,10 @@ class SettingsViewModel(
         router.openNodes()
     }
 
+    fun currenciesClicked() {
+        router.openCurrencies()
+    }
+
     fun languagesClicked() {
         router.openLanguages()
     }

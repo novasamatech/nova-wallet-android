@@ -155,6 +155,14 @@
             app:popExitAnim="@anim/fragment_close_exit" />
 
         <action
+            android:id="@+id/action_mainFragment_to_currenciesFragment"
+            app:destination="@id/selectCurrencyFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
             android:id="@+id/action_mainFragment_to_pinCodeFragment"
             app:destination="@id/pincodeFragment"
             app:enterAnim="@anim/fragment_open_enter"
@@ -370,6 +378,12 @@
         android:name="io.novafoundation.nova.feature_account_impl.presentation.node.add.AddNodeFragment"
         android:label="AddNodeFragment"
         tools:layout="@layout/fragment_node_add" />
+
+    <fragment
+        android:id="@+id/selectCurrencyFragment"
+        android:name="io.novafoundation.nova.feature_wallet_impl.presentation.currency.SelectCurrencyFragment"
+        android:label="SelectCurrensyFragment"
+        tools:layout="@layout/fragment_select_currency" />
 
     <fragment
         android:id="@+id/languagesFragment"

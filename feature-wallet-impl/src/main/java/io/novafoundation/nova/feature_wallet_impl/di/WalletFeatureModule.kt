@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.interfaces.FileCache
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.core_db.dao.AssetDao
+import io.novafoundation.nova.core_db.dao.CurrencyDao
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.dao.PhishingAddressDao
 import io.novafoundation.nova.core_db.dao.TokenDao
@@ -23,6 +24,8 @@ import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossCh
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
 import io.novafoundation.nova.feature_wallet_api.di.Wallet
+import io.novafoundation.nova.feature_wallet_api.domain.CurrencyInteractor
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
@@ -31,6 +34,8 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderProviderFactory
+import io.novafoundation.nova.feature_wallet_impl.data.datasource.AssetsCurrencyRemoteDataSource
+import io.novafoundation.nova.feature_wallet_impl.data.datasource.CurrencyRemoteDataSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.SubstrateRemoteSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.WssSubstrateSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.BalancesUpdateSystem
@@ -42,10 +47,12 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.RealCr
 import io.novafoundation.nova.feature_wallet_impl.data.network.phishing.PhishingApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RealCrossChainTransfersRepository
+import io.novafoundation.nova.feature_wallet_impl.data.repository.RealCurrencyRepository
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RuntimeWalletConstants
 import io.novafoundation.nova.feature_wallet_impl.data.repository.TokenRepositoryImpl
 import io.novafoundation.nova.feature_wallet_impl.data.repository.WalletRepositoryImpl
 import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
+import io.novafoundation.nova.feature_wallet_impl.domain.CurrencyInteractorImpl
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
@@ -206,4 +213,28 @@ class WalletFeatureModule {
         assetSourceRegistry: AssetSourceRegistry,
         phishingValidationFactory: PhishingValidationFactory
     ): CrossChainTransactor = RealCrossChainTransactor(weigher, extrinsicService, assetSourceRegistry, phishingValidationFactory)
+
+    @Provides
+    @FeatureScope
+    fun provideCurrencyRemoteDataSource(
+        resourceManager: ResourceManager,
+        gson: Gson
+    ): CurrencyRemoteDataSource {
+        return AssetsCurrencyRemoteDataSource(resourceManager, gson)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideCurrencyRepository(
+        currencyDao: CurrencyDao,
+        currencyRemoteDataSource: CurrencyRemoteDataSource
+    ): CurrencyRepository {
+        return RealCurrencyRepository(currencyDao, currencyRemoteDataSource)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideCurrencyInteractor(currencyRepository: CurrencyRepository): CurrencyInteractor {
+        return CurrencyInteractorImpl(currencyRepository)
+    }
 }

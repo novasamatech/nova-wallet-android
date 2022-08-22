@@ -1,20 +1,424 @@
 [
-  {
-    "code": "USD",
-    "name": "US Dollar",
-    "symbol": "$",
-    "category": "fiat",
-    "popular": true,
-    "id": 0,
-    "coingeckoId": "usd"
-  },
-  {
-    "code": "BTC",
-    "name": "Bitcoin",
-    "symbol": "₿",
-    "category": "crypto",
-    "popular": true,
-    "id": 1,
-    "coingeckoId": "btc"
-  }
+    {
+        "code": "USD",
+        "name": "United States Dollar",
+        "symbol": "$",
+        "category": "fiat",
+        "popular": true,
+        "id": 0,
+        "coingeckoId": "usd"
+    },
+    {
+        "code": "EUR",
+        "name": "Euro",
+        "symbol": "€",
+        "category": "fiat",
+        "popular": true,
+        "id": 1,
+        "coingeckoId": "eur"
+    },
+    {
+        "code": "JPY",
+        "name": "Japanese Yen",
+        "symbol": "¥",
+        "category": "fiat",
+        "popular": true,
+        "id": 2,
+        "coingeckoId": "jpy"
+    },
+    {
+        "code": "CNY",
+        "name": "Chinese Yuan",
+        "symbol": "¥",
+        "category": "fiat",
+        "popular": true,
+        "id": 3,
+        "coingeckoId": "cny"
+    },
+    {
+        "code": "TWD",
+        "name": "New Taiwan dollar",
+        "symbol": "$",
+        "category": "fiat",
+        "popular": true,
+        "id": 4,
+        "coingeckoId": "twd"
+    },
+    {
+        "code": "RUB",
+        "name": "Russian Ruble",
+        "symbol": "₽",
+        "category": "fiat",
+        "popular": true,
+        "id": 5,
+        "coingeckoId": "rub"
+    },
+    {
+        "code": "AED",
+        "name": "United Arab Emirates dirham",
+        "category": "fiat",
+        "popular": true,
+        "id": 6,
+        "coingeckoId": "aed"
+    },
+    {
+        "code": "IDR",
+        "name": "Indonesian Rupiah",
+        "category": "fiat",
+        "popular": true,
+        "id": 7,
+        "coingeckoId": "idr"
+    },
+    {
+        "code": "KRW",
+        "name": "South Korean won",
+        "symbol": "₩",
+        "category": "fiat",
+        "popular": true,
+        "id": 8,
+        "coingeckoId": "krw"
+    },
+    {
+        "code": "ARS",
+        "name": "Argentine Peso",
+        "symbol": "$",
+        "category": "fiat",
+        "popular": false,
+        "id": 9,
+        "coingeckoId": "ars"
+    },
+    {
+        "code": "AUD",
+        "name": "Australian Dollar",
+        "symbol": "$",
+        "category": "fiat",
+        "popular": false,
+        "id": 10,
+        "coingeckoId": "aud"
+    },
+    {
+        "code": "BDT",
+        "name": "Bangladeshi Taka",
+        "category": "fiat",
+        "popular": false,
+        "id": 11,
+        "coingeckoId": "bdt"
+    },
+    {
+        "code": "BHD",
+        "name": "Bahraini Dinar",
+        "category": "fiat",
+        "popular": false,
+        "id": 12,
+        "coingeckoId": "bhd"
+    },
+    {
+        "code": "BMD",
+        "name": "Bermudan Dollar",
+        "symbol": "$",
+        "category": "fiat",
+        "popular": false,
+        "id": 13,
+        "coingeckoId": "bmd"
+    },
+    {
+        "code": "BRL",
+        "name": "Brazilian Real",
+        "symbol": "$",
+        "category": "fiat",
+        "popular": false,
+        "id": 14,
+        "coingeckoId": "brl"
+    },
+    {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "symbol": "$",
+        "category": "fiat",
+        "popular": false,
+        "id": 15,
+        "coingeckoId": "cad"
+    },
+    {
+        "code": "CHF",
+        "name": "Swiss Franc",
+        "category": "fiat",
+        "popular": false,
+        "id": 16,
+        "coingeckoId": "chf"
+    },
+    {
+        "code": "CLP",
+        "name": "Chilean Peso",
+        "symbol": "$",
+        "category": "fiat",
+        "popular": false,
+        "id": 17,
+        "coingeckoId": "clp"
+    },
+    {
+        "code": "CZK",
+        "name": "Czech Koruna",
+        "symbol": "Kč",
+        "category": "fiat",
+        "popular": false,
+        "id": 18,
+        "coingeckoId": "czk"
+    },
+    {
+        "code": "DKK",
+        "name": "Danish Krone",
+        "category": "fiat",
+        "popular": false,
+        "id": 19,
+        "coingeckoId": "dkk"
+    },
+    {
+        "code": "GBP",
+        "name": "British Pound Sterling",
+        "symbol": "£",
+        "category": "fiat",
+        "popular": false,
+        "id": 20,
+        "coingeckoId": "gbp"
+    },
+    {
+        "code": "HKD",
+        "name": "Hong Kong Dollar",
+        "symbol": "$",
+        "category": "fiat",
+        "popular": false,
+        "id": 21,
+        "coingeckoId": "hkd"
+    },
+    {
+        "code": "HUF",
+        "name": "Hungarian Forint",
+        "category": "fiat",
+        "popular": false,
+        "id": 22,
+        "coingeckoId": "huf"
+    },
+    {
+        "code": "ILS",
+        "name": "Israeli New Shekel",
+        "symbol": "₪",
+        "category": "fiat",
+        "popular": false,
+        "id": 23,
+        "coingeckoId": "ils"
+    },
+    {
+        "code": "INR",
+        "name": "Indian Rupee",
+        "symbol": "₹",
+        "category": "fiat",
+        "popular": false,
+        "id": 24,
+        "coingeckoId": "inr"
+    },
+    {
+        "code": "KDW",
+        "name": "Kuwaiti Dinar",
+        "category": "fiat",
+        "popular": false,
+        "id": 25,
+        "coingeckoId": "kdw"
+    },
+    {
+        "code": "LKR",
+        "name": "Sri Lankan Rupee",
+        "category": "fiat",
+        "popular": false,
+        "id": 26,
+        "coingeckoId": "lkr"
+    },
+    {
+        "code": "MMK",
+        "name": "Myanmar Kyat",
+        "category": "fiat",
+        "popular": false,
+        "id": 27,
+        "coingeckoId": "mmk"
+    },
+    {
+        "code": "MXN",
+        "name": "Mexican Peso",
+        "symbol": "$",
+        "category": "fiat",
+        "popular": false,
+        "id": 28,
+        "coingeckoId": "mxn"
+    },
+    {
+        "code": "MYR",
+        "name": "Malaysian Ringgit",
+        "category": "fiat",
+        "popular": false,
+        "id": 29,
+        "coingeckoId": "myr"
+    },
+    {
+        "code": "NGN",
+        "name": "Nigerian Naira",
+        "symbol": "₦",
+        "category": "fiat",
+        "popular": false,
+        "id": 30,
+        "coingeckoId": "ngn"
+    },
+    {
+        "code": "NOK",
+        "name": "Norwegian Krone",
+        "category": "fiat",
+        "popular": false,
+        "id": 31,
+        "coingeckoId": "nok"
+    },
+    {
+        "code": "NZD",
+        "name": "New Zealand Dollar",
+        "symbol": "$",
+        "category": "fiat",
+        "popular": false,
+        "id": 32,
+        "coingeckoId": "nzd"
+    },
+    {
+        "code": "PHP",
+        "name": "Philippine peso",
+        "symbol": "₱",
+        "category": "fiat",
+        "popular": false,
+        "id": 33,
+        "coingeckoId": "php"
+    },
+    {
+        "code": "PKR",
+        "name": "Pakistani Rupee",
+        "category": "fiat",
+        "popular": false,
+        "id": 34,
+        "coingeckoId": "pkr"
+    },
+    {
+        "code": "PLN",
+        "name": "Poland złoty",
+        "symbol": "zł",
+        "category": "fiat",
+        "popular": false,
+        "id": 35,
+        "coingeckoId": "pln"
+    },
+    {
+        "code": "SAR",
+        "name": "Saudi Riyal",
+        "category": "fiat",
+        "popular": false,
+        "id": 36,
+        "coingeckoId": "sar"
+    },
+    {
+        "code": "SEK",
+        "name": "Swedish Krona",
+        "category": "fiat",
+        "popular": false,
+        "id": 37,
+        "coingeckoId": "sek"
+    },
+    {
+        "code": "SGD",
+        "name": "Singapore Dollar",
+        "symbol": "$",
+        "category": "fiat",
+        "popular": false,
+        "id": 38,
+        "coingeckoId": "sgd"
+    },
+    {
+        "code": "THB",
+        "name": "Thai Baht",
+        "symbol": "฿",
+        "category": "fiat",
+        "popular": false,
+        "id": 39,
+        "coingeckoId": "thb"
+    },
+    {
+        "code": "TRY",
+        "name": "Turkish lira",
+        "symbol": "₺",
+        "category": "fiat",
+        "popular": false,
+        "id": 40,
+        "coingeckoId": "try"
+    },
+    {
+        "code": "UAH",
+        "name": "Ukrainian hryvnia",
+        "symbol": "₴",
+        "category": "fiat",
+        "popular": false,
+        "id": 41,
+        "coingeckoId": "uah"
+    },
+    {
+        "code": "VEF",
+        "name": "Venezuelan bolívar",
+        "category": "fiat",
+        "popular": false,
+        "id": 42,
+        "coingeckoId": "vef"
+    },
+    {
+        "code": "VND",
+        "name": "Vietnamese dong",
+        "symbol": "₫",
+        "category": "fiat",
+        "popular": false,
+        "id": 43,
+        "coingeckoId": "vnd"
+    },
+    {
+        "code": "ZAR",
+        "name": "South African rand",
+        "category": "fiat",
+        "popular": false,
+        "id": 44,
+        "coingeckoId": "zar"
+    },
+    {
+        "code": "XDR",
+        "name": "IMF Special Drawing Rights",
+        "category": "fiat",
+        "popular": false,
+        "id": 45,
+        "coingeckoId": "xdr"
+    },
+    {
+        "code": "DOT",
+        "name": "Polkadot",
+        "category": "crypto",
+        "popular": true,
+        "id": 46,
+        "coingeckoId": "dot"
+    },
+    {
+        "code": "BTC",
+        "name": "Bitcoin",
+        "symbol": "₿",
+        "category": "crypto",
+        "popular": true,
+        "id": 47,
+        "coingeckoId": "btc"
+    },
+    {
+        "code": "ETH",
+        "name": "Ether",
+        "symbol": "Ξ",
+        "category": "crypto",
+        "popular": true,
+        "id": 48,
+        "coingeckoId": "eth"
+    }
 ]

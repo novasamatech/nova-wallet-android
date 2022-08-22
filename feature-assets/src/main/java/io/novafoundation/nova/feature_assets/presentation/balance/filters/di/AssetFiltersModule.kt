@@ -11,7 +11,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.feature_assets.data.repository.assetFilters.AssetFiltersRepository
 import io.novafoundation.nova.feature_assets.domain.assets.filters.AssetFiltersInteractor
-import io.novafoundation.nova.feature_assets.presentation.WalletRouter
+import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.filters.AssetFiltersViewModel
 
 @Module(includes = [ViewModelModule::class])
@@ -28,7 +28,7 @@ class AssetFiltersModule {
     @ViewModelKey(AssetFiltersViewModel::class)
     fun provideViewModel(
         interactor: AssetFiltersInteractor,
-        router: WalletRouter
+        router: AssetsRouter
     ): ViewModel {
         return AssetFiltersViewModel(
             interactor = interactor,

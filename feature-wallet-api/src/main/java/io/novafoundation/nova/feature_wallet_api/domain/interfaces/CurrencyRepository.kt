@@ -7,9 +7,9 @@ interface CurrencyRepository {
 
     suspend fun syncCurrencies()
 
-    suspend fun observeCurrencies(): Flow<List<Currency>>
+    fun observeCurrencies(): Flow<List<Currency>>
 
-    suspend fun observeSelectCurrency(): Flow<Currency>
+    fun observeSelectCurrency(): Flow<Currency>
 
     suspend fun selectCurrency(currencyId: Int)
 }

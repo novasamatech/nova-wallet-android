@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.A
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
+import io.novafoundation.nova.feature_wallet_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
@@ -22,6 +23,8 @@ interface WalletFeatureApi {
     fun provideAssetCache(): AssetCache
 
     fun provideWallConstants(): WalletConstants
+
+    fun currencyInteractor(): CurrencyInteractor
 
     @Wallet
     fun provideWalletUpdateSystem(): UpdateSystem

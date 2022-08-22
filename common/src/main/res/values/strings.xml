@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="wallet_currency_title">Currency</string>
+  <string name="wallet_currency_category_cryptocurrencies">Cryptocurrencies</string>
+  <string name="wallet_currency_category_feat">Fiat currencies</string>
+  <string name="wallet_currency_category_popular_feat">Popular fiat currencies</string>
+
   <string name="account_parity_signer_not_supported_title">Signing is not supported</string>
   <string name="account_parity_signer_not_supported_subtitle">Parity Signer does not support signing arbitrary messages — only transactions</string>
 

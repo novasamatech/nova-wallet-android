@@ -4,13 +4,14 @@ import io.novafoundation.nova.core_db.model.CurrencyLocal
 import io.novafoundation.nova.feature_wallet_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_impl.data.datasource.CurrencyRemote
 
-fun mapCurrencyFromRemote(remote: CurrencyRemote, selected: Boolean): Currency {
+
+fun mapRemoteCurrencyToLocal(remote: CurrencyRemote, selected: Boolean): CurrencyLocal {
     return with(remote) {
-        Currency(
+        CurrencyLocal(
             code = code,
             name = name,
             symbol = symbol,
-            category = mapCurrencyCategoryFromRemote(category),
+            category = mapRemoteCurrencyCategoryToLocal(category),
             popular = popular,
             id = id,
             coingeckoId = coingeckoId,
@@ -63,10 +64,10 @@ private fun mapCurrencyCategoryFromLocal(local: CurrencyLocal.Category): Currenc
     }
 }
 
-private fun mapCurrencyCategoryFromRemote(remote: String): Currency.Category {
+private fun mapRemoteCurrencyCategoryToLocal(remote: String): CurrencyLocal.Category {
     return when(remote) {
-        "fiat" -> Currency.Category.FIAT
-        "crypto" -> Currency.Category.CRYPTO
+        "fiat" -> CurrencyLocal.Category.FIAT
+        "crypto" -> CurrencyLocal.Category.CRYPTO
         else -> throw IllegalArgumentException("Unknown currency category: $remote")
     }
 }

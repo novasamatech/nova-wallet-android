@@ -4,7 +4,7 @@ import androidx.lifecycle.Lifecycle
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 
-interface WalletRouter {
+interface AssetsRouter {
 
     fun openAssetDetails(assetPayload: AssetPayload)
 
@@ -29,6 +29,7 @@ interface WalletRouter {
     fun openReceive(assetPayload: AssetPayload)
 
     fun openAssetFilters()
+
     fun openAssetSearch()
 
     fun openNfts()

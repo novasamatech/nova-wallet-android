@@ -1,5 +1,6 @@
 package io.novafoundation.nova.core_db.dao
 
+import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -8,11 +9,17 @@ import androidx.room.Transaction
 import androidx.room.Update
 import io.novafoundation.nova.common.utils.CollectionDiffer
 import io.novafoundation.nova.core_db.model.CurrencyLocal
+import kotlinx.coroutines.flow.Flow
 
+private const val RETRIEVE_CURRENCIES = "SELECT * FROM currencies"
+
+private const val RETRIEVE_SELECTED_CURRENCY = "SELECT * FROM currencies WHERE selected = 1"
+
+@Dao
 abstract class CurrencyDao {
 
     @Transaction
-    suspend fun updateCurrencies(currencies: CollectionDiffer.Diff<CurrencyLocal>) {
+    open suspend fun updateCurrencies(currencies: CollectionDiffer.Diff<CurrencyLocal>) {
         deleteCurrencies(currencies.removed)
         insertCurrencies(currencies.added)
         updateCurrencies(currencies.updated)
@@ -22,13 +29,24 @@ abstract class CurrencyDao {
         }
     }
 
-    @Query("SELECT * FROM currencies")
+    @Query("SELECT * FROM currencies WHERE id = 0")
+    abstract fun getFirst(): CurrencyLocal
+
+    @Query(RETRIEVE_CURRENCIES)
     abstract suspend fun getCurrencies(): List<CurrencyLocal>
 
+    @Query(RETRIEVE_CURRENCIES)
+    abstract fun observeCurrencies(): Flow<List<CurrencyLocal>>
+
+    @Query(RETRIEVE_SELECTED_CURRENCY)
     abstract suspend fun getSelectedCurrency(): CurrencyLocal?
+
+    @Query(RETRIEVE_SELECTED_CURRENCY)
+    abstract fun observeSelectCurrency(): Flow<CurrencyLocal>
 
     @Query("UPDATE currencies SET selected = (id = :currencyId)")
     abstract fun selectCurrency(currencyId: Int)
+
 
     @Delete
     protected abstract suspend fun deleteCurrencies(currencies: List<CurrencyLocal>)

@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.mixin.api.NetworkStateUi
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core.updater.Updater
+import io.novafoundation.nova.feature_wallet_api.domain.CurrencyInteractor
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection.ExternalRequirement
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -16,6 +17,7 @@ import kotlinx.coroutines.launch
 
 class RootViewModel(
     private val interactor: RootInteractor,
+    private val currencyInteractor: CurrencyInteractor,
     private val rootRouter: RootRouter,
     private val externalConnectionRequirementFlow: MutableStateFlow<ExternalRequirement>,
     private val resourceManager: ResourceManager,
@@ -29,7 +31,13 @@ class RootViewModel(
             .onEach { handleUpdatesSideEffect(it) }
             .launchIn(this)
 
+        syncCurrencies()
+
         updatePhishingAddresses()
+    }
+
+    private fun syncCurrencies() {
+        launch { currencyInteractor.syncCurrencies() }
     }
 
     private fun handleUpdatesSideEffect(sideEffect: Updater.SideEffect) {

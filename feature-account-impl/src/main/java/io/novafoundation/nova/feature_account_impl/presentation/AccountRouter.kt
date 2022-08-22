@@ -23,9 +23,12 @@ interface AccountRouter : SecureRouter, ReturnableRouter {
     fun openConfirmMnemonicOnCreate(confirmMnemonicPayload: ConfirmMnemonicPayload)
 
     fun openWallets()
+
     fun openSwitchWallet()
 
     fun openNodes()
+
+    fun openCurrencies()
 
     fun openLanguages()
 
@@ -59,9 +62,12 @@ interface AccountRouter : SecureRouter, ReturnableRouter {
     fun openChangePinCode()
 
     fun openScanImportParitySigner()
+
     fun openPreviewImportParitySigner(payload: ParitySignerAccountPayload)
+
     fun openFinishImportParitySigner(payload: ParitySignerAccountPayload)
 
     fun openScanParitySignerSignature(payload: ScanSignParitySignerPayload)
+    
     fun finishParitySignerFlow()
 }
