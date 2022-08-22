@@ -102,7 +102,6 @@ class RealSubstrateLedgerApplication(
         val accountAddressData = dataWithoutResponseCode.dropBytes(PUBLIC_KEY_LENGTH)
         val address = accountAddressData.decodeToString()
 
-        // verify address for validity
         require(address.isValidSS58Address()) {
             "Invalid address"
         }
