@@ -19,7 +19,7 @@ class StartImportLedgerViewModel(
         router.back()
     }
 
-    fun scanQrCodeClicked() {
+    fun continueClicked() {
         showMessage("TODO")
     }
 

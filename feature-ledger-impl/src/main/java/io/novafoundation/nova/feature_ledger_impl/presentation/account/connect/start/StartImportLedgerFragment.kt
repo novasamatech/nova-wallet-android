@@ -25,7 +25,7 @@ class StartImportLedgerFragment : BaseFragment<StartImportLedgerViewModel>() {
         startImportLedgerToolbar.setHomeButtonListener { viewModel.backClicked() }
         startImportLedgerToolbar.applyStatusBarInsets()
 
-        startImportLedgerContinue.setOnClickListener { viewModel.scanQrCodeClicked() }
+        startImportLedgerContinue.setOnClickListener { viewModel.continueClicked() }
 
         startImportLedgerGuideLink.setOnClickListener { viewModel.guideClicked() }
     }
