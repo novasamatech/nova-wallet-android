@@ -68,6 +68,6 @@ interface AccountRouter : SecureRouter, ReturnableRouter {
     fun openFinishImportParitySigner(payload: ParitySignerAccountPayload)
 
     fun openScanParitySignerSignature(payload: ScanSignParitySignerPayload)
-    
+
     fun finishParitySignerFlow()
 }

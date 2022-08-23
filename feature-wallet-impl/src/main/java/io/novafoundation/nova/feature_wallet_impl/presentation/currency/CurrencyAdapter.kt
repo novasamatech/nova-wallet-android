@@ -54,9 +54,9 @@ private object DiffCallback : BaseGroupedDiffCallback<TextHeader, CurrencyModel>
     }
 
     override fun areChildContentsTheSame(oldItem: CurrencyModel, newItem: CurrencyModel): Boolean {
-        return oldItem.sign == newItem.sign
-            && oldItem.name == newItem.name
-            && oldItem.isSelected == newItem.isSelected
+        return oldItem.sign == newItem.sign &&
+            oldItem.name == newItem.name &&
+            oldItem.isSelected == newItem.isSelected
     }
 }
 

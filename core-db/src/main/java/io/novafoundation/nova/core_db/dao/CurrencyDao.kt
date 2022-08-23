@@ -47,7 +47,6 @@ abstract class CurrencyDao {
     @Query("UPDATE currencies SET selected = (id = :currencyId)")
     abstract fun selectCurrency(currencyId: Int)
 
-
     @Delete
     protected abstract suspend fun deleteCurrencies(currencies: List<CurrencyLocal>)
 

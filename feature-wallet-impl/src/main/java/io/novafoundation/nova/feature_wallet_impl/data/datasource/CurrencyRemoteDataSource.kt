@@ -23,7 +23,7 @@ interface CurrencyRemoteDataSource {
 class AssetsCurrencyRemoteDataSource(
     private val resourceManager: ResourceManager,
     private val gson: Gson
-): CurrencyRemoteDataSource {
+) : CurrencyRemoteDataSource {
 
     override suspend fun getCurrenciesRemote(): List<CurrencyRemote> {
         val rawCurrencies = resourceManager.loadRawString(R.raw.currencies)
