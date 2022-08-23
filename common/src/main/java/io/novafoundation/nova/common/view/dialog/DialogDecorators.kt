@@ -38,12 +38,13 @@ fun warningDialog(
     context: Context,
     onConfirm: DialogClickHandler,
     @StringRes confirmTextRes: Int = R.string.common_continue,
+    @StringRes cancelTextRes: Int = R.string.common_cancel,
     onCancel: DialogClickHandler? = null,
     decorator: DialogDecorator? = null
 ) {
     dialog(context.themed(R.style.AccentAlertDialogTheme_Reversed)) {
         setPositiveButton(confirmTextRes) { _, _ -> onConfirm() }
-        setNegativeButton(R.string.common_cancel) { _, _ -> onCancel?.invoke() }
+        setNegativeButton(cancelTextRes) { _, _ -> onCancel?.invoke() }
 
         decorator?.invoke(this)
     }

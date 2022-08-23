@@ -8,6 +8,7 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.view.dialog.warningDialog
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_ledger_api.di.LedgerFeatureApi
 import io.novafoundation.nova.feature_ledger_impl.R
@@ -36,6 +37,7 @@ class FillWalletImportLedgerFragment : BaseFragment<FillWalletImportLedgerViewMo
         fillWalletImportLedgerToolbar.setHomeButtonListener {
             viewModel.backClicked()
         }
+        onBackPressed { viewModel.backClicked() }
 
         fillWalletImportLedgerAccounts.setHasFixedSize(true)
         fillWalletImportLedgerAccounts.adapter = adapter
@@ -57,5 +59,17 @@ class FillWalletImportLedgerFragment : BaseFragment<FillWalletImportLedgerViewMo
     override fun subscribe(viewModel: FillWalletImportLedgerViewModel) {
         viewModel.continueState.observe(fillWalletImportLedgerContinue::setState)
         viewModel.fillableChainAccountModels.observe(adapter::submitList)
+
+        viewModel.confirmExit.awaitableActionLiveData.observeEvent {
+            warningDialog(
+                context = requireContext(),
+                onConfirm = { it.onSuccess(true) },
+                onCancel = { it.onSuccess(false) },
+                cancelTextRes = R.string.common_no,
+                confirmTextRes = R.string.common_yes,
+            ) {
+                setTitle(R.string.common_cancel_operation_warning)
+            }
+        }
     }
 }

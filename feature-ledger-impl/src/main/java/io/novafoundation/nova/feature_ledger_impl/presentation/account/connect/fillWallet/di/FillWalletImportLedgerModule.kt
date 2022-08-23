@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_ledger_impl.domain.account.connect.fillWallet.FillWalletImportLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.domain.account.connect.fillWallet.RealFillWalletImportLedgerInteractor
@@ -33,9 +34,16 @@ class FillWalletImportLedgerModule {
         router: LedgerRouter,
         interactor: FillWalletImportLedgerInteractor,
         addressIconGenerator: AddressIconGenerator,
-        resourceManager: ResourceManager
+        resourceManager: ResourceManager,
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
     ): ViewModel {
-        return FillWalletImportLedgerViewModel(router, interactor, addressIconGenerator, resourceManager)
+        return FillWalletImportLedgerViewModel(
+            router = router,
+            interactor = interactor,
+            addressIconGenerator = addressIconGenerator,
+            resourceManager = resourceManager,
+            actionAwaitableMixin = actionAwaitableMixinFactory
+        )
     }
 
     @Provides

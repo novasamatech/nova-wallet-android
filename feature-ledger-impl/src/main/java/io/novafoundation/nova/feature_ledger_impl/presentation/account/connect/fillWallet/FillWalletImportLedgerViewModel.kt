@@ -2,6 +2,9 @@ package io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.mixin.actionAwaitable.awaitAction
+import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingOrDenyingAction
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
@@ -28,7 +31,8 @@ class FillWalletImportLedgerViewModel(
     private val router: LedgerRouter,
     private val interactor: FillWalletImportLedgerInteractor,
     private val addressIconGenerator: AddressIconGenerator,
-    private val resourceManager: ResourceManager
+    private val resourceManager: ResourceManager,
+    private val actionAwaitableMixin: ActionAwaitableMixin.Factory
 ) : BaseViewModel() {
 
     private val filledAccountsFlow = MutableStateFlow<Map<ChainId, LedgerSubstrateAccount>>(emptyMap())
@@ -48,6 +52,8 @@ class FillWalletImportLedgerViewModel(
         }
     }.shareInBackground()
 
+    val confirmExit = actionAwaitableMixin.confirmingOrDenyingAction<Unit>()
+
     fun continueClicked() {
         showMessage("TODO")
     }
@@ -59,8 +65,12 @@ class FillWalletImportLedgerViewModel(
         addAccount(item.chainUi.id, account)
     }
 
-    fun backClicked() {
-        router.back()
+    fun backClicked() = launch {
+        val filledAccounts = filledAccountsFlow.first()
+
+        if (filledAccounts.isEmpty() || confirmExit.awaitAction()) {
+            router.back()
+        }
     }
 
     private suspend fun randomAccount(item: FillableChainAccountModel): LedgerSubstrateAccount {
