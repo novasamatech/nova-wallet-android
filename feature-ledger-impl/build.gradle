@@ -36,6 +36,8 @@ dependencies {
     implementation project(":common")
     implementation project(":runtime")
 
+    implementation materialDep
+
     implementation fearlessLibDep
 
     implementation bleDep
