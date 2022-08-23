@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="account_ledger_select_device_title">Select your Ledger device</string>
+  <string name="account_ledger_select_device_description">Please enable Bluetooth in your phone settings. Open the Polkadot app on your Ledger device </string>
+
   <string name="common_cancel_operation_warning">Are you sure you want to cancel this operation?</string>
   <string name="common_yes">Yes</string>
   <string name="common_no">No</string>

@@ -16,7 +16,7 @@ class BleConnection(
     private val bluetoothDevice: BluetoothDevice,
 ) : LedgerConnection, DataReceivedCallback {
 
-    suspend fun connect() {
+    override suspend fun connect(): Result<Unit> = runCatching {
         bleManager.connect(bluetoothDevice).suspend()
 
         bleManager.readCallback = this

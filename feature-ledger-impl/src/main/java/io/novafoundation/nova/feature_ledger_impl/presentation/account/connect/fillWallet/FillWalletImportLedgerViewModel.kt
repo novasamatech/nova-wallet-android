@@ -19,7 +19,6 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.f
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -58,11 +57,10 @@ class FillWalletImportLedgerViewModel(
         showMessage("TODO")
     }
 
-    fun itemClicked(item: FillableChainAccountModel) = launch(Dispatchers.Default) {
-        // TODO receive account from ledger
-        val account = randomAccount(item)
+    fun itemClicked(item: FillableChainAccountModel) = launch {
+        router.openImportSelectLedger()
 
-        addAccount(item.chainUi.id, account)
+//        addAccount(item.chainUi.id, account)
     }
 
     fun backClicked() = launch {

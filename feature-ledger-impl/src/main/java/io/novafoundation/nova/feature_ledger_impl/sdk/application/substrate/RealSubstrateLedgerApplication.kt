@@ -48,7 +48,7 @@ const val CHUNK_SIZE = 250
 
 class RealSubstrateLedgerApplication(
     private val transport: LedgerTransport,
-    private val supportedApplications: List<SubstrateApplicationConfig>,
+    private val supportedApplications: List<SubstrateApplicationConfig> = SubstrateApplicationConfig.all(),
 ) : SubstrateLedgerApplication {
 
     override suspend fun getAccount(device: LedgerDevice, chainId: ChainId, accountIndex: Int): LedgerSubstrateAccount {

@@ -4,6 +4,7 @@ import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.merge
 
 class CompoundLedgerDiscoveryService(
     private val delegates: List<LedgerDeviceDiscoveryService>
@@ -15,6 +16,11 @@ class CompoundLedgerDiscoveryService(
         ) { discoveredDevices ->
             discoveredDevices.toList().flatten()
         }
+    }
+
+    override val errors: Flow<Throwable> by lazy {
+        delegates.map(LedgerDeviceDiscoveryService::errors)
+            .merge()
     }
 
     override fun startDiscovery() {

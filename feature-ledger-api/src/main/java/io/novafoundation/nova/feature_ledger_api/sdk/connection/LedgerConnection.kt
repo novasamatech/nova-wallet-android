@@ -17,5 +17,7 @@ interface LedgerConnection {
 
     suspend fun send(chunks: List<ByteArray>)
 
+    suspend fun connect(): Result<Unit>
+
     val receiveChannel: Channel<ByteArray>
 }

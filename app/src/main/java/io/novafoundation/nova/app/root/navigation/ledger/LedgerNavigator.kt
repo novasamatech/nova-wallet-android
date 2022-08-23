@@ -8,4 +8,6 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 class LedgerNavigator(navigationHolder: NavigationHolder) : BaseNavigator(navigationHolder), LedgerRouter {
 
     override fun openImportFillWallet() = performNavigation(R.id.action_startImportLedgerFragment_to_fillWalletImportLedgerFragment)
+
+    override fun openImportSelectLedger() = performNavigation(R.id.action_fillWalletImportLedgerFragment_to_selectLedgerImportFragment)
 }

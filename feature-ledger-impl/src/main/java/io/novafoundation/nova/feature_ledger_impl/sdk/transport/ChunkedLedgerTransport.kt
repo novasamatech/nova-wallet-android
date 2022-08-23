@@ -110,7 +110,7 @@ class ChunkedLedgerTransport : LedgerTransport {
         require(tag == DATA_TAG_ID, Reason.UNSUPPORTED_RESPONSE)
         remainedData = remainedData.dropBytes(1)
 
-        val packetIndex = raw.copyBytes(from = 0, size = PACKET_INDEX_LENGTH).toBigEndianU16()
+        val packetIndex = remainedData.copyBytes(from = 0, size = PACKET_INDEX_LENGTH).toBigEndianU16()
         remainedData = remainedData.dropBytes(PACKET_INDEX_LENGTH)
 
         return if (packetIndex == 0.toUShort()) {

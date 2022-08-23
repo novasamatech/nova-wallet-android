@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.first
 
 class LedgerDevice(
     val id: String,
+    val name: String,
     val connection: LedgerConnection,
 )
 
