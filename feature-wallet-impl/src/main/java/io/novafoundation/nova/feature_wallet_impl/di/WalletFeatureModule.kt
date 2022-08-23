@@ -38,7 +38,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.datasource.AssetsCurrency
 import io.novafoundation.nova.feature_wallet_impl.data.datasource.CurrencyRemoteDataSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.SubstrateRemoteSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.WssSubstrateSource
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.BalancesUpdateSystem
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.balance.BalancesUpdateSystem
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.balance.PaymentUpdaterFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.coingecko.CoingeckoApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.CrossChainConfigApi

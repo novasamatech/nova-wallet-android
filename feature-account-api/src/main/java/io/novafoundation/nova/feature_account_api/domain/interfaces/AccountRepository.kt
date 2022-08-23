@@ -29,8 +29,11 @@ interface AccountRepository {
     suspend fun selectAccount(account: Account, newNode: Node? = null)
 
     suspend fun getSelectedAccount(chainId: String): Account
+
     suspend fun getSelectedMetaAccount(): MetaAccount
+
     suspend fun getMetaAccount(metaId: Long): MetaAccount
+
     fun selectedMetaAccountFlow(): Flow<MetaAccount>
 
     suspend fun findMetaAccount(accountId: ByteArray): MetaAccount?
@@ -38,6 +41,7 @@ interface AccountRepository {
     suspend fun allMetaAccounts(): List<MetaAccount>
 
     fun metaAccountsWithBalancesFlow(): Flow<List<MetaAccountWithAssetBalance>>
+
     suspend fun selectMetaAccount(metaId: Long)
 
     suspend fun updateMetaAccountName(metaId: Long, newName: String)

@@ -27,19 +27,19 @@
         android:hint="@string/account_wallet_nickname" />
 
     <io.novafoundation.nova.common.view.AlertView
+        android:id="@+id/accountDetailsTypeAlert"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
         android:layout_marginTop="16dp"
-        android:id="@+id/accountDetailsTypeAlert"
+        android:layout_marginEnd="16dp"
         tools:styleBackgroundColor="@color/white_12"
         tools:styleIcon="@drawable/ic_watch"
         tools:text="@string/account_details_watch_only_alert" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:layout_width="match_parent"
         android:id="@+id/accountDetailsChainAccounts"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layoutManager="io.novafoundation.nova.common.view.recyclerview.LinearLayoutManagerFixed"
         tools:listitem="@layout/item_chain_acount" />

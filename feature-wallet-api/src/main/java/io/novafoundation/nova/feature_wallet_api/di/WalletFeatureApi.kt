@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_wallet_api.di
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdateSystemFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
@@ -15,6 +16,8 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 
 interface WalletFeatureApi {
+
+    fun provideBalanceLocksUpdateSystemFactory(): BalanceLocksUpdateSystemFactory
 
     fun provideWalletRepository(): WalletRepository
 

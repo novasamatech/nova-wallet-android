@@ -132,7 +132,7 @@ fun MetaAccount.multiChainEncryptionIn(chain: Chain): MultiChainEncryption? {
 fun MetaAccount.ethereumAccountId() = ethereumPublicKey?.asEthereumPublicKey()?.toAccountId()?.value
 
 /**
- @return [MultiChainEncryption] for given [accountId] inside this meta account or null in case it was not possible to determine result
+@return [MultiChainEncryption] for given [accountId] inside this meta account or null in case it was not possible to determine result
  */
 fun MetaAccount.multiChainEncryptionFor(accountId: ByteArray): MultiChainEncryption? {
     return when {

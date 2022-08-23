@@ -11,7 +11,9 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.SelectAddressCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
@@ -31,6 +33,7 @@ class SelectSendModule {
     fun provideViewModel(
         interactor: WalletInteractor,
         sendInteractor: SendInteractor,
+        metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
         validationExecutor: ValidationExecutor,
         selectedAccountUseCase: SelectedAccountUseCase,
         router: AssetsRouter,
@@ -42,9 +45,11 @@ class SelectSendModule {
         assetPayload: AssetPayload,
         recipientAddress: String?,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+        selectAddressCommunicator: SelectAddressCommunicator
     ): ViewModel {
         return SelectSendViewModel(
             interactor = interactor,
+            metaAccountGroupingInteractor = metaAccountGroupingInteractor,
             router = router,
             assetPayload = assetPayload,
             chainRegistry = chainRegistry,
@@ -56,7 +61,8 @@ class SelectSendModule {
             selectedAccountUseCase = selectedAccountUseCase,
             addressInputMixinFactory = addressInputMixinFactory,
             initialRecipientAddress = recipientAddress,
-            actionAwaitableMixinFactory = actionAwaitableMixinFactory
+            actionAwaitableMixinFactory = actionAwaitableMixinFactory,
+            selectAddressRequester = selectAddressCommunicator
         )
     }
 
