@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="account_ledger_import_fill_disabled_hint">Add at least one account</string>
+  <string name="account_ledger_import_fill_title">Add accounts to your wallet</string>
+  <string name="account_ledger_import_fill_description">Make sure Network app is installed to your Ledger device using Ledger Live app. Open the network app on your Ledger device.</string>
+
   <string name="account_welcome_hardware_wallet_subtitle">Use Parity Signer or Ledger</string>
 <!--  <string name="account_welcome_hardware_wallet_subtitle">Use Parity Signer</string>-->
 

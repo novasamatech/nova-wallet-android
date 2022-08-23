@@ -20,7 +20,7 @@ class StartImportLedgerViewModel(
     }
 
     fun continueClicked() {
-        showMessage("TODO")
+        router.openImportFillWallet()
     }
 
     fun guideClicked() {
