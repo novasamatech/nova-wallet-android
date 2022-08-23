@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.CurrencyMode
 import io.novafoundation.nova.feature_wallet_impl.R
 import io.novafoundation.nova.feature_wallet_impl.di.WalletFeatureComponent
 import kotlinx.android.synthetic.main.fragment_select_currency.currencyList
+import kotlinx.android.synthetic.main.fragment_select_currency.currencyToolbar
 
 class SelectCurrencyFragment : BaseFragment<SelectCurrencyViewModel>(), CurrencyAdapter.Handler {
 
@@ -22,6 +23,10 @@ class SelectCurrencyFragment : BaseFragment<SelectCurrencyViewModel>(), Currency
 
     override fun initViews() {
         currencyList.adapter = adapter
+
+        currencyToolbar.setHomeButtonListener {
+            viewModel.backClicked()
+        }
     }
 
     override fun inject() {

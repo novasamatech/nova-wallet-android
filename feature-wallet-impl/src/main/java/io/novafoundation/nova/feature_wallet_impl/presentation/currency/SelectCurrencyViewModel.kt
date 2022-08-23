@@ -61,4 +61,8 @@ class SelectCurrencyViewModel(
             router.back()
         }
     }
+
+    fun backClicked() {
+        router.back()
+    }
 }
