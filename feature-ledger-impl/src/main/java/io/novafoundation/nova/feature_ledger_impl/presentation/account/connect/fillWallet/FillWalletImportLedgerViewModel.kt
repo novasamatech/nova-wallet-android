@@ -49,7 +49,7 @@ class FillWalletImportLedgerViewModel(
     }.shareInBackground()
 
     fun continueClicked() {
-       showMessage("TODO")
+        showMessage("TODO")
     }
 
     fun itemClicked(item: FillableChainAccountModel) = launch(Dispatchers.Default) {
@@ -64,7 +64,7 @@ class FillWalletImportLedgerViewModel(
     }
 
     private suspend fun randomAccount(item: FillableChainAccountModel): LedgerSubstrateAccount {
-        val chain = availableChainsFlow.first().first { it.id ==  item.chainUi.id }
+        val chain = availableChainsFlow.first().first { it.id == item.chainUi.id }
 
         val publicKey = Random.nextBytes(32)
         val address = chain.addressOf(publicKey)
@@ -75,7 +75,7 @@ class FillWalletImportLedgerViewModel(
         )
     }
 
-    private suspend fun createFillableChainAccountModel(chain: Chain, account: LedgerSubstrateAccount?) : FillableChainAccountModel {
+    private suspend fun createFillableChainAccountModel(chain: Chain, account: LedgerSubstrateAccount?): FillableChainAccountModel {
         return FillableChainAccountModel(
             filledAddressModel = account?.let {
                 addressIconGenerator.createAccountAddressModel(chain, it.address)
@@ -84,7 +84,7 @@ class FillWalletImportLedgerViewModel(
         )
     }
 
-    private fun addAccount(chainId: ChainId, account: LedgerSubstrateAccount){
+    private fun addAccount(chainId: ChainId, account: LedgerSubstrateAccount) {
         filledAccountsFlow.value = filledAccountsFlow.value.inserted(chainId, account)
     }
 }

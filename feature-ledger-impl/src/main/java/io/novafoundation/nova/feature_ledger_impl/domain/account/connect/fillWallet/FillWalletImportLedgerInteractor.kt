@@ -13,7 +13,7 @@ interface FillWalletImportLedgerInteractor {
 
 class RealFillWalletImportLedgerInteractor(
     private val chainRegistry: ChainRegistry
-): FillWalletImportLedgerInteractor {
+) : FillWalletImportLedgerInteractor {
 
     override suspend fun availableLedgerChains(): List<Chain> {
         val supportedLedgerApps = SubstrateApplicationConfig.all()
