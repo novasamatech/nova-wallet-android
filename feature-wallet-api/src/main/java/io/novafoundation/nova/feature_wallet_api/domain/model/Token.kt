@@ -7,7 +7,8 @@ import java.math.BigDecimal
 import java.math.BigInteger
 
 class Token(
-    val dollarRate: BigDecimal?,
+    val rate: BigDecimal?,
+    val currency: Currency,
     val recentRateChange: BigDecimal?,
     val configuration: Chain.Asset
 ) {
@@ -15,7 +16,7 @@ class Token(
     fun BigDecimal.toPlanks() = planksFromAmount(this)
     fun BigInteger.toAmount() = amountFromPlanks(this)
 
-    fun fiatAmount(tokenAmount: BigDecimal): BigDecimal = dollarRate?.multiply(tokenAmount) ?: BigDecimal.ZERO
+    fun fiatAmount(tokenAmount: BigDecimal): BigDecimal = rate?.multiply(tokenAmount) ?: BigDecimal.ZERO
 }
 
 fun Token.amountFromPlanks(amountInPlanks: BigInteger) = configuration.amountFromPlanks(amountInPlanks)

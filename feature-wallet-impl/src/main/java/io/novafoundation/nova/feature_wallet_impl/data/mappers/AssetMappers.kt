@@ -13,7 +13,7 @@ fun mapTokenLocalToToken(
     return with(tokenLocal) {
         Token(
             configuration = chainAsset,
-            dollarRate = dollarRate,
+            rate = rate,
             recentRateChange = recentRateChange
         )
     }

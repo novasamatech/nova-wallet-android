@@ -22,7 +22,7 @@ fun mapTokenToTokenModel(token: Token): TokenModel {
 
         TokenModel(
             configuration = configuration,
-            dollarRate = (dollarRate ?: BigDecimal.ZERO).formatAsCurrency(),
+            dollarRate = (rate ?: BigDecimal.ZERO).formatAsCurrency(),
             recentRateChange = (recentRateChange ?: BigDecimal.ZERO).formatAsChange(),
             rateChangeColorRes = changeColorRes
         )

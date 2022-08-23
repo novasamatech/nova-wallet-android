@@ -260,7 +260,7 @@ class MetamaskSignInteractor(
         val currency = metamaskChain.nativeCurrency
 
         return Token(
-            dollarRate = null,
+            rate = null,
             recentRateChange = null,
             configuration = Chain.Asset(
                 iconUrl = metamaskChain.iconUrls?.firstOrNull(),
