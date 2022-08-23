@@ -1,6 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
@@ -31,6 +32,7 @@ android {
 
 dependencies {
     implementation project(":feature-ledger-api")
+    implementation project(':feature-account-api')
     implementation project(":common")
     implementation project(":runtime")
 
@@ -47,7 +49,6 @@ dependencies {
 
     implementation coroutinesDep
     implementation coroutinesAndroidDep
-
 
     implementation daggerDep
     kapt daggerKapt

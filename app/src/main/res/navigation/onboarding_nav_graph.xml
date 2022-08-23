@@ -52,6 +52,14 @@
             app:popExitAnim="@anim/fragment_close_exit"
             android:id="@+id/action_welcomeFragment_to_import_parity_signer_graph"
             app:destination="@id/import_parity_signer_graph" />
+
+        <action
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            android:id="@+id/action_welcomeFragment_to_import_ledger_graph"
+            app:destination="@id/import_ledger_graph" />
     </fragment>
 
 
@@ -74,6 +82,7 @@
     <include app:graph="@navigation/mnemonic_nav_graph" />
     <include app:graph="@navigation/import_nav_graph" />
     <include app:graph="@navigation/import_parity_signer_graph" />
+    <include app:graph="@navigation/import_ledger_graph" />
 
     <fragment
         android:id="@+id/createWatchWalletFragment"

@@ -21,7 +21,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.di.CrowdloanFeatureHolder
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureHolder
 import io.novafoundation.nova.feature_ledger_api.di.LedgerFeatureApi
-import io.novafoundation.nova.feature_ledger_impl.LedgerFeatureHolder
+import io.novafoundation.nova.feature_ledger_impl.di.LedgerFeatureHolder
 import io.novafoundation.nova.feature_nft_api.NftFeatureApi
 import io.novafoundation.nova.feature_nft_impl.di.NftFeatureHolder
 import io.novafoundation.nova.feature_onboarding_api.di.OnboardingFeatureApi

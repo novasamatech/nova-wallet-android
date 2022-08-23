@@ -519,6 +519,10 @@ class Navigator(
         navController?.navigate(R.id.action_welcomeFragment_to_import_parity_signer_graph)
     }
 
+    override fun openStartImportLedger() {
+        navController?.navigate(R.id.action_welcomeFragment_to_import_ledger_graph)
+    }
+
     override fun withPinCodeCheckRequired(
         delayedNavigation: DelayedNavigation,
         createMode: Boolean,

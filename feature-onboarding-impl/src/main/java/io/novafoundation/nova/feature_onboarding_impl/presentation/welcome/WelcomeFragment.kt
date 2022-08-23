@@ -92,9 +92,14 @@ class WelcomeFragment : BaseFragment<WelcomeViewModel>() {
     }
 
     override fun subscribe(viewModel: WelcomeViewModel) {
-        viewModel.shouldShowBackLiveData.observe(back::setVisible)
-
         observeBrowserEvents(viewModel)
         setupImportTypeChooser(viewModel)
+
+        viewModel.shouldShowBackLiveData.observe(back::setVisible)
+
+        viewModel.selectHardwareWallet.awaitableActionLiveData.observeEvent {
+            SelectHardwareWalletBottomSheet(requireContext(), it.onSuccess)
+                .show()
+        }
     }
 }
