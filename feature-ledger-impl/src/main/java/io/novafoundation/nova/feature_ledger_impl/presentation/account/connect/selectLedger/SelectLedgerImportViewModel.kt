@@ -32,7 +32,7 @@ class SelectLedgerImportViewModel(
 ) {
 
     override suspend fun verifyConnection(device: LedgerDevice) {
-        val account = substrateApplication.getAccount(device, selectLedgerPayload.chainId, accountIndex = 0)
+        val account = substrateApplication.getAccount(device, selectLedgerPayload.chainId, accountIndex = 0, confirmAddress = false)
 
         showMessage("Connected to device ${device.name} with account ${account.address}")
     }

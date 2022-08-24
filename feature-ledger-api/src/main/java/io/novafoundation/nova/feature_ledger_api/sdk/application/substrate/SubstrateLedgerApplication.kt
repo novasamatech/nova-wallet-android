@@ -9,6 +9,7 @@ interface SubstrateLedgerApplication {
         device: LedgerDevice,
         chainId: ChainId,
         accountIndex: Int,
+        confirmAddress: Boolean
     ): LedgerSubstrateAccount
 
     suspend fun getSignature(
