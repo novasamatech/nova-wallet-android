@@ -120,7 +120,7 @@ class RealSubstrateLedgerApplication(
         val pathAsString = "//44//$coin//$accountIndex//0//0"
         val junctions = BIP32JunctionDecoder.decode(pathAsString).junctions
 
-        return junctions.encodeToByteArray()
+        return junctions.serializeInLedgerFormat()
     }
 
     /**
