@@ -34,7 +34,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.pincode.PincodeF
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.ToolbarConfiguration
 import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.change.ChangeWatchAccountFragment
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
-import io.novafoundation.nova.feature_assets.presentation.WalletRouter
+import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.BalanceDetailFragment
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.receive.ReceiveFragment
@@ -91,7 +91,7 @@ class Navigator(
     SplashRouter,
     OnboardingRouter,
     AccountRouter,
-    WalletRouter,
+    AssetsRouter,
     RootRouter,
     StakingRouter,
     CrowdloanRouter {
@@ -385,6 +385,10 @@ class Navigator(
 
     override fun openNodes() {
         navController?.navigate(R.id.action_mainFragment_to_nodesFragment)
+    }
+
+    override fun openCurrencies() {
+        navController?.navigate(R.id.action_mainFragment_to_currenciesFragment)
     }
 
     override fun openLanguages() {

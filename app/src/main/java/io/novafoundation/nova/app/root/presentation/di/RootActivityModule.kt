@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -28,6 +29,7 @@ class RootActivityModule {
     @ViewModelKey(RootViewModel::class)
     fun provideViewModel(
         interactor: RootInteractor,
+        currencyInteractor: CurrencyInteractor,
         rootRouter: RootRouter,
         resourceManager: ResourceManager,
         networkStateMixin: NetworkStateMixin,
@@ -35,6 +37,7 @@ class RootActivityModule {
     ): ViewModel {
         return RootViewModel(
             interactor,
+            currencyInteractor,
             rootRouter,
             externalRequirementsFlow,
             resourceManager,

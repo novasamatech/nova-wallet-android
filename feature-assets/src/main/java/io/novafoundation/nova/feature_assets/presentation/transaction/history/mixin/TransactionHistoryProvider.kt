@@ -12,7 +12,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.AddressD
 import io.novafoundation.nova.feature_assets.data.mappers.mappers.mapOperationToOperationModel
 import io.novafoundation.nova.feature_assets.data.mappers.mappers.mapOperationToParcel
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
-import io.novafoundation.nova.feature_assets.presentation.WalletRouter
+import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.model.OperationModel
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProviderFactory
@@ -41,7 +41,7 @@ import kotlinx.coroutines.withContext
 
 class TransactionHistoryProvider(
     private val walletInteractor: WalletInteractor,
-    private val router: WalletRouter,
+    private val router: AssetsRouter,
     private val historyFiltersProviderFactory: HistoryFiltersProviderFactory,
     private val resourceManager: ResourceManager,
     private val addressDisplayUseCase: AddressDisplayUseCase,

@@ -10,7 +10,7 @@ import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_assets.presentation.WalletRouter
+import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
@@ -20,7 +20,7 @@ class ExtrinsicDetailViewModel(
     private val addressDisplayUseCase: AddressDisplayUseCase,
     private val addressIconGenerator: AddressIconGenerator,
     private val chainRegistry: ChainRegistry,
-    private val router: WalletRouter,
+    private val router: AssetsRouter,
     val operation: OperationParcelizeModel.Extrinsic,
     private val externalActions: ExternalActions.Presentation
 ) : BaseViewModel(),

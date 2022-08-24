@@ -16,7 +16,7 @@ import io.novafoundation.nova.feature_assets.domain.BalanceLocksInteractor
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
-import io.novafoundation.nova.feature_assets.presentation.WalletRouter
+import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy.BuyMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.model.BalanceLocksModel
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryMixin
@@ -37,7 +37,7 @@ class BalanceDetailViewModel(
     private val walletInteractor: WalletInteractor,
     private val balanceLocksInteractor: BalanceLocksInteractor,
     private val sendInteractor: SendInteractor,
-    private val router: WalletRouter,
+    private val router: AssetsRouter,
     private val assetPayload: AssetPayload,
     buyMixinFactory: BuyMixinFactory,
     private val transactionHistoryMixin: TransactionHistoryMixin,

@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.list.AssetsListInteractor
-import io.novafoundation.nova.feature_assets.presentation.WalletRouter
+import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.list.BalanceListViewModel
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 
@@ -34,7 +34,7 @@ class BalanceListModule {
     fun provideViewModel(
         interactor: WalletInteractor,
         assetsListInteractor: AssetsListInteractor,
-        router: WalletRouter,
+        router: AssetsRouter,
         selectedAccountUseCase: SelectedAccountUseCase,
         addressIconGenerator: AddressIconGenerator,
     ): ViewModel {

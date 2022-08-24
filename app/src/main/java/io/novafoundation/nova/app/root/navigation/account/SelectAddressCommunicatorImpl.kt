@@ -6,9 +6,9 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.S
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.SelectAddressRequester
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.SelectAddressResponder
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.selecting.SelectAddressFragment
-import io.novafoundation.nova.feature_assets.presentation.WalletRouter
+import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 
-class SelectAddressCommunicatorImpl(private val router: WalletRouter, navigationHolder: NavigationHolder) :
+class SelectAddressCommunicatorImpl(private val router: AssetsRouter, navigationHolder: NavigationHolder) :
     BaseInterScreenCommunicator<SelectAddressRequester.Request, SelectAddressResponder.Response>(navigationHolder),
     SelectAddressCommunicator {
 

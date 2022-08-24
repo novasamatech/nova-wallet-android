@@ -22,7 +22,7 @@ import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
-import io.novafoundation.nova.feature_assets.presentation.WalletRouter
+import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDirectionModel
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.amount.view.CrossChainDestinationModel
@@ -63,7 +63,7 @@ class SelectSendViewModel(
     private val interactor: WalletInteractor,
     private val sendInteractor: SendInteractor,
     private val metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
-    private val router: WalletRouter,
+    private val router: AssetsRouter,
     private val assetPayload: AssetPayload,
     private val initialRecipientAddress: String?,
     private val chainRegistry: ChainRegistry,

@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_assets.data.buyToken.BuyTokenRegistry
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRepository
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_wallet_api.di.Wallet
+import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
@@ -33,6 +34,8 @@ interface RootDependencies {
     fun buyTokenRegistry(): BuyTokenRegistry
 
     fun resourceManager(): ResourceManager
+
+    fun currencyInteractor(): CurrencyInteractor
 
     @Wallet
     fun walletUpdateSystem(): UpdateSystem

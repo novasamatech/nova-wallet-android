@@ -12,7 +12,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.AdvancedEncryptionCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.SelectAddressCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.ParitySignerSignInterScreenCommunicator
-import io.novafoundation.nova.feature_assets.presentation.WalletRouter
+import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 
 @Module
 class AccountNavigationModule {
@@ -32,7 +32,7 @@ class AccountNavigationModule {
     @Provides
     @ApplicationScope
     fun provideSelectAddressCommunicator(
-        router: WalletRouter,
+        router: AssetsRouter,
         navigationHolder: NavigationHolder
     ): SelectAddressCommunicator = SelectAddressCommunicatorImpl(router, navigationHolder)
 
