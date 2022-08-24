@@ -9,15 +9,16 @@ import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDisco
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerViewModel
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.selectAddress.SelectLedgerAddressPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 class SelectLedgerImportViewModel(
     private val substrateApplication: SubstrateLedgerApplication,
     private val selectLedgerPayload: SelectLedgerPayload,
+    private val router: LedgerRouter,
     discoveryService: LedgerDeviceDiscoveryService,
     permissionsAsker: PermissionsAsker.Presentation,
     bluetoothManager: BluetoothManager,
-    router: LedgerRouter,
     resourceManager: ResourceManager,
     chainRegistry: ChainRegistry,
 ) : SelectLedgerViewModel(
@@ -31,8 +32,10 @@ class SelectLedgerImportViewModel(
 ) {
 
     override suspend fun verifyConnection(device: LedgerDevice) {
-        val account = substrateApplication.getAccount(device, selectLedgerPayload.chainId, accountIndex = 0, confirmAddress = false)
+        // ensure that address loads successfully
+        substrateApplication.getAccount(device, selectLedgerPayload.chainId, accountIndex = 0, confirmAddress = false)
 
-        showMessage("Connected to device ${device.name} with account ${account.address}")
+        val selectAddressPayload = SelectLedgerAddressPayload(device.id, selectLedgerPayload.chainId)
+        router.openSelectImportAddress(selectAddressPayload)
     }
 }

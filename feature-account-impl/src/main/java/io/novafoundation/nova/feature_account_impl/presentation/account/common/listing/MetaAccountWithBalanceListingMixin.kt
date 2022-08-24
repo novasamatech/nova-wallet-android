@@ -7,7 +7,7 @@ import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.utils.formatAsCurrency
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountWithTotalBalance
-import io.novafoundation.nova.feature_account_impl.presentation.account.model.MetaAccountUi
+import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountUi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.map
 
@@ -51,7 +51,7 @@ private class MetaAccountWithBalanceListingMixin(
             backgroundColorRes = AddressIconGenerator.BACKGROUND_TRANSPARENT
         )
 
-        MetaAccountUi(
+        AccountUi(
             id = metaId,
             title = name,
             subtitle = totalBalance.formatAsCurrency(),

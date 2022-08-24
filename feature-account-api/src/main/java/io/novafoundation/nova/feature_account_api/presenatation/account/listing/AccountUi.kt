@@ -1,8 +1,8 @@
-package io.novafoundation.nova.feature_account_impl.presentation.account.model
+package io.novafoundation.nova.feature_account_api.presenatation.account.listing
 
 import android.graphics.drawable.Drawable
 
-class MetaAccountUi(
+class AccountUi(
     val id: Long,
     val title: String,
     val subtitle: String,

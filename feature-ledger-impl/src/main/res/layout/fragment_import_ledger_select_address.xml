@@ -8,9 +8,9 @@
     tools:background="@color/black">
 
     <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/ledgerSelectAddressToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/selectLedgerToolbar"
         app:dividerVisible="false" />
 
     <TextView
@@ -20,32 +20,24 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:text="@string/account_ledger_select_device_title" />
+        android:text="@string/ledher_import_select_address_title" />
 
-    <TextView
-        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
-        android:layout_width="match_parent"
+    <io.novafoundation.nova.feature_account_api.view.ChainChipView
+        android:layout_width="wrap_content"
+        android:id="@+id/ledgerSelectAddressChain"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:text="@string/account_ledger_select_device_description" />
+        android:layout_marginTop="16dp" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/selectLedgerDevices"
         android:layout_width="match_parent"
+        android:layout_height="0dp"
         android:layout_marginTop="16dp"
-        android:layout_height="0dp"
         android:layout_weight="1"
-        android:visibility="gone"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
-
-    <ProgressBar
-        android:id="@+id/selectLedgerProgress"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="1"
-        android:indeterminate="true"
-        android:indeterminateTint="@color/white" />
+        android:clipToPadding="false"
+        android:paddingBottom="16dp"
+        android:id="@+id/ledgerSelectAddressContent"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:itemCount="3"
+        tools:listitem="@layout/item_account" />
 </LinearLayout>

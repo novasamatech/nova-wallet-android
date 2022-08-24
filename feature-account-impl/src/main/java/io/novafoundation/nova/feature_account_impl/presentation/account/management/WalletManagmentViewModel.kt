@@ -7,11 +7,11 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingOrDenyingAc
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
+import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountUi
+import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountsAdapter.Mode
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountWithBalanceListingMixinFactory
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.AccountsAdapter.Mode
-import io.novafoundation.nova.feature_account_impl.presentation.account.model.MetaAccountUi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -39,7 +39,7 @@ class WalletManagmentViewModel(
 
     val confirmAccountDeletion = actionAwaitableMixinFactory.confirmingOrDenyingAction<Unit>()
 
-    fun accountClicked(accountModel: MetaAccountUi) {
+    fun accountClicked(accountModel: AccountUi) {
         accountRouter.openAccountDetails(accountModel.id)
     }
 
@@ -49,7 +49,7 @@ class WalletManagmentViewModel(
         mode.value = newMode
     }
 
-    fun deleteClicked(account: MetaAccountUi) = launch {
+    fun deleteClicked(account: AccountUi) = launch {
         if (account.isSelected) return@launch
 
         val deleteConfirmed = confirmAccountDeletion.awaitAction()

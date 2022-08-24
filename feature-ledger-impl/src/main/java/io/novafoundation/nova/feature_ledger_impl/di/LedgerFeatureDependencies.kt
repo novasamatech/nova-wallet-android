@@ -8,6 +8,8 @@ import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 interface LedgerFeatureDependencies {
@@ -29,4 +31,8 @@ interface LedgerFeatureDependencies {
     val permissionAskerFactory: PermissionsAskerFactory
 
     val contextManager: ContextManager
+
+    val assetSourceRegistry: AssetSourceRegistry
+
+    val tokenRepository: TokenRepository
 }

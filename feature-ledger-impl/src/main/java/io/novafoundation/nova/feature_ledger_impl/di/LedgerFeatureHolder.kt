@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.di.FeatureApiHolder
 import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
+import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 import javax.inject.Inject
 
@@ -17,6 +18,7 @@ class LedgerFeatureHolder @Inject constructor(
         val accountFeatureDependencies = DaggerLedgerFeatureComponent_LedgerFeatureDependenciesComponent.builder()
             .commonApi(commonApi())
             .runtimeApi(getFeature(RuntimeApi::class.java))
+            .walletFeatureApi(getFeature(WalletFeatureApi::class.java))
             .build()
 
         return DaggerLedgerFeatureComponent.factory()
