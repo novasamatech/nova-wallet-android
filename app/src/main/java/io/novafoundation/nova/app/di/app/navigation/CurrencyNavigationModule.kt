@@ -10,7 +10,7 @@ import io.novafoundation.nova.feature_currency_api.presentation.CurrencyRouter
 
 @Module
 class CurrencyNavigationModule {
-    
+
     @ApplicationScope
     @Provides
     fun provideRouter(
