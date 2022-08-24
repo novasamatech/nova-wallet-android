@@ -16,22 +16,32 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.language.mapper.mapLanguageToLanguageModel
+import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
+import io.novafoundation.nova.feature_currency_api.presentation.mapper.mapCurrencyToUI
 import kotlinx.coroutines.launch
 
 class SettingsViewModel(
-    private val interactor: AccountInteractor,
+    private val accountInteractor: AccountInteractor,
     private val router: AccountRouter,
     private val appLinksProvider: AppLinksProvider,
     private val resourceManager: ResourceManager,
     private val appVersionProvider: AppVersionProvider,
     private val selectedAccountUseCase: SelectedAccountUseCase,
+    private val currencyInteractor: CurrencyInteractor
 ) : BaseViewModel(), Browserable {
 
     val selectedWalletModel = selectedAccountUseCase.selectedWalletModelFlow()
         .shareInBackground()
 
+    val selectedCurrencyFlow = flowOf {
+        val currency = currencyInteractor.getSelectedCurrency()
+        mapCurrencyToUI(currency)
+    }
+        .inBackground()
+        .share()
+
     val selectedLanguageFlow = flowOf {
-        val language = interactor.getSelectedLanguage()
+        val language = accountInteractor.getSelectedLanguage()
 
         mapLanguageToLanguageModel(language)
     }

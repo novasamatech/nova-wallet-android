@@ -8,7 +8,7 @@ import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.mixin.api.NetworkStateUi
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core.updater.Updater
-import io.novafoundation.nova.feature_wallet_api.domain.CurrencyInteractor
+import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection.ExternalRequirement
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn

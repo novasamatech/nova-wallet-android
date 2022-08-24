@@ -3,9 +3,8 @@ package io.novafoundation.nova.core_db.migrations
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-val AddCurrencies_18_19 = object : Migration(17, 18) {
+val AddCurrencies_18_19 = object : Migration(18, 19) {
     override fun migrate(database: SupportSQLiteDatabase) {
-        database.beginTransaction()
         // new table
         database.execSQL(
             """

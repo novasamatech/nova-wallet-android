@@ -391,7 +391,7 @@
 
     <fragment
         android:id="@+id/selectCurrencyFragment"
-        android:name="io.novafoundation.nova.feature_wallet_impl.presentation.currency.SelectCurrencyFragment"
+        android:name="io.novafoundation.nova.feature_currency_impl.presentation.currency.SelectCurrencyFragment"
         android:label="SelectCurrensyFragment"
         tools:layout="@layout/fragment_select_currency" />
 

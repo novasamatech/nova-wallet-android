@@ -89,6 +89,10 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
             accountView.setTitle(it.name)
         }
 
+        viewModel.selectedCurrencyFlow.observe {
+            settingsCurrency.setValue(it.code)
+        }
+
         viewModel.selectedLanguageFlow.observe {
             settingsLanguage.setValue(it.displayName)
         }
