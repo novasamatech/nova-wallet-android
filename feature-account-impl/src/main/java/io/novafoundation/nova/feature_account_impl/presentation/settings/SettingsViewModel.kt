@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.language.mapper.mapLanguageToLanguageModel
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.presentation.mapper.mapCurrencyToUI
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class SettingsViewModel(
@@ -33,10 +34,8 @@ class SettingsViewModel(
     val selectedWalletModel = selectedAccountUseCase.selectedWalletModelFlow()
         .shareInBackground()
 
-    val selectedCurrencyFlow = flowOf {
-        val currency = currencyInteractor.getSelectedCurrency()
-        mapCurrencyToUI(currency)
-    }
+    val selectedCurrencyFlow = currencyInteractor.observeSelectCurrency()
+        .map { mapCurrencyToUI(it) }
         .inBackground()
         .share()
 

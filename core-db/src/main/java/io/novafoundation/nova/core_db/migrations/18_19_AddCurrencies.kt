@@ -21,8 +21,5 @@ val AddCurrencies_18_19 = object : Migration(18, 19) {
         )
             """.trimIndent()
         )
-
-        database.setTransactionSuccessful()
-        database.endTransaction()
     }
 }
