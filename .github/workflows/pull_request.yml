@@ -1,9 +1,7 @@
 name: Pull request
 
 on:
-  push:
-    branches:
-      - "dev"
+  pull_request:
 
 jobs:
   test:
