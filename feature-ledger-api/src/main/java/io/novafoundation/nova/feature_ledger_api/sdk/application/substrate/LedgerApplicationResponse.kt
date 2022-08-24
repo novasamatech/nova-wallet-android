@@ -20,7 +20,8 @@ enum class LedgerApplicationResponse(val code: UShort) {
     badKey(0x6A80u),
     invalidP1P2(0x6B00u),
     instructionNotSupported(0x6D00u),
-    appNotOpen(0x6E00u),
+    wrongAppOpen(0x6E00u),
+    appNotOpen(0x6E01u),
     unknownError(0x6F00u),
     signVerifyError(0x6F01u);
 

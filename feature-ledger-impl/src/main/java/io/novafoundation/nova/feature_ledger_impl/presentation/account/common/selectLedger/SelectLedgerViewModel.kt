@@ -102,7 +102,11 @@ abstract class SelectLedgerViewModel(
 
             SideEffect.EnableBluetooth -> bluetoothManager.enableBluetooth()
 
-            is SideEffect.PresentConnectionFailure -> showError(effect.reason.message ?: "Error")
+            is SideEffect.PresentConnectionFailure -> {
+                effect.reason.printStackTrace()
+
+                showError(effect.reason.message ?: "Error")
+            }
 
             is SideEffect.StartDeviceFlow -> connectedToDevice(effect.device, effect.checkedAccount)
 

@@ -19,5 +19,7 @@ interface LedgerConnection {
 
     suspend fun connect(): Result<Unit>
 
+    suspend fun resetReceiveChannel()
+
     val receiveChannel: Channel<ByteArray>
 }

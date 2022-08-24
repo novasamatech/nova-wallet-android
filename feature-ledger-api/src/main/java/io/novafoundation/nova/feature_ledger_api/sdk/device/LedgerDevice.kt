@@ -9,4 +9,4 @@ class LedgerDevice(
     val connection: LedgerConnection,
 )
 
-suspend fun LedgerDevice.isConnected() = connection.isActive.first()
+suspend fun LedgerDevice.awaitConnected() = connection.isActive.first { connected -> connected }

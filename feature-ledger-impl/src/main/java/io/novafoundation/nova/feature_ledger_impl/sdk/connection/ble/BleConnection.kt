@@ -17,6 +17,10 @@ class BleConnection(
     private val bluetoothDevice: BluetoothDevice,
 ) : LedgerConnection, DataReceivedCallback {
 
+    @Volatile
+    private var _receiveChannel = newChannel()
+    private val receiveChannelLock = Any()
+
     override suspend fun connect(): Result<Unit> = runCatching {
         bleManager.connect(bluetoothDevice).suspend()
 
@@ -43,7 +47,13 @@ class BleConnection(
         bleManager.send(chunks)
     }
 
-    override val receiveChannel = Channel<ByteArray>(Channel.BUFFERED)
+    override suspend fun resetReceiveChannel() = synchronized(receiveChannelLock) {
+        _receiveChannel.close()
+        _receiveChannel = newChannel()
+    }
+
+    override val receiveChannel
+        get() = synchronized(receiveChannelLock) { _receiveChannel }
 
     override fun onDataReceived(device: BluetoothDevice, data: Data) {
         ensureCorrectDevice()
@@ -54,4 +64,6 @@ class BleConnection(
     private fun ensureCorrectDevice() = require(bleManager.bluetoothDevice?.address == bluetoothDevice.address) {
         "Wrong device connected"
     }
+
+    private fun newChannel() = Channel<ByteArray>(Channel.BUFFERED)
 }
