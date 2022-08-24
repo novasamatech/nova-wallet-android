@@ -18,6 +18,8 @@ import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureHolder
 import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
 import io.novafoundation.nova.feature_crowdloan_impl.di.CrowdloanFeatureHolder
+import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
+import io.novafoundation.nova.feature_currency_impl.di.CurrencyFeatureHolder
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureHolder
 import io.novafoundation.nova.feature_ledger_api.di.LedgerFeatureApi
@@ -89,6 +91,12 @@ interface ComponentHolderModule {
     @ClassKey(WalletFeatureApi::class)
     @IntoMap
     fun provideWalletFeature(walletFeatureHolder: WalletFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(CurrencyFeatureApi::class)
+    @IntoMap
+    fun provideCurrencyFeature(currencyFeatureHolder: CurrencyFeatureHolder): FeatureApiHolder
 
     @ApplicationScope
     @Binds

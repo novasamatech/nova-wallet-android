@@ -17,6 +17,7 @@ import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.AssetDao
+import io.novafoundation.nova.core_db.dao.CurrencyDao
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.dao.PhishingAddressDao
 import io.novafoundation.nova.core_db.dao.TokenDao
@@ -58,6 +59,8 @@ interface WalletFeatureDependencies {
     fun tokenDao(): TokenDao
 
     fun operationDao(): OperationDao
+
+    fun currencyDao(): CurrencyDao
 
     fun networkCreator(): NetworkApiCreator
 

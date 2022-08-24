@@ -101,6 +101,7 @@ class WalletRepositoryImpl(
         return mapAssetLocalToAsset(assetLocal, chainAsset = chainAsset)
     }
 
+    // params: currency + logic
     override suspend fun syncAssetsRates() {
         val chains = chainRegistry.currentChains.first()
 

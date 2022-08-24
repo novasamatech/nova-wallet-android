@@ -16,6 +16,7 @@ import kotlinx.android.synthetic.main.fragment_profile.accountView
 import kotlinx.android.synthetic.main.fragment_profile.settingsAppVersion
 import kotlinx.android.synthetic.main.fragment_profile.settingsAvatar
 import kotlinx.android.synthetic.main.fragment_profile.settingsContainer
+import kotlinx.android.synthetic.main.fragment_profile.settingsCurrency
 import kotlinx.android.synthetic.main.fragment_profile.settingsEmail
 import kotlinx.android.synthetic.main.fragment_profile.settingsGithub
 import kotlinx.android.synthetic.main.fragment_profile.settingsLanguage
@@ -48,6 +49,7 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
         settingsWallets.setOnClickListener { viewModel.walletsClicked() }
         settingsNetworks.setOnClickListener { viewModel.networksClicked() }
 
+        settingsCurrency.setOnClickListener { viewModel.currenciesClicked() }
         settingsLanguage.setOnClickListener { viewModel.languagesClicked() }
 
         settingsTelegram.setOnClickListener { viewModel.telegramClicked() }
@@ -85,6 +87,10 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
 
             accountView.setAccountIcon(it.walletIcon)
             accountView.setTitle(it.name)
+        }
+
+        viewModel.selectedCurrencyFlow.observe {
+            settingsCurrency.setValue(it.code)
         }
 
         viewModel.selectedLanguageFlow.observe {

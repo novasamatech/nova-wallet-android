@@ -34,6 +34,19 @@
   <string name="account_ledger_import_start_step_2"><font color='#FFFFFF'>Open the network app</font> on your Ledger device</string>
   <string name="account_ledger_import_start_step_1">Make sure <font color='#FFFFFF'>Network apps are installed</font> to your Ledger device using Ledger Live app</string>
 
+  <string name="wallet_currency_title">Currency</string>
+  <string name="wallet_currency_category_cryptocurrencies">Cryptocurrencies</string>
+  <string name="wallet_currency_category_feat">Fiat currencies</string>
+  <string name="wallet_currency_category_popular_feat">Popular fiat currencies</string>
+
+  <string name="assets_select_send_your_wallets">Your wallets</string>
+
+  <string name="assets_balance_details_locks_reserved">Reserved</string>
+  <string name="assets_balance_details_locks_staking">Staking</string>
+  <string name="assets_balance_details_locks_democrac">Democracy</string>
+  <string name="assets_balance_details_locks_vesting">Vesting</string>
+  <string name="assets_balance_details_locks_phrelect">Elections</string>
+
   <string name="account_parity_signer_not_supported_title">Signing is not supported</string>
   <string name="account_parity_signer_not_supported_subtitle">Parity Signer does not support signing arbitrary messages — only transactions</string>
 
@@ -856,12 +869,7 @@
   <string name="wallet_balance_details_total">Total balance</string>
   <string name="wallet_balance_details_total_after">Total after transfer</string>
   <string name="wallet_balance_frozen">Frozen</string>
-  <string name="wallet_balance_locked_template">Locked</string>
   <string name="wallet_balance_locked">Locked</string>
-  <string name="wallet_balance_locks_staking">Staking</string>
-  <string name="wallet_balance_locks_democrac">Democracy</string>
-  <string name="wallet_balance_locks_vesting">Vesting</string>
-  <string name="wallet_balance_locks_phrelect">Elections</string>
   <string name="wallet_balance_redeemable">Redeemable</string>
   <string name="wallet_balance_reserved">Reserved</string>
   <string name="wallet_balance_transferable">Transferable</string>
@@ -893,5 +901,4 @@
   <string name="wallet_transfer_details_title">Transfer details</string>
   <string name="wallet_your_balance">Your balance</string>
   <string name="yesterday">Yesterday</string>
-
 </resources>

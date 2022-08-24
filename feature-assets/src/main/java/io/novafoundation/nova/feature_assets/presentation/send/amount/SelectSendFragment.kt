@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import androidx.core.view.isInvisible
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
@@ -29,6 +30,7 @@ import kotlinx.android.synthetic.main.fragment_select_send.selectSendOriginFee
 import kotlinx.android.synthetic.main.fragment_select_send.selectSendRecipient
 import kotlinx.android.synthetic.main.fragment_select_send.selectSendToTitle
 import kotlinx.android.synthetic.main.fragment_select_send.selectSendToolbar
+import kotlinx.android.synthetic.main.fragment_select_send.selectWallet
 
 private const val KEY_ADDRESS = "KEY_ADDRESS"
 private const val KEY_ASSET_PAYLOAD = "KEY_ASSET_PAYLOAD"
@@ -58,6 +60,10 @@ class SelectSendFragment : BaseFragment<SelectSendViewModel>() {
         selectSendToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         selectSendDestinationChain.setOnClickListener { viewModel.destinationChainClicked() }
+
+        selectWallet.background = getRoundedCornerDrawable(cornerSizeDp = 8).withRipple()
+        selectWallet.setOnClickListener { viewModel.selectRecipientWallet() }
+
         selectSendDestinationChain.setChangeable(true)
 
         selectSendCrossChainFee.makeGone() // gone inititally
@@ -90,6 +96,10 @@ class SelectSendFragment : BaseFragment<SelectSendViewModel>() {
                 onSelected = it.onSuccess,
                 onCancelled = it.onCancel
             ).show()
+        }
+
+        viewModel.isSelectAddressAvailable.observe {
+            selectWallet.isInvisible = !it
         }
 
         viewModel.transferDirectionModel.observe {

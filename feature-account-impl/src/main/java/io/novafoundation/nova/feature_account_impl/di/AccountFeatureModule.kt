@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
@@ -43,12 +44,13 @@ import io.novafoundation.nova.feature_account_impl.di.modules.ParitySignerModule
 import io.novafoundation.nova.feature_account_impl.di.modules.SignersModule
 import io.novafoundation.nova.feature_account_impl.di.modules.WatchOnlyModule
 import io.novafoundation.nova.feature_account_impl.domain.AccountInteractorImpl
+import io.novafoundation.nova.feature_account_impl.domain.MetaAccountGroupingInteractorImpl
 import io.novafoundation.nova.feature_account_impl.domain.NodeHostValidator
 import io.novafoundation.nova.feature_account_impl.domain.account.add.AddAccountInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountDetailsInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountListingMixinFactory
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountWithBalanceListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.wallet.WalletUiUseCaseImpl
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherMixin
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherProvider
@@ -281,9 +283,18 @@ class AccountFeatureModule {
 
     @Provides
     @FeatureScope
+    fun provideMetaAccountGroupingInteractor(
+        chainRegistry: ChainRegistry,
+        accountRepository: AccountRepository
+    ): MetaAccountGroupingInteractor {
+        return MetaAccountGroupingInteractorImpl(chainRegistry, accountRepository)
+    }
+
+    @Provides
+    @FeatureScope
     fun provideAccountListingMixinFactory(
         addressIconGenerator: AddressIconGenerator,
         resourceManager: ResourceManager,
-        accountInteractor: AccountInteractor
-    ) = MetaAccountListingMixinFactory(addressIconGenerator, resourceManager, accountInteractor)
+        metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
+    ) = MetaAccountWithBalanceListingMixinFactory(addressIconGenerator, resourceManager, metaAccountGroupingInteractor)
 }

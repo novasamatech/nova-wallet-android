@@ -139,6 +139,9 @@ dependencies {
     implementation project(':feature-nft-api')
     implementation project(':feature-nft-impl')
 
+    implementation project(':feature-currency-api')
+    implementation project(':feature-currency-impl')
+
     implementation project(':feature-assets')
 
     implementation kotlinDep
