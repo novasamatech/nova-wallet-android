@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.S
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.AdvancedEncryptionCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.ParitySignerSignInterScreenCommunicator
+import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 import javax.inject.Inject
 
@@ -25,6 +26,7 @@ class AccountFeatureHolder @Inject constructor(
             .commonApi(commonApi())
             .dbApi(getFeature(DbApi::class.java))
             .runtimeApi(getFeature(RuntimeApi::class.java))
+            .currencyFeatureApi(getFeature(CurrencyFeatureApi::class.java))
             .build()
 
         return DaggerAccountFeatureComponent.factory()

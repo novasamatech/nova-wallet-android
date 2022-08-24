@@ -19,7 +19,7 @@ import io.novafoundation.nova.splash.SplashRouter
         DAppNavigationModule::class,
         NftNavigationModule::class,
         StakingNavigationModule::class,
-        WalletNavigationModule::class
+        CurrencyNavigationModule::class
     ]
 )
 class NavigationModule {
