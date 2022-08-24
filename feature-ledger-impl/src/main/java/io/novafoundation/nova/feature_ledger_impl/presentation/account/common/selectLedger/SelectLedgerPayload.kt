@@ -7,4 +7,4 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 class SelectLedgerPayload(
     val chainId: ChainId
-): Parcelable
+) : Parcelable

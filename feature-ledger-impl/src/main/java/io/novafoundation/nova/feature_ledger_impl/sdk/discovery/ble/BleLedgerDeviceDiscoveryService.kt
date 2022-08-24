@@ -15,7 +15,7 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 
-class BleScanFailed(val errorCode: Int): Throwable()
+class BleScanFailed(val errorCode: Int) : Throwable()
 
 @SuppressLint("MissingPermission")
 class BleLedgerDeviceDiscoveryService(

@@ -12,7 +12,7 @@ sealed class SideEffect {
 
     class VerifyConnection(val device: LedgerDevice) : SideEffect()
 
-    object StartDiscovery: SideEffect()
+    object StartDiscovery : SideEffect()
 }
 
 sealed class SelectLedgerEvent {

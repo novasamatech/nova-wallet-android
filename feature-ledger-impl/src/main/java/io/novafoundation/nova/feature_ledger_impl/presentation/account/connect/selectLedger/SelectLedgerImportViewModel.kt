@@ -21,7 +21,6 @@ class SelectLedgerImportViewModel(
     resourceManager: ResourceManager,
     chainRegistry: ChainRegistry,
 ) : SelectLedgerViewModel(
-    substrateApplication = substrateApplication,
     discoveryService = discoveryService,
     permissionsAsker = permissionsAsker,
     bluetoothManager = bluetoothManager,

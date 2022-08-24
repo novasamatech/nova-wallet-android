@@ -21,7 +21,6 @@ import kotlinx.android.synthetic.main.fragment_select_ledger.selectLedgerDevices
 import kotlinx.android.synthetic.main.fragment_select_ledger.selectLedgerProgress
 import kotlinx.android.synthetic.main.fragment_select_ledger.selectLedgerToolbar
 
-
 abstract class SelectLedgerFragment<V : SelectLedgerViewModel> : BaseFragment<V>(), SelectLedgerAdapter.Handler {
 
     companion object {
@@ -70,12 +69,6 @@ abstract class SelectLedgerFragment<V : SelectLedgerViewModel> : BaseFragment<V>
 
     override fun onStart() {
         super.onStart()
-
-//        lifecycleScope.launchWhenStarted {
-//            if (viewModel.canTrackBluetooth.first()) {
-//                enableBluetoothConnectivityTracker()
-//            }
-//        }
 
         enableBluetoothConnectivityTracker()
     }

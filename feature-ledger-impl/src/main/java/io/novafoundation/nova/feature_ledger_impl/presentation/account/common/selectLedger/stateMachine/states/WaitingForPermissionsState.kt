@@ -7,10 +7,10 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.se
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.SelectLedgerEvent.PermissionsGranted
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.SideEffect
 
-class WaitingForPermissionsState(private val bluetoothEnabled: Boolean = false): SelectLedgerState() {
+class WaitingForPermissionsState(private val bluetoothEnabled: Boolean = false) : SelectLedgerState() {
 
     override suspend fun StateMachine.Transition<SelectLedgerState, SideEffect>.performTransition(event: SelectLedgerEvent) {
-        when(event) {
+        when (event) {
             PermissionsGranted -> if (bluetoothEnabled) {
                 startDiscovery()
             } else {

@@ -19,7 +19,6 @@ import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.Ledge
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerApplicationResponse.appNotOpen
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerApplicationResponse.transactionRejected
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerApplicationResponse.wrongAppOpen
-import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateLedgerApplication
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateLedgerApplicationError
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
@@ -47,7 +46,6 @@ enum class BluetoothState {
 }
 
 abstract class SelectLedgerViewModel(
-    private val substrateApplication: SubstrateLedgerApplication,
     private val discoveryService: LedgerDeviceDiscoveryService,
     private val permissionsAsker: PermissionsAsker.Presentation,
     private val bluetoothManager: BluetoothManager,
@@ -93,7 +91,6 @@ abstract class SelectLedgerViewModel(
         router.back()
     }
 
-
     private fun emitInitialBluetoothState() {
         val state = if (bluetoothManager.isBluetoothEnabled()) {
             BluetoothState.ON
@@ -124,23 +121,21 @@ abstract class SelectLedgerViewModel(
 
             SideEffect.EnableBluetooth -> bluetoothManager.enableBluetooth()
 
-            is SideEffect.PresentConnectionFailure -> {
-                effect.reason.printStackTrace()
-
-                handleConnectionFailure(effect.device, effect.reason)
-            }
+            is SideEffect.PresentConnectionFailure -> handleConnectionFailure(effect.device, effect.reason)
 
             is SideEffect.VerifyConnection -> performConnectionVerification(effect.device)
 
-            SideEffect.StartDiscovery -> {
-                discoveryService.performDiscovery(scope = this)
-                discoveryService.errors.onEach(::discoveryError)
-
-                discoveryService.discoveredDevices.onEach {
-                    stateMachine.onEvent(SelectLedgerEvent.DiscoveredDevicesListChanged(it))
-                }.launchIn(this)
-            }
+            SideEffect.StartDiscovery -> startDeviceDiscovery()
         }
+    }
+
+    private fun startDeviceDiscovery() {
+        discoveryService.performDiscovery(scope = this)
+        discoveryService.errors.onEach(::discoveryError)
+
+        discoveryService.discoveredDevices.onEach {
+            stateMachine.onEvent(SelectLedgerEvent.DiscoveredDevicesListChanged(it))
+        }.launchIn(this)
     }
 
     private fun handleConnectionFailure(device: LedgerDevice, reason: Throwable) = launch {

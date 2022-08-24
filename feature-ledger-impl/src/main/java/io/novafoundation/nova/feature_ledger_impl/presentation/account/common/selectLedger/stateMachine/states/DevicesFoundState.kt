@@ -16,7 +16,7 @@ data class DevicesFoundState(
 ) : SelectLedgerState() {
 
     override suspend fun StateMachine.Transition<SelectLedgerState, SideEffect>.performTransition(event: SelectLedgerEvent) {
-        when(event) {
+        when (event) {
             BluetoothDisabled -> bluetoothDisabled()
 
             is ConnectionFailed -> connectingDevice?.let { device ->

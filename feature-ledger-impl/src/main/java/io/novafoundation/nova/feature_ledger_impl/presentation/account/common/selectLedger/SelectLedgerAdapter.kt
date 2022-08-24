@@ -14,7 +14,7 @@ import kotlinx.android.synthetic.main.item_ledger.view.itemLedger
 
 class SelectLedgerAdapter(
     private val handler: Handler
-): BaseListAdapter<SelectLedgerModel, SelectLedgerHolder>(DiffCallback()) {
+) : BaseListAdapter<SelectLedgerModel, SelectLedgerHolder>(DiffCallback()) {
 
     interface Handler {
 

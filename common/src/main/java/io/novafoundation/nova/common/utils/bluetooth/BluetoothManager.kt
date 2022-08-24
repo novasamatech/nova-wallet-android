@@ -40,7 +40,7 @@ internal class RealBluetoothManager(
     }
 
     override fun enableBluetooth() {
-        val activity  = contextManager.getActivity()
+        val activity = contextManager.getActivity()
         val intent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
 
         activity!!.startActivityForResult(intent, 0)

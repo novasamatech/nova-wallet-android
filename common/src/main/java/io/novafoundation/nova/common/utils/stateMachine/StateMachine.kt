@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-interface StateMachine<STATE: StateMachine.State<STATE, SIDE_EFFECT, EVENT>, SIDE_EFFECT, EVENT> {
+interface StateMachine<STATE : StateMachine.State<STATE, SIDE_EFFECT, EVENT>, SIDE_EFFECT, EVENT> {
 
     val state: StateFlow<STATE>
 
@@ -17,12 +17,12 @@ interface StateMachine<STATE: StateMachine.State<STATE, SIDE_EFFECT, EVENT>, SID
 
     fun onEvent(event: EVENT)
 
-    interface State<STATE: State<STATE, SIDE_EFFECT, EVENT>, SIDE_EFFECT, EVENT> {
+    interface State<STATE : State<STATE, SIDE_EFFECT, EVENT>, SIDE_EFFECT, EVENT> {
 
         suspend fun Transition<STATE, SIDE_EFFECT>.performTransition(event: EVENT)
     }
 
-    interface Transition<STATE: State<*, *, *>, SIDE_EFFECT> {
+    interface Transition<STATE : State<*, *, *>, SIDE_EFFECT> {
 
         suspend fun emitState(newState: STATE)
 
@@ -30,14 +30,14 @@ interface StateMachine<STATE: StateMachine.State<STATE, SIDE_EFFECT, EVENT>, SID
     }
 }
 
-fun <STATE: StateMachine.State<STATE, SIDE_EFFECT, EVENT>, SIDE_EFFECT, EVENT> StateMachine(
+fun <STATE : StateMachine.State<STATE, SIDE_EFFECT, EVENT>, SIDE_EFFECT, EVENT> StateMachine(
     initialState: STATE,
     coroutineScope: CoroutineScope
 ): StateMachine<STATE, SIDE_EFFECT, EVENT> = StateMachineImpl(initialState, coroutineScope)
 
-private class StateMachineImpl<STATE: StateMachine.State<STATE, SIDE_EFFECT, EVENT>, SIDE_EFFECT, EVENT>(
-        private val initialState: STATE,
-        coroutineScope: CoroutineScope
+private class StateMachineImpl<STATE : StateMachine.State<STATE, SIDE_EFFECT, EVENT>, SIDE_EFFECT, EVENT>(
+    private val initialState: STATE,
+    coroutineScope: CoroutineScope
 ) : StateMachine<STATE, SIDE_EFFECT, EVENT>, CoroutineScope by coroutineScope {
 
     private val mutex = Mutex()
