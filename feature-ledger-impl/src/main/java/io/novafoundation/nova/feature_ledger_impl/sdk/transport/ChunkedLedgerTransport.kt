@@ -5,8 +5,8 @@ import io.novafoundation.nova.common.utils.buildByteArray
 import io.novafoundation.nova.common.utils.dropBytes
 import io.novafoundation.nova.common.utils.toBigEndianU16
 import io.novafoundation.nova.feature_ledger_api.sdk.connection.LedgerConnection
+import io.novafoundation.nova.feature_ledger_api.sdk.connection.isConnected
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
-import io.novafoundation.nova.feature_ledger_api.sdk.device.awaitConnected
 import io.novafoundation.nova.feature_ledger_api.sdk.transport.LedgerTransport
 import io.novafoundation.nova.feature_ledger_api.sdk.transport.LedgerTransportError
 import io.novafoundation.nova.feature_ledger_api.sdk.transport.LedgerTransportError.Reason
@@ -29,7 +29,7 @@ class ChunkedLedgerTransport : LedgerTransport {
     private val exchangeMutex = Mutex()
 
     override suspend fun exchange(data: ByteArray, device: LedgerDevice): ByteArray = exchangeMutex.withLock {
-        device.awaitConnected()
+        require(device.connection.isConnected(), Reason.DEVICE_NOT_CONNECTED)
         device.connection.resetReceiveChannel()
 
         val mtu = device.connection.mtu()

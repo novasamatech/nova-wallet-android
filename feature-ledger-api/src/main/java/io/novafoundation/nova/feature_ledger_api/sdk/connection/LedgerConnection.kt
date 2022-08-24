@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_ledger_api.sdk.connection
 
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 
 interface LedgerConnection {
 
@@ -23,3 +24,6 @@ interface LedgerConnection {
 
     val receiveChannel: Channel<ByteArray>
 }
+
+suspend fun LedgerConnection.awaitConnected() = isActive.first { connected -> connected }
+suspend fun LedgerConnection.isConnected() = isActive.first()
