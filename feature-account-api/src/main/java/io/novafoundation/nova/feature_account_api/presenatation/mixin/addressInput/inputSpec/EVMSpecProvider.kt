@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import jp.co.soramitsu.fearless_utils.extensions.asEthereumAddress
 import jp.co.soramitsu.fearless_utils.extensions.isValid
 import jp.co.soramitsu.fearless_utils.extensions.toAccountId
-import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 

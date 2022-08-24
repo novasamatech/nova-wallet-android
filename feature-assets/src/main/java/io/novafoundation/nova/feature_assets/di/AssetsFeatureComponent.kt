@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.SelectAddressCommunicator
 import io.novafoundation.nova.feature_assets.presentation.WalletRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.di.BalanceDetailComponent
 import io.novafoundation.nova.feature_assets.presentation.balance.filters.di.AssetFiltersComponent
@@ -63,6 +64,7 @@ interface AssetsFeatureComponent : AssetsFeatureApi {
 
         fun create(
             @BindsInstance accountRouter: WalletRouter,
+            @BindsInstance selectAddressCommunicator: SelectAddressCommunicator,
             deps: AssetsFeatureDependencies
         ): AssetsFeatureComponent
     }

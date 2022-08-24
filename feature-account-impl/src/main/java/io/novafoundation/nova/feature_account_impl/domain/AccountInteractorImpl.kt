@@ -1,21 +1,15 @@
 package io.novafoundation.nova.feature_account_impl.domain
 
-import io.novafoundation.nova.common.list.GroupedList
-import io.novafoundation.nova.common.utils.amountFromPlanks
-import io.novafoundation.nova.common.utils.orZero
-import io.novafoundation.nova.common.utils.sumByBigDecimal
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.core.model.Language
 import io.novafoundation.nova.core.model.Node
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.Account
-import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
-import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountWithAssetBalance
-import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountWithTotalBalance
 import io.novafoundation.nova.feature_account_api.domain.model.PreferredCryptoType
+import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_impl.domain.errors.NodeAlreadyExistsException
 import io.novafoundation.nova.feature_account_impl.domain.errors.UnsupportedNetworkException
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -23,7 +17,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.Mnemonic
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 class AccountInteractorImpl(
@@ -75,32 +68,6 @@ class AccountInteractorImpl(
 
     override suspend fun getMetaAccount(metaId: Long): MetaAccount {
         return accountRepository.getMetaAccount(metaId)
-    }
-
-    override fun metaAccountsFlow(): Flow<GroupedList<LightMetaAccount.Type, MetaAccountWithTotalBalance>> {
-        return accountRepository.metaAccountsWithBalancesFlow().map { accountsWithBalances ->
-            accountsWithBalances.groupBy(MetaAccountWithAssetBalance::metaId)
-                .map { (metaId, balances) ->
-                    val totalBalance = balances.sumByBigDecimal {
-                        val totalInPlanks = it.freeInPlanks + it.reservedInPlanks
-
-                        totalInPlanks.amountFromPlanks(it.precision) * it.dollarRate.orZero()
-                    }
-
-                    val first = balances.first()
-
-                    MetaAccountWithTotalBalance(
-                        metaId = metaId,
-                        totalBalance = totalBalance,
-                        name = first.name,
-                        type = first.type,
-                        isSelected = first.isSelected,
-                        substrateAccountId = first.substrateAccountId
-                    )
-                }
-                .groupBy(MetaAccountWithTotalBalance::type)
-                .toSortedMap(metaAccountTypeComparator())
-        }
     }
 
     override suspend fun selectMetaAccount(metaId: Long) {
@@ -203,11 +170,9 @@ class AccountInteractorImpl(
         return accountRepository.deleteNode(nodeId)
     }
 
-    private fun metaAccountTypeComparator() = compareBy<LightMetaAccount.Type> {
-        when (it) {
-            LightMetaAccount.Type.SECRETS -> 0
-            LightMetaAccount.Type.PARITY_SIGNER -> 1
-            LightMetaAccount.Type.WATCH_ONLY -> 2
-        }
+    override suspend fun getChainAddress(metaId: Long, chainId: ChainId): String? {
+        val metaAccount = getMetaAccount(metaId)
+        val chain = chainRegistry.getChain(chainId)
+        return metaAccount.addressIn(chain)
     }
 }
