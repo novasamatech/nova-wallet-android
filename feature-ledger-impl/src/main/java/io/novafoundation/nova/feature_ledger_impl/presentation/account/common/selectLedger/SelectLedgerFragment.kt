@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.permissions.setupPermissionAsker
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.model.SelectLedgerModel
@@ -53,6 +54,8 @@ abstract class SelectLedgerFragment<V : SelectLedgerViewModel> : BaseFragment<V>
             selectLedgerDevices.setVisible(it.isNotEmpty())
             selectLedgerProgress.setVisible(it.isEmpty())
         }
+
+        setupPermissionAsker(viewModel)
     }
 
     override fun onStart() {

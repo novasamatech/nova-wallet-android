@@ -117,7 +117,7 @@ class RealSubstrateLedgerApplication(
     }
 
     private fun buildDerivationPath(coin: Int, accountIndex: Int): ByteArray {
-        val pathAsString = "//44//$coin//0/0/$accountIndex"
+        val pathAsString = "//44//$coin//$accountIndex//0//0"
         val junctions = BIP32JunctionDecoder.decode(pathAsString).junctions
 
         return junctions.encodeToByteArray()

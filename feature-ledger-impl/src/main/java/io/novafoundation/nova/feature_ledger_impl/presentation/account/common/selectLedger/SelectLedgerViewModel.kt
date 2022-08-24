@@ -40,7 +40,7 @@ abstract class SelectLedgerViewModel(
     private val permissionsAsker: PermissionsAsker.Presentation,
     private val bluetoothManager: BluetoothManager,
     private val router: ReturnableRouter,
-) : BaseViewModel() {
+) : BaseViewModel(), PermissionsAsker by permissionsAsker{
 
     private val stateMachine = StateMachine(WaitingForPermissionsState(), coroutineScope = this)
 
@@ -119,7 +119,7 @@ abstract class SelectLedgerViewModel(
 
     private fun connectToDevice(device: LedgerDevice) = launch {
         device.connection.connect().mapCatching {
-            substrateApplication.getAccount(device, Chain.Geneses.POLKADOT, accountIndex = 0)
+            substrateApplication.getAccount(device, Chain.Geneses.POLKADOT, accountIndex = 1)
         }
             .onSuccess {
                 stateMachine.onEvent(Event.ConnectionSucceeded(it))
