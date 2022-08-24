@@ -1,36 +1,37 @@
 package io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine
 
-import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerSubstrateAccount
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 
 sealed class SideEffect {
 
     object EnableBluetooth : SideEffect()
 
-    class PresentConnectionFailure(val reason: Throwable) : SideEffect()
+    class PresentConnectionFailure(val reason: Throwable, val device: LedgerDevice) : SideEffect()
 
     class ConnectToDevice(val device: LedgerDevice) : SideEffect()
 
-    class StartDeviceFlow(val device: LedgerDevice, val checkedAccount: LedgerSubstrateAccount) : SideEffect()
+    class VerifyConnection(val device: LedgerDevice) : SideEffect()
 
     object StartDiscovery: SideEffect()
 }
 
-sealed class Event {
+sealed class SelectLedgerEvent {
 
-    class DiscoveredDevicesListChanged(val newDevices: List<LedgerDevice>) : Event()
+    class DiscoveredDevicesListChanged(val newDevices: List<LedgerDevice>) : SelectLedgerEvent()
 
-    object BluetoothEnabled : Event()
+    object BluetoothEnabled : SelectLedgerEvent()
 
-    object BluetoothDisabled : Event()
+    object BluetoothDisabled : SelectLedgerEvent()
 
-    class DeviceChosen(val device: LedgerDevice) : Event()
+    class DeviceChosen(val device: LedgerDevice) : SelectLedgerEvent()
 
-    class ConnectionSucceeded(val checkedAccount: LedgerSubstrateAccount) : Event()
+    object ConnectionSucceeded : SelectLedgerEvent()
 
-    class ConnectionFailed(val reason: Throwable) : Event()
+    class ConnectionFailed(val reason: Throwable) : SelectLedgerEvent()
 
-    object DeviceFlowCancelled : Event()
+    object ConnectionVerified : SelectLedgerEvent()
 
-    object PermissionsGranted : Event()
+    object DeviceFlowCancelled : SelectLedgerEvent()
+
+    object PermissionsGranted : SelectLedgerEvent()
 }

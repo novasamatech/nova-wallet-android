@@ -10,7 +10,7 @@ class SelectLedgerImportFragment : SelectLedgerFragment<SelectLedgerImportViewMo
     override fun inject() {
         FeatureUtils.getFeature<LedgerFeatureComponent>(requireContext(), LedgerFeatureApi::class.java)
             .selectLedgerImportComponentFactory()
-            .create(this)
+            .create(this, payload())
             .inject(this)
     }
 }

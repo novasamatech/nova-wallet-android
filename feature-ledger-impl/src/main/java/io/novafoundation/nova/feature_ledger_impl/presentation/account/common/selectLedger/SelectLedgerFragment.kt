@@ -9,7 +9,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import io.novafoundation.nova.common.base.BaseFragment
+import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.permissions.setupPermissionAsker
 import io.novafoundation.nova.common.utils.setVisible
@@ -21,6 +23,13 @@ import kotlinx.android.synthetic.main.fragment_select_ledger.selectLedgerToolbar
 
 
 abstract class SelectLedgerFragment<V : SelectLedgerViewModel> : BaseFragment<V>(), SelectLedgerAdapter.Handler {
+
+    companion object {
+
+        private const val PAYLOAD_KEY = "SelectLedgerFragment.PAYLOAD_KEY"
+
+        fun getBundle(payload: SelectLedgerPayload): Bundle = bundleOf(PAYLOAD_KEY to payload)
+    }
 
     private val adapter by lazy(LazyThreadSafetyMode.NONE) {
         SelectLedgerAdapter(this)
@@ -56,6 +65,7 @@ abstract class SelectLedgerFragment<V : SelectLedgerViewModel> : BaseFragment<V>
         }
 
         setupPermissionAsker(viewModel)
+        observeRetries(viewModel)
     }
 
     override fun onStart() {
@@ -75,6 +85,8 @@ abstract class SelectLedgerFragment<V : SelectLedgerViewModel> : BaseFragment<V>
 
         disableBluetoothConnectivityTracker()
     }
+
+    protected fun payload() = argument<SelectLedgerPayload>(PAYLOAD_KEY)
 
     private fun enableBluetoothConnectivityTracker() {
         val filter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
