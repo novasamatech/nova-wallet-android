@@ -1,0 +1,28 @@
+runs:
+  using: "composite"
+  steps:
+    - name: ☕️ Install Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '11'
+        cache: 'gradle'
+
+    # - name: Install NDK
+    #   uses: nttld/setup-ndk@v1
+    #   id: setup-ndk
+    #   with:
+    #     ndk-version: r21e
+    #     add-to-path: true
+
+    # - name: ⚙️ Install Rust
+    #   uses: ATiltedTree/setup-rust@v1
+    #   with:
+    #     rust-version: stable
+    #     components: |
+    #       armv7-linux-androideabi
+    #       i686-linux-android
+    #       aarch64-linux-android
+    #       x86_64-linux-android
+
+
