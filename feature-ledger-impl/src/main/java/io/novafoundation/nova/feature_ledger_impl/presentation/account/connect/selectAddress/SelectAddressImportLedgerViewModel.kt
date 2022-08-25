@@ -89,8 +89,6 @@ class SelectAddressImportLedgerViewModel(
     }
 
     fun backClicked() {
-        // TODO notify previous screen that flow is cancelled
-
         router.back()
     }
 
