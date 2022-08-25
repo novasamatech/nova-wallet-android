@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_ledger_impl.domain.account.connect.select
 
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerSubstrateAccount
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateLedgerApplication
+import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.findDevice
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
@@ -22,6 +23,8 @@ class LedgerAccountWithBalance(
 interface SelectAddressImportLedgerInteractor {
 
     suspend fun loadLedgerAccount(chain: Chain, deviceId: String, accountIndex: Int): Result<LedgerAccountWithBalance>
+
+    suspend fun verifyLedgerAccount(chain: Chain, deviceId: String, accountIndex: Int): Result<Unit>
 }
 
 class RealSelectAddressImportLedgerInteractor(
@@ -32,7 +35,7 @@ class RealSelectAddressImportLedgerInteractor(
 ) : SelectAddressImportLedgerInteractor {
 
     override suspend fun loadLedgerAccount(chain: Chain, deviceId: String, accountIndex: Int) = runCatching {
-        val device = ledgerDeviceDiscoveryService.findDevice(deviceId) ?: throw IllegalArgumentException("Device not found")
+        val device = findDevice(deviceId)
         val ledgerAccount = substrateLedgerApplication.getAccount(device, chain.id, accountIndex, confirmAddress = false)
 
         val utilityAsset = chain.utilityAsset
@@ -45,5 +48,15 @@ class RealSelectAddressImportLedgerInteractor(
         val token = tokenRepository.getToken(utilityAsset)
 
         LedgerAccountWithBalance(accountIndex, ledgerAccount, balance, token)
+    }
+
+    override suspend fun verifyLedgerAccount(chain: Chain, deviceId: String, accountIndex: Int): Result<Unit> = kotlin.runCatching {
+        val device = findDevice(deviceId)
+
+        substrateLedgerApplication.getAccount(device, chain.id, accountIndex, confirmAddress = true)
+    }
+
+    private suspend fun findDevice(deviceId: String): LedgerDevice {
+        return ledgerDeviceDiscoveryService.findDevice(deviceId) ?: throw IllegalArgumentException("Device not found")
     }
 }

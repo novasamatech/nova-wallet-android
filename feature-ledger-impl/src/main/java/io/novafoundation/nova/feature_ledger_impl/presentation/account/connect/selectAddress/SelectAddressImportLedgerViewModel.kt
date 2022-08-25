@@ -1,10 +1,14 @@
 package io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.selectAddress
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.added
+import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
@@ -20,9 +24,18 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
+sealed class VerifyCommand {
+
+    object Hide : VerifyCommand()
+
+    class Show(val onCancel: () -> Unit) : VerifyCommand()
+}
 
 class SelectAddressImportLedgerViewModel(
     private val router: LedgerRouter,
@@ -33,10 +46,15 @@ class SelectAddressImportLedgerViewModel(
     private val chainRegistry: ChainRegistry,
 ) : BaseViewModel() {
 
+    private val _verifyAddressCommandEvent = MutableLiveData<Event<VerifyCommand>>()
+    val verifyAddressCommandEvent: LiveData<Event<VerifyCommand>> = _verifyAddressCommandEvent
+
     private val chain by lazyAsync { chainRegistry.getChain(payload.chainId) }
 
     private val loadingAccount = MutableStateFlow(false)
     private val loadedAccounts: MutableStateFlow<List<LedgerAccountWithBalance>> = MutableStateFlow(emptyList())
+
+    private var verifyAddressJob: Job? = null
 
     val loadedAccountModels = loadedAccounts.mapList(::mapLedgerAccountWithBalanceToUi)
         .shareInBackground()
@@ -68,10 +86,35 @@ class SelectAddressImportLedgerViewModel(
         router.back()
     }
 
-    fun accountClicked(accountUi: AccountUi) = launch {
-        val account = loadedAccounts.value.first { it.index == accountUi.id.toInt() }
+    fun accountClicked(accountUi: AccountUi) {
+        verifyAccount(accountUi.id)
+    }
 
-        showMessage("TODO - confirm ${account.account.address} address")
+    private fun verifyAccount(id: Long) {
+        _verifyAddressCommandEvent.value = VerifyCommand.Show(::verifyAddressCancelled).event()
+
+        verifyAddressJob = launch {
+            val result = withContext(Dispatchers.Default) {
+                val account = loadedAccounts.value.first { it.index == id.toInt() }
+
+                interactor.verifyLedgerAccount(chain(), payload.deviceId, account.index)
+            }
+
+            _verifyAddressCommandEvent.value = VerifyCommand.Hide.event()
+
+            result.onFailure {
+                // TODO error handling
+                showError(it)
+            }.onSuccess {
+                // TODO pass verified account back to previous screen
+                router.back()
+            }
+        }
+    }
+
+    private fun verifyAddressCancelled() {
+        verifyAddressJob?.cancel()
+        verifyAddressJob = null
     }
 
     private fun loadNewAccount() = launch(Dispatchers.Default) {

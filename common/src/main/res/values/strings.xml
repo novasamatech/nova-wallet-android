@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="ledger_verify_address_title">Verify address</string>
+  <string name="ledger_verify_address_subtitle">Press both buttons on your Nano X E426 to verify address</string>
+
   <string name="ledger_import_select_address_load_more">Load more accounts</string>
   <string name="ledher_import_select_address_title">Select an account to pair in Nova Wallet</string>
 

@@ -14,12 +14,15 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.listing.
 import io.novafoundation.nova.feature_ledger_api.di.LedgerFeatureApi
 import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.di.LedgerFeatureComponent
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.selectAddress.verify.VerifyLedgerAddressBottomSheet
 import kotlinx.android.synthetic.main.fragment_import_ledger_select_address.ledgerSelectAddressChain
 import kotlinx.android.synthetic.main.fragment_import_ledger_select_address.ledgerSelectAddressContent
 import kotlinx.android.synthetic.main.fragment_import_ledger_select_address.ledgerSelectAddressToolbar
 
 class SelectAddressImportLedgerFragment : BaseFragment<SelectAddressImportLedgerViewModel>(), AccountsAdapter.AccountItemHandler,
     LedgerSelectAddressLoadMoreAdapter.Handler {
+
+    private var showedVerifyBottomSheet: VerifyLedgerAddressBottomSheet? = null
 
     companion object {
 
@@ -63,6 +66,19 @@ class SelectAddressImportLedgerFragment : BaseFragment<SelectAddressImportLedger
         viewModel.loadedAccountModels.observe(addressesAdapter::submitList)
 
         viewModel.chainUi.observe(ledgerSelectAddressChain::setChain)
+
+        viewModel.verifyAddressCommandEvent.observeEvent {
+            when(it){
+                VerifyCommand.Hide -> {
+                    showedVerifyBottomSheet?.dismiss()
+                    showedVerifyBottomSheet = null
+                }
+                is VerifyCommand.Show -> {
+                    showedVerifyBottomSheet = VerifyLedgerAddressBottomSheet(requireContext(), it.onCancel)
+                    showedVerifyBottomSheet!!.show()
+                }
+            }
+        }
     }
 
     override fun itemClicked(accountModel: AccountUi) {
