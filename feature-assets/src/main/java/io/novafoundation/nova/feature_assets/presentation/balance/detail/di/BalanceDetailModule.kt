@@ -20,7 +20,7 @@ import io.novafoundation.nova.feature_assets.domain.BalanceLocksInteractorImpl
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
-import io.novafoundation.nova.feature_assets.presentation.WalletRouter
+import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy.BuyMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.BalanceDetailViewModel
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProviderFactory
@@ -64,7 +64,7 @@ class BalanceDetailModule {
     @ScreenScope
     fun provideTransferHistoryMixin(
         walletInteractor: WalletInteractor,
-        walletRouter: WalletRouter,
+        assetsRouter: AssetsRouter,
         historyFiltersProviderFactory: HistoryFiltersProviderFactory,
         assetSourceRegistry: AssetSourceRegistry,
         resourceManager: ResourceManager,
@@ -74,7 +74,7 @@ class BalanceDetailModule {
     ): TransactionHistoryMixin {
         return TransactionHistoryProvider(
             walletInteractor = walletInteractor,
-            router = walletRouter,
+            router = assetsRouter,
             historyFiltersProviderFactory = historyFiltersProviderFactory,
             resourceManager = resourceManager,
             addressDisplayUseCase = addressDisplayUseCase,
@@ -92,7 +92,7 @@ class BalanceDetailModule {
         walletInteractor: WalletInteractor,
         balanceLocksInteractor: BalanceLocksInteractor,
         sendInteractor: SendInteractor,
-        router: WalletRouter,
+        router: AssetsRouter,
         transactionHistoryMixin: TransactionHistoryMixin,
         buyMixinFactory: BuyMixinFactory,
         assetPayload: AssetPayload,

@@ -16,7 +16,7 @@ import io.novafoundation.nova.feature_assets.domain.BalanceLocksInteractor
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
-import io.novafoundation.nova.feature_assets.presentation.WalletRouter
+import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy.BuyMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.model.BalanceLocksModel
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryMixin
@@ -37,7 +37,7 @@ class BalanceDetailViewModel(
     private val walletInteractor: WalletInteractor,
     private val balanceLocksInteractor: BalanceLocksInteractor,
     private val sendInteractor: SendInteractor,
-    private val router: WalletRouter,
+    private val router: AssetsRouter,
     private val assetPayload: AssetPayload,
     buyMixinFactory: BuyMixinFactory,
     private val transactionHistoryMixin: TransactionHistoryMixin,
@@ -68,11 +68,6 @@ class BalanceDetailViewModel(
 
     private val lockedBalanceModel = balanceLocksFlow
         .map { mapBalanceLocksToUi(it, assetFlow.first()) }
-        .inBackground()
-        .share()
-
-    val lockedBalanceAvailability = lockedBalanceModel
-        .map { isBalanceLocksAvailable(it) }
         .inBackground()
         .share()
 
@@ -132,13 +127,7 @@ class BalanceDetailViewModel(
 
     fun lockedInfoClicked() = launch {
         val balanceLocks = lockedBalanceModel.first()
-        if (balanceLocks != null) {
-            _showLockedDetailsEvent.value = Event(balanceLocks)
-        }
-    }
-
-    private fun isBalanceLocksAvailable(balanceLocks: BalanceLocksModel?): Boolean {
-        return balanceLocks != null
+        _showLockedDetailsEvent.value = Event(balanceLocks)
     }
 
     private fun requireSecretsWallet(action: () -> Unit) {
@@ -161,25 +150,34 @@ class BalanceDetailViewModel(
         )
     }
 
-    private fun mapBalanceLocksToUi(balanceLocks: BalanceLocks?, asset: Asset): BalanceLocksModel? {
-        if (balanceLocks == null) return null
+    @OptIn(ExperimentalStdlibApi::class)
+    private fun mapBalanceLocksToUi(balanceLocks: BalanceLocks?, asset: Asset): BalanceLocksModel {
+        val mappedLocks = balanceLocks?.locks?.map {
+            BalanceLocksModel.Lock(
+                mapBalanceLockIdToUi(it.id),
+                mapAmountToAmountModel(it.amount, asset)
+            )
+        }
+
+        val reservedBalance = BalanceLocksModel.Lock(
+            resourceManager.getString(R.string.assets_balance_details_locks_reserved),
+            mapAmountToAmountModel(asset.reserved, asset)
+        )
 
         return BalanceLocksModel(
-            balanceLocks.locks.map {
-                BalanceLocksModel.Lock(
-                    mapBalanceLockIdToUi(it.id),
-                    mapAmountToAmountModel(it.amount, asset)
-                )
+            buildList {
+                mappedLocks?.let { addAll(it) }
+                add(reservedBalance)
             }
         )
     }
 
     private fun mapBalanceLockIdToUi(id: String): String {
         return when (id) {
-            "staking" -> resourceManager.getString(R.string.wallet_balance_locks_staking)
-            "democrac" -> resourceManager.getString(R.string.wallet_balance_locks_democrac)
-            "vesting" -> resourceManager.getString(R.string.wallet_balance_locks_vesting)
-            "phrelect" -> resourceManager.getString(R.string.wallet_balance_locks_phrelect)
+            "staking" -> resourceManager.getString(R.string.assets_balance_details_locks_staking)
+            "democrac" -> resourceManager.getString(R.string.assets_balance_details_locks_democrac)
+            "vesting" -> resourceManager.getString(R.string.assets_balance_details_locks_vesting)
+            "phrelect" -> resourceManager.getString(R.string.assets_balance_details_locks_phrelect)
             else -> id.capitalize(Locale.getDefault())
         }
     }

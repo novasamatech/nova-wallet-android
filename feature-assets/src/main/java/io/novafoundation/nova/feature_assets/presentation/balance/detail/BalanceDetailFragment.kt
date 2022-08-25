@@ -107,9 +107,6 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
         viewModel.sync()
 
         viewModel.state.observe(transfersContainer::showState)
-        viewModel.lockedBalanceAvailability.observe {
-            balanceDetailsBalances.setLockedClickable(it)
-        }
 
         setupBuyIntegration(
             mixin = viewModel.buyMixin,
