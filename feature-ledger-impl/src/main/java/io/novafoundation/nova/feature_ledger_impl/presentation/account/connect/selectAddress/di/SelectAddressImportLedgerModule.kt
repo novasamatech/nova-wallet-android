@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDisco
 import io.novafoundation.nova.feature_ledger_impl.domain.account.connect.selectAddress.RealSelectAddressImportLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.domain.account.connect.selectAddress.SelectAddressImportLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.SelectLedgerAddressInterScreenCommunicator
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.selectAddress.SelectAddressImportLedgerViewModel
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.selectAddress.SelectLedgerAddressPayload
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
@@ -51,6 +52,7 @@ class SelectAddressImportLedgerModule {
         resourceManager: ResourceManager,
         payload: SelectLedgerAddressPayload,
         chainRegistry: ChainRegistry,
+        selectLedgerAddressInterScreenCommunicator: SelectLedgerAddressInterScreenCommunicator,
     ): ViewModel {
         return SelectAddressImportLedgerViewModel(
             router = router,
@@ -58,7 +60,8 @@ class SelectAddressImportLedgerModule {
             addressIconGenerator = addressIconGenerator,
             resourceManager = resourceManager,
             payload = payload,
-            chainRegistry = chainRegistry
+            chainRegistry = chainRegistry,
+            responder = selectLedgerAddressInterScreenCommunicator
         )
     }
 

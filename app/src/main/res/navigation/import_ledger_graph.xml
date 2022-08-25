@@ -49,5 +49,14 @@
     <fragment
         android:id="@+id/selectAddressImportLedgerFragment"
         android:name="io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.selectAddress.SelectAddressImportLedgerFragment"
-        android:label="SelectAddressImportLedgerFragment" />
+        android:label="SelectAddressImportLedgerFragment" >
+
+        <action
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_open_enter"
+            app:popExitAnim="@anim/fragment_open_exit"
+            android:id="@+id/action_selectAddressImportLedgerFragment_to_fillWalletImportLedgerFragment"
+            app:popUpTo="@id/fillWalletImportLedgerFragment" />
+    </fragment>
 </navigation>

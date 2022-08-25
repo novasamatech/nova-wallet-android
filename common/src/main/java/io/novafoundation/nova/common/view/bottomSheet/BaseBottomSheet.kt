@@ -10,6 +10,4 @@ abstract class BaseBottomSheet(context: Context): BottomSheetDialog(context, R.s
 
     final override val dialogInterface: DialogInterface
         get() = this
-
-
 }

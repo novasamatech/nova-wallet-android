@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_ledger_api.di.LedgerFeatureApi
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.SelectLedgerAddressInterScreenCommunicator
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.fillWallet.di.FillWalletImportLedgerComponent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.selectAddress.di.SelectAddressImportLedgerComponent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.selectLedger.di.SelectLedgerImportLedgerComponent
@@ -29,7 +30,8 @@ interface LedgerFeatureComponent : LedgerFeatureApi {
 
         fun create(
             deps: LedgerFeatureDependencies,
-            @BindsInstance router: LedgerRouter
+            @BindsInstance router: LedgerRouter,
+            @BindsInstance selectLedgerAddressInterScreenCommunicator: SelectLedgerAddressInterScreenCommunicator,
         ): LedgerFeatureComponent
     }
 

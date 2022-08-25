@@ -21,6 +21,8 @@ import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.domain.account.connect.selectAddress.LedgerAccountWithBalance
 import io.novafoundation.nova.feature_ledger_impl.domain.account.connect.selectAddress.SelectAddressImportLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.SelectLedgerAddressInterScreenCommunicator
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.SelectLedgerAddressInterScreenResponder
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.Dispatchers
@@ -44,6 +46,7 @@ class SelectAddressImportLedgerViewModel(
     private val resourceManager: ResourceManager,
     private val payload: SelectLedgerAddressPayload,
     private val chainRegistry: ChainRegistry,
+    private val responder: SelectLedgerAddressInterScreenResponder,
 ) : BaseViewModel() {
 
     private val _verifyAddressCommandEvent = MutableLiveData<Event<VerifyCommand>>()
@@ -94,9 +97,9 @@ class SelectAddressImportLedgerViewModel(
         _verifyAddressCommandEvent.value = VerifyCommand.Show(::verifyAddressCancelled).event()
 
         verifyAddressJob = launch {
-            val result = withContext(Dispatchers.Default) {
-                val account = loadedAccounts.value.first { it.index == id.toInt() }
+            val account = loadedAccounts.value.first { it.index == id.toInt() }
 
+            val result = withContext(Dispatchers.Default) {
                 interactor.verifyLedgerAccount(chain(), payload.deviceId, account.index)
             }
 
@@ -106,8 +109,8 @@ class SelectAddressImportLedgerViewModel(
                 // TODO error handling
                 showError(it)
             }.onSuccess {
-                // TODO pass verified account back to previous screen
-                router.back()
+                responder.respond(screenResponseFrom(account))
+                router.returnToImportFillWallet()
             }
         }
     }
@@ -115,6 +118,14 @@ class SelectAddressImportLedgerViewModel(
     private fun verifyAddressCancelled() {
         verifyAddressJob?.cancel()
         verifyAddressJob = null
+    }
+
+    private fun screenResponseFrom(account: LedgerAccountWithBalance): SelectLedgerAddressInterScreenCommunicator.Response {
+       return SelectLedgerAddressInterScreenCommunicator.Response(
+           publicKey = account.account.publicKey,
+           address = account.account.address,
+           chainId = payload.chainId
+       )
     }
 
     private fun loadNewAccount() = launch(Dispatchers.Default) {
