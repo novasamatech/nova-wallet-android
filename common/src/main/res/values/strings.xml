@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="ledger_error_general_title">Operation failed</string>
+  <string name="ledger_error_general_message">Operation completed with error on device. Please, try again later.</string>
+
+  <string name="ledger_error_app_cancelled_title">Operation rejected</string>
+  <string name="ledger_error_app_cancelled_message">Operation was cancelled by the device. Make sure you unlocked your Ledger with PIN-code.</string>
+
+  <string name="ledger_error_app_not_launched_title">%s app not launched</string>
+  <string name="ledger_error_app_not_launched_message">Open the %s app on your Ledger device </string>
+
+  <string name="account_ledger_select_device_title">Select your Ledger device</string>
+  <string name="account_ledger_select_device_description">Please enable Bluetooth in your phone settings. Open the Polkadot app on your Ledger device </string>
+
   <string name="common_cancel_operation_warning">Are you sure you want to cancel this operation?</string>
   <string name="common_yes">Yes</string>
   <string name="common_no">No</string>

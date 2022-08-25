@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_ledger_impl.sdk.connection.ble
 
 import android.bluetooth.BluetoothDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.connection.LedgerConnection
+import io.novafoundation.nova.feature_ledger_api.sdk.connection.awaitConnected
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -16,10 +17,16 @@ class BleConnection(
     private val bluetoothDevice: BluetoothDevice,
 ) : LedgerConnection, DataReceivedCallback {
 
-    suspend fun connect() {
+    @Volatile
+    private var _receiveChannel = newChannel()
+    private val receiveChannelLock = Any()
+
+    override suspend fun connect(): Result<Unit> = runCatching {
         bleManager.connect(bluetoothDevice).suspend()
 
         bleManager.readCallback = this
+
+        awaitConnected()
     }
 
     override val type: LedgerConnection.Type = LedgerConnection.Type.BLE
@@ -40,7 +47,13 @@ class BleConnection(
         bleManager.send(chunks)
     }
 
-    override val receiveChannel = Channel<ByteArray>(Channel.BUFFERED)
+    override suspend fun resetReceiveChannel() = synchronized(receiveChannelLock) {
+        _receiveChannel.close()
+        _receiveChannel = newChannel()
+    }
+
+    override val receiveChannel
+        get() = synchronized(receiveChannelLock) { _receiveChannel }
 
     override fun onDataReceived(device: BluetoothDevice, data: Data) {
         ensureCorrectDevice()
@@ -51,4 +64,6 @@ class BleConnection(
     private fun ensureCorrectDevice() = require(bleManager.bluetoothDevice?.address == bluetoothDevice.address) {
         "Wrong device connected"
     }
+
+    private fun newChannel() = Channel<ByteArray>(Channel.BUFFERED)
 }

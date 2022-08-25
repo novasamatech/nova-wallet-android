@@ -17,8 +17,23 @@
             android:id="@+id/action_startImportLedgerFragment_to_fillWalletImportLedgerFragment"
             app:destination="@id/fillWalletImportLedgerFragment" />
     </fragment>
+    
     <fragment
         android:id="@+id/fillWalletImportLedgerFragment"
         android:name="io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.fillWallet.FillWalletImportLedgerFragment"
-        android:label="FillWalletImportLedgerFragment" />
+        android:label="FillWalletImportLedgerFragment" >
+
+        <action
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            android:id="@+id/action_fillWalletImportLedgerFragment_to_selectLedgerImportFragment"
+            app:destination="@id/selectLedgerImportFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/selectLedgerImportFragment"
+        android:name="io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.selectLedger.SelectLedgerImportFragment"
+        android:label="SelectLedgerImportFragment" />
 </navigation>

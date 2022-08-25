@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.transport.LedgerTransport
 import io.novafoundation.nova.feature_ledger_api.sdk.transport.send
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.DisplayVerificationDialog.NO
+import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.DisplayVerificationDialog.YES
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.encrypt.json.copyBytes
 import jp.co.soramitsu.fearless_utils.encrypt.junction.BIP32JunctionDecoder
@@ -48,12 +49,17 @@ const val CHUNK_SIZE = 250
 
 class RealSubstrateLedgerApplication(
     private val transport: LedgerTransport,
-    private val supportedApplications: List<SubstrateApplicationConfig>,
+    private val supportedApplications: List<SubstrateApplicationConfig> = SubstrateApplicationConfig.all(),
 ) : SubstrateLedgerApplication {
 
-    override suspend fun getAccount(device: LedgerDevice, chainId: ChainId, accountIndex: Int): LedgerSubstrateAccount {
+    override suspend fun getAccount(
+        device: LedgerDevice,
+        chainId: ChainId,
+        accountIndex: Int,
+        confirmAddress: Boolean
+    ): LedgerSubstrateAccount {
         val applicationConfig = getConfig(chainId)
-        val displayVerificationDialog = NO
+        val displayVerificationDialog = if (confirmAddress) YES else NO
 
         val rawResponse = transport.send(
             cla = applicationConfig.cla,
@@ -117,10 +123,10 @@ class RealSubstrateLedgerApplication(
     }
 
     private fun buildDerivationPath(coin: Int, accountIndex: Int): ByteArray {
-        val pathAsString = "//44//$coin//0/0/$accountIndex"
+        val pathAsString = "//44//$coin//$accountIndex//0//0"
         val junctions = BIP32JunctionDecoder.decode(pathAsString).junctions
 
-        return junctions.encodeToByteArray()
+        return junctions.serializeInLedgerFormat()
     }
 
     /**

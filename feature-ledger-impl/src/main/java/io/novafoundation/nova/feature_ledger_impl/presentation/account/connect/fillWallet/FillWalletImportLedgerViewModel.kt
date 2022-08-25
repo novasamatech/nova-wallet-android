@@ -15,17 +15,15 @@ import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.Ledge
 import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.domain.account.connect.fillWallet.FillWalletImportLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.fillWallet.model.FillableChainAccountModel
-import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlin.random.Random
 
 class FillWalletImportLedgerViewModel(
     private val router: LedgerRouter,
@@ -58,11 +56,11 @@ class FillWalletImportLedgerViewModel(
         showMessage("TODO")
     }
 
-    fun itemClicked(item: FillableChainAccountModel) = launch(Dispatchers.Default) {
-        // TODO receive account from ledger
-        val account = randomAccount(item)
+    fun itemClicked(item: FillableChainAccountModel) = launch {
+        val payload = SelectLedgerPayload(item.chainUi.id)
+        router.openImportSelectLedger(payload)
 
-        addAccount(item.chainUi.id, account)
+//        addAccount(item.chainUi.id, account)
     }
 
     fun backClicked() = launch {
@@ -71,18 +69,6 @@ class FillWalletImportLedgerViewModel(
         if (filledAccounts.isEmpty() || confirmExit.awaitAction()) {
             router.back()
         }
-    }
-
-    private suspend fun randomAccount(item: FillableChainAccountModel): LedgerSubstrateAccount {
-        val chain = availableChainsFlow.first().first { it.id == item.chainUi.id }
-
-        val publicKey = Random.nextBytes(32)
-        val address = chain.addressOf(publicKey)
-
-        return LedgerSubstrateAccount(
-            address = address,
-            publicKey = publicKey,
-        )
     }
 
     private suspend fun createFillableChainAccountModel(chain: Chain, account: LedgerSubstrateAccount?): FillableChainAccountModel {
