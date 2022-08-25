@@ -5,6 +5,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 val AddCurrencies_18_19 = object : Migration(18, 19) {
     override fun migrate(database: SupportSQLiteDatabase) {
+        // new table
         database.execSQL(
             """
             CREATE TABLE IF NOT EXISTS `currencies` (
