@@ -22,6 +22,8 @@ class LedgerAccountWithBalance(
 
 interface SelectAddressImportLedgerInteractor {
 
+    suspend fun connectToDevice(deviceId: String): Result<Unit>
+
     suspend fun loadLedgerAccount(chain: Chain, deviceId: String, accountIndex: Int): Result<LedgerAccountWithBalance>
 
     suspend fun verifyLedgerAccount(chain: Chain, deviceId: String, accountIndex: Int): Result<Unit>
@@ -33,6 +35,12 @@ class RealSelectAddressImportLedgerInteractor(
     private val tokenRepository: TokenRepository,
     private val assetSourceRegistry: AssetSourceRegistry,
 ) : SelectAddressImportLedgerInteractor {
+
+    override suspend fun connectToDevice(deviceId: String): Result<Unit> = runCatching {
+        val device = findDevice(deviceId)
+
+        device.connection.connect()
+    }
 
     override suspend fun loadLedgerAccount(chain: Chain, deviceId: String, accountIndex: Int) = runCatching {
         val device = findDevice(deviceId)

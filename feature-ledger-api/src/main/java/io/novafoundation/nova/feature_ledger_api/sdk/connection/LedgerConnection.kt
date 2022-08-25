@@ -25,5 +25,8 @@ interface LedgerConnection {
     val receiveChannel: Channel<ByteArray>
 }
 
+suspend fun LedgerConnection.ensureConnected() {
+    if (!isConnected()) connect()
+}
 suspend fun LedgerConnection.awaitConnected() = isActive.first { connected -> connected }
 suspend fun LedgerConnection.isConnected() = isActive.first()

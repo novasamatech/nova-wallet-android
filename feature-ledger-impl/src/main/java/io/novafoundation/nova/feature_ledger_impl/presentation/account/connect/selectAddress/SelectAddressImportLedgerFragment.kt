@@ -8,6 +8,7 @@ import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.ConcatAdapter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountsAdapter
@@ -62,6 +63,8 @@ class SelectAddressImportLedgerFragment : BaseFragment<SelectAddressImportLedger
     }
 
     override fun subscribe(viewModel: SelectAddressImportLedgerViewModel) {
+        observeRetries(viewModel)
+
         viewModel.loadMoreState.observe(loadMoreAdapter::setState)
         viewModel.loadedAccountModels.observe(addressesAdapter::submitList)
 

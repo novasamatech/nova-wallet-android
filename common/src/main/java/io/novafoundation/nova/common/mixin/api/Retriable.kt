@@ -1,6 +1,6 @@
 package io.novafoundation.nova.common.mixin.api
 
-import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.utils.Event
 
 typealias Action = () -> Unit
@@ -14,5 +14,5 @@ class RetryPayload(
 
 interface Retriable {
 
-    val retryEvent: LiveData<Event<RetryPayload>>
+    val retryEvent: MutableLiveData<Event<RetryPayload>>
 }

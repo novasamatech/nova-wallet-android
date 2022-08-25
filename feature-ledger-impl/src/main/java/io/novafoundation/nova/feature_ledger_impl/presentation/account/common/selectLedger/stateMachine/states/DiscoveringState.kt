@@ -13,7 +13,7 @@ class DiscoveringState : SelectLedgerState() {
             BluetoothDisabled -> bluetoothDisabled()
 
             is DiscoveredDevicesListChanged -> if (event.newDevices.isNotEmpty()) {
-                val newState = DevicesFoundState(devices = event.newDevices, connectingDevice = null)
+                val newState = DevicesFoundState(devices = event.newDevices, verifyingDevice = null)
                 emitState(newState)
             }
 

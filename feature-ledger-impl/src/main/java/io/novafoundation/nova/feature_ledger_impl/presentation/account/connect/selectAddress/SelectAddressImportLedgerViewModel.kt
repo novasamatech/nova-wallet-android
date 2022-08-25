@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.mixin.api.Retriable
+import io.novafoundation.nova.common.mixin.api.RetryPayload
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
@@ -21,6 +23,7 @@ import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.domain.account.connect.selectAddress.LedgerAccountWithBalance
 import io.novafoundation.nova.feature_ledger_impl.domain.account.connect.selectAddress.SelectAddressImportLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.errors.handleLedgerError
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.SelectLedgerAddressInterScreenCommunicator
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.SelectLedgerAddressInterScreenResponder
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
@@ -47,7 +50,9 @@ class SelectAddressImportLedgerViewModel(
     private val payload: SelectLedgerAddressPayload,
     private val chainRegistry: ChainRegistry,
     private val responder: SelectLedgerAddressInterScreenResponder,
-) : BaseViewModel() {
+) : BaseViewModel(), Retriable {
+
+    override val retryEvent = MutableLiveData<Event<RetryPayload>>()
 
     private val _verifyAddressCommandEvent = MutableLiveData<Event<VerifyCommand>>()
     val verifyAddressCommandEvent: LiveData<Event<VerifyCommand>> = _verifyAddressCommandEvent
@@ -96,6 +101,7 @@ class SelectAddressImportLedgerViewModel(
     private fun verifyAccount(id: Long) {
         _verifyAddressCommandEvent.value = VerifyCommand.Show(::verifyAddressCancelled).event()
 
+        verifyAddressJob?.cancel()
         verifyAddressJob = launch {
             val account = loadedAccounts.value.first { it.index == id.toInt() }
 
@@ -106,13 +112,16 @@ class SelectAddressImportLedgerViewModel(
             _verifyAddressCommandEvent.value = VerifyCommand.Hide.event()
 
             result.onFailure {
-                // TODO error handling
-                showError(it)
+                handleLedgerError(it) { verifyAccount(id) }
             }.onSuccess {
                 responder.respond(screenResponseFrom(account))
                 router.returnToImportFillWallet()
             }
         }
+    }
+
+    private suspend fun handleLedgerError(error: Throwable, retry: () -> Unit) {
+        handleLedgerError(error, chain, resourceManager, retry)
     }
 
     private fun verifyAddressCancelled() {
@@ -121,24 +130,25 @@ class SelectAddressImportLedgerViewModel(
     }
 
     private fun screenResponseFrom(account: LedgerAccountWithBalance): SelectLedgerAddressInterScreenCommunicator.Response {
-       return SelectLedgerAddressInterScreenCommunicator.Response(
-           publicKey = account.account.publicKey,
-           address = account.account.address,
-           chainId = payload.chainId
-       )
+        return SelectLedgerAddressInterScreenCommunicator.Response(
+            publicKey = account.account.publicKey,
+            address = account.account.address,
+            chainId = payload.chainId
+        )
     }
 
-    private fun loadNewAccount() = launch(Dispatchers.Default) {
-        loadingAccount.withFlagSet {
-            val nextAccountIndex = loadedAccounts.value.size
+    private fun loadNewAccount() {
+        launch(Dispatchers.Default) {
+            loadingAccount.withFlagSet {
+                val nextAccountIndex = loadedAccounts.value.size
 
-            interactor.loadLedgerAccount(chain(), payload.deviceId, nextAccountIndex)
-                .onSuccess {
-                    loadedAccounts.value = loadedAccounts.value.added(it)
-                }.onFailure {
-                    // TODO error handling
-                    showError(it)
-                }
+                interactor.loadLedgerAccount(chain(), payload.deviceId, nextAccountIndex)
+                    .onSuccess {
+                        loadedAccounts.value = loadedAccounts.value.added(it)
+                    }.onFailure {
+                        handleLedgerError(it) { loadNewAccount() }
+                    }
+            }
         }
     }
 
@@ -156,6 +166,14 @@ class SelectAddressImportLedgerViewModel(
                 picture = addressModel.image,
                 subtitleIconRes = null
             )
+        }
+    }
+
+    private suspend fun reconnectToDevice(andThen: () -> Unit) {
+        interactor.connectToDevice(payload.deviceId).onSuccess {
+            andThen()
+        }.onFailure {
+            handleLedgerError(it, retry = andThen)
         }
     }
 }
