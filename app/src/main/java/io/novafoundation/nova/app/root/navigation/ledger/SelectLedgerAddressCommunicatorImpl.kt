@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.se
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.SelectLedgerAddressInterScreenCommunicator
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.SelectLedgerAddressInterScreenCommunicator.Response
 
-class SelectLedgerAddressCommunicatorImpl(navigationHolder: NavigationHolder):
+class SelectLedgerAddressCommunicatorImpl(navigationHolder: NavigationHolder) :
     BaseInterScreenCommunicator<SelectLedgerPayload, Response>(navigationHolder),
     SelectLedgerAddressInterScreenCommunicator {
 

@@ -7,16 +7,16 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.se
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.android.parcel.Parcelize
 
-interface SelectLedgerAddressInterScreenRequester: InterScreenRequester<SelectLedgerPayload, SelectLedgerAddressInterScreenCommunicator.Response>
+interface SelectLedgerAddressInterScreenRequester : InterScreenRequester<SelectLedgerPayload, SelectLedgerAddressInterScreenCommunicator.Response>
 
-interface SelectLedgerAddressInterScreenResponder: InterScreenResponder<SelectLedgerPayload, SelectLedgerAddressInterScreenCommunicator.Response>
+interface SelectLedgerAddressInterScreenResponder : InterScreenResponder<SelectLedgerPayload, SelectLedgerAddressInterScreenCommunicator.Response>
 
-interface SelectLedgerAddressInterScreenCommunicator: SelectLedgerAddressInterScreenRequester, SelectLedgerAddressInterScreenResponder  {
+interface SelectLedgerAddressInterScreenCommunicator : SelectLedgerAddressInterScreenRequester, SelectLedgerAddressInterScreenResponder {
 
     @Parcelize
     class Response(
         val publicKey: ByteArray,
         val address: String,
         val chainId: ChainId
-    ): Parcelable
+    ) : Parcelable
 }

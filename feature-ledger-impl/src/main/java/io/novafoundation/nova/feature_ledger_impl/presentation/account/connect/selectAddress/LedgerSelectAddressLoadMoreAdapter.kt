@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_ledger_impl.R
 class LedgerSelectAddressLoadMoreAdapter(
     private val handler: Handler,
     private val lifecycleOwner: LifecycleOwner,
-    ) : RecyclerView.Adapter<LedgerSelectAddressLoadMoreViewHolder>() {
+) : RecyclerView.Adapter<LedgerSelectAddressLoadMoreViewHolder>() {
 
     interface Handler {
 
@@ -58,5 +58,3 @@ class LedgerSelectAddressLoadMoreViewHolder(
 
     override fun unbind() {}
 }
-
-

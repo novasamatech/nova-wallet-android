@@ -8,4 +8,4 @@ import kotlinx.android.parcel.Parcelize
 class SelectLedgerAddressPayload(
     val deviceId: String,
     val chainId: ChainId
-): Parcelable
+) : Parcelable

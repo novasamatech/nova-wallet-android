@@ -20,7 +20,9 @@ import kotlinx.android.synthetic.main.fragment_import_ledger_select_address.ledg
 import kotlinx.android.synthetic.main.fragment_import_ledger_select_address.ledgerSelectAddressContent
 import kotlinx.android.synthetic.main.fragment_import_ledger_select_address.ledgerSelectAddressToolbar
 
-class SelectAddressImportLedgerFragment : BaseFragment<SelectAddressImportLedgerViewModel>(), AccountsAdapter.AccountItemHandler,
+class SelectAddressImportLedgerFragment :
+    BaseFragment<SelectAddressImportLedgerViewModel>(),
+    AccountsAdapter.AccountItemHandler,
     LedgerSelectAddressLoadMoreAdapter.Handler {
 
     private var showedVerifyBottomSheet: VerifyLedgerAddressBottomSheet? = null
@@ -71,7 +73,7 @@ class SelectAddressImportLedgerFragment : BaseFragment<SelectAddressImportLedger
         viewModel.chainUi.observe(ledgerSelectAddressChain::setChain)
 
         viewModel.verifyAddressCommandEvent.observeEvent {
-            when(it){
+            when (it) {
                 VerifyCommand.Hide -> {
                     showedVerifyBottomSheet?.dismiss()
                     showedVerifyBottomSheet = null

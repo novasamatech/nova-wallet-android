@@ -11,7 +11,7 @@ import kotlinx.android.synthetic.main.fragment_ledger_message.ledgerMessageTitle
 class VerifyLedgerAddressBottomSheet(
     context: Context,
     private val onCancel: () -> Unit,
-): BaseBottomSheet(context) {
+) : BaseBottomSheet(context) {
 
     init {
         setContentView(R.layout.fragment_ledger_message)
