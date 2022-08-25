@@ -166,12 +166,4 @@ class SelectAddressImportLedgerViewModel(
             )
         }
     }
-
-    private suspend fun reconnectToDevice(andThen: () -> Unit) {
-        interactor.connectToDevice(payload.deviceId).onSuccess {
-            andThen()
-        }.onFailure {
-            handleLedgerError(it, retry = andThen)
-        }
-    }
 }
