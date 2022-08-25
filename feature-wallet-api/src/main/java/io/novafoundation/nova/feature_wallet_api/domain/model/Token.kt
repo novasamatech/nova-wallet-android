@@ -17,7 +17,7 @@ class Token(
     fun BigDecimal.toPlanks() = planksFromAmount(this)
     fun BigInteger.toAmount() = amountFromPlanks(this)
 
-    fun fiatAmount(tokenAmount: BigDecimal): BigDecimal = rate?.multiply(tokenAmount) ?: BigDecimal.ZERO
+    fun priceOf(tokenAmount: BigDecimal): BigDecimal = rate?.multiply(tokenAmount) ?: BigDecimal.ZERO
 }
 
 fun Token.amountFromPlanks(amountInPlanks: BigInteger) = configuration.amountFromPlanks(amountInPlanks)

@@ -6,7 +6,7 @@ import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core_db.dao.CurrencyDao
-import io.novafoundation.nova.feature_currency_api.data.datasource.CurrencyRemoteDataSource
+import io.novafoundation.nova.feature_currency_impl.data.datasource.CurrencyRemoteDataSource
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_currency_impl.data.datasource.AssetsCurrencyRemoteDataSource

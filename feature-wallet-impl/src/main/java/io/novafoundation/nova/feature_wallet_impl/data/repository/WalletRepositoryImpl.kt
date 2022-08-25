@@ -3,8 +3,6 @@ package io.novafoundation.nova.feature_wallet_impl.data.repository
 import io.novafoundation.nova.common.data.model.CursorPage
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.coingecko.PriceInfo
-import io.novafoundation.nova.common.data.network.runtime.binding.bindDoubleOrNull
-import io.novafoundation.nova.common.data.network.runtime.binding.castToMap
 import io.novafoundation.nova.common.utils.asQueryParam
 import io.novafoundation.nova.common.utils.defaultOnNull
 import io.novafoundation.nova.common.utils.mapList
@@ -145,9 +143,13 @@ class WalletRepositoryImpl(
             .map {
                 it.defaultOnNull {
                     val asset = AssetLocal.createEmpty(chainAsset.id, chainAsset.chainId, metaId)
-                    val token = tokenDao.getTokenOrDefault(chainAsset.symbol)
-
-                    AssetWithToken(asset, token.token!!, token.currency)
+                    val tokenWithCurrency = tokenDao.getToken(chainAsset.symbol)
+                    var token = tokenWithCurrency.token
+                    val currency = tokenWithCurrency.currency
+                    if (token == null) {
+                        token = TokenLocal.createEmpty(chainAsset.symbol, currency.id)
+                    }
+                    AssetWithToken(asset, token, currency)
                 }
             }
             .map { mapAssetLocalToAsset(it, chainAsset) }
@@ -305,12 +307,11 @@ class WalletRepositoryImpl(
     private suspend fun getAssetPriceCoingecko(priceIds: Set<String>, coingeccoId: String): Map<String, PriceInfo> {
         return apiCall { coingeckoApi.getAssetPrice(priceIds.asQueryParam(), currency = coingeccoId, includeRateChange = true) }
             .mapValues {
-                val currencyInfo = it.value.castToMap()
-                val price = currencyInfo[coingeccoId]
-                val recentRate = currencyInfo[getRecentRateFieldName(coingeccoId)]
+                val price = it.value[coingeccoId]
+                val recentRate = it.value[getRecentRateFieldName(coingeccoId)]
                 PriceInfo(
-                    bindDoubleOrNull(price)?.toBigDecimal(),
-                    bindDoubleOrNull(recentRate)?.toBigDecimal()
+                    price?.toBigDecimal(),
+                    recentRate?.toBigDecimal()
                 )
             }
     }
@@ -322,6 +323,4 @@ class WalletRepositoryImpl(
 
         assetCache.getAsset(metaAccount.id, chainId, assetId)
     }
-
-    private suspend fun TokenDao.getTokenOrDefault(symbol: String) = getToken(symbol)
 }
