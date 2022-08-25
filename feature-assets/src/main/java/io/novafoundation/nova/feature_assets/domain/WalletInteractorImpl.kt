@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_assets.data.repository.assetFilters.AssetFiltersRepository
 import io.novafoundation.nova.feature_assets.domain.common.AssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.groupAndSortAssetsByNetwork
+import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
@@ -55,9 +56,9 @@ class WalletInteractorImpl(
             }
     }
 
-    override suspend fun syncAssetsRates() {
+    override suspend fun syncAssetsRates(currency: Currency) {
         runCatching {
-            walletRepository.syncAssetsRates()
+            walletRepository.syncAssetsRates(currency)
         }
     }
 

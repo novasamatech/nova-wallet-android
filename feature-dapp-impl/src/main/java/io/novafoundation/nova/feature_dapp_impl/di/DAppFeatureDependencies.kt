@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
+import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
@@ -26,6 +27,8 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RuntimeVer
 import okhttp3.OkHttpClient
 
 interface DAppFeatureDependencies {
+
+    fun currencyRepository(): CurrencyRepository
 
     fun accountRepository(): AccountRepository
 

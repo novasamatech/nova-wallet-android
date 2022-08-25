@@ -2,11 +2,11 @@ package io.novafoundation.nova.feature_currency_impl.data.repository
 
 import io.novafoundation.nova.common.utils.CollectionDiffer
 import io.novafoundation.nova.core_db.dao.CurrencyDao
+import io.novafoundation.nova.feature_currency_api.data.datasource.CurrencyRemoteDataSource
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
-import io.novafoundation.nova.feature_currency_impl.data.datasource.CurrencyRemoteDataSource
-import io.novafoundation.nova.feature_currency_impl.data.mappers.mapCurrencyFromLocal
-import io.novafoundation.nova.feature_currency_impl.data.mappers.mapRemoteCurrencyToLocal
+import io.novafoundation.nova.feature_currency_api.presentation.mapper.mapCurrencyFromLocal
+import io.novafoundation.nova.feature_currency_api.presentation.mapper.mapRemoteCurrencyToLocal
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

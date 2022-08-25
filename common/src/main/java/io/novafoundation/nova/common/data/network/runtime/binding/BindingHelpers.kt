@@ -34,11 +34,21 @@ inline fun <reified T> requireType(dynamicInstance: Any?): T {
     return dynamicInstance as? T ?: incompatible()
 }
 
+inline fun <reified T> Any?.castOrNull(): T? {
+    if (this == null) return null
+
+    return this as? T ?: incompatible()
+}
+
 inline fun <reified T> Any?.cast(): T {
     return this as? T ?: incompatible()
 }
 
 fun Any?.castToStruct(): Struct.Instance {
+    return cast()
+}
+
+fun Any?.castToMap(): Map<String, Any?> {
     return cast()
 }
 
