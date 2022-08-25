@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
+import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites.di.AddToFavouritesComponent
@@ -69,7 +70,8 @@ interface DAppFeatureComponent : DAppFeatureApi {
             DbApi::class,
             AccountFeatureApi::class,
             WalletFeatureApi::class,
-            RuntimeApi::class
+            RuntimeApi::class,
+            CurrencyFeatureApi::class
         ]
     )
     interface DAppFeatureDependenciesComponent : DAppFeatureDependencies

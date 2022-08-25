@@ -39,7 +39,7 @@ fun mapAmountToAmountModel(
     includeZeroFiat: Boolean = true,
     tokenAmountSign: AmountSign = AmountSign.NONE,
 ): AmountModel {
-    val fiatAmount = token.fiatAmount(amount)
+    val fiatAmount = token.priceOf(amount)
 
     return AmountModel(
         token = tokenAmountSign.signSymbol + amount.formatTokenAmount(token.configuration),

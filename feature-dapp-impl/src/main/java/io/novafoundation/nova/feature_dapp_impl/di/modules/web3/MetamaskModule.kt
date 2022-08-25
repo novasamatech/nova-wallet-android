@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_dapp_impl.BuildConfig
 import io.novafoundation.nova.feature_dapp_impl.data.network.ethereum.EthereumApiFactory
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
@@ -111,13 +112,15 @@ class MetamaskModule {
         @ExtrinsicSerialization extrinsicGson: Gson,
         addressIconGenerator: AddressIconGenerator,
         ethereumApiFactory: EthereumApiFactory,
-        signerProvider: SignerProvider
+        signerProvider: SignerProvider,
+        currencyRepository: CurrencyRepository
     ) = MetamaskSignInteractorFactory(
         metamaskInteractor = metamaskInteractor,
         chainRegistry = chainRegistry,
         accountRepository = accountRepository,
         signerProvider = signerProvider,
         tokenRepository = tokenRepository,
+        currencyRepository = currencyRepository,
         extrinsicGson = extrinsicGson,
         addressIconGenerator = addressIconGenerator,
         ethereumApiFactory = ethereumApiFactory

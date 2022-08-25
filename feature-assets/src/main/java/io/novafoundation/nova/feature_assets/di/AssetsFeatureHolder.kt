@@ -7,6 +7,7 @@ import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.SelectAddressCommunicator
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
+import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_nft_api.NftFeatureApi
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
@@ -27,6 +28,7 @@ class AssetsFeatureHolder @Inject constructor(
             .walletFeatureApi(getFeature(WalletFeatureApi::class.java))
             .runtimeApi(getFeature(RuntimeApi::class.java))
             .accountFeatureApi(getFeature(AccountFeatureApi::class.java))
+            .currencyFeatureApi(getFeature(CurrencyFeatureApi::class.java))
             .build()
         return DaggerAssetsFeatureComponent.factory()
             .create(router, selectAddressCommunicator, dependencies)

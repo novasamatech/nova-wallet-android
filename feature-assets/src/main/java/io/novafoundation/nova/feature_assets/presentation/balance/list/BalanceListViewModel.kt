@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.mapGrou
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.NftPreviewUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.TotalBalanceModel
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
+import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.debounce
@@ -34,8 +35,6 @@ import kotlinx.coroutines.launch
 import kotlin.time.ExperimentalTime
 import kotlin.time.seconds
 
-private const val CURRENT_ICON_SIZE = 40
-
 private typealias SyncAction = suspend (MetaAccount) -> Unit
 
 @OptIn(ExperimentalTime::class)
@@ -45,13 +44,19 @@ class BalanceListViewModel(
     private val addressIconGenerator: AddressIconGenerator,
     private val selectedAccountUseCase: SelectedAccountUseCase,
     private val router: AssetsRouter,
+    private val currencyInteractor: CurrencyInteractor
 ) : BaseViewModel() {
 
     private val _hideRefreshEvent = MutableLiveData<Event<Unit>>()
     val hideRefreshEvent: LiveData<Event<Unit>> = _hideRefreshEvent
 
+    private val selectedCurrency = currencyInteractor.observeSelectCurrency()
+        .onEach { fullSync() }
+        .inBackground()
+        .share()
+
     private val fullSyncActions: List<SyncAction> = listOf(
-        { interactor.syncAssetsRates() },
+        { interactor.syncAssetsRates(selectedCurrency.first()) },
         interactor::syncNfts
     )
 
@@ -99,8 +104,6 @@ class BalanceListViewModel(
         .share()
 
     init {
-        fullSync()
-
         nftsPreviews
             .debounce(1L.seconds)
             .onEach { nfts ->

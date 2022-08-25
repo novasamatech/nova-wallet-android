@@ -101,7 +101,7 @@ fun stakeToScoring(stakeInPlanks: BigInteger?, token: Token): StakeTargetModel.S
 
     return StakeTargetModel.Scoring.TwoFields(
         primary = stake.formatTokenAmount(token.configuration),
-        secondary = token.fiatAmount(stake).formatAsCurrency()
+        secondary = token.priceOf(stake).formatAsCurrency()
     )
 }
 

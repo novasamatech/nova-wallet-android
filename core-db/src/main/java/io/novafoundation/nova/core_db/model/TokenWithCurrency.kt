@@ -2,12 +2,9 @@ package io.novafoundation.nova.core_db.model
 
 import androidx.room.Embedded
 
-class AssetWithToken(
+class TokenWithCurrency(
     @Embedded
-    val asset: AssetLocal,
-
-    @Embedded
-    val token: TokenLocal,
+    val token: TokenLocal?,
 
     @Embedded
     val currency: CurrencyLocal
