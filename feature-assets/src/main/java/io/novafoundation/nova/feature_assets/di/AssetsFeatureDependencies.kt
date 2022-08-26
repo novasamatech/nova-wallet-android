@@ -28,6 +28,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnl
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
+import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdateSystemFactory
@@ -53,6 +54,8 @@ import javax.inject.Named
 interface AssetsFeatureDependencies {
 
     fun currencyInteractor(): CurrencyInteractor
+
+    fun currencyRepository(): CurrencyRepository
 
     fun metaAccountGroupingInteractor(): MetaAccountGroupingInteractor
 

@@ -11,8 +11,8 @@ import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.presentation.mapLoading
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.resources.formatTimeLeft
-import io.novafoundation.nova.common.utils.format
-import io.novafoundation.nova.common.utils.formatAsPercentage
+import io.novafoundation.nova.common.utils.formatting.format
+import io.novafoundation.nova.common.utils.formatting.formatAsPercentage
 import io.novafoundation.nova.common.utils.fractionToPercentage
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.core.updater.UpdateSystem
