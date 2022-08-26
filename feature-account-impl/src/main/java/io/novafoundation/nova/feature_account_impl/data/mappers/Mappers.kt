@@ -15,7 +15,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.Account
 import io.novafoundation.nova.feature_account_api.domain.model.AddAccountType
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountWithAssetBalance
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_impl.R
@@ -93,21 +93,18 @@ private fun mapMetaAccountTypeFromLocal(local: MetaAccountLocal.Type): LightMeta
         MetaAccountLocal.Type.SECRETS -> LightMetaAccount.Type.SECRETS
         MetaAccountLocal.Type.WATCH_ONLY -> LightMetaAccount.Type.WATCH_ONLY
         MetaAccountLocal.Type.PARITY_SIGNER -> LightMetaAccount.Type.PARITY_SIGNER
+        MetaAccountLocal.Type.LEDGER -> LightMetaAccount.Type.LEDGER
     }
 }
 
-fun mapMetaAccountWithBalanceFromLocal(local: MetaAccountWithBalanceLocal): MetaAccountWithAssetBalance {
+fun mapMetaAccountWithBalanceFromLocal(local: MetaAccountWithBalanceLocal): MetaAccountAssetBalance {
     return with(local) {
-        MetaAccountWithAssetBalance(
+        MetaAccountAssetBalance(
             metaId = id,
-            name = name,
-            type = mapMetaAccountTypeFromLocal(type),
-            isSelected = isSelected,
-            substrateAccountId = substrateAccountId,
             freeInPlanks = freeInPlanks,
             reservedInPlanks = reservedInPlanks,
             precision = precision,
-            dollarRate = dollarRate
+            rate = rate
         )
     }
 }

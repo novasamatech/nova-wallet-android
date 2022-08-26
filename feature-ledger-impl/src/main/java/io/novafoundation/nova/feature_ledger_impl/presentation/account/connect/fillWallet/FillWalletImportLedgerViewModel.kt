@@ -16,9 +16,10 @@ import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.domain.account.connect.fillWallet.FillWalletImportLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerPayload
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.SelectLedgerAddressInterScreenCommunicator
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.LedgerChainAccount
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.SelectLedgerAddressInterScreenRequester
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.fillWallet.model.FillableChainAccountModel
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.finish.FinishImportLedgerPayload
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -63,8 +64,24 @@ class FillWalletImportLedgerViewModel(
             .launchIn(this)
     }
 
-    fun continueClicked() {
-        showMessage("TODO")
+    fun continueClicked() = launch {
+        val payload = buildFinishPayload()
+
+        router.openFinishImportLedger(payload)
+    }
+
+    private suspend fun buildFinishPayload(): FinishImportLedgerPayload {
+        val filledAccounts = filledAccountsFlow.first()
+        val parcelableAccounts = filledAccounts.map { (chainId, account) ->
+            LedgerChainAccount(
+                publicKey = account.publicKey,
+                encryptionType = account.encryptionType,
+                address = account.address,
+                chainId = chainId
+            )
+        }
+
+        return FinishImportLedgerPayload(parcelableAccounts)
     }
 
     fun itemClicked(item: FillableChainAccountModel) {
@@ -90,8 +107,8 @@ class FillWalletImportLedgerViewModel(
         )
     }
 
-    private fun addAccount(response: SelectLedgerAddressInterScreenCommunicator.Response) {
-        val account = LedgerSubstrateAccount(response.address, response.publicKey)
+    private fun addAccount(response: LedgerChainAccount) {
+        val account = LedgerSubstrateAccount(response.address, response.publicKey, response.encryptionType)
 
         filledAccountsFlow.value = filledAccountsFlow.value.inserted(response.chainId, account)
     }

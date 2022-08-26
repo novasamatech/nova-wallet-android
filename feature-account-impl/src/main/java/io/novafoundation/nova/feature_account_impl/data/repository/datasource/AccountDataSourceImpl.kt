@@ -21,8 +21,8 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountPositionUpdate
 import io.novafoundation.nova.feature_account_api.domain.model.Account
 import io.novafoundation.nova.feature_account_api.domain.model.AuthType
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
-import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountWithAssetBalance
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapChainAccountToAccount
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapMetaAccountLocalToMetaAccount
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapMetaAccountToAccount
@@ -169,7 +169,17 @@ class AccountDataSourceImpl(
         }
     }
 
-    override fun metaAccountsWithBalancesFlow(): Flow<List<MetaAccountWithAssetBalance>> {
+    override fun allMetaAccountsFlow(): Flow<List<MetaAccount>> {
+       return metaAccountDao.getJoinedMetaAccountsInfoFlow().map { accountsLocal ->
+           val chainsById = chainRegistry.chainsById.first()
+
+           accountsLocal.map {
+               mapMetaAccountLocalToMetaAccount(chainsById, it)
+           }
+       }
+    }
+
+    override fun metaAccountsWithBalancesFlow(): Flow<List<MetaAccountAssetBalance>> {
         return metaAccountDao.metaAccountsWithBalanceFlow().mapList {
             mapMetaAccountWithBalanceFromLocal(it)
         }

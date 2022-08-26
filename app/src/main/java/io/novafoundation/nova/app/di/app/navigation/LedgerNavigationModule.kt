@@ -6,6 +6,7 @@ import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.app.root.navigation.ledger.LedgerNavigator
 import io.novafoundation.nova.app.root.navigation.ledger.SelectLedgerAddressCommunicatorImpl
 import io.novafoundation.nova.common.di.scope.ApplicationScope
+import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.SelectLedgerAddressInterScreenCommunicator
 
@@ -20,5 +21,5 @@ class LedgerNavigationModule {
 
     @ApplicationScope
     @Provides
-    fun provideRouter(navigationHolder: NavigationHolder): LedgerRouter = LedgerNavigator(navigationHolder)
+    fun provideRouter(router: AccountRouter, navigationHolder: NavigationHolder): LedgerRouter = LedgerNavigator(router, navigationHolder)
 }

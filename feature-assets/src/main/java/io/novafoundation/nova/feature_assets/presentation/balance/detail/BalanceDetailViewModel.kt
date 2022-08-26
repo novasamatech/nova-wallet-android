@@ -137,7 +137,7 @@ class BalanceDetailViewModel(
             val metaAccount = accountUseCase.getSelectedMetaAccount()
 
             when (metaAccount.type) {
-                Type.SECRETS, Type.PARITY_SIGNER -> action()
+                Type.SECRETS, Type.PARITY_SIGNER, Type.LEDGER -> action()
                 Type.WATCH_ONLY -> missingKeysPresenter.presentNoKeysFound()
             }
         }

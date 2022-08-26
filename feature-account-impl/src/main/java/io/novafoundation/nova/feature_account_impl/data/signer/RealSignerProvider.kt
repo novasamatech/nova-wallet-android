@@ -21,6 +21,8 @@ internal class RealSignerProvider(
             LightMetaAccount.Type.SECRETS -> secretsSignerFactory.create(metaAccount)
             LightMetaAccount.Type.WATCH_ONLY -> watchOnlySigner
             LightMetaAccount.Type.PARITY_SIGNER -> paritySignerSigner
+            // TODO implement signer for ledger
+            LightMetaAccount.Type.LEDGER -> watchOnlySigner
         }
     }
 

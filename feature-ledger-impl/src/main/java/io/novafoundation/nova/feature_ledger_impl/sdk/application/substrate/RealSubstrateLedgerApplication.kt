@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_ledger_api.sdk.transport.send
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.DisplayVerificationDialog.NO
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.DisplayVerificationDialog.YES
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import jp.co.soramitsu.fearless_utils.encrypt.EncryptionType
 import jp.co.soramitsu.fearless_utils.encrypt.json.copyBytes
 import jp.co.soramitsu.fearless_utils.encrypt.junction.BIP32JunctionDecoder
 import jp.co.soramitsu.fearless_utils.extensions.copyLast
@@ -112,7 +113,9 @@ class RealSubstrateLedgerApplication(
             "Invalid address"
         }
 
-        return LedgerSubstrateAccount(address = address, publicKey = publicKey)
+        val encryptionType = mapCryptoSchemeToEncryptionType(defaultCryptoScheme())
+
+        return LedgerSubstrateAccount(address = address, publicKey = publicKey, encryptionType = encryptionType)
     }
 
     private fun defaultCryptoScheme() = CryptoScheme.ED25519
@@ -145,5 +148,12 @@ class RealSubstrateLedgerApplication(
         }
 
         return raw.dropBytesLast(RESPONSE_CODE_LENGTH)
+    }
+
+    private fun mapCryptoSchemeToEncryptionType(cryptoScheme: CryptoScheme): EncryptionType {
+        return when (cryptoScheme) {
+            CryptoScheme.ED25519 -> EncryptionType.ED25519
+            CryptoScheme.SR25519 -> EncryptionType.SR25519
+        }
     }
 }

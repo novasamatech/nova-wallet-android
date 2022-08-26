@@ -27,7 +27,7 @@ buildscript {
 
         progressButtonsVersion = '2.1.0'
 
-        daggerVersion = '2.25.2'
+        daggerVersion = '2.43.2'
         javaxInjectVersion = '1'
 
         architectureComponentVersion = '2.2.0'
