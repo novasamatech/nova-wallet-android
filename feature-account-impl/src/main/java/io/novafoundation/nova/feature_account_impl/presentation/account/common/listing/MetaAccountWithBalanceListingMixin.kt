@@ -3,11 +3,11 @@ package io.novafoundation.nova.feature_account_impl.presentation.account.common.
 import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
-import io.novafoundation.nova.common.utils.formatAsCurrency
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountWithTotalBalance
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
+import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.map
 
@@ -48,7 +48,7 @@ private class MetaAccountWithBalanceListingMixin(
         AccountUi(
             id = metaAccount.metaAccount.id,
             title = metaAccount.metaAccount.name,
-            subtitle = totalBalance.formatAsCurrency(),
+            subtitle = totalBalance.formatAsCurrency(metaAccount.currency),
             isSelected = metaAccount.metaAccount.isSelected,
             isClickable = true,
             picture = walletUiUseCase.walletIcon(metaAccount.metaAccount),

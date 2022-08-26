@@ -111,8 +111,6 @@ fun mapMetaAccountWithBalanceFromLocal(local: MetaAccountWithBalanceLocal): Meta
             reservedInPlanks = reservedInPlanks,
             precision = precision,
             rate = rate,
-            currencySymbol = local.currencySymbol,
-            currencyCode = local.currencyCode
         )
     }
 }
