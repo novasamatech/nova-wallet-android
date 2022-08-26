@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_assets.domain.common
 
 import io.novafoundation.nova.common.utils.sumByBigDecimal
+import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.ext.defaultComparatorFrom
 import io.novafoundation.nova.runtime.ext.isUtilityAsset
@@ -10,12 +11,14 @@ import java.math.BigDecimal
 class AssetGroup(
     val chain: Chain,
     val groupBalanceFiat: BigDecimal,
-    val zeroBalance: Boolean
+    val zeroBalance: Boolean,
+    val currency: Currency
 )
 
 fun groupAndSortAssetsByNetwork(
     assets: List<Asset>,
-    chainsById: Map<String, Chain>
+    chainsById: Map<String, Chain>,
+    currency: Currency
 ): Map<AssetGroup, List<Asset>> {
     val assetGroupComparator = compareByDescending(AssetGroup::groupBalanceFiat)
         .thenByDescending { it.zeroBalance } // non-zero balances first
@@ -33,7 +36,8 @@ fun groupAndSortAssetsByNetwork(
             AssetGroup(
                 chain = chain,
                 groupBalanceFiat = assets.sumByBigDecimal { it.token.priceOf(it.total) },
-                zeroBalance = assets.any { it.total > BigDecimal.ZERO }
+                zeroBalance = assets.any { it.total > BigDecimal.ZERO },
+                currency
             )
         }.toSortedMap(assetGroupComparator)
 }

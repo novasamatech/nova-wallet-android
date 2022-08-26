@@ -59,7 +59,7 @@
         tools:text="+25%" />
 
     <TextView
-        android:id="@+id/itemAssetDollarAmount"
+        android:id="@+id/itemAssetPriceAmount"
         style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -85,7 +85,7 @@
         android:gravity="end|center_vertical"
         android:maxLines="1"
         app:layout_constraintBaseline_toBaselineOf="@id/itemAssetToken"
-        app:layout_constraintEnd_toEndOf="@+id/itemAssetDollarAmount"
+        app:layout_constraintEnd_toEndOf="@+id/itemAssetPriceAmount"
         app:layout_constraintHorizontal_bias="1"
         app:layout_constraintStart_toEndOf="@+id/itemAssetToken"
         tools:text="120.0849" />

@@ -7,8 +7,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.Event
-import io.novafoundation.nova.common.utils.format
-import io.novafoundation.nova.common.utils.formatAsCurrency
+import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -21,6 +20,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.list.model.Nft
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.TotalBalanceModel
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
+import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.debounce
@@ -51,7 +51,6 @@ class BalanceListViewModel(
     val hideRefreshEvent: LiveData<Event<Unit>> = _hideRefreshEvent
 
     private val selectedCurrency = currencyInteractor.observeSelectCurrency()
-        .onEach { fullSync() }
         .inBackground()
         .share()
 
@@ -96,14 +95,18 @@ class BalanceListViewModel(
     val totalBalanceFlow = balancesFlow.map {
         TotalBalanceModel(
             shouldShowPlaceholder = it.assets.isEmpty(),
-            totalBalanceFiat = it.totalBalanceFiat.formatAsCurrency(),
-            lockedBalanceFiat = it.lockedBalanceFiat.formatAsCurrency()
+            totalBalanceFiat = it.totalBalanceFiat.formatAsCurrency(selectedCurrency.first()),
+            lockedBalanceFiat = it.lockedBalanceFiat.formatAsCurrency(selectedCurrency.first())
         )
     }
         .inBackground()
         .share()
 
     init {
+        selectedCurrency
+            .onEach { fullSync() }
+            .launchIn(this)
+
         nftsPreviews
             .debounce(1L.seconds)
             .onEach { nfts ->

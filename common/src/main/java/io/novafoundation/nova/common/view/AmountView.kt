@@ -18,7 +18,7 @@ import io.novafoundation.nova.common.view.shape.getBlurDrawable
 import io.novafoundation.nova.common.view.shape.getCornersStateDrawable
 import kotlinx.android.synthetic.main.view_choose_amount_old.view.stakingAmountInput
 import kotlinx.android.synthetic.main.view_choose_amount_old.view.stakingAssetBalance
-import kotlinx.android.synthetic.main.view_choose_amount_old.view.stakingAssetDollarAmount
+import kotlinx.android.synthetic.main.view_choose_amount_old.view.stakingAssetPriceAmount
 import kotlinx.android.synthetic.main.view_choose_amount_old.view.stakingAssetImage
 import kotlinx.android.synthetic.main.view_choose_amount_old.view.stakingAssetToken
 
@@ -103,15 +103,7 @@ class AmountView @JvmOverloads constructor(
         stakingAssetBalance.text = balance
     }
 
-    fun setFiatAmount(dollarAmount: String?) {
-        stakingAssetDollarAmount.setTextOrHide(dollarAmount)
-    }
-
-    fun hideAssetDollarAmount() {
-        stakingAssetDollarAmount.makeGone()
-    }
-
-    fun showAssetDollarAmount() {
-        stakingAssetDollarAmount.makeVisible()
+    fun setFiatAmount(priceAmount: String?) {
+        stakingAssetPriceAmount.setTextOrHide(priceAmount)
     }
 }
