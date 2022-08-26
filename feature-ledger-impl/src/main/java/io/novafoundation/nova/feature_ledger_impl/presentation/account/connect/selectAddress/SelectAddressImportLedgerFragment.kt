@@ -34,13 +34,8 @@ class SelectAddressImportLedgerFragment :
         fun getBundle(payload: SelectLedgerAddressPayload) = bundleOf(PAYLOAD_KEY to payload)
     }
 
-    private val addressesAdapter by lazy(LazyThreadSafetyMode.NONE) {
-        AccountsAdapter(this, AccountsAdapter.Mode.VIEW)
-    }
-
-    private val loadMoreAdapter by lazy(LazyThreadSafetyMode.NONE) {
-        LedgerSelectAddressLoadMoreAdapter(handler = this, lifecycleOwner = this)
-    }
+    private val addressesAdapter = AccountsAdapter(this, AccountsAdapter.Mode.VIEW)
+    private val loadMoreAdapter =  LedgerSelectAddressLoadMoreAdapter(handler = this, lifecycleOwner = this)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_import_ledger_select_address, container, false)
