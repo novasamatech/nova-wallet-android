@@ -97,7 +97,6 @@ interface MetaAccountDao {
     suspend fun nextAccountPosition(): Int
 }
 
-// add prefix
 class MetaAccountWithBalanceLocal(
     val id: Long,
     val name: String,
