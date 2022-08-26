@@ -170,13 +170,13 @@ class AccountDataSourceImpl(
     }
 
     override fun allMetaAccountsFlow(): Flow<List<MetaAccount>> {
-       return metaAccountDao.getJoinedMetaAccountsInfoFlow().map { accountsLocal ->
-           val chainsById = chainRegistry.chainsById.first()
+        return metaAccountDao.getJoinedMetaAccountsInfoFlow().map { accountsLocal ->
+            val chainsById = chainRegistry.chainsById.first()
 
-           accountsLocal.map {
-               mapMetaAccountLocalToMetaAccount(chainsById, it)
-           }
-       }
+            accountsLocal.map {
+                mapMetaAccountLocalToMetaAccount(chainsById, it)
+            }
+        }
     }
 
     override fun metaAccountsWithBalancesFlow(): Flow<List<MetaAccountAssetBalance>> {

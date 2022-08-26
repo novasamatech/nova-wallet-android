@@ -20,7 +20,7 @@ class PolkadotJsExtensionInteractor(
     suspend fun getInjectedAccounts(): List<InjectedAccount> {
         val metaAccount = accountRepository.getSelectedMetaAccount()
 
-        val defaultAccount =  metaAccount.defaultSubstrateAddress?.let { address ->
+        val defaultAccount = metaAccount.defaultSubstrateAddress?.let { address ->
             InjectedAccount(
                 address = address,
                 genesisHash = null,

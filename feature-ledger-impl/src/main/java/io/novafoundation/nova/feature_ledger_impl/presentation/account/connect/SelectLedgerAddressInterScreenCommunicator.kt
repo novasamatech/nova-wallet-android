@@ -20,4 +20,4 @@ class LedgerChainAccount(
     val encryptionType: EncryptionType,
     val address: String,
     val chainId: ChainId
-): Parcelable
+) : Parcelable

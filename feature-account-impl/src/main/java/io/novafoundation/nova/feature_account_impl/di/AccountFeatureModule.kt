@@ -193,7 +193,7 @@ class AccountFeatureModule {
         accountRepository: AccountRepository,
         addressIconGenerator: AddressIconGenerator,
         walletUiUseCase: WalletUiUseCase,
-    ) = SelectedAccountUseCase(accountRepository,walletUiUseCase, addressIconGenerator)
+    ) = SelectedAccountUseCase(accountRepository, walletUiUseCase, addressIconGenerator)
 
     @Provides
     @FeatureScope

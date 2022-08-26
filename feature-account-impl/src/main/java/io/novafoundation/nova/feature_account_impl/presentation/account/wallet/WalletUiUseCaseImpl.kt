@@ -73,10 +73,10 @@ class WalletUiUseCaseImpl(
 
             // if both default accounts are null there MUST be at least one chain account. Otherwise wallet is in invalid state
             else -> {
-               chainAccounts.values
-                   .map(ChainAccount::accountId)
-                   .sortedWith(ByteArrayComparator())
-                   .first()
+                chainAccounts.values
+                    .map(ChainAccount::accountId)
+                    .sortedWith(ByteArrayComparator())
+                    .first()
             }
         }
     }

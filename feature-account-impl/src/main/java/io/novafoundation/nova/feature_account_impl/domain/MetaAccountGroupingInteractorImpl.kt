@@ -46,7 +46,6 @@ class MetaAccountGroupingInteractorImpl(
                     totalBalance = totalBalance,
                     currency = selectedCurrency
                 )
-
             }
                 .groupBy { it.metaAccount.type }
                 .toSortedMap(metaAccountTypeComparator())

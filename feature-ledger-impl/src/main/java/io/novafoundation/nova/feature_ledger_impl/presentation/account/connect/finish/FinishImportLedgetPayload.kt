@@ -7,4 +7,4 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 class FinishImportLedgerPayload(
     val ledgerChainAccounts: List<LedgerChainAccount>
-): Parcelable
+) : Parcelable

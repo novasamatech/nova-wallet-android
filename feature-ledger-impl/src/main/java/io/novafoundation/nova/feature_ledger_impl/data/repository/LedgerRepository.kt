@@ -20,7 +20,7 @@ interface LedgerRepository {
 class RealLedgerRepository(
     private val metaAccountDao: MetaAccountDao,
     private val chainRegistry: ChainRegistry,
-): LedgerRepository {
+) : LedgerRepository {
 
     override suspend fun insertLedgerMetaAccount(
         name: String,
