@@ -7,7 +7,7 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
-import io.novafoundation.nova.common.utils.format
+import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.feature_nft_api.data.model.Nft

@@ -7,7 +7,7 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.utils.flowOf
-import io.novafoundation.nova.common.utils.formatFractionAsPercentage
+import io.novafoundation.nova.common.utils.formatting.formatFractionAsPercentage
 import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext

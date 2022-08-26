@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.co
 
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.event
-import io.novafoundation.nova.common.utils.formatFractionAsPercentage
+import io.novafoundation.nova.common.utils.formatting.formatFractionAsPercentage
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState

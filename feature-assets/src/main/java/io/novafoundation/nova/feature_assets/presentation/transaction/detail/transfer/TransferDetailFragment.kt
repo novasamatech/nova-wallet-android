@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.formatDateTime
+import io.novafoundation.nova.common.utils.formatting.formatDateTime
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions

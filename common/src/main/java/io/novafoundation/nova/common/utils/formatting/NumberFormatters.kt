@@ -1,14 +1,13 @@
 @file:OptIn(ExperimentalTime::class)
 
-package io.novafoundation.nova.common.utils
+package io.novafoundation.nova.common.utils.formatting
 
 import android.content.Context
 import android.text.format.DateUtils
 import io.novafoundation.nova.common.R
-import io.novafoundation.nova.common.utils.formatting.CompoundNumberFormatter
-import io.novafoundation.nova.common.utils.formatting.DynamicPrecisionFormatter
-import io.novafoundation.nova.common.utils.formatting.FixedPrecisionFormatter
-import io.novafoundation.nova.common.utils.formatting.NumberAbbreviation
+import io.novafoundation.nova.common.utils.daysFromMillis
+import io.novafoundation.nova.common.utils.fractionToPercentage
+import io.novafoundation.nova.common.utils.isNonNegative
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DecimalFormat
@@ -56,11 +55,6 @@ private val trillionAbbreviation = NumberAbbreviation(
 )
 
 private val defaultNumberFormatter = defaultNumberFormatter()
-private val currencyFormatter = currencyFormatter()
-
-fun BigDecimal.formatAsCurrency(): String {
-    return "$" + currencyFormatter.format(this)
-}
 
 fun BigDecimal.format(): String {
     return defaultNumberFormatter.format(this)

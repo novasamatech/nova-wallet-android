@@ -28,6 +28,7 @@ dependencies {
     implementation coroutinesDep
     implementation project(':runtime')
     implementation project(":common")
+    implementation project(":feature-currency-api")
 
     implementation project(":feature-currency-api")
 

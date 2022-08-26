@@ -6,12 +6,12 @@ import io.novafoundation.nova.common.mixin.api.Retriable
 import io.novafoundation.nova.common.mixin.api.RetryPayload
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
-import io.novafoundation.nova.common.utils.formatAsCurrency
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.requireException
 import io.novafoundation.nova.common.utils.requireValue
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.utils.withLoading
+import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.model.PendingPayout
@@ -122,7 +122,7 @@ class PayoutsListViewModel(
                 createdAt = timeLeftCalculatedAt,
                 daysLeftColor = if (closeToExpire) R.color.red else R.color.white_64,
                 amount = amount.formatTokenChange(token.configuration, isIncome = true),
-                amountFiat = token.priceOf(amount).formatAsCurrency()
+                amountFiat = token.priceOf(amount).formatAsCurrency(token.currency)
             )
         }
     }

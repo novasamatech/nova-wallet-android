@@ -8,7 +8,6 @@ import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.flowOf
-import io.novafoundation.nova.common.utils.formatAsCurrency
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.validation.CompositeValidation
@@ -29,6 +28,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.con
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.contributeValidationFailure
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.ConfirmContributeCustomization
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.parcel.mapParachainMetadataFromParcel
+import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapAssetToAssetModel
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapFeeToFeeModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
@@ -90,7 +90,7 @@ class ConfirmContributeViewModel(
         .share()
 
     val enteredFiatAmountFlow = assetFlow.map { asset ->
-        asset.token.priceOf(payload.amount).formatAsCurrency()
+        asset.token.priceOf(payload.amount).formatAsCurrency(asset.token.currency)
     }
         .inBackground()
         .share()
