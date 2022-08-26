@@ -235,7 +235,7 @@ class StakingInteractor(
     suspend fun getAccountProjectionsInSelectedChains() = withContext(Dispatchers.Default) {
         val chain = stakingSharedState.chain()
 
-        accountRepository.allMetaAccounts().map {
+        accountRepository.allMetaAccounts().mapNotNull {
             mapAccountToStakingAccount(chain, it)
         }
     }

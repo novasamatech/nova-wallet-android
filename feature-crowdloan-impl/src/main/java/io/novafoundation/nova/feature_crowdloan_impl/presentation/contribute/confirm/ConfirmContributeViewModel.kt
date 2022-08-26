@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.co
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.address.AddressIconGenerator
-import io.novafoundation.nova.common.address.createAddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -11,12 +10,13 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatAsCurrency
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.validation.CompositeValidation
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
-import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress
+import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomContributeManager
@@ -58,6 +58,8 @@ class ConfirmContributeViewModel(
     Validatable by validationExecutor,
     ExternalActions by externalActions {
 
+    private val chain by lazyAsync { assetSharedState.chain() }
+
     override val openBrowserEvent = MutableLiveData<Event<String>>()
 
     private val _showNextProgress = MutableLiveData(false)
@@ -72,9 +74,10 @@ class ConfirmContributeViewModel(
         .share()
 
     val selectedAddressModelFlow = accountUseCase.selectedMetaAccountFlow()
-        .map {
-            addressModelGenerator.createAddressModel(it.defaultSubstrateAddress, AddressIconGenerator.SIZE_SMALL, it.name)
+        .map { metaAccount ->
+            addressModelGenerator.createAccountAddressModel(chain.await(), metaAccount)
         }
+        .shareInBackground()
 
     val selectedAmount = payload.amount.toString()
 

@@ -195,8 +195,6 @@ fun mapAddAccountPayloadToAddAccountType(
     }
 }
 
-fun mapNameChooserStateToOptionalName(state: AccountNameChooserMixin.State) = (state as? AccountNameChooserMixin.State.Input)?.value
-
 fun mapOptionalNameToNameChooserState(name: String?) = when (name) {
     null -> AccountNameChooserMixin.State.NoInput
     else -> AccountNameChooserMixin.State.Input(name)

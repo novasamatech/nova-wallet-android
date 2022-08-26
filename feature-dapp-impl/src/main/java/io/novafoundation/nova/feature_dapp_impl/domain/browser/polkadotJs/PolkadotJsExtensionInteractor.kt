@@ -17,16 +17,17 @@ class PolkadotJsExtensionInteractor(
     private val runtimeVersionsRepository: RuntimeVersionsRepository,
 ) {
 
-    @OptIn(ExperimentalStdlibApi::class)
     suspend fun getInjectedAccounts(): List<InjectedAccount> {
         val metaAccount = accountRepository.getSelectedMetaAccount()
 
-        val defaultAccount = InjectedAccount(
-            address = metaAccount.defaultSubstrateAddress,
-            genesisHash = null,
-            name = metaAccount.name,
-            encryption = metaAccount.substrateCryptoType?.let { mapCryptoTypeToEncryption(it) }
-        )
+        val defaultAccount =  metaAccount.defaultSubstrateAddress?.let { address ->
+            InjectedAccount(
+                address = address,
+                genesisHash = null,
+                name = metaAccount.name,
+                encryption = metaAccount.substrateCryptoType?.let { mapCryptoTypeToEncryption(it) }
+            )
+        }
 
         val customAccounts = metaAccount.chainAccounts.mapNotNull { (chainId, chainAccount) ->
             val chain = chainRegistry.getChain(chainId)
@@ -43,7 +44,7 @@ class PolkadotJsExtensionInteractor(
         }
 
         return buildList {
-            add(defaultAccount)
+            defaultAccount?.let(::add)
             addAll(customAccounts)
         }
     }

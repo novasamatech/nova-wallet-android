@@ -22,7 +22,7 @@ interface LightMetaAccount {
     val id: Long
     val substratePublicKey: ByteArray?
     val substrateCryptoType: CryptoType?
-    val substrateAccountId: ByteArray
+    val substrateAccountId: ByteArray?
     val ethereumAddress: ByteArray?
     val ethereumPublicKey: ByteArray?
     val isSelected: Boolean
@@ -61,7 +61,7 @@ class MetaAccount(
     val chainAccounts: Map<ChainId, ChainAccount>,
     override val substratePublicKey: ByteArray?,
     override val substrateCryptoType: CryptoType?,
-    override val substrateAccountId: ByteArray,
+    override val substrateAccountId: ByteArray?,
     override val ethereumAddress: ByteArray?,
     override val ethereumPublicKey: ByteArray?,
     override val isSelected: Boolean,
@@ -98,7 +98,7 @@ fun MetaAccount.addressIn(chain: Chain): String? {
     return when {
         hasChainAccountIn(chain.id) -> chain.addressOf(chainAccounts.getValue(chain.id).accountId)
         chain.isEthereumBased -> ethereumAddress?.let(chain::addressOf)
-        else -> chain.addressOf(substrateAccountId)
+        else -> substrateAccountId?.let { chain.addressOf(substrateAccountId) }
     }
 }
 
@@ -106,8 +106,8 @@ fun MetaAccount.mainEthereumAddress() = ethereumAddress?.toEthereumAddress()
 
 fun MetaAccount.requireAddressIn(chain: Chain): String = addressIn(chain) ?: throw NoSuchElementException("No chain account found for $chain in $name")
 
-val MetaAccount.defaultSubstrateAddress
-    get() = substrateAccountId.toAddress(SS58Encoder.DEFAULT_PREFIX)
+val MetaAccount.defaultSubstrateAddress: String?
+    get() = substrateAccountId?.toAddress(SS58Encoder.DEFAULT_PREFIX)
 
 fun MetaAccount.accountIdIn(chain: Chain): ByteArray? {
     return when {

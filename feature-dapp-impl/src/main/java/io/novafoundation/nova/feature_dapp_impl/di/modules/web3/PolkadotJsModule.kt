@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.polkadotJs.PolkadotJsExtensionInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.polkadotJs.sign.PolkadotJsSignInteractorFactory
@@ -77,7 +78,8 @@ class PolkadotJsModule {
         commonInteractor: DappInteractor,
         resourceManager: ResourceManager,
         addressIconGenerator: AddressIconGenerator,
-        web3Session: Web3Session
+        web3Session: Web3Session,
+        walletUiUseCase: WalletUiUseCase,
     ): PolkadotJsStateFactory {
         return PolkadotJsStateFactory(
             interactor = interactor,
@@ -85,6 +87,7 @@ class PolkadotJsModule {
             resourceManager = resourceManager,
             addressIconGenerator = addressIconGenerator,
             web3Session = web3Session,
+            walletUiUseCase = walletUiUseCase
         )
     }
 

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_dapp_impl.web3.metamask.states
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.metamask.MetamaskInteractor
@@ -26,18 +27,20 @@ class DefaultMetamaskState(
     addressIconGenerator: AddressIconGenerator,
     web3Session: Web3Session,
     hostApi: Web3StateMachineHost,
+    walletUiUseCase: WalletUiUseCase,
 
     private val stateFactory: MetamaskStateFactory,
     private val interactor: MetamaskInteractor,
     override val chain: MetamaskChain,
     override val selectedAccountAddress: String?
 ) : BaseState<MetamaskTransportRequest<*>, MetamaskState>(
-        commonInteractor = commonInteractor,
-        resourceManager = resourceManager,
-        addressIconGenerator = addressIconGenerator,
-        web3Session = web3Session,
-        hostApi = hostApi
-    ),
+    commonInteractor = commonInteractor,
+    resourceManager = resourceManager,
+    addressIconGenerator = addressIconGenerator,
+    web3Session = web3Session,
+    hostApi = hostApi,
+    walletUiUseCase = walletUiUseCase
+),
     MetamaskState {
 
     private val knownChains = mapOf(MetamaskChain.ETHEREUM.chainId to MetamaskChain.ETHEREUM)

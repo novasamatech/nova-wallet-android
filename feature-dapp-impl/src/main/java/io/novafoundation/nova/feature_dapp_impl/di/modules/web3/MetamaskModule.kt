@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_dapp_impl.BuildConfig
 import io.novafoundation.nova.feature_dapp_impl.data.network.ethereum.EthereumApiFactory
@@ -84,13 +85,15 @@ class MetamaskModule {
         resourceManager: ResourceManager,
         addressIconGenerator: AddressIconGenerator,
         web3Session: Web3Session,
+        walletUiUseCase: WalletUiUseCase,
     ): MetamaskStateFactory {
         return MetamaskStateFactory(
             interactor = interactor,
             commonInteractor = commonInteractor,
             resourceManager = resourceManager,
             addressIconGenerator = addressIconGenerator,
-            web3Session = web3Session
+            web3Session = web3Session,
+            walletUiUseCase = walletUiUseCase
         )
     }
 
