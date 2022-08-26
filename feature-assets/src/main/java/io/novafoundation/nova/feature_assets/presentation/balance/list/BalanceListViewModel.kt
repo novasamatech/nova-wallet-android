@@ -21,7 +21,6 @@ import io.novafoundation.nova.feature_assets.presentation.balance.list.model.Tot
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
-import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.debounce

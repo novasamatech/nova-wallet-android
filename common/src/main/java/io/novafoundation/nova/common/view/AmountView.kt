@@ -11,8 +11,6 @@ import coil.ImageLoader
 import coil.load
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.makeGone
-import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.shape.getBlurDrawable
 import io.novafoundation.nova.common.view.shape.getCornersStateDrawable
