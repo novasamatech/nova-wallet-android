@@ -17,6 +17,7 @@ import io.novafoundation.nova.core_db.model.TokenLocal
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.findMetaAccountOrThrow
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
+import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.amountInPlanks
@@ -32,6 +33,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.mappers.mapOperationLocal
 import io.novafoundation.nova.feature_wallet_impl.data.mappers.mapOperationToOperationLocalDb
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.SubstrateRemoteSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.coingecko.CoingeckoApi
+import io.novafoundation.nova.feature_wallet_impl.data.network.coingecko.CoingeckoApi.Companion.getRecentRateFieldName
 import io.novafoundation.nova.feature_wallet_impl.data.network.model.request.SubqueryHistoryRequest
 import io.novafoundation.nova.feature_wallet_impl.data.network.phishing.PhishingApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
@@ -96,13 +98,14 @@ class WalletRepositoryImpl(
         chainsById: Map<ChainId, Chain>,
         assetLocal: AssetWithToken,
     ): Asset {
-        val chainAsset = chainsById.getValue(assetLocal.asset.chainId).assetsBySymbol.getValue(assetLocal.token.symbol)
+        val chainAsset = chainsById.getValue(assetLocal.asset.chainId)
+            .assetsBySymbol
+            .getValue(assetLocal.token.tokenSymbol)
 
         return mapAssetLocalToAsset(assetLocal, chainAsset = chainAsset)
     }
 
-    // params: currency + logic
-    override suspend fun syncAssetsRates() {
+    override suspend fun syncAssetsRates(currency: Currency) {
         val chains = chainRegistry.currentChains.first()
 
         val syncingPriceIdsToSymbols = chains.flatMap(Chain::assets)
@@ -113,12 +116,12 @@ class WalletRepositoryImpl(
             )
 
         if (syncingPriceIdsToSymbols.isNotEmpty()) {
-            val priceStats = getAssetPriceCoingecko(syncingPriceIdsToSymbols.keys)
+            val priceStats = getAssetPriceCoingecko(syncingPriceIdsToSymbols.keys, currency.coingeckoId)
 
             val updatedTokens = priceStats.flatMap { (priceId, tokenStats) ->
                 syncingPriceIdsToSymbols[priceId]?.let { symbols ->
                     symbols.map { symbol ->
-                        TokenLocal(symbol, tokenStats.price, tokenStats.rateChange)
+                        TokenLocal(symbol, tokenStats.price, currency.id, tokenStats.rateChange)
                     }
                 } ?: emptyList()
             }
@@ -140,9 +143,13 @@ class WalletRepositoryImpl(
             .map {
                 it.defaultOnNull {
                     val asset = AssetLocal.createEmpty(chainAsset.id, chainAsset.chainId, metaId)
-                    val token = tokenDao.getTokenOrDefault(chainAsset.symbol)
-
-                    AssetWithToken(asset, token)
+                    val tokenWithCurrency = tokenDao.getToken(chainAsset.symbol)
+                    var token = tokenWithCurrency.token
+                    val currency = tokenWithCurrency.currency
+                    if (token == null) {
+                        token = TokenLocal.createEmpty(chainAsset.symbol, currency.id)
+                    }
+                    AssetWithToken(asset, token, currency)
                 }
             }
             .map { mapAssetLocalToAsset(it, chainAsset) }
@@ -297,8 +304,16 @@ class WalletRepositoryImpl(
         )
     }
 
-    private suspend fun getAssetPriceCoingecko(priceIds: Set<String>): Map<String, PriceInfo> {
-        return apiCall { coingeckoApi.getAssetPrice(priceIds.asQueryParam(), currency = "usd", includeRateChange = true) }
+    private suspend fun getAssetPriceCoingecko(priceIds: Set<String>, coingeccoId: String): Map<String, PriceInfo> {
+        return apiCall { coingeckoApi.getAssetPrice(priceIds.asQueryParam(), currency = coingeccoId, includeRateChange = true) }
+            .mapValues {
+                val price = it.value[coingeccoId]
+                val recentRate = it.value[getRecentRateFieldName(coingeccoId)]
+                PriceInfo(
+                    price?.toBigDecimal(),
+                    recentRate?.toBigDecimal()
+                )
+            }
     }
 
     private suspend fun <T> apiCall(block: suspend () -> T): T = httpExceptionHandler.wrap(block)
@@ -308,7 +323,4 @@ class WalletRepositoryImpl(
 
         assetCache.getAsset(metaAccount.id, chainId, assetId)
     }
-
-    private suspend fun TokenDao.getTokenOrDefault(symbol: String) =
-        getToken(symbol) ?: TokenLocal.createEmpty(symbol)
 }

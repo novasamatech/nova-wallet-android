@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_assets.presentation.balance.detail
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
@@ -21,6 +20,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.b
 import io.novafoundation.nova.feature_assets.presentation.model.BalanceLocksModel
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryMixin
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryUi
+import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLocks
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
@@ -44,6 +44,7 @@ class BalanceDetailViewModel(
     private val accountUseCase: SelectedAccountUseCase,
     private val missingKeysPresenter: WatchOnlyMissingKeysPresenter,
     private val resourceManager: ResourceManager,
+    private val currencyInteractor: CurrencyInteractor
 ) : BaseViewModel(),
     TransactionHistoryUi by transactionHistoryMixin {
 
@@ -99,8 +100,9 @@ class BalanceDetailViewModel(
     }
 
     fun sync() {
-        viewModelScope.launch {
-            val deferredAssetSync = async { walletInteractor.syncAssetsRates() }
+        launch {
+            val currency = currencyInteractor.getSelectedCurrency()
+            val deferredAssetSync = async { walletInteractor.syncAssetsRates(currency) }
             val deferredTransactionsSync = async { transactionHistoryMixin.syncFirstOperationsPage() }
 
             awaitAll(deferredAssetSync, deferredTransactionsSync)

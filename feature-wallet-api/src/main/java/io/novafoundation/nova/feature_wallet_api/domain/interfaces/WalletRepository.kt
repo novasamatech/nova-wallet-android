@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_wallet_api.domain.interfaces
 
 import io.novafoundation.nova.common.data.model.CursorPage
+import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
@@ -17,7 +18,7 @@ interface WalletRepository {
 
     suspend fun getAssets(metaId: Long): List<Asset>
 
-    suspend fun syncAssetsRates()
+    suspend fun syncAssetsRates(currency: Currency)
 
     fun assetFlow(
         accountId: AccountId,

@@ -2,12 +2,14 @@ package io.novafoundation.nova.feature_wallet_api.domain.model
 
 import io.novafoundation.nova.common.utils.amountFromPlanks
 import io.novafoundation.nova.common.utils.planksFromAmount
+import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
 import java.math.BigInteger
 
 class Token(
-    val dollarRate: BigDecimal?,
+    val rate: BigDecimal?,
+    val currency: Currency,
     val recentRateChange: BigDecimal?,
     val configuration: Chain.Asset
 ) {
@@ -15,7 +17,7 @@ class Token(
     fun BigDecimal.toPlanks() = planksFromAmount(this)
     fun BigInteger.toAmount() = amountFromPlanks(this)
 
-    fun fiatAmount(tokenAmount: BigDecimal): BigDecimal = dollarRate?.multiply(tokenAmount) ?: BigDecimal.ZERO
+    fun priceOf(tokenAmount: BigDecimal): BigDecimal = rate?.multiply(tokenAmount) ?: BigDecimal.ZERO
 }
 
 fun Token.amountFromPlanks(amountInPlanks: BigInteger) = configuration.amountFromPlanks(amountInPlanks)
