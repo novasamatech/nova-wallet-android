@@ -22,7 +22,6 @@
         android:layout_marginEnd="16dp"
         android:text="@string/account_ledger_select_device_title" />
 
-
     <TextView
         style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="match_parent"

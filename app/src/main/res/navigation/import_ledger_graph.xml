@@ -7,33 +7,56 @@
     <fragment
         android:id="@+id/startImportLedgerFragment"
         android:name="io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.start.StartImportLedgerFragment"
-        android:label="StartImportLedgerFragment" >
+        android:label="StartImportLedgerFragment">
 
         <action
+            android:id="@+id/action_startImportLedgerFragment_to_fillWalletImportLedgerFragment"
+            app:destination="@id/fillWalletImportLedgerFragment"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit"
-            android:id="@+id/action_startImportLedgerFragment_to_fillWalletImportLedgerFragment"
-            app:destination="@id/fillWalletImportLedgerFragment" />
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
-    
+
     <fragment
         android:id="@+id/fillWalletImportLedgerFragment"
         android:name="io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.fillWallet.FillWalletImportLedgerFragment"
-        android:label="FillWalletImportLedgerFragment" >
+        android:label="FillWalletImportLedgerFragment">
 
         <action
+            android:id="@+id/action_fillWalletImportLedgerFragment_to_selectLedgerImportFragment"
+            app:destination="@id/selectLedgerImportFragment"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit"
-            android:id="@+id/action_fillWalletImportLedgerFragment_to_selectLedgerImportFragment"
-            app:destination="@id/selectLedgerImportFragment" />
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
     <fragment
         android:id="@+id/selectLedgerImportFragment"
         android:name="io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.selectLedger.SelectLedgerImportFragment"
-        android:label="SelectLedgerImportFragment" />
+        android:label="SelectLedgerImportFragment">
+
+        <action
+            android:id="@+id/action_selectLedgerImportFragment_to_selectAddressImportLedgerFragment"
+            app:destination="@id/selectAddressImportLedgerFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/selectAddressImportLedgerFragment"
+        android:name="io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.selectAddress.SelectAddressImportLedgerFragment"
+        android:label="SelectAddressImportLedgerFragment" >
+
+        <action
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_open_enter"
+            app:popExitAnim="@anim/fragment_open_exit"
+            android:id="@+id/action_selectAddressImportLedgerFragment_to_fillWalletImportLedgerFragment"
+            app:popUpTo="@id/fillWalletImportLedgerFragment" />
+    </fragment>
 </navigation>

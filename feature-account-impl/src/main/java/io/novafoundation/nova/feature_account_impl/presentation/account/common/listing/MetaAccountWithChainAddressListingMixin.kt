@@ -9,8 +9,8 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountG
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
+import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountUi
 import io.novafoundation.nova.feature_account_impl.R
-import io.novafoundation.nova.feature_account_impl.presentation.account.model.MetaAccountUi
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.CoroutineScope
@@ -60,7 +60,7 @@ private class MetaAccountWithChainAddressListingMixin(
     }
         .shareInBackground()
 
-    private suspend fun mapMetaAccountToUi(metaAccount: MetaAccount): MetaAccountUi {
+    private suspend fun mapMetaAccountToUi(metaAccount: MetaAccount): AccountUi {
         val accountId = metaAccount.accountIdIn(chainFlow.await())
 
         val icon = addressIconGenerator.createAddressIcon(
@@ -72,7 +72,7 @@ private class MetaAccountWithChainAddressListingMixin(
         val chainAddress = metaAccount.addressIn(chainFlow.await())
         val isSelected = chainAddress != null && chainAddress == selectedAddress
 
-        return MetaAccountUi(
+        return AccountUi(
             id = metaAccount.id,
             title = metaAccount.name,
             subtitle = mapSubtitle(chainAddress),

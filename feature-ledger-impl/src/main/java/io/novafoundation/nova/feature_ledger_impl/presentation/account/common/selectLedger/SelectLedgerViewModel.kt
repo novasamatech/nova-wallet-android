@@ -10,25 +10,17 @@ import io.novafoundation.nova.common.navigation.ReturnableRouter
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
-import io.novafoundation.nova.common.utils.event
-import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.common.utils.stateMachine.StateMachine
-import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerApplicationResponse
-import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerApplicationResponse.appNotOpen
-import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerApplicationResponse.transactionRejected
-import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerApplicationResponse.wrongAppOpen
-import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateLedgerApplicationError
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.findDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.performDiscovery
-import io.novafoundation.nova.feature_ledger_impl.R
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.errors.handleLedgerError
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.model.SelectLedgerModel
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.SelectLedgerEvent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.SideEffect
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.states.DeviceFlowStarted
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.states.DevicesFoundState
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.states.DiscoveringState
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.states.NoBluetoothState
@@ -112,16 +104,19 @@ abstract class SelectLedgerViewModel(
     private fun performConnectionVerification(device: LedgerDevice) = launch {
         runCatching { verifyConnection(device) }
             .onSuccess { stateMachine.onEvent(SelectLedgerEvent.ConnectionVerified) }
-            .onFailure { stateMachine.onEvent(SelectLedgerEvent.ConnectionFailed(it)) }
+            .onFailure { stateMachine.onEvent(SelectLedgerEvent.VerificationFailed(it)) }
     }
 
     private fun handleSideEffect(effect: SideEffect) {
         when (effect) {
-            is SideEffect.ConnectToDevice -> connectToDevice(effect.device)
-
             SideEffect.EnableBluetooth -> bluetoothManager.enableBluetooth()
 
-            is SideEffect.PresentConnectionFailure -> handleConnectionFailure(effect.device, effect.reason)
+            is SideEffect.PresentLedgerFailure -> handleLedgerError(
+                reason = effect.reason,
+                chain = chain,
+                resourceManager = resourceManager,
+                retry = { stateMachine.onEvent(SelectLedgerEvent.DeviceChosen(effect.device)) }
+            )
 
             is SideEffect.VerifyConnection -> performConnectionVerification(effect.device)
 
@@ -136,52 +131,6 @@ abstract class SelectLedgerViewModel(
         discoveryService.discoveredDevices.onEach {
             stateMachine.onEvent(SelectLedgerEvent.DiscoveredDevicesListChanged(it))
         }.launchIn(this)
-    }
-
-    private fun handleConnectionFailure(device: LedgerDevice, reason: Throwable) = launch {
-        when (reason) {
-            is SubstrateLedgerApplicationError.Response -> handleSubstrateApplicationError(device, reason.response)
-            else -> showError(
-                title = resourceManager.getString(R.string.ledger_error_general_title),
-                text = resourceManager.getString(R.string.ledger_error_general_message)
-            )
-        }
-    }
-
-    private suspend fun handleSubstrateApplicationError(device: LedgerDevice, reason: LedgerApplicationResponse) {
-        val errorTitle: String
-        val errorMessage: String
-
-        when (reason) {
-            appNotOpen, wrongAppOpen -> {
-                errorTitle = resourceManager.getString(R.string.ledger_error_app_not_launched_title, chain().name)
-                errorMessage = resourceManager.getString(R.string.ledger_error_app_not_launched_message, chain().name)
-            }
-
-            transactionRejected -> {
-                errorTitle = resourceManager.getString(R.string.ledger_error_app_cancelled_title)
-                errorMessage = resourceManager.getString(R.string.ledger_error_app_cancelled_message)
-            }
-
-            else -> {
-                errorTitle = resourceManager.getString(R.string.ledger_error_general_title)
-                errorMessage = resourceManager.getString(R.string.ledger_error_general_message)
-            }
-        }
-
-        retryEvent.value = RetryPayload(
-            title = errorTitle,
-            message = errorMessage,
-            onRetry = { stateMachine.onEvent(SelectLedgerEvent.DeviceChosen(device)) }
-        ).event()
-    }
-
-    private fun connectToDevice(device: LedgerDevice) = launch {
-        device.connection.connect().onSuccess {
-            stateMachine.onEvent(SelectLedgerEvent.ConnectionSucceeded)
-        }.onFailure {
-            stateMachine.onEvent(SelectLedgerEvent.ConnectionFailed(it))
-        }
     }
 
     private fun requirePermissions() = launch {
@@ -210,8 +159,7 @@ abstract class SelectLedgerViewModel(
 
     private fun mapStateToUi(state: SelectLedgerState): List<SelectLedgerModel> {
         return when (state) {
-            is DeviceFlowStarted -> mapDevicesToUi(state.devices, connectingTo = null)
-            is DevicesFoundState -> mapDevicesToUi(state.devices, connectingTo = state.connectingDevice)
+            is DevicesFoundState -> mapDevicesToUi(state.devices, connectingTo = state.verifyingDevice)
             is DiscoveringState -> emptyList()
             is NoBluetoothState -> emptyList()
             is WaitingForPermissionsState -> emptyList()

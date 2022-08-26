@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="ledger_verify_address_title">Verify address</string>
+  <string name="ledger_verify_address_subtitle">Press both buttons on your Nano X E426 to verify address</string>
+
+  <string name="ledger_import_select_address_load_more">Load more accounts</string>
+  <string name="ledher_import_select_address_title">Select an account to pair in Nova Wallet</string>
+
   <string name="ledger_error_general_title">Operation failed</string>
   <string name="ledger_error_general_message">Operation completed with error on device. Please, try again later.</string>
 

@@ -15,6 +15,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_ledger_impl.domain.account.connect.fillWallet.FillWalletImportLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.domain.account.connect.fillWallet.RealFillWalletImportLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.SelectLedgerAddressInterScreenCommunicator
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.fillWallet.FillWalletImportLedgerViewModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -35,14 +36,16 @@ class FillWalletImportLedgerModule {
         interactor: FillWalletImportLedgerInteractor,
         addressIconGenerator: AddressIconGenerator,
         resourceManager: ResourceManager,
-        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+        selectLedgerAddressInterScreenCommunicator: SelectLedgerAddressInterScreenCommunicator,
     ): ViewModel {
         return FillWalletImportLedgerViewModel(
             router = router,
             interactor = interactor,
             addressIconGenerator = addressIconGenerator,
             resourceManager = resourceManager,
-            actionAwaitableMixin = actionAwaitableMixinFactory
+            actionAwaitableMixin = actionAwaitableMixinFactory,
+            selectLedgerAddressRequester = selectLedgerAddressInterScreenCommunicator,
         )
     }
 
