@@ -5,7 +5,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 data class TokenModel(
     val configuration: Chain.Asset,
-    val dollarRate: String,
+    val rate: String,
     val recentRateChange: String,
     @ColorRes val rateChangeColorRes: Int
 )

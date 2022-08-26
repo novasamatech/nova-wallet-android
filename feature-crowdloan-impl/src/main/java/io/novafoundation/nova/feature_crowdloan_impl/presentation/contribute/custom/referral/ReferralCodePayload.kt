@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.referral
 
-import io.novafoundation.nova.common.utils.formatAsPercentage
+import io.novafoundation.nova.common.utils.formatting.formatAsPercentage
 import io.novafoundation.nova.common.utils.fractionToPercentage
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.BonusPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount

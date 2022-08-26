@@ -12,7 +12,9 @@ class MetaAccountWithAssetBalance(
     val freeInPlanks: BigInteger,
     val reservedInPlanks: BigInteger,
     val precision: Int,
-    val dollarRate: BigDecimal?
+    val priceRate: BigDecimal?,
+    val currencySymbol: String?,
+    val currencyCode: String
 )
 
 class MetaAccountWithTotalBalance(
@@ -21,5 +23,7 @@ class MetaAccountWithTotalBalance(
     val type: LightMetaAccount.Type,
     val isSelected: Boolean,
     val substrateAccountId: ByteArray,
-    val totalBalance: BigDecimal
+    val totalBalance: BigDecimal,
+    val currencySymbol: String?,
+    val currencyCode: String
 )
