@@ -100,6 +100,18 @@ interface MetaAccountDao {
 
     @Query("SELECT COALESCE(MAX(position), 0)  + 1 FROM meta_accounts")
     suspend fun nextAccountPosition(): Int
+
+    @Transaction
+    suspend fun insertMetaAndChainAccounts(
+        metaAccount: MetaAccountLocal,
+        createChainAccounts: suspend (metaId: Long) -> List<ChainAccountLocal>
+    ): Long {
+        val metaId = insertMetaAccount(metaAccount)
+
+        insertChainAccounts(createChainAccounts(metaId))
+
+        return metaId
+    }
 }
 
 class MetaAccountWithBalanceLocal(

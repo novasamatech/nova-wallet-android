@@ -37,21 +37,19 @@ class RealLedgerRepository(
             position = metaAccountDao.nextAccountPosition(),
             type = MetaAccountLocal.Type.LEDGER
         )
-        val metaId = metaAccountDao.insertMetaAccount(metaAccount)
 
-        val chainAccounts = ledgerChainAccounts.map { (chainId, account) ->
-            val chain = chainRegistry.getChain(chainId)
+        return metaAccountDao.insertMetaAndChainAccounts(metaAccount) { metaId ->
+            ledgerChainAccounts.map { (chainId, account) ->
+                val chain = chainRegistry.getChain(chainId)
 
-            ChainAccountLocal(
-                metaId = metaId,
-                chainId = chainId,
-                publicKey = account.publicKey,
-                accountId = chain.accountIdOf(account.publicKey),
-                cryptoType = mapEncryptionToCryptoType(account.encryptionType)
-            )
+                ChainAccountLocal(
+                    metaId = metaId,
+                    chainId = chainId,
+                    publicKey = account.publicKey,
+                    accountId = chain.accountIdOf(account.publicKey),
+                    cryptoType = mapEncryptionToCryptoType(account.encryptionType)
+                )
+            }
         }
-        metaAccountDao.insertChainAccounts(chainAccounts)
-
-        return metaId
     }
 }
