@@ -31,5 +31,5 @@ jobs:
         run: ./gradlew runTest
 
       - name: 🧾 Print ktlint report
-        if: steps.upload.outcome=='failure'
+        if: steps.test.outcome=='failure'
         run: tail -n +1 -- build/reports/*/*
