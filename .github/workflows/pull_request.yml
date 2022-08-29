@@ -30,6 +30,6 @@ jobs:
         id: test
         run: ./gradlew runTest
 
-      - uses: 🧾 Print ktlint report
+      - name: 🧾 Print ktlint report
         if: steps.upload.outcome=='failure'
         run: tail -n +1 -- build/reports/*/*
