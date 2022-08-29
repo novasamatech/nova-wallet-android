@@ -29,8 +29,9 @@ jobs:
       - name: 🧪 Run tests
         id: test
         run: ./gradlew runTest --stacktrace
+        continue-on-error: true
 
       - uses: yutailang0119/action-ktlint@v3
         with:
           report-path: build/*.xml
-        continue-on-error: true
+        continue-on-error: false
