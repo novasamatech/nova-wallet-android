@@ -26,10 +26,16 @@ jobs:
       - name: 🔧 Install dependencies
         uses: ./.github/workflows/install/
 
+      - name: ktlint
+        uses: ScaCap/action-ktlint@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
+
       - name: 🧪 Run tests
         id: test
         run: ./gradlew runTest
 
-      - name: 🧾 Print ktlint report
-        if: steps.test.outcome=='failure'
-        run: tail -n +1 -- build/reports/*/*
+      # - name: 🧾 Print ktlint report
+      #   if: steps.test.outcome=='failure'
+      #   run: tail -n +1 -- build/reports/*/*
