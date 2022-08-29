@@ -59,12 +59,12 @@ class SecretStoreV2Test {
         val chainSecrets = createChainSecrets(derivationPath = "/2")
 
         secretStore.putMetaAccountSecrets(metaId = 11, metaSecrets)
-        secretStore.putChainAccountSecrets(metaId = 1, accountId= ACCOUNT_ID, chainSecrets)
+        secretStore.putChainAccountSecrets(metaId = 1, accountId = ACCOUNT_ID, chainSecrets)
 
         val secretsFromStore = secretStore.getMetaAccountSecrets(11)
 
         requireNotNull(secretsFromStore)
-        assertEquals( metaSecrets[SubstrateDerivationPath], secretsFromStore[SubstrateDerivationPath])
+        assertEquals(metaSecrets[SubstrateDerivationPath], secretsFromStore[SubstrateDerivationPath])
     }
 
     @Test
@@ -111,7 +111,7 @@ class SecretStoreV2Test {
     fun `should manage multiple additional secrets`() = runBlocking {
         val metaId = 0L
 
-        val secretNames =(0..10).map { "secret $it" }
+        val secretNames = (0..10).map { "secret $it" }
 
         secretNames.forEach {
             secretStore.putAdditionalMetaAccountSecret(metaId, secretName = it, value = it)
