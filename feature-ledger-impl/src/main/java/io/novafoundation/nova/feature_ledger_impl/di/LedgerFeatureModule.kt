@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_ledger_impl.di
 
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
@@ -51,5 +52,6 @@ class LedgerFeatureModule {
     fun provideRepository(
         metaAccountDao: MetaAccountDao,
         chainRegistry: ChainRegistry,
-    ): LedgerRepository = RealLedgerRepository(metaAccountDao, chainRegistry)
+        secretStoreV2: SecretStoreV2
+    ): LedgerRepository = RealLedgerRepository(metaAccountDao, chainRegistry, secretStoreV2)
 }

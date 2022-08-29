@@ -19,5 +19,6 @@ class LedgerChainAccount(
     val publicKey: ByteArray,
     val encryptionType: EncryptionType,
     val address: String,
-    val chainId: ChainId
+    val chainId: ChainId,
+    val derivationPath: String,
 ) : Parcelable

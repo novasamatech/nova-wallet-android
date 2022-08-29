@@ -62,21 +62,24 @@ class RealSubstrateLedgerApplication(
         val applicationConfig = getConfig(chainId)
         val displayVerificationDialog = if (confirmAddress) YES else NO
 
+        val derivationPath = buildDerivationPath(applicationConfig.coin, accountIndex)
+        val encodedDerivationPath = buildEncodedDerivationPath(applicationConfig.coin, accountIndex)
+
         val rawResponse = transport.send(
             cla = applicationConfig.cla,
             ins = Instruction.GET_ADDRESS.code,
             p1 = displayVerificationDialog.code,
             p2 = defaultCryptoScheme().code,
-            data = buildDerivationPath(applicationConfig.coin, accountIndex),
+            data = encodedDerivationPath,
             device = device
         )
 
-        return parseAccountResponse(rawResponse)
+        return parseAccountResponse(rawResponse, derivationPath)
     }
 
     override suspend fun getSignature(device: LedgerDevice, chainId: ChainId, accountIndex: Int, payload: ByteArray): ByteArray {
         val applicationConfig = getConfig(chainId)
-        val derivationPath = buildDerivationPath(applicationConfig.coin, accountIndex)
+        val derivationPath = buildEncodedDerivationPath(applicationConfig.coin, accountIndex)
 
         val chunks = listOf(derivationPath) + payload.chunked(CHUNK_SIZE)
 
@@ -98,7 +101,7 @@ class RealSubstrateLedgerApplication(
         return results.last()
     }
 
-    private fun parseAccountResponse(raw: ByteArray): LedgerSubstrateAccount {
+    private fun parseAccountResponse(raw: ByteArray, requestDerivationPath: String): LedgerSubstrateAccount {
         val dataWithoutResponseCode = processResponseCode(raw)
 
         val publicKey = dataWithoutResponseCode.copyBytes(0, PUBLIC_KEY_LENGTH)
@@ -115,7 +118,12 @@ class RealSubstrateLedgerApplication(
 
         val encryptionType = mapCryptoSchemeToEncryptionType(defaultCryptoScheme())
 
-        return LedgerSubstrateAccount(address = address, publicKey = publicKey, encryptionType = encryptionType)
+        return LedgerSubstrateAccount(
+            address = address,
+            publicKey = publicKey,
+            encryptionType = encryptionType,
+            derivationPath = requestDerivationPath
+        )
     }
 
     private fun defaultCryptoScheme() = CryptoScheme.ED25519
@@ -125,8 +133,12 @@ class RealSubstrateLedgerApplication(
             ?: throw SubstrateLedgerApplicationError.UnsupportedApp(chainId)
     }
 
-    private fun buildDerivationPath(coin: Int, accountIndex: Int): ByteArray {
-        val pathAsString = "//44//$coin//$accountIndex//0//0"
+    private fun buildDerivationPath(coin: Int, accountIndex: Int): String {
+        return "//44//$coin//$accountIndex//0//0"
+    }
+
+    private fun buildEncodedDerivationPath(coin: Int, accountIndex: Int): ByteArray {
+        val pathAsString = buildDerivationPath(coin, accountIndex)
         val junctions = BIP32JunctionDecoder.decode(pathAsString).junctions
 
         return junctions.serializeInLedgerFormat()
