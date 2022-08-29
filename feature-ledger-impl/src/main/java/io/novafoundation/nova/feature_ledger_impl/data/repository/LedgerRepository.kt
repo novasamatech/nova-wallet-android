@@ -16,6 +16,11 @@ interface LedgerRepository {
         name: String,
         ledgerChainAccounts: Map<ChainId, LedgerSubstrateAccount>
     ): Long
+
+    suspend fun getChainAccountDerivationPath(
+        metaId: Long,
+        chainId: ChainId /* = kotlin.String */
+    ): String
 }
 
 private const val LEDGER_DERIVATION_PATH_KEY = "LedgerChainAccount.derivationPath"
@@ -62,6 +67,13 @@ class RealLedgerRepository(
         }
 
         return metaId
+    }
+
+    override suspend fun getChainAccountDerivationPath(metaId: Long, chainId: ChainId): String {
+        val key = derivationPathSecretKey(chainId)
+
+        return secretStoreV2.getAdditionalMetaAccountSecret(metaId, key)
+            ?: throw IllegalStateException("Cannot find Ledger derivation path for chain $chainId in meta account $metaId")
     }
 
     private fun derivationPathSecretKey(chainId: ChainId): String {

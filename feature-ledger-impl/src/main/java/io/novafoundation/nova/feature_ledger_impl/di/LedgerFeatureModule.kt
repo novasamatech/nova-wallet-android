@@ -28,8 +28,9 @@ class LedgerFeatureModule {
     @Provides
     @FeatureScope
     fun provideSubstrateLedgerApplication(
-        transport: LedgerTransport
-    ): SubstrateLedgerApplication = RealSubstrateLedgerApplication(transport)
+        transport: LedgerTransport,
+        ledgerRepository: LedgerRepository,
+    ): SubstrateLedgerApplication = RealSubstrateLedgerApplication(transport, ledgerRepository)
 
     @Provides
     @FeatureScope

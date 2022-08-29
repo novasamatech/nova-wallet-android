@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.Subst
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.transport.LedgerTransport
 import io.novafoundation.nova.feature_ledger_api.sdk.transport.send
+import io.novafoundation.nova.feature_ledger_impl.data.repository.LedgerRepository
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.DisplayVerificationDialog.NO
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.DisplayVerificationDialog.YES
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -50,6 +51,7 @@ const val CHUNK_SIZE = 250
 
 class RealSubstrateLedgerApplication(
     private val transport: LedgerTransport,
+    private val ledgerRepository: LedgerRepository,
     private val supportedApplications: List<SubstrateApplicationConfig> = SubstrateApplicationConfig.all(),
 ) : SubstrateLedgerApplication {
 
@@ -63,7 +65,7 @@ class RealSubstrateLedgerApplication(
         val displayVerificationDialog = if (confirmAddress) YES else NO
 
         val derivationPath = buildDerivationPath(applicationConfig.coin, accountIndex)
-        val encodedDerivationPath = buildEncodedDerivationPath(applicationConfig.coin, accountIndex)
+        val encodedDerivationPath = encodeDerivationPath(derivationPath)
 
         val rawResponse = transport.send(
             cla = applicationConfig.cla,
@@ -77,11 +79,18 @@ class RealSubstrateLedgerApplication(
         return parseAccountResponse(rawResponse, derivationPath)
     }
 
-    override suspend fun getSignature(device: LedgerDevice, chainId: ChainId, accountIndex: Int, payload: ByteArray): ByteArray {
+    override suspend fun getSignature(
+        device: LedgerDevice,
+        metaId: Long,
+        chainId: ChainId,
+        payload: ByteArray
+    ): ByteArray {
         val applicationConfig = getConfig(chainId)
-        val derivationPath = buildEncodedDerivationPath(applicationConfig.coin, accountIndex)
 
-        val chunks = listOf(derivationPath) + payload.chunked(CHUNK_SIZE)
+        val derivationPath = ledgerRepository.getChainAccountDerivationPath(metaId, chainId)
+        val encodedDerivationPath = encodeDerivationPath(derivationPath)
+
+        val chunks = listOf(encodedDerivationPath) + payload.chunked(CHUNK_SIZE)
 
         val results = chunks.mapIndexed { index, chunk ->
             val chunkType = SignPayloadType(index, chunks.size)
@@ -137,9 +146,8 @@ class RealSubstrateLedgerApplication(
         return "//44//$coin//$accountIndex//0//0"
     }
 
-    private fun buildEncodedDerivationPath(coin: Int, accountIndex: Int): ByteArray {
-        val pathAsString = buildDerivationPath(coin, accountIndex)
-        val junctions = BIP32JunctionDecoder.decode(pathAsString).junctions
+    private fun encodeDerivationPath(derivationPath: String): ByteArray {
+        val junctions = BIP32JunctionDecoder.decode(derivationPath).junctions
 
         return junctions.serializeInLedgerFormat()
     }

@@ -14,8 +14,8 @@ interface SubstrateLedgerApplication {
 
     suspend fun getSignature(
         device: LedgerDevice,
+        metaId: Long,
         chainId: ChainId,
-        accountIndex: Int,
         payload: ByteArray,
     ): ByteArray
 }
