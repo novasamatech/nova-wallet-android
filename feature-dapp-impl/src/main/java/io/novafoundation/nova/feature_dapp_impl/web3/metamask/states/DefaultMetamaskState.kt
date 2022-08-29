@@ -28,7 +28,6 @@ class DefaultMetamaskState(
     web3Session: Web3Session,
     hostApi: Web3StateMachineHost,
     walletUiUseCase: WalletUiUseCase,
-
     private val stateFactory: MetamaskStateFactory,
     private val interactor: MetamaskInteractor,
     override val chain: MetamaskChain,

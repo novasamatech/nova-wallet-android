@@ -44,14 +44,14 @@ private class MetaAccountWithBalanceListingMixin(
     }
         .shareInBackground()
 
-    private suspend fun mapMetaAccountToUi(metaAccount: MetaAccountWithTotalBalance) = with(metaAccount) {
+    private suspend fun mapMetaAccountToUi(metaAccountWithBalance: MetaAccountWithTotalBalance) = with(metaAccountWithBalance) {
         AccountUi(
-            id = metaAccount.metaAccount.id,
-            title = metaAccount.metaAccount.name,
-            subtitle = totalBalance.formatAsCurrency(metaAccount.currency),
-            isSelected = metaAccount.metaAccount.isSelected,
+            id = metaAccountWithBalance.metaAccount.id,
+            title = metaAccountWithBalance.metaAccount.name,
+            subtitle = totalBalance.formatAsCurrency(metaAccountWithBalance.currency),
+            isSelected = metaAccountWithBalance.metaAccount.isSelected,
             isClickable = true,
-            picture = walletUiUseCase.walletIcon(metaAccount.metaAccount),
+            picture = walletUiUseCase.walletIcon(metaAccountWithBalance.metaAccount),
             subtitleIconRes = null,
         )
     }
