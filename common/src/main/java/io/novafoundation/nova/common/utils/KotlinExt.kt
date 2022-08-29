@@ -188,3 +188,20 @@ fun buildByteArray(block: (ByteArrayOutputStream) -> Unit): ByteArray = ByteArra
 }.toByteArray()
 
 fun String.toUuid() = UUID.fromString(this)
+
+operator fun ByteArray.compareTo(other: ByteArray): Int {
+    if (size != other.size) {
+        return size - other.size
+    }
+
+    for (i in 0 until size) {
+        val result = this[i].compareTo(other[i])
+
+        if (result != 0) {
+            return result
+        }
+    }
+
+    return 0
+}
+fun ByteArrayComparator() = Comparator<ByteArray> { a, b -> a.compareTo(b) }

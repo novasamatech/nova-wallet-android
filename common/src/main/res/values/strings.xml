@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="ledger_wallet_details_description">This wallet is paired with Ledger. Nova will help you to form any operations you want, and you will be requested to sign them using Ledger</string>
+
+  <string name="common_ledger">Ledger</string>
+
   <string name="ledger_verify_address_title">Verify address</string>
   <string name="ledger_verify_address_subtitle">Press both buttons on your Nano X E426 to verify address</string>
 

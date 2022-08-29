@@ -1,15 +1,14 @@
 package io.novafoundation.nova.feature_account_impl.presentation.account.common.listing
 
-import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountUi
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -17,7 +16,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.map
 
 class MetaAccountWithChainAddressListingMixinFactory(
-    private val addressIconGenerator: AddressIconGenerator,
+    private val walletUiUseCase: WalletUiUseCase,
     private val resourceManager: ResourceManager,
     private val chainRegistry: ChainRegistry,
     private val metaAccountGroupingInteractor: MetaAccountGroupingInteractor
@@ -29,7 +28,7 @@ class MetaAccountWithChainAddressListingMixinFactory(
         selectedAddress: String?
     ): MetaAccountListingMixin {
         return MetaAccountWithChainAddressListingMixin(
-            addressIconGenerator = addressIconGenerator,
+            walletUiUseCase = walletUiUseCase,
             resourceManager = resourceManager,
             metaAccountGroupingInteractor = metaAccountGroupingInteractor,
             chainRegistry = chainRegistry,
@@ -41,7 +40,7 @@ class MetaAccountWithChainAddressListingMixinFactory(
 }
 
 private class MetaAccountWithChainAddressListingMixin(
-    private val addressIconGenerator: AddressIconGenerator,
+    private val walletUiUseCase: WalletUiUseCase,
     private val resourceManager: ResourceManager,
     private val metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
     private val chainRegistry: ChainRegistry,
@@ -61,13 +60,7 @@ private class MetaAccountWithChainAddressListingMixin(
         .shareInBackground()
 
     private suspend fun mapMetaAccountToUi(metaAccount: MetaAccount): AccountUi {
-        val accountId = metaAccount.accountIdIn(chainFlow.await())
-
-        val icon = addressIconGenerator.createAddressIcon(
-            accountId = accountId ?: metaAccount.substrateAccountId,
-            sizeInDp = AddressIconGenerator.SIZE_MEDIUM,
-            backgroundColorRes = AddressIconGenerator.BACKGROUND_TRANSPARENT
-        )
+        val icon = walletUiUseCase.walletIcon(metaAccount)
 
         val chainAddress = metaAccount.addressIn(chainFlow.await())
         val isSelected = chainAddress != null && chainAddress == selectedAddress

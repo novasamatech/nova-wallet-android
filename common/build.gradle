@@ -68,7 +68,7 @@ dependencies {
 
     implementation bouncyCastleDep
 
-    implementation fearlessLibDep
+    api fearlessLibDep
 
     implementation coroutinesDep
     implementation liveDataKtxDep
@@ -83,7 +83,7 @@ dependencies {
     kapt lifecycleKapt
 
     implementation retrofitDep
-    implementation gsonConvertedDep
+    api gsonConvertedDep
     implementation scalarsConverterDep
     implementation interceptorVersion
 

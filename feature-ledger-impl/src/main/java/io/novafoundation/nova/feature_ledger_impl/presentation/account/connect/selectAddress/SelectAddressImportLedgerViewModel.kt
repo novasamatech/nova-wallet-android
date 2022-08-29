@@ -24,7 +24,7 @@ import io.novafoundation.nova.feature_ledger_impl.domain.account.connect.selectA
 import io.novafoundation.nova.feature_ledger_impl.domain.account.connect.selectAddress.SelectAddressImportLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.errors.handleLedgerError
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.SelectLedgerAddressInterScreenCommunicator
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.LedgerChainAccount
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.SelectLedgerAddressInterScreenResponder
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -118,7 +118,7 @@ class SelectAddressImportLedgerViewModel(
         }
     }
 
-    private suspend fun handleLedgerError(error: Throwable, retry: () -> Unit) {
+    private fun handleLedgerError(error: Throwable, retry: () -> Unit) {
         handleLedgerError(error, chain, resourceManager, retry)
     }
 
@@ -127,11 +127,12 @@ class SelectAddressImportLedgerViewModel(
         verifyAddressJob = null
     }
 
-    private fun screenResponseFrom(account: LedgerAccountWithBalance): SelectLedgerAddressInterScreenCommunicator.Response {
-        return SelectLedgerAddressInterScreenCommunicator.Response(
+    private fun screenResponseFrom(account: LedgerAccountWithBalance): LedgerChainAccount {
+        return LedgerChainAccount(
             publicKey = account.account.publicKey,
             address = account.account.address,
-            chainId = payload.chainId
+            chainId = payload.chainId,
+            encryptionType = account.account.encryptionType
         )
     }
 

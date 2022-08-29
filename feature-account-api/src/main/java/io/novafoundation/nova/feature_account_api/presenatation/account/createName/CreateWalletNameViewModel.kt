@@ -1,10 +1,10 @@
-package io.novafoundation.nova.feature_account_impl.presentation.common.createName
+package io.novafoundation.nova.feature_account_api.presenatation.account.createName
 
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.navigation.ReturnableRouter
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.feature_account_impl.R
+import io.novafoundation.nova.feature_account_api.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 

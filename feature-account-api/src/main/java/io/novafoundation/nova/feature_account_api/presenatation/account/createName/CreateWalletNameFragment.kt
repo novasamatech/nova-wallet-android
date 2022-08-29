@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.common.createName
+package io.novafoundation.nova.feature_account_api.presenatation.account.createName
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,7 +9,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.hideSoftKeyboard
 import io.novafoundation.nova.common.view.setState
-import io.novafoundation.nova.feature_account_impl.R
+import io.novafoundation.nova.feature_account_api.R
 import kotlinx.android.synthetic.main.fragment_create_wallet_name.createWalletNameContinue
 import kotlinx.android.synthetic.main.fragment_create_wallet_name.createWalletNameInput
 import kotlinx.android.synthetic.main.fragment_create_wallet_name.createWalletNameToolbar

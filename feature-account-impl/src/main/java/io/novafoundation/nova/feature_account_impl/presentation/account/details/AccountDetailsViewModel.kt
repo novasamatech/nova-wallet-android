@@ -173,6 +173,7 @@ class AccountDetailsViewModel(
             Type.SECRETS -> setOf(AccountAction.EXPORT, AccountAction.CHANGE)
             Type.WATCH_ONLY -> setOf(AccountAction.CHANGE)
             Type.PARITY_SIGNER -> emptySet()
+            Type.LEDGER -> setOf(AccountAction.CHANGE)
         }
     }
 
@@ -193,6 +194,13 @@ class AccountDetailsViewModel(
                 text = resourceManager.getString(R.string.account_details_parity_signer_alert)
             )
             Type.SECRETS -> null
+            Type.LEDGER -> AccountTypeAlert(
+                style = AlertView.Style(
+                    backgroundColorRes = R.color.white_12,
+                    iconRes = R.drawable.ic_ledger
+                ),
+                text = resourceManager.getString(R.string.ledger_wallet_details_description)
+            )
         }
     }
 
