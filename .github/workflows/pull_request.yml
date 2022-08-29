@@ -28,10 +28,8 @@ jobs:
 
       - name: 🧪 Run tests
         id: test
-        run: ./gradlew runTest --stacktrace
-        continue-on-error: true
+        run: ./gradlew runTest
 
-      - uses: yutailang0119/action-ktlint@v3
-        with:
-          report-path: build/*.xml
-        continue-on-error: false
+      - uses: 🧾 Print ktlint report
+        if: steps.upload.outcome=='failure'
+        run: tail -n +1 -- build/reports/*/*
