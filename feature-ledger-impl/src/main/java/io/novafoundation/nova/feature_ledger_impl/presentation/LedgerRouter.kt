@@ -17,4 +17,6 @@ interface LedgerRouter : ReturnableRouter {
     fun openMain()
 
     fun openFinishImportLedger(payload: FinishImportLedgerPayload)
+
+    fun finishSignFlow()
 }

@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.data.signer.paritySigner
+package io.novafoundation.nova.feature_account_impl.data.signer.ledger
 
 import io.novafoundation.nova.common.base.errors.SigningCancelledException
 import io.novafoundation.nova.common.utils.MutableSharedState
@@ -9,7 +9,7 @@ import jp.co.soramitsu.fearless_utils.encrypt.SignatureWrapper
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadRaw
 
-class ParitySignerSigner(
+class LedgerSigner(
     signingSharedState: MutableSharedState<SignerPayloadExtrinsic>,
     signFlowRequester: SignInterScreenRequester,
     private val messageSigningNotSupported: ParitySignerSigningNotSupportedPresentable

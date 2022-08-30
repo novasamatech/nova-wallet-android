@@ -15,13 +15,14 @@ import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.utils.SharedState
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenCommunicator
+import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.ParitySignerSignCommunicator
 import io.novafoundation.nova.feature_account_impl.domain.paritySigner.sign.show.RealShowSignParitySignerInteractor
 import io.novafoundation.nova.feature_account_impl.domain.paritySigner.sign.show.ShowSignParitySignerInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.ParitySignerSignInterScreenCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.common.QrCodeExpiredPresentableFactory
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.show.ShowSignParitySignerViewModel
-import io.novafoundation.nova.runtime.extrinsic.MortalityConstructor
+import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
 
@@ -31,8 +32,7 @@ class ShowSignParitySignerModule {
     @Provides
     @ScreenScope
     fun provideInteractor(
-        mortalityConstructor: MortalityConstructor
-    ): ShowSignParitySignerInteractor = RealShowSignParitySignerInteractor(mortalityConstructor)
+    ): ShowSignParitySignerInteractor = RealShowSignParitySignerInteractor()
 
     @Provides
     @IntoMap
@@ -41,15 +41,16 @@ class ShowSignParitySignerModule {
         interactor: ShowSignParitySignerInteractor,
         signSharedState: SharedState<SignerPayloadExtrinsic>,
         qrCodeGenerator: QrCodeGenerator,
-        communicator: ParitySignerSignInterScreenCommunicator,
-        request: ParitySignerSignInterScreenCommunicator.Request,
+        communicator: ParitySignerSignCommunicator,
+        request: SignInterScreenCommunicator.Request,
         chainRegistry: ChainRegistry,
         addressIconGenerator: AddressIconGenerator,
         addressDisplayUseCase: AddressDisplayUseCase,
         router: AccountRouter,
         externalActions: ExternalActions.Presentation,
         appLinksProvider: AppLinksProvider,
-        qrCodeExpiredPresentableFactory: QrCodeExpiredPresentableFactory
+        qrCodeExpiredPresentableFactory: QrCodeExpiredPresentableFactory,
+        extrinsicValidityUseCase: ExtrinsicValidityUseCase,
     ): ViewModel {
         return ShowSignParitySignerViewModel(
             router = router,
@@ -63,7 +64,8 @@ class ShowSignParitySignerModule {
             addressDisplayUseCase = addressDisplayUseCase,
             externalActions = externalActions,
             appLinksProvider = appLinksProvider,
-            qrCodeExpiredPresentableFactory = qrCodeExpiredPresentableFactory
+            qrCodeExpiredPresentableFactory = qrCodeExpiredPresentableFactory,
+            extrinsicValidityUseCase = extrinsicValidityUseCase
         )
     }
 

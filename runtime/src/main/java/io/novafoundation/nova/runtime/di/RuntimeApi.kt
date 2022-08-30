@@ -3,6 +3,7 @@ package io.novafoundation.nova.runtime.di
 import com.google.gson.Gson
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
+import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
 import io.novafoundation.nova.runtime.extrinsic.MortalityConstructor
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.ChainSyncService
@@ -59,4 +60,6 @@ interface RuntimeApi {
     val parachainInfoRepository: ParachainInfoRepository
 
     val mortalityConstructor: MortalityConstructor
+
+    val extrinsicValidityUseCase: ExtrinsicValidityUseCase
 }

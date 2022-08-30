@@ -20,6 +20,8 @@ import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Extrinsic
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.SignedExtras
+import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
+import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.genesisHash
 import jp.co.soramitsu.fearless_utils.runtime.metadata.RuntimeMetadata
 import jp.co.soramitsu.fearless_utils.runtime.metadata.fullName
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module
@@ -127,6 +129,7 @@ fun Module.numberConstant(name: String, runtimeSnapshot: RuntimeSnapshot) = bind
 fun Module.numberConstantOrNull(name: String, runtimeSnapshot: RuntimeSnapshot) = constantOrNull(name)?.let {
     bindNumberConstant(it, runtimeSnapshot)
 }
+
 fun Module.optionalNumberConstant(name: String, runtimeSnapshot: RuntimeSnapshot) = bindNullableNumberConstant(constant(name), runtimeSnapshot)
 
 fun Constant.asNumber(runtimeSnapshot: RuntimeSnapshot) = bindNumberConstant(this, runtimeSnapshot)
@@ -198,6 +201,9 @@ fun structOf(vararg pairs: Pair<String, Any?>) = Struct.Instance(mapOf(*pairs))
 fun SignatureWrapper.asHexString() = signature.toHexString(withPrefix = true)
 
 fun String.ethereumAddressToAccountId() = asEthereumAddress().toAccountId().value
+
+val SignerPayloadExtrinsic.chainId: String
+    get() = genesisHash.toHexString()
 
 object Modules {
     const val VESTING: String = "Vesting"

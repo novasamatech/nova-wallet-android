@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.Ledge
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateLedgerApplicationError
 import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.launch
 
@@ -19,8 +20,13 @@ fun <V> V.handleLedgerError(
     resourceManager: ResourceManager,
     retry: () -> Unit
 ) where V : BaseViewModel, V : Retriable {
+    reason.printStackTrace()
+
     launch {
         when (reason) {
+            is CancellationException -> {
+                // do nothing on coroutines cancellation
+            }
             is SubstrateLedgerApplicationError.Response -> handleSubstrateApplicationError(reason.response, chain(), resourceManager, retry)
             else -> showError(
                 title = resourceManager.getString(R.string.ledger_error_general_title),

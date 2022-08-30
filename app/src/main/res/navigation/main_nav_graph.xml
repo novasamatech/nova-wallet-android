@@ -128,6 +128,14 @@
         app:popEnterAnim="@anim/fragment_close_enter"
         app:popExitAnim="@anim/fragment_close_exit" />
 
+    <action
+        android:id="@+id/action_open_sign_ledger"
+        app:destination="@id/sign_ledger_nav_graph"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
     <fragment
         android:id="@+id/mainFragment"
         android:name="io.novafoundation.nova.app.root.presentation.main.MainFragment"
@@ -1012,5 +1020,7 @@
     </fragment>
 
     <include app:graph="@navigation/sign_parity_signer_graph" />
+
+    <include app:graph="@navigation/sign_ledger_nav_graph" />
 
 </navigation>

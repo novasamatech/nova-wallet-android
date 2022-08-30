@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_account_api.di
 
+import io.novafoundation.nova.common.utils.MutableSharedState
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
@@ -13,6 +14,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnl
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
+import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
 
 interface AccountFeatureApi {
 
@@ -41,4 +43,6 @@ interface AccountFeatureApi {
     val signerProvider: SignerProvider
 
     val watchOnlyMissingKeysPresenter: WatchOnlyMissingKeysPresenter
+
+    val signSharedState: MutableSharedState<SignerPayloadExtrinsic>
 }

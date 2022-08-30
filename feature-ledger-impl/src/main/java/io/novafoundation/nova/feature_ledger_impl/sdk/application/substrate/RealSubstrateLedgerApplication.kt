@@ -17,16 +17,25 @@ import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.Disp
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.DisplayVerificationDialog.YES
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.encrypt.EncryptionType
+import jp.co.soramitsu.fearless_utils.encrypt.SignatureWrapper
 import jp.co.soramitsu.fearless_utils.encrypt.json.copyBytes
 import jp.co.soramitsu.fearless_utils.encrypt.junction.BIP32JunctionDecoder
 import jp.co.soramitsu.fearless_utils.extensions.copyLast
+import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
+import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.encodedSignaturePayload
 
 private enum class Instruction(val code: UByte) {
     GET_ADDRESS(0x01u), SIGN(0x02u)
 }
 
 private enum class CryptoScheme(val code: UByte) {
-    ED25519(0x01u), SR25519(0x02u)
+    ED25519(0x00u), SR25519(0x01u);
+
+    companion object {
+        fun fromCode(code: UByte): CryptoScheme {
+            return values().first { it.code == code }
+        }
+    }
 }
 
 private enum class DisplayVerificationDialog(val code: UByte) {
@@ -83,14 +92,15 @@ class RealSubstrateLedgerApplication(
         device: LedgerDevice,
         metaId: Long,
         chainId: ChainId,
-        payload: ByteArray
-    ): ByteArray {
+        payload: SignerPayloadExtrinsic,
+    ): SignatureWrapper {
+        val payloadBytes = payload.encodedSignaturePayload(hashBigPayloads = false)
         val applicationConfig = getConfig(chainId)
 
         val derivationPath = ledgerRepository.getChainAccountDerivationPath(metaId, chainId)
         val encodedDerivationPath = encodeDerivationPath(derivationPath)
 
-        val chunks = listOf(encodedDerivationPath) + payload.chunked(CHUNK_SIZE)
+        val chunks = listOf(encodedDerivationPath) + payloadBytes.chunked(CHUNK_SIZE)
 
         val results = chunks.mapIndexed { index, chunk ->
             val chunkType = SignPayloadType(index, chunks.size)
@@ -107,7 +117,9 @@ class RealSubstrateLedgerApplication(
             processResponseCode(rawResponse)
         }
 
-        return results.last()
+        val signatureWithType = results.last()
+
+        return parseSignature(signatureWithType)
     }
 
     private fun parseAccountResponse(raw: ByteArray, requestDerivationPath: String): LedgerSubstrateAccount {
@@ -133,6 +145,16 @@ class RealSubstrateLedgerApplication(
             encryptionType = encryptionType,
             derivationPath = requestDerivationPath
         )
+    }
+
+    private fun parseSignature(raw: ByteArray): SignatureWrapper {
+        val cryptoSchemeByte = raw[0]
+        val signature = raw.dropBytes(1)
+
+        return when(CryptoScheme.fromCode(cryptoSchemeByte.toUByte())) {
+            CryptoScheme.ED25519 -> SignatureWrapper.Ed25519(signature)
+            CryptoScheme.SR25519 -> SignatureWrapper.Sr25519(signature)
+        }
     }
 
     private fun defaultCryptoScheme() = CryptoScheme.ED25519

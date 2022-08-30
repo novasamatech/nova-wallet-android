@@ -4,16 +4,13 @@ import android.widget.TextView
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.view.dialog.errorDialog
-import io.novafoundation.nova.common.view.startTimer
+import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenCommunicator
+import io.novafoundation.nova.feature_account_api.presenatation.sign.cancelled
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.ParitySignerSignInterScreenCommunicator
-import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.ParitySignerSignInterScreenResponder
-import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.cancelled
-import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.ValidityPeriod
-import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.closeToExpire
+import io.novafoundation.nova.runtime.extrinsic.ValidityPeriod
+import io.novafoundation.nova.runtime.extrinsic.startExtrinsicValidityTimer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
@@ -34,11 +31,11 @@ class QrCodeExpiredPresentableFactory(
     private val resourceManager: ResourceManager,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val router: AccountRouter,
-    private val responder: ParitySignerSignInterScreenResponder,
+    private val responder: SignInterScreenCommunicator,
 ) {
 
     fun create(
-        request: ParitySignerSignInterScreenCommunicator.Request
+        request: SignInterScreenCommunicator.Request
     ): QrCodeExpiredPresentable.Presentation = RealQrCodeExpiredPresentable(
         resourceManager = resourceManager,
         actionAwaitableMixinFactory = actionAwaitableMixinFactory,
@@ -52,8 +49,8 @@ private class RealQrCodeExpiredPresentable(
     private val resourceManager: ResourceManager,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val router: AccountRouter,
-    private val responder: ParitySignerSignInterScreenResponder,
-    private val request: ParitySignerSignInterScreenCommunicator.Request
+    private val responder: SignInterScreenCommunicator,
+    private val request: SignInterScreenCommunicator.Request
 ) : QrCodeExpiredPresentable.Presentation {
 
     override val acknowledgeExpired: ActionAwaitableMixin.Presentation<String, Unit> = actionAwaitableMixinFactory.create()
@@ -73,26 +70,21 @@ private class RealQrCodeExpiredPresentable(
     }
 }
 
-fun BaseFragment<*>.observeValidityPeriod(
+fun BaseFragment<*>.setupQrCodeExpiration(
     validityPeriodFlow: Flow<ValidityPeriod>,
     qrCodeExpiredPresentable: QrCodeExpiredPresentable,
     timerView: TextView,
     onTimerFinished: () -> Unit
 ) {
     validityPeriodFlow.observe { validityPeriod ->
-        timerView.startTimer(
-            value = validityPeriod.period,
-            customMessageFormat = R.string.account_parity_signer_sign_qr_code_valid_format,
-            lifecycle = viewLifecycleOwner.lifecycle,
-            onTick = { view, _ ->
-                val textColorRes = if (validityPeriod.closeToExpire()) R.color.red else R.color.white_64
-
-                view.setTextColorRes(textColorRes)
-            },
-            onFinish = { view ->
+        viewLifecycleOwner.startExtrinsicValidityTimer(
+            validityPeriod = validityPeriod,
+            timerFormat= R.string.account_parity_signer_sign_qr_code_valid_format,
+            timerView = timerView,
+            onTimerFinished = {
                 onTimerFinished()
 
-                view.setText(R.string.account_parity_signer_sign_qr_code_expired)
+                timerView.setText(R.string.account_parity_signer_sign_qr_code_expired)
             }
         )
     }

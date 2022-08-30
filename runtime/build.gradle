@@ -57,6 +57,8 @@ dependencies {
 
     testImplementation project(':test-shared')
 
+    implementation lifeCycleKtxDep
+
     androidTestImplementation androidTestRunnerDep
     androidTestImplementation androidTestRulesDep
     androidTestImplementation androidJunitDep
