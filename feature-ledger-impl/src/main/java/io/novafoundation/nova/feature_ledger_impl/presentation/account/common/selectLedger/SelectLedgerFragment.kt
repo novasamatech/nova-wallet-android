@@ -11,15 +11,17 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import io.novafoundation.nova.common.base.BaseFragment
-import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.permissions.setupPermissionAsker
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_ledger_impl.R
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessagePresentable
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.setupLedgerMessages
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.model.SelectLedgerModel
 import kotlinx.android.synthetic.main.fragment_select_ledger.selectLedgerDevices
 import kotlinx.android.synthetic.main.fragment_select_ledger.selectLedgerProgress
 import kotlinx.android.synthetic.main.fragment_select_ledger.selectLedgerToolbar
+import javax.inject.Inject
 
 abstract class SelectLedgerFragment<V : SelectLedgerViewModel> : BaseFragment<V>(), SelectLedgerAdapter.Handler {
 
@@ -29,6 +31,9 @@ abstract class SelectLedgerFragment<V : SelectLedgerViewModel> : BaseFragment<V>
 
         fun getBundle(payload: SelectLedgerPayload): Bundle = bundleOf(PAYLOAD_KEY to payload)
     }
+
+    @Inject
+    lateinit var ledgerMessagePresentable: LedgerMessagePresentable
 
     private val adapter by lazy(LazyThreadSafetyMode.NONE) {
         SelectLedgerAdapter(this)
@@ -64,7 +69,7 @@ abstract class SelectLedgerFragment<V : SelectLedgerViewModel> : BaseFragment<V>
         }
 
         setupPermissionAsker(viewModel)
-        observeRetries(viewModel)
+        setupLedgerMessages(ledgerMessagePresentable)
     }
 
     override fun onStart() {

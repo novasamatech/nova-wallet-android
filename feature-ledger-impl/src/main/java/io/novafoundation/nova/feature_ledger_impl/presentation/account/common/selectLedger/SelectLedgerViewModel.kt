@@ -4,8 +4,6 @@ import android.Manifest
 import android.os.Build
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.mixin.api.Retriable
-import io.novafoundation.nova.common.mixin.api.RetryPayload
 import io.novafoundation.nova.common.navigation.ReturnableRouter
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
@@ -17,6 +15,8 @@ import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.findDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.performDiscovery
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommands
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.errors.handleLedgerError
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.model.SelectLedgerModel
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.SelectLedgerEvent
@@ -45,16 +45,16 @@ abstract class SelectLedgerViewModel(
     private val resourceManager: ResourceManager,
     private val payload: SelectLedgerPayload,
     private val chainRegistry: ChainRegistry,
-) : BaseViewModel(), PermissionsAsker by permissionsAsker, Retriable {
+) : BaseViewModel(), PermissionsAsker by permissionsAsker, LedgerMessageCommands {
 
     private val chain by lazyAsync { chainRegistry.getChain(payload.chainId) }
-
-    override val retryEvent = MutableLiveData<Event<RetryPayload>>()
 
     private val stateMachine = StateMachine(WaitingForPermissionsState(), coroutineScope = this)
 
     val deviceModels = stateMachine.state.map(::mapStateToUi)
         .shareInBackground()
+
+    override val ledgerMessageCommands = MutableLiveData<Event<LedgerMessageCommand>>()
 
     init {
         requirePermissions()

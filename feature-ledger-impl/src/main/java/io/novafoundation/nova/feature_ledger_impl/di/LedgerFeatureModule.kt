@@ -12,6 +12,8 @@ import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDisco
 import io.novafoundation.nova.feature_ledger_api.sdk.transport.LedgerTransport
 import io.novafoundation.nova.feature_ledger_impl.data.repository.LedgerRepository
 import io.novafoundation.nova.feature_ledger_impl.data.repository.RealLedgerRepository
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessagePresentable
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.SingleSheetLedgerMessagePresentable
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.RealSubstrateLedgerApplication
 import io.novafoundation.nova.feature_ledger_impl.sdk.connection.ble.LedgerBleManager
 import io.novafoundation.nova.feature_ledger_impl.sdk.discovery.ble.BleLedgerDeviceDiscoveryService
@@ -55,4 +57,7 @@ class LedgerFeatureModule {
         chainRegistry: ChainRegistry,
         secretStoreV2: SecretStoreV2
     ): LedgerRepository = RealLedgerRepository(metaAccountDao, chainRegistry, secretStoreV2)
+
+    @Provides
+    fun provideLedgerMessagePresentable(): LedgerMessagePresentable = SingleSheetLedgerMessagePresentable()
 }

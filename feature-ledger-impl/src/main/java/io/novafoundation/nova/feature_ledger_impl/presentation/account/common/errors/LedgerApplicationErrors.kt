@@ -1,14 +1,16 @@
 package io.novafoundation.nova.feature_ledger_impl.presentation.account.common.errors
 
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.mixin.api.Retriable
-import io.novafoundation.nova.common.mixin.api.RetryPayload
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerApplicationResponse
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateLedgerApplicationError
 import io.novafoundation.nova.feature_ledger_impl.R
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand.Show.Actions.RecoverableError
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommands
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Deferred
@@ -19,7 +21,7 @@ fun <V> V.handleLedgerError(
     chain: Deferred<Chain>,
     resourceManager: ResourceManager,
     retry: () -> Unit
-) where V : BaseViewModel, V : Retriable {
+) where V : BaseViewModel, V : LedgerMessageCommands {
     reason.printStackTrace()
 
     launch {
@@ -28,15 +30,24 @@ fun <V> V.handleLedgerError(
                 // do nothing on coroutines cancellation
             }
             is SubstrateLedgerApplicationError.Response -> handleSubstrateApplicationError(reason.response, chain(), resourceManager, retry)
-            else -> showError(
-                title = resourceManager.getString(R.string.ledger_error_general_title),
-                text = resourceManager.getString(R.string.ledger_error_general_message)
-            )
+            else -> handleUnknownError(reason, resourceManager, retry)
         }
     }
 }
 
-private fun Retriable.handleSubstrateApplicationError(
+private fun LedgerMessageCommands.handleUnknownError(
+    reason: Throwable,
+    resourceManager: ResourceManager,
+    retry: () -> Unit,
+) {
+    ledgerMessageCommands.value = RetryCommand(
+        title = resourceManager.getString(R.string.ledger_error_general_title),
+        subtitle = resourceManager.getString(R.string.ledger_error_general_message),
+        retry = retry,
+    )
+}
+
+private fun LedgerMessageCommands.handleSubstrateApplicationError(
     reason: LedgerApplicationResponse,
     chain: Chain,
     resourceManager: ResourceManager,
@@ -62,9 +73,21 @@ private fun Retriable.handleSubstrateApplicationError(
         }
     }
 
-    retryEvent.value = RetryPayload(
-        title = errorTitle,
-        message = errorMessage,
-        onRetry = retry
-    ).event()
+    ledgerMessageCommands.value = RetryCommand(retry, errorTitle, errorMessage)
+}
+
+private fun LedgerMessageCommands.RetryCommand(
+    retry: () -> Unit,
+    title: String,
+    subtitle: String
+): Event<LedgerMessageCommand> = RecoverableError(
+    title = title,
+    subtitle = subtitle,
+    graphicsIcon = R.drawable.ic_warning_filled,
+    onCancel = ::hide,
+    onRetry = retry
+).event()
+
+private fun LedgerMessageCommands.hide() {
+    ledgerMessageCommands.value = LedgerMessageCommand.Hide.event()
 }
