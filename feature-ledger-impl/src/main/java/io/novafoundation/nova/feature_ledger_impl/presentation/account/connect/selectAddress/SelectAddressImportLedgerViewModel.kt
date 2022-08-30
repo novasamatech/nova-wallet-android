@@ -132,7 +132,8 @@ class SelectAddressImportLedgerViewModel(
             publicKey = account.account.publicKey,
             address = account.account.address,
             chainId = payload.chainId,
-            encryptionType = account.account.encryptionType
+            encryptionType = account.account.encryptionType,
+            derivationPath = account.account.derivationPath
         )
     }
 

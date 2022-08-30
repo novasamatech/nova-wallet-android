@@ -77,6 +77,7 @@ class FillWalletImportLedgerViewModel(
                 publicKey = account.publicKey,
                 encryptionType = account.encryptionType,
                 address = account.address,
+                derivationPath = account.derivationPath,
                 chainId = chainId
             )
         }
@@ -108,7 +109,7 @@ class FillWalletImportLedgerViewModel(
     }
 
     private fun addAccount(response: LedgerChainAccount) {
-        val account = LedgerSubstrateAccount(response.address, response.publicKey, response.encryptionType)
+        val account = LedgerSubstrateAccount(response.address, response.publicKey, response.encryptionType, response.derivationPath)
 
         filledAccountsFlow.value = filledAccountsFlow.value.inserted(response.chainId, account)
     }

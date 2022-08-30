@@ -35,6 +35,6 @@ class FinishImportLedgerViewModel(
 
     private fun constructAccountsMap(): Map<ChainId, LedgerSubstrateAccount> = payload.ledgerChainAccounts.associateBy(
         keySelector = { it.chainId },
-        valueTransform = { LedgerSubstrateAccount(it.address, it.publicKey, it.encryptionType) }
+        valueTransform = { LedgerSubstrateAccount(it.address, it.publicKey, it.encryptionType, it.derivationPath) }
     )
 }
