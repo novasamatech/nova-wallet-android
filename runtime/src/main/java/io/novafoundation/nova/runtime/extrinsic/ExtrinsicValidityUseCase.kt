@@ -13,12 +13,20 @@ import kotlin.time.Duration.Companion.minutes
 
 class ValidityPeriod(val period: TimerValue)
 
-fun ValidityPeriod.closeToExpire(): Boolean {
+fun ValidityPeriod.remainingTime(): Long {
     val currentTimer = System.currentTimeMillis()
     val passedTime = currentTimer - period.millisCalculatedAt
-    val remainingTIme = period.millis - passedTime
+    val remainingTime = period.millis - passedTime
 
-    return remainingTIme.milliseconds < 1.minutes
+    return remainingTime.coerceAtLeast(0)
+}
+
+fun ValidityPeriod.closeToExpire(): Boolean {
+    return remainingTime().milliseconds < 1.minutes
+}
+
+fun ValidityPeriod.ended(): Boolean {
+    return remainingTime() == 0L
 }
 
 interface ExtrinsicValidityUseCase {

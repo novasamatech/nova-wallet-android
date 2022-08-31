@@ -182,14 +182,22 @@ class RealSubstrateLedgerApplication(
         require(responseCodeData.size == RESPONSE_CODE_LENGTH) {
             "No response code"
         }
+        val responseData = raw.dropBytesLast(RESPONSE_CODE_LENGTH)
+
         val responseCode = responseCodeData.toBigEndianU16()
         val response = LedgerApplicationResponse.fromCode(responseCode)
 
         if (response != LedgerApplicationResponse.noError) {
-            throw SubstrateLedgerApplicationError.Response(response)
+            val errorMessage = if (responseData.isNotEmpty()) {
+                responseData.decodeToString()
+            } else {
+                null
+            }
+
+            throw SubstrateLedgerApplicationError.Response(response, errorMessage)
         }
 
-        return raw.dropBytesLast(RESPONSE_CODE_LENGTH)
+        return responseData
     }
 
     private fun mapCryptoSchemeToEncryptionType(cryptoScheme: CryptoScheme): EncryptionType {

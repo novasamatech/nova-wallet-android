@@ -47,7 +47,7 @@ abstract class SelectLedgerViewModel(
     private val chainRegistry: ChainRegistry,
 ) : BaseViewModel(), PermissionsAsker by permissionsAsker, LedgerMessageCommands {
 
-    private val chain by lazyAsync { chainRegistry.getChain(payload.chainId) }
+    protected val chain by lazyAsync { chainRegistry.getChain(payload.chainId) }
 
     private val stateMachine = StateMachine(WaitingForPermissionsState(), coroutineScope = this)
 
@@ -66,6 +66,19 @@ abstract class SelectLedgerViewModel(
 
     abstract suspend fun verifyConnection(device: LedgerDevice)
 
+    open suspend fun handleLedgerError(reason: Throwable, device: LedgerDevice) {
+        handleLedgerError(
+            reason = reason,
+            chain = chain,
+            resourceManager = resourceManager,
+            retry = { stateMachine.onEvent(SelectLedgerEvent.DeviceChosen(device)) }
+        )
+    }
+
+    open fun backClicked() {
+        router.back()
+    }
+
     fun deviceClicked(item: SelectLedgerModel) = launch {
         discoveryService.findDevice(item.id)?.let { device ->
             stateMachine.onEvent(SelectLedgerEvent.DeviceChosen(device))
@@ -77,10 +90,6 @@ abstract class SelectLedgerViewModel(
             BluetoothState.ON -> stateMachine.onEvent(SelectLedgerEvent.BluetoothEnabled)
             BluetoothState.OFF -> stateMachine.onEvent(SelectLedgerEvent.BluetoothDisabled)
         }
-    }
-
-    fun backClicked() {
-        router.back()
     }
 
     private fun emitInitialBluetoothState() {
@@ -111,12 +120,7 @@ abstract class SelectLedgerViewModel(
         when (effect) {
             SideEffect.EnableBluetooth -> bluetoothManager.enableBluetooth()
 
-            is SideEffect.PresentLedgerFailure -> handleLedgerError(
-                reason = effect.reason,
-                chain = chain,
-                resourceManager = resourceManager,
-                retry = { stateMachine.onEvent(SelectLedgerEvent.DeviceChosen(effect.device)) }
-            )
+            is SideEffect.PresentLedgerFailure -> launch { handleLedgerError(effect.reason, effect.device) }
 
             is SideEffect.VerifyConnection -> performConnectionVerification(effect.device)
 
