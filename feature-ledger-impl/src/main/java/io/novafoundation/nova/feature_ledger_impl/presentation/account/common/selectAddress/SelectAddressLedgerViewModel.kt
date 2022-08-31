@@ -120,6 +120,7 @@ abstract class SelectAddressLedgerViewModel(
     }
 
     private fun verifyAddressCancelled() {
+        ledgerMessageCommands.value = LedgerMessageCommand.Hide.event()
         verifyAddressJob?.cancel()
         verifyAddressJob = null
     }
