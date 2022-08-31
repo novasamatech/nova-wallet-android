@@ -54,6 +54,7 @@ abstract class SelectLedgerFragment<V : SelectLedgerViewModel> : BaseFragment<V>
 
     override fun initViews() {
         selectLedgerToolbar.setHomeButtonListener { viewModel.backClicked() }
+        onBackPressed { viewModel.backClicked() }
         selectLedgerToolbar.applyStatusBarInsets()
 
         selectLedgerDevices.setHasFixedSize(true)
