@@ -151,7 +151,7 @@ class RealSubstrateLedgerApplication(
         val cryptoSchemeByte = raw[0]
         val signature = raw.dropBytes(1)
 
-        return when(CryptoScheme.fromCode(cryptoSchemeByte.toUByte())) {
+        return when (CryptoScheme.fromCode(cryptoSchemeByte.toUByte())) {
             CryptoScheme.ED25519 -> SignatureWrapper.Ed25519(signature)
             CryptoScheme.SR25519 -> SignatureWrapper.Sr25519(signature)
         }

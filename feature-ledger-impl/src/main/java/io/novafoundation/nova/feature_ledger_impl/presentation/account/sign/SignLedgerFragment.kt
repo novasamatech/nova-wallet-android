@@ -6,7 +6,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterSc
 import io.novafoundation.nova.feature_ledger_api.di.LedgerFeatureApi
 import io.novafoundation.nova.feature_ledger_impl.di.LedgerFeatureComponent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerFragment
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerPayload
 
 class SignLedgerFragment : SelectLedgerFragment<SignLedgerViewModel>() {
 

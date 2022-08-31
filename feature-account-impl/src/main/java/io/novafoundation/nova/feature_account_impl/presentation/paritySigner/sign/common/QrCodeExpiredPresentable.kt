@@ -79,7 +79,7 @@ fun BaseFragment<*>.setupQrCodeExpiration(
     validityPeriodFlow.observe { validityPeriod ->
         viewLifecycleOwner.startExtrinsicValidityTimer(
             validityPeriod = validityPeriod,
-            timerFormat= R.string.account_parity_signer_sign_qr_code_valid_format,
+            timerFormat = R.string.account_parity_signer_sign_qr_code_valid_format,
             timerView = timerView,
             onTimerFinished = {
                 onTimerFinished()

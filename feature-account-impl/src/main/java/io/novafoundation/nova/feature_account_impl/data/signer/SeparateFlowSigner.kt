@@ -15,7 +15,7 @@ import kotlinx.coroutines.withContext
 abstract class SeparateFlowSigner(
     private val signingSharedState: MutableSharedState<SignerPayloadExtrinsic>,
     private val signFlowRequester: SignInterScreenRequester,
-): Signer {
+) : Signer {
 
     override suspend fun signExtrinsic(payloadExtrinsic: SignerPayloadExtrinsic): SignatureWrapper {
         signingSharedState.set(payloadExtrinsic)

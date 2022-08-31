@@ -7,11 +7,10 @@ import kotlinx.android.parcel.Parcelize
 sealed class SignatureWrapperParcel : Parcelable {
 
     @Parcelize
-    class Ed25519(val signature: ByteArray): SignatureWrapperParcel()
+    class Ed25519(val signature: ByteArray) : SignatureWrapperParcel()
 
     @Parcelize
-    class Sr25519(val signature: ByteArray): SignatureWrapperParcel()
-
+    class Sr25519(val signature: ByteArray) : SignatureWrapperParcel()
 
     @Parcelize
     class Ecdsa(
