@@ -9,6 +9,8 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignCommunicator
 import io.novafoundation.nova.feature_ledger_api.di.LedgerFeatureApi
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectAddress.di.AddLedgerChainAccountSelectAddressComponent
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectLedger.di.AddChainAccountSelectLedgerComponent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.SelectLedgerAddressInterScreenCommunicator
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.fillWallet.di.FillWalletImportLedgerComponent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.finish.di.FinishImportLedgerComponent
@@ -43,13 +45,14 @@ interface LedgerFeatureComponent : LedgerFeatureApi {
 
     fun startImportLedgerComponentFactory(): StartImportLedgerComponent.Factory
     fun fillWalletImportLedgerComponentFactory(): FillWalletImportLedgerComponent.Factory
-
     fun selectLedgerImportComponentFactory(): SelectLedgerImportLedgerComponent.Factory
     fun selectAddressImportLedgerComponentFactory(): SelectAddressImportLedgerComponent.Factory
-
     fun finishImportLedgerComponentFactory(): FinishImportLedgerComponent.Factory
 
     fun signLedgerComponentFactory(): SignLedgerComponent.Factory
+
+    fun addChainAccountSelectLedgerComponentFactory(): AddChainAccountSelectLedgerComponent.Factory
+    fun addChainAccountSelectAddressComponentFactory(): AddLedgerChainAccountSelectAddressComponent.Factory
 
     @Component(
         dependencies = [

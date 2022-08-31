@@ -5,6 +5,8 @@ import io.novafoundation.nova.app.root.navigation.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectAddress.AddLedgerChainAccountSelectAddressFragment
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectAddress.AddLedgerChainAccountSelectAddressPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.SelectAddressLedgerFragment
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.SelectLedgerAddressPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.finish.FinishImportLedgerFragment
@@ -40,4 +42,9 @@ class LedgerNavigator(
     override fun finishSignFlow() {
         back()
     }
+
+    override fun openAddChainAccountSelectAddress(payload: AddLedgerChainAccountSelectAddressPayload) = performNavigation(
+        actionId = R.id.action_addChainAccountSelectLedgerFragment_to_addChainAccountSelectAddressLedgerFragment,
+        args = AddLedgerChainAccountSelectAddressFragment.getBundle(payload)
+    )
 }

@@ -439,6 +439,14 @@
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_accountDetailsFragment_to_addLedgerAccountGraph"
+            app:destination="@id/add_ledger_chain_account_graph"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
     <fragment
@@ -1022,5 +1030,7 @@
     <include app:graph="@navigation/sign_parity_signer_graph" />
 
     <include app:graph="@navigation/sign_ledger_nav_graph" />
+
+    <include app:graph="@navigation/add_ledger_chain_account_graph" />
 
 </navigation>
