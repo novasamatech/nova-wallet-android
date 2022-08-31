@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_ledger_impl.domain.account.connect.selectAddress
+package io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress
 
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerSubstrateAccount
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateLedgerApplication
@@ -18,18 +18,18 @@ class LedgerAccountWithBalance(
     val chainAsset: Chain.Asset
 )
 
-interface SelectAddressImportLedgerInteractor {
+interface SelectAddressLedgerInteractor {
 
     suspend fun loadLedgerAccount(chain: Chain, deviceId: String, accountIndex: Int): Result<LedgerAccountWithBalance>
 
     suspend fun verifyLedgerAccount(chain: Chain, deviceId: String, accountIndex: Int): Result<Unit>
 }
 
-class RealSelectAddressImportLedgerInteractor(
+class RealSelectAddressLedgerInteractor(
     private val substrateLedgerApplication: SubstrateLedgerApplication,
     private val ledgerDeviceDiscoveryService: LedgerDeviceDiscoveryService,
     private val assetSourceRegistry: AssetSourceRegistry,
-) : SelectAddressImportLedgerInteractor {
+) : SelectAddressLedgerInteractor {
 
     override suspend fun loadLedgerAccount(chain: Chain, deviceId: String, accountIndex: Int) = runCatching {
         val device = findDevice(deviceId)

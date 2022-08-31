@@ -1,129 +1,36 @@
 package io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.selectAddress
 
-import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.address.AddressIconGenerator
-import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.Event
-import io.novafoundation.nova.common.utils.added
-import io.novafoundation.nova.common.utils.event
-import io.novafoundation.nova.common.utils.flowOf
-import io.novafoundation.nova.common.utils.invoke
-import io.novafoundation.nova.common.utils.lazyAsync
-import io.novafoundation.nova.common.utils.mapList
-import io.novafoundation.nova.common.utils.withFlagSet
-import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
-import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
-import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountUi
-import io.novafoundation.nova.feature_ledger_impl.R
-import io.novafoundation.nova.feature_ledger_impl.domain.account.connect.selectAddress.LedgerAccountWithBalance
-import io.novafoundation.nova.feature_ledger_impl.domain.account.connect.selectAddress.SelectAddressImportLedgerInteractor
+import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.LedgerAccountWithBalance
+import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.SelectAddressLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand.Footer
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand.Graphics
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommands
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.errors.handleLedgerError
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.SelectAddressLedgerViewModel
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.SelectLedgerAddressPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.LedgerChainAccount
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.SelectLedgerAddressInterScreenResponder
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class SelectAddressImportLedgerViewModel(
     private val router: LedgerRouter,
-    private val interactor: SelectAddressImportLedgerInteractor,
-    private val addressIconGenerator: AddressIconGenerator,
-    private val resourceManager: ResourceManager,
     private val payload: SelectLedgerAddressPayload,
-    private val chainRegistry: ChainRegistry,
     private val responder: SelectLedgerAddressInterScreenResponder,
-) : BaseViewModel(), LedgerMessageCommands {
+    interactor: SelectAddressLedgerInteractor,
+    addressIconGenerator: AddressIconGenerator,
+    resourceManager: ResourceManager,
+    chainRegistry: ChainRegistry,
+) : SelectAddressLedgerViewModel(
+    router = router,
+    interactor = interactor,
+    addressIconGenerator = addressIconGenerator,
+    resourceManager = resourceManager,
+    payload = payload,
+    chainRegistry = chainRegistry
+) {
 
-    override val ledgerMessageCommands: MutableLiveData<Event<LedgerMessageCommand>> = MutableLiveData()
-
-    private val chain by lazyAsync { chainRegistry.getChain(payload.chainId) }
-
-    private val loadingAccount = MutableStateFlow(false)
-    private val loadedAccounts: MutableStateFlow<List<LedgerAccountWithBalance>> = MutableStateFlow(emptyList())
-
-    private var verifyAddressJob: Job? = null
-
-    val loadedAccountModels = loadedAccounts.mapList(::mapLedgerAccountWithBalanceToUi)
-        .shareInBackground()
-
-    val chainUi = flowOf { mapChainToUi(chain()) }
-        .shareInBackground()
-
-    val loadMoreState = loadingAccount.map { loading ->
-        if (loading) {
-            DescriptiveButtonState.Loading
-        } else {
-            DescriptiveButtonState.Enabled(resourceManager.getString(R.string.ledger_import_select_address_load_more))
-        }
-    }.shareInBackground()
-
-    init {
-        loadNewAccount()
-    }
-
-    fun loadMoreClicked() {
-        if (loadingAccount.value) return
-
-        loadNewAccount()
-    }
-
-    fun backClicked() {
-        router.back()
-    }
-
-    fun accountClicked(accountUi: AccountUi) {
-        verifyAccount(accountUi.id)
-    }
-
-    private fun verifyAccount(id: Long) {
-        verifyAddressJob?.cancel()
-        verifyAddressJob = launch {
-            val account = loadedAccounts.value.first { it.index == id.toInt() }
-
-            ledgerMessageCommands.value = LedgerMessageCommand.Show.Info(
-                title = resourceManager.getString(R.string.ledger_verify_address_title),
-                subtitle = resourceManager.getString(R.string.ledger_verify_address_subtitle),
-                graphics = Graphics(R.drawable.ic_eye_filled, R.color.white_64),
-                onCancel = ::verifyAddressCancelled,
-                footer = Footer.Value(
-                    value = account.account.address,
-                )
-            ).event()
-
-            val result = withContext(Dispatchers.Default) {
-                interactor.verifyLedgerAccount(chain(), payload.deviceId, account.index)
-            }
-
-            result.onFailure {
-                handleLedgerError(it) { verifyAccount(id) }
-            }.onSuccess {
-                ledgerMessageCommands.value = LedgerMessageCommand.Hide.event()
-
-                responder.respond(screenResponseFrom(account))
-                router.returnToImportFillWallet()
-            }
-        }
-    }
-
-    private fun handleLedgerError(error: Throwable, retry: () -> Unit) {
-        handleLedgerError(error, chain, resourceManager, retry)
-    }
-
-    private fun verifyAddressCancelled() {
-        verifyAddressJob?.cancel()
-        verifyAddressJob = null
+    override fun onAccountVerified(account: LedgerAccountWithBalance) {
+        responder.respond(screenResponseFrom(account))
+        router.returnToImportFillWallet()
     }
 
     private fun screenResponseFrom(account: LedgerAccountWithBalance): LedgerChainAccount {
@@ -134,39 +41,5 @@ class SelectAddressImportLedgerViewModel(
             encryptionType = account.account.encryptionType,
             derivationPath = account.account.derivationPath
         )
-    }
-
-    private fun loadNewAccount() {
-        ledgerMessageCommands.value = LedgerMessageCommand.Hide.event()
-
-        launch(Dispatchers.Default) {
-            loadingAccount.withFlagSet {
-                val nextAccountIndex = loadedAccounts.value.size
-
-                interactor.loadLedgerAccount(chain(), payload.deviceId, nextAccountIndex)
-                    .onSuccess {
-                        loadedAccounts.value = loadedAccounts.value.added(it)
-                    }.onFailure {
-                        handleLedgerError(it) { loadNewAccount() }
-                    }
-            }
-        }
-    }
-
-    private suspend fun mapLedgerAccountWithBalanceToUi(account: LedgerAccountWithBalance): AccountUi {
-        return with(account) {
-            val tokenBalance = balance.formatPlanks(account.chainAsset)
-            val addressModel = addressIconGenerator.createAccountAddressModel(chain(), account.account.address)
-
-            AccountUi(
-                id = index.toLong(),
-                title = addressModel.address,
-                subtitle = tokenBalance,
-                isSelected = false,
-                isClickable = true,
-                picture = addressModel.image,
-                subtitleIconRes = null
-            )
-        }
     }
 }

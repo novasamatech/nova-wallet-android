@@ -1,80 +1,16 @@
 package io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.selectAddress
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.core.os.bundleOf
-import androidx.recyclerview.widget.ConcatAdapter
-import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
-import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountUi
-import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountsAdapter
 import io.novafoundation.nova.feature_ledger_api.di.LedgerFeatureApi
-import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.di.LedgerFeatureComponent
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessagePresentable
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.setupLedgerMessages
-import kotlinx.android.synthetic.main.fragment_import_ledger_select_address.ledgerSelectAddressChain
-import kotlinx.android.synthetic.main.fragment_import_ledger_select_address.ledgerSelectAddressContent
-import kotlinx.android.synthetic.main.fragment_import_ledger_select_address.ledgerSelectAddressToolbar
-import javax.inject.Inject
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.SelectAddressLedgerFragment
 
-class SelectAddressImportLedgerFragment :
-    BaseFragment<SelectAddressImportLedgerViewModel>(),
-    AccountsAdapter.AccountItemHandler,
-    LedgerSelectAddressLoadMoreAdapter.Handler {
-
-    companion object {
-
-        private const val PAYLOAD_KEY = "SelectAddressImportLedgerFragment.PAYLOAD_KEY"
-
-        fun getBundle(payload: SelectLedgerAddressPayload) = bundleOf(PAYLOAD_KEY to payload)
-    }
-
-    private val addressesAdapter = AccountsAdapter(this, AccountsAdapter.Mode.VIEW)
-    private val loadMoreAdapter = LedgerSelectAddressLoadMoreAdapter(handler = this, lifecycleOwner = this)
-
-    @Inject
-    lateinit var ledgerMessagePresentable: LedgerMessagePresentable
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_import_ledger_select_address, container, false)
-    }
-
-    override fun initViews() {
-        ledgerSelectAddressToolbar.applyStatusBarInsets()
-        ledgerSelectAddressToolbar.setHomeButtonListener {
-            viewModel.backClicked()
-        }
-        onBackPressed { viewModel.backClicked() }
-
-        ledgerSelectAddressContent.setHasFixedSize(true)
-        ledgerSelectAddressContent.adapter = ConcatAdapter(addressesAdapter, loadMoreAdapter)
-    }
+class SelectAddressImportLedgerFragment : SelectAddressLedgerFragment<SelectAddressImportLedgerViewModel>() {
 
     override fun inject() {
         FeatureUtils.getFeature<LedgerFeatureComponent>(requireContext(), LedgerFeatureApi::class.java)
             .selectAddressImportLedgerComponentFactory()
-            .create(this, argument(PAYLOAD_KEY))
+            .create(this, payload())
             .inject(this)
-    }
-
-    override fun subscribe(viewModel: SelectAddressImportLedgerViewModel) {
-        viewModel.loadMoreState.observe(loadMoreAdapter::setState)
-        viewModel.loadedAccountModels.observe(addressesAdapter::submitList)
-
-        viewModel.chainUi.observe(ledgerSelectAddressChain::setChain)
-
-        setupLedgerMessages(ledgerMessagePresentable)
-    }
-
-    override fun itemClicked(accountModel: AccountUi) {
-        viewModel.accountClicked(accountModel)
-    }
-
-    override fun loadMoreClicked() {
-        viewModel.loadMoreClicked()
     }
 }
