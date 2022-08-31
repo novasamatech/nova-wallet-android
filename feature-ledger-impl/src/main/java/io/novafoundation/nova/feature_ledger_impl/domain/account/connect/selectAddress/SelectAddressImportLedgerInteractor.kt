@@ -6,8 +6,6 @@ import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.findDevice
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
-import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -17,7 +15,7 @@ class LedgerAccountWithBalance(
     val index: Int,
     val account: LedgerSubstrateAccount,
     val balance: BigInteger,
-    val token: Token
+    val chainAsset: Chain.Asset
 )
 
 interface SelectAddressImportLedgerInteractor {
@@ -30,7 +28,6 @@ interface SelectAddressImportLedgerInteractor {
 class RealSelectAddressImportLedgerInteractor(
     private val substrateLedgerApplication: SubstrateLedgerApplication,
     private val ledgerDeviceDiscoveryService: LedgerDeviceDiscoveryService,
-    private val tokenRepository: TokenRepository,
     private val assetSourceRegistry: AssetSourceRegistry,
 ) : SelectAddressImportLedgerInteractor {
 
@@ -45,9 +42,7 @@ class RealSelectAddressImportLedgerInteractor(
         val balanceSource = assetSourceRegistry.sourceFor(utilityAsset).balance
         val balance = balanceSource.queryTotalBalance(chain, utilityAsset, accountId)
 
-        val token = tokenRepository.getToken(utilityAsset)
-
-        LedgerAccountWithBalance(accountIndex, ledgerAccount, balance, token)
+        LedgerAccountWithBalance(accountIndex, ledgerAccount, balance, utilityAsset)
     }
 
     override suspend fun verifyLedgerAccount(chain: Chain, deviceId: String, accountIndex: Int): Result<Unit> = kotlin.runCatching {

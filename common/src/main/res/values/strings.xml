@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="common_signature_invalid">Signature is invalid</string>
+  <string name="ledger_sign_signature_invalid_message">Please make sure you have selected the right Ledger device for currently approving operation</string>
+
   <string name="ledger_sign_tx_not_supported_title">Transaction is not supported</string>
   <string name="ledger_sign_tx_not_supported_subtitle">Ledger does not support this transaction.</string>
 

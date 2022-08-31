@@ -11,6 +11,8 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.start.StartImportLedgerViewModel
+import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
+import kotlinx.coroutines.flow.MutableStateFlow
 
 @Module(includes = [ViewModelModule::class])
 class StartImportLedgerModule {
@@ -20,9 +22,10 @@ class StartImportLedgerModule {
     @ViewModelKey(StartImportLedgerViewModel::class)
     fun provideViewModel(
         router: LedgerRouter,
-        appLinksProvider: AppLinksProvider
+        appLinksProvider: AppLinksProvider,
+        externalRequirementsFlow: MutableStateFlow<ChainConnection.ExternalRequirement>
     ): ViewModel {
-        return StartImportLedgerViewModel(router, appLinksProvider)
+        return StartImportLedgerViewModel(router, appLinksProvider, externalRequirementsFlow)
     }
 
     @Provides

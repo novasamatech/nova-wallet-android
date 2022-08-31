@@ -20,7 +20,6 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.S
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.selectAddress.SelectAddressImportLedgerViewModel
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.selectAddress.SelectLedgerAddressPayload
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
@@ -31,13 +30,11 @@ class SelectAddressImportLedgerModule {
     fun provideInteractor(
         substrateLedgerApplication: SubstrateLedgerApplication,
         ledgerDeviceDiscoveryService: LedgerDeviceDiscoveryService,
-        tokenRepository: TokenRepository,
         assetSourceRegistry: AssetSourceRegistry,
     ): SelectAddressImportLedgerInteractor {
         return RealSelectAddressImportLedgerInteractor(
             substrateLedgerApplication = substrateLedgerApplication,
             ledgerDeviceDiscoveryService = ledgerDeviceDiscoveryService,
-            tokenRepository = tokenRepository,
             assetSourceRegistry = assetSourceRegistry
         )
     }

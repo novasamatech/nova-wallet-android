@@ -18,7 +18,9 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.A
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
+import kotlinx.coroutines.flow.MutableStateFlow
 
 interface LedgerFeatureDependencies {
 
@@ -57,4 +59,6 @@ interface LedgerFeatureDependencies {
     val extrinsicValidityUseCase: ExtrinsicValidityUseCase
 
     val selectedAccountUseCase: SelectedAccountUseCase
+
+    val externalRequirementsFlow: MutableStateFlow<ChainConnection.ExternalRequirement>
 }

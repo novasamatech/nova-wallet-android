@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.Subst
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
 import io.novafoundation.nova.feature_ledger_impl.R
+import io.novafoundation.nova.feature_ledger_impl.domain.account.sign.SignLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerPayload
@@ -42,6 +43,8 @@ enum class InvalidDataError {
     METADATA_OUTDATED,
 }
 
+private class InvalidSignatureError : Exception()
+
 class SignLedgerViewModel(
     private val substrateApplication: SubstrateLedgerApplication,
     private val selectLedgerPayload: SelectLedgerPayload,
@@ -52,6 +55,7 @@ class SignLedgerViewModel(
     private val selectedAccountUseCase: SelectedAccountUseCase,
     private val request: SignInterScreenCommunicator.Request,
     private val responder: SignInterScreenResponder,
+    private val interactor: SignLedgerInteractor,
     discoveryService: LedgerDeviceDiscoveryService,
     permissionsAsker: PermissionsAsker.Presentation,
     bluetoothManager: BluetoothManager,
@@ -85,12 +89,15 @@ class SignLedgerViewModel(
     override suspend fun handleLedgerError(reason: Throwable, device: LedgerDevice) {
         if (fatalErrorDetected.value) return
 
-        if (reason is SubstrateLedgerApplicationError.Response && reason.response == LedgerApplicationResponse.invalidData) {
-            handleInvalidData(reason.errorMessage)
-            return
-        }
+        when {
+            reason is SubstrateLedgerApplicationError.Response && reason.response == LedgerApplicationResponse.invalidData -> {
+                handleInvalidData(reason.errorMessage)
+            }
 
-        super.handleLedgerError(reason, device)
+            reason is InvalidSignatureError -> handleInvalidSignature()
+
+            else -> super.handleLedgerError(reason, device)
+        }
     }
 
     override suspend fun verifyConnection(device: LedgerDevice) {
@@ -123,14 +130,13 @@ class SignLedgerViewModel(
 
         val signature = signingJob!!.await()
 
-        // TODO verify signature
-
-        val response = request.signed(signature)
-
-        responder.respond(response)
-        hideBottomSheet()
-
-        router.finishSignFlow()
+        if (interactor.verifySignature(signPayloadState.getOrThrow(), signature)) {
+            responder.respond(request.signed(signature))
+            hideBottomSheet()
+            router.finishSignFlow()
+        } else {
+            throw InvalidSignatureError()
+        }
     }
 
     private fun listenExpire() = launch {
@@ -138,6 +144,13 @@ class SignLedgerViewModel(
         delay(remainingTime)
 
         timerExpired()
+    }
+
+    private fun handleInvalidSignature() {
+        showFatalError(
+            title = resourceManager.getString(R.string.common_signature_invalid),
+            subtitle = resourceManager.getString(R.string.ledger_sign_signature_invalid_message),
+        )
     }
 
     private suspend fun handleInvalidData(invalidDataMessage: String?) {

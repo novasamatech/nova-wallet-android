@@ -16,11 +16,14 @@ import io.novafoundation.nova.common.utils.chainId
 import io.novafoundation.nova.common.utils.getOrThrow
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenCommunicator
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateLedgerApplication
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
+import io.novafoundation.nova.feature_ledger_impl.domain.account.sign.RealSignLedgerInteractor
+import io.novafoundation.nova.feature_ledger_impl.domain.account.sign.SignLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.sign.SignLedgerViewModel
@@ -30,6 +33,13 @@ import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtr
 
 @Module(includes = [ViewModelModule::class])
 class SignLedgerModule {
+
+    @Provides
+    @ScreenScope
+    fun provideInteractor(
+        accountRepository: AccountRepository,
+        chainRegistry: ChainRegistry,
+    ): SignLedgerInteractor = RealSignLedgerInteractor(accountRepository, chainRegistry)
 
     @Provides
     @ScreenScope
@@ -63,6 +73,7 @@ class SignLedgerModule {
         extrinsicValidityUseCase: ExtrinsicValidityUseCase,
         selectedAccountUseCase: SelectedAccountUseCase,
         request: SignInterScreenCommunicator.Request,
+        interactor: SignLedgerInteractor,
         responder: LedgerSignCommunicator,
     ): ViewModel {
         return SignLedgerViewModel(
@@ -78,7 +89,8 @@ class SignLedgerModule {
             extrinsicValidityUseCase = extrinsicValidityUseCase,
             selectedAccountUseCase = selectedAccountUseCase,
             request = request,
-            responder = responder
+            responder = responder,
+            interactor = interactor
         )
     }
 

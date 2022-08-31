@@ -26,7 +26,7 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bo
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.errors.handleLedgerError
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.LedgerChainAccount
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.SelectLedgerAddressInterScreenResponder
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -154,13 +154,13 @@ class SelectAddressImportLedgerViewModel(
 
     private suspend fun mapLedgerAccountWithBalanceToUi(account: LedgerAccountWithBalance): AccountUi {
         return with(account) {
-            val amountModel = mapAmountToAmountModel(balance, token)
+            val tokenBalance = balance.formatPlanks(account.chainAsset)
             val addressModel = addressIconGenerator.createAccountAddressModel(chain(), account.account.address)
 
             AccountUi(
                 id = index.toLong(),
                 title = addressModel.address,
-                subtitle = amountModel.token,
+                subtitle = tokenBalance,
                 isSelected = false,
                 isClickable = true,
                 picture = addressModel.image,
