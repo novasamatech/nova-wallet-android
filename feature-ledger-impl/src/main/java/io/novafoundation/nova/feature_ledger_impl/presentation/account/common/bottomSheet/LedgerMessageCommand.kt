@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet
 
 import android.content.Context
+import android.view.View
+import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import io.novafoundation.nova.common.utils.formatting.TimerValue
@@ -13,6 +15,7 @@ import io.novafoundation.nova.feature_ledger_impl.R
 import kotlinx.android.synthetic.main.fragment_ledger_message.ledgerMessageActions
 import kotlinx.android.synthetic.main.fragment_ledger_message.ledgerMessageCancel
 import kotlinx.android.synthetic.main.fragment_ledger_message.ledgerMessageConfirm
+import kotlinx.android.synthetic.main.fragment_ledger_message.ledgerMessageContainer
 import kotlinx.android.synthetic.main.fragment_ledger_message.ledgerMessageFooterMessage
 import kotlinx.android.synthetic.main.fragment_ledger_message.ledgerMessageGraphics
 import kotlinx.android.synthetic.main.fragment_ledger_message.ledgerMessageSubtitle
@@ -25,41 +28,41 @@ sealed class LedgerMessageCommand {
     sealed class Show(
         val title: String,
         val subtitle: String,
-        @DrawableRes val graphicsIcon: Int,
+        val graphics: Graphics,
         val onCancel: () -> Unit,
     ) : LedgerMessageCommand() {
 
         sealed class Actions(
             title: String,
             subtitle: String,
-            @DrawableRes graphicsIcon: Int,
+            graphics: Graphics,
             onCancel: () -> Unit,
-        ) : Show(title, subtitle, graphicsIcon, onCancel) {
+        ) : Show(title, subtitle, graphics, onCancel) {
 
             class RecoverableError(
                 title: String,
                 subtitle: String,
-                @DrawableRes graphicsIcon: Int,
+                graphics: Graphics,
                 onCancel: () -> Unit,
                 val onRetry: () -> Unit
-            ) : Actions(title, subtitle, graphicsIcon, onCancel)
+            ) : Actions(title, subtitle, graphics, onCancel)
 
             class FatalError(
                 title: String,
                 subtitle: String,
-                @DrawableRes graphicsIcon: Int,
+                graphics: Graphics,
                 val onConfirm: () -> Unit,
                 onCancel: () -> Unit = onConfirm, // when error is fatal, confirm is the same as hide by default
-            ) : Actions(title, subtitle, graphicsIcon, onCancel)
+            ) : Actions(title, subtitle, graphics, onCancel)
         }
 
         class Info(
             title: String,
             subtitle: String,
-            @DrawableRes graphicsIcon: Int,
+            graphics: Graphics,
             onCancel: () -> Unit,
             val footer: Footer
-        ) : Show(title, subtitle, graphicsIcon, onCancel)
+        ) : Show(title, subtitle, graphics, onCancel)
     }
 
     sealed class Footer {
@@ -69,15 +72,20 @@ sealed class LedgerMessageCommand {
             val closeToExpire: (TimerValue) -> Boolean,
             val timerFinished: () -> Unit,
             @StringRes val messageFormat: Int
-        ): Footer()
+        ) : Footer()
 
         class Value(val value: String) : Footer()
     }
+
+    class Graphics(@DrawableRes val src: Int, @ColorRes val tint: Int? = null)
 }
 
 class LedgerMessageBottomSheet(
     context: Context,
 ) : BaseBottomSheet(context) {
+
+    val container: View
+        get() = ledgerMessageContainer
 
     init {
         setContentView(R.layout.fragment_ledger_message)
@@ -120,7 +128,7 @@ class LedgerMessageBottomSheet(
     }
 
     private fun showFooter(footer: LedgerMessageCommand.Footer) {
-        when(footer) {
+        when (footer) {
             is LedgerMessageCommand.Footer.Value -> {
                 ledgerMessageFooterMessage.text = footer.value
             }
@@ -142,7 +150,7 @@ class LedgerMessageBottomSheet(
     private fun setupBaseShow(command: LedgerMessageCommand.Show) {
         ledgerMessageTitle.text = command.title
         ledgerMessageSubtitle.text = command.subtitle
-        ledgerMessageGraphics.setIcon(command.graphicsIcon)
+        ledgerMessageGraphics.setIcon(command.graphics.src, command.graphics.tint)
 
         setOnCancelListener { command.onCancel() }
     }

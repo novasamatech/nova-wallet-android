@@ -5,11 +5,13 @@ import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
+import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.getDrawableCompat
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
 import io.novafoundation.nova.common.utils.setImageResource
+import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.feature_ledger_impl.R
 import kotlinx.android.synthetic.main.view_ledger_action.view.viewLedgerGraphicsIcon
@@ -33,8 +35,9 @@ class LedgerActionView @JvmOverloads constructor(
         super.onMeasure(width, height)
     }
 
-    fun setIcon(@DrawableRes drawableResId: Int?) {
+    fun setIcon(@DrawableRes drawableResId: Int?, @ColorRes tint: Int? = null) {
         viewLedgerGraphicsIcon.setImageResource(drawableResId)
+        viewLedgerGraphicsIcon.setImageTintRes(tint)
     }
 
     fun setLedgerImage(image: Drawable) {

@@ -1,10 +1,10 @@
 package io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet
 
 import android.content.Context
+import android.view.View
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.Event
-import kotlinx.android.synthetic.main.fragment_ledger_message.ledgerMessageContainer
 
 interface LedgerMessagePresentable {
 
@@ -28,25 +28,27 @@ class SingleSheetLedgerMessagePresentable : LedgerMessagePresentable {
                 bottomSheet?.show()
             }
             bottomSheet != null && command is LedgerMessageCommand.Show -> {
-                bottomSheet?.ledgerMessageContainer
-                    ?.animate()
-                    ?.alpha(0f)
-                    ?.withEndAction {
-                        bottomSheet?.receiveCommand(command)
-
-                        bottomSheet?.ledgerMessageContainer
-                            ?.animate()
-                            ?.alpha(1f)
-                            ?.start()
-                    }
-                    ?.start()
-
+                bottomSheet?.container?.transition {
+                    bottomSheet?.receiveCommand(command)
+                }
             }
             else -> {
                 bottomSheet?.receiveCommand(command)
                 bottomSheet = null
             }
         }
+    }
+
+    private fun View.transition(fadedOut: () -> Unit) {
+        animate()
+            .alpha(0f)
+            .withEndAction {
+                fadedOut()
+
+                animate()
+                    .alpha(1f)
+                    .start()
+            }.start()
     }
 }
 

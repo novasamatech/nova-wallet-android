@@ -169,8 +169,8 @@ private fun Drawable.updateDimensions(
     setBounds(0, 0, widthInPx, heightInPx)
 }
 
-fun ImageView.setImageTintRes(@ColorRes tintRes: Int) {
-    imageTintList = ColorStateList.valueOf(context.getColor(tintRes))
+fun ImageView.setImageTintRes(@ColorRes tintRes: Int?) {
+    imageTintList = tintRes?.let { ColorStateList.valueOf(context.getColor(tintRes)) }
 }
 
 fun ImageView.setImageTint(@ColorInt tint: Int?) {

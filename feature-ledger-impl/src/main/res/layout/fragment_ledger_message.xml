@@ -34,9 +34,10 @@
         style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
+        android:gravity="center_horizontal"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
+        android:minLines="2"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="40dp"
         android:textColor="@color/white_64"
@@ -58,7 +59,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:visibility="gone">
+        android:visibility="visible">
 
         <io.novafoundation.nova.common.view.PrimaryButton
             android:id="@+id/ledgerMessageCancel"
