@@ -25,7 +25,7 @@
   <string name="ledger_verify_address_subtitle">Press both buttons on your Nano X E426 to verify address</string>
 
   <string name="ledger_import_select_address_load_more">Load more accounts</string>
-  <string name="ledher_import_select_address_title">Select an account to pair in Nova Wallet</string>
+  <string name="ledher_import_select_address_title">Select account to add to wallet</string>
 
   <string name="ledger_error_general_title">Operation failed</string>
   <string name="ledger_error_general_message">Operation completed with error on device. Please, try again later.</string>
@@ -37,7 +37,7 @@
   <string name="ledger_error_app_not_launched_message">Open the %s app on your Ledger device </string>
 
   <string name="account_ledger_select_device_title">Select your Ledger device</string>
-  <string name="account_ledger_select_device_description">Please enable Bluetooth in your phone settings. Open the Polkadot app on your Ledger device </string>
+  <string name="account_ledger_select_device_description">Please, enable Bluetooth in your phone settings and Ledger device. Unlock your Ledger device and open the %s app.</string>
 
   <string name="common_cancel_operation_warning">Are you sure you want to cancel this operation?</string>
   <string name="common_yes">Yes</string>

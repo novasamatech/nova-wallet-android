@@ -26,10 +26,11 @@
         style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/selectLedgerHints"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
-        android:text="@string/account_ledger_select_device_description" />
+        tools:text="@string/account_ledger_select_device_description" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/selectLedgerDevices"

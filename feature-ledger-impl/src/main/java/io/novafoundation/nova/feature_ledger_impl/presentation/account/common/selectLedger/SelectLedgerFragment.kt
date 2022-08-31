@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bo
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.setupLedgerMessages
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.model.SelectLedgerModel
 import kotlinx.android.synthetic.main.fragment_select_ledger.selectLedgerDevices
+import kotlinx.android.synthetic.main.fragment_select_ledger.selectLedgerHints
 import kotlinx.android.synthetic.main.fragment_select_ledger.selectLedgerProgress
 import kotlinx.android.synthetic.main.fragment_select_ledger.selectLedgerToolbar
 import javax.inject.Inject
@@ -68,6 +69,8 @@ abstract class SelectLedgerFragment<V : SelectLedgerViewModel> : BaseFragment<V>
             selectLedgerDevices.setVisible(it.isNotEmpty())
             selectLedgerProgress.setVisible(it.isEmpty())
         }
+
+        viewModel.hints.observe(selectLedgerHints::setText)
 
         setupPermissionAsker(viewModel)
         setupLedgerMessages(ledgerMessagePresentable)
