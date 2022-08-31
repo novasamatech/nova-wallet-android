@@ -18,7 +18,7 @@ import kotlinx.android.synthetic.main.fragment_import_ledger_select_address.ledg
 import kotlinx.android.synthetic.main.fragment_import_ledger_select_address.ledgerSelectAddressToolbar
 import javax.inject.Inject
 
-abstract class SelectAddressLedgerFragment<V: SelectAddressLedgerViewModel>:
+abstract class SelectAddressLedgerFragment<V : SelectAddressLedgerViewModel> :
     BaseFragment<V>(),
     AccountsAdapter.AccountItemHandler,
     LedgerSelectAddressLoadMoreAdapter.Handler {

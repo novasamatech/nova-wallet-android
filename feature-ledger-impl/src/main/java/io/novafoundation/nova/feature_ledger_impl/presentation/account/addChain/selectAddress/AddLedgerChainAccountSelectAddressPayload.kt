@@ -9,4 +9,4 @@ class AddLedgerChainAccountSelectAddressPayload(
     val chainId: ChainId,
     val metaId: Long,
     val deviceId: String,
-): Parcelable
+) : Parcelable

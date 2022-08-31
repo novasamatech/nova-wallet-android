@@ -98,7 +98,6 @@ class RealLedgerRepository(
         secretStoreV2.putAdditionalMetaAccountSecret(metaId, derivationPathKey, ledgerChainAccount.derivationPath)
     }
 
-
     private fun derivationPathSecretKey(chainId: ChainId): String {
         return "$LEDGER_DERIVATION_PATH_KEY.$chainId"
     }
