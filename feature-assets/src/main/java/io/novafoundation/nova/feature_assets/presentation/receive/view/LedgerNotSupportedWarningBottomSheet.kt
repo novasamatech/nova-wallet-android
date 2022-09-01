@@ -9,7 +9,7 @@ class LedgerNotSupportedWarningBottomSheet(
     context: Context,
     onSuccess: () -> Unit,
     private val message: String
-): ActionNotAllowedBottomSheet(context, onSuccess) {
+) : ActionNotAllowedBottomSheet(context, onSuccess) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
