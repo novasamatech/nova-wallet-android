@@ -28,7 +28,7 @@ class SingleSheetLedgerMessagePresentable : LedgerMessagePresentable {
                 bottomSheet?.show()
             }
             bottomSheet != null && command is LedgerMessageCommand.Show -> {
-                bottomSheet?.container?.transition {
+                bottomSheet?.container?.stateChangeTransition {
                     bottomSheet?.receiveCommand(command)
                 }
             }
@@ -39,11 +39,11 @@ class SingleSheetLedgerMessagePresentable : LedgerMessagePresentable {
         }
     }
 
-    private fun View.transition(fadedOut: () -> Unit) {
+    private fun View.stateChangeTransition(onChangeState: () -> Unit) {
         animate()
             .alpha(0f)
             .withEndAction {
-                fadedOut()
+                onChangeState()
 
                 animate()
                     .alpha(1f)
