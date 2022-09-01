@@ -16,7 +16,6 @@ import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.receive.model.QrSharingPayload
-import io.novafoundation.nova.feature_assets.presentation.receive.view.LedgerNotSupportedWarningBottomSheet
 import kotlinx.android.synthetic.main.fragment_receive.receiveFrom
 import kotlinx.android.synthetic.main.fragment_receive.receiveQrCode
 import kotlinx.android.synthetic.main.fragment_receive.receiveShare
@@ -81,14 +80,6 @@ class ReceiveFragment : BaseFragment<ReceiveViewModel>() {
         viewModel.toolbarTitle.observe(receiveToolbar::setTitle)
 
         viewModel.shareEvent.observeEvent(::startQrSharingIntent)
-
-        viewModel.acknowledgeLedgerWarning.awaitableActionLiveData.observeEvent {
-            LedgerNotSupportedWarningBottomSheet(
-                context = requireContext(),
-                onSuccess = { it.onSuccess(Unit) },
-                message = it.payload
-            ).show()
-        }
     }
 
     private fun startQrSharingIntent(qrSharingPayload: QrSharingPayload) {

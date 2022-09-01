@@ -5,8 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
-import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.QrCodeGenerator
@@ -28,13 +26,9 @@ import io.novafoundation.nova.feature_assets.presentation.receive.model.TokenRec
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-
-private typealias LedgerWarningMessage = String
 
 class ReceiveViewModel(
     private val interactor: ReceiveInteractor,
@@ -46,10 +40,7 @@ class ReceiveViewModel(
     private val chainRegistry: ChainRegistry,
     selectedAccountUseCase: SelectedAccountUseCase,
     private val router: AssetsRouter,
-    private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
 ) : BaseViewModel(), ExternalActions by externalActions {
-
-    val acknowledgeLedgerWarning = actionAwaitableMixinFactory.confirmingAction<LedgerWarningMessage>()
 
     private val selectedMetaAccountFlow = selectedAccountUseCase.selectedMetaAccountFlow()
 
@@ -90,10 +81,6 @@ class ReceiveViewModel(
     private val _shareEvent = MutableLiveData<Event<QrSharingPayload>>()
     val shareEvent: LiveData<Event<QrSharingPayload>> = _shareEvent
 
-    init {
-        checkForLedgerWarning()
-    }
-
     fun recipientClicked() = launch {
         val accountAddress = receiver.first().addressModel.address
         val (chain, _) = chainWithAssetAsync()
@@ -118,23 +105,6 @@ class ReceiveViewModel(
                     _shareEvent.value = Event(QrSharingPayload(fileUri, message))
                 }
                 .onFailure(::showError)
-        }
-    }
-
-    private fun checkForLedgerWarning() = launch(Dispatchers.Default) {
-        val (_, chainAsset) = chainWithAssetAsync()
-        val metaAccount = selectedMetaAccountFlow.first()
-
-        val shouldShowWarning = interactor.shouldShowLedgerWarning(metaAccount, chainAsset)
-
-        if (shouldShowWarning) {
-            val assetSymbol = chainAsset.symbol
-            val warningMessage = resourceManager.getString(R.string.assets_receive_ledger_not_supported_message, assetSymbol, assetSymbol)
-            acknowledgeLedgerWarning.awaitAction(warningMessage)
-
-            withContext(Dispatchers.Main) {
-                router.back()
-            }
         }
     }
 
