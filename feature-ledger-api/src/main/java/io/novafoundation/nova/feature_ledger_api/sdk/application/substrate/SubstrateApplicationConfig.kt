@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate
+package io.novafoundation.nova.feature_ledger_api.sdk.application.substrate
 
 import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
