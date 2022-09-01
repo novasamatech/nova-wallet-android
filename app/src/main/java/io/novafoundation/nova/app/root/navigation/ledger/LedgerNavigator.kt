@@ -5,10 +5,12 @@ import io.novafoundation.nova.app.root.navigation.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectAddress.AddLedgerChainAccountSelectAddressFragment
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectAddress.AddLedgerChainAccountSelectAddressPayload
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.SelectAddressLedgerFragment
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.SelectLedgerAddressPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.finish.FinishImportLedgerFragment
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.finish.FinishImportLedgerPayload
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.selectAddress.SelectAddressImportLedgerFragment
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.selectAddress.SelectLedgerAddressPayload
 
 class LedgerNavigator(
     private val accountRouter: AccountRouter,
@@ -21,7 +23,7 @@ class LedgerNavigator(
 
     override fun openSelectImportAddress(payload: SelectLedgerAddressPayload) = performNavigation(
         actionId = R.id.action_selectLedgerImportFragment_to_selectAddressImportLedgerFragment,
-        args = SelectAddressImportLedgerFragment.getBundle(payload)
+        args = SelectAddressLedgerFragment.getBundle(payload)
     )
 
     override fun openCreatePincode() {
@@ -40,4 +42,9 @@ class LedgerNavigator(
     override fun finishSignFlow() {
         back()
     }
+
+    override fun openAddChainAccountSelectAddress(payload: AddLedgerChainAccountSelectAddressPayload) = performNavigation(
+        actionId = R.id.action_addChainAccountSelectLedgerFragment_to_addChainAccountSelectAddressLedgerFragment,
+        args = AddLedgerChainAccountSelectAddressFragment.getBundle(payload)
+    )
 }

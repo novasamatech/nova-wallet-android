@@ -1,8 +1,9 @@
 package io.novafoundation.nova.feature_ledger_impl.presentation
 
 import io.novafoundation.nova.common.navigation.ReturnableRouter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectAddress.AddLedgerChainAccountSelectAddressPayload
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.SelectLedgerAddressPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.finish.FinishImportLedgerPayload
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.selectAddress.SelectLedgerAddressPayload
 
 interface LedgerRouter : ReturnableRouter {
 
@@ -19,4 +20,6 @@ interface LedgerRouter : ReturnableRouter {
     fun openFinishImportLedger(payload: FinishImportLedgerPayload)
 
     fun finishSignFlow()
+
+    fun openAddChainAccountSelectAddress(payload: AddLedgerChainAccountSelectAddressPayload)
 }

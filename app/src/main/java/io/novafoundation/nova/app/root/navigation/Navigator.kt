@@ -53,6 +53,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.cus
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.terms.MoonbeamCrowdloanTermsFragment
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.CrowdloanContributeFragment
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.parcel.ContributePayload
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectLedger.AddChainAccountSelectLedgerFragment
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
 import io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.WelcomeFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -518,6 +519,12 @@ class Navigator(
 
     override fun finishParitySignerFlow() {
         navController?.navigate(R.id.action_finish_parity_signer_flow)
+    }
+
+    override fun openAddLedgerChainAccountFlow(payload: AddAccountPayload.ChainAccount) {
+        val bundle = AddChainAccountSelectLedgerFragment.getBundle(payload)
+
+        navController?.navigate(R.id.action_accountDetailsFragment_to_addLedgerAccountGraph, bundle)
     }
 
     override fun openCreateWatchWallet() {

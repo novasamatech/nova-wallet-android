@@ -12,12 +12,15 @@ import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDisco
 import io.novafoundation.nova.feature_ledger_api.sdk.transport.LedgerTransport
 import io.novafoundation.nova.feature_ledger_impl.data.repository.LedgerRepository
 import io.novafoundation.nova.feature_ledger_impl.data.repository.RealLedgerRepository
+import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.RealSelectAddressLedgerInteractor
+import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.SelectAddressLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessagePresentable
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.SingleSheetLedgerMessagePresentable
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.RealSubstrateLedgerApplication
 import io.novafoundation.nova.feature_ledger_impl.sdk.connection.ble.LedgerBleManager
 import io.novafoundation.nova.feature_ledger_impl.sdk.discovery.ble.BleLedgerDeviceDiscoveryService
 import io.novafoundation.nova.feature_ledger_impl.sdk.transport.ChunkedLedgerTransport
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module
@@ -60,4 +63,18 @@ class LedgerFeatureModule {
 
     @Provides
     fun provideLedgerMessagePresentable(): LedgerMessagePresentable = SingleSheetLedgerMessagePresentable()
+
+    @Provides
+    @FeatureScope
+    fun provideSelectAddressInteractor(
+        substrateLedgerApplication: SubstrateLedgerApplication,
+        ledgerDeviceDiscoveryService: LedgerDeviceDiscoveryService,
+        assetSourceRegistry: AssetSourceRegistry,
+    ): SelectAddressLedgerInteractor {
+        return RealSelectAddressLedgerInteractor(
+            substrateLedgerApplication = substrateLedgerApplication,
+            ledgerDeviceDiscoveryService = ledgerDeviceDiscoveryService,
+            assetSourceRegistry = assetSourceRegistry
+        )
+    }
 }

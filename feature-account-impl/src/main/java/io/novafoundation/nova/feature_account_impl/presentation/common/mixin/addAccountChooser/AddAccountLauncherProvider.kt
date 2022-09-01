@@ -44,10 +44,14 @@ class AddAccountLauncherProvider(
             LightMetaAccount.Type.SECRETS -> launchAddFromSecrets(chain, metaAccount)
             LightMetaAccount.Type.WATCH_ONLY -> launchAddWatchOnly(chain, metaAccount)
             LightMetaAccount.Type.PARITY_SIGNER -> { } // adding chain accounts is not supported for Parity Signer wallets yet
-            LightMetaAccount.Type.LEDGER -> {
-                // TODO
-            }
+            LightMetaAccount.Type.LEDGER -> launchAddLedger(chain, metaAccount)
         }
+    }
+
+    private fun launchAddLedger(chain: Chain, metaAccount: MetaAccount) {
+        val chainAccountPayload = AddAccountPayload.ChainAccount(chain.id, metaAccount.id)
+
+        router.openAddLedgerChainAccountFlow(chainAccountPayload)
     }
 
     private fun launchAddWatchOnly(chain: Chain, metaAccount: MetaAccount) {

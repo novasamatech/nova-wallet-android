@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.selectAddress
+package io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress
 
 import android.os.Parcelable
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
