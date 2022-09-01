@@ -38,13 +38,8 @@ abstract class TokenDao {
     abstract fun observeToken(symbol: String): Flow<TokenWithCurrency>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insertToken(token: TokenLocal)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insertTokens(tokens: List<TokenLocal>)
 
     @Query(INSERT_TOKEN_WITH_SELECTED_CURRENCY)
     abstract suspend fun insertTokenWithSelectedCurrency(symbol: String)
-
-    suspend fun ensureToken(symbol: String) = insertTokenWithSelectedCurrency(symbol)
 }

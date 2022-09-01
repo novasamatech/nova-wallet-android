@@ -33,9 +33,7 @@ class AssetCache(
         val chainId = chainAsset.chainId
 
         assetUpdateMutex.withLock {
-            tokenDao.ensureToken(chainAsset.symbol)
-
-            val cachedAsset = assetDao.getAsset(metaId, chainId, assetId)?.asset ?: AssetLocal.createEmpty(assetId, chainId, metaId)
+            val cachedAsset = assetDao.getAsset(metaId, chainId, assetId) ?: AssetLocal.createEmpty(assetId, chainId, metaId)
 
             val newAsset = builder.invoke(cachedAsset)
 
