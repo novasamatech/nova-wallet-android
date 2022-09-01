@@ -12,6 +12,7 @@ import jp.co.soramitsu.fearless_utils.extensions.tryFindNonNull
 import no.nordicsemi.android.ble.BleManager
 import no.nordicsemi.android.ble.callback.DataReceivedCallback
 import no.nordicsemi.android.ble.data.Data
+import no.nordicsemi.android.ble.exception.RequestFailedException
 import no.nordicsemi.android.ble.ktx.suspend
 import java.util.UUID
 
@@ -26,6 +27,8 @@ class SupportedBleDevice(
 class LedgerBleManager(
     contextManager: ContextManager
 ) : BleManager(contextManager.getApplicationContext()), DataReceivedCallback {
+
+    private val logTag = LOG_TAG
 
     companion object {
         val supportedLedgerDevices by lazy {
@@ -69,11 +72,11 @@ class LedgerBleManager(
             override fun initialize() {
                 beginAtomicRequestQueue()
                     .add(requestMtu(DEFAULT_MTU)
-                        .with { _, mtu -> Log.d(LOG_TAG, "MTU set to $mtu") }
-                        .fail { _, status -> Log.d(LOG_TAG,"Requested MTU not supported: $status") })
+                        .with { _, mtu -> Log.d(logTag, "MTU set to $mtu") }
+                        .fail { _, status -> Log.d(logTag,"Requested MTU not supported: $status") })
                     .add(enableNotifications(characteristicNotify))
-                    .done {  Log.d(LOG_TAG, "Target initialized") }
-                    .fail { _, status -> Log.d(LOG_TAG,"Target initialization failed: $status")  }
+                    .done {  Log.d(logTag, "Target initialized") }
+                    .fail { _, status -> Log.d(logTag,"Target initialization failed: $status")  }
                     .enqueue()
                 setNotificationCallback(characteristicNotify)
                     .with(this@LedgerBleManager)
@@ -82,12 +85,20 @@ class LedgerBleManager(
     }
 
     suspend fun send(chunks: List<ByteArray>) {
-        beginAtomicRequestQueue().apply {
-            chunks.forEach { chunk ->
-                add(writeCharacteristic(characteristicWrite, chunk, WRITE_TYPE_DEFAULT))
+        try {
+            beginAtomicRequestQueue().apply {
+                chunks.forEach { chunk ->
+                    add(writeCharacteristic(characteristicWrite, chunk, WRITE_TYPE_DEFAULT))
+                }
             }
+                .suspend()
+
+            Log.d(logTag,"Send request succeeded")
+        } catch (e: RequestFailedException) {
+            Log.d(logTag,"Request failed with exception: ${e.status}")
+
+            throw e
         }
-            .suspend()
     }
 
     override fun onDataReceived(device: BluetoothDevice, data: Data) {
