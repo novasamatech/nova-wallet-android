@@ -5,7 +5,11 @@ import android.net.Uri
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.utils.write
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.LEDGER
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Type.Orml
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -17,6 +21,10 @@ class ReceiveInteractor(
     private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
 ) {
+
+    fun shouldShowLedgerWarning(metaAccount: MetaAccount, chainAsset: Chain.Asset): Boolean {
+        return metaAccount.type == LEDGER && chainAsset.type is Orml
+    }
 
     suspend fun getQrCodeSharingString(chainId: ChainId): String = withContext(Dispatchers.Default) {
         val chain = chainRegistry.getChain(chainId)

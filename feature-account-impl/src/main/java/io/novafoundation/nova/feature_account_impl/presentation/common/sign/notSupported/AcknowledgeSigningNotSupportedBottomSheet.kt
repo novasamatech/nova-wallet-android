@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.notSupported
+package io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported
 
 import android.content.Context
 import android.content.DialogInterface
@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_account_impl.R
 
 class AcknowledgeSigningNotSupportedBottomSheet(
     context: Context,
+    private val payload: SigningNotSupportedPresentable.Payload,
     private val onConfirm: () -> Unit
 ) : ActionNotAllowedBottomSheet(
         context = context,
@@ -23,8 +24,8 @@ class AcknowledgeSigningNotSupportedBottomSheet(
         super.onCreate(savedInstanceState)
 
         title.setText(R.string.account_parity_signer_not_supported_title)
-        subtitle.setText(R.string.account_parity_signer_not_supported_subtitle)
+        subtitle.setText(payload.messageRes)
 
-        applySolidIconStyle(R.drawable.ic_parity_signer)
+        applySolidIconStyle(payload.iconRes)
     }
 }

@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.interfaces.FileProvider
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -46,6 +47,7 @@ class ReceiveModule {
         chainRegistry: ChainRegistry,
         selectedAccountUseCase: SelectedAccountUseCase,
         payload: AssetPayload,
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
     ): ViewModel {
         return ReceiveViewModel(
             interactor,
@@ -56,7 +58,8 @@ class ReceiveModule {
             payload,
             chainRegistry,
             selectedAccountUseCase,
-            router
+            router,
+            actionAwaitableMixinFactory
         )
     }
 
