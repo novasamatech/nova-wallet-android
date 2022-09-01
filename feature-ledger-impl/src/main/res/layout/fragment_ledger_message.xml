@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center"
+    android:id="@+id/ledgerMessageContainer"
     android:orientation="vertical"
-    android:paddingBottom="24dp"
+    android:paddingBottom="16dp"
     tools:background="@color/bg_bottom_sheet">
 
     <View
@@ -13,29 +15,68 @@
         android:layout_marginTop="4dp" />
 
     <io.novafoundation.nova.feature_ledger_impl.view.LedgerActionView
+        android:id="@+id/ledgerMessageGraphics"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/ledgerMessageAction"
         android:layout_marginTop="24dp"
-        tools:la_icon="@drawable/ic_eye_filled"
-        tools:la_message="Verify Address" />
+        tools:la_icon="@drawable/ic_eye_filled" />
 
     <TextView
+        android:id="@+id/ledgerMessageTitle"
         style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
         android:layout_width="wrap_content"
-        android:id="@+id/ledgerMessageTitle"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         tools:text="Verify Address" />
 
     <TextView
+        android:id="@+id/ledgerMessageSubtitle"
         style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
-        android:id="@+id/ledgerMessageSubtitle"
+        android:minLines="2"
         android:layout_marginEnd="16dp"
+        android:layout_marginBottom="40dp"
         android:textColor="@color/white_64"
         tools:text="Press both buttons on your Nano X E426 to verify address" />
+
+    <TextView
+        android:id="@+id/ledgerMessageFooterMessage"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:gravity="center"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:visibility="gone"
+        tools:text="Transaction is valid for 05:39" />
+
+    <LinearLayout
+        android:id="@+id/ledgerMessageActions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:visibility="visible">
+
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/ledgerMessageCancel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:layout_weight="1"
+            android:visibility="gone"
+            app:appearance="secondary"
+            android:text="@string/common_cancel" />
+
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/ledgerMessageConfirm"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:appearance="primary"
+            tools:text="@string/common_retry" />
+    </LinearLayout>
 </LinearLayout>

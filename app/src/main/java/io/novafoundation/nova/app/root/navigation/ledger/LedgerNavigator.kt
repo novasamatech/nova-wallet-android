@@ -36,4 +36,8 @@ class LedgerNavigator(
         actionId = R.id.action_fillWalletImportLedgerFragment_to_finishImportLedgerFragment,
         args = FinishImportLedgerFragment.getBundle(payload)
     )
+
+    override fun finishSignFlow() {
+        back()
+    }
 }

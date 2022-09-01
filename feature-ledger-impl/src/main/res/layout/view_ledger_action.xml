@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:layout_width="210dp"
+    tools:background="@drawable/ic_ledger_info"
     tools:layout_height="190dp"
-    tools:parentTag="android.widget.FrameLayout"
-    tools:background="@drawable/ic_ledger_info">
+    tools:layout_width="210dp"
+    tools:parentTag="android.widget.FrameLayout">
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -12,15 +12,12 @@
         android:layout_gravity="bottom"
         android:layout_marginBottom="7dp">
 
-        <TextView
-            android:id="@+id/viewLedgerActionMessage"
-            style="@style/TextAppearance.NovaFoundation.SemiBold.Caption3"
-            android:layout_width="50dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_gravity="center"
-            android:gravity="center"
-            tools:text="Verify Address"
-            android:textColor="@color/white_64" />
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:id="@+id/viewLedgerGraphicsIcon"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="88dp"
+            tools:src="@drawable/ic_eye_filled" />
     </FrameLayout>
 </merge>

@@ -1,11 +1,8 @@
 package io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.selectAddress
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.mixin.api.Retriable
-import io.novafoundation.nova.common.mixin.api.RetryPayload
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
@@ -23,10 +20,14 @@ import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.domain.account.connect.selectAddress.LedgerAccountWithBalance
 import io.novafoundation.nova.feature_ledger_impl.domain.account.connect.selectAddress.SelectAddressImportLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand.Footer
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand.Graphics
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommands
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.errors.handleLedgerError
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.LedgerChainAccount
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.SelectLedgerAddressInterScreenResponder
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -34,13 +35,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-
-sealed class VerifyCommand {
-
-    object Hide : VerifyCommand()
-
-    class Show(val onCancel: () -> Unit) : VerifyCommand()
-}
 
 class SelectAddressImportLedgerViewModel(
     private val router: LedgerRouter,
@@ -50,12 +44,9 @@ class SelectAddressImportLedgerViewModel(
     private val payload: SelectLedgerAddressPayload,
     private val chainRegistry: ChainRegistry,
     private val responder: SelectLedgerAddressInterScreenResponder,
-) : BaseViewModel(), Retriable {
+) : BaseViewModel(), LedgerMessageCommands {
 
-    override val retryEvent = MutableLiveData<Event<RetryPayload>>()
-
-    private val _verifyAddressCommandEvent = MutableLiveData<Event<VerifyCommand>>()
-    val verifyAddressCommandEvent: LiveData<Event<VerifyCommand>> = _verifyAddressCommandEvent
+    override val ledgerMessageCommands: MutableLiveData<Event<LedgerMessageCommand>> = MutableLiveData()
 
     private val chain by lazyAsync { chainRegistry.getChain(payload.chainId) }
 
@@ -97,21 +88,29 @@ class SelectAddressImportLedgerViewModel(
     }
 
     private fun verifyAccount(id: Long) {
-        _verifyAddressCommandEvent.value = VerifyCommand.Show(::verifyAddressCancelled).event()
-
         verifyAddressJob?.cancel()
         verifyAddressJob = launch {
             val account = loadedAccounts.value.first { it.index == id.toInt() }
+
+            ledgerMessageCommands.value = LedgerMessageCommand.Show.Info(
+                title = resourceManager.getString(R.string.ledger_verify_address_title),
+                subtitle = resourceManager.getString(R.string.ledger_verify_address_subtitle),
+                graphics = Graphics(R.drawable.ic_eye_filled, R.color.white_64),
+                onCancel = ::verifyAddressCancelled,
+                footer = Footer.Value(
+                    value = account.account.address,
+                )
+            ).event()
 
             val result = withContext(Dispatchers.Default) {
                 interactor.verifyLedgerAccount(chain(), payload.deviceId, account.index)
             }
 
-            _verifyAddressCommandEvent.value = VerifyCommand.Hide.event()
-
             result.onFailure {
                 handleLedgerError(it) { verifyAccount(id) }
             }.onSuccess {
+                ledgerMessageCommands.value = LedgerMessageCommand.Hide.event()
+
                 responder.respond(screenResponseFrom(account))
                 router.returnToImportFillWallet()
             }
@@ -138,6 +137,8 @@ class SelectAddressImportLedgerViewModel(
     }
 
     private fun loadNewAccount() {
+        ledgerMessageCommands.value = LedgerMessageCommand.Hide.event()
+
         launch(Dispatchers.Default) {
             loadingAccount.withFlagSet {
                 val nextAccountIndex = loadedAccounts.value.size
@@ -154,13 +155,13 @@ class SelectAddressImportLedgerViewModel(
 
     private suspend fun mapLedgerAccountWithBalanceToUi(account: LedgerAccountWithBalance): AccountUi {
         return with(account) {
-            val amountModel = mapAmountToAmountModel(balance, token)
+            val tokenBalance = balance.formatPlanks(account.chainAsset)
             val addressModel = addressIconGenerator.createAccountAddressModel(chain(), account.account.address)
 
             AccountUi(
                 id = index.toLong(),
                 title = addressModel.address,
-                subtitle = amountModel.token,
+                subtitle = tokenBalance,
                 isSelected = false,
                 isClickable = true,
                 picture = addressModel.image,

@@ -8,24 +8,23 @@ import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.ConcatAdapter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountsAdapter
 import io.novafoundation.nova.feature_ledger_api.di.LedgerFeatureApi
 import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.di.LedgerFeatureComponent
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.selectAddress.verify.VerifyLedgerAddressBottomSheet
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessagePresentable
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.setupLedgerMessages
 import kotlinx.android.synthetic.main.fragment_import_ledger_select_address.ledgerSelectAddressChain
 import kotlinx.android.synthetic.main.fragment_import_ledger_select_address.ledgerSelectAddressContent
 import kotlinx.android.synthetic.main.fragment_import_ledger_select_address.ledgerSelectAddressToolbar
+import javax.inject.Inject
 
 class SelectAddressImportLedgerFragment :
     BaseFragment<SelectAddressImportLedgerViewModel>(),
     AccountsAdapter.AccountItemHandler,
     LedgerSelectAddressLoadMoreAdapter.Handler {
-
-    private var showedVerifyBottomSheet: VerifyLedgerAddressBottomSheet? = null
 
     companion object {
 
@@ -36,6 +35,9 @@ class SelectAddressImportLedgerFragment :
 
     private val addressesAdapter = AccountsAdapter(this, AccountsAdapter.Mode.VIEW)
     private val loadMoreAdapter = LedgerSelectAddressLoadMoreAdapter(handler = this, lifecycleOwner = this)
+
+    @Inject
+    lateinit var ledgerMessagePresentable: LedgerMessagePresentable
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_import_ledger_select_address, container, false)
@@ -60,25 +62,12 @@ class SelectAddressImportLedgerFragment :
     }
 
     override fun subscribe(viewModel: SelectAddressImportLedgerViewModel) {
-        observeRetries(viewModel)
-
         viewModel.loadMoreState.observe(loadMoreAdapter::setState)
         viewModel.loadedAccountModels.observe(addressesAdapter::submitList)
 
         viewModel.chainUi.observe(ledgerSelectAddressChain::setChain)
 
-        viewModel.verifyAddressCommandEvent.observeEvent {
-            when (it) {
-                VerifyCommand.Hide -> {
-                    showedVerifyBottomSheet?.dismiss()
-                    showedVerifyBottomSheet = null
-                }
-                is VerifyCommand.Show -> {
-                    showedVerifyBottomSheet = VerifyLedgerAddressBottomSheet(requireContext(), it.onCancel)
-                    showedVerifyBottomSheet!!.show()
-                }
-            }
-        }
+        setupLedgerMessages(ledgerMessagePresentable)
     }
 
     override fun itemClicked(accountModel: AccountUi) {

@@ -28,6 +28,7 @@ import io.novafoundation.nova.core_db.dao.NodeDao
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
+import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
 import io.novafoundation.nova.runtime.extrinsic.MortalityConstructor
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
@@ -105,4 +106,6 @@ interface AccountFeatureDependencies {
     val mortalityConstructor: MortalityConstructor
 
     val currencyRepository: CurrencyRepository
+
+    val extrinsicValidityUseCase: ExtrinsicValidityUseCase
 }

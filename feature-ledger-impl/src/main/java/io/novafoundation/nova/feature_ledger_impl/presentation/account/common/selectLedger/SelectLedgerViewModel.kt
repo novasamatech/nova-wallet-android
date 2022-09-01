@@ -4,12 +4,12 @@ import android.Manifest
 import android.os.Build
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.mixin.api.Retriable
-import io.novafoundation.nova.common.mixin.api.RetryPayload
 import io.novafoundation.nova.common.navigation.ReturnableRouter
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
+import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.common.utils.stateMachine.StateMachine
@@ -17,6 +17,9 @@ import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.findDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.performDiscovery
+import io.novafoundation.nova.feature_ledger_impl.R
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommands
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.errors.handleLedgerError
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.model.SelectLedgerModel
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.SelectLedgerEvent
@@ -45,16 +48,20 @@ abstract class SelectLedgerViewModel(
     private val resourceManager: ResourceManager,
     private val payload: SelectLedgerPayload,
     private val chainRegistry: ChainRegistry,
-) : BaseViewModel(), PermissionsAsker by permissionsAsker, Retriable {
+) : BaseViewModel(), PermissionsAsker by permissionsAsker, LedgerMessageCommands {
 
-    private val chain by lazyAsync { chainRegistry.getChain(payload.chainId) }
-
-    override val retryEvent = MutableLiveData<Event<RetryPayload>>()
+    protected val chain by lazyAsync { chainRegistry.getChain(payload.chainId) }
 
     private val stateMachine = StateMachine(WaitingForPermissionsState(), coroutineScope = this)
 
     val deviceModels = stateMachine.state.map(::mapStateToUi)
         .shareInBackground()
+
+    val hints = flowOf {
+        resourceManager.getString(R.string.account_ledger_select_device_description, chain().name)
+    }.shareInBackground()
+
+    override val ledgerMessageCommands = MutableLiveData<Event<LedgerMessageCommand>>()
 
     init {
         requirePermissions()
@@ -65,6 +72,19 @@ abstract class SelectLedgerViewModel(
     }
 
     abstract suspend fun verifyConnection(device: LedgerDevice)
+
+    open suspend fun handleLedgerError(reason: Throwable, device: LedgerDevice) {
+        handleLedgerError(
+            reason = reason,
+            chain = chain,
+            resourceManager = resourceManager,
+            retry = { stateMachine.onEvent(SelectLedgerEvent.DeviceChosen(device)) }
+        )
+    }
+
+    open fun backClicked() {
+        router.back()
+    }
 
     fun deviceClicked(item: SelectLedgerModel) = launch {
         discoveryService.findDevice(item.id)?.let { device ->
@@ -77,10 +97,6 @@ abstract class SelectLedgerViewModel(
             BluetoothState.ON -> stateMachine.onEvent(SelectLedgerEvent.BluetoothEnabled)
             BluetoothState.OFF -> stateMachine.onEvent(SelectLedgerEvent.BluetoothDisabled)
         }
-    }
-
-    fun backClicked() {
-        router.back()
     }
 
     private fun emitInitialBluetoothState() {
@@ -111,12 +127,7 @@ abstract class SelectLedgerViewModel(
         when (effect) {
             SideEffect.EnableBluetooth -> bluetoothManager.enableBluetooth()
 
-            is SideEffect.PresentLedgerFailure -> handleLedgerError(
-                reason = effect.reason,
-                chain = chain,
-                resourceManager = resourceManager,
-                retry = { stateMachine.onEvent(SelectLedgerEvent.DeviceChosen(effect.device)) }
-            )
+            is SideEffect.PresentLedgerFailure -> launch { handleLedgerError(effect.reason, effect.device) }
 
             is SideEffect.VerifyConnection -> performConnectionVerification(effect.device)
 
