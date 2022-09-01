@@ -9,7 +9,6 @@ import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRep
 import io.novafoundation.nova.feature_crowdloan_impl.data.CrowdloanSharedState
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.acala.AcalaApi
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.parallel.ParallelApi
-import io.novafoundation.nova.feature_crowdloan_impl.data.repository.contributions.source.CompositeContributionsSource
 import io.novafoundation.nova.feature_crowdloan_impl.data.repository.contributions.source.LiquidAcalaContributionSource
 import io.novafoundation.nova.feature_crowdloan_impl.data.repository.contributions.source.ParallelContributionSource
 import io.novafoundation.nova.feature_crowdloan_impl.data.source.contribution.ExternalContributionSource
@@ -37,20 +36,14 @@ class ContributionsModule {
 
     @Provides
     @FeatureScope
-    fun compositeSource(
-        childSources: Set<@JvmSuppressWildcards ExternalContributionSource>,
-    ): ExternalContributionSource = CompositeContributionsSource(childSources)
-
-    @Provides
-    @FeatureScope
     fun provideContributionsInteractor(
-        externalContributionsSource: ExternalContributionSource,
+        externalContributionsSources: Set<@JvmSuppressWildcards ExternalContributionSource>,
         crowdloanRepository: CrowdloanRepository,
         accountRepository: AccountRepository,
         crowdloanSharedState: CrowdloanSharedState,
         chainStateRepository: ChainStateRepository,
     ) = ContributionsInteractor(
-        externalContributionSource = externalContributionsSource,
+        externalContributionsSources = externalContributionsSources.toList(),
         crowdloanRepository = crowdloanRepository,
         accountRepository = accountRepository,
         selectedAssetState = crowdloanSharedState,

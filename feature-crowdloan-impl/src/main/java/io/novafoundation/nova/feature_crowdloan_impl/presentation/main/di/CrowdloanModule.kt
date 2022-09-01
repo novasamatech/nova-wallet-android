@@ -17,11 +17,13 @@ import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_crowdloan_impl.data.CrowdloanSharedState
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomContributeManager
+import io.novafoundation.nova.feature_crowdloan_impl.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.domain.main.CrowdloanInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.domain.main.statefull.StatefulCrowdloanMixin
 import io.novafoundation.nova.feature_crowdloan_impl.domain.main.statefull.StatefulCrowdloanProviderFactory
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.main.CrowdloanViewModel
+import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorMixin
 
 @Module(includes = [ViewModelModule::class])
@@ -31,13 +33,17 @@ class CrowdloanModule {
     @ScreenScope
     fun provideCrowdloanMixinFactory(
         crowdloanSharedState: CrowdloanSharedState,
-        interactor: CrowdloanInteractor,
+        crowdloanInteractor: CrowdloanInteractor,
+        contributionsInteractor: ContributionsInteractor,
         selectedAccountUseCase: SelectedAccountUseCase,
+        assetUseCase: AssetUseCase
     ): StatefulCrowdloanMixin.Factory {
         return StatefulCrowdloanProviderFactory(
             singleAssetSharedState = crowdloanSharedState,
-            interactor = interactor,
+            crowdloanInteractor = crowdloanInteractor,
+            contributionsInteractor = contributionsInteractor,
             selectedAccountUseCase = selectedAccountUseCase,
+            assetUseCase = assetUseCase
         )
     }
 
@@ -54,7 +60,7 @@ class CrowdloanModule {
         customDialogDisplayer: CustomDialogDisplayer.Presentation,
         customContributeManager: CustomContributeManager,
         statefulCrowdloanMixinFactory: StatefulCrowdloanMixin.Factory,
-        selectedAccountUseCase: SelectedAccountUseCase,
+        selectedAccountUseCase: SelectedAccountUseCase
     ): ViewModel {
         return CrowdloanViewModel(
             iconGenerator,
