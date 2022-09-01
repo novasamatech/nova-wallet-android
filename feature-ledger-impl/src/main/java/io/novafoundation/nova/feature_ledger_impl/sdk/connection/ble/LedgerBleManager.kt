@@ -4,7 +4,9 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+import android.util.Log
 import io.novafoundation.nova.common.resources.ContextManager
+import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.toUuid
 import jp.co.soramitsu.fearless_utils.extensions.tryFindNonNull
 import no.nordicsemi.android.ble.BleManager
@@ -66,8 +68,12 @@ class LedgerBleManager(
 
             override fun initialize() {
                 beginAtomicRequestQueue()
-                    .add(requestMtu(DEFAULT_MTU))
+                    .add(requestMtu(DEFAULT_MTU)
+                        .with { _, mtu -> Log.d(LOG_TAG, "MTU set to $mtu") }
+                        .fail { _, status -> Log.d(LOG_TAG,"Requested MTU not supported: $status") })
                     .add(enableNotifications(characteristicNotify))
+                    .done {  Log.d(LOG_TAG, "Target initialized") }
+                    .fail { _, status -> Log.d(LOG_TAG,"Target initialization failed: $status")  }
                     .enqueue()
                 setNotificationCallback(characteristicNotify)
                     .with(this@LedgerBleManager)
