@@ -29,7 +29,7 @@ class MetaAccountGroupingInteractorImpl(
                     val totalBalance = balances.sumByBigDecimal {
                         val totalInPlanks = it.freeInPlanks + it.reservedInPlanks
 
-                        totalInPlanks.amountFromPlanks(it.precision) * it.dollarRate.orZero()
+                        totalInPlanks.amountFromPlanks(it.precision) * it.priceRate.orZero()
                     }
 
                     val first = balances.first()
@@ -40,7 +40,9 @@ class MetaAccountGroupingInteractorImpl(
                         name = first.name,
                         type = first.type,
                         isSelected = first.isSelected,
-                        substrateAccountId = first.substrateAccountId
+                        substrateAccountId = first.substrateAccountId,
+                        currencySymbol = first.currencySymbol,
+                        currencyCode = first.currencyCode
                     )
                 }
                 .groupBy(MetaAccountWithTotalBalance::type)

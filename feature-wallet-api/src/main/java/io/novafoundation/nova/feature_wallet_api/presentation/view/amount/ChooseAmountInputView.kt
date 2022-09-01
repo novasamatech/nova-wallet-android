@@ -46,8 +46,8 @@ class ChooseAmountInputView @JvmOverloads constructor(
         chooseAmountInputToken.text = name
     }
 
-    fun setFiatAmount(dollarAmount: String?) {
-        chooseAmountInputFiat.setTextOrHide(dollarAmount)
+    fun setFiatAmount(priceAmount: String?) {
+        chooseAmountInputFiat.setTextOrHide(priceAmount)
     }
 }
 

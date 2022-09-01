@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.formatters
 
-import io.novafoundation.nova.common.utils.format
+import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal

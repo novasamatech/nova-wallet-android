@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.model
 
-import io.novafoundation.nova.common.utils.formatAsCurrency
+import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
@@ -43,7 +43,7 @@ fun mapAmountToAmountModel(
 
     return AmountModel(
         token = tokenAmountSign.signSymbol + amount.formatTokenAmount(token.configuration),
-        fiat = fiatAmount.takeIf { it != BigDecimal.ZERO || includeZeroFiat }?.formatAsCurrency()
+        fiat = fiatAmount.takeIf { it != BigDecimal.ZERO || includeZeroFiat }?.formatAsCurrency(token.currency)
     )
 }
 
