@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_ledger_impl.domain.account.connect.fillWallet
 
 import io.novafoundation.nova.common.utils.mapToSet
-import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.SubstrateApplicationConfig
+import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateApplicationConfig
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.findChains
