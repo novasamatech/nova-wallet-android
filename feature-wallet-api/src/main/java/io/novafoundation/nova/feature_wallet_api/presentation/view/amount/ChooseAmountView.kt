@@ -41,8 +41,8 @@ class ChooseAmountView @JvmOverloads constructor(
         chooseAmountInput.setAssetName(name)
     }
 
-    fun setFiatAmount(dollarAmount: String?) {
-        chooseAmountInput.setFiatAmount(dollarAmount)
+    fun setFiatAmount(priceAmount: String?) {
+        chooseAmountInput.setFiatAmount(priceAmount)
     }
 }
 

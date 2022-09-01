@@ -4,10 +4,10 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
-import io.novafoundation.nova.common.utils.formatAsCurrency
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountWithTotalBalance
 import io.novafoundation.nova.feature_account_impl.presentation.account.model.MetaAccountUi
+import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.map
 
@@ -54,7 +54,7 @@ private class MetaAccountWithBalanceListingMixin(
         MetaAccountUi(
             id = metaId,
             title = name,
-            subtitle = totalBalance.formatAsCurrency(),
+            subtitle = totalBalance.formatAsCurrency(currencySymbol, currencyCode),
             isSelected = metaAccount.isSelected,
             isClickable = true,
             picture = icon,

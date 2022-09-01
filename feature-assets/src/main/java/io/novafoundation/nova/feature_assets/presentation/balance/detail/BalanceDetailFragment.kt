@@ -118,7 +118,7 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
             balanceDetailTokenIcon.loadTokenIcon(asset.token.configuration.iconUrl, imageLoader)
             balanceDetailTokenName.text = asset.token.configuration.symbol
 
-            balanceDetailRate.text = asset.token.dollarRate
+            balanceDetailRate.text = asset.token.rate
 
             balanceDetailRateChange.setTextColorRes(asset.token.rateChangeColorRes)
             balanceDetailRateChange.text = asset.token.recentRateChange
