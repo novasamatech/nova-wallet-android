@@ -79,7 +79,7 @@ class AccountDetailsInteractor(
         get() = projection != null
 
     private fun accountInChainComparator(metaAccountType: LightMetaAccount.Type): Comparator<AccountInChain> {
-        val hasAccountOrdering: Comparator<AccountInChain> = when(metaAccountType) {
+        val hasAccountOrdering: Comparator<AccountInChain> = when (metaAccountType) {
             LightMetaAccount.Type.LEDGER -> compareBy { !it.hasChainAccount }
             else -> compareBy { it.hasChainAccount }
         }
