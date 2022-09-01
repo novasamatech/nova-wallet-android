@@ -48,7 +48,6 @@ class SignersModule {
     fun provideLedgerSigner(
         signingSharedState: MutableSharedState<SignerPayloadExtrinsic>,
         communicator: LedgerSignCommunicator,
-        // TODO customize for ledger
         signingNotSupportedPresentable: SigningNotSupportedPresentable
     ) = LedgerSigner(signingSharedState, communicator, signingNotSupportedPresentable)
 
