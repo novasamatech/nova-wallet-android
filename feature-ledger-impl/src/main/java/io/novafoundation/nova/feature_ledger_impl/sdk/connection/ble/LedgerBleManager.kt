@@ -4,19 +4,17 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
-import android.util.Log
 import io.novafoundation.nova.common.resources.ContextManager
-import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.toUuid
 import jp.co.soramitsu.fearless_utils.extensions.tryFindNonNull
 import no.nordicsemi.android.ble.BleManager
 import no.nordicsemi.android.ble.callback.DataReceivedCallback
 import no.nordicsemi.android.ble.data.Data
-import no.nordicsemi.android.ble.exception.RequestFailedException
 import no.nordicsemi.android.ble.ktx.suspend
 import java.util.UUID
 
 private const val DEFAULT_MTU = 23
+private const val MTU_RESERVED_BYTES = 3
 
 class SupportedBleDevice(
     val serviceUuid: UUID,
@@ -28,7 +26,6 @@ class LedgerBleManager(
     contextManager: ContextManager
 ) : BleManager(contextManager.getApplicationContext()), DataReceivedCallback {
 
-    private val logTag = LOG_TAG
 
     companion object {
         val supportedLedgerDevices by lazy {
@@ -47,8 +44,9 @@ class LedgerBleManager(
 
     var readCallback: DataReceivedCallback? = null
 
+    // 3 bytes are used for internal purposes, so the maximum size is MTU-3.
     val deviceMtu
-        get() = mtu
+        get() = mtu - MTU_RESERVED_BYTES
 
     override fun getGattCallback(): BleManagerGattCallback {
         return object : BleManagerGattCallback() {
@@ -71,12 +69,8 @@ class LedgerBleManager(
 
             override fun initialize() {
                 beginAtomicRequestQueue()
-                    .add(requestMtu(DEFAULT_MTU)
-                        .with { _, mtu -> Log.d(logTag, "MTU set to $mtu") }
-                        .fail { _, status -> Log.d(logTag,"Requested MTU not supported: $status") })
+                    .add(requestMtu(DEFAULT_MTU))
                     .add(enableNotifications(characteristicNotify))
-                    .done {  Log.d(logTag, "Target initialized") }
-                    .fail { _, status -> Log.d(logTag,"Target initialization failed: $status")  }
                     .enqueue()
                 setNotificationCallback(characteristicNotify)
                     .with(this@LedgerBleManager)
@@ -85,20 +79,12 @@ class LedgerBleManager(
     }
 
     suspend fun send(chunks: List<ByteArray>) {
-        try {
-            beginAtomicRequestQueue().apply {
-                chunks.forEach { chunk ->
-                    add(writeCharacteristic(characteristicWrite, chunk, WRITE_TYPE_DEFAULT))
-                }
+        beginAtomicRequestQueue().apply {
+            chunks.forEach { chunk ->
+                add(writeCharacteristic(characteristicWrite, chunk, WRITE_TYPE_DEFAULT))
             }
-                .suspend()
-
-            Log.d(logTag,"Send request succeeded")
-        } catch (e: RequestFailedException) {
-            Log.d(logTag,"Request failed with exception: ${e.status}")
-
-            throw e
         }
+            .suspend()
     }
 
     override fun onDataReceived(device: BluetoothDevice, data: Data) {
