@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.wel
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState.AssetWithChain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -98,13 +99,16 @@ private class RelaychainStartStakingComponent(
     }
 
     override suspend fun nextClicked() {
-        val payload = WelcomeStakingValidationPayload()
+        val payload = WelcomeStakingValidationPayload(
+            chain = assetWithChain.chain,
+            metaAccount = hostContext.selectedAccount.first(),
+        )
 
         validationExecutor.requireValid(
             validationSystem = validationSystem,
             payload = payload,
             errorDisplayer = hostContext.errorDisplayer,
-            validationFailureTransformerDefault = { welcomeStakingValidationFailure(it, resourceManager) },
+            validationFailureTransformerCustom = { status, _ -> welcomeStakingValidationFailure(status.reason, resourceManager, router) },
         ) {
             setupStakingSharedState.set(currentSetupProgress.fullFlow())
 

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.validations
 
 import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationStatus
+import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.common.validation.validOrError
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
@@ -27,4 +28,13 @@ class MaxNominatorsReachedValidation<P, E>(
             errorProducer()
         }
     }
+}
+
+fun <P, E> ValidationSystemBuilder<P, E>.maximumNominatorsReached(
+    stakingRepository: StakingRepository,
+    isAlreadyNominating: (P) -> Boolean,
+    sharedState: StakingSharedState,
+    errorProducer: () -> E
+) {
+    validate(MaxNominatorsReachedValidation(stakingRepository, isAlreadyNominating, sharedState, errorProducer))
 }

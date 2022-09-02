@@ -23,3 +23,7 @@ class SubstrateApplicationConfig(
         fun all() = ALL
     }
 }
+
+fun SubstrateApplicationConfig.Companion.supports(chainId: String) : Boolean {
+    return all().any { it.chainId == chainId }
+}
