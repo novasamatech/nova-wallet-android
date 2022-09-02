@@ -9,8 +9,8 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_staking_impl.domain.common.validation.handleChainAccountNotFound
-import io.novafoundation.nova.feature_staking_impl.domain.common.validation.hasChainAccount
+import io.novafoundation.nova.feature_account_api.domain.validation.handleChainAccountNotFound
+import io.novafoundation.nova.feature_account_api.domain.validation.hasChainAccount
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.welcome.ParachainStakingWelcomeValidationFailure
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.welcome.ParachainStakingWelcomeValidationFailure.MissingEthereumAccount

@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_staking_impl.domain.common.validation
+package io.novafoundation.nova.feature_account_api.domain.validation
 
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer.Payload.DialogAction.Companion.noOp
@@ -8,14 +8,14 @@ import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.common.validation.invalidError
+import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.LEDGER
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.PARITY_SIGNER
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.hasAccountIn
+import io.novafoundation.nova.feature_account_api.domain.validation.NoChainAccountFoundError.AddAccountState
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateApplicationConfig
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.supports
-import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_staking_impl.domain.common.validation.NoChainAccountFoundError.AddAccountState
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 interface NoChainAccountFoundError {

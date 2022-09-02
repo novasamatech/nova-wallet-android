@@ -3,8 +3,8 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.main
 import io.novafoundation.nova.common.base.TitleAndMessage
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.TransformedFailure
+import io.novafoundation.nova.feature_account_api.domain.validation.handleChainAccountNotFound
 import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_staking_impl.domain.common.validation.handleChainAccountNotFound
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.StakeActionsValidationFailure
 import io.novafoundation.nova.feature_staking_impl.domain.validations.welcome.WelcomeStakingValidationFailure
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter

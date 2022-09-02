@@ -30,7 +30,7 @@ dependencies {
     implementation project(":common")
     implementation project(":feature-currency-api")
 
-    implementation project(":feature-currency-api")
+    implementation project(":feature-ledger-api")
 
     implementation liveDataKtxDep
     implementation lifeCycleKtxDep
