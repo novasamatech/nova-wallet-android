@@ -66,7 +66,7 @@ fun handleChainAccountNotFound(
 ): TransformedFailure {
     val chainName = failure.chain.name
 
-    return when(failure.addAccountState) {
+    return when (failure.addAccountState) {
         AddAccountState.CAN_ADD -> TransformedFailure.Custom(
             dialogPayload = CustomDialogDisplayer.Payload(
                 title = resourceManager.getString(R.string.common_missing_account_title, chainName),

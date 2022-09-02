@@ -24,6 +24,6 @@ class SubstrateApplicationConfig(
     }
 }
 
-fun SubstrateApplicationConfig.Companion.supports(chainId: String) : Boolean {
+fun SubstrateApplicationConfig.Companion.supports(chainId: String): Boolean {
     return all().any { it.chainId == chainId }
 }
