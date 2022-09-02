@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_crowdloan_impl.presentation.contributions
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contributions.Contribution
@@ -19,6 +18,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 
 class UserContributionsViewModel(
     private val interactor: ContributionsInteractor,
@@ -29,18 +29,26 @@ class UserContributionsViewModel(
     private val tokenUseCase: TokenUseCase
 ) : BaseViewModel() {
 
-    val tokenFlow = tokenUseCase.currentTokenFlow()
+    private val tokenFlow = tokenUseCase.currentTokenFlow()
         .shareInBackground()
 
-    val contributionsFlow = flowOf { interactor.getUserContributions() }
+    private val contributionsWitTotalAmountFlow = interactor.observeUserContributions()
         .shareInBackground()
 
-    val contributionsModelsFlow = combine(tokenFlow, contributionsFlow) { token, contributions ->
+    private val contributionsFlow = contributionsWitTotalAmountFlow
+        .map { it.contributions }
+        .shareInBackground()
+
+    val contributionModelsFlow = combine(tokenFlow, contributionsFlow) { token, contributions ->
         val chain = selectedAssetState.chain()
-
         contributions.map { mapCrowdloanToContributionModel(it, chain, token) }
     }
         .withLoading()
+        .shareInBackground()
+
+    val totalContributedAmountFlow = combine(contributionsWitTotalAmountFlow, tokenFlow) { contributionsWitTotalAmount, token ->
+        mapAmountToAmountModel(contributionsWitTotalAmount.totalContributed, token)
+    }
         .shareInBackground()
 
     fun backClicked() {

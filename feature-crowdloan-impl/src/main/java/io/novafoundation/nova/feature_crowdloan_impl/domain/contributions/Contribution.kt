@@ -14,3 +14,5 @@ class Contribution(
     val returnsIn: TimerValue,
     val parachainMetadata: ParachainMetadata?,
 )
+
+class ContributionsWithTotalAmount(val totalContributed: BigInteger, val contributions: List<Contribution>)

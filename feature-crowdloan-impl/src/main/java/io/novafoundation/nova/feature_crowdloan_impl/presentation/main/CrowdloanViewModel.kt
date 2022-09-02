@@ -36,11 +36,11 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelecto
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.chain
+import kotlin.reflect.KClass
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlin.reflect.KClass
 
 class CrowdloanViewModel(
     private val iconGenerator: AddressIconGenerator,
@@ -82,10 +82,8 @@ class CrowdloanViewModel(
         .inBackground()
         .share()
 
-    val myContributionsCount = crowdloansMixin.allUserContributions
-        .mapLoading { it.format() }
-        .inBackground()
-        .share()
+    val contributionsInfo = crowdloansMixin.contributionsInfoFlow
+        .shareInBackground()
 
     val selectedWalletModel = selectedAccountUseCase.selectedWalletModelFlow()
         .shareInBackground()
