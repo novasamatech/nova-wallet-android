@@ -79,30 +79,23 @@ class WalletRepositoryImpl(
             chainRegistry.chainsById,
             assetCache.observeAssets(metaId)
         ) { chainsById, assetsLocal ->
-            assetsLocal.map { asset ->
-                mapAssetToLocalAsset(chainsById, asset)
+            assetsLocal.map {
+                val chain = chainsById[it.asset.chainId]!!
+                val chainAsset = chain.assetsById.getValue(it.asset.assetId)
+                mapAssetLocalToAsset(it, chainAsset)
             }
         }
     }
 
     override suspend fun getAssets(metaId: Long): List<Asset> = withContext(Dispatchers.Default) {
         val chainsById = chainRegistry.chainsById.first()
-        val assetsLocal = assetCache.getAssets(metaId)
+        val assetsLocal = assetCache.getAssetsWithToken(metaId)
 
         assetsLocal.map {
-            mapAssetToLocalAsset(chainsById, it)
+            val chain = chainsById[it.asset.chainId]!!
+            val chainAsset = chain.assetsById.getValue(it.asset.assetId)
+            mapAssetLocalToAsset(it, chainAsset)
         }
-    }
-
-    private fun mapAssetToLocalAsset(
-        chainsById: Map<ChainId, Chain>,
-        assetLocal: AssetWithToken,
-    ): Asset {
-        val chainAsset = chainsById.getValue(assetLocal.asset.chainId)
-            .assetsBySymbol
-            .getValue(assetLocal.token.tokenSymbol)
-
-        return mapAssetLocalToAsset(assetLocal, chainAsset = chainAsset)
     }
 
     override suspend fun syncAssetsRates(currency: Currency) {
@@ -162,7 +155,7 @@ class WalletRepositoryImpl(
     }
 
     override suspend fun getAsset(metaId: Long, chainAsset: Chain.Asset): Asset? {
-        val assetLocal = assetCache.getAsset(metaId, chainAsset.chainId, chainAsset.id)
+        val assetLocal = assetCache.getAssetWithToken(metaId, chainAsset.chainId, chainAsset.id)
 
         return assetLocal?.let { mapAssetLocalToAsset(it, chainAsset) }
     }
@@ -321,6 +314,6 @@ class WalletRepositoryImpl(
     private suspend fun getAsset(accountId: AccountId, chainId: String, assetId: Int) = withContext(Dispatchers.Default) {
         val metaAccount = accountRepository.findMetaAccountOrThrow(accountId)
 
-        assetCache.getAsset(metaAccount.id, chainId, assetId)
+        assetCache.getAssetWithToken(metaAccount.id, chainId, assetId)
     }
 }

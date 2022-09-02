@@ -21,18 +21,16 @@ fun mapTokenWithCurrencyToToken(
 }
 
 fun mapTokenLocalToToken(
-    tokenLocal: TokenLocal,
+    tokenLocal: TokenLocal?,
     currencyLocal: CurrencyLocal,
     chainAsset: Chain.Asset,
 ): Token {
-    return with(tokenLocal) {
-        Token(
-            rate = rate,
-            currency = mapCurrencyFromLocal(currencyLocal),
-            recentRateChange = recentRateChange,
-            configuration = chainAsset
-        )
-    }
+    return Token(
+        rate = tokenLocal?.rate,
+        currency = mapCurrencyFromLocal(currencyLocal),
+        recentRateChange = tokenLocal?.recentRateChange,
+        configuration = chainAsset
+    )
 }
 
 fun mapAssetLocalToAsset(
