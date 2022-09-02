@@ -14,6 +14,7 @@ import no.nordicsemi.android.ble.ktx.suspend
 import java.util.UUID
 
 private const val DEFAULT_MTU = 23
+private const val MTU_RESERVED_BYTES = 3
 
 class SupportedBleDevice(
     val serviceUuid: UUID,
@@ -42,8 +43,9 @@ class LedgerBleManager(
 
     var readCallback: DataReceivedCallback? = null
 
+    // 3 bytes are used for internal purposes, so the maximum size is MTU-3.
     val deviceMtu
-        get() = mtu
+        get() = mtu - MTU_RESERVED_BYTES
 
     override fun getGattCallback(): BleManagerGattCallback {
         return object : BleManagerGattCallback() {
