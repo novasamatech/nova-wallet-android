@@ -26,7 +26,6 @@ class LedgerBleManager(
     contextManager: ContextManager
 ) : BleManager(contextManager.getApplicationContext()), DataReceivedCallback {
 
-
     companion object {
         val supportedLedgerDevices by lazy {
             listOf(
