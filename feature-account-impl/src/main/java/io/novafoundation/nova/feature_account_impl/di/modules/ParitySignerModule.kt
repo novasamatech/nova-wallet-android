@@ -14,8 +14,8 @@ import io.novafoundation.nova.feature_account_impl.data.repository.RealParitySig
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.ParitySignerSignCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.common.QrCodeExpiredPresentableFactory
-import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.notSupported.ParitySignerSigningNotSupportedPresentable
-import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.notSupported.RealParitySignerSigningNotSupportedPresentable
+import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported.SigningNotSupportedPresentable
+import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported.RealSigningNotSupportedPresentable
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
 
 @Module
@@ -46,5 +46,5 @@ class ParitySignerModule {
     @FeatureScope
     fun provideSigningNotSupportedPresentable(
         contextManager: ContextManager
-    ): ParitySignerSigningNotSupportedPresentable = RealParitySignerSigningNotSupportedPresentable(contextManager)
+    ): SigningNotSupportedPresentable = RealSigningNotSupportedPresentable(contextManager)
 }

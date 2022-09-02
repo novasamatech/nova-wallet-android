@@ -15,7 +15,7 @@ import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.Pari
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.ParitySignerSigner
 import io.novafoundation.nova.feature_account_impl.data.signer.secrets.SecretsSignerFactory
 import io.novafoundation.nova.feature_account_impl.data.signer.watchOnly.WatchOnlySigner
-import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.notSupported.ParitySignerSigningNotSupportedPresentable
+import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported.SigningNotSupportedPresentable
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
 
 @Module
@@ -40,7 +40,7 @@ class SignersModule {
     fun provideParitySignerSigner(
         signingSharedState: MutableSharedState<SignerPayloadExtrinsic>,
         communicator: ParitySignerSignCommunicator,
-        signingNotSupportedPresentable: ParitySignerSigningNotSupportedPresentable
+        signingNotSupportedPresentable: SigningNotSupportedPresentable
     ) = ParitySignerSigner(signingSharedState, communicator, signingNotSupportedPresentable)
 
     @Provides
@@ -48,8 +48,7 @@ class SignersModule {
     fun provideLedgerSigner(
         signingSharedState: MutableSharedState<SignerPayloadExtrinsic>,
         communicator: LedgerSignCommunicator,
-        // TODO customize for ledger
-        signingNotSupportedPresentable: ParitySignerSigningNotSupportedPresentable
+        signingNotSupportedPresentable: SigningNotSupportedPresentable
     ) = LedgerSigner(signingSharedState, communicator, signingNotSupportedPresentable)
 
     @Provides
