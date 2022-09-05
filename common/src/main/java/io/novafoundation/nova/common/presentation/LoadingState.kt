@@ -1,5 +1,6 @@
 package io.novafoundation.nova.common.presentation
 
+import io.novafoundation.nova.common.utils.accumulate
 import io.novafoundation.nova.common.utils.withLoading
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -7,7 +8,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 
-sealed class LoadingState<T> {
+sealed class LoadingState<out T> {
 
     class Loading<T> : LoadingState<T>()
 
@@ -65,6 +66,24 @@ fun <T1, T2, R> combineLoading(
         LoadingState.Loading()
     }
 }
+
+fun <T> firstNonEmptyLoading(
+    vararg sources: Flow<LoadingState<List<T>>>
+): Flow<LoadingState<List<T>>> = accumulate(*sources)
+    .map { loadingStates ->
+        val isAllLoaded = loadingStates.all { it is LoadingState.Loaded }
+        val states: List<List<T>> = loadingStates.mapNotNull {
+            if (it is LoadingState.Loaded && it.data.isNotEmpty())
+                it.data
+            else null
+        }
+
+        if (isAllLoaded || states.isNotEmpty()) {
+            LoadingState.Loaded(states.flatten())
+        } else {
+            LoadingState.Loading()
+        }
+    }
 
 val <T> LoadingState<T>.dataOrNull: T?
     get() = when (this) {

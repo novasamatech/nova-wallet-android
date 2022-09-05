@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.ConcatAdapter
 import coil.ImageLoader
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
@@ -22,10 +23,17 @@ import javax.inject.Inject
 
 class UserContributionsFragment : BaseFragment<UserContributionsViewModel>() {
 
-    @Inject protected lateinit var imageLoader: ImageLoader
+    @Inject
+    protected lateinit var imageLoader: ImageLoader
+
+    private val headerAdapter = TotalContributionsHeaderAdapter()
+
+    private val listAdapter by lazy(LazyThreadSafetyMode.NONE) {
+        UserContributionsAdapter(imageLoader)
+    }
 
     private val adapter by lazy(LazyThreadSafetyMode.NONE) {
-        UserContributionsAdapter(imageLoader)
+        ConcatAdapter(headerAdapter, listAdapter)
     }
 
     override fun onCreateView(
@@ -60,14 +68,17 @@ class UserContributionsFragment : BaseFragment<UserContributionsViewModel>() {
     }
 
     override fun subscribe(viewModel: UserContributionsViewModel) {
+        viewModel.totalContributedAmountFlow.observe {
+            headerAdapter.setAmount(it)
+        }
 
-        viewModel.contributionsModelsFlow.observe { loadingState ->
+        viewModel.contributionModelsFlow.observe { loadingState ->
             myContributionsList.setVisible(loadingState is LoadingState.Loaded && loadingState.data.isNotEmpty())
             myContributionsPlaceholder.setVisible(loadingState is LoadingState.Loaded && loadingState.data.isEmpty())
             myContributionsProgress.setVisible(loadingState is LoadingState.Loading)
 
             if (loadingState is LoadingState.Loaded) {
-                adapter.submitList(loadingState.data)
+                listAdapter.submitList(loadingState.data)
             }
         }
     }
