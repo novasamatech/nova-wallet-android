@@ -42,7 +42,7 @@ class WalletInteractorImpl(
 
     override fun balancesFlow(): Flow<Balances> {
         val assetsFlow = accountRepository.selectedMetaAccountFlow()
-            .flatMapLatest { walletRepository.assetsFlow(it.id) }
+            .flatMapLatest { walletRepository.syncedAssetsFlow(it.id) }
 
         return combine(
             assetsFlow,
