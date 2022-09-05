@@ -9,12 +9,11 @@ import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.mapFundIn
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import kotlin.reflect.KClass
-import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlin.reflect.KClass
 
 typealias GroupedCrowdloans = GroupedList<KClass<out Crowdloan.State>, Crowdloan>
 
@@ -25,7 +24,7 @@ class CrowdloanInteractor(
 
     fun crowdloansFlow(chain: Chain, account: MetaAccount): Flow<List<Crowdloan>> {
         return flow {
-            val accountId = account.accountIdIn(chain)!!
+            val accountId = account.accountIdIn(chain)
 
             emitAll(crowdloanListFlow(chain, accountId))
         }
@@ -36,10 +35,9 @@ class CrowdloanInteractor(
             .toSortedMap(Crowdloan.State.STATE_CLASS_COMPARATOR)
     }
 
-    @OptIn(ExperimentalTime::class)
     private suspend fun crowdloanListFlow(
         chain: Chain,
-        accountId: AccountId,
+        contributor: AccountId?,
     ): Flow<List<Crowdloan>> {
         val chainId = chain.id
 
@@ -50,7 +48,7 @@ class CrowdloanInteractor(
         return chainStateRepository.currentBlockNumberFlow(chain.id).map { currentBlockNumber ->
             val fundInfos = crowdloanRepository.allFundInfos(chainId)
 
-            val directContributions = crowdloanRepository.getContributions(chainId, accountId, fundInfos)
+            val directContributions = contributor?.let { it -> crowdloanRepository.getContributions(chainId, it, fundInfos) } ?: emptyMap()
 
             val winnerInfo = crowdloanRepository.getWinnerInfo(chainId, fundInfos)
 

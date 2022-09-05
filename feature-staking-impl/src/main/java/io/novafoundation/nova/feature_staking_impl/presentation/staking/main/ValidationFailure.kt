@@ -25,7 +25,8 @@ fun welcomeStakingValidationFailure(
         is WelcomeStakingValidationFailure.NoRelayChainAccount -> handleChainAccountNotFound(
             failure = reason,
             resourceManager = resourceManager,
-            goToWalletDetails = { router.openAccountDetails(reason.account.id) }
+            goToWalletDetails = { router.openAccountDetails(reason.account.id) },
+            addAccountDescriptionRes = R.string.staking_missing_account_message
         )
     }
 }

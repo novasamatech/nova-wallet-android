@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="crowdloan_missing_account_message">You should add %s account to the wallet in order to contribute</string>
+
   <string name="ledger_chain_not_supported">Ledger doesn’t support %s</string>
   <string name="account_parity_signer_chain_not_supported">Parity Signer doesn’t support %s</string>
 

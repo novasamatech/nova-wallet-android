@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_crowdloan_impl.domain.main.validations
+package io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.custom.acala
 
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.acala.ContributionType
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.ContributeValidationPayload

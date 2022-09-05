@@ -14,7 +14,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToA
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.selectedChainFlow
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 class StatefulCrowdloanProviderFactory(
     private val singleAssetSharedState: SingleAssetSharedState,
@@ -47,16 +46,15 @@ class StatefulCrowdloanProvider(
     CoroutineScope by coroutineScope,
     WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(coroutineScope) {
 
-    private val selectedChain = singleAssetSharedState.selectedChainFlow()
+    override val selectedChain = singleAssetSharedState.selectedChainFlow()
         .shareInBackground()
 
-    private val selectedAccount = selectedAccountUseCase.selectedMetaAccountFlow()
+    override val selectedAccount = selectedAccountUseCase.selectedMetaAccountFlow()
         .shareInBackground()
 
     private val chainAndAccount = combineToPair(selectedChain, selectedAccount)
         .shareInBackground()
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     private val crowdloansIntermediateState = chainAndAccount.withLoading { (chain, account) ->
         crowdloanInteractor.crowdloansFlow(chain, account)
     }
