@@ -202,7 +202,7 @@ class CrowdloanViewModel(
     }
 
     private fun mapValidationFailureToUi(failure: MainCrowdloanValidationFailure): TransformedFailure {
-        return when(failure) {
+        return when (failure) {
             is MainCrowdloanValidationFailure.NoRelaychainAccount -> handleChainAccountNotFound(
                 failure = failure,
                 resourceManager = resourceManager,

@@ -10,5 +10,5 @@ sealed class MainCrowdloanValidationFailure {
         override val chain: Chain,
         override val account: MetaAccount,
         override val addAccountState: NoChainAccountFoundError.AddAccountState
-    ): MainCrowdloanValidationFailure(), NoChainAccountFoundError
+    ) : MainCrowdloanValidationFailure(), NoChainAccountFoundError
 }
