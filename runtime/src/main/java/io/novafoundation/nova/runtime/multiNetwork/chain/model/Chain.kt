@@ -86,6 +86,7 @@ data class Chain(
         val chainId: ChainId,
         val url: String,
         val name: String,
+        val orderId: Int,
     ) : Identifiable {
 
         override val identifier: String = "$chainId:$url"
