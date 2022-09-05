@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import io.novafoundation.nova.common.utils.accumulateFlatten
 import io.novafoundation.nova.common.utils.filterNotNull
+import io.novafoundation.nova.common.utils.firstNonEmpty
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.TimerValue
 import io.novafoundation.nova.common.utils.mapList
@@ -86,7 +87,7 @@ class ContributionsInteractor(
                 )
             }
 
-        val allContributionsFlow = accumulateFlatten(directContributionsFlow, externalContributionsFlow)
+        val allContributionsFlow = firstNonEmpty(directContributionsFlow, externalContributionsFlow)
             .map { sortContributionsByTimeLeft(it) }
             .map {
                 val totalAmount = getTotalContributionAmount(it)
