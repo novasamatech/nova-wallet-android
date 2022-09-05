@@ -218,7 +218,6 @@ fun <T> flowOf(producer: suspend () -> T) = flow {
     emit(producer())
 }
 
-@OptIn(ExperimentalCoroutinesApi::class)
 fun <T> accumulate(vararg flows: Flow<T>): Flow<List<T>> {
     val flowsList = flows.mapIndexed { index, flow -> flow.map { index to flow } }
     val resultOfFlows = MutableList<T?>(flowsList.size) { null }
