@@ -122,11 +122,12 @@ private fun mapChainAssetTypeToRaw(type: Chain.Asset.Type): Pair<String, Map<Str
 fun mapChainRemoteToChain(
     chainRemote: ChainRemote,
 ): Chain {
-    val nodes = chainRemote.nodes.map {
+    val nodes = chainRemote.nodes.mapIndexed { index, node ->
         Chain.Node(
-            url = it.url,
-            name = it.name,
-            chainId = chainRemote.chainId
+            url = node.url,
+            name = node.name,
+            chainId = chainRemote.chainId,
+            orderId = index
         )
     }
 
@@ -199,11 +200,12 @@ fun mapChainRemoteToChain(
 }
 
 fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
-    val nodes = chainLocal.nodes.map {
+    val nodes = chainLocal.getSortedNodes().map {
         Chain.Node(
             url = it.url,
             name = it.name,
-            chainId = it.chainId
+            chainId = it.chainId,
+            orderId = it.orderId
         )
     }
 
@@ -279,6 +281,7 @@ fun mapChainNodeToLocal(node: Chain.Node): ChainNodeLocal {
         url = node.url,
         name = node.name,
         chainId = node.chainId,
+        orderId = node.orderId
     )
 }
 

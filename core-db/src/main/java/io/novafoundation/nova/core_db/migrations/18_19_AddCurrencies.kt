@@ -9,16 +9,16 @@ val AddCurrencies_18_19 = object : Migration(18, 19) {
         database.execSQL(
             """
             CREATE TABLE IF NOT EXISTS `currencies` (
-            `code` TEXT NOT NULL, 
-            `name` TEXT NOT NULL, 
-            `symbol` TEXT, 
-            `category` TEXT NOT NULL, 
-            `popular` INTEGER NOT NULL, 
-            `id` INTEGER NOT NULL, 
-            `coingeckoId` TEXT NOT NULL, 
-            `selected` INTEGER NOT NULL, 
-            PRIMARY KEY(`id`)
-        )
+                `code` TEXT NOT NULL, 
+                `name` TEXT NOT NULL, 
+                `symbol` TEXT, 
+                `category` TEXT NOT NULL, 
+                `popular` INTEGER NOT NULL, 
+                `id` INTEGER NOT NULL, 
+                `coingeckoId` TEXT NOT NULL, 
+                `selected` INTEGER NOT NULL, 
+                PRIMARY KEY(`id`)
+            )
             """.trimIndent()
         )
     }
