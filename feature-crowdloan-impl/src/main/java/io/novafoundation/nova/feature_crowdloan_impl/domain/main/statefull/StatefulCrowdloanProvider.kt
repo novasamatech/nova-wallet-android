@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_crowdloan_impl.domain.main.statefull
 
-import io.novafoundation.nova.common.presentation.firstNonemptyLoading
+import io.novafoundation.nova.common.presentation.firstNonEmptyLoading
 import io.novafoundation.nova.common.presentation.mapLoading
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.utils.combineToPair
@@ -79,7 +79,7 @@ class StatefulCrowdloanProvider(
             crowdloanInteractor.groupCrowdloans(it)
         }
 
-    override val contributionsInfoFlow = firstNonemptyLoading(
+    override val contributionsInfoFlow = firstNonEmptyLoading(
         directContributionsIntermediateState,
         externalContributionsIntermediateState
     )
