@@ -168,7 +168,7 @@ class StakingRepositoryImpl(
                 val accessInfo = accountStaking.stakingAccessInfo
 
                 if (accessInfo == null) {
-                    flowOf(StakingState.NonStash(chain, chainAsset, accountStaking.accountId))
+                    flowOf(StakingState.NonStash(chain, chainAsset))
                 } else {
                     observeStashState(chain, chainAsset, accessInfo, accountId)
                 }

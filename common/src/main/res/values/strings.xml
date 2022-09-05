@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="ledger_chain_not_supported">Ledger doesn’t support %s</string>
+  <string name="account_parity_signer_chain_not_supported">Parity Signer doesn’t support %s</string>
+
   <string name="ledger_sign_raw_not_supported">Ledger does not support signing arbitrary messages — only transactions</string>
 
   <string name="assets_receive_ledger_not_supported_message">Do not transfer %s to the Ledger-controlled account since Ledger does not support sending of %s, so assets will be stuck on this account</string>

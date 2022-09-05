@@ -1,7 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.startStaking.parachain
 
-import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
-import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer.Payload.DialogAction
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.formatting.formatFractionAsPercentage
@@ -11,11 +9,13 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_account_api.domain.validation.handleChainAccountNotFound
+import io.novafoundation.nova.feature_account_api.domain.validation.hasChainAccount
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.welcome.ParachainStakingWelcomeValidationFailure
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.welcome.ParachainStakingWelcomeValidationFailure.MissingEthereumAccount
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.welcome.ParachainStakingWelcomeValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.welcome.ParachainStakingWelcomeValidationSystem
-import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.welcome.hasEthereumAccount
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.maximumAnnualApr
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
@@ -43,7 +43,11 @@ class ParachainStartStakingComponentFactory(
 
     private val validationSystem: ParachainStakingWelcomeValidationSystem by lazy(LazyThreadSafetyMode.NONE) {
         ValidationSystem {
-            hasEthereumAccount()
+            hasChainAccount(
+                chain = { it.chain },
+                metaAccount = { it.account },
+                error = ::MissingEthereumAccount
+            )
         }
     }
 
@@ -116,22 +120,13 @@ private class ParachainStartStakingComponent(
         }
     }
 
-    private fun validationFailure(failure: ParachainStakingWelcomeValidationFailure): TransformedFailure.Custom {
+    private fun validationFailure(failure: ParachainStakingWelcomeValidationFailure): TransformedFailure {
         return when (failure) {
-            is ParachainStakingWelcomeValidationFailure.MissingEthereumAccount -> {
-                TransformedFailure.Custom(
-                    dialogPayload = CustomDialogDisplayer.Payload(
-                        title = resourceManager.getString(R.string.common_missing_account_title, failure.chain.name),
-                        message = resourceManager.getString(R.string.staking_missing_account_message, failure.chain.name),
-                        okAction = DialogAction(
-                            title = resourceManager.getString(R.string.common_add),
-                            action = { router.openAddAccount(failure.chain.id, failure.metaAccount.id) }
-                        ),
-                        cancelAction = DialogAction.noOp(resourceManager.getString(R.string.common_cancel)),
-                        customStyle = R.style.AccentAlertDialogTheme
-                    )
-                )
-            }
+            is MissingEthereumAccount -> handleChainAccountNotFound(
+                failure = failure,
+                resourceManager = resourceManager,
+                goToWalletDetails = { router.openWalletDetails(failure.account.id) }
+            )
         }
     }
 }
