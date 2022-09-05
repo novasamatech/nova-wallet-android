@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_crowdloan_impl.data.source.contribution
 
 import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
-import io.novafoundation.nova.feature_crowdloan_api.data.common.SourceContribution
+import io.novafoundation.nova.feature_crowdloan_api.data.common.CrowdloanContribution
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
@@ -13,7 +13,7 @@ interface ExternalContributionSource {
         val sourceName: String?,
         override val amount: BigInteger,
         val paraId: ParaId,
-    ) : SourceContribution
+    ) : CrowdloanContribution
 
     /**
      * null in case every chain is supported

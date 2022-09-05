@@ -10,7 +10,7 @@ import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
-import io.novafoundation.nova.feature_crowdloan_api.data.common.SourceContribution
+import io.novafoundation.nova.feature_crowdloan_api.data.common.CrowdloanContribution
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.DirectContribution
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.FundInfo
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRepository
@@ -111,20 +111,18 @@ class ContributionsInteractor(
         val externalContributionFlows = externalContributionsSources
             .filter { it.supports(chain) }
             .map { flowOf { it.getContributions(chain, accountId) } }
-            .toMutableList()
 
         if (externalContributionFlows.isEmpty()) {
-            // add empty list to accumulate at least one flow
-            externalContributionFlows += flowOf { listOf() }
+            return flowOf { emptyList() }
         }
 
         return accumulateFlatten(*externalContributionFlows.toTypedArray())
     }
 
     fun getTotalAmountOfContributions(
-        sourceContributions: List<SourceContribution>
+        crowdloanContributions: List<CrowdloanContribution>
     ): BigInteger {
-        return sourceContributions.sumOf { it.amount }
+        return crowdloanContributions.sumOf { it.amount }
     }
 
     private fun FundInfo.returnDuration(

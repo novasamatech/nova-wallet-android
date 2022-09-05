@@ -67,7 +67,7 @@ fun <T1, T2, R> combineLoading(
     }
 }
 
-fun <T> firstNonemptyLoading(
+fun <T> firstNonEmptyLoading(
     vararg sources: Flow<LoadingState<List<T>>>
 ): Flow<LoadingState<List<T>>> = accumulate(*sources)
     .map { loadingStates ->
