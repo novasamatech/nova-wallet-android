@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_account_api.domain.validation
 
+import androidx.annotation.StringRes
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer.Payload.DialogAction.Companion.noOp
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -61,6 +62,7 @@ fun <P, E> ValidationSystemBuilder<P, E>.hasChainAccount(
 
 fun handleChainAccountNotFound(
     failure: NoChainAccountFoundError,
+    @StringRes addAccountDescriptionRes: Int,
     resourceManager: ResourceManager,
     goToWalletDetails: () -> Unit
 ): TransformedFailure {
@@ -70,7 +72,7 @@ fun handleChainAccountNotFound(
         AddAccountState.CAN_ADD -> TransformedFailure.Custom(
             dialogPayload = CustomDialogDisplayer.Payload(
                 title = resourceManager.getString(R.string.common_missing_account_title, chainName),
-                message = resourceManager.getString(R.string.staking_missing_account_message, chainName),
+                message = resourceManager.getString(addAccountDescriptionRes, chainName),
                 okAction = CustomDialogDisplayer.Payload.DialogAction(
                     title = resourceManager.getString(R.string.common_add),
                     action = goToWalletDetails

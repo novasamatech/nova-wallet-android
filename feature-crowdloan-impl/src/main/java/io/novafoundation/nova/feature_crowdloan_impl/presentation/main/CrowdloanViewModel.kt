@@ -206,7 +206,8 @@ class CrowdloanViewModel(
             is MainCrowdloanValidationFailure.NoRelaychainAccount -> handleChainAccountNotFound(
                 failure = failure,
                 resourceManager = resourceManager,
-                goToWalletDetails = { router.openAccountDetails(failure.account.id) }
+                goToWalletDetails = { router.openAccountDetails(failure.account.id) },
+                addAccountDescriptionRes = R.string.crowdloan_missing_account_message
             )
         }
     }
