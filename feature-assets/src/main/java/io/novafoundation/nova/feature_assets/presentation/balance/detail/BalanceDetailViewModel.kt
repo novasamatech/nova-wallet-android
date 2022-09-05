@@ -24,7 +24,6 @@ import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLocks
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import java.util.Locale
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
@@ -32,6 +31,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 class BalanceDetailViewModel(
     private val walletInteractor: WalletInteractor,
@@ -162,7 +162,7 @@ class BalanceDetailViewModel(
         }
 
         val reservedBalance = BalanceLocksModel.Lock(
-            resourceManager.getString(R.string.assets_balance_details_locks_reserved),
+            resourceManager.getString(R.string.wallet_balance_reserved),
             mapAmountToAmountModel(asset.reserved, asset)
         )
 

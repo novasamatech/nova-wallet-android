@@ -38,8 +38,8 @@ class SelectCurrencyViewModel(
         return TextHeader(
             when (category) {
                 CurrencyCategory.CRYPTO -> resourceManager.getString(R.string.wallet_currency_category_cryptocurrencies)
-                CurrencyCategory.FIAT -> resourceManager.getString(R.string.wallet_currency_category_feat)
-                CurrencyCategory.FIAT_POPULAR -> resourceManager.getString(R.string.wallet_currency_category_popular_feat)
+                CurrencyCategory.FIAT -> resourceManager.getString(R.string.wallet_currency_category_fiat)
+                CurrencyCategory.FIAT_POPULAR -> resourceManager.getString(R.string.wallet_currency_category_popular_fiat)
             }
         )
     }

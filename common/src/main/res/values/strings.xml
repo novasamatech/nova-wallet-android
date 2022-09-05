@@ -2,12 +2,11 @@
 <resources>
   <string name="wallet_currency_title">Currency</string>
   <string name="wallet_currency_category_cryptocurrencies">Cryptocurrencies</string>
-  <string name="wallet_currency_category_feat">Fiat currencies</string>
-  <string name="wallet_currency_category_popular_feat">Popular fiat currencies</string>
+  <string name="wallet_currency_category_fiat">Fiat currencies</string>
+  <string name="wallet_currency_category_popular_fiat">Popular fiat currencies</string>
 
   <string name="assets_select_send_your_wallets">Your wallets</string>
 
-  <string name="assets_balance_details_locks_reserved">Reserved</string>
   <string name="assets_balance_details_locks_staking">Staking</string>
   <string name="assets_balance_details_locks_democrac">Democracy</string>
   <string name="assets_balance_details_locks_vesting">Vesting</string>
