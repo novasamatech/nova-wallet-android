@@ -1,5 +1,6 @@
 package io.novafoundation.nova.core_db.model.chain
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
@@ -22,5 +23,7 @@ import androidx.room.Index
 class ChainNodeLocal(
     val chainId: String,
     val url: String,
-    val name: String
+    val name: String,
+    @ColumnInfo(defaultValue = "0")
+    val orderId: Int,
 )

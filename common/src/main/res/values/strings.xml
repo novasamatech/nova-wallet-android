@@ -71,14 +71,15 @@
   <string name="account_ledger_import_start_step_2"><font color='#FFFFFF'>Open the network app</font> on your Ledger device</string>
   <string name="account_ledger_import_start_step_1">Make sure <font color='#FFFFFF'>Network apps are installed</font> to your Ledger device using Ledger Live app</string>
 
+  <string name="common_total">Total</string>
+
   <string name="wallet_currency_title">Currency</string>
   <string name="wallet_currency_category_cryptocurrencies">Cryptocurrencies</string>
-  <string name="wallet_currency_category_feat">Fiat currencies</string>
-  <string name="wallet_currency_category_popular_feat">Popular fiat currencies</string>
+  <string name="wallet_currency_category_fiat">Fiat currencies</string>
+  <string name="wallet_currency_category_popular_fiat">Popular fiat currencies</string>
 
   <string name="assets_select_send_your_wallets">Your wallets</string>
 
-  <string name="assets_balance_details_locks_reserved">Reserved</string>
   <string name="assets_balance_details_locks_staking">Staking</string>
   <string name="assets_balance_details_locks_democrac">Democracy</string>
   <string name="assets_balance_details_locks_vesting">Vesting</string>
@@ -934,7 +935,6 @@
   <string name="wallet_send_existential_warning_title">Transfer will remove account</string>
   <string name="wallet_send_phishing_warning_text">Following address: %s is known to be used in phishing activities, thus we are not recommending sending tokens to that address. Would you like to proceed anyway?</string>
   <string name="wallet_send_phishing_warning_title">Scam alert</string>
-  <string name="wallet_send_total_title">Total</string>
   <string name="wallet_transfer_details_title">Transfer details</string>
   <string name="wallet_your_balance">Your balance</string>
   <string name="yesterday">Yesterday</string>
