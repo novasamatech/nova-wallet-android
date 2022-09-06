@@ -188,7 +188,7 @@ class RealSubstrateLedgerApplication(
         val responseCode = responseCodeData.toBigEndianU16()
         val response = LedgerApplicationResponse.fromCode(responseCode)
 
-        if (response != LedgerApplicationResponse.noError) {
+        if (response != LedgerApplicationResponse.NO_ERROR) {
             val errorMessage = if (responseData.isNotEmpty()) {
                 responseData.decodeToString()
             } else {
