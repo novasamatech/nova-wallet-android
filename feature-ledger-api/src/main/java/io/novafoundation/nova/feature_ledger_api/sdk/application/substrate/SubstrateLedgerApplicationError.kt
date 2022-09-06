@@ -6,7 +6,6 @@ sealed class SubstrateLedgerApplicationError(message: String) : Exception(messag
 
     class UnsupportedApp(val chainId: ChainId) : SubstrateLedgerApplicationError("Unsupported app for chainId: $chainId")
 
-    class Response(val response: LedgerApplicationResponse, val errorMessage: String?) : SubstrateLedgerApplicationError(
-        "Application error: $response"
-    )
+    class Response(val response: LedgerApplicationResponse, val errorMessage: String?) :
+        SubstrateLedgerApplicationError("Application error: $response")
 }
