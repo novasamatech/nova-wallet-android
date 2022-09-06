@@ -30,6 +30,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -66,6 +67,10 @@ abstract class SelectAddressLedgerViewModel(
         }
     }.shareInBackground()
 
+    val device = flowOf {
+        interactor.getDevice(payload.deviceId)
+    }
+
     init {
         loadNewAccount()
     }
@@ -92,8 +97,8 @@ abstract class SelectAddressLedgerViewModel(
             val account = loadedAccounts.value.first { it.index == id.toInt() }
 
             ledgerMessageCommands.value = LedgerMessageCommand.Show.Info(
-                title = resourceManager.getString(R.string.ledger_verify_address_title),
-                subtitle = resourceManager.getString(R.string.ledger_verify_address_subtitle),
+                title = resourceManager.getString(R.string.ledger_review_approve_title),
+                subtitle = resourceManager.getString(R.string.ledger_verify_address_subtitle, device.first().name),
                 graphics = Graphics(R.drawable.ic_eye_filled, R.color.white_64),
                 onCancel = ::verifyAddressCancelled,
                 footer = Footer.Value(

@@ -11,7 +11,7 @@
   <string name="assets_receive_ledger_not_supported_title">Ledger does not support this token</string>
 
   <string name="common_signature_invalid">Signature is invalid</string>
-  <string name="ledger_sign_signature_invalid_message">Please make sure you have selected the right Ledger device for currently approving operation</string>
+  <string name="ledger_sign_signature_invalid_message">Please, make sure you have selected the right Ledger device for currently approving operation</string>
 
   <string name="ledger_sign_tx_not_supported_title">Transaction is not supported</string>
   <string name="ledger_sign_tx_not_supported_subtitle">Ledger does not support this transaction.</string>
@@ -21,7 +21,7 @@
 
   <string name="ledger_sign_transaction_validity_format">Transaction is valid for %s</string>
 
-  <string name="ledger_sign_approve_title">Review and Approve</string>
+  <string name="ledger_review_approve_title">Review and Approve</string>
   <string name="ledger_sign_approve_message">Press both buttons on your %s to approve the transaction</string>
 
   <string name="ledger_sign_transaction_expired_message">For security reasons generated operations valid for only %s. Please try again and approve it with Ledger</string>
@@ -31,20 +31,19 @@
 
   <string name="common_ledger">Ledger</string>
 
-  <string name="ledger_verify_address_title">Verify address</string>
-  <string name="ledger_verify_address_subtitle">Press both buttons on your Nano X E426 to verify address</string>
+  <string name="ledger_verify_address_subtitle">Press both buttons on your %s to approve address</string>
 
   <string name="ledger_import_select_address_load_more">Load more accounts</string>
   <string name="ledher_import_select_address_title">Select account to add to wallet</string>
 
-  <string name="ledger_error_general_title">Operation failed</string>
+  <string name="ledger_error_general_title">Ledger operation failed</string>
   <string name="ledger_error_general_message">Operation completed with error on device. Please, try again later.</string>
 
-  <string name="ledger_error_app_cancelled_title">Operation rejected</string>
-  <string name="ledger_error_app_cancelled_message">Operation was cancelled by the device. Make sure you unlocked your Ledger with PIN-code.</string>
+  <string name="ledger_error_app_cancelled_title">Operation cancelled</string>
+  <string name="ledger_error_app_cancelled_message">Operation was cancelled by the device. Make sure you unlocked your Ledger.</string>
 
   <string name="ledger_error_app_not_launched_title">%s app not launched</string>
-  <string name="ledger_error_app_not_launched_message">Open the %s app on your Ledger device </string>
+  <string name="ledger_error_app_not_launched_message">Open the %s app on your Ledger device</string>
 
   <string name="account_ledger_select_device_title">Select your Ledger device</string>
   <string name="account_ledger_select_device_description">Please, enable Bluetooth in your phone settings and Ledger device. Unlock your Ledger device and open the %s app.</string>
@@ -58,7 +57,6 @@
   <string name="account_ledger_import_fill_description">Make sure Network app is installed to your Ledger device using Ledger Live app. Open the network app on your Ledger device.</string>
 
   <string name="account_welcome_hardware_wallet_subtitle">Use Parity Signer or Ledger</string>
-<!--  <string name="account_welcome_hardware_wallet_subtitle">Use Parity Signer</string>-->
 
   <string name="account_ledger_nano_x">Ledger Nano X</string>
   <string name="account_select_hardware_wallet">Select hardware wallet</string>
@@ -66,10 +64,10 @@
   <string name="account_ledger_import_start_title">Connect Ledger Nano X</string>
   <string name="account_ledger_import_start_guide">Ledger’s official Bluetooth Connection Guide</string>
 
-  <string name="account_ledger_import_start_step_4">Select an <font color='#FFFFFF'>account to pair</font> in Nova Wallet</string>
+  <string name="account_ledger_import_start_step_4"><font color='#FFFFFF'>Select account</font> to add to wallet</string>
   <string name="account_ledger_import_start_step_3">Allow Nova Wallet to <font color='#FFFFFF'>access Bluetooth</font></string>
   <string name="account_ledger_import_start_step_2"><font color='#FFFFFF'>Open the network app</font> on your Ledger device</string>
-  <string name="account_ledger_import_start_step_1">Make sure <font color='#FFFFFF'>Network apps are installed</font> to your Ledger device using Ledger Live app</string>
+  <string name="account_ledger_import_start_step_1">Make sure <font color='#FFFFFF'>Network app is installed</font> to your Ledger device using Ledger Live app</string>
 
   <string name="common_total">Total</string>
 

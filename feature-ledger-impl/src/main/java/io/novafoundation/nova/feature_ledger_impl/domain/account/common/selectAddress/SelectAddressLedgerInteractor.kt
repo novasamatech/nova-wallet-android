@@ -20,6 +20,8 @@ class LedgerAccountWithBalance(
 
 interface SelectAddressLedgerInteractor {
 
+    suspend fun getDevice(deviceId: String): LedgerDevice
+
     suspend fun loadLedgerAccount(chain: Chain, deviceId: String, accountIndex: Int): Result<LedgerAccountWithBalance>
 
     suspend fun verifyLedgerAccount(chain: Chain, deviceId: String, accountIndex: Int): Result<Unit>
@@ -30,6 +32,10 @@ class RealSelectAddressLedgerInteractor(
     private val ledgerDeviceDiscoveryService: LedgerDeviceDiscoveryService,
     private val assetSourceRegistry: AssetSourceRegistry,
 ) : SelectAddressLedgerInteractor {
+
+    override suspend fun getDevice(deviceId: String): LedgerDevice {
+        return findDevice(deviceId)
+    }
 
     override suspend fun loadLedgerAccount(chain: Chain, deviceId: String, accountIndex: Int) = runCatching {
         val device = findDevice(deviceId)
