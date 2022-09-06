@@ -9,8 +9,7 @@ import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.Ledge
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateLedgerApplicationError
 import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand.Graphics
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand.Show.Actions.RecoverableError
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand.Show.Error.RecoverableError
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommands
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.CancellationException
@@ -84,7 +83,6 @@ private fun LedgerMessageCommands.RetryCommand(
 ): Event<LedgerMessageCommand> = RecoverableError(
     title = title,
     subtitle = subtitle,
-    graphics = Graphics(R.drawable.ic_warning_filled),
     onCancel = ::hide,
     onRetry = retry
 ).event()
