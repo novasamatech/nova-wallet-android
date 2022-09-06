@@ -175,7 +175,7 @@ class BalanceDetailViewModel(
     }
 
     private fun mapBalanceLockIdToUi(id: String): String {
-        return when (id) {
+        return when (id.trim()) {
             "staking" -> resourceManager.getString(R.string.assets_balance_details_locks_staking)
             "democrac" -> resourceManager.getString(R.string.assets_balance_details_locks_democrac)
             "vesting" -> resourceManager.getString(R.string.assets_balance_details_locks_vesting)
