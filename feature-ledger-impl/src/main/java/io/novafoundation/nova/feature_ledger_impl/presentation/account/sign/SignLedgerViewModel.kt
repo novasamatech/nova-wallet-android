@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterSc
 import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenResponder
 import io.novafoundation.nova.feature_account_api.presenatation.sign.cancelled
 import io.novafoundation.nova.feature_account_api.presenatation.sign.signed
-import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerApplicationResponse
+import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerApplicationResponse.INVALID_DATA
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateLedgerApplication
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateLedgerApplicationError
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
@@ -90,7 +90,7 @@ class SignLedgerViewModel(
         if (fatalErrorDetected.value) return
 
         when {
-            reason is SubstrateLedgerApplicationError.Response && reason.response == LedgerApplicationResponse.invalidData -> {
+            reason is SubstrateLedgerApplicationError.Response && reason.response == INVALID_DATA -> {
                 handleInvalidData(reason.errorMessage)
             }
 

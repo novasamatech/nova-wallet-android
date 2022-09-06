@@ -14,7 +14,7 @@ buildscript {
 
         kotlinVersion = '1.7.10'
 
-        ktlintPinterestVersion = '0.40.0'
+        ktlintPinterestVersion = '0.47.0'
 
         recyclerVersion = "1.2.1"
         supportVersion = '1.1.0'
@@ -205,7 +205,11 @@ task clean(type: Delete) {
 }
 
 dependencies {
-    ktlint "com.pinterest:ktlint:$ktlintPinterestVersion"
+    ktlint ("com.pinterest:ktlint:$ktlintPinterestVersion") {
+        attributes {
+            attribute(Bundling.BUNDLING_ATTRIBUTE, getObjects().named(Bundling, Bundling.EXTERNAL))
+        }
+    }
 }
 
 task ktlint(type: JavaExec, group: "verification") {
