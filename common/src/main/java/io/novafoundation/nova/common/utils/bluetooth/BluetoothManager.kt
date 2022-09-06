@@ -8,6 +8,7 @@ import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanSettings
 import android.content.Intent
 import io.novafoundation.nova.common.resources.ContextManager
+import io.novafoundation.nova.common.utils.whenStarted
 import android.bluetooth.BluetoothManager as NativeBluetoothManager
 
 interface BluetoothManager {
@@ -32,18 +33,20 @@ internal class RealBluetoothManager(
         get() = nativeBluetoothManager.adapter
 
     override fun startBleScan(filters: List<ScanFilter>, settings: ScanSettings, callback: ScanCallback) {
-        bluetoothAdapter.bluetoothLeScanner.startScan(filters, settings, callback)
+        bluetoothAdapter.bluetoothLeScanner?.startScan(filters, settings, callback)
     }
 
     override fun stopBleScan(callback: ScanCallback) {
-        bluetoothAdapter.bluetoothLeScanner.stopScan(callback)
+        bluetoothAdapter.bluetoothLeScanner?.stopScan(callback)
     }
 
     override fun enableBluetooth() {
-        val activity = contextManager.getActivity()
+        val activity = contextManager.getActivity()!!
         val intent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
 
-        activity!!.startActivityForResult(intent, 0)
+        activity.lifecycle.whenStarted {
+            activity.startActivityForResult(intent, 0)
+        }
     }
 
     override fun isBluetoothEnabled(): Boolean {
