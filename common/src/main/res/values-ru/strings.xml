@@ -67,6 +67,16 @@
   <string name="account_invalid_derivation_path_message_v2_2_0">Ваш путь деривации содержит неподдерживаемые символы или имеет некорректную структуру</string>
   <string name="account_invalid_derivation_path_title">Некорректный путь деривации</string>
   <string name="account_json_file">JSON файл</string>
+  <string name="account_ledger_import_fill_description">Убедитесь, что приложение сети установлено на вашем Ledger устройстве через приложение Ledger Live. Откройте приложение сети на вашем Ledger устройстве.</string>
+  <string name="account_ledger_import_fill_disabled_hint">Добавьте аккаунт</string>
+  <string name="account_ledger_import_fill_title">Добавьте аккаунты в Ваш кошелёк</string>
+  <string name="account_ledger_import_start_guide">Инструкция по подключению Ledger</string>
+  <string name="account_ledger_import_start_step_1">Удостоверьтесь, что <font color="#FFFFFF">приложение Сети установлено</font> на Ваше устройство Ledger, используя приложение Ledger Live</string>
+  <string name="account_ledger_import_start_step_2"><font color="#FFFFFF">Откройте приложение Сети</font> на Вашем Ledger устройстве</string>
+  <string name="account_ledger_import_start_step_3">Разрешите Nova Wallet <font color="#FFFFFF">доступ к Bluetooth</font></string>
+  <string name="account_ledger_import_start_step_4"><font color="#FFFFFF">Выберите аккаунт</font> для добавления в кошелёк</string>
+  <string name="account_ledger_import_start_title">Подключите Ledger Nano X</string>
+  <string name="account_ledger_nano_x">Ledger Nano X</string>
   <string name="account_mnmonic_length_variants">фраза длиной 12, 15, 18, 21 или 24 слова</string>
   <string name="account_needed_message">У вас нет учетной записи в этой сети, вы можете создать или импортировать учетную запись.</string>
   <string name="account_needed_title">Необходим аккаунт</string>
@@ -93,6 +103,7 @@
   <string name="account_private_key">Приватный ключ</string>
   <string name="account_restore_account">У меня уже есть аккаунт</string>
   <string name="account_seed_hex_symbols">64 шест. символа</string>
+  <string name="account_select_hardware_wallet">Выберите аппаратный кошелёк</string>
   <string name="account_select_secret_source">Выберите ваш тип секрета</string>
   <string name="account_select_wallet">Выберите кошелек</string>
   <string name="account_shared_secret">Аккаунты с общим секретом</string>
@@ -107,7 +118,7 @@
   <string name="account_watch_key_missing_description">Ваш кошелек доступен только для просмотра, то есть вы не можете выполнять с ним никаких операций</string>
   <string name="account_watch_key_missing_title">Упс! Ключ отсутствует</string>
   <string name="account_watch_only">watch-only</string>
-  <string name="account_welcome_hardware_wallet_subtitle">Использовать Parity Signer</string>
+  <string name="account_welcome_hardware_wallet_subtitle">Использовать Parity Signer или Ledger</string>
   <string name="account_welcome_hardware_wallet_title">Подключить аппаратный кошелёк</string>
   <string name="accounts_add_chain_account">Добавить %s аккаунт</string>
   <string name="accounts_add_wallet">Добавить кошелёк</string>
@@ -232,6 +243,7 @@
   <string name="common_time_left">Оставшееся время</string>
   <string name="common_title">Заголовок</string>
   <string name="common_to_settings">Открыть Настройки</string>
+  <string name="common_total">Всего</string>
   <string name="common_transaction_id">ID транзакции</string>
   <string name="common_transaction_submitted">Транзакция отправлена</string>
   <string name="common_try_again">Попробовать снова</string>
@@ -739,8 +751,8 @@
   <string name="wallet_search_empty_title">Убедитесь, что адрес\nиз правильной сети</string>
   <string name="wallet_search_empty_title_v2_2_0">Неверный формат адреса.\nУбедитесь, что адрес \nсоответствует сети</string>
   <string name="wallet_send_balance_minimal">Минимальный баланс</string>
-  <string name="wallet_send_cannot_pay_cross_chain_fee">У вас недостаточно токенов для оплаты межсетевой комиссии в размере %s.\nОстаток баланса после перевода: %s</string>
-  <string name="wallet_send_cannot_pay_network_fee">У вас недостаточно токенов, чтобы оплатить комиссию сети в размере %s.\n Доступный баланс: %s</string>
+  <string name="wallet_send_cannot_pay_cross_chain_fee" formatted="false">У вас недостаточно токенов для оплаты межсетевой комиссии в размере %s.\nОстаток баланса после перевода: %s</string>
+  <string name="wallet_send_cannot_pay_network_fee" formatted="false">У вас недостаточно токенов, чтобы оплатить комиссию сети в размере %s.\n Доступный баланс: %s</string>
   <string name="wallet_send_confirm_hint">Межсетевая комиссия добавляется к введенной сумме. Получатель может получить часть межсетевой комиссии</string>
   <string name="wallet_send_confirm_transfer">Подтвердить</string>
   <string name="wallet_send_cross_chain">Между сетями</string>
@@ -763,7 +775,6 @@
   <string name="wallet_send_tokens_from">Отправить %s из</string>
   <string name="wallet_send_tokens_on">Отправить %s в</string>
   <string name="wallet_send_tokens_to">в</string>
-  <string name="wallet_send_total_title">Всего</string>
   <string name="wallet_sender">Отправитель</string>
   <string name="wallet_tokens">Токены</string>
   <string name="wallet_transfer_details_send_back">Отправить этому контакту</string>
