@@ -105,7 +105,7 @@ class SignLedgerViewModel(
         val validityPeriod = validityPeriod.first()
 
         ledgerMessageCommands.value = LedgerMessageCommand.Show.Info(
-            title = resourceManager.getString(R.string.ledger_sign_approve_title),
+            title = resourceManager.getString(R.string.ledger_review_approve_title),
             subtitle = resourceManager.getString(R.string.ledger_sign_approve_message, device.name),
             graphics = Graphics(R.drawable.ic_eye_filled, R.color.white_64),
             onCancel = ::bottomSheetClosed,
