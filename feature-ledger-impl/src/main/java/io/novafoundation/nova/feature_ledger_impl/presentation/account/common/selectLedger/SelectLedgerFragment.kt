@@ -76,14 +76,14 @@ abstract class SelectLedgerFragment<V : SelectLedgerViewModel> : BaseFragment<V>
         setupLedgerMessages(ledgerMessagePresentable)
     }
 
-    override fun onStart() {
-        super.onStart()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
         enableBluetoothConnectivityTracker()
     }
 
-    override fun onStop() {
-        super.onStop()
+    override fun onDestroy() {
+        super.onDestroy()
 
         disableBluetoothConnectivityTracker()
     }
