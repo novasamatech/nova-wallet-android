@@ -80,7 +80,7 @@ class MetaAccount(
 
 fun MetaAccount.hasAccountIn(chain: Chain) = when {
     hasChainAccountIn(chain.id) -> true
-    chain.isEthereumBased -> ethereumPublicKey != null
+    chain.isEthereumBased -> ethereumAddress != null
     else -> substrateAccountId != null
 }
 
