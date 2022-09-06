@@ -22,7 +22,6 @@ import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAd
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand.Footer
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand.Graphics
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommands
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.errors.handleLedgerError
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
@@ -99,7 +98,6 @@ abstract class SelectAddressLedgerViewModel(
             ledgerMessageCommands.value = LedgerMessageCommand.Show.Info(
                 title = resourceManager.getString(R.string.ledger_review_approve_title),
                 subtitle = resourceManager.getString(R.string.ledger_verify_address_subtitle, device.first().name),
-                graphics = Graphics(R.drawable.ic_eye_filled, R.color.white_64),
                 onCancel = ::verifyAddressCancelled,
                 footer = Footer.Value(
                     value = account.account.address,

@@ -32,34 +32,34 @@ sealed class LedgerMessageCommand {
         val onCancel: () -> Unit,
     ) : LedgerMessageCommand() {
 
-        sealed class Actions(
+        sealed class Error(
             title: String,
             subtitle: String,
-            graphics: Graphics,
+            graphics: Graphics = Graphics.error(),
             onCancel: () -> Unit,
         ) : Show(title, subtitle, graphics, onCancel) {
 
             class RecoverableError(
                 title: String,
                 subtitle: String,
-                graphics: Graphics,
+                graphics: Graphics = Graphics.error(),
                 onCancel: () -> Unit,
                 val onRetry: () -> Unit
-            ) : Actions(title, subtitle, graphics, onCancel)
+            ) : Error(title, subtitle, graphics, onCancel)
 
             class FatalError(
                 title: String,
                 subtitle: String,
-                graphics: Graphics,
+                graphics: Graphics = Graphics.error(),
                 val onConfirm: () -> Unit,
                 onCancel: () -> Unit = onConfirm, // when error is fatal, confirm is the same as hide by default
-            ) : Actions(title, subtitle, graphics, onCancel)
+            ) : Error(title, subtitle, graphics, onCancel)
         }
 
         class Info(
             title: String,
             subtitle: String,
-            graphics: Graphics,
+            graphics: Graphics = Graphics.info(),
             onCancel: () -> Unit,
             val footer: Footer
         ) : Show(title, subtitle, graphics, onCancel)
@@ -77,8 +77,26 @@ sealed class LedgerMessageCommand {
         class Value(val value: String) : Footer()
     }
 
-    class Graphics(@DrawableRes val src: Int, @ColorRes val tint: Int? = null)
+    class Graphics(
+        @DrawableRes val icon: Int,
+        @ColorRes val iconTint: Int?,
+        @DrawableRes val background: Int,
+    ) {
+        companion object
+    }
 }
+
+private fun LedgerMessageCommand.Graphics.Companion.error() = LedgerMessageCommand.Graphics(
+    icon = R.drawable.ic_warning_filled,
+    iconTint = null,
+    background = R.drawable.ic_ledger_warning
+)
+
+private fun LedgerMessageCommand.Graphics.Companion.info() = LedgerMessageCommand.Graphics(
+    icon = R.drawable.ic_eye_filled,
+    iconTint = R.color.white_64,
+    background = R.drawable.ic_ledger_info
+)
 
 class LedgerMessageBottomSheet(
     context: Context,
@@ -92,20 +110,20 @@ class LedgerMessageBottomSheet(
     }
 
     fun receiveCommand(command: LedgerMessageCommand) {
-        ledgerMessageActions.setVisible(command is LedgerMessageCommand.Show.Actions)
-        ledgerMessageCancel.setVisible(command is LedgerMessageCommand.Show.Actions.RecoverableError)
+        ledgerMessageActions.setVisible(command is LedgerMessageCommand.Show.Error)
+        ledgerMessageCancel.setVisible(command is LedgerMessageCommand.Show.Error.RecoverableError)
         setupFooterVisibility(command is LedgerMessageCommand.Show.Info)
 
         when (command) {
             LedgerMessageCommand.Hide -> dismiss()
 
-            is LedgerMessageCommand.Show.Actions.FatalError -> {
+            is LedgerMessageCommand.Show.Error.FatalError -> {
                 setupBaseShow(command)
                 ledgerMessageConfirm.setOnClickListener { command.onConfirm() }
                 ledgerMessageConfirm.setText(R.string.common_ok_back)
             }
 
-            is LedgerMessageCommand.Show.Actions.RecoverableError -> {
+            is LedgerMessageCommand.Show.Error.RecoverableError -> {
                 setupBaseShow(command)
                 ledgerMessageConfirm.setOnClickListener { command.onRetry() }
                 ledgerMessageConfirm.setText(R.string.common_retry)
@@ -150,7 +168,8 @@ class LedgerMessageBottomSheet(
     private fun setupBaseShow(command: LedgerMessageCommand.Show) {
         ledgerMessageTitle.text = command.title
         ledgerMessageSubtitle.text = command.subtitle
-        ledgerMessageGraphics.setIcon(command.graphics.src, command.graphics.tint)
+        ledgerMessageGraphics.setIcon(command.graphics.icon, command.graphics.iconTint)
+        ledgerMessageGraphics.setLedgerImage(command.graphics.background)
 
         setOnCancelListener { command.onCancel() }
     }

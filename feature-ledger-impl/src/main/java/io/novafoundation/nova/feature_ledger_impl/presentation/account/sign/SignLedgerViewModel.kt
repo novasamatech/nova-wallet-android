@@ -22,7 +22,6 @@ import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.domain.account.sign.SignLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand.Graphics
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerViewModel
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
@@ -107,7 +106,6 @@ class SignLedgerViewModel(
         ledgerMessageCommands.value = LedgerMessageCommand.Show.Info(
             title = resourceManager.getString(R.string.ledger_review_approve_title),
             subtitle = resourceManager.getString(R.string.ledger_sign_approve_message, device.name),
-            graphics = Graphics(R.drawable.ic_eye_filled, R.color.white_64),
             onCancel = ::bottomSheetClosed,
             footer = LedgerMessageCommand.Footer.Timer(
                 timerValue = validityPeriod.period,
@@ -194,10 +192,9 @@ class SignLedgerViewModel(
     ) {
         fatalErrorDetected.value = true
 
-        ledgerMessageCommands.value = LedgerMessageCommand.Show.Actions.FatalError(
+        ledgerMessageCommands.value = LedgerMessageCommand.Show.Error.FatalError(
             title = title,
             subtitle = subtitle,
-            graphics = Graphics(R.drawable.ic_warning_filled),
             onConfirm = ::errorAcknowledged
         ).event()
     }
