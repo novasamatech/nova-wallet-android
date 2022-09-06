@@ -5,6 +5,7 @@
     app:startDestination="@id/signLedgerFragment">
     
     <fragment
+        app:useAdd="true"
         android:id="@+id/signLedgerFragment"
         android:name="io.novafoundation.nova.feature_ledger_impl.presentation.account.sign.SignLedgerFragment"
         android:label="SignLedgerFragment" />
