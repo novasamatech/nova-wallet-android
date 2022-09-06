@@ -72,7 +72,9 @@ class AccountsAdapter(
         require(holder is AccountHolder)
 
         resolvePayload(
-            holder, position, payloads,
+            holder,
+            position,
+            payloads,
             onUnknownPayload = { holder.bindMode(mode, child, accountItemHandler) },
             onDiffCheck = {
                 when (it) {
@@ -182,7 +184,9 @@ class AccountHolder(view: View) : GroupedListHolder(view) {
 }
 
 private object MetaAccountPayloadGenerator : PayloadGenerator<AccountUi>(
-    AccountUi::title, AccountUi::subtitle, AccountUi::isSelected
+    AccountUi::title,
+    AccountUi::subtitle,
+    AccountUi::isSelected
 )
 
 private class DiffCallback : BaseGroupedDiffCallback<ChipLabelModel, AccountUi>(ChipLabelModel::class.java) {

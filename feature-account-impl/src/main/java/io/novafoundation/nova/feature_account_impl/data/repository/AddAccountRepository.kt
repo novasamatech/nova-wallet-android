@@ -43,7 +43,6 @@ class AddAccountRepository(
         advancedEncryption: AdvancedEncryption,
         addAccountType: AddAccountType
     ): Long = withContext(Dispatchers.Default) {
-
         addAccount(
             derivationPaths = advancedEncryption.derivationPaths,
             addAccountType = addAccountType,
@@ -59,7 +58,6 @@ class AddAccountRepository(
         password: String,
         addAccountType: AddAccountType
     ): Long = withContext(Dispatchers.Default) {
-
         addAccount(
             derivationPaths = AdvancedEncryption.DerivationPaths.empty(),
             addAccountType = addAccountType,

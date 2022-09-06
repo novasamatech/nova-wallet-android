@@ -73,9 +73,11 @@ fun <T> firstNonEmptyLoading(
     .map { loadingStates ->
         val isAllLoaded = loadingStates.all { it is LoadingState.Loaded }
         val states: List<List<T>> = loadingStates.mapNotNull {
-            if (it is LoadingState.Loaded && it.data.isNotEmpty())
+            if (it is LoadingState.Loaded && it.data.isNotEmpty()) {
                 it.data
-            else null
+            } else {
+                null
+            }
         }
 
         if (isAllLoaded || states.isNotEmpty()) {

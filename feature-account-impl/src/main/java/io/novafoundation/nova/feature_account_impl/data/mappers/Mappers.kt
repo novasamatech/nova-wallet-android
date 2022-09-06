@@ -44,7 +44,6 @@ fun mapCryptoTypeToCryptoTypeModel(
     resourceManager: ResourceManager,
     encryptionType: CryptoType
 ): CryptoTypeModel {
-
     val name = when (encryptionType) {
         CryptoType.SR25519 -> "${resourceManager.getString(R.string.sr25519_selection_title)} ${
         resourceManager.getString(

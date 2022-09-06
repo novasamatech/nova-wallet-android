@@ -12,9 +12,9 @@ class AcknowledgePhishingBottomSheet(
     context: Context,
     private val confirmation: DappPendingConfirmation<*>,
 ) : ActionNotAllowedBottomSheet(
-        context = context,
-        onSuccess = { confirmation.onConfirm() }
-    ),
+    context = context,
+    onSuccess = { confirmation.onConfirm() }
+),
     DialogExtensions {
 
     override val dialogInterface: DialogInterface

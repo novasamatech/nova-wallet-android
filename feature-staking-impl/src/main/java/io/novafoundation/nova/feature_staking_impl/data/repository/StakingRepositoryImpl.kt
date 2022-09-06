@@ -254,10 +254,20 @@ class StakingRepositoryImpl(
         ) { nominations, prefs ->
             when {
                 prefs != null -> StakingState.Stash.Validator(
-                    chain, chainAsset, accountId, controllerId, stashId, prefs
+                    chain,
+                    chainAsset,
+                    accountId,
+                    controllerId,
+                    stashId,
+                    prefs
                 )
                 nominations != null -> StakingState.Stash.Nominator(
-                    chain, chainAsset, accountId, controllerId, stashId, nominations
+                    chain,
+                    chainAsset,
+                    accountId,
+                    controllerId,
+                    stashId,
+                    nominations
                 )
 
                 else -> StakingState.Stash.None(chain, chainAsset, accountId, controllerId, stashId)

@@ -33,13 +33,13 @@ class DefaultMetamaskState(
     override val chain: MetamaskChain,
     override val selectedAccountAddress: String?
 ) : BaseState<MetamaskTransportRequest<*>, MetamaskState>(
-        commonInteractor = commonInteractor,
-        resourceManager = resourceManager,
-        addressIconGenerator = addressIconGenerator,
-        web3Session = web3Session,
-        hostApi = hostApi,
-        walletUiUseCase = walletUiUseCase
-    ),
+    commonInteractor = commonInteractor,
+    resourceManager = resourceManager,
+    addressIconGenerator = addressIconGenerator,
+    web3Session = web3Session,
+    hostApi = hostApi,
+    walletUiUseCase = walletUiUseCase
+),
     MetamaskState {
 
     private val knownChains = mapOf(MetamaskChain.ETHEREUM.chainId to MetamaskChain.ETHEREUM)

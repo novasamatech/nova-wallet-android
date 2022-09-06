@@ -78,7 +78,6 @@ private class ParachainAlertsComponent(
 
     private fun mapAlertToAlertModel(alert: ParachainStakingAlert, asset: Asset): AlertModel {
         return when (alert) {
-
             ParachainStakingAlert.ChangeCollator -> AlertModel(
                 title = resourceManager.getString(R.string.parachain_staking_change_collator),
                 extraMessage = resourceManager.getString(R.string.parachain_staking_alerts_change_collator_message),

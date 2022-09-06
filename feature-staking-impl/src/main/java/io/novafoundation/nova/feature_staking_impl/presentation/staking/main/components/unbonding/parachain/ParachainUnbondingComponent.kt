@@ -86,7 +86,6 @@ private class ParachainUnbondingComponent(
     private val cancelLoadingFlow = MutableStateFlow(false)
 
     private fun handleRebond() = launch {
-
         val delegatorState = delegatorStateUseCase.currentDelegatorState().castOrNull<DelegatorState.Delegator>() ?: return@launch
         val chooserPayload = cancelLoadingFlow.withFlagSet { createRebondChooserPayload(delegatorState) }
 

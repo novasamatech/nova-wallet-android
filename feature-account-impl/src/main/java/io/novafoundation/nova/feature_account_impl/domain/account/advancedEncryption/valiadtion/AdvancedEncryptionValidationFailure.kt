@@ -14,7 +14,6 @@ fun mapAdvancedEncryptionValidationFailureToUi(
     resourceManager: ResourceManager,
     failure: AdvancedEncryptionValidationFailure,
 ): TitleAndMessage {
-
     return when (failure) {
         SUBSTRATE_DERIVATION_PATH -> resourceManager.getString(R.string.account_derivation_path_substrate_invalid_title) to
             resourceManager.getString(R.string.account_invalid_derivation_path_message_v2_2_0)

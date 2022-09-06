@@ -135,7 +135,6 @@ fun mapNodeToOperation(
     tokenType: Chain.Asset,
 ): Operation {
     val type: Operation.Type = when {
-
         node.reward != null -> with(node.reward) {
             Operation.Type.Reward(
                 amount = amount,

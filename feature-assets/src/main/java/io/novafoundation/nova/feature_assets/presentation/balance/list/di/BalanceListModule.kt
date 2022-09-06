@@ -40,7 +40,6 @@ class BalanceListModule {
         addressIconGenerator: AddressIconGenerator,
         currencyInteractor: CurrencyInteractor
     ): ViewModel {
-
         return BalanceListViewModel(
             interactor,
             assetsListInteractor,

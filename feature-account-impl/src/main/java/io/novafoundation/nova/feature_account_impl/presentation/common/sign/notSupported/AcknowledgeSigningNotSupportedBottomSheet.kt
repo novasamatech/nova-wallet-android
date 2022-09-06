@@ -12,9 +12,9 @@ class AcknowledgeSigningNotSupportedBottomSheet(
     private val payload: SigningNotSupportedPresentable.Payload,
     private val onConfirm: () -> Unit
 ) : ActionNotAllowedBottomSheet(
-        context = context,
-        onSuccess = onConfirm,
-    ),
+    context = context,
+    onSuccess = onConfirm,
+),
     DialogExtensions {
 
     override val dialogInterface: DialogInterface
