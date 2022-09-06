@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
@@ -232,6 +233,18 @@ fun <T> accumulate(vararg flows: Flow<T>): Flow<List<T>> {
 fun <T> accumulateFlatten(vararg flows: Flow<List<T>>): Flow<List<T>> {
     return accumulate(*flows).map { it.flatten() }
 }
+
+fun <T> firstNonEmpty(
+    vararg sources: Flow<List<T>>
+): Flow<List<T>> = accumulate(*sources)
+    .transform { collected ->
+        val isAllLoaded = collected.size == sources.size
+        val flattenResult: List<T> = collected.flatten()
+
+        if (isAllLoaded || flattenResult.isNotEmpty()) {
+            emit(flattenResult)
+        }
+    }
 
 fun <T> Flow<T>.observeInLifecycle(
     lifecycleCoroutineScope: LifecycleCoroutineScope,

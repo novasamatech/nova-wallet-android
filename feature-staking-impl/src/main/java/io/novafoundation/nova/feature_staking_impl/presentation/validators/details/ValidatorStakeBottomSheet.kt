@@ -42,7 +42,7 @@ class ValidatorStakeBottomSheet(
         }
 
         item(createCellView()) {
-            it.setTitle(R.string.wallet_send_total_title)
+            it.setTitle(R.string.common_total)
             it.showAmount(payload.total)
         }
     }

@@ -79,7 +79,7 @@
   <string name="account_parity_signer_import_start_step_1"><font color="#FFFFFF">Откройте приложение Parity Signer</font> на смартфоне.</string>
   <string name="account_parity_signer_import_start_step_2"><font color="#FFFFFF">Перейдите на вкладку «Ключи». Выберите сид, затем аккаунт</font>, который вы хотите добавить в Nova Wallet.</string>
   <string name="account_parity_signer_import_start_step_3">Parity Signer предоставит вам <font color="#FFFFFF">QR-код для сканирования</font></string>
-  <string name="account_parity_signer_import_start_title">Добавить кошелек из Parity Signer</string>
+  <string name="account_parity_signer_import_start_title">Добавить кошелёк из Parity Signer</string>
   <string name="account_parity_signer_not_supported_subtitle">Parity Signer не поддерживает подписание произвольных сообщений — только транзакции</string>
   <string name="account_parity_signer_not_supported_title">Подписание не поддерживается</string>
   <string name="account_parity_signer_scan_from">Отсканируйте QR-код из Parity Signer</string>
@@ -108,13 +108,18 @@
   <string name="account_watch_key_missing_title">Упс! Ключ отсутствует</string>
   <string name="account_watch_only">watch-only</string>
   <string name="account_welcome_hardware_wallet_subtitle">Использовать Parity Signer</string>
-  <string name="account_welcome_hardware_wallet_title">Подключить аппаратный кошелек</string>
+  <string name="account_welcome_hardware_wallet_title">Подключить аппаратный кошелёк</string>
   <string name="accounts_add_chain_account">Добавить %s аккаунт</string>
   <string name="accounts_add_wallet">Добавить кошелёк</string>
   <string name="accounts_change_chain_account">Изменить аккаунт %s</string>
   <string name="accounts_change_chain_secrets">Изменить аккаунт</string>
+  <string name="assets_balance_details_locks_democrac">Демократия</string>
+  <string name="assets_balance_details_locks_phrelect">Выборы</string>
+  <string name="assets_balance_details_locks_staking">Стейкинг</string>
+  <string name="assets_balance_details_locks_vesting">Вестинг</string>
   <string name="assets_search_hint">Поиск по названию сети или токена</string>
   <string name="assets_search_placeholder">Не найдено сетей или токенов с\nуказаным именем</string>
+  <string name="assets_select_send_your_wallets">Ваши кошельки</string>
   <string name="buy_completed">Покупка совершена! Ожидайте до 60 минут. Вы можете отслеживать статус по электронной почте.</string>
   <string name="choose_amount_asset">Токен</string>
   <string name="choose_amount_available_balance">Свободный баланс</string>
@@ -227,6 +232,7 @@
   <string name="common_time_left">Оставшееся время</string>
   <string name="common_title">Заголовок</string>
   <string name="common_to_settings">Открыть Настройки</string>
+  <string name="common_total">Всего</string>
   <string name="common_transaction_id">ID транзакции</string>
   <string name="common_transaction_submitted">Транзакция отправлена</string>
   <string name="common_try_again">Попробовать снова</string>
@@ -713,6 +719,10 @@
   <string name="wallet_balance_transferable">Доступно</string>
   <string name="wallet_balance_unbonding_v1_9_0">В процессе вывода</string>
   <string name="wallet_chain_management_title">Кошелёк</string>
+  <string name="wallet_currency_category_cryptocurrencies">Криптовалюты</string>
+  <string name="wallet_currency_category_fiat">Фиатные валюты</string>
+  <string name="wallet_currency_category_popular_fiat">Популярные фиатные валюты</string>
+  <string name="wallet_currency_title">Валюта</string>
   <string name="wallet_extrinsic_details_title">Детали транзакции</string>
   <string name="wallet_filter_hide_zero_balance">Скрыть активы с нулевым балансом</string>
   <string name="wallet_filters_extrinsics">Прочие транзакции</string>
@@ -754,7 +764,6 @@
   <string name="wallet_send_tokens_from">Отправить %s из</string>
   <string name="wallet_send_tokens_on">Отправить %s в</string>
   <string name="wallet_send_tokens_to">в</string>
-  <string name="wallet_send_total_title">Всего</string>
   <string name="wallet_sender">Отправитель</string>
   <string name="wallet_tokens">Токены</string>
   <string name="wallet_transfer_details_send_back">Отправить этому контакту</string>

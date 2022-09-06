@@ -3,7 +3,7 @@ package io.novafoundation.nova.core_db.migrations
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-val NullableSubstrateAccountId_20_21 = object : Migration(20, 21) {
+val NullableSubstrateAccountId_21_22 = object : Migration(21, 22) {
 
     override fun migrate(database: SupportSQLiteDatabase) {
         // rename

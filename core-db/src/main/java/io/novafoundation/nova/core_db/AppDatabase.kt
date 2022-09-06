@@ -41,10 +41,11 @@ import io.novafoundation.nova.core_db.migrations.AddSitePhishing_6_7
 import io.novafoundation.nova.core_db.migrations.AssetTypes_2_3
 import io.novafoundation.nova.core_db.migrations.BetterChainDiffing_8_9
 import io.novafoundation.nova.core_db.migrations.ChangeAsset_3_4
+import io.novafoundation.nova.core_db.migrations.ChangeChainNodes_20_21
 import io.novafoundation.nova.core_db.migrations.ChangeDAppAuthorization_10_11
 import io.novafoundation.nova.core_db.migrations.ChangeTokens_19_20
 import io.novafoundation.nova.core_db.migrations.FixMigrationConflicts_13_14
-import io.novafoundation.nova.core_db.migrations.NullableSubstrateAccountId_20_21
+import io.novafoundation.nova.core_db.migrations.NullableSubstrateAccountId_21_22
 import io.novafoundation.nova.core_db.migrations.NullableSubstratePublicKey_15_16
 import io.novafoundation.nova.core_db.migrations.RemoveChainForeignKeyFromChainAccount_11_12
 import io.novafoundation.nova.core_db.migrations.RemoveColorFromChains_17_18
@@ -72,7 +73,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
 import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
 
 @Database(
-    version = 21,
+    version = 22,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -132,7 +133,8 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(AddFavouriteDApps_9_10, ChangeDAppAuthorization_10_11, RemoveChainForeignKeyFromChainAccount_11_12)
                     .addMigrations(AddAdditionalFieldToChains_12_13, FixMigrationConflicts_13_14, AddMetaAccountType_14_15)
                     .addMigrations(NullableSubstratePublicKey_15_16, WatchOnlyChainAccounts_16_17, RemoveColorFromChains_17_18)
-                    .addMigrations(AddCurrencies_18_19, ChangeTokens_19_20, NullableSubstrateAccountId_20_21)
+                    .addMigrations(AddCurrencies_18_19, ChangeTokens_19_20, ChangeChainNodes_20_21)
+                    .addMigrations(NullableSubstrateAccountId_21_22)
                     .fallbackToDestructiveMigration()
                     .build()
             }
