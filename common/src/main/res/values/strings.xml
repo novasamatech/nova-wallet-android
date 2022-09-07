@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="common_on">On</string>
+  <string name="common_off">Off</string>
+  <string name="staking_turing_yield_boost">Yield Boost</string>
+
   <string name="crowdloan_missing_account_message">You should add %s account to the wallet in order to contribute</string>
 
   <string name="ledger_chain_not_supported">Ledger doesn’t support %s</string>

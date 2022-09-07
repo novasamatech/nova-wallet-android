@@ -168,6 +168,8 @@ fun RuntimeMetadata.vesting() = module(Modules.VESTING)
 
 fun RuntimeMetadata.identity() = module(Modules.IDENTITY)
 
+fun RuntimeMetadata.automationTime() = module(Modules.AUTOMATION_TIME)
+
 fun RuntimeMetadata.parachainInfoOrNull() = moduleOrNull(Modules.PARACHAIN_INFO)
 
 fun RuntimeMetadata.firstExistingModule(vararg options: String): String {
@@ -231,4 +233,6 @@ object Modules {
 
     const val PARACHAIN_INFO = "ParachainInfo"
     const val X_TOKENS = "XTokens"
+
+    const val AUTOMATION_TIME = "AutomationTime"
 }

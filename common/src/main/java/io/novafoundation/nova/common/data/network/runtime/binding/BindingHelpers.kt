@@ -37,8 +37,16 @@ inline fun <reified T> Any?.cast(): T {
     return this as? T ?: incompatible()
 }
 
+inline fun <reified T> Any?.castOrNull(): T? {
+    return this as? T
+}
+
 fun Any?.castToStruct(): Struct.Instance {
     return cast()
+}
+
+fun Any?.castToStructOrNull(): Struct.Instance? {
+    return castOrNull()
 }
 
 fun Any?.castToList(): List<*> {

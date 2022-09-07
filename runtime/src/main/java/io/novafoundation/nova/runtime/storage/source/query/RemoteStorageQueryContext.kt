@@ -43,4 +43,8 @@ class RemoteStorageQueryContext(
     override suspend fun observeKeys(keys: List<String>): Flow<Map<String, String?>> {
         TODO("Not yet needed")
     }
+
+    override suspend fun observeKeysByPrefix(prefix: String): Flow<Map<String, String?>> {
+        TODO("Not yet supported")
+    }
 }
