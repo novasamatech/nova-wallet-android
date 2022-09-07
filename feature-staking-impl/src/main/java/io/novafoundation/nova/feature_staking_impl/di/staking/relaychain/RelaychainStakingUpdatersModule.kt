@@ -157,7 +157,8 @@ class RelaychainStakingUpdatersModule {
         storageCache: StorageCache,
     ) = HistoryDepthUpdater(
         sharedState,
-        chainRegistry, storageCache
+        chainRegistry,
+        storageCache
     )
 
     @Provides

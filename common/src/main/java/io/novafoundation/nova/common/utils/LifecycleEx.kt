@@ -14,7 +14,6 @@ fun Lifecycle.onDestroy(action: () -> Unit) {
     })
 }
 
-
 fun Lifecycle.whenStarted(action: () -> Unit) {
     if (currentState.isAtLeast(Lifecycle.State.STARTED)) {
         action()

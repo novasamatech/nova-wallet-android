@@ -57,7 +57,6 @@ class StakingLedgerUpdater(
 ) : StakingUpdater {
 
     override suspend fun listenForUpdates(storageSubscriptionBuilder: SubscriptionBuilder): Flow<Updater.SideEffect> {
-
         val (chain, chainAsset) = stakingSharedState.assetWithChain.first()
         val runtime = chainRegistry.getRuntime(chain.id)
 
@@ -97,7 +96,6 @@ class StakingLedgerUpdater(
         accountId: AccountId,
         ledgerWithController: LedgerWithController?,
     ) {
-
         val accountStaking = AccountStakingLocal(
             chainId = chainId,
             chainAssetId = chainAssetId,

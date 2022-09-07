@@ -96,7 +96,8 @@ private object CrowdloanDiffCallback : BaseGroupedDiffCallback<CrowdloanStatusMo
 }
 
 private object CrowdloanPayloadGenerator : PayloadGenerator<CrowdloanModel>(
-    CrowdloanModel::state, CrowdloanModel::raised
+    CrowdloanModel::state,
+    CrowdloanModel::raised
 )
 
 private class CrowdloanGroupHolder(containerView: View) : GroupedListHolder(containerView) {

@@ -314,7 +314,12 @@ class StakingFeatureModule {
         accountDisplayUseCase: AddressDisplayUseCase,
         sharedState: StakingSharedState,
     ): RewardDestinationMixin.Presentation = RewardDestinationProvider(
-        resourceManager, stakingInteractor, iconGenerator, appLinksProvider, sharedState, accountDisplayUseCase
+        resourceManager,
+        stakingInteractor,
+        iconGenerator,
+        appLinksProvider,
+        sharedState,
+        accountDisplayUseCase
     )
 
     @Provides

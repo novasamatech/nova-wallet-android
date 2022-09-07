@@ -78,7 +78,6 @@ class AssetsFeatureModule {
         rampProvider: RampProvider,
         transakProvider: TransakProvider
     ): BuyTokenRegistry {
-
         return BuyTokenRegistry(
             providers = listOf(
                 rampProvider,

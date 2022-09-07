@@ -24,6 +24,7 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
 
     @Inject
     lateinit var navigationHolder: NavigationHolder
+
     @Inject
     lateinit var systemCallExecutor: SystemCallExecutor
 

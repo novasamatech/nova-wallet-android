@@ -21,7 +21,6 @@ fun Context.addRipple(
     mask: Drawable? = null,
     @ColorInt rippleColor: Int = getColor(R.color.colorSelected)
 ): Drawable {
-
     return RippleDrawable(rippleColor.toColorStateList(), drawable, mask)
 }
 

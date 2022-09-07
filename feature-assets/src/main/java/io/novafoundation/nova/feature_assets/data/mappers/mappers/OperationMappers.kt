@@ -117,7 +117,6 @@ suspend fun mapOperationToOperationModel(
             }
 
             is Operation.Type.Extrinsic -> {
-
                 val amountColor = if (operationType.status == Operation.Status.FAILED) R.color.gray2 else R.color.white
 
                 OperationModel(

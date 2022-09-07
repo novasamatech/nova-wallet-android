@@ -71,7 +71,9 @@ class StakeTargetAdapter<V>(
         val item = getItem(position)
 
         resolvePayload(
-            holder, position, payloads,
+            holder,
+            position,
+            payloads,
             onUnknownPayload = { holder.bindIcon(mode, item, itemHandler) },
             onDiffCheck = {
                 when (it) {
@@ -186,5 +188,7 @@ class ValidatorDiffCallback<V> : DiffUtil.ItemCallback<StakeTargetModel<V>>() {
 }
 
 private object ValidatorPayloadGenerator : PayloadGenerator<StakeTargetModel<*>>(
-    StakeTargetModel<*>::isChecked, StakeTargetModel<*>::scoring, StakeTargetModel<*>::subtitle
+    StakeTargetModel<*>::isChecked,
+    StakeTargetModel<*>::scoring,
+    StakeTargetModel<*>::subtitle
 )

@@ -29,7 +29,6 @@ class SpannableBuilder(val content: String) {
         @ColorInt color: Int? = null,
         onClick: () -> Unit
     ) {
-
         val startIndex = content.indexOf(text)
 
         if (startIndex == -1) {

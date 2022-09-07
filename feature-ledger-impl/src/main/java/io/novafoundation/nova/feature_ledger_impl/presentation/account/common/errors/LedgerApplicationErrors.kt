@@ -57,12 +57,12 @@ private fun LedgerMessageCommands.handleSubstrateApplicationError(
     val errorMessage: String
 
     when (reason) {
-        LedgerApplicationResponse.appNotOpen, LedgerApplicationResponse.wrongAppOpen -> {
+        LedgerApplicationResponse.APP_NOT_OPEN, LedgerApplicationResponse.WRONG_APP_OPEN -> {
             errorTitle = resourceManager.getString(R.string.ledger_error_app_not_launched_title, chain.name)
             errorMessage = resourceManager.getString(R.string.ledger_error_app_not_launched_message, chain.name)
         }
 
-        LedgerApplicationResponse.transactionRejected -> {
+        LedgerApplicationResponse.TRANSACTION_REJECTED -> {
             errorTitle = resourceManager.getString(R.string.ledger_error_app_cancelled_title)
             errorMessage = resourceManager.getString(R.string.ledger_error_app_cancelled_message)
         }

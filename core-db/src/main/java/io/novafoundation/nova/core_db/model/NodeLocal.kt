@@ -11,5 +11,6 @@ data class NodeLocal(
     val isDefault: Boolean,
     val isActive: Boolean = false
 ) {
-    @PrimaryKey(autoGenerate = true) var id: Int = 0
+    @PrimaryKey(autoGenerate = true)
+    var id: Int = 0
 }
