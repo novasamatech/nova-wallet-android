@@ -56,7 +56,15 @@ private class TuringStakeActionsComponent(
     unbondValidationSystem: ParachainStakingUnbondPreliminaryValidationSystem,
     validationExecutor: ValidationExecutor,
     private val turingAutomationTasksRepository: TuringAutomationTasksRepository,
-) : ParachainStakeActionsComponent(delegatorStateUseCase, resourceManager, router, assetWithChain, hostContext, unbondValidationSystem, validationExecutor) {
+) : ParachainStakeActionsComponent(
+    delegatorStateUseCase = delegatorStateUseCase,
+    resourceManager = resourceManager,
+    router = router,
+    assetWithChain = assetWithChain,
+    hostContext = hostContext,
+    unbondValidationSystem = unbondValidationSystem,
+    validationExecutor = validationExecutor
+) {
 
     override fun stateFor(delegatorState: DelegatorState.Delegator): Flow<StakeActionsState> {
         return flow {
