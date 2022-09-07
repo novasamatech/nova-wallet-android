@@ -1,16 +1,21 @@
 package io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.turing
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
+import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountId
+import io.novafoundation.nova.common.data.network.runtime.binding.bindBlockNumber
+import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
+import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
+import io.novafoundation.nova.common.data.network.runtime.binding.incompatible
 import io.novafoundation.nova.common.utils.automationTime
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.DictEnum
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import java.math.BigInteger
 
 class TuringAutomationTask(
     val id: String,
@@ -35,19 +40,24 @@ class RealTuringAutomationTasksRepository(
                 accountId,
                 keyExtractor = { (_: AccountId, taskId: ByteArray) -> taskId.toHexString() },
                 binding = ::bindAutomationTasks
-            ).map { it.values.toList() }
+            ).map { it.values.filterNotNull() }
         }
     }
 
-    private fun bindAutomationTasks(raw: Any?, taskId: String): TuringAutomationTask {
-        println()
+    private fun bindAutomationTasks(raw: Any?, taskId: String): TuringAutomationTask? = runCatching {
+        val action = raw.castToStruct().get<DictEnum.Entry<*>>("action") ?: incompatible()
+        val actionType = action.name
+
+        if (actionType != "AutoCompoundDelegatedStake") return null
+
+        val actionValue = action.value.castToStruct()
 
         return TuringAutomationTask(
             id = taskId,
-            delegator = byteArrayOf(),
-            collator = byteArrayOf(),
-            accountMinimum = BigInteger.ONE,
-            frequency = BigInteger.ONE
+            delegator = bindAccountId(actionValue["delegator"]),
+            collator = bindAccountId(actionValue["collator"]),
+            accountMinimum = bindNumber(actionValue["account_minimum"]),
+            frequency = bindBlockNumber(actionValue["frequency"])
         )
-    }
+    }.getOrNull()
 }
