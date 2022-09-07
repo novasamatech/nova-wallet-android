@@ -149,6 +149,10 @@ fun <T> List<T>.added(toAdd: T): List<T> {
     return toMutableList().apply { add(toAdd) }
 }
 
+fun <T> List<T>.prepended(toPrepend: T): List<T> {
+    return toMutableList().apply { add(0, toPrepend) }
+}
+
 fun <T> List<T>.modified(index: Int, modification: T): List<T> {
     val newList = this.toMutableList()
 

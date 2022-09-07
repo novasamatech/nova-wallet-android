@@ -33,6 +33,8 @@ abstract class BaseStorageQueryContext(
 
     protected abstract suspend fun observeKeys(keys: List<String>): Flow<Map<String, String?>>
 
+    protected abstract suspend fun observeKeysByPrefix(prefix: String): Flow<Map<String, String?>>
+
     override suspend fun StorageEntry.keys(vararg prefixArgs: Any?): List<StorageKeyComponents> {
         val prefix = storageKey(runtime, *prefixArgs)
 
@@ -69,6 +71,27 @@ abstract class BaseStorageQueryContext(
             keyExtractor = keyExtractor,
             binding = binding
         )
+    }
+
+    override suspend fun <K, V> StorageEntry.observeByPrefix(
+        vararg prefixArgs: Any?,
+        keyExtractor: (StorageKeyComponents) -> K,
+        binding: DynamicInstanceBinderWithKey<K, V>
+    ): Flow<Map<K, V>> {
+        val prefixKey = storageKey(runtime, *prefixArgs)
+
+        return observeKeysByPrefix(prefixKey).map { valuesByKey ->
+            applyMappersToEntries(
+                entries = valuesByKey,
+                storageEntry = this,
+                keyExtractor = keyExtractor,
+                binding = binding
+            )
+        }
+    }
+
+    override suspend fun StorageEntry.entriesRaw(vararg prefixArgs: Any?): Map<String, String?> {
+        return queryEntriesByPrefix(storageKey(runtime, *prefixArgs))
     }
 
     override suspend fun StorageEntry.entriesRaw(keysArguments: List<List<Any?>>): Map<String, String?> {
