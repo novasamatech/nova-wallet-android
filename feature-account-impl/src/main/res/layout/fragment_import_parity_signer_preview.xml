@@ -46,7 +46,7 @@
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             android:clipToPadding="false"
             android:paddingBottom="93dp"
-            tools:listitem="@layout/item_chain_acount" />
+            tools:listitem="@layout/item_chain_account" />
     </LinearLayout>
 
 

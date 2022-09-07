@@ -4,13 +4,11 @@ import io.novafoundation.nova.common.data.model.CursorPage
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.coingecko.PriceInfo
 import io.novafoundation.nova.common.utils.asQueryParam
-import io.novafoundation.nova.common.utils.defaultOnNull
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.dao.PhishingAddressDao
 import io.novafoundation.nova.core_db.dao.TokenDao
-import io.novafoundation.nova.core_db.model.AssetLocal
-import io.novafoundation.nova.core_db.model.AssetWithToken
+import io.novafoundation.nova.core_db.model.AssetAndChainId
 import io.novafoundation.nova.core_db.model.OperationLocal
 import io.novafoundation.nova.core_db.model.PhishingAddressLocal
 import io.novafoundation.nova.core_db.model.TokenLocal
@@ -22,7 +20,6 @@ import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.amountInPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
@@ -66,7 +63,6 @@ class WalletRepositoryImpl(
     private val phishingApi: PhishingApi,
     private val accountRepository: AccountRepository,
     private val assetCache: AssetCache,
-    private val walletConstants: WalletConstants,
     private val phishingAddressDao: PhishingAddressDao,
     private val cursorStorage: TransferCursorStorage,
     private val coingeckoApi: CoingeckoApi,
@@ -74,27 +70,32 @@ class WalletRepositoryImpl(
     private val tokenDao: TokenDao,
 ) : WalletRepository {
 
-    override fun assetsFlow(metaId: Long): Flow<List<Asset>> {
+    override fun syncedAssetsFlow(metaId: Long): Flow<List<Asset>> {
         return combine(
             chainRegistry.chainsById,
-            assetCache.observeAssets(metaId)
+            assetCache.observeSyncedAssets(metaId)
         ) { chainsById, assetsLocal ->
             assetsLocal.map {
-                val chain = chainsById[it.asset.chainId]!!
-                val chainAsset = chain.assetsById.getValue(it.asset.assetId)
-                mapAssetLocalToAsset(it, chainAsset)
+                mapAssetLocalToAsset(it, chainsById.chainAsset(it.assetAndChainId))
             }
         }
     }
 
-    override suspend fun getAssets(metaId: Long): List<Asset> = withContext(Dispatchers.Default) {
+    override suspend fun getSyncedAssets(metaId: Long): List<Asset> = withContext(Dispatchers.Default) {
         val chainsById = chainRegistry.chainsById.first()
-        val assetsLocal = assetCache.getAssetsWithToken(metaId)
+        val assetsLocal = assetCache.getSyncedAssets(metaId)
 
         assetsLocal.map {
-            val chain = chainsById[it.asset.chainId]!!
-            val chainAsset = chain.assetsById.getValue(it.asset.assetId)
-            mapAssetLocalToAsset(it, chainAsset)
+            mapAssetLocalToAsset(it, chainsById.chainAsset(it.assetAndChainId))
+        }
+    }
+
+    override suspend fun getSupportedAssets(metaId: Long): List<Asset> = withContext(Dispatchers.Default) {
+        val chainsById = chainRegistry.chainsById.first()
+        val assetsLocal = assetCache.getSupportedAssets(metaId)
+
+        assetsLocal.map {
+            mapAssetLocalToAsset(it, chainsById.chainAsset(it.assetAndChainId))
         }
     }
 
@@ -133,18 +134,6 @@ class WalletRepositoryImpl(
 
     override fun assetFlow(metaId: Long, chainAsset: Chain.Asset): Flow<Asset> {
         return assetCache.observeAsset(metaId, chainAsset.chainId, chainAsset.id)
-            .map {
-                it.defaultOnNull {
-                    val asset = AssetLocal.createEmpty(chainAsset.id, chainAsset.chainId, metaId)
-                    val tokenWithCurrency = tokenDao.getToken(chainAsset.symbol)
-                    var token = tokenWithCurrency.token
-                    val currency = tokenWithCurrency.currency
-                    if (token == null) {
-                        token = TokenLocal.createEmpty(chainAsset.symbol, currency.id)
-                    }
-                    AssetWithToken(asset, token, currency)
-                }
-            }
             .map { mapAssetLocalToAsset(it, chainAsset) }
     }
 
@@ -315,5 +304,9 @@ class WalletRepositoryImpl(
         val metaAccount = accountRepository.findMetaAccountOrThrow(accountId)
 
         assetCache.getAssetWithToken(metaAccount.id, chainId, assetId)
+    }
+
+    private fun Map<ChainId, Chain>.chainAsset(ids: AssetAndChainId): Chain.Asset {
+        return getValue(ids.chainId).assetsById.getValue(ids.assetId)
     }
 }

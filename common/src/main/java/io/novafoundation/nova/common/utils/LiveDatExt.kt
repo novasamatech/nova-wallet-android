@@ -75,7 +75,6 @@ fun <FIRST, SECOND, RESULT> LiveData<FIRST>.combine(
     initial: RESULT? = null,
     zipper: (FIRST, SECOND) -> RESULT
 ): LiveData<RESULT> {
-
     return MediatorLiveData<RESULT>().apply {
         addSource(this@combine) { first ->
             val second = another.value

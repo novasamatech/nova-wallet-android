@@ -28,7 +28,6 @@ fun startParachainStakingValidationFailure(
                         resourceManager.getString(messageFormat, formattedMinStake)
                 }
                 is TooLowStake.TooLowTotalStake -> {
-
                     resourceManager.getString(R.string.common_amount_low) to
                         resourceManager.getString(R.string.staking_setup_amount_too_low, formattedMinStake)
                 }

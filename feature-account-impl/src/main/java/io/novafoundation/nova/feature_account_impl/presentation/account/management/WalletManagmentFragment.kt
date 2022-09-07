@@ -7,10 +7,10 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.view.dialog.warningDialog
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
+import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountUi
+import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountsAdapter
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.AccountsAdapter
-import io.novafoundation.nova.feature_account_impl.presentation.account.model.MetaAccountUi
 import kotlinx.android.synthetic.main.fragment_accounts.accountListToolbar
 import kotlinx.android.synthetic.main.fragment_accounts.accountsList
 import kotlinx.android.synthetic.main.fragment_accounts.addAccount
@@ -65,11 +65,11 @@ class WalletManagmentFragment : BaseFragment<WalletManagmentViewModel>(), Accoun
         }
     }
 
-    override fun itemClicked(accountModel: MetaAccountUi) {
+    override fun itemClicked(accountModel: AccountUi) {
         viewModel.accountClicked(accountModel)
     }
 
-    override fun deleteClicked(accountModel: MetaAccountUi) {
+    override fun deleteClicked(accountModel: AccountUi) {
         viewModel.deleteClicked(accountModel)
     }
 }

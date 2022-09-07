@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_account_impl.domain.paritySigner.sign.scan
 
 import io.novafoundation.nova.common.utils.dropBytes
+import jp.co.soramitsu.fearless_utils.encrypt.SignatureVerifier
+import jp.co.soramitsu.fearless_utils.encrypt.SignatureWrapper
 import jp.co.soramitsu.fearless_utils.encrypt.Signer
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
@@ -21,8 +23,9 @@ class RealScanSignParitySignerInteractor : ScanSignParitySignerInteractor {
             val multiSignatureBytes = signature.fromHex()
             // first byte indicates encryption type
             val signatureBytes = multiSignatureBytes.dropBytes(1)
+            val signatureWrapper = SignatureWrapper.Sr25519(signatureBytes)
 
-            val valid = Signer.verifySr25519(signaturePayload, signatureBytes, payload.accountId)
+            val valid = SignatureVerifier.verify(signatureWrapper, Signer.MessageHashing.SUBSTRATE, signaturePayload, payload.accountId)
 
             if (!valid) {
                 throw IllegalArgumentException("Invalid signature")

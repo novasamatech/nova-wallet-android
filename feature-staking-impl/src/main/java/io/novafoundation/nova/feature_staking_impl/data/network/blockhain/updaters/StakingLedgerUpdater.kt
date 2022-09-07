@@ -7,15 +7,6 @@ import io.novafoundation.nova.core.updater.SubscriptionBuilder
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.model.AccountStakingLocal
-import jp.co.soramitsu.fearless_utils.extensions.fromHex
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
-import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
-import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.storage.SubscribeStorageRequest
-import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.storage.storageChange
-import jp.co.soramitsu.fearless_utils.wsrpc.subscriptionFlow
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
@@ -31,8 +22,18 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.network.updaters.insert
+import jp.co.soramitsu.fearless_utils.extensions.fromHex
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
+import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
+import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
+import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
+import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.storage.SubscribeStorageRequest
+import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.storage.storageChange
+import jp.co.soramitsu.fearless_utils.wsrpc.subscriptionFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
@@ -56,11 +57,10 @@ class StakingLedgerUpdater(
 ) : StakingUpdater {
 
     override suspend fun listenForUpdates(storageSubscriptionBuilder: SubscriptionBuilder): Flow<Updater.SideEffect> {
-
         val (chain, chainAsset) = stakingSharedState.assetWithChain.first()
         val runtime = chainRegistry.getRuntime(chain.id)
 
-        val currentAccountId = scope.getAccount().accountIdIn(chain)!! // TODO ethereum
+        val currentAccountId = scope.getAccount().accountIdIn(chain) ?: return emptyFlow()
 
         val key = runtime.metadata.staking().storage("Bonded").storageKey(runtime, currentAccountId)
 
@@ -96,7 +96,6 @@ class StakingLedgerUpdater(
         accountId: AccountId,
         ledgerWithController: LedgerWithController?,
     ) {
-
         val accountStaking = AccountStakingLocal(
             chainId = chainId,
             chainAssetId = chainAssetId,

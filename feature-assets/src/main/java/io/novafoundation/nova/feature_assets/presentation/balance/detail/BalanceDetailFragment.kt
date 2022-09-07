@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy.setupBuyIntegration
 import io.novafoundation.nova.feature_assets.presentation.model.BalanceLocksModel
+import io.novafoundation.nova.feature_assets.presentation.receive.view.LedgerNotSupportedWarningBottomSheet
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.showState
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetaiActions
@@ -135,6 +136,14 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
         viewModel.showLockedDetailsEvent.observeEvent(::showLockedDetails)
 
         viewModel.sendEnabled.observe(balanceDetaiActions.send::setEnabled)
+
+        viewModel.acknowledgeLedgerWarning.awaitableActionLiveData.observeEvent {
+            LedgerNotSupportedWarningBottomSheet(
+                context = requireContext(),
+                onSuccess = { it.onSuccess(Unit) },
+                message = it.payload
+            ).show()
+        }
     }
 
     private fun setRefreshEnabled(bottomSheetState: Int) {

@@ -23,6 +23,7 @@ class HasChainAccountTest {
     fun `should return true for substrate chain`() {
         chainHasId("1")
         metaAccountHasChainAccounts(emptySet())
+        metaAccountHasSubstrateAccountId(byteArrayOf())
         assertTrue(metaAccount.hasAccountIn(chain))
 
         metaAccountHasChainAccounts(setOf("1", "2"))
@@ -30,10 +31,10 @@ class HasChainAccountTest {
     }
 
     @Test
-    fun `should return true for ethereum chain with ethereum keypair`() {
+    fun `should return true for ethereum chain with ethereum main account`() {
         chainHasId("1")
         chainIsEthereumBased(true)
-        metaAccountHasEthereumPublicKey(byteArrayOf())
+        metaAccountHasEthereumAccountId(byteArrayOf())
         metaAccountHasChainAccounts(emptySet())
 
         assertTrue(metaAccount.hasAccountIn(chain))
@@ -43,18 +44,35 @@ class HasChainAccountTest {
     fun `should return false for ethereum chain with no ethereum keypair`() {
         chainHasId("1")
         chainIsEthereumBased(true)
-        metaAccountHasEthereumPublicKey(null)
+        metaAccountHasEthereumAccountId(null)
         metaAccountHasChainAccounts(emptySet())
 
         assertFalse(metaAccount.hasAccountIn(chain))
     }
 
     @Test
-    fun `should return true for ethereum chain with no ethereum keypair but with chain account`() {
+    fun `should return true for ethereum chain with no ethereum main account but with chain account`() {
         chainHasId("1")
         chainIsEthereumBased(true)
-        metaAccountHasEthereumPublicKey(null)
+        metaAccountHasEthereumAccountId(null)
         metaAccountHasChainAccounts(setOf("1"))
+
+        assertTrue(metaAccount.hasAccountIn(chain))
+    }
+
+    @Test
+    fun `should return true for watch-only ethereum account`() {
+        chainHasId("1")
+        metaAccountHasEthereumAccountId(byteArrayOf())
+        chainIsEthereumBased(true)
+
+        assertTrue(metaAccount.hasAccountIn(chain))
+    }
+
+    @Test
+    fun `should return true for watch-only substrate account`() {
+        chainHasId("1")
+        metaAccountHasSubstrateAccountId(byteArrayOf())
 
         assertTrue(metaAccount.hasAccountIn(chain))
     }
@@ -66,5 +84,7 @@ class HasChainAccountTest {
         chainIds.associateWith { Mockito.mock(MetaAccount.ChainAccount::class.java) }
     )
 
-    private fun metaAccountHasEthereumPublicKey(publicKey: ByteArray?) = `when`(metaAccount.ethereumPublicKey).thenReturn(publicKey)
+    private fun metaAccountHasEthereumAccountId(accountId: ByteArray?) = `when`(metaAccount.ethereumAddress).thenReturn(accountId)
+
+    private fun metaAccountHasSubstrateAccountId(accountId: ByteArray?) = `when`(metaAccount.substrateAccountId).thenReturn(accountId)
 }

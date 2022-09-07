@@ -43,7 +43,6 @@ fun minimumStake(
     exposures: Collection<Exposure>,
     minimumNominatorBond: BigInteger,
 ): BigInteger {
-
     val stakeByNominator = exposures
         .map(Exposure::others)
         .flatten()

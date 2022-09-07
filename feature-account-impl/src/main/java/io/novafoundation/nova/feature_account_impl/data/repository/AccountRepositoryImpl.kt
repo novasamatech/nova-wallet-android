@@ -20,7 +20,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.Account
 import io.novafoundation.nova.feature_account_api.domain.model.AuthType
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
-import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountWithAssetBalance
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.domain.model.multiChainEncryptionIn
@@ -123,7 +123,11 @@ class AccountRepositoryImpl(
         return accountDataSource.allMetaAccounts()
     }
 
-    override fun metaAccountsWithBalancesFlow(): Flow<List<MetaAccountWithAssetBalance>> {
+    override fun allMetaAccountsFlow(): Flow<List<MetaAccount>> {
+        return accountDataSource.allMetaAccountsFlow()
+    }
+
+    override fun metaAccountBalancesFlow(): Flow<List<MetaAccountAssetBalance>> {
         return accountDataSource.metaAccountsWithBalancesFlow()
     }
 

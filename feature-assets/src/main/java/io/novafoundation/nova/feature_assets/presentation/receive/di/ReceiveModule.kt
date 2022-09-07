@@ -56,7 +56,7 @@ class ReceiveModule {
             payload,
             chainRegistry,
             selectedAccountUseCase,
-            router
+            router,
         )
     }
 

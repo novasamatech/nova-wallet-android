@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_dapp_impl.web3.metamask.states
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.metamask.MetamaskInteractor
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskChain
@@ -14,6 +15,7 @@ class MetamaskStateFactory(
     private val resourceManager: ResourceManager,
     private val addressIconGenerator: AddressIconGenerator,
     private val web3Session: Web3Session,
+    private val walletUiUseCase: WalletUiUseCase,
 ) {
 
     fun default(
@@ -27,6 +29,7 @@ class MetamaskStateFactory(
             resourceManager = resourceManager,
             addressIconGenerator = addressIconGenerator,
             web3Session = web3Session,
+            walletUiUseCase = walletUiUseCase,
             hostApi = hostApi,
             chain = chain,
             selectedAccountAddress = selectedAddress,

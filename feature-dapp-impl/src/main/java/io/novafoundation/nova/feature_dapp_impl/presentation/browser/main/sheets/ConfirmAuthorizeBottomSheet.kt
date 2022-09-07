@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import coil.ImageLoader
 import io.novafoundation.nova.common.utils.postToSelf
-import io.novafoundation.nova.feature_account_api.view.showAddress
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.showWallet
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DappPendingConfirmation
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DappPendingConfirmation.Action
@@ -28,7 +28,7 @@ class ConfirmAuthorizeBottomSheet(
         val action = confirmation.action
 
         confirmAuthorizeDappIcon.showDAppIcon(action.content.dAppIconUrl, imageLoader)
-        confirmAuthorizeDappWallet.postToSelf { showAddress(action.content.walletAddressModel) }
+        confirmAuthorizeDappWallet.postToSelf { showWallet(action.content.walletModel) }
 
         confirmAuthorizeDappTitle.text = action.content.title
         confirmAuthorizeDappDApp.postToSelf { showValue(action.content.dAppUrl) }

@@ -44,7 +44,7 @@ class AssetUseCaseImpl(
 
         val chainsById = chainRegistry.chainsById.first()
 
-        walletRepository.getAssets(metaAccount.id).filter {
+        walletRepository.getSupportedAssets(metaAccount.id).filter {
             it.token.configuration in availableChainAssets
         }
             .map {

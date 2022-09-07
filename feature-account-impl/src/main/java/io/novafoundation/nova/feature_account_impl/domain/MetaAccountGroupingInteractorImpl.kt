@@ -9,43 +9,45 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountWithAssetBalance
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountWithTotalBalance
 import io.novafoundation.nova.feature_account_api.domain.model.hasAccountIn
+import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 
 class MetaAccountGroupingInteractorImpl(
     private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
+    private val currencyRepository: CurrencyRepository,
 ) : MetaAccountGroupingInteractor {
 
     override fun metaAccountsWithTotalBalanceFlow(): Flow<GroupedList<LightMetaAccount.Type, MetaAccountWithTotalBalance>> {
-        return accountRepository.metaAccountsWithBalancesFlow().map { accountsWithBalances ->
-            accountsWithBalances.groupBy(MetaAccountWithAssetBalance::metaId)
-                .map { (metaId, balances) ->
-                    val totalBalance = balances.sumByBigDecimal {
-                        val totalInPlanks = it.freeInPlanks + it.reservedInPlanks
+        return combine(
+            currencyRepository.observeSelectCurrency(),
+            accountRepository.allMetaAccountsFlow(),
+            accountRepository.metaAccountBalancesFlow()
+        ) { selectedCurrency, accounts, allBalances ->
+            val groupedBalances = allBalances.groupBy(MetaAccountAssetBalance::metaId)
 
-                        totalInPlanks.amountFromPlanks(it.precision) * it.priceRate.orZero()
-                    }
+            accounts.map { metaAccount ->
+                val accountBalances = groupedBalances[metaAccount.id] ?: emptyList()
 
-                    val first = balances.first()
+                val totalBalance = accountBalances.sumByBigDecimal {
+                    val totalInPlanks = it.freeInPlanks + it.reservedInPlanks
 
-                    MetaAccountWithTotalBalance(
-                        metaId = metaId,
-                        totalBalance = totalBalance,
-                        name = first.name,
-                        type = first.type,
-                        isSelected = first.isSelected,
-                        substrateAccountId = first.substrateAccountId,
-                        currencySymbol = first.currencySymbol,
-                        currencyCode = first.currencyCode
-                    )
+                    totalInPlanks.amountFromPlanks(it.precision) * it.rate.orZero()
                 }
-                .groupBy(MetaAccountWithTotalBalance::type)
+
+                MetaAccountWithTotalBalance(
+                    metaAccount = metaAccount,
+                    totalBalance = totalBalance,
+                    currency = selectedCurrency
+                )
+            }
+                .groupBy { it.metaAccount.type }
                 .toSortedMap(metaAccountTypeComparator())
         }
     }
@@ -71,7 +73,8 @@ class MetaAccountGroupingInteractorImpl(
         when (it) {
             LightMetaAccount.Type.SECRETS -> 0
             LightMetaAccount.Type.PARITY_SIGNER -> 1
-            LightMetaAccount.Type.WATCH_ONLY -> 2
+            LightMetaAccount.Type.LEDGER -> 2
+            LightMetaAccount.Type.WATCH_ONLY -> 3
         }
     }
 }

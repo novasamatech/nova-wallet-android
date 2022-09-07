@@ -17,6 +17,7 @@ class AppLinksProvider(
     val setControllerLearnMore: String,
 
     val paritySignerTroubleShooting: String,
+    val ledgerBluetoothGuide: String,
 ) {
 
     fun getTwitterAccountUrl(

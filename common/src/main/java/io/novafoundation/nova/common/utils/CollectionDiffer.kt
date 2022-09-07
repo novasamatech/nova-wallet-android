@@ -22,7 +22,6 @@ object CollectionDiffer {
         oldItems: List<T>,
         forceUseNewItems: Boolean
     ): Diff<T> {
-
         val newKeys: Set<String> = newItems.mapTo(mutableSetOf()) { it.identifier }
         val oldMapping = oldItems.associateBy { it.identifier }
 

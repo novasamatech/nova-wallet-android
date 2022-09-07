@@ -8,11 +8,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    container:
-      image: ghcr.io/nova-wallet/build_tools:pr-3
-      credentials:
-        username: stepanLav
-        password: ${{ secrets.GITHUB_TOKEN }}
+
     env:
       ACALA_PROD_AUTH_TOKEN: ${{ secrets.ACALA_PROD_AUTH_TOKEN }}
       ACALA_TEST_AUTH_TOKEN: ${{ secrets.ACALA_TEST_AUTH_TOKEN }}
@@ -27,6 +23,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+
+      - name: 🔧 Install dependencies
+        uses: ./.github/workflows/install/
 
       - name: Bump version
         uses: chkfung/android-version-actions@v1.1

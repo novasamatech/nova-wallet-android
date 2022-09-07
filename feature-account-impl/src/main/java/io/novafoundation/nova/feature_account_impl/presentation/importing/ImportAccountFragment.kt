@@ -31,7 +31,6 @@ class ImportAccountFragment : BaseFragment<ImportAccountViewModel>() {
         private const val PAYLOAD = "ImportAccountFragment.PAYLOAD"
 
         fun getBundle(payload: ImportAccountPayload): Bundle {
-
             return Bundle().apply {
                 putParcelable(PAYLOAD, payload)
             }

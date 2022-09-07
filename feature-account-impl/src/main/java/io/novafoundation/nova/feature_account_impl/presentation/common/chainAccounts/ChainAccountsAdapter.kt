@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.presentation.common.chainAccounts
 
-import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams
 import coil.ImageLoader
 import io.novafoundation.nova.common.list.BaseGroupedDiffCallback
 import io.novafoundation.nova.common.list.GroupedListAdapter
@@ -9,15 +9,9 @@ import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.common.list.headers.TextHeader
 import io.novafoundation.nova.common.list.headers.TextHeaderHolder
 import io.novafoundation.nova.common.utils.castOrNull
-import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadChainIcon
-import io.novafoundation.nova.feature_account_impl.R
-import kotlinx.android.synthetic.main.item_chain_acount.view.chainAccountAccountAddress
-import kotlinx.android.synthetic.main.item_chain_acount.view.chainAccountAccountIcon
-import kotlinx.android.synthetic.main.item_chain_acount.view.chainAccountChainIcon
-import kotlinx.android.synthetic.main.item_chain_acount.view.chainAccountChainName
-import kotlinx.android.synthetic.main.item_chain_acount.view.labeledTextAction
+import io.novafoundation.nova.feature_account_api.view.ItemChainAccount
 
 class ChainAccountsAdapter(
     private val handler: Handler,
@@ -34,7 +28,11 @@ class ChainAccountsAdapter(
     }
 
     override fun createChildViewHolder(parent: ViewGroup): GroupedListHolder {
-        return ChainAccountHolder(parent.inflateChild(R.layout.item_chain_acount))
+        val view = ItemChainAccount(parent.context).apply {
+            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+        }
+
+        return ChainAccountHolder(view)
     }
 
     override fun bindGroup(holder: GroupedListHolder, group: TextHeader) {
@@ -46,20 +44,20 @@ class ChainAccountsAdapter(
     }
 }
 
-class ChainAccountHolder(view: View) : GroupedListHolder(view) {
+class ChainAccountHolder(override val containerView: ItemChainAccount) : GroupedListHolder(containerView) {
 
     fun bind(
         item: AccountInChainUi,
         handler: ChainAccountsAdapter.Handler,
         imageLoader: ImageLoader
     ) = with(containerView) {
-        chainAccountChainIcon.loadChainIcon(item.chainUi.icon, imageLoader)
-        chainAccountChainName.text = item.chainUi.name
+        chainIcon.loadChainIcon(item.chainUi.icon, imageLoader)
+        chainName.text = item.chainUi.name
 
-        chainAccountAccountIcon.setImageDrawable(item.accountIcon)
-        chainAccountAccountAddress.text = item.addressOrHint
+        accountIcon.setImageDrawable(item.accountIcon)
+        accountAddress.text = item.addressOrHint
 
-        labeledTextAction.setVisible(item.actionsAvailable)
+        action.setVisible(item.actionsAvailable)
         if (item.actionsAvailable) {
             setOnClickListener { handler.chainAccountClicked(item) }
         } else {

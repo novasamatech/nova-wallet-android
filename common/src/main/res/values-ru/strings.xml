@@ -67,11 +67,24 @@
   <string name="account_invalid_derivation_path_message_v2_2_0">Ваш путь деривации содержит неподдерживаемые символы или имеет некорректную структуру</string>
   <string name="account_invalid_derivation_path_title">Некорректный путь деривации</string>
   <string name="account_json_file">JSON файл</string>
+  <string name="account_ledger_import_fill_description">Убедитесь, что приложение сети установлено на вашем Ledger устройстве через приложение Ledger Live. Откройте приложение сети на вашем Ledger устройстве.</string>
+  <string name="account_ledger_import_fill_disabled_hint">Добавьте аккаунт</string>
+  <string name="account_ledger_import_fill_title">Добавьте аккаунты в Ваш кошелёк</string>
+  <string name="account_ledger_import_start_guide">Инструкция по подключению Ledger</string>
+  <string name="account_ledger_import_start_step_1">Удостоверьтесь, что <font color="#FFFFFF">приложение Сети установлено</font> на Ваше устройство Ledger, используя приложение Ledger Live</string>
+  <string name="account_ledger_import_start_step_2"><font color="#FFFFFF">Откройте приложение Сети</font> на Вашем Ledger устройстве</string>
+  <string name="account_ledger_import_start_step_3">Разрешите Nova Wallet <font color="#FFFFFF">доступ к Bluetooth</font></string>
+  <string name="account_ledger_import_start_step_4"><font color="#FFFFFF">Выберите аккаунт</font> для добавления в кошелёк</string>
+  <string name="account_ledger_import_start_title">Подключите Ledger Nano X</string>
+  <string name="account_ledger_nano_x">Ledger Nano X</string>
+  <string name="account_ledger_select_device_description">Пожалуйста, включите Bluetooth в настройках телефона. Разблокируйте Ledger устройство и откройте %s приложение.</string>
+  <string name="account_ledger_select_device_title">Выберите устройство Ledger</string>
   <string name="account_mnmonic_length_variants">фраза длиной 12, 15, 18, 21 или 24 слова</string>
   <string name="account_needed_message">У вас нет учетной записи в этой сети, вы можете создать или импортировать учетную запись.</string>
   <string name="account_needed_title">Необходим аккаунт</string>
   <string name="account_no_chain_projection">Аккаунт не найден</string>
   <string name="account_parity_signer">Parity Signer</string>
+  <string name="account_parity_signer_chain_not_supported">Parity Signer не поддерживает %s</string>
   <string name="account_parity_signer_import_preview_description">Следующие аккаунты были успешно считаны с Parity Signer</string>
   <string name="account_parity_signer_import_preview_title">Вот ваши аккаунты</string>
   <string name="account_parity_signer_import_scan_invalid_qr">Неверный QR-код, пожалуйста, убедитесь, что вы сканируете QR-код из Parity Signer</string>
@@ -93,6 +106,7 @@
   <string name="account_private_key">Приватный ключ</string>
   <string name="account_restore_account">У меня уже есть аккаунт</string>
   <string name="account_seed_hex_symbols">64 шест. символа</string>
+  <string name="account_select_hardware_wallet">Выберите аппаратный кошелёк</string>
   <string name="account_select_secret_source">Выберите ваш тип секрета</string>
   <string name="account_select_wallet">Выберите кошелек</string>
   <string name="account_shared_secret">Аккаунты с общим секретом</string>
@@ -107,7 +121,7 @@
   <string name="account_watch_key_missing_description">Ваш кошелек доступен только для просмотра, то есть вы не можете выполнять с ним никаких операций</string>
   <string name="account_watch_key_missing_title">Упс! Ключ отсутствует</string>
   <string name="account_watch_only">watch-only</string>
-  <string name="account_welcome_hardware_wallet_subtitle">Использовать Parity Signer</string>
+  <string name="account_welcome_hardware_wallet_subtitle">Использовать Parity Signer или Ledger</string>
   <string name="account_welcome_hardware_wallet_title">Подключить аппаратный кошелёк</string>
   <string name="accounts_add_chain_account">Добавить %s аккаунт</string>
   <string name="accounts_add_wallet">Добавить кошелёк</string>
@@ -117,6 +131,8 @@
   <string name="assets_balance_details_locks_phrelect">Выборы</string>
   <string name="assets_balance_details_locks_staking">Стейкинг</string>
   <string name="assets_balance_details_locks_vesting">Вестинг</string>
+  <string name="assets_receive_ledger_not_supported_message">Не переводите %s на Ledger аккаунт так как Ledger не поддерживает переводы %s, таким образом ассет будет недоступен для перевода на этом аккаунте</string>
+  <string name="assets_receive_ledger_not_supported_title">Ledger не поддерживает этот токен</string>
   <string name="assets_search_hint">Поиск по названию сети или токена</string>
   <string name="assets_search_placeholder">Не найдено сетей или токенов с\nуказаным именем</string>
   <string name="assets_select_send_your_wallets">Ваши кошельки</string>
@@ -148,6 +164,7 @@
   <string name="common_bonus">Бонус</string>
   <string name="common_call">Вызов</string>
   <string name="common_cancel">Отмена</string>
+  <string name="common_cancel_operation_warning">Вы уверены, что хотите отменить операцию?</string>
   <string name="common_cannot_open_link">Не удается открыть данную ссылку</string>
   <string name="common_chain">Сеть</string>
   <string name="common_change">Изменить</string>
@@ -190,6 +207,7 @@
   <string name="common_invalid_qr">QR-код недействителен</string>
   <string name="common_learn_more">Узнать больше</string>
   <string name="common_learn_more_v2_2_0">Узнать больше</string>
+  <string name="common_ledger">Ledger</string>
   <string name="common_left">%s осталось</string>
   <string name="common_maximum">Максимальный</string>
   <plurals name="common_minutes_format">
@@ -202,6 +220,7 @@
   <string name="common_module">Модуль</string>
   <string name="common_network">Сеть</string>
   <string name="common_next">Далее</string>
+  <string name="common_no">Нет</string>
   <string name="common_no_screenshot_message_v2_2_0">Мы собираемся показать вашу мнемонику. Убедитесь, что никто не видит ваш экран и не делайте скриншотов - к ним могут получить доступ вредоносные программы</string>
   <string name="common_not_enough_funds_message">К сожалению, у вас недостаточно средств для оплаты сетевого сбора.</string>
   <string name="common_not_enough_funds_title">Недостаточный баланс</string>
@@ -225,6 +244,7 @@
   <string name="common_search_results_number">Результаты поиска: %d</string>
   <string name="common_secret_derivation_path">Последовательность для вывода</string>
   <string name="common_share">Поделиться</string>
+  <string name="common_signature_invalid">Неверная подпись</string>
   <string name="common_skip">Пропустить</string>
   <string name="common_skip_process">Пропустить</string>
   <string name="common_status">Статус</string>
@@ -245,6 +265,7 @@
   <string name="common_validation_invalid_address_message">Получатель должен быть допустимым адресом %s</string>
   <string name="common_validation_invalid_address_title">Недопустимый получатель</string>
   <string name="common_warning">Предупреждение</string>
+  <string name="common_yes">Да</string>
   <string name="common_zero_amount_error">Сумма должна быть больше нуля</string>
   <string name="connection_add_already_exists_error">Узел уже был добавлен ранее. Пожалуйста, попробуйте другой узел.</string>
   <string name="connection_add_invalid_error">Не удается установить соединение с узлом. Пожалуйста, попробуйте другой узел.</string>
@@ -291,6 +312,7 @@
   <string name="crowdloan_learn_v2_2_0">Cайт краудлоана %s</string>
   <string name="crowdloan_leasing_period">Период лизинга</string>
   <string name="crowdloan_main_description_v2_2_0">Выберите парачейны для внесения своих %s. Вы получите внесенные токены обратно, и если парачейн выиграет слот вы получите награду после окончания аукциона</string>
+  <string name="crowdloan_missing_account_message">Вы должны добавить %s аккаунт в кошелёк для того, чтобы внести вклад</string>
   <string name="crowdloan_missing_bonus_action">Применить</string>
   <string name="crowdloan_missing_bonus_message">Если у вас нет реферального кода, вы можете применить код Nova, чтобы получить бонус за свой вклад</string>
   <string name="crowdloan_missing_bonus_title">Вы не применили бонус</string>
@@ -370,6 +392,28 @@
   <string name="invoice_scan_qr_code_title">QR код</string>
   <string name="invoice_scan_upload">Из галереи</string>
   <string name="language_title">Язык</string>
+  <string name="ledger_chain_not_supported">Ledger не поддерживает %s</string>
+  <string name="ledger_error_app_cancelled_message">Операция была отменена устройством. Удостоверьтесь, что Ledger разблокирован.</string>
+  <string name="ledger_error_app_cancelled_title">Операция отменена</string>
+  <string name="ledger_error_app_not_launched_message">Откройте %s приложение на вашем Ledger устройстве</string>
+  <string name="ledger_error_app_not_launched_title">%s приложение не запущено</string>
+  <string name="ledger_error_general_message">Операция завершилась ошибкой на устройстве. Пожалуйста, попробуйте позже.</string>
+  <string name="ledger_error_general_title">Ошибка Ledger</string>
+  <string name="ledger_import_select_address_load_more">Загрузить больше аккаунтов</string>
+  <string name="ledger_review_approve_title">Проверьте и Подтвердите</string>
+  <string name="ledger_sign_approve_message">Нажмите обе кнопки на Вашем %s для подтверждения транзакции</string>
+  <string name="ledger_sign_metadata_outdated_subtitle">Пожалуйста, обновите %s приложение, используя Ledger Live</string>
+  <string name="ledger_sign_metadata_outdated_title">Метаданные устарели</string>
+  <string name="ledger_sign_raw_not_supported">Ledger не поддерживает подтверждение произвольных сообщений — только транзакции</string>
+  <string name="ledger_sign_signature_invalid_message">Пожалуйста, удостоверьтесь, что Вы выбрали верное устройство Ledger</string>
+  <string name="ledger_sign_transaction_expired_message">В целях безопасности сгенерированные операции действительны только в течение %s. Пожалуйста, попробуйте еще раз и подтвердите транзакцию с помощью Ledger</string>
+  <string name="ledger_sign_transaction_expired_title">Срок действия транзакции истек</string>
+  <string name="ledger_sign_transaction_validity_format">Транзакция валидна %s</string>
+  <string name="ledger_sign_tx_not_supported_subtitle">Ledger не поддерживает данную транзакцию.</string>
+  <string name="ledger_sign_tx_not_supported_title">Транзакция не поддерживается</string>
+  <string name="ledger_verify_address_subtitle">Нажмите обе кнопки на Вашем %s для подтверждения адреса</string>
+  <string name="ledger_wallet_details_description">Этот кошелёк добавлен из Ledger устройства. Nova Wallet поможет создать любую операцию, и вам будет необходимо подписать ее с помощью Ledger устройства</string>
+  <string name="ledher_import_select_address_title">Выберите аккаунт для добавления в кошелёк</string>
   <string name="make_payout_transaction_sent">Транзакция на выплату отправлена</string>
   <string name="mnemonic_error_try_another_one">Пожалуйста, попробуйте другую.</string>
   <string name="mnemonic_error_try_another_one_v2_2_0">Ваша мнемоника недействительна, пожалуйста, проверьте еще раз порядок слов</string>
