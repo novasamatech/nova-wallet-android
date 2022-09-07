@@ -221,7 +221,7 @@ class SignLedgerViewModel(
 
     private fun matchInvalidDataMessage(message: String?): InvalidDataError? {
         return when (message) {
-            "Method not supported" -> InvalidDataError.TX_NOT_SUPPORTED
+            "Method not supported", "Call nesting not supported" -> InvalidDataError.TX_NOT_SUPPORTED
             "Spec version not supported", "Txn version not supported" -> InvalidDataError.METADATA_OUTDATED
             else -> null
         }
