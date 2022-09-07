@@ -32,7 +32,7 @@ interface TuringAutomationTasksRepository {
 
 class RealTuringAutomationTasksRepository(
     private val localStorageDataSource: StorageDataSource
-): TuringAutomationTasksRepository {
+) : TuringAutomationTasksRepository {
 
     override fun automationTasksFlow(chainId: ChainId, accountId: AccountId): Flow<List<TuringAutomationTask>> {
         return localStorageDataSource.subscribe(chainId) {

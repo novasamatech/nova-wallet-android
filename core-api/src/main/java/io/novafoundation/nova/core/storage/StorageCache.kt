@@ -28,7 +28,6 @@ interface StorageCache {
      */
     suspend fun observeEntries(keys: List<String>, chainId: String): Flow<List<StorageEntry>>
 
-
     suspend fun observeEntries(keyPrefix: String, chainId: String): Flow<List<StorageEntry>>
 
     /**
