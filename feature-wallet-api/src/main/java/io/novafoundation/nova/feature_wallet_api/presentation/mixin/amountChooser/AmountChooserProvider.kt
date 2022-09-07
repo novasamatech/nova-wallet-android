@@ -3,8 +3,8 @@ package io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoos
 import androidx.annotation.StringRes
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
-import io.novafoundation.nova.common.utils.formatAsCurrency
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.model.ChooseAmountModel
@@ -85,7 +85,7 @@ class AmountChooserProvider(
         .debounce(DEBOUNCE_DURATION_MILLIS.milliseconds)
 
     override val fiatAmount: Flow<String> = usedAssetFlow.combine(amount) { asset, amount ->
-        asset.token.fiatAmount(amount).formatAsCurrency()
+        asset.token.priceOf(amount).formatAsCurrency(asset.token.currency)
     }
         .inBackground()
         .share()

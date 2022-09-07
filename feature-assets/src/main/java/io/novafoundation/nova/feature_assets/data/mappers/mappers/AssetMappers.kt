@@ -1,11 +1,12 @@
 package io.novafoundation.nova.feature_assets.data.mappers.mappers
 
+import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.feature_assets.R
-import io.novafoundation.nova.common.utils.formatAsChange
-import io.novafoundation.nova.common.utils.formatAsCurrency
+import io.novafoundation.nova.common.utils.formatting.formatAsChange
 import io.novafoundation.nova.common.utils.isNonNegative
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import io.novafoundation.nova.feature_assets.presentation.model.TokenModel
+import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import java.math.BigDecimal
@@ -22,7 +23,7 @@ fun mapTokenToTokenModel(token: Token): TokenModel {
 
         TokenModel(
             configuration = configuration,
-            dollarRate = (dollarRate ?: BigDecimal.ZERO).formatAsCurrency(),
+            rate = (rate ?: BigDecimal.ZERO).formatAsCurrency(token.currency),
             recentRateChange = (recentRateChange ?: BigDecimal.ZERO).formatAsChange(),
             rateChangeColorRes = changeColorRes
         )
@@ -33,14 +34,8 @@ fun mapAssetToAssetModel(asset: Asset): AssetModel {
     return with(asset) {
         AssetModel(
             token = mapTokenToTokenModel(token),
-            total = total,
-            bonded = bonded,
-            locked = locked,
-            available = transferable,
-            reserved = reserved,
-            redeemable = redeemable,
-            unbonding = unbonding,
-            dollarAmount = dollarAmount
+            total = total.format(),
+            priceAmount = priceAmount.formatAsCurrency(asset.token.currency)
         )
     }
 }

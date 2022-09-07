@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.View
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.ColorRes
@@ -47,6 +48,19 @@ open class TableCellView @JvmOverloads constructor(
 
     enum class FieldStyle {
         TEXT, LINK
+    }
+
+    companion object {
+        fun createTableCellView(context: Context): TableCellView {
+            return TableCellView(context).apply {
+                layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+
+                setDividerColor(R.color.white_24)
+
+                valueSecondary.setTextColorRes(R.color.white_64)
+                title.setTextColorRes(R.color.white_64)
+            }
+        }
     }
 
     val title: TextView

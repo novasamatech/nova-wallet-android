@@ -19,7 +19,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.W
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
-import io.novafoundation.nova.feature_assets.presentation.WalletRouter
+import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.confirm.ConfirmSendViewModel
 import io.novafoundation.nova.feature_assets.presentation.send.confirm.hints.ConfirmSendHintsMixinFactory
@@ -46,7 +46,7 @@ class ConfirmSendModule {
         interactor: WalletInteractor,
         sendInteractor: SendInteractor,
         validationExecutor: ValidationExecutor,
-        router: WalletRouter,
+        router: AssetsRouter,
         addressIconGenerator: AddressIconGenerator,
         externalActions: ExternalActions.Presentation,
         selectedAccountUseCase: SelectedAccountUseCase,

@@ -7,7 +7,7 @@ import io.novafoundation.nova.common.utils.filterToSet
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
-import io.novafoundation.nova.feature_assets.presentation.WalletRouter
+import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 
 class TransactionHistoryFilterViewModel(
-    private val router: WalletRouter,
+    private val router: AssetsRouter,
     private val historyFiltersProviderFactory: HistoryFiltersProviderFactory
 ) : BaseViewModel() {
 

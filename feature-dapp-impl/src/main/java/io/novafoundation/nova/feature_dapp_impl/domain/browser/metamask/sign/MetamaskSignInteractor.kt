@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
+import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_dapp_impl.data.network.ethereum.EthereumApi
 import io.novafoundation.nova.feature_dapp_impl.data.network.ethereum.EthereumApiFactory
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.metamask.MetamaskInteractor
@@ -38,6 +39,7 @@ import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.findChain
+import java.math.BigInteger
 import jp.co.soramitsu.fearless_utils.extensions.asEthereumAddress
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.extensions.toAccountId
@@ -50,13 +52,13 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import org.web3j.crypto.RawTransaction
-import java.math.BigInteger
 
 class MetamaskSignInteractorFactory(
     private val metamaskInteractor: MetamaskInteractor,
     private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
     private val tokenRepository: TokenRepository,
+    private val currencyRepository: CurrencyRepository,
     private val extrinsicGson: Gson,
     private val addressIconGenerator: AddressIconGenerator,
     private val ethereumApiFactory: EthereumApiFactory,
@@ -66,6 +68,7 @@ class MetamaskSignInteractorFactory(
     fun create(request: MetamaskSendTransactionRequest) = MetamaskSignInteractor(
         chainRegistry = chainRegistry,
         tokenRepository = tokenRepository,
+        currencyRepository = currencyRepository,
         extrinsicGson = extrinsicGson,
         addressIconGenerator = addressIconGenerator,
         request = request,
@@ -82,6 +85,7 @@ class MetamaskSignInteractor(
     private val metamaskInteractor: MetamaskInteractor,
     private val addressIconGenerator: AddressIconGenerator,
     private val tokenRepository: TokenRepository,
+    private val currencyRepository: CurrencyRepository,
     private val chainRegistry: ChainRegistry,
     private val extrinsicGson: Gson,
     private val accountRepository: AccountRepository,
@@ -256,24 +260,26 @@ class MetamaskSignInteractor(
         )
     }
 
-    private fun createTokenFrom(metamaskChain: MetamaskChain): Token {
-        val currency = metamaskChain.nativeCurrency
+    private suspend fun createTokenFrom(metamaskChain: MetamaskChain): Token {
+        val currency = currencyRepository.getSelectedCurrency()
+        val chainCurrency = metamaskChain.nativeCurrency
 
         return Token(
-            dollarRate = null,
+            rate = null,
             recentRateChange = null,
             configuration = Chain.Asset(
                 iconUrl = metamaskChain.iconUrls?.firstOrNull(),
                 id = 0,
                 priceId = null,
                 chainId = metamaskChain.chainId,
-                symbol = currency.symbol,
-                precision = currency.decimals,
+                symbol = chainCurrency.symbol,
+                precision = chainCurrency.decimals,
                 buyProviders = emptyMap(),
                 staking = Chain.Asset.StakingType.UNSUPPORTED,
                 type = Chain.Asset.Type.Native,
-                name = currency.name
-            )
+                name = chainCurrency.name
+            ),
+            currency = currency
         )
     }
 

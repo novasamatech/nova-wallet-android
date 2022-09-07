@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInter
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.settings.SettingsViewModel
+import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 
 @Module(includes = [ViewModelModule::class])
 class SettingsModule {
@@ -23,20 +24,22 @@ class SettingsModule {
     @IntoMap
     @ViewModelKey(SettingsViewModel::class)
     fun provideViewModel(
-        interactor: AccountInteractor,
+        accountInteractor: AccountInteractor,
         router: AccountRouter,
         appLinksProvider: AppLinksProvider,
         resourceManager: ResourceManager,
         appVersionProvider: AppVersionProvider,
-        selectedAccountUseCase: SelectedAccountUseCase
+        selectedAccountUseCase: SelectedAccountUseCase,
+        currencyInteractor: CurrencyInteractor
     ): ViewModel {
         return SettingsViewModel(
-            interactor,
+            accountInteractor,
             router,
             appLinksProvider,
             resourceManager,
             appVersionProvider,
-            selectedAccountUseCase
+            selectedAccountUseCase,
+            currencyInteractor
         )
     }
 

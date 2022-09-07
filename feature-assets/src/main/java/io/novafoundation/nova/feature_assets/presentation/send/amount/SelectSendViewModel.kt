@@ -14,13 +14,15 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
+import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.SelectAddressRequester
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
-import io.novafoundation.nova.feature_assets.presentation.WalletRouter
+import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDirectionModel
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.amount.view.CrossChainDestinationModel
@@ -41,24 +43,27 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.requireO
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.asset
+import java.math.BigDecimal
+import java.math.BigInteger
+import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.math.BigDecimal
-import java.math.BigInteger
-import kotlin.time.ExperimentalTime
 
 class SelectSendViewModel(
     private val interactor: WalletInteractor,
     private val sendInteractor: SendInteractor,
-    private val router: WalletRouter,
+    private val metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
+    private val router: AssetsRouter,
     private val assetPayload: AssetPayload,
     private val initialRecipientAddress: String?,
     private val chainRegistry: ChainRegistry,
@@ -68,7 +73,8 @@ class SelectSendViewModel(
     private val resourceManager: ResourceManager,
     private val addressInputMixinFactory: AddressInputMixinFactory,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-    amountChooserMixinFactory: AmountChooserMixin.Factory
+    amountChooserMixinFactory: AmountChooserMixin.Factory,
+    private val selectAddressRequester: SelectAddressRequester
 ) : BaseViewModel(),
     Validatable by validationExecutor {
 
@@ -79,7 +85,6 @@ class SelectSendViewModel(
 
     val addressInputMixin = with(addressInputMixinFactory) {
         val destinationChain = destinationChain.map { it.chain }
-
         create(
             inputSpecProvider = singleChainInputSpec(destinationChain),
             myselfBehaviorProvider = crossChainOnlyMyself(originChain, destinationChain),
@@ -95,6 +100,11 @@ class SelectSendViewModel(
     }
         .onStart { emit(emptyList()) }
         .shareInBackground()
+
+    val isSelectAddressAvailable = destinationChain
+        .map { metaAccountGroupingInteractor.hasAvailableMetaAccountsForDestination(it.chain.id) }
+        .inBackground()
+        .share()
 
     val transferDirectionModel = combine(
         availableCrossChainDestinations,
@@ -140,6 +150,8 @@ class SelectSendViewModel(
     }
 
     init {
+        subscribeOnSelectAddress()
+
         setInitialState()
 
         setupFees()
@@ -195,6 +207,23 @@ class SelectSendViewModel(
         val newDestinationChain = chooseDestinationChain.awaitAction(payload)
 
         destinationChain.emit(newDestinationChain)
+    }
+
+    fun selectRecipientWallet() {
+        launch {
+            val currentAddress = addressInputMixin.inputFlow.value
+            val currentDestination = destinationChain.first().chain
+            val request = SelectAddressRequester.Request(currentDestination.id, currentAddress)
+            selectAddressRequester.openRequest(request)
+        }
+    }
+
+    private fun subscribeOnSelectAddress() {
+        selectAddressRequester.responseFlow
+            .onEach {
+                addressInputMixin.inputFlow.value = it.selectedAddress
+            }
+            .launchIn(this)
     }
 
     private fun setInitialState() = launch {

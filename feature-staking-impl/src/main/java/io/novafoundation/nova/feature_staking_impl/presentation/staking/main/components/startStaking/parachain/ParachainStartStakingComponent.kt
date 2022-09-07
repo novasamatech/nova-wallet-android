@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer.Payload.DialogAction
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.event
-import io.novafoundation.nova.common.utils.formatFractionAsPercentage
+import io.novafoundation.nova.common.utils.formatting.formatFractionAsPercentage
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.validation.TransformedFailure
 import io.novafoundation.nova.common.validation.ValidationExecutor

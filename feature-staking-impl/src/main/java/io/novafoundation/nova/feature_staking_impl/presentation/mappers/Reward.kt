@@ -2,8 +2,8 @@ package io.novafoundation.nova.feature_staking_impl.presentation.mappers
 
 import androidx.annotation.StringRes
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.formatAsCurrency
-import io.novafoundation.nova.common.utils.formatFractionAsPercentage
+import io.novafoundation.nova.common.utils.formatting.formatFractionAsPercentage
+import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.PeriodReturns
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.model.RewardEstimation
@@ -36,7 +36,7 @@ fun mapPeriodReturnsToRewardEstimation(
 
     return RewardEstimation(
         amount = amountWithSuffix,
-        fiatAmount = token.fiatAmount(periodReturns.gainAmount).formatAsCurrency(),
+        fiatAmount = token.priceOf(periodReturns.gainAmount).formatAsCurrency(token.currency),
         gain = gainWithSuffix
     )
 }

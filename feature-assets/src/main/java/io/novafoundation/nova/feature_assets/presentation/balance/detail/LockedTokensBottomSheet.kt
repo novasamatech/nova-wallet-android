@@ -2,26 +2,44 @@ package io.novafoundation.nova.feature_assets.presentation.balance.detail
 
 import android.content.Context
 import android.os.Bundle
+import android.view.ViewGroup
+import androidx.core.view.updateLayoutParams
+import androidx.core.view.updateMargins
+import io.novafoundation.nova.common.view.TableCellView
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.common.view.bottomSheet.list.fixed.FixedListBottomSheet
-import io.novafoundation.nova.feature_assets.presentation.common.currencyItem
-import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
+import io.novafoundation.nova.feature_assets.presentation.model.BalanceLocksModel
+import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
 
 class LockedTokensBottomSheet(
     context: Context,
-    private val payload: AssetModel
+    private val balanceLocks: BalanceLocksModel
 ) : FixedListBottomSheet(context) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val title = context.getString(R.string.wallet_balance_locked_template, payload.token.configuration.symbol)
-        setTitle(title)
+        setTitle(R.string.wallet_balance_locked)
+        val viewItems = createViewItems(balanceLocks.locks)
+        viewItems.forEach { addItem(it) }
+    }
 
-        currencyItem(R.string.wallet_balance_locked, payload.locked)
-        currencyItem(R.string.wallet_balance_bonded, payload.bonded)
-        currencyItem(R.string.wallet_balance_reserved, payload.reserved)
-        currencyItem(R.string.wallet_balance_redeemable, payload.redeemable)
-        currencyItem(R.string.wallet_balance_unbonding_v1_9_0, payload.unbonding)
+    private fun createViewItems(locks: List<BalanceLocksModel.Lock>): List<TableCellView> {
+        return locks.map(::createViewItem)
+    }
+
+    private fun createViewItem(lock: BalanceLocksModel.Lock): TableCellView {
+        return TableCellView.createTableCellView(context).apply {
+            setDividerVisible(false)
+            setTitle(lock.name)
+            setDividerColor(R.color.white_8)
+            showAmount(lock.amount)
+            updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                updateMargins(
+                    left = getCommonPadding(),
+                    right = getCommonPadding()
+                )
+            }
+        }
     }
 }

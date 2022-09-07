@@ -11,7 +11,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_assets.presentation.WalletRouter
+import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.extrinsic.ExtrinsicDetailViewModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -25,7 +25,7 @@ class ExtrinsicDetailModule {
         addressDisplayUseCase: AddressDisplayUseCase,
         addressIconGenerator: AddressIconGenerator,
         chainRegistry: ChainRegistry,
-        router: WalletRouter,
+        router: AssetsRouter,
         operation: OperationParcelizeModel.Extrinsic,
         externalActions: ExternalActions.Presentation,
     ): ViewModel {

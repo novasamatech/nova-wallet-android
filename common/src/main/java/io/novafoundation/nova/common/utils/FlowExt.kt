@@ -24,8 +24,10 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
@@ -219,6 +221,34 @@ fun MutableStateFlow<Boolean>.toggle() {
 fun <T> flowOf(producer: suspend () -> T) = flow {
     emit(producer())
 }
+
+@OptIn(ExperimentalCoroutinesApi::class)
+fun <T> accumulate(vararg flows: Flow<T>): Flow<List<T>> {
+    val flowsList = flows.mapIndexed { index, flow -> flow.map { index to flow } }
+    val resultOfFlows = MutableList<T?>(flowsList.size) { null }
+    return flowsList
+        .merge()
+        .map {
+            resultOfFlows[it.first] = it.second.first()
+            resultOfFlows.filterNotNull()
+        }
+}
+
+fun <T> accumulateFlatten(vararg flows: Flow<List<T>>): Flow<List<T>> {
+    return accumulate(*flows).map { it.flatten() }
+}
+
+fun <T> firstNonEmpty(
+    vararg sources: Flow<List<T>>
+): Flow<List<T>> = accumulate(*sources)
+    .transform { collected ->
+        val isAllLoaded = collected.size == sources.size
+        val flattenResult: List<T> = collected.flatten()
+
+        if (isAllLoaded || flattenResult.isNotEmpty()) {
+            emit(flattenResult)
+        }
+    }
 
 inline fun <T> Flow<T>.observeInLifecycle(
     lifecycleCoroutineScope: LifecycleCoroutineScope,

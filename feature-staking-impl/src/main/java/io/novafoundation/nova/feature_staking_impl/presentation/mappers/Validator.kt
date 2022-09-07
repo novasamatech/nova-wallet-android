@@ -4,11 +4,11 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.address.createAddressModel
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.format
-import io.novafoundation.nova.common.utils.formatAsCurrency
-import io.novafoundation.nova.common.utils.formatAsPercentage
+import io.novafoundation.nova.common.utils.formatting.format
+import io.novafoundation.nova.common.utils.formatting.formatAsPercentage
 import io.novafoundation.nova.common.utils.fractionToPercentage
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
+import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_staking_api.domain.model.NominatedValidator
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_impl.R
@@ -101,7 +101,7 @@ fun stakeToScoring(stakeInPlanks: BigInteger?, token: Token): StakeTargetModel.S
 
     return StakeTargetModel.Scoring.TwoFields(
         primary = stake.formatTokenAmount(token.configuration),
-        secondary = token.fiatAmount(stake).formatAsCurrency()
+        secondary = token.priceOf(stake).formatAsCurrency(token.currency)
     )
 }
 

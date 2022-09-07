@@ -4,6 +4,7 @@ import android.animation.LayoutTransition
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+import androidx.core.view.isVisible
 import io.novafoundation.nova.common.list.BaseGroupedDiffCallback
 import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
@@ -11,6 +12,7 @@ import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.view.ChipLabelModel
 import io.novafoundation.nova.common.view.ChipLabelView
 import io.novafoundation.nova.feature_account_impl.R
@@ -73,8 +75,8 @@ class AccountsAdapter(
             onUnknownPayload = { holder.bindMode(mode, child, accountItemHandler) },
             onDiffCheck = {
                 when (it) {
-                    MetaAccountUi::name -> holder.bindName(child)
-                    MetaAccountUi::totalBalance -> holder.bindTotalBalance(child)
+                    MetaAccountUi::title -> holder.bindName(child)
+                    MetaAccountUi::subtitle -> holder.bindSubtitle(child)
                     MetaAccountUi::isSelected -> holder.bindMode(mode, child, accountItemHandler)
                 }
             }
@@ -114,18 +116,19 @@ class AccountHolder(view: View) : GroupedListHolder(view) {
         handler: AccountsAdapter.AccountItemHandler,
     ) = with(containerView) {
         bindName(accountModel)
-        bindTotalBalance(accountModel)
+        bindSubtitle(accountModel)
         bindMode(mode, accountModel, handler)
 
         itemAccountIcon.setImageDrawable(accountModel.picture)
     }
 
     fun bindName(accountModel: MetaAccountUi) {
-        containerView.itemAccountTitle.text = accountModel.name
+        containerView.itemAccountTitle.text = accountModel.title
     }
 
-    fun bindTotalBalance(accountModel: MetaAccountUi) {
-        containerView.itemAccountSubtitle.text = accountModel.totalBalance
+    fun bindSubtitle(accountModel: MetaAccountUi) {
+        containerView.itemAccountSubtitle.text = accountModel.subtitle
+        containerView.itemAccountSubtitle.setDrawableStart(accountModel.subtitleIconRes, paddingInDp = 4)
     }
 
     fun bindMode(
@@ -167,7 +170,8 @@ class AccountHolder(view: View) : GroupedListHolder(view) {
 
                 itemAccountDelete.visibility = View.GONE
 
-                itemAccountCheck.visibility = View.VISIBLE
+                itemAccountCheck.isVisible = accountModel.isClickable
+
                 itemAccountCheck.isChecked = accountModel.isSelected
 
                 setOnClickListener { handler.itemClicked(accountModel) }
@@ -177,7 +181,7 @@ class AccountHolder(view: View) : GroupedListHolder(view) {
 }
 
 private object MetaAccountPayloadGenerator : PayloadGenerator<MetaAccountUi>(
-    MetaAccountUi::name, MetaAccountUi::totalBalance, MetaAccountUi::isSelected
+    MetaAccountUi::title, MetaAccountUi::subtitle, MetaAccountUi::isSelected
 )
 
 private class DiffCallback : BaseGroupedDiffCallback<ChipLabelModel, MetaAccountUi>(ChipLabelModel::class.java) {
@@ -194,7 +198,7 @@ private class DiffCallback : BaseGroupedDiffCallback<ChipLabelModel, MetaAccount
     }
 
     override fun areChildContentsTheSame(oldItem: MetaAccountUi, newItem: MetaAccountUi): Boolean {
-        return oldItem.name == newItem.name && oldItem.totalBalance == newItem.totalBalance && oldItem.isSelected == newItem.isSelected
+        return oldItem.title == newItem.title && oldItem.subtitle == newItem.subtitle && oldItem.isSelected == newItem.isSelected
     }
 
     override fun getChildChangePayload(oldItem: MetaAccountUi, newItem: MetaAccountUi): Any? {

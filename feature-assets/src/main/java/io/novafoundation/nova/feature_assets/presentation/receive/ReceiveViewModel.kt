@@ -20,7 +20,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.receive.ReceiveInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
-import io.novafoundation.nova.feature_assets.presentation.WalletRouter
+import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.receive.model.QrSharingPayload
 import io.novafoundation.nova.feature_assets.presentation.receive.model.TokenReceiver
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -39,7 +39,7 @@ class ReceiveViewModel(
     private val assetPayload: AssetPayload,
     private val chainRegistry: ChainRegistry,
     selectedAccountUseCase: SelectedAccountUseCase,
-    private val router: WalletRouter,
+    private val router: AssetsRouter,
 ) : BaseViewModel(), ExternalActions by externalActions {
 
     private val chainWithAssetAsync by lazyAsync {

@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import coil.ImageLoader
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
@@ -11,6 +13,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.setupCustomDialogDisplayer
 import io.novafoundation.nova.common.presentation.LoadingState
+import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getBlurDrawable
@@ -18,20 +21,25 @@ import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.di.CrowdloanFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.setupAssetSelector
+import javax.inject.Inject
 import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanAbout
 import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanAssetSelector
 import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanAvatar
 import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanContainer
 import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanList
 import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanMainDescription
-import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanMyContributions
 import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanPlaceholder
 import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanProgress
-import javax.inject.Inject
+import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanTotalContributedContainer
+import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanTotalContributedFiat
+import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanTotalContributedShimmering
+import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanTotalContributedValue
+import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanTotalContributionsCount
 
 class CrowdloanFragment : BaseFragment<CrowdloanViewModel>(), CrowdloanAdapter.Handler {
 
-    @Inject protected lateinit var imageLoader: ImageLoader
+    @Inject
+    protected lateinit var imageLoader: ImageLoader
 
     private val adapter by lazy(LazyThreadSafetyMode.NONE) {
         CrowdloanAdapter(imageLoader, this)
@@ -58,10 +66,11 @@ class CrowdloanFragment : BaseFragment<CrowdloanViewModel>(), CrowdloanAdapter.H
 
         with(requireContext()) {
             crowdloanAbout.background = getBlurDrawable()
-            crowdloanMyContributions.background = addRipple(getBlurDrawable())
+            crowdloanTotalContributedContainer.background = addRipple(getBlurDrawable())
+            crowdloanTotalContributedShimmering.background = getBlurDrawable()
         }
 
-        crowdloanMyContributions.setOnClickListener { viewModel.myContributionsClicked() }
+        crowdloanTotalContributedContainer.setOnClickListener { viewModel.myContributionsClicked() }
     }
 
     override fun inject() {
@@ -92,9 +101,19 @@ class CrowdloanFragment : BaseFragment<CrowdloanViewModel>(), CrowdloanAdapter.H
             }
         }
 
-        viewModel.myContributionsCount.observe {
-            crowdloanMyContributions.setInProgress(it is LoadingState.Loading)
-            crowdloanMyContributions.setBadgeText((it as? LoadingState.Loaded)?.data)
+        viewModel.contributionsInfo.observe {
+            if (it is LoadingState.Loaded) {
+                crowdloanTotalContributionsCount.text = it.data.contributionsCount.format()
+                crowdloanTotalContributedValue.text = it.data.totalContributed.token
+                crowdloanTotalContributedFiat.text = it.data.totalContributed.fiat
+                crowdloanAbout.isGone = it.data.isUserHasContributions
+                crowdloanTotalContributedContainer.isVisible = it.data.isUserHasContributions
+                crowdloanTotalContributedShimmering.isVisible = false
+            } else {
+                crowdloanTotalContributedShimmering.isVisible = true
+                crowdloanAbout.isVisible = false
+                crowdloanTotalContributedContainer.isVisible = false
+            }
         }
 
         viewModel.mainDescription.observe(crowdloanMainDescription::setText)

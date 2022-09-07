@@ -4,8 +4,10 @@ import android.graphics.drawable.Drawable
 
 class MetaAccountUi(
     val id: Long,
-    val name: String,
+    val title: String,
+    val subtitle: String,
     val isSelected: Boolean,
-    val totalBalance: String,
+    val isClickable: Boolean,
     val picture: Drawable,
+    val subtitleIconRes: Int?
 )

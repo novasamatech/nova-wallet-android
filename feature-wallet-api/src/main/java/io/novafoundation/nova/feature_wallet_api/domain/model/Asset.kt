@@ -45,5 +45,5 @@ class Asset(
     val redeemable = token.amountFromPlanks(redeemableInPlanks)
     val unbonding = token.amountFromPlanks(unbondingInPlanks)
 
-    val dollarAmount = token.fiatAmount(total)
+    val priceAmount = token.priceOf(total)
 }

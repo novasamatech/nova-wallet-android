@@ -9,6 +9,8 @@ import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_assets.data.repository.assetFilters.AssetFiltersRepository
 import io.novafoundation.nova.feature_assets.domain.common.AssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.groupAndSortAssetsByNetwork
+import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
+import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
@@ -35,6 +37,7 @@ class WalletInteractorImpl(
     private val assetFiltersRepository: AssetFiltersRepository,
     private val chainRegistry: ChainRegistry,
     private val nftRepository: NftRepository,
+    private val currencyRepository: CurrencyRepository
 ) : WalletInteractor {
 
     override fun balancesFlow(): Flow<Balances> {
@@ -48,16 +51,17 @@ class WalletInteractorImpl(
             assets.applyFilters(filters)
         }
             .map { assets ->
+                val selectedCurrency = currencyRepository.getSelectedCurrency()
                 val chains = chainRegistry.chainsById.first()
-                val groupedAssets = groupAndSortAssetsByNetwork(assets, chains)
+                val groupedAssets = groupAndSortAssetsByNetwork(assets, chains, selectedCurrency)
 
                 balancesFromAssets(assets, groupedAssets)
             }
     }
 
-    override suspend fun syncAssetsRates() {
+    override suspend fun syncAssetsRates(currency: Currency) {
         runCatching {
-            walletRepository.syncAssetsRates()
+            walletRepository.syncAssetsRates(currency)
         }
     }
 
@@ -141,19 +145,18 @@ class WalletInteractorImpl(
     private fun balancesFromAssets(
         assets: List<Asset>,
         groupedAssets: GroupedList<AssetGroup, Asset>
-    ):
-        Balances {
-            val (totalFiat, lockedFiat) = assets.fold(BigDecimal.ZERO to BigDecimal.ZERO) { (total, locked), asset ->
-                val assetTotalFiat = asset.token.fiatAmount(asset.total)
-                val assetLockedFiat = asset.token.fiatAmount(asset.locked)
+    ): Balances {
+        val (totalFiat, lockedFiat) = assets.fold(BigDecimal.ZERO to BigDecimal.ZERO) { (total, locked), asset ->
+            val assetTotalFiat = asset.token.priceOf(asset.total)
+            val assetLockedFiat = asset.token.priceOf(asset.locked)
 
-                (total + assetTotalFiat) to (locked + assetLockedFiat)
-            }
-
-            return Balances(
-                assets = groupedAssets,
-                totalBalanceFiat = totalFiat,
-                lockedBalanceFiat = lockedFiat
-            )
+            (total + assetTotalFiat) to (locked + assetLockedFiat)
         }
+
+        return Balances(
+            assets = groupedAssets,
+            totalBalanceFiat = totalFiat,
+            lockedBalanceFiat = lockedFiat
+        )
+    }
 }

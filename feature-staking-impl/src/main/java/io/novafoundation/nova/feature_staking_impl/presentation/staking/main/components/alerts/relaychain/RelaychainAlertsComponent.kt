@@ -4,9 +4,9 @@ import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
-import io.novafoundation.nova.common.utils.formatAsCurrency
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.common.utils.withLoading
+import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
@@ -137,7 +137,7 @@ private class RelaychainAlertsComponent(
     }
 
     private fun formatAlertTokenAmount(amount: BigDecimal, token: Token): String {
-        val formattedFiat = token.fiatAmount(amount).formatAsCurrency()
+        val formattedFiat = token.priceOf(amount).formatAsCurrency(token.currency)
         val formattedAmount = amount.formatTokenAmount(token.configuration)
 
         return buildString {

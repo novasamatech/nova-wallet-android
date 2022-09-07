@@ -86,7 +86,12 @@ private object CrowdloanDiffCallback : BaseGroupedDiffCallback<CrowdloanStatusMo
     }
 
     override fun areChildContentsTheSame(oldItem: CrowdloanModel, newItem: CrowdloanModel): Boolean {
-        return oldItem == newItem
+        return oldItem.relaychainId == newItem.relaychainId &&
+            oldItem.parachainId == newItem.parachainId &&
+            oldItem.title == newItem.title &&
+            oldItem.description == newItem.description &&
+            oldItem.raised == newItem.raised &&
+            oldItem.state == newItem.state
     }
 }
 

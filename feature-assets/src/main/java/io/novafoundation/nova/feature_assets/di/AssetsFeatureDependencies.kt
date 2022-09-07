@@ -18,15 +18,20 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnly.WatchOnlyMissingKeysPresenter
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
+import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
+import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdateSystemFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
@@ -47,6 +52,14 @@ import jp.co.soramitsu.fearless_utils.wsrpc.logging.Logger
 import javax.inject.Named
 
 interface AssetsFeatureDependencies {
+
+    fun currencyInteractor(): CurrencyInteractor
+
+    fun currencyRepository(): CurrencyRepository
+
+    fun metaAccountGroupingInteractor(): MetaAccountGroupingInteractor
+
+    fun accountInteractor(): AccountInteractor
 
     fun preferences(): Preferences
 
@@ -109,6 +122,8 @@ interface AssetsFeatureDependencies {
     fun amountChooserFactory(): AmountChooserMixin.Factory
 
     fun walletConstants(): WalletConstants
+
+    fun balanceLocksUpdateSystemFactory(): BalanceLocksUpdateSystemFactory
 
     val assetsSourceRegistry: AssetSourceRegistry
 

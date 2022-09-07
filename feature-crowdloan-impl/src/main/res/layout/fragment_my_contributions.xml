@@ -27,7 +27,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/myContributionsToolbar"
-        android:paddingTop="8dp"
+        android:paddingTop="16dp"
         android:paddingBottom="16dp"
         android:visibility="gone"
         tools:visibility="visible"
@@ -59,4 +59,5 @@
         app:layout_constraintTop_toBottomOf="@id/myContributionsToolbar"
         app:layout_constraintVertical_bias="0.4"
         app:showBackground="false" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

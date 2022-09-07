@@ -6,6 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import io.novafoundation.nova.core_db.converters.CryptoTypeConverters
+import io.novafoundation.nova.core_db.converters.CurrencyConverters
 import io.novafoundation.nova.core_db.converters.LongMathConverters
 import io.novafoundation.nova.core_db.converters.MetaAccountTypeConverters
 import io.novafoundation.nova.core_db.converters.NetworkTypeConverters
@@ -16,6 +17,7 @@ import io.novafoundation.nova.core_db.dao.AccountDao
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.dao.AssetDao
 import io.novafoundation.nova.core_db.dao.ChainDao
+import io.novafoundation.nova.core_db.dao.CurrencyDao
 import io.novafoundation.nova.core_db.dao.DappAuthorizationDao
 import io.novafoundation.nova.core_db.dao.FavouriteDAppsDao
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
@@ -30,6 +32,7 @@ import io.novafoundation.nova.core_db.dao.TokenDao
 import io.novafoundation.nova.core_db.migrations.AddAdditionalFieldToChains_12_13
 import io.novafoundation.nova.core_db.migrations.AddBuyProviders_7_8
 import io.novafoundation.nova.core_db.migrations.AddChainColor_4_5
+import io.novafoundation.nova.core_db.migrations.AddCurrencies_18_19
 import io.novafoundation.nova.core_db.migrations.AddDAppAuthorizations_1_2
 import io.novafoundation.nova.core_db.migrations.AddFavouriteDApps_9_10
 import io.novafoundation.nova.core_db.migrations.AddMetaAccountType_14_15
@@ -39,6 +42,8 @@ import io.novafoundation.nova.core_db.migrations.AssetTypes_2_3
 import io.novafoundation.nova.core_db.migrations.BetterChainDiffing_8_9
 import io.novafoundation.nova.core_db.migrations.ChangeAsset_3_4
 import io.novafoundation.nova.core_db.migrations.ChangeDAppAuthorization_10_11
+import io.novafoundation.nova.core_db.migrations.ChangeChainNodes_20_21
+import io.novafoundation.nova.core_db.migrations.ChangeTokens_19_20
 import io.novafoundation.nova.core_db.migrations.FixMigrationConflicts_13_14
 import io.novafoundation.nova.core_db.migrations.NullableSubstratePublicKey_15_16
 import io.novafoundation.nova.core_db.migrations.RemoveChainForeignKeyFromChainAccount_11_12
@@ -47,6 +52,7 @@ import io.novafoundation.nova.core_db.migrations.WatchOnlyChainAccounts_16_17
 import io.novafoundation.nova.core_db.model.AccountLocal
 import io.novafoundation.nova.core_db.model.AccountStakingLocal
 import io.novafoundation.nova.core_db.model.AssetLocal
+import io.novafoundation.nova.core_db.model.CurrencyLocal
 import io.novafoundation.nova.core_db.model.DappAuthorizationLocal
 import io.novafoundation.nova.core_db.model.FavouriteDAppLocal
 import io.novafoundation.nova.core_db.model.NftLocal
@@ -66,7 +72,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
 import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
 
 @Database(
-    version = 18,
+    version = 21,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -91,7 +97,8 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
 
         PhishingSiteLocal::class,
 
-        FavouriteDAppLocal::class
+        FavouriteDAppLocal::class,
+        CurrencyLocal::class
     ],
 )
 @TypeConverters(
@@ -101,7 +108,8 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
     OperationConverters::class,
     CryptoTypeConverters::class,
     NftTypeConverters::class,
-    MetaAccountTypeConverters::class
+    MetaAccountTypeConverters::class,
+    CurrencyConverters::class
 )
 
 abstract class AppDatabase : RoomDatabase() {
@@ -124,6 +132,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(AddFavouriteDApps_9_10, ChangeDAppAuthorization_10_11, RemoveChainForeignKeyFromChainAccount_11_12)
                     .addMigrations(AddAdditionalFieldToChains_12_13, FixMigrationConflicts_13_14, AddMetaAccountType_14_15)
                     .addMigrations(NullableSubstratePublicKey_15_16, WatchOnlyChainAccounts_16_17, RemoveColorFromChains_17_18)
+                    .addMigrations(AddCurrencies_18_19, ChangeTokens_19_20, ChangeChainNodes_20_21)
                     .fallbackToDestructiveMigration()
                     .build()
             }
@@ -160,4 +169,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun phishingSitesDao(): PhishingSitesDao
 
     abstract fun favouriteDAppsDao(): FavouriteDAppsDao
+
+    abstract fun currencyDao(): CurrencyDao
 }

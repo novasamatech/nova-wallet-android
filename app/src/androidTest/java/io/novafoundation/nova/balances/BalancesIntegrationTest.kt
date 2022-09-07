@@ -13,22 +13,24 @@ import io.novafoundation.nova.runtime.di.RuntimeApi
 import io.novafoundation.nova.runtime.di.RuntimeComponent
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
-import io.qameta.allure.android.runners.AllureAndroidJUnit4
+import java.math.BigInteger
+import java.math.BigInteger.ZERO
+import java.net.URL
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
-import kotlinx.coroutines.*
+import kotlin.time.ExperimentalTime
+import kotlin.time.seconds
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import java.math.BigInteger
-import java.math.BigInteger.ZERO
-import java.net.URL
-import java.util.*
-import kotlin.time.ExperimentalTime
-import kotlin.time.seconds
 
 
 @RunWith(Parameterized::class)

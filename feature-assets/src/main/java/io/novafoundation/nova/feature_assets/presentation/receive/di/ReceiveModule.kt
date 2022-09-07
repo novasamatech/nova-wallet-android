@@ -18,7 +18,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_assets.domain.receive.ReceiveInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
-import io.novafoundation.nova.feature_assets.presentation.WalletRouter
+import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.receive.ReceiveViewModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -42,7 +42,7 @@ class ReceiveModule {
         addressIconGenerator: AddressIconGenerator,
         resourceManager: ResourceManager,
         externalActions: ExternalActions.Presentation,
-        router: WalletRouter,
+        router: AssetsRouter,
         chainRegistry: ChainRegistry,
         selectedAccountUseCase: SelectedAccountUseCase,
         payload: AssetPayload,

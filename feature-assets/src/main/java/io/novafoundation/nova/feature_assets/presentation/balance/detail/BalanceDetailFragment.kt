@@ -17,7 +17,7 @@ import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy.setupBuyIntegration
-import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
+import io.novafoundation.nova.feature_assets.presentation.model.BalanceLocksModel
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.showState
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetaiActions
@@ -45,7 +45,8 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
         }
     }
 
-    @Inject lateinit var imageLoader: ImageLoader
+    @Inject
+    lateinit var imageLoader: ImageLoader
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -117,7 +118,7 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
             balanceDetailTokenIcon.loadTokenIcon(asset.token.configuration.iconUrl, imageLoader)
             balanceDetailTokenName.text = asset.token.configuration.symbol
 
-            balanceDetailRate.text = asset.token.dollarRate
+            balanceDetailRate.text = asset.token.rate
 
             balanceDetailRateChange.setTextColorRes(asset.token.rateChangeColorRes)
             balanceDetailRateChange.text = asset.token.recentRateChange
@@ -131,7 +132,7 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
             balanceDetailContainer.isRefreshing = false
         }
 
-        viewModel.showFrozenDetailsEvent.observeEvent(::showLockedDetails)
+        viewModel.showLockedDetailsEvent.observeEvent(::showLockedDetails)
 
         viewModel.sendEnabled.observe(balanceDetaiActions.send::setEnabled)
     }
@@ -141,7 +142,7 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
         balanceDetailContainer.isEnabled = bottomSheetCollapsed
     }
 
-    private fun showLockedDetails(model: AssetModel) {
+    private fun showLockedDetails(model: BalanceLocksModel) {
         LockedTokensBottomSheet(requireContext(), model).show()
     }
 }
