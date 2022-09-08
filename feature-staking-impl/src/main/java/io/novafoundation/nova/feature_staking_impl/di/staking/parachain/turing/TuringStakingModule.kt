@@ -3,16 +3,23 @@ package io.novafoundation.nova.feature_staking_impl.di.staking.parachain.turing
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.turing.RealTuringAutomationTasksRepository
-import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.turing.RealTuringStakingRewardsRepository
-import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.turing.TuringAutomationTasksRepository
-import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.turing.TuringStakingRewardsRepository
+import io.novafoundation.nova.feature_staking_api.data.parachainStaking.turing.repository.TuringAutomationTasksRepository
+import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.turing.network.rpc.RealTuringAutomationRpcApi
+import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.turing.network.rpc.TuringAutomationRpcApi
+import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.turing.repository.RealTuringAutomationTasksRepository
+import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.turing.repository.RealTuringStakingRewardsRepository
+import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.turing.repository.TuringStakingRewardsRepository
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
 @Module
 class TuringStakingModule {
+
+    @Provides
+    @FeatureScope
+    fun provideTuringAutomationRpcApi(chainRegistry: ChainRegistry): TuringAutomationRpcApi = RealTuringAutomationRpcApi(chainRegistry)
 
     @Provides
     @FeatureScope
@@ -23,6 +30,7 @@ class TuringStakingModule {
     @Provides
     @FeatureScope
     fun provideTuringAutomationRepository(
-        @Named(LOCAL_STORAGE_SOURCE) storageDataSource: StorageDataSource
-    ): TuringAutomationTasksRepository = RealTuringAutomationTasksRepository(storageDataSource)
+        @Named(LOCAL_STORAGE_SOURCE) storageDataSource: StorageDataSource,
+        turingAutomationRpcApi: TuringAutomationRpcApi,
+    ): TuringAutomationTasksRepository = RealTuringAutomationTasksRepository(storageDataSource, turingAutomationRpcApi)
 }
