@@ -32,10 +32,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Run tests
+      - name: 🧪 Run tests
         run: ./gradlew runTest
 
-      - name: Build with Gradle
+      - name: 🏗 Build with Gradle
         run: ./gradlew assembleDevelop
 
       - uses: actions/upload-artifact@v2
@@ -55,7 +55,7 @@ jobs:
           name: apk
           path: app
 
-      - name: Upload artifact to Firebase App Distribution
+      - name: 📬 Upload artifact to Firebase App Distribution
         id: upload
         continue-on-error: true
         uses: wzieba/Firebase-Distribution-Github-Action@v1

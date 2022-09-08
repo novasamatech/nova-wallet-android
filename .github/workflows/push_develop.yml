@@ -4,12 +4,7 @@ on:
   push:
     branches: [develop]
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-
-    env:
+env:
       ACALA_PROD_AUTH_TOKEN: ${{ secrets.ACALA_PROD_AUTH_TOKEN }}
       ACALA_TEST_AUTH_TOKEN: ${{ secrets.ACALA_TEST_AUTH_TOKEN }}
       MOONBEAM_PROD_AUTH_TOKEN: ${{ secrets.MOONBEAM_PROD_AUTH_TOKEN }}
@@ -20,6 +15,11 @@ jobs:
       CI_KEYSTORE_PASS: ${{ secrets.CI_KEYSTORE_PASS }}
       CI_KEYSTORE_KEY_ALIAS: ${{ secrets.CI_KEYSTORE_KEY_ALIAS }}
       CI_KEYSTORE_KEY_PASS: ${{ secrets.CI_KEYSTORE_KEY_PASS }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
       - uses: actions/checkout@v2
@@ -33,10 +33,10 @@ jobs:
           gradlePath: app/build.gradle
           versionCode: ${{github.run_number}}
 
-      - name: Run tests
+      - name: 🧪 Run tests
         run: ./gradlew runTest
 
-      - name: Build with Gradle
+      - name: 🏗 Build with Gradle
         run: ./gradlew assembleDevelop
 
       - uses: actions/upload-artifact@v2
@@ -56,7 +56,7 @@ jobs:
           name: apk
           path: app
 
-      - name: Upload artifact to Firebase App Distribution
+      - name: 📬 Upload artifact to Firebase App Distribution
         id: upload
         continue-on-error: true
         uses: wzieba/Firebase-Distribution-Github-Action@v1
@@ -67,13 +67,13 @@ jobs:
           groups: dev-team
           file: app/app-develop.apk
 
-      - name: Sleep for 60 seconds
+      - name: 💤 Sleep for 60 seconds
         uses: whatnick/wait-action@master
         if: steps.upload.outcome=='failure'
         with:
           time: '60s'
 
-      - name: Retry upload artifacts
+      - name: 📬 Upload artifact to Firebase App Distribution
         if: steps.upload.outcome=='failure'
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:

@@ -3,12 +3,7 @@ name: Pull request
 on:
   pull_request:
 
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-
-    env:
+env:
       ACALA_PROD_AUTH_TOKEN: ${{ secrets.ACALA_PROD_AUTH_TOKEN }}
       ACALA_TEST_AUTH_TOKEN: ${{ secrets.ACALA_TEST_AUTH_TOKEN }}
       MOONBEAM_PROD_AUTH_TOKEN: ${{ secrets.MOONBEAM_PROD_AUTH_TOKEN }}
@@ -19,6 +14,11 @@ jobs:
       CI_KEYSTORE_PASS: ${{ secrets.CI_KEYSTORE_PASS }}
       CI_KEYSTORE_KEY_ALIAS: ${{ secrets.CI_KEYSTORE_KEY_ALIAS }}
       CI_KEYSTORE_KEY_PASS: ${{ secrets.CI_KEYSTORE_KEY_PASS }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
       - uses: actions/checkout@v2
