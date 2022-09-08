@@ -50,7 +50,7 @@ class TuringStakeActionsComponentFactory(
 private class TuringStakeActionsComponent(
     delegatorStateUseCase: DelegatorStateUseCase,
     private val resourceManager: ResourceManager,
-    router: ParachainStakingRouter,
+    private val router: ParachainStakingRouter,
     assetWithChain: SingleAssetSharedState.AssetWithChain,
     private val hostContext: ComponentHostContext,
     unbondValidationSystem: ParachainStakingUnbondPreliminaryValidationSystem,
@@ -92,7 +92,7 @@ private class TuringStakeActionsComponent(
     }
 
     private fun goToYieldBoost() {
-        hostContext.errorDisplayer(NotImplementedError("TODO"))
+        router.openSetupYieldBoost()
     }
 
     private fun ManageStakeAction.Companion.yieldBoost(yieldBoostActive: Boolean): ManageStakeAction {

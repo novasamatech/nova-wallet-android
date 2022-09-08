@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.utils.daysFromMillis
 import io.novafoundation.nova.common.utils.fractionToPercentage
 import io.novafoundation.nova.common.utils.isNonNegative
 import java.math.BigDecimal
+import java.math.BigInteger
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.util.concurrent.TimeUnit
@@ -61,6 +62,10 @@ fun BigDecimal.format(): String {
 }
 
 fun Int.format(): String {
+    return defaultNumberFormatter.format(BigDecimal(this))
+}
+
+fun BigInteger.format(): String {
     return defaultNumberFormatter.format(BigDecimal(this))
 }
 

@@ -62,4 +62,6 @@ class ParachainStakingNavigator(
         actionId = R.id.action_mainFragment_to_parachainStakingRebondFragment,
         args = ParachainStakingRebondFragment.getBundle(payload)
     )
+
+    override fun openSetupYieldBoost() = performNavigation(R.id.action_mainFragment_to_yieldBoostGraph)
 }

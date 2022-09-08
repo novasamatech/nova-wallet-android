@@ -1,5 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="staking_turing_destination_payout">without Yield Boost</string>
+  <string name="staking_turing_destination_restake">with Yield Boost</string>
+
+  <string name="staking_turing_collator_title">For my collator</string>
+  <string name="staking_turing_restake_title">I want to stake</string>
+  <string name="staking_turing_frequency_new_title">to automatically stake %s all my transferable tokens above</string>
+  <string name="staking_turing_frequency_update_title">to automatically stake %s (updating from %s) all my transferable tokens above</string>
+  <plurals name="common_frequency_days">
+    <item quantity="one">every day</item>
+    <item quantity="other">every %s days</item>
+  </plurals>
+  <string name="staking_turing_boost_threshold">Boost threshold</string>
+
   <string name="common_on">On</string>
   <string name="common_off">Off</string>
   <string name="staking_turing_yield_boost">Yield Boost</string>

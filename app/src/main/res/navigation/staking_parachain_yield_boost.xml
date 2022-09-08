@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/staking_parachain_yield_boost"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@id/setupYieldBoostFragment">
+
+    <fragment
+        android:id="@+id/setupYieldBoostFragment"
+        tools:layout="@layout/fragment_setup_yield_boost"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.yieldBoost.setup.SetupYieldBoostFragment"
+        android:label="SetupYieldBoostFragment" />
+</navigation>

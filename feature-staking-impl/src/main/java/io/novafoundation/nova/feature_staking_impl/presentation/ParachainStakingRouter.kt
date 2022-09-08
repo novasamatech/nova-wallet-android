@@ -30,4 +30,6 @@ interface ParachainStakingRouter {
     fun openRedeem()
 
     fun openRebond(payload: ParachainStakingRebondPayload)
+
+    fun openSetupYieldBoost()
 }

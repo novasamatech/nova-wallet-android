@@ -16,7 +16,7 @@ class TuringAutomationIntegrationTest : BaseIntegrationTest() {
     private val automationTasksRepository = stakingApi.turingAutomationRepository
 
     @Test
-    fun calculateOptinalAutoCompounding(){
+    fun calculateOptimalAutoCompounding(){
         runBlocking {
             val chain = chainRegistry.findChain { it.name == "Turing" }!!
             val request = OptimalAutomationRequest(
