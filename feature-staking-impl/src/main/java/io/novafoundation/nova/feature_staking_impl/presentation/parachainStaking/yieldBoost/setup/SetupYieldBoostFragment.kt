@@ -8,7 +8,6 @@ import androidx.core.view.isVisible
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.scrollOnFocusTo
@@ -19,9 +18,11 @@ import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.ChooseStakedStakeTargetsBottomSheet
 import io.novafoundation.nova.feature_staking_impl.presentation.view.showRewardEstimation
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 import kotlinx.android.synthetic.main.fragment_setup_yield_boost.setupYieldBoostCollator
 import kotlinx.android.synthetic.main.fragment_setup_yield_boost.setupYieldBoostContainer
 import kotlinx.android.synthetic.main.fragment_setup_yield_boost.setupYieldBoostContinue
+import kotlinx.android.synthetic.main.fragment_setup_yield_boost.setupYieldBoostFee
 import kotlinx.android.synthetic.main.fragment_setup_yield_boost.setupYieldBoostFrequency
 import kotlinx.android.synthetic.main.fragment_setup_yield_boost.setupYieldBoostOakLogo
 import kotlinx.android.synthetic.main.fragment_setup_yield_boost.setupYieldBoostOff
@@ -76,9 +77,9 @@ class SetupYieldBoostFragment : BaseFragment<SetupYieldBoostViewModel>() {
     }
 
     override fun subscribe(viewModel: SetupYieldBoostViewModel) {
-        observeRetries(viewModel)
         observeValidations(viewModel)
         setupAmountChooser(viewModel.boostThresholdChooserMixin, setupYieldBoostThreshold)
+        setupFeeLoading(viewModel, setupYieldBoostFee)
 
         viewModel.selectedCollatorModel.observe {
             setupYieldBoostCollator.setSelectedCollator(it)

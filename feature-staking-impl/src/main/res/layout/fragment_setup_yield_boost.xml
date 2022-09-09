@@ -80,13 +80,21 @@
                 android:layout_marginTop="8dp"
                 app:title="@string/staking_turing_boost_threshold" />
 
+            <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/setupYieldBoostFee"
+                app:dividerVisible="false"
+                android:layout_marginTop="8dp" />
+
             <ImageView
                 android:id="@+id/setupYieldBoostOakLogo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="95dp"
+                android:layout_height="22dp"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="8dp"
                 android:src="@drawable/ic_powered_by_oak" />
+
         </LinearLayout>
     </ScrollView>
 

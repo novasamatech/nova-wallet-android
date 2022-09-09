@@ -42,10 +42,13 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
@@ -54,6 +57,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
@@ -64,6 +68,8 @@ sealed class YieldBoostStateModel {
 
     class On(val frequencyTitle: String) : YieldBoostStateModel()
 }
+
+private val FEE_DEBOUNCE_MILLIS = 500L
 
 class SetupYieldBoostViewModel(
     private val router: ParachainStakingRouter,
@@ -172,12 +178,15 @@ class SetupYieldBoostViewModel(
             else -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_continue))
         }
     }
+        .onStart { emit(DescriptiveButtonState.Disabled(resourceManager.getString(R.string.common_no_changes))) }
         .shareInBackground()
 
     init {
         setInitialCollator()
 
         updateYieldBoostStateOnCollatorChange()
+
+        listenFee()
     }
 
     fun selectCollatorClicked() = launch {
@@ -213,6 +222,15 @@ class SetupYieldBoostViewModel(
             .launchIn(this)
     }
 
+    @OptIn(FlowPreview::class)
+    private fun listenFee() {
+        feeLoaderMixin.connectWith(
+            inputSource = modifiedYieldBoostConfiguration.debounce(FEE_DEBOUNCE_MILLIS),
+            scope = this,
+            feeConstructor = { interactor.calculateFee(it, activeTasksFlow.first()) },
+        )
+    }
+
     private fun setIsEnabled(configuration: YieldBoostConfiguration) {
         modifiedYieldBoostEnabled.value = configuration is YieldBoostConfiguration.On
     }
@@ -231,10 +249,10 @@ class SetupYieldBoostViewModel(
         activeConfiguration: YieldBoostConfiguration,
         modifiedConfiguration: YieldBoostConfiguration
     ): YieldBoostStateModel {
-        return when(modifiedConfiguration) {
+        return when (modifiedConfiguration) {
             is YieldBoostConfiguration.Off -> YieldBoostStateModel.Off
             is YieldBoostConfiguration.On -> {
-               val optionalFrequency = modifiedConfiguration.frequencyInDays
+                val optionalFrequency = modifiedConfiguration.frequencyInDays
                 val activeFrequency = activeConfiguration.castOrNull<YieldBoostConfiguration.On>()?.frequencyInDays
 
                 val title = createFrequencyTitle(optionalFrequency, activeFrequency)
