@@ -8,7 +8,7 @@
   <string name="staking_turing_frequency_new_title">to automatically stake %s all my transferable tokens above</string>
   <string name="staking_turing_frequency_update_title">to automatically stake %s (updating from %s) all my transferable tokens above</string>
   <plurals name="common_frequency_days">
-    <item quantity="one">every day</item>
+    <item quantity="one">everyday</item>
     <item quantity="other">every %s days</item>
   </plurals>
   <string name="staking_turing_boost_threshold">Boost threshold</string>

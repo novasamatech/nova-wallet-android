@@ -52,7 +52,7 @@ class RealTuringAutomationTasksRepository(
             delegator = bindAccountId(actionValue["delegator"]),
             collator = bindAccountId(actionValue["collator"]),
             accountMinimum = bindNumber(actionValue["account_minimum"]),
-            frequency = bindBlockNumber(actionValue["frequency"])
+            frequencyInSeconds = bindBlockNumber(actionValue["frequency"])
         )
     }.getOrNull()
 }

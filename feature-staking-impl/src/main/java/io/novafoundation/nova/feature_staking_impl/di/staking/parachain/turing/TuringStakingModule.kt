@@ -13,7 +13,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.yield
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.yieldBoost.YieldBoostInteractor
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
@@ -41,6 +40,5 @@ class TuringStakingModule {
     @FeatureScope
     fun provideYieldBoostInteractor(
         automationTasksRepository: TuringAutomationTasksRepository,
-        chainStateRepository: ChainStateRepository
-    ): YieldBoostInteractor = RealYieldBoostInteractor(automationTasksRepository, chainStateRepository)
+    ): YieldBoostInteractor = RealYieldBoostInteractor(automationTasksRepository)
 }
