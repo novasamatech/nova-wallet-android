@@ -66,18 +66,21 @@ class RealYieldBoostInteractor(
         activeTasks: List<YieldBoostTask>
     ): BigInteger {
         val chain = singleAssetSharedState.chain()
+        val collatorId = configuration.collatorIdHex.fromHex()
+        val activeCollatorTask = activeTasks.find { it.collator.contentEquals(collatorId) }
 
         return extrinsicService.estimateFee(chain) {
             when (configuration) {
                 is YieldBoostConfiguration.Off -> {
-                    val collatorId = configuration.collatorIdHex.fromHex()
-                    val activeCollatorTask = activeTasks.find { it.collator.contentEquals(collatorId) }
-
                     activeCollatorTask?.let {
                         stopAutoCompounding(it)
                     }
                 }
                 is YieldBoostConfiguration.On -> {
+                    activeCollatorTask?.let {
+                        stopAutoCompounding(it)
+                    }
+
                     startAutoCompounding(chain.id, configuration)
                 }
             }
