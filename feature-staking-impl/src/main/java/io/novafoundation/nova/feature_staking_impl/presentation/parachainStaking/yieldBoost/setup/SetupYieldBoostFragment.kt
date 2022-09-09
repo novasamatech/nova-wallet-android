@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.scrollOnFocusTo
+import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
@@ -60,6 +61,8 @@ class SetupYieldBoostFragment : BaseFragment<SetupYieldBoostViewModel>() {
         }
 
         setupYieldBoostScrollArea.scrollOnFocusTo(setupYieldBoostThreshold)
+
+        setYieldViewsVisible(false)
     }
 
     override fun inject() {
@@ -91,24 +94,28 @@ class SetupYieldBoostFragment : BaseFragment<SetupYieldBoostViewModel>() {
             ).show()
         }
 
-        viewModel.yieldBoostState.observe { state ->
-            yieldBoostViews().forEach { it.isVisible = state is YieldBoostState.On }
+        viewModel.configurationUi.observe { state ->
+            setYieldViewsVisible(state is YieldBoostStateModel.On)
 
-            setupYieldBoostOn.setChecked(state is YieldBoostState.On)
-            setupYieldBoostOff.setChecked(state is YieldBoostState.Off)
+            setupYieldBoostOn.setChecked(state is YieldBoostStateModel.On)
+            setupYieldBoostOff.setChecked(state is YieldBoostStateModel.Off)
 
-            if (state is YieldBoostState.On) {
+            if (state is YieldBoostStateModel.On) {
                 setupYieldBoostFrequency.text = state.frequencyTitle
             }
         }
+
+        viewModel.buttonState.observe(setupYieldBoostContinue::setState)
 
         viewModel.rewardsWithYieldBoost.observe(setupYieldBoostOn::showRewardEstimation)
         viewModel.rewardsWithoutYieldBoost.observe(setupYieldBoostOff::showRewardEstimation)
     }
 
-    private fun yieldBoostViews() = listOf(
-        setupYieldBoostFrequency,
-        setupYieldBoostThreshold,
-        setupYieldBoostOakLogo
-    )
+    private fun setYieldViewsVisible(visible: Boolean) {
+        listOf(
+            setupYieldBoostFrequency,
+            setupYieldBoostThreshold,
+            setupYieldBoostOakLogo
+        ).onEach { it.isVisible =  visible }
+    }
 }

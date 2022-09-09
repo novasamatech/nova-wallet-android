@@ -5,7 +5,9 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.api.Retriable
 import io.novafoundation.nova.common.mixin.api.Validatable
+import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.common.utils.findById
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.inBackground
@@ -20,7 +22,9 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.commo
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.SelectedCollator
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.accountId
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.estimatedAprReturns
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.yieldBoost.YieldBoostConfiguration
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.yieldBoost.YieldBoostInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.yieldBoost.YieldBoostParameters
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.yieldBoost.YieldBoostTask
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.yieldBoost.frequencyInDays
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
@@ -35,27 +39,30 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
+import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 
-sealed class YieldBoostState {
+sealed class YieldBoostStateModel {
 
-    object Off : YieldBoostState()
+    object Off : YieldBoostStateModel()
 
-    class On(val frequencyTitle: String): YieldBoostState()
+    class On(val frequencyTitle: String) : YieldBoostStateModel()
 }
 
 class SetupYieldBoostViewModel(
@@ -121,11 +128,11 @@ class SetupYieldBoostViewModel(
         )
     }.shareInBackground()
 
-    private val yieldBoostParameters = combine(currentDelegatorStateFlow, selectedCollatorIdFlow) { delegatorState, collatorId ->
+    private val optimalYieldBoostParameters = combine(currentDelegatorStateFlow, selectedCollatorIdFlow) { delegatorState, collatorId ->
         interactor.optimalYieldBoostParameters(delegatorState, collatorId)
     }.shareInBackground()
 
-    val rewardsWithYieldBoost = yieldBoostParameters.map {
+    val rewardsWithYieldBoost = optimalYieldBoostParameters.map {
         mapPeriodReturnsToRewardEstimation(
             periodReturns = it.yearlyReturns,
             token = assetFlow.first().token,
@@ -137,7 +144,35 @@ class SetupYieldBoostViewModel(
     private val activeTasksFlow = currentDelegatorStateFlow.flatMapLatest(interactor::activeYieldBoostTasks)
         .shareInBackground()
 
-    val yieldBoostState = MutableStateFlow<YieldBoostState>(YieldBoostState.Off)
+    private val activeYieldBoostConfiguration = combine(activeTasksFlow, selectedCollatorFlow, ::constructActiveConfiguration)
+        .shareInBackground()
+
+    private val modifiedYieldBoostEnabled = MutableStateFlow(false)
+
+    private val modifiedYieldBoostConfiguration = combine(
+        modifiedYieldBoostEnabled,
+        boostThresholdChooserMixin.amount,
+        optimalYieldBoostParameters,
+        selectedCollatorFlow,
+        ::constructModifiedConfiguration
+    )
+        .shareInBackground()
+
+    val configurationUi = combine(activeYieldBoostConfiguration, modifiedYieldBoostConfiguration, ::createYieldBoostUiState)
+        .shareInBackground()
+
+    val buttonState = combine(
+        activeYieldBoostConfiguration,
+        modifiedYieldBoostConfiguration,
+        boostThresholdChooserMixin.amountInput
+    ) { activeConfiguration, modifiedConfiguration, amountInput ->
+        when {
+            amountInput.isEmpty() -> DescriptiveButtonState.Disabled(resourceManager.getString(R.string.common_enter_amount))
+            activeConfiguration == modifiedConfiguration -> DescriptiveButtonState.Disabled(resourceManager.getString(R.string.common_no_changes))
+            else -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_continue))
+        }
+    }
+        .shareInBackground()
 
     init {
         setInitialCollator()
@@ -163,37 +198,49 @@ class SetupYieldBoostViewModel(
         router.back()
     }
 
-    fun yieldBoostStateChanged(yieldBoostOn: Boolean)  = launch(Dispatchers.Default) {
-        setNewYieldBoostState(haveYieldBoost = yieldBoostOn)
+    fun yieldBoostStateChanged(yieldBoostOn: Boolean) {
+        modifiedYieldBoostEnabled.value = yieldBoostOn
     }
 
     private fun updateYieldBoostStateOnCollatorChange() {
-        selectedCollatorFlow.map {
-            setNewYieldBoostState(haveYieldBoost = selectedCollatorTask() != null)
-        }
+        activeYieldBoostConfiguration
+            .distinctUntilChangedBy { it.collatorIdHex }
+            .onEach {
+                setActiveAmount(it)
+                setIsEnabled(it)
+            }
             .inBackground()
             .launchIn(this)
     }
 
-    private suspend fun setNewYieldBoostState(haveYieldBoost: Boolean) {
-        if (haveYieldBoost) {
-            val selectedCollatorTask = selectedCollatorTask()
-            val optimalFrequency = yieldBoostParameters.first().periodInDays
+    private fun setIsEnabled(configuration: YieldBoostConfiguration) {
+        modifiedYieldBoostEnabled.value = configuration is YieldBoostConfiguration.On
+    }
 
-            if (selectedCollatorTask != null) {
-                val currentFrequency = selectedCollatorTask.frequencyInDays()
-                yieldBoostState.value = YieldBoostState.On(createFrequencyTitle(optimalFrequency, currentFrequency))
-
-                val currentMinimum = selectedCollatorTask.accountMinimum
-                val currentMinimumInput = assetFlow.first().token.amountFromPlanks(currentMinimum).format()
-                boostThresholdChooserMixin.amountInput.value = currentMinimumInput
-            } else {
-                yieldBoostState.value = YieldBoostState.On(createFrequencyTitle(optimalFrequency, currentFrequency = null))
-
-                boostThresholdChooserMixin.amountInput.value = ""
-            }
+    private suspend fun setActiveAmount(configuration: YieldBoostConfiguration) {
+        val newAmount = if (configuration is YieldBoostConfiguration.On) {
+            assetFlow.first().token.amountFromPlanks(configuration.threshold).format()
         } else {
-            yieldBoostState.value = YieldBoostState.Off
+            ""
+        }
+
+        boostThresholdChooserMixin.amountInput.value = newAmount
+    }
+
+    private fun createYieldBoostUiState(
+        activeConfiguration: YieldBoostConfiguration,
+        modifiedConfiguration: YieldBoostConfiguration
+    ): YieldBoostStateModel {
+        return when(modifiedConfiguration) {
+            is YieldBoostConfiguration.Off -> YieldBoostStateModel.Off
+            is YieldBoostConfiguration.On -> {
+               val optionalFrequency = modifiedConfiguration.frequencyInDays
+                val activeFrequency = activeConfiguration.castOrNull<YieldBoostConfiguration.On>()?.frequencyInDays
+
+                val title = createFrequencyTitle(optionalFrequency, activeFrequency)
+
+                YieldBoostStateModel.On(title)
+            }
         }
     }
 
@@ -203,9 +250,9 @@ class SetupYieldBoostViewModel(
         return if (currentFrequency != null && currentFrequency != optimalFrequency) {
             val currentFrequencyFormatted = resourceManager.getQuantityString(R.plurals.common_frequency_days, currentFrequency, currentFrequency.format())
 
-            resourceManager.getString(R.string.staking_turing_frequency_update_title,  optimalFrequencyFormatted, currentFrequencyFormatted)
+            resourceManager.getString(R.string.staking_turing_frequency_update_title, optimalFrequencyFormatted, currentFrequencyFormatted)
         } else {
-            resourceManager.getString(R.string.staking_turing_frequency_new_title,  optimalFrequencyFormatted)
+            resourceManager.getString(R.string.staking_turing_frequency_new_title, optimalFrequencyFormatted)
         }
     }
 
@@ -284,10 +331,37 @@ class SetupYieldBoostViewModel(
         onError = { title, message -> showError(title, message) }
     )
 
-    private suspend fun selectedCollatorTask(): YieldBoostTask? {
-        val tasks = activeTasksFlow.first()
-        val collator = selectedCollatorFlow.first()
+    private fun constructActiveConfiguration(tasks: List<YieldBoostTask>, collator: Collator): YieldBoostConfiguration {
+        val collatorId = collator.accountId()
+        val collatorTask = tasks.find { it.collator.contentEquals(collatorId) }
 
-        return tasks.find { it.collator.contentEquals(collator.accountId()) }
+        return if (collatorTask != null) {
+            YieldBoostConfiguration.On(
+                threshold = collatorTask.accountMinimum,
+                frequencyInDays = collatorTask.frequencyInDays(),
+                collatorIdHex = collator.accountIdHex
+            )
+        } else {
+            YieldBoostConfiguration.Off(collator.accountIdHex)
+        }
+    }
+
+    private suspend fun constructModifiedConfiguration(
+        enabled: Boolean,
+        threshold: BigDecimal,
+        optimalParams: YieldBoostParameters,
+        collator: Collator,
+    ): YieldBoostConfiguration {
+        return if (enabled) {
+            val thresholdPlanks = assetFlow.first().token.planksFromAmount(threshold)
+
+            YieldBoostConfiguration.On(
+                threshold = thresholdPlanks,
+                frequencyInDays = optimalParams.periodInDays,
+                collatorIdHex = collator.accountIdHex
+            )
+        } else {
+            YieldBoostConfiguration.Off(collator.accountIdHex)
+        }
     }
 }
