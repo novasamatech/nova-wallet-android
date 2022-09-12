@@ -108,7 +108,7 @@ class StartParachainStakingViewModel(
         currentDelegatorStateFlow,
         assetFlow
     ) { selectedCollator, currentDelegatorState, asset ->
-        selectedCollator?.let { mapCollatorToSelectCollatorModel(it, currentDelegatorState, asset, addressIconGenerator) }
+        selectedCollator?.let { mapCollatorToSelectCollatorModel(it, currentDelegatorState, asset, addressIconGenerator, resourceManager) }
     }.shareInBackground()
 
     private val resultingStakedAmountFlow = combine(
@@ -228,7 +228,8 @@ class StartParachainStakingViewModel(
                     selectedCollator = it,
                     chain = delegatorState.chain,
                     asset = asset,
-                    addressIconGenerator = addressIconGenerator
+                    addressIconGenerator = addressIconGenerator,
+                    resourceManager = resourceManager
                 )
             }
             val selected = collatorModels.findById(selectedCollator)

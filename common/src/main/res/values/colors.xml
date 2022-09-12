@@ -65,4 +65,6 @@
     <color name="disabledTransparent">@color/white_8</color>
 
     <color name="pms_black">#2D2926</color>
+
+    <color name="textInactive">@color/white_32</color>
 </resources>

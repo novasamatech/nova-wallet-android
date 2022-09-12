@@ -121,7 +121,7 @@ class SetupYieldBoostViewModel(
         currentDelegatorStateFlow,
         assetFlow
     ) { selectedCollator, currentDelegatorState, asset ->
-        mapCollatorToSelectCollatorModel(selectedCollator, currentDelegatorState, asset, addressIconGenerator)
+        mapCollatorToSelectCollatorModel(selectedCollator, currentDelegatorState, asset, addressIconGenerator, resourceManager)
     }.shareInBackground()
 
     val rewardsWithoutYieldBoost = combine(currentDelegatorStateFlow, selectedCollatorFlow) { delegatorState, collator ->
@@ -292,7 +292,8 @@ class SetupYieldBoostViewModel(
                     selectedCollator = it,
                     chain = delegatorState.chain,
                     asset = asset,
-                    addressIconGenerator = addressIconGenerator
+                    addressIconGenerator = addressIconGenerator,
+                    resourceManager = resourceManager
                 )
             }
             val selected = collatorModels.findById(selectedCollator)

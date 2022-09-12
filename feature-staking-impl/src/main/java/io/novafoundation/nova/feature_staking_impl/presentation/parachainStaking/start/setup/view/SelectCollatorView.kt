@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_staking_impl.presentation.parachainStakin
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
-import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.makeGone
@@ -11,15 +10,12 @@ import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.SelectStakeTargetModel
-import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.mappers.withSubtitleLabelSuffix
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.model.SelectCollatorModel
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import kotlinx.android.synthetic.main.item_validator.view.itemValidationCheck
 import kotlinx.android.synthetic.main.item_validator.view.itemValidatorActionIcon
 import kotlinx.android.synthetic.main.item_validator.view.itemValidatorIcon
 import kotlinx.android.synthetic.main.item_validator.view.itemValidatorInfo
 import kotlinx.android.synthetic.main.item_validator.view.itemValidatorName
-import kotlinx.android.synthetic.main.item_validator.view.itemValidatorSubtitleGroup
 import kotlinx.android.synthetic.main.item_validator.view.itemValidatorSubtitleLabel
 import kotlinx.android.synthetic.main.item_validator.view.itemValidatorSubtitleValue
 
@@ -37,6 +33,7 @@ class SelectCollatorView @JvmOverloads constructor(
 
         itemValidationCheck.makeGone()
         itemValidatorActionIcon.makeGone()
+        itemValidatorSubtitleLabel.makeGone()
 
         itemValidatorInfo.setImageResource(R.drawable.ic_chevron_right)
         itemValidatorInfo.setImageTintRes(R.color.white_48)
@@ -58,14 +55,13 @@ fun View.bindSelectedCollator(selectedCollator: SelectStakeTargetModel<*>) {
     itemValidatorName.text = selectedCollator.addressModel.nameOrAddress
     itemValidatorIcon.setImageDrawable(selectedCollator.addressModel.image)
 
-    bindStaked(selectedCollator.amount, selectedCollator.amountLabelRes)
+    bindSubtitle(selectedCollator.subtitle)
 }
 
-private fun View.bindStaked(staked: AmountModel?, @StringRes label: Int) {
-    itemValidatorSubtitleGroup.setVisible(staked != null)
+private fun View.bindSubtitle(subtitle: CharSequence?) {
+    itemValidatorSubtitleValue.setVisible(subtitle != null)
 
-    if (staked != null) {
-        itemValidatorSubtitleLabel.text = context.getString(label).withSubtitleLabelSuffix()
-        itemValidatorSubtitleValue.text = staked.token
+    if (subtitle != null) {
+        itemValidatorSubtitleValue.text = subtitle
     }
 }
