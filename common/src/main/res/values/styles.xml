@@ -261,7 +261,7 @@
     </style>
 
     <style name="Widget.Nova.Puller" parent="">
-        <item name="android:layout_height">2dp</item>
+        <item name="android:layout_height">3dp</item>
         <item name="android:layout_width">35dp</item>
         <item name="android:background">@drawable/bg_puller</item>
     </style>

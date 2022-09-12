@@ -12,6 +12,7 @@ import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.dao.CurrencyDao
 import io.novafoundation.nova.core_db.dao.DappAuthorizationDao
 import io.novafoundation.nova.core_db.dao.FavouriteDAppsDao
+import io.novafoundation.nova.core_db.dao.LocksDao
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.dao.NftDao
 import io.novafoundation.nova.core_db.dao.NodeDao
@@ -49,6 +50,12 @@ class DbModule {
     @ApplicationScope
     fun provideAssetDao(appDatabase: AppDatabase): AssetDao {
         return appDatabase.assetDao()
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideLocksDao(appDatabase: AppDatabase): LocksDao {
+        return appDatabase.locksDao()
     }
 
     @Provides

@@ -1,0 +1,5 @@
+package io.novafoundation.nova.feature_crowdloan_impl.domain.contributions
+
+import io.novafoundation.nova.feature_crowdloan_api.data.repository.ContributionsRepository
+
+class RealContributionsRepository : ContributionsRepository

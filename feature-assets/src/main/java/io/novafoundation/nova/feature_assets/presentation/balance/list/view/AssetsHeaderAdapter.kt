@@ -21,6 +21,7 @@ import kotlinx.android.synthetic.main.item_asset_header.view.balanceListTotalTit
 class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<HeaderHolder>() {
 
     interface Handler {
+        fun totalBalanceClicked()
 
         fun manageClicked()
         fun searchClicked()
@@ -98,6 +99,7 @@ class HeaderHolder(
 
     init {
         with(containerView) {
+            balanceListTotalBalance.setOnClickListener { handler.totalBalanceClicked() }
             balanceListManage.setOnClickListener { handler.manageClicked() }
             balanceListAvatar.setOnClickListener { handler.avatarClicked() }
             balanceListNfts.setOnClickListener { handler.goToNftsClicked() }

@@ -274,7 +274,7 @@
   <string name="crowdloan_contributions_returns_in">Вернется через %s</string>
   <string name="crowdloan_contributions_to_be_returned">Ожидает возвращения парачейном</string>
   <string name="crowdloan_contributions_with_source" formatted="false">%s (через %s)</string>
-  <string name="crowdloan_crowdloan">Краудлоуны</string>
+  <string name="common_crowdloan">Краудлоуны</string>
   <string name="crowdloan_empty_bonus_title">Получите специальный бонус</string>
   <string name="crowdloan_empty_message_v2_2_0">Краудлоуны появятся здесь</string>
   <string name="crowdloan_ended_message">Невозможно внести вклад в выбранный краудлоун, поскольку он уже завершён.</string>

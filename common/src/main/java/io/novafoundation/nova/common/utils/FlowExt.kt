@@ -222,6 +222,10 @@ fun <T> flowOf(producer: suspend () -> T) = flow {
     emit(producer())
 }
 
+fun <T> List<Flow<T>>.accumulate(): Flow<List<T>> {
+    return accumulate(*this.toTypedArray())
+}
+
 @OptIn(ExperimentalCoroutinesApi::class)
 fun <T> accumulate(vararg flows: Flow<T>): Flow<List<T>> {
     val flowsList = flows.mapIndexed { index, flow -> flow.map { index to flow } }

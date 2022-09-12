@@ -22,7 +22,7 @@
             android:layout_marginStart="17dp"
             android:layout_marginTop="25dp"
             android:layout_marginEnd="16dp"
-            android:text="@string/crowdloan_crowdloan"
+            android:text="@string/common_crowdloan"
             app:layout_constraintEnd_toStartOf="@+id/crowdloanAvatar"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

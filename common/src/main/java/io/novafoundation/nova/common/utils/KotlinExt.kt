@@ -15,6 +15,10 @@ private val PERCENTAGE_MULTIPLIER = 100.toBigDecimal()
 
 fun BigDecimal.fractionToPercentage() = this * PERCENTAGE_MULTIPLIER
 
+fun Number.percentageOf(number: Number): Float {
+    return (this.toFloat() / number.toFloat()) * 100f
+}
+
 fun Float.percentageToFraction() = this / 100f
 fun Double.percentageToFraction() = this / 100
 

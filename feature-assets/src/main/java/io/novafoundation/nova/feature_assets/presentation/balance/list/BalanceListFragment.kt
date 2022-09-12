@@ -13,14 +13,15 @@ import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
+import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.BalanceBreakdownBottomSheet
 import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetGroupingDecoration
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.applyDefaultTo
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.AssetsHeaderAdapter
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
+import javax.inject.Inject
 import kotlinx.android.synthetic.main.fragment_balance_list.balanceListAssets
 import kotlinx.android.synthetic.main.fragment_balance_list.walletContainer
-import javax.inject.Inject
 
 class BalanceListFragment :
     BaseFragment<BalanceListViewModel>(),
@@ -83,7 +84,7 @@ class BalanceListFragment :
     }
 
     override fun subscribe(viewModel: BalanceListViewModel) {
-        viewModel.assetsFlow.observe {
+        viewModel.assetModelsFlow.observe {
             assetsAdapter.submitList(it) {
                 balanceListAssets.invalidateItemDecorations()
             }
@@ -102,6 +103,19 @@ class BalanceListFragment :
 
     override fun assetClicked(asset: AssetModel) {
         viewModel.assetClicked(asset)
+    }
+
+    override fun totalBalanceClicked() {
+        val balanceBreakdownBottomSheet = BalanceBreakdownBottomSheet(requireContext())
+
+        // TODO fix observing on balance breakdown when bottom sheet is showing.
+        balanceBreakdownBottomSheet.setOnShowListener {
+            viewModel.balanceBreakdownFlow.observe {
+                balanceBreakdownBottomSheet.setBalanceBreakdown(it)
+            }
+        }
+
+        balanceBreakdownBottomSheet.show()
     }
 
     override fun manageClicked() {

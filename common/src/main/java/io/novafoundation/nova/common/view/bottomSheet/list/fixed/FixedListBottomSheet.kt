@@ -28,8 +28,7 @@ abstract class FixedListBottomSheet(
     context: Context,
     private val onCancel: (() -> Unit)? = null,
     private val viewConfiguration: ViewConfiguration = ViewConfiguration.default()
-) :
-    BottomSheetDialog(context, R.style.BottomSheetDialog), DialogExtensions {
+) : BottomSheetDialog(context, R.style.BottomSheetDialog), DialogExtensions {
 
     class ViewConfiguration(
         @LayoutRes val layout: Int,

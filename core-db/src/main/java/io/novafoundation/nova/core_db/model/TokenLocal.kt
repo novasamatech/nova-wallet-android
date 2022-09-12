@@ -13,8 +13,4 @@ data class TokenLocal(
     companion object {
         fun createEmpty(symbol: String, currencyId: Int): TokenLocal = TokenLocal(symbol, null, currencyId, null)
     }
-
-    enum class Type {
-        KSM, DOT, WND, ROC
-    }
 }
