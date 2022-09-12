@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="yiled_boost_yield_boosted">Yield Boosted</string>
+
   <string name="yield_boost_already_enabled_title">Change the Yield Boosted Collator?</string>
   <string name="yield_boost_already_enabled_message">Yield Boost will be turned off for current collators. New collator: %s</string>
 

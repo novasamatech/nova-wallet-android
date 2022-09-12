@@ -7,10 +7,12 @@ import io.novafoundation.nova.common.mixin.api.Retriable
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.buildSpannable
 import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.common.utils.findById
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
@@ -33,9 +35,10 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.yield
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.ChooseStakedStakeTargetsBottomSheet
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.RewardSuffix
+import io.novafoundation.nova.feature_staking_impl.presentation.mappers.format
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapPeriodReturnsToRewardEstimation
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.collators.collatorAddressModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.selectCollators.mapCollatorToSelectCollatorModel
-import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.selectCollators.mapSelectedCollatorToSelectCollatorModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.model.SelectCollatorModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.yieldBoost.common.yieldBoostValidationFailure
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
@@ -45,6 +48,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
+import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -197,8 +201,9 @@ class SetupYieldBoostViewModel(
     fun selectCollatorClicked() = launch {
         val delegatorState = currentDelegatorStateFlow.first()
         val alreadyStakedCollators = selectedCollatorsFlow.first()
+        val activeTasks = activeTasksFlow.first()
 
-        val payload = createSelectCollatorPayload(alreadyStakedCollators, delegatorState)
+        val payload = createSelectCollatorPayload(alreadyStakedCollators, delegatorState, activeTasks)
         val newSelectedCollatorModel = chooseCollatorAction.awaitAction(payload)
 
         selectedCollatorFlow.emit(newSelectedCollatorModel.payload)
@@ -281,19 +286,24 @@ class SetupYieldBoostViewModel(
 
     private suspend fun createSelectCollatorPayload(
         stakedCollators: List<SelectedCollator>,
-        delegatorState: DelegatorState
+        delegatorState: DelegatorState,
+        activeTasks: List<YieldBoostTask>,
     ): ChooseStakedStakeTargetsBottomSheet.Payload<SelectCollatorModel> {
-        val asset = assetFlow.first()
         val selectedCollator = selectedCollatorFlow.first()
+        val chain = delegatorState.chain
 
         return withContext(Dispatchers.Default) {
+            val activeTaskCollatorIds = activeTasks.mapToSet { it.collator.toHexString() }
+
             val collatorModels = stakedCollators.map {
-                mapSelectedCollatorToSelectCollatorModel(
-                    selectedCollator = it,
-                    chain = delegatorState.chain,
-                    asset = asset,
-                    addressIconGenerator = addressIconGenerator,
-                    resourceManager = resourceManager
+                SelectCollatorModel(
+                    addressModel = addressIconGenerator.collatorAddressModel(it.collator, chain),
+                    subtitle = selectCollatorSubsTitle(
+                        collator = it.collator,
+                        hasActiveYieldBoost = it.collator.accountIdHex in activeTaskCollatorIds
+                    ),
+                    active = true,
+                    payload = it.collator
                 )
             }
             val selected = collatorModels.findById(selectedCollator)
@@ -377,6 +387,19 @@ class SetupYieldBoostViewModel(
             )
         } else {
             YieldBoostConfiguration.Off(collator.accountIdHex)
+        }
+    }
+
+    private fun selectCollatorSubsTitle(collator: Collator, hasActiveYieldBoost: Boolean): CharSequence {
+        return buildSpannable(resourceManager) {
+            val aprText = RewardSuffix.APR.format(resourceManager, collator.apr.orZero())
+
+            appendColored(aprText, R.color.green)
+
+            if (hasActiveYieldBoost) {
+                appendColored(", ", R.color.green)
+                appendColored(resourceManager.getString(R.string.yiled_boost_yield_boosted), R.color.white_64)
+            }
         }
     }
 }
