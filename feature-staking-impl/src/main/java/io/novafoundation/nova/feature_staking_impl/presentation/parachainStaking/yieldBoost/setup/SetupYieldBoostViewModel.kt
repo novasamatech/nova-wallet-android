@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_staking_api.domain.model.parachain.delegat
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.SelectedCollatorSorting
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.Collator
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.SelectedCollator
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.accountId
@@ -114,7 +115,7 @@ class SetupYieldBoostViewModel(
         .shareInBackground()
 
     private val selectedCollatorsFlow = currentDelegatorStateFlow
-        .mapLatest(collatorsUseCase::getSelectedCollators)
+        .mapLatest { collatorsUseCase.getSelectedCollators(it, SelectedCollatorSorting.APR) }
         .shareInBackground()
 
     private val selectedCollatorFlow = MutableSharedFlow<Collator>(replay = 1)
@@ -293,7 +294,7 @@ class SetupYieldBoostViewModel(
         val chain = delegatorState.chain
 
         return withContext(Dispatchers.Default) {
-            val activeTaskCollatorIds = activeTasks.mapToSet { it.collator.toHexString() }
+            val activeTaskCollatorIds = activeTasks.yieldBoostedCollatorIdsSet()
 
             val collatorModels = stakedCollators.map {
                 SelectCollatorModel(
@@ -312,12 +313,16 @@ class SetupYieldBoostViewModel(
         }
     }
 
-    private fun setInitialCollator() = launch {
+    private fun setInitialCollator() = launch(Dispatchers.Default) {
         val alreadyStakedCollators = selectedCollatorsFlow.first()
+        val activeTasks = activeTasksFlow.first()
+        val yieldBoostedCollatorsSet = activeTasks.yieldBoostedCollatorIdsSet()
 
-        if (alreadyStakedCollators.isNotEmpty()) {
-            selectedCollatorFlow.emit(alreadyStakedCollators.first().collator)
-        }
+        val mostRelevantCollator = alreadyStakedCollators
+            .firstOrNull { it.collator.accountIdHex in yieldBoostedCollatorsSet }
+            ?: alreadyStakedCollators.first()
+
+        selectedCollatorFlow.emit(mostRelevantCollator.collator)
     }
 
     private fun maybeGoToNext() = requireFee { fee ->
@@ -401,5 +406,9 @@ class SetupYieldBoostViewModel(
                 appendColored(resourceManager.getString(R.string.yiled_boost_yield_boosted), R.color.white_64)
             }
         }
+    }
+
+    private fun List<YieldBoostTask>.yieldBoostedCollatorIdsSet(): Set<String> {
+        return mapToSet { it.collator.toHexString() }
     }
 }
