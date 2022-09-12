@@ -509,7 +509,6 @@
   <string name="crowdloan_contribution_format">You contributed: %s</string>
   <string name="crowdloan_contributions_placeholder">Your contributions\n will appear here</string>
   <string name="crowdloan_contributions_with_source" formatted="false">%s (via %s)</string>
-  <string name="crowdloan_crowdloan">Crowdloans</string>
   <!--<string name="crowdloan_crowdloan">Crowdloans</string>-->
   <string name="common_crowdloan">Crowdloans</string>
   <string name="crowdloan_empty_bonus_title">Get a special bonus</string>
