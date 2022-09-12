@@ -6,11 +6,13 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.data.network.runtime.binding.incompatible
 import io.novafoundation.nova.common.utils.automationTime
+import io.novafoundation.nova.feature_staking_api.data.parachainStaking.turing.repository.AutomationAction
 import io.novafoundation.nova.feature_staking_api.data.parachainStaking.turing.repository.OptimalAutomationRequest
 import io.novafoundation.nova.feature_staking_api.data.parachainStaking.turing.repository.OptimalAutomationResponse
 import io.novafoundation.nova.feature_staking_api.data.parachainStaking.turing.repository.TuringAutomationTask
 import io.novafoundation.nova.feature_staking_api.data.parachainStaking.turing.repository.TuringAutomationTasksRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.turing.network.rpc.TuringAutomationRpcApi
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
@@ -37,6 +39,10 @@ class RealTuringAutomationTasksRepository(
 
     override suspend fun calculateOptimalAutomation(chainId: ChainId, request: OptimalAutomationRequest): OptimalAutomationResponse {
         return turingAutomationRpcApi.calculateOptimalAutomation(chainId, request)
+    }
+
+    override suspend fun getTimeAutomationFees(chainId: ChainId, action: AutomationAction, executions: Int): Balance {
+        return turingAutomationRpcApi.getTimeAutomationFees(chainId, action, executions)
     }
 
     private fun bindAutomationTasks(raw: Any?, taskId: String): TuringAutomationTask? = runCatching {

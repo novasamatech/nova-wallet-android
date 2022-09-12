@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.delegationAmountTo
 import io.novafoundation.nova.feature_staking_impl.R
@@ -27,15 +28,16 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.yield
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.yieldBoost.YieldBoostParameters
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.yieldBoost.YieldBoostTask
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.yieldBoost.frequencyInDays
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.yieldBoost.validations.YieldBoostValidationPayload
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.yieldBoost.validations.YieldBoostValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.ChooseStakedStakeTargetsBottomSheet
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.RewardSuffix
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapPeriodReturnsToRewardEstimation
-import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select.model.mapCollatorToCollatorParcelModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.selectCollators.mapCollatorToSelectCollatorModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.selectCollators.mapSelectedCollatorToSelectCollatorModel
-import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.model.ConfirmStartParachainStakingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.model.SelectCollatorModel
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.yieldBoost.common.yieldBoostValidationFailure
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
@@ -69,7 +71,7 @@ sealed class YieldBoostStateModel {
     class On(val frequencyTitle: String) : YieldBoostStateModel()
 }
 
-private val FEE_DEBOUNCE_MILLIS = 500L
+private const val FEE_DEBOUNCE_MILLIS = 500L
 
 class SetupYieldBoostViewModel(
     private val router: ParachainStakingRouter,
@@ -82,13 +84,14 @@ class SetupYieldBoostViewModel(
     private val delegatorStateUseCase: DelegatorStateUseCase,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val collatorsUseCase: CollatorsUseCase,
+    private val validationSystem: YieldBoostValidationSystem,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
 ) : BaseViewModel(),
     Retriable,
     Validatable by validationExecutor,
     FeeLoaderMixin by feeLoaderMixin {
 
-    private val validationInProgress = MutableStateFlow(false)
+    private val validationInProgressFlow = MutableStateFlow(false)
 
     private val assetFlow = assetUseCase.currentAssetFlow()
         .share()
@@ -170,9 +173,11 @@ class SetupYieldBoostViewModel(
     val buttonState = combine(
         activeYieldBoostConfiguration,
         modifiedYieldBoostConfiguration,
-        boostThresholdChooserMixin.amountInput
-    ) { activeConfiguration, modifiedConfiguration, amountInput ->
+        boostThresholdChooserMixin.amountInput,
+        validationInProgressFlow
+    ) { activeConfiguration, modifiedConfiguration, amountInput, validationInProgress ->
         when {
+            validationInProgress -> DescriptiveButtonState.Loading
             amountInput.isEmpty() -> DescriptiveButtonState.Disabled(resourceManager.getString(R.string.common_enter_amount))
             activeConfiguration == modifiedConfiguration -> DescriptiveButtonState.Disabled(resourceManager.getString(R.string.common_no_changes))
             else -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_continue))
@@ -305,43 +310,34 @@ class SetupYieldBoostViewModel(
     }
 
     private fun maybeGoToNext() = requireFee { fee ->
-//        launch {
-//            val collator = selectedCollatorFlow.first()
-//            val amount = amountChooserMixin.amount.first()
-//
-//            val payload = StartParachainStakingValidationPayload(
-//                amount = amount,
-//                fee = fee,
-//                asset = assetFlow.first(),
-//                collator = collator
-//            )
-//
-//            validationExecutor.requireValid(
-//                validationSystem = validationSystem,
-//                payload = payload,
-//                validationFailureTransformer = { startParachainStakingValidationFailure(it, resourceManager) },
-//                progressConsumer = validationInProgress.progressConsumer()
-//            ) {
-//                validationInProgress.value = false
-//
-//                goToNextStep(fee = fee, amount = amount, collator = collator)
-//            }
-//        }
-        showMessage("TODO")
+        launch {
+            val payload = YieldBoostValidationPayload(
+                collator = selectedCollatorFlow.first(),
+                configuration = modifiedYieldBoostConfiguration.first(),
+                fee = fee,
+                activeTasks = activeTasksFlow.first(),
+                asset = assetFlow.first()
+            )
+
+            validationExecutor.requireValid(
+                validationSystem = validationSystem,
+                payload = payload,
+                validationFailureTransformer = { yieldBoostValidationFailure(it, resourceManager) },
+                progressConsumer = validationInProgressFlow.progressConsumer()
+            ) {
+                validationInProgressFlow.value = false
+
+                goToNextStep(fee = it.fee, collator = it.collator, configuration = it.configuration)
+            }
+        }
     }
 
     private fun goToNextStep(
         fee: BigDecimal,
-        amount: BigDecimal,
+        configuration: YieldBoostConfiguration,
         collator: Collator,
     ) = launch {
-        val payload = withContext(Dispatchers.Default) {
-            ConfirmStartParachainStakingPayload(
-                collator = mapCollatorToCollatorParcelModel(collator),
-                amount = amount,
-                fee = fee
-            )
-        }
+        showMessage("Ready to go to confirm")
     }
 
     private fun requireFee(block: (BigDecimal) -> Unit) = feeLoaderMixin.requireFee(

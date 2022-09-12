@@ -23,7 +23,7 @@ class SetControllerValidationsModule {
         return EnoughToPayFeesValidation(
             feeExtractor = { it.fee },
             availableBalanceProducer = { it.transferable },
-            errorProducer = { SetControllerValidationFailure.NOT_ENOUGH_TO_PAY_FEES }
+            errorProducer = { _, _ -> SetControllerValidationFailure.NOT_ENOUGH_TO_PAY_FEES }
         )
     }
 

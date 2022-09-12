@@ -11,3 +11,10 @@ data class OptimalAutomationResponse(
     val apy: Double,
     val period: Int,
 )
+
+enum class AutomationAction(val rpcParamName: String) {
+    NOTIFY("Notify"),
+    NATIVE_TRANSFER("NativeTransfer"),
+    XCMP("XCMP"),
+    AUTO_COMPOUND_DELEGATED_STAKE("AutoCompoundDelegatedStake"),
+}

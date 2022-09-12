@@ -8,7 +8,7 @@ import io.novafoundation.nova.common.validation.TransformedFailure
 import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
-import io.novafoundation.nova.common.validation.invalidError
+import io.novafoundation.nova.common.validation.validationError
 import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.LEDGER
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.PARITY_SIGNER
@@ -42,12 +42,12 @@ class HasChainAccountValidation<P, E>(
         return when {
             account.hasAccountIn(chain) -> ValidationStatus.Valid()
             account.type == LEDGER && !SubstrateApplicationConfig.supports(chain.id) -> {
-                errorProducer(chain, account, AddAccountState.LEDGER_NOT_SUPPORTED).invalidError()
+                errorProducer(chain, account, AddAccountState.LEDGER_NOT_SUPPORTED).validationError()
             }
             account.type == PARITY_SIGNER && chain.isEthereumBased -> {
-                errorProducer(chain, account, AddAccountState.PARITY_SIGNER_NOT_SUPPORTED).invalidError()
+                errorProducer(chain, account, AddAccountState.PARITY_SIGNER_NOT_SUPPORTED).validationError()
             }
-            else -> errorProducer(chain, account, AddAccountState.CAN_ADD).invalidError()
+            else -> errorProducer(chain, account, AddAccountState.CAN_ADD).validationError()
         }
     }
 }

@@ -8,7 +8,6 @@ import io.novafoundation.nova.feature_staking_api.data.parachainStaking.turing.r
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.delegationAmountTo
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.PeriodReturns
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -22,7 +21,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.math.BigInteger
 import kotlin.math.roundToLong
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
@@ -32,15 +30,6 @@ class YieldBoostParameters(
     val yearlyReturns: PeriodReturns,
     val periodInDays: Int
 )
-
-class YieldBoostTask(
-    val id: String,
-    val collator: AccountId,
-    val accountMinimum: Balance,
-    val frequency: Duration,
-)
-
-fun YieldBoostTask.frequencyInDays() = frequency.toInt(DurationUnit.DAYS).coerceAtLeast(1)
 
 interface YieldBoostInteractor {
 
@@ -67,7 +56,7 @@ class RealYieldBoostInteractor(
     ): BigInteger {
         val chain = singleAssetSharedState.chain()
         val collatorId = configuration.collatorIdHex.fromHex()
-        val activeCollatorTask = activeTasks.find { it.collator.contentEquals(collatorId) }
+        val activeCollatorTask = activeTasks.findByCollator(collatorId)
 
         return extrinsicService.estimateFee(chain) {
             when (configuration) {
@@ -77,8 +66,12 @@ class RealYieldBoostInteractor(
                     }
                 }
                 is YieldBoostConfiguration.On -> {
-                    activeCollatorTask?.let {
-                        stopAutoCompounding(it)
+                    if (activeCollatorTask != null) {
+                        // updating existing yield-boost - cancel only modified collator task
+                        stopAutoCompounding(activeCollatorTask)
+                    } else {
+                        // setting up new yield boost - cancel every existing task
+                        stopAllAutoCompounding(activeTasks)
                     }
 
                     startAutoCompounding(chain.id, configuration)
@@ -138,6 +131,12 @@ class RealYieldBoostInteractor(
                 "account_minimum" to configuration.threshold
             )
         )
+    }
+
+    private fun ExtrinsicBuilder.stopAllAutoCompounding(tasks: List<YieldBoostTask>){
+        tasks.forEach { task ->
+            stopAutoCompounding(task)
+        }
     }
 
     private fun ExtrinsicBuilder.stopAutoCompounding(task: YieldBoostTask) {

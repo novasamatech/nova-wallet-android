@@ -15,6 +15,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.yieldBoost.YieldBoostInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.yieldBoost.validations.YieldBoostValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.yieldBoost.setup.SetupYieldBoostViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
@@ -39,6 +40,7 @@ class SetupYieldBoostModule {
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         amountChooserMixinFactory: AmountChooserMixin.Factory,
         collatorsUseCase: CollatorsUseCase,
+        yieldBoostValidationSystem: YieldBoostValidationSystem,
     ): ViewModel {
         return SetupYieldBoostViewModel(
             router = router,
@@ -51,7 +53,8 @@ class SetupYieldBoostModule {
             delegatorStateUseCase = delegatorStateUseCase,
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
             collatorsUseCase = collatorsUseCase,
-            amountChooserMixinFactory = amountChooserMixinFactory
+            amountChooserMixinFactory = amountChooserMixinFactory,
+            validationSystem = yieldBoostValidationSystem
         )
     }
 
