@@ -16,7 +16,6 @@ import jp.co.soramitsu.fearless_utils.wsrpc.mappers.pojo
 import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.RuntimeRequest
 import jp.co.soramitsu.fearless_utils.wsrpc.response.RpcResponse
 
-
 interface TuringAutomationRpcApi {
 
     suspend fun getTimeAutomationFees(chainId: ChainId, action: AutomationAction, executions: Int): Balance
@@ -26,7 +25,7 @@ interface TuringAutomationRpcApi {
 
 class RealTuringAutomationRpcApi(
     private val chainRegistry: ChainRegistry,
-): TuringAutomationRpcApi {
+) : TuringAutomationRpcApi {
 
     override suspend fun getTimeAutomationFees(chainId: ChainId, action: AutomationAction, executions: Int): Balance {
         val socket = chainRegistry.getSocket(chainId)

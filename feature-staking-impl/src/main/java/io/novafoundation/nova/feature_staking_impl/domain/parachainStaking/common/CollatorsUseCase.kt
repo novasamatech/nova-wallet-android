@@ -93,7 +93,7 @@ class RealCollatorsUseCase(
         }
     }
 
-    private fun SelectedCollatorSorting.ascendingComparator() = when(this) {
+    private fun SelectedCollatorSorting.ascendingComparator() = when (this) {
         SelectedCollatorSorting.DELEGATION -> compareBy<SelectedCollator> { it.delegation }
         SelectedCollatorSorting.APR -> compareBy { it.collator.apr }
     }

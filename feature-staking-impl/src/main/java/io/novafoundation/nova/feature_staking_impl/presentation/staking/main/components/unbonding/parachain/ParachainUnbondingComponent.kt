@@ -108,7 +108,7 @@ private class ParachainUnbondingComponent(
 
         val selectStakeTargetModels = unbondingRequests.map { unbondingWithCollator ->
             val amountModel = mapAmountToAmountModel(unbondingWithCollator.request.action.amount, asset)
-            val subtitle = resourceManager.labeledAmountSubtitle( R.string.wallet_balance_unbonding_v1_9_0, amountModel, selectionActive = true)
+            val subtitle = resourceManager.labeledAmountSubtitle(R.string.wallet_balance_unbonding_v1_9_0, amountModel, selectionActive = true)
 
             SelectStakeTargetModel(
                 addressModel = addressIconGenerator.createAccountAddressModel(

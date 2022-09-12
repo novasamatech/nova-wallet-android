@@ -13,7 +13,7 @@ sealed class YieldBoostValidationFailure {
         val networkFee: BigDecimal,
         val availableBalanceBeforeFees: BigDecimal,
         val type: Type
-    ): YieldBoostValidationFailure() {
+    ) : YieldBoostValidationFailure() {
 
         enum class Type {
             EXECUTION_FEE, THRESHOLD
@@ -22,11 +22,11 @@ sealed class YieldBoostValidationFailure {
 
     class WillCancelAllExistingTasks(
         val newCollator: Collator,
-    ): YieldBoostValidationFailure()
+    ) : YieldBoostValidationFailure()
 
     class NotEnoughToPayToPayFees(
         override val chainAsset: Chain.Asset,
         override val availableToPayFees: BigDecimal,
         override val fee: BigDecimal
-    ): YieldBoostValidationFailure(), NotEnoughToPayFeesError
+    ) : YieldBoostValidationFailure(), NotEnoughToPayFeesError
 }

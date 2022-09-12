@@ -117,6 +117,6 @@ class SetupYieldBoostFragment : BaseFragment<SetupYieldBoostViewModel>() {
             setupYieldBoostFrequency,
             setupYieldBoostThreshold,
             setupYieldBoostOakLogo
-        ).onEach { it.isVisible =  visible }
+        ).onEach { it.isVisible = visible }
     }
 }

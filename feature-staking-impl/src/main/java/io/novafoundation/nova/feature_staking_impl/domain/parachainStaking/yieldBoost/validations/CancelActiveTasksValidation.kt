@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.yield
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.yieldBoost.findByCollator
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.yieldBoost.validations.YieldBoostValidationFailure.WillCancelAllExistingTasks
 
-class CancelActiveTasksValidation: YieldBoostValidation {
+class CancelActiveTasksValidation : YieldBoostValidation {
 
     override suspend fun validate(value: YieldBoostValidationPayload): ValidationStatus<YieldBoostValidationFailure> {
         return when {

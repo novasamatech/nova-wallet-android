@@ -29,7 +29,6 @@ import kotlinx.android.synthetic.main.item_validator.view.itemValidatorName
 import kotlinx.android.synthetic.main.item_validator.view.itemValidatorSubtitleLabel
 import kotlinx.android.synthetic.main.item_validator.view.itemValidatorSubtitleValue
 
-
 class ChooseStakedStakeTargetsBottomSheet<T : Identifiable>(
     context: Context,
     private val payload: Payload<SelectStakeTargetModel<T>>,

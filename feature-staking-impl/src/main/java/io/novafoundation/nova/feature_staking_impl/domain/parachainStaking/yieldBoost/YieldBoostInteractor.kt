@@ -133,7 +133,7 @@ class RealYieldBoostInteractor(
         )
     }
 
-    private fun ExtrinsicBuilder.stopAllAutoCompounding(tasks: List<YieldBoostTask>){
+    private fun ExtrinsicBuilder.stopAllAutoCompounding(tasks: List<YieldBoostTask>) {
         tasks.forEach { task ->
             stopAutoCompounding(task)
         }

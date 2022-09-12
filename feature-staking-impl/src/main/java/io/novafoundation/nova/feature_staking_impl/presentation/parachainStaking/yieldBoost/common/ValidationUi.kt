@@ -10,9 +10,9 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.handleNotEnou
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 
 fun yieldBoostValidationFailure(failure: YieldBoostValidationFailure, resourceManager: ResourceManager): TitleAndMessage {
-    return when(failure) {
+    return when (failure) {
         is YieldBoostValidationFailure.FirstTaskCannotExecute -> {
-            val (titleRes, messageRes) = when(failure.type) {
+            val (titleRes, messageRes) = when (failure.type) {
                 THRESHOLD -> R.string.yield_boost_not_enough_threshold_title to R.string.yield_boost_not_enough_threshold_message
                 EXECUTION_FEE -> R.string.yield_boost_not_enough_execution_fee_title to R.string.yield_boost_not_enough_execution_fee_message
             }
@@ -30,7 +30,7 @@ fun yieldBoostValidationFailure(failure: YieldBoostValidationFailure, resourceMa
             val collatorName = failure.newCollator.identity?.display ?: failure.newCollator.address
 
             resourceManager.getString(R.string.yield_boost_already_enabled_title) to
-                    resourceManager.getString(R.string.yield_boost_already_enabled_message, collatorName)
+                resourceManager.getString(R.string.yield_boost_already_enabled_message, collatorName)
         }
     }
 }
