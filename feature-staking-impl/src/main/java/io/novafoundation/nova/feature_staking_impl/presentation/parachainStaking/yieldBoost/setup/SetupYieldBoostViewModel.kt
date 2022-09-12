@@ -183,8 +183,8 @@ class SetupYieldBoostViewModel(
     ) { activeConfiguration, modifiedConfiguration, amountInput, validationInProgress ->
         when {
             validationInProgress -> DescriptiveButtonState.Loading
-            amountInput.isEmpty() -> DescriptiveButtonState.Disabled(resourceManager.getString(R.string.common_enter_amount))
             activeConfiguration == modifiedConfiguration -> DescriptiveButtonState.Disabled(resourceManager.getString(R.string.common_no_changes))
+            amountInput.isEmpty() -> DescriptiveButtonState.Disabled(resourceManager.getString(R.string.common_enter_amount))
             else -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_continue))
         }
     }
