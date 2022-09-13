@@ -48,6 +48,8 @@ class TuringAutomationTasksUpdater(
 
                 remoteStorageSource.query(chain.id) {
                     if (isChange) {
+                        // Due to parachain consensus querying right after change arrived does not guarantee that the change will be in storage right away
+                        // So we wait until account storage matches with the change
                         awaitSameAccountValue(accountId, expectedAccountValue)
                     }
 
