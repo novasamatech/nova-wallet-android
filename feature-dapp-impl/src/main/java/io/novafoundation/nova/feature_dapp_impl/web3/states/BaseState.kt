@@ -1,9 +1,8 @@
 package io.novafoundation.nova.feature_dapp_impl.web3.states
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
-import io.novafoundation.nova.common.address.createAddressModel
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.web3.Web3Transport
 import io.novafoundation.nova.feature_dapp_impl.web3.session.Web3Session
@@ -16,6 +15,7 @@ abstract class BaseState<R : Web3Transport.Request<*>, S>(
     protected val addressIconGenerator: AddressIconGenerator,
     protected val web3Session: Web3Session,
     protected val hostApi: Web3StateMachineHost,
+    private val walletUiUseCase: WalletUiUseCase,
 ) : Web3ExtensionStateMachine.State<R, S> {
 
     suspend fun respondIfAllowed(
@@ -60,12 +60,7 @@ abstract class BaseState<R : Web3Transport.Request<*>, S>(
             ),
             dAppIconUrl = dAppInfo.metadata?.iconLink,
             dAppUrl = dAppInfo.baseUrl,
-            walletAddressModel = addressIconGenerator.createAddressModel(
-                accountAddress = selectedAccount.defaultSubstrateAddress,
-                sizeInDp = AddressIconGenerator.SIZE_MEDIUM,
-                accountName = selectedAccount.name,
-                background = AddressIconGenerator.BACKGROUND_TRANSPARENT
-            )
+            walletModel = walletUiUseCase.selectedWalletUi()
         )
 
         val authorizationState = hostApi.authorizeDApp(action)

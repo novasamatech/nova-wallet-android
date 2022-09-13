@@ -9,20 +9,19 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 sealed class StakingState(
     val chain: Chain,
     val chainAsset: Chain.Asset,
-    val accountId: AccountId
 ) {
 
-    val accountAddress: String = chain.addressOf(accountId)
-
-    class NonStash(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId) : StakingState(chain, chainAsset, accountId)
+    class NonStash(chain: Chain, chainAsset: Chain.Asset) : StakingState(chain, chainAsset)
 
     sealed class Stash(
         chain: Chain,
         chainAsset: Chain.Asset,
-        accountId: AccountId,
+        val accountId: AccountId,
         val controllerId: AccountId,
         val stashId: AccountId,
-    ) : StakingState(chain, chainAsset, accountId) {
+    ) : StakingState(chain, chainAsset) {
+
+        val accountAddress: String = chain.addressOf(accountId)
 
         val stashAddress = chain.addressOf(stashId)
         val controllerAddress = chain.addressOf(controllerId)

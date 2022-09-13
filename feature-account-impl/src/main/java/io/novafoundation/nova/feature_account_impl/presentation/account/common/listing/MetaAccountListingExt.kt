@@ -15,4 +15,8 @@ fun mapMetaAccountTypeToUi(type: LightMetaAccount.Type, resourceManager: Resourc
         iconRes = R.drawable.ic_parity_signer,
         title = resourceManager.getString(R.string.account_parity_signer)
     )
+    LightMetaAccount.Type.LEDGER -> ChipLabelModel(
+        iconRes = R.drawable.ic_ledger,
+        title = resourceManager.getString(R.string.common_ledger)
+    )
 }

@@ -13,3 +13,17 @@ fun Lifecycle.onDestroy(action: () -> Unit) {
         }
     })
 }
+
+fun Lifecycle.whenStarted(action: () -> Unit) {
+    if (currentState.isAtLeast(Lifecycle.State.STARTED)) {
+        action()
+    } else {
+        addObserver(object : DefaultLifecycleObserver {
+            override fun onStart(owner: LifecycleOwner) {
+                action()
+
+                removeObserver(this)
+            }
+        })
+    }
+}

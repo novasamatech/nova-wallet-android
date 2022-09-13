@@ -38,8 +38,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlin.time.ExperimentalTime
-import kotlin.time.seconds
+import kotlin.time.Duration.Companion.seconds
 
 private const val UPDATE_NAME_INTERVAL_SECONDS = 1L
 
@@ -92,7 +91,6 @@ class AccountDetailsViewModel(
         accountRouter.back()
     }
 
-    @OptIn(ExperimentalTime::class)
     private fun syncNameChangesWithDb() {
         accountNameFlow
             .filter { it.isNotEmpty() }
@@ -102,18 +100,17 @@ class AccountDetailsViewModel(
     }
 
     private suspend fun mapFromToTextHeader(from: AccountInChain.From): TextHeader? {
-        val availableActions = availableAccountActions.first()
+        return when (metaAccount().type) {
+            Type.LEDGER, Type.PARITY_SIGNER -> null
+            Type.SECRETS, Type.WATCH_ONLY -> {
+                val resId = when (from) {
+                    AccountInChain.From.META_ACCOUNT -> R.string.account_shared_secret
+                    AccountInChain.From.CHAIN_ACCOUNT -> R.string.account_custom_secret
+                }
 
-        // it is not possible to add chain account for this type of wallet
-        // so do not show groups since there will only be one group (shared secrets)
-        if (AccountAction.CHANGE !in availableActions) return null
-
-        val resId = when (from) {
-            AccountInChain.From.META_ACCOUNT -> R.string.account_shared_secret
-            AccountInChain.From.CHAIN_ACCOUNT -> R.string.account_custom_secret
+                return TextHeader(resourceManager.getString(resId))
+            }
         }
-
-        return TextHeader(resourceManager.getString(resId))
     }
 
     private suspend fun mapChainAccountProjectionToUi(metaAccount: LightMetaAccount, accountInChain: AccountInChain) = with(accountInChain) {
@@ -173,6 +170,7 @@ class AccountDetailsViewModel(
             Type.SECRETS -> setOf(AccountAction.EXPORT, AccountAction.CHANGE)
             Type.WATCH_ONLY -> setOf(AccountAction.CHANGE)
             Type.PARITY_SIGNER -> emptySet()
+            Type.LEDGER -> setOf(AccountAction.CHANGE)
         }
     }
 
@@ -193,6 +191,13 @@ class AccountDetailsViewModel(
                 text = resourceManager.getString(R.string.account_details_parity_signer_alert)
             )
             Type.SECRETS -> null
+            Type.LEDGER -> AccountTypeAlert(
+                style = AlertView.Style(
+                    backgroundColorRes = R.color.white_12,
+                    iconRes = R.drawable.ic_ledger
+                ),
+                text = resourceManager.getString(R.string.ledger_wallet_details_description)
+            )
         }
     }
 

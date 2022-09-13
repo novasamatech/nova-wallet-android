@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.cu
 
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.ContributeValidation
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.MinContributionValidation
-import io.novafoundation.nova.feature_crowdloan_impl.domain.main.validations.AcalaMinContributionValidation
+import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.custom.acala.AcalaMinContributionValidation
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.ContributeCustomization
 
 abstract class AcalaMainFlowCustomization<V> : ContributeCustomization<V> {

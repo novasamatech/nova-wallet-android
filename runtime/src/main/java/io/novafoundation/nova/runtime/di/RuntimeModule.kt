@@ -11,7 +11,9 @@ import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.dao.StorageDao
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicSerializers
+import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
 import io.novafoundation.nova.runtime.extrinsic.MortalityConstructor
+import io.novafoundation.nova.runtime.extrinsic.RealExtrinsicValidityUseCase
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.DbRuntimeVersionsRepository
@@ -126,4 +128,10 @@ class RuntimeModule {
     fun provideParachainInfoRepository(
         @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource
     ): ParachainInfoRepository = RealParachainInfoRepository(remoteStorageSource)
+
+    @Provides
+    @ApplicationScope
+    fun provideExtrinsicValidityUseCase(
+        mortalityConstructor: MortalityConstructor
+    ): ExtrinsicValidityUseCase = RealExtrinsicValidityUseCase(mortalityConstructor)
 }

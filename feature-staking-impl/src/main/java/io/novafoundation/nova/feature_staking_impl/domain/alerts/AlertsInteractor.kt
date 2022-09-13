@@ -122,6 +122,11 @@ class AlertsInteractor(
     )
 
     fun getAlertsFlow(stakingState: StakingState): Flow<List<Alert>> = flow {
+        if (stakingState !is StakingState.Stash) {
+            emit(emptyList())
+            return@flow
+        }
+
         val (chain, chainAsset) = sharedState.chainAndAsset()
 
         val maxRewardedNominatorsPerValidator = stakingConstantsRepository.maxRewardedNominatorPerValidator(chain.id)

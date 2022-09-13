@@ -10,7 +10,8 @@ import java.math.BigInteger
 
 fun ExtrinsicBuilder.setController(controllerAddress: MultiAddress): ExtrinsicBuilder {
     return call(
-        "Staking", "set_controller",
+        "Staking",
+        "set_controller",
         mapOf(
             "controller" to bindMultiAddress(controllerAddress)
         )
@@ -23,7 +24,8 @@ fun ExtrinsicBuilder.bond(
     payee: RewardDestination,
 ): ExtrinsicBuilder {
     return call(
-        "Staking", "bond",
+        "Staking",
+        "bond",
         mapOf(
             "controller" to bindMultiAddress(controllerAddress),
             "value" to amount,
@@ -34,7 +36,8 @@ fun ExtrinsicBuilder.bond(
 
 fun ExtrinsicBuilder.nominate(targets: List<MultiAddress>): ExtrinsicBuilder {
     return call(
-        "Staking", "nominate",
+        "Staking",
+        "nominate",
         mapOf(
             "targets" to targets.map(::bindMultiAddress)
         )
@@ -43,7 +46,8 @@ fun ExtrinsicBuilder.nominate(targets: List<MultiAddress>): ExtrinsicBuilder {
 
 fun ExtrinsicBuilder.payoutStakers(era: BigInteger, validatorId: AccountId): ExtrinsicBuilder {
     return call(
-        "Staking", "payout_stakers",
+        "Staking",
+        "payout_stakers",
         mapOf(
             "validator_stash" to validatorId,
             "era" to era
@@ -53,7 +57,8 @@ fun ExtrinsicBuilder.payoutStakers(era: BigInteger, validatorId: AccountId): Ext
 
 fun ExtrinsicBuilder.bondMore(amount: BigInteger): ExtrinsicBuilder {
     return call(
-        "Staking", "bond_extra",
+        "Staking",
+        "bond_extra",
         mapOf(
             "max_additional" to amount
         )
@@ -66,7 +71,8 @@ fun ExtrinsicBuilder.chill(): ExtrinsicBuilder {
 
 fun ExtrinsicBuilder.unbond(amount: BigInteger): ExtrinsicBuilder {
     return call(
-        "Staking", "unbond",
+        "Staking",
+        "unbond",
         mapOf(
             "value" to amount
         )
@@ -75,7 +81,8 @@ fun ExtrinsicBuilder.unbond(amount: BigInteger): ExtrinsicBuilder {
 
 fun ExtrinsicBuilder.withdrawUnbonded(numberOfSlashingSpans: BigInteger): ExtrinsicBuilder {
     return call(
-        "Staking", "withdraw_unbonded",
+        "Staking",
+        "withdraw_unbonded",
         mapOf(
             "num_slashing_spans" to numberOfSlashingSpans
         )
@@ -84,7 +91,8 @@ fun ExtrinsicBuilder.withdrawUnbonded(numberOfSlashingSpans: BigInteger): Extrin
 
 fun ExtrinsicBuilder.rebond(amount: BigInteger): ExtrinsicBuilder {
     return call(
-        "Staking", "rebond",
+        "Staking",
+        "rebond",
         mapOf(
             "value" to amount
         )
@@ -92,9 +100,9 @@ fun ExtrinsicBuilder.rebond(amount: BigInteger): ExtrinsicBuilder {
 }
 
 fun ExtrinsicBuilder.setPayee(rewardDestination: RewardDestination): ExtrinsicBuilder {
-
     return call(
-        "Staking", "set_payee",
+        "Staking",
+        "set_payee",
         mapOf(
             "payee" to bindRewardDestination(rewardDestination)
         )

@@ -25,7 +25,6 @@ class NodeAutobalancer(
         availableNodesFlow: Flow<List<Chain.Node>>,
         scope: CoroutineScope,
     ): Flow<Chain.Node> {
-
         val result = MutableSharedFlow<Chain.Node>(replay = 1)
 
         combine(

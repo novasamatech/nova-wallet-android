@@ -87,7 +87,6 @@ class ConfirmSetControllerViewModel(
     }
 
     private fun maybeConfirm() = launch {
-
         val payload = SetControllerValidationPayload(
             stashAddress = payload.stashAddress,
             controllerAddress = payload.controllerAddress,

@@ -116,6 +116,20 @@ private fun TextView.setCompoundDrawable(
 
 fun TextView.removeCompoundDrawables() = setCompoundDrawablesRelative(null, null, null, null)
 
+fun TextView.setDrawableTop(
+    @DrawableRes drawableRes: Int? = null,
+    widthInDp: Int? = null,
+    heightInDp: Int? = widthInDp,
+    paddingInDp: Int = 0,
+    @ColorRes tint: Int? = null,
+) {
+    val (start, _, end, bottom) = compoundDrawablesRelative
+
+    setCompoundDrawable(drawableRes, widthInDp, heightInDp, tint, paddingInDp) {
+        setCompoundDrawablesRelative(start, it, end, bottom)
+    }
+}
+
 fun TextView.setDrawableEnd(
     @DrawableRes drawableRes: Int? = null,
     widthInDp: Int? = null,
@@ -155,8 +169,8 @@ private fun Drawable.updateDimensions(
     setBounds(0, 0, widthInPx, heightInPx)
 }
 
-fun ImageView.setImageTintRes(@ColorRes tintRes: Int) {
-    imageTintList = ColorStateList.valueOf(context.getColor(tintRes))
+fun ImageView.setImageTintRes(@ColorRes tintRes: Int?) {
+    imageTintList = tintRes?.let { ColorStateList.valueOf(context.getColor(tintRes)) }
 }
 
 fun ImageView.setImageTint(@ColorInt tint: Int?) {

@@ -7,16 +7,14 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.presentation.LoadingState
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
@@ -205,9 +203,9 @@ fun RadioGroup.bindTo(flow: MutableStateFlow<Int>, scope: LifecycleCoroutineScop
     }
 }
 
-inline fun <T> Flow<T>.observe(
+fun <T> Flow<T>.observe(
     scope: LifecycleCoroutineScope,
-    crossinline collector: suspend (T) -> Unit,
+    collector: FlowCollector<T>,
 ) {
     scope.launchWhenResumed {
         collect(collector)
@@ -226,7 +224,6 @@ fun <T> List<Flow<T>>.accumulate(): Flow<List<T>> {
     return accumulate(*this.toTypedArray())
 }
 
-@OptIn(ExperimentalCoroutinesApi::class)
 fun <T> accumulate(vararg flows: Flow<T>): Flow<List<T>> {
     val flowsList = flows.mapIndexed { index, flow -> flow.map { index to flow } }
     val resultOfFlows = MutableList<T?>(flowsList.size) { null }
@@ -254,24 +251,12 @@ fun <T> firstNonEmpty(
         }
     }
 
-inline fun <T> Flow<T>.observeInLifecycle(
+fun <T> Flow<T>.observeInLifecycle(
     lifecycleCoroutineScope: LifecycleCoroutineScope,
-    crossinline observer: suspend (T) -> Unit,
+    observer: FlowCollector<T>,
 ) {
     lifecycleCoroutineScope.launchWhenResumed {
         collect(observer)
-    }
-}
-
-// TODO replace with trySendBlocking from stdlib after upgrade to Kotlin 1.5
-// why not offer: https://github.com/Kotlin/kotlinx.coroutines/issues/2550
-@ExperimentalCoroutinesApi
-fun <E> SendChannel<E>.safeOffer(value: E): Boolean {
-    if (isClosedForSend) return false
-    return try {
-        offer(value)
-    } catch (e: CancellationException) {
-        false
     }
 }
 

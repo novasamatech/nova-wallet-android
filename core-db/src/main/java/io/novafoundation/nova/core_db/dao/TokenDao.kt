@@ -10,14 +10,14 @@ import kotlinx.coroutines.flow.Flow
 
 private const val RETRIEVE_TOKEN_WITH_CURRENCY = """
     SELECT * FROM currencies AS currency
-    LEFT OUTER JOIN tokens AS token ON token.currencyId = currency.id
-    WHERE token.tokenSymbol = :symbol AND currency.selected = 1
+    LEFT OUTER JOIN tokens AS token ON token.currencyId = currency.id AND token.tokenSymbol = :symbol
+    WHERE currency.selected = 1
 """
 
 private const val RETRIEVE_TOKENS_WITH_CURRENCY = """
     SELECT * FROM currencies AS currency
-    LEFT OUTER JOIN tokens AS token ON token.currencyId = currency.id
-    WHERE token.tokenSymbol in (:symbols) AND currency.selected = 1
+    LEFT OUTER JOIN tokens AS token ON token.currencyId = currency.id AND token.tokenSymbol in (:symbols)
+    WHERE currency.selected = 1
 """
 
 private const val INSERT_TOKEN_WITH_SELECTED_CURRENCY = """

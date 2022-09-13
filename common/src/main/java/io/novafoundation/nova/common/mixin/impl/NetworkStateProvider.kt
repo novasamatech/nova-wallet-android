@@ -16,7 +16,9 @@ class NetworkStateProvider : NetworkStateMixin {
             attempts != null && attempts > ATTEMPT_THRESHOLD
         }
         .distinctUntilChanged()
-        .asLiveData()*/ MutableLiveData(false)
+        .asLiveData()*/ MutableLiveData(
+        false
+    )
 
     private fun stateAsAttempting(state: State): Int? {
         return when (state) {

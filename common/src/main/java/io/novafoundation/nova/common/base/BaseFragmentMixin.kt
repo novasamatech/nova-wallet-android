@@ -18,7 +18,6 @@ import io.novafoundation.nova.common.utils.EventObserver
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.bindTo
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 
 interface BaseFragmentMixin<T : BaseViewModel> : WithContextExtensions {
 
@@ -40,11 +39,11 @@ interface BaseFragmentMixin<T : BaseViewModel> : WithContextExtensions {
             .show()
     }
 
-    fun showErrorWithTitle(title: String, errorMessage: String) {
+    fun showErrorWithTitle(title: String, errorMessage: String?) {
         buildErrorDialog(title, errorMessage).show()
     }
 
-    fun buildErrorDialog(title: String, errorMessage: String): AlertDialog {
+    fun buildErrorDialog(title: String, errorMessage: String?): AlertDialog {
         return AlertDialog.Builder(ContextThemeWrapper(fragment.requireContext(), R.style.WhiteOverlay))
             .setTitle(title)
             .setMessage(errorMessage)

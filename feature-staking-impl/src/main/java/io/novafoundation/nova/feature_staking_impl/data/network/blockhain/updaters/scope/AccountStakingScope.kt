@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.runtime.state.chainAndAsset
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 
 class AccountStakingScope(
@@ -23,8 +24,9 @@ class AccountStakingScope(
             accountRepository.selectedMetaAccountFlow()
         ).flatMapLatest { (chainWithAsset, account) ->
             val (chain, chainAsset) = chainWithAsset
+            val accountId = account.accountIdIn(chain) ?: return@flatMapLatest emptyFlow()
 
-            accountStakingDao.observeDistinct(chain.id, chainAsset.id, account.accountIdIn(chain)!!)
+            accountStakingDao.observeDistinct(chain.id, chainAsset.id, accountId)
         }
     }
 

@@ -36,7 +36,7 @@ class AssetSearchInteractor(
         queryFlow: Flow<String>
     ): Flow<Map<AssetGroup, List<Asset>>> {
         val assetsFlow = accountRepository.selectedMetaAccountFlow()
-            .flatMapLatest { walletRepository.assetsFlow(it.id) }
+            .flatMapLatest { walletRepository.syncedAssetsFlow(it.id) }
 
         return combine(
             assetsFlow,

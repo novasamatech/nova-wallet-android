@@ -146,5 +146,7 @@ private object DiffCallback : BaseGroupedDiffCallback<AssetGroupUi, AssetModel>(
 }
 
 private object AssetPayloadGenerator : PayloadGenerator<AssetModel>(
-    priceRateExtractor, recentChangeExtractor, AssetModel::total
+    priceRateExtractor,
+    recentChangeExtractor,
+    AssetModel::total
 )

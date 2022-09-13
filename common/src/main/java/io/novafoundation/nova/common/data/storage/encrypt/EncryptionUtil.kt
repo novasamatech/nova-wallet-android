@@ -186,8 +186,10 @@ class EncryptionUtil @Inject constructor(
     private fun decrypt(key: ByteArray, encrypted: ByteArray): ByteArray {
         val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
         cipher.init(
-            Cipher.DECRYPT_MODE, SecretKeySpec(key, "AES"),
-            IvParameterSpec(Arrays.copyOfRange(encrypted, 0, BLOCK_SIZE)), secureRandom
+            Cipher.DECRYPT_MODE,
+            SecretKeySpec(key, "AES"),
+            IvParameterSpec(Arrays.copyOfRange(encrypted, 0, BLOCK_SIZE)),
+            secureRandom
         )
         return cipher.doFinal(Arrays.copyOfRange(encrypted, BLOCK_SIZE, encrypted.size))
     }

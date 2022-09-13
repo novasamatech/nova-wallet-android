@@ -18,9 +18,12 @@
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:orientation="vertical"
             android:paddingBottom="16dp">
 
             <TextView
@@ -28,155 +31,64 @@
                 style="@style/TextAppearance.NovaFoundation.Bold.Title2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
-                android:layout_marginEnd="16dp"
-                android:text="@string/account_parity_signer_import_start_title"
-                app:layout_constrainedWidth="true"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:text="@string/account_parity_signer_import_start_title" />
 
-            <ImageView
-                android:id="@+id/startImportParitySignerNovaLogo"
-                style="@style/Widget.Nova.Icon.Big"
-                android:layout_marginTop="31dp"
-                android:layout_marginEnd="15dp"
-                android:src="@drawable/ic_nova_wallet"
-                app:layout_constraintEnd_toStartOf="@+id/startImportParitySignerDots"
-                app:layout_constraintTop_toBottomOf="@+id/startImportParitySignerTitle" />
-
-            <ImageView
-                android:id="@+id/startImportParitySignerDots"
+            <io.novafoundation.nova.common.view.NovaConnectView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_three_dots"
-                app:layout_constraintBottom_toBottomOf="@id/startImportParitySignerNovaLogo"
-                app:layout_constraintEnd_toEndOf="@+id/centerVertical"
-                app:layout_constraintStart_toStartOf="@id/centerVertical"
-                app:layout_constraintTop_toTopOf="@id/startImportParitySignerNovaLogo" />
-
-            <ImageView
-                style="@style/Widget.Nova.Icon.Big"
-                android:layout_marginStart="16dp"
-                android:src="@drawable/ic_parity_signer"
-                app:layout_constraintBottom_toBottomOf="@id/startImportParitySignerNovaLogo"
-                app:layout_constraintStart_toEndOf="@id/startImportParitySignerDots"
-                app:layout_constraintTop_toTopOf="@id/startImportParitySignerNovaLogo" />
-
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/centerVertical"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintGuide_percent="0.5" />
-
-            <TextView
-                android:id="@+id/startImportParitySignerStepIndicator1"
-                style="@style/Widget.Nova.Text.Number"
-                android:layout_marginStart="16dp"
+                android:layout_gravity="center_horizontal"
                 android:layout_marginTop="32dp"
-                android:text="1"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/startImportParitySignerNovaLogo" />
+                app:targetImage="@drawable/ic_parity_signer" />
 
-            <TextView
+            <io.novafoundation.nova.common.view.InstructionStepView
                 android:id="@+id/startImportParitySignerStep1"
-                style="@style/TextAppearance.NovaFoundation.Regular.Body"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:text="@string/account_parity_signer_import_start_step_1"
-                android:textColor="@color/white_64"
-                app:layout_constrainedWidth="true"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0"
-                app:layout_constraintStart_toEndOf="@+id/startImportParitySignerStepIndicator1"
-                app:layout_constraintTop_toTopOf="@+id/startImportParitySignerStepIndicator1" />
+                android:layout_marginTop="32dp"
+                app:stepNumber="1"
+                app:stepText="@string/account_parity_signer_import_start_step_1" />
 
-            <androidx.constraintlayout.widget.Barrier
-                android:id="@+id/startImportParitySignerStepBarrier1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:barrierDirection="bottom"
-                app:constraint_referenced_ids="startImportParitySignerStep1,startImportParitySignerStepIndicator1" />
-
-            <TextView
-                android:id="@+id/startImportParitySignerStepIndicator2"
-                style="@style/Widget.Nova.Text.Number"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="24dp"
-                android:text="2"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/startImportParitySignerStepBarrier1" />
-
-            <TextView
+            <io.novafoundation.nova.common.view.InstructionStepView
                 android:id="@+id/startImportParitySignerStep2"
-                style="@style/TextAppearance.NovaFoundation.Regular.Body"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:text="@string/account_parity_signer_import_start_step_2"
-                android:textColor="@color/white_64"
-                app:layout_constrainedWidth="true"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0"
-                app:layout_constraintStart_toEndOf="@+id/startImportParitySignerStepIndicator2"
-                app:layout_constraintTop_toTopOf="@+id/startImportParitySignerStepIndicator2" />
+                android:layout_marginTop="24dp"
+                app:stepNumber="2"
+                app:stepText="@string/account_parity_signer_import_start_step_2" />
 
             <TextView
                 android:id="@+id/startImportParitySignerSelectTop"
                 style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="48dp"
                 android:layout_marginTop="12dp"
                 android:drawablePadding="6dp"
                 android:text="@string/account_parity_signer_import_start_select_top"
                 android:textColor="@color/green"
                 app:drawableStartCompat="@drawable/ic_checkmark_circle_16"
-                app:drawableTint="@color/green"
-                app:layout_constraintStart_toStartOf="@+id/startImportParitySignerStep2"
-                app:layout_constraintTop_toBottomOf="@+id/startImportParitySignerStep2" />
+                app:drawableTint="@color/green" />
 
             <ImageView
                 android:id="@+id/startImportParitySignerSelectTopImage"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="48dp"
                 android:layout_marginTop="6dp"
-                android:layout_marginEnd="32dp"
-                android:adjustViewBounds="true"
-                android:src="@drawable/my_parity_signer"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="@+id/startImportParitySignerSelectTop"
-                app:layout_constraintTop_toBottomOf="@+id/startImportParitySignerSelectTop" />
-
-            <TextView
-                android:id="@+id/startImportParitySignerStepIndicator3"
-                style="@style/Widget.Nova.Text.Number"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="24dp"
-                android:text="3"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/startImportParitySignerSelectTopImage" />
-
-            <TextView
-                android:id="@+id/startImportParitySignerStep3"
-                style="@style/TextAppearance.NovaFoundation.Regular.Body"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
-                android:text="@string/account_parity_signer_import_start_step_3"
-                android:textColor="@color/white_64"
-                app:layout_constrainedWidth="true"
+                android:adjustViewBounds="true"
+                android:src="@drawable/my_parity_signer" />
+
+            <io.novafoundation.nova.common.view.InstructionStepView
+                android:id="@+id/startImportParitySignerStep3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0"
-                app:layout_constraintStart_toEndOf="@+id/startImportParitySignerStepIndicator3"
-                app:layout_constraintTop_toTopOf="@+id/startImportParitySignerStepIndicator3" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                app:stepNumber="3"
+                app:stepText="@string/account_parity_signer_import_start_step_3" />
+        </LinearLayout>
 
     </ScrollView>
 

@@ -27,6 +27,7 @@ class Asset(
 
     // Non-reserved plus reserved
     val totalInPlanks = freeInPlanks + reservedInPlanks
+
     // Free without its min threshold, represented by frozen
     val transferableInPlanks = freeInPlanks - frozenInPlanks
 

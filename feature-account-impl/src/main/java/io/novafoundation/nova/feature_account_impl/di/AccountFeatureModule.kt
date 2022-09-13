@@ -54,6 +54,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.common.l
 import io.novafoundation.nova.feature_account_impl.presentation.account.wallet.WalletUiUseCaseImpl
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherMixin
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherProvider
+import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
@@ -190,8 +191,9 @@ class AccountFeatureModule {
     @FeatureScope
     fun provideAccountUseCase(
         accountRepository: AccountRepository,
-        addressIconGenerator: AddressIconGenerator
-    ) = SelectedAccountUseCase(accountRepository, addressIconGenerator)
+        addressIconGenerator: AddressIconGenerator,
+        walletUiUseCase: WalletUiUseCase,
+    ) = SelectedAccountUseCase(accountRepository, walletUiUseCase, addressIconGenerator)
 
     @Provides
     @FeatureScope
@@ -285,16 +287,17 @@ class AccountFeatureModule {
     @FeatureScope
     fun provideMetaAccountGroupingInteractor(
         chainRegistry: ChainRegistry,
-        accountRepository: AccountRepository
+        accountRepository: AccountRepository,
+        currencyRepository: CurrencyRepository,
     ): MetaAccountGroupingInteractor {
-        return MetaAccountGroupingInteractorImpl(chainRegistry, accountRepository)
+        return MetaAccountGroupingInteractorImpl(chainRegistry, accountRepository, currencyRepository)
     }
 
     @Provides
     @FeatureScope
     fun provideAccountListingMixinFactory(
-        addressIconGenerator: AddressIconGenerator,
+        walletUseCase: WalletUiUseCase,
         resourceManager: ResourceManager,
         metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
-    ) = MetaAccountWithBalanceListingMixinFactory(addressIconGenerator, resourceManager, metaAccountGroupingInteractor)
+    ) = MetaAccountWithBalanceListingMixinFactory(walletUseCase, resourceManager, metaAccountGroupingInteractor)
 }

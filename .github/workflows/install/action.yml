@@ -1,0 +1,9 @@
+runs:
+  using: "composite"
+  steps:
+    - name: ☕️ Install Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '11'
+        cache: 'gradle'

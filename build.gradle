@@ -1,33 +1,33 @@
 buildscript {
     ext {
         // App version
-        versionName = '3.5.1'
-        versionCode = 31
+        versionName = '3.7.0'
+        versionCode = 34
 
         applicationId = "io.novafoundation.nova"
         releaseApplicationSuffix = "market"
 
         // SDK and tools
-        compileSdkVersion = 30
+        compileSdkVersion = 31
         minSdkVersion = 24
-        targetSdkVersion = 30
+        targetSdkVersion = 31
 
-        kotlinVersion = '1.4.31'
+        kotlinVersion = '1.7.10'
 
-        ktlintPinterestVersion = '0.40.0'
+        ktlintPinterestVersion = '0.47.0'
 
         recyclerVersion = "1.2.1"
         supportVersion = '1.1.0'
         cardViewVersion = '1.0.0'
         constraintVersion = '1.1.3'
 
-        coroutinesVersion = '1.4.2'
+        coroutinesVersion = '1.6.3'
 
         biometricVersion = '1.0.1'
 
         progressButtonsVersion = '2.1.0'
 
-        daggerVersion = '2.25.2'
+        daggerVersion = '2.43.2'
         javaxInjectVersion = '1'
 
         architectureComponentVersion = '2.2.0'
@@ -49,7 +49,7 @@ buildscript {
 
         web3jVersion = '4.8.0'
 
-        fearlessLibVersion = '1.5.1'
+        fearlessLibVersion = '1.6.0'
 
         gifVersion = '1.2.19'
 
@@ -58,7 +58,7 @@ buildscript {
 
         biometricDep = "androidx.biometric:biometric:$biometricVersion"
 
-        firebaseAppDistrVersion = '2.0.1'
+        firebaseAppDistrVersion = '2.1.1'
         playPublisherVersion = '2.5.0'
 
         wsVersion = "2.10"
@@ -74,6 +74,10 @@ buildscript {
         coilVersion = '1.2.1'
 
         flexBoxVersion = "3.0.0"
+
+        bleVersion = '2.5.1'
+
+        roomVersion = '2.4.3'
 
         coilDep = "io.coil-kt:coil:$coilVersion"
         coilSvg = "io.coil-kt:coil-svg:$coilVersion"
@@ -114,9 +118,9 @@ buildscript {
 
         permissionsDep = "com.github.florent37:runtime-permission-kotlin:$permissionsVersion"
 
-        roomDep = "androidx.room:room-runtime:$architectureComponentVersion"
-        roomKtxDep = "androidx.room:room-ktx:$architectureComponentVersion"
-        roomKapt = "androidx.room:room-compiler:$architectureComponentVersion"
+        roomDep = "androidx.room:room-runtime:$roomVersion"
+        roomKtxDep = "androidx.room:room-ktx:$roomVersion"
+        roomKapt = "androidx.room:room-compiler:$roomVersion"
 
         navigationFragmentDep = "androidx.navigation:navigation-fragment-ktx:$navControllerVersion"
         navigationUiDep = "androidx.navigation:navigation-ui-ktx:$navControllerVersion"
@@ -151,6 +155,9 @@ buildscript {
 
         progressButtonDep = "com.github.razir.progressbutton:progressbutton:$progressButtonsVersion"
 
+        bleDep = "no.nordicsemi.android:ble:$bleVersion"
+        bleKotlinDep = "no.nordicsemi.android:ble-ktx:$bleVersion"
+
         androidTestRunnerDep = 'androidx.test:runner:1.4.0'
         androidTestRulesDep = 'androidx.test:rules:1.4.0'
         androidJunitDep = 'androidx.test.ext:junit:1.1.3'
@@ -170,9 +177,9 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.6.0'
+        classpath 'com.android.tools.build:gradle:7.1.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
-        classpath 'com.google.gms:google-services:4.3.3'
+        classpath 'com.google.gms:google-services:4.3.10'
         classpath "com.google.firebase:firebase-appdistribution-gradle:$firebaseAppDistrVersion"
         classpath "com.github.triplet.gradle:play-publisher:$playPublisherVersion"
     }
@@ -198,7 +205,11 @@ task clean(type: Delete) {
 }
 
 dependencies {
-    ktlint "com.pinterest:ktlint:$ktlintPinterestVersion"
+    ktlint ("com.pinterest:ktlint:$ktlintPinterestVersion") {
+        attributes {
+            attribute(Bundling.BUNDLING_ATTRIBUTE, getObjects().named(Bundling, Bundling.EXTERNAL))
+        }
+    }
 }
 
 task ktlint(type: JavaExec, group: "verification") {

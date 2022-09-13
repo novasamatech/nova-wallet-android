@@ -30,7 +30,6 @@ class WelcomeFragment : BaseFragment<WelcomeViewModel>() {
         private const val KEY_ADD_ACCOUNT_PAYLOAD = "add_account_payload"
 
         fun bundle(displayBack: Boolean): Bundle {
-
             return Bundle().apply {
                 putBoolean(KEY_DISPLAY_BACK, displayBack)
                 putParcelable(KEY_ADD_ACCOUNT_PAYLOAD, AddAccountPayload.MetaAccount)
@@ -92,9 +91,14 @@ class WelcomeFragment : BaseFragment<WelcomeViewModel>() {
     }
 
     override fun subscribe(viewModel: WelcomeViewModel) {
-        viewModel.shouldShowBackLiveData.observe(back::setVisible)
-
         observeBrowserEvents(viewModel)
         setupImportTypeChooser(viewModel)
+
+        viewModel.shouldShowBackLiveData.observe(back::setVisible)
+
+        viewModel.selectHardwareWallet.awaitableActionLiveData.observeEvent {
+            SelectHardwareWalletBottomSheet(requireContext(), it.onSuccess)
+                .show()
+        }
     }
 }

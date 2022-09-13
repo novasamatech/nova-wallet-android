@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import coil.ImageLoader
 import coil.load
@@ -58,6 +59,10 @@ class GoNextView @JvmOverloads constructor(
     fun loadIcon(iconLink: String, imageLoader: ImageLoader) {
         icon.load(iconLink, imageLoader)
         icon.setVisible(true)
+    }
+
+    fun setProgressTint(@ColorRes tintColor: Int) {
+        goNextProgress.indeterminateTintList = ColorStateList.valueOf(context.getColor(tintColor))
     }
 
     fun setIcon(drawable: Drawable?) {

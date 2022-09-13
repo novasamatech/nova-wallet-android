@@ -48,7 +48,7 @@ class WalletInteractorImpl(
 
     override fun assetsFlow(): Flow<List<Asset>> {
         return accountRepository.selectedMetaAccountFlow()
-            .flatMapLatest { walletRepository.assetsFlow(it.id) }
+            .flatMapLatest { walletRepository.syncedAssetsFlow(it.id) }
     }
 
     override suspend fun syncAssetsRates(currency: Currency) {
