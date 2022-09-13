@@ -31,7 +31,7 @@ class RealExtrinsicService(
     override suspend fun submitExtrinsicWithSelectedWallet(
         chain: Chain,
         formExtrinsic: suspend ExtrinsicBuilder.() -> Unit,
-    ): Result<*> {
+    ): Result<String> {
         val account = accountRepository.getSelectedMetaAccount()
         val accountId = account.accountIdIn(chain)!!
 

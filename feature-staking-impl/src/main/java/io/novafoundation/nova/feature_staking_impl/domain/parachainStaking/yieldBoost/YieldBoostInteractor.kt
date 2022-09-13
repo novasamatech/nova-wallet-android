@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.yiel
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.extrinsic.submitExtrinsicWithSelectedWalletAndWaitBlockInclusion
 import io.novafoundation.nova.feature_staking_api.data.parachainStaking.turing.repository.OptimalAutomationRequest
 import io.novafoundation.nova.feature_staking_api.data.parachainStaking.turing.repository.TuringAutomationTasksRepository
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
@@ -10,6 +11,8 @@ import io.novafoundation.nova.feature_staking_api.domain.model.parachain.delegat
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.PeriodReturns
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.runtime.ext.addressOf
+import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.repository.TimestampRepository
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
@@ -23,6 +26,7 @@ import java.math.BigInteger
 import kotlin.math.roundToLong
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
@@ -37,6 +41,11 @@ interface YieldBoostInteractor {
         configuration: YieldBoostConfiguration,
         activeTasks: List<YieldBoostTask>,
     ): BigInteger
+
+    suspend fun setYieldBoost(
+        configuration: YieldBoostConfiguration,
+        activeTasks: List<YieldBoostTask>
+    ): Result<ExtrinsicStatus.InBlock>
 
     suspend fun optimalYieldBoostParameters(delegatorState: DelegatorState, collatorId: AccountId): YieldBoostParameters
 
@@ -55,28 +64,17 @@ class RealYieldBoostInteractor(
         activeTasks: List<YieldBoostTask>
     ): BigInteger {
         val chain = singleAssetSharedState.chain()
-        val collatorId = configuration.collatorIdHex.fromHex()
-        val activeCollatorTask = activeTasks.findByCollator(collatorId)
 
         return extrinsicService.estimateFee(chain) {
-            when (configuration) {
-                is YieldBoostConfiguration.Off -> {
-                    activeCollatorTask?.let {
-                        stopAutoCompounding(it)
-                    }
-                }
-                is YieldBoostConfiguration.On -> {
-                    if (activeCollatorTask != null) {
-                        // updating existing yield-boost - cancel only modified collator task
-                        stopAutoCompounding(activeCollatorTask)
-                    } else {
-                        // setting up new yield boost - cancel every existing task
-                        stopAllAutoCompounding(activeTasks)
-                    }
+            setYieldBoost(chain, activeTasks, configuration)
+        }
+    }
 
-                    startAutoCompounding(chain.id, configuration)
-                }
-            }
+    override suspend fun setYieldBoost(configuration: YieldBoostConfiguration, activeTasks: List<YieldBoostTask>): Result<ExtrinsicStatus.InBlock> {
+        val chain = singleAssetSharedState.chain()
+
+        return extrinsicService.submitExtrinsicWithSelectedWalletAndWaitBlockInclusion(chain) {
+            setYieldBoost(chain, activeTasks, configuration)
         }
     }
 
@@ -113,8 +111,36 @@ class RealYieldBoostInteractor(
         }
     }
 
+    private suspend fun ExtrinsicBuilder.setYieldBoost(
+        chain: Chain,
+        activeTasks: List<YieldBoostTask>,
+        configuration: YieldBoostConfiguration
+    ) {
+        val collatorId = configuration.collatorIdHex.fromHex()
+        val activeCollatorTask = activeTasks.findByCollator(collatorId)
+
+        when (configuration) {
+            is YieldBoostConfiguration.Off -> {
+                activeCollatorTask?.let {
+                    stopAutoCompounding(it)
+                }
+            }
+            is YieldBoostConfiguration.On -> {
+                if (activeCollatorTask != null) {
+                    // updating existing yield-boost - cancel only modified collator task
+                    stopAutoCompounding(activeCollatorTask)
+                } else {
+                    // setting up new yield boost - cancel every existing task
+                    stopAllAutoCompounding(activeTasks)
+                }
+
+                startAutoCompounding(chain.id, configuration)
+            }
+        }
+    }
+
     private suspend fun ExtrinsicBuilder.startAutoCompounding(chainId: ChainId, configuration: YieldBoostConfiguration.On) {
-        val currentTimeStamp = timestampRepository.now(chainId).toLong().seconds
+        val currentTimeStamp = timestampRepository.now(chainId).toLong().milliseconds
         val frequency = configuration.frequencyInDays.days
 
         val firstExecution = currentTimeStamp + frequency

@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.data.parachainStaking.networ
 
 import io.novafoundation.nova.common.utils.automationTime
 import io.novafoundation.nova.core.storage.StorageCache
-import io.novafoundation.nova.core.storage.insert
+import io.novafoundation.nova.core.storage.insertPrefixEntries
 import io.novafoundation.nova.core.updater.SubscriptionBuilder
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
@@ -13,7 +13,9 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletReposit
 import io.novafoundation.nova.runtime.state.chainAndAsset
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
+import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.onEach
 
@@ -30,12 +32,16 @@ class TuringAutomationTasksUpdater(
         val metaAccount = scope.getAccount()
         val accountId = metaAccount.accountIdIn(chain) ?: return emptyFlow()
 
-        return walletRepository.assetFlow(metaAccount.id, chainAsset).onEach {
-            val entries = remoteStorageSource.query(chain.id) {
-                runtime.metadata.automationTime().storage("AccountTasks").entriesRaw(accountId)
-            }
+        return walletRepository.assetFlow(metaAccount.id, chainAsset)
+            .distinctUntilChangedBy { it.totalInPlanks }
+            .onEach {
+                remoteStorageSource.query(chain.id) {
+                    val storageEntry = runtime.metadata.automationTime().storage("AccountTasks")
+                    val entries = storageEntry.entriesRaw(accountId)
+                    val storagePrefix = storageEntry.storageKey(runtime, accountId)
 
-            storageCache.insert(entries, chain.id)
-        }.noSideAffects()
+                    storageCache.insertPrefixEntries(entries, prefix = storagePrefix, chainId = chain.id)
+                }
+            }.noSideAffects()
     }
 }

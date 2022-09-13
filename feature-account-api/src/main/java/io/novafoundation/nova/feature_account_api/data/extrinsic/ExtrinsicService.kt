@@ -13,7 +13,7 @@ interface ExtrinsicService {
     suspend fun submitExtrinsicWithSelectedWallet(
         chain: Chain,
         formExtrinsic: suspend ExtrinsicBuilder.() -> Unit,
-    ): Result<*>
+    ): Result<String>
 
     suspend fun submitAndWatchExtrinsicWithSelectedWallet(
         chain: Chain,
