@@ -172,7 +172,7 @@ fun CompoundButton.bindTo(flow: MutableStateFlow<Boolean>, scope: CoroutineScope
 fun CompoundButton.bindTo(flow: MutableStateFlow<Input<Boolean>>, scope: CoroutineScope) {
     scope.launch {
         flow.collect { newValue ->
-            when(newValue) {
+            when (newValue) {
                 Input.Disabled -> makeGone()
 
                 is Input.Enabled -> {

@@ -14,19 +14,18 @@ class YieldBoostConfirmPayload(
     val fee: BigDecimal,
 ) : Parcelable
 
-sealed class YieldBoostConfigurationParcel(open val collatorIdHex: String): Parcelable {
+sealed class YieldBoostConfigurationParcel(open val collatorIdHex: String) : Parcelable {
 
     @Parcelize
     class On(
         val threshold: BigInteger,
         val frequencyInDays: Int,
         override val collatorIdHex: String
-    ): YieldBoostConfigurationParcel(collatorIdHex)
+    ) : YieldBoostConfigurationParcel(collatorIdHex)
 
     @Parcelize
     class Off(override val collatorIdHex: String) : YieldBoostConfigurationParcel(collatorIdHex)
 }
-
 
 fun YieldBoostConfigurationParcel(configuration: YieldBoostConfiguration) = when (configuration) {
     is YieldBoostConfiguration.On -> YieldBoostConfigurationParcel.On(
