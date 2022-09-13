@@ -35,7 +35,6 @@ class WalletInteractorImpl(
     private val assetFiltersRepository: AssetFiltersRepository,
     private val chainRegistry: ChainRegistry,
     private val nftRepository: NftRepository,
-    private val currencyRepository: CurrencyRepository,
 ) : WalletInteractor {
 
     override fun filterAssets(assetsFlow: Flow<List<Asset>>): Flow<List<Asset>> {
