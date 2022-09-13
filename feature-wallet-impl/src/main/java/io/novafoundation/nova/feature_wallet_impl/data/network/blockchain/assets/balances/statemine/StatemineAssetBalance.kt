@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.statemine
 
+import android.util.Log
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.common.utils.decodeValue
 import io.novafoundation.nova.core.storage.StorageCache
@@ -84,6 +85,10 @@ class StatemineAssetBalance(
 
         val assetDetailsStorage = module.storage("Asset")
         val assetDetailsKey = assetDetailsStorage.storageKey(runtime, statemineType.id)
+
+        if (chainAsset.symbol == "POOP") {
+            Log.d("RX", "Poop")
+        }
 
         val assetAccountStorage = module.storage("Account")
         val assetAccountKey = assetAccountStorage.storageKey(runtime, statemineType.id, accountId)
