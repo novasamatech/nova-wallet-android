@@ -14,9 +14,10 @@ import java.math.BigInteger
 
 interface WalletRepository {
 
-    fun assetsFlow(metaId: Long): Flow<List<Asset>>
+    fun syncedAssetsFlow(metaId: Long): Flow<List<Asset>>
 
-    suspend fun getAssets(metaId: Long): List<Asset>
+    suspend fun getSyncedAssets(metaId: Long): List<Asset>
+    suspend fun getSupportedAssets(metaId: Long): List<Asset>
 
     suspend fun syncAssetsRates(currency: Currency)
 

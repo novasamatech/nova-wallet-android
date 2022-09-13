@@ -12,7 +12,8 @@ fun ResourceManager.formatIssuance(issuance: Nft.Issuance): String {
         is Nft.Issuance.Limited -> {
             getString(
                 R.string.nft_issuance_limited_format,
-                issuance.edition.format(), issuance.max.format()
+                issuance.edition.format(),
+                issuance.max.format()
             )
         }
     }

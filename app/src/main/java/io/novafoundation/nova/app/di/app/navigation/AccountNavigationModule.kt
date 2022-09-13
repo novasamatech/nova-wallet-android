@@ -8,10 +8,10 @@ import io.novafoundation.nova.app.root.navigation.account.AdvancedEncryptionComm
 import io.novafoundation.nova.app.root.navigation.account.ParitySignerSignCommunicatorImpl
 import io.novafoundation.nova.app.root.navigation.account.SelectAddressCommunicatorImpl
 import io.novafoundation.nova.common.di.scope.ApplicationScope
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.SelectAddressCommunicator
+import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.ParitySignerSignCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.AdvancedEncryptionCommunicator
-import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.SelectAddressCommunicator
-import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.ParitySignerSignInterScreenCommunicator
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 
 @Module
@@ -27,7 +27,7 @@ class AccountNavigationModule {
     @ApplicationScope
     fun provideParitySignerCommunicator(
         navigationHolder: NavigationHolder
-    ): ParitySignerSignInterScreenCommunicator = ParitySignerSignCommunicatorImpl(navigationHolder)
+    ): ParitySignerSignCommunicator = ParitySignerSignCommunicatorImpl(navigationHolder)
 
     @Provides
     @ApplicationScope

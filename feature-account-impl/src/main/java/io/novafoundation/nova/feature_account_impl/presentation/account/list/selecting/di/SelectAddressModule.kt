@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
-import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -14,6 +13,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInter
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.SelectAddressCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.SelectAddressRequester
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountWithChainAddressListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.selecting.SelectAddressViewModel
@@ -24,13 +24,13 @@ class SelectAddressModule {
 
     @Provides
     fun provideAccountListingMixinFactory(
-        addressIconGenerator: AddressIconGenerator,
+        walletUiUseCase: WalletUiUseCase,
         resourceManager: ResourceManager,
         chainRegistry: ChainRegistry,
         metaAccountGroupingInteractor: MetaAccountGroupingInteractor
     ): MetaAccountWithChainAddressListingMixinFactory {
         return MetaAccountWithChainAddressListingMixinFactory(
-            addressIconGenerator = addressIconGenerator,
+            walletUiUseCase = walletUiUseCase,
             resourceManager = resourceManager,
             chainRegistry = chainRegistry,
             metaAccountGroupingInteractor = metaAccountGroupingInteractor,

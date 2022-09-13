@@ -17,7 +17,8 @@ import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-@Suppress("EXPERIMENTAL_API_USAGE") class SocketSingleRequestExecutor(
+@Suppress("EXPERIMENTAL_API_USAGE")
+class SocketSingleRequestExecutor(
     private val jsonMapper: Gson,
     private val logger: Logger,
     private val wsFactory: WebSocketFactory,

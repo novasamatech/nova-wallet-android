@@ -5,7 +5,6 @@ import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.app.root.navigation.Navigator
-import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.rebond.ParachainStakingRebondFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.rebond.model.ParachainStakingRebondPayload
@@ -15,7 +14,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.confirm.model.ParachainStakingUnbondConfirmPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.ValidatorDetailsFragment
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
 class ParachainStakingNavigator(
     navigationHolder: NavigationHolder,
@@ -36,8 +34,8 @@ class ParachainStakingNavigator(
         args = ValidatorDetailsFragment.getBundle(payload)
     )
 
-    override fun openAddAccount(chainId: ChainId, metaId: Long) {
-        commonNavigator.openAddAccount(AddAccountPayload.ChainAccount(chainId, metaId))
+    override fun openWalletDetails(metaId: Long) {
+        commonNavigator.openAccountDetails(metaId)
     }
 
     override fun returnToMain() {

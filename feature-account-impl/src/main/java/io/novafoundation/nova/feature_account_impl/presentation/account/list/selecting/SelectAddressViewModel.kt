@@ -1,13 +1,13 @@
 package io.novafoundation.nova.feature_account_impl.presentation.account.list.selecting
 
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
+import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountUi
+import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountsAdapter
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.SelectAddressRequester
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.SelectAddressResponder
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.AccountsAdapter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountWithChainAddressListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.WalletListViewModel
-import io.novafoundation.nova.feature_account_impl.presentation.account.model.MetaAccountUi
 import kotlinx.coroutines.launch
 
 class SelectAddressViewModel(
@@ -22,7 +22,7 @@ class SelectAddressViewModel(
 
     override val mode: AccountsAdapter.Mode = AccountsAdapter.Mode.SWITCH
 
-    override fun accountClicked(accountModel: MetaAccountUi) {
+    override fun accountClicked(accountModel: AccountUi) {
         launch {
             val address = accountInteractor.getChainAddress(accountModel.id, request.chainId)
             if (address != null) {

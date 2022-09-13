@@ -84,9 +84,7 @@ object TransactionStateMachine {
         sideEffectListener: (SideEffect) -> Unit,
     ): State =
         when (action) {
-
             is Action.CachePageArrived -> {
-
                 val nextCursor = action.newPage.nextCursor
 
                 when {

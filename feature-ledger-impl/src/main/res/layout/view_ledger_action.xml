@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:background="@drawable/ic_ledger_info"
+    tools:layout_height="190dp"
+    tools:layout_width="210dp"
+    tools:parentTag="android.widget.FrameLayout">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="51dp"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="7dp">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:id="@+id/viewLedgerGraphicsIcon"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="88dp"
+            tools:src="@drawable/ic_eye_filled" />
+    </FrameLayout>
+</merge>

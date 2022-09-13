@@ -9,8 +9,8 @@ import io.novafoundation.nova.core.model.Node
 import io.novafoundation.nova.feature_account_api.domain.model.Account
 import io.novafoundation.nova.feature_account_api.domain.model.AuthType
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
-import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountWithAssetBalance
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
@@ -43,8 +43,9 @@ interface AccountDataSource : SecretStoreV1 {
     suspend fun findMetaAccount(accountId: ByteArray): MetaAccount?
 
     suspend fun allMetaAccounts(): List<MetaAccount>
+    fun allMetaAccountsFlow(): Flow<List<MetaAccount>>
 
-    fun metaAccountsWithBalancesFlow(): Flow<List<MetaAccountWithAssetBalance>>
+    fun metaAccountsWithBalancesFlow(): Flow<List<MetaAccountAssetBalance>>
     suspend fun selectMetaAccount(metaId: Long)
     suspend fun updateAccountPositions(accountOrdering: List<MetaAccountOrdering>)
 

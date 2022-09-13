@@ -3,12 +3,14 @@ package io.novafoundation.nova.feature_staking_impl.di.validations
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.common.validation.CompositeValidation
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_account_api.domain.validation.hasChainAccount
 import io.novafoundation.nova.feature_staking_impl.domain.validations.welcome.WelcomeStakingMaxNominatorsValidation
 import io.novafoundation.nova.feature_staking_impl.domain.validations.welcome.WelcomeStakingValidationFailure
+import io.novafoundation.nova.feature_staking_impl.domain.validations.welcome.WelcomeStakingValidationFailure.NoRelayChainAccount
+import io.novafoundation.nova.feature_staking_impl.domain.validations.welcome.WelcomeStakingValidationSystem
 
 @Module
 class WelcomeStakingValidationModule {
@@ -20,7 +22,7 @@ class WelcomeStakingValidationModule {
         stakingRepository: StakingRepository
     ) = WelcomeStakingMaxNominatorsValidation(
         stakingRepository = stakingRepository,
-        errorProducer = { WelcomeStakingValidationFailure.MAX_NOMINATORS_REACHED },
+        errorProducer = { WelcomeStakingValidationFailure.MaxNominatorsReached },
         isAlreadyNominating = { false },
         sharedState = stakingSharedState
     )
@@ -29,11 +31,13 @@ class WelcomeStakingValidationModule {
     @FeatureScope
     fun provideSetupStakingValidationSystem(
         maxNominatorsReachedValidation: WelcomeStakingMaxNominatorsValidation
-    ) = ValidationSystem(
-        CompositeValidation(
-            listOf(
-                maxNominatorsReachedValidation,
-            )
+    ): WelcomeStakingValidationSystem = ValidationSystem {
+        validate(maxNominatorsReachedValidation)
+
+        hasChainAccount(
+            chain = { it.chain },
+            metaAccount = { it.metaAccount },
+            error = ::NoRelayChainAccount
         )
-    )
+    }
 }

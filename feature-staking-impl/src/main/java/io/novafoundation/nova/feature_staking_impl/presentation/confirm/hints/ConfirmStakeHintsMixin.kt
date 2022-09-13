@@ -36,7 +36,6 @@ private class ConfirmStakeHintsMixin(
 ) : ConstantHintsMixin(coroutineScope) {
 
     override suspend fun getHints(): List<String> {
-
         return when (payload) {
             is Payload.Validators -> changeValidatorsHints()
             else -> beginStakeHints()

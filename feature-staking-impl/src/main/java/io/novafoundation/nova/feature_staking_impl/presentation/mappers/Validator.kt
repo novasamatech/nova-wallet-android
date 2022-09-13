@@ -187,7 +187,6 @@ suspend fun mapValidatorDetailsParcelToValidatorDetailsModel(
         val identity = identity?.let(::mapIdentityParcelModelToIdentityModel)
 
         val stake = when (val stake = validator.stake) {
-
             StakeTargetStakeParcelModel.Inactive -> ValidatorStakeModel(
                 status = ValidatorStakeModel.Status(
                     text = resourceManager.getString(R.string.staking_nominator_status_inactive),

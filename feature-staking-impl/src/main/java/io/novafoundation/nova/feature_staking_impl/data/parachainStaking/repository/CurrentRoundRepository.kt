@@ -75,7 +75,8 @@ class RealCurrentRoundRepository(
     override suspend fun collatorSnapshot(chainId: ChainId, collatorId: AccountId, roundIndex: RoundIndex): CollatorSnapshot? {
         return storageDataSource.query(chainId) {
             runtime.metadata.parachainStaking().storage("AtStake").query(
-                roundIndex, collatorId,
+                roundIndex,
+                collatorId,
                 binding = ::bindCollatorSnapshot
             )
         }

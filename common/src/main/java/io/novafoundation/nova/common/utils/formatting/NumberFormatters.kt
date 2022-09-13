@@ -180,9 +180,9 @@ inline fun Duration.format(
     val withoutPrefix = toComponents { days, hours, minutes, seconds, _ ->
         when {
             // format days + hours if both are present
-            days > 0 && hours > 0 -> "${daysFormat(days)} ${hoursFormat(hours)}"
+            days > 0 && hours > 0 -> "${daysFormat(days.toInt())} ${hoursFormat(hours)}"
             // only days in case there is no hours
-            days > 0 -> daysFormat(days)
+            days > 0 -> daysFormat(days.toInt())
             // if timeFormat is given, format with it in case there is less then 1 day left
             timeFormat != null -> timeFormat(hours, minutes, seconds)
             // format hours if present

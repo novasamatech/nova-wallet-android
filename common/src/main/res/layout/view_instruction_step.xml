@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    tools:parentTag="android.widget.LinearLayout">
+
+    <TextView
+        android:id="@+id/instructionStepIndicator"
+        style="@style/Widget.Nova.Text.Number"
+        tools:text="1" />
+
+    <TextView
+        android:id="@+id/instructionStepText"
+        style="@style/TextAppearance.NovaFoundation.Regular.Body"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="16dp"
+        android:layout_weight="1"
+        android:textColor="@color/white_64"
+        tools:text="@string/account_parity_signer_import_start_step_1" />
+
+</merge>

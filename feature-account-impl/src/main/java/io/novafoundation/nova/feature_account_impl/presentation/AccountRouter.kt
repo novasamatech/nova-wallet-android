@@ -70,4 +70,6 @@ interface AccountRouter : SecureRouter, ReturnableRouter {
     fun openScanParitySignerSignature(payload: ScanSignParitySignerPayload)
 
     fun finishParitySignerFlow()
+
+    fun openAddLedgerChainAccountFlow(payload: AddAccountPayload.ChainAccount)
 }

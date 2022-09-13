@@ -12,7 +12,6 @@ fun ValidationSystem.Companion.parachainStakingUnbond(
     remainingUnbondValidationFactory: RemainingUnbondValidationFactory,
     noExistingDelegationRequestsToCollatorValidationFactory: NoExistingDelegationRequestsToCollatorValidationFactory,
 ): ParachainStakingUnbondValidationSystem = ValidationSystem {
-
     with(remainingUnbondValidationFactory) {
         validRemainingUnbond()
     }

@@ -13,6 +13,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 private const val ACCESS_SECRETS = "ACCESS_SECRETS"
+private const val ADDITIONAL_KNOWN_KEYS = "ADDITIONAL_KNOWN_KEYS"
+private const val ADDITIONAL_KNOWN_KEYS_DELIMITER = ","
 
 typealias AccountSecrets = Union<EncodableStruct<MetaAccountSecrets>, EncodableStruct<ChainAccountSecrets>>
 
@@ -36,20 +38,66 @@ class SecretStoreV2(
         encryptedPreferences.getDecryptedString(chainAccountKey(metaId, accountId, ACCESS_SECRETS))?.let(ChainAccountSecrets::read)
     }
 
-    suspend fun hasChainSecrets(metaId: Long, accountId: ByteArray) = withContext(Dispatchers.Default) {
+    suspend fun hasChainSecrets(metaId: Long, accountId: ByteArray) = withContext(Dispatchers.IO) {
         encryptedPreferences.hasKey(chainAccountKey(metaId, accountId, ACCESS_SECRETS))
     }
 
-    suspend fun clearSecrets(metaId: Long, chainAccountIds: List<AccountId>) = withContext(Dispatchers.Default) {
+    suspend fun getAdditionalMetaAccountSecret(metaId: Long, secretName: String) = withContext(Dispatchers.IO) {
+        encryptedPreferences.getDecryptedString(metaAccountAdditionalKey(metaId, secretName))
+    }
+
+    suspend fun putAdditionalMetaAccountSecret(metaId: Long, secretName: String, value: String) = withContext(Dispatchers.IO) {
+        val key = metaAccountAdditionalKey(metaId, secretName)
+
+        encryptedPreferences.putEncryptedString(key, value)
+        putAdditionalSecretKeyToKnown(metaId, secretName)
+    }
+
+    suspend fun clearSecrets(metaId: Long, chainAccountIds: List<AccountId>) = withContext(Dispatchers.IO) {
         chainAccountIds.map { chainAccountKey(metaId, it, ACCESS_SECRETS) }
             .onEach(encryptedPreferences::removeKey)
 
         encryptedPreferences.removeKey(metaAccountKey(metaId, ACCESS_SECRETS))
+        clearAdditionalSecrets(metaId)
+    }
+
+    suspend fun allKnownAdditionalSecretKeys(metaId: Long): Set<String> = withContext(Dispatchers.IO) {
+        val metaAccountAdditionalKnownKey = metaAccountAdditionalKnownKey(metaId)
+
+        encryptedPreferences.getDecryptedString(metaAccountAdditionalKnownKey)
+            ?.split(ADDITIONAL_KNOWN_KEYS_DELIMITER)?.toSet()
+            ?: emptySet()
+    }
+
+    private suspend fun clearAdditionalSecrets(metaId: Long) {
+        val allKnown = allKnownAdditionalSecretKeys(metaId)
+
+        allKnown.forEach { secretName ->
+            encryptedPreferences.removeKey(metaAccountAdditionalKey(metaId, secretName))
+        }
+
+        encryptedPreferences.removeKey(metaAccountAdditionalKnownKey(metaId))
+    }
+
+    private suspend fun putAdditionalSecretKeyToKnown(metaId: Long, secretName: String) {
+        require(validAdditionalKeyName(secretName))
+
+        val currentKnownKeys = allKnownAdditionalSecretKeys(metaId)
+
+        val updatedKnownKeys = currentKnownKeys + secretName
+        val encodedKnownKeys = updatedKnownKeys.joinToString(ADDITIONAL_KNOWN_KEYS_DELIMITER)
+
+        encryptedPreferences.putEncryptedString(metaAccountAdditionalKnownKey(metaId), encodedKnownKeys)
     }
 
     private fun chainAccountKey(metaId: Long, accountId: ByteArray, secretName: String) = "$metaId:${accountId.toHexString()}:$secretName"
 
     private fun metaAccountKey(metaId: Long, secretName: String) = "$metaId:$secretName"
+
+    private fun metaAccountAdditionalKnownKey(metaId: Long) = "$metaId:$ADDITIONAL_KNOWN_KEYS"
+    private fun metaAccountAdditionalKey(metaId: Long, secretName: String) = "$metaId:$ADDITIONAL_KNOWN_KEYS:$secretName"
+
+    private fun validAdditionalKeyName(secretName: String) = ADDITIONAL_KNOWN_KEYS_DELIMITER !in secretName
 }
 
 suspend fun SecretStoreV2.getAccountSecrets(

@@ -1,7 +1,6 @@
 package io.novafoundation.nova.common.view.bottomSheet.list.fixed
 
 import android.content.Context
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -10,14 +9,13 @@ import androidx.annotation.CallSuper
 import androidx.annotation.DrawableRes
 import androidx.annotation.LayoutRes
 import androidx.annotation.StringRes
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import io.novafoundation.nova.common.R
-import io.novafoundation.nova.common.utils.DialogExtensions
+import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.setDrawableEnd
 import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.utils.setTextOrHide
-import io.novafoundation.nova.common.utils.dp
+import io.novafoundation.nova.common.view.bottomSheet.BaseBottomSheet
 import kotlinx.android.synthetic.main.bottom_sheeet_fixed_list.fixedListSheetItemContainer
 import kotlinx.android.synthetic.main.bottom_sheeet_fixed_list.fixedListSheetTitle
 import kotlinx.android.synthetic.main.item_sheet_iconic_label.view.itemExternalActionContent
@@ -28,8 +26,7 @@ abstract class FixedListBottomSheet(
     context: Context,
     private val onCancel: (() -> Unit)? = null,
     private val viewConfiguration: ViewConfiguration = ViewConfiguration.default()
-) :
-    BottomSheetDialog(context, R.style.BottomSheetDialog), DialogExtensions {
+) : BaseBottomSheet(context) {
 
     class ViewConfiguration(
         @LayoutRes val layout: Int,
@@ -48,9 +45,6 @@ abstract class FixedListBottomSheet(
     init {
         setContentView(viewConfiguration.layout)
     }
-
-    final override val dialogInterface: DialogInterface
-        get() = this
 
     @CallSuper
     override fun onCreate(savedInstanceState: Bundle?) {

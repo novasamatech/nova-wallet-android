@@ -53,6 +53,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.cus
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.terms.MoonbeamCrowdloanTermsFragment
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.CrowdloanContributeFragment
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.parcel.ContributePayload
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectLedger.AddChainAccountSelectLedgerFragment
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
 import io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.WelcomeFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -140,6 +141,7 @@ class Navigator(
             R.id.confirmMnemonicFragment -> navController?.navigate(R.id.action_confirmMnemonicFragment_to_pincodeFragment, bundle)
             R.id.createWatchWalletFragment -> navController?.navigate(R.id.action_watchWalletFragment_to_pincodeFragment, bundle)
             R.id.finishImportParitySignerFragment -> navController?.navigate(R.id.action_finishImportParitySignerFragment_to_pincodeFragment, bundle)
+            R.id.finishImportLedgerFragment -> navController?.navigate(R.id.action_finishImportLedgerFragment_to_pincodeFragment, bundle)
         }
     }
 
@@ -519,12 +521,22 @@ class Navigator(
         navController?.navigate(R.id.action_finish_parity_signer_flow)
     }
 
+    override fun openAddLedgerChainAccountFlow(payload: AddAccountPayload.ChainAccount) {
+        val bundle = AddChainAccountSelectLedgerFragment.getBundle(payload)
+
+        navController?.navigate(R.id.action_accountDetailsFragment_to_addLedgerAccountGraph, bundle)
+    }
+
     override fun openCreateWatchWallet() {
         navController?.navigate(R.id.action_welcomeFragment_to_createWatchWalletFragment)
     }
 
     override fun openStartImportParitySigner() {
         navController?.navigate(R.id.action_welcomeFragment_to_import_parity_signer_graph)
+    }
+
+    override fun openStartImportLedger() {
+        navController?.navigate(R.id.action_welcomeFragment_to_import_ledger_graph)
     }
 
     override fun withPinCodeCheckRequired(
