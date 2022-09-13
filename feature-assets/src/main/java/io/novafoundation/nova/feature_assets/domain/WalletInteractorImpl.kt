@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_assets.domain
 
 import io.novafoundation.nova.common.data.model.CursorPage
-import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.common.utils.applyFilters
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -29,7 +28,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.withContext
-import java.math.BigDecimal
 
 class WalletInteractorImpl(
     private val walletRepository: WalletRepository,
@@ -48,7 +46,7 @@ class WalletInteractorImpl(
 
     override fun assetsFlow(): Flow<List<Asset>> {
         return accountRepository.selectedMetaAccountFlow()
-            .flatMapLatest { walletRepository.assetsFlow(it.id) }
+            .flatMapLatest { walletRepository.syncedAssetsFlow(it.id) }
     }
 
     override suspend fun syncAssetsRates(currency: Currency) {

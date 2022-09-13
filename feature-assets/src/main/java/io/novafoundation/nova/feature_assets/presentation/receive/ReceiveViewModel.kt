@@ -42,6 +42,8 @@ class ReceiveViewModel(
     private val router: AssetsRouter,
 ) : BaseViewModel(), ExternalActions by externalActions {
 
+    private val selectedMetaAccountFlow = selectedAccountUseCase.selectedMetaAccountFlow()
+
     private val chainWithAssetAsync by lazyAsync {
         chainRegistry.chainWithAsset(assetPayload.chainId, assetPayload.chainAssetId)
     }
@@ -54,7 +56,7 @@ class ReceiveViewModel(
         .inBackground()
         .share()
 
-    val receiver = selectedAccountUseCase.selectedMetaAccountFlow()
+    val receiver = selectedMetaAccountFlow
         .map {
             val (chain, chainAsset) = chainWithAssetAsync()
             val address = it.addressIn(chain)!!

@@ -9,7 +9,6 @@ fun rewardDestinationValidationFailure(
     resourceManager: ResourceManager,
     failure: RewardDestinationValidationFailure
 ): TitleAndMessage = when (failure) {
-
     is RewardDestinationValidationFailure.MissingController -> {
         resourceManager.getString(R.string.common_error_general_title) to
             resourceManager.getString(R.string.staking_add_controller, failure.controllerAddress)

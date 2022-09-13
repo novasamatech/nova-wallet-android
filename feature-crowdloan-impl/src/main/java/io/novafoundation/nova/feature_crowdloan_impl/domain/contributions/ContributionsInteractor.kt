@@ -25,12 +25,12 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
-import java.math.BigInteger
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import java.math.BigInteger
 
 class ContributionsInteractor(
     private val externalContributionsSources: List<ExternalContributionSource>,
@@ -40,7 +40,6 @@ class ContributionsInteractor(
     private val chainStateRepository: ChainStateRepository
 ) {
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     fun observeUserContributions(): Flow<ContributionsWithTotalAmount> = flow {
         val chain = selectedAssetState.chain()
         val metaAccount = accountRepository.getSelectedMetaAccount()
@@ -96,18 +95,17 @@ class ContributionsInteractor(
         emitAll(allContributionsFlow)
     }
 
-    fun getTotalContributionAmount(contributions: List<Contribution>): BigInteger = contributions.sumOf { it.amount }
+    private fun getTotalContributionAmount(contributions: List<Contribution>): BigInteger = contributions.sumOf { it.amount }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    fun directContributionsFlow(chain: Chain, account: MetaAccount, fundInfos: Map<ParaId, FundInfo>): Flow<Map<ParaId, DirectContribution>> = flowOf {
+    private fun directContributionsFlow(chain: Chain, account: MetaAccount, fundInfos: Map<ParaId, FundInfo>): Flow<Map<ParaId, DirectContribution>> = flowOf {
         val accountId = account.accountIdIn(chain)!!
         crowdloanRepository.getContributions(chain.id, accountId, fundInfos)
             .filterNotNull()
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     fun externalContributionsFlow(chain: Chain, account: MetaAccount): Flow<List<ExternalContributionSource.Contribution>> {
-        val accountId = account.accountIdIn(chain)!!
+        val accountId = account.accountIdIn(chain) ?: return flowOf(emptyList())
+
         val externalContributionFlows = externalContributionsSources
             .filter { it.supports(chain) }
             .map { flowOf { it.getContributions(chain, accountId) } }

@@ -6,25 +6,20 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.DefaultMutableSharedState
 import io.novafoundation.nova.common.utils.MutableSharedState
 import io.novafoundation.nova.common.utils.SharedState
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.feature_account_impl.data.repository.ParitySignerRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.RealParitySignerRepository
+import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.ParitySignerSignCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.ParitySignerSignInterScreenCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.common.QrCodeExpiredPresentableFactory
-import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.notSupported.ParitySignerSigningNotSupportedPresentable
-import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.notSupported.RealParitySignerSigningNotSupportedPresentable
+import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported.SigningNotSupportedPresentable
+import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported.RealSigningNotSupportedPresentable
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
 
 @Module
 class ParitySignerModule {
-
-    @Provides
-    @FeatureScope
-    fun provideSignSharedState(): MutableSharedState<SignerPayloadExtrinsic> = DefaultMutableSharedState()
 
     @Provides
     @FeatureScope
@@ -44,12 +39,12 @@ class ParitySignerModule {
         resourceManager: ResourceManager,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         router: AccountRouter,
-        communicator: ParitySignerSignInterScreenCommunicator
+        communicator: ParitySignerSignCommunicator
     ) = QrCodeExpiredPresentableFactory(resourceManager, actionAwaitableMixinFactory, router, communicator)
 
     @Provides
     @FeatureScope
     fun provideSigningNotSupportedPresentable(
         contextManager: ContextManager
-    ): ParitySignerSigningNotSupportedPresentable = RealParitySignerSigningNotSupportedPresentable(contextManager)
+    ): SigningNotSupportedPresentable = RealSigningNotSupportedPresentable(contextManager)
 }

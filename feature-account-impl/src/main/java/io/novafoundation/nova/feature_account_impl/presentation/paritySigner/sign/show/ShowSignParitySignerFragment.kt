@@ -10,10 +10,10 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenCommunicator
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
-import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.ParitySignerSignInterScreenCommunicator
-import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.common.observeValidityPeriod
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.common.setupQrCodeExpiration
 import kotlinx.android.synthetic.main.fragment_sign_parity_signer_show.signParitySignerShowAddress
 import kotlinx.android.synthetic.main.fragment_sign_parity_signer_show.signParitySignerShowContinue
 import kotlinx.android.synthetic.main.fragment_sign_parity_signer_show.signParitySignerShowHaveError
@@ -27,7 +27,7 @@ class ShowSignParitySignerFragment : BaseFragment<ShowSignParitySignerViewModel>
 
         private const val PAYLOAD_KEY = "ShowSignParitySignerFragment.Payload"
 
-        fun getBundle(payload: ParitySignerSignInterScreenCommunicator.Request): Bundle {
+        fun getBundle(payload: SignInterScreenCommunicator.Request): Bundle {
             return Bundle().apply {
                 putParcelable(PAYLOAD_KEY, payload)
             }
@@ -63,7 +63,7 @@ class ShowSignParitySignerFragment : BaseFragment<ShowSignParitySignerViewModel>
     }
 
     override fun subscribe(viewModel: ShowSignParitySignerViewModel) {
-        observeValidityPeriod(
+        setupQrCodeExpiration(
             validityPeriodFlow = viewModel.validityPeriod,
             qrCodeExpiredPresentable = viewModel.qrCodeExpiredPresentable,
             timerView = signParitySignerShowTimer,

@@ -1,31 +1,30 @@
 name: Pull request
 
 on:
-  [pull_request]
+  pull_request:
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    container:
-      image: ghcr.io/nova-wallet/build_tools:pr-3
-      credentials:
-        username: stepanLav
-        password: ${{ secrets.GITHUB_TOKEN }}
-      env:
-        ACALA_PROD_AUTH_TOKEN: ${{ secrets.ACALA_PROD_AUTH_TOKEN }}
-        ACALA_TEST_AUTH_TOKEN: ${{ secrets.ACALA_TEST_AUTH_TOKEN }}
-        MOONBEAM_PROD_AUTH_TOKEN: ${{ secrets.MOONBEAM_PROD_AUTH_TOKEN }}
-        MOONBEAM_TEST_AUTH_TOKEN: ${{ secrets.MOONBEAM_TEST_AUTH_TOKEN }}
-        MOONPAY_PRODUCTION_SECRET: ${{ secrets.MOONPAY_PRODUCTION_SECRET }}
-        MOONPAY_TEST_SECRET: ${{ secrets.MOONPAY_TEST_SECRET }}
 
-        CI_KEYSTORE_PASS: ${{ secrets.CI_KEYSTORE_PASS }}
-        CI_KEYSTORE_KEY_ALIAS: ${{ secrets.CI_KEYSTORE_KEY_ALIAS }}
-        CI_KEYSTORE_KEY_PASS: ${{ secrets.CI_KEYSTORE_KEY_PASS }}
+    env:
+      ACALA_PROD_AUTH_TOKEN: ${{ secrets.ACALA_PROD_AUTH_TOKEN }}
+      ACALA_TEST_AUTH_TOKEN: ${{ secrets.ACALA_TEST_AUTH_TOKEN }}
+      MOONBEAM_PROD_AUTH_TOKEN: ${{ secrets.MOONBEAM_PROD_AUTH_TOKEN }}
+      MOONBEAM_TEST_AUTH_TOKEN: ${{ secrets.MOONBEAM_TEST_AUTH_TOKEN }}
+      MOONPAY_PRODUCTION_SECRET: ${{ secrets.MOONPAY_PRODUCTION_SECRET }}
+      MOONPAY_TEST_SECRET: ${{ secrets.MOONPAY_TEST_SECRET }}
+
+      CI_KEYSTORE_PASS: ${{ secrets.CI_KEYSTORE_PASS }}
+      CI_KEYSTORE_KEY_ALIAS: ${{ secrets.CI_KEYSTORE_KEY_ALIAS }}
+      CI_KEYSTORE_KEY_PASS: ${{ secrets.CI_KEYSTORE_KEY_PASS }}
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: Run tests
+      - name: 🔧 Install dependencies
+        uses: ./.github/workflows/install/
+
+      - name: 🧪 Run tests
         run: ./gradlew runTest

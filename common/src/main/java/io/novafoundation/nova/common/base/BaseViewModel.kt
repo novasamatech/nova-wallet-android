@@ -16,7 +16,7 @@ import io.novafoundation.nova.common.validation.ValidationSystem
 import kotlinx.coroutines.CoroutineScope
 import kotlin.coroutines.CoroutineContext
 
-typealias TitleAndMessage = Pair<String, String>
+typealias TitleAndMessage = Pair<String, String?>
 
 open class BaseViewModel : ViewModel(), CoroutineScope, WithCoroutineScopeExtensions {
 

@@ -24,7 +24,6 @@ class ConfirmMnemonicFragment : BaseFragment<ConfirmMnemonicViewModel>() {
         private const val KEY_PAYLOAD = "confirm_payload"
 
         fun getBundle(payload: ConfirmMnemonicPayload): Bundle {
-
             return Bundle().apply {
                 putParcelable(KEY_PAYLOAD, payload)
             }

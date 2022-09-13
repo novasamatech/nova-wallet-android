@@ -4,12 +4,14 @@ import io.novafoundation.nova.common.data.secrets.v1.Keypair
 import io.novafoundation.nova.common.data.secrets.v2.KeyPairSchema.PrivateKey
 import io.novafoundation.nova.common.data.secrets.v2.MetaAccountSecrets.SubstrateDerivationPath
 import io.novafoundation.nova.common.data.secrets.v2.MetaAccountSecrets.SubstrateKeypair
-import jp.co.soramitsu.fearless_utils.scale.EncodableStruct
 import io.novafoundation.nova.test_shared.HashMapEncryptedPreferences
+import io.novafoundation.nova.test_shared.assertSetEquals
+import jp.co.soramitsu.fearless_utils.scale.EncodableStruct
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -57,12 +59,12 @@ class SecretStoreV2Test {
         val chainSecrets = createChainSecrets(derivationPath = "/2")
 
         secretStore.putMetaAccountSecrets(metaId = 11, metaSecrets)
-        secretStore.putChainAccountSecrets(metaId = 1, accountId= ACCOUNT_ID, chainSecrets)
+        secretStore.putChainAccountSecrets(metaId = 1, accountId = ACCOUNT_ID, chainSecrets)
 
         val secretsFromStore = secretStore.getMetaAccountSecrets(11)
 
         requireNotNull(secretsFromStore)
-        assertEquals( metaSecrets[SubstrateDerivationPath], secretsFromStore[SubstrateDerivationPath])
+        assertEquals(metaSecrets[SubstrateDerivationPath], secretsFromStore[SubstrateDerivationPath])
     }
 
     @Test
@@ -80,6 +82,60 @@ class SecretStoreV2Test {
 
         val chainSecretsLocal = secretStore.getChainAccountSecrets(META_ID, ACCOUNT_ID)
         assertNull(chainSecretsLocal)
+    }
+
+    @Test
+    fun `should CRUD single additional secret`() = runBlocking {
+        val secretName = "additional secret key"
+        val secretValue = "value"
+
+        val metaId = 0L
+
+        secretStore.putAdditionalMetaAccountSecret(metaId, secretName, secretValue)
+
+        val valueFromStore = secretStore.getAdditionalMetaAccountSecret(metaId, secretName)
+        assertEquals(secretValue, valueFromStore)
+
+        val changedValue = "value changed"
+        secretStore.putAdditionalMetaAccountSecret(metaId, secretName, changedValue)
+
+        val changedValueFromStore = secretStore.getAdditionalMetaAccountSecret(metaId, secretName)
+        assertEquals(changedValue, changedValueFromStore)
+
+        secretStore.clearSecrets(metaId, chainAccountIds = emptyList())
+        val shouldNotExists = secretStore.getAdditionalMetaAccountSecret(metaId, secretName)
+        assertNull(shouldNotExists)
+    }
+
+    @Test
+    fun `should manage multiple additional secrets`() = runBlocking {
+        val metaId = 0L
+
+        val secretNames = (0..10).map { "secret $it" }
+
+        secretNames.forEach {
+            secretStore.putAdditionalMetaAccountSecret(metaId, secretName = it, value = it)
+        }
+
+        val knownSecrets = secretStore.allKnownAdditionalSecretKeys(metaId)
+        assertSetEquals(secretNames.toSet(), knownSecrets)
+
+        secretStore.clearSecrets(metaId, emptyList())
+
+        val knownSecretsAfterClear = secretStore.allKnownAdditionalSecretKeys(metaId)
+        assertTrue(knownSecretsAfterClear.isEmpty())
+    }
+
+    @Test
+    fun `known keys should be unique`() = runBlocking {
+        val metaId = 0L
+
+        repeat(2) {
+            secretStore.putAdditionalMetaAccountSecret(metaId, "key", "value $it")
+        }
+
+        val knownSecrets = secretStore.allKnownAdditionalSecretKeys(metaId)
+        assertEquals(1, knownSecrets.size)
     }
 
     private fun createMetaSecrets(

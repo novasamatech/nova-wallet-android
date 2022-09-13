@@ -28,8 +28,6 @@ android {
     }
 
     kotlinOptions {
-        freeCompilerArgs = ["-Xallow-result-return-type"]
-
         jvmTarget = '1.8'
     }
 }
@@ -41,6 +39,7 @@ dependencies {
     implementation project(':runtime')
     implementation project(':feature-account-api')
     implementation project(':feature-currency-api')
+    implementation project(':feature-ledger-api')
 
     implementation kotlinDep
 

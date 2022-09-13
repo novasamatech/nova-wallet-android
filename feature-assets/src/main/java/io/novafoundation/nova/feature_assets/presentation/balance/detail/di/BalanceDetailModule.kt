@@ -9,6 +9,7 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
@@ -83,7 +84,8 @@ class BalanceDetailModule {
         accountUseCase: SelectedAccountUseCase,
         missingKeysPresenter: WatchOnlyMissingKeysPresenter,
         resourceManager: ResourceManager,
-        currencyInteractor: CurrencyInteractor
+        currencyInteractor: CurrencyInteractor,
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
     ): ViewModel {
         return BalanceDetailViewModel(
             walletInteractor = walletInteractor,
@@ -96,7 +98,8 @@ class BalanceDetailModule {
             accountUseCase = accountUseCase,
             missingKeysPresenter = missingKeysPresenter,
             resourceManager = resourceManager,
-            currencyInteractor
+            currencyInteractor = currencyInteractor,
+            actionAwaitableMixinFactory = actionAwaitableMixinFactory
         )
     }
 

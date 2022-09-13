@@ -43,6 +43,11 @@
         <item name="android:textSize">?attr/textSizeSubHeadline</item>
     </style>
 
+    <style name="TextAppearance.NovaFoundation.SemiBold.Caption3">
+        <item name="android:textSize">9sp</item>
+        <item name="lineHeight">11sp</item>
+    </style>
+
     <!-- Bold -->
 
     <style name="TextAppearance.NovaFoundation.Bold" parent="TextAppearance.AppCompat.Title">

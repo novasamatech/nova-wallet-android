@@ -13,6 +13,8 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.MixinFactory
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_crowdloan_impl.data.CrowdloanSharedState
@@ -21,6 +23,8 @@ import io.novafoundation.nova.feature_crowdloan_impl.domain.contributions.Contri
 import io.novafoundation.nova.feature_crowdloan_impl.domain.main.CrowdloanInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.domain.main.statefull.StatefulCrowdloanMixin
 import io.novafoundation.nova.feature_crowdloan_impl.domain.main.statefull.StatefulCrowdloanProviderFactory
+import io.novafoundation.nova.feature_crowdloan_impl.domain.main.validations.MainCrowdloanValidationSystem
+import io.novafoundation.nova.feature_crowdloan_impl.domain.main.validations.mainCrowdloan
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.main.CrowdloanViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
@@ -28,6 +32,12 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelecto
 
 @Module(includes = [ViewModelModule::class])
 class CrowdloanModule {
+
+    @Provides
+    @ScreenScope
+    fun provideValidationSystem(): MainCrowdloanValidationSystem {
+        return ValidationSystem.mainCrowdloan()
+    }
 
     @Provides
     @ScreenScope
@@ -60,19 +70,23 @@ class CrowdloanModule {
         customDialogDisplayer: CustomDialogDisplayer.Presentation,
         customContributeManager: CustomContributeManager,
         statefulCrowdloanMixinFactory: StatefulCrowdloanMixin.Factory,
-        selectedAccountUseCase: SelectedAccountUseCase
+        selectedAccountUseCase: SelectedAccountUseCase,
+        validationExecutor: ValidationExecutor,
+        validationSystem: MainCrowdloanValidationSystem,
     ): ViewModel {
         return CrowdloanViewModel(
-            iconGenerator,
-            resourceManager,
-            crowdloanSharedState,
-            router,
-            customContributeManager,
-            selectedAccountUseCase,
-            crowdloanUpdateSystem,
-            assetSelectorFactory,
-            statefulCrowdloanMixinFactory,
-            customDialogDisplayer
+            iconGenerator = iconGenerator,
+            resourceManager = resourceManager,
+            crowdloanSharedState = crowdloanSharedState,
+            router = router,
+            customContributeManager = customContributeManager,
+            selectedAccountUseCase = selectedAccountUseCase,
+            validationSystem = validationSystem,
+            validationExecutor = validationExecutor,
+            crowdloanUpdateSystem = crowdloanUpdateSystem,
+            assetSelectorFactory = assetSelectorFactory,
+            statefulCrowdloanMixinFactory = statefulCrowdloanMixinFactory,
+            customDialogDisplayer = customDialogDisplayer
         )
     }
 

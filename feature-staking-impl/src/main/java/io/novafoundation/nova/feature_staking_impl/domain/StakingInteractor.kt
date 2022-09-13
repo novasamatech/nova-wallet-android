@@ -223,9 +223,13 @@ class StakingInteractor(
         assetWithChain: SingleAssetSharedState.AssetWithChain
     ) = flow {
         val (chain, chainAsset) = assetWithChain
-        val accountId = metaAccount.accountIdIn(chain)!! // TODO may be null for ethereum chains
+        val accountId = metaAccount.accountIdIn(chain)
 
-        emitAll(stakingRepository.stakingStateFlow(chain, chainAsset, accountId))
+        if (accountId != null) {
+            emitAll(stakingRepository.stakingStateFlow(chain, chainAsset, accountId))
+        } else {
+            emit(StakingState.NonStash(assetWithChain.chain, assetWithChain.asset))
+        }
     }
 
     fun selectedAccountStakingStateFlow() = selectionStateFlow().flatMapLatest { (selectedAccount, assetWithChain) ->
@@ -235,7 +239,7 @@ class StakingInteractor(
     suspend fun getAccountProjectionsInSelectedChains() = withContext(Dispatchers.Default) {
         val chain = stakingSharedState.chain()
 
-        accountRepository.allMetaAccounts().map {
+        accountRepository.allMetaAccounts().mapNotNull {
             mapAccountToStakingAccount(chain, it)
         }
     }

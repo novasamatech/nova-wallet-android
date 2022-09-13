@@ -7,6 +7,8 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.SelectAddressCommunicator
+import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignCommunicator
+import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.ParitySignerSignCommunicator
 import io.novafoundation.nova.feature_account_impl.di.modules.ExportModule
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.AdvancedEncryptionCommunicator
@@ -14,8 +16,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.advanced
 import io.novafoundation.nova.feature_account_impl.presentation.account.create.di.CreateAccountComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.di.AccountDetailsComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.selecting.di.SelectAddressComponent
-import io.novafoundation.nova.feature_account_impl.presentation.account.management.di.WalletManagmentComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.switching.di.SwitchWalletComponent
+import io.novafoundation.nova.feature_account_impl.presentation.account.management.di.WalletManagmentComponent
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ShareCompletedReceiver
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.di.ExportJsonConfirmComponent
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.password.di.ExportJsonPasswordComponent
@@ -27,7 +29,6 @@ import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm
 import io.novafoundation.nova.feature_account_impl.presentation.node.add.di.AddNodeComponent
 import io.novafoundation.nova.feature_account_impl.presentation.node.details.di.NodeDetailsComponent
 import io.novafoundation.nova.feature_account_impl.presentation.node.list.di.NodesComponent
-import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.ParitySignerSignInterScreenCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.finish.di.FinishImportParitySignerComponent
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.preview.di.PreviewImportParitySignerComponent
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.scan.di.ScanImportParitySignerComponent
@@ -108,7 +109,8 @@ interface AccountFeatureComponent : AccountFeatureApi {
         fun create(
             @BindsInstance accountRouter: AccountRouter,
             @BindsInstance advancedEncryptionCommunicator: AdvancedEncryptionCommunicator,
-            @BindsInstance paritySignerSignInterScreenCommunicator: ParitySignerSignInterScreenCommunicator,
+            @BindsInstance paritySignerSignInterScreenCommunicator: ParitySignerSignCommunicator,
+            @BindsInstance ledgerSignInterScreenCommunicator: LedgerSignCommunicator,
             @BindsInstance selectAddressCommunicator: SelectAddressCommunicator,
             deps: AccountFeatureDependencies
         ): AccountFeatureComponent
@@ -119,7 +121,7 @@ interface AccountFeatureComponent : AccountFeatureApi {
             CommonApi::class,
             RuntimeApi::class,
             CurrencyFeatureApi::class,
-            DbApi::class
+            DbApi::class,
         ]
     )
     interface AccountFeatureDependenciesComponent : AccountFeatureDependencies

@@ -52,6 +52,8 @@ sealed class ValidationStatus<S> {
     }
 }
 
+fun <T> T.invalidError(): ValidationStatus.NotValid<T> = ValidationStatus.NotValid(DefaultFailureLevel.ERROR, this)
+
 enum class DefaultFailureLevel(override val value: Int) : ValidationStatus.NotValid.Level {
     WARNING(1), ERROR(2)
 }

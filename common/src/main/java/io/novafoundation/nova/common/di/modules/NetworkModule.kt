@@ -15,7 +15,10 @@ import io.novafoundation.nova.common.data.network.rpc.SocketSingleRequestExecuto
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.mixin.impl.NetworkStateProvider
+import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
+import io.novafoundation.nova.common.utils.bluetooth.RealBluetoothManager
 import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
 import jp.co.soramitsu.fearless_utils.wsrpc.logging.Logger
 import jp.co.soramitsu.fearless_utils.wsrpc.recovery.Reconnector
@@ -44,6 +47,7 @@ class NetworkModule {
             setControllerLearnMore = BuildConfig.SET_CONTROLLER_LEARN_MORE,
             recommendedValidatorsLearnMore = BuildConfig.RECOMMENDED_VALIDATORS_LEARN_MORE,
             paritySignerTroubleShooting = BuildConfig.PARITY_SIGNER_TROUBLESHOOTING,
+            ledgerBluetoothGuide = BuildConfig.LEDGER_BLEUTOOTH_GUIDE,
             telegram = BuildConfig.TELEGRAM_URL,
             twitter = BuildConfig.TWITTER_URL,
             rateApp = BuildConfig.RATE_URL,
@@ -126,4 +130,10 @@ class NetworkModule {
     @Provides
     @ApplicationScope
     fun provideJsonMapper() = Gson()
+
+    @Provides
+    @ApplicationScope
+    fun provideBluetoothManager(
+        contextManager: ContextManager
+    ): BluetoothManager = RealBluetoothManager(contextManager)
 }

@@ -7,11 +7,11 @@ import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import io.novafoundation.nova.common.base.BaseBottomSheetFragment
+import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountUi
+import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountsAdapter
 import io.novafoundation.nova.feature_account_impl.R
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.AccountsAdapter
-import io.novafoundation.nova.feature_account_impl.presentation.account.model.MetaAccountUi
-import kotlinx.android.synthetic.main.fragment_wallet_list.walletListContent
 import kotlinx.android.synthetic.main.fragment_wallet_list.walletListBarAction
+import kotlinx.android.synthetic.main.fragment_wallet_list.walletListContent
 import kotlinx.android.synthetic.main.fragment_wallet_list.walletListTitle
 
 abstract class WalletListFragment<T : WalletListViewModel> :
@@ -36,11 +36,11 @@ abstract class WalletListFragment<T : WalletListViewModel> :
         viewModel.walletsListingMixin.metaAccountsFlow.observe(adapter::submitList)
     }
 
-    override fun itemClicked(accountModel: MetaAccountUi) {
+    override fun itemClicked(accountModel: AccountUi) {
         viewModel.accountClicked(accountModel)
     }
 
-    override fun deleteClicked(accountModel: MetaAccountUi) {
+    override fun deleteClicked(accountModel: AccountUi) {
         // no delete possible
     }
 

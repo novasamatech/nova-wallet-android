@@ -5,7 +5,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.model.ConfirmStartParachainStakingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.confirm.model.ParachainStakingUnbondConfirmPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
 interface ParachainStakingRouter {
 
@@ -15,7 +14,7 @@ interface ParachainStakingRouter {
 
     fun openCollatorDetails(payload: StakeTargetDetailsPayload)
 
-    fun openAddAccount(chainId: ChainId, metaId: Long)
+    fun openWalletDetails(metaId: Long)
 
     fun back()
     fun returnToMain()

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/sign_ledger_nav_graph"
+    app:startDestination="@id/signLedgerFragment">
+    
+    <fragment
+        app:useAdd="true"
+        android:id="@+id/signLedgerFragment"
+        android:name="io.novafoundation.nova.feature_ledger_impl.presentation.account.sign.SignLedgerFragment"
+        android:label="SignLedgerFragment" />
+</navigation>

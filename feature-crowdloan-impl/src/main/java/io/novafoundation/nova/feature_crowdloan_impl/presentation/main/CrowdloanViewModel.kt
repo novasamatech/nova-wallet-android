@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.list.toValueList
 import io.novafoundation.nova.common.mixin.MixinFactory
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
+import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.presentation.mapLoading
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -15,13 +16,19 @@ import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.formatting.formatAsPercentage
 import io.novafoundation.nova.common.utils.fractionToPercentage
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.common.validation.TransformedFailure
+import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.domain.validation.handleChainAccountNotFound
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.data.CrowdloanSharedState
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomContributeManager
 import io.novafoundation.nova.feature_crowdloan_impl.domain.main.Crowdloan
 import io.novafoundation.nova.feature_crowdloan_impl.domain.main.statefull.StatefulCrowdloanMixin
+import io.novafoundation.nova.feature_crowdloan_impl.domain.main.validations.MainCrowdloanValidationFailure
+import io.novafoundation.nova.feature_crowdloan_impl.domain.main.validations.MainCrowdloanValidationPayload
+import io.novafoundation.nova.feature_crowdloan_impl.domain.main.validations.MainCrowdloanValidationSystem
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.parcel.ContributePayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.parcel.mapParachainMetadataToParcel
@@ -36,11 +43,11 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelecto
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.chain
-import kotlin.reflect.KClass
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlin.reflect.KClass
 
 class CrowdloanViewModel(
     private val iconGenerator: AddressIconGenerator,
@@ -49,11 +56,14 @@ class CrowdloanViewModel(
     private val router: CrowdloanRouter,
     private val customContributeManager: CustomContributeManager,
     private val selectedAccountUseCase: SelectedAccountUseCase,
+    private val validationSystem: MainCrowdloanValidationSystem,
+    private val validationExecutor: ValidationExecutor,
     crowdloanUpdateSystem: UpdateSystem,
     assetSelectorFactory: MixinFactory<AssetSelectorMixin.Presentation>,
     statefulCrowdloanMixinFactory: StatefulCrowdloanMixin.Factory,
-    customDialogDisplayer: CustomDialogDisplayer,
+    customDialogDisplayer: CustomDialogDisplayer
 ) : BaseViewModel(),
+    Validatable by validationExecutor,
     WithAssetSelector,
     CustomDialogDisplayer by customDialogDisplayer {
 
@@ -163,7 +173,7 @@ class CrowdloanViewModel(
             if (startFlowInterceptor != null) {
                 startFlowInterceptor.startFlow(payload)
             } else {
-                router.openContribute(payload)
+                openStandardContributionFlow(payload)
             }
         }
     }
@@ -174,5 +184,31 @@ class CrowdloanViewModel(
 
     fun avatarClicked() {
         router.openSwitchWallet()
+    }
+
+    private suspend fun openStandardContributionFlow(contributionPayload: ContributePayload) {
+        val validationPayload = MainCrowdloanValidationPayload(
+            metaAccount = crowdloansMixin.selectedAccount.first(),
+            chain = crowdloansMixin.selectedChain.first()
+        )
+
+        validationExecutor.requireValid(
+            validationSystem = validationSystem,
+            payload = validationPayload,
+            validationFailureTransformerCustom = { status, _ -> mapValidationFailureToUi(status.reason) },
+        ) {
+            router.openContribute(contributionPayload)
+        }
+    }
+
+    private fun mapValidationFailureToUi(failure: MainCrowdloanValidationFailure): TransformedFailure {
+        return when (failure) {
+            is MainCrowdloanValidationFailure.NoRelaychainAccount -> handleChainAccountNotFound(
+                failure = failure,
+                resourceManager = resourceManager,
+                goToWalletDetails = { router.openAccountDetails(failure.account.id) },
+                addAccountDescriptionRes = R.string.crowdloan_missing_account_message
+            )
+        }
     }
 }
