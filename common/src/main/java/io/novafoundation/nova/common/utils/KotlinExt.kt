@@ -18,7 +18,7 @@ private val PERCENTAGE_MULTIPLIER = 100.toBigDecimal()
 fun BigDecimal.fractionToPercentage() = this * PERCENTAGE_MULTIPLIER
 
 fun BigDecimal.percentageOf(number: BigDecimal): BigDecimal {
-    if (number == BigDecimal.ZERO) return BigDecimal.ZERO
+    if (number.isZero) return BigDecimal.ZERO
 
     return this / number * BigDecimal.valueOf(100)
 }
@@ -32,6 +32,9 @@ infix fun Int.floorMod(divisor: Int) = Math.floorMod(this, divisor)
  * Compares two BigDecimals taking into account only values but not scale unlike `==` operator
  */
 infix fun BigDecimal.hasTheSaveValueAs(another: BigDecimal) = compareTo(another) == 0
+
+val BigDecimal.isZero: Boolean
+    get() = hasTheSaveValueAs(BigDecimal.ZERO)
 
 val BigDecimal.isNonNegative: Boolean
     get() = signum() >= 0
