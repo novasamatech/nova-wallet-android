@@ -13,12 +13,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import java.math.BigDecimal
 import kotlinx.coroutines.flow.Flow
 
-class Balances(
-    val assets: GroupedList<AssetGroup, Asset>,
-    val totalBalanceFiat: BigDecimal,
-    val lockedBalanceFiat: BigDecimal
-)
-
 interface WalletInteractor {
 
     fun filterAssets(assetsFlow: Flow<List<Asset>>): Flow<List<Asset>>

@@ -35,7 +35,7 @@ import io.novafoundation.nova.core_db.migrations.AddChainColor_4_5
 import io.novafoundation.nova.core_db.migrations.AddCurrencies_18_19
 import io.novafoundation.nova.core_db.migrations.AddDAppAuthorizations_1_2
 import io.novafoundation.nova.core_db.migrations.AddFavouriteDApps_9_10
-import io.novafoundation.nova.core_db.migrations.AddLocks_21_22
+import io.novafoundation.nova.core_db.migrations.AddLocks_22_23
 import io.novafoundation.nova.core_db.migrations.AddMetaAccountType_14_15
 import io.novafoundation.nova.core_db.migrations.AddNfts_5_6
 import io.novafoundation.nova.core_db.migrations.AddSitePhishing_6_7
@@ -85,7 +85,6 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
         AccountStakingLocal::class,
         TotalRewardLocal::class,
         OperationLocal::class,
-
         ChainLocal::class,
         ChainNodeLocal::class,
         ChainAssetLocal::class,
@@ -93,12 +92,9 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
         ChainExplorerLocal::class,
         MetaAccountLocal::class,
         ChainAccountLocal::class,
-
         DappAuthorizationLocal::class,
         NftLocal::class,
-
         PhishingSiteLocal::class,
-
         FavouriteDAppLocal::class,
         CurrencyLocal::class,
         BalanceLockLocal::class
@@ -113,7 +109,6 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
     MetaAccountTypeConverters::class,
     CurrencyConverters::class
 )
-
 abstract class AppDatabase : RoomDatabase() {
 
     companion object {
@@ -134,7 +129,8 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(AddFavouriteDApps_9_10, ChangeDAppAuthorization_10_11, RemoveChainForeignKeyFromChainAccount_11_12)
                     .addMigrations(AddAdditionalFieldToChains_12_13, FixMigrationConflicts_13_14, AddMetaAccountType_14_15)
                     .addMigrations(NullableSubstratePublicKey_15_16, WatchOnlyChainAccounts_16_17, RemoveColorFromChains_17_18)
-                    .addMigrations(AddCurrencies_18_19, ChangeTokens_19_20, ChangeChainNodes_20_21, AddLocks_21_22)
+                    .addMigrations(AddCurrencies_18_19, ChangeTokens_19_20, ChangeChainNodes_20_21)
+                    .addMigrations(NullableSubstrateAccountId_21_22, AddLocks_22_23)
                     .fallbackToDestructiveMigration()
                     .build()
             }

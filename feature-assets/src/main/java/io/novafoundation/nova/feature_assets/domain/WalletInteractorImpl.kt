@@ -138,22 +138,4 @@ class WalletInteractorImpl(
         val chains = chainRegistry.chainsById.first()
         return groupAndSortAssetsByNetwork(assets, chains)
     }
-
-    private fun balancesFromAssets(
-        assets: List<Asset>,
-        groupedAssets: GroupedList<AssetGroup, Asset>
-    ): Balances {
-        val (totalFiat, lockedFiat) = assets.fold(BigDecimal.ZERO to BigDecimal.ZERO) { (total, locked), asset ->
-            val assetTotalFiat = asset.token.priceOf(asset.total)
-            val assetLockedFiat = asset.token.priceOf(asset.locked)
-
-            (total + assetTotalFiat) to (locked + assetLockedFiat)
-        }
-
-        return Balances(
-            assets = groupedAssets,
-            totalBalanceFiat = totalFiat,
-            lockedBalanceFiat = lockedFiat
-        )
-    }
 }
