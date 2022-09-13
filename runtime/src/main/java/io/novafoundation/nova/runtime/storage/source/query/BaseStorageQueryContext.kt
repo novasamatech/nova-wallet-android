@@ -21,9 +21,9 @@ abstract class BaseStorageQueryContext(
     private val at: BlockHash?,
 ) : StorageQueryContext {
 
-    protected abstract suspend fun queryKeysByPrefix(prefix: String): List<String>
+    protected abstract suspend fun queryKeysByPrefix(prefix: String, at: BlockHash?): List<String>
 
-    protected abstract suspend fun queryEntriesByPrefix(prefix: String): Map<String, String?>
+    protected abstract suspend fun queryEntriesByPrefix(prefix: String, at: BlockHash?): Map<String, String?>
 
     protected abstract suspend fun queryKeys(keys: List<String>, at: BlockHash?): Map<String, String?>
 
@@ -38,7 +38,7 @@ abstract class BaseStorageQueryContext(
     override suspend fun StorageEntry.keys(vararg prefixArgs: Any?): List<StorageKeyComponents> {
         val prefix = storageKey(runtime, *prefixArgs)
 
-        return queryKeysByPrefix(prefix).map { ComponentHolder(splitKey(runtime, it)) }
+        return queryKeysByPrefix(prefix, at).map { ComponentHolder(splitKey(runtime, it)) }
     }
 
     override suspend fun <K, V> StorageEntry.entries(
@@ -48,7 +48,7 @@ abstract class BaseStorageQueryContext(
     ): Map<K, V> {
         val prefix = storageKey(runtime, *prefixArgs)
 
-        val entries = queryEntriesByPrefix(prefix)
+        val entries = queryEntriesByPrefix(prefix, at)
 
         return applyMappersToEntries(
             entries = entries,
@@ -91,7 +91,7 @@ abstract class BaseStorageQueryContext(
     }
 
     override suspend fun StorageEntry.entriesRaw(vararg prefixArgs: Any?): Map<String, String?> {
-        return queryEntriesByPrefix(storageKey(runtime, *prefixArgs))
+        return queryEntriesByPrefix(storageKey(runtime, *prefixArgs), at)
     }
 
     override suspend fun StorageEntry.entriesRaw(keysArguments: List<List<Any?>>): Map<String, String?> {
@@ -107,6 +107,12 @@ abstract class BaseStorageQueryContext(
         val decoded = scaleResult?.let { type.value?.fromHex(runtime, scaleResult) }
 
         return binding(decoded)
+    }
+
+    override suspend fun StorageEntry.queryRaw(vararg keyArguments: Any?): String? {
+        val storageKey = storageKeyWith(keyArguments)
+
+        return queryKey(storageKey, at)
     }
 
     override suspend fun <V> StorageEntry.observe(

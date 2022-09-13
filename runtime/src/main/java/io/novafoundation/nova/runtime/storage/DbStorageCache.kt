@@ -36,6 +36,12 @@ class DbStorageCache(
         storageDao.insert(mapped)
     }
 
+    override suspend fun insertPrefixEntries(entries: List<StorageEntry>, prefixKey: String, chainId: String) {
+        val mapped = entries.map { mapStorageEntryToLocal(it, chainId) }
+
+        storageDao.insertPrefixedEntries(mapped, prefix = prefixKey, chainId = chainId)
+    }
+
     override suspend fun removeByPrefix(prefixKey: String, chainId: String) {
         storageDao.removeByPrefix(prefix = prefixKey, chainId = chainId)
     }

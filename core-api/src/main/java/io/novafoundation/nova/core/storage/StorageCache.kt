@@ -13,6 +13,8 @@ interface StorageCache {
 
     suspend fun insert(entries: List<StorageEntry>, chainId: String)
 
+    suspend fun insertPrefixEntries(entries: List<StorageEntry>, prefixKey: String, chainId: String)
+
     suspend fun removeByPrefix(prefixKey: String, chainId: String)
     suspend fun removeByPrefixExcept(
         prefixKey: String,
@@ -50,4 +52,10 @@ suspend fun StorageCache.insert(entries: Map<String, String?>, chainId: String) 
     val changes = entries.map { (key, value) -> StorageEntry(key, value) }
 
     insert(changes, chainId)
+}
+
+suspend fun StorageCache.insertPrefixEntries(entries: Map<String, String?>, prefix: String, chainId: String) {
+    val changes = entries.map { (key, value) -> StorageEntry(key, value) }
+
+    insertPrefixEntries(changes, prefixKey = prefix, chainId = chainId)
 }

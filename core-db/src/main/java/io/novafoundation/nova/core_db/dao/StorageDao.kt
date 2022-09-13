@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import io.novafoundation.nova.core_db.model.StorageEntryLocal
 import kotlinx.coroutines.flow.Flow
 
@@ -51,4 +52,11 @@ abstract class StorageDao {
 
     @Query("SELECT storageKey from storage WHERE chainId = :chainId AND storageKey in (:keys)")
     abstract suspend fun filterKeysInCache(chainId: String, keys: List<String>): List<String>
+
+    @Transaction
+    open suspend fun insertPrefixedEntries(entries: List<StorageEntryLocal>, prefix: String, chainId: String) {
+        removeByPrefix(prefix, chainId)
+
+        insert(entries)
+    }
 }
