@@ -22,7 +22,6 @@ import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.list.BalanceListViewModel
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
@@ -51,12 +50,10 @@ class BalanceListModule {
     @ScreenScope
     fun provideBalanceBreakdownInteractor(
         accountRepository: AccountRepository,
-        walletRepository: WalletRepository,
         balanceLocksRepository: BalanceLocksRepository
     ): BalanceBreakdownInteractor {
         return BalanceBreakdownInteractor(
             accountRepository,
-            walletRepository,
             balanceLocksRepository
         )
     }

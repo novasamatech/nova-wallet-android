@@ -40,10 +40,10 @@ class BalancesUpdateSystem(
                     val socket = chainRegistry.getSocket(chain.id)
                     val subscriptionBuilder = StorageSubscriptionBuilder.create(socket)
 
-                    val updaters: List<Updater> = buildList {
-                        add(paymentUpdaterFactory.create(chain))
-                        add(balanceLocksUpdater.create(chain))
-                    }
+                    val updaters: List<Updater> = listOf(
+                        paymentUpdaterFactory.create(chain),
+                        balanceLocksUpdater.create(chain)
+                    )
 
                     kotlin.runCatching {
                         updaters.map { it.listenForUpdates(subscriptionBuilder) }

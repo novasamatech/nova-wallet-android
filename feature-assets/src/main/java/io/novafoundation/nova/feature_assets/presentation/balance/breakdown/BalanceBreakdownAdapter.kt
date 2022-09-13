@@ -2,15 +2,13 @@ package io.novafoundation.nova.feature_assets.presentation.balance.breakdown
 
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
+import io.novafoundation.nova.common.list.BaseGroupedDiffCallback
+import io.novafoundation.nova.common.list.GroupedListAdapter
+import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.model.BalanceBreakdownAmount
-import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.model.BalanceBreakdownItem
 import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.model.BalanceBreakdownTotal
-import java.security.InvalidParameterException
 import kotlinx.android.synthetic.main.item_balance_breakdown_amount.view.itemBreakdownAmount
 import kotlinx.android.synthetic.main.item_balance_breakdown_amount.view.itemBreakdownAmountName
 import kotlinx.android.synthetic.main.item_balance_breakdown_total.view.itemBreakdownTotal
@@ -18,66 +16,64 @@ import kotlinx.android.synthetic.main.item_balance_breakdown_total.view.itemBrea
 import kotlinx.android.synthetic.main.item_balance_breakdown_total.view.itemBreakdownTotalName
 import kotlinx.android.synthetic.main.item_balance_breakdown_total.view.itemBreakdownTotalPercentage
 
-// TODO change to group
-class BalanceBreakdownAdapter() : ListAdapter<BalanceBreakdownItem, RecyclerView.ViewHolder>(DiffCallback) {
+class BalanceBreakdownAdapter : GroupedListAdapter<BalanceBreakdownTotal, BalanceBreakdownAmount>(DiffCallback) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return when (viewType) {
-            0 -> BalanceTotalHolder(parent.inflateChild(R.layout.item_balance_breakdown_total, false))
-            1 -> BalanceAmountHolder(parent.inflateChild(R.layout.item_balance_breakdown_amount, false))
-            else -> throw InvalidParameterException()
-        }
+    override fun createGroupViewHolder(parent: ViewGroup): GroupedListHolder {
+        return BalanceTotalHolder(parent.inflateChild(R.layout.item_balance_breakdown_total, false))
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if (holder is BalanceTotalHolder) {
-            holder.bind(getItem(position))
-        } else if (holder is BalanceAmountHolder) {
-            holder.bind(getItem(position))
-        }
+    override fun createChildViewHolder(parent: ViewGroup): GroupedListHolder {
+        return BalanceAmountHolder(parent.inflateChild(R.layout.item_balance_breakdown_amount, false))
     }
 
-    override fun getItemViewType(position: Int): Int {
-        return when (getItem(position)) {
-            is BalanceBreakdownTotal -> 0
-            is BalanceBreakdownAmount -> 1
-            else -> throw InvalidParameterException()
-        }
+    override fun bindGroup(holder: GroupedListHolder, group: BalanceBreakdownTotal) {
+        require(holder is BalanceTotalHolder)
+        holder.bind(group)
+    }
+
+    override fun bindChild(holder: GroupedListHolder, child: BalanceBreakdownAmount) {
+        require(holder is BalanceAmountHolder)
+        holder.bind(child)
     }
 }
 
 class BalanceTotalHolder(
     containerView: View,
-) : RecyclerView.ViewHolder(containerView) {
+) : GroupedListHolder(containerView) {
 
-    fun bind(item: BalanceBreakdownItem) {
-        item as BalanceBreakdownTotal
-
+    fun bind(item: BalanceBreakdownTotal) {
         itemView.itemBreakdownTotalIcon.setImageResource(item.iconRes)
         itemView.itemBreakdownTotalName.text = item.name
-        itemView.itemBreakdownTotalPercentage.text = item.percentage.toString()
+        itemView.itemBreakdownTotalPercentage.text = item.percentage
         itemView.itemBreakdownTotal.text = item.amount
     }
 }
 
 class BalanceAmountHolder(
     containerView: View,
-) : RecyclerView.ViewHolder(containerView) {
+) : GroupedListHolder(containerView) {
 
-    fun bind(item: BalanceBreakdownItem) {
-        item as BalanceBreakdownAmount
-
+    fun bind(item: BalanceBreakdownAmount) {
         itemView.itemBreakdownAmountName.text = item.name
         itemView.itemBreakdownAmount.text = item.amount
     }
 }
 
-private object DiffCallback : DiffUtil.ItemCallback<BalanceBreakdownItem>() {
-    override fun areItemsTheSame(oldItem: BalanceBreakdownItem, newItem: BalanceBreakdownItem): Boolean {
+private object DiffCallback : BaseGroupedDiffCallback<BalanceBreakdownTotal, BalanceBreakdownAmount>(BalanceBreakdownTotal::class.java) {
+
+    override fun areGroupItemsTheSame(oldItem: BalanceBreakdownTotal, newItem: BalanceBreakdownTotal): Boolean {
         return oldItem == newItem
     }
 
-    override fun areContentsTheSame(oldItem: BalanceBreakdownItem, newItem: BalanceBreakdownItem): Boolean {
+    override fun areGroupContentsTheSame(oldItem: BalanceBreakdownTotal, newItem: BalanceBreakdownTotal): Boolean {
+        return true
+    }
+
+    override fun areChildItemsTheSame(oldItem: BalanceBreakdownAmount, newItem: BalanceBreakdownAmount): Boolean {
+        return oldItem == newItem
+    }
+
+    override fun areChildContentsTheSame(oldItem: BalanceBreakdownAmount, newItem: BalanceBreakdownAmount): Boolean {
         return true
     }
 }

@@ -114,7 +114,7 @@ class BalanceListViewModel(
         TotalBalanceModel(
             shouldShowPlaceholder = assets.isEmpty(),
             totalBalanceFiat = it.total.formatAsCurrency(currency),
-            lockedBalanceFiat = it.locksTotal.formatAsCurrency(currency)
+            lockedBalanceFiat = it.locksTotal.amount.formatAsCurrency(currency)
         )
     }
         .inBackground()
@@ -201,18 +201,18 @@ class BalanceListViewModel(
             add(
                 BalanceBreakdownTotal(
                     resourceManager.getString(R.string.wallet_balance_transferable),
-                    balanceBreakdown.transferableTotal.formatAsCurrency(currency),
+                    balanceBreakdown.transferableTotal.amount.formatAsCurrency(currency),
                     R.drawable.ic_staking_operations,
-                    resourceManager.getString(R.string.common_percentage, balanceBreakdown.transferablePercentage.roundToInt())
+                    mapPercentage(balanceBreakdown.transferableTotal)
                 )
             )
 
             add(
                 BalanceBreakdownTotal(
                     resourceManager.getString(R.string.wallet_balance_locked),
-                    balanceBreakdown.locksTotal.formatAsCurrency(currency),
+                    balanceBreakdown.locksTotal.amount.formatAsCurrency(currency),
                     R.drawable.ic_lock,
-                    resourceManager.getString(R.string.common_percentage, balanceBreakdown.locksPercentage.roundToInt())
+                    mapPercentage(balanceBreakdown.locksTotal)
                 )
             )
 
@@ -225,5 +225,12 @@ class BalanceListViewModel(
 
             addAll(breakdown)
         }
+    }
+
+    private fun mapPercentage(percentageAmount: BalanceBreakdown.PercentageAmount): String {
+        return resourceManager.getString(
+            R.string.common_percentage,
+            percentageAmount.percentage.roundToInt()
+        )
     }
 }
