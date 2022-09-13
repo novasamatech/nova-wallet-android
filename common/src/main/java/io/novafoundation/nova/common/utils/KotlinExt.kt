@@ -34,7 +34,7 @@ infix fun Int.floorMod(divisor: Int) = Math.floorMod(this, divisor)
 infix fun BigDecimal.hasTheSaveValueAs(another: BigDecimal) = compareTo(another) == 0
 
 val BigDecimal.isZero: Boolean
-    get() = hasTheSaveValueAs(BigDecimal.ZERO)
+    get() = signum() == 0
 
 val BigDecimal.isNonNegative: Boolean
     get() = signum() >= 0
