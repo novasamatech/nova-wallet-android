@@ -28,12 +28,10 @@ import io.novafoundation.nova.feature_assets.presentation.balance.list.model.Nft
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.TotalBalanceModel
 import io.novafoundation.nova.feature_assets.presentation.common.mapBalanceIdToUi
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
-import io.novafoundation.nova.feature_assets.presentation.model.BalanceLocksModel
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
-import kotlin.math.roundToInt
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged

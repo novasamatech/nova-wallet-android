@@ -1,14 +1,12 @@
 package io.novafoundation.nova.common.utils.formatting
 
 import java.math.BigDecimal
-import java.math.RoundingMode
 
 class FixedPrecisionFormatter(
-    precision: Int,
-    roundingMode: RoundingMode
+    precision: Int
 ) : NumberFormatter {
 
-    private val delegate = decimalFormatterFor(patternWith(precision), roundingMode)
+    private val delegate = decimalFormatterFor(patternWith(precision))
 
     override fun format(number: BigDecimal): String {
         return delegate.format(number)

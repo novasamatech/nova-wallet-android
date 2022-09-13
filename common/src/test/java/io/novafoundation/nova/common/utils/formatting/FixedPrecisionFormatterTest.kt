@@ -1,11 +1,10 @@
 package io.novafoundation.nova.common.utils.formatting
 
-import java.math.RoundingMode
 import org.junit.Test
 
 class FixedPrecisionFormatterTest {
 
-    private val formatter = FixedPrecisionFormatter(2, RoundingMode.FLOOR)
+    private val formatter = FixedPrecisionFormatter(2)
 
     @Test
     fun `test format`() {

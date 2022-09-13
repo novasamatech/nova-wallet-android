@@ -2,7 +2,6 @@ package io.novafoundation.nova.common.utils.formatting
 
 import java.lang.Integer.max
 import java.math.BigDecimal
-import java.math.RoundingMode
 
 class DynamicPrecisionFormatter(
     private val minPrecision: Int,
@@ -15,6 +14,6 @@ class DynamicPrecisionFormatter(
 
         val formattingPrecision = max(minPrecision, requiredPrecision)
 
-        return decimalFormatterFor(patternWith(formattingPrecision), RoundingMode.FLOOR).format(number)
+        return decimalFormatterFor(patternWith(formattingPrecision)).format(number)
     }
 }
