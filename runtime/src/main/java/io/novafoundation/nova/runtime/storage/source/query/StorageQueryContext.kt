@@ -58,6 +58,11 @@ interface StorageQueryContext {
         binding: DynamicInstanceBinder<V>
     ): V
 
+    suspend fun StorageEntry.queryRaw(
+        vararg keyArguments: Any?
+    ): String?
+
+
     suspend fun multi(
         builderBlock: MultiQueryBuilder.() -> Unit
     ): Map<StorageEntry, Map<StorageKeyComponents, Any?>>

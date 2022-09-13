@@ -17,11 +17,11 @@ class LocalStorageQueryContext(
     runtime: RuntimeSnapshot
 ) : BaseStorageQueryContext(runtime, at) {
 
-    override suspend fun queryKeysByPrefix(prefix: String): List<String> {
+    override suspend fun queryKeysByPrefix(prefix: String, at: BlockHash?): List<String> {
         return storageCache.getKeys(prefix, chainId)
     }
 
-    override suspend fun queryEntriesByPrefix(prefix: String): Map<String, String?> {
+    override suspend fun queryEntriesByPrefix(prefix: String, at: BlockHash?): Map<String, String?> {
         return observeKeysByPrefix(prefix)
             .filter { it.isNotEmpty() }
             .first()

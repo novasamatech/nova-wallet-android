@@ -19,12 +19,12 @@ class RemoteStorageQueryContext(
     runtime: RuntimeSnapshot
 ) : BaseStorageQueryContext(runtime, at) {
 
-    override suspend fun queryKeysByPrefix(prefix: String): List<String> {
-        return bulkRetriever.retrieveAllKeys(socketService, prefix)
+    override suspend fun queryKeysByPrefix(prefix: String, at: BlockHash?): List<String> {
+        return bulkRetriever.retrieveAllKeys(socketService, prefix, at)
     }
 
-    override suspend fun queryEntriesByPrefix(prefix: String): Map<String, String?> {
-        return bulkRetriever.retrieveAllValues(socketService, prefix)
+    override suspend fun queryEntriesByPrefix(prefix: String, at: BlockHash?): Map<String, String?> {
+        return bulkRetriever.retrieveAllValues(socketService, prefix, at)
     }
 
     override suspend fun queryKeys(keys: List<String>, at: BlockHash?): Map<String, String?> {

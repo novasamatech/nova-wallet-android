@@ -9,7 +9,6 @@ import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateS
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.blockhain.updaters.turing.TuringAdditionalIssuanceUpdater
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.blockhain.updaters.turing.TuringAutomationTasksUpdater
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
@@ -35,14 +34,14 @@ class TuringStakingUpdatersModule {
     fun provideAutomationTaskUpdater(
         storageCache: StorageCache,
         stakingSharedState: StakingSharedState,
-        walletRepository: WalletRepository,
+        chainRegistry: ChainRegistry,
         @Named(REMOTE_STORAGE_SOURCE) remoteStorageDataSource: StorageDataSource,
         accountUpdateScope: AccountUpdateScope,
     ) = TuringAutomationTasksUpdater(
         storageCache = storageCache,
         stakingSharedState = stakingSharedState,
-        walletRepository = walletRepository,
         remoteStorageSource = remoteStorageDataSource,
+        chainRegistry = chainRegistry,
         scope = accountUpdateScope
     )
 
