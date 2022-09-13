@@ -24,7 +24,7 @@ class BalanceBreakdown(
         const val CROWDLOAN_ID = "crowdloan"
     }
 
-    class PercentageAmount(val amount: BigDecimal, val percentage: Float)
+    class PercentageAmount(val amount: BigDecimal, val percentage: BigDecimal)
 
     class BreakdownItem(val id: String, val chainAsset: Chain.Asset, val fiatAmount: BigDecimal)
 }
@@ -87,17 +87,19 @@ class BalanceBreakdownInteractor(
                     it.token.priceOf(it.reserved)
                 )
             }
-        val breakdownLocks = locks.map { lock ->
-            val token = assetsByChainId.getValue(lock.chainAsset.chainId to lock.chainAsset.id)
-                .token
 
-            val amount = token.amountFromPlanks(lock.amountInPlanks)
-            BalanceBreakdown.BreakdownItem(
-                lock.id,
-                lock.chainAsset,
-                token.priceOf(amount)
-            )
-        }
+        val breakdownLocks = locks.filter { assetsByChainId.containsKey(it.chainAsset.chainId to it.chainAsset.id) }
+            .map { lock ->
+                val token = assetsByChainId.getValue(lock.chainAsset.chainId to lock.chainAsset.id)
+                    .token
+
+                val amount = token.amountFromPlanks(lock.amountInPlanks)
+                BalanceBreakdown.BreakdownItem(
+                    lock.id,
+                    lock.chainAsset,
+                    token.priceOf(amount)
+                )
+            }
 
         return (breakdownAssets + breakdownLocks).sortedByDescending {
             it.fiatAmount

@@ -23,35 +23,36 @@ private const val DECIMAL_SEPARATOR = '.'
 private const val FULL_PRECISION = 5
 private const val ABBREVIATED_PRECISION = 2
 
-private val defaultAbbreviationFormatter = FixedPrecisionFormatter(ABBREVIATED_PRECISION)
-private val defaultFullFormatter = FixedPrecisionFormatter(FULL_PRECISION)
+private val floorAbbreviationFormatter = FixedPrecisionFormatter(ABBREVIATED_PRECISION, RoundingMode.FLOOR)
+private val halfUpAbbreviationFormatter = FixedPrecisionFormatter(ABBREVIATED_PRECISION, RoundingMode.HALF_UP)
+private val defaultFullFormatter = FixedPrecisionFormatter(FULL_PRECISION, RoundingMode.FLOOR)
 
 private val thousandAbbreviation = NumberAbbreviation(
     threshold = BigDecimal("1E+3"),
     divisor = BigDecimal.ONE,
     suffix = "",
-    formatter = defaultAbbreviationFormatter
+    formatter = floorAbbreviationFormatter
 )
 
 private val millionAbbreviation = NumberAbbreviation(
     threshold = BigDecimal("1E+6"),
     divisor = BigDecimal("1E+6"),
     suffix = "M",
-    formatter = defaultAbbreviationFormatter
+    formatter = floorAbbreviationFormatter
 )
 
 private val billionAbbreviation = NumberAbbreviation(
     threshold = BigDecimal("1E+9"),
     divisor = BigDecimal("1E+9"),
     suffix = "B",
-    formatter = defaultAbbreviationFormatter
+    formatter = floorAbbreviationFormatter
 )
 
 private val trillionAbbreviation = NumberAbbreviation(
     threshold = BigDecimal("1E+12"),
     divisor = BigDecimal("1E+12"),
     suffix = "T",
-    formatter = defaultAbbreviationFormatter
+    formatter = floorAbbreviationFormatter
 )
 
 private val defaultNumberFormatter = defaultNumberFormatter()
@@ -71,7 +72,7 @@ fun BigDecimal.formatAsChange(): String {
 }
 
 fun BigDecimal.formatAsPercentage(): String {
-    return defaultAbbreviationFormatter.format(this) + "%"
+    return halfUpAbbreviationFormatter.format(this) + "%"
 }
 
 fun BigDecimal.formatFractionAsPercentage(): String {
@@ -98,7 +99,7 @@ fun Long.formatDateFromMillis(context: Context) = DateUtils.formatDateTime(conte
 
 fun Long.formatDateTime(context: Context) = DateUtils.getRelativeDateTimeString(context, this, DateUtils.SECOND_IN_MILLIS, 0, 0)
 
-fun decimalFormatterFor(pattern: String): DecimalFormat {
+fun decimalFormatterFor(pattern: String, roundingMode: RoundingMode): DecimalFormat {
     return DecimalFormat(pattern).apply {
         val symbols = decimalFormatSymbols
 
@@ -107,7 +108,7 @@ fun decimalFormatterFor(pattern: String): DecimalFormat {
 
         decimalFormatSymbols = symbols
 
-        roundingMode = RoundingMode.FLOOR
+        this.roundingMode = roundingMode
         decimalFormatSymbols = decimalFormatSymbols
     }
 }
@@ -147,7 +148,7 @@ fun currencyFormatter() = CompoundNumberFormatter(
             threshold = BigDecimal.ONE,
             divisor = BigDecimal.ONE,
             suffix = "",
-            formatter = defaultAbbreviationFormatter
+            formatter = floorAbbreviationFormatter
         ),
         thousandAbbreviation,
         millionAbbreviation,

@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.math.MathContext
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
@@ -17,8 +18,10 @@ private val PERCENTAGE_MULTIPLIER = 100.toBigDecimal()
 
 fun BigDecimal.fractionToPercentage() = this * PERCENTAGE_MULTIPLIER
 
-fun Number.percentageOf(number: Number): Float {
-    return (this.toFloat() / number.toFloat()) * 100f
+fun BigDecimal.percentageOf(number: BigDecimal): BigDecimal {
+    if (number == BigDecimal.ZERO) return BigDecimal.ZERO
+
+    return this / number * BigDecimal.valueOf(100)
 }
 
 fun Float.percentageToFraction() = this / 100f
@@ -208,4 +211,5 @@ operator fun ByteArray.compareTo(other: ByteArray): Int {
 
     return 0
 }
+
 fun ByteArrayComparator() = Comparator<ByteArray> { a, b -> a.compareTo(b) }

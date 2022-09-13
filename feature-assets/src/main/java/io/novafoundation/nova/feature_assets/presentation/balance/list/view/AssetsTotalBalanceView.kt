@@ -31,7 +31,7 @@ class AssetsTotalBalanceView @JvmOverloads constructor(
         viewAssetsTotalBalanceLocked.background = addRipple(
             getRoundedCornerDrawable(
                 fillColorRes = R.color.white_16,
-                cornerSizeDp = 3
+                cornerSizeDp = 6
             )
         )
 
@@ -44,8 +44,7 @@ class AssetsTotalBalanceView @JvmOverloads constructor(
         viewAssetsTotalBalanceTotal.setVisible(true)
         viewAssetsTotalBalanceTotal.text = totalBalance.totalBalanceFiat
 
-        // TODO uncomment when total locked balance will include funds locked in crowdloans
-//        viewAssetsTotalBalanceLocked.setVisible(true)
-//        viewAssetsTotalBalanceLocked.text = totalBalance.lockedBalanceFiat
+        viewAssetsTotalBalanceLocked.setVisible(true)
+        viewAssetsTotalBalanceLocked.text = totalBalance.lockedBalanceFiat
     }
 }

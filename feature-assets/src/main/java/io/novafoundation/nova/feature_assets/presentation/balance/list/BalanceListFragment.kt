@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.fragment_balance_list.balanceListAssets
 import kotlinx.android.synthetic.main.fragment_balance_list.walletContainer
+import kotlinx.coroutines.flow.onSubscription
 
 class BalanceListFragment :
     BaseFragment<BalanceListViewModel>(),
@@ -30,6 +31,8 @@ class BalanceListFragment :
 
     @Inject
     protected lateinit var imageLoader: ImageLoader
+
+    private var balanceBreakdownBottomSheet: BalanceBreakdownBottomSheet? = null
 
     private val assetsAdapter by lazy(LazyThreadSafetyMode.NONE) {
         BalanceListAdapter(imageLoader, this)
@@ -99,6 +102,22 @@ class BalanceListFragment :
         viewModel.hideRefreshEvent.observeEvent {
             walletContainer.isRefreshing = false
         }
+
+        viewModel.balanceBreakdownFlow.observe {
+            if (balanceBreakdownBottomSheet?.isShowing == true) {
+                balanceBreakdownBottomSheet?.setBalanceBreakdown(it)
+            }
+        }
+
+        viewModel.showBalanceBreakdownEvent.observe { event ->
+            if (balanceBreakdownBottomSheet == null) {
+                balanceBreakdownBottomSheet = BalanceBreakdownBottomSheet(requireContext())
+            }
+            balanceBreakdownBottomSheet?.setOnShowListener {
+                balanceBreakdownBottomSheet?.setBalanceBreakdown(event.peekContent())
+            }
+            balanceBreakdownBottomSheet?.show()
+        }
     }
 
     override fun assetClicked(asset: AssetModel) {
@@ -106,16 +125,7 @@ class BalanceListFragment :
     }
 
     override fun totalBalanceClicked() {
-        val balanceBreakdownBottomSheet = BalanceBreakdownBottomSheet(requireContext())
-
-        // TODO fix observing on balance breakdown when bottom sheet is showing.
-        balanceBreakdownBottomSheet.setOnShowListener {
-            viewModel.balanceBreakdownFlow.observe {
-                balanceBreakdownBottomSheet.setBalanceBreakdown(it)
-            }
-        }
-
-        balanceBreakdownBottomSheet.show()
+        viewModel.balanceBreakdownClicked()
     }
 
     override fun manageClicked() {

@@ -62,11 +62,11 @@ class BalanceAmountHolder(
 private object DiffCallback : BaseGroupedDiffCallback<BalanceBreakdownTotal, BalanceBreakdownAmount>(BalanceBreakdownTotal::class.java) {
 
     override fun areGroupItemsTheSame(oldItem: BalanceBreakdownTotal, newItem: BalanceBreakdownTotal): Boolean {
-        return oldItem == newItem
+        return oldItem.name == newItem.name
     }
 
     override fun areGroupContentsTheSame(oldItem: BalanceBreakdownTotal, newItem: BalanceBreakdownTotal): Boolean {
-        return true
+        return oldItem == newItem
     }
 
     override fun areChildItemsTheSame(oldItem: BalanceBreakdownAmount, newItem: BalanceBreakdownAmount): Boolean {

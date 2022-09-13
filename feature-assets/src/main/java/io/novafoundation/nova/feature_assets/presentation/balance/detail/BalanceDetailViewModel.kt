@@ -157,7 +157,6 @@ class BalanceDetailViewModel(
         )
     }
 
-    @OptIn(ExperimentalStdlibApi::class)
     private fun mapBalanceLocksToUi(balanceLocks: List<BalanceLock>, asset: Asset): BalanceLocksModel {
         val mappedLocks = balanceLocks.map {
             BalanceLocksModel.Lock(

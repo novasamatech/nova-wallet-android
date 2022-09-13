@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.formatting.format
+import io.novafoundation.nova.common.utils.formatting.formatAsPercentage
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -21,12 +22,13 @@ import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.model.BalanceBreakdownAmount
 import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.model.BalanceBreakdownItem
 import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.model.BalanceBreakdownTotal
-import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.model.TotalBreakdownModel
+import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.model.TotalBalanceBreakdownModel
 import io.novafoundation.nova.feature_assets.presentation.balance.common.mapGroupedAssetsToUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.NftPreviewUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.TotalBalanceModel
 import io.novafoundation.nova.feature_assets.presentation.common.mapBalanceIdToUi
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
+import io.novafoundation.nova.feature_assets.presentation.model.BalanceLocksModel
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
@@ -62,6 +64,9 @@ class BalanceListViewModel(
     private val _hideRefreshEvent = MutableLiveData<Event<Unit>>()
     val hideRefreshEvent: LiveData<Event<Unit>> = _hideRefreshEvent
 
+    private val _showBalanceBreakdownEvent = MutableLiveData<Event<TotalBalanceBreakdownModel>>()
+    val showBalanceBreakdownEvent: LiveData<Event<TotalBalanceBreakdownModel>> = _showBalanceBreakdownEvent
+
     private val selectedCurrency = currencyInteractor.observeSelectCurrency()
         .inBackground()
         .share()
@@ -86,7 +91,7 @@ class BalanceListViewModel(
         .shareInBackground()
 
     private val balanceBreakdown = balanceBreakdownInteractor.balanceBreakdownFlow(assetsFlow)
-        .share()
+        .shareInBackground()
 
     private val nftsPreviews = assetsListInteractor.observeNftPreviews()
         .inBackground()
@@ -123,7 +128,7 @@ class BalanceListViewModel(
     val balanceBreakdownFlow = balanceBreakdown.map {
         val currency = selectedCurrency.first()
         val total = it.total.formatAsCurrency(currency)
-        TotalBreakdownModel(total, mapBreakdownToList(it, currency))
+        TotalBalanceBreakdownModel(total, mapBreakdownToList(it, currency))
     }
         .shareInBackground()
 
@@ -180,6 +185,13 @@ class BalanceListViewModel(
         router.openAssetSearch()
     }
 
+    fun balanceBreakdownClicked() {
+        launch {
+            val balanceBreakdown = balanceBreakdownFlow.first()
+            _showBalanceBreakdownEvent.value = Event(balanceBreakdown)
+        }
+    }
+
     private suspend fun syncWith(syncActions: List<SyncAction>, metaAccount: MetaAccount) = if (syncActions.size == 1) {
         val syncAction = syncActions.first()
         syncAction(metaAccount)
@@ -195,7 +207,6 @@ class BalanceListViewModel(
         }
     }
 
-    @OptIn(ExperimentalStdlibApi::class)
     private fun mapBreakdownToList(balanceBreakdown: BalanceBreakdown, currency: Currency): List<BalanceBreakdownItem> {
         return buildList {
             add(
@@ -203,7 +214,7 @@ class BalanceListViewModel(
                     resourceManager.getString(R.string.wallet_balance_transferable),
                     balanceBreakdown.transferableTotal.amount.formatAsCurrency(currency),
                     R.drawable.ic_staking_operations,
-                    mapPercentage(balanceBreakdown.transferableTotal)
+                    balanceBreakdown.transferableTotal.percentage.formatAsPercentage()
                 )
             )
 
@@ -212,7 +223,7 @@ class BalanceListViewModel(
                     resourceManager.getString(R.string.wallet_balance_locked),
                     balanceBreakdown.locksTotal.amount.formatAsCurrency(currency),
                     R.drawable.ic_lock,
-                    mapPercentage(balanceBreakdown.locksTotal)
+                    balanceBreakdown.locksTotal.percentage.formatAsPercentage()
                 )
             )
 
@@ -225,12 +236,5 @@ class BalanceListViewModel(
 
             addAll(breakdown)
         }
-    }
-
-    private fun mapPercentage(percentageAmount: BalanceBreakdown.PercentageAmount): String {
-        return resourceManager.getString(
-            R.string.common_percentage,
-            percentageAmount.percentage.roundToInt()
-        )
     }
 }
