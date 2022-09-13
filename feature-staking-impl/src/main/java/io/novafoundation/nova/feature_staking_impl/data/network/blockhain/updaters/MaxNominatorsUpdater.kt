@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters
 
-import io.novafoundation.nova.common.utils.defaultInHex
 import io.novafoundation.nova.common.utils.staking
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core.updater.GlobalScope
@@ -20,9 +19,5 @@ class MaxNominatorsUpdater(
 
     override suspend fun storageKey(runtime: RuntimeSnapshot): String? {
         return runtime.metadata.staking().storageOrNull("MaxNominatorsCount")?.storageKey()
-    }
-
-    override fun fallbackValue(runtime: RuntimeSnapshot): String? {
-        return runtime.metadata.staking().storageOrNull("MaxNominatorsCount")?.defaultInHex()
     }
 }
