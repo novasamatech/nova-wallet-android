@@ -48,7 +48,7 @@ class TuringAutomationTasksUpdater(
 
                 remoteStorageSource.query(chain.id) {
                     if (isChange) {
-                       awaitSameAccountValue(accountId, expectedAccountValue)
+                        awaitSameAccountValue(accountId, expectedAccountValue)
                     }
 
                     val storageEntry = runtime.metadata.automationTime().storage("AccountTasks")
