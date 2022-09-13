@@ -18,6 +18,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.AssetDao
 import io.novafoundation.nova.core_db.dao.CurrencyDao
+import io.novafoundation.nova.core_db.dao.LocksDao
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.dao.PhishingAddressDao
 import io.novafoundation.nova.core_db.dao.TokenDao
@@ -57,6 +58,8 @@ interface WalletFeatureDependencies {
     fun assetsDao(): AssetDao
 
     fun tokenDao(): TokenDao
+
+    fun provideLocksDao(): LocksDao
 
     fun operationDao(): OperationDao
 

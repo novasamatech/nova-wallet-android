@@ -37,10 +37,9 @@ class ContributionsInteractor(
     private val crowdloanRepository: CrowdloanRepository,
     private val accountRepository: AccountRepository,
     private val selectedAssetState: SingleAssetSharedState,
-    private val chainStateRepository: ChainStateRepository,
+    private val chainStateRepository: ChainStateRepository
 ) {
 
-    // return model with count, amount and list of contributions
     @OptIn(ExperimentalCoroutinesApi::class)
     fun observeUserContributions(): Flow<ContributionsWithTotalAmount> = flow {
         val chain = selectedAssetState.chain()

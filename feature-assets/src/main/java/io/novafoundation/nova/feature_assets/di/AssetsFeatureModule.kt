@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.core_db.dao.LocksDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_assets.BuildConfig
@@ -17,6 +18,8 @@ import io.novafoundation.nova.feature_assets.data.repository.assetFilters.Prefer
 import io.novafoundation.nova.feature_assets.di.modules.SendModule
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.WalletInteractorImpl
+import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksRepository
+import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksRepositoryImpl
 import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy.BuyMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProviderFactory
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
@@ -26,6 +29,16 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [SendModule::class])
 class AssetsFeatureModule {
+
+    @Provides
+    @FeatureScope
+    fun provideBalanceLocksRepository(
+        accountRepository: AccountRepository,
+        chainRegistry: ChainRegistry,
+        locksDao: LocksDao
+    ): BalanceLocksRepository {
+        return BalanceLocksRepositoryImpl(accountRepository, chainRegistry, locksDao)
+    }
 
     @Provides
     @FeatureScope
@@ -41,14 +54,14 @@ class AssetsFeatureModule {
         assetFiltersRepository: AssetFiltersRepository,
         chainRegistry: ChainRegistry,
         nftRepository: NftRepository,
-        currencyRepository: CurrencyRepository
+        currencyRepository: CurrencyRepository,
     ): WalletInteractor = WalletInteractorImpl(
         walletRepository,
         accountRepository,
         assetFiltersRepository,
         chainRegistry,
         nftRepository,
-        currencyRepository = currencyRepository
+        currencyRepository,
     )
 
     @Provides

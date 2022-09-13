@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="feature_asset_balance_breakdown_total_balance">Total balance</string>
+  <string name="common_percentage">%d%%</string>
+
   <string name="common_total">Total</string>
 
   <string name="wallet_currency_title">Currency</string>
@@ -506,7 +509,8 @@
   <string name="crowdloan_contribution_format">You contributed: %s</string>
   <string name="crowdloan_contributions_placeholder">Your contributions\n will appear here</string>
   <string name="crowdloan_contributions_with_source" formatted="false">%s (via %s)</string>
-  <string name="crowdloan_crowdloan">Crowdloans</string>
+  <!--<string name="crowdloan_crowdloan">Crowdloans</string>-->
+  <string name="common_crowdloan">Crowdloans</string>
   <string name="crowdloan_empty_bonus_title">Get a special bonus</string>
   <string name="crowdloan_empty_message_v2_2_0">Crowdloans will be displayed here</string>
   <string name="crowdloan_ended_message">Cannot contribute to selected crowdloan since it is already ended.</string>

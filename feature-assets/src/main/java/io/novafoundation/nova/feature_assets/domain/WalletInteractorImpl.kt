@@ -37,26 +37,18 @@ class WalletInteractorImpl(
     private val assetFiltersRepository: AssetFiltersRepository,
     private val chainRegistry: ChainRegistry,
     private val nftRepository: NftRepository,
-    private val currencyRepository: CurrencyRepository
+    private val currencyRepository: CurrencyRepository,
 ) : WalletInteractor {
 
-    override fun balancesFlow(): Flow<Balances> {
-        val assetsFlow = accountRepository.selectedMetaAccountFlow()
-            .flatMapLatest { walletRepository.assetsFlow(it.id) }
-
-        return combine(
-            assetsFlow,
-            assetFiltersRepository.assetFiltersFlow()
-        ) { assets, filters ->
+    override fun filterAssets(assetsFlow: Flow<List<Asset>>): Flow<List<Asset>> {
+        return combine(assetsFlow, assetFiltersRepository.assetFiltersFlow()) { assets, filters ->
             assets.applyFilters(filters)
         }
-            .map { assets ->
-                val selectedCurrency = currencyRepository.getSelectedCurrency()
-                val chains = chainRegistry.chainsById.first()
-                val groupedAssets = groupAndSortAssetsByNetwork(assets, chains, selectedCurrency)
+    }
 
-                balancesFromAssets(assets, groupedAssets)
-            }
+    override fun assetsFlow(): Flow<List<Asset>> {
+        return accountRepository.selectedMetaAccountFlow()
+            .flatMapLatest { walletRepository.assetsFlow(it.id) }
     }
 
     override suspend fun syncAssetsRates(currency: Currency) {
@@ -140,6 +132,11 @@ class WalletInteractorImpl(
                 chainAsset
             )
         }
+    }
+
+    override suspend fun groupAssets(assets: List<Asset>): Map<AssetGroup, List<Asset>> {
+        val chains = chainRegistry.chainsById.first()
+        return groupAndSortAssetsByNetwork(assets, chains)
     }
 
     private fun balancesFromAssets(

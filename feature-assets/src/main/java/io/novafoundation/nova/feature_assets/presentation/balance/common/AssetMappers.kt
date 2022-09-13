@@ -6,19 +6,17 @@ import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_assets.data.mappers.mappers.mapAssetToAssetModel
 import io.novafoundation.nova.feature_assets.domain.common.AssetGroup
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.AssetGroupUi
+import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 
-fun Flow<GroupedList<AssetGroup, Asset>>.mapGroupedAssetsToUi() = map { assets ->
-    assets
-        .mapKeys { (assetGroup, _) -> mapAssetGroupToUi(assetGroup) }
+fun GroupedList<AssetGroup, Asset>.mapGroupedAssetsToUi(currency: Currency): List<Any> {
+    return mapKeys { (assetGroup, _) -> mapAssetGroupToUi(assetGroup, currency) }
         .mapValues { (_, assets) -> assets.map(::mapAssetToAssetModel) }
         .toListWithHeaders()
 }
 
-private fun mapAssetGroupToUi(assetGroup: AssetGroup) = AssetGroupUi(
+private fun mapAssetGroupToUi(assetGroup: AssetGroup, currency: Currency) = AssetGroupUi(
     chainUi = mapChainToUi(assetGroup.chain),
-    groupBalanceFiat = assetGroup.groupBalanceFiat.formatAsCurrency(assetGroup.currency)
+    groupBalanceFiat = assetGroup.groupBalanceFiat.formatAsCurrency(currency)
 )

@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_wallet_impl.di.modules
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.core.storage.StorageCache
+import io.novafoundation.nova.core_db.dao.LocksDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSource
@@ -13,7 +13,6 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.orml.OrmlAssetBalance
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.orml.OrmlAssetHistory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.orml.OrmlAssetTransfers
-import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
@@ -33,9 +32,8 @@ class OrmlAssetsModule {
         chainRegistry: ChainRegistry,
         assetCache: AssetCache,
         @Named(REMOTE_STORAGE_SOURCE) remoteDataSource: StorageDataSource,
-        @Named(LOCAL_STORAGE_SOURCE) localDataSource: StorageDataSource,
-        storageCache: StorageCache
-    ) = OrmlAssetBalance(assetCache, remoteDataSource, localDataSource, chainRegistry, storageCache)
+        locksDao: LocksDao
+    ) = OrmlAssetBalance(assetCache, remoteDataSource, chainRegistry, locksDao)
 
     @Provides
     @FeatureScope

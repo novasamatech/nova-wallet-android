@@ -11,25 +11,24 @@ import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.
 import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnly.WatchOnlyMissingKeysPresenter
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.data.mappers.mappers.mapTokenToTokenModel
-import io.novafoundation.nova.feature_assets.domain.BalanceLocksInteractor
+import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksInteractor
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy.BuyMixinFactory
+import io.novafoundation.nova.feature_assets.presentation.common.mapBalanceIdToUi
 import io.novafoundation.nova.feature_assets.presentation.model.BalanceLocksModel
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryMixin
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryUi
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLocks
+import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import java.util.Locale
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -79,11 +78,6 @@ class BalanceDetailViewModel(
     }
         .inBackground()
         .share()
-
-    init {
-        balanceLocksInteractor.runBalanceLocksUpdate()
-            .launchIn(this)
-    }
 
     override fun onCleared() {
         super.onCleared()
@@ -153,11 +147,11 @@ class BalanceDetailViewModel(
     }
 
     @OptIn(ExperimentalStdlibApi::class)
-    private fun mapBalanceLocksToUi(balanceLocks: BalanceLocks?, asset: Asset): BalanceLocksModel {
-        val mappedLocks = balanceLocks?.locks?.map {
+    private fun mapBalanceLocksToUi(balanceLocks: List<BalanceLock>, asset: Asset): BalanceLocksModel {
+        val mappedLocks = balanceLocks.map {
             BalanceLocksModel.Lock(
-                mapBalanceLockIdToUi(it.id),
-                mapAmountToAmountModel(it.amount, asset)
+                mapBalanceIdToUi(resourceManager, it.id),
+                mapAmountToAmountModel(it.amountInPlanks, asset)
             )
         }
 
@@ -168,19 +162,9 @@ class BalanceDetailViewModel(
 
         return BalanceLocksModel(
             buildList {
-                mappedLocks?.let { addAll(it) }
+                addAll(mappedLocks)
                 add(reservedBalance)
             }
         )
-    }
-
-    private fun mapBalanceLockIdToUi(id: String): String {
-        return when (id) {
-            "staking" -> resourceManager.getString(R.string.assets_balance_details_locks_staking)
-            "democrac" -> resourceManager.getString(R.string.assets_balance_details_locks_democrac)
-            "vesting" -> resourceManager.getString(R.string.assets_balance_details_locks_vesting)
-            "phrelect" -> resourceManager.getString(R.string.assets_balance_details_locks_phrelect)
-            else -> id.capitalize(Locale.getDefault())
-        }
     }
 }

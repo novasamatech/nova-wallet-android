@@ -61,6 +61,7 @@ dependencies {
     implementation project(':feature-account-api')
     implementation project(':feature-nft-api')
     implementation project(':feature-currency-api')
+    implementation project(':feature-crowdloan-api')
     implementation project(':runtime')
 
     implementation kotlinDep

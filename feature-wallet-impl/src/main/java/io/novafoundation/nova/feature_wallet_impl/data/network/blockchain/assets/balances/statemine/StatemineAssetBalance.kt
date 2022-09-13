@@ -7,24 +7,23 @@ import io.novafoundation.nova.core.updater.SubscriptionBuilder
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
-import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLocks
+import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
 import io.novafoundation.nova.runtime.ext.requireStatemine
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.network.updaters.insert
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
+import java.math.BigInteger
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flow
-import java.math.BigInteger
 
 class StatemineAssetBalance(
     private val chainRegistry: ChainRegistry,
@@ -33,16 +32,14 @@ class StatemineAssetBalance(
     private val localStorage: StorageDataSource,
     private val storageCache: StorageCache
 ) : AssetBalance {
-    override suspend fun queryBalanceLocks(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): Flow<BalanceLocks?> {
-        return flow { emit(null) }
-    }
 
     override suspend fun startSyncingBalanceLocks(
+        metaAccount: MetaAccount,
         chain: Chain,
         chainAsset: Chain.Asset,
         accountId: AccountId,
         subscriptionBuilder: SubscriptionBuilder
-    ): Flow<BalanceLocks> {
+    ): Flow<List<BalanceLock>> {
         return emptyFlow()
     }
 
