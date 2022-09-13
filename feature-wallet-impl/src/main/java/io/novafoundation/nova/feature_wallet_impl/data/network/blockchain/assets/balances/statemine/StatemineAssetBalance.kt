@@ -60,9 +60,10 @@ class StatemineAssetBalance(
     override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {
         val statemineType = chainAsset.requireStatemine()
 
-        val assetAccount =  remoteStorage.query(chain.id) {
+        val assetAccount = remoteStorage.query(chain.id) {
             runtime.metadata.statemineModule(statemineType).storage("Account").query(
-                statemineType.id, accountId,
+                statemineType.id,
+                accountId,
                 binding = ::bindAssetAccountOrEmpty
             )
         }

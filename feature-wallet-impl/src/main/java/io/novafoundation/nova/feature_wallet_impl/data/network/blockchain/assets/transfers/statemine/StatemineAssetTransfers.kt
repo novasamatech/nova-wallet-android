@@ -44,7 +44,7 @@ class StatemineAssetTransfers(
     }
 
     private fun ExtrinsicBuilder.statemineTransfer(
-        assetType:  Chain.Asset.Type.Statemine,
+        assetType: Chain.Asset.Type.Statemine,
         target: AccountId,
         amount: BigInteger
     ) {
