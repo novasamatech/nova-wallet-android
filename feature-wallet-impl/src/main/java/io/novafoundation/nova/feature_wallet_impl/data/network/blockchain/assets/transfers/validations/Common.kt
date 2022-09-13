@@ -65,11 +65,11 @@ fun AssetTransfersValidationSystemBuilder.sufficientTransferableBalanceToPayOrig
     fee = { it.originFee },
     available = { it.originCommissionAsset.transferable },
     amount = { it.sendingAmountInCommissionAsset },
-    error = {
+    error = { payload, availableToPayFees ->
         AssetTransferValidationFailure.NotEnoughFunds.InCommissionAsset(
-            commissionAsset = it.transfer.originChain.commissionAsset,
-            transferableBalance = it.originCommissionAsset.transferable,
-            fee = it.originFee
+            chainAsset = payload.transfer.originChain.commissionAsset,
+            fee = payload.originFee,
+            availableToPayFees = availableToPayFees
         )
     }
 )

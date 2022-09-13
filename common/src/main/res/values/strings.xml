@@ -1,5 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="yiled_boost_yield_boosted">Yield Boosted</string>
+
+  <string name="yield_boost_already_enabled_title">Change the Yield Boosted Collator?</string>
+  <string name="yield_boost_already_enabled_message">Yield Boost will be turned off for current collators. New collator: %s</string>
+
+  <string name="yield_boost_not_enough_threshold_title">Not enough tokens to stay above threshold</string>
+  <string name="yield_boost_not_enough_threshold_message">You don’t have enough balance to pay the network fee of %s and not drop below the threshold %s.\nAvailable balance to pay the fee: %s</string>
+
+  <string name="yield_boost_not_enough_execution_fee_title">Not enough tokens to pay first execution fee</string>
+  <string name="yield_boost_not_enough_execution_fee_message">You don’t have enough balance to pay the network fee of %s and the yield boost execution fee of %s.\nAvailable balance to pay the fee: %s</string>
+
+  <string name="common_cannot_pay_network_fee_message">You don’t have enough balance to pay the network fee of %s.\nAvailable  balance to pay fee after operation: %s</string>
+<!--  <string name="wallet_send_cannot_pay_network_fee">You don’t have enough balance to pay the network fee of %s.\nTransferable balance: %s</string>-->
+
+  <string name="common_no_changes">No changes</string>
+
+  <string name="staking_turing_destination_payout">without Yield Boost</string>
+  <string name="staking_turing_destination_restake">with Yield Boost</string>
+
+  <string name="staking_turing_collator_title">For my collator</string>
+  <string name="staking_turing_restake_title">I want to stake</string>
+  <string name="staking_turing_frequency_new_title">to automatically stake %s all my transferable tokens above</string>
+  <string name="staking_turing_frequency_update_title">to automatically stake %s (updating from %s) all my transferable tokens above</string>
+  <plurals name="common_frequency_days">
+    <item quantity="one">everyday</item>
+    <item quantity="other">every %s days</item>
+  </plurals>
+  <string name="staking_turing_boost_threshold">Boost threshold</string>
+
   <string name="common_on">On</string>
   <string name="common_off">Off</string>
   <string name="staking_turing_yield_boost">Yield Boost</string>
@@ -184,7 +213,6 @@
   </plurals>
   <string name="wallet_send_myself">Myself</string>
 
-  <string name="wallet_send_cannot_pay_network_fee">You don’t have enough balance to pay the network fee of %s.\nTransferable balance: %s</string>
   <string name="wallet_send_cannot_pay_cross_chain_fee">You don’t have enough balance to pay the Cross-chain fee of %s.\nRemaining balance after transfer: %s</string>
 
   <string name="wallet_send_confirm_hint">Cross-chain fee is added on top of entered amount. Recipient may receive part of cross-chain fee</string>

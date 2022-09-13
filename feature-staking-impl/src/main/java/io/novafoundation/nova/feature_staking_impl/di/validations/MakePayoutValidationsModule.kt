@@ -31,7 +31,7 @@ class MakePayoutValidationsModule {
                 chainAssetExtractor = { it.chainAsset },
                 stakingSharedState = stakingSharedState
             ),
-            errorProducer = { PayoutValidationFailure.CannotPayFee }
+            errorProducer = { _, _ -> PayoutValidationFailure.CannotPayFee }
         )
     }
 

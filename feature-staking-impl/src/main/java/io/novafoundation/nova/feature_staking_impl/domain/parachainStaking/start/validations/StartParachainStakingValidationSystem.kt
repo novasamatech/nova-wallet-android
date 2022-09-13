@@ -31,6 +31,6 @@ fun ValidationSystem.Companion.parachainStakingStart(
         fee = { it.fee },
         amount = { it.amount },
         available = { it.asset.transferable },
-        error = { StartParachainStakingValidationFailure.NotEnoughBalanceToPayFees }
+        error = { _, _ -> StartParachainStakingValidationFailure.NotEnoughBalanceToPayFees }
     )
 }

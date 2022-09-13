@@ -3,9 +3,9 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.co
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.prepended
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.feature_staking_api.data.parachainStaking.turing.repository.TuringAutomationTasksRepository
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.turing.TuringAutomationTasksRepository
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.preliminary.ParachainStakingUnbondPreliminaryValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
@@ -50,7 +50,7 @@ class TuringStakeActionsComponentFactory(
 private class TuringStakeActionsComponent(
     delegatorStateUseCase: DelegatorStateUseCase,
     private val resourceManager: ResourceManager,
-    router: ParachainStakingRouter,
+    private val router: ParachainStakingRouter,
     assetWithChain: SingleAssetSharedState.AssetWithChain,
     private val hostContext: ComponentHostContext,
     unbondValidationSystem: ParachainStakingUnbondPreliminaryValidationSystem,
@@ -92,7 +92,7 @@ private class TuringStakeActionsComponent(
     }
 
     private fun goToYieldBoost() {
-        hostContext.errorDisplayer(NotImplementedError("TODO"))
+        router.openSetupYieldBoost()
     }
 
     private fun ManageStakeAction.Companion.yieldBoost(yieldBoostActive: Boolean): ManageStakeAction {
