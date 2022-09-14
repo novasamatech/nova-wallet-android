@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.turing
+package io.novafoundation.nova.feature_staking_impl.data.parachainStaking.turing.repository
 
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.utils.vesting

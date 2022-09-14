@@ -31,10 +31,12 @@ class CompoundStakingComponentFactory(
     fun <S, E, A> create(
         relaychainComponentCreator: ComponentCreator<S, E, A>,
         parachainComponentCreator: ComponentCreator<S, E, A>,
+        turingComponentCreator: ComponentCreator<S, E, A> = parachainComponentCreator,
         hostContext: ComponentHostContext,
     ): StatefullComponent<S, E, A> = CompoundStakingComponent(
         relaychainComponentCreator = relaychainComponentCreator,
         parachainComponentCreator = parachainComponentCreator,
+        turingComponentCreator = turingComponentCreator,
         singleAssetSharedState = singleAssetSharedState,
         hostContext = hostContext
     )
@@ -45,6 +47,7 @@ private class CompoundStakingComponent<S, E, A>(
 
     private val relaychainComponentCreator: ComponentCreator<S, E, A>,
     private val parachainComponentCreator: ComponentCreator<S, E, A>,
+    private val turingComponentCreator: ComponentCreator<S, E, A>,
     private val hostContext: ComponentHostContext,
 ) : StatefullComponent<S, E, A>, CoroutineScope by hostContext.scope, WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(hostContext.scope) {
 
@@ -75,7 +78,8 @@ private class CompoundStakingComponent<S, E, A>(
         return when (assetWithChain.asset.staking) {
             UNSUPPORTED -> UnsupportedComponent()
             RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO -> relaychainComponentCreator(assetWithChain, childHostContext)
-            PARACHAIN, TURING -> parachainComponentCreator(assetWithChain, childHostContext)
+            PARACHAIN -> parachainComponentCreator(assetWithChain, childHostContext)
+            TURING -> turingComponentCreator(assetWithChain, childHostContext)
         }
     }
 }

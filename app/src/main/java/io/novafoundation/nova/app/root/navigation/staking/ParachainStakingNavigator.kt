@@ -12,6 +12,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.model.ConfirmStartParachainStakingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.confirm.ParachainStakingUnbondConfirmFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.confirm.model.ParachainStakingUnbondConfirmPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.yieldBoost.confirm.YieldBoostConfirmFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.yieldBoost.confirm.model.YieldBoostConfirmPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.ValidatorDetailsFragment
 
@@ -61,5 +63,14 @@ class ParachainStakingNavigator(
     override fun openRebond(payload: ParachainStakingRebondPayload) = performNavigation(
         actionId = R.id.action_mainFragment_to_parachainStakingRebondFragment,
         args = ParachainStakingRebondFragment.getBundle(payload)
+    )
+
+    override fun openSetupYieldBoost() = performNavigation(R.id.action_mainFragment_to_yieldBoostGraph)
+
+    override fun openConfirmYieldBoost(
+        payload: YieldBoostConfirmPayload
+    ) = performNavigation(
+        actionId = R.id.action_setupYieldBoostFragment_to_yieldBoostConfirmFragment,
+        args = YieldBoostConfirmFragment.getBundle(payload)
     )
 }

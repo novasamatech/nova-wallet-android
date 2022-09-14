@@ -14,10 +14,9 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 open class BaseIntegrationTest {
 
-    private val runtimeApi = FeatureUtils.getFeature<RuntimeComponent>(
-        ApplicationProvider.getApplicationContext<Context>(),
-        RuntimeApi::class.java
-    )
+    protected val context: Context = ApplicationProvider.getApplicationContext()
+
+    private val runtimeApi = FeatureUtils.getFeature<RuntimeComponent>(context, RuntimeApi::class.java)
 
     val chainRegistry = runtimeApi.chainRegistry()
 

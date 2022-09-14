@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.co
 
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.utils.castOrNull
@@ -15,6 +16,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.ChooseStakedStakeTargetsBottomSheet
 import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.SelectStakeTargetModel
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.selectCollators.labeledAmountSubtitle
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.rebond.model.ParachainStakingRebondPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.awaitAction
@@ -40,6 +42,7 @@ class ParachainUnbondingComponentFactory(
     private val addressIconGenerator: AddressIconGenerator,
     private val interactor: ParachainStakingUnbondingsInteractor,
     private val router: ParachainStakingRouter,
+    private val resourceManager: ResourceManager,
 ) {
 
     fun create(
@@ -51,7 +54,8 @@ class ParachainUnbondingComponentFactory(
         delegatorStateUseCase = delegatorStateUseCase,
         interactor = interactor,
         router = router,
-        addressIconGenerator = addressIconGenerator
+        addressIconGenerator = addressIconGenerator,
+        resourceManager = resourceManager
     )
 }
 
@@ -59,6 +63,7 @@ private class ParachainUnbondingComponent(
     private val delegatorStateUseCase: DelegatorStateUseCase,
     private val interactor: ParachainStakingUnbondingsInteractor,
     private val addressIconGenerator: AddressIconGenerator,
+    private val resourceManager: ResourceManager,
 
     private val assetWithChain: AssetWithChain,
     private val hostContext: ComponentHostContext,
@@ -102,16 +107,18 @@ private class ParachainUnbondingComponent(
         val asset = hostContext.assetFlow.first()
 
         val selectStakeTargetModels = unbondingRequests.map { unbondingWithCollator ->
+            val amountModel = mapAmountToAmountModel(unbondingWithCollator.request.action.amount, asset)
+            val subtitle = resourceManager.labeledAmountSubtitle(R.string.wallet_balance_unbonding_v1_9_0, amountModel, selectionActive = true)
+
             SelectStakeTargetModel(
                 addressModel = addressIconGenerator.createAccountAddressModel(
                     chain = delegatorState.chain,
                     accountId = unbondingWithCollator.request.collator,
                     name = unbondingWithCollator.collatorIdentity?.display
                 ),
-                amount = mapAmountToAmountModel(unbondingWithCollator.request.action.amount, asset),
                 payload = unbondingWithCollator,
-                amountLabelRes = R.string.wallet_balance_unbonding_v1_9_0,
-                active = true
+                active = true,
+                subtitle = subtitle
             )
         }
 

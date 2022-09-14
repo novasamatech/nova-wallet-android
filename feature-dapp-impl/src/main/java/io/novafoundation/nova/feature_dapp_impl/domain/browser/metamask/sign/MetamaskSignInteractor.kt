@@ -39,7 +39,6 @@ import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.findChain
-import java.math.BigInteger
 import jp.co.soramitsu.fearless_utils.extensions.asEthereumAddress
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.extensions.toAccountId
@@ -52,6 +51,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import org.web3j.crypto.RawTransaction
+import java.math.BigInteger
 
 class MetamaskSignInteractorFactory(
     private val metamaskInteractor: MetamaskInteractor,
@@ -183,7 +183,7 @@ class MetamaskSignInteractor(
                 available = { validationPayload ->
                     validationPayload.convertingToAmount { ethereumApi.getAccountBalance(payload.originAddress) }
                 },
-                error = { NotEnoughBalanceToPayFees }
+                error = { _, _ -> NotEnoughBalanceToPayFees }
             )
         }
     }

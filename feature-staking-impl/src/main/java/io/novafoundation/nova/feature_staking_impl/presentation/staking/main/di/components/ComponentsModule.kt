@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.relaychain.RelaychainNetworkInfoComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.StakeActionsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.parachain.ParachainStakeActionsComponentFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.parachain.turing.TuringStakeActionsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.relaychain.RelaychainStakeActionsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.StakeSummaryComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.parachain.ParachainStakeSummaryComponentFactory
@@ -26,7 +27,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.parachain.ParachainUserRewardsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.relaychain.RelaychainUserRewardsComponentFactory
 
-@Module(includes = [RelaychainModule::class, ParachainModule::class])
+@Module(includes = [RelaychainModule::class, ParachainModule::class, TuringModule::class])
 class ComponentsModule {
 
     @Provides
@@ -50,8 +51,14 @@ class ComponentsModule {
     fun provideStakeActionsComponentFactory(
         relaychainComponentFactory: RelaychainStakeActionsComponentFactory,
         parachainComponentFactory: ParachainStakeActionsComponentFactory,
+        turingStakeActionsComponentFactory: TuringStakeActionsComponentFactory,
         compoundStakingComponentFactory: CompoundStakingComponentFactory,
-    ) = StakeActionsComponentFactory(relaychainComponentFactory, parachainComponentFactory, compoundStakingComponentFactory)
+    ) = StakeActionsComponentFactory(
+        relaychainComponentFactory = relaychainComponentFactory,
+        parachainComponentFactory = parachainComponentFactory,
+        turingComponentFactory = turingStakeActionsComponentFactory,
+        compoundStakingComponentFactory = compoundStakingComponentFactory
+    )
 
     @Provides
     @ScreenScope

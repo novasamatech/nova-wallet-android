@@ -82,12 +82,14 @@ class ParachainModule {
         delegatorStateUseCase: DelegatorStateUseCase,
         interactor: ParachainStakingUnbondingsInteractor,
         router: ParachainStakingRouter,
-        addressIconGenerator: AddressIconGenerator
+        addressIconGenerator: AddressIconGenerator,
+        resourceManager: ResourceManager
     ) = ParachainUnbondingComponentFactory(
         delegatorStateUseCase = delegatorStateUseCase,
         interactor = interactor,
         router = router,
-        addressIconGenerator = addressIconGenerator
+        addressIconGenerator = addressIconGenerator,
+        resourceManager = resourceManager
     )
 
     @Provides

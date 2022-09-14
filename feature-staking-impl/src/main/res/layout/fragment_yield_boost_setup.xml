@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:id="@+id/setupYieldBoostContainer"
+    tools:background="@color/black">
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:dividerVisible="false"
+        android:id="@+id/setupYieldBoostToolbar"
+        app:homeButtonIcon="@drawable/ic_close"
+        app:titleText="@string/staking_turing_yield_boost" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:id="@+id/setupYieldBoostScrollArea"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:animateLayoutChanges="true"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/staking_turing_collator_title" />
+
+            <io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.view.SelectCollatorView
+                android:layout_width="match_parent"
+                android:id="@+id/setupYieldBoostCollator"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <TextView
+                style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/staking_turing_restake_title" />
+
+            <io.novafoundation.nova.feature_staking_impl.presentation.view.RewardDestinationView
+                android:layout_width="match_parent"
+                android:id="@+id/setupYieldBoostOff"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:checked="true"
+                app:targetName="@string/staking_turing_destination_payout" />
+
+            <io.novafoundation.nova.feature_staking_impl.presentation.view.RewardDestinationView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/setupYieldBoostOn"
+                android:layout_marginTop="12dp"
+                app:targetName="@string/staking_turing_destination_restake" />
+
+            <TextView
+                style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/setupYieldBoostFrequency"
+                android:layout_marginTop="16dp"
+                tools:text="@string/staking_turing_frequency_title" />
+
+            <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.ChooseAmountView
+                android:id="@+id/setupYieldBoostThreshold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:title="@string/staking_turing_boost_threshold" />
+
+            <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/setupYieldBoostFee"
+                app:dividerVisible="false"
+                android:layout_marginTop="8dp" />
+
+            <ImageView
+                android:id="@+id/setupYieldBoostOakLogo"
+                android:layout_width="95dp"
+                android:layout_height="22dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="8dp"
+                android:src="@drawable/ic_powered_by_oak" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/setupYieldBoostContinue"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="@string/common_continue" />
+</LinearLayout>

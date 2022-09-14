@@ -103,13 +103,13 @@ class ParachainStakingUnbondViewModel(
         currentDelegatorStateFlow,
         assetFlow
     ) { selectedCollator, currentDelegatorState, asset ->
-        mapCollatorToSelectCollatorModel(selectedCollator, currentDelegatorState, asset, addressIconGenerator)
+        mapCollatorToSelectCollatorModel(selectedCollator, currentDelegatorState, asset, addressIconGenerator, resourceManager)
     }.shareInBackground()
 
     val chooseCollatorAction = actionAwaitableMixinFactory.create<ChooseStakedStakeTargetsBottomSheet.Payload<SelectCollatorModel>, SelectCollatorModel>()
 
     val minimumStake = selectedCollatorFlow.map {
-        val minimumStake = it.minimumStakeToGetRewards ?: collatorsUseCase.defaultMinimumStake()
+        val minimumStake = it.minimumStakeToGetRewards
         val asset = assetFlow.first()
 
         mapAmountToAmountModel(minimumStake, asset)
@@ -174,7 +174,8 @@ class ParachainStakingUnbondViewModel(
                     unbondingCollator = it,
                     chain = delegatorState.chain,
                     asset = asset,
-                    addressIconGenerator = addressIconGenerator
+                    addressIconGenerator = addressIconGenerator,
+                    resourceManager = resourceManager
                 )
             }
             val selected = collatorModels.findById(selectedCollator)
