@@ -8,7 +8,7 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import coil.ImageLoader
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.bindTo
-import io.novafoundation.nova.common.utils.createSpannable
+import io.novafoundation.nova.common.utils.styleText
 import io.novafoundation.nova.common.utils.observe
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.showBrowser
@@ -78,7 +78,7 @@ class ReferralContributeView @JvmOverloads constructor(
 
         referralNovaBonusApply.setOnClickListener { viewState.applyNovaCode() }
 
-        referralPrivacyText.text = createSpannable(context.getString(R.string.onboarding_terms_and_conditions_1_v2_2_0)) {
+        referralPrivacyText.text = styleText(context.getString(R.string.onboarding_terms_and_conditions_1_v2_2_0)) {
             clickable(context.getString(R.string.onboarding_terms_and_conditions_2)) {
                 viewState.termsClicked()
             }

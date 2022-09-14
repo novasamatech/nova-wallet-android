@@ -17,13 +17,20 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.math.BigInteger
 
+enum class SelectedCollatorSorting {
+    DELEGATION, APR
+}
+
 interface CollatorsUseCase {
 
     suspend fun collatorAddressModel(collator: Collator): AddressModel
 
     suspend fun getCollator(collatorId: AccountId): Collator
 
-    suspend fun getSelectedCollators(delegatorState: DelegatorState): List<SelectedCollator>
+    suspend fun getSelectedCollators(
+        delegatorState: DelegatorState,
+        sorting: SelectedCollatorSorting = SelectedCollatorSorting.DELEGATION
+    ): List<SelectedCollator>
 
     suspend fun maxRewardedDelegatorsPerCollator(): Int
 
@@ -58,7 +65,10 @@ class RealCollatorsUseCase(
         collatorProvider.getCollator(singleAssetSharedState.chainAsset(), collatorId)
     }
 
-    override suspend fun getSelectedCollators(delegatorState: DelegatorState): List<SelectedCollator> {
+    override suspend fun getSelectedCollators(
+        delegatorState: DelegatorState,
+        sorting: SelectedCollatorSorting
+    ): List<SelectedCollator> {
         return when (delegatorState) {
             is DelegatorState.Delegator -> {
                 val delegationAmountByCollator = delegatorState.delegations.associateBy(
@@ -76,10 +86,15 @@ class RealCollatorsUseCase(
                             delegation = delegationAmountByCollator.getValue(collator.accountIdHex)
                         )
                     }
-                    .sortedByDescending(SelectedCollator::delegation)
+                    .sortedWith(sorting.ascendingComparator().reversed())
             }
 
             is DelegatorState.None -> emptyList()
         }
+    }
+
+    private fun SelectedCollatorSorting.ascendingComparator() = when (this) {
+        SelectedCollatorSorting.DELEGATION -> compareBy<SelectedCollator> { it.delegation }
+        SelectedCollatorSorting.APR -> compareBy { it.collator.apr }
     }
 }

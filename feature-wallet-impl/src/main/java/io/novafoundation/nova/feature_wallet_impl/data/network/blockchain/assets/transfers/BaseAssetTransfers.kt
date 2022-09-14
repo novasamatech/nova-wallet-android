@@ -86,7 +86,7 @@ abstract class BaseAssetTransfers(
     protected fun AssetTransfersValidationSystemBuilder.sufficientBalanceInUsedAsset() = sufficientBalance(
         amount = { it.transfer.amount },
         available = { it.originUsedAsset.transferable },
-        error = { AssetTransferValidationFailure.NotEnoughFunds.InUsedAsset },
+        error = { _, _ -> AssetTransferValidationFailure.NotEnoughFunds.InUsedAsset },
         fee = { it.originFeeInUsedAsset }
     )
 

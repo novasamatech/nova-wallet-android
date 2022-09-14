@@ -1,6 +1,7 @@
 package io.novafoundation.nova.common.utils.input
 
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 
 sealed class Input<out I> {
@@ -47,6 +48,13 @@ inline fun <I> Input<I>.ifModifiable(action: (I) -> Unit) {
 val <I> Input<I>.valueOrNull
     get() = (this as? Input.Enabled)?.value
 
+val Input<*>.isModifiable
+    get() = this is Input.Enabled.Modifiable
+
 suspend fun <I> MutableSharedFlow<Input<I>>.modifyInput(newValue: I) {
     emit(first().modify(newValue))
+}
+
+fun <I> MutableStateFlow<Input<I>>.modifyInput(newValue: I) {
+    value = value.modify(newValue)
 }

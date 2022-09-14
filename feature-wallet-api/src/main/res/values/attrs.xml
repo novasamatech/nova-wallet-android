@@ -15,4 +15,8 @@
     <declare-styleable name="PriceSectionView">
         <attr name="sectionTitle" />
     </declare-styleable>
+
+    <declare-styleable name="ChooseAmountView">
+        <attr name="title" />
+    </declare-styleable>
 </resources>

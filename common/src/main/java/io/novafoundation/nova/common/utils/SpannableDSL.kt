@@ -2,11 +2,15 @@ package io.novafoundation.nova.common.utils
 
 import android.text.Spannable
 import android.text.SpannableString
+import android.text.SpannableStringBuilder
+import android.text.Spanned
 import android.text.TextPaint
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.view.View
 import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
+import io.novafoundation.nova.common.resources.ResourceManager
 
 private fun clickableSpan(onClick: () -> Unit) = object : ClickableSpan() {
     override fun updateDrawState(ds: TextPaint) {
@@ -20,7 +24,7 @@ private fun clickableSpan(onClick: () -> Unit) = object : ClickableSpan() {
 
 private fun colorSpan(color: Int) = ForegroundColorSpan(color)
 
-class SpannableBuilder(val content: String) {
+class SpannableStyler(val content: String) {
 
     private val buildingSpannable = SpannableString(content)
 
@@ -46,10 +50,35 @@ class SpannableBuilder(val content: String) {
     fun build() = buildingSpannable
 }
 
-fun createSpannable(content: String, block: SpannableBuilder.() -> Unit): Spannable {
-    val builder = SpannableBuilder(content)
+fun styleText(content: String, block: SpannableStyler.() -> Unit): Spannable {
+    val builder = SpannableStyler(content)
 
     builder.block()
+
+    return builder.build()
+}
+
+class SpannableBuilder(private val resourceManager: ResourceManager) {
+
+    private val builder = SpannableStringBuilder()
+
+    fun appendColored(text: String, @ColorRes color: Int): SpannableBuilder {
+        val span = ForegroundColorSpan(resourceManager.getColor(color))
+
+        return append(text, span)
+    }
+
+    fun build(): SpannableString = SpannableString(builder)
+
+    private fun append(text: String, span: Any): SpannableBuilder {
+        builder.append(text, span, Spanned.SPAN_INCLUSIVE_INCLUSIVE)
+
+        return this
+    }
+}
+
+fun buildSpannable(resourceManager: ResourceManager, block: SpannableBuilder.() -> Unit): Spannable {
+    val builder = SpannableBuilder(resourceManager).apply(block)
 
     return builder.build()
 }

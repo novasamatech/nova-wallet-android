@@ -1,9 +1,12 @@
 package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model
 
 import io.novafoundation.nova.common.utils.Identifiable
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_staking_api.domain.model.Identity
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.CandidateMetadata
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.CollatorSnapshot
+import io.novafoundation.nova.feature_staking_impl.domain.rewards.PeriodReturns
+import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -35,3 +38,12 @@ fun CollatorSnapshot.minimumStake(
 
     return minStakeToGetRewards.coerceAtLeast(systemForcedMinStake)
 }
+
+fun Collator.estimatedAprReturns(amount: BigDecimal): PeriodReturns {
+    return PeriodReturns(
+        gainAmount = amount * apr.orZero(),
+        gainFraction = apr.orZero(),
+    )
+}
+
+fun Collator.accountId() = accountIdHex.fromHex()

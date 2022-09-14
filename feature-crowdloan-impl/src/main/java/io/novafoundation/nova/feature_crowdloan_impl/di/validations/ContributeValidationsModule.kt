@@ -27,7 +27,7 @@ class ContributeValidationsModule {
         feeExtractor = { it.fee },
         availableBalanceProducer = { it.asset.transferable },
         extraAmountExtractor = { it.contributionAmount },
-        errorProducer = { ContributeValidationFailure.CannotPayFees }
+        errorProducer = { _, _ -> ContributeValidationFailure.CannotPayFees }
     )
 
     @Provides
