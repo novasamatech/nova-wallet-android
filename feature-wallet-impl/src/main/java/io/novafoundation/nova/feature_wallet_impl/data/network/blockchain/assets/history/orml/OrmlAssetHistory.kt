@@ -29,6 +29,7 @@ class OrmlAssetHistory(
 
     override suspend fun fetchOperationsForBalanceChange(
         chain: Chain,
+        chainAsset: Chain.Asset,
         blockHash: String,
         accountId: AccountId
     ): Result<List<TransferExtrinsic>> = runCatching {
@@ -39,15 +40,15 @@ class OrmlAssetHistory(
             .mapNotNull { extrinsicWithEvents ->
                 val extrinsic = extrinsicWithEvents.extrinsic
 
-                val chainAsset = chain.findAssetByOrmlCurrencyId(runtime, extrinsic.call.arguments["currency_id"])
+                val inferredAsset = chain.findAssetByOrmlCurrencyId(runtime, extrinsic.call.arguments["currency_id"])
 
-                chainAsset?.let {
+                inferredAsset?.let {
                     TransferExtrinsic(
                         senderId = bindAccountIdentifier(extrinsic.signature!!.accountIdentifier),
                         recipientId = bindAccountIdentifier(extrinsic.call.arguments["dest"]),
                         amountInPlanks = bindNumber(extrinsic.call.arguments["amount"]),
                         hash = extrinsicWithEvents.extrinsicHash,
-                        chainAsset = chainAsset,
+                        chainAsset = inferredAsset,
                         status = extrinsicWithEvents.status()
                     )
                 }

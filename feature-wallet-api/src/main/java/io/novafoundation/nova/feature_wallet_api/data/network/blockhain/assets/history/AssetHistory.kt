@@ -9,6 +9,7 @@ interface AssetHistory {
 
     suspend fun fetchOperationsForBalanceChange(
         chain: Chain,
+        chainAsset: Chain.Asset,
         blockHash: String,
         accountId: AccountId
     ): Result<List<TransferExtrinsic>>

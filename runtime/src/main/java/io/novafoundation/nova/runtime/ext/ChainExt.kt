@@ -2,6 +2,7 @@ package io.novafoundation.nova.runtime.ext
 
 import io.novafoundation.nova.common.data.network.runtime.binding.MultiAddress
 import io.novafoundation.nova.common.data.network.runtime.binding.bindOrNull
+import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.formatNamed
 import io.novafoundation.nova.common.utils.substrateAccountId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -168,6 +169,10 @@ fun Chain.Asset.requireStatemine(): Type.Statemine {
     require(type is Type.Statemine)
 
     return type
+}
+
+fun Type.Statemine.palletNameOrDefault(): String {
+    return palletName ?: Modules.ASSETS
 }
 
 fun Chain.Asset.requireOrml(): Type.Orml {
