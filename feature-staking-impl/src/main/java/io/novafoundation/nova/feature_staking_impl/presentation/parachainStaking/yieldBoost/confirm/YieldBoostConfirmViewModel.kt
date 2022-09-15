@@ -7,7 +7,6 @@ import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
-import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.input.Input
 import io.novafoundation.nova.common.utils.input.disabledInput
 import io.novafoundation.nova.common.utils.input.modifiableInput
