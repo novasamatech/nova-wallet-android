@@ -42,6 +42,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.collators.collatorAddressModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.selectCollators.mapCollatorToSelectCollatorModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.model.SelectCollatorModel
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.yieldBoost.common.formatDaysFrequency
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.yieldBoost.common.yieldBoostValidationFailure
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.yieldBoost.confirm.model.YieldBoostConfigurationParcel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.yieldBoost.confirm.model.YieldBoostConfirmPayload
@@ -277,10 +278,10 @@ class SetupYieldBoostViewModel(
     }
 
     private fun createFrequencyTitle(optimalFrequency: Int, currentFrequency: Int?): String {
-        val optimalFrequencyFormatted = resourceManager.getQuantityString(R.plurals.common_frequency_days, optimalFrequency, optimalFrequency.format())
+        val optimalFrequencyFormatted = resourceManager.formatDaysFrequency(optimalFrequency)
 
         return if (currentFrequency != null && currentFrequency != optimalFrequency) {
-            val currentFrequencyFormatted = resourceManager.getQuantityString(R.plurals.common_frequency_days, currentFrequency, currentFrequency.format())
+            val currentFrequencyFormatted = resourceManager.formatDaysFrequency(currentFrequency)
 
             resourceManager.getString(R.string.staking_turing_frequency_update_title, optimalFrequencyFormatted, currentFrequencyFormatted)
         } else {

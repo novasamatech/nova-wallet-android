@@ -131,7 +131,7 @@
   <string name="assets_balance_details_locks_phrelect">Выборы</string>
   <string name="assets_balance_details_locks_staking">Стейкинг</string>
   <string name="assets_balance_details_locks_vesting">Вестинг</string>
-  <string name="assets_receive_ledger_not_supported_message">Не переводите %s на Ledger аккаунт так как Ledger не поддерживает переводы %s, таким образом ассет будет недоступен для перевода на этом аккаунте</string>
+  <string name="assets_receive_ledger_not_supported_message" formatted="false">Не переводите %s на Ledger аккаунт так как Ledger не поддерживает переводы %s, таким образом ассет будет недоступен для перевода на этом аккаунте</string>
   <string name="assets_receive_ledger_not_supported_title">Ledger не поддерживает этот токен</string>
   <string name="assets_search_hint">Поиск по названию сети или токена</string>
   <string name="assets_search_placeholder">Не найдено сетей или токенов с\nуказаным именем</string>
@@ -145,6 +145,7 @@
   <string name="choose_amount_fee">Комиссия</string>
   <string name="choose_amount_network_error">Сеть недоступна</string>
   <string name="choose_amount_to">Кому</string>
+  <string name="common_accept_terms">Примите условия...</string>
   <string name="common_account">Аккаунт</string>
   <string name="common_account_address">Адрес аккаунта</string>
   <string name="common_add">Добавить</string>
@@ -166,6 +167,8 @@
   <string name="common_cancel">Отмена</string>
   <string name="common_cancel_operation_warning">Вы уверены, что хотите отменить операцию?</string>
   <string name="common_cannot_open_link">Не удается открыть данную ссылку</string>
+  <string name="common_cannot_pay_network_fee_message" formatted="false">У вас недостаточно средств для оплаты комиссии сети в размере %s.\nДоступный баланс для оплаты комиссии после операции: %s</string>
+  <string name="common_cannot_pay_network_fee_title">Недостаточно токенов для оплаты комиссии</string>
   <string name="common_chain">Сеть</string>
   <string name="common_change">Изменить</string>
   <string name="common_choose_network">Выберите сеть</string>
@@ -194,6 +197,13 @@
   <string name="common_explore">Исследуй</string>
   <string name="common_filter_sort_header">Сортировать по:</string>
   <string name="common_find_out_more">Узнать больше</string>
+  <plurals name="common_frequency_days">
+    <item quantity="one">каждый %s день</item>
+    <item quantity="few">каждые %s дня</item>
+    <item quantity="many">каждые %s дней</item>
+    <item quantity="other">каждый %s час</item>
+  </plurals>
+  <string name="common_frequency_days_everyday">ежедневно</string>
   <plurals name="common_hours_format">
     <item quantity="one">%d час</item>
     <item quantity="few">%d часа</item>
@@ -221,11 +231,14 @@
   <string name="common_network">Сеть</string>
   <string name="common_next">Далее</string>
   <string name="common_no">Нет</string>
+  <string name="common_no_changes">Нет изменений</string>
   <string name="common_no_screenshot_message_v2_2_0">Мы собираемся показать вашу мнемонику. Убедитесь, что никто не видит ваш экран и не делайте скриншотов - к ним могут получить доступ вредоносные программы</string>
   <string name="common_not_enough_funds_message">К сожалению, у вас недостаточно средств для оплаты сетевого сбора.</string>
   <string name="common_not_enough_funds_title">Недостаточный баланс</string>
+  <string name="common_off">Выкл</string>
   <string name="common_ok">OK</string>
   <string name="common_ok_back">Хорошо, назад</string>
+  <string name="common_on">Вкл</string>
   <string name="common_options_title">Выберите опцию</string>
   <string name="common_paste">Вставить</string>
   <string name="common_per_year_format">%s / год</string>
@@ -685,6 +698,14 @@
   <string name="staking_title">Стейкинг</string>
   <string name="staking_total_rewards_v1.9.0">Заработано</string>
   <string name="staking_total_staked">Всего застейкано</string>
+  <string name="staking_turing_boost_threshold">Порог Boost</string>
+  <string name="staking_turing_collator_title">Для моего коллатора</string>
+  <string name="staking_turing_destination_payout">без Yield Boost</string>
+  <string name="staking_turing_destination_restake">с Yield Boost</string>
+  <string name="staking_turing_frequency_new_title">чтобы автоматически, %s, отправлять все мои переводимые токены выше</string>
+  <string name="staking_turing_frequency_update_title" formatted="false">чтобы автоматически, %s (раньше:  %s), отправлять все мои переводимые токены выше</string>
+  <string name="staking_turing_restake_title">Я хочу стейкать</string>
+  <string name="staking_turing_yield_boost">Yield Boost</string>
   <string name="staking_unbond_crossed_existential">В результате этой операции все токены будут выведены из стейкинга.</string>
   <string name="staking_unbond_too_big">Сумма, которую вы хотите вывести из стейкинга, превышает сумму застейканных токенов.</string>
   <string name="staking_unbond_v1_9_0">Вывод из стейка</string>
@@ -784,8 +805,7 @@
   <string name="wallet_search_empty_title">Убедитесь, что адрес\nиз правильной сети</string>
   <string name="wallet_search_empty_title_v2_2_0">Неверный формат адреса.\nУбедитесь, что адрес \nсоответствует сети</string>
   <string name="wallet_send_balance_minimal">Минимальный баланс</string>
-  <string name="wallet_send_cannot_pay_cross_chain_fee">У вас недостаточно токенов для оплаты межсетевой комиссии в размере %s.\nОстаток баланса после перевода: %s</string>
-  <string name="wallet_send_cannot_pay_network_fee">У вас недостаточно токенов, чтобы оплатить комиссию сети в размере %s.\n Доступный баланс: %s</string>
+  <string name="wallet_send_cannot_pay_cross_chain_fee" formatted="false">У вас недостаточно токенов для оплаты межсетевой комиссии в размере %s.\nОстаток баланса после перевода: %s</string>
   <string name="wallet_send_confirm_hint">Межсетевая комиссия добавляется к введенной сумме. Получатель может получить часть межсетевой комиссии</string>
   <string name="wallet_send_confirm_transfer">Подтвердить</string>
   <string name="wallet_send_cross_chain">Между сетями</string>
@@ -814,4 +834,13 @@
   <string name="wallet_transfer_details_title">Детали перевода</string>
   <string name="wallet_your_balance">Ваш баланс</string>
   <string name="yesterday">Вчера</string>
+  <string name="yield_boost_already_enabled_message">Yield Boost будет отключен для текущих коллаторов. Новый коллатор: %s</string>
+  <string name="yield_boost_already_enabled_title">Изменить коллатора с Yield Boost?</string>
+  <string name="yield_boost_not_enough_execution_fee_message" formatted="false">У вас недостаточно средств для оплаты сетевой комиссии в размере %s и комиссии за выполнение первой Yield Boost операции в размере %s. \nДоступный баланс для оплаты комиссии: %s</string>
+  <string name="yield_boost_not_enough_execution_fee_title">Недостаточно токенов для оплаты комиссии за первое исполнение</string>
+  <string name="yield_boost_not_enough_threshold_message" formatted="false">У вас недостаточно средств, чтобы оплатить комиссию сети в размере %s и не опуститься ниже порога %s.\nДоступный баланс для оплаты комиссии: %s</string>
+  <string name="yield_boost_not_enough_threshold_title">Недостаточно токенов, чтобы оставаться выше порога</string>
+  <string name="yield_boost_stake_increase_time">Частота увеличения стейка</string>
+  <string name="yield_boost_terms" formatted="false">Yield Boost будет автоматически стейкать %s все мои переводные токены выше %s</string>
+  <string name="yiled_boost_yield_boosted">С Yield Boost</string>
 </resources>

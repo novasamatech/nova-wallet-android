@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
   <string name="common_accept_terms" >Accept terms...</string>
-  <string name="yield_boost_terms">Yield Boost will automatically stake every %s all my transferable tokens above %s</string>
+  <string name="yield_boost_terms">Yield Boost will automatically stake %s all my transferable tokens above %s</string>
 
   <string name="yield_boost_stake_increase_time">Stake increase time</string>
   <string name="yiled_boost_yield_boosted">Yield Boosted</string>
@@ -16,7 +16,7 @@
   <string name="yield_boost_not_enough_execution_fee_message">You don’t have enough balance to pay the network fee of %s and the yield boost execution fee of %s.\nAvailable balance to pay the fee: %s</string>
 
   <string name="common_cannot_pay_network_fee_message">You don’t have enough balance to pay the network fee of %s.\nAvailable  balance to pay fee after operation: %s</string>
-<!--  <string name="wallet_send_cannot_pay_network_fee">You don’t have enough balance to pay the network fee of %s.\nTransferable balance: %s</string>-->
+  <string name="common_cannot_pay_network_fee_title">Not enough tokens to pay the fee</string>
 
   <string name="common_no_changes">No changes</string>
 
@@ -26,7 +26,9 @@
   <string name="staking_turing_collator_title">For my collator</string>
   <string name="staking_turing_restake_title">I want to stake</string>
   <string name="staking_turing_frequency_new_title">to automatically stake %s all my transferable tokens above</string>
-  <string name="staking_turing_frequency_update_title">to automatically stake %s (updating from %s) all my transferable tokens above</string>
+  <string name="staking_turing_frequency_update_title">to automatically stake %s (before: %s) all my transferable tokens above</string>
+
+  <string name="common_frequency_days_everyday">everyday</string>
   <plurals name="common_frequency_days">
     <item quantity="one">everyday</item>
     <item quantity="other">every %s days</item>
