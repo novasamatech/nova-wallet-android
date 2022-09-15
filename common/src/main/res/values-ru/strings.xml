@@ -201,7 +201,7 @@
     <item quantity="one">каждый %s день</item>
     <item quantity="few">каждые %s дня</item>
     <item quantity="many">каждые %s дней</item>
-    <item quantity="other">каждый %s час</item>
+    <item quantity="other">каждый %s день</item>
   </plurals>
   <string name="common_frequency_days_everyday">ежедневно</string>
   <plurals name="common_hours_format">
