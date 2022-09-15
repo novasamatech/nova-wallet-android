@@ -14,11 +14,8 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.mapLatest
@@ -43,16 +40,10 @@ class TuringAutomationTasksUpdater(
         return storageSubscriptionBuilder.subscribe(accountKey)
             .withIndex()
             .mapLatest { (index, change) ->
-                val expectedAccountValue = change.value
                 val isChange = index > 0
+                val at = if (isChange) change.block else null
 
-                remoteStorageSource.query(chain.id) {
-                    if (isChange) {
-                        // Due to parachain consensus querying right after change arrived does not guarantee that the change will be in storage right away
-                        // So we wait until account storage matches with the change
-                        awaitSameAccountValue(accountId, expectedAccountValue)
-                    }
-
+                remoteStorageSource.query(chain.id, at) {
                     val storageEntry = runtime.metadata.automationTime().storage("AccountTasks")
                     val entries = storageEntry.entriesRaw(accountId)
                     val storagePrefix = storageEntry.storageKey(runtime, accountId)
@@ -60,22 +51,5 @@ class TuringAutomationTasksUpdater(
                     storageCache.insertPrefixEntries(entries, prefix = storagePrefix, chainId = chain.id)
                 }
             }.noSideAffects()
-    }
-
-    private suspend fun StorageQueryContext.awaitSameAccountValue(accountId: AccountId, expected: String?) {
-        suspend fun checkSame(): Boolean {
-            val actual = runtime.metadata.system().storage("Account").queryRaw(accountId)
-
-            return actual == expected
-        }
-
-        // no delay at the first try
-        if (checkSame()) {
-            return
-        }
-
-        do {
-            delay(500)
-        } while (!checkSame())
     }
 }
