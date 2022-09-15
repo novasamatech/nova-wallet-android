@@ -63,7 +63,7 @@ fun ResourceManager.notSufficientBalanceToPayFeeErrorMessage() = getString(R.str
     getString(R.string.common_not_enough_funds_message)
 
 fun handleNotEnoughFeeError(error: NotEnoughToPayFeesError, resourceManager: ResourceManager): TitleAndMessage {
-    val title = resourceManager.getString(R.string.common_not_enough_funds_title)
+    val title = resourceManager.getString(R.string.common_cannot_pay_network_fee_title)
 
     val availableToPayFees = error.availableToPayFees.formatTokenAmount(error.chainAsset)
     val fee = error.fee.formatTokenAmount(error.chainAsset)

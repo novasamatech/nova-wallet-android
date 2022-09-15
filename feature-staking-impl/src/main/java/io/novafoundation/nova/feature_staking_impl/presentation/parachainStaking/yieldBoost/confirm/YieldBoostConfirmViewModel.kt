@@ -7,7 +7,6 @@ import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
-import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.input.Input
 import io.novafoundation.nova.common.utils.input.disabledInput
 import io.novafoundation.nova.common.utils.input.modifiableInput
@@ -29,6 +28,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.yield
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select.model.mapCollatorParcelModelToCollator
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.collators.collatorAddressModel
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.yieldBoost.common.formatDaysFrequency
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.yieldBoost.common.yieldBoostValidationFailure
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.yieldBoost.confirm.model.YieldBoostConfiguration
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.yieldBoost.confirm.model.YieldBoostConfigurationModel
@@ -197,11 +197,7 @@ class YieldBoostConfirmViewModel(
             val asset = assetFlow.first()
 
             val threshold = mapAmountToAmountModel(configuration.threshold, asset)
-            val frequency = resourceManager.getQuantityString(
-                R.plurals.common_frequency_days,
-                configuration.frequencyInDays,
-                configuration.frequencyInDays.format()
-            )
+            val frequency = resourceManager.formatDaysFrequency(configuration.frequencyInDays)
 
             val termsText = resourceManager.getString(R.string.yield_boost_terms, frequency, threshold.token)
 
