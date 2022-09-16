@@ -70,7 +70,6 @@ class RealContributionsRepository(
         currentBlockNumber: BlockNumber,
         expectedBlockTime: BigInteger
     ): Flow<Pair<Contribution.Type, List<Contribution>>> = flow {
-
         if (!isCrowdloansAvailable(chain)) {
             return@flow
         }
@@ -153,7 +152,6 @@ class RealContributionsRepository(
 
         return flowOf { emptyList() }
     }
-
 
     override suspend fun isCrowdloansAvailable(chain: Chain): Boolean {
         return chainRegistry.getRuntime(chain.id).metadata.hasModule(Modules.CROWDLOAN)

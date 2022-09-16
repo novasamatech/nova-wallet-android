@@ -112,5 +112,4 @@ class ContributionsModule {
         contributionsRepository = contributionsRepository,
         contributionsUpdaterFactory = contributionsUpdaterFactory,
     )
-
 }

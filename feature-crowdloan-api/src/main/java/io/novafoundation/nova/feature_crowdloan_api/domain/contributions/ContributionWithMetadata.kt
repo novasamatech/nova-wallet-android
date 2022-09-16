@@ -8,7 +8,6 @@ import io.novafoundation.nova.feature_crowdloan_api.data.repository.ParachainMet
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger
 
-
 open class Contribution(
     val chain: Chain,
     val amountInPlanks: BigInteger,
