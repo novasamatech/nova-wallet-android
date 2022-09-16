@@ -24,7 +24,7 @@ class BalanceLocksRepositoryImpl(
         }
     }
 
-    override suspend fun observeLocksForMetaAccount(metaAccount: MetaAccount): Flow<List<BalanceLock>> {
+    override fun observeLocksForMetaAccount(metaAccount: MetaAccount): Flow<List<BalanceLock>> {
         return combine(lockDao.observeLocksForMetaAccount(metaAccount.id), chainRegistry.chainsById) { locks, chains ->
             locks.map {
                 val asset = chains.getValue(it.chainId)

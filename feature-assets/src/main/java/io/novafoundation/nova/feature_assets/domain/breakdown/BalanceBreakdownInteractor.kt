@@ -1,13 +1,13 @@
 package io.novafoundation.nova.feature_assets.domain.breakdown
 
+import io.novafoundation.nova.common.utils.accumulateFlatten
 import io.novafoundation.nova.common.utils.percentageOf
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_assets.domain.breakdown.BalanceBreakdown.Companion.CROWDLOAN_ID
 import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksRepository
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ContributionsRepository
-import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.Contribution
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -15,7 +15,9 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 
 class BalanceBreakdown(
     val total: BigDecimal,
@@ -47,15 +49,21 @@ class BalanceBreakdownInteractor(
 
     fun balanceBreakdownFlow(assetsFlow: Flow<List<Asset>>): Flow<BalanceBreakdown> {
         val metaAccountFlow = accountRepository.selectedMetaAccountFlow()
-        val locksFlow = metaAccountFlow
-            .flatMapLatest { balanceLocksRepository.observeLocksForMetaAccount(it) }
 
-        val contributionsFlow = metaAccountFlow.flatMapLatest {
-            contributionsRepository.observeContributions(it)
+        val locksFlow = metaAccountFlow.flatMapLatest { metaAccount ->
+            locksBreakdownFlow(assetsFlow, metaAccount)
         }
+        val contributionsFlow = metaAccountFlow.flatMapLatest { metaAccount ->
+            contributionsBreakdownFlow(assetsFlow, metaAccount)
+        }
+        val reservedFlow = assetsFlow.map { getReservedBreakdown(it) }
 
-        return combine(assetsFlow, locksFlow, contributionsFlow) { assets, locks, contributions ->
-            val totalAmount = totalBalanceFromAssets(assets)
+        val breakdownFlow = accumulateFlatten(locksFlow, contributionsFlow, reservedFlow)
+
+        return combine(assetsFlow, breakdownFlow) { assets, breakdown ->
+            val contributions = contributionsFlow.first()
+
+            val totalAmount = calculateTotalBalance(assets, contributions)
             val transferablePercentage = totalAmount.transferable.percentageOf(totalAmount.total)
             val locksPercentage = totalAmount.locks.percentageOf(totalAmount.total)
 
@@ -63,17 +71,19 @@ class BalanceBreakdownInteractor(
                 totalAmount.total,
                 BalanceBreakdown.PercentageAmount(totalAmount.transferable, transferablePercentage),
                 BalanceBreakdown.PercentageAmount(totalAmount.locks, locksPercentage),
-                mapBalanceBreakdown(assets, locks, contributions)
+                breakdown.sortedByDescending { it.fiatAmount }
             )
         }
     }
 
-    private fun totalBalanceFromAssets(
-        assets: List<Asset>
+    private fun calculateTotalBalance(
+        assets: List<Asset>,
+        contributions: List<BalanceBreakdown.BreakdownItem>
     ): TotalAmount {
-        var total = BigDecimal.ZERO
+        val contributionsTotal = contributions.sumOf { it.fiatAmount }
+        var total = contributionsTotal
         var transferable = BigDecimal.ZERO
-        var locks = BigDecimal.ZERO
+        var locks = contributionsTotal
 
         assets.forEach { asset ->
             total += asset.token.priceOf(asset.total)
@@ -84,10 +94,8 @@ class BalanceBreakdownInteractor(
         return TotalAmount(total, transferable, locks)
     }
 
-    private fun mapBalanceBreakdown(assets: List<Asset>, locks: List<BalanceLock>, contributions: List<Contribution>): List<BalanceBreakdown.BreakdownItem> {
-        val assetsByChainId = assets.associateBy { it.token.configuration.chainId to it.token.configuration.id }
-
-        val breakdownAssets = assets
+    private fun getReservedBreakdown(assets: List<Asset>): List<BalanceBreakdown.BreakdownItem> {
+        return assets
             .filter { it.reservedInPlanks > BigInteger.ZERO }
             .map {
                 BalanceBreakdown.BreakdownItem(
@@ -96,35 +104,42 @@ class BalanceBreakdownInteractor(
                     it.token.priceOf(it.reserved)
                 )
             }
+    }
 
-        val breakdownLocks = locks.filter { assetsByChainId.containsKey(it.chainAsset.chainId to it.chainAsset.id) }
-            .map { lock ->
-                val token = assetsByChainId.getValue(lock.chainAsset.chainId to lock.chainAsset.id)
-                    .token
+    private fun locksBreakdownFlow(assetsFlow: Flow<List<Asset>>, metaAccount: MetaAccount): Flow<List<BalanceBreakdown.BreakdownItem>> {
+        return combine(assetsFlow, balanceLocksRepository.observeLocksForMetaAccount(metaAccount)) { assets, locks ->
+            val assetsByChainId = assets.associateBy { it.token.configuration.chainId to it.token.configuration.id }
+            locks.filter { assetsByChainId.containsKey(it.chainAsset.chainId to it.chainAsset.id) }
+                .map { lock ->
+                    val token = assetsByChainId.getValue(lock.chainAsset.chainId to lock.chainAsset.id)
+                        .token
 
-                val amount = token.amountFromPlanks(lock.amountInPlanks)
-                BalanceBreakdown.BreakdownItem(
-                    lock.id,
-                    lock.chainAsset,
-                    token.priceOf(amount)
-                )
-            }
+                    val amount = token.amountFromPlanks(lock.amountInPlanks)
+                    BalanceBreakdown.BreakdownItem(
+                        lock.id,
+                        lock.chainAsset,
+                        token.priceOf(amount)
+                    )
+                }
+        }
+    }
 
-        val breakdownContributions = contributions.groupBy { it.chain.id to it.chain.utilityAsset.id }
-            .filter { (chainAndAssetId, _) -> assetsByChainId.containsKey(chainAndAssetId) }
-            .map { (chainAndAssetId, contributions) ->
-                val token = assetsByChainId.getValue(chainAndAssetId).token
+    private fun contributionsBreakdownFlow(assetsFlow: Flow<List<Asset>>, metaAccount: MetaAccount): Flow<List<BalanceBreakdown.BreakdownItem>> {
+        return combine(assetsFlow, contributionsRepository.observeContributions(metaAccount)) { assets, contributions ->
+            val assetsByChainId = assets.associateBy { it.token.configuration.chainId to it.token.configuration.id }
 
-                val totalAmountInPlanks = contributions.sumOf { it.amountInPlanks }
-                BalanceBreakdown.BreakdownItem(
-                    CROWDLOAN_ID,
-                    token.configuration,
-                    token.priceOf(token.amountFromPlanks(totalAmountInPlanks))
-                )
-            }
+            contributions.groupBy { it.chain.id to it.chain.utilityAsset.id }
+                .filter { (chainAndAssetId, _) -> assetsByChainId.containsKey(chainAndAssetId) }
+                .map { (chainAndAssetId, contributions) ->
+                    val token = assetsByChainId.getValue(chainAndAssetId).token
 
-        return (breakdownAssets + breakdownLocks + breakdownContributions).sortedByDescending {
-            it.fiatAmount
+                    val totalAmountInPlanks = contributions.sumOf { it.amountInPlanks }
+                    BalanceBreakdown.BreakdownItem(
+                        CROWDLOAN_ID,
+                        token.configuration,
+                        token.priceOf(token.amountFromPlanks(totalAmountInPlanks))
+                    )
+                }
         }
     }
 }
