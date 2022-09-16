@@ -19,12 +19,24 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
-      ci {
-          storeFile file("develop_key.jks")
-          storePassword System.env.CI_KEYSTORE_PASS ?: ""
-          keyAlias System.env.CI_KEYSTORE_KEY_ALIAS ?: ""
-          keyPassword System.env.CI_KEYSTORE_KEY_PASS ?: ""
-      }
+        dev {
+            storeFile file('develop_key.jks')
+            storePassword System.env.CI_KEYSTORE_PASS ?: ''
+            keyAlias System.env.CI_KEYSTORE_KEY_ALIAS ?: ''
+            keyPassword System.env.CI_KEYSTORE_KEY_PASS ?: ''
+        }
+        market {
+            storeFile file('market_key.jks')
+            storePassword System.env.CI_MARKET_KEYSTORE_PASS ?: ''
+            keyAlias System.env.CI_MARKET_KEYSTORE_KEY_ALIAS ?: ''
+            keyPassword System.env.CI_MARKET_KEYSTORE_KEY_PASS ?: ''
+        }
+        github {
+            storeFile file('github_key.jks')
+            storePassword System.env.CI_GITHUB_KEYSTORE_PASS ?: ''
+            keyAlias System.env.CI_GITHUB_KEYSTORE_KEY_ALIAS ?: ''
+            keyPassword System.env.CI_GITHUB_KEYSTORE_KEY_PASS ?: ''
+        }
     }
     buildTypes {
         debug {
@@ -34,20 +46,33 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.debug
 
             versionNameSuffix "-${releaseApplicationSuffix}"
             applicationIdSuffix ".${releaseApplicationSuffix}"
         }
+        releaseTest {
+            initWith buildTypes.release
+            matchingFallbacks = ['release']
+            signingConfig signingConfigs.debug
+
+            versionNameSuffix '-test'
+            applicationIdSuffix '.test'
+        }
+        releaseMarket {
+            initWith buildTypes.release
+            matchingFallbacks = ['release']
+            signingConfig signingConfigs.market
+        }
         releaseGithub {
             initWith buildTypes.release
             matchingFallbacks = ['release']
+            signingConfig signingConfigs.github
 
-            applicationIdSuffix '.github'
             versionNameSuffix '-github'
+            applicationIdSuffix '.github'
         }
         develop {
-            signingConfig signingConfigs.ci
+            signingConfig signingConfigs.dev
             matchingFallbacks = ['debug']
             versionNameSuffix '-develop'
             applicationIdSuffix '.dev'
