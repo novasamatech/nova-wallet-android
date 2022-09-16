@@ -36,6 +36,9 @@ infix fun BigDecimal.hasTheSaveValueAs(another: BigDecimal) = compareTo(another)
 val BigDecimal.isZero: Boolean
     get() = signum() == 0
 
+val BigDecimal.isPositive: Boolean
+    get() = signum() > 0
+
 val BigDecimal.isNonNegative: Boolean
     get() = signum() >= 0
 

@@ -23,6 +23,7 @@ abstract class BaseMigrationTest {
     val migrationHelper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
         AppDatabase::class.java.canonicalName,
+
         FrameworkSQLiteOpenHelperFactory()
     )
 

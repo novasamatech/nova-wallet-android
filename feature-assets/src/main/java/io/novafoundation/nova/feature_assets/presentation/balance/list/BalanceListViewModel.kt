@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.formatting.formatAsPercentage
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.common.utils.isPositive
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_assets.R
@@ -28,11 +29,15 @@ import io.novafoundation.nova.feature_assets.presentation.balance.list.model.Nft
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.TotalBalanceModel
 import io.novafoundation.nova.feature_assets.presentation.common.mapBalanceIdToUi
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
+import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
+import kotlin.time.ExperimentalTime
+import kotlin.time.seconds
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
@@ -42,9 +47,6 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
-import kotlin.time.ExperimentalTime
-import kotlin.time.seconds
-import kotlinx.coroutines.flow.combine
 
 private typealias SyncAction = suspend (MetaAccount) -> Unit
 
@@ -56,6 +58,7 @@ class BalanceListViewModel(
     private val router: AssetsRouter,
     private val currencyInteractor: CurrencyInteractor,
     private val balanceBreakdownInteractor: BalanceBreakdownInteractor,
+    private val contributionsInteractor: ContributionsInteractor,
     private val resourceManager: ResourceManager
 ) : BaseViewModel() {
 
@@ -116,6 +119,7 @@ class BalanceListViewModel(
         val assets = assetsFlow.first()
         TotalBalanceModel(
             shouldShowPlaceholder = assets.isEmpty(),
+            shouldShowLockedBalance = it.locksTotal.amount.isPositive,
             totalBalanceFiat = it.total.formatAsCurrency(currency),
             lockedBalanceFiat = it.locksTotal.amount.formatAsCurrency(currency)
         )
@@ -131,6 +135,9 @@ class BalanceListViewModel(
         .shareInBackground()
 
     init {
+        contributionsInteractor.runUpdate()
+            .launchIn(this)
+
         selectedCurrency
             .onEach { fullSync() }
             .launchIn(this)

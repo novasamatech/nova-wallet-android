@@ -5,8 +5,8 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_crowdloan_impl.R
-import io.novafoundation.nova.feature_crowdloan_impl.domain.contributions.Contribution
-import io.novafoundation.nova.feature_crowdloan_impl.domain.contributions.ContributionsInteractor
+import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionWithMetadata
+import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contributions.model.ContributionModel
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.model.generateCrowdloanIcon
@@ -56,7 +56,7 @@ class UserContributionsViewModel(
     }
 
     private suspend fun mapCrowdloanToContributionModel(
-        contribution: Contribution,
+        contribution: ContributionWithMetadata,
         chain: Chain,
         token: Token,
     ): ContributionModel {
@@ -64,7 +64,7 @@ class UserContributionsViewModel(
         val parachainName = contribution.parachainMetadata?.name ?: contribution.paraId.toString()
 
         val contributionTitle = if (contribution.sourceName != null) {
-            resourceManager.getString(R.string.crowdloan_contributions_with_source, parachainName, contribution.sourceName)
+            resourceManager.getString(R.string.crowdloan_contributions_with_source, parachainName, contribution.sourceName!!)
         } else {
             parachainName
         }
@@ -72,7 +72,7 @@ class UserContributionsViewModel(
         return ContributionModel(
             title = contributionTitle,
             icon = generateCrowdloanIcon(contribution.parachainMetadata, depositorAddress, iconGenerator),
-            amount = mapAmountToAmountModel(contribution.amount, token),
+            amount = mapAmountToAmountModel(contribution.amountInPlanks, token),
             returnsIn = contribution.returnsIn
         )
     }

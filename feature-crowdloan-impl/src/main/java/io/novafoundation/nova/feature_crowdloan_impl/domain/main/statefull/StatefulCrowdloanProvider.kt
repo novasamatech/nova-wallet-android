@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
-import io.novafoundation.nova.feature_crowdloan_impl.domain.contributions.ContributionsInteractor
+import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.domain.main.CrowdloanInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.getCurrentAsset

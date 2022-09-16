@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.common.utils.decodeValue
 import io.novafoundation.nova.common.utils.tokens
 import io.novafoundation.nova.core.updater.SubscriptionBuilder
-import io.novafoundation.nova.core_db.dao.LocksDao
+import io.novafoundation.nova.core_db.dao.LockDao
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
@@ -28,7 +28,7 @@ class OrmlAssetBalance(
     private val assetCache: AssetCache,
     private val remoteStorageSource: StorageDataSource,
     private val chainRegistry: ChainRegistry,
-    private val locksDao: LocksDao
+    private val lockDao: LockDao
 ) : AssetBalance {
 
     override suspend fun startSyncingBalanceLocks(
@@ -48,7 +48,7 @@ class OrmlAssetBalance(
             .map { change ->
                 val balanceLocks = bindBalanceLocks(storage.decodeValue(change.value, runtime))
                 balanceLocks?.map { mapBlockchainLockToLocal(metaAccount.id, chain.id, chainAsset.id, it) }
-                    ?.let { locksDao.insert(it) }
+                    ?.let { lockDao.insert(it) }
             }
     }
 

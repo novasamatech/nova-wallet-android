@@ -8,39 +8,55 @@ import io.novafoundation.nova.common.utils.firstNonEmpty
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.TimerValue
 import io.novafoundation.nova.common.utils.mapList
+import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_crowdloan_api.data.common.CrowdloanContribution
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.DirectContribution
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.FundInfo
+import io.novafoundation.nova.feature_crowdloan_api.data.network.updater.ContributionsUpdateSystemFactory
+import io.novafoundation.nova.feature_crowdloan_api.data.repository.ContributionsRepository
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRepository
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.LeasePeriodToBlocksConverter
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ParachainMetadata
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.getContributions
-import io.novafoundation.nova.feature_crowdloan_impl.data.source.contribution.ExternalContributionSource
-import io.novafoundation.nova.feature_crowdloan_impl.data.source.contribution.supports
+import io.novafoundation.nova.feature_crowdloan_api.data.source.contribution.ExternalContributionSource
+import io.novafoundation.nova.feature_crowdloan_api.data.source.contribution.supports
+import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.Contribution
+import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionWithMetadata
+import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
+import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsWithTotalAmount
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.leasePeriodInMillis
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
+import java.math.BigInteger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import java.math.BigInteger
 
-class ContributionsInteractor(
+class RealContributionsInteractor(
     private val externalContributionsSources: List<ExternalContributionSource>,
     private val crowdloanRepository: CrowdloanRepository,
     private val accountRepository: AccountRepository,
-    private val selectedAssetState: SingleAssetSharedState,
-    private val chainStateRepository: ChainStateRepository
-) {
+    private val selectedAssetState: SingleAssetSharedState, // bring outside
+    private val chainStateRepository: ChainStateRepository,
+    private val contributionsRepository: ContributionsRepository,
+    private val contributionsUpdateSystemFactory: ContributionsUpdateSystemFactory
+) : ContributionsInteractor {
 
-    fun observeUserContributions(): Flow<ContributionsWithTotalAmount> = flow {
+    override fun runUpdate(): Flow<Updater.SideEffect> = flow {
+        val sideEffectFlow = contributionsUpdateSystemFactory.create()
+            .start()
+
+        emitAll(sideEffectFlow)
+    }
+
+    override fun observeUserContributions(): Flow<ContributionsWithTotalAmount> = flow {
         val chain = selectedAssetState.chain()
         val metaAccount = accountRepository.getSelectedMetaAccount()
 
@@ -62,6 +78,7 @@ class ContributionsInteractor(
             .map { directContributionsMap ->
                 directContributionsMap.map {
                     mapDirectContribution(
+                        chain,
                         it.value,
                         it.key,
                         fundInfos.getValue(it.key),
@@ -74,11 +91,12 @@ class ContributionsInteractor(
             }
 
         val externalContributionsFlow = externalContributionsFlow(chain, metaAccount)
-            .mapList {
+            .mapList { source ->
                 mapExternalContribution(
-                    it,
-                    fundInfos.getValue(it.paraId),
-                    parachainMetadatas.getValue(it.paraId),
+                    chain,
+                    source,
+                    fundInfos.getValue(source.paraId),
+                    parachainMetadatas.getValue(source.paraId),
                     blocksPerLeasePeriod,
                     currentBlockNumber,
                     expectedBlockTime
@@ -95,7 +113,7 @@ class ContributionsInteractor(
         emitAll(allContributionsFlow)
     }
 
-    private fun getTotalContributionAmount(contributions: List<Contribution>): BigInteger = contributions.sumOf { it.amount }
+    private fun getTotalContributionAmount(contributions: List<ContributionWithMetadata>): BigInteger = contributions.sumOf { it.amountInPlanks }
 
     private fun directContributionsFlow(chain: Chain, account: MetaAccount, fundInfos: Map<ParaId, FundInfo>): Flow<Map<ParaId, DirectContribution>> = flowOf {
         val accountId = account.accountIdIn(chain)!!
@@ -103,7 +121,7 @@ class ContributionsInteractor(
             .filterNotNull()
     }
 
-    fun externalContributionsFlow(chain: Chain, account: MetaAccount): Flow<List<ExternalContributionSource.Contribution>> {
+    override fun externalContributionsFlow(chain: Chain, account: MetaAccount): Flow<List<ExternalContributionSource.ExternalContribution>> {
         val accountId = account.accountIdIn(chain) ?: return flowOf(emptyList())
 
         val externalContributionFlows = externalContributionsSources
@@ -117,7 +135,7 @@ class ContributionsInteractor(
         return accumulateFlatten(*externalContributionFlows.toTypedArray())
     }
 
-    fun getTotalAmountOfContributions(
+    override fun getTotalAmountOfContributions(
         crowdloanContributions: List<CrowdloanContribution>
     ): BigInteger {
         return crowdloanContributions.sumOf { it.amount }
@@ -139,6 +157,7 @@ class ContributionsInteractor(
     }
 
     private fun mapDirectContribution(
+        chain: Chain,
         directContribution: DirectContribution,
         paraId: ParaId,
         fundInfo: FundInfo,
@@ -146,36 +165,41 @@ class ContributionsInteractor(
         blocksPerLeasePeriod: LeasePeriodToBlocksConverter,
         currentBlockNumber: BlockNumber,
         expectedBlockTime: BigInteger
-    ): Contribution {
-        return Contribution(
+    ): ContributionWithMetadata {
+        return ContributionWithMetadata(
+            chain = chain,
             amount = directContribution.amount,
             paraId = paraId,
-            fundInfo = fundInfo,
             sourceName = null,
+            returnsIn = fundInfo.returnDuration(blocksPerLeasePeriod, currentBlockNumber, expectedBlockTime),
+            type = Contribution.Type.DIRECT,
+            fundInfo = fundInfo,
             parachainMetadata = parachainMetadata,
-            returnsIn = fundInfo.returnDuration(blocksPerLeasePeriod, currentBlockNumber, expectedBlockTime)
         )
     }
 
     private fun mapExternalContribution(
-        contribution: ExternalContributionSource.Contribution,
+        chain: Chain,
+        contribution: ExternalContributionSource.ExternalContribution,
         fundInfo: FundInfo,
         parachainMetadata: ParachainMetadata,
         blocksPerLeasePeriod: LeasePeriodToBlocksConverter,
         currentBlockNumber: BlockNumber,
         expectedBlockTime: BigInteger
-    ): Contribution {
-        return Contribution(
+    ): ContributionWithMetadata {
+        return ContributionWithMetadata(
+            chain = chain,
             amount = contribution.amount,
-            parachainMetadata = parachainMetadata,
             sourceName = contribution.sourceName,
-            fundInfo = fundInfo,
             paraId = contribution.paraId,
-            returnsIn = fundInfo.returnDuration(blocksPerLeasePeriod, currentBlockNumber, expectedBlockTime)
+            returnsIn = fundInfo.returnDuration(blocksPerLeasePeriod, currentBlockNumber, expectedBlockTime),
+            type = Contribution.Type.DIRECT,
+            fundInfo = fundInfo,
+            parachainMetadata = parachainMetadata,
         )
     }
 
-    private fun sortContributionsByTimeLeft(contributions: List<Contribution>): List<Contribution> {
+    private fun sortContributionsByTimeLeft(contributions: List<ContributionWithMetadata>): List<ContributionWithMetadata> {
         return contributions.sortedBy { it.returnsIn.millis }
     }
 }

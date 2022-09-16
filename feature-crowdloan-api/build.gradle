@@ -26,6 +26,7 @@ dependencies {
     implementation coroutinesDep
     implementation project(':runtime')
     implementation project(":common")
+    implementation project(":feature-account-api")
 
     implementation daggerDep
 

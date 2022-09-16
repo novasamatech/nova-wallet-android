@@ -44,7 +44,10 @@ class AssetsTotalBalanceView @JvmOverloads constructor(
         viewAssetsTotalBalanceTotal.setVisible(true)
         viewAssetsTotalBalanceTotal.text = totalBalance.totalBalanceFiat
 
-        viewAssetsTotalBalanceLocked.setVisible(true)
-        viewAssetsTotalBalanceLocked.text = totalBalance.lockedBalanceFiat
+        viewAssetsTotalBalanceLocked.setVisible(totalBalance.shouldShowLockedBalance)
+
+        if (totalBalance.shouldShowLockedBalance) {
+            viewAssetsTotalBalanceLocked.text = totalBalance.lockedBalanceFiat
+        }
     }
 }

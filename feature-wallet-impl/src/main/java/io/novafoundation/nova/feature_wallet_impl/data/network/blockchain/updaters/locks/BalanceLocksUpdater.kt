@@ -7,7 +7,6 @@ import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateS
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdaterFactory
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.merge
@@ -33,7 +32,6 @@ class BalanceLocksUpdater(
 ) : Updater {
     override val requiredModules: List<String> = emptyList()
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun listenForUpdates(storageSubscriptionBuilder: SubscriptionBuilder): Flow<Updater.SideEffect> {
         return chain.assets.map { chainAsset ->
             val metaAccount = scope.getAccount()
