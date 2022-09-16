@@ -21,7 +21,6 @@ import kotlinx.android.synthetic.main.item_validator.view.itemValidatorInfo
 import kotlinx.android.synthetic.main.item_validator.view.itemValidatorName
 import kotlinx.android.synthetic.main.item_validator.view.itemValidatorScoringPrimary
 import kotlinx.android.synthetic.main.item_validator.view.itemValidatorScoringSecondary
-import kotlinx.android.synthetic.main.item_validator.view.itemValidatorSubtitleGroup
 import kotlinx.android.synthetic.main.item_validator.view.itemValidatorSubtitleLabel
 import kotlinx.android.synthetic.main.item_validator.view.itemValidatorSubtitleValue
 
@@ -162,12 +161,16 @@ class ValidatorViewHolder<V>(override val containerView: View) : RecyclerView.Vi
 
     fun bindSubtitle(item: StakeTargetModel<*>) = with(containerView) {
         if (item.subtitle != null) {
-            itemValidatorSubtitleGroup.makeVisible()
+            itemValidatorSubtitleLabel.makeVisible()
+            itemValidatorSubtitleValue.makeVisible()
 
             itemValidatorSubtitleLabel.text = item.subtitle.label
 
             itemValidatorSubtitleValue.text = item.subtitle.value.text
             itemValidatorSubtitleValue.setTextColorRes(item.subtitle.value.colorRes)
+        } else {
+            itemValidatorSubtitleValue.makeGone()
+            itemValidatorSubtitleLabel.makeGone()
         }
     }
 }

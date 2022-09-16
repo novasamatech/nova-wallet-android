@@ -2,12 +2,12 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/itemValidatorContainer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:animateLayoutChanges="true"
     android:background="@drawable/bg_primary_list_item"
     android:gravity="center_vertical"
-    android:id="@+id/itemValidatorContainer"
     android:orientation="horizontal"
     tools:background="@color/black">
 
@@ -41,10 +41,10 @@
         android:id="@+id/itemValidatorIcon"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="12dp"
         android:layout_gravity="center_vertical"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/itemValidationCheck"
         app:layout_constraintTop_toTopOf="parent"
@@ -60,7 +60,7 @@
         android:ellipsize="middle"
         android:singleLine="true"
         android:textColor="@color/white"
-        app:layout_constraintBottom_toTopOf="@+id/itemValidatorSubtitleLabel"
+        app:layout_constraintBottom_toTopOf="@+id/itemValidatorSubtitleValue"
         app:layout_constraintEnd_toStartOf="@+id/amountBarrier"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/itemValidatorIcon"
@@ -73,10 +73,12 @@
         style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingEnd="4dp"
         android:textColor="@color/white_64"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/itemValidatorSubtitleValue"
         app:layout_constraintStart_toStartOf="@+id/itemValidatorName"
-        app:layout_constraintTop_toBottomOf="@+id/itemValidatorName"
+        app:layout_constraintTop_toTopOf="@+id/itemValidatorSubtitleValue"
         tools:text="Rewards:" />
 
     <TextView
@@ -84,13 +86,13 @@
         style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        app:layout_constraintBottom_toBottomOf="@+id/itemValidatorSubtitleLabel"
+        android:textColor="@color/white"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/itemValidatorSubtitleLabel"
-        app:layout_constraintTop_toTopOf="@+id/itemValidatorSubtitleLabel"
+        app:layout_constraintTop_toBottomOf="@+id/itemValidatorName"
         app:layout_constraintVertical_bias="0.0"
-        tools:text="29.75%"
-        android:textColor="@color/white" />
+        tools:text="29.75%" />
 
     <TextView
         android:id="@+id/itemValidatorScoringPrimary"
@@ -137,12 +139,4 @@
         android:layout_height="wrap_content"
         app:barrierDirection="left"
         app:constraint_referenced_ids="itemValidatorScoringPrimary,itemValidatorScoringSecondary" />
-
-    <androidx.constraintlayout.widget.Group
-        android:id="@+id/itemValidatorSubtitleGroup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        tools:visibility="visible"
-        app:constraint_referenced_ids="itemValidatorSubtitleLabel,itemValidatorSubtitleValue" />
 </androidx.constraintlayout.widget.ConstraintLayout>

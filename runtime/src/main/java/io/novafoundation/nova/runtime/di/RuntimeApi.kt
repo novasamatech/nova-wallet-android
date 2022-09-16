@@ -14,6 +14,7 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RuntimeVer
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
+import io.novafoundation.nova.runtime.repository.TimestampRepository
 import io.novafoundation.nova.runtime.storage.SampledBlockTimeStorage
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -62,4 +63,6 @@ interface RuntimeApi {
     val mortalityConstructor: MortalityConstructor
 
     val extrinsicValidityUseCase: ExtrinsicValidityUseCase
+
+    val timestampRepository: TimestampRepository
 }

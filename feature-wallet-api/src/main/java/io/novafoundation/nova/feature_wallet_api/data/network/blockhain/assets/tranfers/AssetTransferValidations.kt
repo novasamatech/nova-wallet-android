@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
+import io.novafoundation.nova.feature_wallet_api.domain.validation.NotEnoughToPayFeesError
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
@@ -33,10 +34,10 @@ sealed class AssetTransferValidationFailure {
         object InUsedAsset : NotEnoughFunds()
 
         class InCommissionAsset(
-            val commissionAsset: Chain.Asset,
-            val fee: BigDecimal,
-            val transferableBalance: BigDecimal,
-        ) : NotEnoughFunds()
+            override val chainAsset: Chain.Asset,
+            override val availableToPayFees: BigDecimal,
+            override val fee: BigDecimal
+        ) : NotEnoughFunds(), NotEnoughToPayFeesError
 
         class ToStayAboveED(val commissionAsset: Chain.Asset) : NotEnoughFunds()
 

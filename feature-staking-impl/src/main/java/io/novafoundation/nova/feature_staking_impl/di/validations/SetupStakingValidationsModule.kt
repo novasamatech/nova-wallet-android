@@ -34,7 +34,7 @@ class SetupStakingValidationsModule {
                 chainAssetExtractor = { it.asset.token.configuration },
                 stakingSharedState = stakingSharedState
             ),
-            errorProducer = { SetupStakingValidationFailure.CannotPayFee },
+            errorProducer = { _, _ -> SetupStakingValidationFailure.CannotPayFee },
             extraAmountExtractor = { it.bondAmount ?: BigDecimal.ZERO }
         )
     }

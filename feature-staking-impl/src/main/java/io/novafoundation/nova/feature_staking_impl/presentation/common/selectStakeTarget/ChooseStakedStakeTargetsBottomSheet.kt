@@ -29,8 +29,6 @@ import kotlinx.android.synthetic.main.item_validator.view.itemValidatorName
 import kotlinx.android.synthetic.main.item_validator.view.itemValidatorSubtitleLabel
 import kotlinx.android.synthetic.main.item_validator.view.itemValidatorSubtitleValue
 
-private val INACTIVE_COLOR = R.color.white_32
-
 class ChooseStakedStakeTargetsBottomSheet<T : Identifiable>(
     context: Context,
     private val payload: Payload<SelectStakeTargetModel<T>>,
@@ -106,18 +104,17 @@ private class ViewHolder<T : Identifiable>(
         itemSelectStakedCollatorCollator.bindSelectedCollator(item)
         itemSelectStakedCollatorCheck.isChecked = isSelected
 
-        val primaryTextColor = if (item.active) R.color.white else INACTIVE_COLOR
-        val secondaryTextColor = if (item.active) R.color.white_64 else INACTIVE_COLOR
+        val primaryTextColor = if (item.active) R.color.white else R.color.textInactive
 
         with(itemSelectStakedCollatorCollator) {
             itemValidatorName.setTextColorRes(primaryTextColor)
-            itemValidatorSubtitleLabel.setTextColorRes(secondaryTextColor)
             itemValidatorSubtitleValue.setTextColorRes(primaryTextColor)
         }
     }
 
     private fun setInitialState() = with(containerView) {
         itemSelectStakedCollatorCollator.background = null
+        itemSelectStakedCollatorCollator.itemValidatorSubtitleLabel.makeGone()
 
         when (selectionStyle) {
             SelectionStyle.RadioGroup -> {
@@ -136,7 +133,7 @@ private class ViewHolder<T : Identifiable>(
 private class DiffCallback<T : Identifiable> : DiffUtil.ItemCallback<SelectStakeTargetModel<T>>() {
 
     override fun areContentsTheSame(oldItem: SelectStakeTargetModel<T>, newItem: SelectStakeTargetModel<T>): Boolean {
-        return oldItem.amount == newItem.amount && oldItem.active != newItem.active
+        return oldItem.subtitle == newItem.subtitle && oldItem.active != newItem.active
     }
 
     override fun areItemsTheSame(oldItem: SelectStakeTargetModel<T>, newItem: SelectStakeTargetModel<T>): Boolean {

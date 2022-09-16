@@ -71,6 +71,7 @@ private const val ASSET_ORML = "orml"
 private const val ASSET_UNSUPPORTED = "unsupported"
 
 private const val STATEMINE_EXTRAS_ID = "assetId"
+private const val STATEMINE_EXTRAS_PALLET_NAME = "palletName"
 
 private const val ORML_EXTRAS_CURRENCY_ID_SCALE = "currencyIdScale"
 private const val ORML_EXTRAS_CURRENCY_TYPE = "currencyIdType"
@@ -90,8 +91,9 @@ private fun mapChainAssetTypeFromRaw(type: String?, typeExtras: Map<String, Any?
         null, ASSET_NATIVE -> Chain.Asset.Type.Native
         ASSET_STATEMINE -> {
             val id = typeExtras?.get(STATEMINE_EXTRAS_ID)?.asGsonParsedNumberOrNull()
+            val palletName = typeExtras?.get(STATEMINE_EXTRAS_PALLET_NAME) as String?
 
-            Chain.Asset.Type.Statemine(id!!)
+            Chain.Asset.Type.Statemine(id!!, palletName)
         }
         ASSET_ORML -> {
             Chain.Asset.Type.Orml(
@@ -108,7 +110,8 @@ private fun mapChainAssetTypeFromRaw(type: String?, typeExtras: Map<String, Any?
 private fun mapChainAssetTypeToRaw(type: Chain.Asset.Type): Pair<String, Map<String, Any?>?> = when (type) {
     is Chain.Asset.Type.Native -> ASSET_NATIVE to null
     is Chain.Asset.Type.Statemine -> ASSET_STATEMINE to mapOf(
-        STATEMINE_EXTRAS_ID to type.id.toString()
+        STATEMINE_EXTRAS_ID to type.id.toString(),
+        STATEMINE_EXTRAS_PALLET_NAME to type.palletName
     )
     is Chain.Asset.Type.Orml -> ASSET_ORML to mapOf(
         ORML_EXTRAS_CURRENCY_ID_SCALE to type.currencyIdScale,

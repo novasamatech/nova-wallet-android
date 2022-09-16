@@ -34,7 +34,7 @@ class OrmlAssetTransfers(
         )
     }
 
-    override val transferFunctions = listOf(
+    override suspend fun transferFunctions(chainAsset: Chain.Asset) = listOf(
         Modules.CURRENCIES to "transfer",
         Modules.TOKENS to "transfer"
     )

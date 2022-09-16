@@ -32,7 +32,7 @@ class BondMoreValidationsModule {
                 chainAssetExtractor = { it.chainAsset },
                 stakingSharedState = stakingSharedState
             ),
-            errorProducer = { BondMoreValidationFailure.NOT_ENOUGH_TO_PAY_FEES },
+            errorProducer = { _, _ -> BondMoreValidationFailure.NOT_ENOUGH_TO_PAY_FEES },
             extraAmountExtractor = { it.amount }
         )
     }

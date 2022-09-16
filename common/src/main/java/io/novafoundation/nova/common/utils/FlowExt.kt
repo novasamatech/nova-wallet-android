@@ -7,6 +7,10 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.presentation.LoadingState
+import io.novafoundation.nova.common.utils.input.Input
+import io.novafoundation.nova.common.utils.input.isModifiable
+import io.novafoundation.nova.common.utils.input.modifyInput
+import io.novafoundation.nova.common.utils.input.valueOrNull
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
@@ -160,6 +164,32 @@ fun CompoundButton.bindTo(flow: MutableStateFlow<Boolean>, scope: CoroutineScope
     setOnCheckedChangeListener { _, newValue ->
         if (flow.value != newValue) {
             flow.value = newValue
+        }
+    }
+}
+
+@JvmName("bindToInput")
+fun CompoundButton.bindTo(flow: MutableStateFlow<Input<Boolean>>, scope: CoroutineScope) {
+    scope.launch {
+        flow.collect { newValue ->
+            when (newValue) {
+                Input.Disabled -> makeGone()
+
+                is Input.Enabled -> {
+                    if (isChecked != newValue.value) {
+                        isChecked = newValue.value
+                    }
+
+                    makeVisible()
+                    isEnabled = newValue.isModifiable
+                }
+            }
+        }
+    }
+
+    setOnCheckedChangeListener { _, newValue ->
+        if (flow.value.valueOrNull != newValue) {
+            flow.modifyInput(newValue)
         }
     }
 }

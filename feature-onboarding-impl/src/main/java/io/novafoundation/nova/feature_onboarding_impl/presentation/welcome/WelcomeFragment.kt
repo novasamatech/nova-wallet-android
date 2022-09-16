@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
-import io.novafoundation.nova.common.utils.createSpannable
+import io.novafoundation.nova.common.utils.styleText
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.setupImportTypeChooser
@@ -68,7 +68,7 @@ class WelcomeFragment : BaseFragment<WelcomeViewModel>() {
     private fun configureTermsAndPrivacy(sourceText: String, terms: String, privacy: String) {
         val linkColor = requireContext().getColor(R.color.white)
 
-        termsTv.text = createSpannable(sourceText) {
+        termsTv.text = styleText(sourceText) {
             clickable(terms, linkColor) {
                 viewModel.termsClicked()
             }

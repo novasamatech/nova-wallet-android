@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValid
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.BaseAssetTransfers
 import io.novafoundation.nova.runtime.ext.accountIdOrDefault
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 
 class NativeAssetTransfers(
@@ -29,5 +30,5 @@ class NativeAssetTransfers(
         )
     }
 
-    override val transferFunctions = listOf(Modules.BALANCES to "transfer")
+    override suspend fun transferFunctions(chainAsset: Chain.Asset) = listOf(Modules.BALANCES to "transfer")
 }

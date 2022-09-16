@@ -18,7 +18,7 @@ class RebondValidationsModule {
     fun provideFeeValidation() = RebondFeeValidation(
         feeExtractor = { it.fee },
         availableBalanceProducer = { it.controllerAsset.transferable },
-        errorProducer = { RebondValidationFailure.CANNOT_PAY_FEE }
+        errorProducer = { _, _ -> RebondValidationFailure.CANNOT_PAY_FEE }
     )
 
     @FeatureScope

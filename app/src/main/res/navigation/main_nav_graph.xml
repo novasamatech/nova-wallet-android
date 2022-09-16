@@ -332,6 +332,14 @@
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_mainFragment_to_yieldBoostGraph"
+            app:destination="@id/staking_parachain_yield_boost"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
 
@@ -1033,4 +1041,5 @@
 
     <include app:graph="@navigation/add_ledger_chain_account_graph" />
 
+    <include app:graph="@navigation/staking_parachain_yield_boost" />
 </navigation>
