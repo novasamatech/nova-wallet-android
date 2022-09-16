@@ -40,7 +40,7 @@ private fun RuntimeSnapshot.prepareWeightForEncoding(weight: Weight): Any {
     return when {
         weightArgumentType.isWeightV1() -> weight
         // it is either a Weight1.5 or we don't know how to handle it
-        else -> structOf("ref_time" to weight)
+        else -> structOf("refTime" to weight)
     }
 }
 
