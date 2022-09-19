@@ -142,6 +142,9 @@ dependencies {
     implementation project(':feature-currency-api')
     implementation project(':feature-currency-impl')
 
+    implementation project(':feature-governance-api')
+    implementation project(':feature-governance-impl')
+
     implementation project(':feature-assets')
 
     implementation kotlinDep
