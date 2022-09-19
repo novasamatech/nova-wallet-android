@@ -25,6 +25,7 @@ data class Chain(
     val isEthereumBased: Boolean,
     val isTestNet: Boolean,
     val hasCrowdloans: Boolean,
+    val hasGovernance: Boolean,
     val parentId: String?,
     val additional: Additional?
 ) : Identifiable {
