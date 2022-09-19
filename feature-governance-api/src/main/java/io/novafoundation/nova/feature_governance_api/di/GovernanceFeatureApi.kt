@@ -1,0 +1,3 @@
+package io.novafoundation.nova.feature_governance_api.di
+
+interface GovernanceFeatureApi
