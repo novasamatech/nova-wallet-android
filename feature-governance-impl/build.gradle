@@ -44,15 +44,10 @@ dependencies {
 
     implementation fearlessLibDep
 
-    implementation bleDep
-    implementation bleKotlinDep
-
     implementation kotlinDep
 
     implementation androidDep
-
-    implementation permissionsDep
-
+    
     implementation coroutinesDep
     implementation coroutinesAndroidDep
     implementation lifeCycleKtxDep
