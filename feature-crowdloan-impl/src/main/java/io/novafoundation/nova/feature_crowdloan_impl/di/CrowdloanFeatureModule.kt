@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.mixin.MixinFactory
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_crowdloan_api.data.repository.ContributionsRepository
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRepository
 import io.novafoundation.nova.feature_crowdloan_impl.data.CrowdloanSharedState
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.parachain.ParachainMetadataApi
@@ -106,9 +107,11 @@ class CrowdloanFeatureModule {
     fun provideCrowdloanInteractor(
         crowdloanRepository: CrowdloanRepository,
         chainStateRepository: ChainStateRepository,
+        contributionsRepository: ContributionsRepository
     ) = CrowdloanInteractor(
         crowdloanRepository,
-        chainStateRepository
+        chainStateRepository,
+        contributionsRepository
     )
 
     @Provides
@@ -126,12 +129,14 @@ class CrowdloanFeatureModule {
         sharedState: CrowdloanSharedState,
         crowdloanRepository: CrowdloanRepository,
         customContributeManager: CustomContributeManager,
+        contributionsRepository: ContributionsRepository
     ) = CrowdloanContributeInteractor(
         extrinsicService,
         accountRepository,
         chainStateRepository,
         customContributeManager,
         sharedState,
-        crowdloanRepository
+        crowdloanRepository,
+        contributionsRepository
     )
 }

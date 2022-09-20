@@ -52,7 +52,6 @@ class ContributionsModule {
     @Provides
     @FeatureScope
     fun provideContributionsInteractor(
-        externalContributionsSources: Set<@JvmSuppressWildcards ExternalContributionSource>,
         crowdloanRepository: CrowdloanRepository,
         accountRepository: AccountRepository,
         crowdloanSharedState: CrowdloanSharedState,
@@ -60,7 +59,6 @@ class ContributionsModule {
         contributionsRepository: ContributionsRepository,
         contributionsUpdateSystemFactory: ContributionsUpdateSystemFactory
     ): ContributionsInteractor = RealContributionsInteractor(
-        externalContributionsSources = externalContributionsSources.toList(),
         crowdloanRepository = crowdloanRepository,
         accountRepository = accountRepository,
         selectedAssetCrowdloanState = crowdloanSharedState,

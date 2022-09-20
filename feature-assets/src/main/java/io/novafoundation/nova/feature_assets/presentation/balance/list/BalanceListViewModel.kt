@@ -29,7 +29,6 @@ import io.novafoundation.nova.feature_assets.presentation.balance.list.model.Nft
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.TotalBalanceModel
 import io.novafoundation.nova.feature_assets.presentation.common.mapBalanceIdToUi
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
-import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
@@ -58,7 +57,6 @@ class BalanceListViewModel(
     private val router: AssetsRouter,
     private val currencyInteractor: CurrencyInteractor,
     private val balanceBreakdownInteractor: BalanceBreakdownInteractor,
-    private val contributionsInteractor: ContributionsInteractor,
     private val resourceManager: ResourceManager
 ) : BaseViewModel() {
 
@@ -135,9 +133,6 @@ class BalanceListViewModel(
         .shareInBackground()
 
     init {
-        contributionsInteractor.runUpdate()
-            .launchIn(this)
-
         selectedCurrency
             .onEach { fullSync() }
             .launchIn(this)

@@ -80,15 +80,22 @@ class RealContributionsRepository(
         accountId: ByteArray,
         fundInfos: Map<ParaId, FundInfo>,
     ): Flow<List<Contribution>> = flow {
-        val result = withContext(Dispatchers.Default) {
+        val result = getDirectContributions(chain, accountId, fundInfos)
+        emit(result)
+    }
+
+    override suspend fun getDirectContributions(
+        chain: Chain,
+        accountId: ByteArray,
+        fundInfos: Map<ParaId, FundInfo>,
+    ): List<Contribution> {
+        return withContext(Dispatchers.Default) {
             fundInfos.map { (paraId, fundInfo) ->
-                async { getDirectContribution(chain, paraId, accountId, fundInfo.trieIndex) }
+                async { getDirectContribution(chain, accountId, paraId, fundInfo.trieIndex) }
             }
                 .awaitAll()
                 .filterNotNull()
         }
-
-        emit(result)
     }
 
     private fun externalContributionsFlow(
@@ -111,10 +118,10 @@ class RealContributionsRepository(
         return emptyFlow()
     }
 
-    private suspend fun getDirectContribution(
+    override suspend fun getDirectContribution(
         chain: Chain,
-        paraId: ParaId,
         accountId: ByteArray,
+        paraId: ParaId,
         trieIndex: BigInteger,
     ): Contribution? {
         val contribution = remoteStorage.queryChildState(

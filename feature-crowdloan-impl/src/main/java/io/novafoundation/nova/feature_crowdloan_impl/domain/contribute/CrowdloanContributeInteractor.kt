@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
+import io.novafoundation.nova.feature_crowdloan_api.data.repository.ContributionsRepository
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRepository
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ParachainMetadata
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.hasWonAuction
@@ -38,6 +39,7 @@ class CrowdloanContributeInteractor(
     private val customContributeManager: CustomContributeManager,
     private val crowdloanSharedState: CrowdloanSharedState,
     private val crowdloanRepository: CrowdloanRepository,
+    private val contributionsRepository: ContributionsRepository
 ) {
 
     fun crowdloanStateFlow(
@@ -54,7 +56,7 @@ class CrowdloanContributeInteractor(
             crowdloanRepository.fundInfoFlow(chain.id, parachainId),
             chainStateRepository.currentBlockNumberFlow(chain.id)
         ) { fundInfo, blockNumber ->
-            val contribution = crowdloanRepository.getContribution(chain.id, accountId, parachainId, fundInfo.trieIndex)
+            val contribution = contributionsRepository.getDirectContribution(chain, accountId, parachainId, fundInfo.trieIndex)
             val hasWonAuction = crowdloanRepository.hasWonAuction(chain.id, fundInfo)
 
             mapFundInfoToCrowdloan(
@@ -123,7 +125,7 @@ class CrowdloanContributeInteractor(
         val account = accountRepository.getSelectedMetaAccount()
 
         val privateSignature = crowdloan.parachainMetadata?.customFlow?.let {
-            val previousContribution = crowdloan.myContribution?.amount ?: BigInteger.ZERO
+            val previousContribution = crowdloan.myContribution?.amountInPlanks ?: BigInteger.ZERO
 
             val signatureProvider = customContributeManager.getFactoryOrNull(it)?.privateCrowdloanSignatureProvider
             val address = account.addressIn(chain)!!
