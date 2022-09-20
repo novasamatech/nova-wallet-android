@@ -14,7 +14,7 @@ class ParallelContributionSource(
 ) : ExternalContributionSource {
 
     override val supportedChains = setOf(Chain.Geneses.POLKADOT)
-    
+
     override val sourceId: String = "parallel"
 
     override suspend fun getContributions(

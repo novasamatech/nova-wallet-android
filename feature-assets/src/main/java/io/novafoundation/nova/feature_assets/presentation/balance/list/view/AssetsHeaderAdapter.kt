@@ -152,5 +152,4 @@ class HeaderHolder(
     fun bindPlaceholder(shouldShowPlaceholder: Boolean) = with(containerView) {
         balanceListAssetPlaceholder.setVisible(shouldShowPlaceholder)
     }
-
 }
