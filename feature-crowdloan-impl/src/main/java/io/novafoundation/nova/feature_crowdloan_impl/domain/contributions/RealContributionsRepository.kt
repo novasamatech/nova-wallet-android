@@ -1,42 +1,36 @@
 package io.novafoundation.nova.feature_crowdloan_impl.domain.contributions
 
-import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
-import io.novafoundation.nova.common.utils.Modules
-import io.novafoundation.nova.common.utils.accumulate
 import io.novafoundation.nova.common.utils.flowOf
-import io.novafoundation.nova.common.utils.formatting.TimerValue
-import io.novafoundation.nova.common.utils.hasModule
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.core_db.dao.ContributionDao
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.DirectContribution
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.FundInfo
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.bindContribution
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ContributionsRepository
-import io.novafoundation.nova.feature_crowdloan_api.data.repository.LeasePeriodToBlocksConverter
 import io.novafoundation.nova.feature_crowdloan_api.data.source.contribution.ExternalContributionSource
 import io.novafoundation.nova.feature_crowdloan_api.data.source.contribution.supports
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.Contribution
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.mapContributionFromLocal
-import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.leasePeriodInMillis
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import java.math.BigInteger
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.hash.Hasher.blake2b256
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.primitives.u32
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.toByteArray
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.withContext
 
 private const val CONTRIBUTIONS_CHILD_SUFFIX = "crowdloan"
 
@@ -66,37 +60,16 @@ class RealContributionsRepository(
         chain: Chain,
         accountId: ByteArray,
         fundInfos: Map<ParaId, FundInfo>,
-        blocksPerLeasePeriod: LeasePeriodToBlocksConverter,
-        currentBlockNumber: BlockNumber,
-        expectedBlockTime: BigInteger
-    ): Flow<Pair<Contribution.Type, List<Contribution>>> = flow {
-        if (!isCrowdloansAvailable(chain)) {
+    ): Flow<Pair<String, List<Contribution>>> = flow {
+        if (!chain.hasCrowdloans) {
             return@flow
         }
 
-        val directContributionFlow = directContributionsFlow(
-            chain,
-            accountId,
-            fundInfos,
-            blocksPerLeasePeriod,
-            currentBlockNumber,
-            expectedBlockTime
-        ).map {
-            Contribution.Type.DIRECT to it
-        }
+        val directContributionFlow = directContributionsFlow(chain, accountId, fundInfos)
+            .map { Contribution.DIRECT_SOURCE_ID to it }
 
         val externalContributionsFlow = externalContributionsSources.map { source ->
-            externalContributionsFlow(
-                source,
-                chain,
-                accountId,
-                fundInfos,
-                blocksPerLeasePeriod,
-                currentBlockNumber,
-                expectedBlockTime
-            ).map {
-                source.contributionsType to it
-            }
+            externalContributionsFlow(source, chain, accountId).map { source.sourceId to it }
         }.merge()
 
         emitAll(merge(directContributionFlow, externalContributionsFlow))
@@ -106,63 +79,45 @@ class RealContributionsRepository(
         chain: Chain,
         accountId: ByteArray,
         fundInfos: Map<ParaId, FundInfo>,
-        blocksPerLeasePeriod: LeasePeriodToBlocksConverter,
-        currentBlockNumber: BlockNumber,
-        expectedBlockTime: BigInteger
-    ): Flow<List<Contribution>> {
-        return fundInfos.map { (paraId, fundInfo) ->
-            flowOf { getDirectContribution(chain.id, accountId, fundInfo.trieIndex) }
-                .mapNotNull { it }
-                .map {
-                    Contribution(
-                        chain = chain,
-                        amountInPlanks = it.amount,
-                        paraId = paraId,
-                        sourceName = null,
-                        returnsIn = fundInfo.getDuration(blocksPerLeasePeriod, currentBlockNumber, expectedBlockTime),
-                        type = Contribution.Type.DIRECT
-                    )
-                }
-        }.accumulate()
+    ): Flow<List<Contribution>> = flow {
+        val result = withContext(Dispatchers.Default) {
+            fundInfos.map { (paraId, fundInfo) ->
+                async { getDirectContribution(chain, paraId, accountId, fundInfo.trieIndex) }
+            }
+                .awaitAll()
+                .filterNotNull()
+        }
+
+        emit(result)
     }
 
-    fun externalContributionsFlow(
+    private fun externalContributionsFlow(
         externalContributionSource: ExternalContributionSource,
         chain: Chain,
         accountId: ByteArray,
-        fundInfos: Map<ParaId, FundInfo>,
-        blocksPerLeasePeriod: LeasePeriodToBlocksConverter,
-        currentBlockNumber: BlockNumber,
-        expectedBlockTime: BigInteger
     ): Flow<List<Contribution>> {
         if (externalContributionSource.supports(chain)) {
             return flowOf { externalContributionSource.getContributions(chain, accountId) }
                 .mapList {
-                    val fundInfo = fundInfos.getValue(it.paraId)
                     Contribution(
                         chain = chain,
                         amountInPlanks = it.amount,
-                        sourceName = it.sourceName,
-                        paraId = it.paraId,
-                        returnsIn = fundInfo.getDuration(blocksPerLeasePeriod, currentBlockNumber, expectedBlockTime),
-                        type = externalContributionSource.contributionsType
+                        sourceId = it.sourceId,
+                        paraId = it.paraId
                     )
                 }
         }
 
-        return flowOf { emptyList() }
-    }
-
-    override suspend fun isCrowdloansAvailable(chain: Chain): Boolean {
-        return chainRegistry.getRuntime(chain.id).metadata.hasModule(Modules.CROWDLOAN)
+        return emptyFlow()
     }
 
     private suspend fun getDirectContribution(
-        chainId: ChainId,
+        chain: Chain,
+        paraId: ParaId,
         accountId: ByteArray,
         trieIndex: BigInteger,
-    ): DirectContribution? {
-        return remoteStorage.queryChildState(
+    ): Contribution? {
+        val contribution = remoteStorage.queryChildState(
             storageKeyBuilder = { accountId.toHexString(withPrefix = true) },
             childKeyBuilder = {
                 val suffix = (CONTRIBUTIONS_CHILD_SUFFIX.encodeToByteArray() + u32.toByteArray(it, trieIndex))
@@ -171,22 +126,16 @@ class RealContributionsRepository(
                 write(suffix)
             },
             binder = { scale, runtime -> scale?.let { bindContribution(it, runtime) } },
-            chainId = chainId
-        )
-    }
-
-    private fun FundInfo.getDuration(
-        blocksPerLeasePeriod: LeasePeriodToBlocksConverter,
-        currentBlockNumber: BlockNumber,
-        expectedBlockTime: BigInteger
-    ): TimerValue {
-        val millis = leasePeriodInMillis(
-            leasePeriodToBlocksConverter = blocksPerLeasePeriod,
-            currentBlockNumber = currentBlockNumber,
-            endingLeasePeriod = lastSlot,
-            expectedBlockTimeInMillis = expectedBlockTime,
+            chainId = chain.id
         )
 
-        return TimerValue(millis, millisCalculatedAt = System.currentTimeMillis())
+        return contribution?.let {
+            Contribution(
+                chain = chain,
+                amountInPlanks = contribution.amount,
+                paraId = paraId,
+                sourceId = contribution.sourceId,
+            )
+        }
     }
 }

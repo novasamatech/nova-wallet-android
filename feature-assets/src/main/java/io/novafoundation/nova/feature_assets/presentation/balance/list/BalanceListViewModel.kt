@@ -116,16 +116,16 @@ class BalanceListViewModel(
 
     val totalBalanceFlow = balanceBreakdown.map {
         val currency = selectedCurrency.first()
-        val assets = assetsFlow.first()
         TotalBalanceModel(
-            shouldShowPlaceholder = assets.isEmpty(),
-            shouldShowLockedBalance = it.locksTotal.amount.isPositive,
+            isLocksAvailable = it.locksTotal.amount.isPositive,
             totalBalanceFiat = it.total.formatAsCurrency(currency),
             lockedBalanceFiat = it.locksTotal.amount.formatAsCurrency(currency)
         )
     }
         .inBackground()
         .share()
+
+    val shouldShowPlaceholderFlow = assetsFlow.map { it.isEmpty() }
 
     val balanceBreakdownFlow = balanceBreakdown.map {
         val currency = selectedCurrency.first()
@@ -192,8 +192,11 @@ class BalanceListViewModel(
 
     fun balanceBreakdownClicked() {
         launch {
-            val balanceBreakdown = balanceBreakdownFlow.first()
-            _showBalanceBreakdownEvent.value = Event(balanceBreakdown)
+            val isLocksAvailable = totalBalanceFlow.first().isLocksAvailable
+            if (isLocksAvailable) {
+                val balanceBreakdown = balanceBreakdownFlow.first()
+                _showBalanceBreakdownEvent.value = Event(balanceBreakdown)
+            }
         }
     }
 

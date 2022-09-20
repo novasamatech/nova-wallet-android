@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:paddingVertical="20dp"
     tools:background="@color/black_48"
     tools:gravity="center_horizontal"
     tools:orientation="vertical"
@@ -14,15 +15,11 @@
         style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:drawablePadding="4dp"
         android:gravity="center_vertical"
         android:includeFontPadding="false"
         android:text="@string/wallet_balance_details_total"
         android:textColor="@color/white_64"
-        app:drawableEndCompat="@drawable/ic_info_16"
-        app:drawableTint="@color/white_48"
-        tools:drawableEnd="@drawable/ic_info_16" />
+        app:drawableTint="@color/white_48" />
 
     <TextView
         android:id="@+id/viewAssetsTotalBalanceTotal"
@@ -44,7 +41,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:layout_marginBottom="20dp"
         android:drawablePadding="5dp"
         android:gravity="center_vertical"
         android:paddingStart="6dp"

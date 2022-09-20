@@ -61,7 +61,7 @@ class ContributionsModule {
         externalContributionsSources = externalContributionsSources.toList(),
         crowdloanRepository = crowdloanRepository,
         accountRepository = accountRepository,
-        selectedAssetState = crowdloanSharedState,
+        selectedAssetCrowdloanState = crowdloanSharedState,
         chainStateRepository = chainStateRepository,
         contributionsRepository = contributionsRepository,
         contributionsUpdateSystemFactory = contributionsUpdateSystemFactory
@@ -89,13 +89,11 @@ class ContributionsModule {
         accountUpdateScope: AccountUpdateScope,
         contributionsRepository: ContributionsRepository,
         crowdloanRepository: CrowdloanRepository,
-        chainStateRepository: ChainStateRepository,
         contributionDao: ContributionDao
     ): ContributionsUpdaterFactory = RealContributionsUpdaterFactory(
         accountUpdateScope,
         contributionsRepository,
         crowdloanRepository,
-        chainStateRepository,
         contributionDao
     )
 

@@ -46,6 +46,7 @@ class ContributionsUpdateSystem(
     override fun start(): Flow<Updater.SideEffect> {
         return accountUpdateScope.invalidationFlow().flatMapLatest {
             chainRegistry.currentChains.first()
+                .filter { it.hasCrowdloans }
                 .map { chain -> run(chain) }
                 .merge()
         }.flowOn(Dispatchers.Default)
@@ -53,11 +54,6 @@ class ContributionsUpdateSystem(
 
     private fun run(chain: Chain): Flow<Updater.SideEffect> {
         return flow {
-            val isCrowdloansAvailable = contributionsRepository.isCrowdloansAvailable(chain)
-            if (!isCrowdloansAvailable) {
-                return@flow
-            }
-
             val socket = chainRegistry.getSocket(chain.id)
             val subscriptionBuilder = StorageSubscriptionBuilder.create(socket)
             val updater = contributionsUpdaterFactory.create(chain)

@@ -2,6 +2,9 @@
 <resources>
   <string name="feature_asset_balance_breakdown_total_balance">Total balance</string>
 
+  <string name="crowdloan_contributions_liquid_source">Liquid</string>
+  <string name="crowdloan_contributions_parallel_source">Parallel</string>
+
   <string name="crowdloan_missing_account_message">You should add %s account to the wallet in order to contribute</string>
 
   <string name="ledger_chain_not_supported">Ledger doesn’t support %s</string>

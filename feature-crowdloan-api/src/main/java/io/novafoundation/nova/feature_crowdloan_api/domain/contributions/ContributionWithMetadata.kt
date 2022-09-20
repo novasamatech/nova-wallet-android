@@ -8,30 +8,28 @@ import io.novafoundation.nova.feature_crowdloan_api.data.repository.ParachainMet
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger
 
-open class Contribution(
+class Contribution(
     val chain: Chain,
     val amountInPlanks: BigInteger,
     val paraId: ParaId,
-    val sourceName: String?,
-    val returnsIn: TimerValue,
-    val type: Type,
+    val sourceId: String,
 ) {
 
-    enum class Type {
-        DIRECT, ACALA, PARALLEL
+    companion object {
+        const val DIRECT_SOURCE_ID = "direct"
     }
 }
 
-class ContributionWithMetadata(
-    chain: Chain,
-    amount: BigInteger,
-    paraId: ParaId,
-    sourceName: String?,
-    returnsIn: TimerValue,
-    type: Type,
+class ContributionMetadata(
+    val returnsIn: TimerValue,
     val fundInfo: FundInfo,
     val parachainMetadata: ParachainMetadata?,
-) : Contribution(chain, amount, paraId, sourceName, returnsIn, type)
+)
+
+class ContributionWithMetadata(
+    val contribution: Contribution,
+    val metadata: ContributionMetadata
+)
 
 class ContributionsWithTotalAmount(val totalContributed: BigInteger, val contributions: List<ContributionWithMetadata>)
 
@@ -41,18 +39,8 @@ fun mapContributionToLocal(metaId: Long, contribution: Contribution): Contributi
         contribution.chain.id,
         contribution.paraId,
         contribution.amountInPlanks,
-        contribution.sourceName,
-        contribution.returnsIn.millis,
-        mapContributionTypeToLocal(contribution.type)
+        contribution.sourceId,
     )
-}
-
-fun mapContributionTypeToLocal(contributionType: Contribution.Type): ContributionLocal.Type {
-    return when (contributionType) {
-        Contribution.Type.DIRECT -> ContributionLocal.Type.DIRECT
-        Contribution.Type.ACALA -> ContributionLocal.Type.ACALA
-        Contribution.Type.PARALLEL -> ContributionLocal.Type.PARALLEL
-    }
 }
 
 fun mapContributionFromLocal(
@@ -63,16 +51,6 @@ fun mapContributionFromLocal(
         chain,
         contribution.amountInPlanks,
         contribution.paraId,
-        contribution.sourceName,
-        TimerValue.fromCurrentTime(contribution.returnsIn),
-        mapContributionTypeFromLocal(contribution.type),
+        contribution.sourceId,
     )
-}
-
-fun mapContributionTypeFromLocal(contributionType: ContributionLocal.Type): Contribution.Type {
-    return when (contributionType) {
-        ContributionLocal.Type.DIRECT -> Contribution.Type.DIRECT
-        ContributionLocal.Type.ACALA -> Contribution.Type.ACALA
-        ContributionLocal.Type.PARALLEL -> Contribution.Type.PARALLEL
-    }
 }

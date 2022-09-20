@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_crowdloan_api.data.repository.getContribut
 import io.novafoundation.nova.feature_crowdloan_api.data.source.contribution.ExternalContributionSource
 import io.novafoundation.nova.feature_crowdloan_api.data.source.contribution.supports
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.Contribution
+import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionMetadata
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionWithMetadata
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsWithTotalAmount
@@ -43,7 +44,7 @@ class RealContributionsInteractor(
     private val externalContributionsSources: List<ExternalContributionSource>,
     private val crowdloanRepository: CrowdloanRepository,
     private val accountRepository: AccountRepository,
-    private val selectedAssetState: SingleAssetSharedState, // bring outside
+    private val selectedAssetCrowdloanState: SingleAssetSharedState,
     private val chainStateRepository: ChainStateRepository,
     private val contributionsRepository: ContributionsRepository,
     private val contributionsUpdateSystemFactory: ContributionsUpdateSystemFactory
@@ -57,7 +58,7 @@ class RealContributionsInteractor(
     }
 
     override fun observeUserContributions(): Flow<ContributionsWithTotalAmount> = flow {
-        val chain = selectedAssetState.chain()
+        val chain = selectedAssetCrowdloanState.chain()
         val metaAccount = accountRepository.getSelectedMetaAccount()
 
         if (crowdloanRepository.isCrowdloansAvailable(chain.id).not()) {
@@ -113,7 +114,7 @@ class RealContributionsInteractor(
         emitAll(allContributionsFlow)
     }
 
-    private fun getTotalContributionAmount(contributions: List<ContributionWithMetadata>): BigInteger = contributions.sumOf { it.amountInPlanks }
+    private fun getTotalContributionAmount(contributions: List<ContributionWithMetadata>): BigInteger = contributions.sumOf { it.contribution.amountInPlanks }
 
     private fun directContributionsFlow(chain: Chain, account: MetaAccount, fundInfos: Map<ParaId, FundInfo>): Flow<Map<ParaId, DirectContribution>> = flowOf {
         val accountId = account.accountIdIn(chain)!!
@@ -167,14 +168,17 @@ class RealContributionsInteractor(
         expectedBlockTime: BigInteger
     ): ContributionWithMetadata {
         return ContributionWithMetadata(
-            chain = chain,
-            amount = directContribution.amount,
-            paraId = paraId,
-            sourceName = null,
-            returnsIn = fundInfo.returnDuration(blocksPerLeasePeriod, currentBlockNumber, expectedBlockTime),
-            type = Contribution.Type.DIRECT,
-            fundInfo = fundInfo,
-            parachainMetadata = parachainMetadata,
+            contribution = Contribution(
+                chain = chain,
+                amountInPlanks = directContribution.amount,
+                paraId = paraId,
+                sourceId = directContribution.sourceId,
+            ),
+            metadata = ContributionMetadata(
+                returnsIn = fundInfo.returnDuration(blocksPerLeasePeriod, currentBlockNumber, expectedBlockTime),
+                fundInfo = fundInfo,
+                parachainMetadata = parachainMetadata,
+            )
         )
     }
 
@@ -188,18 +192,21 @@ class RealContributionsInteractor(
         expectedBlockTime: BigInteger
     ): ContributionWithMetadata {
         return ContributionWithMetadata(
-            chain = chain,
-            amount = contribution.amount,
-            sourceName = contribution.sourceName,
-            paraId = contribution.paraId,
-            returnsIn = fundInfo.returnDuration(blocksPerLeasePeriod, currentBlockNumber, expectedBlockTime),
-            type = Contribution.Type.DIRECT,
-            fundInfo = fundInfo,
-            parachainMetadata = parachainMetadata,
+            contribution = Contribution(
+                chain = chain,
+                amountInPlanks = contribution.amount,
+                paraId = contribution.paraId,
+                sourceId = contribution.sourceId,
+            ),
+            metadata = ContributionMetadata(
+                returnsIn = fundInfo.returnDuration(blocksPerLeasePeriod, currentBlockNumber, expectedBlockTime),
+                fundInfo = fundInfo,
+                parachainMetadata = parachainMetadata,
+            )
         )
     }
 
     private fun sortContributionsByTimeLeft(contributions: List<ContributionWithMetadata>): List<ContributionWithMetadata> {
-        return contributions.sortedBy { it.returnsIn.millis }
+        return contributions.sortedBy { it.metadata.returnsIn.millis }
     }
 }

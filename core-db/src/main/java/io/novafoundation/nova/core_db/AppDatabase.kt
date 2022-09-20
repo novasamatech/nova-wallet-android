@@ -5,7 +5,6 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import io.novafoundation.nova.core_db.converters.ContributionTypeConverter
 import io.novafoundation.nova.core_db.converters.CryptoTypeConverters
 import io.novafoundation.nova.core_db.converters.CurrencyConverters
 import io.novafoundation.nova.core_db.converters.LongMathConverters
@@ -113,7 +112,6 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
     NftTypeConverters::class,
     MetaAccountTypeConverters::class,
     CurrencyConverters::class,
-    ContributionTypeConverter::class
 )
 abstract class AppDatabase : RoomDatabase() {
 

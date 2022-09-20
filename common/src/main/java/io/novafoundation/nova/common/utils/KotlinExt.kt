@@ -1,9 +1,6 @@
 package io.novafoundation.nova.common.utils
 
 import android.net.Uri
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.math.BigDecimal
@@ -12,6 +9,9 @@ import java.util.UUID
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 
 private val PERCENTAGE_MULTIPLIER = 100.toBigDecimal()
 
@@ -131,6 +131,8 @@ fun String.ensureSuffix(suffix: String) = if (endsWith(suffix)) this else this +
 private val NAMED_PATTERN_REGEX = "\\{([a-zA-z]+)\\}".toRegex()
 
 fun String.formatNamed(vararg values: Pair<String, String>) = formatNamed(values.toMap())
+
+fun String.capitalize() = this.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
 
 /**
  * Replaces all parts in form of '{name}' to the corresponding value from values using 'name' as a key.

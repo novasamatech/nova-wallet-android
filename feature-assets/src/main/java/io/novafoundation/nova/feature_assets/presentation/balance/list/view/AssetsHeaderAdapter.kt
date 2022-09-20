@@ -31,6 +31,7 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<H
         fun goToNftsClicked()
     }
 
+    private var shouldShowPlaceholder: Boolean = false
     private var totalBalance: TotalBalanceModel? = null
     private var selectedWalletModel: SelectedWalletModel? = null
     private var nftCountLabel: String? = null
@@ -60,6 +61,12 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<H
         notifyItemChanged(0, Payload.ADDRESS)
     }
 
+    fun setPlaceholderVisibility(shouldShowPlaceholder: Boolean) {
+        this.shouldShowPlaceholder = shouldShowPlaceholder
+
+        notifyItemChanged(0, Payload.PLACEHOLDER)
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HeaderHolder {
         return HeaderHolder(parent.inflateChild(R.layout.item_asset_header), handler)
     }
@@ -74,13 +81,14 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<H
                     Payload.ADDRESS -> holder.bindAddress(selectedWalletModel)
                     Payload.NFT_COUNT -> holder.bindNftCount(nftCountLabel)
                     Payload.NFT_PREVIEWS -> holder.bindNftPreviews(nftPreviews)
+                    Payload.PLACEHOLDER -> holder.bindPlaceholder(shouldShowPlaceholder)
                 }
             }
         }
     }
 
     override fun onBindViewHolder(holder: HeaderHolder, position: Int) {
-        holder.bind(totalBalance, selectedWalletModel, nftCountLabel, nftPreviews)
+        holder.bind(totalBalance, selectedWalletModel, nftCountLabel, nftPreviews, shouldShowPlaceholder)
     }
 
     override fun getItemCount(): Int {
@@ -89,7 +97,7 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<H
 }
 
 private enum class Payload {
-    TOTAL_BALANCE, ADDRESS, NFT_COUNT, NFT_PREVIEWS
+    TOTAL_BALANCE, ADDRESS, NFT_COUNT, NFT_PREVIEWS, PLACEHOLDER
 }
 
 class HeaderHolder(
@@ -111,12 +119,14 @@ class HeaderHolder(
         totalBalance: TotalBalanceModel?,
         addressModel: SelectedWalletModel?,
         nftCount: String?,
-        nftPreviews: List<NftPreviewUi>?
+        nftPreviews: List<NftPreviewUi>?,
+        shouldShowPlaceholder: Boolean
     ) {
         bindTotalBalance(totalBalance)
         bindAddress(addressModel)
         bindNftPreviews(nftPreviews)
         bindNftCount(nftCount)
+        bindPlaceholder(shouldShowPlaceholder)
     }
 
     fun bindNftPreviews(nftPreviews: List<NftPreviewUi>?) = with(containerView) {
@@ -130,7 +140,6 @@ class HeaderHolder(
     fun bindTotalBalance(totalBalance: TotalBalanceModel?) = totalBalance?.let {
         with(containerView) {
             balanceListTotalBalance.showTotalBalance(totalBalance)
-            balanceListAssetPlaceholder.setVisible(it.shouldShowPlaceholder)
         }
     }
 
@@ -139,4 +148,9 @@ class HeaderHolder(
 
         containerView.balanceListAvatar.setModel(it)
     }
+
+    fun bindPlaceholder(shouldShowPlaceholder: Boolean) = with(containerView) {
+        balanceListAssetPlaceholder.setVisible(shouldShowPlaceholder)
+    }
+
 }

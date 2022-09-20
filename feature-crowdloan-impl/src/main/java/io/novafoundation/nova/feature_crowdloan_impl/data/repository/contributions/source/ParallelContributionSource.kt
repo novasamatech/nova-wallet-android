@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_crowdloan_impl.data.repository.contributi
 import android.util.Log
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.feature_crowdloan_api.data.source.contribution.ExternalContributionSource
-import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.Contribution
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.parallel.ParallelApi
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.parallel.getContributions
 import io.novafoundation.nova.runtime.ext.Geneses
@@ -15,8 +14,8 @@ class ParallelContributionSource(
 ) : ExternalContributionSource {
 
     override val supportedChains = setOf(Chain.Geneses.POLKADOT)
-
-    override val contributionsType: Contribution.Type = Contribution.Type.PARALLEL
+    
+    override val sourceId: String = "parallel"
 
     override suspend fun getContributions(
         chain: Chain,
@@ -27,7 +26,7 @@ class ParallelContributionSource(
             accountId = accountId
         ).map {
             ExternalContributionSource.ExternalContribution(
-                sourceName = "Parallel",
+                sourceId = sourceId,
                 amount = it.amount,
                 paraId = it.paraId
             )
