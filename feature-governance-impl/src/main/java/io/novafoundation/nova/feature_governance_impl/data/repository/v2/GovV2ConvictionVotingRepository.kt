@@ -55,7 +55,7 @@ class GovV2ConvictionVotingRepository(
     private fun bindVoting(decoded: Any?): Voting {
         decoded.castToDictEnum()
 
-        return when(decoded.name) {
+        return when (decoded.name) {
             "Casting" -> {
                 val casting = decoded.value.castToStruct()
 
@@ -82,7 +82,7 @@ class GovV2ConvictionVotingRepository(
     private fun bindAccountVote(decoded: Any?): AccountVote {
         decoded.castToDictEnum()
 
-        return when(decoded.name) {
+        return when (decoded.name) {
             "Standard" -> {
                 val standardVote = decoded.value.castToStruct()
 

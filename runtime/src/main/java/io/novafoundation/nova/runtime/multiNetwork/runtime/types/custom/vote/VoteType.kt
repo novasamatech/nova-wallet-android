@@ -22,10 +22,10 @@ enum class Conviction {
     Locked6x
 }
 
-private const val AYE_MASK  = 0b1000_0000.toByte()
+private const val AYE_MASK = 0b1000_0000.toByte()
 private const val VOTE_MASK = 0b0111_1111.toByte()
 
-class VoteType(name: String): Primitive<Vote>(name) {
+class VoteType(name: String) : Primitive<Vote>(name) {
 
     override fun decode(scaleCodecReader: ScaleCodecReader, runtime: RuntimeSnapshot): Vote {
         val compactVote = scaleCodecReader.readByte()

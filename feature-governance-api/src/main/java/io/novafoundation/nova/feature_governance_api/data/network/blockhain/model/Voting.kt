@@ -9,7 +9,7 @@ sealed class Voting {
     data class Casting(
         val votes: Map<ReferendumId, AccountVote>,
         val prior: PriorLock
-    ): Voting()
+    ) : Voting()
 
     // do not yet care about delegations
     object Delegating : Voting()
@@ -20,7 +20,7 @@ sealed class AccountVote {
     data class Standard(
         val vote: Vote,
         val balance: Balance
-    ): AccountVote()
+    ) : AccountVote()
 
     // do not yet care split votes
     object Split : AccountVote()
