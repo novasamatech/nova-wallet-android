@@ -1,0 +1,81 @@
+name: Manual Firebase distribution
+
+on:
+  workflow_dispatch:
+     inputs:
+      app_version:
+        description: 'Version of application'
+        required: true
+        default: v*.*.*
+
+env:
+  ACALA_PROD_AUTH_TOKEN: ${{ secrets.ACALA_PROD_AUTH_TOKEN }}
+  ACALA_TEST_AUTH_TOKEN: ${{ secrets.ACALA_TEST_AUTH_TOKEN }}
+  MOONBEAM_PROD_AUTH_TOKEN: ${{ secrets.MOONBEAM_PROD_AUTH_TOKEN }}
+  MOONBEAM_TEST_AUTH_TOKEN: ${{ secrets.MOONBEAM_TEST_AUTH_TOKEN }}
+  MOONPAY_PRODUCTION_SECRET: ${{ secrets.MOONPAY_PRODUCTION_SECRET }}
+  MOONPAY_TEST_SECRET: ${{ secrets.MOONPAY_TEST_SECRET }}
+
+  CI_MARKET_KEYSTORE_PASS: ${{ secrets.CI_MARKET_KEYSTORE_PASS }}
+  CI_MARKET_KEYSTORE_KEY_ALIAS: ${{ secrets.CI_MARKET_KEYSTORE_KEY_ALIAS }}
+  CI_MARKET_KEYSTORE_KEY_PASS: ${{ secrets.CI_MARKET_KEYSTORE_KEY_PASS }}
+  CI_KEY_FILE: ${{ secrets.RELEASE_MARKET_KEY_FILE }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: 🔧 Install dependencies
+        uses: ./.github/workflows/install/
+
+      - name: Getting sign key
+        id: write_file
+        uses: timheuer/base64-to-file@v1.1
+        with:
+          fileName: 'market_key.jks'
+          fileDir: './app/'
+          encodedString: ${{ env.CI_KEY_FILE }}
+
+      - name: Run tests
+        run: ./gradlew runTest
+
+      - name: Build with Gradle
+        run: ./gradlew assembleReleaseMarket
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: apk
+          path: app/build/outputs/apk/releaseMarket
+
+  upload:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download built artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: apk
+          path: app
+
+      - name: Rename artifacts
+        run: mv app/app-releaseMarket.apk app/nova-wallet-android-${{ github.event.inputs.app_version }}.apk
+
+      - name: Market publication
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }} # The contents of your service-account.json
+          packageName: io.novafoundation.nova
+          releaseFiles: app/nova-wallet-android-${{ github.event.inputs.app_version }}.apk
+          track: production # One of production, beta, alpha, internalsharing, internal, or a custom track name (case sensitive)
+          status: draft # One of "completed", "inProgress", "halted", "draft"
+          inAppUpdatePriority: 2
+          userFraction: 1.0 # Percentage of users who should get the staged version of the app. Defaults to 1.0
+          whatsNewDirectory: distribution/whatsnew # The directory of localized "whats new" files to upload as the release notes. The files contained in the whatsNewDirectory MUST use the pattern whatsnew-<LOCALE> where LOCALE is using the BCP 47 format
+          mappingFile: app/build/outputs/mapping/release/mapping.txt # The mapping.txt file used to de-obfuscate your stack traces from crash reports
+          debugSymbols: app/intermediates/merged_native_libs/release/out/lib
