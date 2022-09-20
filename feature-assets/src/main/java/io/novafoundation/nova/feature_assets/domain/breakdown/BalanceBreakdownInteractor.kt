@@ -88,8 +88,9 @@ class BalanceBreakdownInteractor(
                 )
             }
 
-        val breakdownLocks = locks.filter { assetsByChainId.containsKey(it.chainAsset.chainId to it.chainAsset.id) }
-            .map { lock ->
+        val breakdownLocks = locks.mapNotNull { lock ->
+            val assetWithChainId = assetsByChainId[lock.chainAsset.chainId to lock.chainAsset.id]
+            assetWithChainId?.let {
                 val token = assetsByChainId.getValue(lock.chainAsset.chainId to lock.chainAsset.id)
                     .token
 
@@ -100,6 +101,7 @@ class BalanceBreakdownInteractor(
                     token.priceOf(amount)
                 )
             }
+        }
 
         return (breakdownAssets + breakdownLocks).sortedByDescending {
             it.fiatAmount

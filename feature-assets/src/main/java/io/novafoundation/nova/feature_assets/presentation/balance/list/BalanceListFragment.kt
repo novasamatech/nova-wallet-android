@@ -111,6 +111,10 @@ class BalanceListFragment :
         viewModel.showBalanceBreakdownEvent.observe { event ->
             if (balanceBreakdownBottomSheet == null) {
                 balanceBreakdownBottomSheet = BalanceBreakdownBottomSheet(requireContext())
+
+                balanceBreakdownBottomSheet?.setOnDismissListener {
+                    balanceBreakdownBottomSheet = null
+                }
             }
             balanceBreakdownBottomSheet?.setOnShowListener {
                 balanceBreakdownBottomSheet?.setBalanceBreakdown(event.peekContent())
