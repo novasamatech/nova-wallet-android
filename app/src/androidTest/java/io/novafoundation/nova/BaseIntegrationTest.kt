@@ -16,7 +16,7 @@ open class BaseIntegrationTest {
 
     protected val context: Context = ApplicationProvider.getApplicationContext()
 
-    private val runtimeApi = FeatureUtils.getFeature<RuntimeComponent>(context, RuntimeApi::class.java)
+    protected val runtimeApi = FeatureUtils.getFeature<RuntimeComponent>(context, RuntimeApi::class.java)
 
     val chainRegistry = runtimeApi.chainRegistry()
 

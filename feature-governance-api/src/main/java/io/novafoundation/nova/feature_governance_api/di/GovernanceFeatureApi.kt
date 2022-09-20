@@ -1,3 +1,8 @@
 package io.novafoundation.nova.feature_governance_api.di
 
-interface GovernanceFeatureApi
+import io.novafoundation.nova.feature_governance_api.data.repository.OnChainReferendaRepository
+
+interface GovernanceFeatureApi {
+
+    val onChainReferendaRepository: OnChainReferendaRepository
+}
