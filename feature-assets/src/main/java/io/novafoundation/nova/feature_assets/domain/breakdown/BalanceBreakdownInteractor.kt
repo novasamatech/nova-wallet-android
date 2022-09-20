@@ -87,10 +87,12 @@ class BalanceBreakdownInteractor(
 
     private fun mapLocks(assets: List<Asset>, locks: List<BalanceLock>): List<BalanceBreakdown.BreakdownItem> {
         val assetsByChainId = assets.associateBy { it.token.configuration.chainId to it.token.configuration.id }
-        return locks.filter { assetsByChainId.containsKey(it.chainAsset.chainId to it.chainAsset.id) }
-            .map { lock ->
-                val token = assetsByChainId.getValue(lock.chainAsset.chainId to lock.chainAsset.id)
-                    .token
+        return locks.mapNotNull { lock ->
+            val chainAsset = assetsByChainId[lock.chainAsset.chainId to lock.chainAsset.id]
+            if (chainAsset == null) {
+                null
+            } else {
+                val token = chainAsset.token
 
                 val amount = token.amountFromPlanks(lock.amountInPlanks)
                 BalanceBreakdown.BreakdownItem(
@@ -99,22 +101,27 @@ class BalanceBreakdownInteractor(
                     token.priceOf(amount)
                 )
             }
+        }
     }
 
     private fun mapContributions(assets: List<Asset>, contributions: List<Contribution>): List<BalanceBreakdown.BreakdownItem> {
         val assetsByChainId = assets.associateBy { it.token.configuration.chainId to it.token.configuration.id }
 
         return contributions.groupBy { it.chain.id to it.chain.utilityAsset.id }
-            .filter { (chainAndAssetId, _) -> assetsByChainId.containsKey(chainAndAssetId) }
-            .map { (chainAndAssetId, chainContributions) ->
-                val token = assetsByChainId.getValue(chainAndAssetId).token
+            .mapNotNull { (chainAndAssetId, chainContributions) ->
+                val chainAsset = assetsByChainId[chainAndAssetId]
+                if (chainAsset == null) {
+                    null
+                } else {
+                    val token = assetsByChainId.getValue(chainAndAssetId).token
 
-                val totalAmountInPlanks = chainContributions.sumOf { it.amountInPlanks }
-                BalanceBreakdown.BreakdownItem(
-                    CROWDLOAN_ID,
-                    token.configuration,
-                    token.priceOf(token.amountFromPlanks(totalAmountInPlanks))
-                )
+                    val totalAmountInPlanks = chainContributions.sumOf { it.amountInPlanks }
+                    BalanceBreakdown.BreakdownItem(
+                        CROWDLOAN_ID,
+                        token.configuration,
+                        token.priceOf(token.amountFromPlanks(totalAmountInPlanks))
+                    )
+                }
             }
     }
 

@@ -4,16 +4,15 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.bindString
 import io.novafoundation.nova.common.data.network.runtime.binding.cast
 import io.novafoundation.nova.common.data.network.runtime.binding.incompatible
-import io.novafoundation.nova.feature_crowdloan_api.data.common.CrowdloanContribution
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.Contribution.Companion.DIRECT_SOURCE_ID
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHex
 import java.math.BigInteger
 
 class DirectContribution(
-    override val amount: BigInteger,
+    val amount: BigInteger,
     val memo: String,
-) : CrowdloanContribution {
+) {
 
     val sourceId = DIRECT_SOURCE_ID
 }
