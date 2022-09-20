@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.data.repository
+package io.novafoundation.nova.feature_governance_impl.data.repository.v2
 
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountId
 import io.novafoundation.nova.common.data.network.runtime.binding.bindBlockNumber
@@ -17,21 +17,23 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.OnChainReferendumStatus
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Tally
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
 import io.novafoundation.nova.feature_governance_api.data.repository.OnChainReferendaRepository
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
+import java.math.BigInteger
 
-class RealOnChainReferendaRepository(
+class GovV2OnChainReferendaRepository(
     private val remoteStorageSource: StorageDataSource,
-): OnChainReferendaRepository {
+) : OnChainReferendaRepository {
 
     override suspend fun getOnChainReferenda(chainId: ChainId): Collection<OnChainReferendum> {
         return remoteStorageSource.query(chainId) {
             runtime.metadata.referenda().storage("ReferendumInfoFor").entries(
                 prefixArgs = emptyArray(),
-                keyExtractor = { (id: ReferendumId) -> id },
+                keyExtractor = { (id: BigInteger) -> ReferendumId(id) },
                 binding = ::bindReferendum
             ).values.filterNotNull()
         }
@@ -40,12 +42,12 @@ class RealOnChainReferendaRepository(
     private fun bindReferendum(decoded: Any?, id: ReferendumId): OnChainReferendum? = runCatching {
         val asDictEnum = decoded.castToDictEnum()
 
-        val referendumStatus = when(asDictEnum.name) {
+        val referendumStatus = when (asDictEnum.name) {
             "Ongoing" -> {
                 val status = asDictEnum.value.castToStruct()
 
                 OnChainReferendumStatus.Ongoing(
-                    track = bindNumber(status["track"]),
+                    track = TrackId(bindNumber(status["track"])),
                     proposalHash = bindByteArray(status["proposalHash"]),
                     desiredEnactment = bindDispatchTime(status.getTyped("enactment")),
                     submitted = bindBlockNumber(status["submitted"]),

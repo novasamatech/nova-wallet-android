@@ -6,8 +6,11 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import java.math.BigInteger
 
-typealias TrackId = BigInteger
-typealias ReferendumId = BigInteger
+@JvmInline
+value class TrackId(val value: BigInteger)
+
+@JvmInline
+value class ReferendumId(val value: BigInteger)
 
 class OnChainReferendum(
     val status: OnChainReferendumStatus,
@@ -25,17 +28,17 @@ sealed class OnChainReferendumStatus {
         val deciding: DecidingStatus?,
         val tally: Tally,
         val inQueue: Boolean,
-    ): OnChainReferendumStatus()
+    ) : OnChainReferendumStatus()
 
-    object Approved: OnChainReferendumStatus()
+    object Approved : OnChainReferendumStatus()
 
-    object Rejected: OnChainReferendumStatus()
+    object Rejected : OnChainReferendumStatus()
 
-    object Cancelled: OnChainReferendumStatus()
+    object Cancelled : OnChainReferendumStatus()
 
-    object TimedOut: OnChainReferendumStatus()
+    object TimedOut : OnChainReferendumStatus()
 
-    object Killed: OnChainReferendumStatus()
+    object Killed : OnChainReferendumStatus()
 }
 
 class DecidingStatus(

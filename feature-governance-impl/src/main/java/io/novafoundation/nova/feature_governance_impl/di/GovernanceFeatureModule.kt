@@ -7,9 +7,11 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.mixin.MixinFactory
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_governance_api.data.repository.ConvictionVotingRepository
 import io.novafoundation.nova.feature_governance_api.data.repository.OnChainReferendaRepository
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
-import io.novafoundation.nova.feature_governance_impl.data.repository.RealOnChainReferendaRepository
+import io.novafoundation.nova.feature_governance_impl.data.repository.v2.GovV2ConvictionVotingRepository
+import io.novafoundation.nova.feature_governance_impl.data.repository.v2.GovV2OnChainReferendaRepository
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.AssetUseCaseImpl
@@ -79,5 +81,11 @@ class GovernanceFeatureModule {
     @FeatureScope
     fun provideOnChainReferendaRepository(
         @Named(REMOTE_STORAGE_SOURCE) storageSource: StorageDataSource
-    ): OnChainReferendaRepository = RealOnChainReferendaRepository(storageSource)
+    ): OnChainReferendaRepository = GovV2OnChainReferendaRepository(storageSource)
+
+    @Provides
+    @FeatureScope
+    fun provideConvictionVotingRepository(
+        @Named(REMOTE_STORAGE_SOURCE) storageSource: StorageDataSource
+    ): ConvictionVotingRepository = GovV2ConvictionVotingRepository(storageSource)
 }

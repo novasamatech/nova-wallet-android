@@ -42,11 +42,21 @@ inline fun <reified T> Any?.castOrNull(): T? {
     return this as? T
 }
 
+@OptIn(ExperimentalContracts::class)
 fun Any?.castToStruct(): Struct.Instance {
+    contract {
+        returns() implies (this@castToStruct is Struct.Instance)
+    }
+
     return cast()
 }
 
+@OptIn(ExperimentalContracts::class)
 fun Any?.castToDictEnum(): DictEnum.Entry<*> {
+    contract {
+        returns() implies (this@castToDictEnum is DictEnum.Entry<*>)
+    }
+
     return cast()
 }
 

@@ -11,7 +11,7 @@ sealed class DispatchTime {
 }
 
 fun bindDispatchTime(decoded: DictEnum.Entry<*>): DispatchTime {
-    return when(decoded.name) {
+    return when (decoded.name) {
         "At" -> DispatchTime.At(block = bindBlockNumber(decoded.value))
         "After" -> DispatchTime.After(block = bindBlockNumber(decoded.value))
         else -> incompatible()

@@ -173,6 +173,8 @@ fun RuntimeMetadata.parachainInfoOrNull() = moduleOrNull(Modules.PARACHAIN_INFO)
 
 fun RuntimeMetadata.referenda() = module(Modules.REFERENDA)
 
+fun RuntimeMetadata.convictionVoting() = module(Modules.CONVICTION_VOTING)
+
 fun RuntimeMetadata.firstExistingModule(vararg options: String): String {
     return options.first(::hasModule)
 }
@@ -238,4 +240,5 @@ object Modules {
     const val AUTOMATION_TIME = "AutomationTime"
 
     const val REFERENDA = "Referenda"
+    const val CONVICTION_VOTING = "ConvictionVoting"
 }
