@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_assets.domain
 
 import io.novafoundation.nova.common.data.model.CursorPage
-import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_assets.domain.common.AssetGroup
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
@@ -10,14 +9,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.OperationsPageChange
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import java.math.BigDecimal
 import kotlinx.coroutines.flow.Flow
-
-class Balances(
-    val assets: GroupedList<AssetGroup, Asset>,
-    val totalBalanceFiat: BigDecimal,
-    val lockedBalanceFiat: BigDecimal
-)
 
 interface WalletInteractor {
 

@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_assets.presentation.balance.breakdown.model
 
-class TotalBreakdownModel(
+class TotalBalanceBreakdownModel(
     val totalFiat: String,
     val breakdown: List<BalanceBreakdownItem>
 )

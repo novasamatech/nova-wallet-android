@@ -10,8 +10,8 @@ fun mapBalanceIdToUi(resourceManager: ResourceManager, id: String): String {
         "democrac" -> resourceManager.getString(R.string.assets_balance_details_locks_democrac)
         "vesting" -> resourceManager.getString(R.string.assets_balance_details_locks_vesting)
         "phrelect" -> resourceManager.getString(R.string.assets_balance_details_locks_phrelect)
-        "reserved" -> resourceManager.getString(R.string.assets_balance_details_locks_reserved)
+        "reserved" -> resourceManager.getString(R.string.wallet_balance_reserved)
         "crowdloan" -> resourceManager.getString(R.string.common_crowdloan)
-        else -> id.capitalize(Locale.getDefault())
+        else -> id.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
     }
 }

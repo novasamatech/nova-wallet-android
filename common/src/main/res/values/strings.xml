@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
   <string name="feature_asset_balance_breakdown_total_balance">Total balance</string>
-  <string name="common_percentage">%d%%</string>
 
   <string name="crowdloan_missing_account_message">You should add %s account to the wallet in order to contribute</string>
 

@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_assets.domain
 
 import io.novafoundation.nova.common.data.model.CursorPage
-import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.common.utils.applyFilters
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -9,7 +8,6 @@ import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_assets.data.repository.assetFilters.AssetFiltersRepository
 import io.novafoundation.nova.feature_assets.domain.common.AssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.groupAndSortAssetsByNetwork
-import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
@@ -29,7 +27,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.withContext
-import java.math.BigDecimal
 
 class WalletInteractorImpl(
     private val walletRepository: WalletRepository,
@@ -37,7 +34,6 @@ class WalletInteractorImpl(
     private val assetFiltersRepository: AssetFiltersRepository,
     private val chainRegistry: ChainRegistry,
     private val nftRepository: NftRepository,
-    private val currencyRepository: CurrencyRepository,
 ) : WalletInteractor {
 
     override fun filterAssets(assetsFlow: Flow<List<Asset>>): Flow<List<Asset>> {
@@ -137,23 +133,5 @@ class WalletInteractorImpl(
     override suspend fun groupAssets(assets: List<Asset>): Map<AssetGroup, List<Asset>> {
         val chains = chainRegistry.chainsById.first()
         return groupAndSortAssetsByNetwork(assets, chains)
-    }
-
-    private fun balancesFromAssets(
-        assets: List<Asset>,
-        groupedAssets: GroupedList<AssetGroup, Asset>
-    ): Balances {
-        val (totalFiat, lockedFiat) = assets.fold(BigDecimal.ZERO to BigDecimal.ZERO) { (total, locked), asset ->
-            val assetTotalFiat = asset.token.priceOf(asset.total)
-            val assetLockedFiat = asset.token.priceOf(asset.locked)
-
-            (total + assetTotalFiat) to (locked + assetLockedFiat)
-        }
-
-        return Balances(
-            assets = groupedAssets,
-            totalBalanceFiat = totalFiat,
-            lockedBalanceFiat = lockedFiat
-        )
     }
 }

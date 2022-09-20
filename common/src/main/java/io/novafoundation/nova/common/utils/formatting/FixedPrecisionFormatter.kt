@@ -3,7 +3,7 @@ package io.novafoundation.nova.common.utils.formatting
 import java.math.BigDecimal
 
 class FixedPrecisionFormatter(
-    private val precision: Int
+    precision: Int
 ) : NumberFormatter {
 
     private val delegate = decimalFormatterFor(patternWith(precision))

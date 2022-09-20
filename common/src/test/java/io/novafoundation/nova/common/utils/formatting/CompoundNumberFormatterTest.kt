@@ -1,6 +1,5 @@
 package io.novafoundation.nova.common.utils.formatting
 
-import io.novafoundation.nova.common.utils.formatting.defaultNumberFormatter
 import org.junit.Test
 
 class CompoundNumberFormatterTest {
