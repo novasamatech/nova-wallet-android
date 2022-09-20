@@ -17,11 +17,13 @@ import io.novafoundation.nova.feature_crowdloan_impl.data.CrowdloanSharedState
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.updater.RealContributionsUpdaterFactory
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.acala.AcalaApi
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.parallel.ParallelApi
+import io.novafoundation.nova.feature_crowdloan_impl.data.network.updater.AssetBalanceScopeFactory
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.updater.RealContributionsUpdateSystemFactory
 import io.novafoundation.nova.feature_crowdloan_impl.data.repository.contributions.source.LiquidAcalaContributionSource
 import io.novafoundation.nova.feature_crowdloan_impl.data.repository.contributions.source.ParallelContributionSource
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contributions.RealContributionsInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contributions.RealContributionsRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
@@ -103,11 +105,17 @@ class ContributionsModule {
         accountUpdateScope: AccountUpdateScope,
         contributionsUpdaterFactory: ContributionsUpdaterFactory,
         chainRegistry: ChainRegistry,
-        contributionsRepository: ContributionsRepository,
+        assetBalanceScopeFactory: AssetBalanceScopeFactory
     ): ContributionsUpdateSystemFactory = RealContributionsUpdateSystemFactory(
         chainRegistry = chainRegistry,
         accountUpdateScope = accountUpdateScope,
-        contributionsRepository = contributionsRepository,
         contributionsUpdaterFactory = contributionsUpdaterFactory,
+        assetBalanceScopeFactory = assetBalanceScopeFactory
     )
+
+    @Provides
+    @FeatureScope
+    fun provideAssetBalanceScopeFactory(
+        walletRepository: WalletRepository
+    ) = AssetBalanceScopeFactory(walletRepository)
 }

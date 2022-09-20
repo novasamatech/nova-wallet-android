@@ -108,12 +108,12 @@ class BalanceListFragment :
             }
         }
 
-        viewModel.showBalanceBreakdownEvent.observe { event ->
+        viewModel.showBalanceBreakdownEvent.observeEvent { totalBalanceBreakdown ->
             if (balanceBreakdownBottomSheet == null) {
                 balanceBreakdownBottomSheet = BalanceBreakdownBottomSheet(requireContext())
             }
             balanceBreakdownBottomSheet?.setOnShowListener {
-                balanceBreakdownBottomSheet?.setBalanceBreakdown(event.peekContent())
+                balanceBreakdownBottomSheet?.setBalanceBreakdown(totalBalanceBreakdown)
             }
             balanceBreakdownBottomSheet?.show()
         }
