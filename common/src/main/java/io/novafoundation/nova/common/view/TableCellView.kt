@@ -231,19 +231,19 @@ open class TableCellView @JvmOverloads constructor(
         try {
             val titleTextColor = typedArray.getColorOrThrow(R.styleable.TableCellView_titleTextColor)
             setTitleTextColor(titleTextColor)
-        } finally {
+        } catch (_: Exception) {
         }
 
         try {
             val primaryValueTextColor = typedArray.getColorOrThrow(R.styleable.TableCellView_primaryValueTextColor)
             setPrimaryValueTextColor(primaryValueTextColor)
-        } finally {
+        } catch (_: Exception) {
         }
 
         try {
             val secondaryValueTextColor = typedArray.getColorOrThrow(R.styleable.TableCellView_secondaryValueTextColor)
             setSecondaryValueTextColor(secondaryValueTextColor)
-        } finally {
+        } catch (_: Exception) {
         }
     }
 }
