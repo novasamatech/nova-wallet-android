@@ -3,7 +3,7 @@ package io.novafoundation.nova.core_db.migrations
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-val AddLocks_21_22 = object : Migration(21, 22) {
+val AddLocks_22_23 = object : Migration(22, 23) {
     override fun migrate(database: SupportSQLiteDatabase) {
         // new table
         database.execSQL(

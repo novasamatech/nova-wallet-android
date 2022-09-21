@@ -76,4 +76,8 @@ private object DiffCallback : BaseGroupedDiffCallback<BalanceBreakdownTotal, Bal
     override fun areChildContentsTheSame(oldItem: BalanceBreakdownAmount, newItem: BalanceBreakdownAmount): Boolean {
         return true
     }
+
+    override fun getGroupChangePayload(oldItem: BalanceBreakdownTotal, newItem: BalanceBreakdownTotal): Any? {
+        return true
+    }
 }

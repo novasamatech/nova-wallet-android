@@ -5,6 +5,10 @@ import java.math.RoundingMode
 
 fun percentage(scale: Int, values: List<BigDecimal>): List<BigDecimal> {
     val total = values.sumOf { it }
+    if (total.isZero) {
+        return values.map { BigDecimal.ZERO }
+    }
+
     val percentage = values.map { it / total * BigDecimal.valueOf(100.0) }
 
     val accumulatedValues = List(percentage.size) { index ->
