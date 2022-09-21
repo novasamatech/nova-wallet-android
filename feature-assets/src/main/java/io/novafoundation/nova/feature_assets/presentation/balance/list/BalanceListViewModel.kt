@@ -33,6 +33,7 @@ import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
+import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import kotlin.time.ExperimentalTime
 import kotlin.time.seconds
 import kotlinx.coroutines.async
@@ -232,8 +233,8 @@ class BalanceListViewModel(
 
             val breakdown = balanceBreakdown.breakdown.map {
                 BalanceBreakdownAmount(
-                    it.chainAsset.symbol + " " + mapBalanceIdToUi(resourceManager, it.id),
-                    it.fiatAmount.formatAsCurrency(currency)
+                    it.asset.token.configuration.symbol + " " + mapBalanceIdToUi(resourceManager, it.id),
+                    mapAmountToAmountModel(it.tokenAmount, it.asset)
                 )
             }
 

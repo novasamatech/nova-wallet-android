@@ -9,8 +9,8 @@ import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.model.BalanceBreakdownAmount
 import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.model.BalanceBreakdownTotal
-import kotlinx.android.synthetic.main.item_balance_breakdown_amount.view.itemBreakdownAmount
-import kotlinx.android.synthetic.main.item_balance_breakdown_amount.view.itemBreakdownAmountName
+import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
+import kotlinx.android.synthetic.main.item_balance_breakdown_amount.view.balanceBreakdownItemDetail
 import kotlinx.android.synthetic.main.item_balance_breakdown_total.view.itemBreakdownTotal
 import kotlinx.android.synthetic.main.item_balance_breakdown_total.view.itemBreakdownTotalIcon
 import kotlinx.android.synthetic.main.item_balance_breakdown_total.view.itemBreakdownTotalName
@@ -45,7 +45,7 @@ class BalanceTotalHolder(
         itemView.itemBreakdownTotalIcon.setImageResource(item.iconRes)
         itemView.itemBreakdownTotalName.text = item.name
         itemView.itemBreakdownTotalPercentage.text = item.percentage
-        itemView.itemBreakdownTotal.text = item.amount
+        itemView.itemBreakdownTotal.text = item.fiatAmount
     }
 }
 
@@ -54,8 +54,8 @@ class BalanceAmountHolder(
 ) : GroupedListHolder(containerView) {
 
     fun bind(item: BalanceBreakdownAmount) {
-        itemView.itemBreakdownAmountName.text = item.name
-        itemView.itemBreakdownAmount.text = item.amount
+        itemView.balanceBreakdownItemDetail.setTitle(item.name)
+        itemView.balanceBreakdownItemDetail.showAmount(item.amount)
     }
 }
 

@@ -3,15 +3,18 @@ package io.novafoundation.nova.common.view
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.Group
+import androidx.core.content.res.getColorOrThrow
 import coil.ImageLoader
 import coil.load
 import coil.transform.RoundedCornersTransformation
@@ -158,6 +161,30 @@ open class TableCellView @JvmOverloads constructor(
         tableCellTitle.setDrawableEnd(icon, widthInDp = 16, paddingInDp = 4, tint = ICON_TINT_DEFAULT)
     }
 
+    fun setTitleTextColor(@ColorInt color: Int) {
+        title.setTextColor(color)
+    }
+
+    fun setPrimaryValueTextColor(@ColorInt color: Int) {
+        valuePrimary.setTextColor(color)
+    }
+
+    fun setSecondaryValueTextColor(@ColorInt color: Int) {
+        valueSecondary.setTextColor(color)
+    }
+
+    fun setTitleSize(size: Float) {
+        title.setTextSize(TypedValue.COMPLEX_UNIT_PX, size)
+    }
+
+    fun setPrimaryValueTextSize(size: Float) {
+        valuePrimary.setTextSize(TypedValue.COMPLEX_UNIT_PX, size)
+    }
+
+    fun setSecondaryValueTextSize(size: Float) {
+        valueSecondary.setTextSize(TypedValue.COMPLEX_UNIT_PX, size)
+    }
+
     fun showValue(primary: String, secondary: String? = null) {
         postToSelf {
             contentGroup.makeVisible()
@@ -191,6 +218,33 @@ open class TableCellView @JvmOverloads constructor(
 
         val titleIcon = typedArray.getResourceIdOrNull(R.styleable.TableCellView_titleIcon)
         titleIcon?.let(::setTitleIcon)
+
+        val primaryValueTextSize = typedArray.getDimension(R.styleable.TableCellView_primaryValueTextSize, valuePrimary.textSize)
+        setPrimaryValueTextSize(primaryValueTextSize)
+
+        val secondaryValueTextSize = typedArray.getDimension(R.styleable.TableCellView_secondaryValueTextSize, valueSecondary.textSize)
+        setSecondaryValueTextSize(secondaryValueTextSize)
+
+        val titleSize = typedArray.getDimension(R.styleable.TableCellView_titleSize, valuePrimary.textSize)
+        setTitleSize(titleSize)
+
+        try {
+            val titleTextColor = typedArray.getColorOrThrow(R.styleable.TableCellView_titleTextColor)
+            setTitleTextColor(titleTextColor)
+        } finally {
+        }
+
+        try {
+            val primaryValueTextColor = typedArray.getColorOrThrow(R.styleable.TableCellView_primaryValueTextColor)
+            setPrimaryValueTextColor(primaryValueTextColor)
+        } finally {
+        }
+
+        try {
+            val secondaryValueTextColor = typedArray.getColorOrThrow(R.styleable.TableCellView_secondaryValueTextColor)
+            setSecondaryValueTextColor(secondaryValueTextColor)
+        } finally {
+        }
     }
 }
 

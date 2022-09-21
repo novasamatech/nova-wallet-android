@@ -1,29 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<io.novafoundation.nova.common.view.TableCellView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/balanceBreakdownItemDetail"
     android:layout_width="match_parent"
-    android:layout_height="48dp"
+    android:layout_height="44dp"
     android:paddingStart="40dp"
     android:paddingEnd="16dp"
-    tools:background="@color/blurColor">
-
-    <TextView
-        android:id="@+id/itemBreakdownAmountName"
-        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:textColor="@color/white_48"
-        tools:text="KSM Crowdloans" />
-
-    <TextView
-        android:id="@+id/itemBreakdownAmount"
-        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical|end"
-        android:textColor="@color/white_48"
-        tools:text="$1,025" />
-
-</FrameLayout>
+    android:textSize="13sp"
+    app:dividerVisible="false"
+    app:primaryValueTextColor="@color/white_64"
+    app:primaryValueTextSize="13sp"
+    app:secondaryValueTextColor="@color/white_64"
+    app:secondaryValueTextSize="12sp"
+    app:titleSize="13sp"
+    app:titleTextColor="@color/white_64" />
