@@ -17,6 +17,8 @@ class Contribution(
 
     companion object {
         const val DIRECT_SOURCE_ID = "direct"
+        const val LIQUID_SOURCE_ID = "liquid"
+        const val PARALLEL_SOURCE_ID = "parallel"
     }
 }
 
@@ -53,4 +55,8 @@ fun mapContributionFromLocal(
         contribution.paraId,
         contribution.sourceId,
     )
+}
+
+fun List<ContributionWithMetadata>.totalContributionAmount(): BigInteger {
+    return sumOf { it.contribution.amountInPlanks }
 }

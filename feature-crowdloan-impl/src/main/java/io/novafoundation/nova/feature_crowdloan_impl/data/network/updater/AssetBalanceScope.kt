@@ -6,8 +6,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletReposit
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 class AssetBalanceScopeFactory(
     private val walletRepository: WalletRepository
@@ -24,11 +23,8 @@ class AssetBalanceScope(
     private val walletRepository: WalletRepository
 ) : UpdateScope {
 
-    private var currentAsset: Asset? = null
-
     override fun invalidationFlow(): Flow<Asset> {
         return walletRepository.assetFlow(metaAccount.id, asset)
-            .filter { currentAsset?.totalInPlanks != it.totalInPlanks }
-            .onEach { currentAsset = it }
+            .distinctUntilChanged { old, new -> old.totalInPlanks == new.totalInPlanks }
     }
 }

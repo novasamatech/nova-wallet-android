@@ -13,5 +13,5 @@ data class ContributionLocal(
     val sourceId: String,
 ) : Identifiable {
     override val identifier: String
-        get() = metaId.toString() + chainId + paraId.toString() + sourceId.toString()
+        get() = "$metaId|$chainId|$paraId|$sourceId"
 }

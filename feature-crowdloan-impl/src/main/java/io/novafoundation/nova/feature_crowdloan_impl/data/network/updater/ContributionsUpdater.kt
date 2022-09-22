@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_crowdloan_impl.data.network.updater
 
-import android.util.Log
 import io.novafoundation.nova.common.utils.CollectionDiffer
 import io.novafoundation.nova.core.updater.SubscriptionBuilder
 import io.novafoundation.nova.core.updater.UpdateScope
@@ -49,7 +48,6 @@ class ContributionsUpdater(
 
     override suspend fun listenForUpdates(storageSubscriptionBuilder: SubscriptionBuilder): Flow<Updater.SideEffect> {
         return scope.invalidationFlow().flatMapLatest {
-            Log.d("TAG_!", chain.name)
             val metaAccount = accountScope.getAccount()
 
             val fundInfos = crowdloanRepository.allFundInfos(chain.id)

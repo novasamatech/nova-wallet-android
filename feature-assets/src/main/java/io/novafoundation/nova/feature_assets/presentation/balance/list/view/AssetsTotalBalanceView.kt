@@ -38,7 +38,7 @@ class AssetsTotalBalanceView @JvmOverloads constructor(
             )
         )
 
-        background = getRoundedCornerDrawable(R.color.black_48)
+        setBackgroundClickable(false)
     }
 
     fun showTotalBalance(totalBalance: TotalBalanceModel) {

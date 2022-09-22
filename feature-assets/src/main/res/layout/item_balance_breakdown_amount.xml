@@ -6,11 +6,7 @@
     android:layout_height="44dp"
     android:paddingStart="40dp"
     android:paddingEnd="16dp"
-    android:textSize="13sp"
     app:dividerVisible="false"
-    app:primaryValueTextColor="@color/white_64"
-    app:primaryValueTextSize="13sp"
-    app:secondaryValueTextColor="@color/white_64"
-    app:secondaryValueTextSize="12sp"
-    app:titleSize="13sp"
-    app:titleTextColor="@color/white_64" />
+    app:primaryValueTextAppearance="@style/TextAppearance.NovaFoundation.Regular.Footnote.Translucent"
+    app:secondaryValueTextAppearance="@style/TextAppearance.NovaFoundation.Regular.Caption1.Translucent"
+    app:titleValueTextAppearance="@style/TextAppearance.NovaFoundation.Regular.Footnote.Translucent" />

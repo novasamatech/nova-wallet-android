@@ -79,8 +79,8 @@ class UserContributionsViewModel(
 
         val sourceName = when (contributionWithMetadata.contribution.sourceId) {
             Contribution.DIRECT_SOURCE_ID -> null
-            "liquid" -> resourceManager.getString(R.string.crowdloan_contributions_liquid_source)
-            "parallel" -> resourceManager.getString(R.string.crowdloan_contributions_parallel_source)
+            Contribution.LIQUID_SOURCE_ID -> resourceManager.getString(R.string.crowdloan_contributions_liquid_source)
+            Contribution.PARALLEL_SOURCE_ID -> resourceManager.getString(R.string.crowdloan_contributions_parallel_source)
             else -> contributionWithMetadata.contribution.sourceId.capitalize()
         }
 

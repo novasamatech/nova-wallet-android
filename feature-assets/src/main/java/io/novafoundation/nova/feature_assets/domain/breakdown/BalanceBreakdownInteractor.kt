@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_assets.domain.breakdown
 
+import io.novafoundation.nova.common.utils.formatting.ABBREVIATED_PRECISION
 import io.novafoundation.nova.common.utils.percentage
 import io.novafoundation.nova.common.utils.unite
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -11,6 +12,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.runtime.ext.utilityAsset
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import java.math.BigDecimal
 import java.math.BigInteger
 import kotlinx.coroutines.flow.Flow
@@ -29,8 +32,8 @@ class BalanceBreakdown(
         fun empty(): BalanceBreakdown {
             return BalanceBreakdown(
                 BigDecimal.ZERO,
-                PercentageAmount(BigDecimal.ZERO, BigDecimal.ZERO),
-                PercentageAmount(BigDecimal.ZERO, BigDecimal.ZERO),
+                PercentageAmount(amount = BigDecimal.ZERO, percentage = BigDecimal.ZERO),
+                PercentageAmount(amount = BigDecimal.ZERO, percentage = BigDecimal.ZERO),
                 listOf()
             )
         }
@@ -63,19 +66,23 @@ class BalanceBreakdownInteractor(
                 if (assets == null) {
                     BalanceBreakdown.empty()
                 } else {
-                    val locksOrEmpty = locks?.let { mapLocks(assets, it) } ?: listOf()
-                    val contributionsOrEmpty = contributions?.let { mapContributions(assets, it) } ?: listOf()
+                    val assetsByChainId = assets.associateBy { it.token.configuration.chainId to it.token.configuration.id }
+                    val locksOrEmpty = locks?.let { mapLocks(assetsByChainId, it) }.orEmpty()
+                    val contributionsOrEmpty = contributions?.let { mapContributions(assetsByChainId, it) }.orEmpty()
                     val reserved = getReservedBreakdown(assets)
 
                     val breakdown = locksOrEmpty + contributionsOrEmpty + reserved
 
                     val totalAmount = calculateTotalBalance(assets, contributionsOrEmpty)
-                    val percentage = percentage(scale = 2, totalAmount.transferableFiat, totalAmount.locksFiat)
-
+                    val (transferablePercentage, locksPercentage) = percentage(
+                        scale = ABBREVIATED_PRECISION,
+                        totalAmount.transferableFiat,
+                        totalAmount.locksFiat
+                    )
                     BalanceBreakdown(
                         totalAmount.totalFiat,
-                        BalanceBreakdown.PercentageAmount(totalAmount.transferableFiat, percentage[0]),
-                        BalanceBreakdown.PercentageAmount(totalAmount.locksFiat, percentage[1]),
+                        BalanceBreakdown.PercentageAmount(totalAmount.transferableFiat, transferablePercentage),
+                        BalanceBreakdown.PercentageAmount(totalAmount.locksFiat, locksPercentage),
                         breakdown.sortedByDescending { it.fiatAmount }
                     )
                 }
@@ -83,8 +90,10 @@ class BalanceBreakdownInteractor(
         }
     }
 
-    private fun mapLocks(assets: List<Asset>, locks: List<BalanceLock>): List<BalanceBreakdown.BreakdownItem> {
-        val assetsByChainId = assets.associateBy { it.token.configuration.chainId to it.token.configuration.id }
+    private fun mapLocks(
+        assetsByChainId: Map<Pair<ChainId, ChainAssetId>, Asset>,
+        locks: List<BalanceLock>
+    ): List<BalanceBreakdown.BreakdownItem> {
         return locks.mapNotNull { lock ->
             val asset = assetsByChainId[lock.chainAsset.chainId to lock.chainAsset.id]
             if (asset == null) {
@@ -93,18 +102,19 @@ class BalanceBreakdownInteractor(
                 val token = asset.token
                 val tokenAmount = token.amountFromPlanks(lock.amountInPlanks)
                 BalanceBreakdown.BreakdownItem(
-                    lock.id,
-                    asset,
-                    tokenAmount,
-                    token.priceOf(tokenAmount)
+                    id = lock.id,
+                    asset = asset,
+                    tokenAmount = tokenAmount,
+                    fiatAmount = token.priceOf(tokenAmount)
                 )
             }
         }
     }
 
-    private fun mapContributions(assets: List<Asset>, contributions: List<Contribution>): List<BalanceBreakdown.BreakdownItem> {
-        val assetsByChainId = assets.associateBy { it.token.configuration.chainId to it.token.configuration.id }
-
+    private fun mapContributions(
+        assetsByChainId: Map<Pair<ChainId, ChainAssetId>, Asset>,
+        contributions: List<Contribution>
+    ): List<BalanceBreakdown.BreakdownItem> {
         return contributions.groupBy { it.chain.id to it.chain.utilityAsset.id }
             .mapNotNull { (chainAndAssetId, chainContributions) ->
                 val asset = assetsByChainId[chainAndAssetId]
@@ -116,10 +126,10 @@ class BalanceBreakdownInteractor(
                     val totalAmountInPlanks = chainContributions.sumOf { it.amountInPlanks }
                     val tokenAmount = token.amountFromPlanks(totalAmountInPlanks)
                     BalanceBreakdown.BreakdownItem(
-                        CROWDLOAN_ID,
-                        asset,
-                        tokenAmount,
-                        token.priceOf(tokenAmount)
+                        id = CROWDLOAN_ID,
+                        asset = asset,
+                        tokenAmount = tokenAmount,
+                        fiatAmount = token.priceOf(tokenAmount)
                     )
                 }
             }
@@ -148,10 +158,10 @@ class BalanceBreakdownInteractor(
             .filter { it.reservedInPlanks > BigInteger.ZERO }
             .map {
                 BalanceBreakdown.BreakdownItem(
-                    BalanceBreakdown.RESERVED_ID,
-                    it,
-                    it.reserved,
-                    it.token.priceOf(it.reserved)
+                    id = BalanceBreakdown.RESERVED_ID,
+                    asset = it,
+                    tokenAmount = it.reserved,
+                    fiatAmount = it.token.priceOf(it.reserved)
                 )
             }
     }

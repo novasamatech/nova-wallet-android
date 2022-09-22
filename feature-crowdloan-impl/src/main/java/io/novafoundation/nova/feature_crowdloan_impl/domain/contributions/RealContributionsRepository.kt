@@ -68,11 +68,13 @@ class RealContributionsRepository(
         val directContributionFlow = directContributionsFlow(chain, accountId, fundInfos)
             .map { Contribution.DIRECT_SOURCE_ID to it }
 
-        val externalContributionsFlow = externalContributionsSources.map { source ->
+        val externalContributionFlows = externalContributionsSources.map { source ->
             externalContributionsFlow(source, chain, accountId).map { source.sourceId to it }
-        }.merge()
+        }
 
-        emitAll(merge(directContributionFlow, externalContributionsFlow))
+        val contributionsFlows = externalContributionFlows + listOf(directContributionFlow)
+
+        emitAll(contributionsFlows.merge())
     }
 
     private fun directContributionsFlow(

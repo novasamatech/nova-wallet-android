@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_crowdloan_impl.data.repository.contributi
 import android.util.Log
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.feature_crowdloan_api.data.source.contribution.ExternalContributionSource
+import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.Contribution
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.acala.AcalaApi
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.acala.getContributions
 import io.novafoundation.nova.runtime.ext.Geneses
@@ -18,7 +19,7 @@ class LiquidAcalaContributionSource(
 
     override val supportedChains = setOf(Chain.Geneses.POLKADOT)
 
-    override val sourceId: String = "liquid"
+    override val sourceId: String = Contribution.LIQUID_SOURCE_ID
 
     override suspend fun getContributions(
         chain: Chain,

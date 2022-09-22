@@ -75,12 +75,9 @@
             <enum name="text" value="0" />
             <enum name="link" value="1" />
         </attr>
-        <attr name="titleSize" format="dimension" />
-        <attr name="primaryValueTextSize" format="dimension" />
-        <attr name="secondaryValueTextSize" format="dimension" />
-        <attr name="titleTextColor" format="color" />
-        <attr name="primaryValueTextColor" format="color" />
-        <attr name="secondaryValueTextColor" format="color" />
+        <attr name="titleValueTextAppearance" format="reference" />
+        <attr name="primaryValueTextAppearance" format="reference" />
+        <attr name="secondaryValueTextAppearance" format="reference" />
         <attr name="titleIcon" format="reference|color" />
         <attr name="primaryValueIconTint" format="color" />
     </declare-styleable>
