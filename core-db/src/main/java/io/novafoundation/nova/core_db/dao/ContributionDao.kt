@@ -21,17 +21,17 @@ abstract class ContributionDao {
         deleteContributions(contributions.removed)
     }
 
-    @Query("SELECT * FROM contributions WHERE metaId = :metaId AND chainId = :chainId")
-    abstract fun observeContributions(metaId: Long, chainId: String): Flow<List<ContributionLocal>>
+    @Query("SELECT * FROM contributions WHERE metaId = :metaId AND chainId = :chainId AND assetId = :assetId")
+    abstract fun observeContributions(metaId: Long, chainId: String, assetId: Int): Flow<List<ContributionLocal>>
 
     @Query("SELECT * FROM contributions WHERE metaId = :metaId")
     abstract fun observeContributions(metaId: Long): Flow<List<ContributionLocal>>
 
-    @Query("SELECT * FROM contributions WHERE metaId = :metaId AND chainId = :chainId AND sourceId = :sourceId")
-    abstract fun getContributions(metaId: Long, chainId: String, sourceId: String): List<ContributionLocal>
+    @Query("SELECT * FROM contributions WHERE metaId = :metaId AND chainId = :chainId AND assetId = :assetId AND sourceId = :sourceId")
+    abstract fun getContributions(metaId: Long, chainId: String, assetId: Int, sourceId: String): List<ContributionLocal>
 
-    @Query("DELETE FROM contributions WHERE metaId = :metaId AND chainId = :chainId AND sourceId = :sourceId")
-    abstract fun deleteBySourceId(metaId: Long, chainId: String, sourceId: String)
+    @Query("DELETE FROM contributions WHERE metaId = :metaId AND chainId = :chainId AND assetId = :assetId AND sourceId = :sourceId")
+    abstract fun deleteBySourceId(metaId: Long, chainId: String, assetId: Int, sourceId: String)
 
     @Delete
     protected abstract suspend fun deleteContributions(currencies: List<ContributionLocal>)

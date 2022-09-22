@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_crowdloan_api.data.network.updater.Contrib
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ContributionsRepository
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRepository
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.mapContributionToLocal
+import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -58,7 +59,7 @@ class ContributionsUpdater(
                 fundInfos,
             ).onEach { (sourceId, contributions) ->
                 val newContributions = contributions.map { mapContributionToLocal(metaAccount.id, it) }
-                val oldContributions = contributionDao.getContributions(metaAccount.id, chain.id, sourceId)
+                val oldContributions = contributionDao.getContributions(metaAccount.id, chain.id, chain.utilityAsset.id, sourceId)
                 val collectionDiffer = CollectionDiffer.findDiff(newContributions, oldContributions, false)
                 contributionDao.updateContributions(collectionDiffer)
             }

@@ -8,6 +8,7 @@ import java.math.BigInteger
 data class ContributionLocal(
     val metaId: Long,
     val chainId: String,
+    val assetId: Int,
     val paraId: BigInteger,
     val amountInPlanks: BigInteger,
     val sourceId: String,
