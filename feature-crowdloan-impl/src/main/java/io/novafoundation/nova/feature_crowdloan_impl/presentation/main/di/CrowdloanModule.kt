@@ -17,9 +17,9 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.data.CrowdloanSharedState
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomContributeManager
-import io.novafoundation.nova.feature_crowdloan_impl.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.domain.main.CrowdloanInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.domain.main.statefull.StatefulCrowdloanMixin
 import io.novafoundation.nova.feature_crowdloan_impl.domain.main.statefull.StatefulCrowdloanProviderFactory

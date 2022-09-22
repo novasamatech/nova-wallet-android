@@ -94,7 +94,7 @@ class BalanceListFragment :
 
         viewModel.totalBalanceFlow.observe(headerAdapter::setTotalBalance)
         viewModel.selectedWalletModelFlow.observe(headerAdapter::setSelectedWallet)
-
+        viewModel.shouldShowPlaceholderFlow.observe(headerAdapter::setPlaceholderVisibility)
         viewModel.nftCountFlow.observe(headerAdapter::setNftCountLabel)
         viewModel.nftPreviewsUi.observe(headerAdapter::setNftPreviews)
 
@@ -108,7 +108,7 @@ class BalanceListFragment :
             }
         }
 
-        viewModel.showBalanceBreakdownEvent.observe { event ->
+        viewModel.showBalanceBreakdownEvent.observeEvent { totalBalanceBreakdown ->
             if (balanceBreakdownBottomSheet == null) {
                 balanceBreakdownBottomSheet = BalanceBreakdownBottomSheet(requireContext())
 
@@ -117,7 +117,7 @@ class BalanceListFragment :
                 }
             }
             balanceBreakdownBottomSheet?.setOnShowListener {
-                balanceBreakdownBottomSheet?.setBalanceBreakdown(event.peekContent())
+                balanceBreakdownBottomSheet?.setBalanceBreakdown(totalBalanceBreakdown)
             }
             balanceBreakdownBottomSheet?.show()
         }

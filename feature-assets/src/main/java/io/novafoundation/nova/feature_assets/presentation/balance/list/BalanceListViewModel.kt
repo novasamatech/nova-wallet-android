@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.formatting.formatAsPercentage
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.common.utils.isPositive
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_assets.R
@@ -32,7 +33,11 @@ import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
+import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import kotlin.time.ExperimentalTime
+import kotlin.time.seconds
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
@@ -42,9 +47,6 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
-import kotlin.time.ExperimentalTime
-import kotlin.time.seconds
-import kotlinx.coroutines.flow.combine
 
 private typealias SyncAction = suspend (MetaAccount) -> Unit
 
@@ -113,15 +115,16 @@ class BalanceListViewModel(
 
     val totalBalanceFlow = balanceBreakdown.map {
         val currency = selectedCurrency.first()
-        val assets = assetsFlow.first()
         TotalBalanceModel(
-            shouldShowPlaceholder = assets.isEmpty(),
+            isLocksAvailable = it.locksTotal.amount.isPositive,
             totalBalanceFiat = it.total.formatAsCurrency(currency),
             lockedBalanceFiat = it.locksTotal.amount.formatAsCurrency(currency)
         )
     }
         .inBackground()
         .share()
+
+    val shouldShowPlaceholderFlow = assetsFlow.map { it.isEmpty() }
 
     val balanceBreakdownFlow = balanceBreakdown.map {
         val currency = selectedCurrency.first()
@@ -185,8 +188,11 @@ class BalanceListViewModel(
 
     fun balanceBreakdownClicked() {
         launch {
-            val balanceBreakdown = balanceBreakdownFlow.first()
-            _showBalanceBreakdownEvent.value = Event(balanceBreakdown)
+            val isLocksAvailable = totalBalanceFlow.first().isLocksAvailable
+            if (isLocksAvailable) {
+                val balanceBreakdown = balanceBreakdownFlow.first()
+                _showBalanceBreakdownEvent.value = Event(balanceBreakdown)
+            }
         }
     }
 
@@ -227,8 +233,8 @@ class BalanceListViewModel(
 
             val breakdown = balanceBreakdown.breakdown.map {
                 BalanceBreakdownAmount(
-                    it.chainAsset.symbol + " " + mapBalanceIdToUi(resourceManager, it.id),
-                    it.fiatAmount.formatAsCurrency(currency)
+                    name = it.asset.token.configuration.symbol + " " + mapBalanceIdToUi(resourceManager, it.id),
+                    amount = mapAmountToAmountModel(it.tokenAmount, it.asset)
                 )
             }
 

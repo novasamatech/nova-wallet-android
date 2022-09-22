@@ -8,7 +8,7 @@ import io.novafoundation.nova.core_db.model.BalanceLockLocal
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-abstract class LocksDao {
+abstract class LockDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insert(locks: List<BalanceLockLocal>)

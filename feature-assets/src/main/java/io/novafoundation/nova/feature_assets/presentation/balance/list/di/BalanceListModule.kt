@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksInteractor
 import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksRepository
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.list.BalanceListViewModel
+import io.novafoundation.nova.feature_crowdloan_api.data.repository.ContributionsRepository
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -50,11 +51,13 @@ class BalanceListModule {
     @ScreenScope
     fun provideBalanceBreakdownInteractor(
         accountRepository: AccountRepository,
-        balanceLocksRepository: BalanceLocksRepository
+        balanceLocksRepository: BalanceLocksRepository,
+        contributionsRepository: ContributionsRepository
     ): BalanceBreakdownInteractor {
         return BalanceBreakdownInteractor(
             accountRepository,
-            balanceLocksRepository
+            balanceLocksRepository,
+            contributionsRepository
         )
     }
 

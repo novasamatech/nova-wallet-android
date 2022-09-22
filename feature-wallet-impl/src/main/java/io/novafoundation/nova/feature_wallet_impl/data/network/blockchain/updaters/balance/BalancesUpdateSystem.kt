@@ -27,10 +27,10 @@ class BalancesUpdateSystem(
     private val chainRegistry: ChainRegistry,
     private val paymentUpdaterFactory: PaymentUpdaterFactory,
     private val balanceLocksUpdater: BalanceLocksUpdaterFactory,
-    private val accountUpdateScope: AccountUpdateScope,
+    private val accountUpdateScope: AccountUpdateScope
 ) : UpdateSystem {
 
-    @OptIn(ExperimentalStdlibApi::class, ExperimentalCoroutinesApi::class)
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun start(): Flow<Updater.SideEffect> {
         return accountUpdateScope.invalidationFlow().flatMapLatest {
             val chains = chainRegistry.currentChains.first()

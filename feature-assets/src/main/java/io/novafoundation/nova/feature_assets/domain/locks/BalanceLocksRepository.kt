@@ -9,5 +9,5 @@ interface BalanceLocksRepository {
 
     suspend fun observeBalanceLocks(chain: Chain, chainAsset: Chain.Asset): Flow<List<BalanceLock>>
 
-    suspend fun observeLocksForMetaAccount(metaAccount: MetaAccount): Flow<List<BalanceLock>>
+    fun observeLocksForMetaAccount(metaAccount: MetaAccount): Flow<List<BalanceLock>>
 }

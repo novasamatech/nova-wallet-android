@@ -18,7 +18,7 @@ private const val GROUPING_SEPARATOR = ','
 private const val DECIMAL_SEPARATOR = '.'
 
 private const val FULL_PRECISION = 5
-private const val ABBREVIATED_PRECISION = 2
+const val ABBREVIATED_PRECISION = 2
 
 private val defaultAbbreviationFormatter = FixedPrecisionFormatter(ABBREVIATED_PRECISION)
 private val defaultFullFormatter = FixedPrecisionFormatter(FULL_PRECISION)

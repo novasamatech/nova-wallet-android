@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_assets.presentation.common
 
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.capitalize
 import io.novafoundation.nova.feature_assets.R
-import java.util.Locale
 
 fun mapBalanceIdToUi(resourceManager: ResourceManager, id: String): String {
     return when (id.trim()) {
@@ -12,6 +12,6 @@ fun mapBalanceIdToUi(resourceManager: ResourceManager, id: String): String {
         "phrelect" -> resourceManager.getString(R.string.assets_balance_details_locks_phrelect)
         "reserved" -> resourceManager.getString(R.string.wallet_balance_reserved)
         "crowdloan" -> resourceManager.getString(R.string.common_crowdloan)
-        else -> id.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+        else -> id.capitalize()
     }
 }

@@ -16,10 +16,11 @@ import io.novafoundation.nova.core_db.dao.AccountDao
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.dao.AssetDao
 import io.novafoundation.nova.core_db.dao.ChainDao
+import io.novafoundation.nova.core_db.dao.ContributionDao
 import io.novafoundation.nova.core_db.dao.CurrencyDao
 import io.novafoundation.nova.core_db.dao.DappAuthorizationDao
 import io.novafoundation.nova.core_db.dao.FavouriteDAppsDao
-import io.novafoundation.nova.core_db.dao.LocksDao
+import io.novafoundation.nova.core_db.dao.LockDao
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.dao.NftDao
 import io.novafoundation.nova.core_db.dao.NodeDao
@@ -32,6 +33,7 @@ import io.novafoundation.nova.core_db.dao.TokenDao
 import io.novafoundation.nova.core_db.migrations.AddAdditionalFieldToChains_12_13
 import io.novafoundation.nova.core_db.migrations.AddBuyProviders_7_8
 import io.novafoundation.nova.core_db.migrations.AddChainColor_4_5
+import io.novafoundation.nova.core_db.migrations.AddContributions_23_24
 import io.novafoundation.nova.core_db.migrations.AddCurrencies_18_19
 import io.novafoundation.nova.core_db.migrations.AddDAppAuthorizations_1_2
 import io.novafoundation.nova.core_db.migrations.AddFavouriteDApps_9_10
@@ -58,6 +60,7 @@ import io.novafoundation.nova.core_db.model.CurrencyLocal
 import io.novafoundation.nova.core_db.model.DappAuthorizationLocal
 import io.novafoundation.nova.core_db.model.FavouriteDAppLocal
 import io.novafoundation.nova.core_db.model.BalanceLockLocal
+import io.novafoundation.nova.core_db.model.ContributionLocal
 import io.novafoundation.nova.core_db.model.NftLocal
 import io.novafoundation.nova.core_db.model.NodeLocal
 import io.novafoundation.nova.core_db.model.OperationLocal
@@ -75,7 +78,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
 import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
 
 @Database(
-    version = 23,
+    version = 24,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -98,7 +101,8 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
         PhishingSiteLocal::class,
         FavouriteDAppLocal::class,
         CurrencyLocal::class,
-        BalanceLockLocal::class
+        BalanceLockLocal::class,
+        ContributionLocal::class
     ],
 )
 @TypeConverters(
@@ -108,7 +112,7 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
     CryptoTypeConverters::class,
     NftTypeConverters::class,
     MetaAccountTypeConverters::class,
-    CurrencyConverters::class
+    CurrencyConverters::class,
 )
 abstract class AppDatabase : RoomDatabase() {
 
@@ -132,7 +136,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(AddAdditionalFieldToChains_12_13, FixMigrationConflicts_13_14, AddMetaAccountType_14_15)
                     .addMigrations(NullableSubstratePublicKey_15_16, WatchOnlyChainAccounts_16_17, RemoveColorFromChains_17_18)
                     .addMigrations(AddCurrencies_18_19, ChangeTokens_19_20, ChangeChainNodes_20_21)
-                    .addMigrations(NullableSubstrateAccountId_21_22, AddLocks_22_23)
+                    .addMigrations(NullableSubstrateAccountId_21_22, AddLocks_22_23, AddContributions_23_24)
                     .fallbackToDestructiveMigration()
                     .build()
             }
@@ -172,5 +176,7 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun currencyDao(): CurrencyDao
 
-    abstract fun locksDao(): LocksDao
+    abstract fun lockDao(): LockDao
+
+    abstract fun contributionDao(): ContributionDao
 }

@@ -11,12 +11,12 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="33dp"
-        android:includeFontPadding="false"
-        app:layout_constraintHorizontal_bias="0"
-        android:singleLine="true"
-        android:ellipsize="end"
         android:layout_marginEnd="16dp"
+        android:ellipsize="end"
+        android:includeFontPadding="false"
+        android:singleLine="true"
         app:layout_constraintEnd_toStartOf="@+id/balanceListAvatar"
+        app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="@tools:sample/full_names" />
@@ -86,5 +86,6 @@
         android:text="@string/wallet_assets_empty"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        tools:visibility="gone" />
 </androidx.constraintlayout.widget.ConstraintLayout>
