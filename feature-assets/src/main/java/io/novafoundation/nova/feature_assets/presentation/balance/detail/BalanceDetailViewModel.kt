@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_assets.presentation.balance.detail
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
@@ -39,7 +38,6 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import java.math.BigInteger
 
 private typealias LedgerWarningMessage = String
 
@@ -182,7 +180,6 @@ class BalanceDetailViewModel(
             resourceManager.getString(R.string.wallet_balance_reserved),
             mapAmountToAmountModel(asset.reserved, asset)
         )
-
 
         return BalanceLocksModel(
             buildList {
