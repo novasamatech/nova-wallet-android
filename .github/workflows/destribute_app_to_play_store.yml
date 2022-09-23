@@ -20,6 +20,7 @@ env:
   CI_MARKET_KEYSTORE_KEY_ALIAS: ${{ secrets.CI_MARKET_KEYSTORE_KEY_ALIAS }}
   CI_MARKET_KEYSTORE_KEY_PASS: ${{ secrets.CI_MARKET_KEYSTORE_KEY_PASS }}
   CI_KEY_FILE: ${{ secrets.RELEASE_MARKET_KEY_FILE }}
+  CI_KEY_NAME: market_key.jks
 
 jobs:
   build:
@@ -36,7 +37,7 @@ jobs:
         id: write_file
         uses: timheuer/base64-to-file@v1.1
         with:
-          fileName: 'market_key.jks'
+          fileName: ${{ env.CI_KEY_NAME }}
           fileDir: './app/'
           encodedString: ${{ env.CI_KEY_FILE }}
 
@@ -45,6 +46,9 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew assembleReleaseMarket
+
+      - name: Delete key after building
+        run: rm ./app/${{ env.CI_KEY_NAME }}
 
       - uses: actions/upload-artifact@v2
         with:
