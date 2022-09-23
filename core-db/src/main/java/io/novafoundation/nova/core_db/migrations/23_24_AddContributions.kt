@@ -14,7 +14,7 @@ val AddContributions_23_24 = object : Migration(23, 24) {
                 `paraId` TEXT NOT NULL, 
                 `amountInPlanks` TEXT NOT NULL, 
                 `sourceId` TEXT NOT NULL, 
-                PRIMARY KEY(`metaId`, `chainId`, `assetId`, `sourceId`)
+                PRIMARY KEY(`metaId`, `chainId`, `assetId`, `paraId`, `sourceId`)
             )
             """.trimIndent()
         )
