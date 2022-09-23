@@ -19,4 +19,8 @@ class AssetWithToken(
 class AssetAndChainId(
     val chainId: String,
     val assetId: Int
-)
+) {
+    fun toPair(): Pair<String, Int> {
+        return chainId to assetId
+    }
+}

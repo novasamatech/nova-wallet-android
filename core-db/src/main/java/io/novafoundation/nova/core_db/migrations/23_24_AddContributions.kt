@@ -10,10 +10,11 @@ val AddContributions_23_24 = object : Migration(23, 24) {
             CREATE TABLE IF NOT EXISTS `contributions` (
                 `metaId` INTEGER NOT NULL, 
                 `chainId` TEXT NOT NULL, 
+                `assetId` INTEGER NOT NULL, 
                 `paraId` TEXT NOT NULL, 
                 `amountInPlanks` TEXT NOT NULL, 
                 `sourceId` TEXT NOT NULL, 
-                PRIMARY KEY(`metaId`, `chainId`, `paraId`, `sourceId`)
+                PRIMARY KEY(`metaId`, `chainId`, `assetId`, `sourceId`)
             )
             """.trimIndent()
         )

@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.coingecko.PriceInfo
 import io.novafoundation.nova.common.utils.asQueryParam
 import io.novafoundation.nova.common.utils.mapList
+import io.novafoundation.nova.core_db.dao.ContributionDao
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.dao.PhishingAddressDao
 import io.novafoundation.nova.core_db.dao.TokenDao
@@ -68,15 +69,20 @@ class WalletRepositoryImpl(
     private val coingeckoApi: CoingeckoApi,
     private val chainRegistry: ChainRegistry,
     private val tokenDao: TokenDao,
+    private val contributionDao: ContributionDao
 ) : WalletRepository {
 
     override fun syncedAssetsFlow(metaId: Long): Flow<List<Asset>> {
         return combine(
             chainRegistry.chainsById,
-            assetCache.observeSyncedAssets(metaId)
-        ) { chainsById, assetsLocal ->
-            assetsLocal.map {
-                mapAssetLocalToAsset(it, chainsById.chainAsset(it.assetAndChainId))
+            assetCache.observeSyncedAssets(metaId),
+            contributionDao.observeContributions(metaId)
+        ) { chainsById, assetsLocal, contributions ->
+            val contributionsByChainAndAssetId = contributions.groupBy { it.chainId to it.assetId }
+            assetsLocal.map { asset ->
+                val assetContributions = contributionsByChainAndAssetId.filter { it.key == asset.assetAndChainId.toPair() }
+                    .flatMap { it.value }
+                mapAssetLocalToAsset(asset, chainsById.chainAsset(asset.assetAndChainId), assetContributions)
             }
         }
     }

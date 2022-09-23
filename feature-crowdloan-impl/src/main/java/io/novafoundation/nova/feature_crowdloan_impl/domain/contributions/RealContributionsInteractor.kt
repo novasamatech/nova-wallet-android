@@ -21,16 +21,15 @@ import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.Contrib
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.totalContributionAmount
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.leasePeriodInMillis
 import io.novafoundation.nova.runtime.ext.utilityAsset
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
+import kotlinx.coroutines.flow.*
 import java.math.BigInteger
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
 
 class RealContributionsInteractor(
     private val crowdloanRepository: CrowdloanRepository,
@@ -38,7 +37,8 @@ class RealContributionsInteractor(
     private val selectedAssetCrowdloanState: SingleAssetSharedState,
     private val chainStateRepository: ChainStateRepository,
     private val contributionsRepository: ContributionsRepository,
-    private val contributionsUpdateSystemFactory: ContributionsUpdateSystemFactory
+    private val contributionsUpdateSystemFactory: ContributionsUpdateSystemFactory,
+    private val chainRegistry: ChainRegistry,
 ) : ContributionsInteractor {
 
     override fun runUpdate(): Flow<Updater.SideEffect> {
@@ -58,7 +58,12 @@ class RealContributionsInteractor(
 
     override fun observeChainContributions(chainId: ChainId, assetId: ChainAssetId): Flow<ContributionsWithTotalAmount> {
         return accountRepository.selectedMetaAccountFlow().flatMapLatest {
-            observeChainContributions(it, chain, chain.utilityAsset)
+            val (chain, asset) = chainRegistry.chainWithAsset(chainId, assetId)
+            if (chain.hasCrowdloans) {
+                observeChainContributions(it, chain, asset)
+            } else {
+                emptyFlow()
+            }
         }
     }
 

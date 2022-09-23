@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import jp.co.soramitsu.fearless_utils.scale.dataType.list
 import java.math.BigDecimal
 import java.math.BigInteger
 import kotlinx.coroutines.flow.Flow
@@ -23,6 +24,7 @@ class BalanceBreakdown(
     val total: BigDecimal,
     val transferableTotal: PercentageAmount,
     val locksTotal: PercentageAmount,
+    val contributions: List<BreakdownItem>,
     val breakdown: List<BreakdownItem>
 ) {
     companion object {
@@ -34,6 +36,7 @@ class BalanceBreakdown(
                 BigDecimal.ZERO,
                 PercentageAmount(amount = BigDecimal.ZERO, percentage = BigDecimal.ZERO),
                 PercentageAmount(amount = BigDecimal.ZERO, percentage = BigDecimal.ZERO),
+                listOf(),
                 listOf()
             )
         }
@@ -83,6 +86,7 @@ class BalanceBreakdownInteractor(
                         totalAmount.totalFiat,
                         BalanceBreakdown.PercentageAmount(totalAmount.transferableFiat, transferablePercentage),
                         BalanceBreakdown.PercentageAmount(totalAmount.locksFiat, locksPercentage),
+                        contributionsOrEmpty,
                         breakdown.sortedByDescending { it.fiatAmount }
                     )
                 }

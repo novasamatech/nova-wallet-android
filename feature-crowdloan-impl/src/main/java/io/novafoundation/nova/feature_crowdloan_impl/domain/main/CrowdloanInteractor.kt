@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ContributionsRepository
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRepository
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.mapFundInfoToCrowdloan
+import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
@@ -54,7 +55,7 @@ class CrowdloanInteractor(
         return chainStateRepository.currentBlockNumberFlow(chain.id).map { currentBlockNumber ->
             val fundInfos = crowdloanRepository.allFundInfos(chainId)
 
-            val directContributions = contributor?.let { it -> contributionsRepository.getDirectContributions(chain, it, fundInfos) }
+            val directContributions = contributor?.let { it -> contributionsRepository.getDirectContributions(chain, chain.utilityAsset, it, fundInfos) }
                 ?.associateBy { it.paraId } ?: emptyMap()
 
             val winnerInfo = crowdloanRepository.getWinnerInfo(chainId, fundInfos)

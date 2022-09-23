@@ -35,7 +35,13 @@ class ContributionWithMetadata(
     val metadata: ContributionMetadata
 )
 
-class ContributionsWithTotalAmount(val totalContributed: BigInteger, val contributions: List<ContributionWithMetadata>)
+class ContributionsWithTotalAmount(val totalContributed: BigInteger, val contributions: List<ContributionWithMetadata>) {
+    companion object {
+        fun empty(): ContributionsWithTotalAmount {
+            return ContributionsWithTotalAmount(BigInteger.ZERO, listOf())
+        }
+    }
+}
 
 fun mapContributionToLocal(metaId: Long, contribution: Contribution): ContributionLocal {
     return ContributionLocal(

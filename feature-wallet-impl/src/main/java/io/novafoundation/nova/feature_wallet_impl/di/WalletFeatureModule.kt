@@ -10,10 +10,7 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.interfaces.FileCache
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core.updater.UpdateSystem
-import io.novafoundation.nova.core_db.dao.AssetDao
-import io.novafoundation.nova.core_db.dao.OperationDao
-import io.novafoundation.nova.core_db.dao.PhishingAddressDao
-import io.novafoundation.nova.core_db.dao.TokenDao
+import io.novafoundation.nova.core_db.dao.*
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
@@ -118,6 +115,7 @@ class WalletFeatureModule {
         cursorStorage: TransferCursorStorage,
         chainRegistry: ChainRegistry,
         tokenDao: TokenDao,
+        contributionDao: ContributionDao
     ): WalletRepository = WalletRepositoryImpl(
         substrateSource,
         operationsDao,
@@ -130,7 +128,8 @@ class WalletFeatureModule {
         cursorStorage,
         coingeckoApi,
         chainRegistry,
-        tokenDao
+        tokenDao,
+        contributionDao
     )
 
     @Provides

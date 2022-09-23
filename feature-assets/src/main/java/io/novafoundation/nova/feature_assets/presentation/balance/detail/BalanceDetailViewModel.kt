@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_assets.presentation.balance.detail
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
@@ -23,7 +24,6 @@ import io.novafoundation.nova.feature_assets.presentation.common.mapBalanceIdToU
 import io.novafoundation.nova.feature_assets.presentation.model.BalanceLocksModel
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryMixin
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryUi
-import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionWithMetadata
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsWithTotalAmount
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
@@ -33,13 +33,13 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Type.Orml
+import jp.co.soramitsu.fearless_utils.hash.isPositive
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.math.BigInteger
 
 private typealias LedgerWarningMessage = String
 
@@ -77,6 +77,7 @@ class BalanceDetailViewModel(
         .share()
 
     private val contributionsFlow = contributionsInteractor.observeChainContributions(assetPayload.chainId, assetPayload.chainAssetId)
+        .onStart { emit(ContributionsWithTotalAmount.empty()) }
         .shareInBackground()
 
     val assetDetailsModel = combine(assetFlow, contributionsFlow) { asset, contributions ->
@@ -86,7 +87,7 @@ class BalanceDetailViewModel(
         .share()
 
     private val lockedBalanceModel = combine(balanceLocksFlow, contributionsFlow, assetFlow) { locks, contributions, asset ->
-        mapBalanceLocksToUi(locks, contributions.contributions, asset)
+        mapBalanceLocksToUi(locks, contributions, asset)
     }
         .inBackground()
         .share()
@@ -169,7 +170,7 @@ class BalanceDetailViewModel(
         )
     }
 
-    private fun mapBalanceLocksToUi(balanceLocks: List<BalanceLock>, contributions: List<ContributionWithMetadata>, asset: Asset): BalanceLocksModel {
+    private fun mapBalanceLocksToUi(balanceLocks: List<BalanceLock>, contributions: ContributionsWithTotalAmount, asset: Asset): BalanceLocksModel {
         val mappedLocks = balanceLocks.map {
             BalanceLocksModel.Lock(
                 mapBalanceIdToUi(resourceManager, it.id),
@@ -182,18 +183,20 @@ class BalanceDetailViewModel(
             mapAmountToAmountModel(asset.reserved, asset)
         )
 
-        val contributionsBalances = contributions.map {
-            BalanceLocksModel.Lock(
-                resourceManager.getString(R.string.wallet_balance_reserved),
-                mapAmountToAmountModel(it.contribution.amountInPlanks, asset)
-            )
-        }
 
         return BalanceLocksModel(
             buildList {
                 addAll(mappedLocks)
                 add(reservedBalance)
-                addAll(contributionsBalances)
+
+                if (contributions.totalContributed.isPositive()) {
+                    val totalContributedBalance = BalanceLocksModel.Lock(
+                        resourceManager.getString(R.string.common_crowdloan),
+                        mapAmountToAmountModel(contributions.totalContributed, asset)
+                    )
+
+                    add(totalContributedBalance)
+                }
             }
         )
     }

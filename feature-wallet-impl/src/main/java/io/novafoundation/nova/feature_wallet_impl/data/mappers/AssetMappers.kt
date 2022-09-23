@@ -1,10 +1,7 @@
 package io.novafoundation.nova.feature_wallet_impl.data.mappers
 
 import io.novafoundation.nova.common.utils.orZero
-import io.novafoundation.nova.core_db.model.AssetWithToken
-import io.novafoundation.nova.core_db.model.CurrencyLocal
-import io.novafoundation.nova.core_db.model.TokenLocal
-import io.novafoundation.nova.core_db.model.TokenWithCurrency
+import io.novafoundation.nova.core_db.model.*
 import io.novafoundation.nova.feature_currency_api.presentation.mapper.mapCurrencyFromLocal
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
@@ -36,13 +33,15 @@ fun mapTokenLocalToToken(
 
 fun mapAssetLocalToAsset(
     assetLocal: AssetWithToken,
-    chainAsset: Chain.Asset
+    chainAsset: Chain.Asset,
+    contributions: List<ContributionLocal> = listOf()
 ): Asset {
     return with(assetLocal) {
+        val totalContributed = contributions.sumOf { it.amountInPlanks }
         Asset(
             token = mapTokenLocalToToken(token, assetLocal.currency, chainAsset),
             frozenInPlanks = asset?.frozenInPlanks.orZero(),
-            freeInPlanks = asset?.freeInPlanks.orZero(),
+            freeInPlanks = asset?.freeInPlanks.orZero() + totalContributed,
             reservedInPlanks = asset?.reservedInPlanks.orZero(),
             bondedInPlanks = asset?.bondedInPlanks.orZero(),
             unbondingInPlanks = asset?.unbondingInPlanks.orZero(),
