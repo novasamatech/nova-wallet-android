@@ -1,3 +1,5 @@
+name: Install dependencies for Android build
+description: Contains all dependencies for Android build
 runs:
   using: "composite"
   steps:
