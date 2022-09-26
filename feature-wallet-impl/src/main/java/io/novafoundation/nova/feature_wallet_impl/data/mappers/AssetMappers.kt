@@ -1,7 +1,10 @@
 package io.novafoundation.nova.feature_wallet_impl.data.mappers
 
 import io.novafoundation.nova.common.utils.orZero
-import io.novafoundation.nova.core_db.model.*
+import io.novafoundation.nova.core_db.model.AssetWithToken
+import io.novafoundation.nova.core_db.model.CurrencyLocal
+import io.novafoundation.nova.core_db.model.TokenLocal
+import io.novafoundation.nova.core_db.model.TokenWithCurrency
 import io.novafoundation.nova.feature_currency_api.presentation.mapper.mapCurrencyFromLocal
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token

@@ -36,7 +36,6 @@ import jp.co.soramitsu.fearless_utils.hash.isPositive
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 private typealias LedgerWarningMessage = String
