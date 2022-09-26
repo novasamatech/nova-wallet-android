@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    uses: nova-wallet/nova-wallet-android/.github/workflows/android_build.yml@fix/github_actions # will be removed after merge in develop
+    uses: nova-wallet/nova-wallet-android/.github/workflows/android_build.yml@develop
     with:
       branch: develop
       gradlew-command: assembleDevelop
