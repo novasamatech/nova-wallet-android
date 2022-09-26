@@ -1,0 +1,69 @@
+name: Reusable workflow for build Android
+
+on:
+  workflow_call:
+    inputs:
+      gradlew-command:
+        required: true
+        type: string
+      run-tests:
+        required:
+        type: boolean
+        default: false
+    secrets:
+      ACALA_PROD_AUTH_TOKEN:
+        required: true
+      ACALA_TEST_AUTH_TOKEN:
+        required: true
+      MOONBEAM_PROD_AUTH_TOKEN:
+        required: true
+      MOONBEAM_TEST_AUTH_TOKEN:
+        required: true
+      MOONPAY_PRODUCTION_SECRET:
+        required: true
+      MOONPAY_TEST_SECRET:
+        required: true
+      # Special secrets for signing:
+      CI_MARKET_KEYSTORE_PASS:
+        required: true
+      CI_MARKET_KEYSTORE_KEY_ALIAS:
+        required: true
+      CI_MARKET_KEYSTORE_KEY_PASS:
+        required: true
+      CI_MARKET_KEY_FILE:
+        required: true
+      CI_KEYSTORE_PASS:
+        required: true
+      CI_KEYSTORE_KEY_ALIAS:
+        required: true
+      CI_KEYSTORE_KEY_PASS:
+        required: true
+
+env:
+  ACALA_PROD_AUTH_TOKEN: ${{ secrets.ACALA_PROD_AUTH_TOKEN }}
+  ACALA_TEST_AUTH_TOKEN: ${{ secrets.ACALA_TEST_AUTH_TOKEN }}
+  MOONBEAM_PROD_AUTH_TOKEN: ${{ secrets.MOONBEAM_PROD_AUTH_TOKEN }}
+  MOONBEAM_TEST_AUTH_TOKEN: ${{ secrets.MOONBEAM_TEST_AUTH_TOKEN }}
+  MOONPAY_PRODUCTION_SECRET: ${{ secrets.MOONPAY_PRODUCTION_SECRET }}
+  MOONPAY_TEST_SECRET: ${{ secrets.MOONPAY_TEST_SECRET }}
+
+  CI_MARKET_KEYSTORE_PASS: ${{ secrets.CI_MARKET_KEYSTORE_PASS }}
+  CI_MARKET_KEYSTORE_KEY_ALIAS: ${{ secrets.CI_MARKET_KEYSTORE_KEY_ALIAS }}
+  CI_MARKET_KEYSTORE_KEY_PASS: ${{ secrets.CI_MARKET_KEYSTORE_KEY_PASS }}
+  CI_MARKET_KEY_FILE: ${{ secrets.RELEASE_MARKET_KEY_FILE }}
+  CI_MARKET_KEY_NAME: market_key.jks
+
+  CI_KEYSTORE_PASS: ${{ secrets.CI_KEYSTORE_PASS }}
+  CI_KEYSTORE_KEY_ALIAS: ${{ secrets.CI_KEYSTORE_KEY_ALIAS }}
+  CI_KEYSTORE_KEY_PASS: ${{ secrets.CI_KEYSTORE_KEY_PASS }}
+
+jobs:
+  example_job:
+    name: Pass input and secrets to my-action
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: 🔧 Install dependencies
+        uses: ./.github/workflows/install/
+      - name: Run tests
+        run: ./gradlew runTest
