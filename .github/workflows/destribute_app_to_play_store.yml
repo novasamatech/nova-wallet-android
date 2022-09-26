@@ -13,6 +13,8 @@ jobs:
     uses: nova-wallet/nova-wallet-android/.github/workflows/android_build.yml@fix/github_actions
     with:
       gradlew-command: assembleReleaseMarket
+      keystore-file-name: market_key.jks
+      keystore-file-base64: ${{ secrets.RELEASE_MARKET_KEY_FILE }}
     secrets: inherit
 
   upload:
