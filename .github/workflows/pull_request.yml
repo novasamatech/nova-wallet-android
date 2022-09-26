@@ -5,7 +5,7 @@ on:
 
 
 jobs:
-  unit-tests:
+  test:
     uses: nova-wallet/nova-wallet-android/.github/workflows/android_build.yml@fix/github_actions
     with:
       branch: ${{github.head_ref}}
