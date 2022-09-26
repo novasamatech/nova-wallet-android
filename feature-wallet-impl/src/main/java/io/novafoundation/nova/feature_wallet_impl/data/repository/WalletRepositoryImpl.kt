@@ -5,10 +5,8 @@ import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.coingecko.PriceInfo
 import io.novafoundation.nova.common.utils.asQueryParam
 import io.novafoundation.nova.common.utils.mapList
-import io.novafoundation.nova.core_db.dao.ContributionDao
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.dao.PhishingAddressDao
-import io.novafoundation.nova.core_db.dao.TokenDao
 import io.novafoundation.nova.core_db.model.AssetAndChainId
 import io.novafoundation.nova.core_db.model.OperationLocal
 import io.novafoundation.nova.core_db.model.PhishingAddressLocal
