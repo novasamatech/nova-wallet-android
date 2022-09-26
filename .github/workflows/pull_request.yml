@@ -3,10 +3,8 @@ name: Pull request
 on:
   pull_request:
 
-env:
-  branch: ${{ github.head_ref || github.ref_name }}
 
 jobs:
   unit-tests:
-    uses: nova-wallet/nova-wallet-android/.github/workflows/android_build.yml@${{env.branch}}
+    uses: nova-wallet/nova-wallet-android/.github/workflows/android_build.yml@${{github.head_ref}}
     secrets: inherit
