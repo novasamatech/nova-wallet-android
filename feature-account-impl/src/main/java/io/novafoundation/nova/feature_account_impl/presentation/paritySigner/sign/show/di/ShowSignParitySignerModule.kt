@@ -31,7 +31,7 @@ class ShowSignParitySignerModule {
 
     @Provides
     @ScreenScope
-    fun provideInteractor(): ShowSignParitySignerInteractor = RealShowSignParitySignerInteractor()
+    fun provideInteractor(chainRegistry: ChainRegistry): ShowSignParitySignerInteractor = RealShowSignParitySignerInteractor(chainRegistry)
 
     @Provides
     @IntoMap

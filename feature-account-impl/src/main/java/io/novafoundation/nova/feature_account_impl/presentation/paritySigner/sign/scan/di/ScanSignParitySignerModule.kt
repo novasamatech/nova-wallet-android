@@ -19,13 +19,14 @@ import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.common.QrCodeExpiredPresentableFactory
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan.ScanSignParitySignerViewModel
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan.model.ScanSignParitySignerPayload
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
 
 @Module(includes = [ViewModelModule::class])
 class ScanSignParitySignerModule {
 
     @Provides
-    fun provideInteractor(): ScanSignParitySignerInteractor = RealScanSignParitySignerInteractor()
+    fun provideInteractor(chainRegistry: ChainRegistry): ScanSignParitySignerInteractor = RealScanSignParitySignerInteractor(chainRegistry)
 
     @Provides
     fun providePermissionAsker(

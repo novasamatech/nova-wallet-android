@@ -6,15 +6,20 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindNullableNu
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumberConstant
 import io.novafoundation.nova.common.data.network.runtime.binding.fromHexOrIncompatible
 import io.novafoundation.nova.core.model.Node
+import jp.co.soramitsu.fearless_utils.encrypt.SignatureVerifier
 import jp.co.soramitsu.fearless_utils.encrypt.SignatureWrapper
+import jp.co.soramitsu.fearless_utils.encrypt.Signer
+import jp.co.soramitsu.fearless_utils.encrypt.json.copyBytes
 import jp.co.soramitsu.fearless_utils.encrypt.junction.BIP32JunctionDecoder
 import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.Mnemonic
 import jp.co.soramitsu.fearless_utils.encrypt.seed.SeedFactory
 import jp.co.soramitsu.fearless_utils.extensions.asEthereumAddress
+import jp.co.soramitsu.fearless_utils.extensions.asEthereumPublicKey
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.extensions.toAccountId
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.hash.Hasher.blake2b256
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Extrinsic
@@ -205,6 +210,37 @@ fun String.ethereumAddressToAccountId() = asEthereumAddress().toAccountId().valu
 
 val SignerPayloadExtrinsic.chainId: String
     get() = genesisHash.toHexString()
+
+fun SignatureWrapperEcdsa(signature: ByteArray): SignatureWrapper.Ecdsa {
+    require(signature.size == 65)
+
+    val r = signature.copyBytes(0, 32)
+    val s = signature.copyBytes(32, 64)
+    val v = signature.copyBytes(64, 65)
+
+    return SignatureWrapper.Ecdsa(v, r, s)
+}
+
+fun SignatureVerifier.verifyByAccountId(
+    signature: SignatureWrapper,
+    unHashedMessage: ByteArray,
+    expectedAccountId: AccountId,
+    messageHashing: Signer.MessageHashing
+): Boolean {
+    return when(signature) {
+        // for Ed25519 and Sr25519 accountId == publicKey
+        is SignatureWrapper.Ed25519, is SignatureWrapper.Sr25519 -> {
+            verify(signature, messageHashing, unHashedMessage, publicKey = expectedAccountId)
+        }
+
+        is SignatureWrapper.Ecdsa -> {
+            val recoveredPublicKey = recoverSignaturePublicKey(unHashedMessage, signature, messageHashing)
+            val accountId = recoveredPublicKey.asEthereumPublicKey().toAccountId().value
+
+            accountId.contentEquals(expectedAccountId)
+        }
+    }
+}
 
 object Modules {
     const val VESTING: String = "Vesting"
