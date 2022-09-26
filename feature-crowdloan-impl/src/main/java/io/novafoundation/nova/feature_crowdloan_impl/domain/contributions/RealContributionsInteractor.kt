@@ -50,7 +50,16 @@ class RealContributionsInteractor(
             .start()
     }
 
-    override fun observeChainContributions(): Flow<ContributionsWithTotalAmount> {
+    override fun observeTotalContributedByAssets(): Flow<Map<ChainAssetId, BigInteger>> {
+        return accountRepository.selectedMetaAccountFlow().flatMapLatest { metaAccount ->
+            contributionsRepository.observeContributions(metaAccount)
+        }.map {
+            it.groupBy { it.asset.id }
+                .mapValues { entry -> entry.value.sumOf { it.amountInPlanks } }
+        }
+    }
+
+    override fun observeSelectedChainContributions(): Flow<ContributionsWithTotalAmount> {
         val metaAccountFlow = accountRepository.selectedMetaAccountFlow()
         val chainFlow = selectedAssetCrowdloanState.assetWithChain.map { it.chain }
         return combineToPair(metaAccountFlow, chainFlow)

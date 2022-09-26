@@ -107,8 +107,11 @@ class BalanceListViewModel(
         .inBackground()
         .share()
 
-    val assetModelsFlow = combine(filteredAssetsFlow, selectedCurrency) { assets, currensy ->
-        walletInteractor.groupAssets(assets).mapGroupedAssetsToUi(currensy)
+    val assetModelsFlow = combine(filteredAssetsFlow, selectedCurrency, balanceBreakdown) { assets, currensy, breakdown ->
+        val contributionsByAssetId = breakdown.contributions
+            .associateBy { it.asset.token.configuration.id }
+            .mapValues { it.value.amountInPlanks }
+        walletInteractor.groupAssets(assets).mapGroupedAssetsToUi(currensy, contributionsByAssetId)
     }
         .distinctUntilChanged()
         .shareInBackground()

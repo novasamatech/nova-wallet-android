@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_assets.presentation.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.mapGroupedAssetsToUi
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
+import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -16,6 +17,7 @@ class AssetSearchViewModel(
     private val router: AssetsRouter,
     interactor: AssetSearchInteractor,
     private val currencyInteractor: CurrencyInteractor,
+    private val contributionsInteractor: ContributionsInteractor,
 ) : BaseViewModel() {
 
     val query = MutableStateFlow("")
@@ -24,8 +26,14 @@ class AssetSearchViewModel(
         .inBackground()
         .share()
 
-    val searchResults = combine(interactor.searchAssetsFlow(query), selectedCurrency) { assets, currency ->
-        assets.mapGroupedAssetsToUi(currency)
+    private val totalContributedByAssetsFlow = contributionsInteractor.observeTotalContributedByAssets()
+
+    val searchResults = combine(
+        interactor.searchAssetsFlow(query),
+        selectedCurrency,
+        totalContributedByAssetsFlow
+    ) { assets, currency, totalContributedByAssets ->
+        assets.mapGroupedAssetsToUi(currency, totalContributedByAssets)
     }
         .distinctUntilChanged()
         .shareInBackground()
