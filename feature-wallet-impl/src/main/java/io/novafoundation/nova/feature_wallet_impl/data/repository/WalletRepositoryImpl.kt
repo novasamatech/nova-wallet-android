@@ -68,21 +68,15 @@ class WalletRepositoryImpl(
     private val cursorStorage: TransferCursorStorage,
     private val coingeckoApi: CoingeckoApi,
     private val chainRegistry: ChainRegistry,
-    private val tokenDao: TokenDao,
-    private val contributionDao: ContributionDao
 ) : WalletRepository {
 
     override fun syncedAssetsFlow(metaId: Long): Flow<List<Asset>> {
         return combine(
             chainRegistry.chainsById,
-            assetCache.observeSyncedAssets(metaId),
-            contributionDao.observeContributions(metaId)
-        ) { chainsById, assetsLocal, contributions ->
-            val contributionsByChainAndAssetId = contributions.groupBy { it.chainId to it.assetId }
+            assetCache.observeSyncedAssets(metaId)
+        ) { chainsById, assetsLocal ->
             assetsLocal.map { asset ->
-                val assetContributions = contributionsByChainAndAssetId.filter { it.key == asset.assetAndChainId.toPair() }
-                    .flatMap { it.value }
-                mapAssetLocalToAsset(asset, chainsById.chainAsset(asset.assetAndChainId), assetContributions)
+                mapAssetLocalToAsset(asset, chainsById.chainAsset(asset.assetAndChainId))
             }
         }
     }

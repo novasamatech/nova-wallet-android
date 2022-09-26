@@ -33,15 +33,13 @@ fun mapTokenLocalToToken(
 
 fun mapAssetLocalToAsset(
     assetLocal: AssetWithToken,
-    chainAsset: Chain.Asset,
-    contributions: List<ContributionLocal> = listOf()
+    chainAsset: Chain.Asset
 ): Asset {
     return with(assetLocal) {
-        val totalContributed = contributions.sumOf { it.amountInPlanks }
         Asset(
             token = mapTokenLocalToToken(token, assetLocal.currency, chainAsset),
             frozenInPlanks = asset?.frozenInPlanks.orZero(),
-            freeInPlanks = asset?.freeInPlanks.orZero() + totalContributed,
+            freeInPlanks = asset?.freeInPlanks.orZero(),
             reservedInPlanks = asset?.reservedInPlanks.orZero(),
             bondedInPlanks = asset?.bondedInPlanks.orZero(),
             unbondingInPlanks = asset?.unbondingInPlanks.orZero(),

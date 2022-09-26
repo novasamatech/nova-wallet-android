@@ -17,6 +17,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import java.math.BigInteger
 
 class MetaAccountGroupingInteractorImpl(
     private val chainRegistry: ChainRegistry,
@@ -36,7 +37,7 @@ class MetaAccountGroupingInteractorImpl(
                 val accountBalances = groupedBalances[metaAccount.id] ?: emptyList()
 
                 val totalBalance = accountBalances.sumByBigDecimal {
-                    val totalInPlanks = it.freeInPlanks + it.reservedInPlanks
+                    val totalInPlanks = it.freeInPlanks + it.reservedInPlanks + (it.offChainBalance ?: BigInteger.ZERO)
 
                     totalInPlanks.amountFromPlanks(it.precision) * it.rate.orZero()
                 }

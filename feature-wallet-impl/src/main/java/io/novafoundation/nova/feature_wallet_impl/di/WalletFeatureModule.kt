@@ -114,8 +114,6 @@ class WalletFeatureModule {
         accountRepository: AccountRepository,
         cursorStorage: TransferCursorStorage,
         chainRegistry: ChainRegistry,
-        tokenDao: TokenDao,
-        contributionDao: ContributionDao
     ): WalletRepository = WalletRepositoryImpl(
         substrateSource,
         operationsDao,
@@ -128,8 +126,6 @@ class WalletFeatureModule {
         cursorStorage,
         coingeckoApi,
         chainRegistry,
-        tokenDao,
-        contributionDao
     )
 
     @Provides
