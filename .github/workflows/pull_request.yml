@@ -12,9 +12,9 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Set Environment Variables
-        uses: tw3lveparsecs/github-actions-setvars@v0.1
+        uses: ./.github/workflows/setvars/
         with:
-          envFilePath: .github/workflows/variables/android.env
+          varFilePath: ${{ secrets }}
 
       - name: 🔧 Install dependencies
         uses: ./.github/workflows/install/
