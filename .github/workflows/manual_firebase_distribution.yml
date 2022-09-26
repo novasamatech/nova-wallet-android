@@ -7,10 +7,14 @@ on:
         description: 'Firebase group'
         required: true
         default: dev-team
+      branch:
+        description: 'From which branch the application will be built'
+        required: true
+        default: develop
 
 jobs:
   build:
-    uses: nova-wallet/nova-wallet-android/.github/workflows/android_build.yml@fix/github_actions
+    uses: nova-wallet/nova-wallet-android/.github/workflows/android_build.yml@${{ github.event.inputs.app_version }}
     with:
       gradlew-command: assembleDevelop
     secrets: inherit
