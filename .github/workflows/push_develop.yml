@@ -3,11 +3,10 @@ name: Build test and deploy develop apk
 on:
   push:
     branches: [develop]
-  pull_request:
 
 jobs:
   build:
-    uses: nova-wallet/nova-wallet-android/.github/workflows/android_build.yml@fix/github_actions
+    uses: nova-wallet/nova-wallet-android/.github/workflows/android_build.yml@fix/github_actions # will be removed after merge in develop
     with:
       branch: develop
       gradlew-command: assembleDevelop
