@@ -10,41 +10,10 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set Environment Variables
-        uses: tw3lveparsecs/github-actions-setvars@v0.1
-        with:
-          envFilePath: .github/workflows/variables/android.env
-
-      - name: 🔧 Install dependencies
-        uses: ./.github/workflows/install/
-
-      - name: Getting sign key
-        id: write_file
-        uses: timheuer/base64-to-file@v1.1
-        with:
-          fileName: ${{ env.CI_MARKET_KEY_NAME }}
-          fileDir: './app/'
-          encodedString: ${{ env.CI_MARKET_KEY_FILE }}
-
-      - name: Run tests
-        run: ./gradlew runTest
-
-      - name: Build with Gradle
-        run: ./gradlew assembleReleaseMarket
-
-      - name: Delete key after building
-        run: rm ./app/${{ env.CI_MARKET_KEY_NAME }}
-
-      - uses: actions/upload-artifact@v2
-        with:
-          name: apk
-          path: app/build/outputs/apk/releaseMarket
+    uses: nova-wallet/nova-wallet-android/.github/workflows/android_build.yml@fix/github_actions
+    with:
+      gradlew-command: assembleReleaseMarket
+    secrets: inherit
 
   upload:
     runs-on: ubuntu-latest
@@ -64,14 +33,14 @@ jobs:
           path: app
 
       - name: Rename artifacts
-        run: mv app/app-releaseMarket.apk app/nova-wallet-android-${{ github.event.inputs.app_version }}.apk
+        run: mv app/releaseMarket/app-releaseMarket.apk app/releaseMarket/nova-wallet-android-${{ github.event.inputs.app_version }}.apk
 
       - name: Market publication
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }} # The contents of your service-account.json
           packageName: io.novafoundation.nova
-          releaseFiles: app/nova-wallet-android-${{ github.event.inputs.app_version }}.apk
+          releaseFiles: app/releaseMarket/nova-wallet-android-${{ github.event.inputs.app_version }}.apk
           track: production # One of production, beta, alpha, internalsharing, internal, or a custom track name (case sensitive)
           status: draft # One of "completed", "inProgress", "halted", "draft"
           inAppUpdatePriority: 2

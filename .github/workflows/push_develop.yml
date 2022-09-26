@@ -6,36 +6,11 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
+    uses: nova-wallet/nova-wallet-android/.github/workflows/android_build.yml@fix/github_actions
+    with:
+      gradlew-command: assembleDevelop
+    secrets: inherit
 
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set Environment Variables
-        uses: tw3lveparsecs/github-actions-setvars@v0.1
-        with:
-          envFilePath: .github/workflows/variables/android.env
-
-      - name: 🔧 Install dependencies
-        uses: ./.github/workflows/install/
-
-      - name: Bump version
-        uses: chkfung/android-version-actions@v1.1
-        with:
-          gradlePath: app/build.gradle
-          versionCode: ${{github.run_number}}
-
-      - name: Run tests
-        run: ./gradlew runTest
-
-      - name: Build with Gradle
-        run: ./gradlew assembleDevelop
-
-      - uses: actions/upload-artifact@v2
-        with:
-          name: apk
-          path: app/build/outputs/apk/develop/
 
   upload:
     runs-on: ubuntu-latest
@@ -56,4 +31,4 @@ jobs:
           firebase-token: ${{ secrets.ANDROID_DEV_FIREBASE_TOKEN }}
           releaseNotes: ${{ github.event.head_commit.message }}
           test-groups: dev-team
-          upload-file: app/app-develop.apk
+          upload-file: app/develop/app-develop.apk

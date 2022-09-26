@@ -6,6 +6,4 @@ on:
 jobs:
   call-workflow-passing-data:
     uses: nova-wallet/nova-wallet-android/.github/workflows/android_build.yml@fix/github_actions
-    with:
-      gradlew-command: runTests
     secrets: inherit

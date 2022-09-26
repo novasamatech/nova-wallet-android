@@ -4,12 +4,13 @@ on:
   workflow_call:
     inputs:
       gradlew-command:
-        required: true
+        required: false
         type: string
+        default: false
       run-tests:
         required: false
         type: boolean
-        default: false
+        default: true
     secrets:
       ACALA_PROD_AUTH_TOKEN:
         required: true
@@ -58,12 +59,39 @@ env:
   CI_KEYSTORE_KEY_PASS: ${{ secrets.CI_KEYSTORE_KEY_PASS }}
 
 jobs:
-  example_job:
-    name: Pass input and secrets to my-action
+  build-app:
+    name: Build and test android app
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v2
+
       - name: 🔧 Install dependencies
         uses: ./.github/workflows/install/
+
       - name: Run tests
+        if: ${{ inputs.run-tests }} == "true"
         run: ./gradlew runTest
+
+      - name: Getting sign key
+        if: ${{ inputs.gradlew-command }} != "false"
+        id: write_file
+        uses: timheuer/base64-to-file@v1.1
+        with:
+          fileName: ${{ env.CI_MARKET_KEY_NAME }}
+          fileDir: './app/'
+          encodedString: ${{ env.CI_MARKET_KEY_FILE }}
+
+      - name: Build app
+        if: ${{ inputs.gradlew-command }} != "false"
+        run: ./gradlew ${{ inputs.gradlew-command }}
+
+      - name: Delete key after building
+        if: ${{ inputs.gradlew-command }} != "false"
+        run: rm ./app/${{ env.CI_MARKET_KEY_NAME }}
+
+      - uses: actions/upload-artifact@v2
+        if: ${{ inputs.gradlew-command }} != "false"
+        with:
+          name: apk
+          path: app/build/outputs/apk/
