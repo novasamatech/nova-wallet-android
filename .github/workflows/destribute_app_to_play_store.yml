@@ -8,20 +8,6 @@ on:
         required: true
         default: v*.*.*
 
-env:
-  ACALA_PROD_AUTH_TOKEN: ${{ secrets.ACALA_PROD_AUTH_TOKEN }}
-  ACALA_TEST_AUTH_TOKEN: ${{ secrets.ACALA_TEST_AUTH_TOKEN }}
-  MOONBEAM_PROD_AUTH_TOKEN: ${{ secrets.MOONBEAM_PROD_AUTH_TOKEN }}
-  MOONBEAM_TEST_AUTH_TOKEN: ${{ secrets.MOONBEAM_TEST_AUTH_TOKEN }}
-  MOONPAY_PRODUCTION_SECRET: ${{ secrets.MOONPAY_PRODUCTION_SECRET }}
-  MOONPAY_TEST_SECRET: ${{ secrets.MOONPAY_TEST_SECRET }}
-
-  CI_MARKET_KEYSTORE_PASS: ${{ secrets.CI_MARKET_KEYSTORE_PASS }}
-  CI_MARKET_KEYSTORE_KEY_ALIAS: ${{ secrets.CI_MARKET_KEYSTORE_KEY_ALIAS }}
-  CI_MARKET_KEYSTORE_KEY_PASS: ${{ secrets.CI_MARKET_KEYSTORE_KEY_PASS }}
-  CI_KEY_FILE: ${{ secrets.RELEASE_MARKET_KEY_FILE }}
-  CI_KEY_NAME: market_key.jks
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -30,6 +16,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Set Environment Variables
+        uses: tw3lveparsecs/github-actions-setvars@v0.1
+        with:
+          envFilePath: .github/workflows/variables/android.env
+
       - name: 🔧 Install dependencies
         uses: ./.github/workflows/install/
 
@@ -37,9 +28,9 @@ jobs:
         id: write_file
         uses: timheuer/base64-to-file@v1.1
         with:
-          fileName: ${{ env.CI_KEY_NAME }}
+          fileName: ${{ env.CI_MARKET_KEY_NAME }}
           fileDir: './app/'
-          encodedString: ${{ env.CI_KEY_FILE }}
+          encodedString: ${{ env.CI_MARKET_KEY_FILE }}
 
       - name: Run tests
         run: ./gradlew runTest
@@ -48,7 +39,7 @@ jobs:
         run: ./gradlew assembleReleaseMarket
 
       - name: Delete key after building
-        run: rm ./app/${{ env.CI_KEY_NAME }}
+        run: rm ./app/${{ env.CI_MARKET_KEY_NAME }}
 
       - uses: actions/upload-artifact@v2
         with:
@@ -61,6 +52,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      - name: Set Environment Variables
+        uses: tw3lveparsecs/github-actions-setvars@v0.1
+        with:
+          envFilePath: .github/workflows/variables/android.env
+
       - name: Download built artifact
         uses: actions/download-artifact@v2
         with:
