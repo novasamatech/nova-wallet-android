@@ -3,6 +3,10 @@ name: Reusable workflow for build Android
 on:
   workflow_call:
     inputs:
+      branch:
+        required: true
+        default: develop
+        type: string
       gradlew-command:
         required: false
         type: string
@@ -80,7 +84,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout particualr branch
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ inputs.branch }}
 
       - name: 🔧 Install dependencies
         uses: ./.github/workflows/install/

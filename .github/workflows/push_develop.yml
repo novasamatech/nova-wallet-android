@@ -8,6 +8,7 @@ jobs:
   build:
     uses: nova-wallet/nova-wallet-android/.github/workflows/android_build.yml@develop
     with:
+      branch: develop
       gradlew-command: assembleDevelop
     secrets: inherit
 

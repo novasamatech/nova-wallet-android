@@ -5,17 +5,8 @@ on:
 
 
 jobs:
-  setup:
-    runs-on: ubuntu-latest
-    outputs:
-      branch: ${{ steps.extract_branch.outputs.branch }}
-    steps:
-      - name: Extract branch name
-        shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-        id: extract_branch
-
   unit-tests:
-    needs: setup
-    uses: nova-wallet/nova-wallet-android/.github/workflows/android_build.yml@${{needs.setup.outputs.branch}}
+    uses: nova-wallet/nova-wallet-android/.github/workflows/android_build.yml@fix/github_actions
+    with:
+      branch: ${{github.head_ref}}
     secrets: inherit
