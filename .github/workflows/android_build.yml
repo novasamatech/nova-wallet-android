@@ -25,19 +25,19 @@ on:
         required: true
       # Special secrets for signing:
       CI_MARKET_KEYSTORE_PASS:
-        required: true
+        required: false
       CI_MARKET_KEYSTORE_KEY_ALIAS:
-        required: true
+        required: false
       CI_MARKET_KEYSTORE_KEY_PASS:
-        required: true
+        required: false
       CI_MARKET_KEY_FILE:
-        required: true
+        required: false
       CI_KEYSTORE_PASS:
-        required: true
+        required: false
       CI_KEYSTORE_KEY_ALIAS:
-        required: true
+        required: false
       CI_KEYSTORE_KEY_PASS:
-        required: true
+        required: false
 
 env:
   ACALA_PROD_AUTH_TOKEN: ${{ secrets.ACALA_PROD_AUTH_TOKEN }}
