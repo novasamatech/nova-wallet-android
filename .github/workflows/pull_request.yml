@@ -4,6 +4,6 @@ on:
   pull_request:
 
 jobs:
-  call-workflow-passing-data:
+  unit-tests:
     uses: nova-wallet/nova-wallet-android/.github/workflows/android_build.yml@fix/github_actions
     secrets: inherit

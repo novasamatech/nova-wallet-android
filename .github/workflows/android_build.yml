@@ -69,12 +69,12 @@ jobs:
       - name: 🔧 Install dependencies
         uses: ./.github/workflows/install/
 
-      - name: Run tests
-        if: ${{ inputs.run-tests }} == "true"
-        run: ./gradlew runTest
+      # - name: 🧪 Run tests
+      #   if: ${{ inputs.run-tests }} == "true"
+      #   run: ./gradlew runTest
 
-      - name: Getting sign key
-        if: ${{ inputs.gradlew-command }} != "false"
+      - name: 🔐 Getting sign key
+        if: ${{ inputs.gradlew-command != "false" }}
         id: write_file
         uses: timheuer/base64-to-file@v1.1
         with:
@@ -82,16 +82,17 @@ jobs:
           fileDir: './app/'
           encodedString: ${{ env.CI_MARKET_KEY_FILE }}
 
-      - name: Build app
-        if: ${{ inputs.gradlew-command }} != "false"
+      - name: 🏗 Build app
+        if: ${{ inputs.gradlew-command != "false" }}
         run: ./gradlew ${{ inputs.gradlew-command }}
 
-      - name: Delete key after building
-        if: ${{ inputs.gradlew-command }} != "false"
+      - name: 🧹 Delete key after building
+        if: ${{ inputs.gradlew-command != "false" }}
         run: rm ./app/${{ env.CI_MARKET_KEY_NAME }}
 
-      - uses: actions/upload-artifact@v2
-        if: ${{ inputs.gradlew-command }} != "false"
+      - name: ➡️ Upload build artifacts
+        uses: actions/upload-artifact@v2
+        if: ${{ inputs.gradlew-command != "false" }}
         with:
           name: apk
           path: app/build/outputs/apk/
