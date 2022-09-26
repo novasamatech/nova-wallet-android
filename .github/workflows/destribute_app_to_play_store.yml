@@ -14,7 +14,7 @@ on:
 
 jobs:
   build:
-    uses: nova-wallet/nova-wallet-android/.github/workflows/android_build.yml@${{ github.event.inputs.app_version }}
+    uses: nova-wallet/nova-wallet-android/.github/workflows/android_build.yml@${{ github.event.inputs.branch }}
     with:
       gradlew-command: assembleReleaseMarket
       keystore-file-name: market_key.jks
