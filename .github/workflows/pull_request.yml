@@ -5,5 +5,5 @@ on:
 
 jobs:
   unit-tests:
-    uses: nova-wallet/nova-wallet-android/.github/workflows/android_build.yml@${GITHUB_REF##*/}
+    uses: nova-wallet/nova-wallet-android/.github/workflows/android_build.yml@${{ github.head_ref || github.ref_name }}
     secrets: inherit
