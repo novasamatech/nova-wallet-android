@@ -5,7 +5,7 @@ on:
 
 jobs:
   call-workflow-passing-data:
-    uses: nova-wallet/nova-wallet-android/.github/workflows/build-app/android_build.yml@fix/github_actions
+    uses: nova-wallet/nova-wallet-android/.github/workflows/android_build.yml@fix/github_actions
     with:
       username: mona
     secrets: inherit
