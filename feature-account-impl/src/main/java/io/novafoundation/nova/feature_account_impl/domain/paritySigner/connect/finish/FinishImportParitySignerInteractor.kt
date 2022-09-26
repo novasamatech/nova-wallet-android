@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.
 
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.ParitySignerRepository
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.scan.ParitySignerAccount
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -10,7 +10,7 @@ interface FinishImportParitySignerInteractor {
 
     suspend fun createWallet(
         name: String,
-        substrateAccountId: AccountId,
+        paritySignerAccount: ParitySignerAccount,
     ): Result<Unit>
 }
 
@@ -19,9 +19,9 @@ class RealFinishImportParitySignerInteractor(
     private val accountRepository: AccountRepository,
 ) : FinishImportParitySignerInteractor {
 
-    override suspend fun createWallet(name: String, substrateAccountId: AccountId): Result<Unit> = withContext(Dispatchers.Default) {
+    override suspend fun createWallet(name: String, paritySignerAccount: ParitySignerAccount): Result<Unit> = withContext(Dispatchers.Default) {
         runCatching {
-            val metaId = repository.addParitySignerWallet(name, substrateAccountId)
+            val metaId = repository.addParitySignerWallet(name, paritySignerAccount)
 
             accountRepository.selectMetaAccount(metaId)
         }

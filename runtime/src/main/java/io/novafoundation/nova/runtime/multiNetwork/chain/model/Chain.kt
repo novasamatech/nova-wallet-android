@@ -116,6 +116,10 @@ data class Chain(
         }
     }
 
+    enum class Type {
+        SUBSTRATE, ETHEREUM
+    }
+
     override val identifier: String = id
 }
 

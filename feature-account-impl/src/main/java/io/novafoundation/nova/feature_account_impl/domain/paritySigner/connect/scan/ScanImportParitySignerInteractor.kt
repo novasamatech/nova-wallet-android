@@ -1,15 +1,8 @@
 package io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.scan
 
-import jp.co.soramitsu.fearless_utils.encrypt.qr.QrFormat
-import jp.co.soramitsu.fearless_utils.encrypt.qr.formats.SubstrateQrFormat
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
+import io.novafoundation.nova.common.address.format.asAddress
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-
-class ParitySignerAccount(
-    val accountId: AccountId,
-)
 
 interface ScanImportParitySignerInteractor {
 
@@ -17,14 +10,14 @@ interface ScanImportParitySignerInteractor {
 }
 
 class RealScanImportParitySignerInteractor(
-    private val addressQrFormat: QrFormat = SubstrateQrFormat()
+    private val connectQrDecoder: ParitySignerConnectQrDecoder,
 ) : ScanImportParitySignerInteractor {
 
-    override suspend fun decodeScanResult(scanResult: String): Result<ParitySignerAccount> = runCatching {
-        withContext(Dispatchers.Default) {
-            val parsed = addressQrFormat.decode(scanResult)
+    override suspend fun decodeScanResult(scanResult: String): Result<ParitySignerAccount> = withContext(Dispatchers.Default) {
+        connectQrDecoder.decode(scanResult).mapCatching {
+            val accountId = it.accountType.addressFormat.accountIdOf(it.address.asAddress())
 
-            ParitySignerAccount(parsed.address.toAccountId())
+            ParitySignerAccount(accountId.value, it.accountType)
         }
     }
 }
