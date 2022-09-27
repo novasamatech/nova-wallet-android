@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.search.AssetSearchViewModel
+import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -39,12 +40,14 @@ class AssetSearchModule {
     fun provideViewModel(
         router: AssetsRouter,
         interactor: AssetSearchInteractor,
-        currencyInteractor: CurrencyInteractor
+        currencyInteractor: CurrencyInteractor,
+        contributionsInteractor: ContributionsInteractor
     ): ViewModel {
         return AssetSearchViewModel(
             router = router,
             interactor = interactor,
-            currencyInteractor = currencyInteractor
+            currencyInteractor = currencyInteractor,
+            contributionsInteractor = contributionsInteractor
         )
     }
 }

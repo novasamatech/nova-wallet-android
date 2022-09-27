@@ -9,7 +9,9 @@ import io.novafoundation.nova.feature_assets.presentation.model.TokenModel
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
+import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import java.math.BigDecimal
+import java.math.BigInteger
 
 fun mapTokenToTokenModel(token: Token): TokenModel {
     return with(token) {
@@ -30,12 +32,14 @@ fun mapTokenToTokenModel(token: Token): TokenModel {
     }
 }
 
-fun mapAssetToAssetModel(asset: Asset): AssetModel {
+fun mapAssetToAssetModel(asset: Asset, offChainBalance: BigInteger): AssetModel {
     return with(asset) {
+        val offChainAmount = asset.token.amountFromPlanks(offChainBalance)
+        val assetTotalFiat = priceAmount + token.priceOf(offChainAmount)
         AssetModel(
             token = mapTokenToTokenModel(token),
             total = total.format(),
-            priceAmount = priceAmount.formatAsCurrency(asset.token.currency)
+            priceAmount = assetTotalFiat.formatAsCurrency(asset.token.currency)
         )
     }
 }

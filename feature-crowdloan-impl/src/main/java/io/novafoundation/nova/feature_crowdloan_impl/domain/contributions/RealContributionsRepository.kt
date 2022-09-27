@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_crowdloan_api.data.source.contribution.Ext
 import io.novafoundation.nova.feature_crowdloan_api.data.source.contribution.supports
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.Contribution
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.mapContributionFromLocal
+import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
@@ -51,8 +52,8 @@ class RealContributionsRepository(
         }
     }
 
-    override fun observeContributions(metaAccount: MetaAccount, chain: Chain): Flow<List<Contribution>> {
-        return contributionDao.observeContributions(metaAccount.id, chain.id)
+    override fun observeContributions(metaAccount: MetaAccount, chain: Chain, asset: Chain.Asset): Flow<List<Contribution>> {
+        return contributionDao.observeContributions(metaAccount.id, chain.id, asset.id)
             .mapList { mapContributionFromLocal(it, chain) }
     }
 
@@ -65,11 +66,11 @@ class RealContributionsRepository(
             return@flow
         }
 
-        val directContributionFlow = directContributionsFlow(chain, accountId, fundInfos)
+        val directContributionFlow = directContributionsFlow(chain, chain.utilityAsset, accountId, fundInfos)
             .map { Contribution.DIRECT_SOURCE_ID to it }
 
         val externalContributionFlows = externalContributionsSources.map { source ->
-            externalContributionsFlow(source, chain, accountId).map { source.sourceId to it }
+            externalContributionsFlow(source, chain, chain.utilityAsset, accountId).map { source.sourceId to it }
         }
 
         val contributionsFlows = externalContributionFlows + listOf(directContributionFlow)
@@ -79,21 +80,23 @@ class RealContributionsRepository(
 
     private fun directContributionsFlow(
         chain: Chain,
+        asset: Chain.Asset,
         accountId: ByteArray,
         fundInfos: Map<ParaId, FundInfo>,
     ): Flow<List<Contribution>> = flow {
-        val result = getDirectContributions(chain, accountId, fundInfos)
+        val result = getDirectContributions(chain, asset, accountId, fundInfos)
         emit(result)
     }
 
     override suspend fun getDirectContributions(
         chain: Chain,
+        asset: Chain.Asset,
         accountId: ByteArray,
         fundInfos: Map<ParaId, FundInfo>,
     ): List<Contribution> {
         return withContext(Dispatchers.Default) {
             fundInfos.map { (paraId, fundInfo) ->
-                async { getDirectContribution(chain, accountId, paraId, fundInfo.trieIndex) }
+                async { getDirectContribution(chain, asset, accountId, paraId, fundInfo.trieIndex) }
             }
                 .awaitAll()
                 .filterNotNull()
@@ -103,6 +106,7 @@ class RealContributionsRepository(
     private fun externalContributionsFlow(
         externalContributionSource: ExternalContributionSource,
         chain: Chain,
+        asset: Chain.Asset,
         accountId: ByteArray,
     ): Flow<List<Contribution>> {
         if (externalContributionSource.supports(chain)) {
@@ -110,6 +114,7 @@ class RealContributionsRepository(
                 .mapList {
                     Contribution(
                         chain = chain,
+                        asset = asset,
                         amountInPlanks = it.amount,
                         sourceId = it.sourceId,
                         paraId = it.paraId
@@ -122,6 +127,7 @@ class RealContributionsRepository(
 
     override suspend fun getDirectContribution(
         chain: Chain,
+        asset: Chain.Asset,
         accountId: ByteArray,
         paraId: ParaId,
         trieIndex: BigInteger,
@@ -141,6 +147,7 @@ class RealContributionsRepository(
         return contribution?.let {
             Contribution(
                 chain = chain,
+                asset = asset,
                 amountInPlanks = contribution.amount,
                 paraId = paraId,
                 sourceId = contribution.sourceId,

@@ -33,7 +33,7 @@ class WalletInteractorImpl(
     private val accountRepository: AccountRepository,
     private val assetFiltersRepository: AssetFiltersRepository,
     private val chainRegistry: ChainRegistry,
-    private val nftRepository: NftRepository,
+    private val nftRepository: NftRepository
 ) : WalletInteractor {
 
     override fun filterAssets(assetsFlow: Flow<List<Asset>>): Flow<List<Asset>> {
@@ -71,13 +71,6 @@ class WalletInteractorImpl(
 
             walletRepository.assetFlow(metaAccount.id, chain.commissionAsset)
         }
-    }
-
-    override suspend fun getCurrentAsset(chainId: ChainId, chainAssetId: Int): Asset {
-        val metaAccount = accountRepository.getSelectedMetaAccount()
-        val (chain, chainAsset) = chainRegistry.chainWithAsset(chainId, chainAssetId)
-
-        return walletRepository.getAsset(metaAccount.accountIdIn(chain)!!, chainAsset)!!
     }
 
     override fun operationsFirstPageFlow(chainId: ChainId, chainAssetId: Int): Flow<OperationsPageChange> {

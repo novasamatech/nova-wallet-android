@@ -26,6 +26,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.detail.Balance
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProviderFactory
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryMixin
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryProvider
+import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -85,7 +86,8 @@ class BalanceDetailModule {
         missingKeysPresenter: WatchOnlyMissingKeysPresenter,
         resourceManager: ResourceManager,
         currencyInteractor: CurrencyInteractor,
-        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+        contributionsInteractor: ContributionsInteractor
     ): ViewModel {
         return BalanceDetailViewModel(
             walletInteractor = walletInteractor,
@@ -99,7 +101,8 @@ class BalanceDetailModule {
             missingKeysPresenter = missingKeysPresenter,
             resourceManager = resourceManager,
             currencyInteractor = currencyInteractor,
-            actionAwaitableMixinFactory = actionAwaitableMixinFactory
+            actionAwaitableMixinFactory = actionAwaitableMixinFactory,
+            contributionsInteractor = contributionsInteractor
         )
     }
 

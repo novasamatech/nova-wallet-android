@@ -23,17 +23,23 @@ import io.novafoundation.nova.feature_assets.presentation.common.mapBalanceIdToU
 import io.novafoundation.nova.feature_assets.presentation.model.BalanceLocksModel
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryMixin
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryUi
+import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
+import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsWithTotalAmount
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
+import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Type.Orml
+import jp.co.soramitsu.fearless_utils.hash.isPositive
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
 private typealias LedgerWarningMessage = String
@@ -51,6 +57,7 @@ class BalanceDetailViewModel(
     private val resourceManager: ResourceManager,
     private val currencyInteractor: CurrencyInteractor,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+    private val contributionsInteractor: ContributionsInteractor
 ) : BaseViewModel(),
     TransactionHistoryUi by transactionHistoryMixin {
 
@@ -70,13 +77,19 @@ class BalanceDetailViewModel(
         .inBackground()
         .share()
 
-    val assetDetailsModel = assetFlow
-        .map { mapAssetToUi(it) }
+    private val contributionsFlow = contributionsInteractor.observeChainContributions(assetPayload.chainId, assetPayload.chainAssetId)
+        .onStart { emit(ContributionsWithTotalAmount.empty()) }
+        .shareInBackground()
+
+    val assetDetailsModel = combine(assetFlow, contributionsFlow) { asset, contributions ->
+        mapAssetToUi(asset, contributions)
+    }
         .inBackground()
         .share()
 
-    private val lockedBalanceModel = balanceLocksFlow
-        .map { mapBalanceLocksToUi(it, assetFlow.first()) }
+    private val lockedBalanceModel = combine(balanceLocksFlow, contributionsFlow, assetFlow) { locks, contributions, asset ->
+        mapBalanceLocksToUi(locks, contributions, asset)
+    }
         .inBackground()
         .share()
 
@@ -148,16 +161,17 @@ class BalanceDetailViewModel(
         }
     }
 
-    private fun mapAssetToUi(asset: Asset): AssetDetailsModel {
+    private fun mapAssetToUi(asset: Asset, contributions: ContributionsWithTotalAmount): AssetDetailsModel {
+        val totalContributed = asset.token.amountFromPlanks(contributions.totalContributed)
         return AssetDetailsModel(
             token = mapTokenToTokenModel(asset.token),
-            total = mapAmountToAmountModel(asset.total, asset),
+            total = mapAmountToAmountModel(asset.total + totalContributed, asset),
             transferable = mapAmountToAmountModel(asset.transferable, asset),
-            locked = mapAmountToAmountModel(asset.locked, asset)
+            locked = mapAmountToAmountModel(asset.locked + totalContributed, asset)
         )
     }
 
-    private fun mapBalanceLocksToUi(balanceLocks: List<BalanceLock>, asset: Asset): BalanceLocksModel {
+    private fun mapBalanceLocksToUi(balanceLocks: List<BalanceLock>, contributions: ContributionsWithTotalAmount, asset: Asset): BalanceLocksModel {
         val mappedLocks = balanceLocks.map {
             BalanceLocksModel.Lock(
                 mapBalanceIdToUi(resourceManager, it.id),
@@ -174,6 +188,15 @@ class BalanceDetailViewModel(
             buildList {
                 addAll(mappedLocks)
                 add(reservedBalance)
+
+                if (contributions.totalContributed.isPositive()) {
+                    val totalContributedBalance = BalanceLocksModel.Lock(
+                        resourceManager.getString(R.string.common_crowdloan),
+                        mapAmountToAmountModel(contributions.totalContributed, asset)
+                    )
+
+                    add(totalContributedBalance)
+                }
             }
         )
     }

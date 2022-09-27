@@ -59,7 +59,7 @@ class StatefulCrowdloanProvider(
     }
         .shareInBackground()
 
-    override val contributionsInfoFlow = contributionsInteractor.observeChainContributions()
+    override val contributionsInfoFlow = contributionsInteractor.observeSelectedChainContributions()
         .withLoading()
         .mapLoading {
             val amountModel = mapAmountToAmountModel(

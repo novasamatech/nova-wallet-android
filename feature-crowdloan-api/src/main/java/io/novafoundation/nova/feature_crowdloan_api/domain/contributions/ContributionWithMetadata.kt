@@ -5,11 +5,13 @@ import io.novafoundation.nova.common.utils.formatting.TimerValue
 import io.novafoundation.nova.core_db.model.ContributionLocal
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.FundInfo
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ParachainMetadata
+import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger
 
 class Contribution(
     val chain: Chain,
+    val asset: Chain.Asset,
     val amountInPlanks: BigInteger,
     val paraId: ParaId,
     val sourceId: String,
@@ -33,12 +35,19 @@ class ContributionWithMetadata(
     val metadata: ContributionMetadata
 )
 
-class ContributionsWithTotalAmount(val totalContributed: BigInteger, val contributions: List<ContributionWithMetadata>)
+class ContributionsWithTotalAmount(val totalContributed: BigInteger, val contributions: List<ContributionWithMetadata>) {
+    companion object {
+        fun empty(): ContributionsWithTotalAmount {
+            return ContributionsWithTotalAmount(BigInteger.ZERO, listOf())
+        }
+    }
+}
 
 fun mapContributionToLocal(metaId: Long, contribution: Contribution): ContributionLocal {
     return ContributionLocal(
         metaId,
         contribution.chain.id,
+        contribution.asset.id,
         contribution.paraId,
         contribution.amountInPlanks,
         contribution.sourceId,
@@ -51,6 +60,7 @@ fun mapContributionFromLocal(
 ): Contribution {
     return Contribution(
         chain,
+        chain.utilityAsset,
         contribution.amountInPlanks,
         contribution.paraId,
         contribution.sourceId,

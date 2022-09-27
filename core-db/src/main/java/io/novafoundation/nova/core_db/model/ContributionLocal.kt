@@ -4,10 +4,11 @@ import androidx.room.Entity
 import io.novafoundation.nova.common.utils.Identifiable
 import java.math.BigInteger
 
-@Entity(tableName = "contributions", primaryKeys = ["metaId", "chainId", "paraId", "sourceId"])
+@Entity(tableName = "contributions", primaryKeys = ["metaId", "chainId", "assetId", "paraId", "sourceId"])
 data class ContributionLocal(
     val metaId: Long,
     val chainId: String,
+    val assetId: Int,
     val paraId: BigInteger,
     val amountInPlanks: BigInteger,
     val sourceId: String,

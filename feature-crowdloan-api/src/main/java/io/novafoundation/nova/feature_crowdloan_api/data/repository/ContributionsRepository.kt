@@ -17,9 +17,9 @@ interface ContributionsRepository {
 
     fun observeContributions(metaAccount: MetaAccount): Flow<List<Contribution>>
 
-    fun observeContributions(metaAccount: MetaAccount, chain: Chain): Flow<List<Contribution>>
+    fun observeContributions(metaAccount: MetaAccount, chain: Chain, asset: Chain.Asset): Flow<List<Contribution>>
 
-    suspend fun getDirectContributions(chain: Chain, accountId: ByteArray, fundInfos: Map<ParaId, FundInfo>): List<Contribution>
+    suspend fun getDirectContributions(chain: Chain, asset: Chain.Asset, accountId: ByteArray, fundInfos: Map<ParaId, FundInfo>): List<Contribution>
 
-    suspend fun getDirectContribution(chain: Chain, accountId: ByteArray, paraId: ParaId, trieIndex: TrieIndex): Contribution?
+    suspend fun getDirectContribution(chain: Chain, asset: Chain.Asset, accountId: ByteArray, paraId: ParaId, trieIndex: TrieIndex): Contribution?
 }

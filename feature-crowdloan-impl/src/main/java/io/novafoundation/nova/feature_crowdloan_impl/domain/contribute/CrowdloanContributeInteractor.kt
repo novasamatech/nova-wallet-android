@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.Pr
 import io.novafoundation.nova.feature_crowdloan_impl.domain.main.Crowdloan
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.BonusPayload
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
+import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.state.chainAndAsset
@@ -56,7 +57,7 @@ class CrowdloanContributeInteractor(
             crowdloanRepository.fundInfoFlow(chain.id, parachainId),
             chainStateRepository.currentBlockNumberFlow(chain.id)
         ) { fundInfo, blockNumber ->
-            val contribution = contributionsRepository.getDirectContribution(chain, accountId, parachainId, fundInfo.trieIndex)
+            val contribution = contributionsRepository.getDirectContribution(chain, chain.utilityAsset, accountId, parachainId, fundInfo.trieIndex)
             val hasWonAuction = crowdloanRepository.hasWonAuction(chain.id, fundInfo)
 
             mapFundInfoToCrowdloan(

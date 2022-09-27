@@ -25,8 +25,6 @@ interface WalletInteractor {
 
     fun commissionAssetFlow(chainId: ChainId): Flow<Asset>
 
-    suspend fun getCurrentAsset(chainId: ChainId, chainAssetId: Int): Asset
-
     fun operationsFirstPageFlow(chainId: ChainId, chainAssetId: Int): Flow<OperationsPageChange>
 
     suspend fun syncOperationsFirstPage(

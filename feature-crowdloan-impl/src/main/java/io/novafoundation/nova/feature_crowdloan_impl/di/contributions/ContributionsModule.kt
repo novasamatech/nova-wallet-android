@@ -57,6 +57,7 @@ class ContributionsModule {
         crowdloanSharedState: CrowdloanSharedState,
         chainStateRepository: ChainStateRepository,
         contributionsRepository: ContributionsRepository,
+        chainRegistry: ChainRegistry,
         contributionsUpdateSystemFactory: ContributionsUpdateSystemFactory
     ): ContributionsInteractor = RealContributionsInteractor(
         crowdloanRepository = crowdloanRepository,
@@ -64,6 +65,7 @@ class ContributionsModule {
         selectedAssetCrowdloanState = crowdloanSharedState,
         chainStateRepository = chainStateRepository,
         contributionsRepository = contributionsRepository,
+        chainRegistry = chainRegistry,
         contributionsUpdateSystemFactory = contributionsUpdateSystemFactory
     )
 
