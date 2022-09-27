@@ -43,7 +43,11 @@ class BalanceBreakdown(
 
     class PercentageAmount(val amount: BigDecimal, val percentage: BigDecimal)
 
-    class BreakdownItem(val id: String, val asset: Asset, val amountInPlanks: BigInteger, val tokenAmount: BigDecimal, val fiatAmount: BigDecimal)
+    class BreakdownItem(val id: String, val asset: Asset, val amountInPlanks: BigInteger) {
+        val tokenAmount by lazy { asset.token.amountFromPlanks(amountInPlanks) }
+
+        val fiatAmount by lazy { asset.token.priceOf(tokenAmount) }
+    }
 }
 
 class BalanceBreakdownInteractor(
@@ -108,8 +112,6 @@ class BalanceBreakdownInteractor(
                     id = lock.id,
                     asset = asset,
                     amountInPlanks = lock.amountInPlanks,
-                    tokenAmount = tokenAmount,
-                    fiatAmount = token.priceOf(tokenAmount)
                 )
             }
         }
@@ -133,8 +135,6 @@ class BalanceBreakdownInteractor(
                         id = CROWDLOAN_ID,
                         asset = asset,
                         amountInPlanks = totalAmountInPlanks,
-                        tokenAmount = tokenAmount,
-                        fiatAmount = token.priceOf(tokenAmount)
                     )
                 }
             }
@@ -165,9 +165,7 @@ class BalanceBreakdownInteractor(
                 BalanceBreakdown.BreakdownItem(
                     id = BalanceBreakdown.RESERVED_ID,
                     asset = it,
-                    amountInPlanks = it.reservedInPlanks,
-                    tokenAmount = it.reserved,
-                    fiatAmount = it.token.priceOf(it.reserved)
+                    amountInPlanks = it.reservedInPlanks
                 )
             }
     }
