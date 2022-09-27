@@ -61,6 +61,7 @@ data class Chain(
 
             data class Statemine(
                 val id: BigInteger,
+                val palletName: String?
             ) : Type()
 
             data class Orml(

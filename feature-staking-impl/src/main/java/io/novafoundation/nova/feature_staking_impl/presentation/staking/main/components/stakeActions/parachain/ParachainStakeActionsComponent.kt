@@ -55,7 +55,7 @@ class ParachainStakeActionsComponentFactory(
     )
 }
 
-private class ParachainStakeActionsComponent(
+internal open class ParachainStakeActionsComponent(
     delegatorStateUseCase: DelegatorStateUseCase,
     private val resourceManager: ResourceManager,
     private val router: ParachainStakingRouter,
@@ -95,16 +95,15 @@ private class ParachainStakeActionsComponent(
         }
     }
 
-    private fun stateFor(delegatorState: DelegatorState.Delegator): Flow<StakeActionsState> {
+    protected open fun stateFor(delegatorState: DelegatorState.Delegator): Flow<StakeActionsState> {
         return flowOf {
-            val availableActions = availableActionsFor(delegatorState)
+            val availableActions = availableParachainStakingActionsFor(delegatorState)
 
             StakeActionsState(availableActions)
         }
     }
 
-    @OptIn(ExperimentalStdlibApi::class)
-    private fun availableActionsFor(delegatorState: DelegatorState.Delegator): List<ManageStakeAction> = buildList {
+    protected fun availableParachainStakingActionsFor(delegatorState: DelegatorState.Delegator): List<ManageStakeAction> = buildList {
         add(ManageStakeAction.bondMore(resourceManager))
         add(ManageStakeAction.unbond(resourceManager))
 

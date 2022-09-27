@@ -142,7 +142,6 @@ fun RuntimeMetadata.system() = module(Modules.SYSTEM)
 
 fun RuntimeMetadata.balances() = module(Modules.BALANCES)
 
-fun RuntimeMetadata.assets() = module(Modules.ASSETS)
 fun RuntimeMetadata.tokens() = module(Modules.TOKENS)
 fun RuntimeMetadata.tokensOrNull() = moduleOrNull(Modules.TOKENS)
 fun RuntimeMetadata.currencies() = module(Modules.CURRENCIES)
@@ -167,6 +166,8 @@ fun RuntimeMetadata.parachainStaking() = module(Modules.PARACHAIN_STAKING)
 fun RuntimeMetadata.vesting() = module(Modules.VESTING)
 
 fun RuntimeMetadata.identity() = module(Modules.IDENTITY)
+
+fun RuntimeMetadata.automationTime() = module(Modules.AUTOMATION_TIME)
 
 fun RuntimeMetadata.parachainInfoOrNull() = moduleOrNull(Modules.PARACHAIN_INFO)
 
@@ -231,4 +232,6 @@ object Modules {
 
     const val PARACHAIN_INFO = "ParachainInfo"
     const val X_TOKENS = "XTokens"
+
+    const val AUTOMATION_TIME = "AutomationTime"
 }

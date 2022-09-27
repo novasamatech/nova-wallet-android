@@ -41,7 +41,7 @@ abstract class BaseAssetTransfers(
      * Format: [(Module, Function)]
      * Transfers will be enabled if at least one function exists
      */
-    protected abstract val transferFunctions: List<Pair<String, String>>
+    protected abstract suspend fun transferFunctions(chainAsset: Chain.Asset): List<Pair<String, String>>
 
     override suspend fun performTransfer(transfer: AssetTransfer): Result<String> {
         val senderAccountId = transfer.sender.accountIdIn(transfer.originChain)!!
@@ -60,7 +60,7 @@ abstract class BaseAssetTransfers(
     override suspend fun areTransfersEnabled(chainAsset: Chain.Asset): Boolean {
         val runtime = chainRegistry.getRuntime(chainAsset.chainId)
 
-        return transferFunctions.any { (module, function) ->
+        return transferFunctions(chainAsset).any { (module, function) ->
             runtime.metadata.moduleOrNull(module)?.callOrNull(function) != null
         }
     }
@@ -86,7 +86,7 @@ abstract class BaseAssetTransfers(
     protected fun AssetTransfersValidationSystemBuilder.sufficientBalanceInUsedAsset() = sufficientBalance(
         amount = { it.transfer.amount },
         available = { it.originUsedAsset.transferable },
-        error = { AssetTransferValidationFailure.NotEnoughFunds.InUsedAsset },
+        error = { _, _ -> AssetTransferValidationFailure.NotEnoughFunds.InUsedAsset },
         fee = { it.originFeeInUsedAsset }
     )
 

@@ -9,18 +9,28 @@ import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.RuntimeRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
+import kotlin.coroutines.coroutineContext
 
 class GetKeysPagedRequest(
     keyPrefix: String,
     pageSize: Int,
     fullKeyOffset: String?,
-    at: BlockHash?
 ) : RuntimeRequest(
     method = "state_getKeysPaged",
     params = listOfNotNull(
         keyPrefix,
         pageSize,
         fullKeyOffset,
+    )
+)
+
+class GetKeys(
+    keyPrefix: String,
+    at: BlockHash?
+) : RuntimeRequest(
+    method = "state_getKeys",
+    params = listOfNotNull(
+        keyPrefix,
         at
     )
 )
@@ -51,30 +61,20 @@ class BulkRetriever(
     private val pageSize: Int = DEFAULT_PAGE_SIZE
 ) {
 
+    /**
+     * Retrieves all keys starting with [keyPrefix] from [at] block
+     * Returns only first [DEFAULT_PAGE_SIZE] elements in case historical querying is used ([at] is not null)
+     */
     suspend fun retrieveAllKeys(
         socketService: SocketService,
         keyPrefix: String,
         at: BlockHash? = null
     ): List<String> = withContext(Dispatchers.IO) {
-        val result = mutableListOf<String>()
-
-        var currentOffset: String? = null
-
-        while (true) {
-            ensureActive()
-
-            val request = GetKeysPagedRequest(keyPrefix, DEFAULT_PAGE_SIZE, currentOffset, at)
-
-            val page = socketService.executeAsync(request, mapper = pojoList<String>().nonNull())
-
-            result += page
-
-            if (isLastPage(page)) break
-
-            currentOffset = page.last()
+        if (at != null) {
+            queryKeysByPrefixHistorical(socketService, keyPrefix, at)
+        } else {
+            queryKeysByPrefixCurrent(socketService, keyPrefix)
         }
-
-        result
     }
 
     suspend fun queryKeys(
@@ -96,6 +96,48 @@ class BulkRetriever(
 
             acc
         }
+    }
+
+    /**
+     * Note: the amount of keys returned by this method is limited by [DEFAULT_PAGE_SIZE]
+     * So it is should not be used for storages with big amount of entries
+     */
+    private suspend fun queryKeysByPrefixHistorical(
+        socketService: SocketService,
+        prefix: String,
+        at: BlockHash
+    ): List<String> {
+        // We use `state_getKeys` for historical prefix queries instead of `state_getKeysPaged`
+        // since most of the chains always return empty list when the same is requested via `state_getKeysPaged`
+        // Thus, we can only request up to 1000 first historical keys
+        val request = GetKeys(prefix, at)
+
+        return socketService.executeAsync(request, mapper = pojoList<String>().nonNull())
+    }
+
+    private suspend fun queryKeysByPrefixCurrent(
+        socketService: SocketService,
+        prefix: String
+    ): List<String> {
+        val result = mutableListOf<String>()
+
+        var currentOffset: String? = null
+
+        while (true) {
+            coroutineContext.ensureActive()
+
+            val request = GetKeysPagedRequest(prefix, DEFAULT_PAGE_SIZE, currentOffset)
+
+            val page = socketService.executeAsync(request, mapper = pojoList<String>().nonNull())
+
+            result += page
+
+            if (isLastPage(page)) break
+
+            currentOffset = page.last()
+        }
+
+        return result
     }
 
     private fun isLastPage(page: List<String>) = page.size < pageSize

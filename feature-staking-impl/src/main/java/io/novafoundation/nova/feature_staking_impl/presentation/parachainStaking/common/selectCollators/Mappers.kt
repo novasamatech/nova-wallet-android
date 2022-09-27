@@ -1,9 +1,13 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.selectCollators
 
+import androidx.annotation.StringRes
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.buildSpannable
 import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.delegationAmountTo
+import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.Collator
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.SelectedCollator
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.UnbondingCollator
@@ -11,6 +15,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.model.SelectCollatorModel
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
@@ -20,12 +25,14 @@ suspend fun mapUnbondingCollatorToSelectCollatorModel(
     chain: Chain,
     asset: Asset,
     addressIconGenerator: AddressIconGenerator,
-) = mapSelectedCollatorToSelectCollatorModel(
+    resourceManager: ResourceManager,
+): SelectCollatorModel = mapSelectedCollatorToSelectCollatorModel(
     selectedCollator = unbondingCollator,
     active = unbondingCollator.hasPendingUnbonding.not(),
     chain = chain,
     asset = asset,
-    addressIconGenerator = addressIconGenerator
+    addressIconGenerator = addressIconGenerator,
+    resourceManager = resourceManager,
 )
 
 suspend fun mapSelectedCollatorToSelectCollatorModel(
@@ -34,13 +41,15 @@ suspend fun mapSelectedCollatorToSelectCollatorModel(
     chain: Chain,
     asset: Asset,
     addressIconGenerator: AddressIconGenerator,
-) = mapCollatorToSelectCollatorModel(
+    resourceManager: ResourceManager,
+): SelectCollatorModel = mapCollatorToSelectCollatorModel(
     collator = selectedCollator.collator,
     stakedAmount = selectedCollator.delegation,
     chain = chain,
     active = active,
     asset = asset,
-    addressIconGenerator = addressIconGenerator
+    addressIconGenerator = addressIconGenerator,
+    resourceManager = resourceManager
 )
 
 suspend fun mapCollatorToSelectCollatorModel(
@@ -48,6 +57,7 @@ suspend fun mapCollatorToSelectCollatorModel(
     delegatorState: DelegatorState,
     asset: Asset,
     addressIconGenerator: AddressIconGenerator,
+    resourceManager: ResourceManager,
     active: Boolean = true
 ): SelectCollatorModel {
     val chain = delegatorState.chain
@@ -61,7 +71,8 @@ suspend fun mapCollatorToSelectCollatorModel(
         chain = chain,
         active = active,
         asset = asset,
-        addressIconGenerator = addressIconGenerator
+        addressIconGenerator = addressIconGenerator,
+        resourceManager = resourceManager,
     )
 }
 
@@ -72,14 +83,38 @@ suspend fun mapCollatorToSelectCollatorModel(
     chain: Chain,
     asset: Asset,
     addressIconGenerator: AddressIconGenerator,
+    resourceManager: ResourceManager,
 ): SelectCollatorModel {
     val addressModel = addressIconGenerator.collatorAddressModel(collator, chain)
     val stakedAmountModel = stakedAmount?.let { mapAmountToAmountModel(stakedAmount, asset) }
 
+    val subtitle = stakedAmountModel?.let {
+        resourceManager.labeledAmountSubtitle(R.string.staking_main_stake_balance_staked, it, selectionActive = active)
+    }
+
     return SelectCollatorModel(
         addressModel = addressModel,
-        amount = stakedAmountModel,
         payload = collator,
-        active = active
+        active = active,
+        subtitle = subtitle
     )
+}
+
+fun ResourceManager.labeledAmountSubtitle(
+    @StringRes labelRes: Int,
+    amount: AmountModel,
+    selectionActive: Boolean
+): CharSequence {
+    val labelText = "${getString(labelRes)}: "
+
+    return if (selectionActive) {
+        buildSpannable(this) {
+            appendColored(labelText, R.color.white_64)
+            appendColored(amount.token, R.color.white)
+        }
+    } else {
+        buildSpannable(this) {
+            appendColored(labelText + amount.token, R.color.textInactive)
+        }
+    }
 }

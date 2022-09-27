@@ -27,11 +27,21 @@ interface StorageQueryContext {
         binding: DynamicInstanceBinderWithKey<K, V>
     ): Flow<Map<K, V>>
 
+    suspend fun <K, V> StorageEntry.observeByPrefix(
+        vararg prefixArgs: Any?,
+        keyExtractor: (StorageKeyComponents) -> K,
+        binding: DynamicInstanceBinderWithKey<K, V>
+    ): Flow<Map<K, V>>
+
     suspend fun <K, V> StorageEntry.entries(
         vararg prefixArgs: Any?,
         keyExtractor: (StorageKeyComponents) -> K,
         binding: DynamicInstanceBinderWithKey<K, V>
     ): Map<K, V>
+
+    suspend fun StorageEntry.entriesRaw(
+        vararg prefixArgs: Any?,
+    ): Map<String, String?>
 
     suspend fun StorageEntry.entriesRaw(
         keysArguments: List<List<Any?>>
@@ -47,6 +57,10 @@ interface StorageQueryContext {
         vararg keyArguments: Any?,
         binding: DynamicInstanceBinder<V>
     ): V
+
+    suspend fun StorageEntry.queryRaw(
+        vararg keyArguments: Any?
+    ): String?
 
     suspend fun multi(
         builderBlock: MultiQueryBuilder.() -> Unit

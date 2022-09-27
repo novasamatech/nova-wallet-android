@@ -8,7 +8,6 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.b
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.filterOwn
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.AssetHistory
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
-import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
@@ -26,6 +25,7 @@ class NativeAssetHistory(
 
     override suspend fun fetchOperationsForBalanceChange(
         chain: Chain,
+        chainAsset: Chain.Asset,
         blockHash: String,
         accountId: AccountId
     ): Result<List<TransferExtrinsic>> = runCatching {
@@ -41,7 +41,7 @@ class NativeAssetHistory(
                     recipientId = bindAccountIdentifier(extrinsic.call.arguments["dest"]),
                     amountInPlanks = bindNumber(extrinsic.call.arguments["value"]),
                     hash = it.extrinsicHash,
-                    chainAsset = chain.utilityAsset,
+                    chainAsset = chainAsset,
                     status = it.status()
                 )
             }.filterOwn(accountId)

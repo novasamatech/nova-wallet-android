@@ -7,8 +7,14 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.MultiLocation
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.XcmMultiAsset.Fungibility
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.Type
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.DictEnum
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.primitives.NumberType
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.skipAliases
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
+import jp.co.soramitsu.fearless_utils.runtime.metadata.call
+import jp.co.soramitsu.fearless_utils.runtime.metadata.module
 
 fun ExtrinsicBuilder.xcmExecute(
     message: VersionedXcm,
@@ -19,9 +25,27 @@ fun ExtrinsicBuilder.xcmExecute(
         callName = "execute",
         arguments = mapOf(
             "message" to message.toEncodableInstance(),
-            "max_weight" to maxWeight
+            "max_weight" to runtime.prepareWeightForEncoding(maxWeight)
         )
     )
+}
+
+private fun RuntimeSnapshot.prepareWeightForEncoding(weight: Weight): Any {
+    val moduleName = metadata.xcmPalletName()
+    val call = metadata.module(moduleName).call("execute")
+
+    val weightArgument = call.arguments.first { it.name == "max_weight" }
+    val weightArgumentType = weightArgument.type?.skipAliases()!!
+
+    return when {
+        weightArgumentType.isWeightV1() -> weight
+        // it is either a Weight1.5 or we don't know how to handle it
+        else -> structOf("refTime" to weight)
+    }
+}
+
+private fun Type<*>.isWeightV1(): Boolean {
+    return this is NumberType
 }
 
 private fun VersionedXcm.toEncodableInstance() = when (this) {
