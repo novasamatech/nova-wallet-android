@@ -11,6 +11,7 @@ import io.novafoundation.nova.runtime.ext.type
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.encrypt.EncryptionType
+import jp.co.soramitsu.fearless_utils.encrypt.MultiChainEncryption
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -32,15 +33,15 @@ class RealShowSignParitySignerInteractor(
         val txPayload = payload.paritySignerTxPayload()
         val chain = chainRegistry.getChain(payload.chainId)
 
-        val encryptionType = when (chain.type) {
-            Chain.Type.SUBSTRATE -> EncryptionType.SR25519
-            Chain.Type.ETHEREUM -> EncryptionType.ECDSA
+        val multiChainEncryption = when (chain.type) {
+            Chain.Type.SUBSTRATE -> MultiChainEncryption.Substrate(EncryptionType.SR25519)
+            Chain.Type.ETHEREUM -> MultiChainEncryption.Ethereum
         }
 
         val uosPayload = UOS.createUOSPayload(
             payload = txPayload,
             contentCode = ParitySignerUOSContentCode.SUBSTRATE,
-            cryptoCode = encryptionType.paritySignerUOSCryptoType(),
+            cryptoCode = multiChainEncryption.paritySignerUOSCryptoType(),
             payloadCode = ParitySignerUOSPayloadCode.TRANSACTION
         )
         val multiFramePayload = LegacyMultiPart.createSingle(uosPayload)
