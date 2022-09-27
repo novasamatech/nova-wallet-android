@@ -13,7 +13,8 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.search.AssetSearchViewModel
-import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
+import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
+import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -25,9 +26,8 @@ class AssetSearchModule {
     fun provideInteractor(
         walletRepository: WalletRepository,
         accountRepository: AccountRepository,
-        chainRegistry: ChainRegistry,
-        currencyRepository: CurrencyRepository
-    ) = AssetSearchInteractor(walletRepository, accountRepository, chainRegistry, currencyRepository)
+        chainRegistry: ChainRegistry
+    ) = AssetSearchInteractor(walletRepository, accountRepository, chainRegistry)
 
     @Provides
     internal fun provideViewModel(fragment: Fragment, factory: ViewModelProvider.Factory): AssetSearchViewModel {
@@ -40,10 +40,14 @@ class AssetSearchModule {
     fun provideViewModel(
         router: AssetsRouter,
         interactor: AssetSearchInteractor,
+        currencyInteractor: CurrencyInteractor,
+        contributionsInteractor: ContributionsInteractor
     ): ViewModel {
         return AssetSearchViewModel(
             router = router,
-            interactor = interactor
+            interactor = interactor,
+            currencyInteractor = currencyInteractor,
+            contributionsInteractor = contributionsInteractor
         )
     }
 }

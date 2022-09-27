@@ -17,6 +17,7 @@ import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.core_db.dao.LockDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -27,11 +28,12 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.W
 import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnly.WatchOnlyMissingKeysPresenter
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
+import io.novafoundation.nova.feature_crowdloan_api.data.repository.ContributionsRepository
+import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdateSystemFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
@@ -52,6 +54,12 @@ import jp.co.soramitsu.fearless_utils.wsrpc.logging.Logger
 import javax.inject.Named
 
 interface AssetsFeatureDependencies {
+
+    fun contributionsInteractor(): ContributionsInteractor
+
+    fun contributionsRepository(): ContributionsRepository
+
+    fun locksDao(): LockDao
 
     fun currencyInteractor(): CurrencyInteractor
 
@@ -122,8 +130,6 @@ interface AssetsFeatureDependencies {
     fun amountChooserFactory(): AmountChooserMixin.Factory
 
     fun walletConstants(): WalletConstants
-
-    fun balanceLocksUpdateSystemFactory(): BalanceLocksUpdateSystemFactory
 
     val assetsSourceRegistry: AssetSourceRegistry
 

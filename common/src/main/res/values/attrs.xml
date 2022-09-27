@@ -49,7 +49,7 @@
         <attr name="enabled" format="boolean" />
         <attr name="android:singleLine" />
 
-        <attr format="reference" name="messageStyle" />
+        <attr name="messageStyle" format="reference" />
     </declare-styleable>
 
     <declare-styleable name="AccountInfoView">
@@ -75,6 +75,9 @@
             <enum name="text" value="0" />
             <enum name="link" value="1" />
         </attr>
+        <attr name="titleValueTextAppearance" format="reference" />
+        <attr name="primaryValueTextAppearance" format="reference" />
+        <attr name="secondaryValueTextAppearance" format="reference" />
         <attr name="titleIcon" format="reference|color" />
         <attr name="primaryValueIconTint" format="color" />
     </declare-styleable>
@@ -95,14 +98,14 @@
     </declare-styleable>
 
     <declare-styleable name="PrimaryButton">
-        <attr format="enum" name="appearance">
+        <attr name="appearance" format="enum">
             <enum name="primary" value="0" />
             <enum name="primaryTransparent" value="1" />
             <enum name="secondary" value="2" />
             <enum name="secondaryTransparent" value="3" />
         </attr>
 
-        <attr format="enum" name="size">
+        <attr name="size" format="enum">
             <enum name="large" value="0" />
             <enum name="small" value="1" />
         </attr>
@@ -119,7 +122,7 @@
         <attr name="sectionContentEndIcon" format="reference|color" />
         <attr name="sectionContentEndIconTint" format="color" />
     </declare-styleable>
-    
+
     <declare-styleable name="SearchView">
         <attr name="android:hint" />
         <attr name="icon" />
@@ -130,7 +133,7 @@
         <attr name="subtitle" />
         <attr name="dividerVisible" />
     </declare-styleable>
-    
+
     <declare-styleable name="AdvertisementCard">
         <attr name="title" />
         <attr name="subtitle" />
@@ -158,7 +161,7 @@
     <declare-styleable name="SearchToolbar">
         <attr name="android:hint" />
     </declare-styleable>
-    
+
     <declare-styleable name="ButtonLarge">
         <attr name="icon" />
         <attr name="title" />

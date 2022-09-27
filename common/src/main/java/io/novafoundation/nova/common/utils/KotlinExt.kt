@@ -1,9 +1,6 @@
 package io.novafoundation.nova.common.utils
 
 import android.net.Uri
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.math.BigDecimal
@@ -12,12 +9,14 @@ import java.util.UUID
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 
 private val PERCENTAGE_MULTIPLIER = 100.toBigDecimal()
 
 fun BigDecimal.fractionToPercentage() = this * PERCENTAGE_MULTIPLIER
 
-fun Float.percentageToFraction() = this / 100f
 fun Double.percentageToFraction() = this / 100
 
 infix fun Int.floorMod(divisor: Int) = Math.floorMod(this, divisor)
@@ -26,6 +25,12 @@ infix fun Int.floorMod(divisor: Int) = Math.floorMod(this, divisor)
  * Compares two BigDecimals taking into account only values but not scale unlike `==` operator
  */
 infix fun BigDecimal.hasTheSaveValueAs(another: BigDecimal) = compareTo(another) == 0
+
+val BigDecimal.isZero: Boolean
+    get() = signum() == 0
+
+val BigDecimal.isPositive: Boolean
+    get() = signum() > 0
 
 val BigDecimal.isNonNegative: Boolean
     get() = signum() >= 0
@@ -120,6 +125,8 @@ private val NAMED_PATTERN_REGEX = "\\{([a-zA-z]+)\\}".toRegex()
 
 fun String.formatNamed(vararg values: Pair<String, String>) = formatNamed(values.toMap())
 
+fun String.capitalize() = this.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+
 /**
  * Replaces all parts in form of '{name}' to the corresponding value from values using 'name' as a key.
  *
@@ -208,4 +215,5 @@ operator fun ByteArray.compareTo(other: ByteArray): Int {
 
     return 0
 }
+
 fun ByteArrayComparator() = Comparator<ByteArray> { a, b -> a.compareTo(b) }

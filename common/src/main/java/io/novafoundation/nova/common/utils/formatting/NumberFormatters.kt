@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalTime::class)
-
 package io.novafoundation.nova.common.utils.formatting
 
 import android.content.Context
@@ -14,7 +12,6 @@ import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
 
 private const val DECIMAL_PATTERN_BASE = "###,###."
 
@@ -22,7 +19,7 @@ private const val GROUPING_SEPARATOR = ','
 private const val DECIMAL_SEPARATOR = '.'
 
 private const val FULL_PRECISION = 5
-private const val ABBREVIATED_PRECISION = 2
+const val ABBREVIATED_PRECISION = 2
 
 private val defaultAbbreviationFormatter = FixedPrecisionFormatter(ABBREVIATED_PRECISION)
 private val defaultFullFormatter = FixedPrecisionFormatter(FULL_PRECISION)
@@ -112,7 +109,7 @@ fun decimalFormatterFor(pattern: String): DecimalFormat {
 
         decimalFormatSymbols = symbols
 
-        roundingMode = RoundingMode.FLOOR
+        this.roundingMode = RoundingMode.FLOOR
         decimalFormatSymbols = decimalFormatSymbols
     }
 }

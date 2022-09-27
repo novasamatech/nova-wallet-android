@@ -3,9 +3,10 @@ package io.novafoundation.nova.feature_crowdloan_impl.domain.main
 import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
+import io.novafoundation.nova.feature_crowdloan_api.data.repository.ContributionsRepository
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRepository
-import io.novafoundation.nova.feature_crowdloan_api.data.repository.getContributions
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.mapFundInfoToCrowdloan
+import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
@@ -19,10 +20,16 @@ typealias GroupedCrowdloans = GroupedList<KClass<out Crowdloan.State>, Crowdloan
 
 class CrowdloanInteractor(
     private val crowdloanRepository: CrowdloanRepository,
-    private val chainStateRepository: ChainStateRepository
+    private val chainStateRepository: ChainStateRepository,
+    private val contributionsRepository: ContributionsRepository
 ) {
 
-    fun crowdloansFlow(chain: Chain, account: MetaAccount): Flow<List<Crowdloan>> {
+    fun groupedCrowdloansFlow(chain: Chain, account: MetaAccount): Flow<GroupedCrowdloans> {
+        return crowdloansFlow(chain, account)
+            .map { groupCrowdloans(it) }
+    }
+
+    private fun crowdloansFlow(chain: Chain, account: MetaAccount): Flow<List<Crowdloan>> {
         return flow {
             val accountId = account.accountIdIn(chain)
 
@@ -30,7 +37,7 @@ class CrowdloanInteractor(
         }
     }
 
-    fun groupCrowdloans(crowdloans: List<Crowdloan>): GroupedCrowdloans {
+    private fun groupCrowdloans(crowdloans: List<Crowdloan>): GroupedCrowdloans {
         return crowdloans.groupBy { it.state::class }
             .toSortedMap(Crowdloan.State.STATE_CLASS_COMPARATOR)
     }
@@ -48,7 +55,8 @@ class CrowdloanInteractor(
         return chainStateRepository.currentBlockNumberFlow(chain.id).map { currentBlockNumber ->
             val fundInfos = crowdloanRepository.allFundInfos(chainId)
 
-            val directContributions = contributor?.let { it -> crowdloanRepository.getContributions(chainId, it, fundInfos) } ?: emptyMap()
+            val directContributions = contributor?.let { it -> contributionsRepository.getDirectContributions(chain, chain.utilityAsset, it, fundInfos) }
+                ?.associateBy { it.paraId } ?: emptyMap()
 
             val winnerInfo = crowdloanRepository.getWinnerInfo(chainId, fundInfos)
 

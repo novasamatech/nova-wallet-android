@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_assets.domain
 
 import io.novafoundation.nova.common.data.model.CursorPage
-import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_assets.domain.common.AssetGroup
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
@@ -11,17 +10,12 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.OperationsPageChange
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.flow.Flow
-import java.math.BigDecimal
-
-class Balances(
-    val assets: GroupedList<AssetGroup, Asset>,
-    val totalBalanceFiat: BigDecimal,
-    val lockedBalanceFiat: BigDecimal
-)
 
 interface WalletInteractor {
 
-    fun balancesFlow(): Flow<Balances>
+    fun filterAssets(assetsFlow: Flow<List<Asset>>): Flow<List<Asset>>
+
+    fun assetsFlow(): Flow<List<Asset>>
 
     suspend fun syncAssetsRates(currency: Currency)
 
@@ -30,8 +24,6 @@ interface WalletInteractor {
     fun assetFlow(chainId: ChainId, chainAssetId: Int): Flow<Asset>
 
     fun commissionAssetFlow(chainId: ChainId): Flow<Asset>
-
-    suspend fun getCurrentAsset(chainId: ChainId, chainAssetId: Int): Asset
 
     fun operationsFirstPageFlow(chainId: ChainId, chainAssetId: Int): Flow<OperationsPageChange>
 
@@ -49,4 +41,6 @@ interface WalletInteractor {
         cursor: String?,
         filters: Set<TransactionFilter>
     ): Result<CursorPage<Operation>>
+
+    suspend fun groupAssets(assets: List<Asset>): Map<AssetGroup, List<Asset>>
 }

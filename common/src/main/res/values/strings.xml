@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="feature_asset_balance_breakdown_total_balance">Total balance</string>
+
+    <string name="crowdloan_contributions_liquid_source">Liquid</string>
+    <string name="crowdloan_contributions_parallel_source">Parallel</string>
+
+    <string name="common_crowdloan">Crowdloan</string>
+
+    <string name="crowdloan_missing_account_message">You should add %s account to the wallet in order to contribute</string>
+
     <string name="common_accept_terms">Accept terms...</string>
     <string name="yield_boost_terms">Yield Boost will automatically stake %s all my transferable tokens above %s</string>
 
@@ -38,8 +47,6 @@
     <string name="common_on">On</string>
     <string name="common_off">Off</string>
     <string name="staking_turing_yield_boost">Yield Boost</string>
-
-    <string name="crowdloan_missing_account_message">You should add %s account to the wallet in order to contribute</string>
 
     <string name="ledger_chain_not_supported">Ledger doesn’t support %s</string>
     <string name="account_parity_signer_chain_not_supported">Parity Signer doesn’t support %s</string>
