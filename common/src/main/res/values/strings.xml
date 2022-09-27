@@ -5,6 +5,8 @@
     <string name="crowdloan_contributions_liquid_source">Liquid</string>
     <string name="crowdloan_contributions_parallel_source">Parallel</string>
 
+    <string name="common_crowdloan">Crowdloan</string>
+
     <string name="crowdloan_missing_account_message">You should add %s account to the wallet in order to contribute</string>
 
     <string name="common_accept_terms">Accept terms...</string>
