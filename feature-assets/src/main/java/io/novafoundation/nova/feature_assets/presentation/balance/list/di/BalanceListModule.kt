@@ -52,13 +52,11 @@ class BalanceListModule {
     @ScreenScope
     fun provideBalanceBreakdownInteractor(
         accountRepository: AccountRepository,
-        balanceLocksRepository: BalanceLocksRepository,
-        contributionsRepository: ContributionsRepository
+        balanceLocksRepository: BalanceLocksRepository
     ): BalanceBreakdownInteractor {
         return BalanceBreakdownInteractor(
             accountRepository,
-            balanceLocksRepository,
-            contributionsRepository
+            balanceLocksRepository
         )
     }
 

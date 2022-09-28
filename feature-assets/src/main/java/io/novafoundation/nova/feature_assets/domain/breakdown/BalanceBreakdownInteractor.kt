@@ -51,8 +51,7 @@ class BalanceBreakdown(
 
 class BalanceBreakdownInteractor(
     private val accountRepository: AccountRepository,
-    private val balanceLocksRepository: BalanceLocksRepository,
-    private val contributionsRepository: ContributionsRepository
+    private val balanceLocksRepository: BalanceLocksRepository
 ) {
 
     private class TotalAmount(
