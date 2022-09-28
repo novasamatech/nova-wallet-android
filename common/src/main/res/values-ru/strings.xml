@@ -127,6 +127,7 @@
     <string name="accounts_add_wallet">Добавить кошелёк</string>
     <string name="accounts_change_chain_account">Изменить аккаунт %s</string>
     <string name="accounts_change_chain_secrets">Изменить аккаунт</string>
+    <string name="assets_balance_details_locks_crowdloans">Краудлоуны</string>
     <string name="assets_balance_details_locks_democrac">Демократия</string>
     <string name="assets_balance_details_locks_phrelect">Выборы</string>
     <string name="assets_balance_details_locks_staking">Стейкинг</string>
@@ -310,6 +311,8 @@
     <string name="crowdloan_contribute_title">Внести вклад в краудлоун</string>
     <string name="crowdloan_contribution">Тип вклада</string>
     <string name="crowdloan_contribution_format">Вы вложили: %s</string>
+    <string name="crowdloan_contributions_liquid_source">Liquid</string>
+    <string name="crowdloan_contributions_parallel_source">Parallel</string>
     <string name="crowdloan_contributions_placeholder">Ваши взносы\n появятся здесь</string>
     <string name="crowdloan_contributions_returns_in">Вернется через %s</string>
     <string name="crowdloan_contributions_to_be_returned">Ожидает возвращения парачейном</string>

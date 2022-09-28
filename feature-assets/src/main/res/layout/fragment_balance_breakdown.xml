@@ -21,7 +21,7 @@
       android:layout_height="wrap_content"
       android:layout_marginStart="16dp"
       android:layout_marginTop="23dp"
-      android:text="@string/feature_asset_balance_breakdown_total_balance"
+      android:text="@string/wallet_balance_details_total"
       android:textColor="@color/white"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="parent" />

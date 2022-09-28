@@ -13,8 +13,8 @@ import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.
 import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnly.WatchOnlyMissingKeysPresenter
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.data.mappers.mappers.mapTokenToTokenModel
-import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksInteractor
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
+import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
@@ -191,7 +191,7 @@ class BalanceDetailViewModel(
 
                 if (contributions.totalContributed.isPositive()) {
                     val totalContributedBalance = BalanceLocksModel.Lock(
-                        resourceManager.getString(R.string.common_crowdloan),
+                        resourceManager.getString(R.string.assets_balance_details_locks_crowdloans),
                         mapAmountToAmountModel(contributions.totalContributed, asset)
                     )
 
