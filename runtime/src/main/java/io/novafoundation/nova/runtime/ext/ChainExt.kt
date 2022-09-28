@@ -186,7 +186,7 @@ fun Chain.Asset.ormlCurrencyId(runtime: RuntimeSnapshot): Any? {
     val ormlType = requireOrml()
 
     val currencyIdType = runtime.typeRegistry[ormlType.currencyIdType]
-        ?: error("Cannot find type $ormlType.currencyIdType")
+        ?: error("Cannot find type ${ormlType.currencyIdType}")
 
     return currencyIdType.fromHex(runtime, ormlType.currencyIdScale)
 }

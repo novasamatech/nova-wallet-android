@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
-    <string name="feature_asset_balance_breakdown_total_balance">Total balance</string>
-
     <string name="crowdloan_contributions_liquid_source">Liquid</string>
     <string name="crowdloan_contributions_parallel_source">Parallel</string>
 
-    <string name="common_crowdloan">Crowdloan</string>
+    <string name="assets_balance_details_locks_crowdloans">Crowdloans</string>
 
     <string name="crowdloan_missing_account_message">You should add %s account to the wallet in order to contribute</string>
 
