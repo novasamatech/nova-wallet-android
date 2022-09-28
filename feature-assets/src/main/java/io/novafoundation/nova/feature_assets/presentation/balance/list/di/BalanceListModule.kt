@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksRepository
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.list.BalanceListViewModel
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ContributionsRepository
+import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -71,6 +72,7 @@ class BalanceListModule {
         selectedAccountUseCase: SelectedAccountUseCase,
         currencyInteractor: CurrencyInteractor,
         balanceBreakdownInteractor: BalanceBreakdownInteractor,
+        contributionsInteractor: ContributionsInteractor,
         resourceManager: ResourceManager
     ): ViewModel {
         return BalanceListViewModel(
@@ -80,6 +82,7 @@ class BalanceListModule {
             router,
             currencyInteractor,
             balanceBreakdownInteractor,
+            contributionsInteractor,
             resourceManager
         )
     }

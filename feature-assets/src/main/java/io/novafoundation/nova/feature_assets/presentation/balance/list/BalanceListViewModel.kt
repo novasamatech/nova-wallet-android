@@ -29,12 +29,12 @@ import io.novafoundation.nova.feature_assets.presentation.balance.list.model.Nft
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.TotalBalanceModel
 import io.novafoundation.nova.feature_assets.presentation.common.mapBalanceIdToUi
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
+import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import io.novafoundation.nova.runtime.ext.fullId
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
@@ -59,6 +59,7 @@ class BalanceListViewModel(
     private val router: AssetsRouter,
     private val currencyInteractor: CurrencyInteractor,
     private val balanceBreakdownInteractor: BalanceBreakdownInteractor,
+    private val contributionsInteractor: ContributionsInteractor,
     private val resourceManager: ResourceManager
 ) : BaseViewModel() {
 
@@ -91,7 +92,10 @@ class BalanceListViewModel(
     val selectedWalletModelFlow = selectedAccountUseCase.selectedWalletModelFlow()
         .shareInBackground()
 
-    private val balanceBreakdown = balanceBreakdownInteractor.balanceBreakdownFlow(assetsFlow)
+    private val offChainBalances = contributionsInteractor.observeTotalContributedByAssets()
+        .shareInBackground()
+
+    private val balanceBreakdown = balanceBreakdownInteractor.balanceBreakdownFlow(assetsFlow, offChainBalances)
         .shareInBackground()
 
     private val nftsPreviews = assetsListInteractor.observeNftPreviews()
@@ -108,14 +112,8 @@ class BalanceListViewModel(
         .inBackground()
         .share()
 
-    val assetModelsFlow = combine(filteredAssetsFlow, selectedCurrency, balanceBreakdown) { assets, currensy, breakdown ->
-        val contributionsByFullAssetId = breakdown.contributions
-            .associateBy(
-                keySelector = { it.asset.token.configuration.fullId },
-                valueTransform = { it.amountInPlanks }
-            )
-
-        walletInteractor.groupAssets(assets).mapGroupedAssetsToUi(currensy, contributionsByFullAssetId)
+    val assetModelsFlow = combine(filteredAssetsFlow, selectedCurrency, offChainBalances) { assets, currency, offChainBalances ->
+        walletInteractor.groupAssets(assets, offChainBalances).mapGroupedAssetsToUi(currency)
     }
         .distinctUntilChanged()
         .shareInBackground()

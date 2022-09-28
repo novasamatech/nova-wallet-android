@@ -16,8 +16,8 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 class AssetSearchViewModel(
     private val router: AssetsRouter,
     interactor: AssetSearchInteractor,
-    private val currencyInteractor: CurrencyInteractor,
-    private val contributionsInteractor: ContributionsInteractor,
+    currencyInteractor: CurrencyInteractor,
+    contributionsInteractor: ContributionsInteractor,
 ) : BaseViewModel() {
 
     val query = MutableStateFlow("")
@@ -29,11 +29,10 @@ class AssetSearchViewModel(
     private val totalContributedByAssetsFlow = contributionsInteractor.observeTotalContributedByAssets()
 
     val searchResults = combine(
-        interactor.searchAssetsFlow(query),
+        interactor.searchAssetsFlow(query, totalContributedByAssetsFlow),
         selectedCurrency,
-        totalContributedByAssetsFlow
-    ) { assets, currency, totalContributedByAssets ->
-        assets.mapGroupedAssetsToUi(currency, totalContributedByAssets)
+    ) { assets, currency ->
+        assets.mapGroupedAssetsToUi(currency)
     }
         .distinctUntilChanged()
         .shareInBackground()

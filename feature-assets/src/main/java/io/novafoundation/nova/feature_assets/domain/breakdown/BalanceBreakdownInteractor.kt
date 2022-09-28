@@ -7,17 +7,16 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_assets.domain.breakdown.BalanceBreakdown.Companion.CROWDLOAN_ID
 import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksRepository
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ContributionsRepository
-import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.Contribution
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
-import io.novafoundation.nova.runtime.ext.utilityAsset
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import java.math.BigDecimal
-import java.math.BigInteger
+import io.novafoundation.nova.runtime.ext.fullId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
+import java.math.BigDecimal
+import java.math.BigInteger
 
 class BalanceBreakdown(
     val total: BigDecimal,
@@ -62,17 +61,20 @@ class BalanceBreakdownInteractor(
         val locksFiat: BigDecimal,
     )
 
-    fun balanceBreakdownFlow(assetsFlow: Flow<List<Asset>>): Flow<BalanceBreakdown> {
+    fun balanceBreakdownFlow(
+        assetsFlow: Flow<List<Asset>>,
+        contributions: Flow<Map<FullChainAssetId, Balance>>
+    ): Flow<BalanceBreakdown> {
         return accountRepository.selectedMetaAccountFlow().flatMapLatest { metaAccount ->
             unite(
                 assetsFlow,
                 balanceLocksRepository.observeLocksForMetaAccount(metaAccount),
-                contributionsRepository.observeContributions(metaAccount)
+                contributions
             ) { assets, locks, contributions ->
                 if (assets == null) {
                     BalanceBreakdown.empty()
                 } else {
-                    val assetsByChainId = assets.associateBy { it.token.configuration.chainId to it.token.configuration.id }
+                    val assetsByChainId = assets.associateBy { it.token.configuration.fullId }
                     val locksOrEmpty = locks?.let { mapLocks(assetsByChainId, it) }.orEmpty()
                     val contributionsOrEmpty = contributions?.let { mapContributions(assetsByChainId, it) }.orEmpty()
                     val reserved = getReservedBreakdown(assets)
@@ -98,16 +100,11 @@ class BalanceBreakdownInteractor(
     }
 
     private fun mapLocks(
-        assetsByChainId: Map<Pair<ChainId, ChainAssetId>, Asset>,
+        assetsByChainId: Map<FullChainAssetId, Asset>,
         locks: List<BalanceLock>
     ): List<BalanceBreakdown.BreakdownItem> {
         return locks.mapNotNull { lock ->
-            val asset = assetsByChainId[lock.chainAsset.chainId to lock.chainAsset.id]
-            if (asset == null) {
-                null
-            } else {
-                val token = asset.token
-                val tokenAmount = token.amountFromPlanks(lock.amountInPlanks)
+            assetsByChainId[lock.chainAsset.fullId]?.let { asset ->
                 BalanceBreakdown.BreakdownItem(
                     id = lock.id,
                     asset = asset,
@@ -118,26 +115,18 @@ class BalanceBreakdownInteractor(
     }
 
     private fun mapContributions(
-        assetsByChainId: Map<Pair<ChainId, ChainAssetId>, Asset>,
-        contributions: List<Contribution>
+        assetsByChainId: Map<FullChainAssetId, Asset>,
+        contributions: Map<FullChainAssetId, BigInteger>
     ): List<BalanceBreakdown.BreakdownItem> {
-        return contributions.groupBy { it.chain.id to it.chain.utilityAsset.id }
-            .mapNotNull { (chainAndAssetId, chainContributions) ->
-                val asset = assetsByChainId[chainAndAssetId]
-                if (asset == null) {
-                    null
-                } else {
-                    val token = asset.token
-
-                    val totalAmountInPlanks = chainContributions.sumOf { it.amountInPlanks }
-                    val tokenAmount = token.amountFromPlanks(totalAmountInPlanks)
-                    BalanceBreakdown.BreakdownItem(
-                        id = CROWDLOAN_ID,
-                        asset = asset,
-                        amountInPlanks = totalAmountInPlanks,
-                    )
-                }
+        return contributions.mapNotNull { (chainAndAssetId, chainContributions) ->
+            assetsByChainId[chainAndAssetId]?.let { asset ->
+                BalanceBreakdown.BreakdownItem(
+                    id = CROWDLOAN_ID,
+                    asset = asset,
+                    amountInPlanks = chainContributions,
+                )
             }
+        }
     }
 
     private fun calculateTotalBalance(
