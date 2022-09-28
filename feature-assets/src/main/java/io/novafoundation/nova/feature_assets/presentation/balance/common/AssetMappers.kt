@@ -12,30 +12,37 @@ import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
+import io.novafoundation.nova.runtime.ext.fullId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import java.math.BigInteger
 
-fun GroupedList<AssetGroup, Asset>.mapGroupedAssetsToUi(currency: Currency, offChainBalanceByAssetId: Map<ChainAssetId, BigInteger>): List<Any> {
+fun GroupedList<AssetGroup, Asset>.mapGroupedAssetsToUi(
+    currency: Currency,
+    offChainBalanceByAssetId: Map<FullChainAssetId, BigInteger>
+): List<Any> {
     return mapKeys { (assetGroup, assets) -> mapAssetGroupToUi(assetGroup, assets, currency, offChainBalanceByAssetId) }
         .mapValues { (_, assets) -> mapAssetsToAssetModels(assets, offChainBalanceByAssetId) }
         .toListWithHeaders()
 }
 
-fun mapAssetsToAssetModels(assets: List<Asset>, contributionsByAssetId: Map<ChainAssetId, BigInteger>): List<AssetModel> {
+fun mapAssetsToAssetModels(
+    assets: List<Asset>,
+    offChainBalanceByAssetId: Map<FullChainAssetId, BigInteger>
+): List<AssetModel> {
     return assets.map {
-        val offChainBalance = contributionsByAssetId[it.token.configuration.id].orZero()
+        val offChainBalance = offChainBalanceByAssetId[it.token.configuration.fullId].orZero()
         mapAssetToAssetModel(it, offChainBalance)
     }
 }
 
 private fun mapAssetGroupToUi(
     assetGroup: AssetGroup,
-    assets: List<Asset>,
+    groupAssets: List<Asset>,
     currency: Currency,
-    offChainBalanceByAssetId: Map<ChainAssetId, BigInteger>
+    offChainBalanceByAssetId: Map<FullChainAssetId, BigInteger>
 ): AssetGroupUi {
-    val offChainGroupFiatBalance = assets.sumOf {
-        val offChainInPlanks = offChainBalanceByAssetId[it.token.configuration.id].orZero()
+    val offChainGroupFiatBalance = groupAssets.sumOf {
+        val offChainInPlanks = offChainBalanceByAssetId[it.token.configuration.fullId].orZero()
         val offChainTokenAmount = it.token.amountFromPlanks(offChainInPlanks)
         it.token.priceOf(offChainTokenAmount)
     }

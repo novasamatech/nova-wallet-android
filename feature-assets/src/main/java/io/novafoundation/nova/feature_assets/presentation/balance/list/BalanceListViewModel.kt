@@ -34,8 +34,7 @@ import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import kotlin.time.ExperimentalTime
-import kotlin.time.seconds
+import io.novafoundation.nova.runtime.ext.fullId
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
@@ -47,6 +46,8 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
+import kotlin.time.ExperimentalTime
+import kotlin.time.seconds
 
 private typealias SyncAction = suspend (MetaAccount) -> Unit
 
@@ -108,10 +109,13 @@ class BalanceListViewModel(
         .share()
 
     val assetModelsFlow = combine(filteredAssetsFlow, selectedCurrency, balanceBreakdown) { assets, currensy, breakdown ->
-        val contributionsByAssetId = breakdown.contributions
-            .associateBy { it.asset.token.configuration.id }
-            .mapValues { it.value.amountInPlanks }
-        walletInteractor.groupAssets(assets).mapGroupedAssetsToUi(currensy, contributionsByAssetId)
+        val contributionsByFullAssetId = breakdown.contributions
+            .associateBy(
+                keySelector = { it.asset.token.configuration.fullId },
+                valueTransform = { it.amountInPlanks }
+            )
+
+        walletInteractor.groupAssets(assets).mapGroupedAssetsToUi(currensy, contributionsByFullAssetId)
     }
         .distinctUntilChanged()
         .shareInBackground()

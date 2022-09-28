@@ -14,17 +14,20 @@ import io.novafoundation.nova.feature_crowdloan_api.data.repository.Contribution
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRepository
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.LeasePeriodToBlocksConverter
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ParachainMetadata
+import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.Contribution
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionMetadata
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionWithMetadata
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsWithTotalAmount
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.totalContributionAmount
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.leasePeriodInMillis
+import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
@@ -50,12 +53,12 @@ class RealContributionsInteractor(
             .start()
     }
 
-    override fun observeTotalContributedByAssets(): Flow<Map<ChainAssetId, BigInteger>> {
+    override fun observeTotalContributedByAssets(): Flow<Map<FullChainAssetId, BigInteger>> {
         return accountRepository.selectedMetaAccountFlow().flatMapLatest { metaAccount ->
             contributionsRepository.observeContributions(metaAccount)
-        }.map {
-            it.groupBy { it.asset.id }
-                .mapValues { entry -> entry.value.sumOf { it.amountInPlanks } }
+        }.map { contributions ->
+            contributions.groupBy { it.asset.fullId }
+                .mapValues { entry -> entry.value.sumOf(Contribution::amountInPlanks) }
         }
     }
 
