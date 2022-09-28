@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.utils.substrateAccountId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Type
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ExplorerTemplateExtractor
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.TypesUsage
 import jp.co.soramitsu.fearless_utils.extensions.asEthereumAccountId
 import jp.co.soramitsu.fearless_utils.extensions.asEthereumAddress
@@ -189,6 +190,9 @@ fun Chain.Asset.ormlCurrencyId(runtime: RuntimeSnapshot): Any? {
 
     return currencyIdType.fromHex(runtime, ormlType.currencyIdScale)
 }
+
+val Chain.Asset.fullId: FullChainAssetId
+    get() = FullChainAssetId(chainId, id)
 
 fun Chain.findAssetByStatemineId(statemineAssetId: BigInteger): Chain.Asset? {
     return assets.find {
