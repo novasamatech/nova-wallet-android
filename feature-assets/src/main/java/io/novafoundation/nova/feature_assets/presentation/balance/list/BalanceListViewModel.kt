@@ -128,7 +128,7 @@ class BalanceListViewModel(
         .inBackground()
         .share()
 
-    val shouldShowPlaceholderFlow = assetsFlow.map { it.isEmpty() }
+    val shouldShowPlaceholderFlow = filteredAssetsFlow.map { it.isEmpty() }
 
     val balanceBreakdownFlow = balanceBreakdown.map {
         val currency = selectedCurrency.first()
