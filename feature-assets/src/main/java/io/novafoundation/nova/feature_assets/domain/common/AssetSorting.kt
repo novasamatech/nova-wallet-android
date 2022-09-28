@@ -39,7 +39,7 @@ fun groupAndSortAssetsByNetwork(
         .then(Chain.defaultComparatorFrom(AssetGroup::chain))
 
     return assets
-        .map { asset-> AssetWithOffChainBalance(asset, asset.totalWithOffChain(offChainBalancesByFullAssetId)) }
+        .map { asset -> AssetWithOffChainBalance(asset, asset.totalWithOffChain(offChainBalancesByFullAssetId)) }
         .groupBy { chainsById.getValue(it.asset.token.configuration.chainId) }
         .mapValues { (_, assets) ->
             assets.sortedWith(
