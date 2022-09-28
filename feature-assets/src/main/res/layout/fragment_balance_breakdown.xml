@@ -1,52 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/balanceDetailContainer"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-  <View
-      style="@style/Widget.Nova.Puller"
-      android:layout_gravity="center_horizontal"
-      android:layout_marginTop="4dp"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/balanceDetailContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-  <TextView
-      android:id="@+id/balanceBreakdownTitle"
-      style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginStart="16dp"
-      android:layout_marginTop="23dp"
-      android:text="@string/wallet_balance_details_total"
-      android:textColor="@color/white"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent" />
+        <View
+            style="@style/Widget.Nova.Puller"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-  <TextView
-      android:id="@+id/balanceBreakdownTotal"
-      style="@style/TextAppearance.NovaFoundation.SemiBold.SubHeadline"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_gravity="end"
-      android:layout_marginEnd="16dp"
-      android:textColor="@color/white"
-      app:layout_constraintBottom_toBottomOf="@+id/balanceBreakdownTitle"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintTop_toTopOf="@+id/balanceBreakdownTitle"
-      tools:text="$11,529.26" />
+        <TextView
+            android:id="@+id/balanceBreakdownTitle"
+            style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/wallet_balance_details_total"
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-  <androidx.recyclerview.widget.RecyclerView
-      android:id="@+id/balanceBreakdownList"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="8dp"
-      android:clipToPadding="false"
-      android:paddingBottom="16dp"
-      app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-      app:layout_constraintTop_toBottomOf="@+id/balanceBreakdownTitle" />
+        <TextView
+            android:id="@+id/balanceBreakdownTotal"
+            style="@style/TextAppearance.NovaFoundation.SemiBold.SubHeadline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginEnd="16dp"
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="@+id/balanceBreakdownTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/balanceBreakdownTitle"
+            tools:text="$11,529.26" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/balanceBreakdownList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:paddingBottom="24dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintTop_toBottomOf="@+id/balanceBreakdownTitle" />
+
+</LinearLayout>
