@@ -47,10 +47,10 @@ class AssetsTotalBalanceView @JvmOverloads constructor(
         viewAssetsTotalBalanceTotal.setVisible(true)
         viewAssetsTotalBalanceTotal.text = totalBalance.totalBalanceFiat
 
-        viewAssetsTotalBalanceLocked.setVisible(totalBalance.isLocksAvailable)
-        setBackgroundClickable(totalBalance.isLocksAvailable)
+        viewAssetsTotalBalanceLocked.setVisible(totalBalance.isBreakdownAbailable)
+        setBackgroundClickable(totalBalance.isBreakdownAbailable)
 
-        if (totalBalance.isLocksAvailable) {
+        if (totalBalance.isBreakdownAbailable) {
             viewAssetsTotalBalanceLocked.text = totalBalance.lockedBalanceFiat
             viewAssetsTotalBalanceTitle.setDrawableEnd(R.drawable.ic_info_16, paddingInDp = 4)
         } else {

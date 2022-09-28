@@ -10,7 +10,6 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.formatting.formatAsPercentage
 import io.novafoundation.nova.common.utils.inBackground
-import io.novafoundation.nova.common.utils.isPositive
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_assets.R
@@ -121,7 +120,7 @@ class BalanceListViewModel(
     val totalBalanceFlow = balanceBreakdown.map {
         val currency = selectedCurrency.first()
         TotalBalanceModel(
-            isLocksAvailable = it.locksTotal.amount.isPositive,
+            isBreakdownAbailable = it.breakdown.isNotEmpty(),
             totalBalanceFiat = it.total.formatAsCurrency(currency),
             lockedBalanceFiat = it.locksTotal.amount.formatAsCurrency(currency)
         )
@@ -193,8 +192,8 @@ class BalanceListViewModel(
 
     fun balanceBreakdownClicked() {
         launch {
-            val isLocksAvailable = totalBalanceFlow.first().isLocksAvailable
-            if (isLocksAvailable) {
+            val totalBalance = totalBalanceFlow.first()
+            if (totalBalance.isBreakdownAbailable) {
                 val balanceBreakdown = balanceBreakdownFlow.first()
                 _showBalanceBreakdownEvent.value = Event(balanceBreakdown)
             }
