@@ -7,7 +7,10 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
+import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.storage.source.StorageDataSource
+import javax.inject.Named
 
 interface GovernanceFeatureDependencies {
 
@@ -26,4 +29,7 @@ interface GovernanceFeatureDependencies {
     val accountRepository: AccountRepository
 
     val selectedAccountUseCase: SelectedAccountUseCase
+
+    @Named(REMOTE_STORAGE_SOURCE)
+    fun remoteStorageDataSource(): StorageDataSource
 }

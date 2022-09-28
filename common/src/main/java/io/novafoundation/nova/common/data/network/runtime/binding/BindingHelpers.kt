@@ -3,6 +3,7 @@ package io.novafoundation.nova.common.data.network.runtime.binding
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.RuntimeType
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.Type
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.DictEnum
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHexOrNull
 import jp.co.soramitsu.fearless_utils.runtime.metadata.RuntimeMetadata
@@ -41,7 +42,21 @@ inline fun <reified T> Any?.castOrNull(): T? {
     return this as? T
 }
 
+@OptIn(ExperimentalContracts::class)
 fun Any?.castToStruct(): Struct.Instance {
+    contract {
+        returns() implies (this@castToStruct is Struct.Instance)
+    }
+
+    return cast()
+}
+
+@OptIn(ExperimentalContracts::class)
+fun Any?.castToDictEnum(): DictEnum.Entry<*> {
+    contract {
+        returns() implies (this@castToDictEnum is DictEnum.Entry<*>)
+    }
+
     return cast()
 }
 

@@ -8,7 +8,6 @@ import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossCh
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.transferConfiguration
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
-import io.novafoundation.nova.runtime.di.RuntimeApi
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.findChain
 import kotlinx.coroutines.runBlocking
@@ -20,11 +19,6 @@ class CrossChainTransfersIntegrationTest : BaseIntegrationTest() {
     private val walletApi = FeatureUtils.getFeature<WalletFeatureApi>(
         ApplicationProvider.getApplicationContext<Context>(),
         WalletFeatureApi::class.java
-    )
-
-    private val runtimeApi = FeatureUtils.getFeature<RuntimeApi>(
-        ApplicationProvider.getApplicationContext<Context>(),
-        RuntimeApi::class.java
     )
 
     private val chainTransfersRepository = walletApi.crossChainTransfersRepository
