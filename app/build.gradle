@@ -52,8 +52,8 @@ android {
             matchingFallbacks = ['release']
             signingConfig signingConfigs.debug
 
-            versionNameSuffix '-test'
-            applicationIdSuffix '.test'
+            versionNameSuffix '-releaseTest'
+            applicationIdSuffix '.releaseTest'
         }
         releaseMarket {
             initWith buildTypes.release
@@ -98,6 +98,9 @@ android {
         releaseMarket {
             res.srcDirs = ['src/release/res']
         }
+        releaseTest {
+            res.srcDirs = ['src/release/res']
+        }
     }
 
     bundle {
@@ -112,29 +115,30 @@ android {
     }
 
     kotlinOptions {
-
-
         jvmTarget = '1.8'
+    }
+
+    applicationVariants.all { variant ->
+        String name = variant.buildType.name
+        if (name != "release" && name.startsWith("release")) {
+            createBindReleaseFileTask(variant.buildType.name)
+        }
     }
 }
 
-task bindReleaseGithubGoogleServicesToRelease(type: Copy) {
-    description = 'Switches to RELEASE google-services.json for GitHub'
-    from "src/release"
-    include "google-services.json"
-    into "src/releaseGithub"
-}
+void createBindReleaseFileTask(String destination) {
+    String taskName = "bind${destination.capitalize()}GithubGoogleServicesToRelease"
 
-task bindReleaseMarketGoogleServicesToRelease(type: Copy) {
-    description = 'Switches to RELEASE google-services.json for Market'
-    from "src/release"
-    include "google-services.json"
-    into "src/releaseMarket"
-}
+    Task task = task(taskName, type: Copy) {
+        description = "Switches to RELEASE google-services.json for ${destination}"
+        from "src/release"
+        include "google-services.json"
+        into "src/${destination}"
+    }
 
-afterEvaluate {
-    processReleaseGithubGoogleServices.dependsOn bindReleaseGithubGoogleServicesToRelease
-    processReleaseMarketGoogleServices.dependsOn bindReleaseMarketGoogleServicesToRelease
+    afterEvaluate {
+        tasks.getByName("process${destination.capitalize()}GoogleServices").dependsOn task
+    }
 }
 
 play {
