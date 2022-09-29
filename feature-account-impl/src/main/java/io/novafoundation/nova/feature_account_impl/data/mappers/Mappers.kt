@@ -108,6 +108,7 @@ fun mapMetaAccountWithBalanceFromLocal(local: MetaAccountWithBalanceLocal): Meta
             metaId = id,
             freeInPlanks = freeInPlanks,
             reservedInPlanks = reservedInPlanks,
+            offChainBalance = offChainBalance,
             precision = precision,
             rate = rate,
         )

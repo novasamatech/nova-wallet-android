@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.RewardDetailComponent
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.TransactionDetailComponent
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.di.TransactionHistoryFilterComponent
+import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_nft_api.NftFeatureApi
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
@@ -78,7 +79,8 @@ interface AssetsFeatureComponent : AssetsFeatureApi {
             NftFeatureApi::class,
             WalletFeatureApi::class,
             AccountFeatureApi::class,
-            CurrencyFeatureApi::class
+            CurrencyFeatureApi::class,
+            CrowdloanFeatureApi::class
         ]
     )
     interface AssetsFeatureDependenciesComponent : AssetsFeatureDependencies

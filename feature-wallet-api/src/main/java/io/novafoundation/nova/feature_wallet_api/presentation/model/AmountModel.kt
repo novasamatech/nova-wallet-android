@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.model
 
+import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
@@ -19,10 +20,12 @@ enum class AmountSign(val signSymbol: String) {
 
 fun mapAmountToAmountModel(
     amountInPlanks: BigInteger,
-    asset: Asset
+    asset: Asset,
+    includeAssetTicker: Boolean = true,
 ): AmountModel = mapAmountToAmountModel(
     amount = asset.token.amountFromPlanks(amountInPlanks),
-    asset = asset
+    asset = asset,
+    includeAssetTicker = includeAssetTicker
 )
 
 fun mapAmountToAmountModel(
@@ -37,12 +40,19 @@ fun mapAmountToAmountModel(
     amount: BigDecimal,
     token: Token,
     includeZeroFiat: Boolean = true,
+    includeAssetTicker: Boolean = true,
     tokenAmountSign: AmountSign = AmountSign.NONE,
 ): AmountModel {
     val fiatAmount = token.priceOf(amount)
 
+    val unsignedTokenAmount = if (includeAssetTicker) {
+        amount.formatTokenAmount(token.configuration)
+    } else {
+        amount.format()
+    }
+
     return AmountModel(
-        token = tokenAmountSign.signSymbol + amount.formatTokenAmount(token.configuration),
+        token = tokenAmountSign.signSymbol + unsignedTokenAmount,
         fiat = fiatAmount.takeIf { it != BigDecimal.ZERO || includeZeroFiat }?.formatAsCurrency(token.currency)
     )
 }
@@ -51,8 +61,15 @@ fun mapAmountToAmountModel(
     amount: BigDecimal,
     asset: Asset,
     includeZeroFiat: Boolean = true,
+    includeAssetTicker: Boolean = true,
     tokenAmountSign: AmountSign = AmountSign.NONE
-): AmountModel = mapAmountToAmountModel(amount, asset.token, includeZeroFiat, tokenAmountSign)
+): AmountModel = mapAmountToAmountModel(
+    amount = amount,
+    token = asset.token,
+    includeZeroFiat = includeZeroFiat,
+    includeAssetTicker = includeAssetTicker,
+    tokenAmountSign = tokenAmountSign
+)
 
 fun Asset.transferableAmountModel() = mapAmountToAmountModel(transferable, this)
 

@@ -12,6 +12,8 @@ typealias ExplorerTemplateExtractor = (Chain.Explorer) -> StringTemplate?
 typealias BuyProviderId = String
 typealias BuyProviderArguments = Map<String, Any?>
 
+data class FullChainAssetId(val chainId: ChainId, val assetId: ChainAssetId)
+
 data class Chain(
     val id: ChainId,
     val name: String,

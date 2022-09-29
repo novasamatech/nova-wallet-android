@@ -170,8 +170,8 @@ open class TableCellView @JvmOverloads constructor(
     }
 
     private fun applyAttributes(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.TableCellView) { typedArray ->
-        val title = typedArray.getString(R.styleable.TableCellView_title)
-        setTitle(title)
+        val titleText = typedArray.getString(R.styleable.TableCellView_title)
+        setTitle(titleText)
 
         val dividerVisible = typedArray.getBoolean(R.styleable.TableCellView_dividerVisible, true)
         setDividerVisible(dividerVisible)
@@ -191,6 +191,15 @@ open class TableCellView @JvmOverloads constructor(
 
         val titleIcon = typedArray.getResourceIdOrNull(R.styleable.TableCellView_titleIcon)
         titleIcon?.let(::setTitleIcon)
+
+        val titleTextAppearance = typedArray.getResourceIdOrNull(R.styleable.TableCellView_titleValueTextAppearance)
+        titleTextAppearance?.let(title::setTextAppearance)
+
+        val primaryValueTextAppearance = typedArray.getResourceIdOrNull(R.styleable.TableCellView_primaryValueTextAppearance)
+        primaryValueTextAppearance?.let(valuePrimary::setTextAppearance)
+
+        val secondaryValueTextAppearance = typedArray.getResourceIdOrNull(R.styleable.TableCellView_secondaryValueTextAppearance)
+        secondaryValueTextAppearance?.let(valueSecondary::setTextAppearance)
     }
 }
 

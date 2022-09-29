@@ -1,0 +1,121 @@
+name: Reusable workflow for build Android
+
+on:
+  workflow_call:
+    inputs:
+      branch:
+        required: true
+        default: develop
+        type: string
+      gradlew-command:
+        required: false
+        type: string
+        default: false
+      run-tests:
+        required: false
+        type: boolean
+        default: true
+      keystore-file-name:
+        required: false
+        type: string
+        default: false
+      keystore-file-base64:
+        required: false
+        type: string
+    secrets:
+      ACALA_PROD_AUTH_TOKEN:
+        required: true
+      ACALA_TEST_AUTH_TOKEN:
+        required: true
+      MOONBEAM_PROD_AUTH_TOKEN:
+        required: true
+      MOONBEAM_TEST_AUTH_TOKEN:
+        required: true
+      MOONPAY_PRODUCTION_SECRET:
+        required: true
+      MOONPAY_TEST_SECRET:
+        required: true
+      # Special secrets for signing:
+      CI_MARKET_KEYSTORE_PASS:
+        required: false
+      CI_MARKET_KEYSTORE_KEY_ALIAS:
+        required: false
+      CI_MARKET_KEYSTORE_KEY_PASS:
+        required: false
+      CI_MARKET_KEY_FILE:
+        required: false
+      CI_KEYSTORE_PASS:
+        required: false
+      CI_KEYSTORE_KEY_ALIAS:
+        required: false
+      CI_KEYSTORE_KEY_PASS:
+        required: false
+      CI_GITHUB_KEYSTORE_PASS:
+        required: false
+      CI_GITHUB_KEYSTORE_KEY_ALIAS:
+        required: false
+      CI_GITHUB_KEYSTORE_KEY_PASS:
+        required: false
+
+env:
+  ACALA_PROD_AUTH_TOKEN: ${{ secrets.ACALA_PROD_AUTH_TOKEN }}
+  ACALA_TEST_AUTH_TOKEN: ${{ secrets.ACALA_TEST_AUTH_TOKEN }}
+  MOONBEAM_PROD_AUTH_TOKEN: ${{ secrets.MOONBEAM_PROD_AUTH_TOKEN }}
+  MOONBEAM_TEST_AUTH_TOKEN: ${{ secrets.MOONBEAM_TEST_AUTH_TOKEN }}
+  MOONPAY_PRODUCTION_SECRET: ${{ secrets.MOONPAY_PRODUCTION_SECRET }}
+  MOONPAY_TEST_SECRET: ${{ secrets.MOONPAY_TEST_SECRET }}
+
+  CI_MARKET_KEYSTORE_PASS: ${{ secrets.CI_MARKET_KEYSTORE_PASS }}
+  CI_MARKET_KEYSTORE_KEY_ALIAS: ${{ secrets.CI_MARKET_KEYSTORE_KEY_ALIAS }}
+  CI_MARKET_KEYSTORE_KEY_PASS: ${{ secrets.CI_MARKET_KEYSTORE_KEY_PASS }}
+  CI_MARKET_KEY_FILE: ${{ secrets.RELEASE_MARKET_KEY_FILE }}
+
+  CI_KEYSTORE_PASS: ${{ secrets.CI_KEYSTORE_PASS }}
+  CI_KEYSTORE_KEY_ALIAS: ${{ secrets.CI_KEYSTORE_KEY_ALIAS }}
+  CI_KEYSTORE_KEY_PASS: ${{ secrets.CI_KEYSTORE_KEY_PASS }}
+
+  CI_GITHUB_KEYSTORE_PASS: ${{ secrets.CI_GITHUB_KEYSTORE_PASS }}
+  CI_GITHUB_KEYSTORE_KEY_ALIAS: ${{ secrets.CI_GITHUB_KEYSTORE_KEY_ALIAS }}
+  CI_GITHUB_KEYSTORE_KEY_PASS: ${{ secrets.CI_GITHUB_KEYSTORE_KEY_PASS }}
+
+jobs:
+  build-app:
+    name: Build and test android app
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout particualr branch
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ inputs.branch }}
+
+      - name: 🔧 Install dependencies
+        uses: ./.github/workflows/install/
+
+      - name: 🧪 Run tests
+        if: ${{ inputs.run-tests }} == "true"
+        run: ./gradlew runTest
+
+      - name: 🔐 Getting sign key
+        if: ${{ !startsWith(inputs.keystore-file-name, 'false') }}
+        id: write_file
+        uses: timheuer/base64-to-file@v1.1
+        with:
+          fileName: ${{ inputs.keystore-file-name }}
+          fileDir: './app/'
+          encodedString: ${{ inputs.keystore-file-base64 }}
+
+      - name: 🏗 Build app
+        if: ${{ !startsWith(inputs.gradlew-command, 'false') }}
+        run: ./gradlew ${{ inputs.gradlew-command }}
+
+      - name: 🧹 Delete key after building
+        if: ${{ !startsWith(inputs.keystore-file-name, 'false') }}
+        run: rm ./app/${{ inputs.keystore-file-name }}
+
+      - name: ➡️ Upload build artifacts
+        uses: actions/upload-artifact@v2
+        if: ${{ !startsWith(inputs.gradlew-command, 'false') }}
+        with:
+          name: apk
+          path: app/build/outputs/apk/

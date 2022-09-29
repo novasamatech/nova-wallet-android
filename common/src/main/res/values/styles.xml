@@ -95,6 +95,10 @@
         <item name="android:textSize">12sp</item>
     </style>
 
+    <style name="TextAppearance.NovaFoundation.Regular.Caption1.Translucent" parent="TextAppearance.NovaFoundation.Regular.Caption1">
+        <item name="android:textColor">@color/white_64</item>
+    </style>
+
     <style name="TextAppearance.NovaFoundation.Caps" parent="TextAppearance.NovaFoundation.Regular">
         <item name="android:textAllCaps">true</item>
         <item name="android:textSize">11sp</item>
@@ -112,6 +116,10 @@
     <style name="TextAppearance.NovaFoundation.Regular.Footnote">
         <item name="android:textSize">13sp</item>
         <item name="lineHeight">18sp</item>
+    </style>
+
+    <style name="TextAppearance.NovaFoundation.Regular.Footnote.Translucent" parent="TextAppearance.NovaFoundation.Regular.Footnote">
+        <item name="android:textColor">@color/white_64</item>
     </style>
 
     <style name="TextAppearance.NovaFoundation.Regular.SubHeadline">
@@ -266,7 +274,7 @@
     </style>
 
     <style name="Widget.Nova.Puller" parent="">
-        <item name="android:layout_height">2dp</item>
+        <item name="android:layout_height">3dp</item>
         <item name="android:layout_width">35dp</item>
         <item name="android:background">@drawable/bg_puller</item>
     </style>
@@ -281,7 +289,7 @@
     <style name="Widget.Nova.Icon.Big.Dashed">
         <item name="android:background">@drawable/bg_icon_big_dashed</item>
     </style>
-    
+
     <style name="Widget.Nova.Text.Number" parent="">
         <item name="android:textAppearance">@style/TextAppearance.NovaFoundation.Regular.Body</item>
         <item name="android:textColor">@color/white_64</item>
@@ -310,7 +318,8 @@
     <style name="Widget.Nova.RadioButton" parent="">
         <item name="android:paddingStart">4dp</item>
         <item name="android:textColor">@color/white</item>
-        <item name="android:textAppearance">@style/TextAppearance.NovaFoundation.Regular.Footnote</item>
+        <item name="android:textAppearance">@style/TextAppearance.NovaFoundation.Regular.Footnote
+        </item>
         <item name="buttonTint">@color/tint_radio_button</item>
     </style>
 
@@ -329,7 +338,8 @@
         <item name="android:paddingBottom">3dp</item>
         <item name="android:textColor">@color/white_80</item>
         <item name="android:includeFontPadding">false</item>
-        <item name="android:textAppearance">@style/TextAppearance.NovaFoundation.SemiBold.Caps1</item>
+        <item name="android:textAppearance">@style/TextAppearance.NovaFoundation.SemiBold.Caps1
+        </item>
     </style>
 
     <style name="Widget.Nova.TabItem" parent="">
@@ -368,7 +378,9 @@
     </style>
 
     <style name="Widget.Nova.Input.Text" parent="Widget.Nova.Input.EditText">
-        <item name="android:textAppearance">@style/TextAppearance.NovaFoundation.Regular.SubHeadline</item>
+        <item name="android:textAppearance">
+            @style/TextAppearance.NovaFoundation.Regular.SubHeadline
+        </item>
         <item name="android:textColorHint">@color/white_32</item>
         <item name="android:paddingStart">12dp</item>
         <item name="android:paddingEnd">12dp</item>

@@ -11,14 +11,13 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.core.updater.UpdateSystem
-import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnly.WatchOnlyMissingKeysPresenter
-import io.novafoundation.nova.feature_assets.domain.BalanceLocksInteractor
-import io.novafoundation.nova.feature_assets.domain.BalanceLocksInteractorImpl
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
+import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksInteractor
+import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksInteractorImpl
+import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksRepository
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
@@ -27,10 +26,9 @@ import io.novafoundation.nova.feature_assets.presentation.balance.detail.Balance
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProviderFactory
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryMixin
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryProvider
+import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdateSystemFactory
-import io.novafoundation.nova.feature_wallet_api.di.BalanceLocks
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
@@ -38,27 +36,13 @@ class BalanceDetailModule {
 
     @Provides
     @ScreenScope
-    @BalanceLocks
-    fun provideBalanceLocksUpdateSystem(
-        assetPayload: AssetPayload,
-        balanceLocksUpdateSystemFactory: BalanceLocksUpdateSystemFactory
-    ): UpdateSystem {
-        return balanceLocksUpdateSystemFactory.create(assetPayload.chainId, assetPayload.chainAssetId)
-    }
-
-    @Provides
-    @ScreenScope
     fun provideBalanceLocksInteractor(
-        @BalanceLocks updateSystem: UpdateSystem,
-        assetSourceRegistry: AssetSourceRegistry,
         chainRegistry: ChainRegistry,
-        accountRepository: AccountRepository,
+        balanceLocksRepository: BalanceLocksRepository
     ): BalanceLocksInteractor {
         return BalanceLocksInteractorImpl(
-            updateSystem,
-            assetSourceRegistry,
             chainRegistry,
-            accountRepository
+            balanceLocksRepository
         )
     }
 
@@ -102,7 +86,8 @@ class BalanceDetailModule {
         missingKeysPresenter: WatchOnlyMissingKeysPresenter,
         resourceManager: ResourceManager,
         currencyInteractor: CurrencyInteractor,
-        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+        contributionsInteractor: ContributionsInteractor
     ): ViewModel {
         return BalanceDetailViewModel(
             walletInteractor = walletInteractor,
@@ -116,7 +101,8 @@ class BalanceDetailModule {
             missingKeysPresenter = missingKeysPresenter,
             resourceManager = resourceManager,
             currencyInteractor = currencyInteractor,
-            actionAwaitableMixinFactory = actionAwaitableMixinFactory
+            actionAwaitableMixinFactory = actionAwaitableMixinFactory,
+            contributionsInteractor = contributionsInteractor
         )
     }
 
