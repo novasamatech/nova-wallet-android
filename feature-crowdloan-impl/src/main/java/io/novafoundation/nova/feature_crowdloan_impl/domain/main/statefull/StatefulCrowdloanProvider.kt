@@ -1,12 +1,11 @@
 package io.novafoundation.nova.feature_crowdloan_impl.domain.main.statefull
 
-import io.novafoundation.nova.common.presentation.firstNonEmptyLoading
 import io.novafoundation.nova.common.presentation.mapLoading
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
-import io.novafoundation.nova.feature_crowdloan_impl.domain.contributions.ContributionsInteractor
+import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.domain.main.CrowdloanInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.getCurrentAsset
@@ -55,41 +54,22 @@ class StatefulCrowdloanProvider(
     private val chainAndAccount = combineToPair(selectedChain, selectedAccount)
         .shareInBackground()
 
-    private val crowdloansIntermediateState = chainAndAccount.withLoading { (chain, account) ->
-        crowdloanInteractor.crowdloansFlow(chain, account)
+    override val groupedCrowdloansFlow = chainAndAccount.withLoading { (chain, account) ->
+        crowdloanInteractor.groupedCrowdloansFlow(chain, account)
     }
         .shareInBackground()
 
-    private val directContributionsIntermediateState = crowdloansIntermediateState
-        .mapLoading { crowdloan ->
-            crowdloan.mapNotNull { it.myContribution }
-        }
-        .shareInBackground()
-
-    private val externalContributionsIntermediateState = chainAndAccount
-        .withLoading { (chain, account) ->
-            contributionsInteractor.externalContributionsFlow(chain, account)
-        }
-        .shareInBackground()
-
-    override val groupedCrowdloansFlow = crowdloansIntermediateState
-        .mapLoading {
-            crowdloanInteractor.groupCrowdloans(it)
-        }
-
-    override val contributionsInfoFlow = firstNonEmptyLoading(
-        directContributionsIntermediateState,
-        externalContributionsIntermediateState
-    )
+    override val contributionsInfoFlow = contributionsInteractor.observeSelectedChainContributions()
+        .withLoading()
         .mapLoading {
             val amountModel = mapAmountToAmountModel(
-                contributionsInteractor.getTotalAmountOfContributions(it),
+                it.totalContributed,
                 assetUseCase.getCurrentAsset()
             )
 
             StatefulCrowdloanMixin.ContributionsInfo(
-                contributionsCount = it.size,
-                isUserHasContributions = it.isNotEmpty(),
+                contributionsCount = it.contributions.size,
+                isUserHasContributions = it.contributions.isNotEmpty(),
                 totalContributed = amountModel
             )
         }

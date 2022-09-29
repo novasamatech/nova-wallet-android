@@ -13,14 +13,15 @@ import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
+import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.BalanceBreakdownBottomSheet
 import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetGroupingDecoration
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.applyDefaultTo
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.AssetsHeaderAdapter
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
+import javax.inject.Inject
 import kotlinx.android.synthetic.main.fragment_balance_list.balanceListAssets
 import kotlinx.android.synthetic.main.fragment_balance_list.walletContainer
-import javax.inject.Inject
 
 class BalanceListFragment :
     BaseFragment<BalanceListViewModel>(),
@@ -29,6 +30,8 @@ class BalanceListFragment :
 
     @Inject
     protected lateinit var imageLoader: ImageLoader
+
+    private var balanceBreakdownBottomSheet: BalanceBreakdownBottomSheet? = null
 
     private val assetsAdapter by lazy(LazyThreadSafetyMode.NONE) {
         BalanceListAdapter(imageLoader, this)
@@ -83,7 +86,7 @@ class BalanceListFragment :
     }
 
     override fun subscribe(viewModel: BalanceListViewModel) {
-        viewModel.assetsFlow.observe {
+        viewModel.assetModelsFlow.observe {
             assetsAdapter.submitList(it) {
                 balanceListAssets.invalidateItemDecorations()
             }
@@ -91,17 +94,41 @@ class BalanceListFragment :
 
         viewModel.totalBalanceFlow.observe(headerAdapter::setTotalBalance)
         viewModel.selectedWalletModelFlow.observe(headerAdapter::setSelectedWallet)
-
+        viewModel.shouldShowPlaceholderFlow.observe(headerAdapter::setPlaceholderVisibility)
         viewModel.nftCountFlow.observe(headerAdapter::setNftCountLabel)
         viewModel.nftPreviewsUi.observe(headerAdapter::setNftPreviews)
 
         viewModel.hideRefreshEvent.observeEvent {
             walletContainer.isRefreshing = false
         }
+
+        viewModel.balanceBreakdownFlow.observe {
+            if (balanceBreakdownBottomSheet?.isShowing == true) {
+                balanceBreakdownBottomSheet?.setBalanceBreakdown(it)
+            }
+        }
+
+        viewModel.showBalanceBreakdownEvent.observeEvent { totalBalanceBreakdown ->
+            if (balanceBreakdownBottomSheet == null) {
+                balanceBreakdownBottomSheet = BalanceBreakdownBottomSheet(requireContext())
+
+                balanceBreakdownBottomSheet?.setOnDismissListener {
+                    balanceBreakdownBottomSheet = null
+                }
+            }
+            balanceBreakdownBottomSheet?.setOnShowListener {
+                balanceBreakdownBottomSheet?.setBalanceBreakdown(totalBalanceBreakdown)
+            }
+            balanceBreakdownBottomSheet?.show()
+        }
     }
 
     override fun assetClicked(asset: AssetModel) {
         viewModel.assetClicked(asset)
+    }
+
+    override fun totalBalanceClicked() {
+        viewModel.balanceBreakdownClicked()
     }
 
     override fun manageClicked() {

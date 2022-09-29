@@ -7,7 +7,6 @@ import io.novafoundation.nova.common.utils.asQueryParam
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.dao.PhishingAddressDao
-import io.novafoundation.nova.core_db.dao.TokenDao
 import io.novafoundation.nova.core_db.model.AssetAndChainId
 import io.novafoundation.nova.core_db.model.OperationLocal
 import io.novafoundation.nova.core_db.model.PhishingAddressLocal
@@ -67,7 +66,6 @@ class WalletRepositoryImpl(
     private val cursorStorage: TransferCursorStorage,
     private val coingeckoApi: CoingeckoApi,
     private val chainRegistry: ChainRegistry,
-    private val tokenDao: TokenDao,
 ) : WalletRepository {
 
     override fun syncedAssetsFlow(metaId: Long): Flow<List<Asset>> {
@@ -75,8 +73,8 @@ class WalletRepositoryImpl(
             chainRegistry.chainsById,
             assetCache.observeSyncedAssets(metaId)
         ) { chainsById, assetsLocal ->
-            assetsLocal.map {
-                mapAssetLocalToAsset(it, chainsById.chainAsset(it.assetAndChainId))
+            assetsLocal.map { asset ->
+                mapAssetLocalToAsset(asset, chainsById.chainAsset(asset.assetAndChainId))
             }
         }
     }

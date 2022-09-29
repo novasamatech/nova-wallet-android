@@ -19,12 +19,24 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
-      ci {
-          storeFile file("develop_key.jks")
-          storePassword System.env.CI_KEYSTORE_PASS ?: ""
-          keyAlias System.env.CI_KEYSTORE_KEY_ALIAS ?: ""
-          keyPassword System.env.CI_KEYSTORE_KEY_PASS ?: ""
-      }
+        dev {
+            storeFile file('develop_key.jks')
+            storePassword readSecretOrNull('CI_KEYSTORE_PASS')
+            keyAlias readSecretOrNull('CI_KEYSTORE_KEY_ALIAS')
+            keyPassword readSecretOrNull('CI_KEYSTORE_KEY_PASS')
+        }
+        market {
+            storeFile file('market_key.jks')
+            storePassword readSecretOrNull('CI_MARKET_KEYSTORE_PASS')
+            keyAlias readSecretOrNull('CI_MARKET_KEYSTORE_KEY_ALIAS')
+            keyPassword readSecretOrNull('CI_MARKET_KEYSTORE_KEY_PASS')
+        }
+        github {
+            storeFile file('github_key.jks')
+            storePassword readSecretOrNull('CI_GITHUB_KEYSTORE_PASS')
+            keyAlias readSecretOrNull('CI_GITHUB_KEYSTORE_KEY_ALIAS')
+            keyPassword readSecretOrNull('CI_GITHUB_KEYSTORE_KEY_PASS')
+        }
     }
     buildTypes {
         debug {
@@ -34,7 +46,19 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        releaseTest {
+            initWith buildTypes.release
+            matchingFallbacks = ['release']
             signingConfig signingConfigs.debug
+
+            versionNameSuffix '-test'
+            applicationIdSuffix '.test'
+        }
+        releaseMarket {
+            initWith buildTypes.release
+            matchingFallbacks = ['release']
+            signingConfig signingConfigs.market
 
             versionNameSuffix "-${releaseApplicationSuffix}"
             applicationIdSuffix ".${releaseApplicationSuffix}"
@@ -42,12 +66,13 @@ android {
         releaseGithub {
             initWith buildTypes.release
             matchingFallbacks = ['release']
+            signingConfig signingConfigs.github
 
-            applicationIdSuffix '.github'
             versionNameSuffix '-github'
+            applicationIdSuffix '.github'
         }
         develop {
-            signingConfig signingConfigs.ci
+            signingConfig signingConfigs.dev
             matchingFallbacks = ['debug']
             versionNameSuffix '-develop'
             applicationIdSuffix '.dev'
@@ -68,6 +93,9 @@ android {
 
     sourceSets {
         releaseGithub {
+            res.srcDirs = ['src/release/res']
+        }
+        releaseMarket {
             res.srcDirs = ['src/release/res']
         }
     }
@@ -91,14 +119,22 @@ android {
 }
 
 task bindReleaseGithubGoogleServicesToRelease(type: Copy) {
-    description = 'Switches to RELEASE google-services.json'
+    description = 'Switches to RELEASE google-services.json for GitHub'
     from "src/release"
     include "google-services.json"
     into "src/releaseGithub"
 }
 
+task bindReleaseMarketGoogleServicesToRelease(type: Copy) {
+    description = 'Switches to RELEASE google-services.json for Market'
+    from "src/release"
+    include "google-services.json"
+    into "src/releaseMarket"
+}
+
 afterEvaluate {
     processReleaseGithubGoogleServices.dependsOn bindReleaseGithubGoogleServicesToRelease
+    processReleaseMarketGoogleServices.dependsOn bindReleaseMarketGoogleServicesToRelease
 }
 
 play {
