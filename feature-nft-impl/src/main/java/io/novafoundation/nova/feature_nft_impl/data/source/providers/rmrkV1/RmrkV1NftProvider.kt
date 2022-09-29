@@ -28,7 +28,7 @@ class RmrkV1NftProvider(
 ) : NftProvider {
 
     override suspend fun initialNftsSync(chain: Chain, metaAccount: MetaAccount, forceOverwrite: Boolean) {
-        val address = metaAccount.addressIn(chain)!!
+        val address = metaAccount.addressIn(chain) ?: return
         val nfts = api.getNfts(address)
 
         val toSave = nfts.map {
