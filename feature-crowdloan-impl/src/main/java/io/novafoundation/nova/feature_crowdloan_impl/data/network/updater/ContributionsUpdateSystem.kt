@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_crowdloan_impl.data.network.updater
 
+import android.util.Log
 import io.novafoundation.nova.common.data.network.StorageSubscriptionBuilder
+import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -13,6 +15,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getSocket
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
@@ -62,9 +65,14 @@ class ContributionsUpdateSystem(
 
             kotlin.runCatching {
                 updater.listenForUpdates(subscriptionBuilder)
+                    .catch { logError(it) }
             }.onSuccess { updaterFlow ->
                 emitAll(updaterFlow)
             }
         }
+    }
+
+    private fun logError(exception: Throwable) {
+        Log.e(LOG_TAG, "Failed to run contributions updater: ${exception.message}", exception)
     }
 }

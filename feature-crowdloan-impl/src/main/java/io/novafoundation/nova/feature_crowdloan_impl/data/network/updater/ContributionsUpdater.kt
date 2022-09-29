@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.mapCont
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.onEach
 
@@ -50,13 +51,14 @@ class ContributionsUpdater(
     override suspend fun listenForUpdates(storageSubscriptionBuilder: SubscriptionBuilder): Flow<Updater.SideEffect> {
         return scope.invalidationFlow().flatMapLatest {
             val metaAccount = accountScope.getAccount()
+            val accountId = metaAccount.accountIdIn(chain) ?: return@flatMapLatest emptyFlow()
 
             val fundInfos = crowdloanRepository.allFundInfos(chain.id)
 
             contributionsRepository.loadContributionsGraduallyFlow(
-                chain,
-                metaAccount.accountIdIn(chain)!!,
-                fundInfos,
+                chain = chain,
+                accountId = accountId,
+                fundInfos = fundInfos,
             ).onEach { (sourceId, contributions) ->
                 val newContributions = contributions.map { mapContributionToLocal(metaAccount.id, it) }
                 val oldContributions = contributionDao.getContributions(metaAccount.id, chain.id, chain.utilityAsset.id, sourceId)
