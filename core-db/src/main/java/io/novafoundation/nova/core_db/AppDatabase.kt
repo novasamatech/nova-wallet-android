@@ -37,7 +37,7 @@ import io.novafoundation.nova.core_db.migrations.AddContributions_23_24
 import io.novafoundation.nova.core_db.migrations.AddCurrencies_18_19
 import io.novafoundation.nova.core_db.migrations.AddDAppAuthorizations_1_2
 import io.novafoundation.nova.core_db.migrations.AddFavouriteDApps_9_10
-import io.novafoundation.nova.core_db.migrations.AddGovernanceFlagToChains_22_23
+import io.novafoundation.nova.core_db.migrations.AddGovernanceFlagToChains_24_25
 import io.novafoundation.nova.core_db.migrations.AddLocks_22_23
 import io.novafoundation.nova.core_db.migrations.AddMetaAccountType_14_15
 import io.novafoundation.nova.core_db.migrations.AddNfts_5_6
@@ -57,11 +57,11 @@ import io.novafoundation.nova.core_db.migrations.WatchOnlyChainAccounts_16_17
 import io.novafoundation.nova.core_db.model.AccountLocal
 import io.novafoundation.nova.core_db.model.AccountStakingLocal
 import io.novafoundation.nova.core_db.model.AssetLocal
+import io.novafoundation.nova.core_db.model.BalanceLockLocal
+import io.novafoundation.nova.core_db.model.ContributionLocal
 import io.novafoundation.nova.core_db.model.CurrencyLocal
 import io.novafoundation.nova.core_db.model.DappAuthorizationLocal
 import io.novafoundation.nova.core_db.model.FavouriteDAppLocal
-import io.novafoundation.nova.core_db.model.BalanceLockLocal
-import io.novafoundation.nova.core_db.model.ContributionLocal
 import io.novafoundation.nova.core_db.model.NftLocal
 import io.novafoundation.nova.core_db.model.NodeLocal
 import io.novafoundation.nova.core_db.model.OperationLocal
@@ -138,7 +138,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(NullableSubstratePublicKey_15_16, WatchOnlyChainAccounts_16_17, RemoveColorFromChains_17_18)
                     .addMigrations(AddCurrencies_18_19, ChangeTokens_19_20, ChangeChainNodes_20_21)
                     .addMigrations(NullableSubstrateAccountId_21_22, AddLocks_22_23, AddContributions_23_24)
-                    .addMigrations(AddGovernanceFlagToChains_22_23)
+                    .addMigrations(AddGovernanceFlagToChains_24_25)
                     .fallbackToDestructiveMigration()
                     .build()
             }
