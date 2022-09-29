@@ -12,10 +12,10 @@
         android:label="ProfileFragment" />
 
     <fragment
-        android:id="@+id/crowdloanFragment"
-        tools:layout="@layout/fragment_crowdloans"
-        android:name="io.novafoundation.nova.feature_crowdloan_impl.presentation.main.CrowdloanFragment"
-        android:label="CrowdloanFragment" />
+        android:id="@+id/voteFragment"
+        tools:layout="@layout/fragment_vote"
+        android:name="io.novafoundation.nova.feature_vote.presentation.vote.VoteFragment"
+        android:label="VoteFragment" />
 
     <fragment
         android:id="@+id/dAppsFragment"

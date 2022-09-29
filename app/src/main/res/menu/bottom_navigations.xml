@@ -10,7 +10,7 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/crowdloanFragment"
+        android:id="@+id/voteFragment"
         android:enabled="true"
         android:icon="@drawable/bottom_crodwloans"
         android:title="@string/crowdloan_crowdloan"

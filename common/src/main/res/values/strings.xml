@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+  <string name="vote_vote">Vote</string>
+
+  <string name="common_governance">Governance</string>
+
   <string name="common_accept_terms" >Accept terms...</string>
   <string name="yield_boost_terms">Yield Boost will automatically stake %s all my transferable tokens above %s</string>
 

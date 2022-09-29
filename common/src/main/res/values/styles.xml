@@ -332,6 +332,14 @@
         <item name="android:textAppearance">@style/TextAppearance.NovaFoundation.SemiBold.Caps1</item>
     </style>
 
+    <style name="Widget.Nova.TabItem" parent="">
+        <item name="android:paddingTop">6dp</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/tab_item_text_color</item>
+        <item name="android:textAppearance">@style/TextAppearance.NovaFoundation.Regular.Footnote</item>
+    </style>
+
     <!-- Buttons -->
 
     <!-- Input -->
