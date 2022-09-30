@@ -19,7 +19,7 @@ class TabsView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
-): LinearLayout(context, attrs, defStyleAttr), WithContextExtensions by WithContextExtensions(context) {
+) : LinearLayout(context, attrs, defStyleAttr), WithContextExtensions by WithContextExtensions(context) {
 
     private var activeTab: Int? = null
     private var onTabSelected: OnTabSelected? = null
@@ -73,7 +73,6 @@ class TabsView @JvmOverloads constructor(
 fun TabsView.addTab(@StringRes titleRes: Int) {
     addTab(context.getString(titleRes))
 }
-
 
 fun TabsView.setupWithRouter(router: TabsRouter, lifecycle: Lifecycle) {
     onTabSelected { index ->

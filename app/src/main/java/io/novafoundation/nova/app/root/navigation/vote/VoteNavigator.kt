@@ -12,7 +12,7 @@ import io.novafoundation.nova.feature_vote.presentation.VoteRouter
 
 class VoteNavigatorFactory(
     private val commonNavigator: Navigator
-): VoteRouter.Factory {
+) : VoteRouter.Factory {
 
     override fun create(host: Fragment): VoteRouter {
         return VoteNavigator(host, commonNavigator)

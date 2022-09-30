@@ -7,7 +7,7 @@ import io.novafoundation.nova.feature_vote.presentation.VoteRouter
 class VoteViewModel(
     private val router: VoteRouter,
     private val selectedAccountUseCase: SelectedAccountUseCase,
-): BaseViewModel() {
+) : BaseViewModel() {
 
     val selectedWalletModel = selectedAccountUseCase.selectedWalletModelFlow()
         .shareInBackground()

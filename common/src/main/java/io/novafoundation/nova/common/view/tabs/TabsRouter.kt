@@ -6,5 +6,5 @@ interface TabsRouter {
 
     fun openTabAt(index: Int)
 
-    fun listenCurrentTab( lifecycle: Lifecycle, onChange: (index: Int) -> Unit)
+    fun listenCurrentTab(lifecycle: Lifecycle, onChange: (index: Int) -> Unit)
 }
