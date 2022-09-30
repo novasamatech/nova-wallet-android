@@ -7,6 +7,7 @@ import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.Navigator
 import io.novafoundation.nova.common.utils.onDestroy
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.main.CrowdloanFragment
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.ReferendaListFragment
 import io.novafoundation.nova.feature_vote.presentation.VoteRouter
 
 class VoteNavigatorFactory(
@@ -40,7 +41,7 @@ private class VoteNavigator(
 
     override fun openTabAt(index: Int) {
         val fragment = when (index) {
-            INDEX_DEMOCRACY -> Fragment()
+            INDEX_DEMOCRACY -> ReferendaListFragment()
             INDEX_CROWDLOANS -> CrowdloanFragment()
             else -> error("Unknown index: $index")
         }
@@ -71,6 +72,7 @@ private class VoteNavigator(
     private val Fragment.tabIndex: Int
         get() = when (this) {
             is CrowdloanFragment -> INDEX_CROWDLOANS
-            else -> INDEX_DEMOCRACY
+            is ReferendaListFragment -> INDEX_DEMOCRACY
+            else -> error("Unknown fragment: ${this::class.simpleName}")
         }
 }
