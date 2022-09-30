@@ -4,17 +4,32 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.core_db.dao.ContributionDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
+import io.novafoundation.nova.feature_crowdloan_api.data.network.updater.ContributionsUpdateSystemFactory
+import io.novafoundation.nova.feature_crowdloan_api.data.network.updater.ContributionsUpdaterFactory
+import io.novafoundation.nova.feature_crowdloan_api.data.repository.ContributionsRepository
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRepository
+import io.novafoundation.nova.feature_crowdloan_api.data.source.contribution.ExternalContributionSource
+import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.data.CrowdloanSharedState
+import io.novafoundation.nova.feature_crowdloan_impl.data.network.updater.RealContributionsUpdaterFactory
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.acala.AcalaApi
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.parallel.ParallelApi
+import io.novafoundation.nova.feature_crowdloan_impl.data.network.updater.AssetBalanceScopeFactory
+import io.novafoundation.nova.feature_crowdloan_impl.data.network.updater.RealContributionsUpdateSystemFactory
 import io.novafoundation.nova.feature_crowdloan_impl.data.repository.contributions.source.LiquidAcalaContributionSource
 import io.novafoundation.nova.feature_crowdloan_impl.data.repository.contributions.source.ParallelContributionSource
-import io.novafoundation.nova.feature_crowdloan_impl.data.source.contribution.ExternalContributionSource
-import io.novafoundation.nova.feature_crowdloan_impl.domain.contributions.ContributionsInteractor
+import io.novafoundation.nova.feature_crowdloan_impl.domain.contributions.RealContributionsInteractor
+import io.novafoundation.nova.feature_crowdloan_impl.domain.contributions.RealContributionsRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
+import io.novafoundation.nova.runtime.storage.source.StorageDataSource
+import javax.inject.Named
 
 @Module
 class ContributionsModule {
@@ -37,16 +52,70 @@ class ContributionsModule {
     @Provides
     @FeatureScope
     fun provideContributionsInteractor(
-        externalContributionsSources: Set<@JvmSuppressWildcards ExternalContributionSource>,
         crowdloanRepository: CrowdloanRepository,
         accountRepository: AccountRepository,
         crowdloanSharedState: CrowdloanSharedState,
         chainStateRepository: ChainStateRepository,
-    ) = ContributionsInteractor(
-        externalContributionsSources = externalContributionsSources.toList(),
+        contributionsRepository: ContributionsRepository,
+        chainRegistry: ChainRegistry,
+        contributionsUpdateSystemFactory: ContributionsUpdateSystemFactory
+    ): ContributionsInteractor = RealContributionsInteractor(
         crowdloanRepository = crowdloanRepository,
         accountRepository = accountRepository,
-        selectedAssetState = crowdloanSharedState,
-        chainStateRepository = chainStateRepository
+        selectedAssetCrowdloanState = crowdloanSharedState,
+        chainStateRepository = chainStateRepository,
+        contributionsRepository = contributionsRepository,
+        chainRegistry = chainRegistry,
+        contributionsUpdateSystemFactory = contributionsUpdateSystemFactory
     )
+
+    @Provides
+    @FeatureScope
+    fun provideContributionsRepository(
+        externalContributionsSources: Set<@JvmSuppressWildcards ExternalContributionSource>,
+        chainRegistry: ChainRegistry,
+        @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
+        contributionDao: ContributionDao
+    ): ContributionsRepository {
+        return RealContributionsRepository(
+            externalContributionsSources.toList(),
+            chainRegistry,
+            remoteStorageSource,
+            contributionDao
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideContributionsUpdaterFactory(
+        accountUpdateScope: AccountUpdateScope,
+        contributionsRepository: ContributionsRepository,
+        crowdloanRepository: CrowdloanRepository,
+        contributionDao: ContributionDao
+    ): ContributionsUpdaterFactory = RealContributionsUpdaterFactory(
+        accountUpdateScope,
+        contributionsRepository,
+        crowdloanRepository,
+        contributionDao
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideContributionUpdateSystemFactory(
+        accountUpdateScope: AccountUpdateScope,
+        contributionsUpdaterFactory: ContributionsUpdaterFactory,
+        chainRegistry: ChainRegistry,
+        assetBalanceScopeFactory: AssetBalanceScopeFactory
+    ): ContributionsUpdateSystemFactory = RealContributionsUpdateSystemFactory(
+        chainRegistry = chainRegistry,
+        accountUpdateScope = accountUpdateScope,
+        contributionsUpdaterFactory = contributionsUpdaterFactory,
+        assetBalanceScopeFactory = assetBalanceScopeFactory
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideAssetBalanceScopeFactory(
+        walletRepository: WalletRepository
+    ) = AssetBalanceScopeFactory(walletRepository)
 }

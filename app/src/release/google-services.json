@@ -91,6 +91,35 @@
           ]
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:802342409053:android:67b2b7e7e96c0a76378eb4",
+        "android_client_info": {
+          "package_name": "io.novafoundation.nova.releaseTest"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "802342409053-rgoughr36c138jfjle5k8glafpkbagli.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDV0jNUiEGmb4tOn65m2EAyGV5eJpxhZY0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "802342409053-rgoughr36c138jfjle5k8glafpkbagli.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
     }
   ],
   "configuration_version": "1"

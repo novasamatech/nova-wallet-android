@@ -249,6 +249,10 @@ fun <T> flowOf(producer: suspend () -> T) = flow {
     emit(producer())
 }
 
+fun <T> List<Flow<T>>.accumulate(): Flow<List<T>> {
+    return accumulate(*this.toTypedArray())
+}
+
 fun <T> accumulate(vararg flows: Flow<T>): Flow<List<T>> {
     val flowsList = flows.mapIndexed { index, flow -> flow.map { index to flow } }
     val resultOfFlows = MutableList<T?>(flowsList.size) { null }
@@ -262,6 +266,28 @@ fun <T> accumulate(vararg flows: Flow<T>): Flow<List<T>> {
 
 fun <T> accumulateFlatten(vararg flows: Flow<List<T>>): Flow<List<T>> {
     return accumulate(*flows).map { it.flatten() }
+}
+
+fun <A, B, R> unite(flowA: Flow<A>, flowB: Flow<B>, transform: (A?, B?) -> R): Flow<R> {
+    var aResult: A? = null
+    var bResult: B? = null
+
+    return merge(
+        flowA.onEach { aResult = it },
+        flowB.onEach { bResult = it },
+    ).map { transform(aResult, bResult) }
+}
+
+fun <A, B, C, R> unite(flowA: Flow<A>, flowB: Flow<B>, flowC: Flow<C>, transform: (A?, B?, C?) -> R): Flow<R> {
+    var aResult: A? = null
+    var bResult: B? = null
+    var cResult: C? = null
+
+    return merge(
+        flowA.onEach { aResult = it },
+        flowB.onEach { bResult = it },
+        flowC.onEach { cResult = it },
+    ).map { transform(aResult, bResult, cResult) }
 }
 
 fun <T> firstNonEmpty(

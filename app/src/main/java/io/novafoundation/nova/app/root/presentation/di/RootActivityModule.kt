@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,7 +34,8 @@ class RootActivityModule {
         rootRouter: RootRouter,
         resourceManager: ResourceManager,
         networkStateMixin: NetworkStateMixin,
-        externalRequirementsFlow: MutableStateFlow<ChainConnection.ExternalRequirement>
+        externalRequirementsFlow: MutableStateFlow<ChainConnection.ExternalRequirement>,
+        contributionsInteractor: ContributionsInteractor
     ): ViewModel {
         return RootViewModel(
             interactor,
@@ -41,7 +43,8 @@ class RootActivityModule {
             rootRouter,
             externalRequirementsFlow,
             resourceManager,
-            networkStateMixin
+            networkStateMixin,
+            contributionsInteractor
         )
     }
 

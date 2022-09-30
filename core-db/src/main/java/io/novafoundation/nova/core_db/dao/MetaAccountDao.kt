@@ -37,7 +37,13 @@ private const val FIND_BY_ADDRESS_QUERY = """
 
 @Language("RoomSql")
 private const val META_ACCOUNTS_WITH_BALANCE_QUERY = """
-    SELECT m.id, a.freeInPlanks, a.reservedInPlanks, ca.precision, t.rate
+    SELECT 
+    m.id, 
+    a.freeInPlanks, 
+    a.reservedInPlanks, 
+    (SELECT SUM(amountInPlanks) FROM contributions WHERE chainId = a.chainId AND assetId = a.assetId AND metaId = m.id) offChainBalance,
+    ca.precision, 
+    t.rate
     FROM meta_accounts as m
     INNER JOIN assets as a ON  a.metaId = m.id
     INNER JOIN chain_assets AS ca ON a.assetId = ca.id AND a.chainId = ca.chainId
@@ -118,6 +124,7 @@ class MetaAccountWithBalanceLocal(
     val id: Long,
     val freeInPlanks: BigInteger,
     val reservedInPlanks: BigInteger,
+    val offChainBalance: BigInteger?,
     val precision: Int,
     val rate: BigDecimal?
 )

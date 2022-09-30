@@ -15,8 +15,8 @@ import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.AssetGroupUi
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import kotlinx.android.synthetic.main.item_asset.view.itemAssetBalance
-import kotlinx.android.synthetic.main.item_asset.view.itemAssetPriceAmount
 import kotlinx.android.synthetic.main.item_asset.view.itemAssetImage
+import kotlinx.android.synthetic.main.item_asset.view.itemAssetPriceAmount
 import kotlinx.android.synthetic.main.item_asset.view.itemAssetRate
 import kotlinx.android.synthetic.main.item_asset.view.itemAssetRateChange
 import kotlinx.android.synthetic.main.item_asset.view.itemAssetToken
@@ -60,7 +60,7 @@ class BalanceListAdapter(
             when (it) {
                 priceRateExtractor -> holder.bindPriceInfo(child)
                 recentChangeExtractor -> holder.bindRecentChange(child)
-                AssetModel::total -> holder.bindTotal(child)
+                AssetModel::amount -> holder.bindTotal(child)
             }
         }
     }
@@ -102,9 +102,8 @@ class AssetViewHolder(
     }
 
     fun bindTotal(asset: AssetModel) {
-        containerView.itemAssetBalance.text = asset.total.format()
-
-        bindPriceAmount(asset.priceAmount)
+        containerView.itemAssetBalance.text = asset.amount.token
+        containerView.itemAssetPriceAmount.text = asset.amount.fiat
     }
 
     fun bindRecentChange(asset: AssetModel) = with(containerView) {
@@ -114,11 +113,6 @@ class AssetViewHolder(
 
     fun bindPriceInfo(asset: AssetModel) = with(containerView) {
         itemAssetRate.text = asset.token.rate
-        bindPriceAmount(asset.priceAmount)
-    }
-
-    private fun bindPriceAmount(price: String?) {
-        containerView.itemAssetPriceAmount.text = price
     }
 }
 
@@ -148,5 +142,5 @@ private object DiffCallback : BaseGroupedDiffCallback<AssetGroupUi, AssetModel>(
 private object AssetPayloadGenerator : PayloadGenerator<AssetModel>(
     priceRateExtractor,
     recentChangeExtractor,
-    AssetModel::total
+    AssetModel::amount
 )

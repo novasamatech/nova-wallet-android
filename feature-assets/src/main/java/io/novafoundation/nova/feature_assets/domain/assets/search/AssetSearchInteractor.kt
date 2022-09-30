@@ -2,12 +2,14 @@ package io.novafoundation.nova.feature_assets.domain.assets.search
 
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_assets.domain.common.AssetGroup
+import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
 import io.novafoundation.nova.feature_assets.domain.common.groupAndSortAssetsByNetwork
-import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -30,25 +32,25 @@ private val Match.isFullMatch
 class AssetSearchInteractor(
     private val walletRepository: WalletRepository,
     private val accountRepository: AccountRepository,
-    private val chainRegistry: ChainRegistry,
-    private val currencyRepository: CurrencyRepository
+    private val chainRegistry: ChainRegistry
 ) {
 
     fun searchAssetsFlow(
-        queryFlow: Flow<String>
-    ): Flow<Map<AssetGroup, List<Asset>>> {
+        queryFlow: Flow<String>,
+        offChainBalanceFlow: Flow<Map<FullChainAssetId, Balance>>,
+    ): Flow<Map<AssetGroup, List<AssetWithOffChainBalance>>> {
         val assetsFlow = accountRepository.selectedMetaAccountFlow()
             .flatMapLatest { walletRepository.syncedAssetsFlow(it.id) }
 
         return combine(
             assetsFlow,
+            offChainBalanceFlow,
             queryFlow
-        ) { assets, query ->
-            val selectedCurrency = currencyRepository.getSelectedCurrency()
+        ) { assets, offChainBalance, query ->
             val chainsById = chainRegistry.chainsById.first()
             val filtered = assets.filterBy(query, chainsById)
 
-            groupAndSortAssetsByNetwork(filtered, chainsById, selectedCurrency)
+            groupAndSortAssetsByNetwork(filtered, offChainBalance, chainsById)
         }
     }
 
@@ -87,12 +89,9 @@ class AssetSearchInteractor(
         else -> Match.NONE
     }
 
-    @OptIn(ExperimentalStdlibApi::class)
     private infix fun String.fullMatch(other: String) = lowercase() == other.lowercase()
 
-    @OptIn(ExperimentalStdlibApi::class)
     private infix fun String.prefixMatch(prefix: String) = lowercase().startsWith(prefix.lowercase())
 
-    @OptIn(ExperimentalStdlibApi::class)
     private infix fun String.inclusionMatch(inclusion: String) = inclusion.lowercase() in lowercase()
 }
