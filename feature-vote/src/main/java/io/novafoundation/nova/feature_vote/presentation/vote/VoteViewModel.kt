@@ -7,11 +7,7 @@ class VoteViewModel(
     private val voteRouter: VoteRouter,
 ): BaseViewModel() {
 
-    fun crowdloansSelected() {
-        voteRouter.openCrowdloans()
-    }
-
-    fun democracySelected() {
+    init {
         voteRouter.openDemocracy()
     }
 }

@@ -8,13 +8,19 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.tabs.addTab
+import io.novafoundation.nova.common.view.tabs.setupWithRouter
 import io.novafoundation.nova.feature_vote.R
 import io.novafoundation.nova.feature_vote.di.VoteFeatureApi
 import io.novafoundation.nova.feature_vote.di.VoteFeatureComponent
+import io.novafoundation.nova.feature_vote.presentation.VoteRouter
 import kotlinx.android.synthetic.main.fragment_vote.voteContainer
 import kotlinx.android.synthetic.main.fragment_vote.voteTabs
+import javax.inject.Inject
 
 class VoteFragment : BaseFragment<VoteViewModel>() {
+
+    @Inject
+    lateinit var router: VoteRouter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -27,8 +33,10 @@ class VoteFragment : BaseFragment<VoteViewModel>() {
     override fun initViews() {
         voteContainer.applyStatusBarInsets()
 
-        voteTabs.addTab(R.string.common_governance, checked = true, viewModel::democracySelected)
-        voteTabs.addTab(R.string.crowdloan_crowdloan, checked = false, viewModel::crowdloansSelected)
+        voteTabs.addTab(R.string.common_governance)
+        voteTabs.addTab(R.string.crowdloan_crowdloan)
+
+        voteTabs.setupWithRouter(router, viewLifecycleOwner.lifecycle)
     }
 
     override fun inject() {

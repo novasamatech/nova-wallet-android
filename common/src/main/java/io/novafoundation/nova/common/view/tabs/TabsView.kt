@@ -7,12 +7,13 @@ import android.widget.LinearLayout.LayoutParams.MATCH_PARENT
 import android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
 import androidx.annotation.StringRes
 import androidx.core.view.children
+import androidx.lifecycle.Lifecycle
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 
-typealias OnTabSelected = () -> Unit
+typealias OnTabSelected = (index: Int) -> Unit
 
 class TabsView @JvmOverloads constructor(
     context: Context,
@@ -20,8 +21,8 @@ class TabsView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ): LinearLayout(context, attrs, defStyleAttr), WithContextExtensions by WithContextExtensions(context) {
 
-    private var listeners = ArrayList<OnTabSelected>()
     private var activeTab: Int? = null
+    private var onTabSelected: OnTabSelected? = null
 
     init {
         background = context.getRoundedCornerDrawable(R.color.black_48)
@@ -29,13 +30,7 @@ class TabsView @JvmOverloads constructor(
         updatePadding(top = 4.dp, bottom = 4.dp, start = 4.dp)
     }
 
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val height = MeasureSpec.makeMeasureSpec(40.dp, MeasureSpec.EXACTLY)
-
-        super.onMeasure(widthMeasureSpec, height)
-    }
-
-    fun addTab(title: String, checked: Boolean, onTabSelected: OnTabSelected) {
+    fun addTab(title: String) {
         val tab = TabItem(context).apply {
             text = title
             layoutParams = LayoutParams(MATCH_PARENT, WRAP_CONTENT).apply {
@@ -45,35 +40,47 @@ class TabsView @JvmOverloads constructor(
 
             setOnClickListener { clickedView ->
                 setCheckedTab(indexOfChild(clickedView))
+
+                onTabSelected?.invoke(activeTab!!)
             }
         }
 
-        val tabPosition = childCount
-        listeners += onTabSelected
-
         addView(tab)
-
-        if (checked) {
-            setCheckedTab(tabPosition)
-        }
     }
 
     fun setCheckedTab(newActiveTab: Int) {
-        val previousTab = activeTab
+        if (activeTab == newActiveTab) return
 
         activeTab = newActiveTab
-
-        if (previousTab != newActiveTab) {
-            listeners[newActiveTab].invoke()
-        }
 
         children.filterIsInstance<TabItem>()
             .forEachIndexed { index, tabItem ->
                 tabItem.isChecked = index == activeTab
             }
     }
+
+    fun onTabSelected(listener: OnTabSelected) {
+        onTabSelected = listener
+    }
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val height = MeasureSpec.makeMeasureSpec(40.dp, MeasureSpec.EXACTLY)
+
+        super.onMeasure(widthMeasureSpec, height)
+    }
 }
 
-fun TabsView.addTab(@StringRes titleRes: Int, checked: Boolean, onTabSelected: OnTabSelected) {
-    addTab(context.getString(titleRes), checked, onTabSelected)
+fun TabsView.addTab(@StringRes titleRes: Int) {
+    addTab(context.getString(titleRes))
+}
+
+
+fun TabsView.setupWithRouter(router: TabsRouter, lifecycle: Lifecycle) {
+    onTabSelected { index ->
+        router.openTabAt(index)
+    }
+
+    router.listenCurrentTab(lifecycle) { index ->
+        setCheckedTab(index)
+    }
 }
