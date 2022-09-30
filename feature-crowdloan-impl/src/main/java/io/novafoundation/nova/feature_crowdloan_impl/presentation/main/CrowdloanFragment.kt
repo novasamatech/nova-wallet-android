@@ -22,19 +22,7 @@ import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.di.CrowdloanFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.setupAssetSelector
-import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanAbout
-import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanAssetSelector
-import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanAvatar
-import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanContainer
-import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanList
-import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanMainDescription
-import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanPlaceholder
-import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanProgress
-import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanTotalContributedContainer
-import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanTotalContributedFiat
-import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanTotalContributedShimmering
-import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanTotalContributedValue
-import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanTotalContributionsCount
+import kotlinx.android.synthetic.main.fragment_crowdloans.*
 import javax.inject.Inject
 
 class CrowdloanFragment : BaseFragment<CrowdloanViewModel>(), CrowdloanAdapter.Handler {
@@ -93,7 +81,7 @@ class CrowdloanFragment : BaseFragment<CrowdloanViewModel>(), CrowdloanAdapter.H
             // GONE state does not trigger re-render on data change (i.e. when we want to drop outdated list)
             crowdloanList.setVisible(loadingState is LoadingState.Loaded && loadingState.data.isNotEmpty(), falseState = View.INVISIBLE)
             crowdloanPlaceholder.setVisible(loadingState is LoadingState.Loaded && loadingState.data.isEmpty())
-            crowdloanProgress.setVisible(loadingState is LoadingState.Loading)
+            crowdloanShimmering.setVisible(loadingState is LoadingState.Loading)
 
             if (loadingState is LoadingState.Loaded) {
                 adapter.submitList(loadingState.data)
