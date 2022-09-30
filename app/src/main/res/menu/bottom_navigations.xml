@@ -12,8 +12,8 @@
     <item
         android:id="@+id/voteFragment"
         android:enabled="true"
-        android:icon="@drawable/bottom_crodwloans"
-        android:title="@string/crowdloan_crowdloan"
+        android:icon="@drawable/bottom_vote"
+        android:title="@string/vote_vote"
         app:showAsAction="ifRoom" />
 
     <item
