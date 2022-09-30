@@ -95,9 +95,6 @@ class CrowdloanViewModel(
     val contributionsInfo = crowdloansMixin.contributionsInfoFlow
         .shareInBackground()
 
-    val selectedWalletModel = selectedAccountUseCase.selectedWalletModelFlow()
-        .shareInBackground()
-
     init {
         crowdloanUpdateSystem.start()
             .launchIn(this)
@@ -180,10 +177,6 @@ class CrowdloanViewModel(
 
     fun myContributionsClicked() {
         router.openUserContributions()
-    }
-
-    fun avatarClicked() {
-        router.openSwitchWallet()
     }
 
     private suspend fun openStandardContributionFlow(contributionPayload: ContributePayload) {

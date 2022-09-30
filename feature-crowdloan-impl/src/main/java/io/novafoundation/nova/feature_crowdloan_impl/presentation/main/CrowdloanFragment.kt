@@ -23,7 +23,6 @@ import io.novafoundation.nova.feature_crowdloan_impl.di.CrowdloanFeatureComponen
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.setupAssetSelector
 import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanAbout
 import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanAssetSelector
-import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanAvatar
 import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanList
 import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanMainDescription
 import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanPlaceholder
@@ -53,8 +52,6 @@ class CrowdloanFragment : BaseFragment<CrowdloanViewModel>(), CrowdloanAdapter.H
     }
 
     override fun initViews() {
-        crowdloanAvatar.setOnClickListener { viewModel.avatarClicked() }
-
         crowdloanList.adapter = adapter
 
         with(requireContext()) {
@@ -111,8 +108,6 @@ class CrowdloanFragment : BaseFragment<CrowdloanViewModel>(), CrowdloanAdapter.H
         }
 
         viewModel.mainDescription.observe(crowdloanMainDescription::setText)
-
-        viewModel.selectedWalletModel.observe(crowdloanAvatar::setModel)
     }
 
     override fun crowdloanClicked(paraId: ParaId) {

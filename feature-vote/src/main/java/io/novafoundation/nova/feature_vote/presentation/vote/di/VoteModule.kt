@@ -9,6 +9,7 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_vote.presentation.VoteRouter
 import io.novafoundation.nova.feature_vote.presentation.vote.VoteViewModel
 
@@ -33,10 +34,12 @@ class VoteModule {
     @IntoMap
     @ViewModelKey(VoteViewModel::class)
     fun provideViewModel(
-        voteRouter: VoteRouter
+        voteRouter: VoteRouter,
+        selectedAccountUseCase: SelectedAccountUseCase
     ): ViewModel {
         return VoteViewModel(
-            voteRouter = voteRouter
+            router = voteRouter,
+            selectedAccountUseCase = selectedAccountUseCase
         )
     }
 }

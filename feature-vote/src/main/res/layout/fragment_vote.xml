@@ -13,7 +13,8 @@
         <TextView
             android:id="@+id/voteTitle"
             style="@style/TextAppearance.NovaFoundation.Header1"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:layout_marginStart="17dp"
             android:layout_marginTop="25dp"
@@ -30,6 +31,9 @@
 
     <io.novafoundation.nova.common.view.tabs.TabsView
         android:id="@+id/voteTabs"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

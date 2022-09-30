@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_vote.R
 import io.novafoundation.nova.feature_vote.di.VoteFeatureApi
 import io.novafoundation.nova.feature_vote.di.VoteFeatureComponent
 import io.novafoundation.nova.feature_vote.presentation.VoteRouter
+import kotlinx.android.synthetic.main.fragment_vote.voteAvatar
 import kotlinx.android.synthetic.main.fragment_vote.voteContainer
 import kotlinx.android.synthetic.main.fragment_vote.voteTabs
 import javax.inject.Inject
@@ -37,6 +38,8 @@ class VoteFragment : BaseFragment<VoteViewModel>() {
         voteTabs.addTab(R.string.crowdloan_crowdloan)
 
         voteTabs.setupWithRouter(router, viewLifecycleOwner.lifecycle)
+
+        voteAvatar.setOnClickListener { viewModel.avatarClicked() }
     }
 
     override fun inject() {
@@ -47,5 +50,6 @@ class VoteFragment : BaseFragment<VoteViewModel>() {
     }
 
     override fun subscribe(viewModel: VoteViewModel) {
+        viewModel.selectedWalletModel.observe(voteAvatar::setModel)
     }
 }

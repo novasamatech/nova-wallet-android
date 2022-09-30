@@ -13,4 +13,6 @@ interface VoteRouter: TabsRouter {
     fun openDemocracy()
 
     fun openCrowdloans()
+
+    fun openSwitchWallet()
 }
