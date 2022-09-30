@@ -39,20 +39,24 @@ class TabsView @JvmOverloads constructor(
             }
 
             setOnClickListener { clickedView ->
-                setCheckedTab(indexOfChild(clickedView))
-
-                onTabSelected?.invoke(activeTab!!)
+                setCheckedTab(indexOfChild(clickedView), triggerListener = true)
             }
         }
 
         addView(tab)
     }
 
-    fun setCheckedTab(newActiveTab: Int) {
-        if (activeTab == newActiveTab) return
+    fun setCheckedTab(newActiveTab: Int, triggerListener: Boolean) {
+        val previousTab = activeTab
 
         activeTab = newActiveTab
 
+        if (previousTab != newActiveTab && triggerListener) {
+            onTabSelected?.invoke(newActiveTab)
+        }
+
+        // we need to update checked states even if the same button was clicked since
+        // CompoundButton (which is parent for TabItem) toggles state internally on every click
         children.filterIsInstance<TabItem>()
             .forEachIndexed { index, tabItem ->
                 tabItem.isChecked = index == activeTab
@@ -80,6 +84,6 @@ fun TabsView.setupWithRouter(router: TabsRouter, lifecycle: Lifecycle) {
     }
 
     router.listenCurrentTab(lifecycle) { index ->
-        setCheckedTab(index)
+        setCheckedTab(index, triggerListener = false)
     }
 }
