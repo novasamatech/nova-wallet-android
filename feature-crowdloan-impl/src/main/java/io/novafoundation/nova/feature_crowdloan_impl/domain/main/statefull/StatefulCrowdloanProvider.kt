@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.domain.main.CrowdloanIntera
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.getCurrentAsset
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.selectedChainFlow
 import kotlinx.coroutines.CoroutineScope
@@ -59,8 +60,9 @@ class StatefulCrowdloanProvider(
     }
         .shareInBackground()
 
-    override val contributionsInfoFlow = contributionsInteractor.observeSelectedChainContributions()
-        .withLoading()
+    override val contributionsInfoFlow = chainAndAccount.withLoading { (chain, account) ->
+        contributionsInteractor.observeChainContributions(account, chain.id, chain.utilityAsset.id)
+    }
         .mapLoading {
             val amountModel = mapAmountToAmountModel(
                 it.totalContributed,

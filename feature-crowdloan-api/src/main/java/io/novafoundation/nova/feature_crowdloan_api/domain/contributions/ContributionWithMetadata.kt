@@ -35,10 +35,10 @@ class ContributionWithMetadata(
     val metadata: ContributionMetadata
 )
 
-class ContributionsWithTotalAmount(val totalContributed: BigInteger, val contributions: List<ContributionWithMetadata>) {
+class ContributionsWithTotalAmount<T>(val totalContributed: BigInteger, val contributions: List<T>) {
     companion object {
-        fun empty(): ContributionsWithTotalAmount {
-            return ContributionsWithTotalAmount(BigInteger.ZERO, listOf())
+        fun <T> empty(): ContributionsWithTotalAmount<T> {
+            return ContributionsWithTotalAmount(BigInteger.ZERO, emptyList())
         }
     }
 }
@@ -65,8 +65,4 @@ fun mapContributionFromLocal(
         contribution.paraId,
         contribution.sourceId,
     )
-}
-
-fun List<ContributionWithMetadata>.totalContributionAmount(): BigInteger {
-    return sumOf { it.contribution.amountInPlanks }
 }
