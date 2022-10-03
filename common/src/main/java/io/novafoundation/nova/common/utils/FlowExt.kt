@@ -26,14 +26,12 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
-import java.util.concurrent.atomic.AtomicIntegerArray
 
 inline fun <T, R> Flow<List<T>>.mapList(crossinline mapper: suspend (T) -> R) = map { list ->
     list.map { item -> mapper(item) }
@@ -290,28 +288,6 @@ fun <A, B, C, R> unite(flowA: Flow<A>, flowB: Flow<B>, flowC: Flow<C>, transform
         flowB.onEach { bResult = it },
         flowC.onEach { cResult = it },
     ).map { transform(aResult, bResult, cResult) }
-}
-
-fun <T> List<Flow<T>>.onCompletion(action: suspend () -> Unit): List<Flow<T>> {
-    val completedFlowCheckList = AtomicIntegerArray(this.size)
-
-    return mapIndexed { index, flow ->
-        flow.onCompletion {
-            completedFlowCheckList.set(index, 1)
-
-            var allFlowsCompleted = true
-            for (i in 0 until completedFlowCheckList.length()) {
-                if (completedFlowCheckList.get(i) != 1) {
-                    allFlowsCompleted = false
-                    break
-                }
-            }
-
-            if (allFlowsCompleted) {
-                action()
-            }
-        }
-    }
 }
 
 fun <T> firstNonEmpty(
