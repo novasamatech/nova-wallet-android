@@ -33,7 +33,8 @@ class BalancesUpdateSystem(
         return accountUpdateScope.invalidationFlow().flatMapLatest {
             val chains = chainRegistry.currentChains.first()
 
-            chains.map { balanceChainUpdaters(it) }.merge()
+            chains.map { balanceChainUpdaters(it) }
+                .merge()
         }.flowOn(Dispatchers.Default)
     }
 
@@ -52,7 +53,8 @@ class BalancesUpdateSystem(
             }
 
             val cancellable = socket.subscribeUsing(subscriptionBuilder.build())
-            sideEffectFlows.merge().onCompletion { cancellable.cancel() }
+            sideEffectFlows.merge()
+                .onCompletion { cancellable.cancel() }
         }
     }
 
