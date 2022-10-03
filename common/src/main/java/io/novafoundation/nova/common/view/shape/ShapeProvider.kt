@@ -36,6 +36,16 @@ fun Context.getCornersStateDrawable(
     }
 }
 
+fun Context.getCornersCheckableDrawable(
+    checked: Drawable,
+    unchecked: Drawable
+): Drawable {
+    return StateListDrawable().apply {
+        addState(intArrayOf(android.R.attr.state_checked), checked)
+        addState(StateSet.WILD_CARD, unchecked)
+    }
+}
+
 fun Context.getInputBackground() = getCornersStateDrawable(
     focusedDrawable = getRoundedCornerDrawableFromColors(
         fillColor = getColor(R.color.white_8),

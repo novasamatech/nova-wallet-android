@@ -32,6 +32,8 @@ import io.novafoundation.nova.feature_onboarding_api.di.OnboardingFeatureApi
 import io.novafoundation.nova.feature_onboarding_impl.di.OnboardingFeatureHolder
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureHolder
+import io.novafoundation.nova.feature_vote.di.VoteFeatureApi
+import io.novafoundation.nova.feature_vote.di.VoteFeatureHolder
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.feature_wallet_impl.di.WalletFeatureHolder
 import io.novafoundation.nova.runtime.di.RuntimeApi
@@ -93,6 +95,12 @@ interface ComponentHolderModule {
     @ClassKey(AssetsFeatureApi::class)
     @IntoMap
     fun provideAssetsFeature(holder: AssetsFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(VoteFeatureApi::class)
+    @IntoMap
+    fun provideVoteFeature(holder: VoteFeatureHolder): FeatureApiHolder
 
     @ApplicationScope
     @Binds

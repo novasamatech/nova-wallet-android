@@ -187,6 +187,8 @@ dependencies {
 
     implementation project(':feature-assets')
 
+    implementation project(':feature-vote')
+
     implementation kotlinDep
 
     implementation androidDep

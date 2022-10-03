@@ -14,40 +14,17 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/crowdloanTitle"
-            style="@style/TextAppearance.NovaFoundation.Header1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="17dp"
-            android:layout_marginTop="25dp"
-            android:layout_marginEnd="16dp"
-            android:text="@string/crowdloan_crowdloan"
-            app:layout_constraintEnd_toStartOf="@+id/crowdloanAvatar"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <io.novafoundation.nova.feature_account_api.view.SelectedWalletView
-            android:id="@+id/crowdloanAvatar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="25dp"
-            android:layout_marginEnd="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
         <io.novafoundation.nova.feature_wallet_api.presentation.view.AssetSelectorView
             android:id="@+id/crowdloanAssetSelector"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             app:actionIcon="@drawable/ic_chevron_down"
             app:backgroundStyle="blurred"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/crowdloanTitle" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/crowdloanAbout"
