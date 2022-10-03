@@ -26,7 +26,7 @@ import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanAssetSelector
 import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanList
 import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanMainDescription
 import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanPlaceholder
-import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanProgress
+import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanShimmering
 import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanTotalContributedContainer
 import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanTotalContributedFiat
 import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanTotalContributedShimmering
