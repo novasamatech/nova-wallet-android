@@ -14,6 +14,7 @@ import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.storage.subscribeUsi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
@@ -53,8 +54,10 @@ class BalancesUpdateSystem(
             }
 
             val cancellable = socket.subscribeUsing(subscriptionBuilder.build())
-            sideEffectFlows.merge()
+            val resultFlow = sideEffectFlows.merge()
                 .onCompletion { cancellable.cancel() }
+
+            emitAll(resultFlow)
         }
     }
 
