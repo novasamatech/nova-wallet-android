@@ -14,7 +14,7 @@ class LinearDecreasingCurve(
     private val length: Perbill,
     private val floor: Perbill,
     private val ceil: Perbill
-): VotingCurve {
+) : VotingCurve {
 
     override fun threshold(x: Perbill): Perbill {
         return ceil - x.coerceAtMost(length).divide(length, RoundingMode.DOWN) * (ceil - floor)
