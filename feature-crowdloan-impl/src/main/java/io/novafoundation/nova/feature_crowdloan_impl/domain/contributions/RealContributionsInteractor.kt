@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.formatting.TimerValue
 import io.novafoundation.nova.common.utils.mapList
+import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -19,7 +20,6 @@ import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.Contrib
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionWithMetadata
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsWithTotalAmount
-import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.totalContributionAmount
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.leasePeriodInMillis
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.utilityAsset
@@ -32,9 +32,10 @@ import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import java.math.BigInteger
 
@@ -62,24 +63,27 @@ class RealContributionsInteractor(
         }
     }
 
-    override fun observeSelectedChainContributions(): Flow<ContributionsWithTotalAmount> {
+    override fun observeSelectedChainContributionsWithMetadata(): Flow<ContributionsWithTotalAmount<ContributionWithMetadata>> {
         val metaAccountFlow = accountRepository.selectedMetaAccountFlow()
         val chainFlow = selectedAssetCrowdloanState.assetWithChain.map { it.chain }
         return combineToPair(metaAccountFlow, chainFlow)
             .filter { (_, chain) -> crowdloanRepository.isCrowdloansAvailable(chain.id) }
             .flatMapLatest { (metaAccount, chain) ->
-                observeChainContributions(metaAccount, chain, chain.utilityAsset)
+                observeChainContributionsWithMetadata(metaAccount, chain, chain.utilityAsset)
             }
     }
 
-    override fun observeChainContributions(chainId: ChainId, assetId: ChainAssetId): Flow<ContributionsWithTotalAmount> {
-        return accountRepository.selectedMetaAccountFlow().flatMapLatest {
+    override fun observeChainContributions(
+        metaAccount: MetaAccount,
+        chainId: ChainId,
+        assetId: ChainAssetId
+    ): Flow<ContributionsWithTotalAmount<Contribution>> {
+        return flow {
             val (chain, asset) = chainRegistry.chainWithAsset(chainId, assetId)
-            if (chain.hasCrowdloans) {
-                observeChainContributions(it, chain, asset)
-            } else {
-                emptyFlow()
-            }
+
+            emitAll(contributionsRepository.observeContributions(metaAccount, chain, asset))
+        }.map { contributions ->
+            contributions.totalContributions { it.amountInPlanks }
         }
     }
 
@@ -106,7 +110,7 @@ class RealContributionsInteractor(
 
     private fun getMetadata(
         fundInfo: FundInfo,
-        parachainMetadata: ParachainMetadata,
+        parachainMetadata: ParachainMetadata?,
         blocksPerLeasePeriod: LeasePeriodToBlocksConverter,
         currentBlockNumber: BlockNumber,
         expectedBlockTime: BigInteger
@@ -118,11 +122,15 @@ class RealContributionsInteractor(
         )
     }
 
-    private fun sortContributionsByTimeLeft(contributions: List<ContributionWithMetadata>): List<ContributionWithMetadata> {
-        return contributions.sortedBy { it.metadata.returnsIn.millis }
+    private fun List<ContributionWithMetadata>.sortByTimeLeft(): List<ContributionWithMetadata> {
+        return sortedBy { it.metadata.returnsIn.millis }
     }
 
-    private suspend fun observeChainContributions(metaAccount: MetaAccount, chain: Chain, asset: Chain.Asset): Flow<ContributionsWithTotalAmount> {
+    private suspend fun observeChainContributionsWithMetadata(
+        metaAccount: MetaAccount,
+        chain: Chain,
+        asset: Chain.Asset
+    ): Flow<ContributionsWithTotalAmount<ContributionWithMetadata>> {
         val parachainMetadatas = getParachainMetadata(chain)
         val fundInfos = crowdloanRepository.allFundInfos(chain.id)
         val blocksPerLeasePeriod = crowdloanRepository.leasePeriodToBlocksConverter(chain.id)
@@ -132,20 +140,26 @@ class RealContributionsInteractor(
         return contributionsRepository.observeContributions(metaAccount, chain, asset)
             .mapList { contribution ->
                 ContributionWithMetadata(
-                    contribution,
-                    getMetadata(
-                        fundInfos.getValue(contribution.paraId),
-                        parachainMetadatas.getValue(contribution.paraId),
-                        blocksPerLeasePeriod,
-                        currentBlockNumber,
-                        expectedBlockTime
+                    contribution = contribution,
+                    metadata = getMetadata(
+                        fundInfo = fundInfos.getValue(contribution.paraId),
+                        parachainMetadata = parachainMetadatas[contribution.paraId],
+                        blocksPerLeasePeriod = blocksPerLeasePeriod,
+                        currentBlockNumber = currentBlockNumber,
+                        expectedBlockTime = expectedBlockTime
                     )
                 )
-            }.map {
-                ContributionsWithTotalAmount(
-                    it.totalContributionAmount(),
-                    sortContributionsByTimeLeft(it)
-                )
+            }.map { contributions ->
+                contributions
+                    .sortByTimeLeft()
+                    .totalContributions { it.contribution.amountInPlanks }
             }
+    }
+
+    private fun <T> List<T>.totalContributions(amount: (T) -> BigInteger): ContributionsWithTotalAmount<T> {
+        return ContributionsWithTotalAmount(
+            totalContributed = sumByBigInteger(amount),
+            contributions = this
+        )
     }
 }
