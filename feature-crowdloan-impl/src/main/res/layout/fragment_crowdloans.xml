@@ -168,57 +168,35 @@
 
             <com.facebook.shimmer.ShimmerFrameLayout
                 android:id="@+id/crowdloanShimmeringFirst"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="88dp"
+                android:layout_height="12dp"
                 android:layout_marginTop="26dp"
+                android:background="@drawable/bg_shimerring_light"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <View
-                    android:layout_width="88dp"
-                    android:layout_height="12dp"
-                    android:layout_gravity="center"
-                    android:background="@drawable/bg_shimerring" />
-
-            </com.facebook.shimmer.ShimmerFrameLayout>
+                app:layout_constraintTop_toTopOf="parent" />
 
             <com.facebook.shimmer.ShimmerFrameLayout
                 android:id="@+id/crowdloanShimmeringSecond"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="120dp"
+                android:layout_height="22dp"
                 android:layout_marginTop="12dp"
+                android:background="@drawable/bg_shimerring_light"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/crowdloanShimmeringFirst">
-
-                <View
-                    android:layout_width="120dp"
-                    android:layout_height="22dp"
-                    android:layout_gravity="center"
-                    android:background="@drawable/bg_shimerring" />
-
-            </com.facebook.shimmer.ShimmerFrameLayout>
-
+                app:layout_constraintTop_toBottomOf="@+id/crowdloanShimmeringFirst" />
 
             <com.facebook.shimmer.ShimmerFrameLayout
                 android:id="@+id/crowdloanShimmeringThird"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="70dp"
+                android:layout_height="12dp"
                 android:layout_marginTop="14dp"
                 android:layout_marginBottom="25dp"
+                android:background="@drawable/bg_shimerring_light"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/crowdloanShimmeringSecond">
-
-                <View
-                    android:layout_width="70dp"
-                    android:layout_height="12dp"
-                    android:layout_gravity="center"
-                    android:background="@drawable/bg_shimerring" />
-
-            </com.facebook.shimmer.ShimmerFrameLayout>
+                app:layout_constraintTop_toBottomOf="@+id/crowdloanShimmeringSecond" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -253,18 +231,30 @@
             app:layout_constraintTop_toBottomOf="@id/crowdloanTotalContributedShimmering"
             app:layout_constraintVertical_bias="0.45" />
 
-        <ProgressBar
-            android:id="@+id/crowdloanProgress"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/crowdloanShimmering"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="64dp"
-            android:indeterminate="true"
-            android:indeterminateTint="@color/white"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/crowdloanTotalContributedShimmering" />
+            android:layout_marginTop="14dp"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/crowdloanTotalContributedShimmering">
 
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/itemCrowdloanShimmeringIcon"
+                android:layout_width="88dp"
+                android:layout_height="14dp"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/bg_shimerring_light" />
+
+            <include layout="@layout/item_crowdloan_shimmering" />
+
+            <include layout="@layout/item_crowdloan_shimmering" />
+
+            <include layout="@layout/item_crowdloan_shimmering" />
+
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>

@@ -34,7 +34,7 @@ class UserContributionsViewModel(
     private val tokenFlow = tokenUseCase.currentTokenFlow()
         .shareInBackground()
 
-    private val contributionsWitTotalAmountFlow = interactor.observeSelectedChainContributions()
+    private val contributionsWitTotalAmountFlow = interactor.observeSelectedChainContributionsWithMetadata()
         .shareInBackground()
 
     private val contributionsFlow = contributionsWitTotalAmountFlow

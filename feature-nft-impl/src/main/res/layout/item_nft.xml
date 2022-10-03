@@ -18,7 +18,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="262dp"
-            android:background="@drawable/bg_shimerring" />
+            android:background="@drawable/bg_shimerring_light" />
 
     </com.facebook.shimmer.ShimmerFrameLayout>
 

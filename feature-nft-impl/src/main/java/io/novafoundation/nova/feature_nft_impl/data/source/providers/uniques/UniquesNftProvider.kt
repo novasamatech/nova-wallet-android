@@ -37,7 +37,7 @@ class UniquesNftProvider(
 ) : NftProvider {
 
     override suspend fun initialNftsSync(chain: Chain, metaAccount: MetaAccount, forceOverwrite: Boolean) {
-        val accountId = metaAccount.accountIdIn(chain)!!
+        val accountId = metaAccount.accountIdIn(chain) ?: return
 
         val newNfts = remoteStorage.query(chain.id) {
             val classesWithInstances = runtime.metadata.uniques().storage("Account").keys(accountId)
