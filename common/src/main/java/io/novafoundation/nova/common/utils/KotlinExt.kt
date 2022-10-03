@@ -1,23 +1,25 @@
 package io.novafoundation.nova.common.utils
 
 import android.net.Uri
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.math.MathContext
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
 
 private val PERCENTAGE_MULTIPLIER = 100.toBigDecimal()
 
 fun BigDecimal.fractionToPercentage() = this * PERCENTAGE_MULTIPLIER
 
-fun Double.percentageToFraction() = this / 100
+fun Double.percentageToFraction() = this / PERCENTAGE_MULTIPLIER.toDouble()
+fun BigDecimal.percentageToFraction() = this.divide(PERCENTAGE_MULTIPLIER, MathContext.DECIMAL64)
 
 infix fun Int.floorMod(divisor: Int) = Math.floorMod(this, divisor)
 
