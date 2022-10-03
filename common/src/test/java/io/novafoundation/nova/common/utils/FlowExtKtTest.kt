@@ -43,10 +43,10 @@ class FlowExtKtTest {
 
             performTest(
                 first = listOf(1, 2),
-                second =  listOf(2, 3),
+                second = listOf(2, 3),
                 expectedDiff = ListDiff(
                     removed = listOf(1),
-                    addedOrModified =  listOf(3),
+                    addedOrModified = listOf(3),
                     all = listOf(2, 3)
                 )
             )
