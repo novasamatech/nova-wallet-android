@@ -27,7 +27,7 @@ class TokenRepositoryImpl(
     }
 
     override suspend fun getToken(chainAsset: Chain.Asset): Token = withContext(Dispatchers.Default) {
-        val tokenLocal = tokenDao.getToken(chainAsset.symbol)
+        val tokenLocal = tokenDao.getToken(chainAsset.symbol)!!
 
         mapTokenWithCurrencyToToken(tokenLocal, chainAsset)
     }

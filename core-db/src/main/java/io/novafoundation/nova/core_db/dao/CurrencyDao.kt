@@ -47,6 +47,9 @@ abstract class CurrencyDao {
     @Query("UPDATE currencies SET selected = (id = :currencyId)")
     abstract fun selectCurrency(currencyId: Int)
 
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    abstract suspend fun insert(currency: CurrencyLocal)
+
     @Delete
     protected abstract suspend fun deleteCurrencies(currencies: List<CurrencyLocal>)
 
