@@ -18,13 +18,13 @@ class SelectAddressViewModel(
     private val request: SelectAddressForTransactionRequester.Request,
 ) : WalletListViewModel() {
 
-    override val walletsListingMixin = accountListingMixinFactory.create(this, request.fromChainId, request.destinationChainId, request.initialAddress)
+    override val walletsListingMixin = accountListingMixinFactory.create(this, request.fromChainId, request.destinationChainId, request.selectedAddress)
 
     override val mode: AccountsAdapter.Mode = AccountsAdapter.Mode.SWITCH
 
     override fun accountClicked(accountModel: AccountUi) {
         launch {
-            val address = accountInteractor.getChainAddress(accountModel.id, request.fromChainId)
+            val address = accountInteractor.getChainAddress(accountModel.id, request.destinationChainId)
             if (address != null) {
                 selectAddressResponder.respond(SelectAddressForTransactionResponder.Response(address))
                 router.back()

@@ -211,9 +211,9 @@ class SelectSendViewModel(
 
     fun selectRecipientWallet() {
         launch {
-            val currentAddress = addressInputMixin.inputFlow.value
+            val selectedAddress = addressInputMixin.inputFlow.value
             val currentDestination = destinationChain.first().chain
-            val request = SelectAddressForTransactionRequester.Request(assetPayload.chainId, currentDestination.id, currentAddress)
+            val request = SelectAddressForTransactionRequester.Request(assetPayload.chainId, currentDestination.id, selectedAddress)
             selectAddressRequester.openRequest(request)
         }
     }

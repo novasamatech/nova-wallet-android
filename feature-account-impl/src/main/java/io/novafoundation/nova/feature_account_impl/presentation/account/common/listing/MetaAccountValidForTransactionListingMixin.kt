@@ -54,12 +54,13 @@ private class MetaAccountValidForTransactionListingMixin(
 
     private val destinationChainFlow by coroutineScope.lazyAsync { chainRegistry.getChain(destinationChainId) }
 
-    override val metaAccountsFlow = metaAccountGroupingInteractor.getMetaAccountsForTransaction(fromChainId, destinationChainId).map { list ->
-        list.toListWithHeaders(
-            keyMapper = { mapMetaAccountTypeToUi(it, resourceManager) },
-            valueMapper = { mapMetaAccountToUi(it) }
-        )
-    }
+    override val metaAccountsFlow = metaAccountGroupingInteractor.getMetaAccountsForTransaction(fromChainId, destinationChainId)
+        .map { list ->
+            list.toListWithHeaders(
+                keyMapper = { mapMetaAccountTypeToUi(it, resourceManager) },
+                valueMapper = { mapMetaAccountToUi(it) }
+            )
+        }
         .shareInBackground()
 
     private suspend fun mapMetaAccountToUi(metaAccount: MetaAccount): AccountUi {

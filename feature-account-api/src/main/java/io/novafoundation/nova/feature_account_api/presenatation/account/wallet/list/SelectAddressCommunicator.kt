@@ -12,7 +12,7 @@ interface SelectAddressForTransactionRequester : InterScreenRequester<SelectAddr
     class Request(
         val fromChainId: ChainId,
         val destinationChainId: ChainId,
-        val initialAddress: String?
+        val selectedAddress: String?
     ) : Parcelable
 }
 
