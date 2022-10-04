@@ -11,7 +11,7 @@ interface MetaAccountGroupingInteractor {
 
     fun metaAccountsWithTotalBalanceFlow(): Flow<GroupedList<LightMetaAccount.Type, MetaAccountWithTotalBalance>>
 
-    fun getControlledMetaAccountsFlow(): Flow<GroupedList<LightMetaAccount.Type, MetaAccount>>
+    fun getMetaAccountsForTransaction(fromId: ChainId, destinationId: ChainId): Flow<GroupedList<LightMetaAccount.Type, MetaAccount>>
 
-    suspend fun hasAvailableMetaAccountsForDestination(chainId: ChainId): Boolean
+    suspend fun hasAvailableMetaAccountsForDestination(fromId: ChainId, destinationId: ChainId): Boolean
 }

@@ -3,30 +3,30 @@ package io.novafoundation.nova.feature_account_impl.presentation.account.list.se
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountsAdapter
-import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.SelectAddressRequester
-import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.SelectAddressResponder
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressForTransactionRequester
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressForTransactionResponder
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountWithChainAddressListingMixinFactory
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountValidForTransactionListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.WalletListViewModel
 import kotlinx.coroutines.launch
 
 class SelectAddressViewModel(
-    accountListingMixinFactory: MetaAccountWithChainAddressListingMixinFactory,
+    accountListingMixinFactory: MetaAccountValidForTransactionListingMixinFactory,
     private val router: AccountRouter,
-    private val selectAddressResponder: SelectAddressResponder,
+    private val selectAddressResponder: SelectAddressForTransactionResponder,
     private val accountInteractor: AccountInteractor,
-    private val request: SelectAddressRequester.Request,
+    private val request: SelectAddressForTransactionRequester.Request,
 ) : WalletListViewModel() {
 
-    override val walletsListingMixin = accountListingMixinFactory.create(this, request.chainId, request.initialAddress)
+    override val walletsListingMixin = accountListingMixinFactory.create(this, request.fromChainId, request.destinationChainId, request.initialAddress)
 
     override val mode: AccountsAdapter.Mode = AccountsAdapter.Mode.SWITCH
 
     override fun accountClicked(accountModel: AccountUi) {
         launch {
-            val address = accountInteractor.getChainAddress(accountModel.id, request.chainId)
+            val address = accountInteractor.getChainAddress(accountModel.id, request.fromChainId)
             if (address != null) {
-                selectAddressResponder.respond(SelectAddressResponder.Response(address))
+                selectAddressResponder.respond(SelectAddressForTransactionResponder.Response(address))
                 router.back()
             }
         }
