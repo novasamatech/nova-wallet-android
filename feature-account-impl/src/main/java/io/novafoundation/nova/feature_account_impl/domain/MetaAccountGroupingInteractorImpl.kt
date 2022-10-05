@@ -36,7 +36,7 @@ class MetaAccountGroupingInteractorImpl(
                 val accountBalances = groupedBalances[metaAccount.id] ?: emptyList()
 
                 val totalBalance = accountBalances.sumByBigDecimal {
-                    val totalInPlanks = it.freeInPlanks + it.reservedInPlanks
+                    val totalInPlanks = it.freeInPlanks + it.reservedInPlanks + it.offChainBalance.orZero()
 
                     totalInPlanks.amountFromPlanks(it.precision) * it.rate.orZero()
                 }

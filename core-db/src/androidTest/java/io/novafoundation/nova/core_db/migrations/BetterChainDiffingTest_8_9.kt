@@ -69,7 +69,7 @@ class BetterChainDiffingTest_8_9 : BaseMigrationTest() {
     }
 
     private suspend fun postMigrate(db: AppDatabase) {
-        val assetsForMeta1 = db.assetDao().getAssets(meta1Id)
+        val assetsForMeta1 = db.assetDao().getSupportedAssets(meta1Id)
 
         val symbolToAssetIdMapping = mapOf(
             (chain1Id to "A") to 0,
@@ -81,14 +81,14 @@ class BetterChainDiffingTest_8_9 : BaseMigrationTest() {
         )
 
         assetsForMeta1.forEach {
-            val actualChainId = it.asset.chainId
-            val actualTokenSymbol = it.token.symbol
+            val actualChainId = it.asset!!.chainId
+            val actualTokenSymbol = it.token!!.tokenSymbol
 
             val assetIdExpected = symbolToAssetIdMapping[actualChainId to actualTokenSymbol]
-            assertEquals(assetIdExpected, it.asset.assetId)
+            assertEquals(assetIdExpected, it.asset!!.assetId)
 
             val expectedOldAsset = assetsOld.first { it.chainId == actualChainId && it.metaId == meta1Id && it.tokenSymbol == actualTokenSymbol }
-            assertEquals(expectedOldAsset.freeInPlanks.toBigInteger(), it.asset.freeInPlanks)
+            assertEquals(expectedOldAsset.freeInPlanks.toBigInteger(), it.asset!!.freeInPlanks)
         }
     }
 
@@ -119,8 +119,8 @@ class BetterChainDiffingTest_8_9 : BaseMigrationTest() {
 
         val contentValues = ContentValues().apply {
             put("parentId", chain.parentId)
-            put("color", chain.color)
             put("name", chain.name)
+            put("additional", chain.additional)
             put("id", chain.id)
             put("icon", chain.icon)
             // types

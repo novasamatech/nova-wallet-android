@@ -3,10 +3,12 @@ package io.novafoundation.nova.feature_crowdloan_impl.presentation.contributions
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.capitalize
 import io.novafoundation.nova.common.utils.withLoading
+import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.Contribution
+import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionWithMetadata
+import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.R
-import io.novafoundation.nova.feature_crowdloan_impl.domain.contributions.Contribution
-import io.novafoundation.nova.feature_crowdloan_impl.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contributions.model.ContributionModel
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.model.generateCrowdloanIcon
@@ -32,7 +34,7 @@ class UserContributionsViewModel(
     private val tokenFlow = tokenUseCase.currentTokenFlow()
         .shareInBackground()
 
-    private val contributionsWitTotalAmountFlow = interactor.observeUserContributions()
+    private val contributionsWitTotalAmountFlow = interactor.observeSelectedChainContributionsWithMetadata()
         .shareInBackground()
 
     private val contributionsFlow = contributionsWitTotalAmountFlow
@@ -56,24 +58,40 @@ class UserContributionsViewModel(
     }
 
     private suspend fun mapCrowdloanToContributionModel(
-        contribution: Contribution,
+        contributionWithMetadata: ContributionWithMetadata,
         chain: Chain,
         token: Token,
     ): ContributionModel {
-        val depositorAddress = chain.addressOf(contribution.fundInfo.depositor)
-        val parachainName = contribution.parachainMetadata?.name ?: contribution.paraId.toString()
-
-        val contributionTitle = if (contribution.sourceName != null) {
-            resourceManager.getString(R.string.crowdloan_contributions_with_source, parachainName, contribution.sourceName)
-        } else {
-            parachainName
-        }
+        val depositorAddress = chain.addressOf(contributionWithMetadata.metadata.fundInfo.depositor)
+        val contributionTitle = mapContributionTitle(contributionWithMetadata)
 
         return ContributionModel(
             title = contributionTitle,
-            icon = generateCrowdloanIcon(contribution.parachainMetadata, depositorAddress, iconGenerator),
-            amount = mapAmountToAmountModel(contribution.amount, token),
-            returnsIn = contribution.returnsIn
+            icon = generateCrowdloanIcon(contributionWithMetadata.metadata.parachainMetadata, depositorAddress, iconGenerator),
+            amount = mapAmountToAmountModel(contributionWithMetadata.contribution.amountInPlanks, token),
+            returnsIn = contributionWithMetadata.metadata.returnsIn
         )
+    }
+
+    private fun mapContributionTitle(contributionWithMetadata: ContributionWithMetadata): String {
+        val parachainName = contributionWithMetadata.metadata.parachainMetadata?.name
+            ?: contributionWithMetadata.contribution.paraId.toString()
+
+        val sourceName = when (contributionWithMetadata.contribution.sourceId) {
+            Contribution.DIRECT_SOURCE_ID -> null
+            Contribution.LIQUID_SOURCE_ID -> resourceManager.getString(R.string.crowdloan_contributions_liquid_source)
+            Contribution.PARALLEL_SOURCE_ID -> resourceManager.getString(R.string.crowdloan_contributions_parallel_source)
+            else -> contributionWithMetadata.contribution.sourceId.capitalize()
+        }
+
+        return if (sourceName == null) {
+            parachainName
+        } else {
+            resourceManager.getString(
+                R.string.crowdloan_contributions_with_source,
+                parachainName,
+                sourceName
+            )
+        }
     }
 }

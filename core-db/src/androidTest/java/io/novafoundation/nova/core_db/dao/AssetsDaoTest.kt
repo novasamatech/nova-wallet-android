@@ -13,27 +13,94 @@ class AssetsDaoTest : DaoTest<AssetDao>(AppDatabase::assetDao) {
 
     private val chainDao by dao<ChainDao>()
     private val metaAccountDao by dao<MetaAccountDao>()
+    private val currencyDao by dao<CurrencyDao>()
+    private val assetDao by dao<AssetDao>()
 
     private var metaId: Long = 0
 
     private val chainId = "0"
     private val testChain = createTestChain(chainId)
-    private val assetId = testChain.assets.first().id
+    private val asset = testChain.assets.first()
+    private val assetId = asset.id
 
     @Before
     fun setupDb() = runBlocking {
-        chainDao.addChain(testChain)
         metaId = metaAccountDao.insertMetaAccount(testMetaAccount())
+        chainDao.addChain(testChain)
     }
 
     @Test
     fun shouldDeleteAssetAfterChainIsDeleted() = runBlocking {
         dao.insertAsset(AssetLocal.createEmpty(assetId = assetId, chainId = chainId, metaId))
-
         chainDao.removeChain(testChain)
 
-        val assets = dao.getAssets(metaId)
+        val assets = dao.getSupportedAssets(metaId)
 
         assert(assets.isEmpty())
+    }
+
+    @Test
+    fun testRetrievingAssetsByMetaId() = runBlocking {
+        currencyDao.insert(createCurrency(selected = true))
+
+        val assetWithToken = dao.getAssetWithToken(metaId, chainId, assetId)
+
+        assert(assetWithToken != null)
+    }
+
+    @Test
+    fun testRetrievingAssetsByMetaIdWithoutCurrency() = runBlocking {
+        currencyDao.insert(createCurrency(selected = false))
+
+        val assetWithToken = dao.getAssetWithToken(metaId, chainId, assetId)
+
+        assert(assetWithToken == null)
+    }
+
+    @Test
+    fun testRetrievingSyncedAssets() = runBlocking {
+        assetDao.insertAsset(AssetLocal.createEmpty(assetId, chainId, metaId))
+        currencyDao.insert(createCurrency(selected = true))
+
+        val assetWithToken = dao.getSyncedAssets(metaId)
+
+        assert(assetWithToken.isNotEmpty())
+    }
+
+    @Test
+    fun testRetrievingSyncedAssetsWithoutCurrency() = runBlocking {
+        assetDao.insertAsset(AssetLocal.createEmpty(assetId, chainId, metaId))
+        currencyDao.insert(createCurrency(selected = false))
+
+        val assetsWithTokens = dao.getSyncedAssets(metaId)
+
+        assert(assetsWithTokens.isEmpty())
+    }
+
+    @Test
+    fun testRetrievingSyncedAssetsWithoutAssetBalance() = runBlocking {
+        currencyDao.insert(createCurrency(selected = false))
+
+        val assetsWithTokens = dao.getSyncedAssets(metaId)
+
+        assert(assetsWithTokens.isEmpty())
+    }
+
+    @Test
+    fun testRetrievingSupportedAssets() = runBlocking {
+        currencyDao.insert(createCurrency(selected = true))
+
+        val assetsWithTokens = dao.getSupportedAssets(metaId)
+
+        assert(assetsWithTokens.isNotEmpty())
+    }
+
+    @Test
+    fun testRetrievingSupportedAssetsWithoutCurrency() = runBlocking {
+        currencyDao.insert(createCurrency(selected = false))
+
+        val assetsWithTokens = dao.getSupportedAssets(metaId)
+
+        assert(assetsWithTokens.isEmpty())
     }
 }

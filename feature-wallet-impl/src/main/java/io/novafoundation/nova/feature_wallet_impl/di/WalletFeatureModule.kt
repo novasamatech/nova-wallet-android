@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
@@ -116,7 +117,6 @@ class WalletFeatureModule {
         accountRepository: AccountRepository,
         cursorStorage: TransferCursorStorage,
         chainRegistry: ChainRegistry,
-        tokenDao: TokenDao,
     ): WalletRepository = WalletRepositoryImpl(
         substrateSource,
         operationsDao,
@@ -129,7 +129,6 @@ class WalletFeatureModule {
         cursorStorage,
         coingeckoApi,
         chainRegistry,
-        tokenDao
     )
 
     @Provides
@@ -150,10 +149,12 @@ class WalletFeatureModule {
     fun provideFeatureUpdaters(
         chainRegistry: ChainRegistry,
         paymentUpdaterFactory: PaymentUpdaterFactory,
+        balanceLocksUpdater: BalanceLocksUpdaterFactory,
         accountUpdateScope: AccountUpdateScope,
     ): UpdateSystem = BalancesUpdateSystem(
         chainRegistry,
         paymentUpdaterFactory,
+        balanceLocksUpdater,
         accountUpdateScope,
     )
 

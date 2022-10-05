@@ -1,0 +1,57 @@
+name: Manual Firebase distribution
+
+on:
+  workflow_dispatch:
+     inputs:
+      app_version:
+        description: 'Version of application'
+        required: true
+        default: v*.*.*
+      branch:
+        description: 'From which branch the application will be built'
+        required: true
+        default: develop
+
+jobs:
+  build:
+    uses: nova-wallet/nova-wallet-android/.github/workflows/android_build.yml@develop
+    with:
+      branch: ${{ github.event.inputs.branch }}
+      gradlew-command: assembleReleaseMarket
+      keystore-file-name: market_key.jks
+      keystore-file-base64: ${{ secrets.RELEASE_MARKET_KEY_FILE }}
+    secrets: inherit
+
+  upload:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set Environment Variables
+        uses: tw3lveparsecs/github-actions-setvars@v0.1
+        with:
+          envFilePath: .github/workflows/variables/android.env
+
+      - name: Download built artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: apk
+          path: app
+
+      - name: Rename artifacts
+        run: mv app/releaseMarket/app-releaseMarket.apk app/releaseMarket/nova-wallet-android-${{ github.event.inputs.app_version }}.apk
+
+      - name: Market publication
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }} # The contents of your service-account.json
+          packageName: io.novafoundation.nova
+          releaseFiles: app/releaseMarket/nova-wallet-android-${{ github.event.inputs.app_version }}.apk
+          track: production # One of production, beta, alpha, internalsharing, internal, or a custom track name (case sensitive)
+          status: draft # One of "completed", "inProgress", "halted", "draft"
+          inAppUpdatePriority: 2
+          userFraction: 1.0 # Percentage of users who should get the staged version of the app. Defaults to 1.0
+          whatsNewDirectory: distribution/whatsnew # The directory of localized "whats new" files to upload as the release notes. The files contained in the whatsNewDirectory MUST use the pattern whatsnew-<LOCALE> where LOCALE is using the BCP 47 format
+          mappingFile: app/build/outputs/mapping/release/mapping.txt # The mapping.txt file used to de-obfuscate your stack traces from crash reports
+          debugSymbols: app/intermediates/merged_native_libs/release/out/lib

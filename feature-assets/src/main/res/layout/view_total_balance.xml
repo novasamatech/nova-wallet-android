@@ -4,23 +4,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:paddingVertical="20dp"
     tools:background="@color/black_48"
     tools:gravity="center_horizontal"
     tools:orientation="vertical"
     tools:parentTag="android.widget.LinearLayout">
-
 
     <TextView
         android:id="@+id/viewAssetsTotalBalanceTitle"
         style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:drawablePadding="5dp"
         android:gravity="center_vertical"
         android:includeFontPadding="false"
         android:text="@string/wallet_balance_details_total"
-        android:textColor="@color/white_64" />
+        android:textColor="@color/white_64"
+        app:drawableTint="@color/white_48" />
 
     <TextView
         android:id="@+id/viewAssetsTotalBalanceTotal"
@@ -30,8 +29,8 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="4dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
         android:gravity="center_horizontal"
+        android:textColor="@color/white"
         android:visibility="gone"
         tools:text="$214.66"
         tools:visibility="visible" />
@@ -41,19 +40,21 @@
         style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="9dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginTop="8dp"
         android:drawablePadding="5dp"
         android:gravity="center_vertical"
         android:paddingStart="6dp"
         android:paddingTop="1dp"
         android:paddingEnd="6dp"
         android:paddingBottom="1dp"
+        android:textColor="@color/white_64"
         android:visibility="gone"
         app:drawableStartCompat="@drawable/ic_lock"
         app:drawableTint="@color/white_64"
         tools:background="@color/white_16"
-        tools:text="$214.66" />
+        tools:drawableStart="@drawable/ic_lock"
+        tools:text="$214.66"
+        tools:visibility="visible" />
 
     <com.facebook.shimmer.ShimmerFrameLayout
         android:id="@+id/viewAssetsTotalBalanceShimmer"
@@ -72,13 +73,13 @@
             <View
                 android:layout_width="136dp"
                 android:layout_height="32dp"
-                android:background="@drawable/bg_shimerring" />
+                android:background="@drawable/bg_shimerring_light" />
 
             <View
                 android:layout_width="80dp"
                 android:layout_height="18dp"
                 android:layout_marginTop="12dp"
-                android:background="@drawable/bg_shimerring"
+                android:background="@drawable/bg_shimerring_light"
                 android:visibility="gone" />
         </LinearLayout>
     </com.facebook.shimmer.ShimmerFrameLayout>
