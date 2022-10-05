@@ -124,7 +124,7 @@ class GovV2OnChainReferendaRepository(
 
     private fun bindTracks(decoded: Any?): List<TrackInfo> {
         return bindList(decoded) {
-            val (id,content) = it.castToList()
+            val (id, content) = it.castToList()
             val trackInfoStruct = content.castToStruct()
 
             TrackInfo(
@@ -136,7 +136,7 @@ class GovV2OnChainReferendaRepository(
                 decisionPeriod = bindBlockNumber(trackInfoStruct["decisionPeriod"]),
                 confirmPeriod = bindBlockNumber(trackInfoStruct["confirmPeriod"]),
                 minEnactmentPeriod = bindBlockNumber(trackInfoStruct["minEnactmentPeriod"]),
-                minApproval =  bindCurve(trackInfoStruct.getTyped("minApproval")),
+                minApproval = bindCurve(trackInfoStruct.getTyped("minApproval")),
                 minSupport = bindCurve(trackInfoStruct.getTyped("minSupport"))
             )
         }
@@ -145,7 +145,7 @@ class GovV2OnChainReferendaRepository(
     private fun bindCurve(decoded: DictEnum.Entry<*>): VotingCurve {
         val valueStruct = decoded.value.castToStruct()
 
-        return when(decoded.name) {
+        return when (decoded.name) {
             "Reciprocal" -> {
                 ReciprocalCurve(
                     factor = bindNumber(valueStruct["factor"]),
