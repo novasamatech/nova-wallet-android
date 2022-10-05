@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings
 
 import io.novafoundation.nova.common.data.network.runtime.binding.UseCaseBinding
-import io.novafoundation.nova.common.data.network.runtime.binding.bindPerbill
+import io.novafoundation.nova.common.data.network.runtime.binding.bindPerbillNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.data.network.runtime.binding.getTyped
 import io.novafoundation.nova.common.data.network.runtime.binding.returnType
@@ -17,7 +17,7 @@ fun bindValidatorPrefs(decoded: Any?): ValidatorPrefs {
     val asStruct = decoded.castToStruct()
 
     return ValidatorPrefs(
-        commission = bindPerbill(asStruct.getTyped("commission")),
+        commission = bindPerbillNumber(asStruct.getTyped("commission")),
         blocked = asStruct["blocked"] ?: BLOCKED_DEFAULT
     )
 }

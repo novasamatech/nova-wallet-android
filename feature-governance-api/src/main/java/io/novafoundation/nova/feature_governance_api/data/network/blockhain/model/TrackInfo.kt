@@ -5,7 +5,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.Perbill
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import java.math.BigInteger
 
-class TrackInfo(
+data class TrackInfo(
     val id: BigInteger,
     val name: String,
     val maxDeciding: BigInteger,
@@ -14,7 +14,8 @@ class TrackInfo(
     val decisionPeriod: BlockNumber,
     val confirmPeriod: BlockNumber,
     val minEnactmentPeriod: BlockNumber,
-    val minApproval: VotingCurve
+    val minApproval: VotingCurve,
+    val minSupport: VotingCurve
 )
 
 interface VotingCurve {

@@ -5,8 +5,10 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.findChain
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 
@@ -47,5 +49,19 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
         Log.d(this@GovernanceIntegrationTest.LOG_TAG, trackLocks.toString())
     }
 
-    private suspend fun chain(): Chain = chainRegistry.findChain { it.hasGovernance }!!
+    @Test
+    fun shouldRetrieveReferendaTracks() = runBlocking<Unit> {
+        val chain = chain()
+        val onChainReferendaRepository = governanceApi.onChainReferendaRepository
+
+        val tracks = onChainReferendaRepository.getTracks(chain.id)
+
+        Log.d(this@GovernanceIntegrationTest.LOG_TAG, tracks.toString())
+    }
+
+    private suspend fun chain(): Chain = chainRegistry.currentChains.map { chains ->
+        chains.find(Chain::hasGovernance)
+    }
+        .filterNotNull()
+        .first()
 }

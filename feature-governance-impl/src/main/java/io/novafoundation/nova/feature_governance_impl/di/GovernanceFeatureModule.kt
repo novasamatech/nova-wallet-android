@@ -80,8 +80,9 @@ class GovernanceFeatureModule {
     @Provides
     @FeatureScope
     fun provideOnChainReferendaRepository(
-        @Named(REMOTE_STORAGE_SOURCE) storageSource: StorageDataSource
-    ): OnChainReferendaRepository = GovV2OnChainReferendaRepository(storageSource)
+        @Named(REMOTE_STORAGE_SOURCE) storageSource: StorageDataSource,
+        chainRegistry: ChainRegistry
+    ): OnChainReferendaRepository = GovV2OnChainReferendaRepository(storageSource, chainRegistry)
 
     @Provides
     @FeatureScope
