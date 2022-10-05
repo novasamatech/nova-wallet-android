@@ -5,6 +5,7 @@ import jp.co.soramitsu.fearless_utils.runtime.definitions.types.RuntimeType
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.Type
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.DictEnum
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromByteArrayOrNull
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHexOrNull
 import jp.co.soramitsu.fearless_utils.runtime.metadata.RuntimeMetadata
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module
@@ -80,4 +81,6 @@ fun RuntimeMetadata.storageReturnType(moduleName: String, storageName: String): 
     return module(moduleName).storage(storageName).returnType()
 }
 
-fun <D> RuntimeType<*, D>.fromHexOrIncompatible(scale: String, runtime: RuntimeSnapshot) = fromHexOrNull(runtime, scale) ?: incompatible()
+fun <D> RuntimeType<*, D>.fromHexOrIncompatible(scale: String, runtime: RuntimeSnapshot): D = fromHexOrNull(runtime, scale) ?: incompatible()
+
+fun <D> RuntimeType<*, D>.fromByteArrayOrIncompatible(scale: ByteArray, runtime: RuntimeSnapshot): D = fromByteArrayOrNull(runtime, scale) ?: incompatible()

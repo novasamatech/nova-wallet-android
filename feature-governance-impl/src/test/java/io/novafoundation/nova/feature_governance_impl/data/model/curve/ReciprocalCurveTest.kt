@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_governance_impl.data.model.curve
 
 import org.junit.Test
 import java.math.BigDecimal
+import java.math.BigInteger
 
 class ReciprocalCurveTest {
 
@@ -15,9 +16,9 @@ class ReciprocalCurveTest {
     fun threshold() {
         // 10/(x + 1) + 1
         val curve = ReciprocalCurve(
-            factor = BigDecimal.TEN,
-            xOffset = BigDecimal.ONE,
-            yOffset = (-1).toBigDecimal()
+            factor = BigInteger.TEN,
+            xOffset = BigInteger.ONE,
+            yOffset = (-1).toBigInteger()
         )
 
         curve.runTests(TESTS)
