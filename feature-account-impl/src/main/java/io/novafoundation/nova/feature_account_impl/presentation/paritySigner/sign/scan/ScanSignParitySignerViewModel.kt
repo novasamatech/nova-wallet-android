@@ -51,6 +51,8 @@ class ScanSignParitySignerViewModel(
         interactor.encodeAndVerifySignature(signSharedState.getOrThrow(), result)
             .onSuccess(::respondResult)
             .onFailure {
+                it.printStackTrace()
+
                 invalidQrConfirmation.awaitAction()
 
                 resetScanning()
