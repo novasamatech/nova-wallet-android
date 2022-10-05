@@ -16,7 +16,7 @@ import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
-import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.SelectAddressRequester
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressForTransactionRequester
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
@@ -74,7 +74,7 @@ class SelectSendViewModel(
     private val addressInputMixinFactory: AddressInputMixinFactory,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
-    private val selectAddressRequester: SelectAddressRequester
+    private val selectAddressRequester: SelectAddressForTransactionRequester
 ) : BaseViewModel(),
     Validatable by validationExecutor {
 
@@ -102,7 +102,7 @@ class SelectSendViewModel(
         .shareInBackground()
 
     val isSelectAddressAvailable = destinationChain
-        .map { metaAccountGroupingInteractor.hasAvailableMetaAccountsForDestination(it.chain.id) }
+        .map { metaAccountGroupingInteractor.hasAvailableMetaAccountsForDestination(assetPayload.chainId, it.chain.id) }
         .inBackground()
         .share()
 
@@ -211,9 +211,9 @@ class SelectSendViewModel(
 
     fun selectRecipientWallet() {
         launch {
-            val currentAddress = addressInputMixin.inputFlow.value
+            val selectedAddress = addressInputMixin.inputFlow.value
             val currentDestination = destinationChain.first().chain
-            val request = SelectAddressRequester.Request(currentDestination.id, currentAddress)
+            val request = SelectAddressForTransactionRequester.Request(assetPayload.chainId, currentDestination.id, selectedAddress)
             selectAddressRequester.openRequest(request)
         }
     }

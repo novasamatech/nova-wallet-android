@@ -15,7 +15,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.map
 
-class MetaAccountWithChainAddressListingMixinFactory(
+class MetaAccountValidForTransactionListingMixinFactory(
     private val walletUiUseCase: WalletUiUseCase,
     private val resourceManager: ResourceManager,
     private val chainRegistry: ChainRegistry,
@@ -24,45 +24,49 @@ class MetaAccountWithChainAddressListingMixinFactory(
 
     fun create(
         coroutineScope: CoroutineScope,
-        chainId: ChainId,
+        fromChainId: ChainId,
+        destinationChainId: ChainId,
         selectedAddress: String?
     ): MetaAccountListingMixin {
-        return MetaAccountWithChainAddressListingMixin(
+        return MetaAccountValidForTransactionListingMixin(
             walletUiUseCase = walletUiUseCase,
             resourceManager = resourceManager,
             metaAccountGroupingInteractor = metaAccountGroupingInteractor,
             chainRegistry = chainRegistry,
-            chainId = chainId,
+            fromChainId = fromChainId,
+            destinationChainId = destinationChainId,
             selectedAddress = selectedAddress,
             coroutineScope = coroutineScope
         )
     }
 }
 
-private class MetaAccountWithChainAddressListingMixin(
+private class MetaAccountValidForTransactionListingMixin(
     private val walletUiUseCase: WalletUiUseCase,
     private val resourceManager: ResourceManager,
     private val metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
     private val chainRegistry: ChainRegistry,
-    private val chainId: ChainId,
+    private val fromChainId: ChainId,
+    private val destinationChainId: ChainId,
     private val selectedAddress: String?,
     coroutineScope: CoroutineScope,
 ) : MetaAccountListingMixin, WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(coroutineScope) {
 
-    private val chainFlow by coroutineScope.lazyAsync { chainRegistry.getChain(chainId) }
+    private val destinationChainFlow by coroutineScope.lazyAsync { chainRegistry.getChain(destinationChainId) }
 
-    override val metaAccountsFlow = metaAccountGroupingInteractor.getControlledMetaAccountsFlow().map { list ->
-        list.toListWithHeaders(
-            keyMapper = { mapMetaAccountTypeToUi(it, resourceManager) },
-            valueMapper = { mapMetaAccountToUi(it) }
-        )
-    }
+    override val metaAccountsFlow = metaAccountGroupingInteractor.getMetaAccountsForTransaction(fromChainId, destinationChainId)
+        .map { list ->
+            list.toListWithHeaders(
+                keyMapper = { mapMetaAccountTypeToUi(it, resourceManager) },
+                valueMapper = { mapMetaAccountToUi(it) }
+            )
+        }
         .shareInBackground()
 
     private suspend fun mapMetaAccountToUi(metaAccount: MetaAccount): AccountUi {
         val icon = walletUiUseCase.walletIcon(metaAccount)
 
-        val chainAddress = metaAccount.addressIn(chainFlow.await())
+        val chainAddress = metaAccount.addressIn(destinationChainFlow.await())
         val isSelected = chainAddress != null && chainAddress == selectedAddress
 
         return AccountUi(
