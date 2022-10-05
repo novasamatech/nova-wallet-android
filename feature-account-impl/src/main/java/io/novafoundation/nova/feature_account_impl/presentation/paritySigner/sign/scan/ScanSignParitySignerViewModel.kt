@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.common.QrCodeExpiredPresentableFactory
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan.model.ScanSignParitySignerPayload
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan.model.mapValidityPeriodFromParcel
-import jp.co.soramitsu.fearless_utils.encrypt.SignatureWrapper.Sr25519
+import jp.co.soramitsu.fearless_utils.encrypt.SignatureWrapper
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
@@ -51,15 +51,16 @@ class ScanSignParitySignerViewModel(
         interactor.encodeAndVerifySignature(signSharedState.getOrThrow(), result)
             .onSuccess(::respondResult)
             .onFailure {
+                it.printStackTrace()
+
                 invalidQrConfirmation.awaitAction()
 
                 resetScanning()
             }
     }
 
-    private fun respondResult(signature: ByteArray) {
-        val wrapper = Sr25519(signature)
-        val response = payload.request.signed(wrapper)
+    private fun respondResult(signature: SignatureWrapper) {
+        val response = payload.request.signed(signature)
         responder.respond(response)
 
         router.finishParitySignerFlow()

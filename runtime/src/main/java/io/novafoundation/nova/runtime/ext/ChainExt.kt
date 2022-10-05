@@ -1,5 +1,8 @@
 package io.novafoundation.nova.runtime.ext
 
+import io.novafoundation.nova.common.address.format.AddressFormat
+import io.novafoundation.nova.common.address.format.EthereumAddressFormat
+import io.novafoundation.nova.common.address.format.SpecificSubstrateAddressFormat
 import io.novafoundation.nova.common.data.network.runtime.binding.MultiAddress
 import io.novafoundation.nova.common.data.network.runtime.binding.bindOrNull
 import io.novafoundation.nova.common.utils.Modules
@@ -34,9 +37,6 @@ val Chain.typesUsage: TypesUsage
 
 val Chain.utilityAsset
     get() = assets.first(Chain.Asset::isUtilityAsset)
-
-val Chain.isSubstrateBased
-    get() = !isEthereumBased
 
 val Chain.commissionAsset
     get() = utilityAsset
@@ -119,6 +119,20 @@ fun Chain.isValidAddress(address: String): Boolean {
         }
     }.getOrDefault(false)
 }
+
+fun Chain.addressFormat(): AddressFormat {
+    return when {
+        isEthereumBased -> EthereumAddressFormat()
+        else -> SpecificSubstrateAddressFormat(addressPrefix.toShort())
+    }
+}
+
+val Chain.type: Chain.Type
+    get() = if (isEthereumBased) {
+        Chain.Type.ETHEREUM
+    } else {
+        Chain.Type.SUBSTRATE
+    }
 
 val Chain.isParachain
     get() = parentId != null

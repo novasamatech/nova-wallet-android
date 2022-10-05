@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.p
 import io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.preview.PreviewImportParitySignerInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.common.chainAccounts.AccountInChainUi
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerAccount
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerAccountPayload
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -25,7 +26,9 @@ class PreviewImportParitySignerViewModel(
     private val chainRegistry: ChainRegistry,
 ) : BaseViewModel(), ExternalActions by externalActions {
 
-    val chainAccountProjections = flowOf { interactor.deriveSubstrateChainAccounts(payload.accountId) }
+    private val paritySignerAccount = ParitySignerAccount(payload)
+
+    val chainAccountProjections = flowOf { interactor.deriveSubstrateChainAccounts(paritySignerAccount) }
         .mapList(::mapParitySignerAccountInChainToUi)
         .shareInBackground()
 

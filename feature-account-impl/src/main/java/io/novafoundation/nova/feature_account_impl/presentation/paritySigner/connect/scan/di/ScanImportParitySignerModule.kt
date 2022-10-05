@@ -11,6 +11,8 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
+import io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.scan.ParitySignerConnectQrDecoder
+import io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.scan.RealParitySignerConnectQrDecoder
 import io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.scan.RealScanImportParitySignerInteractor
 import io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.scan.ScanImportParitySignerInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -20,7 +22,12 @@ import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.con
 class ScanImportParitySignerModule {
 
     @Provides
-    fun provideInteractor(): ScanImportParitySignerInteractor = RealScanImportParitySignerInteractor()
+    fun provideQrDecoder(): ParitySignerConnectQrDecoder = RealParitySignerConnectQrDecoder()
+
+    @Provides
+    fun provideInteractor(
+        decoder: ParitySignerConnectQrDecoder
+    ): ScanImportParitySignerInteractor = RealScanImportParitySignerInteractor(decoder)
 
     @Provides
     fun providePermissionAsker(

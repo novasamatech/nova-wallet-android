@@ -37,7 +37,7 @@ class ScanImportParitySignerViewModel(
     }
 
     private fun openPreview(signerAccount: ParitySignerAccount) {
-        val payload = ParitySignerAccountPayload(signerAccount.accountId)
+        val payload = ParitySignerAccountPayload(signerAccount.accountId, signerAccount.accountType)
 
         router.openPreviewImportParitySigner(payload)
     }
