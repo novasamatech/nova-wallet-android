@@ -2,12 +2,15 @@ package io.novafoundation.nova.core_db.dao
 
 import io.novafoundation.nova.common.utils.CollectionDiffer
 import io.novafoundation.nova.core.model.CryptoType
+import io.novafoundation.nova.core_db.model.CurrencyLocal
+import io.novafoundation.nova.core_db.model.TokenLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.JoinedChainInfo
 import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
+import java.math.BigDecimal
 
 fun createTestChain(
     id: String,
@@ -44,7 +47,7 @@ fun chainOf(
     isEthereumBased = false,
     externalApi = null,
     hasCrowdloans = false,
-    color = "test"
+    additional = ""
 )
 
 fun ChainLocal.nodeOf(
@@ -52,7 +55,8 @@ fun ChainLocal.nodeOf(
 ) = ChainNodeLocal(
     name = "Test",
     url = link,
-    chainId = id
+    chainId = id,
+    orderId = 0
 )
 
 fun ChainLocal.assetOf(
@@ -68,7 +72,7 @@ fun ChainLocal.assetOf(
     staking = "test",
     icon = "test",
     type = "test",
-    buyProviders ="test",
+    buyProviders = "test",
     typeExtras = null
 )
 
@@ -135,7 +139,8 @@ fun testMetaAccount(name: String = "Test") = MetaAccountLocal(
     isSelected = false,
     substrateAccountId = byteArrayOf(),
     ethereumAddress = null,
-    position = 0
+    position = 0,
+    type = MetaAccountLocal.Type.WATCH_ONLY
 )
 
 fun testChainAccount(
@@ -149,3 +154,16 @@ fun testChainAccount(
     cryptoType = CryptoType.SR25519,
     accountId = accountId
 )
+
+fun createCurrency(symbol: String = "$", selected: Boolean = true): CurrencyLocal {
+    return CurrencyLocal(
+        code = "USD",
+        name = "Dollar",
+        symbol = symbol,
+        category = CurrencyLocal.Category.FIAT,
+        popular = true,
+        id = 0,
+        coingeckoId = "usd",
+        selected = selected
+    )
+}
