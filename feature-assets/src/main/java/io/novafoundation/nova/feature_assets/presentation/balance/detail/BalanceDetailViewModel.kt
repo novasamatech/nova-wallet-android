@@ -23,6 +23,7 @@ import io.novafoundation.nova.feature_assets.presentation.common.mapBalanceIdToU
 import io.novafoundation.nova.feature_assets.presentation.model.BalanceLocksModel
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryMixin
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryUi
+import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.Contribution
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsWithTotalAmount
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
@@ -38,6 +39,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
@@ -57,7 +59,7 @@ class BalanceDetailViewModel(
     private val resourceManager: ResourceManager,
     private val currencyInteractor: CurrencyInteractor,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-    private val contributionsInteractor: ContributionsInteractor
+    private val contributionsInteractor: ContributionsInteractor,
 ) : BaseViewModel(),
     TransactionHistoryUi by transactionHistoryMixin {
 
@@ -77,7 +79,12 @@ class BalanceDetailViewModel(
         .inBackground()
         .share()
 
-    private val contributionsFlow = contributionsInteractor.observeChainContributions(assetPayload.chainId, assetPayload.chainAssetId)
+    private val selectedAccountFlow = accountUseCase.selectedMetaAccountFlow()
+        .share()
+
+    private val contributionsFlow = selectedAccountFlow.flatMapLatest {
+        contributionsInteractor.observeChainContributions(it, assetPayload.chainId, assetPayload.chainAssetId)
+    }
         .onStart { emit(ContributionsWithTotalAmount.empty()) }
         .shareInBackground()
 
@@ -150,7 +157,7 @@ class BalanceDetailViewModel(
 
     private fun checkControllableAsset(action: () -> Unit) {
         launch {
-            val metaAccount = accountUseCase.getSelectedMetaAccount()
+            val metaAccount = selectedAccountFlow.first()
             val chainAsset = assetFlow.first().token.configuration
 
             when {
@@ -161,8 +168,9 @@ class BalanceDetailViewModel(
         }
     }
 
-    private fun mapAssetToUi(asset: Asset, contributions: ContributionsWithTotalAmount): AssetDetailsModel {
+    private fun mapAssetToUi(asset: Asset, contributions: ContributionsWithTotalAmount<Contribution>): AssetDetailsModel {
         val totalContributed = asset.token.amountFromPlanks(contributions.totalContributed)
+
         return AssetDetailsModel(
             token = mapTokenToTokenModel(asset.token),
             total = mapAmountToAmountModel(asset.total + totalContributed, asset),
@@ -171,7 +179,11 @@ class BalanceDetailViewModel(
         )
     }
 
-    private fun mapBalanceLocksToUi(balanceLocks: List<BalanceLock>, contributions: ContributionsWithTotalAmount, asset: Asset): BalanceLocksModel {
+    private fun mapBalanceLocksToUi(
+        balanceLocks: List<BalanceLock>,
+        contributions: ContributionsWithTotalAmount<Contribution>,
+        asset: Asset
+    ): BalanceLocksModel {
         val mappedLocks = balanceLocks.map {
             BalanceLocksModel.Lock(
                 mapBalanceIdToUi(resourceManager, it.id),
