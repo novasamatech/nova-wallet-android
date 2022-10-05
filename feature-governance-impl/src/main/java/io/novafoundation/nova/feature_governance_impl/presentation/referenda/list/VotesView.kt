@@ -1,11 +1,13 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.list
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
+import android.os.Parcel
+import android.os.Parcelable
+import android.os.Parcelable.ClassLoaderCreator
 import android.util.AttributeSet
 import android.view.View
 import androidx.annotation.FloatRange
@@ -89,7 +91,6 @@ class VotesView : View {
         }
     }
 
-    @SuppressLint("DrawAllocation")
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
         val percentageArea: Float = measuredWidth - (paddingStart + paddingEnd).toFloat()
@@ -141,6 +142,20 @@ class VotesView : View {
         canvas.drawRoundRect(thresholdRect, thresholdCornerRadius, thresholdCornerRadius, thresholdPaint)
     }
 
+    override fun onSaveInstanceState(): Parcelable {
+        return SavedState(super.onSaveInstanceState(), positivePercentage, threshold)
+    }
+
+    override fun onRestoreInstanceState(state: Parcelable?) {
+        if (state is SavedState) {
+            super.onRestoreInstanceState(state.superState)
+            positivePercentage = state.positivePercentage
+            threshold = state.threshold
+        } else {
+            super.onRestoreInstanceState(state)
+        }
+    }
+
     fun setPositiveVotesPercentage(@FloatRange(from = 0.0, to = 1.0) positivePercentage: Float) {
         this.positivePercentage = max(min(1f, positivePercentage), 0f)
         hasPositiveVotes = positivePercentage > 0f
@@ -159,5 +174,47 @@ class VotesView : View {
 
     private fun hasOnlyNegativeVotes(): Boolean {
         return hasNegativeVotes && !hasPositiveVotes
+    }
+
+    private class SavedState : BaseSavedState {
+
+        val positivePercentage: Float
+        val threshold: Float
+
+        constructor(superState: Parcelable?, positivePercentage: Float, threshold: Float) : super(superState) {
+            this.positivePercentage = positivePercentage
+            this.threshold = threshold
+        }
+
+        constructor(parcel: Parcel) : this(parcel, null)
+
+        constructor(parcel: Parcel, loader: ClassLoader?) : super(parcel, loader) {
+            this.positivePercentage = parcel.readFloat()
+            this.threshold = parcel.readFloat()
+        }
+
+        override fun writeToParcel(out: Parcel, flags: Int) {
+            super.writeToParcel(out, flags)
+            out.writeFloat(positivePercentage)
+            out.writeFloat(threshold)
+        }
+
+        override fun describeContents(): Int {
+            return 0
+        }
+
+        companion object CREATOR : ClassLoaderCreator<SavedState> {
+            override fun createFromParcel(parcel: Parcel): SavedState {
+                return SavedState(parcel)
+            }
+
+            override fun createFromParcel(parcel: Parcel, classLoader: ClassLoader?): SavedState {
+                return SavedState(parcel, classLoader)
+            }
+
+            override fun newArray(size: Int): Array<SavedState?> {
+                return arrayOfNulls(size)
+            }
+        }
     }
 }
