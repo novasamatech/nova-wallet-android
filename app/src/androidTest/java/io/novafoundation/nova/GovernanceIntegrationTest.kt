@@ -20,7 +20,7 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
     @Test
     fun shouldRetrieveOnChainReferenda() = runBlocking<Unit> {
         val chain = chain()
-        val onChainReferendaRepository = governanceApi.onChainReferendaRepository
+        val onChainReferendaRepository = source(chain).referenda
 
         val referenda = onChainReferendaRepository.getOnChainReferenda(chain.id)
 
@@ -30,7 +30,7 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
     @Test
     fun shouldRetrieveConvictionVotes() = runBlocking<Unit> {
         val chain = chain()
-        val convictionVotingRepository = governanceApi.convictionVotingRepository
+        val convictionVotingRepository = source(chain).convictionVoting
 
         val accountId = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".toAccountId()
 
@@ -41,7 +41,7 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
     @Test
     fun shouldRetrieveTrackLocks() = runBlocking<Unit> {
         val chain = chain()
-        val convictionVotingRepository = governanceApi.convictionVotingRepository
+        val convictionVotingRepository = source(chain).convictionVoting
 
         val accountId = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".toAccountId()
 
@@ -52,12 +52,14 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
     @Test
     fun shouldRetrieveReferendaTracks() = runBlocking<Unit> {
         val chain = chain()
-        val onChainReferendaRepository = governanceApi.onChainReferendaRepository
+        val onChainReferendaRepository = source(chain).referenda
 
         val tracks = onChainReferendaRepository.getTracks(chain.id)
 
         Log.d(this@GovernanceIntegrationTest.LOG_TAG, tracks.toString())
     }
+
+    private suspend fun source(chain: Chain) = governanceApi.governanceSourceRegistry.sourceFor(chain.id)
 
     private suspend fun chain(): Chain = chainRegistry.currentChains.map { chains ->
         chains.find(Chain::hasGovernance)

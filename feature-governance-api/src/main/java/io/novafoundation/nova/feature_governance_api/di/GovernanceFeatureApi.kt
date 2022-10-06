@@ -1,11 +1,8 @@
 package io.novafoundation.nova.feature_governance_api.di
 
-import io.novafoundation.nova.feature_governance_api.data.repository.ConvictionVotingRepository
-import io.novafoundation.nova.feature_governance_api.data.repository.OnChainReferendaRepository
+import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 
 interface GovernanceFeatureApi {
 
-    val onChainReferendaRepository: OnChainReferendaRepository
-
-    val convictionVotingRepository: ConvictionVotingRepository
+    val governanceSourceRegistry: GovernanceSourceRegistry
 }
