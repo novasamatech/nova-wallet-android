@@ -15,14 +15,20 @@ import io.novafoundation.nova.feature_governance_impl.R
 import java.lang.Float.max
 import java.lang.Float.min
 
-class VotesView : View {
+class VotesView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0,
+    defStyleRes: Int = 0
+) : View(context, attrs, defStyleAttr, defStyleRes) {
 
+    private val noVotesPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val positivePaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val negativePaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val thresholdPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     private var minimumLineLength: Float = 0f
-    private var votesStrokeWidth: Float = 0f
+    private var votesLineWidth: Float = 0f
     private var cornerRadius: Float = 0f
     private var marginBetweenVotes: Float = 0f
     private var thresholdWidth: Float = 0f
@@ -30,40 +36,30 @@ class VotesView : View {
     private var thresholdCornerRadius: Float = 0f
 
     private var threshold: Float = 0.5f
-    private var positivePercentage: Float = 0.5f
+    private var positiveFraction: Float = 0.0f
 
+    private var noVotesRect = RectF()
     private var positiveRect = RectF()
     private var negativeRect = RectF()
     private var thresholdRect = RectF()
-    private var hasPositiveVotes = true
-    private var hasNegativeVotes = true
+    private var hasPositiveVotes = false
+    private var hasNegativeVotes = false
 
-    constructor(context: Context) : super(context) {
-        init(null, 0)
-    }
-
-    constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
-        init(attrs, 0)
-    }
-
-    constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(context, attrs, defStyle) {
-        init(attrs, defStyle)
-    }
-
-    private fun init(attrs: AttributeSet?, defStyle: Int) {
+    init {
         val a = context.obtainStyledAttributes(
             attrs,
             R.styleable.VotesView,
-            defStyle,
+            defStyleAttr,
             0
         )
 
+        val noVotesColor = a.getColor(R.styleable.VotesView_noVotesColor, Color.GRAY)
         val positiveColor = a.getColor(R.styleable.VotesView_positiveColor, Color.GREEN)
         val negativeColor = a.getColor(R.styleable.VotesView_negativeColor, Color.RED)
         val thresholdColor = a.getColor(R.styleable.VotesView_thresholdColor, Color.RED)
         val thresholdShadowColor = a.getColor(R.styleable.VotesView_thresholdShadowColor, Color.GRAY)
         val thresholdShadowSize = a.getDimension(R.styleable.VotesView_thresholdShadowSize, 0f)
-        votesStrokeWidth = a.getDimension(R.styleable.VotesView_votesStrokeWidth, 2f)
+        votesLineWidth = a.getDimension(R.styleable.VotesView_votesLineWidth, 2f)
         marginBetweenVotes = a.getDimension(R.styleable.VotesView_marginBetweenVotes, 0f)
         minimumLineLength = a.getDimension(R.styleable.VotesView_minimumLineLength, 0f)
         thresholdWidth = a.getDimension(R.styleable.VotesView_thresholdWidth, 0f)
@@ -72,21 +68,14 @@ class VotesView : View {
 
         a.recycle()
 
-        cornerRadius = votesStrokeWidth / 2
+        cornerRadius = votesLineWidth / 2
 
-        with(positivePaint) {
-            color = positiveColor
-            strokeWidth = votesStrokeWidth
-            strokeCap = Paint.Cap.ROUND
-        }
-        with(negativePaint) {
-            color = negativeColor
-            strokeWidth = votesStrokeWidth
-            strokeCap = Paint.Cap.ROUND
-        }
+        noVotesPaint.color = noVotesColor
+        positivePaint.color = positiveColor
+        negativePaint.color = negativeColor
+
         with(thresholdPaint) {
             color = thresholdColor
-            strokeCap = Paint.Cap.ROUND
             setShadowLayer(thresholdShadowSize, 0f, 0f, thresholdShadowColor)
         }
     }
@@ -101,13 +90,15 @@ class VotesView : View {
         val lineStart = paddingStart.toFloat()
         val lineEnd = (measuredWidth - paddingEnd).toFloat()
 
-        if (hasOnlyPositiveVotes()) {
+        if (noVotes()) {
+            noVotesRect.set(lineStart, lineTop, lineEnd, lineBottom)
+        } else if (hasOnlyPositiveVotes()) {
             positiveRect.set(lineStart, lineTop, lineEnd, lineBottom)
         } else if (hasOnlyNegativeVotes()) {
             negativeRect.set(lineStart, lineTop, lineEnd, lineBottom)
         } else {
             val halfMarginBetweenVotes = marginBetweenVotes / 2
-            val positivePercentageWidth: Float = percentageArea * positivePercentage
+            val positivePercentageWidth: Float = percentageArea * positiveFraction
             val maximumPositivePercentageWidth = percentageArea - halfMarginBetweenVotes - minimumLineLength
             val minimumPositivePercentageWidth = minimumLineLength + halfMarginBetweenVotes
             val stablePositivePercentageWidth: Float = max(min(positivePercentageWidth, maximumPositivePercentageWidth), minimumPositivePercentageWidth)
@@ -131,40 +122,59 @@ class VotesView : View {
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        if (hasPositiveVotes) {
-            canvas.drawRoundRect(positiveRect, cornerRadius, cornerRadius, positivePaint)
-        }
+        if (noVotes()) {
+            canvas.drawRoundRect(noVotesRect, cornerRadius, cornerRadius, noVotesPaint)
+        } else {
+            if (hasPositiveVotes) {
+                canvas.drawRoundRect(positiveRect, cornerRadius, cornerRadius, positivePaint)
+            }
 
-        if (hasNegativeVotes) {
-            canvas.drawRoundRect(negativeRect, cornerRadius, cornerRadius, negativePaint)
+            if (hasNegativeVotes) {
+                canvas.drawRoundRect(negativeRect, cornerRadius, cornerRadius, negativePaint)
+            }
         }
 
         canvas.drawRoundRect(thresholdRect, thresholdCornerRadius, thresholdCornerRadius, thresholdPaint)
     }
 
     override fun onSaveInstanceState(): Parcelable {
-        return SavedState(super.onSaveInstanceState(), positivePercentage, threshold)
+        return SavedState(
+            super.onSaveInstanceState(),
+            positiveFraction,
+            threshold,
+            hasPositiveVotes,
+            hasNegativeVotes
+        )
     }
 
     override fun onRestoreInstanceState(state: Parcelable?) {
         if (state is SavedState) {
             super.onRestoreInstanceState(state.superState)
-            positivePercentage = state.positivePercentage
+            positiveFraction = state.positiveFraction
             threshold = state.threshold
+            hasPositiveVotes = state.hasPositiveVotes
+            hasNegativeVotes = state.hasNegativeVotes
         } else {
             super.onRestoreInstanceState(state)
         }
     }
 
-    fun setPositiveVotesPercentage(@FloatRange(from = 0.0, to = 1.0) positivePercentage: Float) {
-        this.positivePercentage = max(min(1f, positivePercentage), 0f)
-        hasPositiveVotes = positivePercentage > 0f
-        hasNegativeVotes = positivePercentage < 1f
+    fun setPositiveVotesFraction(positiveFraction: Float?) {
+        if (positiveFraction == null) {
+            hasPositiveVotes = false
+            hasNegativeVotes = false
+        } else {
+            require(positiveFraction in 0f..1f)
+            this.positiveFraction = positiveFraction
+            hasPositiveVotes = positiveFraction > 0f
+            hasNegativeVotes = positiveFraction < 1f
+        }
         requestLayout()
     }
 
     fun setThreshold(@FloatRange(from = 0.0, to = 1.0) threshold: Float) {
-        this.threshold = max(min(1f, threshold), 0f)
+        require(threshold in 0f..1f)
+        this.threshold = threshold
         requestLayout()
     }
 
@@ -176,27 +186,39 @@ class VotesView : View {
         return hasNegativeVotes && !hasPositiveVotes
     }
 
+    private fun noVotes(): Boolean {
+        return !hasNegativeVotes && !hasPositiveVotes
+    }
+
     private class SavedState : BaseSavedState {
 
-        val positivePercentage: Float
+        val positiveFraction: Float
         val threshold: Float
+        val hasPositiveVotes: Boolean
+        val hasNegativeVotes: Boolean
 
-        constructor(superState: Parcelable?, positivePercentage: Float, threshold: Float) : super(superState) {
-            this.positivePercentage = positivePercentage
+        constructor(superState: Parcelable?, positivePercentage: Float, threshold: Float, hasPositiveVotes: Boolean, hasNegativeVotes: Boolean) : super(superState) {
+            this.positiveFraction = positivePercentage
             this.threshold = threshold
+            this.hasPositiveVotes = hasPositiveVotes
+            this.hasNegativeVotes = hasNegativeVotes
         }
 
         constructor(parcel: Parcel) : this(parcel, null)
 
         constructor(parcel: Parcel, loader: ClassLoader?) : super(parcel, loader) {
-            this.positivePercentage = parcel.readFloat()
+            this.positiveFraction = parcel.readFloat()
             this.threshold = parcel.readFloat()
+            this.hasPositiveVotes = parcel.readInt() == 1
+            this.hasNegativeVotes = parcel.readInt() == 1
         }
 
         override fun writeToParcel(out: Parcel, flags: Int) {
             super.writeToParcel(out, flags)
-            out.writeFloat(positivePercentage)
+            out.writeFloat(positiveFraction)
             out.writeFloat(threshold)
+            out.writeInt(if (hasPositiveVotes) 1 else 0)
+            out.writeInt(if (hasNegativeVotes) 1 else 0)
         }
 
         override fun describeContents(): Int {

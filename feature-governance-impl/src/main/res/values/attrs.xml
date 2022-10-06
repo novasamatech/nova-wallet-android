@@ -1,5 +1,6 @@
 <resources>
     <declare-styleable name="VotesView">
+        <attr name="noVotesColor" format="color" />
         <attr name="positiveColor" format="color" />
         <attr name="negativeColor" format="color" />
         <attr name="thresholdColor" format="color" />
@@ -8,7 +9,7 @@
         <attr name="thresholdHeight" format="dimension" />
         <attr name="thresholdCornerRadius" format="dimension" />
         <attr name="thresholdShadowSize" format="dimension" />
-        <attr name="votesStrokeWidth" format="dimension" />
+        <attr name="votesLineWidth" format="dimension" />
         <attr name="marginBetweenVotes" format="dimension" />
         <attr name="minimumLineLength" format="dimension" />
     </declare-styleable>
