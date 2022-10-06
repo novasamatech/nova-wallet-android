@@ -2,36 +2,31 @@ package io.novafoundation.nova.feature_governance_impl.presentation.referenda.li
 
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
-import io.novafoundation.nova.common.utils.formatting.TimerValue
-import io.novafoundation.nova.common.R
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.VotesView
 
-class ReferendaStatusModel(val status: String, val count: String)
+data class ReferendaStatusModel(val status: String, val count: String)
 
-class ReferendumModel(
+data class ReferendumModel(
+    val id: String,
     val status: ReferendumStatus,
     val name: String,
     val timeEstimation: ReferendumTimeEstimation?,
-    val referendumChips: List<ReferendumChip>,
+    val track: ReferendumTrack,
+    val number: String,
     val voting: ReferendumVoting?,
     val yourVote: YourVote?
-)
-
-enum class ReferendumStatus(@StringRes val nameRes: Int, @ColorRes val colorRes: Int) {
-    PASSING(R.string.referendum_status_passing, R.color.darkGreen),
-    APPROVED(R.string.referendum_status_approved, R.color.darkGreen),
-    IN_QUEUE(R.string.referendum_status_in_queue, R.color.white_64),
-    TIMEOUT(R.string.referendum_status_timeout, R.color.white_64),
-    CANCELLED(R.string.referendum_status_cancelled, R.color.white_64),
-    NOT_PASSING(R.string.referendum_status_not_passing, R.color.red),
-    REJECTED(R.string.referendum_status_not_rejected, R.color.red),
+) {
 }
 
-class ReferendumTimeEstimation(val time: TimerValue, @DrawableRes val iconRes: Int, @ColorRes val colorRes: Int)
+data class ReferendumTrack(val name: String, @DrawableRes val iconRes: Int)
 
-class ReferendumChip(val value: String, @DrawableRes val iconRes: Int?)
+data class ReferendumStatus(val name: String, @ColorRes val colorRes: Int)
 
-class ReferendumVoting(
+data class ReferendumTimeEstimation(val time: String, @DrawableRes val iconRes: Int, @ColorRes val colorRes: Int)
+
+data class ReferendumVoting(
+    val positiveFraction: Float?,
+    val thresholdFraction: Float,
     val isThresholdReached: Boolean,
     val thresholdInfo: String,
     val positivePercentage: String,
@@ -39,9 +34,9 @@ class ReferendumVoting(
     val thresholdPercentage: String,
 )
 
-class YourVote(val voteType: VoteType, val yourVoteDetails: String)
+data class YourVote(val voteType: String, @ColorRes val colorRes: Int, val details: String)
 
-enum class VoteType(@StringRes val typeRes: Int, @ColorRes val colorRes: Int) {
-    POSITIVE(R.string.referendum_vote_positive_type, R.color.multicolorGreen),
-    NEGATIVE(R.string.referendum_vote_negative_type, R.color.red),
+fun VotesView.setModel(voting: ReferendumVoting) {
+    setPositiveVotesFraction(voting.positiveFraction)
+    setThreshold(voting.thresholdFraction)
 }

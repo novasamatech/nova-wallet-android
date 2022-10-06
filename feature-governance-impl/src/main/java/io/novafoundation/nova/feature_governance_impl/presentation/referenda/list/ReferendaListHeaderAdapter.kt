@@ -9,7 +9,11 @@ import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetModel
 import kotlinx.android.synthetic.main.item_referenda_header.view.*
 
-class ReferendaListHeaderAdapter(val imageLoader: ImageLoader) : RecyclerView.Adapter<ReferendaListHeaderAdapter.HeaderHolder>() {
+class ReferendaListHeaderAdapter(val imageLoader: ImageLoader, val handler: Handler) : RecyclerView.Adapter<ReferendaListHeaderAdapter.HeaderHolder>() {
+
+    interface Handler {
+        fun onClickAssetSelector()
+    }
 
     private var assetModel: AssetModel? = null
 
@@ -31,6 +35,10 @@ class ReferendaListHeaderAdapter(val imageLoader: ImageLoader) : RecyclerView.Ad
     }
 
     inner class HeaderHolder(view: View) : RecyclerView.ViewHolder(view) {
+
+        init {
+            view.setOnClickListener { handler.onClickAssetSelector() }
+        }
 
         fun bind(assetModel: AssetModel?) {
             assetModel?.let { itemView.referendaAssetHeader.setState(imageLoader, assetModel) }

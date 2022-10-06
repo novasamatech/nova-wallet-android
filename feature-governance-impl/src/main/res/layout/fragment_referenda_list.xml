@@ -9,9 +9,20 @@
         android:id="@+id/referendaList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:clipToPadding="false"
         android:overScrollMode="never"
+        android:paddingBottom="12dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:itemCount="10"
         tools:visibility="visible" />
+
+    <ProgressBar
+        android:id="@+id/referendaProgress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="16dp"
+        android:indeterminateTint="@color/white"
+        android:visibility="gone" />
 
 </FrameLayout>
