@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/itemCrowdloanGroup"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:layout_marginVertical="4dp"
+    android:layout_marginHorizontal="16dp"
+    tools:background="@color/blurColor">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/itemReferendumStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="PASSING" />
+
+        <TextView
+            android:id="@+id/itemReferendumTimeEstimate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:drawablePadding="5dp"
+            tools:text="Approve in 3:59:59" />
+
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/itemReferendumName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        tools:text="Runtime upgrade to 9280" />
+    <!--
+        <com.google.android.material.chip.ChipGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+        android:layout_marginTop="12dp">
+
+        </com.google.android.material.chip.ChipGroup>
+    -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="22dp"
+        android:layout_marginTop="12dp"
+        android:background="@color/blurColor" />
+
+    <TextView
+        android:id="@+id/itemReferendumThresholdInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        tools:text="Threshold: 16,492 of 15,392.5 KSM " />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="11dp"
+        android:layout_marginTop="11dp"
+        android:background="@color/blurColor" />
+
+    <FrameLayout
+        android:id="@+id/itemReferendumPercentageDetailsGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="7dp">
+
+        <TextView
+            android:id="@+id/itemReferendumPositivePercentage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            tools:text="Aye: 80%" />
+
+        <TextView
+            android:id="@+id/itemReferendumThresholdPercentage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            tools:text="To pass: 50%" />
+
+        <TextView
+            android:id="@+id/itemReferendumNegativePercentage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            tools:text="Nay: 20%" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/itemReferendumYourVoiceGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="13dp">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/white_8" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp">
+
+            <TextView
+                android:id="@+id/itemReferendumYourVoteType"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/bg_chip"
+                android:includeFontPadding="false"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4.5dp"
+                tools:text="AYE" />
+
+            <TextView
+                android:id="@+id/itemReferendumYourVoteDetails"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="6dp"
+                tools:text="To pass: 50%" />
+
+        </LinearLayout>
+    </FrameLayout>
+</LinearLayout>
