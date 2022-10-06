@@ -197,7 +197,13 @@ class VotesView @JvmOverloads constructor(
         val hasPositiveVotes: Boolean
         val hasNegativeVotes: Boolean
 
-        constructor(superState: Parcelable?, positivePercentage: Float, threshold: Float, hasPositiveVotes: Boolean, hasNegativeVotes: Boolean) : super(superState) {
+        constructor(
+            superState: Parcelable?,
+            positivePercentage: Float,
+            threshold: Float,
+            hasPositiveVotes: Boolean,
+            hasNegativeVotes: Boolean
+        ) : super(superState) {
             this.positiveFraction = positivePercentage
             this.threshold = threshold
             this.hasPositiveVotes = hasPositiveVotes
