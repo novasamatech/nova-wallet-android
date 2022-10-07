@@ -2,28 +2,52 @@ package io.novafoundation.nova.feature_governance_impl.presentation.referenda.li
 
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import io.novafoundation.nova.common.utils.formatting.TimerValue
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.VotesView
 
-data class ReferendaStatusModel(val status: String, val count: String)
+data class ReferendaGroupModel(val name: String, val badge: String)
 
 data class ReferendumModel(
-    val id: String,
-    val status: ReferendumStatus,
+    val id: ReferendumId,
+    val status: ReferendumStatusModel,
     val name: String,
     val timeEstimation: ReferendumTimeEstimation?,
-    val track: ReferendumTrack,
+    val track: ReferendumTrackModel?,
     val number: String,
-    val voting: ReferendumVoting?,
+    val voting: ReferendumVotingModel?,
     val yourVote: YourVote?
 )
 
-data class ReferendumTrack(val name: String, @DrawableRes val iconRes: Int)
+data class ReferendumTrackModel(val name: String, @DrawableRes val iconRes: Int)
 
-data class ReferendumStatus(val name: String, @ColorRes val colorRes: Int)
+data class ReferendumStatusModel(val name: String, @ColorRes val colorRes: Int)
 
-data class ReferendumTimeEstimation(val time: String, @DrawableRes val iconRes: Int, @ColorRes val colorRes: Int)
+typealias ReferendumTimeEstimationStyleRefresher = () -> ReferendumTimeEstimation.TextStyle
 
-data class ReferendumVoting(
+sealed class ReferendumTimeEstimation {
+
+    data class TextStyle(
+        @DrawableRes val iconRes: Int,
+        @ColorRes val colorRes: Int
+    ) {
+        companion object
+    }
+
+    data class Timer(
+        val time: TimerValue,
+        @StringRes val timeFormat: Int,
+        val textStyleRefresher: ReferendumTimeEstimationStyleRefresher,
+    ) : ReferendumTimeEstimation()
+
+    data class Text(
+        val text: String,
+        val textStyle: TextStyle
+    ) : ReferendumTimeEstimation()
+}
+
+data class ReferendumVotingModel(
     val positiveFraction: Float?,
     val thresholdFraction: Float,
     val votingResultIcon: Int,
@@ -36,7 +60,7 @@ data class ReferendumVoting(
 
 data class YourVote(val voteType: String, @ColorRes val colorRes: Int, val details: String)
 
-fun VotesView.setModel(voting: ReferendumVoting) {
+fun VotesView.setModel(voting: ReferendumVotingModel) {
     setPositiveVotesFraction(voting.positiveFraction)
     setThreshold(voting.thresholdFraction)
 }

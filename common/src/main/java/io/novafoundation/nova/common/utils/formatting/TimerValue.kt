@@ -21,3 +21,11 @@ class TimerValue(
 }
 
 fun Duration.toTimerValue() = TimerValue.fromCurrentTime(millis = inWholeMilliseconds)
+
+fun TimerValue.remainingTime(): Long {
+    val currentTimer = System.currentTimeMillis()
+    val passedTime = currentTimer - millisCalculatedAt
+    val remainingTime = millis - passedTime
+
+    return remainingTime.coerceAtLeast(0)
+}

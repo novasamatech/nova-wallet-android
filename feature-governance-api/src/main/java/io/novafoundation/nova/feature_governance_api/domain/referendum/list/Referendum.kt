@@ -6,6 +6,10 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 
+enum class ReferendumGroup {
+    ONGOING, COMPLETED
+}
+
 data class ReferendumPreview(
     val id: ReferendumId,
     val status: ReferendumStatus,
@@ -38,6 +42,10 @@ data class ReferendumVoting(
         val nayFraction: Perbill,
         val threshold: Perbill
     )
+}
+
+fun ReferendumVoting.Support.passes(): Boolean {
+    return turnout > threshold
 }
 
 sealed class ReferendumStatus {

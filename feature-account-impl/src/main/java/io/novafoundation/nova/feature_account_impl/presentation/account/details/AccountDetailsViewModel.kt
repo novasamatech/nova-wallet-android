@@ -72,7 +72,7 @@ class AccountDetailsViewModel(
     val chainAccountProjections = flowOf { interactor.getChainProjections(metaAccount()) }
         .map { groupedList ->
             groupedList.toListWithHeaders(
-                keyMapper = { mapFromToTextHeader(it) },
+                keyMapper = { type, _ -> mapFromToTextHeader(type) },
                 valueMapper = { mapChainAccountProjectionToUi(metaAccount(), it) }
             )
         }
