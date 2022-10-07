@@ -4,6 +4,7 @@ import io.emeraldpay.polkaj.scale.ScaleCodecReader
 import io.emeraldpay.polkaj.scale.ScaleCodecWriter
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNullableNumberConstant
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumberConstant
+import io.novafoundation.nova.common.data.network.runtime.binding.fromByteArrayOrIncompatible
 import io.novafoundation.nova.common.data.network.runtime.binding.fromHexOrIncompatible
 import io.novafoundation.nova.core.model.Node
 import jp.co.soramitsu.fearless_utils.encrypt.SignatureWrapper
@@ -117,6 +118,12 @@ fun StorageEntry.decodeValue(value: String?, runtimeSnapshot: RuntimeSnapshot) =
     val type = type.value ?: throw IllegalStateException("Unknown value type for storage ${this.fullName}")
 
     type.fromHexOrIncompatible(it, runtimeSnapshot)
+}
+
+fun Constant.decodedValue(runtimeSnapshot: RuntimeSnapshot): Any? {
+    val type = type ?: throw IllegalStateException("Unknown value type for constant ${this.name}")
+
+    return type.fromByteArrayOrIncompatible(value, runtimeSnapshot)
 }
 
 fun String.toHexAccountId(): String = toAccountId().toHexString()

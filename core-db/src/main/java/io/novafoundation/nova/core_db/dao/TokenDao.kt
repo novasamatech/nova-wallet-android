@@ -29,10 +29,13 @@ private const val INSERT_TOKEN_WITH_SELECTED_CURRENCY = """
 abstract class TokenDao {
 
     @Query(RETRIEVE_TOKEN_WITH_CURRENCY)
-    abstract suspend fun getToken(symbol: String): TokenWithCurrency
+    abstract suspend fun getToken(symbol: String): TokenWithCurrency?
 
     @Query(RETRIEVE_TOKENS_WITH_CURRENCY)
     abstract fun observeTokens(symbols: List<String>): Flow<List<TokenWithCurrency>>
+
+    @Query(RETRIEVE_TOKENS_WITH_CURRENCY)
+    abstract fun getTokens(symbols: List<String>): List<TokenWithCurrency>
 
     @Query(RETRIEVE_TOKEN_WITH_CURRENCY)
     abstract fun observeToken(symbol: String): Flow<TokenWithCurrency>
