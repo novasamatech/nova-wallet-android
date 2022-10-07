@@ -1,15 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/itemCrowdloanGroup"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:paddingStart="4dp"
-    android:paddingTop="8dp"
-    android:paddingBottom="16dp">
+    android:layout_marginStart="16dp"
+    android:paddingTop="20dp"
+    android:paddingBottom="8dp">
 
     <TextView
-        android:id="@+id/itemCrowdloanGroupStatus"
+        android:id="@+id/itemReferendaGroupStatus"
         style="@style/TextAppearance.NovaFoundation.Header3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -17,7 +18,7 @@
         tools:text="Active" />
 
     <TextView
-        android:id="@+id/itemCrowdloanGroupCounter"
+        android:id="@+id/itemReferendaGroupCounter"
         style="@style/TextAppearance.NovaFoundation.Header5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -32,4 +33,3 @@
         tools:text="13" />
 
 </LinearLayout>
-
