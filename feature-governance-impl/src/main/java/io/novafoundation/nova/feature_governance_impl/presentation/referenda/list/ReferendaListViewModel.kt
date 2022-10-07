@@ -40,7 +40,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelecto
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.selectedChainFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlin.time.Duration.Companion.days
@@ -106,7 +105,7 @@ class ReferendaListViewModel(
             track = referendum.track?.let(::mapReferendumTrackToUi),
             number = mapReferendumIdToUi(referendum.id),
             voting = referendum.voting?.let { mapReferendumVotingToUi(it, token) },
-            yourVote = mapUserVoteToUi(referendum.userVote)
+            yourVote = mapUserVoteToUi(referendum.userVote, token)
         )
     }
 
@@ -114,9 +113,9 @@ class ReferendaListViewModel(
         return "#${id.value.format()}"
     }
 
-    private fun mapUserVoteToUi(vote: AccountVote?): YourVote? {
+    private fun mapUserVoteToUi(vote: AccountVote?, token: Token): YourVote? {
         val isAye = vote?.isAye() ?: return null
-        val votes = vote.votes() ?: return null
+        val votes = vote.votes(token.configuration) ?: return null
 
         val voteTypeRes = if (isAye) R.string.referendum_vote_positive_type else R.string.referendum_vote_negative_type
         val colorRes = if (isAye) R.color.multicolor_green_100 else R.color.multicolor_red_100
