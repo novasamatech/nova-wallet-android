@@ -36,7 +36,7 @@ data class PriorLock(
 )
 
 fun AccountVote.votes(chainAsset: Chain.Asset): BigDecimal? {
-    return when(this) {
+    return when (this) {
         // TODO handle split votes
         AccountVote.Split -> null
         is AccountVote.Standard -> {
@@ -49,15 +49,15 @@ fun AccountVote.votes(chainAsset: Chain.Asset): BigDecimal? {
 }
 
 fun AccountVote.isAye(): Boolean? {
-    return when(this) {
+    return when (this) {
         // TODO handle split votes
         AccountVote.Split -> null
         is AccountVote.Standard -> vote.aye
     }
 }
 
-private fun Conviction.amountMultiplier() : BigDecimal {
-    val multiplier: Double = when(this) {
+private fun Conviction.amountMultiplier(): BigDecimal {
+    val multiplier: Double = when (this) {
         Conviction.None -> 0.1
         Conviction.Locked1x -> 1.0
         Conviction.Locked2x -> 2.0

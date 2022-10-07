@@ -27,7 +27,7 @@ class SelectCurrencyViewModel(
 
     val currencyModels = currencies.map { groupedList ->
         groupedList.toListWithHeaders(
-            keyMapper = {category, _ -> mapCurrencyCategoryToUI(category) },
+            keyMapper = { category, _ -> mapCurrencyCategoryToUI(category) },
             valueMapper = { mapCurrencyToUI(it) }
         )
     }

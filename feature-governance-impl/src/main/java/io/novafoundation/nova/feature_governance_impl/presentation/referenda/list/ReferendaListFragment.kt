@@ -63,7 +63,7 @@ class ReferendaListFragment : BaseFragment<ReferendaListViewModel>(), ReferendaL
         }
 
         viewModel.referendaUiFlow.observe {
-            when(it) {
+            when (it) {
                 is LoadingState.Loaded -> {
                     referendaProgress.makeGone()
                     referendaListAdapter.submitList(it.data)
