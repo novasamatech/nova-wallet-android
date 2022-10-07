@@ -24,8 +24,10 @@ import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
 import io.novafoundation.nova.runtime.repository.RealParachainInfoRepository
+import io.novafoundation.nova.runtime.repository.RealTotalIssuanceRepository
 import io.novafoundation.nova.runtime.repository.RemoteTimestampRepository
 import io.novafoundation.nova.runtime.repository.TimestampRepository
+import io.novafoundation.nova.runtime.repository.TotalIssuanceRepository
 import io.novafoundation.nova.runtime.storage.DbStorageCache
 import io.novafoundation.nova.runtime.storage.PrefsSampledBlockTimeStorage
 import io.novafoundation.nova.runtime.storage.SampledBlockTimeStorage
@@ -142,4 +144,10 @@ class RuntimeModule {
     fun provideTimestampRepository(
         @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
     ): TimestampRepository = RemoteTimestampRepository(remoteStorageSource)
+
+    @Provides
+    @ApplicationScope
+    fun provideTotalIssuanceRepository(
+        @Named(LOCAL_STORAGE_SOURCE) localStorageSource: StorageDataSource,
+    ): TotalIssuanceRepository = RealTotalIssuanceRepository(localStorageSource)
 }

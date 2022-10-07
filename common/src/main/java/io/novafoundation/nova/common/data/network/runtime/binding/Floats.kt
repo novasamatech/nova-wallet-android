@@ -4,14 +4,23 @@ import java.math.BigDecimal
 import java.math.BigInteger
 
 typealias Perbill = BigDecimal
+typealias FixedI64 = BigDecimal
 
-private const val PERBILL_MANTISSA_SIZE = 9
+private const val FLOAT_MANTISSA_SIZE = 9
 
 @HelperBinding
 fun bindPerbillNumber(value: BigInteger): Perbill {
-    return value.toBigDecimal(scale = PERBILL_MANTISSA_SIZE)
+    return value.toBigDecimal(scale = FLOAT_MANTISSA_SIZE)
 }
 
 fun bindPerbill(dynamic: Any?): Perbill {
     return bindPerbillNumber(dynamic.cast())
+}
+
+fun bindFixedI64Number(value: BigInteger): FixedI64 {
+    return bindPerbillNumber(value)
+}
+
+fun bindFixedI64(dynamic: Any?): FixedI64 {
+    return bindPerbill(dynamic)
 }
