@@ -9,7 +9,7 @@ import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetModel
 import kotlinx.android.synthetic.main.item_referenda_header.view.*
 
-class ReferendaListHeaderAdapter(val imageLoader: ImageLoader, val handler: Handler) : RecyclerView.Adapter<ReferendaListHeaderAdapter.HeaderHolder>() {
+class ReferendaListHeaderAdapter(val imageLoader: ImageLoader, val handler: Handler) : RecyclerView.Adapter<HeaderHolder>() {
 
     interface Handler {
         fun onClickAssetSelector()
@@ -18,7 +18,7 @@ class ReferendaListHeaderAdapter(val imageLoader: ImageLoader, val handler: Hand
     private var assetModel: AssetModel? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HeaderHolder {
-        return HeaderHolder(parent.inflateChild(R.layout.item_referenda_header))
+        return HeaderHolder(imageLoader, parent.inflateChild(R.layout.item_referenda_header), handler)
     }
 
     override fun onBindViewHolder(holder: HeaderHolder, position: Int) {
@@ -33,15 +33,15 @@ class ReferendaListHeaderAdapter(val imageLoader: ImageLoader, val handler: Hand
         this.assetModel = assetModel
         notifyItemChanged(0, true)
     }
+}
 
-    inner class HeaderHolder(view: View) : RecyclerView.ViewHolder(view) {
+class HeaderHolder(private val imageLoader: ImageLoader, view: View, handler: ReferendaListHeaderAdapter.Handler) : RecyclerView.ViewHolder(view) {
 
-        init {
-            view.setOnClickListener { handler.onClickAssetSelector() }
-        }
+    init {
+        view.setOnClickListener { handler.onClickAssetSelector() }
+    }
 
-        fun bind(assetModel: AssetModel?) {
-            assetModel?.let { itemView.referendaAssetHeader.setState(imageLoader, assetModel) }
-        }
+    fun bind(assetModel: AssetModel?) {
+        assetModel?.let { itemView.referendaAssetHeader.setState(imageLoader, assetModel) }
     }
 }

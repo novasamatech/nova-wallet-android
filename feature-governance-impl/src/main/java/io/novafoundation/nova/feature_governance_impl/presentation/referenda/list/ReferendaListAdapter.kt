@@ -6,7 +6,6 @@ import androidx.core.view.isVisible
 import io.novafoundation.nova.common.list.BaseGroupedDiffCallback
 import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
-import io.novafoundation.nova.common.list.resolvePayload
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.setDrawableEnd
 import io.novafoundation.nova.common.utils.setDrawableStart
@@ -134,11 +133,7 @@ private class ReferendumChildHolder(
         itemReferendumPercentageDetailsGroup.isVisible = hasVotingInfo
 
         if (voting != null) {
-            if (voting.isThresholdReached) {
-                itemReferendumThresholdInfo.setDrawableStart(R.drawable.ic_checkmark, widthInDp = 16, paddingInDp = 4, tint = R.color.darkGreen)
-            } else {
-                itemReferendumThresholdInfo.setDrawableStart(R.drawable.ic_close, widthInDp = 16, paddingInDp = 4, tint = R.color.red)
-            }
+            itemReferendumThresholdInfo.setDrawableStart(voting.votingResultIcon, widthInDp = 16, paddingInDp = 4, tint = voting.votingResultIconColor)
             itemReferendumThresholdInfo.text = voting.thresholdInfo
             itemReferendumVotesView.setModel(voting)
             itemReferendumPositivePercentage.text = voting.positivePercentage

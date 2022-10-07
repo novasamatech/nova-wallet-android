@@ -20,7 +20,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:includeFontPadding="false"
-            tools:text="PASSING" />
+            android:layout_gravity="center_vertical"
+            tools:text="Passing" />
 
         <TextView
             android:id="@+id/itemReferendumTimeEstimate"
@@ -93,6 +94,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="18dp"
         android:includeFontPadding="false"
+        android:gravity="center_vertical"
         android:textColor="@color/white_64"
         tools:text="Threshold: 16,492 of 15,392.5 KSM " />
 
@@ -139,7 +141,7 @@
         android:id="@+id/itemReferendumYourVoiceGroup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="13dp">
+        android:layout_marginTop="12dp">
 
         <View
             android:layout_width="match_parent"

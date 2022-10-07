@@ -20,7 +20,6 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.lis
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.YourVote
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.subscribeOnAssetChange
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.subscribeOnAssetClick
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetModel
 import kotlinx.android.synthetic.main.fragment_referenda_list.*
 import javax.inject.Inject
 
@@ -29,11 +28,9 @@ class ReferendaListFragment : BaseFragment<ReferendaListViewModel>(), ReferendaL
     @Inject
     protected lateinit var imageLoader: ImageLoader
 
-    private val referendaHeaderAdapter by lazy { ReferendaListHeaderAdapter(imageLoader, this) }
+    private val referendaHeaderAdapter by lazy(LazyThreadSafetyMode.NONE) { ReferendaListHeaderAdapter(imageLoader, this) }
 
-    private val referendaListAdapter by lazy { ReferendaListAdapter(this) }
-
-    private val adapter by lazy(LazyThreadSafetyMode.NONE) { ConcatAdapter(referendaHeaderAdapter, referendaListAdapter) }
+    private val referendaListAdapter by lazy(LazyThreadSafetyMode.NONE) { ReferendaListAdapter(this) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,7 +46,7 @@ class ReferendaListFragment : BaseFragment<ReferendaListViewModel>(), ReferendaL
     }
 
     override fun initViews() {
-        referendaList.adapter = adapter
+        referendaList.adapter = ConcatAdapter(referendaHeaderAdapter, referendaListAdapter)
         referendaListAdapter.submitList(
             listOf(
                 ReferendaStatusModel("Active", "2"),
@@ -63,11 +60,12 @@ class ReferendaListFragment : BaseFragment<ReferendaListViewModel>(), ReferendaL
                     ReferendumVoting(
                         0.84f,
                         0.7f,
-                        true,
+                        R.drawable.ic_close,
+                        R.color.red,
                         "Threshold: 1.551 KSM of 1.43 KSM",
                         "Aye: 80%",
                         "Nay: 20%",
-                        "To pass: 20%"
+                        "To pass: 20%",
                     ),
                     YourVote("NAY", R.color.red, "Your vote: 100"),
                 ),
@@ -81,11 +79,12 @@ class ReferendaListFragment : BaseFragment<ReferendaListViewModel>(), ReferendaL
                     ReferendumVoting(
                         null,
                         0.12f,
-                        false,
+                        R.drawable.ic_checkmark,
+                        R.color.green,
                         "Threshold: 1.551 KSM of 1.43 KSM",
                         "Aye: 80%",
                         "Nay: 20%",
-                        "To pass: 20%"
+                        "To pass: 20%",
                     ),
                     null
                 ),

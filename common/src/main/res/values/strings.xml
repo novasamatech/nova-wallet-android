@@ -2,15 +2,15 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
     <string name="vote_vote">Vote</string>
     <string name="common_governance">Governance</string>
-    <string name="referendum_status_passing">PASSING</string>
-    <string name="referendum_status_approved">APPROVED</string>
-    <string name="referendum_status_in_queue">IN QUEUE</string>
-    <string name="referendum_status_timeout">TIMEOUT</string>
-    <string name="referendum_status_cancelled">CANCELLED</string>
-    <string name="referendum_status_not_passing">NOT PASSING</string>
-    <string name="referendum_status_not_rejected">REJECTED</string>
-    <string name="referendum_vote_positive_type">AYE</string>
-    <string name="referendum_vote_negative_type">NAY</string>
+    <string name="referendum_status_passing">Passing</string>
+    <string name="referendum_status_approved">Approved</string>
+    <string name="referendum_status_in_queue">In queue</string>
+    <string name="referendum_status_timeout">Timeout</string>
+    <string name="referendum_status_cancelled">Cancelled</string>
+    <string name="referendum_status_not_passing">Not passing</string>
+    <string name="referendum_status_not_rejected">Rejected</string>
+    <string name="referendum_vote_positive_type">Aye</string>
+    <string name="referendum_vote_negative_type">Nay</string>
 
     <string name="crowdloan_contributions_liquid_source">Liquid</string>
     <string name="crowdloan_contributions_parallel_source">Parallel</string>

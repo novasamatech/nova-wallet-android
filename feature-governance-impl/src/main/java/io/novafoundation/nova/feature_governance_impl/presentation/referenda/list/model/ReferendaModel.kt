@@ -15,8 +15,7 @@ data class ReferendumModel(
     val number: String,
     val voting: ReferendumVoting?,
     val yourVote: YourVote?
-) {
-}
+)
 
 data class ReferendumTrack(val name: String, @DrawableRes val iconRes: Int)
 
@@ -27,7 +26,8 @@ data class ReferendumTimeEstimation(val time: String, @DrawableRes val iconRes: 
 data class ReferendumVoting(
     val positiveFraction: Float?,
     val thresholdFraction: Float,
-    val isThresholdReached: Boolean,
+    val votingResultIcon: Int,
+    val votingResultIconColor: Int,
     val thresholdInfo: String,
     val positivePercentage: String,
     val negativePercentage: String,
