@@ -118,7 +118,7 @@ class GovV2OnChainReferendaRepository(
                     desiredEnactment = bindDispatchTime(status.getTyped("enactment")),
                     submitted = bindBlockNumber(status["submitted"]),
                     decisionDeposit = bindDecisionDeposit(status["decisionDeposit"]),
-                    deciding = bindDecidingStatus(status.getTyped("deciding")),
+                    deciding = bindDecidingStatus(status["deciding"]),
                     tally = bindTally(status.getTyped("tally")),
                     inQueue = bindBoolean(status["inQueue"])
                 )
@@ -137,10 +137,13 @@ class GovV2OnChainReferendaRepository(
         )
     }.getOrNull()
 
-    private fun bindDecidingStatus(decoded: Struct.Instance): DecidingStatus {
+    private fun bindDecidingStatus(decoded: Any?): DecidingStatus? {
+        if (decoded == null) return null
+        val decodedStruct = decoded.castToStruct()
+
         return DecidingStatus(
-            since = bindBlockNumber(decoded["since"]),
-            confirming = decoded.get<Any?>("confirming")?.let {
+            since = bindBlockNumber(decodedStruct["since"]),
+            confirming = decodedStruct.get<Any?>("confirming")?.let {
                 ConfirmingStatus(
                     till = bindBlockNumber(it)
                 )
