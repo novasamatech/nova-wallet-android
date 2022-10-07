@@ -9,10 +9,13 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
+import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaListInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.data.source.RealGovernanceSourceRegistry
+import io.novafoundation.nova.feature_governance_impl.di.modules.GovernanceUpdatersModule
 import io.novafoundation.nova.feature_governance_impl.di.modules.GovernanceV2
 import io.novafoundation.nova.feature_governance_impl.di.modules.V2GovernanceModule
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.RealReferendaListInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.AssetUseCaseImpl
@@ -24,8 +27,10 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelecto
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
+import io.novafoundation.nova.runtime.repository.TotalIssuanceRepository
 
-@Module(includes = [V2GovernanceModule::class])
+@Module(includes = [V2GovernanceModule::class, GovernanceUpdatersModule::class])
 class GovernanceFeatureModule {
 
     @Provides
@@ -83,5 +88,19 @@ class GovernanceFeatureModule {
     ): GovernanceSourceRegistry = RealGovernanceSourceRegistry(
         chainRegistry = chainRegistry,
         governanceV2Source = governanceV2Source
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideReferendaListInteractor(
+        chainStateRepository: ChainStateRepository,
+        governanceSourceRegistry: GovernanceSourceRegistry,
+        selectedAssetState: GovernanceSharedState,
+        totalIssuanceRepository: TotalIssuanceRepository,
+    ): ReferendaListInteractor = RealReferendaListInteractor(
+        chainStateRepository = chainStateRepository,
+        governanceSourceRegistry = governanceSourceRegistry,
+        selectedAssetState = selectedAssetState,
+        totalIssuanceRepository = totalIssuanceRepository
     )
 }

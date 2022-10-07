@@ -4,6 +4,7 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
+import io.novafoundation.nova.feature_governance_impl.data.repository.v2.Gov2OffChainReferendaInfoRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.v2.GovV2ConvictionVotingRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.v2.GovV2OnChainReferendaRepository
 import io.novafoundation.nova.feature_governance_impl.data.source.StaticGovernanceSource
@@ -34,9 +35,14 @@ class V2GovernanceModule {
 
     @Provides
     @FeatureScope
+    fun provideOffChainInfoRepository() = Gov2OffChainReferendaInfoRepository()
+
+    @Provides
+    @FeatureScope
     @GovernanceV2
     fun provideGovernanceSource(
         referendaRepository: GovV2OnChainReferendaRepository,
-        convictionVotingRepository: GovV2ConvictionVotingRepository
-    ): GovernanceSource = StaticGovernanceSource(referendaRepository, convictionVotingRepository)
+        convictionVotingRepository: GovV2ConvictionVotingRepository,
+        offChainInfoRepository: Gov2OffChainReferendaInfoRepository
+    ): GovernanceSource = StaticGovernanceSource(referendaRepository, convictionVotingRepository, offChainInfoRepository)
 }
