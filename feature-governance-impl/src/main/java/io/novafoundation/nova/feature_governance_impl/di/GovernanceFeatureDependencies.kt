@@ -49,7 +49,5 @@ interface GovernanceFeatureDependencies {
 
     val storageCache: StorageCache
 
-    val preferences: Preferences
-
     val sampledBlockTimeStorage: SampledBlockTimeStorage
 }

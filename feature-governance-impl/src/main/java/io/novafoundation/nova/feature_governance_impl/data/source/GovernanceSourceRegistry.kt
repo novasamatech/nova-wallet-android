@@ -11,7 +11,7 @@ import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 internal class RealGovernanceSourceRegistry(
     private val chainRegistry: ChainRegistry,
     private val governanceV2Source: GovernanceSource,
-): GovernanceSourceRegistry {
+) : GovernanceSourceRegistry {
 
     override suspend fun sourceFor(chainId: ChainId): GovernanceSource {
         val metadata = chainRegistry.getRuntime(chainId).metadata

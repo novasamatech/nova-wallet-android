@@ -9,4 +9,4 @@ internal class StaticGovernanceSource(
     override val referenda: OnChainReferendaRepository,
     override val convictionVoting: ConvictionVotingRepository,
     override val offChainInfo: OffChainReferendaInfoRepository
-): GovernanceSource
+) : GovernanceSource

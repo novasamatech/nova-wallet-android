@@ -215,14 +215,13 @@ class GovV2OnChainReferendaRepository(
         }
     }
 
-
     // https://github.com/paritytech/substrate/blob/fc67cbb66d8c484bc7b7506fc1300344d12ecbad/frame/referenda/src/lib.rs#L716
     private fun ReferendumId.enactmentSchedulerId(runtime: RuntimeSnapshot): ByteArray {
         val encodedAssemblyId = ASSEMBLY_ID.encodeToByteArray() // 'const bytes' in rust
         val encodedEnactment = string.toByteArray("enactment") // 'string' in rust
         val encodedIndex = u32.toByteArray(runtime, value)
 
-        val toHash =  encodedAssemblyId + encodedEnactment + encodedIndex
+        val toHash = encodedAssemblyId + encodedEnactment + encodedIndex
 
         return toHash
         // TODO use hashed version once testnet will be updated to latest pallet-referenda version

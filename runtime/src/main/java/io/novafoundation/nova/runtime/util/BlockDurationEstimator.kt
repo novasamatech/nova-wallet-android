@@ -23,7 +23,7 @@ fun BlockDurationEstimator(currentBlock: BlockNumber, blockTimeMillis: BigIntege
 internal class RealBlockDurationEstimator(
     private val currentBlock: BlockNumber,
     private val blockTimeMillis: BigInteger
-):BlockDurationEstimator {
+) : BlockDurationEstimator {
 
     override fun durationUntil(block: BlockNumber): Duration {
         val blocksInFuture = block - currentBlock
