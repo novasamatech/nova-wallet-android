@@ -17,7 +17,7 @@ data class ReferendumModel(
     val track: ReferendumTrackModel?,
     val number: String,
     val voting: ReferendumVotingModel?,
-    val yourVote: YourVote?
+    val yourVote: YourVoteModel?
 )
 
 data class ReferendumTrackModel(val name: String, @DrawableRes val iconRes: Int)
@@ -58,7 +58,7 @@ data class ReferendumVotingModel(
     val thresholdPercentage: String,
 )
 
-data class YourVote(val voteType: String, @ColorRes val colorRes: Int, val details: String)
+data class YourVoteModel(val voteType: String, @ColorRes val colorRes: Int, val details: String)
 
 fun VotesView.setModel(voting: ReferendumVotingModel) {
     setPositiveVotesFraction(voting.positiveFraction)

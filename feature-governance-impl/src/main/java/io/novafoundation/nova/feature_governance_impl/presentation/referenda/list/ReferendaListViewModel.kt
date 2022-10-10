@@ -33,7 +33,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.lis
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumTimeEstimationStyleRefresher
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumTrackModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumVotingModel
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.YourVote
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.YourVoteModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.WithAssetSelector
@@ -113,14 +113,14 @@ class ReferendaListViewModel(
         return "#${id.value.format()}"
     }
 
-    private fun mapUserVoteToUi(vote: AccountVote?, token: Token): YourVote? {
+    private fun mapUserVoteToUi(vote: AccountVote?, token: Token): YourVoteModel? {
         val isAye = vote?.isAye() ?: return null
         val votes = vote.votes(token.configuration) ?: return null
 
         val voteTypeRes = if (isAye) R.string.referendum_vote_positive_type else R.string.referendum_vote_negative_type
         val colorRes = if (isAye) R.color.multicolor_green_100 else R.color.multicolor_red_100
 
-        return YourVote(
+        return YourVoteModel(
             voteType = resourceManager.getString(voteTypeRes),
             colorRes = colorRes,
             details = resourceManager.getString(R.string.referendum_your_vote_format, votes.format())

@@ -26,7 +26,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.lis
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumTimeEstimation
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumTrackModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumVotingModel
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.YourVote
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.YourVoteModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.setModel
 import kotlinx.android.synthetic.main.item_referenda_group.view.itemReferendaGroupCounter
 import kotlinx.android.synthetic.main.item_referenda_group.view.itemReferendaGroupStatus
@@ -196,7 +196,7 @@ private class ReferendumChildHolder(
         }
     }
 
-    private fun setYourVote(vote: YourVote?) = with(containerView) {
+    private fun setYourVote(vote: YourVoteModel?) = with(containerView) {
         itemReferendumYourVoiceGroup.isVisible = vote != null
         if (vote != null) {
             itemReferendumYourVoteType.text = vote.voteType
