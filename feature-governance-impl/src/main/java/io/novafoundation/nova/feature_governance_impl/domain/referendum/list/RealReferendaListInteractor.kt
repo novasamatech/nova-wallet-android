@@ -2,7 +2,10 @@ package io.novafoundation.nova.feature_governance_impl.domain.referendum.list
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.Perbill
+import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.common.utils.divideToDecimal
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.OnChainReferendum
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.OnChainReferendumStatus
@@ -20,6 +23,7 @@ import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourc
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.PreparingReason
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaListInteractor
+import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumGroup
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumPreview
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumStatus
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumVoting
@@ -27,11 +31,8 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.TotalIssuanceRepository
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
-import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.util.BlockDurationEstimator
 import io.novafoundation.nova.runtime.util.timerUntil
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
@@ -41,18 +42,17 @@ import java.math.BigInteger
 class RealReferendaListInteractor(
     private val chainStateRepository: ChainStateRepository,
     private val governanceSourceRegistry: GovernanceSourceRegistry,
-    private val selectedAssetState: SingleAssetSharedState,
     private val totalIssuanceRepository: TotalIssuanceRepository,
 ) : ReferendaListInteractor {
 
-    override fun referendaFlow(voterAccountId: AccountId): Flow<List<ReferendumPreview>> {
+    override fun referendaFlow(metaAccount: MetaAccount, chain: Chain): Flow<GroupedList<ReferendumGroup, ReferendumPreview>> {
         return flow {
-            emitAll(referendaFlowSuspend(voterAccountId))
+            emitAll(referendaFlowSuspend(metaAccount, chain))
         }
     }
 
-    private suspend fun referendaFlowSuspend(voterAccountId: AccountId): Flow<List<ReferendumPreview>> {
-        val chain = selectedAssetState.chain()
+    private suspend fun referendaFlowSuspend(metaAccount: MetaAccount, chain: Chain): Flow<GroupedList<ReferendumGroup, ReferendumPreview>> {
+        val voterAccountId = metaAccount.accountIdIn(chain)
 
         val governanceSource = governanceSourceRegistry.sourceFor(chain.id)
 
@@ -69,9 +69,11 @@ class RealReferendaListInteractor(
                 currentBlockNumber = currentBlockNumber
             )
 
-            val userVotes = governanceSource.convictionVoting.votingFor(voterAccountId, chain.id).flattenCastingVotes()
+            val userVotes = voterAccountId?.let {
+                governanceSource.convictionVoting.votingFor(voterAccountId, chain.id)
+            }?.flattenCastingVotes().orEmpty()
 
-            onChainReferenda.map { onChainReferendum ->
+            val referenda = onChainReferenda.map { onChainReferendum ->
                 ReferendumPreview(
                     id = onChainReferendum.id,
                     offChainMetadata = offChainInfo[onChainReferendum.id]?.let {
@@ -95,6 +97,8 @@ class RealReferendaListInteractor(
                     userVote = userVotes[onChainReferendum.id]
                 )
             }
+
+            referenda.groupBy { it.group() }
         }
     }
 
@@ -230,5 +234,15 @@ class RealReferendaListInteractor(
                 Voting.Delegating -> emptyList()
             }
         }.toMap()
+    }
+
+    private fun ReferendumPreview.group(): ReferendumGroup {
+        return when (status) {
+            is ReferendumStatus.Executed,
+            is ReferendumStatus.Approved,
+            is ReferendumStatus.NotExecuted -> ReferendumGroup.COMPLETED
+
+            else -> ReferendumGroup.ONGOING
+        }
     }
 }

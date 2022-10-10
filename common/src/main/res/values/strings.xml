@@ -1,14 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="common_ongoing">Ongoing</string>
+    <string name="common_completed">Completed</string>
+    <!--    <string name="crowdloan_completed_section">Completed</string>-->
+
+    <string name="referendum_aye_format">Aye: %s</string>
+    <string name="referendum_nay_format">Nay: %s</string>
+    <string name="referendum_to_pass_format">To pass: %s</string>
+
     <string name="vote_vote">Vote</string>
     <string name="common_governance">Governance</string>
-    <string name="referendum_status_passing">Passing</string>
+
+    <string name="referendum_name_unknown">Unnamed referenda</string>
+
+    <string name="referendum_support_threshold_format">Threshold: %s of %s</string>
+    <string name="referendum_your_vote_format">Your vote: %s votes</string>
+
     <string name="referendum_status_approved">Approved</string>
     <string name="referendum_status_in_queue">In queue</string>
-    <string name="referendum_status_timeout">Timeout</string>
+    <string name="referendum_status_timeout">Timed out</string>
     <string name="referendum_status_cancelled">Cancelled</string>
+    <string name="referendum_status_passing">Passing</string>
     <string name="referendum_status_not_passing">Not passing</string>
-    <string name="referendum_status_not_rejected">Rejected</string>
+    <string name="referendum_status_rejected">Rejected</string>
+    <string name="referendum_status_preparing">Preparing</string>
+    <string name="referendum_status_executed">Executed</string>
+    <string name="referendum_status_killed">Killed</string>
+
+    <string name="referendum_status_deciding_in">Deciding in %s</string>
+    <string name="referendum_status_waiting_deposit">Waiting for deposit</string>
+    <string name="referendum_status_time_out_in">Time out in %s</string>
+    <string name="referendum_status_time_reject_in">Reject in %s</string>
+    <string name="referendum_status_time_approve_in">Approve in %s</string>
+    <string name="referendum_status_time_execute_in">Execute in %s</string>
+
+    <string name="referendum_track_root">main agenda</string>
+    <string name="referendum_whitelisted_caller">fellowship: whitelist</string>
+    <string name="referendum_staking_admin">staking</string>
+    <string name="referendum_track_treasurer">Treasury: ANY</string>
+    <string name="referendum_track_lease_admin">Governance: lease</string>
+    <string name="referendum_track_fellowship_admin">fellowship: admin</string>
+    <string name="referendum_track_general_admin">governance: registrar</string>
+    <string name="referendum_track_auction_admin">crowdloans</string>
+    <string name="referendum_track_referendum_canceller">governance: canceller</string>
+    <string name="referendum_track_referendum_killer">governance: killer</string>
+    <string name="referendum_track_small_tipper">Treasury: small tips</string>
+    <string name="referendum_track_big_tipper">Treasury: big tips</string>
+    <string name="referendum_track_small_spender">Treasury: Small spend</string>
+    <string name="referendum_track_medium_spender">Treasury: medium spend</string>
+    <string name="referendum_track_big_spender">Treasury: big spend</string>
+
     <string name="referendum_vote_positive_type">Aye</string>
     <string name="referendum_vote_negative_type">Nay</string>
 
@@ -622,7 +663,6 @@
     <string name="crowdloan_cap_reached_amount_message">Cannot contribute chosen amount since resulting raised amount will exceed crowdloan cap. Maximum allowed contribution is %s.</string>
     <string name="crowdloan_cap_reached_raised_message">Cannot contribute to selected crowdloan  since its cap is already reached.</string>
     <string name="crowdloan_cap_reached_title">Crowdloan cap exceeded</string>
-    <string name="crowdloan_completed_section">Completed</string>
     <string name="crowdloan_contribute_title">Contribute to crowdloan</string>
     <string name="crowdloan_contribution">Contribution</string>
     <string name="crowdloan_contribution_format">You contributed: %s</string>

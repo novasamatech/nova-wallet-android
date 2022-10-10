@@ -18,7 +18,7 @@ import javax.inject.Qualifier
 annotation class GovernanceV2
 
 @Module
-class V2GovernanceModule {
+class GovernanceV2Module {
 
     @Provides
     @FeatureScope

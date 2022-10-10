@@ -307,7 +307,7 @@
     <string name="crowdloan_cap_reached_amount_message">Невозможно вложить введённую сумму, поскольку общая сумма сбора будет превышать максимальную сумму краудлоуна. Максимально допустимый вклад составляет %s .</string>
     <string name="crowdloan_cap_reached_raised_message">Невозможно внести вклад в выбранный краудлоун, поскольку его максимальная сумма сбора уже достигнута.</string>
     <string name="crowdloan_cap_reached_title">Превышена максимальная сумма краудлоуна</string>
-    <string name="crowdloan_completed_section">Завершённые</string>
+    <string name="common_completed">Завершённые</string>
     <string name="crowdloan_contribute_title">Внести вклад в краудлоун</string>
     <string name="crowdloan_contribution">Тип вклада</string>
     <string name="crowdloan_contribution_format">Вы вложили: %s</string>

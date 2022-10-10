@@ -103,7 +103,7 @@ class CrowdloanViewModel(
     private fun mapCrowdloanStatusToUi(statusClass: KClass<out Crowdloan.State>, statusCount: Int): CrowdloanStatusModel {
         return when (statusClass) {
             Crowdloan.State.Finished::class -> CrowdloanStatusModel(
-                status = resourceManager.getString(R.string.crowdloan_completed_section),
+                status = resourceManager.getString(R.string.common_completed),
                 count = statusCount.toString()
             )
             Crowdloan.State.Active::class -> CrowdloanStatusModel(

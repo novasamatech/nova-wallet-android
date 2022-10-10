@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.data.source.RealGovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_impl.di.modules.GovernanceUpdatersModule
 import io.novafoundation.nova.feature_governance_impl.di.modules.GovernanceV2
-import io.novafoundation.nova.feature_governance_impl.di.modules.V2GovernanceModule
+import io.novafoundation.nova.feature_governance_impl.di.modules.GovernanceV2Module
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.RealReferendaListInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
@@ -30,7 +30,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.TotalIssuanceRepository
 
-@Module(includes = [V2GovernanceModule::class, GovernanceUpdatersModule::class])
+@Module(includes = [GovernanceV2Module::class, GovernanceUpdatersModule::class])
 class GovernanceFeatureModule {
 
     @Provides
@@ -95,12 +95,10 @@ class GovernanceFeatureModule {
     fun provideReferendaListInteractor(
         chainStateRepository: ChainStateRepository,
         governanceSourceRegistry: GovernanceSourceRegistry,
-        selectedAssetState: GovernanceSharedState,
         totalIssuanceRepository: TotalIssuanceRepository,
     ): ReferendaListInteractor = RealReferendaListInteractor(
         chainStateRepository = chainStateRepository,
         governanceSourceRegistry = governanceSourceRegistry,
-        selectedAssetState = selectedAssetState,
         totalIssuanceRepository = totalIssuanceRepository
     )
 }

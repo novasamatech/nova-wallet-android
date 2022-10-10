@@ -8,19 +8,16 @@ import androidx.recyclerview.widget.ConcatAdapter
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.presentation.LoadingState
+import io.novafoundation.nova.common.utils.makeGone
+import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendaStatusModel
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumModel
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumStatus
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumTimeEstimation
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumTrack
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumVoting
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.YourVote
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.subscribeOnAssetChange
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.subscribeOnAssetClick
-import kotlinx.android.synthetic.main.fragment_referenda_list.*
+import kotlinx.android.synthetic.main.fragment_referenda_list.referendaList
+import kotlinx.android.synthetic.main.fragment_referenda_list.referendaProgress
 import javax.inject.Inject
 
 class ReferendaListFragment : BaseFragment<ReferendaListViewModel>(), ReferendaListAdapter.Handler, ReferendaListHeaderAdapter.Handler {
@@ -47,70 +44,6 @@ class ReferendaListFragment : BaseFragment<ReferendaListViewModel>(), ReferendaL
 
     override fun initViews() {
         referendaList.adapter = ConcatAdapter(referendaHeaderAdapter, referendaListAdapter)
-        referendaListAdapter.submitList(
-            listOf(
-                ReferendaStatusModel("Active", "2"),
-                ReferendumModel(
-                    "",
-                    ReferendumStatus("PASSING", R.color.darkGreen),
-                    "Implement cool thing",
-                    null,
-                    ReferendumTrack("auction admin", R.drawable.ic_staking),
-                    "#220",
-                    ReferendumVoting(
-                        0.84f,
-                        0.7f,
-                        R.drawable.ic_close,
-                        R.color.red,
-                        "Threshold: 1.551 KSM of 1.43 KSM",
-                        "Aye: 80%",
-                        "Nay: 20%",
-                        "To pass: 20%",
-                    ),
-                    YourVote("NAY", R.color.red, "Your vote: 100"),
-                ),
-                ReferendumModel(
-                    "",
-                    ReferendumStatus("PASSING", R.color.darkGreen),
-                    "Implement cool thing",
-                    ReferendumTimeEstimation("Waiting for deposit", R.drawable.ic_time_16, R.color.yellow),
-                    ReferendumTrack("auction admin", R.drawable.ic_staking),
-                    "#222",
-                    ReferendumVoting(
-                        null,
-                        0.12f,
-                        R.drawable.ic_checkmark,
-                        R.color.green,
-                        "Threshold: 1.551 KSM of 1.43 KSM",
-                        "Aye: 80%",
-                        "Nay: 20%",
-                        "To pass: 20%",
-                    ),
-                    null
-                ),
-                ReferendaStatusModel("Completed", "2"),
-                ReferendumModel(
-                    "",
-                    ReferendumStatus("PASSING", R.color.darkGreen),
-                    "Implement cool thing",
-                    ReferendumTimeEstimation("Execute in 16 days", R.drawable.ic_time_16, R.color.yellow),
-                    ReferendumTrack("auction admin", R.drawable.ic_staking),
-                    "#224",
-                    null,
-                    null
-                ),
-                ReferendumModel(
-                    "",
-                    ReferendumStatus("PASSING", R.color.darkGreen),
-                    "Implement cool thing",
-                    ReferendumTimeEstimation("Execute in 16 days", R.drawable.ic_time_16, R.color.yellow),
-                    ReferendumTrack("auction admin", R.drawable.ic_staking),
-                    "#225",
-                    null,
-                    YourVote("AYE", R.color.multicolorGreen, "Your vote: 600"),
-                )
-            )
-        )
     }
 
     override fun inject() {
@@ -127,6 +60,19 @@ class ReferendaListFragment : BaseFragment<ReferendaListViewModel>(), ReferendaL
         subscribeOnAssetClick(viewModel.assetSelectorMixin, imageLoader)
         subscribeOnAssetChange(viewModel.assetSelectorMixin) {
             referendaHeaderAdapter.setAsset(it)
+        }
+
+        viewModel.referendaUiFlow.observe {
+            when (it) {
+                is LoadingState.Loaded -> {
+                    referendaProgress.makeGone()
+                    referendaListAdapter.submitList(it.data)
+                }
+                is LoadingState.Loading -> {
+                    referendaProgress.makeVisible()
+                    referendaListAdapter.submitList(emptyList())
+                }
+            }
         }
     }
 

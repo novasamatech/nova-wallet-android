@@ -4,6 +4,7 @@ import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.lifecycle.LifecycleOwner
 import io.novafoundation.nova.common.utils.formatting.TimerValue
+import io.novafoundation.nova.common.utils.formatting.remainingTime
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.view.startTimer
 import io.novafoundation.nova.runtime.R
@@ -14,11 +15,7 @@ import kotlin.time.Duration.Companion.minutes
 class ValidityPeriod(val period: TimerValue)
 
 fun ValidityPeriod.remainingTime(): Long {
-    val currentTimer = System.currentTimeMillis()
-    val passedTime = currentTimer - period.millisCalculatedAt
-    val remainingTime = period.millis - passedTime
-
-    return remainingTime.coerceAtLeast(0)
+    return period.remainingTime()
 }
 
 fun ValidityPeriod.closeToExpire(): Boolean {
