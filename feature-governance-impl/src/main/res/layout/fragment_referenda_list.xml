@@ -1,12 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <TextView
+        style="@style/TextAppearance.NovaFoundation.Header1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TODO"
         android:layout_gravity="center"
-        style="@style/TextAppearance.NovaFoundation.Header1" />
+        android:text="TODO" />
+
+    <io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.timeline.TimelineLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingBottom="20dp"
+        app:timelineDefaultColor="@color/accentBlue"
+        app:timelineItemStartPadding="16dp"
+        app:timelineItemStatePointSize="12dp"
+        app:timelinePointToStrokeOffset="6dp"
+        app:timelineStrokeWidth="1dp"
+        app:timelineUnfinishedColor="@color/white_24" />
 </FrameLayout>
