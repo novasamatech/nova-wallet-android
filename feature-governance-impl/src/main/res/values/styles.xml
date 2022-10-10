@@ -15,4 +15,14 @@
         <item name="marginBetweenVotes">6dp</item>
         <item name="minimumLineLength">3dp</item>
     </style>
+
+    <style name="DefaultTimelineLayout">
+        <item name="timelineDefaultColor">@color/accentBlue</item>
+        <item name="timelineUnfinishedColor">@color/white_24</item>
+        <item name="timelineStrokeWidth">1dp</item>
+        <item name="timelineItemStartPadding">16dp</item>
+        <item name="timelinePointToStrokeOffset">6dp</item>
+        <item name="timelineItemStatePointSize">12dp</item>
+        <item name="paddingStart">16dp</item>
+    </style>
 </resources>

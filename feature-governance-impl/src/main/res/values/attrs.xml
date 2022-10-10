@@ -13,4 +13,13 @@
         <attr name="marginBetweenVotes" format="dimension" />
         <attr name="minimumLineLength" format="dimension" />
     </declare-styleable>
+
+    <declare-styleable name="TimelineLayout">
+        <attr name="timelineDefaultColor" format="color" />
+        <attr name="timelineUnfinishedColor" format="color" />
+        <attr name="timelineStrokeWidth" format="dimension" />
+        <attr name="timelineItemStartPadding" format="dimension" />
+        <attr name="timelinePointToStrokeOffset" format="dimension" />
+        <attr name="timelineItemStatePointSize" format="dimension" />
+    </declare-styleable>
 </resources>
