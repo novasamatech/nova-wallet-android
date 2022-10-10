@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginStart="8dp"
-        android:background="@drawable/bg_crowdloan_status_chip"
+        android:background="@drawable/bg_voting_status_chip"
         android:includeFontPadding="false"
         android:paddingStart="10dp"
         android:paddingTop="3dp"

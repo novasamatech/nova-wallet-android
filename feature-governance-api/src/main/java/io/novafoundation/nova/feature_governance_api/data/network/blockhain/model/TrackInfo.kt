@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import java.math.BigInteger
 
 data class TrackInfo(
-    val id: BigInteger,
+    val id: TrackId,
     val name: String,
     val maxDeciding: BigInteger,
     val decisionDeposit: Balance,

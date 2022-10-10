@@ -40,6 +40,10 @@ val BigDecimal.isNonNegative: Boolean
 fun BigInteger?.orZero(): BigInteger = this ?: BigInteger.ZERO
 fun BigDecimal?.orZero(): BigDecimal = this ?: 0.toBigDecimal()
 
+fun BigInteger.divideToDecimal(divisor: BigInteger, mathContext: MathContext = MathContext.DECIMAL64): BigDecimal {
+    return toBigDecimal().divide(divisor.toBigDecimal(), mathContext)
+}
+
 fun Long.daysFromMillis() = TimeUnit.MILLISECONDS.toDays(this)
 
 inline fun <T> Collection<T>.sumByBigInteger(extractor: (T) -> BigInteger) = fold(BigInteger.ZERO) { acc, element ->

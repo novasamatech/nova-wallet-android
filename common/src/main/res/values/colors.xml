@@ -14,6 +14,7 @@
     <color name="gray_disabled">#D0D0D0</color>
     <color name="colorGreyText">#888888</color>
     <color name="green">#00FF19</color>
+    <color name="darkGreen">@color/multicolor_green_100</color>
     <color name="dividerGray">#444444</color>
     <color name="bottomSheetBackground">#80838383</color>
     <color name="blurColorDark">#B3000000</color>
@@ -44,6 +45,10 @@
     <color name="black3">@color/gray3</color>
     <color name="black4">@color/gray4</color>
 
+    <color name="multicolor_yellow_100">#EBC50A</color>
+    <color name="multicolor_green_100">#15CF37</color>
+    <color name="multicolor_red_100">#FF3A69</color>
+
     <color name="bg_bottom_sheet">#1D1D20</color>
 
     <color name="settings_group_background">#1D1D20</color>
@@ -51,7 +56,7 @@
     <color name="account_icon_light">#eeeeee</color>
     <color name="account_icon_dark">@color/black</color>
 
-    <color name="red">#FF3A69</color>
+    <color name="red">@color/multicolor_red_100</color>
     <color name="faded_red">#BF3758</color>
     <color name="red_12">#1FFF3A69</color>
 

@@ -8,6 +8,7 @@ import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.di.ReferendaListComponent
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 
@@ -21,6 +22,8 @@ import io.novafoundation.nova.runtime.di.RuntimeApi
 )
 @FeatureScope
 interface GovernanceFeatureComponent : GovernanceFeatureApi {
+
+    fun referendaListFactory(): ReferendaListComponent.Factory
 
     @Component.Factory
     interface Factory {

@@ -57,7 +57,7 @@ private class MetaAccountValidForTransactionListingMixin(
     override val metaAccountsFlow = metaAccountGroupingInteractor.getMetaAccountsForTransaction(fromChainId, destinationChainId)
         .map { list ->
             list.toListWithHeaders(
-                keyMapper = { mapMetaAccountTypeToUi(it, resourceManager) },
+                keyMapper = { type, _ -> mapMetaAccountTypeToUi(type, resourceManager) },
                 valueMapper = { mapMetaAccountToUi(it) }
             )
         }
