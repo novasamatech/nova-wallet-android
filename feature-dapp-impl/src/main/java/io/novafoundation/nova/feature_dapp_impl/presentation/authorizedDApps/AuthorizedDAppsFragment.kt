@@ -25,11 +25,8 @@ import javax.inject.Inject
 
 class AuthorizedDAppsFragment : BaseFragment<AuthorizedDAppsViewModel>(), AuthorizedDAppAdapter.Handler {
 
-    @Inject
-    lateinit var imageLoader: ImageLoader
-
     private val adapter by lazy(LazyThreadSafetyMode.NONE) {
-        AuthorizedDAppAdapter(this, imageLoader)
+        AuthorizedDAppAdapter(this)
     }
 
     private val placeholderViews by lazy(LazyThreadSafetyMode.NONE) {

@@ -18,7 +18,7 @@ import io.novafoundation.nova.feature_account_api.view.showChain
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
-import io.novafoundation.nova.feature_dapp_impl.presentation.common.showDAppIcon
+import io.novafoundation.nova.feature_dapp_api.presentation.common.showDAppIcon
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 import kotlinx.android.synthetic.main.bottom_sheet_confirm_dapp_action.confirmDAppActionAllow
 import kotlinx.android.synthetic.main.bottom_sheet_confirm_dapp_action.confirmDAppActionReject

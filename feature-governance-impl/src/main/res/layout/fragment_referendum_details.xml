@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/currencyToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:dividerVisible="false"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical|end"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/referendumDetailsTrack"
+                style="@style/ReferendumChip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="6dp"
+                tools:background="@color/white_8"
+                tools:drawableStart="@drawable/ic_info_16"
+                tools:text="MAIN TRACK" />
+
+            <TextView
+                android:id="@+id/referendumDetailsNumber"
+                style="@style/ReferendumChip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                tools:background="@color/white_8"
+                tools:text="#255" />
+        </LinearLayout>
+
+    </io.novafoundation.nova.common.view.Toolbar>
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/referendumDetailsScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:overScrollMode="never"
+        app:layout_constraintTop_toBottomOf="@+id/currencyToolbar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="16dp">
+
+            <io.novafoundation.nova.common.view.AddressView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                style="@style/TextAppearance.NovaFoundation.Bold.Title1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                tools:text="Polkadot and Kusama participation in the 10th Pais Digital Chile Summit." />
+
+            <TextView
+                style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:ellipsize="end"
+                android:maxLines="4"
+                android:textColor="@color/white_64"
+                tools:text="Sovereign Nature Initiative (SNI) is a non-profit foundation that has brought together multiple partners and engineers from the Kusama ecosystem including Kodadot, Unique Network, Kilt Protocol, Momentum, and Ocean Protocol, to support the building of Web3 capacities for wildlife" />
+
+            <TextView
+                style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:gravity="center_vertical"
+                android:includeFontPadding="false"
+                android:paddingHorizontal="4dp"
+                android:paddingVertical="7dp"
+                android:text="@string/common_read_more"
+                android:textColor="@color/accentBlue"
+                tools:drawableEnd="@drawable/ic_chevron_right"
+                tools:drawableTint="@color/accentBlue" />
+
+            <io.novafoundation.nova.feature_governance_impl.presentation.view.YourVoteView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <io.novafoundation.nova.feature_governance_impl.presentation.view.VotesViewOverview
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp" />
+
+            <io.novafoundation.nova.feature_governance_impl.presentation.view.ReferendumDappList
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/viewYourVote"
+                    style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:text="@string/referendum_dapp_list_title"
+                    android:textColor="@color/white_64" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

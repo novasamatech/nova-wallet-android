@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="common_read_more">Read more</string>
+
     <string name="common_ongoing">Ongoing</string>
     <string name="common_completed">Completed</string>
     <!--    <string name="crowdloan_completed_section">Completed</string>-->
@@ -52,6 +54,11 @@
 
     <string name="referendum_vote_positive_type">Aye</string>
     <string name="referendum_vote_negative_type">Nay</string>
+
+    <string name="referendum_details_your_vote">Your vote:</string>
+    <string name="votes_view_start_vote">Vote</string>
+
+    <string name="referendum_dapp_list_title">Use Nova DApp browser</string>
 
     <string name="crowdloan_contributions_liquid_source">Liquid</string>
     <string name="crowdloan_contributions_parallel_source">Parallel</string>

@@ -5,7 +5,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import io.novafoundation.nova.common.utils.formatting.TimerValue
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.VotesView
+import io.novafoundation.nova.feature_governance_impl.presentation.view.VotesView
 
 data class ReferendaGroupModel(val name: String, val badge: String)
 

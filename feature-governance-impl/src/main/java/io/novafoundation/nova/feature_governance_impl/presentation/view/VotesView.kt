@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.presentation.referenda.list
+package io.novafoundation.nova.feature_governance_impl.presentation.view
 
 import android.content.Context
 import android.graphics.Canvas

@@ -34,10 +34,7 @@ class DappSearchFragment : BaseBottomSheetFragment<DAppSearchViewModel>(), Searc
         )
     }
 
-    @Inject
-    lateinit var imageLoader: ImageLoader
-
-    private val adapter by lazy(LazyThreadSafetyMode.NONE) { SearchDappAdapter(imageLoader, this) }
+    private val adapter by lazy(LazyThreadSafetyMode.NONE) { SearchDappAdapter(this) }
 
     override fun onCreateView(
         inflater: LayoutInflater,

@@ -34,9 +34,7 @@ class CategorizedDappsView @JvmOverloads constructor(
     DappListAdapter.Handler,
     DappCategoriesAdapter.Handler {
 
-    @Inject lateinit var imageLoader: ImageLoader
-
-    private val dappListAdapter by lazy(LazyThreadSafetyMode.NONE) { DappListAdapter(this, imageLoader) }
+    private val dappListAdapter by lazy(LazyThreadSafetyMode.NONE) { DappListAdapter(this) }
     private val categoriesAdapter by lazy(LazyThreadSafetyMode.NONE) { DappCategoriesAdapter(this) }
 
     private var dAppListEventHandler: DappListAdapter.Handler? = null
@@ -47,11 +45,6 @@ class CategorizedDappsView @JvmOverloads constructor(
         orientation = VERTICAL
 
         background = context.getRoundedCornerDrawable(fillColorRes = R.color.black_48)
-
-        FeatureUtils.getFeature<DAppFeatureComponent>(
-            context,
-            DAppFeatureApi::class.java
-        ).inject(this)
 
         categorizedDappsList.adapter = dappListAdapter
         categorizedDappsCategories.adapter = categoriesAdapter

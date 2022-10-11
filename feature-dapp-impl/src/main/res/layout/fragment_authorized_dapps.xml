@@ -62,5 +62,5 @@
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
         android:layout_weight="1"
-        tools:listitem="@layout/item_dapp" />
+        tools:listitem="@layout/view_dapp" />
 </LinearLayout>
