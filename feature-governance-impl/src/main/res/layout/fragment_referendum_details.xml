@@ -107,18 +107,57 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="vertical"
+                android:paddingHorizontal="16dp"
+                android:paddingTop="16dp"
+                tools:background="@color/white_8">
 
                 <TextView
-                    android:id="@+id/viewYourVote"
                     style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
-                    android:text="@string/referendum_dapp_list_title"
+                    android:text="@string/referendum_details_timeline"
                     android:textColor="@color/white_64" />
 
+                <io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.timeline.TimelineLayout
+                    android:id="@+id/referendumDetailsTimeline"
+                    style="@style/DefaultTimelineLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp" />
+
             </LinearLayout>
+
+            <FrameLayout
+                android:id="@+id/referendumFullDetails"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_primary_list_item"
+                tools:background="@color/white_8">
+
+                <TextView
+                    style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginVertical="17dp"
+                    android:layout_marginStart="16dp"
+                    android:text="Full details"
+                    android:textColor="@color/accentBlue" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical|end"
+                    android:layout_marginVertical="14dp"
+                    android:layout_marginEnd="16dp"
+                    android:src="@drawable/ic_chevron_right" />
+
+            </FrameLayout>
 
         </LinearLayout>
 
