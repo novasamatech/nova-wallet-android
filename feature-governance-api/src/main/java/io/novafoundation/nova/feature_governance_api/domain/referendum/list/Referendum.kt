@@ -1,10 +1,11 @@
 package io.novafoundation.nova.feature_governance_api.domain.referendum.list
 
-import io.novafoundation.nova.common.data.network.runtime.binding.Perbill
 import io.novafoundation.nova.common.utils.formatting.TimerValue
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumTrack
+import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumVoting
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
 
 enum class ReferendumGroup {
     ONGOING, COMPLETED
@@ -15,37 +16,22 @@ data class ReferendumPreview(
     val status: ReferendumStatus,
     val offChainMetadata: OffChainMetadata?,
     val onChainMetadata: OnChainMetadata?,
-    val track: Track?,
+    val track: ReferendumTrack?,
     val voting: ReferendumVoting?,
     val userVote: AccountVote?
 ) {
 
-    data class Track(val name: String)
 
     data class OffChainMetadata(val title: String)
 
-    data class OnChainMetadata(val proposalHash: String)
+    data class OnChainMetadata(val proposal: ReferendumProposal)
 }
 
-data class ReferendumVoting(
-    val support: Support,
-    val approval: Approval
-) {
+sealed class ReferendumProposal {
 
-    data class Support(
-        val threshold: Balance,
-        val turnout: Balance
-    )
+    class Hash(val callHash: String): ReferendumProposal()
 
-    data class Approval(
-        val ayeFraction: Perbill,
-        val nayFraction: Perbill,
-        val threshold: Perbill
-    )
-}
-
-fun ReferendumVoting.Support.passes(): Boolean {
-    return turnout > threshold
+    class Call(val call: GenericCall.Instance): ReferendumProposal()
 }
 
 sealed class ReferendumStatus {

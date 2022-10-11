@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.data.repository.v2
 
+import android.util.Log
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountId
 import io.novafoundation.nova.common.data.network.runtime.binding.bindBlockNumber
@@ -16,6 +17,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.castToList
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.data.network.runtime.binding.getTyped
 import io.novafoundation.nova.common.data.network.runtime.binding.incompatible
+import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.constant
 import io.novafoundation.nova.common.utils.decodedValue
 import io.novafoundation.nova.common.utils.filterNotNull
@@ -28,6 +30,7 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.DecisionDeposit
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.OnChainReferendum
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.OnChainReferendumStatus
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Proposal
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Tally
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
@@ -43,13 +46,17 @@ import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
+import jp.co.soramitsu.fearless_utils.hash.Hasher.blake2b256
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.DictEnum
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromByteArray
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.primitives.u32
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.toByteArray
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import jp.co.soramitsu.fearless_utils.scale.dataType.string
+import kotlinx.coroutines.flow.Flow
 import java.math.BigInteger
 
 private const val ASSEMBLY_ID = "assembly"
@@ -77,8 +84,17 @@ class GovV2OnChainReferendaRepository(
             runtime.metadata.referenda().storage("ReferendumInfoFor").entries(
                 prefixArgs = emptyArray(),
                 keyExtractor = { (id: BigInteger) -> ReferendumId(id) },
-                binding = ::bindReferendum
+                binding = { decoded, id -> bindReferendum(decoded, id, runtime) }
             ).values.filterNotNull()
+        }
+    }
+
+    override suspend fun onChainReferendumFlow(chainId: ChainId, referendumId: ReferendumId): Flow<OnChainReferendum> {
+        return remoteStorageSource.subscribe(chainId) {
+            runtime.metadata.referenda().storage("ReferendumInfoFor").observe(
+                referendumId.value,
+                binding = { bindReferendum(it, referendumId, runtime)!! }
+            )
         }
     }
 
@@ -105,7 +121,7 @@ class GovV2OnChainReferendaRepository(
         }
     }
 
-    private fun bindReferendum(decoded: Any?, id: ReferendumId): OnChainReferendum? = runCatching {
+    private fun bindReferendum(decoded: Any?, id: ReferendumId, runtime: RuntimeSnapshot): OnChainReferendum? = runCatching {
         val asDictEnum = decoded.castToDictEnum()
 
         val referendumStatus = when (asDictEnum.name) {
@@ -114,7 +130,7 @@ class GovV2OnChainReferendaRepository(
 
                 OnChainReferendumStatus.Ongoing(
                     track = TrackId(bindNumber(status["track"])),
-                    proposalHash = bindByteArray(status["proposalHash"]),
+                    proposal = bindProposal(status["proposal"], runtime),
                     desiredEnactment = bindDispatchTime(status.getTyped("enactment")),
                     submitted = bindBlockNumber(status["submitted"]),
                     decisionDeposit = bindDecisionDeposit(status["decisionDeposit"]),
@@ -135,7 +151,35 @@ class GovV2OnChainReferendaRepository(
             id = id,
             status = referendumStatus
         )
-    }.getOrNull()
+    }
+        .onFailure { Log.e(this.LOG_TAG, "Failed to decode on-chain referendum", it) }
+        .getOrNull()
+
+    private fun bindProposal(decoded: Any?, runtime: RuntimeSnapshot): Proposal {
+        val asEnum = decoded.castToDictEnum()
+
+        return when(asEnum.name) {
+            "Legacy" -> {
+                val valueAsStruct = asEnum.value.castToStruct()
+                Proposal.Legacy(bindByteArray(valueAsStruct["hash"]))
+            }
+            "Inline" -> {
+                val bytes = bindByteArray(asEnum.value)
+                val call = GenericCall.fromByteArray(runtime, bytes)
+
+                Proposal.Inline(call)
+            }
+            "Lookup" -> {
+                val valueAsStruct = asEnum.value.castToStruct()
+
+                Proposal.Lookup(
+                    hash = bindByteArray(valueAsStruct["hash"]),
+                    callLength = bindNumber(valueAsStruct["len"])
+                )
+            }
+            else -> incompatible()
+        }
+    }
 
     private fun bindDecidingStatus(decoded: Any?): DecidingStatus? {
         if (decoded == null) return null
@@ -226,8 +270,6 @@ class GovV2OnChainReferendaRepository(
 
         val toHash = encodedAssemblyId + encodedEnactment + encodedIndex
 
-        return toHash
-        // TODO use hashed version once testnet will be updated to latest pallet-referenda version
-//        return toHash.blake2b256()
+        return toHash.blake2b256()
     }
 }

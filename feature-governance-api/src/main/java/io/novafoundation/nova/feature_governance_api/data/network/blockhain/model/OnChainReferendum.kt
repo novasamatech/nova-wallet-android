@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.DispatchTime
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
 import java.math.BigInteger
 
 @JvmInline
@@ -21,7 +22,7 @@ sealed class OnChainReferendumStatus {
 
     class Ongoing(
         val track: TrackId,
-        val proposalHash: ByteArray,
+        val proposal: Proposal,
         val desiredEnactment: DispatchTime,
         val submitted: BlockNumber,
         val decisionDeposit: DecisionDeposit?,
@@ -39,6 +40,15 @@ sealed class OnChainReferendumStatus {
     object TimedOut : OnChainReferendumStatus()
 
     object Killed : OnChainReferendumStatus()
+}
+
+sealed class Proposal {
+
+    class Legacy(val hash: ByteArray): Proposal()
+
+    class Inline(val call: GenericCall.Instance): Proposal()
+
+    class Lookup(val hash: ByteArray, val callLength: BigInteger): Proposal()
 }
 
 class DecidingStatus(

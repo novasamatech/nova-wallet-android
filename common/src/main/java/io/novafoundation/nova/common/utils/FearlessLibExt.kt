@@ -184,6 +184,10 @@ fun RuntimeMetadata.convictionVoting() = module(Modules.CONVICTION_VOTING)
 
 fun RuntimeMetadata.scheduler() = module(Modules.SCHEDULER)
 
+fun RuntimeMetadata.treasury() = module(Modules.TREASURY)
+
+fun RuntimeMetadata.preImage() = module(Modules.PREIMAGE)
+
 fun RuntimeMetadata.firstExistingModule(vararg options: String): String {
     return options.first(::hasModule)
 }
@@ -209,6 +213,8 @@ private fun cropSeedTo32Bytes(seedResult: SeedFactory.Result): SeedFactory.Resul
 
 fun GenericCall.Instance.oneOf(vararg functionCandidates: MetadataFunction): Boolean = functionCandidates.any { function == it }
 fun GenericCall.Instance.instanceOf(functionCandidate: MetadataFunction): Boolean = function == functionCandidate
+
+fun GenericCall.Instance.instanceOf(moduleName: String, callName: String): Boolean = moduleName == module.name && callName == function.name
 
 fun structOf(vararg pairs: Pair<String, Any?>) = Struct.Instance(mapOf(*pairs))
 
@@ -252,4 +258,8 @@ object Modules {
     const val CONVICTION_VOTING = "ConvictionVoting"
 
     const val SCHEDULER = "Scheduler"
+
+    const val TREASURY = "Treasury"
+
+    const val PREIMAGE = "Preimage"
 }
