@@ -7,9 +7,9 @@ import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core.updater.SubscriptionBuilder
 import io.novafoundation.nova.core.updater.UpdateScope
 import io.novafoundation.nova.core.updater.Updater
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
+import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
@@ -45,7 +45,7 @@ abstract class SingleStorageKeyUpdater<S : UpdateScope>(
         val chainId = chainIdHolder.chainId()
         val runtime = chainRegistry.getRuntime(chainId)
 
-        val storageKey = storageKey(runtime) ?: return emptyFlow()
+        val storageKey = runCatching { storageKey(runtime) }.getOrNull() ?: return emptyFlow()
 
         return storageSubscriptionBuilder.subscribe(storageKey)
             .map {
