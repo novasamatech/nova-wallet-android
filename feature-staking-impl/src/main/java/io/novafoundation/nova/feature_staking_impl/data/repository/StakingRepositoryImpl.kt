@@ -97,7 +97,7 @@ class StakingRepositoryImpl(
 
     override suspend fun getHistoryDepth(chainId: ChainId): BigInteger {
         val runtime = runtimeFor(chainId)
-        val fromConstants = runtime.metadata.staking().numberConstantOrNull("`HistoryDepth", runtime)
+        val fromConstants = runtime.metadata.staking().numberConstantOrNull("HistoryDepth", runtime)
 
         return fromConstants ?: localStorage.queryNonNull(
             keyBuilder = { it.metadata.staking().storage("HistoryDepth").storageKey() },
