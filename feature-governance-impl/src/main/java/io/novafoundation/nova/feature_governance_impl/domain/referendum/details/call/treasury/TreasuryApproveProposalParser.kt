@@ -12,7 +12,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
 class TreasuryApproveProposalParser(
     private val treasuryRepository: TreasuryRepository
-): ReferendumCallParser {
+) : ReferendumCallParser {
 
     override suspend fun parse(preImage: PreImage, chainId: ChainId): ReferendumCall? = runCatching {
         val call = preImage.call

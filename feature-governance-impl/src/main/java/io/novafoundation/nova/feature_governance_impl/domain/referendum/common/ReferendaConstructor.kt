@@ -61,7 +61,6 @@ suspend fun ReferendaConstructor.constructReferendumStatus(
     currentBlockNumber = currentBlockNumber
 ).values.first()
 
-
 class RealReferendaConstructor(
     private val governanceSourceRegistry: GovernanceSourceRegistry,
     private val chainStateRepository: ChainStateRepository,
@@ -159,7 +158,7 @@ class RealReferendaConstructor(
         val blockTime = chainStateRepository.predictedBlockTime(chain.id)
         val blockDurationEstimator = BlockDurationEstimator(currentBlock = currentBlockNumber, blockTimeMillis = blockTime)
 
-        fun MutableList<ReferendumTimeline.Entry>.add(state: State, at: BlockNumber?){
+        fun MutableList<ReferendumTimeline.Entry>.add(state: State, at: BlockNumber?) {
             val entry = ReferendumTimeline.Entry(
                 state = state,
                 at = at?.let(blockDurationEstimator::timestampOf)
@@ -169,7 +168,7 @@ class RealReferendaConstructor(
         }
 
         return buildList {
-            when(calculatedStatus) {
+            when (calculatedStatus) {
                 // for ongoing referenda, we have access to some timestamps on-chain
                 is ReferendumStatus.Preparing,
                 is ReferendumStatus.InQueue,

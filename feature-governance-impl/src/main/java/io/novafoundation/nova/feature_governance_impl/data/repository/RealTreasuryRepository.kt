@@ -12,7 +12,7 @@ import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 
 class RealTreasuryRepository(
     private val remoteSource: StorageDataSource
-): TreasuryRepository {
+) : TreasuryRepository {
 
     override suspend fun getTreasuryProposal(chainId: ChainId, id: TreasuryProposal.Id): TreasuryProposal? {
         return remoteSource.query(chainId) {

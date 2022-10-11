@@ -21,7 +21,6 @@ data class ReferendumPreview(
     val userVote: AccountVote?
 ) {
 
-
     data class OffChainMetadata(val title: String)
 
     data class OnChainMetadata(val proposal: ReferendumProposal)
@@ -29,9 +28,9 @@ data class ReferendumPreview(
 
 sealed class ReferendumProposal {
 
-    class Hash(val callHash: String): ReferendumProposal()
+    class Hash(val callHash: String) : ReferendumProposal()
 
-    class Call(val call: GenericCall.Instance): ReferendumProposal()
+    class Call(val call: GenericCall.Instance) : ReferendumProposal()
 }
 
 sealed class ReferendumStatus {

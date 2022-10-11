@@ -158,7 +158,7 @@ class GovV2OnChainReferendaRepository(
     private fun bindProposal(decoded: Any?, runtime: RuntimeSnapshot): Proposal {
         val asEnum = decoded.castToDictEnum()
 
-        return when(asEnum.name) {
+        return when (asEnum.name) {
             "Legacy" -> {
                 val valueAsStruct = asEnum.value.castToStruct()
                 Proposal.Legacy(bindByteArray(valueAsStruct["hash"]))

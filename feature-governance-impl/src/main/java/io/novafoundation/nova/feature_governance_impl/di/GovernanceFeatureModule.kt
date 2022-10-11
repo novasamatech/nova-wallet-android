@@ -38,12 +38,14 @@ import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
-@Module(includes = [
-    GovernanceV2Module::class,
-    GovernanceUpdatersModule::class,
-    ReferendumDetailsModule::class,
-    ReferendumListModule::class
-])
+@Module(
+    includes = [
+        GovernanceV2Module::class,
+        GovernanceUpdatersModule::class,
+        ReferendumDetailsModule::class,
+        ReferendumListModule::class
+    ]
+)
 class GovernanceFeatureModule {
 
     @Provides

@@ -11,7 +11,7 @@ fun OnChainReferendum.proposal(): Proposal? {
 }
 
 fun Proposal.hash(): ByteArray? {
-    return when(this) {
+    return when (this) {
         is Proposal.Inline -> null
         is Proposal.Legacy -> hash
         is Proposal.Lookup -> hash
@@ -35,7 +35,7 @@ fun Tally.ayeVotes(): Approval.Votes {
 }
 
 fun Tally.nayVotes(): Approval.Votes {
-   return votesOf(Tally::nays)
+    return votesOf(Tally::nays)
 }
 
 fun TrackInfo.supportThreshold(x: Perbill, totalIssuance: Balance): Balance {

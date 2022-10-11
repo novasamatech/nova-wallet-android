@@ -22,7 +22,6 @@ data class ReferendumDetails(
     data class OnChainMetadata(val preImage: PreImage)
 }
 
-
 data class ReferendumTimeline(val currentStatus: ReferendumStatus, val pastEntries: List<Entry>) {
 
     data class Entry(val state: State, val at: Long?) {
