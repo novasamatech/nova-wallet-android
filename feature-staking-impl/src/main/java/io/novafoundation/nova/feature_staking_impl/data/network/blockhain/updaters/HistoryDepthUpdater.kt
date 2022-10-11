@@ -9,8 +9,8 @@ import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.update
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.network.updaters.SingleStorageKeyUpdater
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
+import jp.co.soramitsu.fearless_utils.runtime.metadata.storageOrNull
 
 class HistoryDepthUpdater(
     stakingSharedState: StakingSharedState,
@@ -18,13 +18,13 @@ class HistoryDepthUpdater(
     storageCache: StorageCache,
 ) : SingleStorageKeyUpdater<GlobalScope>(GlobalScope, stakingSharedState, chainRegistry, storageCache), StakingUpdater {
 
-    override fun fallbackValue(runtime: RuntimeSnapshot): String {
-        return storageEntry(runtime).defaultInHex()
+    override fun fallbackValue(runtime: RuntimeSnapshot): String? {
+        return storageEntry(runtime)?.defaultInHex()
     }
 
-    override suspend fun storageKey(runtime: RuntimeSnapshot): String {
-        return storageEntry(runtime).storageKey()
+    override suspend fun storageKey(runtime: RuntimeSnapshot): String? {
+        return storageEntry(runtime)?.storageKey()
     }
 
-    private fun storageEntry(runtime: RuntimeSnapshot) = runtime.metadata.staking().storage("HistoryDepth")
+    private fun storageEntry(runtime: RuntimeSnapshot) = runtime.metadata.staking().storageOrNull("HistoryDepth")
 }
