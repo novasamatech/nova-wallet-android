@@ -6,7 +6,7 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
 internal class OneOfIdentityProvider(
     private val delegates: List<IdentityProvider>
-): IdentityProvider {
+) : IdentityProvider {
 
     override suspend fun identityFor(accountId: AccountId, chainId: ChainId): Identity? {
         return delegates.tryFindNonNull {

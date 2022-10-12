@@ -108,7 +108,6 @@ suspend fun AddressIconGenerator.createAccountAddressModel(
     addressDisplayUseCase: AddressDisplayUseCase,
 ) = createAccountAddressModel(chain, accountId, addressDisplayUseCase.invoke(accountId))
 
-
 suspend fun AddressIconGenerator.createIdentityAddressModel(
     chain: Chain,
     accountId: ByteArray,

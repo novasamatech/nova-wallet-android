@@ -8,7 +8,7 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
 class OnChainIdentityProvider(
     private val onChainIdentityRepository: OnChainIdentityRepository
-): IdentityProvider {
+) : IdentityProvider {
 
     override suspend fun identityFor(accountId: AccountId, chainId: ChainId): Identity? {
         val onChainIdentity = onChainIdentityRepository.getIdentityFromId(chainId, accountId)

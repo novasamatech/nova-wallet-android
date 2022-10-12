@@ -23,7 +23,7 @@ fun OnChainReferendum.track(): TrackId? {
 }
 
 fun OnChainReferendum.submissionDeposit(): ReferendumDeposit? {
-    return when(status) {
+    return when (status) {
         is OnChainReferendumStatus.Ongoing -> status.submissionDeposit
         else -> null
     }

@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.first
 
 class ReferendumProposerIdentityProvider(
     private val proposerFlow: Flow<ReferendumProposer?>
-): IdentityProvider {
+) : IdentityProvider {
 
     override suspend fun identityFor(accountId: AccountId, chainId: ChainId): Identity? {
         val proposer = proposerFlow.first()

@@ -8,7 +8,7 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
 class LocalIdentityProvider(
     private val accountRepository: AccountRepository
-): IdentityProvider {
+) : IdentityProvider {
 
     override suspend fun identityFor(accountId: AccountId, chainId: ChainId): Identity? {
         val name = accountRepository.accountNameFor(accountId)

@@ -15,7 +15,7 @@ import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
 
 @UseCaseBinding
-fun bindIdentity(dynamic: Any?, ): OnChainIdentity? {
+fun bindIdentity(dynamic: Any?,): OnChainIdentity? {
     if (dynamic == null) return null
 
     val decoded = dynamic.castToStruct()
