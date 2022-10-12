@@ -28,6 +28,8 @@ class ReferendumDappList @JvmOverloads constructor(
         dAppView.setTitle(title)
         dAppView.setSubtitle(subtitle)
         dAppView.setIconUrl(iconUrl)
+        dAppView.setActionResource(iconRes = R.drawable.ic_chevron_right, colorRes = R.color.white_48)
+        dAppView.setActionEndPadding(16.dp)
         dAppView.setOnClickListener(listener)
         addView(dAppView)
     }

@@ -100,6 +100,50 @@
                 app:drawableEndCompat="@drawable/ic_chevron_right"
                 app:drawableTint="@color/accentBlue" />
 
+            <LinearLayout
+                android:id="@+id/referendumDetailsRequestedAmountContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/bg_primary_list_item"
+                android:orientation="vertical"
+                tools:background="@color/white_8">
+
+                <TextView
+                    style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="20dp"
+                    android:text="@string/referendum_details_requested_amount"
+                    android:textColor="@color/white_64" />
+
+                <TextView
+                    android:id="@+id/referendumDetailsRequestedAmount"
+                    style="@style/TextAppearance.NovaFoundation.Bold.Title2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="2dp"
+                    android:textColor="@color/white"
+                    tools:text="1,158.47 KSM" />
+
+                <TextView
+                    android:id="@+id/referendumDetailsRequestedAmountFiat"
+                    style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginBottom="24dp"
+                    android:textColor="@color/white_64"
+                    tools:text="$51,158.3" />
+
+            </LinearLayout>
+
             <io.novafoundation.nova.feature_governance_impl.presentation.view.YourVoteView
                 android:id="@+id/referendumDetailsYourVote"
                 android:layout_width="match_parent"
@@ -169,7 +213,8 @@
                     android:layout_gravity="center_vertical|end"
                     android:layout_marginVertical="14dp"
                     android:layout_marginEnd="16dp"
-                    android:src="@drawable/ic_chevron_right" />
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="@color/white_48" />
 
             </FrameLayout>
 

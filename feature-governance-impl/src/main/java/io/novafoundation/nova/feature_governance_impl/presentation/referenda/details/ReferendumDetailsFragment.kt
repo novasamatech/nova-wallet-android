@@ -1,9 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.details
 
 import android.content.Context
-import android.graphics.Color
-import android.graphics.drawable.ShapeDrawable
-import android.graphics.drawable.shapes.OvalShape
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +9,6 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.setDrawableStart
-import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
@@ -25,6 +21,9 @@ import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDeta
 import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsDescription
 import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsNumber
 import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsReadMore
+import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsRequestedAmount
+import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsRequestedAmountContainer
+import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsRequestedAmountFiat
 import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsTimeline
 import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsTitle
 import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsToolbar
@@ -61,6 +60,7 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
         referendumDetailsToolbar.setHomeButtonListener {
             viewModel.backClicked()
         }
+        referendumDetailsRequestedAmountContainer.background = getRoundedCornerDrawable(R.color.white_8)
         referendumDetailsTrack.background = getRoundedCornerDrawable(R.color.white_16, cornerSizeDp = 8)
             .withRippleMask(getRippleMask(cornerSizeDp = 8))
         referendumDetailsNumber.background = getRoundedCornerDrawable(R.color.white_16, cornerSizeDp = 8)
@@ -75,44 +75,60 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
         referendumDetailsNumber.text = "#256"
         referendumDetailsTrack.setOnClickListener {}
         referendumDetailsNumber.setOnClickListener {}
-        referendumDetailsAddress.setAddress(ShapeDrawable(), "Address")
+        referendumDetailsAddress.setAddress(context!!.getDrawable(R.drawable.ic_fire)!!, "Address")
         referendumDetailsAddress.setOnClickListener { }
         referendumDetailsTitle.text = "Oh mine!"
-        referendumDetailsDescription.text = "Sovereign Nature Initiative (SNI) is a non-profit foundation that has brought together multiple partners and engineers from the Kusama ecosystem including Kodadot, Unique Network, Kilt Protocol, Momentum, and Ocean Protocol, to support the building of Web3 capacities for wildlife"
+        referendumDetailsDescription.text = "Sovereign Nature Initiative (SNI) is a non-profit foundation that has brought together multiple partners and " +
+            "engineers from the Kusama ecosystem including Kodadot, Unique Network, Kilt Protocol, Momentum, and Ocean Protocol, to support the building of " +
+            "Web3 capacities for wildlife"
         referendumDetailsReadMore.setOnClickListener { }
+        referendumDetailsRequestedAmount.text = "1,158.47 KSM"
+        referendumDetailsRequestedAmountFiat.text = "\$51,158.3"
         referendumDetailsYourVote.setVoteType(R.string.referendum_vote_positive_type, R.color.green)
         referendumDetailsYourVote.setVoteValue("60 votes", "10 KSM x 6x")
         referendumDetailsVotingStatus.setStatus("Executed", R.color.multicolor_green_100)
-        referendumDetailsVotingStatus.setTimeEstimation("3:10:22", R.drawable.ic_fire, R.color.yellow)
-        referendumDetailsVotingStatus.setThreshold(VotingThresholdView.ThresholdModel(
-            "Threshold: 0.8",
-            R.drawable.ic_red_cross,
-            R.color.red,
-            0.8f,
-            0.9f,
-            "80%",
-            "90%",
-            "10%"
-        ))
-        referendumDetailsVotingStatus.setPositiveVoters(VotersView.VotersModel(
-            R.string.referendum_vote_positive_type, R.color.green, "60", "12222"
-        ))
+        referendumDetailsVotingStatus.setTimeEstimation("Execute in 00:09:31", R.drawable.ic_fire, R.color.yellow)
+        referendumDetailsVotingStatus.setThreshold(
+            VotingThresholdView.ThresholdModel(
+                "Threshold: 16,492 of 15,392.5 KSM ",
+                R.drawable.ic_close,
+                R.color.red,
+                0.8f,
+                0.9f,
+                "Aye: 17.5%",
+                "To pass: 20%",
+                "Nay: 82.5%"
+            )
+        )
+        referendumDetailsVotingStatus.setPositiveVoters(
+            VotersView.VotersModel(
+                R.string.referendum_vote_positive_type,
+                R.color.green,
+                "638 voters",
+                "1,398 votes"
+            )
+        )
         referendumDetailsVotingStatus.setPositiveVotersClickListener {}
 
-        referendumDetailsVotingStatus.setNegativeVoters(VotersView.VotersModel(
-            R.string.referendum_vote_negative_type, R.color.red, "10", "2000"
-        ))
+        referendumDetailsVotingStatus.setNegativeVoters(
+            VotersView.VotersModel(
+                R.string.referendum_vote_negative_type,
+                R.color.red,
+                "28 voter",
+                "1,398 votes"
+            )
+        )
         referendumDetailsVotingStatus.setNegativeVotersClickListener {}
-
+        referendumDetailsVotingStatus.showDetails(false)
         referendumDetailsDappList.addDApp("Title", "Subtitle", null) {}
         referendumDetailsDappList.addDApp("Title", "Subtitle", null) {}
         referendumDetailsTimeline.setTimeline(
             TimelineLayout.Timeline(
                 listOf(
-                    TimelineLayout.TimelineState("Start", "at 4:00", R.drawable.ic_info_16, R.color.yellow),
-                    TimelineLayout.TimelineState("Start", "at 4:00", R.drawable.ic_info_16, R.color.yellow)
+                    TimelineLayout.TimelineState("Start", "Sept 1, 2022 04:44:31", R.drawable.ic_info_16, R.color.yellow),
+                    TimelineLayout.TimelineState("Executed", "Reject in 18 days", null, R.color.white_64)
                 ),
-                true
+                false
             )
         )
         referendumFullDetails.setOnClickListener { }
@@ -129,6 +145,5 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
     }
 
     override fun subscribe(viewModel: ReferendumDetailsViewModel) {
-
     }
 }

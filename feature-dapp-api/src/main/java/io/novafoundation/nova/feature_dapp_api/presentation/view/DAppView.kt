@@ -71,11 +71,12 @@ class DAppView @JvmOverloads constructor(
         itemDappAction.setOnClickListener(listener)
     }
 
-    fun setActionResource(@DrawableRes iconRes: Int?) {
+    fun setActionResource(@DrawableRes iconRes: Int?, @ColorRes colorRes: Int? = null) {
         if (iconRes == null) {
             itemDappAction.setImageDrawable(null)
         } else {
             itemDappAction.setImageResource(iconRes)
+            itemDappAction.setImageTintRes(colorRes)
         }
     }
 

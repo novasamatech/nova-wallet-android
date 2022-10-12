@@ -20,6 +20,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginStart="26dp"
+        android:gravity="center_vertical"
         android:includeFontPadding="false"
         android:textColor="@color/white_64"
         tools:text="RTTI-5220" />

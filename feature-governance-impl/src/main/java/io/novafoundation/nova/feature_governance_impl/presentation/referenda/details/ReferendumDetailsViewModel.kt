@@ -7,7 +7,7 @@ class ReferendumDetailsViewModel(
     private val router: GovernanceRouter,
     private val payload: ReferendumDetailsPayload
 ) : BaseViewModel() {
-    
+
     fun backClicked() {
         router.back()
     }

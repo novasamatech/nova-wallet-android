@@ -63,6 +63,7 @@
 
     <string name="referendum_details_full_details">Full details</string>
     <string name="voting_status">Voting status</string>
+    <string name="referendum_details_requested_amount">Requested amount</string>
 
     <string name="crowdloan_contributions_liquid_source">Liquid</string>
     <string name="crowdloan_contributions_parallel_source">Parallel</string>

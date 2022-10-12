@@ -34,6 +34,7 @@
         android:includeFontPadding="false"
         android:maxLines="1"
         android:singleLine="true"
+        android:textColor="@color/white"
         app:layout_constraintBottom_toTopOf="@+id/itemDAppSubtitle"
         app:layout_constraintEnd_toStartOf="@+id/itemDappAction"
         app:layout_constraintHorizontal_bias="0.5"
