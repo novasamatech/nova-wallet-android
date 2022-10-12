@@ -4,10 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     android:orientation="vertical">
 
     <io.novafoundation.nova.common.view.Toolbar
-        android:id="@+id/currencyToolbar"
+        android:id="@+id/referendumDetailsToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:dividerVisible="false"
@@ -25,7 +26,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="6dp"
-                tools:background="@color/white_8"
+                tools:background="@color/white_16"
                 tools:drawableStart="@drawable/ic_info_16"
                 tools:text="MAIN TRACK" />
 
@@ -35,7 +36,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
-                tools:background="@color/white_8"
+                tools:background="@color/white_16"
                 tools:text="#255" />
         </LinearLayout>
 
@@ -44,9 +45,10 @@
     <androidx.core.widget.NestedScrollView
         android:id="@+id/referendumDetailsScrollView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:overScrollMode="never"
-        app:layout_constraintTop_toBottomOf="@+id/currencyToolbar">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/referendumDetailsToolbar">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -54,20 +56,27 @@
             android:clipToPadding="false"
             android:orientation="vertical"
             android:paddingHorizontal="16dp"
-            android:paddingVertical="16dp">
+            android:paddingTop="8dp"
+            android:paddingBottom="24dp">
 
             <io.novafoundation.nova.common.view.AddressView
+                android:id="@+id/referendumDetailsAddress"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:minHeight="20dp"
+                android:paddingVertical="8dp"
+                android:paddingEnd="4dp" />
 
             <TextView
+                android:id="@+id/referendumDetailsTitle"
                 style="@style/TextAppearance.NovaFoundation.Bold.Title1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 tools:text="Polkadot and Kusama participation in the 10th Pais Digital Chile Summit." />
 
             <TextView
+                android:id="@+id/referendumDetailsDescription"
                 style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -78,29 +87,32 @@
                 tools:text="Sovereign Nature Initiative (SNI) is a non-profit foundation that has brought together multiple partners and engineers from the Kusama ecosystem including Kodadot, Unique Network, Kilt Protocol, Momentum, and Ocean Protocol, to support the building of Web3 capacities for wildlife" />
 
             <TextView
+                android:id="@+id/referendumDetailsReadMore"
                 style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:gravity="center_vertical"
                 android:includeFontPadding="false"
-                android:paddingHorizontal="4dp"
                 android:paddingVertical="7dp"
                 android:text="@string/common_read_more"
                 android:textColor="@color/accentBlue"
-                tools:drawableEnd="@drawable/ic_chevron_right"
-                tools:drawableTint="@color/accentBlue" />
+                app:drawableEndCompat="@drawable/ic_chevron_right"
+                app:drawableTint="@color/accentBlue" />
 
             <io.novafoundation.nova.feature_governance_impl.presentation.view.YourVoteView
+                android:id="@+id/referendumDetailsYourVote"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <io.novafoundation.nova.feature_governance_impl.presentation.view.VotesViewOverview
+            <io.novafoundation.nova.feature_governance_impl.presentation.view.VotingStatusView
+                android:id="@+id/referendumDetailsVotingStatus"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp" />
 
             <io.novafoundation.nova.feature_governance_impl.presentation.view.ReferendumDappList
+                android:id="@+id/referendumDetailsDappList"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp" />
@@ -128,7 +140,8 @@
                     style="@style/DefaultTimelineLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp" />
+                    android:layout_marginTop="8dp"
+                    android:paddingBottom="20dp" />
 
             </LinearLayout>
 
@@ -147,7 +160,7 @@
                     android:layout_gravity="center_vertical"
                     android:layout_marginVertical="17dp"
                     android:layout_marginStart="16dp"
-                    android:text="Full details"
+                    android:text="@string/referendum_details_full_details"
                     android:textColor="@color/accentBlue" />
 
                 <ImageView

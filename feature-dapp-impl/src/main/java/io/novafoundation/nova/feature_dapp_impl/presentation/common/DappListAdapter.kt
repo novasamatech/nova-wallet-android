@@ -19,7 +19,7 @@ class DappListAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DappViewHolder {
-        return DappViewHolder(DAppView.createMathParentWidth(parent.context), handler)
+        return DappViewHolder(DAppView.createUsingMathParentWidth(parent.context), handler)
     }
 
     override fun onBindViewHolder(holder: DappViewHolder, position: Int) {

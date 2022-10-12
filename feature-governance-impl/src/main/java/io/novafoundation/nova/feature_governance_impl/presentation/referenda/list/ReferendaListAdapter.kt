@@ -31,16 +31,11 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.lis
 import kotlinx.android.synthetic.main.item_referenda_group.view.itemReferendaGroupCounter
 import kotlinx.android.synthetic.main.item_referenda_group.view.itemReferendaGroupStatus
 import kotlinx.android.synthetic.main.item_referendum.view.itemReferendumName
-import kotlinx.android.synthetic.main.item_referendum.view.itemReferendumNegativePercentage
 import kotlinx.android.synthetic.main.item_referendum.view.itemReferendumNumber
-import kotlinx.android.synthetic.main.item_referendum.view.itemReferendumPercentageDetailsGroup
-import kotlinx.android.synthetic.main.item_referendum.view.itemReferendumPositivePercentage
 import kotlinx.android.synthetic.main.item_referendum.view.itemReferendumStatus
-import kotlinx.android.synthetic.main.item_referendum.view.itemReferendumThresholdInfo
-import kotlinx.android.synthetic.main.item_referendum.view.itemReferendumThresholdPercentage
+import kotlinx.android.synthetic.main.item_referendum.view.itemReferendumThreshold
 import kotlinx.android.synthetic.main.item_referendum.view.itemReferendumTimeEstimate
 import kotlinx.android.synthetic.main.item_referendum.view.itemReferendumTrack
-import kotlinx.android.synthetic.main.item_referendum.view.itemReferendumVotesView
 import kotlinx.android.synthetic.main.item_referendum.view.itemReferendumYourVoiceGroup
 import kotlinx.android.synthetic.main.item_referendum.view.itemReferendumYourVoteDetails
 import kotlinx.android.synthetic.main.item_referendum.view.itemReferendumYourVoteType
@@ -182,17 +177,10 @@ private class ReferendumChildHolder(
 
     private fun setVoting(voting: ReferendumVotingModel?) = with(containerView) {
         val hasVotingInfo = voting != null
-        itemReferendumThresholdInfo.isVisible = hasVotingInfo
-        itemReferendumVotesView.isVisible = hasVotingInfo
-        itemReferendumPercentageDetailsGroup.isVisible = hasVotingInfo
+        itemReferendumThreshold.isVisible = hasVotingInfo
 
         if (voting != null) {
-            itemReferendumThresholdInfo.setDrawableStart(voting.votingResultIcon, widthInDp = 16, paddingInDp = 4, tint = voting.votingResultIconColor)
-            itemReferendumThresholdInfo.text = voting.thresholdInfo
-            itemReferendumVotesView.setModel(voting)
-            itemReferendumPositivePercentage.text = voting.positivePercentage
-            itemReferendumThresholdPercentage.text = voting.thresholdPercentage
-            itemReferendumNegativePercentage.text = voting.negativePercentage
+            itemReferendumThreshold.setModel(voting)
         }
     }
 

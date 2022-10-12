@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsViewModel
 
@@ -18,9 +19,10 @@ class ReferendumDetailsModule {
     @IntoMap
     @ViewModelKey(ReferendumDetailsViewModel::class)
     fun provideViewModel(
+        router: GovernanceRouter,
         payload: ReferendumDetailsPayload
     ): ViewModel {
-        return ReferendumDetailsViewModel(payload)
+        return ReferendumDetailsViewModel(router, payload)
     }
 
     @Provides

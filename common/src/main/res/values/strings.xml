@@ -61,6 +61,9 @@
 
     <string name="referendum_dapp_list_title">Use Nova DApp browser</string>
 
+    <string name="referendum_details_full_details">Full details</string>
+    <string name="voting_status">Voting status</string>
+
     <string name="crowdloan_contributions_liquid_source">Liquid</string>
     <string name="crowdloan_contributions_parallel_source">Parallel</string>
 

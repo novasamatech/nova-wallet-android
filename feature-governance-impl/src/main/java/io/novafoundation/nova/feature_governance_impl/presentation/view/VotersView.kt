@@ -24,8 +24,14 @@ class VotersView @JvmOverloads constructor(
 
     init {
         View.inflate(context, R.layout.view_voters, this)
-        background = getRoundedCornerDrawable(R.color.transparent).withRipple()
+        setBackgroundResource(R.drawable.bg_primary_list_item)
         votersViewVotesCount.setDrawableEnd(R.drawable.ic_info_16, widthInDp = 16, tint = R.color.white_48, paddingInDp = 8)
+    }
+
+    fun setVotersModel(model: VotersModel) {
+        setVoteType(model.voteTypeRes, model.voteTypeColorRes)
+        setVotersValue(model.votersValue)
+        setVotesValue(model.votesValue)
     }
 
     fun setVoteType(@StringRes voteTypeRes: Int, @ColorRes voteColorRes: Int) {
@@ -40,4 +46,11 @@ class VotersView @JvmOverloads constructor(
     fun setVotesValue(value: String) {
         votersViewVotesCount.text = value
     }
+
+    class VotersModel(
+        @StringRes val voteTypeRes: Int,
+        @ColorRes val voteTypeColorRes: Int,
+        val votersValue: String,
+        val votesValue: String
+    )
 }

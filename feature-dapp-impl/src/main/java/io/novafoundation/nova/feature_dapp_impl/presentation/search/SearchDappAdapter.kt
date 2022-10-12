@@ -28,7 +28,7 @@ class SearchDappAdapter(
     }
 
     override fun createChildViewHolder(parent: ViewGroup): GroupedListHolder {
-        return SearchHolder(DAppView.createMathParentWidth(parent.context), handler)
+        return SearchHolder(DAppView.createUsingMathParentWidth(parent.context), handler)
     }
 
     override fun bindGroup(holder: GroupedListHolder, group: TextHeader) {

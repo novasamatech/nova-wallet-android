@@ -18,7 +18,7 @@ class AuthorizedDAppAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AuthorizedDAppViewHolder {
-        return AuthorizedDAppViewHolder(DAppView.createMathParentWidth(parent.context), handler)
+        return AuthorizedDAppViewHolder(DAppView.createUsingMathParentWidth(parent.context), handler)
     }
 
     override fun onBindViewHolder(holder: AuthorizedDAppViewHolder, position: Int) {

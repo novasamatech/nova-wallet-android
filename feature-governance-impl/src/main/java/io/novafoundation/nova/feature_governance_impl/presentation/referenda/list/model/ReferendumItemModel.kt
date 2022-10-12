@@ -6,6 +6,7 @@ import androidx.annotation.StringRes
 import io.novafoundation.nova.common.utils.formatting.TimerValue
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_impl.presentation.view.VotesView
+import io.novafoundation.nova.feature_governance_impl.presentation.view.VotingThresholdView
 
 data class ReferendaGroupModel(val name: String, val badge: String)
 
@@ -50,8 +51,8 @@ sealed class ReferendumTimeEstimation {
 data class ReferendumVotingModel(
     val positiveFraction: Float?,
     val thresholdFraction: Float,
-    val votingResultIcon: Int,
-    val votingResultIconColor: Int,
+    @DrawableRes val votingResultIcon: Int,
+    @ColorRes val votingResultIconColor: Int,
     val thresholdInfo: String,
     val positivePercentage: String,
     val negativePercentage: String,
@@ -59,6 +60,20 @@ data class ReferendumVotingModel(
 )
 
 data class YourVoteModel(val voteType: String, @ColorRes val colorRes: Int, val details: String)
+
+fun VotingThresholdView.setModel(voting: ReferendumVotingModel) {
+    val thresholdModel = VotingThresholdView.ThresholdModel(
+        voting.thresholdInfo,
+        voting.votingResultIcon,
+        voting.votingResultIconColor,
+        voting.positiveFraction,
+        voting.thresholdFraction,
+        voting.positivePercentage,
+        voting.negativePercentage,
+        voting.thresholdPercentage
+    )
+    setThresholdModel(thresholdModel)
+}
 
 fun VotesView.setModel(voting: ReferendumVotingModel) {
     setPositiveVotesFraction(voting.positiveFraction)

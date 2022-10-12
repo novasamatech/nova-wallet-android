@@ -27,7 +27,7 @@ class DAppView @JvmOverloads constructor(
 ) : ConstraintLayout(context, attrs, defStyle) {
 
     companion object {
-        fun createMathParentWidth(context: Context): DAppView {
+        fun createUsingMathParentWidth(context: Context): DAppView {
             return DAppView(context).apply {
                 layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
             }
