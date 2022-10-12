@@ -5,7 +5,6 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import io.novafoundation.nova.common.utils.formatting.TimerValue
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
-import io.novafoundation.nova.feature_governance_impl.presentation.view.VotesView
 import io.novafoundation.nova.feature_governance_impl.presentation.view.VotingThresholdView
 
 data class ReferendaGroupModel(val name: String, val badge: String)
@@ -73,9 +72,4 @@ fun VotingThresholdView.setModel(voting: ReferendumVotingModel) {
         voting.thresholdPercentage
     )
     setThresholdModel(thresholdModel)
-}
-
-fun VotesView.setModel(voting: ReferendumVotingModel) {
-    setPositiveVotesFraction(voting.positiveFraction)
-    setThreshold(voting.thresholdFraction)
 }
