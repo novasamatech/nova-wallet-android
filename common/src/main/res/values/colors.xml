@@ -74,6 +74,4 @@
     <color name="pms_black">#2D2926</color>
 
     <color name="textInactive">@color/white_32</color>
-
-    <color name="transparent">#00000000</color>
 </resources>
