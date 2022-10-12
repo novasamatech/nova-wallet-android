@@ -26,6 +26,8 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.list.Refe
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumVoting
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.passes
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendaGroupModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumStatusModel
@@ -52,6 +54,7 @@ class ReferendaListViewModel(
     private val selectedAssetSharedState: SingleAssetSharedState,
     private val resourceManager: ResourceManager,
     private val updateSystem: UpdateSystem,
+    private val governanceRouter: GovernanceRouter
 ) : BaseViewModel(), WithAssetSelector {
 
     private val oneDay = 1.days
@@ -80,6 +83,11 @@ class ReferendaListViewModel(
     init {
         updateSystem.start()
             .launchIn(this)
+    }
+
+    fun openReferendum(referendum: ReferendumModel) {
+        val payload = ReferendumDetailsPayload(referendum.id)
+        governanceRouter.openReferendum(payload)
     }
 
     private fun mapReferendumGroupToUi(referendumGroup: ReferendumGroup, groupSize: Int): ReferendaGroupModel {

@@ -51,7 +51,7 @@ class ReferendaListAdapter(
 
     interface Handler {
 
-        fun onReferendaClick()
+        fun onReferendaClick(referendum: ReferendumModel)
     }
 
     override fun createGroupViewHolder(parent: ViewGroup): GroupedListHolder {
@@ -103,7 +103,7 @@ private class ReferendaGroupHolder(containerView: View) : GroupedListHolder(cont
 }
 
 private class ReferendumChildHolder(
-    handler: ReferendaListAdapter.Handler,
+    private val eventHandler: ReferendaListAdapter.Handler,
     containerView: View,
 ) : GroupedListHolder(containerView) {
 
@@ -115,9 +115,7 @@ private class ReferendumChildHolder(
         }
     }
 
-    fun bind(
-        item: ReferendumModel,
-    ) = with(containerView) {
+    fun bind(item: ReferendumModel) = with(containerView) {
         itemReferendumName.text = item.name
         setStatus(item.status)
         setTimeEstimation(item.timeEstimation)
@@ -125,6 +123,8 @@ private class ReferendumChildHolder(
         setNumber(item.number)
         setVoting(item.voting)
         setYourVote(item.yourVote)
+
+        itemView.setOnClickListener { eventHandler.onReferendaClick(item) }
     }
 
     private fun setStatus(status: ReferendumStatusModel) = with(containerView) {
