@@ -23,8 +23,7 @@ import java.math.BigInteger
  * or there is a child chain account which have child.accountId = accountId
  */
 @Language("RoomSql")
-private const val FIND_BY_ADDRESS_QUERY = """
-        SELECT * FROM meta_accounts 
+private const val FIND_BY_ADDRESS_WHERE_CLAUSE = """
         WHERE substrateAccountId = :accountId
         OR ethereumAddress = :accountId
         OR  id = (
@@ -34,6 +33,18 @@ private const val FIND_BY_ADDRESS_QUERY = """
             )
         ORDER BY (CASE WHEN isSelected THEN 0 ELSE 1 END)
     """
+
+@Language("RoomSql")
+private const val FIND_ACCOUNT_BY_ADDRESS_QUERY = """
+            SELECT * FROM meta_accounts 
+            $FIND_BY_ADDRESS_WHERE_CLAUSE
+"""
+
+@Language("RoomSql")
+private const val FIND_NAME_BY_ADDRESS_QUERY = """
+            SELECT name FROM meta_accounts 
+            $FIND_BY_ADDRESS_WHERE_CLAUSE
+"""
 
 @Language("RoomSql")
 private const val META_ACCOUNTS_WITH_BALANCE_QUERY = """
@@ -91,12 +102,16 @@ interface MetaAccountDao {
     @Transaction
     fun selectedMetaAccountInfoFlow(): Flow<RelationJoinedMetaAccountInfo?>
 
-    @Query("SELECT EXISTS ($FIND_BY_ADDRESS_QUERY)")
+    @Query("SELECT EXISTS ($FIND_ACCOUNT_BY_ADDRESS_QUERY)")
     fun isMetaAccountExists(accountId: AccountId): Boolean
 
-    @Query(FIND_BY_ADDRESS_QUERY)
+    @Query(FIND_ACCOUNT_BY_ADDRESS_QUERY)
     @Transaction
     fun getMetaAccountInfo(accountId: AccountId): RelationJoinedMetaAccountInfo?
+
+    @Query(FIND_NAME_BY_ADDRESS_QUERY)
+    @Transaction
+    fun metaAccountNameFor(accountId: AccountId): String?
 
     @Query("UPDATE meta_accounts SET name = :newName WHERE id = :metaId")
     suspend fun updateName(metaId: Long, newName: String)

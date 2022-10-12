@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.data.parachainStaking.reposi
 
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.utils.parachainStaking
-import io.novafoundation.nova.feature_staking_api.domain.api.AccountIdMap
+import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.RoundIndex
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.CollatorSnapshot
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.RoundInfo

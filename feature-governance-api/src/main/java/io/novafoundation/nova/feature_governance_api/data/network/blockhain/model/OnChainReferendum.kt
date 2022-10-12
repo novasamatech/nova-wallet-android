@@ -25,7 +25,8 @@ sealed class OnChainReferendumStatus {
         val proposal: Proposal,
         val desiredEnactment: DispatchTime,
         val submitted: BlockNumber,
-        val decisionDeposit: DecisionDeposit?,
+        val submissionDeposit: ReferendumDeposit,
+        val decisionDeposit: ReferendumDeposit?,
         val deciding: DecidingStatus?,
         val tally: Tally,
         val inQueue: Boolean,
@@ -67,7 +68,7 @@ class Tally(
     val support: Balance
 )
 
-class DecisionDeposit(
+class ReferendumDeposit(
     val who: AccountId,
     val amount: Balance
 )

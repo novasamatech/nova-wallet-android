@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.domain.validators
 
 import io.novafoundation.nova.common.utils.toHexAccountId
-import io.novafoundation.nova.feature_staking_api.domain.api.AccountIdMap
-import io.novafoundation.nova.feature_staking_api.domain.api.IdentityRepository
+import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
+import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.domain.api.getActiveElectedValidatorsExposures
 import io.novafoundation.nova.feature_staking_api.domain.model.Exposure
@@ -23,7 +23,7 @@ sealed class ValidatorSource {
 
 class ValidatorProvider(
     private val stakingRepository: StakingRepository,
-    private val identityRepository: IdentityRepository,
+    private val identityRepository: OnChainIdentityRepository,
     private val rewardCalculatorFactory: RewardCalculatorFactory,
     private val stakingConstantsRepository: StakingConstantsRepository,
 ) {

@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_staking_api.domain.api
+package io.novafoundation.nova.feature_account_api.data.model
 
 typealias AccountIdMap<V> = Map<String, V>
 typealias AccountAddressMap<V> = Map<String, V>

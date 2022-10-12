@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.unbondings
 
 import io.novafoundation.nova.common.utils.Identifiable
-import io.novafoundation.nova.feature_staking_api.domain.api.IdentityRepository
-import io.novafoundation.nova.feature_staking_api.domain.model.Identity
+import io.novafoundation.nova.feature_account_api.data.model.OnChainIdentity
+import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.ScheduledDelegationRequest
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.redeemableIn
@@ -24,7 +24,7 @@ import kotlin.time.ExperimentalTime
 
 class DelegationRequestWithCollatorInfo(
     val request: ScheduledDelegationRequest,
-    val collatorIdentity: Identity?,
+    val collatorIdentity: OnChainIdentity?,
 ) : Identifiable {
 
     override val identifier by lazy { request.collator.toHexString() }
@@ -35,7 +35,7 @@ class ParachainStakingUnbondingsInteractor(
     private val delegatorStateRepository: DelegatorStateRepository,
     private val currentRoundRepository: CurrentRoundRepository,
     private val roundDurationEstimator: RoundDurationEstimator,
-    private val identityRepository: IdentityRepository,
+    private val identityRepository: OnChainIdentityRepository,
 ) {
 
     suspend fun pendingUnbondings(delegatorState: DelegatorState.Delegator): List<DelegationRequestWithCollatorInfo> = withContext(Dispatchers.Default) {

@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common
 
-import io.novafoundation.nova.feature_staking_api.domain.api.AccountIdMap
-import io.novafoundation.nova.feature_staking_api.domain.api.IdentityRepository
+import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
+import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.CollatorSnapshot
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.minimumStakeToGetRewards
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CandidatesRepository
@@ -36,7 +36,7 @@ interface CollatorProvider {
 }
 
 class RealCollatorProvider(
-    private val identityRepository: IdentityRepository,
+    private val identityRepository: OnChainIdentityRepository,
     private val currentRoundRepository: CurrentRoundRepository,
     private val parachainStakingConstantsRepository: ParachainStakingConstantsRepository,
     private val candidatesRepository: CandidatesRepository,

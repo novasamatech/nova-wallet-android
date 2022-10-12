@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_governance_api.domain.referendum.details
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.PreImage
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
+import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumProposer
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumTrack
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumVoting
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumStatus
@@ -11,6 +12,7 @@ data class ReferendumDetails(
     val id: ReferendumId,
     val offChainMetadata: OffChainMetadata?,
     val onChainMetadata: OnChainMetadata?,
+    val proposer: ReferendumProposer?,
     val track: ReferendumTrack?,
     val voting: ReferendumVoting?,
     val userVote: AccountVote?,

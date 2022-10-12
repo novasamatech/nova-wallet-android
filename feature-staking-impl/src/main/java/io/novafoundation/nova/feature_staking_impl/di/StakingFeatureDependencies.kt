@@ -18,6 +18,7 @@ import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
@@ -124,4 +125,6 @@ interface StakingFeatureDependencies {
     val timestampRepository: TimestampRepository
 
     val totalIssuanceRepository: TotalIssuanceRepository
+
+    val onChainIdentityRepository: OnChainIdentityRepository
 }

@@ -1,13 +1,13 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.mappers
 
 import io.novafoundation.nova.common.utils.castOrNull
-import io.novafoundation.nova.feature_staking_api.domain.model.ChildIdentity
-import io.novafoundation.nova.feature_staking_api.domain.model.Identity
-import io.novafoundation.nova.feature_staking_api.domain.model.RootIdentity
+import io.novafoundation.nova.feature_account_api.data.model.ChildIdentity
+import io.novafoundation.nova.feature_account_api.data.model.OnChainIdentity
+import io.novafoundation.nova.feature_account_api.data.model.RootIdentity
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.model.IdentityModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.IdentityParcelModel
 
-fun mapIdentityToIdentityParcelModel(identity: Identity): IdentityParcelModel {
+fun mapIdentityToIdentityParcelModel(identity: OnChainIdentity): IdentityParcelModel {
     return with(identity) {
         val childInfo = identity.castOrNull<ChildIdentity>()?.let {
             IdentityParcelModel.ChildInfo(
@@ -20,7 +20,7 @@ fun mapIdentityToIdentityParcelModel(identity: Identity): IdentityParcelModel {
     }
 }
 
-fun mapIdentityParcelModelToIdentity(identity: IdentityParcelModel): Identity {
+fun mapIdentityParcelModelToIdentity(identity: IdentityParcelModel): OnChainIdentity {
     return with(identity) {
         if (childInfo != null) {
             val parent = RootIdentity(childInfo.parentSeparateDisplay, legal, web, riot, email, pgpFingerprint, image, twitter)

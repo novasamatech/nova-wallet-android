@@ -6,6 +6,9 @@ import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.mixin.MixinFactory
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
+import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
+import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_governance_api.data.repository.PreImageRepository
 import io.novafoundation.nova.feature_governance_api.data.repository.TreasuryRepository
@@ -20,6 +23,7 @@ import io.novafoundation.nova.feature_governance_impl.di.modules.GovernanceV2
 import io.novafoundation.nova.feature_governance_impl.di.modules.GovernanceV2Module
 import io.novafoundation.nova.feature_governance_impl.di.modules.screens.ReferendumDetailsModule
 import io.novafoundation.nova.feature_governance_impl.di.modules.screens.ReferendumListModule
+import io.novafoundation.nova.feature_governance_impl.domain.identity.GovernanceIdentityProviderFactory
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.RealReferendaConstructor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.ReferendaConstructor
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
@@ -123,4 +127,14 @@ class GovernanceFeatureModule {
         governanceSourceRegistry: GovernanceSourceRegistry,
         chainStateRepository: ChainStateRepository
     ): ReferendaConstructor = RealReferendaConstructor(governanceSourceRegistry, chainStateRepository)
+
+    @Provides
+    @FeatureScope
+    fun provideGovernanceIdentityProviderFactory(
+        @LocalIdentity localProvider: IdentityProvider,
+        @OnChainIdentity onChainProvider: IdentityProvider
+    ): GovernanceIdentityProviderFactory = GovernanceIdentityProviderFactory(
+        localProvider = localProvider,
+        onChainProvider = onChainProvider
+    )
 }
