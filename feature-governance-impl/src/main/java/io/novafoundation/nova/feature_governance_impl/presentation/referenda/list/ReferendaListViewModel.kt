@@ -13,18 +13,21 @@ import io.novafoundation.nova.common.utils.formatting.remainingTime
 import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.isAye
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.votes
+import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumTrack
+import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumVoting
+import io.novafoundation.nova.feature_governance_api.domain.referendum.common.passes
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.PreparingReason.DecidingIn
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.PreparingReason.WaitingForDeposit
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaListInteractor
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumGroup
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumPreview
+import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumProposal
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumStatus
-import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumVoting
-import io.novafoundation.nova.feature_governance_api.domain.referendum.list.passes
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsPayload
@@ -42,6 +45,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelecto
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.selectedChainFlow
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlin.time.Duration.Companion.days
@@ -67,7 +71,9 @@ class ReferendaListViewModel(
     private val accountAndChainFlow = combineToPair(selectedAccount, selectedChainFlow)
 
     private val referendaFlow = accountAndChainFlow.withLoading { (account, chain) ->
-        referendaListInteractor.referendaFlow(account, chain)
+        val accountId = account.accountIdIn(chain)
+
+        referendaListInteractor.referendaFlow(accountId, chain)
     }
 
     val referendaUiFlow = referendaFlow.mapLoading { groupedReferenda ->
@@ -106,15 +112,31 @@ class ReferendaListViewModel(
         return ReferendumModel(
             id = referendum.id,
             status = mapReferendumStatusToUi(referendum.status),
-            name = referendum.offChainMetadata?.title
-                ?: referendum.onChainMetadata?.proposalHash
-                ?: resourceManager.getString(R.string.referendum_name_unknown),
+            name = mapReferendumNameToUi(referendum),
             timeEstimation = maReferendumTimeEstimationToUi(referendum.status),
             track = referendum.track?.let(::mapReferendumTrackToUi),
             number = mapReferendumIdToUi(referendum.id),
             voting = referendum.voting?.let { mapReferendumVotingToUi(it, token) },
             yourVote = mapUserVoteToUi(referendum.userVote, token)
         )
+    }
+
+    private fun mapReferendumNameToUi(referendum: ReferendumPreview): String {
+        return referendum.offChainMetadata?.title
+            ?: mapReferendumOnChainNameToUi(referendum)
+            ?: resourceManager.getString(R.string.referendum_name_unknown)
+    }
+
+    private fun mapReferendumOnChainNameToUi(referendum: ReferendumPreview): String? {
+        return when (val proposal = referendum.onChainMetadata?.proposal) {
+            is ReferendumProposal.Call -> proposal.call.formattedName()
+            is ReferendumProposal.Hash -> proposal.callHash
+            null -> null
+        }
+    }
+
+    private fun GenericCall.Instance.formattedName(): String {
+        return "${module.name}.${function.name}"
     }
 
     private fun mapReferendumIdToUi(id: ReferendumId): String {
@@ -137,18 +159,18 @@ class ReferendaListViewModel(
 
     private fun mapReferendumVotingToUi(voting: ReferendumVoting, token: Token): ReferendumVotingModel {
         return ReferendumVotingModel(
-            positiveFraction = voting.approval.ayeFraction.toFloat(),
+            positiveFraction = voting.approval.ayeVotes.fraction.toFloat(),
             thresholdFraction = voting.approval.threshold.toFloat(),
             votingResultIcon = if (voting.support.passes()) R.drawable.ic_checkmark else R.drawable.ic_close,
             votingResultIconColor = if (voting.support.passes()) R.color.multicolor_green_100 else R.color.multicolor_red_100,
             thresholdInfo = formatThresholdInfo(voting.support, token),
             positivePercentage = resourceManager.getString(
                 R.string.referendum_aye_format,
-                voting.approval.ayeFraction.formatFractionAsPercentage()
+                voting.approval.ayeVotes.fraction.formatFractionAsPercentage()
             ),
             negativePercentage = resourceManager.getString(
                 R.string.referendum_nay_format,
-                voting.approval.nayFraction.formatFractionAsPercentage()
+                voting.approval.nayVotes.fraction.formatFractionAsPercentage()
             ),
             thresholdPercentage = resourceManager.getString(
                 R.string.referendum_to_pass_format,
@@ -167,7 +189,7 @@ class ReferendaListViewModel(
         return resourceManager.getString(R.string.referendum_support_threshold_format, turnoutFormatted, thresholdFormatted)
     }
 
-    private fun mapReferendumTrackToUi(track: ReferendumPreview.Track): ReferendumTrackModel {
+    private fun mapReferendumTrackToUi(track: ReferendumTrack): ReferendumTrackModel {
         return when (track.name) {
             "root" -> ReferendumTrackModel(
                 name = resourceManager.getString(R.string.referendum_track_root),

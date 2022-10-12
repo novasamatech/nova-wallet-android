@@ -249,6 +249,10 @@ fun <T> flowOf(producer: suspend () -> T) = flow {
     emit(producer())
 }
 
+fun <T> flowOfAll(producer: suspend () -> Flow<T>): Flow<T> = flow {
+    emitAll(producer())
+}
+
 fun <T> List<Flow<T>>.accumulate(): Flow<List<T>> {
     return accumulate(*this.toTypedArray())
 }
