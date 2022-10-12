@@ -41,7 +41,7 @@ interface ReferendaConstructor {
         currentBlockNumber: BlockNumber
     ): Map<ReferendumId, ReferendumStatus>
 
-    suspend fun constructPastTimeLine(
+    suspend fun constructPastTimeline(
         chain: Chain,
         onChainReferendum: OnChainReferendum,
         calculatedStatus: ReferendumStatus,
@@ -149,7 +149,7 @@ class RealReferendaConstructor(
         )
     }
 
-    override suspend fun constructPastTimeLine(
+    override suspend fun constructPastTimeline(
         chain: Chain,
         onChainReferendum: OnChainReferendum,
         calculatedStatus: ReferendumStatus,

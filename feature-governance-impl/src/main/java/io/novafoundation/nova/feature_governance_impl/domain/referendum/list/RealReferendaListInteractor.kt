@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_governance_impl.domain.referendum.list
 
 import io.novafoundation.nova.common.list.GroupedList
+import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.OnChainReferendum
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Proposal
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
@@ -28,8 +29,6 @@ import jp.co.soramitsu.fearless_utils.extensions.requireHexPrefix
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 
 class RealReferendaListInteractor(
@@ -41,9 +40,7 @@ class RealReferendaListInteractor(
 ) : ReferendaListInteractor {
 
     override fun referendaFlow(voterAccountId: AccountId?, chain: Chain): Flow<GroupedList<ReferendumGroup, ReferendumPreview>> {
-        return flow {
-            emitAll(referendaFlowSuspend(voterAccountId, chain))
-        }
+        return flowOfAll { referendaFlowSuspend(voterAccountId, chain) }
     }
 
     private suspend fun referendaFlowSuspend(voterAccountId: AccountId?, chain: Chain): Flow<GroupedList<ReferendumGroup, ReferendumPreview>> {

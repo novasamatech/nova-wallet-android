@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.common.utils.preImage
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.PreImage
+import io.novafoundation.nova.feature_governance_api.data.repository.HexHash
 import io.novafoundation.nova.feature_governance_api.data.repository.PreImageRepository
 import io.novafoundation.nova.feature_governance_api.data.repository.PreImageRequest
 import io.novafoundation.nova.feature_governance_api.data.repository.PreImageRequest.FetchCondition
@@ -55,7 +56,7 @@ class RealPreImageRepository(
         }
     }
 
-    override suspend fun getPreimagesFor(requests: Collection<PreImageRequest>, chainId: ChainId): Map<String, PreImage?> {
+    override suspend fun getPreimagesFor(requests: Collection<PreImageRequest>, chainId: ChainId): Map<HexHash, PreImage?> {
         return remoteSource.query(chainId) {
             val storage = runtime.metadata.preImageForStorage()
             val shouldKnowSizes = requests.associateBy(
@@ -120,7 +121,7 @@ class RealPreImageRepository(
         return runtime.metadata.preImage().storage("StatusFor").query(callHash, binding = ::bindPreImageLength)
     }
 
-    private suspend fun StorageQueryContext.fetchPreImagesLength(callHashes: Collection<ByteArray>): Map<String, BigInteger?> {
+    private suspend fun StorageQueryContext.fetchPreImagesLength(callHashes: Collection<ByteArray>): Map<HexHash, BigInteger?> {
         return runtime.metadata.preImage().storage("StatusFor").entries(
             keysArguments = callHashes.wrapSingleArgumentKeys(),
             keyExtractor = { (callHash: ByteArray) -> callHash.toHexString() },

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.domain.referendum.details
 
+import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.PreImage
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Proposal
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
@@ -27,8 +28,6 @@ import jp.co.soramitsu.fearless_utils.extensions.tryFindNonNull
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flow
 
 class RealReferendumDetailsInteractor(
     private val preImageParsers: Collection<ReferendumCallParser>,
@@ -44,9 +43,7 @@ class RealReferendumDetailsInteractor(
         chain: Chain,
         voterAccountId: AccountId?,
     ): Flow<ReferendumDetails> {
-        return flow {
-            emitAll(referendumDetailsFlowSuspend(referendumId, chain, voterAccountId))
-        }
+        return flowOfAll { referendumDetailsFlowSuspend(referendumId, chain, voterAccountId) }
     }
 
     override suspend fun detailsFor(preImage: PreImage, chain: Chain): ReferendumCall? {
@@ -104,7 +101,7 @@ class RealReferendumDetailsInteractor(
                 ),
                 timeline = ReferendumTimeline(
                     currentStatus = currentStatus,
-                    pastEntries = offChainInfo?.pastTimeline ?: referendaConstructor.constructPastTimeLine(
+                    pastEntries = offChainInfo?.pastTimeline ?: referendaConstructor.constructPastTimeline(
                         chain = chain,
                         onChainReferendum = onChainReferendum,
                         calculatedStatus = currentStatus,
