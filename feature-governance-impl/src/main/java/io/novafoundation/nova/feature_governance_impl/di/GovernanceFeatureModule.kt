@@ -7,15 +7,21 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.mixin.MixinFactory
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_governance_api.data.repository.PreImageRepository
+import io.novafoundation.nova.feature_governance_api.data.repository.TreasuryRepository
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
-import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaListInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
+import io.novafoundation.nova.feature_governance_impl.data.repository.RealPreImageRepository
+import io.novafoundation.nova.feature_governance_impl.data.repository.RealTreasuryRepository
 import io.novafoundation.nova.feature_governance_impl.data.source.RealGovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_impl.di.modules.GovernanceUpdatersModule
 import io.novafoundation.nova.feature_governance_impl.di.modules.GovernanceV2
 import io.novafoundation.nova.feature_governance_impl.di.modules.GovernanceV2Module
-import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.RealReferendaListInteractor
+import io.novafoundation.nova.feature_governance_impl.di.modules.screens.ReferendumDetailsModule
+import io.novafoundation.nova.feature_governance_impl.di.modules.screens.ReferendumListModule
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.RealReferendaConstructor
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.ReferendaConstructor
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.AssetUseCaseImpl
@@ -26,11 +32,20 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelecto
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
+import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
-import io.novafoundation.nova.runtime.repository.TotalIssuanceRepository
+import io.novafoundation.nova.runtime.storage.source.StorageDataSource
+import javax.inject.Named
 
-@Module(includes = [GovernanceV2Module::class, GovernanceUpdatersModule::class])
+@Module(
+    includes = [
+        GovernanceV2Module::class,
+        GovernanceUpdatersModule::class,
+        ReferendumDetailsModule::class,
+        ReferendumListModule::class
+    ]
+)
 class GovernanceFeatureModule {
 
     @Provides
@@ -92,13 +107,20 @@ class GovernanceFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideReferendaListInteractor(
-        chainStateRepository: ChainStateRepository,
+    fun providePreImageRepository(
+        @Named(REMOTE_STORAGE_SOURCE) storageSource: StorageDataSource
+    ): PreImageRepository = RealPreImageRepository(storageSource)
+
+    @Provides
+    @FeatureScope
+    fun provideTreasuryRepository(
+        @Named(REMOTE_STORAGE_SOURCE) storageSource: StorageDataSource
+    ): TreasuryRepository = RealTreasuryRepository(storageSource)
+
+    @Provides
+    @FeatureScope
+    fun provideReferendumConstructor(
         governanceSourceRegistry: GovernanceSourceRegistry,
-        totalIssuanceRepository: TotalIssuanceRepository,
-    ): ReferendaListInteractor = RealReferendaListInteractor(
-        chainStateRepository = chainStateRepository,
-        governanceSourceRegistry = governanceSourceRegistry,
-        totalIssuanceRepository = totalIssuanceRepository
-    )
+        chainStateRepository: ChainStateRepository
+    ): ReferendaConstructor = RealReferendaConstructor(governanceSourceRegistry, chainStateRepository)
 }

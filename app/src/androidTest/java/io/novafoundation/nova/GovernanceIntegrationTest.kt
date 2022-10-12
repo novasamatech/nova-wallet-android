@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.childScope
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
+import java.math.BigInteger
 
 
 class GovernanceIntegrationTest : BaseIntegrationTest() {
@@ -64,7 +66,7 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
     }
 
     @Test
-    fun shouldRetrieveDomainReferenda() = runBlocking<Unit> {
+    fun shouldRetrieveDomainReferendaPreviews() = runBlocking<Unit> {
         val childScope = childScope()
 
         val referendaListInteractor = governanceApi.referendaListInteractor
@@ -76,9 +78,40 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
 
         val accountId = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".toAccountId()
 
-        val referenda = referendaListInteractor.referendaFlow(accountId).first()
+        val referendaByGroup = referendaListInteractor.referendaFlow(accountId, chain()).first()
+        val referenda = referendaByGroup.values.flatten()
 
-        Log.d(this@GovernanceIntegrationTest.LOG_TAG, referenda.joinToString("\n"))
+        Log.d(this@GovernanceIntegrationTest.LOG_TAG,referenda.joinToString("\n"))
+
+        childScope.cancel()
+    }
+
+    @Test
+    fun shouldRetrieveDomainReferendumDetails() = runBlocking<Unit> {
+        val childScope = childScope()
+
+        val referendumDetailsInteractor = governanceApi.referendumDetailsInteractor
+        val updateSystem = governanceApi.governanceUpdateSystem
+
+        updateSystem.start()
+            .inBackground()
+            .launchIn(childScope)
+
+        val accountId = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".toAccountId()
+        val referendumId = ReferendumId(BigInteger.ZERO)
+        val chain = chain()
+
+        val referendumDetails = referendumDetailsInteractor.referendumDetailsFlow(referendumId, chain, accountId)
+            .first()
+
+        Log.d(this@GovernanceIntegrationTest.LOG_TAG, referendumDetails.toString())
+
+        val callDetails = referendumDetailsInteractor.detailsFor(
+            preImage = referendumDetails.onChainMetadata!!.preImage,
+            chain = chain
+        )
+
+        Log.d(this@GovernanceIntegrationTest.LOG_TAG, callDetails.toString())
 
         childScope.cancel()
     }

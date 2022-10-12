@@ -10,6 +10,8 @@ import kotlin.time.Duration.Companion.milliseconds
 interface BlockDurationEstimator {
 
     fun durationUntil(block: BlockNumber): Duration
+
+    fun timestampOf(block: BlockNumber): Long
 }
 
 fun BlockDurationEstimator.timerUntil(block: BlockNumber): TimerValue {
@@ -33,5 +35,14 @@ internal class RealBlockDurationEstimator(
         val millisInFuture = blocksInFuture * blockTimeMillis
 
         return millisInFuture.toLong().milliseconds
+    }
+
+    override fun timestampOf(block: BlockNumber): Long {
+        val offsetInBlocks = block - currentBlock
+        val offsetInMillis = offsetInBlocks * blockTimeMillis
+
+        val currentTime = System.currentTimeMillis()
+
+        return currentTime + offsetInMillis.toLong()
     }
 }
