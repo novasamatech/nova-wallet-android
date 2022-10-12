@@ -11,11 +11,11 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
-import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.SelectAddressCommunicator
-import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.SelectAddressRequester
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressCommunicator
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressForTransactionRequester
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountWithChainAddressListingMixinFactory
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountValidForTransactionListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.selecting.SelectAddressViewModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -28,8 +28,8 @@ class SelectAddressModule {
         resourceManager: ResourceManager,
         chainRegistry: ChainRegistry,
         metaAccountGroupingInteractor: MetaAccountGroupingInteractor
-    ): MetaAccountWithChainAddressListingMixinFactory {
-        return MetaAccountWithChainAddressListingMixinFactory(
+    ): MetaAccountValidForTransactionListingMixinFactory {
+        return MetaAccountValidForTransactionListingMixinFactory(
             walletUiUseCase = walletUiUseCase,
             resourceManager = resourceManager,
             chainRegistry = chainRegistry,
@@ -41,11 +41,11 @@ class SelectAddressModule {
     @IntoMap
     @ViewModelKey(SelectAddressViewModel::class)
     fun provideViewModel(
-        accountListingMixinFactory: MetaAccountWithChainAddressListingMixinFactory,
+        accountListingMixinFactory: MetaAccountValidForTransactionListingMixinFactory,
         router: AccountRouter,
         selectAddressCommunicator: SelectAddressCommunicator,
         accountInteractor: AccountInteractor,
-        request: SelectAddressRequester.Request
+        request: SelectAddressForTransactionRequester.Request
     ): ViewModel {
         return SelectAddressViewModel(
             accountListingMixinFactory = accountListingMixinFactory,

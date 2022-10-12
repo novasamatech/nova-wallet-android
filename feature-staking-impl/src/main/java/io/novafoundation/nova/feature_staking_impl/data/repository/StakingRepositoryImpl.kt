@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.NonNullBinderW
 import io.novafoundation.nova.common.data.network.runtime.binding.returnType
 import io.novafoundation.nova.common.utils.constant
 import io.novafoundation.nova.common.utils.numberConstant
+import io.novafoundation.nova.common.utils.numberConstantOrNull
 import io.novafoundation.nova.common.utils.staking
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.model.AccountStakingLocal
@@ -94,11 +95,16 @@ class StakingRepositoryImpl(
         chainId = chainId
     )
 
-    override suspend fun getHistoryDepth(chainId: ChainId): BigInteger = localStorage.queryNonNull(
-        keyBuilder = { it.metadata.staking().storage("HistoryDepth").storageKey() },
-        binding = ::bindHistoryDepth,
-        chainId = chainId
-    )
+    override suspend fun getHistoryDepth(chainId: ChainId): BigInteger {
+        val runtime = runtimeFor(chainId)
+        val fromConstants = runtime.metadata.staking().numberConstantOrNull("HistoryDepth", runtime)
+
+        return fromConstants ?: localStorage.queryNonNull(
+            keyBuilder = { it.metadata.staking().storage("HistoryDepth").storageKey() },
+            binding = ::bindHistoryDepth,
+            chainId = chainId
+        )
+    }
 
     override fun observeActiveEraIndex(chainId: String) = localStorage.observeNonNull(
         chainId = chainId,
