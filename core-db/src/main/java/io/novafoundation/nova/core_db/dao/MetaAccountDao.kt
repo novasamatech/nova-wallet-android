@@ -110,7 +110,6 @@ interface MetaAccountDao {
     fun getMetaAccountInfo(accountId: AccountId): RelationJoinedMetaAccountInfo?
 
     @Query(FIND_NAME_BY_ADDRESS_QUERY)
-    @Transaction
     fun metaAccountNameFor(accountId: AccountId): String?
 
     @Query("UPDATE meta_accounts SET name = :newName WHERE id = :metaId")
