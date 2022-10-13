@@ -92,7 +92,7 @@ class ReferendaListViewModel(
     }
 
     fun openReferendum(referendum: ReferendumModel) {
-        val payload = ReferendumDetailsPayload(referendum.id)
+        val payload = ReferendumDetailsPayload(referendum.id.value)
         governanceRouter.openReferendum(payload)
     }
 
