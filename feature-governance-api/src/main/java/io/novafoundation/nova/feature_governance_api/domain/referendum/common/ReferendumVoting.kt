@@ -10,7 +10,8 @@ data class ReferendumVoting(
 
     data class Support(
         val threshold: Balance,
-        val turnout: Balance
+        val turnout: Balance,
+        val electorate: Balance
     )
 
     data class Approval(

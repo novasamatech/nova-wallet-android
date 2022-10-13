@@ -4,8 +4,11 @@ import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.PreImage
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Proposal
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.asOngoing
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.flattenCastingVotes
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.hash
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.proposal
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.proposerDeposit
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.submissionDeposit
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.track
 import io.novafoundation.nova.feature_governance_api.data.repository.PreImageRepository
@@ -116,15 +119,25 @@ class RealReferendumDetailsInteractor(
                         currentBlockNumber = currentBlockNumber
                     )
                 ),
-                userVote = vote
+                userVote = vote,
+                fullDetails =  ReferendumDetails.FullDetails(
+                    deposit = onChainReferendum.status.asOngoing().proposerDeposit(),
+                    approvalCurve = track?.minApproval,
+                    supportCurve = track?.minSupport,
+                )
             )
         }
     }
 }
 
-private suspend fun PreImageRepository.preImageOf(proposal: Proposal?, chainId: ChainId): PreImage? {
+private suspend fun PreImageRepository.preImageOf(
+    proposal: Proposal?,
+    chainId: ChainId,
+): PreImage? {
     return when (proposal) {
-        is Proposal.Inline -> PreImage(proposal.call)
+        is Proposal.Inline -> {
+            PreImage(encodedCall = proposal.encodedCall, call = proposal.call, callHash = proposal.hash())
+        }
         is Proposal.Legacy -> {
             val request = PreImageRequest(proposal.hash, knownSize = null, fetchIf = ALWAYS)
             getPreimageFor(request, chainId)

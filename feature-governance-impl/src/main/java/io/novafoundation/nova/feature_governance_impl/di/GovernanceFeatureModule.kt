@@ -15,6 +15,8 @@ import io.novafoundation.nova.feature_governance_api.data.repository.TreasuryRep
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
+import io.novafoundation.nova.feature_governance_impl.data.preimage.PreImageSizer
+import io.novafoundation.nova.feature_governance_impl.data.preimage.RealPreImageSizer
 import io.novafoundation.nova.feature_governance_impl.data.repository.RealPreImageRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.RealTreasuryRepository
 import io.novafoundation.nova.feature_governance_impl.data.source.RealGovernanceSourceRegistry
@@ -112,8 +114,9 @@ class GovernanceFeatureModule {
     @Provides
     @FeatureScope
     fun providePreImageRepository(
-        @Named(REMOTE_STORAGE_SOURCE) storageSource: StorageDataSource
-    ): PreImageRepository = RealPreImageRepository(storageSource)
+        @Named(REMOTE_STORAGE_SOURCE) storageSource: StorageDataSource,
+        preImageSizer: PreImageSizer,
+    ): PreImageRepository = RealPreImageRepository(storageSource, preImageSizer)
 
     @Provides
     @FeatureScope
@@ -137,4 +140,8 @@ class GovernanceFeatureModule {
         localProvider = localProvider,
         onChainProvider = onChainProvider
     )
+
+    @Provides
+    @FeatureScope
+    fun providePreImageSizer(): PreImageSizer = RealPreImageSizer()
 }
