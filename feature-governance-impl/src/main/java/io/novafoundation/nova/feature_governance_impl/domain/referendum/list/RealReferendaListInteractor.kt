@@ -114,7 +114,7 @@ class RealReferendaListInteractor(
                 when (val proposal = it.proposal()) {
                     is Proposal.Inline -> ReferendumProposal.Call(proposal.call)
                     is Proposal.Lookup, is Proposal.Legacy -> {
-                        val hashHex = proposal.hash()!!.toHexString()
+                        val hashHex = proposal.hash().toHexString()
                         val preImage = preImages[hashHex]
 
                         if (preImage != null) {

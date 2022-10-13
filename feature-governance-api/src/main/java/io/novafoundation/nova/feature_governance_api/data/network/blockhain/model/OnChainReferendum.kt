@@ -47,7 +47,7 @@ sealed class Proposal {
 
     class Legacy(val hash: ByteArray) : Proposal()
 
-    class Inline(val call: GenericCall.Instance) : Proposal()
+    class Inline(val encodedCall: ByteArray, val call: GenericCall.Instance) : Proposal()
 
     class Lookup(val hash: ByteArray, val callLength: BigInteger) : Proposal()
 }

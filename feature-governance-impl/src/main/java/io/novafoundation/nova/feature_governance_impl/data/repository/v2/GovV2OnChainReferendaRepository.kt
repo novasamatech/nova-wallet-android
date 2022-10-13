@@ -168,7 +168,7 @@ class GovV2OnChainReferendaRepository(
                 val bytes = bindByteArray(asEnum.value)
                 val call = GenericCall.fromByteArray(runtime, bytes)
 
-                Proposal.Inline(call)
+                Proposal.Inline(bytes, call)
             }
             "Lookup" -> {
                 val valueAsStruct = asEnum.value.castToStruct()

@@ -90,7 +90,8 @@ class RealReferendaConstructor(
         return ReferendumVoting(
             support = ReferendumVoting.Support(
                 threshold = track.supportThreshold(elapsedSinceDecidingFraction, totalIssuance),
-                turnout = status.tally.support
+                turnout = status.tally.support,
+                electorate = totalIssuance
             ),
             approval = ReferendumVoting.Approval(
                 ayeVotes = status.tally.ayeVotes(),

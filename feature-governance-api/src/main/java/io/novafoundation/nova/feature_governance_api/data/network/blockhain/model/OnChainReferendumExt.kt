@@ -3,16 +3,19 @@ package io.novafoundation.nova.feature_governance_api.data.network.blockhain.mod
 import io.novafoundation.nova.common.data.network.runtime.binding.Perbill
 import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.common.utils.divideToDecimal
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumVoting.Approval
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import jp.co.soramitsu.fearless_utils.hash.Hasher.blake2b256
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
 fun OnChainReferendum.proposal(): Proposal? {
     return status.asOngoingOrNull()?.proposal
 }
 
-fun Proposal.hash(): ByteArray? {
+fun Proposal.hash(): ByteArray {
     return when (this) {
-        is Proposal.Inline -> null
+        is Proposal.Inline -> encodedCall.blake2b256()
         is Proposal.Legacy -> hash
         is Proposal.Lookup -> hash
     }
@@ -59,6 +62,23 @@ fun Map<TrackId, Voting>.flattenCastingVotes(): Map<ReferendumId, AccountVote> {
             Voting.Delegating -> emptyList()
         }
     }.toMap()
+}
+
+val OnChainReferendumStatus.Ongoing.proposer: AccountId
+    get() = submissionDeposit.who
+
+fun OnChainReferendumStatus.Ongoing.proposerDeposit(): Balance {
+    return depositBy(proposer)
+}
+
+fun OnChainReferendumStatus.Ongoing.depositBy(accountId: AccountId): Balance {
+    return submissionDeposit.amountBy(accountId) + decisionDeposit.amountBy(accountId)
+}
+
+fun ReferendumDeposit?.amountBy(accountId: AccountId): Balance {
+    if (this == null) return Balance.ZERO
+
+    return amount.takeIf { who.contentEquals(accountId) }.orZero()
 }
 
 @Suppress("FunctionName")

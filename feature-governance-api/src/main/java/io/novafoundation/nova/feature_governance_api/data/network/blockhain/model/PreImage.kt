@@ -2,5 +2,4 @@ package io.novafoundation.nova.feature_governance_api.data.network.blockhain.mod
 
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
 
-@JvmInline
-value class PreImage(val call: GenericCall.Instance)
+class PreImage(val encodedCall: ByteArray, val call: GenericCall.Instance, val callHash: ByteArray)

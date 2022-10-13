@@ -206,6 +206,9 @@ fun buildByteArray(block: (ByteArrayOutputStream) -> Unit): ByteArray = ByteArra
 
 fun String.toUuid() = UUID.fromString(this)
 
+val Int.kilobytes: BigInteger
+    get() = this.toBigInteger() * 1024.toBigInteger()
+
 operator fun ByteArray.compareTo(other: ByteArray): Int {
     if (size != other.size) {
         return size - other.size
