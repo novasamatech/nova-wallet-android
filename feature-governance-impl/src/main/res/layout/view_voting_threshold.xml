@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    tools:background="@color/black"
+    tools:parentTag="android.widget.LinearLayout">
+
+    <TextView
+        android:id="@+id/thresholdInfo"
+        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:includeFontPadding="false"
+        android:textColor="@color/white_64"
+        tools:text="Threshold: 16,492 of 15,392.5 KSM " />
+
+    <io.novafoundation.nova.feature_governance_impl.presentation.view.VotesView
+        android:id="@+id/votesView"
+        style="@style/DefaultVotesView"
+        android:layout_width="match_parent"
+        android:layout_height="25dp" />
+
+    <FrameLayout
+        android:id="@+id/percentageDetailsGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/positivePercentage"
+            style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:textColor="@color/white_64"
+            tools:text="Aye: 80%" />
+
+        <TextView
+            android:id="@+id/thresholdPercentage"
+            style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textColor="@color/white_64"
+            tools:text="To pass: 50%" />
+
+        <TextView
+            android:id="@+id/negativePercentage"
+            style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:textColor="@color/white_64"
+            tools:text="Nay: 20%" />
+    </FrameLayout>
+
+</merge>

@@ -14,6 +14,7 @@ import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaListInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
+import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.ReferendaListViewModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorMixin
 
@@ -29,7 +30,8 @@ class ReferendaListModule {
         selectedAccountUseCase: SelectedAccountUseCase,
         selectedAssetSharedState: GovernanceSharedState,
         resourceManager: ResourceManager,
-        updateSystem: UpdateSystem
+        updateSystem: UpdateSystem,
+        governanceRouter: GovernanceRouter
     ): ViewModel {
         return ReferendaListViewModel(
             assetSelectorFactory = assetSelectorFactory,
@@ -37,7 +39,8 @@ class ReferendaListModule {
             selectedAccountUseCase = selectedAccountUseCase,
             selectedAssetSharedState = selectedAssetSharedState,
             resourceManager = resourceManager,
-            updateSystem = updateSystem
+            updateSystem = updateSystem,
+            governanceRouter = governanceRouter
         )
     }
 

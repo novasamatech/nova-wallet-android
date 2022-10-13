@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.s
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DappPendingConfirmation
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DappPendingConfirmation.Action
-import io.novafoundation.nova.feature_dapp_impl.presentation.common.showDAppIcon
+import io.novafoundation.nova.feature_dapp_api.presentation.common.showDAppIcon
 import kotlinx.android.synthetic.main.bottom_sheet_confirm_authorize.confirmAuthorizeDappDApp
 import kotlinx.android.synthetic.main.bottom_sheet_confirm_authorize.confirmAuthorizeDappIcon
 import kotlinx.android.synthetic.main.bottom_sheet_confirm_authorize.confirmAuthorizeDappTitle

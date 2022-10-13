@@ -1,11 +1,15 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model
 
+import android.widget.TextView
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import io.novafoundation.nova.common.utils.formatting.TimerValue
+import io.novafoundation.nova.common.utils.setDrawableEnd
+import io.novafoundation.nova.common.utils.setTextColorRes
+import io.novafoundation.nova.common.view.startTimer
+import io.novafoundation.nova.common.view.stopTimer
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.VotesView
 
 data class ReferendaGroupModel(val name: String, val badge: String)
 
@@ -50,8 +54,8 @@ sealed class ReferendumTimeEstimation {
 data class ReferendumVotingModel(
     val positiveFraction: Float?,
     val thresholdFraction: Float,
-    val votingResultIcon: Int,
-    val votingResultIconColor: Int,
+    @DrawableRes val votingResultIcon: Int,
+    @ColorRes val votingResultIconColor: Int,
     val thresholdInfo: String,
     val positivePercentage: String,
     val negativePercentage: String,
@@ -60,7 +64,30 @@ data class ReferendumVotingModel(
 
 data class YourVoteModel(val voteType: String, @ColorRes val colorRes: Int, val details: String)
 
-fun VotesView.setModel(voting: ReferendumVotingModel) {
-    setPositiveVotesFraction(voting.positiveFraction)
-    setThreshold(voting.thresholdFraction)
+fun TextView.setReferendumTimeEstimation(timeEstimation: ReferendumTimeEstimation) {
+    when (timeEstimation) {
+        is ReferendumTimeEstimation.Text -> {
+            stopTimer()
+
+            text = timeEstimation.text
+            setReferendumTextStyle(timeEstimation.textStyle)
+        }
+
+        is ReferendumTimeEstimation.Timer -> {
+            setReferendumTextStyle(timeEstimation.textStyleRefresher())
+
+            startTimer(
+                value = timeEstimation.time,
+                customMessageFormat = timeEstimation.timeFormat,
+                onTick = { view, _ ->
+                    view.setReferendumTextStyle(timeEstimation.textStyleRefresher())
+                }
+            )
+        }
+    }
+}
+
+private fun TextView.setReferendumTextStyle(textStyle: ReferendumTimeEstimation.TextStyle) {
+    setTextColorRes(textStyle.colorRes)
+    setDrawableEnd(textStyle.iconRes, widthInDp = 16, paddingInDp = 4, tint = textStyle.colorRes)
 }

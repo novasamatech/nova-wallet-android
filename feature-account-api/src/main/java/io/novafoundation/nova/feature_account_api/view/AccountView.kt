@@ -13,21 +13,21 @@ import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.feature_account_api.R
-import kotlinx.android.synthetic.main.view_address.view.addressAction
-import kotlinx.android.synthetic.main.view_address.view.addressPrimaryIcon
-import kotlinx.android.synthetic.main.view_address.view.addressSubtitle
-import kotlinx.android.synthetic.main.view_address.view.addressTitle
+import kotlinx.android.synthetic.main.view_account.view.addressAction
+import kotlinx.android.synthetic.main.view_account.view.addressPrimaryIcon
+import kotlinx.android.synthetic.main.view_account.view.addressSubtitle
+import kotlinx.android.synthetic.main.view_account.view.addressTitle
 
 private const val SHOW_BACKGROUND_DEFAULT = true
 
-class AddressView @JvmOverloads constructor(
+class AccountView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr), WithContextExtensions by WithContextExtensions(context) {
 
     init {
-        View.inflate(context, R.layout.view_address, this)
+        View.inflate(context, R.layout.view_account, this)
 
         attrs?.let(::applyAttributes)
     }

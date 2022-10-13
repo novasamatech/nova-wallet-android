@@ -16,6 +16,18 @@
         <item name="minimumLineLength">3dp</item>
     </style>
 
+    <style name="ReferendumChip" parent="@style/TextAppearance.NovaFoundation.SemiBold.Caps1">
+        <item name="android:drawablePadding">6dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:minHeight">22dp</item>
+        <item name="android:paddingTop">3dp</item>
+        <item name="android:paddingBottom">3dp</item>
+        <item name="android:paddingStart">6dp</item>
+        <item name="android:paddingEnd">8dp</item>
+        <item name="android:textColor">@color/white_64</item>
+    </style>
+
     <style name="DefaultTimelineLayout">
         <item name="timelineDefaultColor">@color/accentBlue</item>
         <item name="timelineUnfinishedColor">@color/white_24</item>

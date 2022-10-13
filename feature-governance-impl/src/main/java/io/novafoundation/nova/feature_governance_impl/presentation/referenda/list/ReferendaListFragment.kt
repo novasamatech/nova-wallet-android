@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.subscribeOnAssetChange
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.subscribeOnAssetClick
 import kotlinx.android.synthetic.main.fragment_referenda_list.referendaList
@@ -76,7 +77,8 @@ class ReferendaListFragment : BaseFragment<ReferendaListViewModel>(), ReferendaL
         }
     }
 
-    override fun onReferendaClick() {
+    override fun onReferendaClick(referendum: ReferendumModel) {
+        viewModel.openReferendum(referendum)
     }
 
     override fun onClickAssetSelector() {

@@ -111,7 +111,7 @@ class TimelineLayout @JvmOverloads constructor(
         }
 
         timelineFinishedPath.reset()
-        if (timeline.finished && timelineStatePoints.isNotEmpty()) {
+        if (!timeline.finished && timelineStatePoints.isNotEmpty()) {
             val lastPoint = timelineStatePoints.last()
             timelineFinishedPath.moveTo(lastPoint.x, lastPoint.y + totalOffsetFromPointCenter)
             timelineFinishedPath.lineTo(lastPoint.x, measuredHeight.toFloat())

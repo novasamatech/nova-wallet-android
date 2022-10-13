@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
-import coil.ImageLoader
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseBottomSheetFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -21,7 +20,6 @@ import io.novafoundation.nova.feature_dapp_impl.domain.search.DappSearchResult
 import kotlinx.android.synthetic.main.fragment_search_dapp.searchDappList
 import kotlinx.android.synthetic.main.fragment_search_dapp.searchDappSearch
 import kotlinx.android.synthetic.main.fragment_search_dapp.searchDappSearhContainer
-import javax.inject.Inject
 
 class DappSearchFragment : BaseBottomSheetFragment<DAppSearchViewModel>(), SearchDappAdapter.Handler {
 
@@ -34,10 +32,7 @@ class DappSearchFragment : BaseBottomSheetFragment<DAppSearchViewModel>(), Searc
         )
     }
 
-    @Inject
-    lateinit var imageLoader: ImageLoader
-
-    private val adapter by lazy(LazyThreadSafetyMode.NONE) { SearchDappAdapter(imageLoader, this) }
+    private val adapter by lazy(LazyThreadSafetyMode.NONE) { SearchDappAdapter(this) }
 
     override fun onCreateView(
         inflater: LayoutInflater,

@@ -19,8 +19,8 @@
             style="@style/TextAppearance.NovaFoundation.SemiBold.Caps1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:includeFontPadding="false"
             android:layout_gravity="center_vertical"
+            android:includeFontPadding="false"
             tools:text="Passing" />
 
         <TextView
@@ -50,92 +50,29 @@
 
         <TextView
             android:id="@+id/itemReferendumTrack"
-            style="@style/TextAppearance.NovaFoundation.SemiBold.Caps1"
+            style="@style/ReferendumChip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:drawablePadding="6dp"
-            android:gravity="center_vertical"
-            android:includeFontPadding="false"
-            android:minHeight="22dp"
-            android:paddingVertical="3dp"
-            android:paddingStart="6dp"
             android:layout_marginEnd="6dp"
-            android:paddingEnd="8dp"
-            android:textColor="@color/white_64"
-            android:textSize="11sp"
             tools:background="@color/white_8"
             tools:drawableStart="@drawable/ic_info_16"
             tools:text="MAIN TRACK" />
 
         <TextView
             android:id="@+id/itemReferendumNumber"
-            style="@style/TextAppearance.NovaFoundation.SemiBold.Caps1"
+            style="@style/ReferendumChip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:drawablePadding="6dp"
-            android:gravity="center_vertical"
-            android:includeFontPadding="false"
-            android:minHeight="22dp"
-            android:paddingVertical="3dp"
-            android:paddingStart="6dp"
-            android:paddingEnd="8dp"
-            android:textAllCaps="true"
-            android:textColor="@color/white_64"
-            android:textSize="11sp"
             tools:background="@color/white_8"
             tools:text="#237" />
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/itemReferendumThresholdInfo"
-        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
-        android:layout_width="wrap_content"
+    <io.novafoundation.nova.feature_governance_impl.presentation.view.VotingThresholdView
+        android:id="@+id/itemReferendumThreshold"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="18dp"
-        android:includeFontPadding="false"
-        android:gravity="center_vertical"
-        android:textColor="@color/white_64"
-        tools:text="Threshold: 16,492 of 15,392.5 KSM " />
-
-    <io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.VotesView
-        android:id="@+id/itemReferendumVotesView"
-        style="@style/DefaultVotesView"
-        android:layout_width="match_parent"
-        android:layout_height="25dp" />
-
-    <FrameLayout
-        android:id="@+id/itemReferendumPercentageDetailsGroup"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:id="@+id/itemReferendumPositivePercentage"
-            style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            android:textColor="@color/white_64"
-            tools:text="Aye: 80%" />
-
-        <TextView
-            android:id="@+id/itemReferendumThresholdPercentage"
-            style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:textColor="@color/white_64"
-            tools:text="To pass: 50%" />
-
-        <TextView
-            android:id="@+id/itemReferendumNegativePercentage"
-            style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:textColor="@color/white_64"
-            tools:text="Nay: 20%" />
-    </FrameLayout>
+        android:layout_marginTop="16dp" />
 
     <FrameLayout
         android:id="@+id/itemReferendumYourVoiceGroup"

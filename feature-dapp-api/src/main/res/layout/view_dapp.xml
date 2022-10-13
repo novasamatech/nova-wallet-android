@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_primary_list_item"
-    tools:background="@color/black_48">
+    tools:background="@color/black_48"
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
     <ImageView
         android:id="@+id/itemDAppIcon"
@@ -33,6 +34,7 @@
         android:includeFontPadding="false"
         android:maxLines="1"
         android:singleLine="true"
+        android:textColor="@color/white"
         app:layout_constraintBottom_toTopOf="@+id/itemDAppSubtitle"
         app:layout_constraintEnd_toStartOf="@+id/itemDappAction"
         app:layout_constraintHorizontal_bias="0.5"
@@ -70,4 +72,4 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:src="@drawable/ic_heart_filled" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</merge>

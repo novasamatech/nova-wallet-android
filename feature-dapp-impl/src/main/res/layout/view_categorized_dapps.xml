@@ -91,7 +91,6 @@
 
     </com.facebook.shimmer.ShimmerFrameLayout>
 
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/categorizedDappsList"
         android:layout_width="match_parent"
@@ -100,6 +99,6 @@
         android:overScrollMode="never"
         android:visibility="gone"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/item_dapp"
+        tools:listitem="@layout/view_dapp"
         tools:visibility="visible" />
 </merge>
