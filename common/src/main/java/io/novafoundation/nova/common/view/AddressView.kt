@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.setDrawableEnd
 import kotlinx.android.synthetic.main.view_address.view.addressImage
@@ -38,4 +39,8 @@ class AddressView @JvmOverloads constructor(
             addressValue.setDrawableEnd(null)
         }
     }
+}
+
+fun AddressView.setModel(address: AddressModel) {
+    setAddress(address.image, address.nameOrAddress)
 }

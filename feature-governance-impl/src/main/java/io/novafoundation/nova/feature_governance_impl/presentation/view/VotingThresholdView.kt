@@ -4,10 +4,9 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
-import androidx.annotation.ColorRes
-import androidx.annotation.DrawableRes
 import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumVotingModel
 import kotlinx.android.synthetic.main.view_voting_threshold.view.negativePercentage
 import kotlinx.android.synthetic.main.view_voting_threshold.view.positivePercentage
 import kotlinx.android.synthetic.main.view_voting_threshold.view.thresholdInfo
@@ -25,24 +24,13 @@ class VotingThresholdView @JvmOverloads constructor(
         orientation = VERTICAL
     }
 
-    fun setThresholdModel(model: ThresholdModel) {
+    fun setThresholdModel(model: ReferendumVotingModel) {
         thresholdInfo.text = model.thresholdInfo
-        thresholdInfo.setDrawableStart(model.thresholdIconRes, widthInDp = 16, tint = model.thresholdIconColorRes, paddingInDp = 4)
+        thresholdInfo.setDrawableStart(model.votingResultIcon, widthInDp = 16, tint = model.votingResultIconColor, paddingInDp = 4)
         votesView.setThreshold(model.thresholdFraction)
-        votesView.setPositiveVotesFraction(model.positiveVotesFraction)
-        positivePercentage.text = model.positiveVotesPercentage
-        negativePercentage.text = model.negativeVotesPercentage
+        votesView.setPositiveVotesFraction(model.positiveFraction)
+        positivePercentage.text = model.positivePercentage
+        negativePercentage.text = model.negativePercentage
         thresholdPercentage.text = model.thresholdPercentage
     }
-
-    class ThresholdModel(
-        val thresholdInfo: String,
-        @DrawableRes val thresholdIconRes: Int,
-        @ColorRes val thresholdIconColorRes: Int,
-        val positiveVotesFraction: Float?,
-        val thresholdFraction: Float,
-        val positiveVotesPercentage: String,
-        val negativeVotesPercentage: String,
-        val thresholdPercentage: String
-    )
 }

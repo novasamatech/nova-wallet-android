@@ -5,13 +5,15 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
 import androidx.annotation.ColorRes
-import androidx.annotation.DrawableRes
 import androidx.core.view.isVisible
-import androidx.core.view.setPadding
 import io.novafoundation.nova.common.utils.WithContextExtensions
-import io.novafoundation.nova.common.utils.setDrawableEnd
+import io.novafoundation.nova.common.utils.makeGone
+import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumTimeEstimation
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumVotingModel
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.setReferendumTimeEstimation
 import kotlinx.android.synthetic.main.view_voting_status.view.negativeVotersDetails
 import kotlinx.android.synthetic.main.view_voting_status.view.positiveVotersDetails
 import kotlinx.android.synthetic.main.view_voting_status.view.votingStatus
@@ -23,7 +25,7 @@ class VotingStatusView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : LinearLayout(context, attrs, defStyle), WithContextExtensions {
+) : LinearLayout(context, attrs, defStyle), WithContextExtensions by WithContextExtensions(context) {
 
     override val providedContext: Context = context
 
@@ -36,10 +38,14 @@ class VotingStatusView @JvmOverloads constructor(
         setPadding(0, 16.dp, 0, 16.dp)
     }
 
-    fun setTimeEstimation(timeEstimation: String?, @DrawableRes icon: Int, @ColorRes colorRes: Int) {
-        votingStatusTimeEstimation.text = timeEstimation
-        votingStatusTimeEstimation.setTextColorRes(colorRes)
-        votingStatusTimeEstimation.setDrawableEnd(icon, widthInDp = 16, tint = colorRes, paddingInDp = 4)
+    fun setTimeEstimation(timeEstimation: ReferendumTimeEstimation?) {
+        if (timeEstimation == null) {
+            votingStatusTimeEstimation.makeGone()
+            return
+        }
+
+        votingStatusTimeEstimation.makeVisible()
+        votingStatusTimeEstimation.setReferendumTimeEstimation(timeEstimation)
     }
 
     fun setStatus(status: String, @ColorRes color: Int) {
@@ -47,7 +53,7 @@ class VotingStatusView @JvmOverloads constructor(
         votingStatus.setTextColorRes(color)
     }
 
-    fun setThreshold(thresholdModel: VotingThresholdView.ThresholdModel) {
+    fun setThreshold(thresholdModel: ReferendumVotingModel) {
         votingStatusThreshold.setThresholdModel(thresholdModel)
     }
 

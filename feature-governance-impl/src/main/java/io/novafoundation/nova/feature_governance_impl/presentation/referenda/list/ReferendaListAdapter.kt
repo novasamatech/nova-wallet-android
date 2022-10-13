@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_governance_impl.presentation.referenda.li
 
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.list.BaseGroupedDiffCallback
 import io.novafoundation.nova.common.list.GroupedListAdapter
@@ -10,15 +9,12 @@ import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
-import io.novafoundation.nova.common.utils.setDrawableEnd
 import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getBlurDrawable
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
-import io.novafoundation.nova.common.view.startTimer
-import io.novafoundation.nova.common.view.stopTimer
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendaGroupModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumModel
@@ -27,7 +23,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.lis
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumTrackModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumVotingModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.YourVoteModel
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.setModel
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.setReferendumTimeEstimation
 import kotlinx.android.synthetic.main.item_referenda_group.view.itemReferendaGroupCounter
 import kotlinx.android.synthetic.main.item_referenda_group.view.itemReferendaGroupStatus
 import kotlinx.android.synthetic.main.item_referendum.view.itemReferendumName
@@ -134,32 +130,7 @@ private class ReferendumChildHolder(
         }
 
         itemReferendumTimeEstimate.makeVisible()
-
-        when (timeEstimation) {
-            is ReferendumTimeEstimation.Text -> {
-                itemReferendumTimeEstimate.stopTimer()
-
-                itemReferendumTimeEstimate.text = timeEstimation.text
-                itemReferendumTimeEstimate.setReferendumTextStyle(timeEstimation.textStyle)
-            }
-
-            is ReferendumTimeEstimation.Timer -> {
-                itemReferendumTimeEstimate.setReferendumTextStyle(timeEstimation.textStyleRefresher())
-
-                itemReferendumTimeEstimate.startTimer(
-                    value = timeEstimation.time,
-                    customMessageFormat = timeEstimation.timeFormat,
-                    onTick = { view, _ ->
-                        view.setReferendumTextStyle(timeEstimation.textStyleRefresher())
-                    }
-                )
-            }
-        }
-    }
-
-    private fun TextView.setReferendumTextStyle(textStyle: ReferendumTimeEstimation.TextStyle) {
-        setTextColorRes(textStyle.colorRes)
-        setDrawableEnd(textStyle.iconRes, widthInDp = 16, paddingInDp = 4, tint = textStyle.colorRes)
+        itemReferendumTimeEstimate.setReferendumTimeEstimation(timeEstimation)
     }
 
     private fun setNumber(number: String) = with(containerView) {
@@ -180,7 +151,7 @@ private class ReferendumChildHolder(
         itemReferendumThreshold.isVisible = hasVotingInfo
 
         if (voting != null) {
-            itemReferendumThreshold.setModel(voting)
+            itemReferendumThreshold.setThresholdModel(voting)
         }
     }
 

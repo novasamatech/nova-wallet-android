@@ -13,9 +13,9 @@ import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumVotingModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.timeline.TimelineLayout
 import io.novafoundation.nova.feature_governance_impl.presentation.view.VotersView
-import io.novafoundation.nova.feature_governance_impl.presentation.view.VotingThresholdView
 import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsAddress
 import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsDappList
 import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsDescription
@@ -87,17 +87,16 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
         referendumDetailsYourVote.setVoteType(R.string.referendum_vote_positive_type, R.color.green)
         referendumDetailsYourVote.setVoteValue("60 votes", "10 KSM x 6x")
         referendumDetailsVotingStatus.setStatus("Executed", R.color.multicolor_green_100)
-        referendumDetailsVotingStatus.setTimeEstimation("Execute in 00:09:31", R.drawable.ic_fire, R.color.yellow)
         referendumDetailsVotingStatus.setThreshold(
-            VotingThresholdView.ThresholdModel(
-                "Threshold: 16,492 of 15,392.5 KSM ",
-                R.drawable.ic_close,
-                R.color.red,
+            ReferendumVotingModel(
                 0.8f,
                 0.9f,
+                R.drawable.ic_close,
+                R.color.red,
+                "Threshold: 16,492 of 15,392.5 KSM ",
                 "Aye: 17.5%",
-                "To pass: 20%",
-                "Nay: 82.5%"
+                "Nay: 82.5%",
+                "To pass: 20%"
             )
         )
         referendumDetailsVotingStatus.setPositiveVoters(

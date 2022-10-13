@@ -12,9 +12,7 @@ class ReferendumDappList @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : LinearLayout(context, attrs, defStyle), WithContextExtensions {
-
-    override val providedContext: Context = context
+) : LinearLayout(context, attrs, defStyle), WithContextExtensions by WithContextExtensions(context) {
 
     init {
         View.inflate(context, R.layout.view_referendum_dapp_list, this)

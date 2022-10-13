@@ -18,9 +18,7 @@ class VotersView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : ConstraintLayout(context, attrs, defStyle), WithContextExtensions {
-
-    override val providedContext: Context = context
+) : ConstraintLayout(context, attrs, defStyle), WithContextExtensions by WithContextExtensions(context) {
 
     init {
         View.inflate(context, R.layout.view_voters, this)
