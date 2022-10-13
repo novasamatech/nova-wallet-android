@@ -17,21 +17,20 @@ class ReferendumFullDetailsPayload(
     val preImage: PreImagePreviewPayload?
 ) : Parcelable
 
-
 sealed class ReferendumCallPayload : Parcelable {
 
     @Parcelize
     class TreasuryRequest(val amount: Balance, val beneficiary: AccountId) : ReferendumCallPayload()
 }
 
-sealed class PreImagePreviewPayload: Parcelable{
+sealed class PreImagePreviewPayload : Parcelable {
 
     @Parcelize
-    object TooLong: PreImagePreviewPayload()
+    object TooLong : PreImagePreviewPayload()
 
     @Parcelize
-    class Preview(val preview: String): PreImagePreviewPayload()
+    class Preview(val preview: String) : PreImagePreviewPayload()
 }
 
 @Parcelize
-class ReferendumProposerPayload(val accountId: AccountId, val offChainName: String?): Parcelable
+class ReferendumProposerPayload(val accountId: AccountId, val offChainName: String?) : Parcelable

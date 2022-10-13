@@ -120,7 +120,7 @@ class RealReferendumDetailsInteractor(
                     )
                 ),
                 userVote = vote,
-                fullDetails =  ReferendumDetails.FullDetails(
+                fullDetails = ReferendumDetails.FullDetails(
                     deposit = onChainReferendum.status.asOngoing().proposerDeposit(),
                     approvalCurve = track?.minApproval,
                     supportCurve = track?.minSupport,

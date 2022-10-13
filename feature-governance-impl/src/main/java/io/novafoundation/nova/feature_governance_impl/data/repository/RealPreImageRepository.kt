@@ -114,8 +114,9 @@ class RealPreImageRepository(
     private fun FetchCondition.shouldFetch(actualPreImageSize: BigInteger?): Boolean {
         return when (this) {
             FetchCondition.ALWAYS -> true
-            FetchCondition.SMALL_SIZE -> actualPreImageSize != null &&
-                preImageSizer.satisfiesSizeConstraint(actualPreImageSize, PreImageSizer.SizeConstraint.SMALL)
+            FetchCondition.SMALL_SIZE ->
+                actualPreImageSize != null &&
+                    preImageSizer.satisfiesSizeConstraint(actualPreImageSize, PreImageSizer.SizeConstraint.SMALL)
         }
     }
 

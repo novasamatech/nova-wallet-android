@@ -15,7 +15,7 @@ interface PreImageSizer {
 class RealPreImageSizer : PreImageSizer {
 
     override fun satisfiesSizeConstraint(preImageSize: BigInteger, constraint: PreImageSizer.SizeConstraint): Boolean {
-       return preImageSize < constraint.threshold
+        return preImageSize < constraint.threshold
     }
 
     private val PreImageSizer.SizeConstraint.threshold: BigInteger
