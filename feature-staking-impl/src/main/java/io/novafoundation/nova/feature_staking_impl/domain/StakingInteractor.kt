@@ -2,11 +2,11 @@ package io.novafoundation.nova.feature_staking_impl.domain
 
 import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.sumByBigInteger
+import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
+import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
-import io.novafoundation.nova.feature_staking_api.domain.api.AccountIdMap
-import io.novafoundation.nova.feature_staking_api.domain.api.IdentityRepository
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.domain.api.getActiveElectedValidatorsExposures
 import io.novafoundation.nova.feature_staking_api.domain.model.Exposure
@@ -55,31 +55,20 @@ import java.math.BigInteger
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
-const val HOURS_IN_DAY = 24
-
-class EraRelativeInfo(
-    val daysLeft: Int,
-    val daysPast: Int,
-    val erasLeft: BigInteger,
-    val erasPast: BigInteger,
-)
-
 val ERA_OFFSET = 1.toBigInteger()
 
-@OptIn(ExperimentalTime::class)
 class StakingInteractor(
     private val walletRepository: WalletRepository,
     private val accountRepository: AccountRepository,
     private val stakingRepository: StakingRepository,
     private val stakingRewardsRepository: StakingRewardsRepository,
     private val stakingConstantsRepository: StakingConstantsRepository,
-    private val identityRepository: IdentityRepository,
+    private val identityRepository: OnChainIdentityRepository,
     private val stakingSharedState: StakingSharedState,
     private val payoutRepository: PayoutRepository,
     private val assetUseCase: AssetUseCase,
     private val factory: EraTimeCalculatorFactory,
 ) {
-    @OptIn(ExperimentalTime::class)
     suspend fun calculatePendingPayouts(): Result<PendingPayoutsStatistics> = withContext(Dispatchers.Default) {
         runCatching {
             val currentStakingState = selectedAccountStakingStateFlow().first()

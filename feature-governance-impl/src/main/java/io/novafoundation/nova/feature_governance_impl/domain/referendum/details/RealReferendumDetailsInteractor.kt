@@ -6,12 +6,14 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.flattenCastingVotes
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.proposal
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.submissionDeposit
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.track
 import io.novafoundation.nova.feature_governance_api.data.repository.PreImageRepository
 import io.novafoundation.nova.feature_governance_api.data.repository.PreImageRequest
 import io.novafoundation.nova.feature_governance_api.data.repository.PreImageRequest.FetchCondition.ALWAYS
 import io.novafoundation.nova.feature_governance_api.data.repository.getTracksById
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
+import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumProposer
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumTrack
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumCall
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumDetails
@@ -88,8 +90,14 @@ class RealReferendumDetailsInteractor(
                 offChainMetadata = offChainInfo?.let {
                     ReferendumDetails.OffChainMetadata(
                         title = it.title,
-                        description = it.description
+                        description = it.description,
                     )
+                },
+                proposer = onChainReferendum.submissionDeposit()?.let { deposit ->
+                    val accountId = deposit.who
+                    val nickname = offChainInfo?.proposerName
+
+                    ReferendumProposer(accountId, nickname)
                 },
                 onChainMetadata = preImage?.let(ReferendumDetails::OnChainMetadata),
                 track = track?.let { ReferendumTrack(it.name) },

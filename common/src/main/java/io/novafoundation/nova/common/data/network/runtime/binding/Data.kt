@@ -1,12 +1,7 @@
-package io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings
+package io.novafoundation.nova.common.data.network.runtime.binding
 
-import io.novafoundation.nova.common.data.network.runtime.binding.HelperBinding
-import io.novafoundation.nova.common.data.network.runtime.binding.cast
-import io.novafoundation.nova.common.data.network.runtime.binding.incompatible
-import io.novafoundation.nova.common.data.network.runtime.binding.requireType
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.DictEnum
-
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Data as DataType
 
 sealed class Data {

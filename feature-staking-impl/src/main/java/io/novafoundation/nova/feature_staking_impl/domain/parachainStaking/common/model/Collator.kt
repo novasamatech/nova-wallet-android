@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.comm
 
 import io.novafoundation.nova.common.utils.Identifiable
 import io.novafoundation.nova.common.utils.orZero
-import io.novafoundation.nova.feature_staking_api.domain.model.Identity
+import io.novafoundation.nova.feature_account_api.data.model.OnChainIdentity
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.CandidateMetadata
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.CollatorSnapshot
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.PeriodReturns
@@ -13,7 +13,7 @@ import java.math.BigInteger
 class Collator(
     val accountIdHex: String,
     val address: String,
-    val identity: Identity?,
+    val identity: OnChainIdentity?,
     val snapshot: CollatorSnapshot?,
     val candidateMetadata: CandidateMetadata,
     val minimumStakeToGetRewards: BigInteger,

@@ -161,6 +161,10 @@ class AccountDataSourceImpl(
         }
     }
 
+    override suspend fun accountNameFor(accountId: AccountId): String? {
+        return metaAccountDao.metaAccountNameFor(accountId)
+    }
+
     override suspend fun allMetaAccounts(): List<MetaAccount> {
         val chainsById = chainRegistry.chainsById.first()
 

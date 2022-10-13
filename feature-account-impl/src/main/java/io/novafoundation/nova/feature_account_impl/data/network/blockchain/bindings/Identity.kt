@@ -1,55 +1,23 @@
-package io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings
+package io.novafoundation.nova.feature_account_impl.data.network.blockchain.bindings
 
 import io.novafoundation.nova.common.data.network.runtime.binding.HelperBinding
 import io.novafoundation.nova.common.data.network.runtime.binding.UseCaseBinding
+import io.novafoundation.nova.common.data.network.runtime.binding.bindData
 import io.novafoundation.nova.common.data.network.runtime.binding.cast
 import io.novafoundation.nova.common.data.network.runtime.binding.castToList
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.data.network.runtime.binding.incompatible
 import io.novafoundation.nova.common.utils.second
-import io.novafoundation.nova.feature_staking_api.domain.model.Identity
-import io.novafoundation.nova.feature_staking_api.domain.model.RootIdentity
-import io.novafoundation.nova.feature_staking_api.domain.model.SuperOf
+import io.novafoundation.nova.feature_account_api.data.model.OnChainIdentity
+import io.novafoundation.nova.feature_account_api.data.model.RootIdentity
+import io.novafoundation.nova.feature_account_api.data.model.SuperOf
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.Type
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHexOrNull
-
-/*
-Registration: {
-  judgements: Vec<Judgement>;
-  deposit: Balance;
-  info: IdentityInfo;
-}
-
-IdentityInfo: {
-  additional: Vec<IdentityInfoAdditional>;
-  display: Data;
-  legal: Data;
-  web: Data;
-  riot: Data;
-  email: Data;
-  pgpFingerprint: Option<H160>;
-  image: Data;
-  twitter: Data;
-}
- */
-
-fun bindIdentity(
-    scale: String,
-    runtime: RuntimeSnapshot,
-    type: Type<*>
-) {
-    val decoded = type.fromHexOrNull(runtime, scale) as? Struct.Instance ?: incompatible()
-
-    bindIdentity(decoded)
-}
 
 @UseCaseBinding
-fun bindIdentity(
-    dynamic: Any?,
-): Identity {
+fun bindIdentity(dynamic: Any?,): OnChainIdentity? {
+    if (dynamic == null) return null
+
     val decoded = dynamic.castToStruct()
 
     val identityInfo = decoded.get<Struct.Instance>("info") ?: incompatible()
@@ -69,7 +37,9 @@ fun bindIdentity(
 }
 
 @UseCaseBinding
-fun bindSuperOf(decoded: Any): SuperOf {
+fun bindSuperOf(decoded: Any?): SuperOf? {
+    if (decoded == null) return null
+
     val asList = decoded.castToList()
 
     val parentId: ByteArray = asList.first().cast()

@@ -15,14 +15,13 @@ import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
-import io.novafoundation.nova.feature_staking_api.domain.api.IdentityRepository
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.StakingApi
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.SubQueryValidatorSetFetcher
-import io.novafoundation.nova.feature_staking_impl.data.repository.IdentityRepositoryImpl
 import io.novafoundation.nova.feature_staking_impl.data.repository.PayoutRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.RealSessionRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.SessionRepository
@@ -163,19 +162,13 @@ class StakingFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideIdentityRepository(
-        @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource
-    ): IdentityRepository = IdentityRepositoryImpl(remoteStorageSource)
-
-    @Provides
-    @FeatureScope
     fun provideStakingInteractor(
         walletRepository: WalletRepository,
         accountRepository: AccountRepository,
         stakingRepository: StakingRepository,
         stakingRewardsRepository: StakingRewardsRepository,
         stakingConstantsRepository: StakingConstantsRepository,
-        identityRepository: IdentityRepository,
+        identityRepository: OnChainIdentityRepository,
         payoutRepository: PayoutRepository,
         stakingSharedState: StakingSharedState,
         assetUseCase: AssetUseCase,
@@ -263,7 +256,7 @@ class StakingFeatureModule {
     @FeatureScope
     fun provideValidatorProvider(
         stakingRepository: StakingRepository,
-        identityRepository: IdentityRepository,
+        identityRepository: OnChainIdentityRepository,
         rewardCalculatorFactory: RewardCalculatorFactory,
         stakingConstantsRepository: StakingConstantsRepository,
     ) = ValidatorProvider(

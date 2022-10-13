@@ -19,8 +19,8 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.model.Account
 import io.novafoundation.nova.feature_account_api.domain.model.AuthType
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.domain.model.multiChainEncryptionIn
@@ -117,6 +117,10 @@ class AccountRepositoryImpl(
 
     override suspend fun findMetaAccount(accountId: ByteArray): MetaAccount? {
         return accountDataSource.findMetaAccount(accountId)
+    }
+
+    override suspend fun accountNameFor(accountId: AccountId): String? {
+        return accountDataSource.accountNameFor(accountId)
     }
 
     override suspend fun allMetaAccounts(): List<MetaAccount> {

@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.data.parachainStaking.reposi
 
 import io.novafoundation.nova.common.utils.mapValuesNotNull
 import io.novafoundation.nova.common.utils.parachainStaking
-import io.novafoundation.nova.feature_staking_api.domain.api.AccountIdMap
+import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.ScheduledDelegationRequest
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.hasDelegation

@@ -149,7 +149,6 @@ private fun mapValidatorToValidatorDetailsParcelModel(
     }
 }
 
-@OptIn(ExperimentalStdlibApi::class)
 fun mapStakeTargetDetailsToErrors(
     stakeTarget: StakeTargetDetailsParcelModel,
     displayConfig: StakeTargetDetailsPayload.DisplayConfig,

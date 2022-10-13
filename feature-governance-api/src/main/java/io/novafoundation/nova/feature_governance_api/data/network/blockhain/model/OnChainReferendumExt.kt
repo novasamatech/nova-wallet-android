@@ -22,6 +22,13 @@ fun OnChainReferendum.track(): TrackId? {
     return status.asOngoingOrNull()?.track
 }
 
+fun OnChainReferendum.submissionDeposit(): ReferendumDeposit? {
+    return when (status) {
+        is OnChainReferendumStatus.Ongoing -> status.submissionDeposit
+        else -> null
+    }
+}
+
 fun OnChainReferendumStatus.asOngoing(): OnChainReferendumStatus.Ongoing {
     return asOngoingOrNull() ?: error("Referendum is not ongoing")
 }

@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
+import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.presenatation.account.invoke
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.addressOf
@@ -106,3 +107,13 @@ suspend fun AddressIconGenerator.createAccountAddressModel(
     accountId: AccountId,
     addressDisplayUseCase: AddressDisplayUseCase,
 ) = createAccountAddressModel(chain, accountId, addressDisplayUseCase.invoke(accountId))
+
+suspend fun AddressIconGenerator.createIdentityAddressModel(
+    chain: Chain,
+    accountId: ByteArray,
+    identityProvider: IdentityProvider
+) = createAccountAddressModel(
+    chain = chain,
+    accountId = accountId,
+    name = identityProvider.identityFor(accountId, chain.id)?.name
+)

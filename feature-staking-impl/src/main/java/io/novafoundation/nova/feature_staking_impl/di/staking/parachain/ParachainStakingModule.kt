@@ -6,8 +6,8 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_staking_api.domain.api.IdentityRepository
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.RealRoundDurationEstimator
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.RoundDurationEstimator
@@ -119,7 +119,7 @@ class ParachainStakingModule {
     @FeatureScope
     fun provideCollatorProvider(
         currentRoundRepository: CurrentRoundRepository,
-        identityRepository: IdentityRepository,
+        identityRepository: OnChainIdentityRepository,
         parachainStakingConstantsRepository: ParachainStakingConstantsRepository,
         candidatesRepository: CandidatesRepository,
         rewardCalculatorFactory: ParachainStakingRewardCalculatorFactory,
@@ -177,7 +177,7 @@ class ParachainStakingModule {
         delegatorStateRepository: DelegatorStateRepository,
         currentRoundRepository: CurrentRoundRepository,
         roundDurationEstimator: RoundDurationEstimator,
-        identityRepository: IdentityRepository
+        identityRepository: OnChainIdentityRepository
     ) = ParachainStakingUnbondingsInteractor(delegatorStateRepository, currentRoundRepository, roundDurationEstimator, identityRepository)
 
     @Provides

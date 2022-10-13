@@ -27,10 +27,10 @@ import io.novafoundation.nova.common.utils.scheduler
 import io.novafoundation.nova.common.utils.toByteArray
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ConfirmingStatus
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.DecidingStatus
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.DecisionDeposit
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.OnChainReferendum
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.OnChainReferendumStatus
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Proposal
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumDeposit
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Tally
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
@@ -133,7 +133,8 @@ class GovV2OnChainReferendaRepository(
                     proposal = bindProposal(status["proposal"], runtime),
                     desiredEnactment = bindDispatchTime(status.getTyped("enactment")),
                     submitted = bindBlockNumber(status["submitted"]),
-                    decisionDeposit = bindDecisionDeposit(status["decisionDeposit"]),
+                    submissionDeposit = bindReferendumDeposit(status["submissionDeposit"])!!,
+                    decisionDeposit = bindReferendumDeposit(status["decisionDeposit"]),
                     deciding = bindDecidingStatus(status["deciding"]),
                     tally = bindTally(status.getTyped("tally")),
                     inQueue = bindBoolean(status["inQueue"])
@@ -203,9 +204,9 @@ class GovV2OnChainReferendaRepository(
         )
     }
 
-    private fun bindDecisionDeposit(decoded: Struct.Instance?): DecisionDeposit? {
+    private fun bindReferendumDeposit(decoded: Struct.Instance?): ReferendumDeposit? {
         return decoded?.let {
-            DecisionDeposit(
+            ReferendumDeposit(
                 who = bindAccountId(it["who"]),
                 amount = bindNumber(it["amount"])
             )

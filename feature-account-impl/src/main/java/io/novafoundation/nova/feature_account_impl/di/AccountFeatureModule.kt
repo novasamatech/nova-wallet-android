@@ -18,6 +18,7 @@ import io.novafoundation.nova.core_db.dao.AccountDao
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.dao.NodeDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -36,10 +37,12 @@ import io.novafoundation.nova.feature_account_impl.data.network.blockchain.Accou
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSourceImpl
 import io.novafoundation.nova.feature_account_impl.data.repository.AccountRepositoryImpl
 import io.novafoundation.nova.feature_account_impl.data.repository.AddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.RealOnChainIdentityRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSource
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSourceImpl
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.migration.AccountDataMigration
 import io.novafoundation.nova.feature_account_impl.data.secrets.AccountSecretsFactory
+import io.novafoundation.nova.feature_account_impl.di.modules.IdentityProviderModule
 import io.novafoundation.nova.feature_account_impl.di.modules.ParitySignerModule
 import io.novafoundation.nova.feature_account_impl.di.modules.SignersModule
 import io.novafoundation.nova.feature_account_impl.di.modules.WatchOnlyModule
@@ -55,14 +58,17 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.wallet.W
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherMixin
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherProvider
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
+import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
+import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedDecoder
 import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedEncoder
+import javax.inject.Named
 
-@Module(includes = [SignersModule::class, WatchOnlyModule::class, ParitySignerModule::class])
+@Module(includes = [SignersModule::class, WatchOnlyModule::class, ParitySignerModule::class, IdentityProviderModule::class])
 class AccountFeatureModule {
 
     @Provides
@@ -300,4 +306,10 @@ class AccountFeatureModule {
         resourceManager: ResourceManager,
         metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
     ) = MetaAccountWithBalanceListingMixinFactory(walletUseCase, resourceManager, metaAccountGroupingInteractor)
+
+    @Provides
+    @FeatureScope
+    fun provideIdentityRepository(
+        @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource
+    ): OnChainIdentityRepository = RealOnChainIdentityRepository(remoteStorageSource)
 }
