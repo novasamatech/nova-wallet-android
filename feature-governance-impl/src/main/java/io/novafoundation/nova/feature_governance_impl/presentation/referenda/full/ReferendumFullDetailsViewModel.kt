@@ -30,7 +30,7 @@ class ReferendumFullDetailsViewModel(
     private val governanceSharedState: GovernanceSharedState,
     private val tokenUseCase: TokenUseCase,
     private val externalActions: ExternalActions.Presentation,
-) : BaseViewModel() {
+) : BaseViewModel(), ExternalActions by externalActions {
 
     private val payloadFlow = flowOf { payload }
 
@@ -127,7 +127,6 @@ class ReferendumFullDetailsViewModel(
     }
 
     fun openCallHash() {
-
     }
 
     private fun openAddressInfo(accountId: ByteArray) = launch {

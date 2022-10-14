@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.full
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,10 +10,14 @@ import androidx.core.view.isVisible
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.presentation.CopierBottomSheet
 import io.novafoundation.nova.common.utils.makeGone
-import io.novafoundation.nova.common.utils.makeVisible
-import io.novafoundation.nova.feature_account_api.presenatation.actions.copyAddressClicked
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
+import io.novafoundation.nova.common.utils.makeVisible
+import io.novafoundation.nova.feature_account_api.presenatation.account.details.ChainAccountActionsSheet
+import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActionsSheet
+import io.novafoundation.nova.feature_account_api.presenatation.actions.copyAddressClicked
 import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
@@ -34,7 +39,6 @@ import kotlinx.android.synthetic.main.fragment_referendum_full_details.referendu
 import kotlinx.android.synthetic.main.fragment_referendum_full_details.referendumFullDetailsToolbar
 import kotlinx.android.synthetic.main.fragment_referendum_full_details.referendumFullDetailsTurnout
 import kotlinx.android.synthetic.main.fragment_referendum_full_details.referendumFullDetailsVoteThreshold
-import kotlinx.coroutines.flow.first
 
 class ReferendumFullDetailsFragment : BaseFragment<ReferendumFullDetailsViewModel>() {
 
@@ -78,9 +82,10 @@ class ReferendumFullDetailsFragment : BaseFragment<ReferendumFullDetailsViewMode
             referendumFullDetailsVoteThreshold.makeVisible()
         }
 
-        viewModel.callHash?.let {
-            referendumFullDetailsCallHash.showValue(it)
+        viewModel.callHash?.let { hash ->
+            referendumFullDetailsCallHash.showValue(hash)
             referendumFullDetailsCallHash.makeVisible()
+            referendumFullDetailsCallHash.setOnClickListener { showCopyingBottomSheet(hash) }
         }
 
         referendumFullDetailsPlaceholder.isGone = viewModel.hasPreImage
@@ -89,7 +94,6 @@ class ReferendumFullDetailsFragment : BaseFragment<ReferendumFullDetailsViewMode
 
         referendumFullDetailsProposal.setOnClickListener { viewModel.openProposal() }
         referendumFullDetailsBeneficiary.setOnClickListener { viewModel.openBeneficiary() }
-        referendumFullDetailsCallHash.setOnClickListener { viewModel.openCallHash() }
     }
 
     override fun inject() {
@@ -103,17 +107,8 @@ class ReferendumFullDetailsFragment : BaseFragment<ReferendumFullDetailsViewMode
     }
 
     override fun subscribe(viewModel: ReferendumFullDetailsViewModel) {
-        setupExternalActions(viewModel) { context, payload ->
-            ChainAccountActionsSheet(
-                context,
-                payload,
-                onCopy = viewModel::copyAddressClicked,
-                onViewExternal = viewModel::viewExternalClicked,
-                onChange = viewModel::changeChainAccountClicked,
-                onExport = viewModel::exportClicked,
-                availableAccountActions = viewModel.availableAccountActions.first()
-            )
-        }
+        setupExternalActions()
+
         viewModel.proposerAddressModelFlow.observe { addressAndAmount ->
             if (addressAndAmount == null) {
                 referendumFullDetailsProposalContainer.makeGone()
@@ -143,5 +138,28 @@ class ReferendumFullDetailsFragment : BaseFragment<ReferendumFullDetailsViewMode
             referendumFullDetailsElectorate?.showAmount(it)
             referendumFullDetailsElectorate.makeVisible()
         }
+    }
+
+    private fun setupExternalActions() {
+        setupExternalActions(viewModel) { context, payload ->
+            getAddressExternalAction(context, payload)
+        }
+    }
+
+    private fun getAddressExternalAction(context: Context, payload: ExternalActions.Payload): ExternalActionsSheet {
+        return ChainAccountActionsSheet(
+            context,
+            payload,
+            onCopy = viewModel::copyAddressClicked,
+            onViewExternal = viewModel::viewExternalClicked
+        )
+    }
+
+    private fun showCopyingBottomSheet(value: String) {
+        CopierBottomSheet(
+            requireContext(),
+            value = value,
+            buttonNameRes = R.string.referendum_full_details_copy_hash
+        ).show()
     }
 }
