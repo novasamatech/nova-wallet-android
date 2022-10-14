@@ -33,6 +33,8 @@ import com.facebook.shimmer.ShimmerFrameLayout
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.utils.input.Input
 import io.novafoundation.nova.common.utils.input.valueOrNull
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 fun View.updatePadding(
     top: Int = paddingTop,
@@ -81,6 +83,16 @@ fun View.updateTopMargin(newMargin: Int) {
     (layoutParams as? MarginLayoutParams)?.let {
         it.setMargins(it.leftMargin, newMargin, it.rightMargin, it.bottomMargin)
     }
+}
+
+inline fun <T> View.useNonNullOrHide(value: T?, setup: (T) -> Unit) {
+    if (value == null) {
+        makeGone()
+        return
+    }
+
+    makeVisible()
+    setup(value)
 }
 
 fun ShimmerFrameLayout.setShimmerVisible(visible: Boolean) {

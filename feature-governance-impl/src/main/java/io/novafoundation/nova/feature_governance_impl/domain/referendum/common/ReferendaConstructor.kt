@@ -8,10 +8,16 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackInfo
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackQueue
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.asOngoing
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ayeVotes
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.inQueue
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.nayVotes
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.orEmpty
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.positionOf
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.supportThreshold
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.track
+import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumVoting
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumTimeline
@@ -20,6 +26,7 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.list.Prep
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumStatus
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.util.BlockDurationEstimator
 import io.novafoundation.nova.runtime.util.timerUntil
@@ -38,7 +45,7 @@ interface ReferendaConstructor {
         chain: Chain,
         onChainReferenda: Collection<OnChainReferendum>,
         tracksById: Map<TrackId, TrackInfo>,
-        currentBlockNumber: BlockNumber
+        currentBlockNumber: BlockNumber,
     ): Map<ReferendumId, ReferendumStatus>
 
     suspend fun constructPastTimeline(
@@ -53,13 +60,14 @@ suspend fun ReferendaConstructor.constructReferendumStatus(
     chain: Chain,
     onChainReferendum: OnChainReferendum,
     tracksById: Map<TrackId, TrackInfo>,
-    currentBlockNumber: BlockNumber
+    currentBlockNumber: BlockNumber,
 ): ReferendumStatus = constructReferendaStatuses(
     chain = chain,
     onChainReferenda = listOf(onChainReferendum),
     tracksById = tracksById,
-    currentBlockNumber = currentBlockNumber
+    currentBlockNumber = currentBlockNumber,
 ).values.first()
+
 
 class RealReferendaConstructor(
     private val governanceSourceRegistry: GovernanceSourceRegistry,
@@ -114,10 +122,8 @@ class RealReferendaConstructor(
 
         val undecidingTimeout = governanceSource.referenda.undecidingTimeout(chain.id)
 
-        val approvedReferendaIds = onChainReferenda.mapNotNull { referendum ->
-            referendum.id.takeIf { referendum.status is OnChainReferendumStatus.Approved }
-        }
-        val approvedReferendaExecutionBlocks = governanceSource.referenda.getReferendaExecutionBlocks(chain.id, approvedReferendaIds)
+        val approvedReferendaExecutionBlocks = governanceSource.fetchExecutionBlocks(onChainReferenda, chain)
+        val queuePositions = governanceSource.fetchQueuePositions(onChainReferenda, chain.id)
 
         return onChainReferenda.associateBy(
             keySelector = { it.id },
@@ -127,7 +133,9 @@ class RealReferendaConstructor(
                         status = status,
                         blockDurationEstimator = blockDurationEstimator,
                         undecidingTimeout = undecidingTimeout,
-                        track = tracksById.getValue(status.track)
+                        track = tracksById.getValue(status.track),
+                        referendumId = referendum.id,
+                        queuePositions = queuePositions,
                     )
 
                     OnChainReferendumStatus.Approved -> {
@@ -171,25 +179,35 @@ class RealReferendaConstructor(
         return buildList {
             when (calculatedStatus) {
                 // for ongoing referenda, we have access to some timestamps on-chain
-                is ReferendumStatus.Preparing,
-                is ReferendumStatus.InQueue,
-                is ReferendumStatus.Deciding,
-                is ReferendumStatus.Confirming -> {
+                is ReferendumStatus.Ongoing -> {
                     add(State.CREATED, at = onChainReferendum.status.asOngoing().submitted)
                 }
 
                 // for other kind of referenda, there is not historic timestamps on-chain
-                is ReferendumStatus.Approved,
-                ReferendumStatus.NotExecuted.Cancelled,
-                ReferendumStatus.NotExecuted.Killed,
-                ReferendumStatus.NotExecuted.Rejected,
+                ReferendumStatus.NotExecuted.Cancelled -> {
+                    add(State.CREATED, at = null)
+                    add(State.CANCELLED, at = null)
+                }
+                ReferendumStatus.NotExecuted.Killed -> {
+                    add(State.CREATED, at = null)
+                    add(State.KILLED, at = null)
+                }
+                ReferendumStatus.NotExecuted.Rejected -> {
+                    add(State.CREATED, at = null)
+                    add(State.REJECTED, at = null)
+                }
                 ReferendumStatus.NotExecuted.TimedOut -> {
                     add(State.CREATED, at = null)
+                    add(State.TIMED_OUT, at = null)
                 }
-
+                is ReferendumStatus.Approved -> {
+                    add(State.CREATED, at = null)
+                    add(State.APPROVED, at = null)
+                }
                 ReferendumStatus.Executed -> {
                     add(State.CREATED, at = null)
                     add(State.APPROVED, at = null)
+                    add(State.EXECUTED, at = null)
                 }
             }
         }
@@ -200,13 +218,16 @@ class RealReferendaConstructor(
         blockDurationEstimator: BlockDurationEstimator,
         undecidingTimeout: BlockNumber,
         track: TrackInfo,
+        referendumId: ReferendumId,
+        queuePositions: Map<ReferendumId, TrackQueue.Position>
     ): ReferendumStatus {
         return when {
             status.inQueue -> {
                 val timeoutBlock = status.submitted + undecidingTimeout
                 val timeOutIn = blockDurationEstimator.timerUntil(timeoutBlock)
+                val positionInQueue = queuePositions.getValue(referendumId)
 
-                ReferendumStatus.InQueue(timeOutIn)
+                ReferendumStatus.Ongoing.InQueue(timeOutIn, positionInQueue)
             }
 
             // confirming
@@ -214,7 +235,7 @@ class RealReferendaConstructor(
                 val approveBlock = status.deciding!!.confirming!!.till
                 val approveIn = blockDurationEstimator.timerUntil(approveBlock)
 
-                ReferendumStatus.Confirming(approveIn = approveIn)
+                ReferendumStatus.Ongoing.Confirming(approveIn = approveIn)
             }
 
             // rejecting
@@ -222,7 +243,7 @@ class RealReferendaConstructor(
                 val rejectBlock = status.deciding!!.since + track.decisionPeriod
                 val rejectIn = blockDurationEstimator.timerUntil(rejectBlock)
 
-                ReferendumStatus.Deciding(rejectIn)
+                ReferendumStatus.Ongoing.Rejecting(rejectIn)
             }
 
             // preparing
@@ -231,11 +252,41 @@ class RealReferendaConstructor(
                     val preparedBlock = status.submitted + track.preparePeriod
                     val preparedIn = blockDurationEstimator.timerUntil(preparedBlock)
 
-                    ReferendumStatus.Preparing(reason = PreparingReason.DecidingIn(preparedIn))
+                    ReferendumStatus.Ongoing.Preparing(reason = PreparingReason.DecidingIn(preparedIn))
                 } else {
-                    ReferendumStatus.Preparing(reason = PreparingReason.WaitingForDeposit)
+                    ReferendumStatus.Ongoing.Preparing(reason = PreparingReason.WaitingForDeposit)
                 }
             }
         }
+    }
+
+    private suspend fun GovernanceSource.fetchExecutionBlocks(
+        onChainReferenda: Collection<OnChainReferendum>,
+        chain: Chain
+    ): Map<ReferendumId, BlockNumber> {
+        val approvedReferendaIds = onChainReferenda.mapNotNull { referendum ->
+            referendum.id.takeIf { referendum.status is OnChainReferendumStatus.Approved }
+        }
+        return referenda.getReferendaExecutionBlocks(chain.id, approvedReferendaIds)
+    }
+
+    private suspend fun GovernanceSource.fetchQueuePositions(
+        onChainReferenda: Collection<OnChainReferendum>,
+        chainId: ChainId,
+    ): Map<ReferendumId, TrackQueue.Position> {
+        val queuedReferenda = onChainReferenda.filter { it.status.inQueue() }
+        val tracksIdsToFetchQueues = queuedReferenda.mapNotNullTo(mutableSetOf(), OnChainReferendum::track)
+
+        val queues = referenda.getTrackQueues(tracksIdsToFetchQueues, chainId)
+
+        return queuedReferenda.associateBy(
+            keySelector = OnChainReferendum::id,
+            valueTransform = {
+                val track = it.track()!! // safe since referendum is ongoing
+                val queue = queues[track].orEmpty()
+
+                queue.positionOf(it.id)
+            }
+        )
     }
 }

@@ -6,8 +6,12 @@ import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core.storage.StorageCache
+import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
+import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
+import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
@@ -50,4 +54,12 @@ interface GovernanceFeatureDependencies {
     val storageCache: StorageCache
 
     val sampledBlockTimeStorage: SampledBlockTimeStorage
+
+    val dAppMetadataRepository: DAppMetadataRepository
+
+    @LocalIdentity
+    fun localIdentityProvider(): IdentityProvider
+
+    @OnChainIdentity
+    fun onChainIdentityProvider(): IdentityProvider
 }

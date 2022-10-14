@@ -35,7 +35,9 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Tally
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackInfo
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackQueue
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VotingCurve
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.empty
 import io.novafoundation.nova.feature_governance_api.data.repository.OnChainReferendaRepository
 import io.novafoundation.nova.feature_governance_impl.data.model.curve.LinearDecreasingCurve
 import io.novafoundation.nova.feature_governance_impl.data.model.curve.ReciprocalCurve
@@ -77,6 +79,19 @@ class GovV2OnChainReferendaRepository(
         val tracksConstant = runtime.metadata.referenda().constant("Tracks").decodedValue(runtime)
 
         return bindTracks(tracksConstant)
+    }
+
+    override suspend fun getTrackQueues(trackIds: Set<TrackId>, chainId: ChainId): Map<TrackId, TrackQueue> {
+        if (trackIds.isEmpty()) return emptyMap()
+        return remoteStorageSource.query(chainId) {
+            val maxQueued = runtime.metadata.referenda().numberConstant("MaxQueued", runtime)
+
+            runtime.metadata.referenda().storage("TrackQueue").entries(
+                keysArguments = trackIds.map { listOf(it.value) },
+                keyExtractor = { (trackIdRaw: BigInteger) -> TrackId(trackIdRaw) },
+                binding = { decoded, _ -> bindTrackQueue(decoded, maxQueued) }
+            )
+        }
     }
 
     override suspend fun getOnChainReferenda(chainId: ChainId): Collection<OnChainReferendum> {
@@ -261,6 +276,18 @@ class GovV2OnChainReferendaRepository(
             }
             else -> incompatible()
         }
+    }
+
+    private fun bindTrackQueue(decoded: Any?, maxQueued: BigInteger): TrackQueue {
+        if (decoded == null) return TrackQueue.empty(maxQueued.toInt())
+
+        val referendumIds = bindList(decoded) {
+            val (referendumIndex, _) = it.castToList()
+
+            ReferendumId(bindNumber(referendumIndex))
+        }
+
+        return TrackQueue(referendumIds, maxQueued.toInt())
     }
 
     // https://github.com/paritytech/substrate/blob/fc67cbb66d8c484bc7b7506fc1300344d12ecbad/frame/referenda/src/lib.rs#L716

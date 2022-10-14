@@ -20,6 +20,7 @@ data class ReferendumVoting(
         val threshold: Perbill
     ) {
 
+        // post-conviction
         data class Votes(
             val amount: Balance,
             val fraction: Perbill
@@ -29,4 +30,9 @@ data class ReferendumVoting(
 
 fun ReferendumVoting.Support.passes(): Boolean {
     return turnout > threshold
+}
+
+
+fun ReferendumVoting.Approval.ayeVotesIfNotEmpty(): ReferendumVoting.Approval.Votes? {
+    return ayeVotes.takeIf { it.amount != Balance.ZERO }
 }

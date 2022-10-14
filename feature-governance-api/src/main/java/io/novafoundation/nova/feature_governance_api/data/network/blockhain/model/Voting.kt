@@ -35,18 +35,30 @@ data class PriorLock(
     val amount: Balance,
 )
 
-fun AccountVote.votes(chainAsset: Chain.Asset): BigDecimal? {
+data class VotesAmount(
+    val total: BigDecimal,
+    val amount: BigDecimal,
+    val multiplier: BigDecimal,
+)
+
+fun AccountVote.votes(chainAsset: Chain.Asset): VotesAmount? {
     return when (this) {
         // TODO handle split votes
         AccountVote.Split -> null
         is AccountVote.Standard -> {
             val amountMultiplier = vote.conviction.amountMultiplier()
             val amount = chainAsset.amountFromPlanks(balance)
+            val total = amountMultiplier * amount
 
-            amountMultiplier * amount
+            VotesAmount(
+                total = total,
+                amount = amount,
+                multiplier = amountMultiplier
+            )
         }
     }
 }
+
 
 fun AccountVote.isAye(): Boolean? {
     return when (this) {

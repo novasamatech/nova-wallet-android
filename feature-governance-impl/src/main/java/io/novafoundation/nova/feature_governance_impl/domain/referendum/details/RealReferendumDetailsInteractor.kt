@@ -1,10 +1,12 @@
 package io.novafoundation.nova.feature_governance_impl.domain.referendum.details
 
+import io.novafoundation.nova.common.utils.Urls
 import io.novafoundation.nova.common.utils.flowOfAll
+import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.PreImage
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Proposal
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.asOngoing
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.asOngoingOrNull
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.flattenCastingVotes
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.hash
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.proposal
@@ -18,6 +20,7 @@ import io.novafoundation.nova.feature_governance_api.data.repository.getTracksBy
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumProposer
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumTrack
+import io.novafoundation.nova.feature_governance_api.domain.referendum.details.GovernanceDApp
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumCall
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumDetails
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumDetailsInteractor
@@ -41,7 +44,26 @@ class RealReferendumDetailsInteractor(
     private val chainStateRepository: ChainStateRepository,
     private val totalIssuanceRepository: TotalIssuanceRepository,
     private val referendaConstructor: ReferendaConstructor,
+    private val dAppMetadataRepository: DAppMetadataRepository,
 ) : ReferendumDetailsInteractor {
+
+    override suspend fun getAvailableDApps(chain: Chain): List<GovernanceDApp> {
+        dAppMetadataRepository.ensureSynced()
+
+        val metadatas = dAppMetadataRepository.getDAppMetadatas().associateBy { it.baseUrl }
+
+        val governanceSource = governanceSourceRegistry.sourceFor(chain.id)
+        val referendumUrlConstructors = governanceSource.dApps.getDAppUrlConstructorsFor(chain)
+
+        return referendumUrlConstructors.map {
+            val baseUrl = Urls.normalizeUrl(it.baseUrl)
+
+            GovernanceDApp(
+                metadata = metadatas[baseUrl],
+                urlConstructor = it
+            )
+        }
+    }
 
     override fun referendumDetailsFlow(
         referendumId: ReferendumId,
@@ -85,7 +107,7 @@ class RealReferendumDetailsInteractor(
                 chain = chain,
                 onChainReferendum = onChainReferendum,
                 tracksById = tracksById,
-                currentBlockNumber = currentBlockNumber
+                currentBlockNumber = currentBlockNumber,
             )
 
             ReferendumDetails(
@@ -121,7 +143,7 @@ class RealReferendumDetailsInteractor(
                 ),
                 userVote = vote,
                 fullDetails = ReferendumDetails.FullDetails(
-                    deposit = onChainReferendum.status.asOngoing().proposerDeposit(),
+                    deposit = onChainReferendum.status.asOngoingOrNull()?.proposerDeposit(),
                     approvalCurve = track?.minApproval,
                     supportCurve = track?.minSupport,
                 )

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.treasury
 
+import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountIdentifier
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNonce
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.instanceOf
@@ -16,7 +17,8 @@ class TreasurySpendParser : ReferendumCallParser {
         if (!call.instanceOf(Modules.TREASURY, "spend")) return null
 
         val amount = bindNonce(call.arguments["amount"])
+        val beneficiary = bindAccountIdentifier(call.arguments["beneficiary"])
 
-        ReferendumCall.TreasuryRequest(amount)
+        ReferendumCall.TreasuryRequest(amount, beneficiary)
     }.getOrNull()
 }

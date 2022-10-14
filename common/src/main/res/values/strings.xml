@@ -1,5 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="referendum_timeline_state_preparing">Voting: Preparing</string>
+    <string name="referendum_timeline_state_in_queue">Voting: In queue</string>
+    <string name="referendum_timeline_state_passing">Voting: Passing</string>
+    <string name="referendum_timeline_state_not_passing">Voting: Not passing</string>
+
+    <string name="referendum_in_queue_position_format">Position: %s of %s</string>
+
+    <string name="referendum_timeline_state_created">Created</string>
+    <string name="referendum_timeline_state_approved">Voted: Approved</string>
+    <string name="referendum_timeline_state_rejected">Voted: Rejected</string>
+    <string name="referendum_timeline_state_executed">Executed</string>
+    <string name="referendum_timeline_state_cancelled">Cancelled</string>
+    <string name="referendum_timeline_state_killed">Killed</string>
+    <string name="referendum_timeline_state_timed_out">Killed</string>
+
+    <string name="referendum_votes_format">%s votes</string>
+
+    <string name="referendum_dapp_comment_react">Comment and react</string>
+
     <string name="common_read_more">Read more</string>
 
     <string name="common_ongoing">Ongoing</string>

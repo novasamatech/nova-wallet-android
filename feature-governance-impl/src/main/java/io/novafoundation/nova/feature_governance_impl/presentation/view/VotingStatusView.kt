@@ -4,16 +4,16 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
-import androidx.annotation.ColorRes
-import androidx.core.view.isVisible
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setTextColorRes
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_governance_impl.R
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumTimeEstimation
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumVotingModel
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.setReferendumTimeEstimation
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumStatusModel
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumTimeEstimation
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumVotingModel
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.setReferendumTimeEstimation
 import kotlinx.android.synthetic.main.view_voting_status.view.negativeVotersDetails
 import kotlinx.android.synthetic.main.view_voting_status.view.positiveVotersDetails
 import kotlinx.android.synthetic.main.view_voting_status.view.votingStatus
@@ -48,16 +48,16 @@ class VotingStatusView @JvmOverloads constructor(
         votingStatusTimeEstimation.setReferendumTimeEstimation(timeEstimation)
     }
 
-    fun setStatus(status: String, @ColorRes color: Int) {
-        votingStatus.text = status
-        votingStatus.setTextColorRes(color)
+    fun setStatus(referendumStatusModel: ReferendumStatusModel) {
+        votingStatus.text = referendumStatusModel.name
+        votingStatus.setTextColorRes(referendumStatusModel.colorRes)
     }
 
-    fun setThreshold(thresholdModel: ReferendumVotingModel) {
+    fun setVotingModel(thresholdModel: ReferendumVotingModel?) {
         votingStatusThreshold.setThresholdModel(thresholdModel)
     }
 
-    fun setPositiveVoters(votersModel: VotersView.VotersModel) {
+    fun setPositiveVoters(votersModel: VotersModel?) {
         positiveVotersDetails.setVotersModel(votersModel)
     }
 
@@ -65,7 +65,7 @@ class VotingStatusView @JvmOverloads constructor(
         positiveVotersDetails.setOnClickListener(listener)
     }
 
-    fun setNegativeVoters(votersModel: VotersView.VotersModel) {
+    fun setNegativeVoters(votersModel: VotersModel?) {
         negativeVotersDetails.setVotersModel(votersModel)
     }
 
@@ -77,10 +77,7 @@ class VotingStatusView @JvmOverloads constructor(
         votingStatusStartVote.setOnClickListener(listener)
     }
 
-    fun showDetails(show: Boolean) {
-        votingStatusThreshold.isVisible = show
-        positiveVotersDetails.isVisible = show
-        negativeVotersDetails.isVisible = show
-        votingStatusStartVote.isVisible = show
+    fun setVoteButtonVisible(visible: Boolean) {
+        votingStatusStartVote.setVisible(visible)
     }
 }

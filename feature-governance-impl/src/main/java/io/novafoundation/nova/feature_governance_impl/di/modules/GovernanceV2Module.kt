@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
 import io.novafoundation.nova.feature_governance_impl.data.repository.v2.Gov2OffChainReferendaInfoRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.v2.GovV2ConvictionVotingRepository
+import io.novafoundation.nova.feature_governance_impl.data.repository.v2.GovV2DAppsRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.v2.GovV2OnChainReferendaRepository
 import io.novafoundation.nova.feature_governance_impl.data.source.StaticGovernanceSource
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
@@ -39,10 +40,20 @@ class GovernanceV2Module {
 
     @Provides
     @FeatureScope
+    fun provideDAppsRepository() = GovV2DAppsRepository()
+
+    @Provides
+    @FeatureScope
     @GovernanceV2
     fun provideGovernanceSource(
         referendaRepository: GovV2OnChainReferendaRepository,
         convictionVotingRepository: GovV2ConvictionVotingRepository,
-        offChainInfoRepository: Gov2OffChainReferendaInfoRepository
-    ): GovernanceSource = StaticGovernanceSource(referendaRepository, convictionVotingRepository, offChainInfoRepository)
+        offChainInfoRepository: Gov2OffChainReferendaInfoRepository,
+        dAppsRepository: GovV2DAppsRepository,
+    ): GovernanceSource = StaticGovernanceSource(
+        referenda = referendaRepository,
+        convictionVoting = convictionVotingRepository,
+        offChainInfo = offChainInfoRepository,
+        dApps = dAppsRepository
+    )
 }

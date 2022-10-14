@@ -10,7 +10,6 @@ fun createDAppComparator() = compareByDescending<DApp> { it.isFavourite }
     .thenBy { it.name }
 
 // Build mapping in O(Metadatas + Favourites) in case of HashMap. It allows constant time access later
-@OptIn(ExperimentalStdlibApi::class)
 internal fun buildUrlToDappMapping(
     dAppMetadatas: List<DappMetadata>,
     favourites: List<FavouriteDApp>

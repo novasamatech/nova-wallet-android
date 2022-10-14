@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_governance_api.domain.referendum.list
 import io.novafoundation.nova.common.utils.formatting.TimerValue
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackQueue
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumTrack
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumVoting
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
@@ -35,13 +36,16 @@ sealed class ReferendumProposal {
 
 sealed class ReferendumStatus {
 
-    data class Preparing(val reason: PreparingReason) : ReferendumStatus()
+    sealed class Ongoing : ReferendumStatus() {
 
-    data class InQueue(val timeOutIn: TimerValue) : ReferendumStatus()
+        data class Preparing(val reason: PreparingReason) : Ongoing()
 
-    data class Deciding(val rejectIn: TimerValue) : ReferendumStatus()
+        data class InQueue(val timeOutIn: TimerValue, val position: TrackQueue.Position) : Ongoing()
 
-    data class Confirming(val approveIn: TimerValue) : ReferendumStatus()
+        data class Rejecting(val rejectIn: TimerValue) : Ongoing()
+
+        data class Confirming(val approveIn: TimerValue) : Ongoing()
+    }
 
     data class Approved(val executeIn: TimerValue) : ReferendumStatus()
 

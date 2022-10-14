@@ -19,7 +19,7 @@ data class ReferendumDetails(
     val voting: ReferendumVoting?,
     val userVote: AccountVote?,
     val timeline: ReferendumTimeline,
-    val fullDetails: FullDetails
+    val fullDetails: FullDetails,
 ) {
 
     data class FullDetails(

@@ -12,50 +12,52 @@
         android:id="@+id/votersViewVoteTypeColor"
         android:layout_width="3dp"
         android:layout_height="20dp"
+        android:layout_marginStart="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:background="@color/green" />
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/votersViewVoteType"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginVertical="5dp"
-        android:layout_marginStart="15dp"
-        android:gravity="start"
-        android:orientation="vertical"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="13dp"
+        android:layout_marginBottom="13dp"
+        android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:id="@+id/votersViewVoteType"
-            style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            tools:text="Aye" />
-
-        <TextView
-            android:id="@+id/votersViewCount"
-            style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white_64"
-            tools:text="551 voters" />
-    </LinearLayout>
+        app:layout_constraintStart_toEndOf="@id/votersViewVoteTypeColor"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Aye" />
 
     <TextView
         android:id="@+id/votersViewVotesCount"
         style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
         android:gravity="center_vertical"
         android:includeFontPadding="false"
         android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/votersViewVotesInfo"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="25,354.16 votes" />
+
+    <ImageView
+        android:id="@+id/votersViewVotesInfo"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:src="@drawable/ic_info_16"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/white_48"
         tools:text="25,354.16 votes" />
 
 </merge>

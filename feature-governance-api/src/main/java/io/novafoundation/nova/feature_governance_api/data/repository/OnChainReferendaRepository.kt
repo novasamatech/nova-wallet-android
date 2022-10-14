@@ -5,6 +5,7 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackInfo
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackQueue
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.flow.Flow
 
@@ -13,6 +14,8 @@ interface OnChainReferendaRepository {
     suspend fun undecidingTimeout(chainId: ChainId): BlockNumber
 
     suspend fun getTracks(chainId: ChainId): Collection<TrackInfo>
+
+    suspend fun getTrackQueues(trackIds: Set<TrackId>, chainId: ChainId): Map<TrackId, TrackQueue>
 
     suspend fun getOnChainReferenda(chainId: ChainId): Collection<OnChainReferendum>
 
