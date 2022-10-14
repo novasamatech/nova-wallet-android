@@ -161,6 +161,8 @@ object ChainGeneses {
 
     const val STATEMINT = "68d56f15f85d3136970ec16946040bc1752654e906147f7e43e9d539d7c3de2f"
     const val EDGEWARE = "742a2ca70c2fda6cee4f8df98d64c4c670a052d9568058982dad9d5a7a135c5b"
+
+    const val GOV2_TESTNET = "a2ee5a1f55a23dccd0c35e36512f9009e6e50a5654e8e5e469445d0748632aa8"
 }
 
 val Chain.Companion.Geneses

@@ -125,7 +125,9 @@ class ReferendumDetailsViewModel(
     }
 
     fun dAppClicked(dAppModel: GovernanceDAppModel) {
-        showMessage("TODO - open dapp")
+        val url = dAppModel.urlConstructor.urlFor(payload.toReferendumId())
+
+        router.openDAppBrowser(url)
     }
 
     fun fullDetailsClicked() {

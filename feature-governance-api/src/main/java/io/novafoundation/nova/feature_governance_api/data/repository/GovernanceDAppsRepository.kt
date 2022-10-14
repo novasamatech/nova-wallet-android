@@ -7,6 +7,8 @@ interface ReferendumUrlConstructor {
 
     val baseUrl: String
 
+    val metadataSearchUrl: String
+
     fun urlFor(referendumId: ReferendumId): String
 }
 

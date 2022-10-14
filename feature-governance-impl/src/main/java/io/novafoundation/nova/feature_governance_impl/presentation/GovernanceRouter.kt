@@ -4,5 +4,8 @@ import io.novafoundation.nova.common.navigation.ReturnableRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsPayload
 
 interface GovernanceRouter : ReturnableRouter {
+
     fun openReferendum(payload: ReferendumDetailsPayload)
+
+    fun openDAppBrowser(initialUrl: String)
 }

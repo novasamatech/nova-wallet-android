@@ -56,7 +56,7 @@ class RealReferendumDetailsInteractor(
         val referendumUrlConstructors = governanceSource.dApps.getDAppUrlConstructorsFor(chain)
 
         return referendumUrlConstructors.map {
-            val baseUrl = Urls.normalizeUrl(it.baseUrl)
+            val baseUrl = Urls.normalizeUrl(it.metadataSearchUrl)
 
             GovernanceDApp(
                 metadata = metadatas[baseUrl],
