@@ -34,9 +34,12 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.det
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.timeline.TimelineLayout
 import io.novafoundation.nova.feature_governance_impl.presentation.view.VotersModel
 import io.novafoundation.nova.feature_governance_impl.presentation.view.YourVoteModel
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
+import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.selectedChainFlow
 import kotlinx.coroutines.flow.first
@@ -160,8 +163,8 @@ class ReferendumDetailsViewModel(
             voting = referendumDetails.voting?.let { referendumFormatter.formatVoting(it, token) },
             statusModel = referendumFormatter.formatStatus(referendumDetails.timeline.currentStatus),
             yourVote = referendumDetails.userVote?.let { mapUserVoteToUi(it, token) },
-            ayeVoters = mapVotersToUi(referendumDetails.voting, VotersType.AYE, token),
-            nayVoters = mapVotersToUi(referendumDetails.voting, VotersType.NAY, token),
+            ayeVoters = mapVotersToUi(referendumDetails.voting, VotersType.AYE, token.configuration),
+            nayVoters = mapVotersToUi(referendumDetails.voting, VotersType.NAY, token.configuration),
             timeEstimation = timeEstimation,
             timeline = mapTimelineToUi(referendumDetails.timeline, timeEstimation)
         )
@@ -227,7 +230,7 @@ class ReferendumDetailsViewModel(
     private fun mapVotersToUi(
         voting: ReferendumVoting?,
         type: VotersType,
-        token: Token,
+        chainAsset: Chain.Asset,
     ): VotersModel? {
         if (voting == null) return null
 
@@ -235,14 +238,20 @@ class ReferendumDetailsViewModel(
             VotersType.AYE -> VotersModel(
                 voteTypeColorRes = R.color.multicolor_green_100,
                 voteTypeRes = R.string.referendum_vote_positive_type,
-                votesValue = mapAmountToAmountModel(voting.approval.ayeVotes.amount, token).token
+                votesValue = formatVotesAmount(voting.approval.ayeVotes.amount, chainAsset)
             )
             VotersType.NAY -> VotersModel(
                 voteTypeColorRes = R.color.multicolor_red_100,
                 voteTypeRes = R.string.referendum_vote_negative_type,
-                votesValue = mapAmountToAmountModel(voting.approval.nayVotes.amount, token).token
+                votesValue = formatVotesAmount(voting.approval.nayVotes.amount, chainAsset)
             )
         }
+    }
+
+    private fun formatVotesAmount(planks: Balance, chainAsset: Chain.Asset): String {
+        val amount = chainAsset.amountFromPlanks(planks)
+
+        return resourceManager.getString(R.string.referendum_votes_format, amount.format())
     }
 
     private fun mapUserVoteToUi(vote: AccountVote, token: Token): YourVoteModel? {
