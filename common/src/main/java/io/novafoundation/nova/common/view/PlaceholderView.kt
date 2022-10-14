@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.utils.getEnum
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.useAttributes
@@ -14,16 +15,16 @@ import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import kotlinx.android.synthetic.main.view_placeholder.view.viewPlaceholderImage
 import kotlinx.android.synthetic.main.view_placeholder.view.viewPlaceholderText
 
-private const val SHOW_BACKGROUND_DEFAULT = true
-
 class PlaceholderView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
-    enum class Style(val showBackground: Boolean, val textColorRes: Int) {
-        BACKGROUND(true, R.color.white_48), NO_BACKGROUND(false, R.color.white_64)
+    enum class Style(val showBackground: Boolean, val backgroundColorRes: Int, val textColorRes: Int) {
+        BACKGROUND_DARK(true, R.color.black_48, R.color.white_48),
+        BACKGROUND_LIGHT(true, R.color.white_8, R.color.white_64),
+        NO_BACKGROUND(false, R.color.black_48, R.color.white_64)
     }
 
     init {
@@ -39,8 +40,8 @@ class PlaceholderView @JvmOverloads constructor(
         val text = typedArray.getString(R.styleable.PlaceholderView_android_text)
         text?.let(::setText)
 
-        val showBackground = typedArray.getBoolean(R.styleable.PlaceholderView_showBackground, SHOW_BACKGROUND_DEFAULT)
-        setStyle(if (showBackground) Style.BACKGROUND else Style.NO_BACKGROUND)
+        val backgroundStyle = typedArray.getEnum(R.styleable.PlaceholderView_placeholderBackgroundStyle, Style.BACKGROUND_DARK)
+        setStyle(backgroundStyle)
 
         val image = typedArray.getResourceIdOrNull(R.styleable.PlaceholderView_image)
         image?.let(::setImage)
@@ -48,7 +49,7 @@ class PlaceholderView @JvmOverloads constructor(
 
     fun setStyle(style: Style) {
         background = if (style.showBackground) {
-            context.getRoundedCornerDrawable(R.color.black_48, cornerSizeInDp = 12)
+            context.getRoundedCornerDrawable(style.backgroundColorRes, cornerSizeInDp = 12)
         } else {
             null
         }

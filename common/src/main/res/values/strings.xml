@@ -65,6 +65,20 @@
     <string name="voting_status">Voting status</string>
     <string name="referendum_details_requested_amount">Requested amount</string>
 
+    <string name="referendum_full_details_parameters_json">Parameters JSON</string>
+    <string name="referendum_full_details_long_for_preview">Too long for preview</string>
+    <string name="referendum_full_details_title">Full details</string>
+    <string name="referendum_full_details_proposal">Proposal</string>
+    <string name="referendum_full_details_deposit">Deposit</string>
+    <string name="referendum_full_details_beneficiary">Beneficiary</string>
+    <string name="referendum_full_details_requested_amount">Requested amount</string>
+    <string name="referendum_full_details_vote_threshold">Vote threshold</string>
+    <string name="referendum_full_details_turnout">Turnout</string>
+    <string name="referendum_full_details_electorate">Electorate</string>
+    <string name="referendum_full_details_hash">Call hash</string>
+    <string name="referendum_full_details_approve_threshold">Approve curve</string>
+    <string name="referendum_full_details_support_threshold">Support curve</string>
+
     <string name="crowdloan_contributions_liquid_source">Liquid</string>
     <string name="crowdloan_contributions_parallel_source">Parallel</string>
 

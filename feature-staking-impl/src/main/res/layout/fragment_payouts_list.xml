@@ -41,7 +41,7 @@
             android:text="@string/staking_reward_payouts_empty_rewards_v2_2_0"
             android:visibility="gone"
             app:image="@drawable/ic_placeholder"
-            app:showBackground="false" />
+            app:placeholderBackgroundStyle="no_background"/>
 
         <ProgressBar
             android:id="@+id/payoutsListProgress"

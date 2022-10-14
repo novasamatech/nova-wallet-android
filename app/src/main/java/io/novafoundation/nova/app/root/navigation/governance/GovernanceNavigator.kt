@@ -7,6 +7,8 @@ import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumFullDetailsFragment
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumFullDetailsPayload
 
 class GovernanceNavigator(
     private val navigationHolder: NavigationHolder
@@ -18,5 +20,10 @@ class GovernanceNavigator(
     override fun openReferendum(payload: ReferendumDetailsPayload) {
         val bundle = ReferendumDetailsFragment.getBundle(payload)
         navController?.navigate(R.id.action_mainFragment_to_referendum_details, bundle)
+    }
+
+    override fun openReferendumDetails(payload: ReferendumFullDetailsPayload) {
+        val bundle = ReferendumFullDetailsFragment.getBundle(payload)
+        navController?.navigate(R.id.action_mainFragment_to_full_details, bundle)
     }
 }

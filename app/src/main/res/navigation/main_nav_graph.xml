@@ -502,7 +502,23 @@
         android:id="@+id/referendumDetailsFragment"
         android:name="io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsFragment"
         android:label="ReferendumFragment"
-        tools:layout="@layout/fragment_referendum_details" />
+        tools:layout="@layout/fragment_referendum_details">
+
+        <action
+            android:id="@+id/action_mainFragment_to_full_details"
+            app:destination="@id/referendumFullDetailsFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/referendumFullDetailsFragment"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumFullDetailsFragment"
+        android:label="ReferendumFullDetailFragment"
+        tools:layout="@layout/fragment_referendum_full_details" />
 
     <fragment
         android:id="@+id/extrinsicDetailFragment"

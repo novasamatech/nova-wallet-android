@@ -51,11 +51,11 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:text="@string/transfers_empty_v2_2_0"
+        app:placeholderBackgroundStyle="no_background"
         app:image="@drawable/ic_placeholder"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/transactionHistoryTitle"
-        app:showBackground="false" />
+        app:layout_constraintTop_toBottomOf="@+id/transactionHistoryTitle" />
 
     <ImageView
         android:id="@+id/transactionHistoryFilter"

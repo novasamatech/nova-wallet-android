@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.annotation.StringRes
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.core.view.updateMarginsRelative
@@ -37,14 +38,14 @@ open class TableView @JvmOverloads constructor(
         attrs?.let(::applyAttributes)
     }
 
-    fun setTitle(title: String?) {
-        titleView.setTextOrHide(title)
-    }
-
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         super.onLayout(changed, l, t, r, b)
 
         setupTableChildrenAppearance()
+    }
+
+    fun setTitle(title: String?) {
+        titleView.setTextOrHide(title)
     }
 
     private fun addTitleView(): TextView = TextView(context).also { title ->

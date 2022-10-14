@@ -130,7 +130,7 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
                 false
             )
         )
-        referendumFullDetails.setOnClickListener { }
+        referendumFullDetails.setOnClickListener { viewModel.openFullDetails() }
     }
 
     override fun inject() {
