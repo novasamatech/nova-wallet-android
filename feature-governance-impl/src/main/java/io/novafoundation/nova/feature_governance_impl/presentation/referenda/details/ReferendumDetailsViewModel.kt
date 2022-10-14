@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createIdentityAddressModel
+import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.isAye
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.votes
@@ -40,6 +41,7 @@ import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.selectedChainFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 private const val DESCRIPTION_LENGTH_LIMIT = 180
 
@@ -58,7 +60,8 @@ class ReferendumDetailsViewModel(
     private val resourceManager: ResourceManager,
     private val tokenUseCase: TokenUseCase,
     private val referendumFormatter: ReferendumFormatter,
-) : BaseViewModel() {
+    private val externalActions: ExternalActions.Presentation
+) : BaseViewModel(), ExternalActions by externalActions {
 
     private val selectedAccount = selectedAccountUseCase.selectedMetaAccountFlow()
     private val selectedChainFlow = selectedAssetSharedState.selectedChainFlow()
@@ -110,6 +113,13 @@ class ReferendumDetailsViewModel(
 
     fun backClicked() {
         router.back()
+    }
+
+    fun proposerClicked() = launch {
+        val proposer = proposerAddressModel.first()?.address ?: return@launch
+        val payload = ExternalActions.Type.Address(proposer)
+
+        externalActions.showExternalActions(payload, selectedChainFlow.first())
     }
 
     fun readMoreClicked() {

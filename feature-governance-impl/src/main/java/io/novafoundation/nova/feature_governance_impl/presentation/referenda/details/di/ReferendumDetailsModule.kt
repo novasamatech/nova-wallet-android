@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumDetailsInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.identity.GovernanceIdentityProviderFactory
@@ -37,6 +38,7 @@ class ReferendumDetailsModule {
         resourceManager: ResourceManager,
         tokenUseCase: TokenUseCase,
         referendumFormatter: ReferendumFormatter,
+        externalActions: ExternalActions.Presentation
     ): ViewModel {
         return ReferendumDetailsViewModel(
             router = router,
@@ -48,7 +50,8 @@ class ReferendumDetailsModule {
             addressIconGenerator = addressIconGenerator,
             resourceManager = resourceManager,
             tokenUseCase = tokenUseCase,
-            referendumFormatter = referendumFormatter
+            referendumFormatter = referendumFormatter,
+            externalActions = externalActions
         )
     }
 

@@ -15,6 +15,7 @@ import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.useNonNullOrHide
 import io.novafoundation.nova.common.view.setAddressOrHide
+import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
@@ -105,6 +106,10 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
         referendumDetailsVotingStatus.setStartVoteOnClickListener {
             viewModel.voteClicked()
         }
+
+        referendumDetailsProposer.setOnClickListener {
+            viewModel.proposerClicked()
+        }
     }
 
     override fun inject() {
@@ -118,6 +123,8 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
     }
 
     override fun subscribe(viewModel: ReferendumDetailsViewModel) {
+        setupExternalActions(viewModel)
+
         viewModel.referendumDetailsModelFlow.observe {
             when (it) {
                 is LoadingState.Loading -> {
