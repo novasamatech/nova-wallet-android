@@ -21,5 +21,3 @@ data class ReferendumModel(
 )
 
 data class YourVotePreviewModel(val voteType: String, @ColorRes val colorRes: Int, val details: String)
-
-

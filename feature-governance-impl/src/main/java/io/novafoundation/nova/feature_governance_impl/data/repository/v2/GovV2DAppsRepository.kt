@@ -29,7 +29,7 @@ private fun KnownChainDAppConstructor(chain: Chain, builder: (chainPrefix: Strin
 
 private class PolkassemblyUrlConstructor(chainPrefix: String) : ReferendumUrlConstructor {
 
-    override val baseUrl: String = "https://${chainPrefix}.polkassembly.io"
+    override val baseUrl: String = "https://$chainPrefix.polkassembly.io"
 
     override val metadataSearchUrl: String = "https://polkadot.polkassembly.io/"
 
@@ -40,7 +40,7 @@ private class PolkassemblyUrlConstructor(chainPrefix: String) : ReferendumUrlCon
 
 private class SubsquareUrlConstructor(chainPrefix: String) : ReferendumUrlConstructor {
 
-    override val baseUrl: String = "https://${chainPrefix}.subsquare.io"
+    override val baseUrl: String = "https://$chainPrefix.subsquare.io"
 
     override val metadataSearchUrl: String = "https://polkadot.subsquare.io/"
 

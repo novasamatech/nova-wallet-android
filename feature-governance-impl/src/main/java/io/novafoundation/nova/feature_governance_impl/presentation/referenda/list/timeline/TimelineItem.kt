@@ -30,7 +30,7 @@ class TimelineItem @JvmOverloads constructor(
     fun setTimelineState(timelineState: TimelineLayout.TimelineState) {
         itemTimelineSubtitle.stopTimer()
 
-        when(timelineState) {
+        when (timelineState) {
             is TimelineLayout.TimelineState.Historical -> {
                 itemTimelineTitle.text = timelineState.title
                 itemTimelineSubtitle.text = timelineState.subtitle

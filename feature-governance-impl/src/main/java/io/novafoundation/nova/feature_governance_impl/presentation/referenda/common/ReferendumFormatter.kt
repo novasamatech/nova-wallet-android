@@ -230,7 +230,8 @@ class RealReferendumFormatter(
                 } else {
                     val formattedPosition = resourceManager.getString(
                         R.string.referendum_in_queue_position_format,
-                        status.position.index, status.position.maxSize
+                        status.position.index,
+                        status.position.maxSize
                     )
                     ReferendumTimeEstimation.Text(
                         text = formattedPosition,

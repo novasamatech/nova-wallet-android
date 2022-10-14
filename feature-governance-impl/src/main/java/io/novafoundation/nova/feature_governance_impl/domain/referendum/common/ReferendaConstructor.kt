@@ -68,7 +68,6 @@ suspend fun ReferendaConstructor.constructReferendumStatus(
     currentBlockNumber = currentBlockNumber,
 ).values.first()
 
-
 class RealReferendaConstructor(
     private val governanceSourceRegistry: GovernanceSourceRegistry,
     private val chainStateRepository: ChainStateRepository,

@@ -32,7 +32,6 @@ fun ReferendumVoting.Support.passes(): Boolean {
     return turnout > threshold
 }
 
-
 fun ReferendumVoting.Approval.ayeVotesIfNotEmpty(): ReferendumVoting.Approval.Votes? {
     return ayeVotes.takeIf { it.amount != Balance.ZERO }
 }

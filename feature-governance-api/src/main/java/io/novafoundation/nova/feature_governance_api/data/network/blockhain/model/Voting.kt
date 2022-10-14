@@ -59,7 +59,6 @@ fun AccountVote.votes(chainAsset: Chain.Asset): VotesAmount? {
     }
 }
 
-
 fun AccountVote.isAye(): Boolean? {
     return when (this) {
         // TODO handle split votes
