@@ -40,9 +40,9 @@ class RealPreImageRepository(
             val shouldKnowSize = storage.shouldKnowSizeExecuting(request)
 
             val preImageSize = if (shouldKnowSize) {
-                request.knownSize
-            } else {
                 request.knownSize ?: fetchPreImageLength(request.hash)
+            } else {
+                request.knownSize
             }
 
             val shouldFetch = request.fetchIf.shouldFetch(actualPreImageSize = preImageSize)
@@ -121,7 +121,10 @@ class RealPreImageRepository(
     }
 
     private suspend fun StorageQueryContext.fetchPreImageLength(callHash: ByteArray): BigInteger? {
-        return runtime.metadata.preImage().storage("StatusFor").query(callHash, binding = ::bindPreImageLength)
+        return runtime.metadata.preImage().storage("StatusFor").query(
+            callHash,
+            binding = ::bindPreImageLength
+        )
     }
 
     private suspend fun StorageQueryContext.fetchPreImagesLength(callHashes: Collection<ByteArray>): Map<HexHash, BigInteger?> {
@@ -138,7 +141,8 @@ class RealPreImageRepository(
         val valueStruct = asDictEnum.value.castToStruct()
 
         bindNumber(valueStruct["len"])
-    }.getOrNull()
+    }
+        .getOrNull()
 
     private fun bindPreimage(
         decoded: Any?,

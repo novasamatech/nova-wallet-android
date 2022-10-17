@@ -7,23 +7,20 @@ import io.novafoundation.nova.common.list.BaseGroupedDiffCallback
 import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.common.utils.inflateChild
-import io.novafoundation.nova.common.utils.makeGone
-import io.novafoundation.nova.common.utils.makeVisible
-import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.utils.setTextColorRes
-import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getBlurDrawable
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumStatusModel
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumTimeEstimation
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumTrackModel
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumVotingModel
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.setReferendumTimeEstimation
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.setReferendumTrackModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendaGroupModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumModel
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumStatusModel
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumTimeEstimation
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumTrackModel
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumVotingModel
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.YourVoteModel
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.setReferendumTimeEstimation
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.YourVotePreviewModel
 import kotlinx.android.synthetic.main.item_referenda_group.view.itemReferendaGroupCounter
 import kotlinx.android.synthetic.main.item_referenda_group.view.itemReferendaGroupStatus
 import kotlinx.android.synthetic.main.item_referendum.view.itemReferendumName
@@ -124,12 +121,6 @@ private class ReferendumChildHolder(
     }
 
     private fun setTimeEstimation(timeEstimation: ReferendumTimeEstimation?) = with(containerView) {
-        if (timeEstimation == null) {
-            itemReferendumTimeEstimate.makeGone()
-            return@with
-        }
-
-        itemReferendumTimeEstimate.makeVisible()
         itemReferendumTimeEstimate.setReferendumTimeEstimation(timeEstimation)
     }
 
@@ -138,24 +129,14 @@ private class ReferendumChildHolder(
     }
 
     private fun setTrack(track: ReferendumTrackModel?) = with(containerView) {
-        itemReferendumTrack.setVisible(track != null)
-
-        if (track != null) {
-            itemReferendumTrack.text = track.name
-            itemReferendumTrack.setDrawableStart(track.iconRes, widthInDp = 16, paddingInDp = 4, tint = R.color.white_64)
-        }
+        itemReferendumTrack.setReferendumTrackModel(track)
     }
 
     private fun setVoting(voting: ReferendumVotingModel?) = with(containerView) {
-        val hasVotingInfo = voting != null
-        itemReferendumThreshold.isVisible = hasVotingInfo
-
-        if (voting != null) {
-            itemReferendumThreshold.setThresholdModel(voting)
-        }
+        itemReferendumThreshold.setThresholdModel(voting)
     }
 
-    private fun setYourVote(vote: YourVoteModel?) = with(containerView) {
+    private fun setYourVote(vote: YourVotePreviewModel?) = with(containerView) {
         itemReferendumYourVoiceGroup.isVisible = vote != null
         if (vote != null) {
             itemReferendumYourVoteType.text = vote.voteType

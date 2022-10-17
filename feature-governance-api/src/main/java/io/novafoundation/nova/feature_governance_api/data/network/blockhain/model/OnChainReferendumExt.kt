@@ -32,11 +32,15 @@ fun OnChainReferendum.submissionDeposit(): ReferendumDeposit? {
     }
 }
 
+fun OnChainReferendumStatus.inQueue(): Boolean {
+    return this is OnChainReferendumStatus.Ongoing && inQueue
+}
+
 fun OnChainReferendumStatus.asOngoing(): OnChainReferendumStatus.Ongoing {
     return asOngoingOrNull() ?: error("Referendum is not ongoing")
 }
 
-private fun OnChainReferendumStatus.asOngoingOrNull(): OnChainReferendumStatus.Ongoing? {
+fun OnChainReferendumStatus.asOngoingOrNull(): OnChainReferendumStatus.Ongoing? {
     return castOrNull<OnChainReferendumStatus.Ongoing>()
 }
 

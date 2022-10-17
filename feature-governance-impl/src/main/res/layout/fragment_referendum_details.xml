@@ -2,10 +2,10 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/referendumDetailsContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    android:orientation="vertical">
+    tools:background="@color/black">
 
     <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/referendumDetailsToolbar"
@@ -15,6 +15,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
+            android:id="@+id/referendumDetailsToolbarChips"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center_vertical|end"
@@ -56,49 +57,56 @@
             android:clipToPadding="false"
             android:orientation="vertical"
             android:paddingHorizontal="16dp"
-            android:paddingTop="8dp"
+            android:paddingTop="16dp"
             android:paddingBottom="24dp">
 
             <io.novafoundation.nova.common.view.AddressView
-                android:id="@+id/referendumDetailsAddress"
+                android:id="@+id/referendumDetailsProposer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minHeight="20dp"
+                android:layout_marginBottom="8dp"
                 android:paddingVertical="8dp"
-                android:paddingEnd="4dp" />
+                android:paddingEnd="4dp"
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/referendumDetailsTitle"
                 style="@style/TextAppearance.NovaFoundation.Bold.Title1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
                 tools:text="Polkadot and Kusama participation in the 10th Pais Digital Chile Summit." />
 
-            <TextView
-                android:id="@+id/referendumDetailsDescription"
-                style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:ellipsize="end"
-                android:maxLines="4"
-                android:textColor="@color/white_64"
-                tools:text="Sovereign Nature Initiative (SNI) is a non-profit foundation that has brought together multiple partners and engineers from the Kusama ecosystem including Kodadot, Unique Network, Kilt Protocol, Momentum, and Ocean Protocol, to support the building of Web3 capacities for wildlife" />
-
-            <TextView
-                android:id="@+id/referendumDetailsReadMore"
-                style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
-                android:layout_width="wrap_content"
+                android:id="@+id/referendumDetails"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:gravity="center_vertical"
-                android:includeFontPadding="false"
-                android:paddingVertical="7dp"
-                android:text="@string/common_read_more"
-                android:textColor="@color/accentBlue"
-                app:drawableEndCompat="@drawable/ic_chevron_right"
-                app:drawableTint="@color/accentBlue" />
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/referendumDetailsDescription"
+                    style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="4"
+                    android:textColor="@color/white_64"
+                    tools:text="Sovereign Nature Initiative (SNI) is a non-profit foundation that has brought together multiple partners and engineers from the Kusama ecosystem including Kodadot, Unique Network, Kilt Protocol, Momentum, and Ocean Protocol, to support the building of Web3 capacities for wildlife" />
+
+                <TextView
+                    android:id="@+id/referendumDetailsReadMore"
+                    style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:includeFontPadding="false"
+                    android:paddingVertical="7dp"
+                    android:text="@string/common_read_more"
+                    android:textColor="@color/accentBlue"
+                    app:drawableEndCompat="@drawable/ic_chevron_right"
+                    app:drawableTint="@color/accentBlue" />
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/referendumDetailsRequestedAmountContainer"
@@ -147,25 +155,25 @@
             <io.novafoundation.nova.feature_governance_impl.presentation.view.YourVoteView
                 android:id="@+id/referendumDetailsYourVote"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp" />
 
             <io.novafoundation.nova.feature_governance_impl.presentation.view.VotingStatusView
                 android:id="@+id/referendumDetailsVotingStatus"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp" />
+                android:layout_marginBottom="12dp" />
 
             <io.novafoundation.nova.feature_governance_impl.presentation.view.ReferendumDappList
                 android:id="@+id/referendumDetailsDappList"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp" />
+                android:layout_marginBottom="12dp"
+                android:layout_height="wrap_content" />
 
             <LinearLayout
                 android:id="@+id/referendumTimelineContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
                 android:orientation="vertical"
                 android:paddingHorizontal="16dp"
                 android:paddingTop="16dp"
@@ -221,5 +229,17 @@
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
+
+    <ProgressBar
+        android:id="@+id/referendumDetailsProgress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminateTint="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="gone" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

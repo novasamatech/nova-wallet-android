@@ -344,12 +344,11 @@
 
         <action
             android:id="@+id/action_mainFragment_to_referendum_details"
-            app:destination="@id/referendumDetailsFragment"
+            app:destination="@id/referendum_details_graph"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
-
     </fragment>
 
 
@@ -497,12 +496,6 @@
         android:name="io.novafoundation.nova.feature_assets.presentation.transaction.detail.transfer.TransferDetailFragment"
         android:label="TransferDetailFragment"
         tools:layout="@layout/fragment_transfer_details" />
-
-    <fragment
-        android:id="@+id/referendumDetailsFragment"
-        android:name="io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsFragment"
-        android:label="ReferendumFragment"
-        tools:layout="@layout/fragment_referendum_details" />
 
     <fragment
         android:id="@+id/extrinsicDetailFragment"
@@ -1058,4 +1051,6 @@
     <include app:graph="@navigation/add_ledger_chain_account_graph" />
 
     <include app:graph="@navigation/staking_parachain_yield_boost" />
+
+    <include app:graph="@navigation/referendum_details_graph" />
 </navigation>

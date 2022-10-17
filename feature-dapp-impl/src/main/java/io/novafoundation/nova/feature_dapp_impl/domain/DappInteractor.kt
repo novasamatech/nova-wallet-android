@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_dapp_impl.domain
 
 import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.Urls
 import io.novafoundation.nova.feature_dapp_api.data.model.DApp
 import io.novafoundation.nova.feature_dapp_api.data.model.DappCategory
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
@@ -12,7 +13,6 @@ import io.novafoundation.nova.feature_dapp_impl.data.repository.PhishingSitesRep
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.DAppInfo
 import io.novafoundation.nova.feature_dapp_impl.domain.common.buildUrlToDappMapping
 import io.novafoundation.nova.feature_dapp_impl.domain.common.createDAppComparator
-import io.novafoundation.nova.feature_dapp_impl.util.Urls
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -48,7 +48,6 @@ class DappInteractor(
         }
     }
 
-    @OptIn(ExperimentalStdlibApi::class)
     fun observeDAppsByCategory(): Flow<GroupedList<DappCategory, DApp>> {
         return combine(
             dAppMetadataRepository.observeDAppMetadatas(),

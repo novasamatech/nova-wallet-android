@@ -15,6 +15,8 @@
 
     <TextView
         android:id="@+id/addressValue"
+        android:singleLine="true"
+        android:ellipsize="middle"
         style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

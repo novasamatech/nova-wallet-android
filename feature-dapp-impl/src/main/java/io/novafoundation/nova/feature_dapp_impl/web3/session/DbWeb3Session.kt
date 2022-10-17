@@ -1,9 +1,9 @@
 package io.novafoundation.nova.feature_dapp_impl.web3.session
 
+import io.novafoundation.nova.common.utils.Urls
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.core_db.dao.DappAuthorizationDao
 import io.novafoundation.nova.core_db.model.DappAuthorizationLocal
-import io.novafoundation.nova.feature_dapp_impl.util.Urls
 import io.novafoundation.nova.feature_dapp_impl.web3.session.Web3Session.Authorization.State
 import kotlinx.coroutines.flow.Flow
 

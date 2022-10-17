@@ -4,10 +4,11 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
-import io.novafoundation.nova.common.utils.setDrawableStart
-import io.novafoundation.nova.common.utils.setTextColorRes
+import io.novafoundation.nova.common.view.stopTimer
 import io.novafoundation.nova.feature_governance_impl.R
-import kotlinx.android.synthetic.main.item_timeline_default_item.view.*
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.setReferendumTimeEstimation
+import kotlinx.android.synthetic.main.item_timeline_default_item.view.itemTimelineSubtitle
+import kotlinx.android.synthetic.main.item_timeline_default_item.view.itemTimelineTitle
 
 class TimelineItem @JvmOverloads constructor(
     context: Context,
@@ -27,9 +28,17 @@ class TimelineItem @JvmOverloads constructor(
     }
 
     fun setTimelineState(timelineState: TimelineLayout.TimelineState) {
-        itemTimelineTitle.text = timelineState.title
-        itemTimelineSubtitle.text = timelineState.subtitle
-        itemTimelineSubtitle.setTextColorRes(timelineState.subtitleColor)
-        itemTimelineSubtitle.setDrawableStart(timelineState.subtitleIconRes, widthInDp = 16, tint = timelineState.subtitleColor, paddingInDp = 4)
+        itemTimelineSubtitle.stopTimer()
+
+        when (timelineState) {
+            is TimelineLayout.TimelineState.Historical -> {
+                itemTimelineTitle.text = timelineState.title
+                itemTimelineSubtitle.text = timelineState.subtitle
+            }
+            is TimelineLayout.TimelineState.Current -> {
+                itemTimelineTitle.text = timelineState.title
+                itemTimelineSubtitle.setReferendumTimeEstimation(timelineState.subtitle)
+            }
+        }
     }
 }
