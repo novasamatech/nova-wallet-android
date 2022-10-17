@@ -15,13 +15,13 @@ import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.SecretType
+import io.novafoundation.nova.feature_account_api.presenatation.account.details.ChainAccountActionsSheet.AccountAction
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountDetailsInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountInChain
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.account.details.ChainAccountActionsSheet.AccountAction
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.model.AccountTypeAlert
 import io.novafoundation.nova.feature_account_impl.presentation.common.chainAccounts.AccountInChainUi
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherMixin
