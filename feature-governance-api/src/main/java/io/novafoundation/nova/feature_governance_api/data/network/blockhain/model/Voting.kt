@@ -68,7 +68,7 @@ fun AccountVote.isAye(): Boolean? {
 }
 
 fun AccountVote.voteType(): VoteType? {
-    return when(this) {
+    return when (this) {
         AccountVote.Split -> null
 
         is AccountVote.Standard -> if (vote.aye) {
@@ -80,7 +80,7 @@ fun AccountVote.voteType(): VoteType? {
 }
 
 fun Voting.votes(): Map<ReferendumId, AccountVote> {
-    return when(this) {
+    return when (this) {
         is Voting.Casting -> votes
         Voting.Delegating -> emptyMap()
     }

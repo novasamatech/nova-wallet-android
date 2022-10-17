@@ -6,4 +6,3 @@ class ReferendumVoter(
     val accountId: AccountId,
     val vote: AccountVote
 )
-

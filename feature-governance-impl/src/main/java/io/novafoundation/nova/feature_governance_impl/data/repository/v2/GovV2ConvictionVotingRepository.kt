@@ -47,12 +47,12 @@ class GovV2ConvictionVotingRepository(
     }
 
     override suspend fun votersOf(referendumId: ReferendumId, chainId: ChainId): List<ReferendumVoter> {
-       val allVotings = remoteStorageSource.query(chainId) {
-           runtime.metadata.convictionVoting().storage("VotingFor").entries(
-               keyExtractor = { it },
-               binding = { decoded, _ -> bindVoting(decoded) }
-           )
-       }
+        val allVotings = remoteStorageSource.query(chainId) {
+            runtime.metadata.convictionVoting().storage("VotingFor").entries(
+                keyExtractor = { it },
+                binding = { decoded, _ -> bindVoting(decoded) }
+            )
+        }
 
         return allVotings.mapNotNull { (keyComponents, voting) ->
             val (voterId: AccountId, _: BigInteger) = keyComponents
