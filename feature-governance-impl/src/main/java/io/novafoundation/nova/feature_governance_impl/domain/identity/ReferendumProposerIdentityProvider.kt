@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.domain.identity
 
+import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_account_api.domain.account.identity.Identity
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumProposer

@@ -45,7 +45,7 @@ fun bindSuperOf(decoded: Any?): SuperOf? {
     val parentId: ByteArray = asList.first().cast()
 
     return SuperOf(
-        parentIdHex = parentId.toHexString(),
+        parentId = parentId,
         childName = bindData(asList.second()).asString()
     )
 }
