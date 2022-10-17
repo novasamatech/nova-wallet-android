@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createIdentityAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.PreImage
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.isAye
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.votes
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumVoting
@@ -31,6 +32,10 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.com
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.GovernanceDAppModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.ReferendumDetailsModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.ShortenedTextModel
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.fullDetails.PreImagePreviewPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.fullDetails.ReferendumCallPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.fullDetails.ReferendumFullDetailsPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.fullDetails.ReferendumProposerPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.timeline.TimelineLayout
 import io.novafoundation.nova.feature_governance_impl.presentation.view.VotersModel
 import io.novafoundation.nova.feature_governance_impl.presentation.view.YourVoteModel
@@ -42,9 +47,11 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToA
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.selectedChainFlow
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 private const val DESCRIPTION_LENGTH_LIMIT = 180
 
@@ -143,8 +150,10 @@ class ReferendumDetailsViewModel(
         router.openDAppBrowser(url)
     }
 
-    fun fullDetailsClicked() {
-        showMessage("TODO - open full details")
+    fun fullDetailsClicked() = launch {
+        val payload = constructFullDetailsPayload()
+
+        showMessage("TODO - open vote details")
     }
 
     fun voteClicked() {
@@ -283,7 +292,7 @@ class ReferendumDetailsViewModel(
 
     private fun mapReferendumTitleToUi(referendumDetails: ReferendumDetails): String {
         return referendumDetails.offChainMetadata?.title
-            ?: referendumDetails.onChainMetadata?.let { referendumFormatter.formatOnChainName(it.preImage.call) }
+            ?: referendumDetails.onChainMetadata?.preImage?.let { referendumFormatter.formatOnChainName(it.call) }
             ?: referendumFormatter.formatUnknownReferendumTitle()
     }
 
@@ -306,5 +315,30 @@ class ReferendumDetailsViewModel(
             description = resourceManager.getString(R.string.referendum_dapp_comment_react),
             urlConstructor = governanceDApp.urlConstructor
         )
+    }
+
+    private suspend fun constructFullDetailsPayload(): ReferendumFullDetailsPayload = withContext(Dispatchers.Default) {
+        val referendumDetails = referendumDetailsFlow.first()
+        val referendumCall = referendumCallFlow.first()
+
+        ReferendumFullDetailsPayload(
+            proposer = referendumDetails.proposer?.let {
+                ReferendumProposerPayload(it.accountId, it.offChainNickname)
+            },
+            approveThreshold = referendumDetails.fullDetails.approvalCurve?.name,
+            supportThreshold = referendumDetails.fullDetails.supportCurve?.name,
+            hash = referendumDetails.onChainMetadata?.preImageHash,
+            deposit = referendumDetails.fullDetails.deposit,
+            turnout = referendumDetails.voting?.support?.turnout,
+            electorate = referendumDetails.voting?.support?.electorate,
+            referendumCall = ReferendumCallPayload(referendumCall),
+            preImage = constructPreimagePreviewPayload(referendumDetails.onChainMetadata?.preImage)
+        )
+    }
+
+    private suspend fun constructPreimagePreviewPayload(preImage: PreImage?): PreImagePreviewPayload? {
+        return preImage?.let {
+            PreImagePreviewPayload(interactor.previewFor(preImage))
+        }
     }
 }

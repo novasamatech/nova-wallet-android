@@ -20,4 +20,7 @@ interface ReferendumDetailsInteractor {
         preImage: PreImage,
         chain: Chain,
     ): ReferendumCall?
+
+
+    suspend fun previewFor(preImage: PreImage): PreimagePreview
 }
