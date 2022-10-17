@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.domain.referendum.details
 
+import com.google.gson.Gson
 import io.novafoundation.nova.common.utils.Urls
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
@@ -21,10 +22,12 @@ import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourc
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumProposer
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumTrack
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.GovernanceDApp
+import io.novafoundation.nova.feature_governance_api.domain.referendum.details.PreimagePreview
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumCall
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumDetails
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumDetailsInteractor
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumTimeline
+import io.novafoundation.nova.feature_governance_impl.data.preimage.PreImageSizer
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.ReferendaConstructor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.constructReferendumStatus
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.ReferendumCallParser
@@ -45,6 +48,8 @@ class RealReferendumDetailsInteractor(
     private val totalIssuanceRepository: TotalIssuanceRepository,
     private val referendaConstructor: ReferendaConstructor,
     private val dAppMetadataRepository: DAppMetadataRepository,
+    private val preImageSizer: PreImageSizer,
+    private val callFormatter: Gson,
 ) : ReferendumDetailsInteractor {
 
     override suspend fun getAvailableDApps(chain: Chain): List<GovernanceDApp> {
@@ -79,6 +84,21 @@ class RealReferendumDetailsInteractor(
         }
     }
 
+    override suspend fun previewFor(preImage: PreImage): PreimagePreview {
+        val shouldDisplay = preImageSizer.satisfiesSizeConstraint(
+            preImageSize = preImage.encodedCall.size.toBigInteger(),
+            constraint = PreImageSizer.SizeConstraint.SMALL
+        )
+
+        return if (shouldDisplay) {
+            val formatted = callFormatter.toJson(preImage.call)
+
+            PreimagePreview.Display(formatted)
+        } else {
+            PreimagePreview.TooLong
+        }
+    }
+
     private suspend fun referendumDetailsFlowSuspend(
         referendumId: ReferendumId,
         chain: Chain,
@@ -86,15 +106,15 @@ class RealReferendumDetailsInteractor(
     ): Flow<ReferendumDetails> {
         val governanceSource = governanceSourceRegistry.sourceFor(chain.id)
         val tracksById = governanceSource.referenda.getTracksById(chain.id)
+        val offChainInfo = governanceSource.offChainInfo.referendumDetails(chain)
+        val totalIssuance = totalIssuanceRepository.getTotalIssuance(chain.id)
 
         return combine(
             governanceSource.referenda.onChainReferendumFlow(chain.id, referendumId),
             chainStateRepository.currentBlockNumberFlow(chain.id)
         ) { onChainReferendum, currentBlockNumber ->
-            val offChainInfo = governanceSource.offChainInfo.referendumDetails(chain)
             val preImage = preImageRepository.preImageOf(onChainReferendum.proposal(), chain.id)
             val track = onChainReferendum.track()?.let(tracksById::get)
-            val totalIssuance = totalIssuanceRepository.getTotalIssuance(chain.id)
 
             val vote = voterAccountId?.let {
                 val voteByReferendumId = governanceSource.convictionVoting.votingFor(voterAccountId, chain.id)
@@ -124,7 +144,12 @@ class RealReferendumDetailsInteractor(
 
                     ReferendumProposer(accountId, nickname)
                 },
-                onChainMetadata = preImage?.let(ReferendumDetails::OnChainMetadata),
+                onChainMetadata = onChainReferendum.proposal()?.hash()?.let { hash ->
+                    ReferendumDetails.OnChainMetadata(
+                        preImage = preImage,
+                        preImageHash = hash
+                    )
+                },
                 track = track?.let { ReferendumTrack(it.name) },
                 voting = referendaConstructor.constructReferendumVoting(
                     referendum = onChainReferendum,
@@ -158,7 +183,7 @@ private suspend fun PreImageRepository.preImageOf(
 ): PreImage? {
     return when (proposal) {
         is Proposal.Inline -> {
-            PreImage(encodedCall = proposal.encodedCall, call = proposal.call, callHash = proposal.hash())
+            PreImage(encodedCall = proposal.encodedCall, call = proposal.call)
         }
         is Proposal.Legacy -> {
             val request = PreImageRequest(proposal.hash, knownSize = null, fetchIf = ALWAYS)

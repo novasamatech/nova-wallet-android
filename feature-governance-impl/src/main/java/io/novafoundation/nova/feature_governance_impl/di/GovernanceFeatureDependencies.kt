@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_governance_impl.di
 
 import coil.ImageLoader
+import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
@@ -15,6 +16,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.runtime.di.ExtrinsicSerialization
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
@@ -65,4 +67,7 @@ interface GovernanceFeatureDependencies {
     fun onChainIdentityProvider(): IdentityProvider
 
     val externalAccountActions: ExternalActions.Presentation
+
+    @ExtrinsicSerialization
+    fun extrinsicGson(): Gson
 }

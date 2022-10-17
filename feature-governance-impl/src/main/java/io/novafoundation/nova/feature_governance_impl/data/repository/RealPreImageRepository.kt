@@ -17,7 +17,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import io.novafoundation.nova.runtime.storage.source.query.wrapSingleArgumentKeys
-import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Tuple
@@ -53,7 +52,7 @@ class RealPreImageRepository(
             if (!canReturnValue) return@query null
 
             val key = storage.preImageStorageKey(request.hash, preImageSize)
-            storage.query(key, binding = { bindPreimage(it, runtime, request.hash) })
+            storage.query(key, binding = { bindPreimage(it, runtime) })
         }
     }
 
@@ -94,7 +93,7 @@ class RealPreImageRepository(
             storage.entries(
                 keysArguments = keysToFetch.wrapSingleArgumentKeys(),
                 keyExtractor = { (hashAndLen: List<*>) -> bindByteArray(hashAndLen.first()).toHexString() },
-                binding = { decoded, hashHex -> bindPreimage(decoded, runtime, preImageHash = hashHex.fromHex()) }
+                binding = { decoded, hashHex -> bindPreimage(decoded, runtime) }
             )
         }
     }
@@ -147,7 +146,6 @@ class RealPreImageRepository(
     private fun bindPreimage(
         decoded: Any?,
         runtime: RuntimeSnapshot,
-        preImageHash: ByteArray,
     ): PreImage? {
         val asByteArray = decoded.castOrNull<ByteArray>() ?: return null
 
@@ -159,7 +157,6 @@ class RealPreImageRepository(
             PreImage(
                 encodedCall = asByteArray,
                 call = it,
-                callHash = preImageHash
             )
         }
     }

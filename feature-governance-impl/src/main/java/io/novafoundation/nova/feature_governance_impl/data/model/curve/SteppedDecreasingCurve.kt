@@ -18,6 +18,8 @@ class SteppedDecreasingCurve(
     private val period: Perbill
 ) : VotingCurve {
 
+    override val name: String = "SteppedDecreasing"
+
     override fun threshold(x: Perbill): Perbill {
         val passedPeriods = x.divideToIntegralValue(period)
         val decrease = passedPeriods * step

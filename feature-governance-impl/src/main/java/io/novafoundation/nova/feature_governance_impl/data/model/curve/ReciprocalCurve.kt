@@ -16,6 +16,8 @@ class ReciprocalCurve(
     private val yOffset: FixedI64
 ) : VotingCurve {
 
+    override val name: String = "Reciprocal"
+
     override fun threshold(x: Perbill): Perbill {
         return factor.divide(x + xOffset, MathContext.DECIMAL64) - yOffset
     }
