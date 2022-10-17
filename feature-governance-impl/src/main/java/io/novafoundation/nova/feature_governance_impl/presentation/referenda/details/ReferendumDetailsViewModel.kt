@@ -32,10 +32,10 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.com
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.GovernanceDAppModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.ReferendumDetailsModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.ShortenedTextModel
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.fullDetails.PreImagePreviewPayload
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.fullDetails.ReferendumCallPayload
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.fullDetails.ReferendumFullDetailsPayload
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.fullDetails.ReferendumProposerPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.PreImagePreviewPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumCallPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumFullDetailsPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumProposerPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.timeline.TimelineLayout
 import io.novafoundation.nova.feature_governance_impl.presentation.view.VotersModel
 import io.novafoundation.nova.feature_governance_impl.presentation.view.YourVoteModel
@@ -152,7 +152,7 @@ class ReferendumDetailsViewModel(
 
     fun fullDetailsClicked() = launch {
         val payload = constructFullDetailsPayload()
-        router.openReferendumDetails(payload)
+        router.openReferendumFullDetails(payload)
     }
 
     fun voteClicked() {
@@ -324,6 +324,8 @@ class ReferendumDetailsViewModel(
             proposer = referendumDetails.proposer?.let {
                 ReferendumProposerPayload(it.accountId, it.offChainNickname)
             },
+
+            voteThreshold = null,
             approveThreshold = referendumDetails.fullDetails.approvalCurve?.name,
             supportThreshold = referendumDetails.fullDetails.supportCurve?.name,
             hash = referendumDetails.onChainMetadata?.preImageHash,
@@ -331,7 +333,7 @@ class ReferendumDetailsViewModel(
             turnout = referendumDetails.voting?.support?.turnout,
             electorate = referendumDetails.voting?.support?.electorate,
             referendumCall = ReferendumCallPayload(referendumCall),
-            preImage = constructPreimagePreviewPayload(referendumDetails.onChainMetadata?.preImage)
+            preImage = constructPreimagePreviewPayload(referendumDetails.onChainMetadata?.preImage),
         )
     }
 

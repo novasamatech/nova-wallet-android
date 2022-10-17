@@ -35,12 +35,6 @@ interface GovernanceFeatureDependencies {
 
     val imageLoader: ImageLoader
 
-    @LocalIdentity
-    fun localProvider(): IdentityProvider
-
-    @OnChainIdentity
-    fun onChainProvider(): IdentityProvider
-
     val addressIconGenerator: AddressIconGenerator
 
     val resourceManager: ResourceManager
@@ -63,8 +57,6 @@ interface GovernanceFeatureDependencies {
     val storageCache: StorageCache
 
     val sampledBlockTimeStorage: SampledBlockTimeStorage
-
-    val externalActionPresentation: ExternalActions.Presentation
 
     val dAppMetadataRepository: DAppMetadataRepository
 
