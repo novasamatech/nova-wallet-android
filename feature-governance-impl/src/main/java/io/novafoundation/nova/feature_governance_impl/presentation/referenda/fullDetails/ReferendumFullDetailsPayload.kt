@@ -39,16 +39,15 @@ sealed class PreImagePreviewPayload : Parcelable {
 class ReferendumProposerPayload(val accountId: AccountId, val offChainName: String?) : Parcelable
 
 fun ReferendumCallPayload(referendumCall: ReferendumCall?): ReferendumCallPayload? {
-    return when(referendumCall) {
+    return when (referendumCall) {
         is ReferendumCall.TreasuryRequest -> ReferendumCallPayload.TreasuryRequest(referendumCall.amount, referendumCall.beneficiary)
         null -> null
     }
 }
 
 fun PreImagePreviewPayload(preimagePreview: PreimagePreview): PreImagePreviewPayload {
-    return when(preimagePreview) {
+    return when (preimagePreview) {
         is PreimagePreview.Display -> PreImagePreviewPayload.Preview(preimagePreview.value)
         PreimagePreview.TooLong -> PreImagePreviewPayload.TooLong
     }
 }
-
