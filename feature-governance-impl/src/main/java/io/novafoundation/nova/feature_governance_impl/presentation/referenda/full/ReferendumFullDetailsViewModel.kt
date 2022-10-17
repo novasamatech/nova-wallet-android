@@ -126,9 +126,6 @@ class ReferendumFullDetailsViewModel(
         }
     }
 
-    fun openCallHash() {
-    }
-
     private fun openAddressInfo(accountId: ByteArray) = launch {
         val chain = getChain()
         val address = chain.addressOf(accountId)
