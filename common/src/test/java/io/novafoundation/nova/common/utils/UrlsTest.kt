@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_dapp_impl.util
+package io.novafoundation.nova.common.utils
 
 import org.junit.Assert.assertEquals
 import org.junit.Test

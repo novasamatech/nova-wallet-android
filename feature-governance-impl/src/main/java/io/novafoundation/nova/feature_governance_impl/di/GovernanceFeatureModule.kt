@@ -28,6 +28,8 @@ import io.novafoundation.nova.feature_governance_impl.di.modules.screens.Referen
 import io.novafoundation.nova.feature_governance_impl.domain.identity.GovernanceIdentityProviderFactory
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.RealReferendaConstructor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.ReferendaConstructor
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.RealReferendumFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.AssetUseCaseImpl
@@ -144,4 +146,8 @@ class GovernanceFeatureModule {
     @Provides
     @FeatureScope
     fun providePreImageSizer(): PreImageSizer = RealPreImageSizer()
+
+    @Provides
+    @FeatureScope
+    fun provideReferendumFormatter(resourceManager: ResourceManager): ReferendumFormatter = RealReferendumFormatter(resourceManager)
 }

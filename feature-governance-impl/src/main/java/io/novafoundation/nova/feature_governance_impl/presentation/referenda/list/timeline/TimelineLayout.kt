@@ -7,16 +7,12 @@ import android.graphics.DashPathEffect
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.PointF
-import android.os.Parcel
-import android.os.Parcelable
 import android.util.AttributeSet
 import android.widget.LinearLayout
-import androidx.annotation.ColorRes
-import androidx.annotation.DrawableRes
 import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.feature_governance_impl.R
-import kotlinx.android.parcel.Parcelize
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumTimeEstimation
 import kotlin.math.roundToInt
 
 class TimelineLayout @JvmOverloads constructor(
@@ -118,22 +114,6 @@ class TimelineLayout @JvmOverloads constructor(
         }
     }
 
-    override fun onSaveInstanceState(): Parcelable {
-        return SavedState(
-            super.onSaveInstanceState(),
-            timeline
-        )
-    }
-
-    override fun onRestoreInstanceState(state: Parcelable?) {
-        if (state is SavedState) {
-            super.onRestoreInstanceState(state.superState)
-            timeline = state.timeline ?: createDefaultTimeline()
-        } else {
-            super.onRestoreInstanceState(state)
-        }
-    }
-
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         timelineStatePoints.forEach {
@@ -169,58 +149,21 @@ class TimelineLayout @JvmOverloads constructor(
         )
     }
 
-    @Parcelize
-    data class Timeline(
+    class Timeline(
         val states: List<TimelineState>,
         val finished: Boolean
-    ) : Parcelable
+    )
 
-    @Parcelize
-    data class TimelineState(
-        val title: String,
-        val subtitle: String,
-        @DrawableRes val subtitleIconRes: Int?,
-        @ColorRes val subtitleColor: Int
-    ) : Parcelable
+    sealed class TimelineState {
 
-    private class SavedState : BaseSavedState {
+        class Historical(
+            val title: String,
+            val subtitle: String?,
+        ) : TimelineState()
 
-        val timeline: Timeline?
-
-        constructor(
-            superState: Parcelable?,
-            timeline: Timeline
-        ) : super(superState) {
-            this.timeline = timeline
-        }
-
-        constructor(parcel: Parcel) : this(parcel, null)
-
-        constructor(parcel: Parcel, loader: ClassLoader?) : super(parcel, loader) {
-            timeline = parcel.readParcelable(Timeline::class.java.classLoader)
-        }
-
-        override fun writeToParcel(out: Parcel, flags: Int) {
-            super.writeToParcel(out, flags)
-            out.writeParcelable(timeline, flags)
-        }
-
-        override fun describeContents(): Int {
-            return 0
-        }
-
-        companion object CREATOR : Parcelable.ClassLoaderCreator<SavedState> {
-            override fun createFromParcel(parcel: Parcel): SavedState {
-                return SavedState(parcel)
-            }
-
-            override fun createFromParcel(parcel: Parcel, classLoader: ClassLoader?): SavedState {
-                return SavedState(parcel, classLoader)
-            }
-
-            override fun newArray(size: Int): Array<SavedState?> {
-                return arrayOfNulls(size)
-            }
-        }
+        class Current(
+            val title: String,
+            val subtitle: ReferendumTimeEstimation
+        ) : TimelineState()
     }
 }

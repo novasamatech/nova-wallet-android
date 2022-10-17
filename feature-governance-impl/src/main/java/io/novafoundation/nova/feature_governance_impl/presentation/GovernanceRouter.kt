@@ -8,5 +8,7 @@ interface GovernanceRouter : ReturnableRouter {
 
     fun openReferendum(payload: ReferendumDetailsPayload)
 
+    fun openDAppBrowser(initialUrl: String)
+
     fun openReferendumDetails(payload: ReferendumFullDetailsPayload)
 }

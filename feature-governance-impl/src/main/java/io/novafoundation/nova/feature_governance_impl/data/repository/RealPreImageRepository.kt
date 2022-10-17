@@ -17,7 +17,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import io.novafoundation.nova.runtime.storage.source.query.wrapSingleArgumentKeys
-import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Tuple
@@ -40,9 +39,9 @@ class RealPreImageRepository(
             val shouldKnowSize = storage.shouldKnowSizeExecuting(request)
 
             val preImageSize = if (shouldKnowSize) {
-                request.knownSize
-            } else {
                 request.knownSize ?: fetchPreImageLength(request.hash)
+            } else {
+                request.knownSize
             }
 
             val shouldFetch = request.fetchIf.shouldFetch(actualPreImageSize = preImageSize)
@@ -53,7 +52,7 @@ class RealPreImageRepository(
             if (!canReturnValue) return@query null
 
             val key = storage.preImageStorageKey(request.hash, preImageSize)
-            storage.query(key, binding = { bindPreimage(it, runtime, request.hash) })
+            storage.query(key, binding = { bindPreimage(it, runtime) })
         }
     }
 
@@ -94,7 +93,7 @@ class RealPreImageRepository(
             storage.entries(
                 keysArguments = keysToFetch.wrapSingleArgumentKeys(),
                 keyExtractor = { (hashAndLen: List<*>) -> bindByteArray(hashAndLen.first()).toHexString() },
-                binding = { decoded, hashHex -> bindPreimage(decoded, runtime, preImageHash = hashHex.fromHex()) }
+                binding = { decoded, hashHex -> bindPreimage(decoded, runtime) }
             )
         }
     }
@@ -121,7 +120,10 @@ class RealPreImageRepository(
     }
 
     private suspend fun StorageQueryContext.fetchPreImageLength(callHash: ByteArray): BigInteger? {
-        return runtime.metadata.preImage().storage("StatusFor").query(callHash, binding = ::bindPreImageLength)
+        return runtime.metadata.preImage().storage("StatusFor").query(
+            callHash,
+            binding = ::bindPreImageLength
+        )
     }
 
     private suspend fun StorageQueryContext.fetchPreImagesLength(callHashes: Collection<ByteArray>): Map<HexHash, BigInteger?> {
@@ -138,12 +140,12 @@ class RealPreImageRepository(
         val valueStruct = asDictEnum.value.castToStruct()
 
         bindNumber(valueStruct["len"])
-    }.getOrNull()
+    }
+        .getOrNull()
 
     private fun bindPreimage(
         decoded: Any?,
         runtime: RuntimeSnapshot,
-        preImageHash: ByteArray,
     ): PreImage? {
         val asByteArray = decoded.castOrNull<ByteArray>() ?: return null
 
@@ -155,7 +157,6 @@ class RealPreImageRepository(
             PreImage(
                 encodedCall = asByteArray,
                 call = it,
-                callHash = preImageHash
             )
         }
     }

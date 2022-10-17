@@ -23,6 +23,6 @@ class TreasuryApproveProposalParser(
 
         val proposal = treasuryRepository.getTreasuryProposal(chainId, TreasuryProposal.Id(id)) ?: return null
 
-        ReferendumCall.TreasuryRequest(amount = proposal.amount)
+        ReferendumCall.TreasuryRequest(amount = proposal.amount, beneficiary = proposal.beneficiary)
     }.getOrNull()
 }

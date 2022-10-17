@@ -1,9 +1,9 @@
 package io.novafoundation.nova.feature_dapp_impl.domain.browser
 
+import io.novafoundation.nova.common.utils.Urls
+import io.novafoundation.nova.common.utils.isSecure
 import io.novafoundation.nova.feature_dapp_impl.data.repository.FavouritesDAppRepository
 import io.novafoundation.nova.feature_dapp_impl.data.repository.PhishingSitesRepository
-import io.novafoundation.nova.feature_dapp_impl.util.Urls
-import io.novafoundation.nova.feature_dapp_impl.util.isSecure
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.net.URL

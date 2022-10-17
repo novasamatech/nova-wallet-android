@@ -56,7 +56,7 @@ class RealReferendaListInteractor(
                 chain = chain,
                 onChainReferenda = onChainReferenda,
                 tracksById = tracksById,
-                currentBlockNumber = currentBlockNumber
+                currentBlockNumber = currentBlockNumber,
             )
 
             val proposals = constructReferendaProposals(onChainReferenda, chain)

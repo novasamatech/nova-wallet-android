@@ -26,4 +26,9 @@ class GovernanceNavigator(
         val bundle = ReferendumFullDetailsFragment.getBundle(payload)
         navController?.navigate(R.id.action_mainFragment_to_full_details, bundle)
     }
+
+    override fun openDAppBrowser(initialUrl: String) = performNavigation(
+        actionId = R.id.action_referendumDetailsFragment_to_DAppBrowserFragment,
+        args = DAppBrowserFragment.getBundle(initialUrl)
+    )
 }

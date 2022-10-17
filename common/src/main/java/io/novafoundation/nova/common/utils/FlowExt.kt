@@ -72,6 +72,10 @@ fun <T> Flow<T>.takeWhileInclusive(predicate: suspend (T) -> Boolean) = transfor
     predicate(it)
 }
 
+inline fun <T, R> Flow<T?>.mapNullable(crossinline mapper: suspend (T) -> R): Flow<R?> {
+    return map { it?.let { mapper(it) } }
+}
+
 /**
  * Modifies flow so that it firstly emits [LoadingState.Loading] state for each element from upstream.
  * Then, it constructs new source via [sourceSupplier] and emits all of its items wrapped into [LoadingState.Loaded] state

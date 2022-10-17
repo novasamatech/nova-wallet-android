@@ -20,5 +20,7 @@ data class TrackInfo(
 
 interface VotingCurve {
 
+    val name: String
+
     fun threshold(x: Perbill): Perbill
 }

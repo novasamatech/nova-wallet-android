@@ -8,6 +8,8 @@ import android.widget.FrameLayout
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.utils.WithContextExtensions
+import io.novafoundation.nova.common.utils.makeGone
+import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setDrawableEnd
 import kotlinx.android.synthetic.main.view_address.view.addressImage
 import kotlinx.android.synthetic.main.view_address.view.addressValue
@@ -32,15 +34,20 @@ class AddressView @JvmOverloads constructor(
     override fun setOnClickListener(listener: OnClickListener?) {
         super.setOnClickListener(listener)
         if (listener != null) {
-            background = getRoundedCornerDrawable(cornerSizeDp = 8).withRipple()
             addressValue.setDrawableEnd(R.drawable.ic_info_16, widthInDp = 16, tint = R.color.white_48, paddingInDp = 6)
         } else {
-            background = null
             addressValue.setDrawableEnd(null)
         }
     }
 }
 
-fun AddressView.setModel(address: AddressModel) {
-    setAddress(address.image, address.nameOrAddress)
+fun AddressView.setAddressOrHide(addressModel: AddressModel?) {
+    if (addressModel == null) {
+        makeGone()
+        return
+    }
+
+    makeVisible()
+
+    setAddress(addressModel.image, addressModel.nameOrAddress)
 }

@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaListInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.ReferendaListViewModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorMixin
 
@@ -31,7 +32,8 @@ class ReferendaListModule {
         selectedAssetSharedState: GovernanceSharedState,
         resourceManager: ResourceManager,
         updateSystem: UpdateSystem,
-        governanceRouter: GovernanceRouter
+        governanceRouter: GovernanceRouter,
+        referendumFormatter: ReferendumFormatter,
     ): ViewModel {
         return ReferendaListViewModel(
             assetSelectorFactory = assetSelectorFactory,
@@ -40,7 +42,8 @@ class ReferendaListModule {
             selectedAssetSharedState = selectedAssetSharedState,
             resourceManager = resourceManager,
             updateSystem = updateSystem,
-            governanceRouter = governanceRouter
+            governanceRouter = governanceRouter,
+            referendumFormatter = referendumFormatter,
         )
     }
 

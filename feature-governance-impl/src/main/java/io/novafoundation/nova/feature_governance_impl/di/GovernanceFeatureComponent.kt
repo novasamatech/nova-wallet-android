@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
+import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.di.ReferendumDetailsComponent
@@ -46,6 +47,7 @@ interface GovernanceFeatureComponent : GovernanceFeatureApi {
             RuntimeApi::class,
             WalletFeatureApi::class,
             AccountFeatureApi::class,
+            DAppFeatureApi::class,
             DbApi::class,
         ]
     )

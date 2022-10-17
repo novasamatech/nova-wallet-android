@@ -19,7 +19,7 @@ data class ReferendumDetails(
     val voting: ReferendumVoting?,
     val userVote: AccountVote?,
     val timeline: ReferendumTimeline,
-    val fullDetails: FullDetails
+    val fullDetails: FullDetails,
 ) {
 
     data class FullDetails(
@@ -30,7 +30,7 @@ data class ReferendumDetails(
 
     data class OffChainMetadata(val title: String, val description: String)
 
-    data class OnChainMetadata(val preImage: PreImage)
+    data class OnChainMetadata(val preImage: PreImage?, val preImageHash: ByteArray)
 }
 
 data class ReferendumTimeline(val currentStatus: ReferendumStatus, val pastEntries: List<Entry>) {
