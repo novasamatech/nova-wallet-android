@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -13,16 +13,13 @@
         android:layout_height="wrap_content"
         app:dividerVisible="false"
         app:homeButtonIcon="@drawable/ic_close"
-        app:layout_constraintTop_toTopOf="parent"
         app:titleText="@string/referendum_full_details_title" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/referendumDetailsScrollView"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:overScrollMode="never"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/referendumFullDetailsToolbar">
+        android:layout_height="match_parent"
+        android:overScrollMode="never">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -42,6 +39,8 @@
                     android:id="@+id/referendumFullDetailsProposal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    app:primaryValueIcon="@drawable/ic_info_16"
+                    app:primaryValueIconTint="@color/white_64"
                     app:title="@string/referendum_full_details_proposal" />
 
                 <io.novafoundation.nova.common.view.TableCellView
@@ -62,6 +61,8 @@
                     android:id="@+id/referendumFullDetailsBeneficiary"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    app:primaryValueIcon="@drawable/ic_info_16"
+                    app:primaryValueIconTint="@color/white_64"
                     app:title="@string/referendum_full_details_beneficiary" />
 
                 <io.novafoundation.nova.common.view.TableCellView
@@ -118,11 +119,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:visibility="gone"
+                    app:primaryValueIcon="@drawable/ic_info_16"
+                    app:primaryValueIconTint="@color/white_64"
                     app:title="@string/referendum_full_details_hash" />
 
             </io.novafoundation.nova.common.view.TableView>
 
             <TextView
+                android:id="@+id/referendumFullDetailsPreimageTitle"
                 style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -156,4 +160,4 @@
 
     </androidx.core.widget.NestedScrollView>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

@@ -1,11 +1,9 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.full
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
@@ -14,10 +12,7 @@ import io.novafoundation.nova.common.presentation.CopierBottomSheet
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.common.utils.makeVisible
-import io.novafoundation.nova.feature_account_api.presenatation.account.details.ChainAccountActionsSheet
-import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActionsSheet
-import io.novafoundation.nova.feature_account_api.presenatation.actions.copyAddressClicked
+import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
@@ -32,6 +27,7 @@ import kotlinx.android.synthetic.main.fragment_referendum_full_details.referendu
 import kotlinx.android.synthetic.main.fragment_referendum_full_details.referendumFullDetailsElectorate
 import kotlinx.android.synthetic.main.fragment_referendum_full_details.referendumFullDetailsPlaceholder
 import kotlinx.android.synthetic.main.fragment_referendum_full_details.referendumFullDetailsPreImage
+import kotlinx.android.synthetic.main.fragment_referendum_full_details.referendumFullDetailsPreimageTitle
 import kotlinx.android.synthetic.main.fragment_referendum_full_details.referendumFullDetailsProposal
 import kotlinx.android.synthetic.main.fragment_referendum_full_details.referendumFullDetailsProposalContainer
 import kotlinx.android.synthetic.main.fragment_referendum_full_details.referendumFullDetailsRequestedAmount
@@ -65,31 +61,18 @@ class ReferendumFullDetailsFragment : BaseFragment<ReferendumFullDetailsViewMode
         }
         referendumFullDetailsPreImage.background = getRoundedCornerDrawable(R.color.white_8)
 
-        referendumFullDetailsProposal.setPrimaryValueIcon(R.drawable.ic_info_16, R.color.white_64)
-        referendumFullDetailsBeneficiary.setPrimaryValueIcon(R.drawable.ic_info_16, R.color.white_64)
-        referendumFullDetailsCallHash.setPrimaryValueIcon(R.drawable.ic_info_16, R.color.white_64)
-
-        viewModel.approveThreshold?.let {
-            referendumFullDetailsApproveThreshold.showValue(it)
-            referendumFullDetailsApproveThreshold.makeVisible()
-        }
-        viewModel.supportThreshold?.let {
-            referendumFullDetailsSupportThreshold.showValue(it)
-            referendumFullDetailsSupportThreshold.makeVisible()
-        }
-        viewModel.voteThreshold?.let {
-            referendumFullDetailsVoteThreshold.showValue(it)
-            referendumFullDetailsVoteThreshold.makeVisible()
-        }
+        referendumFullDetailsApproveThreshold.showValueOrHide(primary = viewModel.approveThreshold)
+        referendumFullDetailsSupportThreshold.showValueOrHide(primary = viewModel.supportThreshold)
+        referendumFullDetailsVoteThreshold.showValueOrHide(primary = viewModel.voteThreshold)
 
         viewModel.callHash?.let { hash ->
-            referendumFullDetailsCallHash.showValue(hash)
-            referendumFullDetailsCallHash.makeVisible()
+            referendumFullDetailsCallHash.showValueOrHide(primary = hash)
             referendumFullDetailsCallHash.setOnClickListener { showCopyingBottomSheet(hash) }
         }
 
-        referendumFullDetailsPlaceholder.isGone = viewModel.hasPreImage
-        referendumFullDetailsPreImage.isVisible = viewModel.hasPreImage
+        referendumFullDetailsPreimageTitle.isVisible = viewModel.hasPreimage
+        referendumFullDetailsPlaceholder.isVisible = viewModel.isPreimageTooLong
+        referendumFullDetailsPreImage.isVisible = viewModel.isPreviewAvailable
         referendumFullDetailsPreImage.text = viewModel.preImage
 
         referendumFullDetailsProposal.setOnClickListener { viewModel.openProposal() }
@@ -107,9 +90,9 @@ class ReferendumFullDetailsFragment : BaseFragment<ReferendumFullDetailsViewMode
     }
 
     override fun subscribe(viewModel: ReferendumFullDetailsViewModel) {
-        setupExternalActions()
+        setupExternalActions(viewModel)
 
-        viewModel.proposerAddressModelFlow.observe { addressAndAmount ->
+        viewModel.proposerModel.observe { addressAndAmount ->
             if (addressAndAmount == null) {
                 referendumFullDetailsProposalContainer.makeGone()
             } else {
@@ -119,7 +102,7 @@ class ReferendumFullDetailsFragment : BaseFragment<ReferendumFullDetailsViewMode
             }
         }
 
-        viewModel.beneficiaryAddressModelFlow.observe { addressAndAmount ->
+        viewModel.beneficiaryModel.observe { addressAndAmount ->
             if (addressAndAmount == null) {
                 referendumFullDetailsBeneficiaryContainer.makeGone()
             } else {
@@ -138,21 +121,6 @@ class ReferendumFullDetailsFragment : BaseFragment<ReferendumFullDetailsViewMode
             referendumFullDetailsElectorate?.showAmount(it)
             referendumFullDetailsElectorate.makeVisible()
         }
-    }
-
-    private fun setupExternalActions() {
-        setupExternalActions(viewModel) { context, payload ->
-            getAddressExternalAction(context, payload)
-        }
-    }
-
-    private fun getAddressExternalAction(context: Context, payload: ExternalActions.Payload): ExternalActionsSheet {
-        return ChainAccountActionsSheet(
-            context,
-            payload,
-            onCopy = viewModel::copyAddressClicked,
-            onViewExternal = viewModel::viewExternalClicked
-        )
     }
 
     private fun showCopyingBottomSheet(value: String) {

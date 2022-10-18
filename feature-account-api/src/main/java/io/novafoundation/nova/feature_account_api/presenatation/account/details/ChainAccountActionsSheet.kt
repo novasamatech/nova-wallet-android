@@ -17,9 +17,9 @@ class ChainAccountActionsSheet(
     payload: ExternalActions.Payload,
     onCopy: CopyCallback,
     onViewExternal: ExternalViewCallback,
-    private val availableAccountActions: Set<AccountAction>? = null,
-    private val onChange: ((inChain: Chain) -> Unit)? = null,
-    private val onExport: ((inChain: Chain) -> Unit)? = null,
+    private val availableAccountActions: Set<AccountAction>,
+    private val onChange: (inChain: Chain) -> Unit,
+    private val onExport: (inChain: Chain) -> Unit,
 ) : ExternalActionsSheet(context, payload, onCopy, onViewExternal) {
 
     enum class AccountAction {
@@ -34,7 +34,7 @@ class ChainAccountActionsSheet(
     }
 
     private fun showAvailableAccountActions() {
-        availableAccountActions?.forEach {
+        availableAccountActions.forEach {
             when (it) {
                 AccountAction.EXPORT -> maybeShowExport()
                 AccountAction.CHANGE -> maybeShowChange()
@@ -45,7 +45,7 @@ class ChainAccountActionsSheet(
     private fun maybeShowExport() {
         accountAddress()?.let {
             item(R.drawable.ic_share_arrow_white_24, R.string.account_export, showArrow = true) {
-                onExport?.invoke(payload.chain)
+                onExport.invoke(payload.chain)
             }
         }
     }
@@ -62,7 +62,7 @@ class ChainAccountActionsSheet(
 
     private fun changeAccountItem(@StringRes labelRes: Int) {
         item(R.drawable.ic_staking_operations, labelRes, showArrow = true) {
-            onChange?.invoke(payload.chain)
+            onChange.invoke(payload.chain)
         }
     }
 

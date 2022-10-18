@@ -21,10 +21,10 @@ class PlaceholderView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
-    enum class Style(val showBackground: Boolean, val backgroundColorRes: Int, val textColorRes: Int) {
+    enum class Style(val showBackground: Boolean, val backgroundColorRes: Int?, val textColorRes: Int) {
         BACKGROUND_DARK(true, R.color.black_48, R.color.white_48),
         BACKGROUND_LIGHT(true, R.color.white_8, R.color.white_64),
-        NO_BACKGROUND(false, R.color.black_48, R.color.white_64)
+        NO_BACKGROUND(false, null, R.color.white_64)
     }
 
     init {
@@ -49,7 +49,7 @@ class PlaceholderView @JvmOverloads constructor(
 
     fun setStyle(style: Style) {
         background = if (style.showBackground) {
-            context.getRoundedCornerDrawable(style.backgroundColorRes, cornerSizeInDp = 12)
+            context.getRoundedCornerDrawable(style.backgroundColorRes!!, cornerSizeInDp = 12)
         } else {
             null
         }

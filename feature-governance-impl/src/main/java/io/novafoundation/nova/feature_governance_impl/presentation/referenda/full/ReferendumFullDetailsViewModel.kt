@@ -41,15 +41,17 @@ class ReferendumFullDetailsViewModel(
     val proposerIdentityProvider = identityProviderFactory.proposerProvider(referendumProposerFlow)
     val defaultIdentityProvider = identityProviderFactory.defaultProvider()
 
-    val proposerAddressModelFlow = payloadFlow
+    val proposerModel = payloadFlow
         .map { createProposerAddressModel(it.proposer, it.deposit) }
         .shareInBackground()
 
-    val beneficiaryAddressModelFlow = payloadFlow
+    val beneficiaryModel = payloadFlow
         .map { createBeneficiaryAddressModel(it.referendumCall) }
         .shareInBackground()
 
-    val hasPreImage = payload.preImage != null && payload.preImage !is PreImagePreviewPayload.TooLong
+    val hasPreimage = payload.preImage != null
+    val isPreimageTooLong = payload.preImage is PreImagePreviewPayload.TooLong
+    val isPreviewAvailable = payload.preImage is PreImagePreviewPayload.Preview
 
     val voteThreshold = payload.voteThreshold
     val approveThreshold = payload.approveThreshold
