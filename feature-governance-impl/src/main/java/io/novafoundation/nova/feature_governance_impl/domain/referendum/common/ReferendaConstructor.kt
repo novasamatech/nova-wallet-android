@@ -201,7 +201,6 @@ class RealReferendaConstructor(
                 }
                 is ReferendumStatus.Approved -> {
                     add(State.CREATED, at = null)
-                    add(State.APPROVED, at = null)
                 }
                 ReferendumStatus.Executed -> {
                     add(State.CREATED, at = null)
