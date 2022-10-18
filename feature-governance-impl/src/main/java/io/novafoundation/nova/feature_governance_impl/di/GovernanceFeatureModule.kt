@@ -31,6 +31,7 @@ import io.novafoundation.nova.feature_governance_impl.di.modules.GovernanceV2
 import io.novafoundation.nova.feature_governance_impl.di.modules.GovernanceV2Module
 import io.novafoundation.nova.feature_governance_impl.di.modules.screens.ReferendumDetailsModule
 import io.novafoundation.nova.feature_governance_impl.di.modules.screens.ReferendumListModule
+import io.novafoundation.nova.feature_governance_impl.di.modules.screens.ReferendumVotersModule
 import io.novafoundation.nova.feature_governance_impl.domain.identity.GovernanceIdentityProviderFactory
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.RealReferendaConstructor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.ReferendaConstructor
@@ -58,7 +59,8 @@ import javax.inject.Named
         GovernanceV2Module::class,
         GovernanceUpdatersModule::class,
         ReferendumDetailsModule::class,
-        ReferendumListModule::class
+        ReferendumListModule::class,
+        ReferendumVotersModule::class,
     ]
 )
 class GovernanceFeatureModule {

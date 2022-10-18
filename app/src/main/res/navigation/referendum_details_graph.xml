@@ -26,8 +26,22 @@
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_referendumDetailsFragment_to_referendumFullDetailsFragment"
+            app:destination="@id/referendumFullDetailsFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
     </fragment>
 
+    <fragment
+        android:id="@+id/referendumFullDetailsFragment"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumFullDetailsFragment"
+        android:label="ReferendumFullDetailsFragment"
+        tools:layout="@layout/fragment_referendum_full_details" />
 
     <fragment
         android:id="@id/DAppBrowserFragment"

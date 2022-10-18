@@ -45,7 +45,7 @@ class ParachainStakingUnbondingsInteractor(
         val unbondingRequests = requests.values.filter { it.unbondingIn(currentRound) }
 
         val collatorIds = unbondingRequests.map { it.collator.toHexString() }
-        val identities = identityRepository.getIdentitiesFromIds(delegatorState.chain.id, collatorIds)
+        val identities = identityRepository.getIdentitiesFromIdsHex(delegatorState.chain.id, collatorIds)
 
         collatorIds.map {
             DelegationRequestWithCollatorInfo(

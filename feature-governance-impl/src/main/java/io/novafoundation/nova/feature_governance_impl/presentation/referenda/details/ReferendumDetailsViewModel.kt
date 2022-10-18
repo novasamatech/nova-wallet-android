@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.icon.cre
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.PreImage
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.isAye
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.votes
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumVoting
@@ -35,10 +36,10 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.des
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.GovernanceDAppModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.ReferendumDetailsModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.ShortenedTextModel
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.fullDetails.PreImagePreviewPayload
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.fullDetails.ReferendumCallPayload
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.fullDetails.ReferendumFullDetailsPayload
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.fullDetails.ReferendumProposerPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.PreImagePreviewPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumCallPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumFullDetailsPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumProposerPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.timeline.TimelineLayout
 import io.novafoundation.nova.feature_governance_impl.presentation.view.VotersModel
 import io.novafoundation.nova.feature_governance_impl.presentation.view.YourVoteModel
@@ -57,10 +58,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 private const val DESCRIPTION_LENGTH_LIMIT = 180
-
-private enum class VotersType {
-    AYE, NAY
-}
 
 class ReferendumDetailsViewModel(
     private val router: GovernanceRouter,
@@ -161,8 +158,7 @@ class ReferendumDetailsViewModel(
 
     fun fullDetailsClicked() = launch {
         val payload = constructFullDetailsPayload()
-
-        showMessage("TODO - open vote details")
+        router.openReferendumFullDetails(payload)
     }
 
     fun voteClicked() {
@@ -181,8 +177,8 @@ class ReferendumDetailsViewModel(
             voting = referendumDetails.voting?.let { referendumFormatter.formatVoting(it, token) },
             statusModel = referendumFormatter.formatStatus(referendumDetails.timeline.currentStatus),
             yourVote = referendumDetails.userVote?.let { mapUserVoteToUi(it, token) },
-            ayeVoters = mapVotersToUi(referendumDetails.voting, VotersType.AYE, token.configuration),
-            nayVoters = mapVotersToUi(referendumDetails.voting, VotersType.NAY, token.configuration),
+            ayeVoters = mapVotersToUi(referendumDetails.voting, VoteType.AYE, token.configuration),
+            nayVoters = mapVotersToUi(referendumDetails.voting, VoteType.NAY, token.configuration),
             timeEstimation = timeEstimation,
             timeline = mapTimelineToUi(referendumDetails.timeline, timeEstimation)
         )
@@ -247,18 +243,18 @@ class ReferendumDetailsViewModel(
 
     private fun mapVotersToUi(
         voting: ReferendumVoting?,
-        type: VotersType,
+        type: VoteType,
         chainAsset: Chain.Asset,
     ): VotersModel? {
         if (voting == null) return null
 
         return when (type) {
-            VotersType.AYE -> VotersModel(
+            VoteType.AYE -> VotersModel(
                 voteTypeColorRes = R.color.multicolor_green_100,
                 voteTypeRes = R.string.referendum_vote_positive_type,
                 votesValue = formatVotesAmount(voting.approval.ayeVotes.amount, chainAsset)
             )
-            VotersType.NAY -> VotersModel(
+            VoteType.NAY -> VotersModel(
                 voteTypeColorRes = R.color.multicolor_red_100,
                 voteTypeRes = R.string.referendum_vote_negative_type,
                 votesValue = formatVotesAmount(voting.approval.nayVotes.amount, chainAsset)
@@ -335,6 +331,8 @@ class ReferendumDetailsViewModel(
             proposer = referendumDetails.proposer?.let {
                 ReferendumProposerPayload(it.accountId, it.offChainNickname)
             },
+
+            voteThreshold = null,
             approveThreshold = referendumDetails.fullDetails.approvalCurve?.name,
             supportThreshold = referendumDetails.fullDetails.supportCurve?.name,
             hash = referendumDetails.onChainMetadata?.preImageHash,
@@ -342,7 +340,7 @@ class ReferendumDetailsViewModel(
             turnout = referendumDetails.voting?.support?.turnout,
             electorate = referendumDetails.voting?.support?.electorate,
             referendumCall = ReferendumCallPayload(referendumCall),
-            preImage = constructPreimagePreviewPayload(referendumDetails.onChainMetadata?.preImage)
+            preImage = constructPreimagePreviewPayload(referendumDetails.onChainMetadata?.preImage),
         )
     }
 

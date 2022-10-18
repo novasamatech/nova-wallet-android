@@ -47,7 +47,7 @@ class ValidatorProvider(
 
         val validatorPrefs = stakingRepository.getValidatorPrefs(chainId, validatorIdsToQueryPrefs.toList())
 
-        val identities = identityRepository.getIdentitiesFromIds(chainId, requestedValidatorIds)
+        val identities = identityRepository.getIdentitiesFromIdsHex(chainId, requestedValidatorIds)
         val slashes = stakingRepository.getSlashes(chainId, requestedValidatorIds)
 
         val rewardCalculator = rewardCalculatorFactory.create(chainAsset, electedValidatorExposures, validatorPrefs)
@@ -83,7 +83,7 @@ class ValidatorProvider(
         val accountIdBridged = listOf(accountId)
 
         val prefs = stakingRepository.getValidatorPrefs(chainId, accountIdBridged)[accountId]
-        val identity = identityRepository.getIdentitiesFromIds(chainId, accountIdBridged)[accountId]
+        val identity = identityRepository.getIdentitiesFromIdsHex(chainId, accountIdBridged)[accountId]
 
         val slashes = stakingRepository.getSlashes(chainId, accountIdBridged)
 

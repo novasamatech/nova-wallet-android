@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.childScope
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
@@ -107,13 +108,26 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
         Log.d(this@GovernanceIntegrationTest.LOG_TAG, referendumDetails.toString())
 
         val callDetails = referendumDetailsInteractor.detailsFor(
-            preImage = referendumDetails.onChainMetadata!!.preImage,
+            preImage = referendumDetails.onChainMetadata!!.preImage!!,
             chain = chain
         )
 
         Log.d(this@GovernanceIntegrationTest.LOG_TAG, callDetails.toString())
 
         childScope.cancel()
+    }
+
+    @Test
+    fun shouldRetrieveVoters() = runBlocking<Unit> {
+        val interactor = governanceApi.referendumVotersInteractor
+
+        val referendumId = ReferendumId(BigInteger.ZERO)
+        val chain = chain()
+
+        val referendumVoters = interactor.votersFlow(referendumId, chain, VoteType.AYE)
+            .first()
+
+        Log.d(this@GovernanceIntegrationTest.LOG_TAG, referendumVoters.toString())
     }
 
     private suspend fun source(chain: Chain) = governanceApi.governanceSourceRegistry.sourceFor(chain.id)

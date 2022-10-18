@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.presentation.referenda.fullDetails
+package io.novafoundation.nova.feature_governance_impl.presentation.referenda.full
 
 import android.os.Parcelable
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.PreimagePreview
@@ -10,6 +10,7 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 class ReferendumFullDetailsPayload(
     val proposer: ReferendumProposerPayload?,
+    val voteThreshold: String?,
     val approveThreshold: String?,
     val supportThreshold: String?,
     val hash: ByteArray?,
