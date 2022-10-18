@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/referendumFullDetailsToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:dividerVisible="false"
+        app:homeButtonIcon="@drawable/ic_close"
+        app:titleText="@string/referendum_full_details_title" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/referendumDetailsScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:overScrollMode="never">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="24dp"
+            android:clipToPadding="false"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp">
+
+            <io.novafoundation.nova.common.view.TableView
+                android:id="@+id/referendumFullDetailsProposalContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/referendumFullDetailsProposal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryValueIcon="@drawable/ic_info_16"
+                    app:primaryValueIconTint="@color/white_64"
+                    app:title="@string/referendum_full_details_proposal" />
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/referendumFullDetailsDeposit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="@string/referendum_full_details_deposit" />
+
+            </io.novafoundation.nova.common.view.TableView>
+
+            <io.novafoundation.nova.common.view.TableView
+                android:id="@+id/referendumFullDetailsBeneficiaryContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp">
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/referendumFullDetailsBeneficiary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryValueIcon="@drawable/ic_info_16"
+                    app:primaryValueIconTint="@color/white_64"
+                    app:title="@string/referendum_full_details_beneficiary" />
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/referendumFullDetailsRequestedAmount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="@string/referendum_full_details_requested_amount" />
+
+            </io.novafoundation.nova.common.view.TableView>
+
+            <io.novafoundation.nova.common.view.TableView
+                android:id="@+id/referendumFullDetailsAdditionalInformation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp">
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/referendumFullDetailsVoteThreshold"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:title="@string/referendum_full_details_vote_threshold" />
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/referendumFullDetailsApproveThreshold"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:title="@string/referendum_full_details_approve_threshold" />
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/referendumFullDetailsSupportThreshold"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:title="@string/referendum_full_details_support_threshold" />
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/referendumFullDetailsTurnout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:title="@string/referendum_full_details_turnout" />
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/referendumFullDetailsElectorate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:title="@string/referendum_full_details_electorate" />
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/referendumFullDetailsCallHash"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:primaryValueIcon="@drawable/ic_info_16"
+                    app:primaryValueIconTint="@color/white_64"
+                    app:title="@string/referendum_full_details_hash" />
+
+            </io.novafoundation.nova.common.view.TableView>
+
+            <TextView
+                android:id="@+id/referendumFullDetailsPreimageTitle"
+                style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="@string/referendum_full_details_parameters_json"
+                android:textColor="@color/white_64" />
+
+            <io.novafoundation.nova.common.view.PlaceholderView
+                android:id="@+id/referendumFullDetailsPlaceholder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="@string/referendum_full_details_long_for_preview"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:placeholderBackgroundStyle="light" />
+
+            <TextView
+                android:id="@+id/referendumFullDetailsPreImage"
+                style="@style/TextAppearance.NovaFoundation.Regular"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:padding="12dp"
+                android:textColor="@color/white"
+                android:textIsSelectable="true"
+                tools:background="@color/white_8" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</LinearLayout>

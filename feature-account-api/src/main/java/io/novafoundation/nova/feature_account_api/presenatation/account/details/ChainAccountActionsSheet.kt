@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.account.details
+package io.novafoundation.nova.feature_account_api.presenatation.account.details
 
 import android.content.Context
 import android.os.Bundle
@@ -45,7 +45,7 @@ class ChainAccountActionsSheet(
     private fun maybeShowExport() {
         accountAddress()?.let {
             item(R.drawable.ic_share_arrow_white_24, R.string.account_export, showArrow = true) {
-                onExport(payload.chain)
+                onExport.invoke(payload.chain)
             }
         }
     }
@@ -62,7 +62,7 @@ class ChainAccountActionsSheet(
 
     private fun changeAccountItem(@StringRes labelRes: Int) {
         item(R.drawable.ic_staking_operations, labelRes, showArrow = true) {
-            onChange(payload.chain)
+            onChange.invoke(payload.chain)
         }
     }
 
