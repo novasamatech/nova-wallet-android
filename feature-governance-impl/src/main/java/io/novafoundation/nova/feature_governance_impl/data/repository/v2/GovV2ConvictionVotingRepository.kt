@@ -12,8 +12,10 @@ import io.novafoundation.nova.common.utils.convictionVoting
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.PriorLock
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumVoter
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.votes
 import io.novafoundation.nova.feature_governance_api.data.repository.ConvictionVotingRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -41,6 +43,27 @@ class GovV2ConvictionVotingRepository(
                 keyExtractor = { (_: AccountId, trackId: BigInteger) -> TrackId(trackId) },
                 binding = { decoded, _ -> bindVoting(decoded) }
             )
+        }
+    }
+
+    override suspend fun votersOf(referendumId: ReferendumId, chainId: ChainId): List<ReferendumVoter> {
+        val allVotings = remoteStorageSource.query(chainId) {
+            runtime.metadata.convictionVoting().storage("VotingFor").entries(
+                keyExtractor = { it },
+                binding = { decoded, _ -> bindVoting(decoded) }
+            )
+        }
+
+        return allVotings.mapNotNull { (keyComponents, voting) ->
+            val (voterId: AccountId, _: BigInteger) = keyComponents
+            val votes = voting.votes()
+
+            votes[referendumId]?.let { accountVote ->
+                ReferendumVoter(
+                    accountId = voterId,
+                    vote = accountVote
+                )
+            }
         }
     }
 

@@ -1,19 +1,21 @@
 package io.novafoundation.nova.feature_account_impl.data.repository
 
+import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.address.get
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.filterNotNull
 import io.novafoundation.nova.common.utils.hasModule
 import io.novafoundation.nova.common.utils.identity
-import io.novafoundation.nova.common.utils.toHexAccountId
+import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.feature_account_api.data.model.AccountAddressMap
+import io.novafoundation.nova.feature_account_api.data.model.AccountIdKeyMap
 import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
 import io.novafoundation.nova.feature_account_api.data.model.ChildIdentity
 import io.novafoundation.nova.feature_account_api.data.model.OnChainIdentity
-import io.novafoundation.nova.feature_account_api.data.model.SuperOf
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.bindings.bindIdentity
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.bindings.bindSuperOf
-import io.novafoundation.nova.runtime.ext.hexAccountIdOf
+import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
@@ -30,32 +32,43 @@ class RealOnChainIdentityRepository(
     private val storageDataSource: StorageDataSource,
 ) : OnChainIdentityRepository {
 
-    override suspend fun getIdentitiesFromIds(
+    override suspend fun getIdentitiesFromIdsHex(
         chainId: ChainId,
         accountIdsHex: Collection<String>
     ): AccountIdMap<OnChainIdentity?> = withContext(Dispatchers.Default) {
+        val accountIds = accountIdsHex.map { it.fromHex() }
+
+        getIdentitiesFromIds(accountIds, chainId).mapKeys { (accountId, _) -> accountId.value.toHexString() }
+    }
+
+    override suspend fun getIdentitiesFromIds(
+        accountIds: Collection<AccountId>,
+        chainId: ChainId
+    ): AccountIdKeyMap<OnChainIdentity?> = withContext(Dispatchers.Default) {
         storageDataSource.query(chainId) {
             if (!runtime.metadata.hasModule(Modules.IDENTITY)) {
                 return@query emptyMap()
             }
 
-            val superOfArguments = accountIdsHex.map { listOf(it.fromHex()) }
+            val superOfArguments = accountIds.map { listOf(it) }
             val superOfValues = runtime.metadata.identity().storage("SuperOf").entries(
                 keysArguments = superOfArguments,
-                keyExtractor = { (accountId: AccountId) -> accountId.toHexString() },
+                keyExtractor = { (accountId: AccountId) -> AccountIdKey(accountId) },
                 binding = { value, _ -> bindSuperOf(value) }
             )
 
-            val parentIdentityIds = superOfValues.values.filterNotNull().map(SuperOf::parentIdHex).distinct()
+            val parentIdentityIds = superOfValues.values.filterNotNull().mapToSet { AccountIdKey(it.parentId) }
             val parentIdentities = fetchIdentities(parentIdentityIds)
 
             val childIdentities = superOfValues.filterNotNull().mapValues { (_, superOf) ->
-                val parentIdentity = parentIdentities[superOf.parentIdHex]
+                val parentIdentity = parentIdentities[superOf.parentId]
 
                 parentIdentity?.let { ChildIdentity(superOf.childName, it) }
             }
 
-            val leftAccountIds = accountIdsHex.toSet() - childIdentities.keys - parentIdentities.keys
+            val allAccountIdKeys = accountIds.mapToSet(::AccountIdKey)
+
+            val leftAccountIds = allAccountIdKeys - childIdentities.keys - parentIdentities.keys
 
             val rootIdentities = fetchIdentities(leftAccountIds.toList())
 
@@ -75,7 +88,7 @@ class RealOnChainIdentityRepository(
             val parentRelationship = runtime.metadata.identity().storage("SuperOf").query(accountId, binding = ::bindSuperOf)
 
             if (parentRelationship != null) {
-                val parentIdentity = fetchIdentity(parentRelationship.parentIdHex.fromHex())
+                val parentIdentity = fetchIdentity(parentRelationship.parentId)
 
                 parentIdentity?.let {
                     ChildIdentity(parentRelationship.childName, parentIdentity)
@@ -87,17 +100,21 @@ class RealOnChainIdentityRepository(
     }
 
     override suspend fun getIdentitiesFromAddresses(chain: Chain, accountAddresses: List<String>): AccountAddressMap<OnChainIdentity?> {
-        val accountIds = accountAddresses.map(chain::hexAccountIdOf)
+        val accountIds = accountAddresses.map(chain::accountIdOf)
 
-        val identitiesByAccountId = getIdentitiesFromIds(chain.id, accountIds)
+        val identitiesByAccountId = getIdentitiesFromIds(accountIds, chain.id)
 
-        return accountAddresses.associateWith { identitiesByAccountId[it.toHexAccountId()] }
+        return accountAddresses.associateWith { address ->
+            val accountId = chain.accountIdOf(address)
+
+            identitiesByAccountId[accountId]
+        }
     }
 
-    private suspend fun StorageQueryContext.fetchIdentities(accountIdsHex: List<String>): Map<String, OnChainIdentity?> {
+    private suspend fun StorageQueryContext.fetchIdentities(accountIdsHex: Collection<AccountIdKey>): AccountIdKeyMap<OnChainIdentity?> {
         return runtime.metadata.module("Identity").storage("IdentityOf").entries(
-            keysArguments = accountIdsHex.map { listOf(it.fromHex()) },
-            keyExtractor = { (accountId: AccountId) -> accountId.toHexString() },
+            keysArguments = accountIdsHex.map { listOf(it.value) },
+            keyExtractor = { (accountId: AccountId) -> AccountIdKey(accountId) },
             binding = { value, _ -> bindIdentity(value) }
         )
     }

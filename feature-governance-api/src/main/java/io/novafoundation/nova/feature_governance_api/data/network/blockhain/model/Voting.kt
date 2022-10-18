@@ -41,6 +41,10 @@ data class VotesAmount(
     val multiplier: BigDecimal,
 )
 
+enum class VoteType {
+    AYE, NAY
+}
+
 fun AccountVote.votes(chainAsset: Chain.Asset): VotesAmount? {
     return when (this) {
         // TODO handle split votes
@@ -60,10 +64,25 @@ fun AccountVote.votes(chainAsset: Chain.Asset): VotesAmount? {
 }
 
 fun AccountVote.isAye(): Boolean? {
+    return voteType()?.let { it == VoteType.AYE }
+}
+
+fun AccountVote.voteType(): VoteType? {
     return when (this) {
-        // TODO handle split votes
         AccountVote.Split -> null
-        is AccountVote.Standard -> vote.aye
+
+        is AccountVote.Standard -> if (vote.aye) {
+            VoteType.AYE
+        } else {
+            VoteType.NAY
+        }
+    }
+}
+
+fun Voting.votes(): Map<ReferendumId, AccountVote> {
+    return when (this) {
+        is Voting.Casting -> votes
+        Voting.Delegating -> emptyMap()
     }
 }
 
