@@ -40,7 +40,6 @@ class ReferendumDescriptionFragment : BaseFragment<ReferendumDescriptionViewMode
         payload?.let { setPayload(it) }
 
         referendumDescriptionTitle.setTextOrHide(viewModel.referendumTitle)
-        referendumFullDescription.text = viewModel.referendumDescription
     }
 
     override fun inject() {
@@ -51,6 +50,9 @@ class ReferendumDescriptionFragment : BaseFragment<ReferendumDescriptionViewMode
     }
 
     override fun subscribe(viewModel: ReferendumDescriptionViewModel) {
+        viewModel.markdownDescription.observe {
+            viewModel.markwon.setParsedMarkdown(referendumFullDescription, it)
+        }
     }
 
     private fun setPayload(payload: ReferendumDescriptionPayload) {

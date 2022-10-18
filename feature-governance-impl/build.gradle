@@ -42,6 +42,9 @@ dependencies {
     implementation project(":runtime")
 
     implementation markdownDep
+    implementation markdownImage
+    implementation markdownTables
+    implementation markdownStrikethrough
 
     implementation materialDep
 

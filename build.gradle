@@ -172,6 +172,9 @@ buildscript {
         roomTestsDep = "androidx.room:room-testing:$architectureComponentVersion"
 
         markdownDep = "io.noties.markwon:core:$markdownVersion"
+        markdownImage = "io.noties.markwon:image-coil:$markdownVersion"
+        markdownTables = "io.noties.markwon:ext-tables:$markdownVersion"
+        markdownStrikethrough = "io.noties.markwon:ext-strikethrough:$markdownVersion"
     }
 
     repositories {
