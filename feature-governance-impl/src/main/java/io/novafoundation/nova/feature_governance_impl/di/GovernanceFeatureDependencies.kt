@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.di
 
+import android.content.Context
 import coil.ImageLoader
 import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AddressIconGenerator
@@ -67,6 +68,8 @@ interface GovernanceFeatureDependencies {
     fun onChainIdentityProvider(): IdentityProvider
 
     val externalAccountActions: ExternalActions.Presentation
+
+    val context: Context
 
     @ExtrinsicSerialization
     fun extrinsicGson(): Gson

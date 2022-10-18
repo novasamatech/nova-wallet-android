@@ -79,6 +79,8 @@ buildscript {
 
         roomVersion = '2.4.3'
 
+        markdownVersion = '4.6.2'
+
         coilDep = "io.coil-kt:coil:$coilVersion"
         coilSvg = "io.coil-kt:coil-svg:$coilVersion"
 
@@ -168,6 +170,8 @@ buildscript {
         allureKotlinAndroid = "io.qameta.allure:allure-kotlin-android:$allureVersion"
 
         roomTestsDep = "androidx.room:room-testing:$architectureComponentVersion"
+
+        markdownDep = "io.noties.markwon:core:$markdownVersion"
     }
 
     repositories {
@@ -205,7 +209,7 @@ task clean(type: Delete) {
 }
 
 dependencies {
-    ktlint ("com.pinterest:ktlint:$ktlintPinterestVersion") {
+    ktlint("com.pinterest:ktlint:$ktlintPinterestVersion") {
         attributes {
             attribute(Bundling.BUNDLING_ATTRIBUTE, getObjects().named(Bundling, Bundling.EXTERNAL))
         }

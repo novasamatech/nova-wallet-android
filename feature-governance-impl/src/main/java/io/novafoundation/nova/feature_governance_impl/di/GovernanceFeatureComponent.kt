@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.description.di.ReferendumDescriptionComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.di.ReferendumDetailsComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.di.ReferendaListComponent
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
@@ -28,6 +29,8 @@ interface GovernanceFeatureComponent : GovernanceFeatureApi {
     fun referendaListFactory(): ReferendaListComponent.Factory
 
     fun referendumDetailsFactory(): ReferendumDetailsComponent.Factory
+
+    fun referendumDescriptionFactory(): ReferendumDescriptionComponent.Factory
 
     @Component.Factory
     interface Factory {

@@ -1,8 +1,10 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.details
 
+import io.noties.markwon.Markwon
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.firstOnLoad
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.mapList
@@ -29,6 +31,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRou
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumCallModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumTimeEstimation
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.description.ReferendumDescriptionPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.GovernanceDAppModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.ReferendumDetailsModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.ShortenedTextModel
@@ -70,7 +73,8 @@ class ReferendumDetailsViewModel(
     private val resourceManager: ResourceManager,
     private val tokenUseCase: TokenUseCase,
     private val referendumFormatter: ReferendumFormatter,
-    private val externalActions: ExternalActions.Presentation
+    private val externalActions: ExternalActions.Presentation,
+    private val markwon: Markwon
 ) : BaseViewModel(), ExternalActions by externalActions {
 
     private val selectedAccount = selectedAccountUseCase.selectedMetaAccountFlow()
@@ -132,8 +136,13 @@ class ReferendumDetailsViewModel(
         externalActions.showExternalActions(payload, selectedChainFlow.first())
     }
 
-    fun readMoreClicked() {
-        showMessage("TODO - open full description")
+    fun readMoreClicked() = launch {
+        val referendumTitle = referendumDetailsModelFlow.firstOnLoad().title
+        val referendumDescription = referendumDetailsFlow.first().offChainMetadata?.description
+        if (referendumDescription != null) {
+            val payload = ReferendumDescriptionPayload(referendumTitle, referendumDescription)
+            router.openReferendumDescription(payload)
+        }
     }
 
     fun positiveVotesClicked() {
@@ -286,7 +295,8 @@ class ReferendumDetailsViewModel(
 
     private fun mapReferendumDescriptionToUi(referendumDetails: ReferendumDetails): ShortenedTextModel? {
         return referendumDetails.offChainMetadata?.description?.let {
-            ShortenedTextModel.from(it, DESCRIPTION_LENGTH_LIMIT)
+            val description = removeMarkdown(it)
+            ShortenedTextModel.from(description, DESCRIPTION_LENGTH_LIMIT)
         }
     }
 
@@ -340,5 +350,10 @@ class ReferendumDetailsViewModel(
         return preImage?.let {
             PreImagePreviewPayload(interactor.previewFor(preImage))
         }
+    }
+
+    private fun removeMarkdown(value: String): String {
+        return markwon.toMarkdown(value)
+            .toString()
     }
 }

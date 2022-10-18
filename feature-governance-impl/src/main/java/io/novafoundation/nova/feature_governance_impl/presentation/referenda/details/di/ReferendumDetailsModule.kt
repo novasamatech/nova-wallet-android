@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.noties.markwon.Markwon
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
@@ -38,7 +39,8 @@ class ReferendumDetailsModule {
         resourceManager: ResourceManager,
         tokenUseCase: TokenUseCase,
         referendumFormatter: ReferendumFormatter,
-        externalActions: ExternalActions.Presentation
+        externalActions: ExternalActions.Presentation,
+        markwon: Markwon
     ): ViewModel {
         return ReferendumDetailsViewModel(
             router = router,
@@ -51,7 +53,8 @@ class ReferendumDetailsModule {
             resourceManager = resourceManager,
             tokenUseCase = tokenUseCase,
             referendumFormatter = referendumFormatter,
-            externalActions = externalActions
+            externalActions = externalActions,
+            markwon = markwon
         )
     }
 

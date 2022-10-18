@@ -1,7 +1,9 @@
 package io.novafoundation.nova.feature_governance_impl.di
 
+import android.content.Context
 import dagger.Module
 import dagger.Provides
+import io.noties.markwon.Markwon
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.mixin.MixinFactory
@@ -55,6 +57,10 @@ import javax.inject.Named
     ]
 )
 class GovernanceFeatureModule {
+
+    @Provides
+    @FeatureScope
+    fun provideMarkwon(context: Context) = Markwon.create(context)
 
     @Provides
     @FeatureScope

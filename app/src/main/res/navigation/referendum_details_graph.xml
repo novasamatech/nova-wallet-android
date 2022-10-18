@@ -2,30 +2,43 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    app:startDestination="@id/referendumDetailsFragment"
-    android:id="@+id/referendum_details_graph">
+    android:id="@+id/referendum_details_graph"
+    app:startDestination="@id/referendumDetailsFragment">
 
     <fragment
         android:id="@+id/referendumDetailsFragment"
         android:name="io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsFragment"
         android:label="ReferendumFragment"
-        tools:layout="@layout/fragment_referendum_details" >
-
+        tools:layout="@layout/fragment_referendum_details">
 
         <action
+            android:id="@+id/action_referendumDetailsFragment_to_DAppBrowserFragment"
+            app:destination="@id/DAppBrowserFragment"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit"
-            android:id="@+id/action_referendumDetailsFragment_to_DAppBrowserFragment"
-            app:destination="@id/DAppBrowserFragment" />
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_referendumDetailsFragment_to_referendumDescription"
+            app:destination="@id/referendumDescription"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
 
     <fragment
         android:id="@id/DAppBrowserFragment"
-        tools:layout="@layout/fragment_dapp_browser"
         android:name="io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBrowserFragment"
-        android:label="DAppBrowserFragment" />
+        android:label="DAppBrowserFragment"
+        tools:layout="@layout/fragment_dapp_browser" />
+
+    <fragment
+        android:id="@+id/referendumDescription"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.referenda.description.ReferendumDescriptionFragment"
+        android:label="ReferendumDescriptionFragment"
+        tools:layout="@layout/fragment_referendum_description" />
 
 </navigation>

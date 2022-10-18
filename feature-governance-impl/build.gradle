@@ -41,6 +41,8 @@ dependencies {
     implementation project(":common")
     implementation project(":runtime")
 
+    implementation markdownDep
+
     implementation materialDep
 
     implementation fearlessLibDep
