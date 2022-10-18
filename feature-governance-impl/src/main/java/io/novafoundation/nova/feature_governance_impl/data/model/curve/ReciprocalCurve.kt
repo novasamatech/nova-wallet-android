@@ -19,6 +19,6 @@ class ReciprocalCurve(
     override val name: String = "Reciprocal"
 
     override fun threshold(x: Perbill): Perbill {
-        return factor.divide(x + xOffset, MathContext.DECIMAL64) - yOffset
+        return factor.divide(x + xOffset, MathContext.DECIMAL64) + yOffset
     }
 }
