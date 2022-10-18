@@ -14,7 +14,7 @@ class Gov2OffChainReferendaInfoRepository : OffChainReferendaInfoRepository {
 
     override suspend fun referendumDetails(chain: Chain): OffChainReferendumDetails? {
         return OffChainReferendumDetails(
-            "Very cool title!",
+            "Title",
             """---
 __Advertisement :)__
 
