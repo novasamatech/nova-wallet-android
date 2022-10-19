@@ -41,6 +41,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.ful
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumFullDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumProposerPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.timeline.TimelineLayout
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.ReferendumVotersPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.view.VotersModel
 import io.novafoundation.nova.feature_governance_impl.presentation.view.YourVoteModel
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -143,11 +144,19 @@ class ReferendumDetailsViewModel(
     }
 
     fun positiveVotesClicked() {
-        showMessage("TODO - open positive votes")
+        val votersPayload = ReferendumVotersPayload(
+            resourceManager.getString(R.string.referendum_positive_voters_title),
+            payload.referendumId
+        )
+        router.openReferendumVoters(votersPayload)
     }
 
     fun negativeVotesClicked() {
-        showMessage("TODO - open negative votes")
+        val votersPayload = ReferendumVotersPayload(
+            resourceManager.getString(R.string.referendum_negative_voters_title),
+            payload.referendumId
+        )
+        router.openReferendumVoters(votersPayload)
     }
 
     fun dAppClicked(dAppModel: GovernanceDAppModel) {

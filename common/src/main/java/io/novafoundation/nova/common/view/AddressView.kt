@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
+import androidx.annotation.DrawableRes
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.utils.WithContextExtensions
@@ -24,6 +25,7 @@ class AddressView @JvmOverloads constructor(
 
     init {
         View.inflate(context, R.layout.view_address, this)
+        setEndIcon(R.drawable.ic_info_16)
     }
 
     fun setAddress(icon: Drawable, address: String) {
@@ -31,14 +33,17 @@ class AddressView @JvmOverloads constructor(
         addressValue.text = address
     }
 
-    override fun setOnClickListener(listener: OnClickListener?) {
-        super.setOnClickListener(listener)
-        if (listener != null) {
-            addressValue.setDrawableEnd(R.drawable.ic_info_16, widthInDp = 16, tint = R.color.white_48, paddingInDp = 6)
-        } else {
+    fun setEndIcon(@DrawableRes iconRes: Int?) {
+        if (iconRes == null) {
             addressValue.setDrawableEnd(null)
+        } else {
+            addressValue.setDrawableEnd(iconRes, widthInDp = 16, tint = R.color.white_48, paddingInDp = 6)
         }
     }
+}
+
+fun AddressView.setAddressModel(addressModel: AddressModel) {
+    setAddress(addressModel.image, addressModel.nameOrAddress)
 }
 
 fun AddressView.setAddressOrHide(addressModel: AddressModel?) {

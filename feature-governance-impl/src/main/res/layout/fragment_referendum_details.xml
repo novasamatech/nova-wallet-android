@@ -78,8 +78,8 @@
                 tools:text="Polkadot and Kusama participation in the 10th Pais Digital Chile Summit." />
 
             <LinearLayout
-                android:layout_width="match_parent"
                 android:id="@+id/referendumDetails"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:orientation="vertical">
@@ -165,8 +165,8 @@
             <io.novafoundation.nova.feature_governance_impl.presentation.view.ReferendumDappList
                 android:id="@+id/referendumDetailsDappList"
                 android:layout_width="match_parent"
-                android:layout_marginBottom="12dp"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp" />
 
             <LinearLayout
                 android:id="@+id/referendumTimelineContainer"

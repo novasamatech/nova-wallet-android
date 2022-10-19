@@ -73,6 +73,19 @@ class ReferendumFullDetailsViewModel(
         router.back()
     }
 
+    fun openProposal() {
+        payload.proposer?.let {
+            openAddressInfo(it.accountId)
+        }
+    }
+
+    fun openBeneficiary() {
+        payload.referendumCall?.let {
+            if (it !is ReferendumCallPayload.TreasuryRequest) return
+            openAddressInfo(it.beneficiary)
+        }
+    }
+
     private suspend fun createProposerAddressModel(referendumProposer: ReferendumProposerPayload?, deposit: Balance?): AddressAndAmountModel? {
         if (referendumProposer == null) return null
 
@@ -112,19 +125,6 @@ class ReferendumFullDetailsViewModel(
         return when (preImage) {
             is PreImagePreviewPayload.Preview -> preImage.preview
             else -> null
-        }
-    }
-
-    fun openProposal() {
-        payload.proposer?.let {
-            openAddressInfo(it.accountId)
-        }
-    }
-
-    fun openBeneficiary() {
-        payload.referendumCall?.let {
-            if (it !is ReferendumCallPayload.TreasuryRequest) return
-            openAddressInfo(it.beneficiary)
         }
     }
 
