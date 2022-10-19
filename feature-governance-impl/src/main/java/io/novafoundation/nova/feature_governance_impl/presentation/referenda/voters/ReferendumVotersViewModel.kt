@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator.Companion.BACK
 import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
@@ -36,6 +37,8 @@ class ReferendumVotersViewModel(
             )
         }
     }
+        .withLoading()
+        .shareInBackground()
 
     fun backClicked() {
         router.back()

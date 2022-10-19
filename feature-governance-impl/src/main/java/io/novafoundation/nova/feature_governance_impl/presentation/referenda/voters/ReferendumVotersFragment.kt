@@ -7,13 +7,18 @@ import android.view.ViewGroup
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.presentation.LoadingState
+import io.novafoundation.nova.common.utils.makeGone
+import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.model.VoterModel
 import javax.inject.Inject
+import kotlinx.android.synthetic.main.fragment_referendum_voters.referendumVotersCount
 import kotlinx.android.synthetic.main.fragment_referendum_voters.referendumVotersList
+import kotlinx.android.synthetic.main.fragment_referendum_voters.referendumVotersProgress
 import kotlinx.android.synthetic.main.fragment_referendum_voters.referendumVotersToolbar
 
 class ReferendumVotersFragment : BaseFragment<ReferendumVotersViewModel>(), ReferendumVotersAdapter.Handler {
@@ -67,7 +72,14 @@ class ReferendumVotersFragment : BaseFragment<ReferendumVotersViewModel>(), Refe
         setupExternalActions(viewModel)
 
         viewModel.votersList.observe {
-            votersAdapter.submitList(it)
+            if (it is LoadingState.Loaded<List<VoterModel>>) {
+                votersAdapter.submitList(it.data)
+                referendumVotersCount.makeVisible()
+                referendumVotersCount.text = it.data.size.toString()
+                referendumVotersProgress.makeGone()
+            } else {
+                referendumVotersProgress.makeVisible()
+            }
         }
     }
 
