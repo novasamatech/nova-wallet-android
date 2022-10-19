@@ -71,7 +71,7 @@ class ReferendumVotersFragment : BaseFragment<ReferendumVotersViewModel>(), Refe
     override fun subscribe(viewModel: ReferendumVotersViewModel) {
         setupExternalActions(viewModel)
 
-        viewModel.votersList.observe {
+        viewModel.voterModels.observe {
             if (it is LoadingState.Loaded<List<VoterModel>>) {
                 votersAdapter.submitList(it.data)
                 referendumVotersCount.makeVisible()

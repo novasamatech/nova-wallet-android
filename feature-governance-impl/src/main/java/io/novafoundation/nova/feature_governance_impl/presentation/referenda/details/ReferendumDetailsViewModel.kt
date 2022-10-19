@@ -145,16 +145,16 @@ class ReferendumDetailsViewModel(
 
     fun positiveVotesClicked() {
         val votersPayload = ReferendumVotersPayload(
-            resourceManager.getString(R.string.referendum_positive_voters_title),
-            payload.referendumId
+            payload.referendumId,
+            VoteType.AYE
         )
         router.openReferendumVoters(votersPayload)
     }
 
     fun negativeVotesClicked() {
         val votersPayload = ReferendumVotersPayload(
-            resourceManager.getString(R.string.referendum_negative_voters_title),
-            payload.referendumId
+            payload.referendumId,
+            VoteType.NAY
         )
         router.openReferendumVoters(votersPayload)
     }
