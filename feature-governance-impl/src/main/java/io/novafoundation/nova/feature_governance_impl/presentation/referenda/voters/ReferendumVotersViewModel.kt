@@ -81,7 +81,7 @@ class ReferendumVotersViewModel(
         val votesAmount = voter.vote.votes(chainAsset)!!
         val amount = votesAmount.amount.formatTokenAmount(chainAsset)
         val multiplier = votesAmount.multiplier
-        val total = votesAmount.total.toBigInteger().format()
+        val total = votesAmount.total.format()
         return VoterModel(
             addressModel,
             resourceManager.getString(R.string.referendum_voter_vote, total),
