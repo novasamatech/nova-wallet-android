@@ -11,6 +11,8 @@ interface BlockDurationEstimator {
 
     fun durationUntil(block: BlockNumber): Duration
 
+    fun durationOf(blocks: BlockNumber): Duration
+
     fun timestampOf(block: BlockNumber): Long
 }
 
@@ -30,9 +32,13 @@ internal class RealBlockDurationEstimator(
     override fun durationUntil(block: BlockNumber): Duration {
         val blocksInFuture = block - currentBlock
 
-        if (blocksInFuture <= BigInteger.ZERO) return Duration.ZERO
+        return durationOf(blocksInFuture)
+    }
 
-        val millisInFuture = blocksInFuture * blockTimeMillis
+    override fun durationOf(blocks: BlockNumber): Duration {
+        if (blocks < BigInteger.ZERO) return Duration.ZERO
+
+        val millisInFuture = blocks * blockTimeMillis
 
         return millisInFuture.toLong().milliseconds
     }

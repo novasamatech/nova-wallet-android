@@ -41,6 +41,8 @@ class Asset(
     val locked = token.amountFromPlanks(lockedInPlanks)
     val transferable = token.amountFromPlanks(transferableInPlanks)
 
+    val free = token.amountFromPlanks(freeInPlanks)
+
     // TODO move to runtime storage
     val bonded = token.amountFromPlanks(bondedInPlanks)
     val redeemable = token.amountFromPlanks(redeemableInPlanks)

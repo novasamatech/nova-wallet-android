@@ -41,6 +41,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.ful
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumFullDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumProposerPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.timeline.TimelineLayout
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.SetupVoteReferendumPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.view.VotersModel
 import io.novafoundation.nova.feature_governance_impl.presentation.view.YourVoteModel
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -99,7 +100,7 @@ class ReferendumDetailsViewModel(
                 identityProvider = proposerIdentityProvider
             )
         }
-    }
+    }.shareInBackground()
 
     val referendumDetailsModelFlow = referendumDetailsFlow.map(::mapReferendumDetailsToUi)
         .withLoading()
@@ -162,7 +163,8 @@ class ReferendumDetailsViewModel(
     }
 
     fun voteClicked() {
-        showMessage("TODO - open vote")
+        val votePayload = SetupVoteReferendumPayload(payload.referendumId)
+        router.openSetupVoteReferendum(votePayload)
     }
 
     private suspend fun mapReferendumDetailsToUi(referendumDetails: ReferendumDetails): ReferendumDetailsModel {
@@ -251,12 +253,12 @@ class ReferendumDetailsViewModel(
         return when (type) {
             VoteType.AYE -> VotersModel(
                 voteTypeColorRes = R.color.multicolor_green_100,
-                voteTypeRes = R.string.referendum_vote_positive_type,
+                voteTypeRes = R.string.referendum_vote_aye,
                 votesValue = formatVotesAmount(voting.approval.ayeVotes.amount, chainAsset)
             )
             VoteType.NAY -> VotersModel(
                 voteTypeColorRes = R.color.multicolor_red_100,
-                voteTypeRes = R.string.referendum_vote_negative_type,
+                voteTypeRes = R.string.referendum_vote_nay,
                 votesValue = formatVotesAmount(voting.approval.nayVotes.amount, chainAsset)
             )
         }
@@ -272,7 +274,7 @@ class ReferendumDetailsViewModel(
         val isAye = vote.isAye() ?: return null
         val votes = vote.votes(token.configuration) ?: return null
 
-        val voteTypeRes = if (isAye) R.string.referendum_vote_positive_type else R.string.referendum_vote_negative_type
+        val voteTypeRes = if (isAye) R.string.referendum_vote_aye else R.string.referendum_vote_nay
         val colorRes = if (isAye) R.color.multicolor_green_100 else R.color.multicolor_red_100
 
         val votesAmountFormatted = mapAmountToAmountModel(votes.amount, token).token
