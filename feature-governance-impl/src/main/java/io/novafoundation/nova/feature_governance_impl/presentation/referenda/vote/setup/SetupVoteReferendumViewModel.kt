@@ -13,8 +13,9 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.Gove
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.model.AmountChangeModel
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.model.LocksChangeModel
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.hints.ReferendumVoteHintsMixinFactory
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.model.AmountChangeModel
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.model.LocksChangeModel
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -40,7 +41,8 @@ class SetupVoteReferendumViewModel(
     private val interactor: VoteReferendumInteractor,
     private val payload: SetupVoteReferendumPayload,
     private val resourceManager: ResourceManager,
-    private val router: GovernanceRouter
+    private val router: GovernanceRouter,
+    private val hintsMixinFactory: ReferendumVoteHintsMixinFactory
 ) : BaseViewModel(), WithFeeLoaderMixin {
 
     private val selectedAsset = assetUseCase.currentAssetFlow()
@@ -50,6 +52,8 @@ class SetupVoteReferendumViewModel(
         .shareInBackground()
 
     override val originFeeMixin = feeLoaderMixinFactory.create(selectedAsset)
+
+    val hintsMixin = hintsMixinFactory.create(scope = this)
 
     val amountChooserMixin = amountChooserMixinFactory.create(
         scope = this,

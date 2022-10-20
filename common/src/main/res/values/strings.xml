@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="referendum_vote_unlock_hint">After locking period don’t forget to redeem your tokens</string>
+
     <string name="common_maximum_format">%s maximum</string>
 
     <string name="referendum_vote_governance_lock">Governance lock</string>
@@ -7,7 +9,7 @@
 
     <string name="referendum_vote_setup_title">Vote for Referendum #%s</string>
     <string name="referendum_vote_select_conviction_title">Multiply votes by increasing locking period</string>
-    
+
     <string name="referendum_timeline_state_preparing">Voting: Preparing</string>
     <string name="referendum_timeline_state_in_queue">Voting: In queue</string>
     <string name="referendum_timeline_state_passing">Voting: Passing</string>

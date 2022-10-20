@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.di
+package io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.di
 
 import androidx.fragment.app.Fragment
 import dagger.BindsInstance

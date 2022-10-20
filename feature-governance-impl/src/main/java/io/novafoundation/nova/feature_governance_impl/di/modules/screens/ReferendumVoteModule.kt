@@ -3,12 +3,14 @@ package io.novafoundation.nova.feature_governance_impl.di.modules.screens
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.RealVoteReferendumInteractor
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.hints.ReferendumVoteHintsMixinFactory
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 
 @Module
@@ -31,4 +33,10 @@ class ReferendumVoteModule {
             extrinsicService = extrinsicService
         )
     }
+
+    @Provides
+    @FeatureScope
+    fun provideHintsMixinFactory(
+        resHintsMixinFactory: ResourcesHintsMixinFactory
+    ): ReferendumVoteHintsMixinFactory = ReferendumVoteHintsMixinFactory(resHintsMixinFactory)
 }

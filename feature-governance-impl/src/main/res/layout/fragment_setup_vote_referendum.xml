@@ -42,13 +42,13 @@
                 android:id="@+id/setupReferendumVoteAmount"
                 android:layout_marginTop="16dp" />
 
-            <io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.view.VotePowerView
+            <io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.view.VotePowerView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/setupReferendumVoteVotePower"
                 android:layout_marginTop="12dp" />
 
-            <io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.view.AmountChangesView
+            <io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.view.AmountChangesView
                 android:layout_width="match_parent"
                 android:id="@+id/setupReferendumVoteLockedAmountChanges"
                 android:layout_height="wrap_content"
@@ -56,7 +56,7 @@
                 app:amountChanges_title="@string/referendum_vote_governance_lock"
                 android:layout_marginTop="12dp" />
 
-            <io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.view.AmountChangesView
+            <io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.view.AmountChangesView
                 android:layout_width="match_parent"
                 app:amountChanges_icon="@drawable/ic_time_16"
                 app:amountChanges_title="@string/referendum_vote_locking_period"
@@ -71,6 +71,7 @@
 
             <io.novafoundation.nova.common.mixin.hints.HintsView
                 android:layout_width="match_parent"
+                android:layout_marginTop="12dp"
                 android:id="@+id/setupReferendumVoteHints"
                 android:layout_height="wrap_content" />
         </LinearLayout>

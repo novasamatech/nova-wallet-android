@@ -6,6 +6,7 @@ import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
@@ -82,4 +83,6 @@ interface GovernanceFeatureDependencies {
     val amountMixinFactory: AmountChooserMixin.Factory
 
     val extrinsicService: ExtrinsicService
+
+    val resourceHintsMixinFactory: ResourcesHintsMixinFactory
 }

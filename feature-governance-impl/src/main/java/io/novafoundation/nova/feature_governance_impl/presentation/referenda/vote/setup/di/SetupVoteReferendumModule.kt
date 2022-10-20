@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.di
+package io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.di
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.hints.ReferendumVoteHintsMixinFactory
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.SetupVoteReferendumPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.SetupVoteReferendumViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
@@ -30,7 +31,8 @@ class SetupVoteReferendumModule {
         interactor: VoteReferendumInteractor,
         payload: SetupVoteReferendumPayload,
         resourceManager: ResourceManager,
-        router: GovernanceRouter
+        router: GovernanceRouter,
+        hintsMixinFactory: ReferendumVoteHintsMixinFactory
     ): ViewModel {
         return SetupVoteReferendumViewModel(
             feeLoaderMixinFactory = feeLoaderMixinFactory,
@@ -39,7 +41,8 @@ class SetupVoteReferendumModule {
             interactor = interactor,
             payload = payload,
             resourceManager = resourceManager,
-            router = router
+            router = router,
+            hintsMixinFactory = hintsMixinFactory
         )
     }
 
