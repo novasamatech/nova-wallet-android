@@ -37,6 +37,15 @@ open class TableView @JvmOverloads constructor(
         attrs?.let(::applyAttributes)
     }
 
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        setupTableChildrenAppearance()
+    }
+
+    /*
+    We use setupTableChildrenAppearance here to support case when child view makes gone programmatically.
+    The we recalculate dividers
+     */
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         super.onLayout(changed, l, t, r, b)
 

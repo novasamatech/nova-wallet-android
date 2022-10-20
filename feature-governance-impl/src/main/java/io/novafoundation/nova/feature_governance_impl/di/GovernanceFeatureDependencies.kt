@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
@@ -32,6 +33,10 @@ import javax.inject.Named
 
 interface GovernanceFeatureDependencies {
 
+    val feeLoaderMixinFactory: FeeLoaderMixin.Factory
+
+    val validationExecutor: ValidationExecutor
+
     val preferences: Preferences
 
     val walletRepository: WalletRepository
@@ -52,9 +57,6 @@ interface GovernanceFeatureDependencies {
 
     val selectedAccountUseCase: SelectedAccountUseCase
 
-    @Named(REMOTE_STORAGE_SOURCE)
-    fun remoteStorageDataSource(): StorageDataSource
-
     val chainStateRepository: ChainStateRepository
 
     val totalIssuanceRepository: TotalIssuanceRepository
@@ -65,24 +67,25 @@ interface GovernanceFeatureDependencies {
 
     val dAppMetadataRepository: DAppMetadataRepository
 
-    @LocalIdentity
-    fun localIdentityProvider(): IdentityProvider
-
-    @OnChainIdentity
-    fun onChainIdentityProvider(): IdentityProvider
-
     val externalAccountActions: ExternalActions.Presentation
 
     val context: Context
-
-    @ExtrinsicSerialization
-    fun extrinsicGson(): Gson
-
-    val feeLoaderMixinFactory: FeeLoaderMixin.Factory
 
     val amountMixinFactory: AmountChooserMixin.Factory
 
     val extrinsicService: ExtrinsicService
 
     val resourceHintsMixinFactory: ResourcesHintsMixinFactory
+
+    @ExtrinsicSerialization
+    fun extrinsicGson(): Gson
+
+    @LocalIdentity
+    fun localIdentityProvider(): IdentityProvider
+
+    @OnChainIdentity
+    fun onChainIdentityProvider(): IdentityProvider
+
+    @Named(REMOTE_STORAGE_SOURCE)
+    fun remoteStorageDataSource(): StorageDataSource
 }
