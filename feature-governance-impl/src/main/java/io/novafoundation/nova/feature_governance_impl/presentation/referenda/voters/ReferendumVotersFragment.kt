@@ -8,6 +8,7 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.presentation.LoadingState
+import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
@@ -73,9 +74,10 @@ class ReferendumVotersFragment : BaseFragment<ReferendumVotersViewModel>(), Refe
 
         viewModel.voterModels.observe {
             if (it is LoadingState.Loaded<List<VoterModel>>) {
-                votersAdapter.submitList(it.data)
+                val voters = it.data
+                votersAdapter.submitList(voters)
                 referendumVotersCount.makeVisible()
-                referendumVotersCount.text = it.data.size.toString()
+                referendumVotersCount.text = voters.size.format()
                 referendumVotersProgress.makeGone()
             } else {
                 referendumVotersProgress.makeVisible()

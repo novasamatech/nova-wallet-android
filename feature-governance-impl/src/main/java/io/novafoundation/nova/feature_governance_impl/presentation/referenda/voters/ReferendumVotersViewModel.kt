@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.withLoading
-import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createIdentityAddressModel
+import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
@@ -73,11 +73,7 @@ class ReferendumVotersViewModel(
     }
 
     private suspend fun mapVoterToVoterModel(chain: Chain, chainAsset: Chain.Asset, voter: ReferendumVoter): VoterModel {
-        val addressModel = addressIconGenerator.createIdentityAddressModel(
-            chain,
-            voter.accountId,
-            defaultIdentityProvider
-        )
+        val addressModel = addressIconGenerator.createAccountAddressModel(chain, voter.accountId, voter.identity?.name)
         val votesAmount = voter.vote.votes(chainAsset)!!
         val amount = votesAmount.amount.formatTokenAmount(chainAsset)
         val multiplier = votesAmount.multiplier
