@@ -9,7 +9,7 @@ class ReferendumVoteHintsMixinFactory(
     private val resourcesHintsMixinFactory: ResourcesHintsMixinFactory
 ) {
 
-    fun create(scope: CoroutineScope) : HintsMixin {
+    fun create(scope: CoroutineScope): HintsMixin {
         return resourcesHintsMixinFactory.create(
             coroutineScope = scope,
             hintsRes = listOf(R.string.referendum_vote_unlock_hint)
