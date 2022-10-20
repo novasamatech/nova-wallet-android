@@ -46,4 +46,8 @@ class GovernanceNavigator(
         actionId = R.id.action_referendumDetailsFragment_to_referendumDescription,
         args = ReferendumDescriptionFragment.getBundle(payload)
     )
+
+    override fun openReferendumConfirm() = performNavigation(
+        actionId = R.id.action_referendumDetailsFragment_to_confirmReferendumVote
+    )
 }
