@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_governance_impl.presentation.referenda.de
 import io.noties.markwon.Markwon
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.firstOnLoad
 import io.novafoundation.nova.common.utils.flowOfAll
@@ -106,9 +107,13 @@ class ReferendumDetailsViewModel(
         .withLoading()
         .shareInBackground()
 
-    val voteButtonVisible = referendumDetailsFlow.map {
-        it.userVote == null && it.timeline.currentStatus is ReferendumStatus.Ongoing
-    }.shareInBackground()
+    val voteButtonState = referendumDetailsFlow.map {
+        when {
+            it.timeline.currentStatus !is ReferendumStatus.Ongoing -> DescriptiveButtonState.Gone
+            it.userVote != null -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.vote_revote))
+            else -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.vote_vote))
+        }
+    }
 
     private val referendumCallFlow = referendumDetailsFlow.map { details ->
         details.onChainMetadata?.preImage?.let { preImage ->
