@@ -162,7 +162,7 @@ class ReferendumDetailsViewModel(
     }
 
     fun voteClicked() {
-        showMessage("TODO - open vote")
+        router.openReferendumConfirm()
     }
 
     private suspend fun mapReferendumDetailsToUi(referendumDetails: ReferendumDetails): ReferendumDetailsModel {
