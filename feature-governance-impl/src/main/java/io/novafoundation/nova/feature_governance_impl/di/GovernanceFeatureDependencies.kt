@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
@@ -17,6 +18,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.runtime.di.ExtrinsicSerialization
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -27,6 +29,10 @@ import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
 interface GovernanceFeatureDependencies {
+
+    val feeLoaderMixinFactory: FeeLoaderMixin.Factory
+
+    val validationExecutor: ValidationExecutor
 
     val preferences: Preferences
 
@@ -48,9 +54,6 @@ interface GovernanceFeatureDependencies {
 
     val selectedAccountUseCase: SelectedAccountUseCase
 
-    @Named(REMOTE_STORAGE_SOURCE)
-    fun remoteStorageDataSource(): StorageDataSource
-
     val chainStateRepository: ChainStateRepository
 
     val totalIssuanceRepository: TotalIssuanceRepository
@@ -61,16 +64,19 @@ interface GovernanceFeatureDependencies {
 
     val dAppMetadataRepository: DAppMetadataRepository
 
-    @LocalIdentity
-    fun localIdentityProvider(): IdentityProvider
-
-    @OnChainIdentity
-    fun onChainIdentityProvider(): IdentityProvider
-
     val externalAccountActions: ExternalActions.Presentation
 
     val context: Context
 
     @ExtrinsicSerialization
     fun extrinsicGson(): Gson
+
+    @LocalIdentity
+    fun localIdentityProvider(): IdentityProvider
+
+    @OnChainIdentity
+    fun onChainIdentityProvider(): IdentityProvider
+
+    @Named(REMOTE_STORAGE_SOURCE)
+    fun remoteStorageDataSource(): StorageDataSource
 }

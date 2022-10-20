@@ -37,9 +37,8 @@ open class TableView @JvmOverloads constructor(
         attrs?.let(::applyAttributes)
     }
 
-    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-        super.onLayout(changed, l, t, r, b)
-
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
         setupTableChildrenAppearance()
     }
 

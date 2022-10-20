@@ -35,6 +35,13 @@
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
 
+        <action
+            android:id="@+id/action_referendumDetailsFragment_to_confirmReferendumVote"
+            app:destination="@id/confirmReferendumVote"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
     <fragment
@@ -55,4 +62,9 @@
         android:label="ReferendumDescriptionFragment"
         tools:layout="@layout/fragment_referendum_description" />
 
+    <fragment
+        android:id="@+id/confirmReferendumVote"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.referenda.confirm.ConfirmReferendumVoteFragment"
+        android:label="ConfirmReferendumVote"
+        tools:layout="@layout/fragment_referendum_confirm_vote" />
 </navigation>
