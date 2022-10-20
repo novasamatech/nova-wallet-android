@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.navigation.ReturnableRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.description.ReferendumDescriptionPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumFullDetailsPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.SetupVoteReferendumPayload
 
 interface GovernanceRouter : ReturnableRouter {
 
@@ -16,4 +17,6 @@ interface GovernanceRouter : ReturnableRouter {
     fun openReferendumFullDetails(payload: ReferendumFullDetailsPayload)
 
     fun openReferendumConfirm()
+
+    fun openSetupVoteReferendum(payload: SetupVoteReferendumPayload)
 }

@@ -4,11 +4,12 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
+import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setTextColorRes
-import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumStatusModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumTimeEstimation
@@ -77,7 +78,7 @@ class VotingStatusView @JvmOverloads constructor(
         votingStatusStartVote.setOnClickListener(listener)
     }
 
-    fun setVoteButtonVisible(visible: Boolean) {
-        votingStatusStartVote.setVisible(visible)
+    fun setVoteButtonState(state: DescriptiveButtonState) {
+        votingStatusStartVote.setState(state)
     }
 }

@@ -120,7 +120,7 @@ class ReferendaListViewModel(
         val isAye = vote?.isAye() ?: return null
         val votes = vote.votes(token.configuration) ?: return null
 
-        val voteTypeRes = if (isAye) R.string.referendum_vote_positive_type else R.string.referendum_vote_negative_type
+        val voteTypeRes = if (isAye) R.string.referendum_vote_aye else R.string.referendum_vote_nay
         val colorRes = if (isAye) R.color.multicolor_green_100 else R.color.multicolor_red_100
 
         return YourVotePreviewModel(

@@ -7,6 +7,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Vote
 import java.math.BigDecimal
+import java.math.BigInteger
 
 sealed class Voting {
 
@@ -50,14 +51,13 @@ fun AccountVote.votes(chainAsset: Chain.Asset): VotesAmount? {
         // TODO handle split votes
         AccountVote.Split -> null
         is AccountVote.Standard -> {
-            val amountMultiplier = vote.conviction.amountMultiplier()
             val amount = chainAsset.amountFromPlanks(balance)
-            val total = amountMultiplier * amount
+            val total = vote.conviction.votesFor(amount)
 
             VotesAmount(
                 total = total,
                 amount = amount,
-                multiplier = amountMultiplier
+                multiplier = vote.conviction.amountMultiplier()
             )
         }
     }
@@ -86,7 +86,53 @@ fun Voting.votes(): Map<ReferendumId, AccountVote> {
     }
 }
 
-private fun Conviction.amountMultiplier(): BigDecimal {
+fun AccountVote.completedReferendumLockDuration(referendumOutcome: VoteType, lockPeriod: BlockNumber): BlockNumber {
+    return when (this) {
+        AccountVote.Split -> BlockNumber.ZERO
+
+        is AccountVote.Standard -> {
+            val approved = referendumOutcome == VoteType.AYE
+
+            // vote has the same direction as outcome
+            if (approved == vote.aye) {
+                vote.conviction.lockDuration(lockPeriod)
+            } else {
+                BlockNumber.ZERO
+            }
+        }
+    }
+}
+
+fun AccountVote.maxLockDuration(lockPeriod: BlockNumber): BlockNumber {
+    return when (this) {
+        AccountVote.Split -> BigInteger.ZERO
+        is AccountVote.Standard -> vote.conviction.lockDuration(lockPeriod)
+    }
+}
+
+fun Conviction.lockDuration(lockPeriod: BlockNumber): BlockNumber {
+    return lockPeriods() * lockPeriod
+}
+
+fun Conviction.lockPeriods(): BigInteger {
+    val multiplier = when (this) {
+        Conviction.None -> 0
+        Conviction.Locked1x -> 1
+        Conviction.Locked2x -> 2
+        Conviction.Locked3x -> 4
+        Conviction.Locked4x -> 8
+        Conviction.Locked5x -> 16
+        Conviction.Locked6x -> 32
+    }
+
+    return multiplier.toBigInteger()
+}
+
+fun Conviction.votesFor(amount: BigDecimal): BigDecimal {
+    return amountMultiplier() * amount
+}
+
+fun Conviction.amountMultiplier(): BigDecimal {
     val multiplier: Double = when (this) {
         Conviction.None -> 0.1
         Conviction.Locked1x -> 1.0

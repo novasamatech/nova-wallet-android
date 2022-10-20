@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="vote_revote">Revote</string>
+
+    <string name="referendum_vote_unlock_hint">After locking period don’t forget to redeem your tokens</string>
+
+    <string name="common_maximum_format">%s maximum</string>
+
+    <string name="referendum_vote_governance_lock">Governance lock</string>
+    <string name="referendum_vote_locking_period">Locking period</string>
+
+    <string name="referendum_vote_setup_title">Vote for Referendum #%s</string>
+    <string name="referendum_vote_select_conviction_title">Multiply votes by increasing locking period</string>
+
     <string name="referendum_timeline_state_preparing">Voting: Preparing</string>
     <string name="referendum_timeline_state_in_queue">Voting: In queue</string>
     <string name="referendum_timeline_state_passing">Voting: Passing</string>
@@ -13,7 +25,7 @@
     <string name="referendum_timeline_state_executed">Executed</string>
     <string name="referendum_timeline_state_cancelled">Cancelled</string>
     <string name="referendum_timeline_state_killed">Killed</string>
-    <string name="referendum_timeline_state_timed_out">Killed</string>
+    <string name="referendum_timeline_state_timed_out">Timed out</string>
 
     <string name="referendum_votes_format">%s votes</string>
 
@@ -71,8 +83,8 @@
     <string name="referendum_track_medium_spender">Treasury: medium spend</string>
     <string name="referendum_track_big_spender">Treasury: big spend</string>
 
-    <string name="referendum_vote_positive_type">Aye</string>
-    <string name="referendum_vote_negative_type">Nay</string>
+    <string name="referendum_vote_aye">Aye</string>
+    <string name="referendum_vote_nay">Nay</string>
 
     <string name="referendum_details_your_vote">Your vote:</string>
     <string name="referendum_details_timeline">Timeline</string>

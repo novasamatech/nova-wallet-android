@@ -137,7 +137,7 @@ class RealReferendaConstructor(
                         queuePositions = queuePositions,
                     )
 
-                    OnChainReferendumStatus.Approved -> {
+                    is OnChainReferendumStatus.Approved -> {
                         val executionBlock = approvedReferendaExecutionBlocks[referendum.id]
 
                         if (executionBlock != null) {
@@ -148,10 +148,11 @@ class RealReferendaConstructor(
                         }
                     }
 
-                    OnChainReferendumStatus.Cancelled -> ReferendumStatus.NotExecuted.Cancelled
-                    OnChainReferendumStatus.Killed -> ReferendumStatus.NotExecuted.Killed
-                    OnChainReferendumStatus.Rejected -> ReferendumStatus.NotExecuted.Rejected
-                    OnChainReferendumStatus.TimedOut -> ReferendumStatus.NotExecuted.TimedOut
+                    is OnChainReferendumStatus.Rejected -> ReferendumStatus.NotExecuted.Rejected
+
+                    is OnChainReferendumStatus.Cancelled -> ReferendumStatus.NotExecuted.Cancelled
+                    is OnChainReferendumStatus.Killed -> ReferendumStatus.NotExecuted.Killed
+                    is OnChainReferendumStatus.TimedOut -> ReferendumStatus.NotExecuted.TimedOut
                 }
             }
         )

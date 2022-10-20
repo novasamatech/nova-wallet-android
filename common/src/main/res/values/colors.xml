@@ -49,6 +49,15 @@
     <color name="multicolor_green_100">#15CF37</color>
     <color name="multicolor_red_100">#FF3A69</color>
 
+    <color name="multicolor_cyan_light">#1DE4FF</color>
+    <color name="multicolor_cyan_medium">#1AD1FF</color>
+    <color name="multicolor_cyan_dark">#1EB3FF</color>
+
+    <color name="multicolor_blue_100">#2194FF</color>
+    <color name="multicolor_indigo">#7471FF</color>
+    <color name="multicolor_violet">#DF00FF</color>
+    <color name="multicolor_pink_polkadot">#FF0087</color>
+
     <color name="bg_bottom_sheet">#1D1D20</color>
 
     <color name="settings_group_background">#1D1D20</color>
@@ -65,7 +74,7 @@
 
     <color name="bar_bg_64">#A8252528</color>
 
-    <color name="accentBlue">#2194FF</color>
+    <color name="accentBlue">@color/multicolor_blue_100</color>
     <color name="accentSecondary">#2D2D30</color>
 
     <color name="disabledColor">#1D1D20</color>

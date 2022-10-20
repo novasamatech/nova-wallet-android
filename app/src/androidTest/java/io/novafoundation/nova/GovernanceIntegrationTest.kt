@@ -29,7 +29,7 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
         val chain = chain()
         val onChainReferendaRepository = source(chain).referenda
 
-        val referenda = onChainReferendaRepository.getOnChainReferenda(chain.id)
+        val referenda = onChainReferendaRepository.getAllOnChainReferenda(chain.id)
 
         Log.d(this@GovernanceIntegrationTest.LOG_TAG, referenda.toString())
     }
@@ -52,7 +52,7 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
 
         val accountId = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".toAccountId()
 
-        val trackLocks = convictionVotingRepository.trackLocksFor(accountId, chain.id)
+        val trackLocks = convictionVotingRepository.trackLocksFlow(accountId, chain.id).first()
         Log.d(this@GovernanceIntegrationTest.LOG_TAG, trackLocks.toString())
     }
 

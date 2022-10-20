@@ -17,7 +17,9 @@ interface OnChainReferendaRepository {
 
     suspend fun getTrackQueues(trackIds: Set<TrackId>, chainId: ChainId): Map<TrackId, TrackQueue>
 
-    suspend fun getOnChainReferenda(chainId: ChainId): Collection<OnChainReferendum>
+    suspend fun getAllOnChainReferenda(chainId: ChainId): Collection<OnChainReferendum>
+
+    suspend fun getOnChainReferenda(chainId: ChainId, referendaIds: Collection<ReferendumId>): Map<ReferendumId, OnChainReferendum>
 
     suspend fun onChainReferendumFlow(chainId: ChainId, referendumId: ReferendumId): Flow<OnChainReferendum>
 

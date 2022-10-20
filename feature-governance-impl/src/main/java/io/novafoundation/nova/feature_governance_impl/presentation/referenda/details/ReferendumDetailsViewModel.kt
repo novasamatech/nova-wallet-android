@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_governance_impl.presentation.referenda.de
 import io.noties.markwon.Markwon
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.firstOnLoad
 import io.novafoundation.nova.common.utils.flowOfAll
@@ -41,6 +42,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.ful
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumFullDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumProposerPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.timeline.TimelineLayout
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.SetupVoteReferendumPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.view.VotersModel
 import io.novafoundation.nova.feature_governance_impl.presentation.view.YourVoteModel
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -99,15 +101,19 @@ class ReferendumDetailsViewModel(
                 identityProvider = proposerIdentityProvider
             )
         }
-    }
+    }.shareInBackground()
 
     val referendumDetailsModelFlow = referendumDetailsFlow.map(::mapReferendumDetailsToUi)
         .withLoading()
         .shareInBackground()
 
-    val voteButtonVisible = referendumDetailsFlow.map {
-        it.userVote == null && it.timeline.currentStatus is ReferendumStatus.Ongoing
-    }.shareInBackground()
+    val voteButtonState = referendumDetailsFlow.map {
+        when {
+            it.timeline.currentStatus !is ReferendumStatus.Ongoing -> DescriptiveButtonState.Gone
+            it.userVote != null -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.vote_revote))
+            else -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.vote_vote))
+        }
+    }
 
     private val referendumCallFlow = referendumDetailsFlow.map { details ->
         details.onChainMetadata?.preImage?.let { preImage ->
@@ -162,7 +168,8 @@ class ReferendumDetailsViewModel(
     }
 
     fun voteClicked() {
-        router.openReferendumConfirm()
+        val votePayload = SetupVoteReferendumPayload(payload.referendumId)
+        router.openSetupVoteReferendum(votePayload)
     }
 
     private suspend fun mapReferendumDetailsToUi(referendumDetails: ReferendumDetails): ReferendumDetailsModel {
@@ -251,12 +258,12 @@ class ReferendumDetailsViewModel(
         return when (type) {
             VoteType.AYE -> VotersModel(
                 voteTypeColorRes = R.color.multicolor_green_100,
-                voteTypeRes = R.string.referendum_vote_positive_type,
+                voteTypeRes = R.string.referendum_vote_aye,
                 votesValue = formatVotesAmount(voting.approval.ayeVotes.amount, chainAsset)
             )
             VoteType.NAY -> VotersModel(
                 voteTypeColorRes = R.color.multicolor_red_100,
-                voteTypeRes = R.string.referendum_vote_negative_type,
+                voteTypeRes = R.string.referendum_vote_nay,
                 votesValue = formatVotesAmount(voting.approval.nayVotes.amount, chainAsset)
             )
         }
@@ -272,7 +279,7 @@ class ReferendumDetailsViewModel(
         val isAye = vote.isAye() ?: return null
         val votes = vote.votes(token.configuration) ?: return null
 
-        val voteTypeRes = if (isAye) R.string.referendum_vote_positive_type else R.string.referendum_vote_negative_type
+        val voteTypeRes = if (isAye) R.string.referendum_vote_aye else R.string.referendum_vote_nay
         val colorRes = if (isAye) R.color.multicolor_green_100 else R.color.multicolor_red_100
 
         val votesAmountFormatted = mapAmountToAmountModel(votes.amount, token).token

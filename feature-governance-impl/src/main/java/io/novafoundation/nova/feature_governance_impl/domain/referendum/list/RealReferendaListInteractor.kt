@@ -48,7 +48,7 @@ class RealReferendaListInteractor(
         val tracksById = governanceSource.referenda.getTracksById(chain.id)
 
         return chainStateRepository.currentBlockNumberFlow(chain.id).map { currentBlockNumber ->
-            val onChainReferenda = governanceSource.referenda.getOnChainReferenda(chain.id)
+            val onChainReferenda = governanceSource.referenda.getAllOnChainReferenda(chain.id)
             val offChainInfo = governanceSource.offChainInfo.referendumPreviews(chain).associateBy(OffChainReferendumPreview::referendumId)
             val totalIssuance = totalIssuanceRepository.getTotalIssuance(chain.id)
 

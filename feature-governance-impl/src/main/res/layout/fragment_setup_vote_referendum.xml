@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:id="@+id/setupReferendumVoteContainer"
+    tools:background="@color/black">
+
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:dividerVisible="false"
+        android:id="@+id/setupReferendumVoteToolbar"
+        app:homeButtonIcon="@drawable/ic_close" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/setupReferendumVoteTitle"
+                style="@style/TextAppearance.NovaFoundation.Bold.Title2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                tools:text="Vote for Referendum #557" />
+
+            <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.ChooseAmountView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/setupReferendumVoteAmount"
+                android:layout_marginTop="16dp" />
+
+            <io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.view.VotePowerView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/setupReferendumVoteVotePower"
+                android:layout_marginTop="12dp" />
+
+            <io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.view.AmountChangesView
+                android:layout_width="match_parent"
+                android:id="@+id/setupReferendumVoteLockedAmountChanges"
+                android:layout_height="wrap_content"
+                app:amountChanges_icon="@drawable/ic_lock"
+                app:amountChanges_title="@string/referendum_vote_governance_lock"
+                android:layout_marginTop="12dp" />
+
+            <io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.view.AmountChangesView
+                android:layout_width="match_parent"
+                app:amountChanges_icon="@drawable/ic_time_16"
+                app:amountChanges_title="@string/referendum_vote_locking_period"
+                android:id="@+id/setupReferendumVoteLockedPeriodChanges"
+                android:layout_height="wrap_content" />
+
+            <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
+                android:layout_width="match_parent"
+                android:id="@+id/setupReferendumVoteFee"
+                app:dividerVisible="false"
+                android:layout_height="wrap_content" />
+
+            <io.novafoundation.nova.common.mixin.hints.HintsView
+                android:layout_width="match_parent"
+                android:layout_marginTop="12dp"
+                android:id="@+id/setupReferendumVoteHints"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:orientation="horizontal">
+
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_weight="1"
+            android:id="@+id/setupReferendumVoteNay"
+            android:text="@string/referendum_vote_nay"
+            app:appearance="primaryRed" />
+
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:id="@+id/setupReferendumVoteAye"
+            android:text="@string/referendum_vote_aye"
+            app:appearance="primaryGreen" />
+    </LinearLayout>
+</LinearLayout>

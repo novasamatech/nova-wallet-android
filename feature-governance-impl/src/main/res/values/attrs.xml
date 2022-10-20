@@ -22,4 +22,9 @@
         <attr name="timelinePointToStrokeOffset" format="dimension" />
         <attr name="timelineItemStatePointSize" format="dimension" />
     </declare-styleable>
+
+    <declare-styleable name="AmountChangesView">
+        <attr name="amountChanges_title" format="string" />
+        <attr name="amountChanges_icon" format="reference|color" />
+    </declare-styleable>
 </resources>

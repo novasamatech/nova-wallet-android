@@ -56,6 +56,18 @@ class PrimaryButton @JvmOverloads constructor(
             override fun disabledColor(context: Context) = context.getColor(R.color.disabledTransparent)
 
             override fun enabledColor(context: Context) = context.getColor(R.color.white_16)
+        },
+
+        PRIMARY_GREEN {
+            override fun disabledColor(context: Context) = context.getColor(R.color.disabledColor)
+
+            override fun enabledColor(context: Context) = context.getColor(R.color.multicolor_green_100)
+        },
+
+        PRIMARY_RED {
+            override fun disabledColor(context: Context) = context.getColor(R.color.disabledColor)
+
+            override fun enabledColor(context: Context) = context.getColor(R.color.multicolor_red_100)
         };
 
         @ColorInt
