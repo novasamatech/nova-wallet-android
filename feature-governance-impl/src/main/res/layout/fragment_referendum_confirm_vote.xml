@@ -5,6 +5,7 @@
     android:id="@+id/stakingConfirmationContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     android:orientation="vertical"
     tools:background="@color/black">
 
@@ -76,20 +77,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="16dp"
                     android:layout_marginTop="12dp" />
-
-                <TextView
-                    android:id="@+id/confirmReferendumVoteNote"
-                    style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="16dp"
-                    android:layout_marginTop="16dp"
-                    android:gravity="center_vertical"
-                    android:includeFontPadding="false"
-                    android:text="@string/confirm_referendum_vote_note"
-                    android:textColor="@color/white_64"
-                    tools:drawableStart="@drawable/ic_star_filled"
-                    tools:drawableTint="@color/white_48" />
 
                 <io.novafoundation.nova.common.mixin.hints.HintsView
                     android:id="@+id/confirmReferendumVoteHints"
