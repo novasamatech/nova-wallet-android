@@ -54,7 +54,8 @@ class RealVoteReferendumInteractor(
 
             val voterAccountId = metaAccount.accountIdIn(chain)!!
 
-            voteAssistantFlowSuspend(chain, voterAccountId, referendumId) }
+            voteAssistantFlowSuspend(chain, voterAccountId, referendumId)
+        }
     }
 
     override suspend fun estimateFee(amount: Balance, conviction: Conviction, referendumId: ReferendumId): Balance {

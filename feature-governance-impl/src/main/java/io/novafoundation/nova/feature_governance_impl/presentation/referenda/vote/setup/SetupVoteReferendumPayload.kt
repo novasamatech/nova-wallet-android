@@ -8,7 +8,7 @@ import java.math.BigInteger
 @Parcelize
 class SetupVoteReferendumPayload(
     val _referendumId: BigInteger
-): Parcelable
+) : Parcelable
 
 val SetupVoteReferendumPayload.referendumId: ReferendumId
     get() = ReferendumId(_referendumId)

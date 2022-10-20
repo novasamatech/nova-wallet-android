@@ -28,7 +28,6 @@ interface GovernanceVoteAssistant {
     val onChainReferendum: OnChainReferendum
 
     suspend fun estimateLocksAfterVoting(amount: Balance, conviction: Conviction): LocksChange
-
 }
 
 fun <T : Comparable<T>> Change(
@@ -36,7 +35,6 @@ fun <T : Comparable<T>> Change(
     newValue: T,
     absoluteDifference: T
 ): GovernanceVoteAssistant.Change<T> {
-
     return if (previousValue == newValue) {
         GovernanceVoteAssistant.Change.Same(newValue)
     } else {
@@ -48,6 +46,5 @@ fun <T : Comparable<T>> Change(
         )
     }
 }
-
 
 fun <T> GovernanceVoteAssistant.Change<T>.changedOrNull(): GovernanceVoteAssistant.Change.Changed<T>? = castOrNull()

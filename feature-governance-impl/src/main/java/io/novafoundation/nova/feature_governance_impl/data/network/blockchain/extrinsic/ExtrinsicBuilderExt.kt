@@ -22,7 +22,7 @@ fun ExtrinsicBuilder.convictionVotingVote(
 }
 
 private fun AccountVote.prepareForEncoding(): Any {
-    return when(this) {
+    return when (this) {
         AccountVote.Split -> NotImplementedError("Split voting not yet supported")
 
         is AccountVote.Standard -> DictEnum.Entry(

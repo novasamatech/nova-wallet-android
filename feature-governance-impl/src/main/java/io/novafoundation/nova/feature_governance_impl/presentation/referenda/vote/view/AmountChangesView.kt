@@ -22,7 +22,6 @@ import kotlinx.android.synthetic.main.view_amount_changes.view.valueChangesIcon
 import kotlinx.android.synthetic.main.view_amount_changes.view.valueChangesTitle
 import kotlinx.android.synthetic.main.view_amount_changes.view.valueChangesTo
 
-
 class AmountChangesView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -73,7 +72,6 @@ class AmountChangesView @JvmOverloads constructor(
         setIcon(icon)
     }
 }
-
 
 fun AmountChangesView.setAmountChangeModel(model: AmountChangeModel) {
     setFrom(model.from)
