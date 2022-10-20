@@ -9,6 +9,8 @@ import kotlin.time.Duration.Companion.milliseconds
 
 interface BlockDurationEstimator {
 
+    val currentBlock: BlockNumber
+
     fun durationUntil(block: BlockNumber): Duration
 
     fun durationOf(blocks: BlockNumber): Duration
@@ -25,7 +27,7 @@ fun BlockDurationEstimator(currentBlock: BlockNumber, blockTimeMillis: BigIntege
 }
 
 internal class RealBlockDurationEstimator(
-    private val currentBlock: BlockNumber,
+    override val currentBlock: BlockNumber,
     private val blockTimeMillis: BigInteger
 ) : BlockDurationEstimator {
 

@@ -137,7 +137,9 @@ private class RealGovernanceLocksEstimator(
         val newMaxUnlocksAt = estimateUnlocksAt(changedVote = vote)
 
         val lockedDifference = newLocked - currentMaxLocked
-        val lockedPeriodDifference = newMaxUnlocksAt - currentMaxUnlocksAt
+
+        val previousLockDuration = blockDurationEstimator.durationUntil(currentMaxUnlocksAt)
+        val newLockDuration = blockDurationEstimator.durationUntil(newMaxUnlocksAt)
 
         return LocksChange(
             amountChange = Change(
@@ -146,9 +148,9 @@ private class RealGovernanceLocksEstimator(
                 absoluteDifference = lockedDifference.abs(),
             ),
             periodChange = Change(
-                previousValue = blockDurationEstimator.durationUntil(currentMaxUnlocksAt),
-                newValue = blockDurationEstimator.durationUntil(newMaxUnlocksAt),
-                absoluteDifference = blockDurationEstimator.durationOf(lockedPeriodDifference.abs()),
+                previousValue = previousLockDuration,
+                newValue = newLockDuration,
+                absoluteDifference = (newLockDuration - previousLockDuration).absoluteValue,
             )
         )
     }
@@ -172,22 +174,22 @@ private class RealGovernanceLocksEstimator(
         val changedVoteMaxLock = onChainReferendum.maxConvictionEnd(changedVote)
 
         val currentVotesExceptChanged = votedReferenda.keys - onChainReferendum.id
-        val currentVotesExceptChangedMaxUnlock = currentVotesExceptChanged.maxOf {
+        val currentVotesExceptChangedMaxUnlock = currentVotesExceptChanged.maxOfOrNull {
             val referendum = votedReferenda.getValue(it)
             val vote = flattenedVotes.getValue(it)
 
             referendum.maxConvictionEnd(vote)
-        }
+        }.orZero()
 
         return changedVoteMaxLock.max(currentVotesExceptChangedMaxUnlock)
     }
 
     private fun votesEstimatedUnlocksAt(): BlockNumber {
-        return votedReferenda.maxOf { (id, referendum) ->
+        return votedReferenda.maxOfOrNull { (id, referendum) ->
             val vote = flattenedVotes.getValue(id)
 
             referendum.maxConvictionEnd(vote)
-        }
+        }.orZero()
     }
 
     private fun OnChainReferendum.maxConvictionEnd(vote: AccountVote): BlockNumber {
