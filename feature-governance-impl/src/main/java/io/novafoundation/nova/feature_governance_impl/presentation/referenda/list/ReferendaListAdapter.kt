@@ -6,6 +6,8 @@ import androidx.core.view.isVisible
 import io.novafoundation.nova.common.list.BaseGroupedDiffCallback
 import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
+import io.novafoundation.nova.common.list.PayloadGenerator
+import io.novafoundation.nova.common.list.resolvePayload
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.view.shape.addRipple
@@ -15,7 +17,6 @@ import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumStatusModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumTimeEstimation
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumTrackModel
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumVotingModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.setReferendumTimeEstimation
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.setReferendumTrackModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendaGroupModel
@@ -35,7 +36,7 @@ import kotlinx.android.synthetic.main.item_referendum.view.itemReferendumYourVot
 
 class ReferendaListAdapter(
     private val handler: Handler,
-) : GroupedListAdapter<ReferendaGroupModel, ReferendumModel>(CrowdloanDiffCallback) {
+) : GroupedListAdapter<ReferendaGroupModel, ReferendumModel>(ReferendaDiffCallback) {
 
     interface Handler {
 
@@ -58,12 +59,32 @@ class ReferendaListAdapter(
         (holder as ReferendumChildHolder).bind(child)
     }
 
+    override fun bindGroup(holder: GroupedListHolder, position: Int, group: ReferendaGroupModel, payloads: List<Any>) {
+        bindGroup(holder, group)
+    }
+
     override fun bindChild(holder: GroupedListHolder, position: Int, child: ReferendumModel, payloads: List<Any>) {
-        bindChild(holder, child)
+        if (holder !is ReferendumChildHolder) return
+
+        resolvePayload(holder, position, payloads) {
+            when (it) {
+                ReferendumModel::voting -> holder.bindVoting(child)
+            }
+        }
     }
 }
 
-private object CrowdloanDiffCallback : BaseGroupedDiffCallback<ReferendaGroupModel, ReferendumModel>(ReferendaGroupModel::class.java) {
+private object ReferendaPayloadGenerator : PayloadGenerator<ReferendumModel>(ReferendumModel::voting)
+
+private object ReferendaDiffCallback : BaseGroupedDiffCallback<ReferendaGroupModel, ReferendumModel>(ReferendaGroupModel::class.java) {
+
+    override fun getGroupChangePayload(oldItem: ReferendaGroupModel, newItem: ReferendaGroupModel): Any? {
+        return if (oldItem == newItem) null else true
+    }
+
+    override fun getChildChangePayload(oldItem: ReferendumModel, newItem: ReferendumModel): Any? {
+        return ReferendaPayloadGenerator.diff(oldItem, newItem)
+    }
 
     override fun areGroupItemsTheSame(oldItem: ReferendaGroupModel, newItem: ReferendaGroupModel): Boolean {
         return oldItem.name == newItem.name
@@ -106,10 +127,10 @@ private class ReferendumChildHolder(
     fun bind(item: ReferendumModel) = with(containerView) {
         itemReferendumName.text = item.name
         setStatus(item.status)
-        setTimeEstimation(item.timeEstimation)
+        bindTimeEstimation(item.timeEstimation)
         setTrack(item.track)
         setNumber(item.number)
-        setVoting(item.voting)
+        bindVoting(item)
         setYourVote(item.yourVote)
 
         itemView.setOnClickListener { eventHandler.onReferendaClick(item) }
@@ -120,7 +141,7 @@ private class ReferendumChildHolder(
         itemReferendumStatus.setTextColorRes(status.colorRes)
     }
 
-    private fun setTimeEstimation(timeEstimation: ReferendumTimeEstimation?) = with(containerView) {
+    private fun bindTimeEstimation(timeEstimation: ReferendumTimeEstimation?) = with(containerView) {
         itemReferendumTimeEstimate.setReferendumTimeEstimation(timeEstimation)
     }
 
@@ -132,10 +153,6 @@ private class ReferendumChildHolder(
         itemReferendumTrack.setReferendumTrackModel(track)
     }
 
-    private fun setVoting(voting: ReferendumVotingModel?) = with(containerView) {
-        itemReferendumThreshold.setThresholdModel(voting)
-    }
-
     private fun setYourVote(vote: YourVotePreviewModel?) = with(containerView) {
         itemReferendumYourVoiceGroup.isVisible = vote != null
         if (vote != null) {
@@ -143,5 +160,10 @@ private class ReferendumChildHolder(
             itemReferendumYourVoteType.setTextColorRes(vote.colorRes)
             itemReferendumYourVoteDetails.text = vote.details
         }
+    }
+
+    fun bindVoting(child: ReferendumModel) = with(containerView) {
+        itemReferendumThreshold.setThresholdModel(child.voting)
+        itemReferendumThreshold.setThresholdInfoVisible(child.voting?.thresholdInfoVisible)
     }
 }

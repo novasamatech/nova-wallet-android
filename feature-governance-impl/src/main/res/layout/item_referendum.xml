@@ -7,12 +7,13 @@
     android:layout_marginHorizontal="16dp"
     android:layout_marginVertical="4dp"
     android:orientation="vertical"
-    android:padding="16dp"
+    android:paddingVertical="16dp"
     tools:background="@color/blurColor">
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp">
 
         <TextView
             android:id="@+id/itemReferendumStatus"
@@ -39,12 +40,14 @@
         style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
         android:layout_marginTop="8dp"
         tools:text="Runtime upgrade to 9280" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
         android:layout_marginTop="12dp"
         android:orientation="horizontal">
 
@@ -72,12 +75,15 @@
         android:id="@+id/itemReferendumThreshold"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp" />
+        android:layout_marginTop="16dp"
+        android:clipToPadding="false"
+        android:paddingHorizontal="16dp" />
 
     <FrameLayout
         android:id="@+id/itemReferendumYourVoiceGroup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
         android:layout_marginTop="12dp">
 
         <View
