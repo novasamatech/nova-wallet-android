@@ -59,6 +59,6 @@ class GovernanceNavigator(
     )
 
     override fun openReferendumUnlockConfirm() {
-        navController?.navigate(R.id.action_mainFragment_to_confirmReferendumUnlock)
+        //TODO
     }
 }
