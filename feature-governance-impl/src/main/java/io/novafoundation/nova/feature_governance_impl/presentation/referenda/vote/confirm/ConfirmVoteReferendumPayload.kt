@@ -17,10 +17,9 @@ class ConfirmVoteReferendumPayload(
 val ConfirmVoteReferendumPayload.referendumId: ReferendumId
     get() = ReferendumId(_referendumId)
 
-
 @Parcelize
 class AccountVoteParcelModel(
     val amount: BigDecimal,
     val conviction: Conviction,
     val aye: Boolean
-): Parcelable
+) : Parcelable
