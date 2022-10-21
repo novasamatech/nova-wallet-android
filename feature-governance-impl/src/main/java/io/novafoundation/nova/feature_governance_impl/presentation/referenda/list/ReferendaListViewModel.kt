@@ -113,8 +113,7 @@ class ReferendaListViewModel(
     private fun mapReferendumOnChainNameToUi(referendum: ReferendumPreview): String? {
         return when (val proposal = referendum.onChainMetadata?.proposal) {
             is ReferendumProposal.Call -> referendumFormatter.formatOnChainName(proposal.call)
-            is ReferendumProposal.Hash -> proposal.callHash
-            null -> null
+            else -> null
         }
     }
 
