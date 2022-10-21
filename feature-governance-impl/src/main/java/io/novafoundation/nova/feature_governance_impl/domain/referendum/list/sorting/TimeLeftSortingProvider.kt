@@ -15,7 +15,7 @@ class RealReferendaSortingProvider : ReferendaSortingProvider {
 
     override suspend fun getGroupSorting(): Comparator<ReferendumGroup> {
         return compareBy {
-            when(it) {
+            when (it) {
                 ReferendumGroup.ONGOING -> 0
                 ReferendumGroup.COMPLETED -> 1
             }

@@ -231,7 +231,7 @@ class ReferendumDetailsViewModel(
     ): TimelineLayout.TimelineState {
         val titleRes = when (currentStatus) {
             is ReferendumStatus.Ongoing.Preparing -> {
-                when(currentStatus.reason) {
+                when (currentStatus.reason) {
                     is PreparingReason.DecidingIn -> R.string.referendum_timeline_state_preparing
                     PreparingReason.WaitingForDeposit -> R.string.referendum_timeline_state_waiting_deposit
                 }

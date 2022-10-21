@@ -37,6 +37,6 @@ class ReferendumListModule {
         totalIssuanceRepository = totalIssuanceRepository,
         preImageRepository = preImageRepository,
         referendaConstructor = referendaConstructor,
-        referendaSortingProvider =referendaSortingProvider,
+        referendaSortingProvider = referendaSortingProvider,
     )
 }
