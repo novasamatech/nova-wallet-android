@@ -27,6 +27,7 @@ class VotingThresholdView @JvmOverloads constructor(
     }
 
     fun setThresholdModel(maybeModel: ReferendumVotingModel?) = useNonNullOrHide(maybeModel) { model ->
+        thresholdInfo.isVisible = model.thresholdInfoVisible
         thresholdInfo.text = model.thresholdInfo
         thresholdInfo.setDrawableStart(model.votingResultIcon, widthInDp = 16, tint = model.votingResultIconColor, paddingInDp = 4)
         votesView.setThreshold(model.thresholdFraction)

@@ -9,7 +9,7 @@ data class ReferendumVotingModel(
     @DrawableRes val votingResultIcon: Int,
     @ColorRes val votingResultIconColor: Int,
     val thresholdInfo: String,
-    val thresholdInfoVisible: Boolean?,
+    val thresholdInfoVisible: Boolean,
     val positivePercentage: String,
     val negativePercentage: String,
     val thresholdPercentage: String,

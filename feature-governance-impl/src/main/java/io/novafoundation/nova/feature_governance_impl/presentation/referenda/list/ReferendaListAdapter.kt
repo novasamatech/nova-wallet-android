@@ -164,6 +164,5 @@ private class ReferendumChildHolder(
 
     fun bindVoting(child: ReferendumModel) = with(containerView) {
         itemReferendumThreshold.setThresholdModel(child.voting)
-        itemReferendumThreshold.setThresholdInfoVisible(child.voting?.thresholdInfoVisible)
     }
 }
