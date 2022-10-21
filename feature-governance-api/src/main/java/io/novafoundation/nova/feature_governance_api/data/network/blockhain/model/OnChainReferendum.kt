@@ -32,15 +32,15 @@ sealed class OnChainReferendumStatus {
         val inQueue: Boolean,
     ) : OnChainReferendumStatus()
 
-    object Approved : OnChainReferendumStatus()
+    class Approved(val since: BlockNumber) : OnChainReferendumStatus()
 
-    object Rejected : OnChainReferendumStatus()
+    class Rejected(val since: BlockNumber) : OnChainReferendumStatus()
 
-    object Cancelled : OnChainReferendumStatus()
+    class Cancelled(val since: BlockNumber) : OnChainReferendumStatus()
 
-    object TimedOut : OnChainReferendumStatus()
+    class TimedOut(val since: BlockNumber) : OnChainReferendumStatus()
 
-    object Killed : OnChainReferendumStatus()
+    class Killed(val since: BlockNumber) : OnChainReferendumStatus()
 }
 
 sealed class Proposal {

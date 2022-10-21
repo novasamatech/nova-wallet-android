@@ -103,6 +103,8 @@
             <enum name="primaryTransparent" value="1" />
             <enum name="secondary" value="2" />
             <enum name="secondaryTransparent" value="3" />
+            <enum name="primaryGreen" value="4" />
+            <enum name="primaryRed" value="5" />
         </attr>
 
         <attr name="size" format="enum">

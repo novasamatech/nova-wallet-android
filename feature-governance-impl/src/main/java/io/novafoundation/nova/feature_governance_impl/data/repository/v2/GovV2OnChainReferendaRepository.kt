@@ -94,7 +94,7 @@ class GovV2OnChainReferendaRepository(
         }
     }
 
-    override suspend fun getOnChainReferenda(chainId: ChainId): Collection<OnChainReferendum> {
+    override suspend fun getAllOnChainReferenda(chainId: ChainId): Collection<OnChainReferendum> {
         return remoteStorageSource.query(chainId) {
             runtime.metadata.referenda().storage("ReferendumInfoFor").entries(
                 prefixArgs = emptyArray(),
@@ -102,6 +102,16 @@ class GovV2OnChainReferendaRepository(
                 binding = { decoded, id -> bindReferendum(decoded, id, runtime) }
             ).values.filterNotNull()
         }
+    }
+
+    override suspend fun getOnChainReferenda(chainId: ChainId, referendaIds: Collection<ReferendumId>): Map<ReferendumId, OnChainReferendum> {
+        return remoteStorageSource.query(chainId) {
+            runtime.metadata.referenda().storage("ReferendumInfoFor").entries(
+                keysArguments = referendaIds.map { id -> listOf(id.value) },
+                keyExtractor = { (id: BigInteger) -> ReferendumId(id) },
+                binding = { decoded, id -> bindReferendum(decoded, id, runtime) }
+            )
+        }.filterNotNull()
     }
 
     override suspend fun onChainReferendumFlow(chainId: ChainId, referendumId: ReferendumId): Flow<OnChainReferendum> {
@@ -155,11 +165,11 @@ class GovV2OnChainReferendaRepository(
                     inQueue = bindBoolean(status["inQueue"])
                 )
             }
-            "Approved" -> OnChainReferendumStatus.Approved
-            "Rejected" -> OnChainReferendumStatus.Rejected
-            "Cancelled" -> OnChainReferendumStatus.Cancelled
-            "TimedOut" -> OnChainReferendumStatus.TimedOut
-            "Killed" -> OnChainReferendumStatus.Killed
+            "Approved" -> OnChainReferendumStatus.Approved(bindCompletedReferendumSince(asDictEnum.value))
+            "Rejected" -> OnChainReferendumStatus.Rejected(bindCompletedReferendumSince(asDictEnum.value))
+            "Cancelled" -> OnChainReferendumStatus.Cancelled(bindCompletedReferendumSince(asDictEnum.value))
+            "TimedOut" -> OnChainReferendumStatus.TimedOut(bindCompletedReferendumSince(asDictEnum.value))
+            "Killed" -> OnChainReferendumStatus.Killed(bindCompletedReferendumSince(asDictEnum.value))
             else -> throw IllegalArgumentException("Unsupported referendum status")
         }
 
@@ -217,6 +227,13 @@ class GovV2OnChainReferendaRepository(
             nays = bindNumber(decoded["nays"]),
             support = bindNumber(decoded["support"])
         )
+    }
+
+    private fun bindCompletedReferendumSince(decoded: Any?): BlockNumber {
+        // first element in tuple
+        val since = decoded.castToList().first()
+
+        return bindNumber(since)
     }
 
     private fun bindReferendumDeposit(decoded: Struct.Instance?): ReferendumDeposit? {

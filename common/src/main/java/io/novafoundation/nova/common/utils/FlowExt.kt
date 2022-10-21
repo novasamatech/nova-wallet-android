@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.utils.input.Input
 import io.novafoundation.nova.common.utils.input.isModifiable
 import io.novafoundation.nova.common.utils.input.modifyInput
 import io.novafoundation.nova.common.utils.input.valueOrNull
+import io.novafoundation.nova.common.view.input.seekbar.Seekbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
@@ -18,7 +19,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
@@ -240,6 +240,22 @@ fun RadioGroup.bindTo(flow: MutableStateFlow<Int>, scope: LifecycleCoroutineScop
         flow.collect {
             if (it != checkedRadioButtonId) {
                 check(it)
+            }
+        }
+    }
+}
+
+fun Seekbar.bindTo(flow: MutableStateFlow<Int>, scope: LifecycleCoroutineScope) {
+    setOnProgressChangedListener { progress ->
+        if (flow.value != progress) {
+            flow.value = progress
+        }
+    }
+
+    scope.launchWhenResumed {
+        flow.collect {
+            if (it != progress) {
+                progress = it
             }
         }
     }

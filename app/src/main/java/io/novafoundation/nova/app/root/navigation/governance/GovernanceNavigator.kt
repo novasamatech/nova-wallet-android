@@ -14,6 +14,8 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.ful
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumFullDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.ReferendumVotersFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.ReferendumVotersPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.SetupVoteReferendumFragment
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.SetupVoteReferendumPayload
 
 class GovernanceNavigator(
     private val navigationHolder: NavigationHolder
@@ -35,6 +37,11 @@ class GovernanceNavigator(
     override fun openReferendumVoters(payload: ReferendumVotersPayload) = performNavigation(
         actionId = R.id.action_referendumDetailsFragment_to_referendumVotersFragment,
         args = ReferendumVotersFragment.getBundle(payload)
+    )
+
+    override fun openSetupVoteReferendum(payload: SetupVoteReferendumPayload) = performNavigation(
+        actionId = R.id.action_referendumDetailsFragment_to_setupVoteReferendumFragment,
+        args = SetupVoteReferendumFragment.getBundle(payload)
     )
 
     override fun openDAppBrowser(initialUrl: String) = performNavigation(
