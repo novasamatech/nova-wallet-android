@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_assets.domain.locks
+package io.novafoundation.nova.feature_wallet_api.data.repository
 
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock

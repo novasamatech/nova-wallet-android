@@ -23,7 +23,8 @@ import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.val
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.VoteReferendumValidationSystem
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.handleVoteReferendumValidationFailure
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.hints.ReferendumVoteHintsMixinFactory
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.confirm.AccountVoteParcelModel
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.confirm.ConfirmVoteReferendumPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.model.AmountChangeModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.model.LocksChangeModel
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -54,7 +55,6 @@ class SetupVoteReferendumViewModel(
     private val payload: SetupVoteReferendumPayload,
     private val resourceManager: ResourceManager,
     private val router: GovernanceRouter,
-    private val hintsMixinFactory: ReferendumVoteHintsMixinFactory,
     private val validationSystem: VoteReferendumValidationSystem,
     private val validationExecutor: ValidationExecutor,
 ) : BaseViewModel(),
@@ -71,8 +71,6 @@ class SetupVoteReferendumViewModel(
     override val originFeeMixin = feeLoaderMixinFactory.create(selectedAsset)
 
     private val validatingVoteType = MutableStateFlow<VoteType?>(null)
-
-    val hintsMixin = hintsMixinFactory.create(scope = this)
 
     val amountChooserMixin = amountChooserMixinFactory.create(
         scope = this,
@@ -98,7 +96,7 @@ class SetupVoteReferendumViewModel(
     ) { amount, conviction, voteAssistant ->
         val amountPlanks = selectedAsset.first().token.planksFromAmount(amount)
 
-        voteAssistant.estimateLocksAfterVoting(amountPlanks, conviction)
+        voteAssistant.estimateLocksAfterVoting(amountPlanks, conviction, selectedAsset.first())
     }
         .inBackground()
         .shareWhileSubscribed()
@@ -116,7 +114,7 @@ class SetupVoteReferendumViewModel(
         .shareInBackground()
 
     val ayeButtonStateFlow = buttonStateFlow(VoteType.AYE, R.string.referendum_vote_aye)
-    val nayButtonStateFlow = buttonStateFlow(VoteType.NAY, R.string.referendum_vote_aye)
+    val nayButtonStateFlow = buttonStateFlow(VoteType.NAY, R.string.referendum_vote_nay)
 
     init {
         originFeeMixin.connectWith(
@@ -165,19 +163,31 @@ class SetupVoteReferendumViewModel(
             ) {
                 validatingVoteType.value = null
 
-                openConfirm()
+                openConfirm(it, voteType)
             }
         }
     }
 
-    private fun openConfirm() {
-        showMessage("Ready to go to confirm")
+    private fun openConfirm(validationPayload: VoteReferendumValidationPayload, voteType: VoteType) = launch {
+        val conviction = selectedConvictionFlow.first()
+
+        val confirmPayload = ConfirmVoteReferendumPayload(
+            _referendumId = payload._referendumId,
+            fee = validationPayload.fee,
+            vote = AccountVoteParcelModel(
+                amount = validationPayload.voteAmount,
+                conviction = conviction,
+                aye = voteType == VoteType.AYE
+            )
+        )
+
+        router.openConfirmVoteReferendum(confirmPayload)
     }
 
     private suspend fun mapLocksChangeToUi(locksChange: LocksChange): LocksChangeModel {
         return LocksChangeModel(
-            amountChange = mapLockedChangeToUi(locksChange.amountChange),
-            periodChange = mapLockedPeriodChangeToUi(locksChange.periodChange)
+            amountChange = mapLockedChangeToUi(locksChange.lockedAmountChange),
+            periodChange = mapLockedPeriodChangeToUi(locksChange.governanceLockChange)
         )
     }
 

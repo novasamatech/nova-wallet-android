@@ -44,16 +44,8 @@
             app:popExitAnim="@anim/fragment_close_exit" />
 
         <action
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit"
             android:id="@+id/action_referendumDetailsFragment_to_setupVoteReferendumFragment"
-            app:destination="@id/setupVoteReferendumFragment" />
-
-        <action
-            android:id="@+id/action_referendumDetailsFragment_to_confirmReferendumVote"
-            app:destination="@id/confirmReferendumVote"
+            app:destination="@id/setupVoteReferendumFragment"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
@@ -81,7 +73,16 @@
     <fragment
         android:id="@+id/setupVoteReferendumFragment"
         android:name="io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.SetupVoteReferendumFragment"
-        android:label="SetupVoteReferendumFragment" />
+        android:label="SetupVoteReferendumFragment">
+
+        <action
+            android:id="@+id/action_setupVoteReferendumFragment_to_confirmReferendumVote"
+            app:destination="@id/confirmReferendumVote"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
 
     <fragment
         android:id="@+id/referendumVoters"
@@ -91,7 +92,16 @@
 
     <fragment
         android:id="@+id/confirmReferendumVote"
-        android:name="io.novafoundation.nova.feature_governance_impl.presentation.referenda.confirm.ConfirmReferendumVoteFragment"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.confirm.ConfirmReferendumVoteFragment"
         android:label="ConfirmReferendumVote"
-        tools:layout="@layout/fragment_referendum_confirm_vote" />
+        tools:layout="@layout/fragment_referendum_confirm_vote">
+
+        <action
+            android:id="@+id/action_confirmReferendumVote_to_referendumDetailsFragment"
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_open_enter"
+            app:popExitAnim="@anim/fragment_open_exit"
+            app:popUpTo="@id/referendumDetailsFragment" />
+    </fragment>
 </navigation>

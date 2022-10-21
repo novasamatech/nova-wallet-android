@@ -62,18 +62,6 @@
                 app:amountChanges_title="@string/referendum_vote_locking_period"
                 android:id="@+id/setupReferendumVoteLockedPeriodChanges"
                 android:layout_height="wrap_content" />
-
-            <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
-                android:layout_width="match_parent"
-                android:id="@+id/setupReferendumVoteFee"
-                app:dividerVisible="false"
-                android:layout_height="wrap_content" />
-
-            <io.novafoundation.nova.common.mixin.hints.HintsView
-                android:layout_width="match_parent"
-                android:layout_marginTop="12dp"
-                android:id="@+id/setupReferendumVoteHints"
-                android:layout_height="wrap_content" />
         </LinearLayout>
     </ScrollView>
 
