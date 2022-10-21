@@ -16,7 +16,9 @@ interface GovernanceRouter : ReturnableRouter {
 
     fun openReferendumFullDetails(payload: ReferendumFullDetailsPayload)
 
-    fun openReferendumConfirm()
+    fun openReferendumVoteConfirm()
 
     fun openSetupVoteReferendum(payload: SetupVoteReferendumPayload)
+
+    fun openReferendumUnlockConfirm()
 }

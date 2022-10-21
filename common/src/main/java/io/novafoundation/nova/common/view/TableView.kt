@@ -1,6 +1,9 @@
 package io.novafoundation.nova.common.view
 
 import android.content.Context
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Path
 import android.util.AttributeSet
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -9,6 +12,7 @@ import androidx.core.view.isVisible
 import androidx.core.view.updateMarginsRelative
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.WithContextExtensions
+import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setTextColorRes
@@ -26,6 +30,11 @@ open class TableView @JvmOverloads constructor(
 
     val titleView: TextView
 
+    private val childHorizontalPadding = 16.dpF(context)
+    private val pathWidth = 1.dpF(context)
+    private val dividerPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val dividerPath = Path()
+
     init {
         orientation = VERTICAL
 
@@ -35,10 +44,16 @@ open class TableView @JvmOverloads constructor(
         titleView = addTitleView()
 
         attrs?.let(::applyAttributes)
+
+        dividerPaint.apply {
+            color = context.getColor(R.color.white_8)
+            style = Paint.Style.STROKE
+        }
     }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
+
         setupTableChildrenAppearance()
     }
 
@@ -50,6 +65,16 @@ open class TableView @JvmOverloads constructor(
         super.onLayout(changed, l, t, r, b)
 
         setupTableChildrenAppearance()
+
+        val halfPathWidth = pathWidth / 2
+        dividerPath.reset()
+        children.toList()
+            .filterNot { it == titleView }
+            .withoutLast()
+            .forEach {
+                dividerPath.moveTo(childHorizontalPadding, it.bottom - halfPathWidth)
+                dividerPath.lineTo(measuredWidth - childHorizontalPadding, it.bottom - halfPathWidth)
+            }
     }
 
     fun setTitle(title: String?) {
@@ -72,7 +97,7 @@ open class TableView @JvmOverloads constructor(
     }
 
     private fun setupTableChildrenAppearance() {
-        val tableChildren = children.filterIsInstance<TableCellView>()
+        val tableChildren = children.filterNot { it == titleView }
             .filter { it.isVisible }
             .toList()
 
@@ -84,8 +109,6 @@ open class TableView @JvmOverloads constructor(
         }
 
         tableChildren.forEach {
-            it.setDividerColor(R.color.white_8)
-            it.setDividerVisible(true)
             it.updatePadding(start = 16.dp, end = 16.dp)
         }
 
@@ -94,7 +117,19 @@ open class TableView @JvmOverloads constructor(
         }
         tableChildren.last().apply {
             updatePadding(bottom = 4.dp)
-            setDividerVisible(false)
+        }
+    }
+
+    override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+        canvas.drawPath(dividerPath, dividerPaint)
+    }
+
+    private fun <T> List<T>.withoutLast(): List<T> {
+        return if (size <= 1) {
+            listOf()
+        } else {
+            subList(0, size - 1)
         }
     }
 }
