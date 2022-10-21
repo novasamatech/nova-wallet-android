@@ -8,7 +8,6 @@ import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
@@ -18,12 +17,9 @@ import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.view.setAmountChangeModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 import kotlinx.android.synthetic.main.fragment_setup_vote_referendum.setupReferendumVoteAmount
 import kotlinx.android.synthetic.main.fragment_setup_vote_referendum.setupReferendumVoteAye
 import kotlinx.android.synthetic.main.fragment_setup_vote_referendum.setupReferendumVoteContainer
-import kotlinx.android.synthetic.main.fragment_setup_vote_referendum.setupReferendumVoteFee
-import kotlinx.android.synthetic.main.fragment_setup_vote_referendum.setupReferendumVoteHints
 import kotlinx.android.synthetic.main.fragment_setup_vote_referendum.setupReferendumVoteLockedAmountChanges
 import kotlinx.android.synthetic.main.fragment_setup_vote_referendum.setupReferendumVoteLockedPeriodChanges
 import kotlinx.android.synthetic.main.fragment_setup_vote_referendum.setupReferendumVoteNay
@@ -73,10 +69,7 @@ class SetupVoteReferendumFragment : BaseFragment<SetupVoteReferendumViewModel>()
 
     override fun subscribe(viewModel: SetupVoteReferendumViewModel) {
         setupAmountChooser(viewModel.amountChooserMixin, setupReferendumVoteAmount)
-        setupFeeLoading(viewModel, setupReferendumVoteFee)
         observeValidations(viewModel)
-
-        observeHints(viewModel.hintsMixin, setupReferendumVoteHints)
 
         setupReferendumVoteVotePower.votePowerSeekbar.setValues(viewModel.convictionValues)
         setupReferendumVoteVotePower.votePowerSeekbar.bindTo(viewModel.selectedConvictionIndex, viewLifecycleOwner.lifecycleScope)

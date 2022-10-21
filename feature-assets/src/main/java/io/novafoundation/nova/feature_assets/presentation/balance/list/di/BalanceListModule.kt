@@ -17,7 +17,7 @@ import io.novafoundation.nova.feature_assets.domain.assets.list.AssetsListIntera
 import io.novafoundation.nova.feature_assets.domain.breakdown.BalanceBreakdownInteractor
 import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksInteractor
 import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksInteractorImpl
-import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.list.BalanceListViewModel
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor

@@ -1,24 +1,39 @@
-package io.novafoundation.nova.feature_governance_impl.presentation.referenda.confirm
+package io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.confirm
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.mixin.impl.observeRetries
+import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.view.setProgress
+import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
+import io.novafoundation.nova.feature_governance_impl.presentation.view.setVoteModelOrHide
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
+import kotlinx.android.synthetic.main.fragment_referendum_confirm_vote.confirmReferendumVoteAmount
 import kotlinx.android.synthetic.main.fragment_referendum_confirm_vote.confirmReferendumVoteConfirm
+import kotlinx.android.synthetic.main.fragment_referendum_confirm_vote.confirmReferendumVoteHints
 import kotlinx.android.synthetic.main.fragment_referendum_confirm_vote.confirmReferendumVoteInformation
+import kotlinx.android.synthetic.main.fragment_referendum_confirm_vote.confirmReferendumVoteNumber
+import kotlinx.android.synthetic.main.fragment_referendum_confirm_vote.confirmReferendumVoteResult
 import kotlinx.android.synthetic.main.fragment_referendum_confirm_vote.confirmReferendumVoteToolbar
+import kotlinx.android.synthetic.main.fragment_referendum_confirm_vote.confirmReferendumVoteTrack
 
 class ConfirmReferendumVoteFragment : BaseFragment<ConfirmReferendumVoteViewModel>() {
+
+    companion object {
+
+        private const val PAYLOAD = "ConfirmReferendumVoteFragment.Payload"
+
+        fun getBundle(payload: ConfirmVoteReferendumPayload): Bundle = bundleOf(PAYLOAD to payload)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -44,20 +59,28 @@ class ConfirmReferendumVoteFragment : BaseFragment<ConfirmReferendumVoteViewMode
             GovernanceFeatureApi::class.java
         )
             .confirmReferendumVote()
-            .create(this)
+            .create(this, argument(PAYLOAD))
             .inject(this)
     }
 
     override fun subscribe(viewModel: ConfirmReferendumVoteViewModel) {
-        observeRetries(viewModel)
         observeValidations(viewModel)
         setupExternalActions(viewModel)
-        // TODO observeHints(viewModel.hintsMixin, confirmReferendumVoteHints)
+        observeHints(viewModel.hintsMixin, confirmReferendumVoteHints)
 
         setupFeeLoading(viewModel, confirmReferendumVoteInformation.fee)
 
-        viewModel.addressModel.observe(confirmReferendumVoteInformation::setAccount)
+        viewModel.currentAddressModelFlow.observe(confirmReferendumVoteInformation::setAccount)
         viewModel.walletModel.observe(confirmReferendumVoteInformation::setWallet)
+
+        viewModel.amountModelFlow.observe(confirmReferendumVoteAmount::setAmount)
+
+        viewModel.accountVoteUi.observe(confirmReferendumVoteResult::setVoteModelOrHide)
+
+        viewModel.reviewReferendumModel.observe {
+            confirmReferendumVoteNumber.showValue(it.number)
+            confirmReferendumVoteTrack.showValueOrHide(it.trackModel?.name)
+        }
 
         viewModel.showNextProgress.observe(confirmReferendumVoteConfirm::setProgress)
     }

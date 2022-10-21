@@ -14,6 +14,8 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.ful
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumFullDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.ReferendumVotersFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.ReferendumVotersPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.confirm.ConfirmReferendumVoteFragment
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.confirm.ConfirmVoteReferendumPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.SetupVoteReferendumFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.SetupVoteReferendumPayload
 
@@ -44,6 +46,8 @@ class GovernanceNavigator(
         args = SetupVoteReferendumFragment.getBundle(payload)
     )
 
+    override fun backToReferendumDetails() = performNavigation(R.id.action_confirmReferendumVote_to_referendumDetailsFragment)
+
     override fun openDAppBrowser(initialUrl: String) = performNavigation(
         actionId = R.id.action_referendumDetailsFragment_to_DAppBrowserFragment,
         args = DAppBrowserFragment.getBundle(initialUrl)
@@ -54,7 +58,8 @@ class GovernanceNavigator(
         args = ReferendumDescriptionFragment.getBundle(payload)
     )
 
-    override fun openReferendumConfirm() = performNavigation(
-        actionId = R.id.action_referendumDetailsFragment_to_confirmReferendumVote
+    override fun openConfirmVoteReferendum(payload: ConfirmVoteReferendumPayload) = performNavigation(
+        actionId = R.id.action_setupVoteReferendumFragment_to_confirmReferendumVote,
+        args = ConfirmReferendumVoteFragment.getBundle(payload)
     )
 }
