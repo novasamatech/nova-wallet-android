@@ -46,6 +46,13 @@ enum class VoteType {
     AYE, NAY
 }
 
+fun Voting.trackVotesNumber(): Int {
+    return when (this) {
+        is Voting.Casting -> votes.size
+        Voting.Delegating -> 0
+    }
+}
+
 fun AccountVote.votes(chainAsset: Chain.Asset): VotesAmount? {
     return when (this) {
         // TODO handle split votes

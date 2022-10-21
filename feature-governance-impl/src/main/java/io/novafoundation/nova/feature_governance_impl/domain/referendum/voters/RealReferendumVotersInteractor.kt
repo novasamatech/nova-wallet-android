@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.address.get
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.voteType
@@ -31,6 +32,7 @@ class RealReferendumVotersInteractor(
 
         val voters = source.convictionVoting.votersOf(referendumId, chain.id)
             .filter { it.vote.voteType() == type }
+            .filter { it.vote is AccountVote.Standard }
 
         val votersAccountIds = voters.map { it.accountId }
         val identities = identityProvider.identitiesFor(votersAccountIds, chain.id)

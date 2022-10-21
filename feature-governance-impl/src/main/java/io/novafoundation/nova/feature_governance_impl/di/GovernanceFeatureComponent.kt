@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.ful
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.di.ReferendaListComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.di.SetupVoteReferendumComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.unlock.di.ConfirmReferendumUnlockComponent
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.di.ReferendumVotersComponent
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 
@@ -41,6 +42,8 @@ interface GovernanceFeatureComponent : GovernanceFeatureApi {
     fun setupVoteReferendumFactory(): SetupVoteReferendumComponent.Factory
 
     fun confirmReferendumVote(): ConfirmReferendumVoteComponent.Factory
+
+    fun referendumVotersFactory(): ReferendumVotersComponent.Factory
 
     fun confirmReferendumUnlock(): ConfirmReferendumUnlockComponent.Factory
 
