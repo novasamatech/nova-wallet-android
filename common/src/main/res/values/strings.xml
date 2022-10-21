@@ -25,6 +25,7 @@
     <string name="referendum_vote_select_conviction_title">Multiply votes by increasing locking period</string>
 
     <string name="referendum_timeline_state_preparing">Voting: Preparing</string>
+    <string name="referendum_timeline_state_waiting_deposit">Voting: Waiting for deposit</string>
     <string name="referendum_timeline_state_in_queue">Voting: In queue</string>
     <string name="referendum_timeline_state_passing">Voting: Passing</string>
     <string name="referendum_timeline_state_not_passing">Voting: Not passing</string>
@@ -62,7 +63,7 @@
     <string name="referendum_your_vote_format">Your vote: %s votes</string>
 
     <string name="referendum_status_approved">Approved</string>
-    <string name="referendum_status_in_queue">In queue</string>
+    <string name="referendum_status_in_queue_format">In queue (%s of %s)</string>
     <string name="referendum_status_timeout">Timed out</string>
     <string name="referendum_status_cancelled">Cancelled</string>
     <string name="referendum_status_passing">Passing</string>
