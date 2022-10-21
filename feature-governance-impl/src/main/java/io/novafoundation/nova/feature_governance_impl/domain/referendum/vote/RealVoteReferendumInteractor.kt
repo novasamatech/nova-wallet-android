@@ -165,7 +165,7 @@ private class RealGovernanceLocksEstimator(
         val newLockDuration = blockDurationEstimator.durationUntil(newMaxUnlocksAt)
 
         val currentTransferablePlanks = asset.transferableInPlanks
-        val newLocked = otherMaxLocked.max(amount)
+        val newLocked = otherMaxLocked.max(newGovernanceLocked)
         val newTransferablePlanks = asset.freeInPlanks - newLocked
 
         return LocksChange(

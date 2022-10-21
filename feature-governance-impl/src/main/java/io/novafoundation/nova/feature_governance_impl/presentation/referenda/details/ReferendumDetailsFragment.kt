@@ -145,6 +145,8 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
         viewModel.governanceDApps.observe(referendumDetailsDappList::setDApps)
 
         viewModel.voteButtonState.observe(referendumDetailsVotingStatus::setVoteButtonState)
+
+        viewModel.showFullDetails.observe(referendumFullDetails::setVisible)
     }
 
     private fun setReferendumState(model: ReferendumDetailsModel) {

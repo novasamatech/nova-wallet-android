@@ -19,7 +19,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.chain
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 
 class ReferendumFullDetailsViewModel(
@@ -60,13 +59,11 @@ class ReferendumFullDetailsViewModel(
     val callHash = payload.hash?.toHexString()
 
     val turnoutAmount = payloadFlow
-        .mapNotNull { it.turnout }
-        .map { mapAmountToAmountModel(it, getToken()) }
+        .map { payload -> payload.turnout?.let { mapAmountToAmountModel(it, getToken()) } }
         .shareInBackground()
 
     val electorateAmount = payloadFlow
-        .mapNotNull { it.electorate }
-        .map { mapAmountToAmountModel(it, getToken()) }
+        .map { payload -> payload.electorate?.let { mapAmountToAmountModel(it, getToken()) } }
         .shareInBackground()
 
     fun backClicked() {
