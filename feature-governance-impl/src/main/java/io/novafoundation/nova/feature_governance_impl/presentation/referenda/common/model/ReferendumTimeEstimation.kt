@@ -22,11 +22,24 @@ sealed class ReferendumTimeEstimation {
         companion object
     }
 
-    data class Timer(
+    class Timer(
         val time: TimerValue,
         @StringRes val timeFormat: Int,
         val textStyleRefresher: ReferendumTimeEstimationStyleRefresher,
-    ) : ReferendumTimeEstimation()
+    ) : ReferendumTimeEstimation() {
+
+        override fun hashCode(): Int {
+            var result = time.hashCode()
+            result = 31 * result + timeFormat
+            return result
+        }
+
+        override fun equals(other: Any?): Boolean {
+            if (other !is Timer) return false
+            return time == other.time
+                && timeFormat == other.timeFormat
+        }
+    }
 
     data class Text(
         val text: String,

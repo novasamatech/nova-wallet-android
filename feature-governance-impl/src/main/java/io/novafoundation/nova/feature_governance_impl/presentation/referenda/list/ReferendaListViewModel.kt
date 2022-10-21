@@ -107,7 +107,7 @@ class ReferendaListViewModel(
     private fun mapReferendumNameToUi(referendum: ReferendumPreview): String {
         return referendum.offChainMetadata?.title
             ?: mapReferendumOnChainNameToUi(referendum)
-            ?: referendumFormatter.formatUnknownReferendumTitle()
+            ?: referendumFormatter.formatUnknownReferendumTitle(referendum.id)
     }
 
     private fun mapReferendumOnChainNameToUi(referendum: ReferendumPreview): String? {

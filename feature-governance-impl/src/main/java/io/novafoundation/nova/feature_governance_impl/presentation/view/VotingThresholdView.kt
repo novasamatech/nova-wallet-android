@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
+import androidx.core.view.isVisible
 import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.utils.useNonNullOrHide
 import io.novafoundation.nova.feature_governance_impl.R
@@ -33,5 +34,9 @@ class VotingThresholdView @JvmOverloads constructor(
         positivePercentage.text = model.positivePercentage
         negativePercentage.text = model.negativePercentage
         thresholdPercentage.text = model.thresholdPercentage
+    }
+
+    fun setThresholdInfoVisible(visible: Boolean?) = thresholdInfo.useNonNullOrHide(visible) { value ->
+        thresholdInfo.isVisible = value
     }
 }

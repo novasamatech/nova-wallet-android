@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.com
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
+import kotlin.random.Random
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -32,7 +33,8 @@ interface ReferendumFormatter {
     fun formatTrack(track: ReferendumTrack): ReferendumTrackModel
 
     fun formatOnChainName(call: GenericCall.Instance): String
-    fun formatUnknownReferendumTitle(): String
+
+    fun formatUnknownReferendumTitle(referendumId: ReferendumId): String
 
     fun formatStatus(status: ReferendumStatus): ReferendumStatusModel
 
@@ -54,6 +56,7 @@ class RealReferendumFormatter(
             votingResultIcon = if (voting.support.passes()) R.drawable.ic_checkmark else R.drawable.ic_close,
             votingResultIconColor = if (voting.support.passes()) R.color.multicolor_green_100 else R.color.multicolor_red_100,
             thresholdInfo = formatThresholdInfo(voting.support, token),
+            thresholdInfoVisible = voting.support.passes(),
             positivePercentage = resourceManager.getString(
                 R.string.referendum_aye_format,
                 voting.approval.ayeVotes.fraction.formatFractionAsPercentage()
@@ -142,8 +145,8 @@ class RealReferendumFormatter(
         return "${call.module.name}.${call.function.name}"
     }
 
-    override fun formatUnknownReferendumTitle(): String {
-        return resourceManager.getString(R.string.referendum_name_unknown)
+    override fun formatUnknownReferendumTitle(referendumId: ReferendumId): String {
+        return resourceManager.getString(R.string.referendum_name_unknown, formatId(referendumId))
     }
 
     private fun mapUnknownTrackNameToUi(name: String): String {

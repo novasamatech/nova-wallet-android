@@ -324,7 +324,7 @@ class ReferendumDetailsViewModel(
     private fun mapReferendumTitleToUi(referendumDetails: ReferendumDetails): String {
         return referendumDetails.offChainMetadata?.title
             ?: referendumDetails.onChainMetadata?.preImage?.let { referendumFormatter.formatOnChainName(it.call) }
-            ?: referendumFormatter.formatUnknownReferendumTitle()
+            ?: referendumFormatter.formatUnknownReferendumTitle(referendumDetails.id)
     }
 
     private suspend fun mapReferendumCallToUi(referendumCall: ReferendumCall): ReferendumCallModel {

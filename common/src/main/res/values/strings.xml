@@ -56,7 +56,7 @@
     <string name="vote_vote">Vote</string>
     <string name="common_governance">Governance</string>
 
-    <string name="referendum_name_unknown">Unnamed referenda</string>
+    <string name="referendum_name_unknown">Referendum %s</string>
 
     <string name="referendum_support_threshold_format">Threshold: %s of %s</string>
     <string name="referendum_your_vote_format">Your vote: %s votes</string>
