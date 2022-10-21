@@ -42,6 +42,12 @@ class GovV2ConvictionVotingRepository(
         return runtime.metadata.convictionVoting().numberConstant("VoteLockingPeriod", runtime)
     }
 
+    override suspend fun maxTrackVotes(chainId: ChainId): BigInteger {
+        val runtime = chainRegistry.getRuntime(chainId)
+
+        return runtime.metadata.convictionVoting().numberConstant("MaxVotes", runtime)
+    }
+
     override suspend fun trackLocksFlow(accountId: AccountId, chainId: ChainId): Flow<Map<TrackId, Balance>> {
         return remoteStorageSource.subscribe(chainId) {
             runtime.metadata.convictionVoting().storage("ClassLocksFor").observe(accountId, binding = ::bindTrackLocks)
@@ -55,6 +61,15 @@ class GovV2ConvictionVotingRepository(
                 accountId,
                 keyExtractor = { (_: AccountId, trackId: BigInteger) -> TrackId(trackId) },
                 binding = { decoded, _ -> bindVoting(decoded) }
+            )
+        }
+    }
+
+    override suspend fun votingFor(accountId: AccountId, chainId: ChainId, trackId: TrackId): Voting? {
+        return remoteStorageSource.query(chainId) {
+            runtime.metadata.convictionVoting().storage("VotingFor").query(
+                accountId,
+                binding = { decoded -> decoded?.let(::bindVoting) }
             )
         }
     }

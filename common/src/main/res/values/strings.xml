@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="common_amount_too_big">Amount is too big</string>
+    <string name="refrendum_vote_not_enough_available_message">You don’t have enough available tokens to vote. Available to vote: %s.</string>
+
+    <string name="refrendum_vote_already_completed_title">Referendum is completed</string>
+    <string name="refrendum_vote_already_completed_message">Referendum is completed and voting has finished</string>
+
+    <string name="refrendum_vote_already_delegating_title">Already delegating votes</string>
+    <string name="refrendum_vote_already_delegating_message">You are delegating votes for selected referendum’s track. Please either ask your delegatee to vote or remove delegation to be able to vote directly.</string>
+
+    <string name="refrendum_vote_max_votes_reached_title">Maximum number of votes reached</string>
+    <string name="refrendum_vote_max_votes_reached_message">You have reached a maximum of %s votes for track</string>
+
     <string name="vote_revote">Revote</string>
 
     <string name="referendum_vote_unlock_hint">After locking period don’t forget to redeem your tokens</string>
@@ -9,7 +21,7 @@
     <string name="referendum_vote_governance_lock">Governance lock</string>
     <string name="referendum_vote_locking_period">Locking period</string>
 
-    <string name="referendum_vote_setup_title">Vote for Referendum #%s</string>
+    <string name="referendum_vote_setup_title">Vote for #%s</string>
     <string name="referendum_vote_select_conviction_title">Multiply votes by increasing locking period</string>
 
     <string name="referendum_timeline_state_preparing">Voting: Preparing</string>
