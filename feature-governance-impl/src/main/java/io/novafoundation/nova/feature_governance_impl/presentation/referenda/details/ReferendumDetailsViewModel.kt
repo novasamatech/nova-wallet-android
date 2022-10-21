@@ -42,6 +42,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.ful
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumFullDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumProposerPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.timeline.TimelineLayout
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.ReferendumVotersPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.SetupVoteReferendumPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.view.VotersModel
 import io.novafoundation.nova.feature_governance_impl.presentation.view.YourVoteModel
@@ -149,11 +150,19 @@ class ReferendumDetailsViewModel(
     }
 
     fun positiveVotesClicked() {
-        showMessage("TODO - open positive votes")
+        val votersPayload = ReferendumVotersPayload(
+            payload.referendumId,
+            VoteType.AYE
+        )
+        router.openReferendumVoters(votersPayload)
     }
 
     fun negativeVotesClicked() {
-        showMessage("TODO - open negative votes")
+        val votersPayload = ReferendumVotersPayload(
+            payload.referendumId,
+            VoteType.NAY
+        )
+        router.openReferendumVoters(votersPayload)
     }
 
     fun dAppClicked(dAppModel: GovernanceDAppModel) {
