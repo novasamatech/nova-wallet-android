@@ -47,7 +47,7 @@ enum class VoteType {
 }
 
 fun Voting.trackVotesNumber(): Int {
-    return when(this) {
+    return when (this) {
         is Voting.Casting -> votes.size
         Voting.Delegating -> 0
     }

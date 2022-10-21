@@ -134,7 +134,7 @@ class SetupVoteReferendumViewModel(
     }
 
     fun ayeClicked() {
-       openConfirmIfValid(VoteType.AYE)
+        openConfirmIfValid(VoteType.AYE)
     }
 
     fun nayClicked() {

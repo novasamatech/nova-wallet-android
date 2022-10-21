@@ -12,7 +12,7 @@ typealias VoteReferendumValidationSystemBuilder = ValidationSystemBuilder<VoteRe
 
 fun ValidationSystem.Companion.voteReferendumValidationSystem(
     governanceSourceRegistry: GovernanceSourceRegistry
-) : VoteReferendumValidationSystem = ValidationSystem {
+): VoteReferendumValidationSystem = ValidationSystem {
     hasEnoughFreeBalance()
 
     sufficientBalance(
@@ -34,4 +34,3 @@ fun ValidationSystem.Companion.voteReferendumValidationSystem(
 
     maximumTrackVotesNotReached(governanceSourceRegistry)
 }
-

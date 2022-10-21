@@ -15,7 +15,6 @@ class NotDelegatingInTrackValidation : VoteReferendumValidation {
     }
 }
 
-
 fun VoteReferendumValidationSystemBuilder.notDelegatingInTrack() {
     validate(NotDelegatingInTrackValidation())
 }

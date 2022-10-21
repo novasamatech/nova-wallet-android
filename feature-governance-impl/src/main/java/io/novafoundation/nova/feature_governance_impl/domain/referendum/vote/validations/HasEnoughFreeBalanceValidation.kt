@@ -17,7 +17,6 @@ class HasEnoughFreeBalanceValidation : VoteReferendumValidation {
     }
 }
 
-
 fun VoteReferendumValidationSystemBuilder.hasEnoughFreeBalance() {
     validate(HasEnoughFreeBalanceValidation())
 }

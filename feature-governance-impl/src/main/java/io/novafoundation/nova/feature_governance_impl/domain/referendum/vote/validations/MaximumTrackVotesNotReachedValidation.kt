@@ -7,7 +7,7 @@ import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourc
 
 class MaximumTrackVotesNotReachedValidation(
     private val governanceSourceRegistry: GovernanceSourceRegistry,
-): VoteReferendumValidation {
+) : VoteReferendumValidation {
 
     override suspend fun validate(value: VoteReferendumValidationPayload): ValidationStatus<VoteReferendumValidationFailure> {
         val chainId = value.asset.token.configuration.chainId
