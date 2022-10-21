@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.presentation.mapLoading
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.formatting.format
+import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -65,7 +66,8 @@ class ReferendaListViewModel(
             valueMapper = { mapReferendumPreviewToUi(it, asset.token) }
         )
     }
-        .shareInBackground()
+        .inBackground()
+        .shareWhileSubscribed()
 
     init {
         updateSystem.start()

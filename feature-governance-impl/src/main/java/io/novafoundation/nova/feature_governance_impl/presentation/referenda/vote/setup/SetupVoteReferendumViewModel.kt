@@ -1,17 +1,27 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup
 
+import androidx.annotation.StringRes
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.mixin.api.Validatable
+import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.format
+import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.common.validation.ProgressConsumer
+import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.view.input.seekbar.SeekbarValue
 import io.novafoundation.nova.common.view.input.seekbar.SeekbarValues
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.amountMultiplier
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.votesFor
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.GovernanceVoteAssistant.Change
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.GovernanceVoteAssistant.LocksChange
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.VoteReferendumValidationPayload
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.VoteReferendumValidationSystem
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.handleVoteReferendumValidationFailure
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.hints.ReferendumVoteHintsMixinFactory
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.model.AmountChangeModel
@@ -25,6 +35,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoade
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.requireFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,6 +43,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.launch
 import kotlin.time.Duration
 
 class SetupVoteReferendumViewModel(
@@ -42,16 +54,23 @@ class SetupVoteReferendumViewModel(
     private val payload: SetupVoteReferendumPayload,
     private val resourceManager: ResourceManager,
     private val router: GovernanceRouter,
-    private val hintsMixinFactory: ReferendumVoteHintsMixinFactory
-) : BaseViewModel(), WithFeeLoaderMixin {
+    private val hintsMixinFactory: ReferendumVoteHintsMixinFactory,
+    private val validationSystem: VoteReferendumValidationSystem,
+    private val validationExecutor: ValidationExecutor,
+) : BaseViewModel(),
+    WithFeeLoaderMixin,
+    Validatable by validationExecutor {
 
     private val selectedAsset = assetUseCase.currentAssetFlow()
         .shareInBackground()
 
     private val voteAssistantFlow = interactor.voteAssistantFlow(payload.referendumId)
-        .shareInBackground()
+        .inBackground()
+        .shareWhileSubscribed()
 
     override val originFeeMixin = feeLoaderMixinFactory.create(selectedAsset)
+
+    private val validatingVoteType = MutableStateFlow<VoteType?>(null)
 
     val hintsMixin = hintsMixinFactory.create(scope = this)
 
@@ -81,7 +100,8 @@ class SetupVoteReferendumViewModel(
 
         voteAssistant.estimateLocksAfterVoting(amountPlanks, conviction)
     }
-        .shareInBackground()
+        .inBackground()
+        .shareWhileSubscribed()
 
     val votesFormattedFlow = combine(
         amountChooserMixin.amount,
@@ -94,6 +114,9 @@ class SetupVoteReferendumViewModel(
 
     val locksChangeUiFlow = locksChangeFlow.map(::mapLocksChangeToUi)
         .shareInBackground()
+
+    val ayeButtonStateFlow = buttonStateFlow(VoteType.AYE, R.string.referendum_vote_aye)
+    val nayButtonStateFlow = buttonStateFlow(VoteType.NAY, R.string.referendum_vote_aye)
 
     init {
         originFeeMixin.connectWith(
@@ -111,15 +134,44 @@ class SetupVoteReferendumViewModel(
     }
 
     fun ayeClicked() {
-        showMessage("TODO aye clicked")
+        openConfirmIfValid(VoteType.AYE)
     }
 
     fun nayClicked() {
-        showMessage("TODO nay clicked")
+        openConfirmIfValid(VoteType.NAY)
     }
 
     fun backClicked() {
         router.back()
+    }
+
+    private fun openConfirmIfValid(voteType: VoteType) = originFeeMixin.requireFee(this) { fee ->
+        launch {
+            val voteAssistant = voteAssistantFlow.first()
+
+            val payload = VoteReferendumValidationPayload(
+                onChainReferendum = voteAssistant.onChainReferendum,
+                asset = selectedAsset.first(),
+                trackVoting = voteAssistant.trackVoting,
+                voteAmount = amountChooserMixin.amount.first(),
+                fee = fee
+            )
+
+            validationExecutor.requireValid(
+                validationSystem = validationSystem,
+                payload = payload,
+                validationFailureTransformer = { handleVoteReferendumValidationFailure(it, resourceManager) },
+                progressConsumer = validatingVoteType.progressConsumer(voteType),
+            ) {
+                validatingVoteType.value = null
+
+                openConfirm()
+            }
+        }
+    }
+
+    private fun openConfirm() {
+        showMessage("Ready to go to confirm")
     }
 
     private suspend fun mapLocksChangeToUi(locksChange: LocksChange): LocksChangeModel {
@@ -195,5 +247,17 @@ class SetupVoteReferendumViewModel(
         }
 
         return SeekbarValues(values)
+    }
+
+    private fun buttonStateFlow(forType: VoteType, @StringRes labelRes: Int) = validatingVoteType.map { validationType ->
+        when (validationType) {
+            null -> DescriptiveButtonState.Enabled(resourceManager.getString(labelRes))
+            forType -> DescriptiveButtonState.Loading
+            else -> DescriptiveButtonState.Disabled(resourceManager.getString(labelRes))
+        }
+    }
+
+    private fun MutableStateFlow<VoteType?>.progressConsumer(voteType: VoteType): ProgressConsumer = { inProgress ->
+        value = voteType.takeIf { inProgress }
     }
 }

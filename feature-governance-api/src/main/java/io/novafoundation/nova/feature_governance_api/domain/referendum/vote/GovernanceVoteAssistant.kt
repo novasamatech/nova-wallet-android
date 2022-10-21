@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_governance_api.domain.referendum.vote
 
 import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.OnChainReferendum
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
 import kotlin.time.Duration
@@ -26,6 +27,8 @@ interface GovernanceVoteAssistant {
     )
 
     val onChainReferendum: OnChainReferendum
+
+    val trackVoting: Voting?
 
     suspend fun estimateLocksAfterVoting(amount: Balance, conviction: Conviction): LocksChange
 }

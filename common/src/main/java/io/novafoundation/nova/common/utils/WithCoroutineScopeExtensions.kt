@@ -21,6 +21,8 @@ interface WithCoroutineScopeExtensions {
         started: SharingStarted = SharingStarted.Eagerly
     ) = inBackground().share(started)
 
+    fun <T> Flow<T>.shareWhileSubscribed() = share(SharingStarted.WhileSubscribed())
+
     fun <T> Flow<T>.asLiveData(): LiveData<T> {
         return asLiveData(coroutineScope)
     }
