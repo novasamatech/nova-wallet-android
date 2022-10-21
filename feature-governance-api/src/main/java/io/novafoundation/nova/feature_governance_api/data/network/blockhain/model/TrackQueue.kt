@@ -11,7 +11,7 @@ fun TrackQueue.Companion.empty(maxSize: Int): TrackQueue = TrackQueue(emptyList(
 
 fun TrackQueue.positionOf(referendumId: ReferendumId): TrackQueue.Position {
     return TrackQueue.Position(
-        index = referenda.indexOf(referendumId),
+        index = referenda.indexOf(referendumId) + 1,
         maxSize = maxSize
     )
 }

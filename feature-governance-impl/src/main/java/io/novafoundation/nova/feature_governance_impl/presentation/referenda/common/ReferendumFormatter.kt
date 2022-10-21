@@ -168,12 +168,24 @@ class RealReferendumFormatter(
 
     override fun formatStatus(status: ReferendumStatus): ReferendumStatusModel {
         return when (status) {
-            is ReferendumStatus.Ongoing.Preparing -> ReferendumStatusModel(
-                name = resourceManager.getString(R.string.referendum_status_preparing),
-                colorRes = R.color.white_64
-            )
+            is ReferendumStatus.Ongoing.Preparing -> {
+                val titleRes = if (status.reason is PreparingReason.WaitingForDeposit) {
+                    R.string.referendum_status_waiting_deposit
+                } else {
+                    R.string.referendum_status_preparing
+                }
+
+                ReferendumStatusModel(
+                    name = resourceManager.getString(titleRes),
+                    colorRes = R.color.white_64
+                )
+            }
             is ReferendumStatus.Ongoing.InQueue -> ReferendumStatusModel(
-                name = resourceManager.getString(R.string.referendum_status_in_queue),
+                name = resourceManager.getString(
+                    R.string.referendum_status_in_queue_format,
+                    status.position.index,
+                    status.position.maxSize
+                ),
                 colorRes = R.color.white_64
             )
             is ReferendumStatus.Ongoing.Rejecting -> ReferendumStatusModel(
@@ -220,30 +232,19 @@ class RealReferendumFormatter(
                         timeFormat = R.string.referendum_status_deciding_in,
                         textStyleRefresher = reason.timeLeft.referendumStatusStyleRefresher()
                     )
-                    PreparingReason.WaitingForDeposit -> ReferendumTimeEstimation.Text(
-                        text = resourceManager.getString(R.string.referendum_status_waiting_deposit),
-                        textStyle = ReferendumTimeEstimation.TextStyle.regular()
+                    PreparingReason.WaitingForDeposit -> ReferendumTimeEstimation.Timer(
+                        time = status.timeOutIn,
+                        timeFormat = R.string.referendum_status_time_out_in,
+                        textStyleRefresher = status.timeOutIn.referendumStatusStyleRefresher()
                     )
                 }
             }
             is ReferendumStatus.Ongoing.InQueue -> {
-                if (status.timeOutIn.referendumStatusIsHot()) {
-                    ReferendumTimeEstimation.Timer(
-                        time = status.timeOutIn,
-                        timeFormat = R.string.referendum_status_deciding_in,
-                        textStyleRefresher = status.timeOutIn.referendumStatusStyleRefresher()
-                    )
-                } else {
-                    val formattedPosition = resourceManager.getString(
-                        R.string.referendum_in_queue_position_format,
-                        status.position.index,
-                        status.position.maxSize
-                    )
-                    ReferendumTimeEstimation.Text(
-                        text = formattedPosition,
-                        textStyle = ReferendumTimeEstimation.TextStyle.regular()
-                    )
-                }
+                ReferendumTimeEstimation.Timer(
+                    time = status.timeOutIn,
+                    timeFormat = R.string.referendum_status_time_out_in,
+                    textStyleRefresher = status.timeOutIn.referendumStatusStyleRefresher()
+                )
             }
             is ReferendumStatus.Ongoing.Rejecting -> ReferendumTimeEstimation.Timer(
                 time = status.rejectIn,

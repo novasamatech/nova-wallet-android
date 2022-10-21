@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.details.R
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumDetails
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumDetailsInteractor
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumTimeline
+import io.novafoundation.nova.feature_governance_api.domain.referendum.list.PreparingReason
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumStatus
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.domain.identity.GovernanceIdentityProviderFactory
@@ -229,7 +230,12 @@ class ReferendumDetailsViewModel(
         currentTimeEstimation: ReferendumTimeEstimation
     ): TimelineLayout.TimelineState {
         val titleRes = when (currentStatus) {
-            is ReferendumStatus.Ongoing.Preparing -> R.string.referendum_timeline_state_preparing
+            is ReferendumStatus.Ongoing.Preparing -> {
+                when (currentStatus.reason) {
+                    is PreparingReason.DecidingIn -> R.string.referendum_timeline_state_preparing
+                    PreparingReason.WaitingForDeposit -> R.string.referendum_timeline_state_waiting_deposit
+                }
+            }
             is ReferendumStatus.Ongoing.Confirming -> R.string.referendum_timeline_state_passing
             is ReferendumStatus.Ongoing.Rejecting -> R.string.referendum_timeline_state_not_passing
             is ReferendumStatus.Ongoing.InQueue -> R.string.referendum_timeline_state_in_queue
