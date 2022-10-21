@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.handleNotEnou
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 
 fun handleVoteReferendumValidationFailure(failure: VoteReferendumValidationFailure, resourceManager: ResourceManager): TitleAndMessage {
-    return when(failure) {
+    return when (failure) {
         is VoteReferendumValidationFailure.NotEnoughToPayFees -> handleNotEnoughFeeError(failure, resourceManager)
 
         VoteReferendumValidationFailure.AlreadyDelegatingVotes -> {
@@ -31,7 +31,6 @@ fun handleVoteReferendumValidationFailure(failure: VoteReferendumValidationFailu
         VoteReferendumValidationFailure.ReferendumCompleted -> {
             resourceManager.getString(R.string.refrendum_vote_already_completed_title) to
                 resourceManager.getString(R.string.refrendum_vote_already_completed_message)
-
         }
     }
 }
