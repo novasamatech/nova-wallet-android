@@ -63,7 +63,7 @@ class ReferendumFullDetailsViewModel(
         .shareInBackground()
 
     val electorateAmount = payloadFlow
-        .map { payload -> payload.electorate?.let {mapAmountToAmountModel(it, getToken()) } }
+        .map { payload -> payload.electorate?.let { mapAmountToAmountModel(it, getToken()) } }
         .shareInBackground()
 
     fun backClicked() {
