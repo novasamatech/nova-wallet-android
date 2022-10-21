@@ -36,4 +36,8 @@ class VotingThresholdView @JvmOverloads constructor(
         negativePercentage.text = model.negativePercentage
         thresholdPercentage.text = model.thresholdPercentage
     }
+
+    fun setThresholdInfoVisible(visible: Boolean?) = thresholdInfo.useNonNullOrHide(visible) { value ->
+        thresholdInfo.isVisible = value
+    }
 }

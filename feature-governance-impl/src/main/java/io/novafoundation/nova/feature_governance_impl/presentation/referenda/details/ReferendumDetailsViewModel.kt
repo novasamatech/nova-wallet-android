@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.firstOnLoad
+import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.inBackground
@@ -16,17 +17,15 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createIdentityAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.PreImage
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.isAye
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.votes
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumVoting
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.GovernanceDApp
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumCall
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumDetails
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumDetailsInteractor
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumTimeline
+import io.novafoundation.nova.feature_governance_api.domain.referendum.list.PreparingReason
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumStatus
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.domain.identity.GovernanceIdentityProviderFactory
@@ -43,13 +42,11 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.ful
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumFullDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumProposerPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.timeline.TimelineLayout
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.ReferendumVotersPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.SetupVoteReferendumPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.ReferendumVotersPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.view.VotersModel
-import io.novafoundation.nova.feature_governance_impl.presentation.view.YourVoteModel
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
-import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -121,6 +118,8 @@ class ReferendumDetailsViewModel(
             else -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.vote_vote))
         }
     }
+
+    val showFullDetails = flowOf { fullDetailsAccessible() }
 
     private val referendumCallFlow = referendumDetailsFlow.map { details ->
         details.onChainMetadata?.preImage?.let { preImage ->
@@ -201,7 +200,7 @@ class ReferendumDetailsViewModel(
             description = mapReferendumDescriptionToUi(referendumDetails),
             voting = referendumDetails.voting?.let { referendumFormatter.formatVoting(it, token) },
             statusModel = referendumFormatter.formatStatus(referendumDetails.timeline.currentStatus),
-            yourVote = referendumDetails.userVote?.let { mapUserVoteToUi(it, token) },
+            yourVote = referendumDetails.userVote?.let { referendumFormatter.formatUserVote(it, token) },
             ayeVoters = mapVotersToUi(referendumDetails.voting, VoteType.AYE, token.configuration),
             nayVoters = mapVotersToUi(referendumDetails.voting, VoteType.NAY, token.configuration),
             timeEstimation = timeEstimation,
@@ -234,7 +233,12 @@ class ReferendumDetailsViewModel(
         currentTimeEstimation: ReferendumTimeEstimation
     ): TimelineLayout.TimelineState {
         val titleRes = when (currentStatus) {
-            is ReferendumStatus.Ongoing.Preparing -> R.string.referendum_timeline_state_preparing
+            is ReferendumStatus.Ongoing.Preparing -> {
+                when (currentStatus.reason) {
+                    is PreparingReason.DecidingIn -> R.string.referendum_timeline_state_preparing
+                    PreparingReason.WaitingForDeposit -> R.string.referendum_timeline_state_waiting_deposit
+                }
+            }
             is ReferendumStatus.Ongoing.Confirming -> R.string.referendum_timeline_state_passing
             is ReferendumStatus.Ongoing.Rejecting -> R.string.referendum_timeline_state_not_passing
             is ReferendumStatus.Ongoing.InQueue -> R.string.referendum_timeline_state_in_queue
@@ -293,27 +297,6 @@ class ReferendumDetailsViewModel(
         return resourceManager.getString(R.string.referendum_votes_format, amount.format())
     }
 
-    private fun mapUserVoteToUi(vote: AccountVote, token: Token): YourVoteModel? {
-        val isAye = vote.isAye() ?: return null
-        val votes = vote.votes(token.configuration) ?: return null
-
-        val voteTypeRes = if (isAye) R.string.referendum_vote_aye else R.string.referendum_vote_nay
-        val colorRes = if (isAye) R.color.multicolor_green_100 else R.color.multicolor_red_100
-
-        val votesAmountFormatted = mapAmountToAmountModel(votes.amount, token).token
-        val multiplierFormatted = votes.multiplier.format()
-
-        val votesFormatted = resourceManager.getString(R.string.referendum_votes_format, votes.total.format())
-        val votesDetails = "$votesAmountFormatted × $multiplierFormatted"
-
-        return YourVoteModel(
-            voteTypeTitleRes = voteTypeRes,
-            voteTypeColorRes = colorRes,
-            votes = votesFormatted,
-            votesDetails = votesDetails
-        )
-    }
-
     private fun mapReferendumDescriptionToUi(referendumDetails: ReferendumDetails): ShortenedTextModel? {
         return referendumDetails.offChainMetadata?.description?.let {
             val description = removeMarkdown(it)
@@ -367,6 +350,25 @@ class ReferendumDetailsViewModel(
             referendumCall = ReferendumCallPayload(referendumCall),
             preImage = constructPreimagePreviewPayload(referendumDetails.onChainMetadata?.preImage),
         )
+    }
+
+    private suspend fun fullDetailsAccessible(): Boolean {
+        val referendumDetails = referendumDetailsFlow.first()
+        val referendumCall = referendumCallFlow.first()
+
+        return checkAnyNonNull(
+            referendumDetails.proposer,
+            referendumDetails.fullDetails.approvalCurve,
+            referendumDetails.fullDetails.supportCurve,
+            referendumDetails.fullDetails.deposit,
+            referendumDetails.onChainMetadata,
+            referendumDetails.voting,
+            referendumCall
+        )
+    }
+
+    private fun checkAnyNonNull(vararg args: Any?): Boolean {
+        return args.any { it != null }
     }
 
     private suspend fun constructPreimagePreviewPayload(preImage: PreImage?): PreImagePreviewPayload? {

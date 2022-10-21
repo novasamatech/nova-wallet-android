@@ -10,15 +10,15 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.presentation.CopierBottomSheet
 import io.novafoundation.nova.common.utils.makeGone
-import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.view.showValueOrHide
+import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
-import javax.inject.Inject
+import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmountOrHide
 import kotlinx.android.synthetic.main.fragment_referendum_full_details.referendumFullDetailsApproveThreshold
 import kotlinx.android.synthetic.main.fragment_referendum_full_details.referendumFullDetailsBeneficiary
 import kotlinx.android.synthetic.main.fragment_referendum_full_details.referendumFullDetailsBeneficiaryContainer
@@ -35,6 +35,7 @@ import kotlinx.android.synthetic.main.fragment_referendum_full_details.referendu
 import kotlinx.android.synthetic.main.fragment_referendum_full_details.referendumFullDetailsToolbar
 import kotlinx.android.synthetic.main.fragment_referendum_full_details.referendumFullDetailsTurnout
 import kotlinx.android.synthetic.main.fragment_referendum_full_details.referendumFullDetailsVoteThreshold
+import javax.inject.Inject
 
 class ReferendumFullDetailsFragment : BaseFragment<ReferendumFullDetailsViewModel>() {
 
@@ -65,8 +66,8 @@ class ReferendumFullDetailsFragment : BaseFragment<ReferendumFullDetailsViewMode
         referendumFullDetailsSupportThreshold.showValueOrHide(primary = viewModel.supportThreshold)
         referendumFullDetailsVoteThreshold.showValueOrHide(primary = viewModel.voteThreshold)
 
+        referendumFullDetailsCallHash.showValueOrHide(primary = viewModel.callHash)
         viewModel.callHash?.let { hash ->
-            referendumFullDetailsCallHash.showValueOrHide(primary = hash)
             referendumFullDetailsCallHash.setOnClickListener { showCopyingBottomSheet(hash) }
         }
 
@@ -112,15 +113,9 @@ class ReferendumFullDetailsFragment : BaseFragment<ReferendumFullDetailsViewMode
             }
         }
 
-        viewModel.turnoutAmount.observe {
-            referendumFullDetailsTurnout?.showAmount(it)
-            referendumFullDetailsTurnout.makeVisible()
-        }
+        viewModel.turnoutAmount.observe(referendumFullDetailsTurnout::showAmountOrHide)
 
-        viewModel.electorateAmount.observe {
-            referendumFullDetailsElectorate?.showAmount(it)
-            referendumFullDetailsElectorate.makeVisible()
-        }
+        viewModel.electorateAmount.observe(referendumFullDetailsElectorate::showAmountOrHide)
     }
 
     private fun showCopyingBottomSheet(value: String) {

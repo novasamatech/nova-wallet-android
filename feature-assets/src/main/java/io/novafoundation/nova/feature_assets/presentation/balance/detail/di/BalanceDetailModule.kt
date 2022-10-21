@@ -17,7 +17,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnl
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksInteractor
 import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksInteractorImpl
-import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter

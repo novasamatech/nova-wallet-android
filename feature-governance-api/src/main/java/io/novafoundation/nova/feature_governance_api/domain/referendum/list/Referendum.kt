@@ -38,7 +38,7 @@ sealed class ReferendumStatus {
 
     sealed class Ongoing : ReferendumStatus() {
 
-        data class Preparing(val reason: PreparingReason) : Ongoing()
+        data class Preparing(val reason: PreparingReason, val timeOutIn: TimerValue) : Ongoing()
 
         data class InQueue(val timeOutIn: TimerValue, val position: TrackQueue.Position) : Ongoing()
 
