@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.firstOnLoad
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.formatting.format
+import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.common.utils.mapNullable
 import io.novafoundation.nova.common.utils.withLoading
@@ -85,7 +86,9 @@ class ReferendumDetailsViewModel(
         val voterAccountId = account.accountIdIn(chain)
 
         interactor.referendumDetailsFlow(payload.toReferendumId(), chain, voterAccountId)
-    }.shareInBackground()
+    }
+        .inBackground()
+        .shareWhileSubscribed()
 
     private val proposerFlow = referendumDetailsFlow.map { it.proposer }
     private val proposerIdentityProvider = governanceIdentityProviderFactory.proposerProvider(proposerFlow)
@@ -101,11 +104,14 @@ class ReferendumDetailsViewModel(
                 identityProvider = proposerIdentityProvider
             )
         }
-    }.shareInBackground()
+    }
+        .inBackground()
+        .shareWhileSubscribed()
 
     val referendumDetailsModelFlow = referendumDetailsFlow.map(::mapReferendumDetailsToUi)
         .withLoading()
-        .shareInBackground()
+        .inBackground()
+        .shareWhileSubscribed()
 
     val voteButtonState = referendumDetailsFlow.map {
         when {
@@ -119,10 +125,13 @@ class ReferendumDetailsViewModel(
         details.onChainMetadata?.preImage?.let { preImage ->
             interactor.detailsFor(preImage, selectedChainFlow.first())
         }
-    }.shareInBackground()
+    }
+        .inBackground()
+        .shareWhileSubscribed()
 
     val referendumCallModelFlow = referendumCallFlow.mapNullable(::mapReferendumCallToUi)
-        .shareInBackground()
+        .inBackground()
+        .shareWhileSubscribed()
 
     val governanceDApps = selectedChainFlow.map(interactor::getAvailableDApps)
         .mapList(::mapGovernanceDAppToUi)
