@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.firstOnLoad
+import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.inBackground
@@ -117,6 +118,8 @@ class ReferendumDetailsViewModel(
             else -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.vote_vote))
         }
     }
+
+    val showFullDetails = flowOf { fullDetailsAccessible() }
 
     private val referendumCallFlow = referendumDetailsFlow.map { details ->
         details.onChainMetadata?.preImage?.let { preImage ->
@@ -347,6 +350,25 @@ class ReferendumDetailsViewModel(
             referendumCall = ReferendumCallPayload(referendumCall),
             preImage = constructPreimagePreviewPayload(referendumDetails.onChainMetadata?.preImage),
         )
+    }
+
+    private suspend fun fullDetailsAccessible(): Boolean {
+        val referendumDetails = referendumDetailsFlow.first()
+        val referendumCall = referendumCallFlow.first()
+
+        return checkAnyNonNull(
+            referendumDetails.proposer,
+            referendumDetails.fullDetails.approvalCurve,
+            referendumDetails.fullDetails.supportCurve,
+            referendumDetails.fullDetails.deposit,
+            referendumDetails.onChainMetadata,
+            referendumDetails.voting,
+            referendumCall
+        )
+    }
+
+    private fun checkAnyNonNull(vararg args: Any?): Boolean {
+        return args.any { it != null }
     }
 
     private suspend fun constructPreimagePreviewPayload(preImage: PreImage?): PreImagePreviewPayload? {

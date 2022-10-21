@@ -83,42 +83,36 @@
                     android:id="@+id/referendumFullDetailsVoteThreshold"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:visibility="gone"
                     app:title="@string/referendum_full_details_vote_threshold" />
 
                 <io.novafoundation.nova.common.view.TableCellView
                     android:id="@+id/referendumFullDetailsApproveThreshold"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:visibility="gone"
                     app:title="@string/referendum_full_details_approve_threshold" />
 
                 <io.novafoundation.nova.common.view.TableCellView
                     android:id="@+id/referendumFullDetailsSupportThreshold"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:visibility="gone"
                     app:title="@string/referendum_full_details_support_threshold" />
 
                 <io.novafoundation.nova.common.view.TableCellView
                     android:id="@+id/referendumFullDetailsTurnout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:visibility="gone"
                     app:title="@string/referendum_full_details_turnout" />
 
                 <io.novafoundation.nova.common.view.TableCellView
                     android:id="@+id/referendumFullDetailsElectorate"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:visibility="gone"
                     app:title="@string/referendum_full_details_electorate" />
 
                 <io.novafoundation.nova.common.view.TableCellView
                     android:id="@+id/referendumFullDetailsCallHash"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:visibility="gone"
                     app:primaryValueIcon="@drawable/ic_info_16"
                     app:primaryValueIconTint="@color/white_64"
                     app:title="@string/referendum_full_details_hash" />
