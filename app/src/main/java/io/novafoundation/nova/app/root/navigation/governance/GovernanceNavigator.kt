@@ -59,6 +59,6 @@ class GovernanceNavigator(
     )
 
     override fun openReferendumUnlockConfirm() {
-        //TODO
+        // TODO
     }
 }
