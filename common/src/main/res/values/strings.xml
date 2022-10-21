@@ -132,6 +132,7 @@
     <string name="confirm_referendum_vote_note">After locking period don’t forget to redeem your tokens</string>
     <string name="confirm_referendum_vote_track">Track</string>
     <string name="confirm_referendum_vote_referendum">Referendum</string>
+    <string name="referendum_voters_empty_list_placeholder">List of voters will appear here</string>
 
     <string name="crowdloan_contributions_liquid_source">Liquid</string>
     <string name="crowdloan_contributions_parallel_source">Parallel</string>

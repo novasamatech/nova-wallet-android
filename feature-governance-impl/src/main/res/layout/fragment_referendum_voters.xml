@@ -52,5 +52,16 @@
             android:indeterminateTint="@color/white"
             android:visibility="gone" />
 
+        <io.novafoundation.nova.common.view.PlaceholderView
+            android:id="@+id/referendumVotersPlaceholder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginHorizontal="32dp"
+            android:text="@string/referendum_voters_empty_list_placeholder"
+            android:visibility="gone"
+            app:image="@drawable/ic_placeholder"
+            app:placeholderBackgroundStyle="no_background" />
+
     </FrameLayout>
 </LinearLayout>
