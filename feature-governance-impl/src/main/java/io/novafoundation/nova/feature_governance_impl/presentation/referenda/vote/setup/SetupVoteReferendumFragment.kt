@@ -9,8 +9,10 @@ import androidx.lifecycle.lifecycleScope
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
+import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
+import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
@@ -72,6 +74,7 @@ class SetupVoteReferendumFragment : BaseFragment<SetupVoteReferendumViewModel>()
     override fun subscribe(viewModel: SetupVoteReferendumViewModel) {
         setupAmountChooser(viewModel.amountChooserMixin, setupReferendumVoteAmount)
         setupFeeLoading(viewModel, setupReferendumVoteFee)
+        observeValidations(viewModel)
 
         observeHints(viewModel.hintsMixin, setupReferendumVoteHints)
 
@@ -88,5 +91,8 @@ class SetupVoteReferendumFragment : BaseFragment<SetupVoteReferendumViewModel>()
         viewModel.votesFormattedFlow.observe {
             setupReferendumVoteVotePower.votePowerVotesText.text = it
         }
+
+        viewModel.ayeButtonStateFlow.observe(setupReferendumVoteAye::setState)
+        viewModel.nayButtonStateFlow.observe(setupReferendumVoteNay::setState)
     }
 }

@@ -14,10 +14,10 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackInfo
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.asOngoingOrNull
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.completedReferendumLockDuration
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.flattenCastingVotes
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.maxLockDuration
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.onlyCasting
 import io.novafoundation.nova.feature_governance_api.data.repository.getTracksById
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.Change
@@ -90,20 +90,18 @@ class RealVoteReferendumInteractor(
             val accountVotesByReferendumId = voting.flattenCastingVotes()
             val votedReferenda = governanceSource.referenda.getOnChainReferenda(chain.id, accountVotesByReferendumId.keys)
 
-            val castingVotes = voting.onlyCasting()
-
-            Triple(locksByTrack, castingVotes, votedReferenda)
+            Triple(locksByTrack, voting, votedReferenda)
         }
 
         val selectedReferendumFlow = governanceSource.referenda.onChainReferendumFlow(chain.id, referendumId)
 
-        return combine(votingInformation, selectedReferendumFlow) { (locksByTrack, castingVotes, votedReferenda), selectedReferendum ->
+        return combine(votingInformation, selectedReferendumFlow) { (locksByTrack, voting, votedReferenda), selectedReferendum ->
             val blockDurationEstimator = chainStateRepository.blockDurationEstimator(chain.id)
 
             RealGovernanceLocksEstimator(
                 onChainReferendum = selectedReferendum,
                 locksByTrack = locksByTrack,
-                voting = castingVotes,
+                voting = voting,
                 votedReferenda = votedReferenda,
                 blockDurationEstimator = blockDurationEstimator,
                 tracks = tracks,
@@ -117,7 +115,7 @@ class RealVoteReferendumInteractor(
 private class RealGovernanceLocksEstimator(
     override val onChainReferendum: OnChainReferendum,
     private val locksByTrack: Map<TrackId, Balance>,
-    private val voting: Map<TrackId, Voting.Casting>,
+    private val voting: Map<TrackId, Voting>,
     private val votedReferenda: Map<ReferendumId, OnChainReferendum>,
     private val blockDurationEstimator: BlockDurationEstimator,
     private val tracks: Map<TrackId, TrackInfo>,
@@ -129,6 +127,8 @@ private class RealGovernanceLocksEstimator(
 
     private val currentMaxLocked = locksByTrack.values.maxOrNull().orZero()
     private val currentMaxUnlocksAt = estimateUnlocksAt(changedVote = null)
+
+    override val trackVoting: Voting? = voting.findVotingFor(onChainReferendum)
 
     override suspend fun estimateLocksAfterVoting(amount: Balance, conviction: Conviction): LocksChange {
         val vote = AyeVote(amount, conviction) // vote direction does not influence lock estimation
@@ -167,7 +167,8 @@ private class RealGovernanceLocksEstimator(
     }
 
     private fun priorUnlocksAt(): BlockNumber {
-        return voting.values.maxOfOrNull { it.prior.unlockAt }.orZero()
+        return voting.values.filterIsInstance<Voting.Casting>()
+            .maxOfOrNull { it.prior.unlockAt }.orZero()
     }
 
     private fun votesEstimatedUnlocksAt(changedVote: AccountVote.Standard): BlockNumber {
@@ -260,6 +261,20 @@ private class RealGovernanceLocksEstimator(
         }
 
         return maxCompletedAt + blocksAfterCompleted
+    }
+
+    private fun Map<TrackId, Voting>.findVotingFor(onChainReferendum: OnChainReferendum): Voting? {
+        val asOngoing = onChainReferendum.status.asOngoingOrNull()
+
+        return if (asOngoing != null) {
+            // fast-path - we have direct access to trackId
+            get(asOngoing.track)
+        } else {
+            // slow path - referendum is completed so have to find by referendumId
+            values.first {
+                it is Voting.Casting && onChainReferendum.id in it.votes.keys
+            }
+        }
     }
 }
 
