@@ -36,8 +36,8 @@ sealed class ReferendumTimeEstimation {
 
         override fun equals(other: Any?): Boolean {
             if (other !is Timer) return false
-            return time == other.time
-                && timeFormat == other.timeFormat
+            return time == other.time &&
+                timeFormat == other.timeFormat
         }
     }
 
