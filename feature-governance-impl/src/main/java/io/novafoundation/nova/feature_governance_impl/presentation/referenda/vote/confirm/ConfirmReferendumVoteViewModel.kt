@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.confirm
 
+import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
@@ -94,8 +95,7 @@ class ConfirmReferendumVoteViewModel(
 
     val showNextProgress: Flow<Boolean> = _showNextProgress
 
-    private val voteAssistantFlow = interactor.voteAssistantFlow(payload.referendumId)
-        .shareInBackground()
+    private val voteAssistantFlow = interactor.voteAssistantFlow(payload.referendumId, viewModelScope)
 
     val accountVoteUi = accountVoteFlow.map {
         referendumFormatter.formatUserVote(it, assetFlow.first().token)

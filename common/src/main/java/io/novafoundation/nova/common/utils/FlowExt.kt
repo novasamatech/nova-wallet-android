@@ -278,7 +278,7 @@ fun <T> flowOf(producer: suspend () -> T) = flow {
     emit(producer())
 }
 
-fun <T> flowOfAll(producer: suspend () -> Flow<T>): Flow<T> = flow {
+inline fun <T> flowOfAll(crossinline producer: suspend () -> Flow<T>): Flow<T> = flow {
     emitAll(producer())
 }
 

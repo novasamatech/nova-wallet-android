@@ -44,11 +44,11 @@ class RecommendedValidatorsViewModel(
 ) : BaseViewModel() {
 
     private val recommendedSettings by lazyAsync {
-        recommendationSettingsProviderFactory.create(router.currentStackEntryLifecycle).defaultSettings()
+        recommendationSettingsProviderFactory.create(scope = viewModelScope).defaultSettings()
     }
 
     private val recommendedValidators = flow {
-        val validatorRecommendator = validatorRecommendatorFactory.create(router.currentStackEntryLifecycle)
+        val validatorRecommendator = validatorRecommendatorFactory.create(scope = viewModelScope)
         val validators = validatorRecommendator.recommendations(recommendedSettings())
 
         emit(validators)

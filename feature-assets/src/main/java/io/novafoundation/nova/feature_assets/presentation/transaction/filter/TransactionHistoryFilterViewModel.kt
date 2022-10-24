@@ -22,7 +22,7 @@ class TransactionHistoryFilterViewModel(
 ) : BaseViewModel() {
 
     private val historyFiltersProvider by lazyAsync {
-        historyFiltersProviderFactory.get(router.currentStackEntryLifecycle)
+        historyFiltersProviderFactory.get(scope = viewModelScope)
     }
 
     private val initialFiltersFlow = flow { emit(historyFiltersProvider().currentFilters()) }

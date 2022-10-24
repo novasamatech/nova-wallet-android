@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup
 
 import androidx.annotation.StringRes
+import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
@@ -64,9 +65,7 @@ class SetupVoteReferendumViewModel(
     private val selectedAsset = assetUseCase.currentAssetFlow()
         .shareInBackground()
 
-    private val voteAssistantFlow = interactor.voteAssistantFlow(payload.referendumId)
-        .inBackground()
-        .shareWhileSubscribed()
+    private val voteAssistantFlow = interactor.voteAssistantFlow(payload.referendumId, viewModelScope)
 
     override val originFeeMixin = feeLoaderMixinFactory.create(selectedAsset)
 
