@@ -108,13 +108,17 @@ class VotesView @JvmOverloads constructor(
             negativeRect.set(negativeStart, lineTop, lineEnd, lineBottom)
         }
 
-        val thresholdPosition = paddingStart + percentageArea * threshold
         val thresholdHalfWidth = thresholdWidth / 2
         val thresholdHalfHeight = thresholdHeight / 2
+        val minThresholdPosition = paddingStart + thresholdHalfWidth
+        val maxThresholdPosition = measuredWidth - paddingEnd - thresholdHalfWidth
+
+        val thresholdPosition = paddingStart + percentageArea * threshold
+        val validThresholdPosition = thresholdPosition.coerceIn(minThresholdPosition, maxThresholdPosition)
         thresholdRect.set(
-            thresholdPosition - thresholdHalfWidth,
+            validThresholdPosition - thresholdHalfWidth,
             lineY - thresholdHalfHeight,
-            thresholdPosition + thresholdHalfWidth,
+            validThresholdPosition + thresholdHalfWidth,
             lineY + thresholdHalfHeight
         )
     }
