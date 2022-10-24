@@ -58,6 +58,8 @@ dependencies {
     implementation coroutinesAndroidDep
     implementation lifeCycleKtxDep
 
+    implementation viewModelKtxDep
+
     implementation daggerDep
     kapt daggerKapt
 

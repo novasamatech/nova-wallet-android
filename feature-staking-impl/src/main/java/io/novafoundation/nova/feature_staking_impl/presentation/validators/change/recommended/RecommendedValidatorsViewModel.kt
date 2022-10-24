@@ -48,7 +48,7 @@ class RecommendedValidatorsViewModel(
     }
 
     private val recommendedValidators = flow {
-        val validatorRecommendator = validatorRecommendatorFactory.create(scope = this@RecommendedValidatorsViewModel)
+        val validatorRecommendator = validatorRecommendatorFactory.create(scope = viewModelScope)
         val validators = validatorRecommendator.recommendations(recommendedSettings())
 
         emit(validators)
