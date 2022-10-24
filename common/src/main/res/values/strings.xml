@@ -25,6 +25,7 @@
     <string name="referendum_vote_select_conviction_title">Multiply votes by increasing locking period</string>
 
     <string name="referendum_timeline_state_preparing">Voting: Preparing</string>
+    <string name="referendum_timeline_state_waiting_deposit">Voting: Waiting for deposit</string>
     <string name="referendum_timeline_state_in_queue">Voting: In queue</string>
     <string name="referendum_timeline_state_passing">Voting: Passing</string>
     <string name="referendum_timeline_state_not_passing">Voting: Not passing</string>
@@ -56,13 +57,13 @@
     <string name="vote_vote">Vote</string>
     <string name="common_governance">Governance</string>
 
-    <string name="referendum_name_unknown">Unnamed referenda</string>
+    <string name="referendum_name_unknown">Referendum %s</string>
 
     <string name="referendum_support_threshold_format">Threshold: %s of %s</string>
     <string name="referendum_your_vote_format">Your vote: %s votes</string>
 
     <string name="referendum_status_approved">Approved</string>
-    <string name="referendum_status_in_queue">In queue</string>
+    <string name="referendum_status_in_queue_format">In queue (%s of %s)</string>
     <string name="referendum_status_timeout">Timed out</string>
     <string name="referendum_status_cancelled">Cancelled</string>
     <string name="referendum_status_passing">Passing</string>
@@ -132,6 +133,7 @@
     <string name="confirm_referendum_vote_note">After locking period don’t forget to redeem your tokens</string>
     <string name="confirm_referendum_vote_track">Track</string>
     <string name="confirm_referendum_vote_referendum">Referendum</string>
+    <string name="referendum_voters_empty_list_placeholder">List of voters will appear here</string>
 
     <string name="confirm_referendum_unlock_title">Unlock from Governance</string>
     <string name="confirm_referendum_unlock_governance_lock">Governance lock</string>

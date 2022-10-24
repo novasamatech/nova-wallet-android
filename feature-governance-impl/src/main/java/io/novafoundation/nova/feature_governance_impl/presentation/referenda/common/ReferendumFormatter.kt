@@ -6,7 +6,10 @@ import io.novafoundation.nova.common.utils.formatting.TimerValue
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.formatting.formatFractionAsPercentage
 import io.novafoundation.nova.common.utils.formatting.remainingTime
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.isAye
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.votes
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumTrack
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumVoting
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ayeVotesIfNotEmpty
@@ -19,6 +22,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.com
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumTimeEstimationStyleRefresher
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumTrackModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumVotingModel
+import io.novafoundation.nova.feature_governance_impl.presentation.view.YourVoteModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
@@ -32,13 +36,16 @@ interface ReferendumFormatter {
     fun formatTrack(track: ReferendumTrack): ReferendumTrackModel
 
     fun formatOnChainName(call: GenericCall.Instance): String
-    fun formatUnknownReferendumTitle(): String
+
+    fun formatUnknownReferendumTitle(referendumId: ReferendumId): String
 
     fun formatStatus(status: ReferendumStatus): ReferendumStatusModel
 
     fun formatTimeEstimation(status: ReferendumStatus): ReferendumTimeEstimation?
 
     fun formatId(referendumId: ReferendumId): String
+
+    fun formatUserVote(vote: AccountVote, token: Token): YourVoteModel?
 }
 
 private val oneDay = 1.days
@@ -54,6 +61,7 @@ class RealReferendumFormatter(
             votingResultIcon = if (voting.support.passes()) R.drawable.ic_checkmark else R.drawable.ic_close,
             votingResultIconColor = if (voting.support.passes()) R.color.multicolor_green_100 else R.color.multicolor_red_100,
             thresholdInfo = formatThresholdInfo(voting.support, token),
+            thresholdInfoVisible = !voting.support.passes(),
             positivePercentage = resourceManager.getString(
                 R.string.referendum_aye_format,
                 voting.approval.ayeVotes.fraction.formatFractionAsPercentage()
@@ -142,8 +150,8 @@ class RealReferendumFormatter(
         return "${call.module.name}.${call.function.name}"
     }
 
-    override fun formatUnknownReferendumTitle(): String {
-        return resourceManager.getString(R.string.referendum_name_unknown)
+    override fun formatUnknownReferendumTitle(referendumId: ReferendumId): String {
+        return resourceManager.getString(R.string.referendum_name_unknown, formatId(referendumId))
     }
 
     private fun mapUnknownTrackNameToUi(name: String): String {
@@ -162,12 +170,24 @@ class RealReferendumFormatter(
 
     override fun formatStatus(status: ReferendumStatus): ReferendumStatusModel {
         return when (status) {
-            is ReferendumStatus.Ongoing.Preparing -> ReferendumStatusModel(
-                name = resourceManager.getString(R.string.referendum_status_preparing),
-                colorRes = R.color.white_64
-            )
+            is ReferendumStatus.Ongoing.Preparing -> {
+                val titleRes = if (status.reason is PreparingReason.WaitingForDeposit) {
+                    R.string.referendum_status_waiting_deposit
+                } else {
+                    R.string.referendum_status_preparing
+                }
+
+                ReferendumStatusModel(
+                    name = resourceManager.getString(titleRes),
+                    colorRes = R.color.white_64
+                )
+            }
             is ReferendumStatus.Ongoing.InQueue -> ReferendumStatusModel(
-                name = resourceManager.getString(R.string.referendum_status_in_queue),
+                name = resourceManager.getString(
+                    R.string.referendum_status_in_queue_format,
+                    status.position.index,
+                    status.position.maxSize
+                ),
                 colorRes = R.color.white_64
             )
             is ReferendumStatus.Ongoing.Rejecting -> ReferendumStatusModel(
@@ -214,30 +234,19 @@ class RealReferendumFormatter(
                         timeFormat = R.string.referendum_status_deciding_in,
                         textStyleRefresher = reason.timeLeft.referendumStatusStyleRefresher()
                     )
-                    PreparingReason.WaitingForDeposit -> ReferendumTimeEstimation.Text(
-                        text = resourceManager.getString(R.string.referendum_status_waiting_deposit),
-                        textStyle = ReferendumTimeEstimation.TextStyle.regular()
+                    PreparingReason.WaitingForDeposit -> ReferendumTimeEstimation.Timer(
+                        time = status.timeOutIn,
+                        timeFormat = R.string.referendum_status_time_out_in,
+                        textStyleRefresher = status.timeOutIn.referendumStatusStyleRefresher()
                     )
                 }
             }
             is ReferendumStatus.Ongoing.InQueue -> {
-                if (status.timeOutIn.referendumStatusIsHot()) {
-                    ReferendumTimeEstimation.Timer(
-                        time = status.timeOutIn,
-                        timeFormat = R.string.referendum_status_deciding_in,
-                        textStyleRefresher = status.timeOutIn.referendumStatusStyleRefresher()
-                    )
-                } else {
-                    val formattedPosition = resourceManager.getString(
-                        R.string.referendum_in_queue_position_format,
-                        status.position.index,
-                        status.position.maxSize
-                    )
-                    ReferendumTimeEstimation.Text(
-                        text = formattedPosition,
-                        textStyle = ReferendumTimeEstimation.TextStyle.regular()
-                    )
-                }
+                ReferendumTimeEstimation.Timer(
+                    time = status.timeOutIn,
+                    timeFormat = R.string.referendum_status_time_out_in,
+                    textStyleRefresher = status.timeOutIn.referendumStatusStyleRefresher()
+                )
             }
             is ReferendumStatus.Ongoing.Rejecting -> ReferendumTimeEstimation.Timer(
                 time = status.rejectIn,
@@ -264,6 +273,27 @@ class RealReferendumFormatter(
 
     override fun formatId(referendumId: ReferendumId): String {
         return "#${referendumId.value.format()}"
+    }
+
+    override fun formatUserVote(vote: AccountVote, token: Token): YourVoteModel? {
+        val isAye = vote.isAye() ?: return null
+        val votes = vote.votes(token.configuration) ?: return null
+
+        val voteTypeRes = if (isAye) R.string.referendum_vote_aye else R.string.referendum_vote_nay
+        val colorRes = if (isAye) R.color.multicolor_green_100 else R.color.multicolor_red_100
+
+        val votesAmountFormatted = mapAmountToAmountModel(votes.amount, token).token
+        val multiplierFormatted = votes.multiplier.format()
+
+        val votesFormatted = resourceManager.getString(R.string.referendum_votes_format, votes.total.format())
+        val votesDetails = "$votesAmountFormatted × $multiplierFormatted"
+
+        return YourVoteModel(
+            voteTypeTitleRes = voteTypeRes,
+            voteTypeColorRes = colorRes,
+            votes = votesFormatted,
+            votesDetails = votesDetails
+        )
     }
 
     private fun TimerValue.referendumStatusStyleRefresher(): ReferendumTimeEstimationStyleRefresher = {

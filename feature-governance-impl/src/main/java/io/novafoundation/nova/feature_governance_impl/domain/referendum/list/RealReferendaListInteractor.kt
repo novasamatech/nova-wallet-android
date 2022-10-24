@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.list.Refe
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumProposal
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumStatus
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.ReferendaConstructor
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.sorting.ReferendaSortingProvider
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.TotalIssuanceRepository
@@ -37,6 +38,7 @@ class RealReferendaListInteractor(
     private val totalIssuanceRepository: TotalIssuanceRepository,
     private val preImageRepository: PreImageRepository,
     private val referendaConstructor: ReferendaConstructor,
+    private val referendaSortingProvider: ReferendaSortingProvider,
 ) : ReferendaListInteractor {
 
     override fun referendaFlow(voterAccountId: AccountId?, chain: Chain): Flow<GroupedList<ReferendumGroup, ReferendumPreview>> {
@@ -90,6 +92,11 @@ class RealReferendaListInteractor(
             }
 
             referenda.groupBy { it.group() }
+                .mapValues { (group, referenda) ->
+                    val sorting = referendaSortingProvider.getReferendumSorting(group)
+
+                    referenda.sortedWith(sorting)
+                }.toSortedMap(referendaSortingProvider.getGroupSorting())
         }
     }
 

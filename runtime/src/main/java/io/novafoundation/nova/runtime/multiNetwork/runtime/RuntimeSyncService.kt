@@ -157,5 +157,5 @@ class RuntimeSyncService(
         syncingChains.remove(chainId)
     }
 
-    private fun ChainRuntimeInfoLocal.shouldSyncMetadata() = syncedVersion < remoteVersion
+    private fun ChainRuntimeInfoLocal.shouldSyncMetadata() = syncedVersion != remoteVersion
 }

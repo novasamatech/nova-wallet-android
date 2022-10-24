@@ -247,13 +247,16 @@ class RealReferendaConstructor(
 
             // preparing
             else -> {
+                val timeoutBlock = status.submitted + undecidingTimeout
+                val timeOutIn = blockDurationEstimator.timerUntil(timeoutBlock)
+
                 if (status.decisionDeposit != null) {
                     val preparedBlock = status.submitted + track.preparePeriod
                     val preparedIn = blockDurationEstimator.timerUntil(preparedBlock)
 
-                    ReferendumStatus.Ongoing.Preparing(reason = PreparingReason.DecidingIn(preparedIn))
+                    ReferendumStatus.Ongoing.Preparing(PreparingReason.DecidingIn(preparedIn), timeOutIn)
                 } else {
-                    ReferendumStatus.Ongoing.Preparing(reason = PreparingReason.WaitingForDeposit)
+                    ReferendumStatus.Ongoing.Preparing(PreparingReason.WaitingForDeposit, timeOutIn)
                 }
             }
         }

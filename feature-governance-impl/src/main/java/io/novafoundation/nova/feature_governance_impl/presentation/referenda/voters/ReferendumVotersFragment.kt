@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -19,6 +20,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vot
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.fragment_referendum_voters.referendumVotersCount
 import kotlinx.android.synthetic.main.fragment_referendum_voters.referendumVotersList
+import kotlinx.android.synthetic.main.fragment_referendum_voters.referendumVotersPlaceholder
 import kotlinx.android.synthetic.main.fragment_referendum_voters.referendumVotersProgress
 import kotlinx.android.synthetic.main.fragment_referendum_voters.referendumVotersToolbar
 
@@ -75,11 +77,14 @@ class ReferendumVotersFragment : BaseFragment<ReferendumVotersViewModel>(), Refe
         viewModel.voterModels.observe {
             if (it is LoadingState.Loaded<List<VoterModel>>) {
                 val voters = it.data
-                votersAdapter.submitList(voters)
-                referendumVotersCount.makeVisible()
                 referendumVotersCount.text = voters.size.format()
+                votersAdapter.submitList(voters)
+                referendumVotersPlaceholder.isVisible = voters.isEmpty()
+                referendumVotersList.isVisible = voters.isNotEmpty()
+                referendumVotersCount.makeVisible()
                 referendumVotersProgress.makeGone()
             } else {
+                referendumVotersPlaceholder.makeGone()
                 referendumVotersProgress.makeVisible()
             }
         }

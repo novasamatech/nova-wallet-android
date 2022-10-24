@@ -1,8 +1,9 @@
-package io.novafoundation.nova.feature_assets.domain.locks
+package io.novafoundation.nova.feature_wallet_impl.data.repository
 
 import io.novafoundation.nova.core_db.dao.LockDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
 import io.novafoundation.nova.feature_wallet_api.domain.model.mapBalanceLockFromLocal
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -11,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 
-class BalanceLocksRepositoryImpl(
+class RealBalanceLocksRepository(
     private val accountRepository: AccountRepository,
     private val chainRegistry: ChainRegistry,
     private val lockDao: LockDao
