@@ -186,7 +186,7 @@ class SetupVoteReferendumViewModel(
     private suspend fun mapLocksChangeToUi(locksChange: LocksChange): LocksChangeModel {
         return LocksChangeModel(
             amountChange = mapLockedChangeToUi(locksChange.lockedAmountChange),
-            periodChange = mapLockedPeriodChangeToUi(locksChange.governanceLockChange)
+            periodChange = mapLockedPeriodChangeToUi(locksChange.lockedPeriodChange)
         )
     }
 

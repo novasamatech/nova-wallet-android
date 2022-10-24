@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_governance_api.domain.referendum.vote
 
-import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.OnChainReferendum
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumTrack
@@ -25,7 +24,7 @@ interface GovernanceVoteAssistant {
 
     class LocksChange(
         val lockedAmountChange: Change<Balance>,
-        val governanceLockChange: Change<Duration>,
+        val lockedPeriodChange: Change<Duration>,
         val transferableChange: Change<Balance>
     )
 
@@ -55,4 +54,6 @@ fun <T : Comparable<T>> Change(
     }
 }
 
-fun <T> GovernanceVoteAssistant.Change<T>.changedOrNull(): GovernanceVoteAssistant.Change.Changed<T>? = castOrNull()
+fun GovernanceVoteAssistant.Change<*>.isReduced(): Boolean {
+    return this is GovernanceVoteAssistant.Change.Changed && !positive
+}

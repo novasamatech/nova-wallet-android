@@ -152,7 +152,12 @@ class ConfirmReferendumVoteViewModel(
         val accountVote = accountVoteFlow.first()
 
         val result = withContext(Dispatchers.Default) {
-            interactor.vote(accountVote, payload.referendumId)
+            interactor.vote(
+                vote = accountVote,
+                referendumId = payload.referendumId,
+                voteAssistant = voteAssistantFlow.first(),
+                asset = assetFlow.first()
+            )
         }
 
         result.onSuccess {
@@ -164,7 +169,7 @@ class ConfirmReferendumVoteViewModel(
         _showNextProgress.value = false
     }
 
-    private fun constructAccountVote(asset: Asset): AccountVote {
+    private fun constructAccountVote(asset: Asset): AccountVote.Standard {
         val planks = asset.token.planksFromAmount(payload.vote.amount)
 
         return AccountVote.Standard(

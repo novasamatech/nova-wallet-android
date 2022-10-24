@@ -26,6 +26,8 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.Chan
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.GovernanceVoteAssistant
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.GovernanceVoteAssistant.LocksChange
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
+import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.isReduced
+import io.novafoundation.nova.feature_governance_impl.data.network.blockchain.extrinsic.convictionVotingUnlock
 import io.novafoundation.nova.feature_governance_impl.data.network.blockchain.extrinsic.convictionVotingVote
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
@@ -78,11 +80,22 @@ class RealVoteReferendumInteractor(
         }
     }
 
-    override suspend fun vote(vote: AccountVote, referendumId: ReferendumId): Result<String> {
+    override suspend fun vote(
+        vote: AccountVote.Standard,
+        referendumId: ReferendumId,
+        voteAssistant: GovernanceVoteAssistant,
+        asset: Asset,
+    ): Result<String> {
         val chain = selectedChainState.chain()
+        val locksChange = voteAssistant.estimateLocksAfterVoting(vote.balance, vote.vote.conviction, asset)
+        val track = voteAssistant.track
 
-        return extrinsicService.submitExtrinsicWithSelectedWallet(chain) {
+        return extrinsicService.submitExtrinsicWithSelectedWallet(chain) { submitterId ->
             convictionVotingVote(referendumId, vote)
+
+            if (locksChange.lockedAmountChange.isReduced() && track != null) {
+                convictionVotingUnlock(track.id, submitterId)
+            }
         }
     }
 
@@ -150,7 +163,7 @@ private class RealGovernanceLocksEstimator(
         .orZero()
 
     override val track: ReferendumTrack? = onChainReferendum.status.asOngoingOrNull()?.let {
-        ReferendumTrack(tracks.getValue(it.track).name)
+        ReferendumTrack(it.track, tracks.getValue(it.track).name)
     }
 
     override val trackVoting: Voting? = voting.findVotingFor(onChainReferendum)
@@ -179,7 +192,7 @@ private class RealGovernanceLocksEstimator(
                 newValue = newGovernanceLocked,
                 absoluteDifference = lockedDifference.abs(),
             ),
-            governanceLockChange = Change(
+            lockedPeriodChange = Change(
                 previousValue = previousLockDuration,
                 newValue = newLockDuration,
                 absoluteDifference = (newLockDuration - previousLockDuration).absoluteValue,
