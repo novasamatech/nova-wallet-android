@@ -60,8 +60,8 @@ class RealReferendumFormatter(
         return ReferendumVotingModel(
             positiveFraction = voting.approval.ayeVotesIfNotEmpty()?.fraction?.toFloat(),
             thresholdFraction = voting.approval.threshold.toFloat(),
-            votingResultIcon = if (voting.support.passes()) R.drawable.ic_checkmark else R.drawable.ic_close,
-            votingResultIconColor = if (voting.support.passes()) R.color.multicolor_green_100 else R.color.multicolor_red_100,
+            votingResultIcon = R.drawable.ic_close,
+            votingResultIconColor = R.color.multicolor_red_100,
             thresholdInfo = formatThresholdInfo(voting.support, token),
             thresholdInfoVisible = !voting.support.passes(),
             positivePercentage = resourceManager.getString(
