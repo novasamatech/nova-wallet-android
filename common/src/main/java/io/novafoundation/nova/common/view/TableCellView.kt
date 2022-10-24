@@ -44,7 +44,7 @@ open class TableCellView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
     defStyleRes: Int = 0,
-) : ConstraintLayout(context, attrs, defStyle, defStyleRes) {
+) : ConstraintLayout(context, attrs, defStyle, defStyleRes), HasDivider {
 
     enum class FieldStyle {
         TEXT, LINK
@@ -131,7 +131,7 @@ open class TableCellView @JvmOverloads constructor(
         valueProgress.makeVisible()
     }
 
-    fun setDividerVisible(visible: Boolean) {
+    override fun setDividerVisible(visible: Boolean) {
         tableCellValueDivider.setVisible(visible)
     }
 

@@ -221,7 +221,7 @@ class BalanceListViewModel(
                 BalanceBreakdownTotal(
                     resourceManager.getString(R.string.wallet_balance_transferable),
                     balanceBreakdown.transferableTotal.amount.formatAsCurrency(currency),
-                    R.drawable.ic_staking_operations,
+                    R.drawable.ic_transferable,
                     balanceBreakdown.transferableTotal.percentage.formatAsPercentage()
                 )
             )
