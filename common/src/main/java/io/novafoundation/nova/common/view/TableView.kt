@@ -109,6 +109,10 @@ open class TableView @JvmOverloads constructor(
         }
 
         tableChildren.forEach {
+            if (it is HasDivider) {
+                it.setDividerVisible(false)
+            }
+
             it.updatePadding(start = 16.dp, end = 16.dp)
         }
 
