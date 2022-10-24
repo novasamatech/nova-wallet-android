@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_ledger_api.sdk.discovery
 
+import io.novafoundation.nova.common.utils.invokeOnCompletion
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 
@@ -20,7 +20,7 @@ interface LedgerDeviceDiscoveryService {
 fun LedgerDeviceDiscoveryService.performDiscovery(scope: CoroutineScope) {
     startDiscovery()
 
-    scope.coroutineContext[Job]?.invokeOnCompletion {
+    scope.invokeOnCompletion {
         stopDiscovery()
     }
 }

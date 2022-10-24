@@ -1,7 +1,6 @@
 package io.novafoundation.nova.app.root.navigation
 
 import android.os.Bundle
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.asFlow
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
@@ -280,9 +279,6 @@ class Navigator(
             ConfirmRewardDestinationFragment.getBundle(payload)
         )
     }
-
-    override val currentStackEntryLifecycle: Lifecycle
-        get() = navController!!.currentBackStackEntry!!.lifecycle
 
     override fun openControllerAccount() {
         navController?.navigate(R.id.action_stakingBalanceFragment_to_setControllerAccountFragment)

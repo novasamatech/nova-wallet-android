@@ -1,52 +1,22 @@
 package io.novafoundation.nova.common.data.memory
 
-import androidx.lifecycle.Lifecycle
-import io.novafoundation.nova.common.utils.onDestroy
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 
-class ComputationalCache {
-
-    private val memory = mutableMapOf<String, Pair<MutableSet<Lifecycle>, Deferred<Any?>>>()
+interface ComputationalCache {
 
     /**
-     * Caches computation till lifecycle is destroyed
+     * Caches [computation] between calls until all supplied [scope]s have been cancelled
      */
-    @Suppress("UNCHECKED_CAST")
-    @Synchronized
     suspend fun <T> useCache(
         key: String,
-        lifecycle: Lifecycle,
-        computation: suspend () -> T
-    ): T = withContext(Dispatchers.Default) {
-        val deferred = if (key in memory) {
-            val (activeLifecycles, existingComputation) = memory[key]!!
+        scope: CoroutineScope,
+        computation: suspend CoroutineScope.() -> T
+    ): T
 
-            activeLifecycles += lifecycle
-
-            existingComputation
-        } else {
-            val deferred = async(Dispatchers.Default) { computation() }
-
-            memory[key] = mutableSetOf(lifecycle) to deferred
-
-            deferred
-        }
-
-        withContext(Dispatchers.Main) {
-            lifecycle.onDestroy {
-                memory[key]?.let { (lifecycles, _) ->
-                    lifecycles -= lifecycle
-
-                    if (lifecycles.isEmpty()) {
-                        memory.remove(key)
-                    }
-                }
-            }
-        }
-
-        deferred.await() as T
-    }
+    fun <T> useSharedFlow(
+        key: String,
+        scope: CoroutineScope,
+        flowLazy: suspend () -> Flow<T>
+    ): Flow<T>
 }

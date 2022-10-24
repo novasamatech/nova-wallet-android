@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_governance_impl.domain.referendum.vote
 
+import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
-import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -40,9 +40,12 @@ import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.chainAndAsset
 import io.novafoundation.nova.runtime.util.BlockDurationEstimator
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+
+private const val VOTE_ASSISTANT_CACHE_KEY = "RealVoteReferendumInteractor.VoteAssistant"
 
 class RealVoteReferendumInteractor(
     private val governanceSourceRegistry: GovernanceSourceRegistry,
@@ -51,10 +54,11 @@ class RealVoteReferendumInteractor(
     private val accountRepository: AccountRepository,
     private val extrinsicService: ExtrinsicService,
     private val locksRepository: BalanceLocksRepository,
+    private val computationalCache: ComputationalCache,
 ) : VoteReferendumInteractor {
 
-    override fun voteAssistantFlow(referendumId: ReferendumId): Flow<GovernanceVoteAssistant> {
-        return flowOfAll {
+    override fun voteAssistantFlow(referendumId: ReferendumId, scope: CoroutineScope): Flow<GovernanceVoteAssistant> {
+        return computationalCache.useSharedFlow(VOTE_ASSISTANT_CACHE_KEY, scope) {
             val (chain, chainAsset) = selectedChainState.chainAndAsset()
             val metaAccount = accountRepository.getSelectedMetaAccount()
 

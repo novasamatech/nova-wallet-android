@@ -2,6 +2,7 @@
 
 package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.search
 
+import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.invoke
@@ -50,7 +51,7 @@ class SearchCollatorViewModel(
     private val electedCollators by lazyAsync {
         val chainAsset = singleAssetSharedState.chainAsset()
 
-        collatorRecommendatorFactory.create(router.currentStackEntryLifecycle, chainAsset)
+        collatorRecommendatorFactory.create(chainAsset, scope = viewModelScope)
             .recommendations(CollatorRecommendationConfig.DEFAULT)
     }
 

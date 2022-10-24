@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.address.CachingAddressIconGenerator
 import io.novafoundation.nova.common.address.StatelessAddressIconGenerator
 import io.novafoundation.nova.common.data.FileProviderImpl
 import io.novafoundation.nova.common.data.memory.ComputationalCache
+import io.novafoundation.nova.common.data.memory.RealComputationalCache
 import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
 import io.novafoundation.nova.common.data.secrets.v1.SecretStoreV1
 import io.novafoundation.nova.common.data.secrets.v1.SecretStoreV1Impl
@@ -61,7 +62,7 @@ class CommonModule {
 
     @Provides
     @ApplicationScope
-    fun provideComputationalCache() = ComputationalCache()
+    fun provideComputationalCache(): ComputationalCache = RealComputationalCache()
 
     @Provides
     @ApplicationScope

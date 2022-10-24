@@ -3,6 +3,7 @@ package io.novafoundation.nova.common.utils
 import android.net.Uri
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
@@ -119,6 +120,10 @@ fun <T> List<T>.cycle(): Sequence<T> {
 
 inline fun <T> CoroutineScope.lazyAsync(context: CoroutineContext = EmptyCoroutineContext, crossinline producer: suspend () -> T) = lazy {
     async(context) { producer() }
+}
+
+inline fun CoroutineScope.invokeOnCompletion(crossinline action: () -> Unit) {
+    coroutineContext[Job]?.invokeOnCompletion { action() }
 }
 
 inline fun <T> Iterable<T>.filterToSet(predicate: (T) -> Boolean): Set<T> = filterTo(mutableSetOf(), predicate)

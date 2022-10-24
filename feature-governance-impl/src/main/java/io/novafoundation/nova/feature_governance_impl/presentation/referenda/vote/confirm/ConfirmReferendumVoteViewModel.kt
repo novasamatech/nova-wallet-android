@@ -94,8 +94,7 @@ class ConfirmReferendumVoteViewModel(
 
     val showNextProgress: Flow<Boolean> = _showNextProgress
 
-    private val voteAssistantFlow = interactor.voteAssistantFlow(payload.referendumId)
-        .shareInBackground()
+    private val voteAssistantFlow = interactor.voteAssistantFlow(payload.referendumId, scope = this)
 
     val accountVoteUi = accountVoteFlow.map {
         referendumFormatter.formatUserVote(it, assetFlow.first().token)

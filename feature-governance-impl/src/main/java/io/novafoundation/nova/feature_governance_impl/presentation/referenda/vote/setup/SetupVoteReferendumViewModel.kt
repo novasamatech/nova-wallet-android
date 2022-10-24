@@ -64,9 +64,7 @@ class SetupVoteReferendumViewModel(
     private val selectedAsset = assetUseCase.currentAssetFlow()
         .shareInBackground()
 
-    private val voteAssistantFlow = interactor.voteAssistantFlow(payload.referendumId)
-        .inBackground()
-        .shareWhileSubscribed()
+    private val voteAssistantFlow = interactor.voteAssistantFlow(payload.referendumId, scope = this)
 
     override val originFeeMixin = feeLoaderMixinFactory.create(selectedAsset)
 

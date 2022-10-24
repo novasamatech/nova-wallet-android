@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_governance_impl.di.modules.screens
 
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.validation.ValidationSystem
@@ -28,7 +29,8 @@ class ReferendumVoteModule {
         selectedChainState: GovernanceSharedState,
         accountRepository: AccountRepository,
         locksRepository: BalanceLocksRepository,
-        extrinsicService: ExtrinsicService
+        extrinsicService: ExtrinsicService,
+        computationalCache: ComputationalCache
     ): VoteReferendumInteractor {
         return RealVoteReferendumInteractor(
             governanceSourceRegistry = governanceSourceRegistry,
@@ -37,6 +39,7 @@ class ReferendumVoteModule {
             accountRepository = accountRepository,
             extrinsicService = extrinsicService,
             locksRepository = locksRepository,
+            computationalCache = computationalCache
         )
     }
 
