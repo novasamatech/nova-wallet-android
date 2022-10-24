@@ -101,10 +101,14 @@ class ConfirmReferendumVoteViewModel(
         referendumFormatter.formatUserVote(it, assetFlow.first().token)
     }.shareInBackground()
 
-    val reviewReferendumModel = voteAssistantFlow.map {
+    val reviewReferendumModel = voteAssistantFlow.map { voteAssistant ->
+        val asset = assetFlow.first()
+            .token
+            .configuration
+
         ReviewReferendumModel(
             number = referendumFormatter.formatId(payload.referendumId),
-            trackModel = it.track?.let(referendumFormatter::formatTrack)
+            trackModel = voteAssistant.track?.let { referendumFormatter.formatTrack(it, asset) },
         )
     }.shareInBackground()
 

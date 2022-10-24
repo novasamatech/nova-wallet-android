@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_governance_impl.presentation.referenda.li
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
+import coil.ImageLoader
 import io.novafoundation.nova.common.list.BaseGroupedDiffCallback
 import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
@@ -36,6 +37,7 @@ import kotlinx.android.synthetic.main.item_referendum.view.itemReferendumYourVot
 
 class ReferendaListAdapter(
     private val handler: Handler,
+    private val imageLoader: ImageLoader,
 ) : GroupedListAdapter<ReferendaGroupModel, ReferendumModel>(ReferendaDiffCallback) {
 
     interface Handler {
@@ -48,7 +50,7 @@ class ReferendaListAdapter(
     }
 
     override fun createChildViewHolder(parent: ViewGroup): GroupedListHolder {
-        return ReferendumChildHolder(handler, parent.inflateChild(R.layout.item_referendum))
+        return ReferendumChildHolder(handler, imageLoader, parent.inflateChild(R.layout.item_referendum))
     }
 
     override fun bindGroup(holder: GroupedListHolder, group: ReferendaGroupModel) {
@@ -74,7 +76,7 @@ class ReferendaListAdapter(
     }
 }
 
-private object ReferendaPayloadGenerator : PayloadGenerator<ReferendumModel>(ReferendumModel::voting)
+private object ReferendaPayloadGenerator : PayloadGenerator<ReferendumModel>(ReferendumModel::voting, ReferendumModel::timeEstimation)
 
 private object ReferendaDiffCallback : BaseGroupedDiffCallback<ReferendaGroupModel, ReferendumModel>(ReferendaGroupModel::class.java) {
 
@@ -113,6 +115,7 @@ private class ReferendaGroupHolder(containerView: View) : GroupedListHolder(cont
 
 private class ReferendumChildHolder(
     private val eventHandler: ReferendaListAdapter.Handler,
+    private val imageLoader: ImageLoader,
     containerView: View,
 ) : GroupedListHolder(containerView) {
 
@@ -146,11 +149,11 @@ private class ReferendumChildHolder(
     }
 
     private fun setNumber(number: String) = with(containerView) {
-        itemReferendumNumber.text = number
+        itemReferendumNumber.setText(number)
     }
 
     private fun setTrack(track: ReferendumTrackModel?) = with(containerView) {
-        itemReferendumTrack.setReferendumTrackModel(track)
+        itemReferendumTrack.setReferendumTrackModel(track, imageLoader)
     }
 
     private fun setYourVote(vote: YourVotePreviewModel?) = with(containerView) {

@@ -4,8 +4,8 @@
     android:id="@+id/itemCrowdloanGroup"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
     android:layout_marginStart="16dp"
+    android:orientation="horizontal"
     android:paddingTop="20dp"
     android:paddingBottom="8dp">
 
@@ -19,7 +19,7 @@
 
     <TextView
         android:id="@+id/itemReferendaGroupCounter"
-        style="@style/TextAppearance.NovaFoundation.Header5"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"

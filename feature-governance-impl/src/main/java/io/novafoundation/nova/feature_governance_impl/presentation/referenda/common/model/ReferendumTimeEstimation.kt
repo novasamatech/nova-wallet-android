@@ -29,14 +29,14 @@ sealed class ReferendumTimeEstimation {
     ) : ReferendumTimeEstimation() {
 
         override fun hashCode(): Int {
-            var result = time.hashCode()
+            var result = time.millis.hashCode()
             result = 31 * result + timeFormat
             return result
         }
 
         override fun equals(other: Any?): Boolean {
             if (other !is Timer) return false
-            return time == other.time &&
+            return time.millis == other.time.millis &&
                 timeFormat == other.timeFormat
         }
     }

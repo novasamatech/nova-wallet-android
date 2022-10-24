@@ -194,7 +194,7 @@ class ReferendumDetailsViewModel(
         val token = tokenFlow.first()
 
         return ReferendumDetailsModel(
-            track = referendumDetails.track?.let(referendumFormatter::formatTrack),
+            track = referendumDetails.track?.let { referendumFormatter.formatTrack(it, token.configuration) },
             number = referendumFormatter.formatId(referendumDetails.id),
             title = mapReferendumTitleToUi(referendumDetails),
             description = mapReferendumDescriptionToUi(referendumDetails),
