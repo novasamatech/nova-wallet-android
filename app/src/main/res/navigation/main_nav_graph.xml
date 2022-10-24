@@ -1053,4 +1053,6 @@
     <include app:graph="@navigation/staking_parachain_yield_boost" />
 
     <include app:graph="@navigation/referendum_details_graph" />
+
+    <include app:graph="@navigation/referendum_unlock_graph" />
 </navigation>

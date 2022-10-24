@@ -135,6 +135,9 @@
     <string name="confirm_referendum_vote_referendum">Referendum</string>
     <string name="referendum_voters_empty_list_placeholder">List of voters will appear here</string>
 
+    <string name="confirm_referendum_unlock_title">Unlock from Governance</string>
+    <string name="confirm_referendum_unlock_governance_lock">Governance lock</string>
+
     <string name="crowdloan_contributions_liquid_source">Liquid</string>
     <string name="crowdloan_contributions_parallel_source">Parallel</string>
 
