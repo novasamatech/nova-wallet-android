@@ -66,14 +66,13 @@ open class TableView @JvmOverloads constructor(
 
         setupTableChildrenAppearance()
 
-        val halfPathWidth = pathWidth / 2
         dividerPath.reset()
         children.toList()
             .filterNot { it == titleView }
             .withoutLast()
             .forEach {
-                dividerPath.moveTo(childHorizontalPadding, it.bottom - halfPathWidth)
-                dividerPath.lineTo(measuredWidth - childHorizontalPadding, it.bottom - halfPathWidth)
+                dividerPath.moveTo(childHorizontalPadding, it.bottom.toFloat())
+                dividerPath.lineTo(measuredWidth - childHorizontalPadding, it.bottom.toFloat())
             }
     }
 
