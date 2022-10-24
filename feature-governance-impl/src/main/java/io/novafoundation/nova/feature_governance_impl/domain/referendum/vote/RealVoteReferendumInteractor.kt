@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.completedReferendumLockDuration
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.flattenCastingVotes
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.maxLockDuration
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.maxLockOfMatching
 import io.novafoundation.nova.feature_governance_api.data.repository.getTracksById
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumTrack
@@ -161,7 +162,7 @@ private class RealGovernanceLocksEstimator(
     ): LocksChange {
         val vote = AyeVote(amount, conviction) // vote direction does not influence lock estimation
 
-        val newGovernanceLocked = currentMaxGovernanceLocked.max(vote.balance)
+        val newGovernanceLocked = maxUnlockAmount(changedVote = vote)
         val newMaxUnlocksAt = estimateUnlocksAt(changedVote = vote)
         val lockedDifference = newGovernanceLocked - currentMaxGovernanceLocked
 
@@ -189,6 +190,14 @@ private class RealGovernanceLocksEstimator(
                 absoluteDifference = (newTransferablePlanks - currentTransferablePlanks).abs()
             )
         )
+    }
+
+    private fun maxUnlockAmount(changedVote: AccountVote.Standard): Balance {
+        val maxLockExceptChanged = voting.maxOfOrNull { (_, trackVoting) ->
+            trackVoting.maxLockOfMatching { referendumId, _ -> referendumId != onChainReferendum.id }
+        }.orZero()
+
+        return maxLockExceptChanged.max(changedVote.balance)
     }
 
     private fun estimateUnlocksAt(changedVote: AccountVote.Standard?): BlockNumber {

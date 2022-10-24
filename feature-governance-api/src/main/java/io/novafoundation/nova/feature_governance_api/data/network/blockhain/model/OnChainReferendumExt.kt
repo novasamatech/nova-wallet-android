@@ -68,11 +68,6 @@ fun Map<TrackId, Voting>.flattenCastingVotes(): Map<ReferendumId, AccountVote> {
     }.toMap()
 }
 
-@Suppress("UNCHECKED_CAST")
-fun Map<TrackId, Voting>.onlyCasting(): Map<TrackId, Voting.Casting> {
-    return filterValues { it is Voting.Casting } as Map<TrackId, Voting.Casting>
-}
-
 val OnChainReferendumStatus.Ongoing.proposer: AccountId
     get() = submissionDeposit.who
 

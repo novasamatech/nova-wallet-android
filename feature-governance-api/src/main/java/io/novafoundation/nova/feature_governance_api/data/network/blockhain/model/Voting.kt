@@ -53,6 +53,20 @@ fun Voting.trackVotesNumber(): Int {
     }
 }
 
+fun Voting.maxLockOfMatching(matcher: (ReferendumId, AccountVote) -> Boolean): Balance {
+    return when(this) {
+        is Voting.Casting -> votes.entries.fold(prior.amount) { acc, (referendumId, vote) ->
+            if (matcher(referendumId, vote)) {
+                acc.max(vote.amount())
+            } else {
+                acc
+            }
+        }
+
+        Voting.Delegating -> Balance.ZERO
+    }
+}
+
 fun AccountVote.votes(chainAsset: Chain.Asset): VotesAmount? {
     return when (this) {
         // TODO handle split votes
@@ -67,6 +81,13 @@ fun AccountVote.votes(chainAsset: Chain.Asset): VotesAmount? {
                 multiplier = vote.conviction.amountMultiplier()
             )
         }
+    }
+}
+
+fun AccountVote.amount(): Balance {
+    return when(this) {
+        AccountVote.Split -> Balance.ZERO // TODO not yet supported
+        is AccountVote.Standard -> balance
     }
 }
 
