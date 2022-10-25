@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.VoteReferendumValidationSystem
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common.LocksChangeFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.confirm.ConfirmReferendumVoteViewModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.confirm.ConfirmVoteReferendumPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.hints.ReferendumVoteHintsMixinFactory
@@ -51,7 +52,8 @@ class ConfirmReferendumVoteModule {
         resourceManager: ResourceManager,
         feeLoaderMixinFactory: FeeLoaderMixin.Factory,
         referendumFormatter: ReferendumFormatter,
-    ): ViewModel {
+        locksChangeFormatter: LocksChangeFormatter,
+        ): ViewModel {
         return ConfirmReferendumVoteViewModel(
             router = router,
             feeLoaderMixinFactory = feeLoaderMixinFactory,
@@ -69,6 +71,7 @@ class ConfirmReferendumVoteModule {
             validationExecutor = validationExecutor,
             resourceManager = resourceManager,
             referendumFormatter = referendumFormatter,
+            locksChangeFormatter = locksChangeFormatter
         )
     }
 

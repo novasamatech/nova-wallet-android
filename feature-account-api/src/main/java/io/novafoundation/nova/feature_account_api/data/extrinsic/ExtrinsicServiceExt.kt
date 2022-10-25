@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.first
 
 suspend fun ExtrinsicService.submitExtrinsicWithSelectedWalletAndWaitBlockInclusion(
     chain: Chain,
-    formExtrinsic: suspend ExtrinsicBuilder.(submitter: AccountId) -> Unit,
+    formExtrinsic: suspend ExtrinsicBuilder.() -> Unit,
 ): Result<ExtrinsicStatus.InBlock> = runCatching {
     submitAndWatchExtrinsicWithSelectedWallet(chain, formExtrinsic)
         .filterIsInstance<ExtrinsicStatus.InBlock>()

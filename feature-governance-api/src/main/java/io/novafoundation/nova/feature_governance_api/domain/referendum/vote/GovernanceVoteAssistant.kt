@@ -10,11 +10,6 @@ import kotlin.time.Duration
 
 interface GovernanceVoteAssistant {
 
-    class LockEstimation(
-        val amount: Balance,
-        val duration: Duration
-    )
-
     sealed class Change<T>(val previousValue: T, val newValue: T) {
 
         class Changed<T>(previousValue: T, newValue: T, val absoluteDifference: T, val positive: Boolean) : Change<T>(previousValue, newValue)
@@ -56,4 +51,8 @@ fun <T : Comparable<T>> Change(
 
 fun GovernanceVoteAssistant.Change<*>.isReduced(): Boolean {
     return this is GovernanceVoteAssistant.Change.Changed && !positive
+}
+
+fun GovernanceVoteAssistant.Change<*>.isIncreased(): Boolean {
+    return this is GovernanceVoteAssistant.Change.Changed && positive
 }

@@ -15,7 +15,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHex
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Extrinsic
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
@@ -31,7 +30,7 @@ class RealExtrinsicService(
 
     override suspend fun submitExtrinsicWithSelectedWallet(
         chain: Chain,
-        formExtrinsic: suspend ExtrinsicBuilder.(submitter: AccountId) -> Unit,
+        formExtrinsic: suspend ExtrinsicBuilder.() -> Unit,
     ): Result<String> {
         val account = accountRepository.getSelectedMetaAccount()
         val accountId = account.accountIdIn(chain)!!
@@ -41,7 +40,7 @@ class RealExtrinsicService(
 
     override suspend fun submitAndWatchExtrinsicWithSelectedWallet(
         chain: Chain,
-        formExtrinsic: suspend ExtrinsicBuilder.(submitter: AccountId) -> Unit,
+        formExtrinsic: suspend ExtrinsicBuilder.() -> Unit,
     ): Flow<ExtrinsicStatus> {
         val account = accountRepository.getSelectedMetaAccount()
         val accountId = account.accountIdIn(chain)!!
@@ -52,7 +51,7 @@ class RealExtrinsicService(
     override suspend fun submitExtrinsicWithAnySuitableWallet(
         chain: Chain,
         accountId: ByteArray,
-        formExtrinsic: suspend ExtrinsicBuilder.(submitter: AccountId) -> Unit,
+        formExtrinsic: suspend ExtrinsicBuilder.() -> Unit,
     ): Result<String> = runCatching {
         val extrinsic = buildExtrinsic(chain, accountId, formExtrinsic)
 
@@ -62,7 +61,7 @@ class RealExtrinsicService(
     override suspend fun submitAndWatchExtrinsicAnySuitableWallet(
         chain: Chain,
         accountId: ByteArray,
-        formExtrinsic: suspend ExtrinsicBuilder.(submitter: AccountId) -> Unit,
+        formExtrinsic: suspend ExtrinsicBuilder.() -> Unit,
     ): Flow<ExtrinsicStatus> {
         val extrinsic = buildExtrinsic(chain, accountId, formExtrinsic)
 
@@ -105,14 +104,14 @@ class RealExtrinsicService(
     private suspend fun buildExtrinsic(
         chain: Chain,
         accountId: ByteArray,
-        formExtrinsic: suspend ExtrinsicBuilder.(submitter: AccountId) -> Unit,
+        formExtrinsic: suspend ExtrinsicBuilder.() -> Unit,
     ): String {
         val metaAccount = accountRepository.findMetaAccount(accountId) ?: error("No meta account found accessing ${accountId.toHexString()}")
         val signer = signerProvider.signerFor(metaAccount)
 
         val extrinsicBuilder = extrinsicBuilderFactory.create(chain, signer, accountId)
 
-        extrinsicBuilder.formExtrinsic(accountId)
+        extrinsicBuilder.formExtrinsic()
 
         return extrinsicBuilder.build(useBatchAll = true)
     }

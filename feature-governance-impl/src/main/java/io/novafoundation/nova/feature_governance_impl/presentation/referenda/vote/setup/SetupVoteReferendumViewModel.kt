@@ -16,19 +16,16 @@ import io.novafoundation.nova.common.view.input.seekbar.SeekbarValues
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.amountMultiplier
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.votesFor
-import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.GovernanceVoteAssistant.Change
-import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.GovernanceVoteAssistant.LocksChange
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.VoteReferendumValidationPayload
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.VoteReferendumValidationSystem
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.handleVoteReferendumValidationFailure
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common.LocksChangeFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.confirm.AccountVoteParcelModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.confirm.ConfirmVoteReferendumPayload
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.model.AmountChangeModel
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.model.LocksChangeModel
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
@@ -38,7 +35,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeL
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.requireFee
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -46,7 +42,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
-import kotlin.time.Duration
 
 class SetupVoteReferendumViewModel(
     private val feeLoaderMixinFactory: FeeLoaderMixin.Factory,
@@ -58,6 +53,8 @@ class SetupVoteReferendumViewModel(
     private val router: GovernanceRouter,
     private val validationSystem: VoteReferendumValidationSystem,
     private val validationExecutor: ValidationExecutor,
+    private val referendumFormatter: ReferendumFormatter,
+    private val locksChangeFormatter: LocksChangeFormatter,
 ) : BaseViewModel(),
     WithFeeLoaderMixin,
     Validatable by validationExecutor {
@@ -83,7 +80,8 @@ class SetupVoteReferendumViewModel(
     val selectedConvictionIndex = MutableStateFlow(0)
 
     val title = flowOf {
-        resourceManager.getString(R.string.referendum_vote_setup_title, payload.referendumId.value.format())
+        val formattedNumber = referendumFormatter.formatId(payload.referendumId)
+        resourceManager.getString(R.string.referendum_vote_setup_title, formattedNumber)
     }.shareInBackground()
 
     private val selectedConvictionFlow = selectedConvictionIndex.mapNotNull(convictionValues::valueAt)
@@ -109,7 +107,9 @@ class SetupVoteReferendumViewModel(
         resourceManager.getString(R.string.referendum_votes_format, votes.format())
     }.shareInBackground()
 
-    val locksChangeUiFlow = locksChangeFlow.map(::mapLocksChangeToUi)
+    val locksChangeUiFlow = locksChangeFlow.map {
+        locksChangeFormatter.mapLocksChangeToUi(it, selectedAsset.first())
+    }
         .shareInBackground()
 
     val ayeButtonStateFlow = buttonStateFlow(VoteType.AYE, R.string.referendum_vote_aye)
@@ -181,59 +181,6 @@ class SetupVoteReferendumViewModel(
         )
 
         router.openConfirmVoteReferendum(confirmPayload)
-    }
-
-    private suspend fun mapLocksChangeToUi(locksChange: LocksChange): LocksChangeModel {
-        return LocksChangeModel(
-            amountChange = mapLockedChangeToUi(locksChange.lockedAmountChange),
-            periodChange = mapLockedPeriodChangeToUi(locksChange.lockedPeriodChange)
-        )
-    }
-
-    private suspend fun mapLockedChangeToUi(lockedChange: Change<Balance>): AmountChangeModel {
-        val asset = selectedAsset.first()
-
-        val fromFormatted = mapAmountToAmountModel(lockedChange.previousValue, asset, includeAssetTicker = false).token
-        val toFormatted = mapAmountToAmountModel(lockedChange.newValue, asset).token
-
-        return when (lockedChange) {
-            is Change.Changed -> AmountChangeModel(
-                from = fromFormatted,
-                to = toFormatted,
-                difference = mapAmountToAmountModel(lockedChange.absoluteDifference, asset).token,
-                positive = lockedChange.positive
-            )
-            is Change.Same -> AmountChangeModel(
-                from = fromFormatted,
-                to = toFormatted,
-                difference = null,
-                positive = null
-            )
-        }
-    }
-
-    private fun mapLockedPeriodChangeToUi(periodChange: Change<Duration>): AmountChangeModel {
-        val from = resourceManager.formatDuration(periodChange.previousValue, estimated = false)
-        val to = resourceManager.formatDuration(periodChange.newValue, estimated = false)
-
-        return when (periodChange) {
-            is Change.Changed -> {
-                val difference = resourceManager.formatDuration(periodChange.absoluteDifference, estimated = false)
-
-                AmountChangeModel(
-                    from = from,
-                    to = to,
-                    difference = resourceManager.getString(R.string.common_maximum_format, difference),
-                    positive = periodChange.positive
-                )
-            }
-            is Change.Same -> AmountChangeModel(
-                from = from,
-                to = to,
-                difference = null,
-                positive = null
-            )
-        }
     }
 
     private fun convictionValues(): SeekbarValues<Conviction> {

@@ -21,7 +21,7 @@
     <string name="referendum_vote_governance_lock">Governance lock</string>
     <string name="referendum_vote_locking_period">Locking period</string>
 
-    <string name="referendum_vote_setup_title">Vote for #%s</string>
+    <string name="referendum_vote_setup_title">Vote for %s</string>
     <string name="referendum_vote_select_conviction_title">Multiply votes by increasing locking period</string>
 
     <string name="referendum_timeline_state_preparing">Voting: Preparing</string>

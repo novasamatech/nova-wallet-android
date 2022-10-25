@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
@@ -23,7 +24,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.val
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.handleVoteReferendumValidationFailure
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.confirm.model.ReviewReferendumModel
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common.LocksChangeFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.hints.ReferendumVoteHintsMixinFactory
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -59,6 +60,7 @@ class ConfirmReferendumVoteViewModel(
     private val validationExecutor: ValidationExecutor,
     private val resourceManager: ResourceManager,
     private val referendumFormatter: ReferendumFormatter,
+    private val locksChangeFormatter: LocksChangeFormatter,
 ) : BaseViewModel(),
     Validatable by validationExecutor,
     WithFeeLoaderMixin,
@@ -101,12 +103,23 @@ class ConfirmReferendumVoteViewModel(
         referendumFormatter.formatUserVote(it, assetFlow.first().token)
     }.shareInBackground()
 
-    val reviewReferendumModel = voteAssistantFlow.map {
-        ReviewReferendumModel(
-            number = referendumFormatter.formatId(payload.referendumId),
-            trackModel = it.track?.let(referendumFormatter::formatTrack)
-        )
+    val title = flowOf {
+        val formattedNumber = referendumFormatter.formatId(payload.referendumId)
+        resourceManager.getString(R.string.referendum_vote_setup_title, formattedNumber)
     }.shareInBackground()
+
+    private val locksChangeFlow = voteAssistantFlow.map { voteAssistant ->
+        val asset = assetFlow.first()
+        val amountPlanks = asset.token.planksFromAmount(payload.vote.amount)
+
+        voteAssistant.estimateLocksAfterVoting(amountPlanks, payload.vote.conviction, asset)
+    }
+
+    val locksChangeUiFlow = locksChangeFlow.map {
+        locksChangeFormatter.mapLocksChangeToUi(it, assetFlow.first())
+    }
+        .shareInBackground()
+
 
     init {
         setFee()
@@ -152,12 +165,7 @@ class ConfirmReferendumVoteViewModel(
         val accountVote = accountVoteFlow.first()
 
         val result = withContext(Dispatchers.Default) {
-            interactor.vote(
-                vote = accountVote,
-                referendumId = payload.referendumId,
-                voteAssistant = voteAssistantFlow.first(),
-                asset = assetFlow.first()
-            )
+            interactor.vote(accountVote, payload.referendumId)
         }
 
         result.onSuccess {

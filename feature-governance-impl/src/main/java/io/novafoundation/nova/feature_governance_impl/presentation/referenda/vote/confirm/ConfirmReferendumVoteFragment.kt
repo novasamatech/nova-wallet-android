@@ -10,21 +10,22 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.view.setProgress
-import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.view.setAmountChangeModel
 import io.novafoundation.nova.feature_governance_impl.presentation.view.setVoteModelOrHide
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 import kotlinx.android.synthetic.main.fragment_referendum_confirm_vote.confirmReferendumVoteAmount
 import kotlinx.android.synthetic.main.fragment_referendum_confirm_vote.confirmReferendumVoteConfirm
 import kotlinx.android.synthetic.main.fragment_referendum_confirm_vote.confirmReferendumVoteHints
 import kotlinx.android.synthetic.main.fragment_referendum_confirm_vote.confirmReferendumVoteInformation
-import kotlinx.android.synthetic.main.fragment_referendum_confirm_vote.confirmReferendumVoteNumber
+import kotlinx.android.synthetic.main.fragment_referendum_confirm_vote.confirmReferendumVoteLockedAmountChanges
+import kotlinx.android.synthetic.main.fragment_referendum_confirm_vote.confirmReferendumVoteLockedPeriodChanges
 import kotlinx.android.synthetic.main.fragment_referendum_confirm_vote.confirmReferendumVoteResult
 import kotlinx.android.synthetic.main.fragment_referendum_confirm_vote.confirmReferendumVoteToolbar
-import kotlinx.android.synthetic.main.fragment_referendum_confirm_vote.confirmReferendumVoteTrack
+import kotlinx.android.synthetic.main.fragment_referendum_confirm_vote.confirmReferendumVoteTransferableAmountChanges
 
 class ConfirmReferendumVoteFragment : BaseFragment<ConfirmReferendumVoteViewModel>() {
 
@@ -77,9 +78,12 @@ class ConfirmReferendumVoteFragment : BaseFragment<ConfirmReferendumVoteViewMode
 
         viewModel.accountVoteUi.observe(confirmReferendumVoteResult::setVoteModelOrHide)
 
-        viewModel.reviewReferendumModel.observe {
-            confirmReferendumVoteNumber.showValue(it.number)
-            confirmReferendumVoteTrack.showValueOrHide(it.trackModel?.name)
+        viewModel.title.observe(confirmReferendumVoteToolbar::setTitle)
+
+        viewModel.locksChangeUiFlow.observe {
+            confirmReferendumVoteLockedAmountChanges.setAmountChangeModel(it.amountChange)
+            confirmReferendumVoteLockedPeriodChanges.setAmountChangeModel(it.periodChange)
+            confirmReferendumVoteTransferableAmountChanges.setAmountChangeModel(it.transferableChange)
         }
 
         viewModel.showNextProgress.observe(confirmReferendumVoteConfirm::setProgress)

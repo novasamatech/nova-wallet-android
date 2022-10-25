@@ -18,7 +18,6 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.completedReferendumLockDuration
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.flattenCastingVotes
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.maxLockDuration
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.maxLockOfMatching
 import io.novafoundation.nova.feature_governance_api.data.repository.getTracksById
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumTrack
@@ -26,8 +25,6 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.Chan
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.GovernanceVoteAssistant
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.GovernanceVoteAssistant.LocksChange
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
-import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.isReduced
-import io.novafoundation.nova.feature_governance_impl.data.network.blockchain.extrinsic.convictionVotingUnlock
 import io.novafoundation.nova.feature_governance_impl.data.network.blockchain.extrinsic.convictionVotingVote
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
@@ -83,19 +80,10 @@ class RealVoteReferendumInteractor(
     override suspend fun vote(
         vote: AccountVote.Standard,
         referendumId: ReferendumId,
-        voteAssistant: GovernanceVoteAssistant,
-        asset: Asset,
     ): Result<String> {
         val chain = selectedChainState.chain()
-        val locksChange = voteAssistant.estimateLocksAfterVoting(vote.balance, vote.vote.conviction, asset)
-        val track = voteAssistant.track
-
-        return extrinsicService.submitExtrinsicWithSelectedWallet(chain) { submitterId ->
+        return extrinsicService.submitExtrinsicWithSelectedWallet(chain) {
             convictionVotingVote(referendumId, vote)
-
-            if (locksChange.lockedAmountChange.isReduced() && track != null) {
-                convictionVotingUnlock(track.id, submitterId)
-            }
         }
     }
 
@@ -175,7 +163,7 @@ private class RealGovernanceLocksEstimator(
     ): LocksChange {
         val vote = AyeVote(amount, conviction) // vote direction does not influence lock estimation
 
-        val newGovernanceLocked = maxUnlockAmount(changedVote = vote)
+        val newGovernanceLocked = currentMaxGovernanceLocked.max(amount)
         val newMaxUnlocksAt = estimateUnlocksAt(changedVote = vote)
         val lockedDifference = newGovernanceLocked - currentMaxGovernanceLocked
 
@@ -203,14 +191,6 @@ private class RealGovernanceLocksEstimator(
                 absoluteDifference = (newTransferablePlanks - currentTransferablePlanks).abs()
             )
         )
-    }
-
-    private fun maxUnlockAmount(changedVote: AccountVote.Standard): Balance {
-        val maxLockExceptChanged = voting.maxOfOrNull { (_, trackVoting) ->
-            trackVoting.maxLockOfMatching { referendumId, _ -> referendumId != onChainReferendum.id }
-        }.orZero()
-
-        return maxLockExceptChanged.max(changedVote.balance)
     }
 
     private fun estimateUnlocksAt(changedVote: AccountVote.Standard?): BlockNumber {
