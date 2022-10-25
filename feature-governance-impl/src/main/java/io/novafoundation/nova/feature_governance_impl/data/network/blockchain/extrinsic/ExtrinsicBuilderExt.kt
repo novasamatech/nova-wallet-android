@@ -27,7 +27,7 @@ fun ExtrinsicBuilder.convictionVotingVote(
 fun ExtrinsicBuilder.convictionVotingUnlock(
     trackId: TrackId,
     accountId: AccountId
-) : ExtrinsicBuilder {
+): ExtrinsicBuilder {
     return call(
         moduleName = Modules.CONVICTION_VOTING,
         callName = "unlock",

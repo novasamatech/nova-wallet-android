@@ -239,7 +239,7 @@ class SetupVoteReferendumViewModel(
         reusableLock: GovernanceVoteAssistant.ReusableLock,
         asset: Asset
     ): AmountChipModel {
-        val labelFormat = when(reusableLock.type) {
+        val labelFormat = when (reusableLock.type) {
             GOVERNANCE -> R.string.referendum_vote_chip_governance_lock
             ALL -> R.string.referendum_vote_chip_all_locks
         }

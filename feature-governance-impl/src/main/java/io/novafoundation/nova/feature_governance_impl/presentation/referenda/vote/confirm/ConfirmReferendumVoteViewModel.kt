@@ -120,7 +120,6 @@ class ConfirmReferendumVoteViewModel(
     }
         .shareInBackground()
 
-
     init {
         setFee()
     }

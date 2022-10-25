@@ -53,7 +53,7 @@ class ConfirmReferendumVoteModule {
         feeLoaderMixinFactory: FeeLoaderMixin.Factory,
         referendumFormatter: ReferendumFormatter,
         locksChangeFormatter: LocksChangeFormatter,
-        ): ViewModel {
+    ): ViewModel {
         return ConfirmReferendumVoteViewModel(
             router = router,
             feeLoaderMixinFactory = feeLoaderMixinFactory,

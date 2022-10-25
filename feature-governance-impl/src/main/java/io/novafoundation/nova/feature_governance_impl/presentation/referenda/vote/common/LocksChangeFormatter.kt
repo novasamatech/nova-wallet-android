@@ -19,7 +19,7 @@ interface LocksChangeFormatter {
 
 class RealLocksChangeFormatter(
     private val resourceManager: ResourceManager,
-): LocksChangeFormatter {
+) : LocksChangeFormatter {
 
     override suspend fun mapLocksChangeToUi(
         locksChange: GovernanceVoteAssistant.LocksChange,
