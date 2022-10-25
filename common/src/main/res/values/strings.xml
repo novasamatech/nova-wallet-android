@@ -126,6 +126,8 @@
     <string name="referendum_positive_voters_title">Aye votes</string>
     <string name="referendum_negative_voters_title">Nay votes</string>
 
+    <string name="referendum_description_fallback">Only the proposer can edit this description and the title. If you own proposer\'s account, visit Polkassembly and fill in information about your proposal</string>
+
     <string name="referendum_voter_vote">%s votes</string>
     <string name="referendum_voter_vote_details">%s × %sx</string>
 
