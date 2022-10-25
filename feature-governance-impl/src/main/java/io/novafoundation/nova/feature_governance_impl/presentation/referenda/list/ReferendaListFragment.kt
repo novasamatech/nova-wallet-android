@@ -28,7 +28,7 @@ class ReferendaListFragment : BaseFragment<ReferendaListViewModel>(), ReferendaL
 
     private val referendaHeaderAdapter by lazy(LazyThreadSafetyMode.NONE) { ReferendaListHeaderAdapter(imageLoader, this) }
 
-    private val referendaListAdapter by lazy(LazyThreadSafetyMode.NONE) { ReferendaListAdapter(this) }
+    private val referendaListAdapter by lazy(LazyThreadSafetyMode.NONE) { ReferendaListAdapter(this, imageLoader) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
