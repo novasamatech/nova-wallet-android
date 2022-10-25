@@ -21,24 +21,23 @@
             android:gravity="center_vertical|end"
             android:orientation="horizontal">
 
-            <TextView
+            <io.novafoundation.nova.feature_governance_impl.presentation.view.NovaChipView
                 android:id="@+id/referendumDetailsTrack"
-                style="@style/ReferendumChip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="6dp"
-                tools:background="@color/white_16"
-                tools:drawableStart="@drawable/ic_info_16"
-                tools:text="MAIN TRACK" />
+                app:backgroundColor="@color/white_16"
+                tools:chipIcon="@drawable/ic_info_16"
+                tools:text="main agenda" />
 
-            <TextView
+            <io.novafoundation.nova.feature_governance_impl.presentation.view.NovaChipView
                 android:id="@+id/referendumDetailsNumber"
-                style="@style/ReferendumChip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
                 android:layout_marginEnd="16dp"
-                tools:background="@color/white_16"
-                tools:text="#255" />
+                app:backgroundColor="@color/white_16"
+                tools:text="#228" />
+
         </LinearLayout>
 
     </io.novafoundation.nova.common.view.Toolbar>
