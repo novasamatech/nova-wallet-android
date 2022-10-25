@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.format
+import io.novafoundation.nova.common.utils.formatting.toAmountInput
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.validation.ProgressConsumer
 import io.novafoundation.nova.common.validation.ValidationExecutor
@@ -16,6 +17,9 @@ import io.novafoundation.nova.common.view.input.seekbar.SeekbarValues
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.amountMultiplier
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.votesFor
+import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.GovernanceVoteAssistant
+import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.GovernanceVoteAssistant.ReusableLock.Type.ALL
+import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.GovernanceVoteAssistant.ReusableLock.Type.GOVERNANCE
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.VoteReferendumValidationPayload
@@ -26,8 +30,10 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.com
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common.LocksChangeFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.confirm.AccountVoteParcelModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.confirm.ConfirmVoteReferendumPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.model.AmountChipModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
@@ -35,6 +41,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeL
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.requireFee
+import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -115,6 +122,13 @@ class SetupVoteReferendumViewModel(
     val ayeButtonStateFlow = buttonStateFlow(VoteType.AYE, R.string.referendum_vote_aye)
     val nayButtonStateFlow = buttonStateFlow(VoteType.NAY, R.string.referendum_vote_nay)
 
+    val amountChips = voteAssistantFlow.map { voteAssistant ->
+        val asset = selectedAsset.first()
+
+        voteAssistant.reusableLocks().map { mapReusableLockToAmountChipModel(it, asset) }
+    }
+        .shareInBackground()
+
     init {
         originFeeMixin.connectWith(
             inputSource1 = amountChooserMixin.amount,
@@ -140,6 +154,10 @@ class SetupVoteReferendumViewModel(
 
     fun backClicked() {
         router.back()
+    }
+
+    fun amountChipClicked(chipModel: AmountChipModel) {
+        amountChooserMixin.amountInput.value = chipModel.amountInput
     }
 
     private fun openConfirmIfValid(voteType: VoteType) = originFeeMixin.requireFee(this) { fee ->
@@ -215,5 +233,23 @@ class SetupVoteReferendumViewModel(
 
     private fun MutableStateFlow<VoteType?>.progressConsumer(voteType: VoteType): ProgressConsumer = { inProgress ->
         value = voteType.takeIf { inProgress }
+    }
+
+    private fun mapReusableLockToAmountChipModel(
+        reusableLock: GovernanceVoteAssistant.ReusableLock,
+        asset: Asset
+    ): AmountChipModel {
+        val labelFormat = when(reusableLock.type) {
+            GOVERNANCE -> R.string.referendum_vote_chip_governance_lock
+            ALL -> R.string.referendum_vote_chip_all_locks
+        }
+
+        val amount = asset.token.amountFromPlanks(reusableLock.amount)
+        val amountModel = mapAmountToAmountModel(amount, asset)
+
+        return AmountChipModel(
+            amountInput = amount.toAmountInput(),
+            label = resourceManager.getString(labelFormat, amountModel.token)
+        )
     }
 }

@@ -2,18 +2,18 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/setupReferendumVoteContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:id="@+id/setupReferendumVoteContainer"
     tools:background="@color/black">
 
 
     <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/setupReferendumVoteToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:dividerVisible="false"
-        android:id="@+id/setupReferendumVoteToolbar"
         app:homeButtonIcon="@drawable/ic_close" />
 
     <ScrollView
@@ -24,8 +24,6 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
             android:orientation="vertical">
 
             <TextView
@@ -33,35 +31,64 @@
                 style="@style/TextAppearance.NovaFoundation.Bold.Title2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
                 tools:text="Vote for Referendum #557" />
 
             <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.ChooseAmountView
+                android:id="@+id/setupReferendumVoteAmount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/setupReferendumVoteAmount"
-                android:layout_marginTop="16dp" />
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp" />
+
+            <HorizontalScrollView
+                android:id="@+id/setupReferendumVoteAmountChipsScroll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:clipToPadding="false"
+                android:paddingStart="16dp"
+                android:visibility="gone"
+                android:paddingEnd="16dp"
+                android:layout_marginBottom="4dp"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:id="@+id/setupReferendumVoteAmountChipsContainer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal" />
+            </HorizontalScrollView>
 
             <io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.view.VotePowerView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:id="@+id/setupReferendumVoteVotePower"
-                android:layout_marginTop="12dp" />
-
-            <io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.view.AmountChangesView
                 android:layout_width="match_parent"
-                android:id="@+id/setupReferendumVoteLockedAmountChanges"
                 android:layout_height="wrap_content"
-                app:amountChanges_icon="@drawable/ic_lock"
-                app:amountChanges_title="@string/referendum_vote_governance_lock"
-                android:layout_marginTop="12dp" />
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="16dp" />
 
             <io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.view.AmountChangesView
+                android:id="@+id/setupReferendumVoteLockedAmountChanges"
                 android:layout_width="match_parent"
-                app:amountChanges_icon="@drawable/ic_time_16"
-                app:amountChanges_title="@string/referendum_vote_locking_period"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="16dp"
+                app:amountChanges_icon="@drawable/ic_lock"
+                app:amountChanges_title="@string/referendum_vote_governance_lock" />
+
+            <io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.view.AmountChangesView
                 android:id="@+id/setupReferendumVoteLockedPeriodChanges"
-                android:layout_height="wrap_content" />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                app:amountChanges_icon="@drawable/ic_time_16"
+                app:amountChanges_title="@string/referendum_vote_locking_period" />
         </LinearLayout>
     </ScrollView>
 
@@ -75,19 +102,19 @@
         android:orientation="horizontal">
 
         <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/setupReferendumVoteNay"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:layout_weight="1"
-            android:id="@+id/setupReferendumVoteNay"
             android:text="@string/referendum_vote_nay"
             app:appearance="primaryRed" />
 
         <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/setupReferendumVoteAye"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:id="@+id/setupReferendumVoteAye"
             android:text="@string/referendum_vote_aye"
             app:appearance="primaryGreen" />
     </LinearLayout>

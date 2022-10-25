@@ -23,6 +23,12 @@ interface GovernanceVoteAssistant {
         val transferableChange: Change<Balance>
     )
 
+    class ReusableLock(val type: Type, val amount: Balance) {
+        enum class Type {
+            GOVERNANCE, ALL
+        }
+    }
+
     val onChainReferendum: OnChainReferendum
 
     val track: ReferendumTrack?
@@ -30,6 +36,8 @@ interface GovernanceVoteAssistant {
     val trackVoting: Voting?
 
     suspend fun estimateLocksAfterVoting(amount: Balance, conviction: Conviction, asset: Asset): LocksChange
+
+    suspend fun reusableLocks(): List<ReusableLock>
 }
 
 fun <T : Comparable<T>> Change(
@@ -47,12 +55,4 @@ fun <T : Comparable<T>> Change(
             positive = newValue > previousValue
         )
     }
-}
-
-fun GovernanceVoteAssistant.Change<*>.isReduced(): Boolean {
-    return this is GovernanceVoteAssistant.Change.Changed && !positive
-}
-
-fun GovernanceVoteAssistant.Change<*>.isIncreased(): Boolean {
-    return this is GovernanceVoteAssistant.Change.Changed && positive
 }
