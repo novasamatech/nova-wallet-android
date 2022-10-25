@@ -16,5 +16,8 @@ interface VoteReferendumInteractor {
 
     suspend fun estimateFee(amount: Balance, conviction: Conviction, referendumId: ReferendumId): Balance
 
-    suspend fun vote(vote: AccountVote, referendumId: ReferendumId): Result<String>
+    suspend fun vote(
+        vote: AccountVote.Standard,
+        referendumId: ReferendumId,
+    ): Result<String>
 }

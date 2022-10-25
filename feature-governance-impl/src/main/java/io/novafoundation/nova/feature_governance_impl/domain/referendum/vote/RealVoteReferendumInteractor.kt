@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.common.Re
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.Change
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.GovernanceVoteAssistant
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.GovernanceVoteAssistant.LocksChange
+import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.GovernanceVoteAssistant.ReusableLock
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
 import io.novafoundation.nova.feature_governance_impl.data.network.blockchain.extrinsic.convictionVotingVote
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -39,6 +40,7 @@ import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.chainAndAsset
 import io.novafoundation.nova.runtime.util.BlockDurationEstimator
+import jp.co.soramitsu.fearless_utils.hash.isPositive
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -77,9 +79,11 @@ class RealVoteReferendumInteractor(
         }
     }
 
-    override suspend fun vote(vote: AccountVote, referendumId: ReferendumId): Result<String> {
+    override suspend fun vote(
+        vote: AccountVote.Standard,
+        referendumId: ReferendumId,
+    ): Result<String> {
         val chain = selectedChainState.chain()
-
         return extrinsicService.submitExtrinsicWithSelectedWallet(chain) {
             convictionVotingVote(referendumId, vote)
         }
@@ -148,8 +152,11 @@ private class RealGovernanceLocksEstimator(
         .maxOfOrNull { it.amountInPlanks }
         .orZero()
 
+    private val allMaxLocked = balanceLocks.maxOfOrNull { it.amountInPlanks }
+        .orZero()
+
     override val track: ReferendumTrack? = onChainReferendum.status.asOngoingOrNull()?.let {
-        ReferendumTrack(tracks.getValue(it.track).name)
+        ReferendumTrack(it.track, tracks.getValue(it.track).name)
     }
 
     override val trackVoting: Voting? = voting.findVotingFor(onChainReferendum)
@@ -161,7 +168,7 @@ private class RealGovernanceLocksEstimator(
     ): LocksChange {
         val vote = AyeVote(amount, conviction) // vote direction does not influence lock estimation
 
-        val newGovernanceLocked = currentMaxGovernanceLocked.max(vote.balance)
+        val newGovernanceLocked = currentMaxGovernanceLocked.max(amount)
         val newMaxUnlocksAt = estimateUnlocksAt(changedVote = vote)
         val lockedDifference = newGovernanceLocked - currentMaxGovernanceLocked
 
@@ -178,7 +185,7 @@ private class RealGovernanceLocksEstimator(
                 newValue = newGovernanceLocked,
                 absoluteDifference = lockedDifference.abs(),
             ),
-            governanceLockChange = Change(
+            lockedPeriodChange = Change(
                 previousValue = previousLockDuration,
                 newValue = newLockDuration,
                 absoluteDifference = (newLockDuration - previousLockDuration).absoluteValue,
@@ -189,6 +196,13 @@ private class RealGovernanceLocksEstimator(
                 absoluteDifference = (newTransferablePlanks - currentTransferablePlanks).abs()
             )
         )
+    }
+
+    override suspend fun reusableLocks(): List<ReusableLock> {
+        return buildList {
+            addIfPositive(ReusableLock.Type.GOVERNANCE, currentMaxGovernanceLocked)
+            addIfPositive(ReusableLock.Type.ALL, allMaxLocked)
+        }
     }
 
     private fun estimateUnlocksAt(changedVote: AccountVote.Standard?): BlockNumber {
@@ -307,9 +321,15 @@ private class RealGovernanceLocksEstimator(
             get(asOngoing.track)
         } else {
             // slow path - referendum is completed so have to find by referendumId
-            values.first {
+            values.firstOrNull {
                 it is Voting.Casting && onChainReferendum.id in it.votes.keys
             }
+        }
+    }
+
+    private fun MutableList<ReusableLock>.addIfPositive(type: ReusableLock.Type, amount: Balance) {
+        if (amount.isPositive()) {
+            add(ReusableLock(type, amount))
         }
     }
 }

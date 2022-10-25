@@ -70,6 +70,13 @@ fun AccountVote.votes(chainAsset: Chain.Asset): VotesAmount? {
     }
 }
 
+fun AccountVote.amount(): Balance {
+    return when (this) {
+        AccountVote.Split -> Balance.ZERO // TODO not yet supported
+        is AccountVote.Standard -> balance
+    }
+}
+
 fun AccountVote.isAye(): Boolean? {
     return voteType()?.let { it == VoteType.AYE }
 }

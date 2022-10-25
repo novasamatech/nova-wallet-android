@@ -62,6 +62,10 @@ fun Int.format(): String {
     return defaultNumberFormatter.format(BigDecimal(this))
 }
 
+fun BigDecimal.toAmountInput(): String {
+    return toDouble().toString()
+}
+
 fun BigInteger.format(): String {
     return defaultNumberFormatter.format(BigDecimal(this))
 }

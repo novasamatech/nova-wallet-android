@@ -13,6 +13,8 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.VoteReferendumValidationSystem
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common.LocksChangeFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.SetupVoteReferendumPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.SetupVoteReferendumViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
@@ -35,6 +37,8 @@ class SetupVoteReferendumModule {
         router: GovernanceRouter,
         validationSystem: VoteReferendumValidationSystem,
         validationExecutor: ValidationExecutor,
+        referendumFormatter: ReferendumFormatter,
+        locksChangeFormatter: LocksChangeFormatter,
     ): ViewModel {
         return SetupVoteReferendumViewModel(
             feeLoaderMixinFactory = feeLoaderMixinFactory,
@@ -45,7 +49,9 @@ class SetupVoteReferendumModule {
             resourceManager = resourceManager,
             router = router,
             validationSystem = validationSystem,
-            validationExecutor = validationExecutor
+            validationExecutor = validationExecutor,
+            referendumFormatter = referendumFormatter,
+            locksChangeFormatter = locksChangeFormatter
         )
     }
 
