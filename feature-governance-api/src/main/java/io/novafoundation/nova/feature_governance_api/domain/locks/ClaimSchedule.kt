@@ -12,16 +12,16 @@ value class ClaimSchedule(val chunks: List<UnlockChunk>) {
 
     sealed class UnlockChunk {
 
-        class Claimable(val amount: Balance, val actions: List<ClaimAction>) : UnlockChunk()
+        data class Claimable(val amount: Balance, val actions: List<ClaimAction>) : UnlockChunk()
 
-        class Pending(val amount: Balance, claimableAt: BlockNumber) : UnlockChunk()
+        data class Pending(val amount: Balance, val claimableAt: BlockNumber) : UnlockChunk()
     }
 
     sealed class ClaimAction {
 
-        class Unlock(val trackId: TrackId) : ClaimAction()
+        data class Unlock(val trackId: TrackId) : ClaimAction()
 
-        class RemoveVote(val trackId: TrackId, val referendumId: ReferendumId) : ClaimAction()
+        data class RemoveVote(val trackId: TrackId, val referendumId: ReferendumId) : ClaimAction()
     }
 }
 

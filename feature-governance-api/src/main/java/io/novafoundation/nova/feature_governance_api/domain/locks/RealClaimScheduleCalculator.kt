@@ -36,8 +36,6 @@ private sealed class ClaimAffect(open val trackId: TrackId) {
     data class Vote(override val trackId: TrackId, val referendumId: ReferendumId) : ClaimAffect(trackId)
 }
 
-private class ClaimFoldState(val previousMaxLock: Balance, val currentSchedule: MutableList<ClaimableLock>)
-
 private class GroupedClaimAffects(
     val trackId: TrackId,
     val hasPriorAffect: Boolean,
@@ -106,11 +104,8 @@ class RealClaimScheduleCalculator(
                     affected = setOf(ClaimAffect.Vote(trackId, referendumId))
                 )
 
-                val unlockHappensAt = estimatedEnd.max(currentBlockNumber)
-                val priorAfterUnlock = priorLock.unlockTriedAt(unlockHappensAt)
-
                 // we estimate whether prior will affect the vote when performing `removeVote`
-                lock.timeAtLeast(priorAfterUnlock.claimAt)
+                lock.timeAtLeast(priorLock.claimAt)
             }
 
             buildList {
@@ -127,23 +122,39 @@ class RealClaimScheduleCalculator(
                 locks.reduce { current, next -> current.foldSameTime(next) }
             }
 
-    private fun constructUnlockSchedule(maxUnlockedByTime: Map<BlockNumber, ClaimableLock>): MutableList<ClaimableLock> {
-        val initialState = ClaimFoldState(previousMaxLock = Balance.ZERO, currentSchedule = mutableListOf())
+    private fun constructUnlockSchedule(maxUnlockedByTime: Map<BlockNumber, ClaimableLock>): List<ClaimableLock> {
+        var currentMaxLock = Balance.ZERO
+        var currentMaxLockAt: BlockNumber? = null
 
-        val unlockSchedule = maxUnlockedByTime.entries.sortedByDescending { it.key }
-            .fold(initialState) { state, (_, lock) ->
-                val newMaxLock = state.previousMaxLock.max(lock.amount)
-                val unlockedAmount = (lock.amount - state.previousMaxLock)
+        val result = maxUnlockedByTime.toMutableMap()
 
-                // TODO we need to add actions from dropped unlock to maximum one that covered it
-                if (unlockedAmount > Balance.ZERO) {
-                    state.currentSchedule.add(lock.copy(amount = unlockedAmount))
+        maxUnlockedByTime.entries.sortedByDescending { it.key }
+            .forEach { (at, lock) ->
+                val newMaxLock = currentMaxLock.max(lock.amount)
+                val unlockedAmount = lock.amount - currentMaxLock
+
+                val shouldSetNewMax = currentMaxLockAt == null || currentMaxLock < newMaxLock
+                if (shouldSetNewMax) {
+                    currentMaxLock = newMaxLock
+                    currentMaxLockAt = at
                 }
 
-                ClaimFoldState(newMaxLock, state.currentSchedule)
-            }.currentSchedule
+                if (unlockedAmount.isPositive()) {
+                    // there is something to unlock at this point
+                    result[at] = lock.copy(amount = unlockedAmount)
+                } else {
+                    // this lock is completely shadowed by later (in time) locks with greater values
+                    result.remove(at)
 
-        return unlockSchedule
+                    // but we want to keep its actions so we move it to the current known maximum that goes later in time
+                    result.computeIfPresent(currentMaxLockAt!!) { _, maxLock ->
+                        maxLock.copy(affected = maxLock.affected + lock.affected)
+                    }
+                }
+            }
+
+        return result.toSortedMap(reverseOrder())
+            .values.toList()
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -161,7 +172,7 @@ class RealClaimScheduleCalculator(
         val gapBetweenVotingAndLocked = voting.gapWith(trackLocks)
         if (gapBetweenVotingAndLocked.balance.isPositive()) {
             val tracksAlreadyToUnlock = claimableChunk.actions.mapNotNullToSet { it.castOrNull<Unlock>()?.trackId }
-            val additionalTracksToUnlock = tracksAlreadyToUnlock - gapBetweenVotingAndLocked.tracks
+            val additionalTracksToUnlock = gapBetweenVotingAndLocked.tracks - tracksAlreadyToUnlock
             val additionalUnlockActions = additionalTracksToUnlock.map(ClaimAction::Unlock)
 
             val totalClaimable = claimableChunk.amount + gapBetweenVotingAndLocked.balance
@@ -250,24 +261,12 @@ class RealClaimScheduleCalculator(
     }
 }
 
-private fun ClaimableLock.unlockTriedAt(at: BlockNumber): ClaimableLock {
-    return if (claimableAt(at)) {
-        ClaimableLock(
-            claimAt = BlockNumber.ZERO,
-            amount = BlockNumber.ZERO,
-            affected = affected
-        )
-    } else {
-        this
-    }
-}
-
 private fun ClaimableLock.foldSameTime(another: ClaimableLock): ClaimableLock {
     require(claimAt == another.claimAt)
 
     return ClaimableLock(
         claimAt = claimAt,
-        amount = another.claimAt.max(another.amount),
+        amount = another.amount.max(another.amount),
         affected = affected + another.affected
     )
 }

@@ -54,6 +54,14 @@ fun Voting.trackVotesNumber(): Int {
     }
 }
 
+fun AyeVote(amount: Balance, conviction: Conviction) = AccountVote.Standard(
+    vote = Vote(
+        aye = true,
+        conviction = conviction
+    ),
+    balance = amount
+)
+
 fun AccountVote.votes(chainAsset: Chain.Asset): VotesAmount? {
     return when (this) {
         // TODO handle split votes
