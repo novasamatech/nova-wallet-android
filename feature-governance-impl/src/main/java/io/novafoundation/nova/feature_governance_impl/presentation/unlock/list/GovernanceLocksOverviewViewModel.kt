@@ -2,12 +2,14 @@ package io.novafoundation.nova.feature_governance_impl.presentation.unlock.list
 
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.unlock.list.model.GovernanceLockModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import java.math.BigInteger
+import kotlinx.coroutines.delay
 
 class GovernanceLocksOverviewViewModel(
     private val router: GovernanceRouter
@@ -18,6 +20,7 @@ class GovernanceLocksOverviewViewModel(
     }.share()
 
     val lockModels = flowOf {
+        delay(700)
         listOf(
             GovernanceLockModel(
                 ReferendumId(BigInteger.ONE),
@@ -37,9 +40,22 @@ class GovernanceLocksOverviewViewModel(
                 R.color.white_48
             )
         }
-    }.share()
+    }
+        .withLoading()
+        .share()
+
+    val isUnlockAvailable = flowOf {
+        delay(700)
+        true
+    }
+        .withLoading()
+        .share()
 
     fun backClicked() {
         router.back()
+    }
+
+    fun unlockClicked() {
+        router.openConfirmGovernanceUnlock()
     }
 }

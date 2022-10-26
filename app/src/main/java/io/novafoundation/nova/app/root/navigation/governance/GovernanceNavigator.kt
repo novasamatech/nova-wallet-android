@@ -67,7 +67,7 @@ class GovernanceNavigator(
         actionId = R.id.action_mainFragment_to_governanceLocksOverview
     )
 
-    override fun openReferendumUnlockConfirm() = performNavigation(
+    override fun openConfirmGovernanceUnlock() = performNavigation(
         actionId = R.id.action_governanceLocksOverview_to_confirmGovernanceUnlock
     )
 }
