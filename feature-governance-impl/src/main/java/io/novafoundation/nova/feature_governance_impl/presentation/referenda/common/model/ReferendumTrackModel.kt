@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_governance_impl.presentation.referenda.co
 
 import coil.ImageLoader
 import io.novafoundation.nova.common.utils.images.Icon
-import io.novafoundation.nova.common.utils.useNonNullOrHide
+import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.feature_governance_impl.presentation.view.NovaChipView
 
 data class ReferendumTrackModel(val name: String, val icon: Icon)
@@ -10,7 +10,7 @@ data class ReferendumTrackModel(val name: String, val icon: Icon)
 fun NovaChipView.setReferendumTrackModel(
     maybeTrack: ReferendumTrackModel?,
     imageLoader: ImageLoader
-) = useNonNullOrHide(maybeTrack) { track ->
+) = letOrHide(maybeTrack) { track ->
     setText(track.name)
     setIcon(track.icon, imageLoader)
 }

@@ -6,7 +6,7 @@ import android.view.View
 import android.widget.LinearLayout
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.utils.setDrawableStart
-import io.novafoundation.nova.common.utils.useNonNullOrHide
+import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumVotingModel
 import kotlinx.android.synthetic.main.view_voting_threshold.view.negativePercentage
@@ -26,7 +26,7 @@ class VotingThresholdView @JvmOverloads constructor(
         orientation = VERTICAL
     }
 
-    fun setThresholdModel(maybeModel: ReferendumVotingModel?) = useNonNullOrHide(maybeModel) { model ->
+    fun setThresholdModel(maybeModel: ReferendumVotingModel?) = letOrHide(maybeModel) { model ->
         thresholdInfo.isVisible = model.thresholdInfoVisible
         thresholdInfo.text = model.thresholdInfo
         thresholdInfo.setDrawableStart(model.votingResultIcon, widthInDp = 16, tint = model.votingResultIconColor, paddingInDp = 4)
@@ -37,7 +37,7 @@ class VotingThresholdView @JvmOverloads constructor(
         thresholdPercentage.text = model.thresholdPercentage
     }
 
-    fun setThresholdInfoVisible(visible: Boolean?) = thresholdInfo.useNonNullOrHide(visible) { value ->
+    fun setThresholdInfoVisible(visible: Boolean?) = thresholdInfo.letOrHide(visible) { value ->
         thresholdInfo.isVisible = value
     }
 }

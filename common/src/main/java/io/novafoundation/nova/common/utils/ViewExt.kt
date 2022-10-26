@@ -83,7 +83,7 @@ fun View.updateTopMargin(newMargin: Int) {
     }
 }
 
-inline fun <T> View.useNonNullOrHide(value: T?, setup: (T) -> Unit) {
+inline fun <T> View.letOrHide(value: T?, setup: (T) -> Unit) {
     if (value == null) {
         makeGone()
         return

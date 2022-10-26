@@ -14,7 +14,7 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setVisible
-import io.novafoundation.nova.common.utils.useNonNullOrHide
+import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.view.setAddressOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
@@ -193,7 +193,7 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
         referendumDetailsProgress.setVisible(!visible)
     }
 
-    private fun setDescription(maybeModel: ShortenedTextModel?) = referendumDetails.useNonNullOrHide(maybeModel) { model ->
+    private fun setDescription(maybeModel: ShortenedTextModel?) = referendumDetails.letOrHide(maybeModel) { model ->
         referendumDetailsDescription.text = model.shortenedText
         referendumDetailsReadMore.setVisible(model.hasMore)
     }
