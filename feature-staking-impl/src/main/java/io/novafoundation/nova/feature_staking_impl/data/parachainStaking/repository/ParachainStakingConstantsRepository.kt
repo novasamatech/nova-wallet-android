@@ -1,5 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository
 
+import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
+import io.novafoundation.nova.common.data.network.runtime.binding.bindBlockNumber
+import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.utils.numberConstant
 import io.novafoundation.nova.common.utils.parachainStaking
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -16,8 +19,6 @@ interface ParachainStakingConstantsRepository {
     suspend fun minimumDelegatorStake(chainId: ChainId): BigInteger
 
     suspend fun delegationBondLessDelay(chainId: ChainId): BigInteger
-
-    suspend fun defaultBlocksPerRound(chainId: ChainId): BigInteger
 
     suspend fun maxDelegationsPerDelegator(chainId: ChainId): BigInteger
 }
@@ -46,10 +47,6 @@ class RuntimeParachainStakingConstantsRepository(
         return numberConstant(chainId, "DelegationBondLessDelay")
     }
 
-    override suspend fun defaultBlocksPerRound(chainId: ChainId): BigInteger {
-        return numberConstant(chainId, "DefaultBlocksPerRound")
-    }
-
     override suspend fun maxDelegationsPerDelegator(chainId: ChainId): BigInteger {
         return numberConstant(chainId, "MaxDelegationsPerDelegator")
     }
@@ -58,5 +55,11 @@ class RuntimeParachainStakingConstantsRepository(
         val runtime = chainRegistry.getRuntime(chainId)
 
         return runtime.metadata.parachainStaking().numberConstant(name, runtime)
+    }
+
+    private fun bindBlocksPerRound(decoded: Any?): BlockNumber {
+        val round = decoded.castToStruct()
+
+        return bindBlockNumber(round["length"])
     }
 }

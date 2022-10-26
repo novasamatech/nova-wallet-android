@@ -11,11 +11,12 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.reposit
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import java.math.BigInteger
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.ExperimentalTime
-import kotlin.time.milliseconds
 
 interface RoundDurationEstimator {
 
@@ -50,7 +51,7 @@ class RealRoundDurationEstimator(
     override suspend fun createDurationCalculator(chainId: ChainId): RoundDurationEstimator.DurationCalculator {
         val currentRoundInfo = currentRoundRepository.currentRoundInfo(chainId)
 
-        val blocksPerRound = parachainStakingConstantsRepository.defaultBlocksPerRound(chainId)
+        val blocksPerRound = currentRoundInfo.length
         val blockTime = chainStateRepository.predictedBlockTime(chainId)
         val blockNumber = chainStateRepository.currentBlock(chainId)
 
@@ -60,7 +61,7 @@ class RealRoundDurationEstimator(
     override suspend fun timeTillRoundFlow(chainId: ChainId, targetRound: RoundIndex): Flow<Duration> {
         val currentRoundInfo = currentRoundRepository.currentRoundInfo(chainId)
 
-        val blocksPerRound = parachainStakingConstantsRepository.defaultBlocksPerRound(chainId)
+        val blocksPerRound = currentRoundInfo.length
         val blockTime = chainStateRepository.predictedBlockTime(chainId)
 
         return chainStateRepository.currentBlockNumberFlow(chainId).map { currentBlock ->
@@ -77,8 +78,11 @@ class RealRoundDurationEstimator(
     }
 
     override suspend fun roundDurationFlow(chainId: ChainId): Flow<Duration> {
-        return chainStateRepository.predictedBlockTimeFlow(chainId).map { blockTime ->
-            val blocksPerRound = parachainStakingConstantsRepository.defaultBlocksPerRound(chainId)
+        return combine(
+            currentRoundRepository.currentRoundInfoFlow(chainId),
+            chainStateRepository.predictedBlockTimeFlow(chainId)
+        ) { roundInfo, blockTime ->
+            val blocksPerRound = roundInfo.length
 
             val durationInMillis = blocksPerRound * blockTime
 
@@ -87,13 +91,7 @@ class RealRoundDurationEstimator(
     }
 
     private suspend fun estimateDuration(chainId: ChainId, numberOfRounds: BigInteger): Flow<Duration> {
-        return chainStateRepository.predictedBlockTimeFlow(chainId).map { blockTime ->
-            val blocksPerRound = parachainStakingConstantsRepository.defaultBlocksPerRound(chainId)
-
-            val durationInMillis = numberOfRounds * blocksPerRound * blockTime
-
-            durationInMillis.toLong().milliseconds
-        }
+        return roundDurationFlow(chainId).map { roundDuration -> roundDuration * numberOfRounds.toInt() }
     }
 }
 
