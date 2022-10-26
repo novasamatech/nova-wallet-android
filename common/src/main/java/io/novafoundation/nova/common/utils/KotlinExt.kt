@@ -65,35 +65,6 @@ fun <K, V> Map<K, V>.reversed() = HashMap<V, K>().also { newMap ->
     entries.forEach { newMap[it.value] = it.key }
 }
 
-/**
- * For every pair of adjacent elements runs [folder].
- * If the result is non null - than replaces both elements in the list with it.
- * Otherwise first element is remained while second one will be checked again with the after-next one.
- *
- * Example:
- * [1, 2, 4, 2, 3] -> (sum if sum is even) -> [1, 6, 8, 3]
- */
-fun <T> List<T>.foldAdjacent(folder: (T, T) -> T?): List<T> {
-    if (size <= 1) return this
-
-    val result = mutableListOf(first())
-
-    for (index in 1..size) {
-        val previous = result[index - 1]
-        val current = get(index)
-
-        val folded = folder(previous, current)
-
-        if (folded != null) {
-            result.add(folded)
-        } else {
-            result.add(current)
-        }
-    }
-
-    return result
-}
-
 fun <T> Iterable<T>.isAscending(comparator: Comparator<T>) = zipWithNext().all { (first, second) -> comparator.compare(first, second) < 0 }
 
 fun <T> Result<T>.requireException() = exceptionOrNull()!!
