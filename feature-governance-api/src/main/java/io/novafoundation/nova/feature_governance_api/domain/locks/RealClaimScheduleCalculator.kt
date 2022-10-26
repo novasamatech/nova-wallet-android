@@ -135,6 +135,7 @@ class RealClaimScheduleCalculator(
                 val newMaxLock = state.previousMaxLock.max(lock.amount)
                 val unlockedAmount = (lock.amount - state.previousMaxLock)
 
+                // TODO we need to add actions from dropped unlock to maximum one that covered it
                 if (unlockedAmount > Balance.ZERO) {
                     state.currentSchedule.add(lock.copy(amount = unlockedAmount))
                 }
