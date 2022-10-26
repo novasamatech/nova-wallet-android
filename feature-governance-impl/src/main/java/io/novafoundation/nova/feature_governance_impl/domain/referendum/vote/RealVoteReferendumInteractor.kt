@@ -8,18 +8,15 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.OnChainReferendum
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.OnChainReferendumStatus
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackInfo
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.asOngoingOrNull
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.completedReferendumLockDuration
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.flattenCastingVotes
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.maxLockDuration
 import io.novafoundation.nova.feature_governance_api.data.repository.getTracksById
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
+import io.novafoundation.nova.feature_governance_api.domain.locks.RealClaimScheduleCalculator
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumTrack
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.Change
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.GovernanceVoteAssistant
@@ -132,16 +129,27 @@ class RealVoteReferendumInteractor(
 
 private class RealGovernanceLocksEstimator(
     override val onChainReferendum: OnChainReferendum,
-    private val balanceLocks: List<BalanceLock>,
-    private val governanceLocksByTrack: Map<TrackId, Balance>,
     private val voting: Map<TrackId, Voting>,
     private val votedReferenda: Map<ReferendumId, OnChainReferendum>,
     private val blockDurationEstimator: BlockDurationEstimator,
     private val tracks: Map<TrackId, TrackInfo>,
-    private val undecidingTimeout: BlockNumber,
-    private val voteLockingPeriod: BlockNumber,
     private val votingLockId: String,
+    undecidingTimeout: BlockNumber,
+    voteLockingPeriod: BlockNumber,
+    balanceLocks: List<BalanceLock>,
+    governanceLocksByTrack: Map<TrackId, Balance>,
 ) : GovernanceVoteAssistant {
+
+    private val claimScheduleCalculator = RealClaimScheduleCalculator(
+        voting = voting,
+        currentBlockNumber = blockDurationEstimator.currentBlock,
+        // votedReferenda might not contain selected referenda so we add it manually
+        referenda = votedReferenda + (onChainReferendum.id to onChainReferendum),
+        tracks = tracks,
+        undecidingTimeout = undecidingTimeout,
+        voteLockingPeriod = voteLockingPeriod,
+        trackLocks = governanceLocksByTrack,
+    )
 
     private val flattenedVotes = voting.flattenCastingVotes()
 
@@ -222,95 +230,22 @@ private class RealGovernanceLocksEstimator(
     }
 
     private fun votesEstimatedUnlocksAt(changedVote: AccountVote.Standard): BlockNumber {
-        val changedVoteMaxLock = onChainReferendum.maxConvictionEnd(changedVote)
+        val changedVoteMaxLock = claimScheduleCalculator.maxConvictionEndOf(changedVote, onChainReferendum.id)
 
         val currentVotesExceptChanged = votedReferenda.keys - onChainReferendum.id
         val currentVotesExceptChangedMaxUnlock = currentVotesExceptChanged.maxOfOrNull {
-            val referendum = votedReferenda.getValue(it)
             val vote = flattenedVotes.getValue(it)
 
-            referendum.maxConvictionEnd(vote)
+            claimScheduleCalculator.maxConvictionEndOf(vote, it)
         }.orZero()
 
         return changedVoteMaxLock.max(currentVotesExceptChangedMaxUnlock)
     }
 
     private fun votesEstimatedUnlocksAt(): BlockNumber {
-        return votedReferenda.maxOfOrNull { (id, referendum) ->
-            val vote = flattenedVotes.getValue(id)
-
-            referendum.maxConvictionEnd(vote)
+        return flattenedVotes.maxOfOrNull { (referendumId, vote) ->
+            claimScheduleCalculator.maxConvictionEndOf(vote, referendumId)
         }.orZero()
-    }
-
-    private fun OnChainReferendum.maxConvictionEnd(vote: AccountVote): BlockNumber {
-        return when (val status = status) {
-            is OnChainReferendumStatus.Ongoing -> status.maxConvictionEnd(vote)
-
-            is OnChainReferendumStatus.Approved -> maxCompletedConvictionEnd(
-                vote = vote,
-                referendumOutcome = VoteType.AYE,
-                completedSince = status.since
-            )
-            is OnChainReferendumStatus.Rejected -> maxCompletedConvictionEnd(
-                vote = vote,
-                referendumOutcome = VoteType.NAY,
-                completedSince = status.since
-            )
-
-            is OnChainReferendumStatus.Cancelled -> status.since
-            is OnChainReferendumStatus.Killed -> status.since
-            is OnChainReferendumStatus.TimedOut -> status.since
-        }
-    }
-
-    private fun maxCompletedConvictionEnd(
-        vote: AccountVote,
-        referendumOutcome: VoteType,
-        completedSince: BlockNumber
-    ): BlockNumber {
-        val convictionPart = vote.completedReferendumLockDuration(referendumOutcome, voteLockingPeriod)
-
-        return completedSince + convictionPart
-    }
-
-    private fun OnChainReferendumStatus.Ongoing.maxConvictionEnd(vote: AccountVote): BlockNumber {
-        val trackInfo = tracks.getValue(track)
-        val decisionPeriod = trackInfo.decisionPeriod
-
-        val blocksAfterCompleted = vote.maxLockDuration(voteLockingPeriod)
-
-        val maxCompletedAt = when {
-            inQueue -> {
-                val maxDecideSince = submitted + undecidingTimeout
-
-                maxDecideSince + decisionPeriod
-            }
-
-            // confirming
-            deciding?.confirming != null -> {
-                val approveBlock = deciding!!.confirming!!.till
-                val rejectBlock = deciding!!.since + decisionPeriod
-
-                approveBlock.max(rejectBlock)
-            }
-
-            // rejecting
-            deciding != null -> {
-                val rejectBlock = deciding!!.since + decisionPeriod
-
-                rejectBlock
-            }
-
-            // preparing
-            else -> {
-                val maxDecideSince = submitted + undecidingTimeout.max(trackInfo.preparePeriod)
-
-                maxDecideSince + decisionPeriod
-            }
-        }
-
-        return maxCompletedAt + blocksAfterCompleted
     }
 
     private fun Map<TrackId, Voting>.findVotingFor(onChainReferendum: OnChainReferendum): Voting? {
