@@ -8,7 +8,7 @@ import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.setTextColorRes
-import io.novafoundation.nova.common.utils.useNonNullOrHide
+import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.feature_governance_impl.R
 import kotlinx.android.synthetic.main.view_your_vote.view.viewYourVoteType
 import kotlinx.android.synthetic.main.view_your_vote.view.viewYourVoteValue
@@ -45,7 +45,7 @@ class YourVoteView @JvmOverloads constructor(
     }
 }
 
-fun YourVoteView.setVoteModelOrHide(maybeModel: YourVoteModel?) = useNonNullOrHide(maybeModel) { model ->
+fun YourVoteView.setVoteModelOrHide(maybeModel: YourVoteModel?) = letOrHide(maybeModel) { model ->
     setVoteType(model.voteTypeTitleRes, model.voteTypeColorRes)
     setVoteValue(model.votes, model.votesDetails)
 }

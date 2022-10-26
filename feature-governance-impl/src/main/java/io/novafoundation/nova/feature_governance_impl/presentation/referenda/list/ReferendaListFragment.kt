@@ -63,6 +63,10 @@ class ReferendaListFragment : BaseFragment<ReferendaListViewModel>(), ReferendaL
             referendaHeaderAdapter.setAsset(it)
         }
 
+        viewModel.governanceTotalLocks.observe {
+            referendaHeaderAdapter.setLocks(it)
+        }
+
         viewModel.referendaUiFlow.observe {
             when (it) {
                 is LoadingState.Loaded -> {
@@ -83,5 +87,9 @@ class ReferendaListFragment : BaseFragment<ReferendaListViewModel>(), ReferendaL
 
     override fun onClickAssetSelector() {
         viewModel.assetSelectorMixin.assetSelectorClicked()
+    }
+
+    override fun onClickGovernanceLocks() {
+        viewModel.governanceLocksClicked()
     }
 }

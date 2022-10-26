@@ -150,7 +150,7 @@ class RealReferendumDetailsInteractor(
                         preImageHash = hash
                     )
                 },
-                track = track?.let { ReferendumTrack(it.name) },
+                track = track?.let { ReferendumTrack(it.id, it.name) },
                 voting = referendaConstructor.constructReferendumVoting(
                     referendum = onChainReferendum,
                     tracksById = tracksById,

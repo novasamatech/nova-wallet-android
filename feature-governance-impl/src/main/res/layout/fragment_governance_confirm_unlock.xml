@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:dividerVisible="false"
-        app:titleText="@string/confirm_referendum_unlock_title" />
+        app:titleText="@string/governance_unlock" />
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -67,7 +67,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:amountChanges_icon="@drawable/ic_lock"
-                        app:amountChanges_title="@string/confirm_referendum_unlock_governance_lock" />
+                        app:amountChanges_title="@string/confirm_governance_unlock_governance_lock" />
 
                 </io.novafoundation.nova.common.view.TableView>
 

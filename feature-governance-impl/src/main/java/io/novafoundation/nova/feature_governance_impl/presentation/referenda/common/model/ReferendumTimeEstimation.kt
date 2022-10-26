@@ -7,7 +7,7 @@ import androidx.annotation.StringRes
 import io.novafoundation.nova.common.utils.formatting.TimerValue
 import io.novafoundation.nova.common.utils.setDrawableEnd
 import io.novafoundation.nova.common.utils.setTextColorRes
-import io.novafoundation.nova.common.utils.useNonNullOrHide
+import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.view.startTimer
 import io.novafoundation.nova.common.view.stopTimer
 
@@ -47,7 +47,7 @@ sealed class ReferendumTimeEstimation {
     ) : ReferendumTimeEstimation()
 }
 
-fun TextView.setReferendumTimeEstimation(maybeTimeEstimation: ReferendumTimeEstimation?) = useNonNullOrHide(maybeTimeEstimation) { timeEstimation ->
+fun TextView.setReferendumTimeEstimation(maybeTimeEstimation: ReferendumTimeEstimation?) = letOrHide(maybeTimeEstimation) { timeEstimation ->
     when (timeEstimation) {
         is ReferendumTimeEstimation.Text -> {
             stopTimer()

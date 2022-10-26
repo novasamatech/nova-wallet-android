@@ -150,11 +150,9 @@ class ReferendumDetailsViewModel(
 
     fun readMoreClicked() = launch {
         val referendumTitle = referendumDetailsModelFlow.firstOnLoad().title
-        val referendumDescription = referendumDetailsFlow.first().offChainMetadata?.description
-        if (referendumDescription != null) {
-            val payload = ReferendumDescriptionPayload(referendumTitle, referendumDescription)
-            router.openReferendumDescription(payload)
-        }
+        val referendumDescription = mapReferendumDescriptionToUi(referendumDetailsFlow.first())
+        val payload = ReferendumDescriptionPayload(referendumTitle, referendumDescription)
+        router.openReferendumDescription(payload)
     }
 
     fun positiveVotesClicked() {
@@ -197,7 +195,7 @@ class ReferendumDetailsViewModel(
             track = referendumDetails.track?.let { referendumFormatter.formatTrack(it, token.configuration) },
             number = referendumFormatter.formatId(referendumDetails.id),
             title = mapReferendumTitleToUi(referendumDetails),
-            description = mapReferendumDescriptionToUi(referendumDetails),
+            description = mapShortenedMarkdownDescription(referendumDetails),
             voting = referendumDetails.voting?.let { referendumFormatter.formatVoting(it, token) },
             statusModel = referendumFormatter.formatStatus(referendumDetails.timeline.currentStatus),
             yourVote = referendumDetails.userVote?.let { referendumFormatter.formatUserVote(it, token) },
@@ -297,11 +295,14 @@ class ReferendumDetailsViewModel(
         return resourceManager.getString(R.string.referendum_votes_format, amount.format())
     }
 
-    private fun mapReferendumDescriptionToUi(referendumDetails: ReferendumDetails): ShortenedTextModel? {
-        return referendumDetails.offChainMetadata?.description?.let {
-            val description = removeMarkdown(it)
-            ShortenedTextModel.from(description, DESCRIPTION_LENGTH_LIMIT)
-        }
+    private fun mapReferendumDescriptionToUi(referendumDetails: ReferendumDetails): String {
+        return referendumDetails.offChainMetadata?.description
+            ?: resourceManager.getString(R.string.referendum_description_fallback)
+    }
+
+    private fun mapShortenedMarkdownDescription(referendumDetails: ReferendumDetails): ShortenedTextModel {
+        val referendumDescription = mapReferendumDescriptionToUi(referendumDetails)
+        return ShortenedTextModel.from(removeMarkdown(referendumDescription), DESCRIPTION_LENGTH_LIMIT)
     }
 
     private fun mapReferendumTitleToUi(referendumDetails: ReferendumDetails): String {

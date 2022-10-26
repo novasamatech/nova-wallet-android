@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_governance_api.domain.referendum.vote
 
-import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.OnChainReferendum
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumTrack
@@ -11,11 +10,6 @@ import kotlin.time.Duration
 
 interface GovernanceVoteAssistant {
 
-    class LockEstimation(
-        val amount: Balance,
-        val duration: Duration
-    )
-
     sealed class Change<T>(val previousValue: T, val newValue: T) {
 
         class Changed<T>(previousValue: T, newValue: T, val absoluteDifference: T, val positive: Boolean) : Change<T>(previousValue, newValue)
@@ -25,9 +19,15 @@ interface GovernanceVoteAssistant {
 
     class LocksChange(
         val lockedAmountChange: Change<Balance>,
-        val governanceLockChange: Change<Duration>,
+        val lockedPeriodChange: Change<Duration>,
         val transferableChange: Change<Balance>
     )
+
+    class ReusableLock(val type: Type, val amount: Balance) {
+        enum class Type {
+            GOVERNANCE, ALL
+        }
+    }
 
     val onChainReferendum: OnChainReferendum
 
@@ -36,6 +36,8 @@ interface GovernanceVoteAssistant {
     val trackVoting: Voting?
 
     suspend fun estimateLocksAfterVoting(amount: Balance, conviction: Conviction, asset: Asset): LocksChange
+
+    suspend fun reusableLocks(): List<ReusableLock>
 }
 
 fun <T : Comparable<T>> Change(
@@ -54,5 +56,3 @@ fun <T : Comparable<T>> Change(
         )
     }
 }
-
-fun <T> GovernanceVoteAssistant.Change<T>.changedOrNull(): GovernanceVoteAssistant.Change.Changed<T>? = castOrNull()

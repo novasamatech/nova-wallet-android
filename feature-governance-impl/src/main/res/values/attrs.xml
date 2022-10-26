@@ -30,7 +30,10 @@
 
     <declare-styleable name="NovaChipView">
         <attr name="chipIcon" format="reference" />
+        <attr name="chipIconSize" format="dimension" />
         <attr name="android:text" />
+        <attr name="android:textColor" />
+        <attr name="chipTextAppearance" format="reference" />
         <attr name="backgroundColor" format="color" />
     </declare-styleable>
 </resources>
