@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.presentation.referenda.unlock
+package io.novafoundation.nova.feature_governance_impl.presentation.unlock.confirm
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,25 +14,25 @@ import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
-import kotlinx.android.synthetic.main.fragment_referendum_confirm_unlock.confirmReferendumUnlockConfirm
-import kotlinx.android.synthetic.main.fragment_referendum_confirm_unlock.confirmReferendumUnlockInformation
-import kotlinx.android.synthetic.main.fragment_referendum_confirm_unlock.confirmReferendumUnlockToolbar
+import kotlinx.android.synthetic.main.fragment_governance_confirm_unlock.confirmGovernanceUnlockConfirm
+import kotlinx.android.synthetic.main.fragment_governance_confirm_unlock.confirmGovernanceUnlockInformation
+import kotlinx.android.synthetic.main.fragment_governance_confirm_unlock.confirmGovernanceUnlockToolbar
 
-class ConfirmReferendumUnlockFragment : BaseFragment<ConfirmReferendumUnlockViewModel>() {
+class ConfirmGovernanceUnlockFragment : BaseFragment<ConfirmGovernanceUnlockViewModel>() {
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
-        return inflater.inflate(R.layout.fragment_referendum_confirm_unlock, container, false)
+        return inflater.inflate(R.layout.fragment_governance_confirm_unlock, container, false)
     }
 
     override fun initViews() {
-        confirmReferendumUnlockToolbar.setHomeButtonListener { viewModel.backClicked() }
-        confirmReferendumUnlockConfirm.prepareForProgress(viewLifecycleOwner)
-        confirmReferendumUnlockConfirm.setOnClickListener { viewModel.confirmClicked() }
-        confirmReferendumUnlockInformation.setOnAccountClickedListener { viewModel.accountClicked() }
+        confirmGovernanceUnlockToolbar.setHomeButtonListener { viewModel.backClicked() }
+        confirmGovernanceUnlockConfirm.prepareForProgress(viewLifecycleOwner)
+        confirmGovernanceUnlockConfirm.setOnClickListener { viewModel.confirmClicked() }
+        confirmGovernanceUnlockInformation.setOnAccountClickedListener { viewModel.accountClicked() }
     }
 
     override fun inject() {
@@ -40,22 +40,22 @@ class ConfirmReferendumUnlockFragment : BaseFragment<ConfirmReferendumUnlockView
             requireContext(),
             GovernanceFeatureApi::class.java
         )
-            .confirmReferendumUnlock()
+            .confirmGovernanceUnlockFactory()
             .create(this)
             .inject(this)
     }
 
-    override fun subscribe(viewModel: ConfirmReferendumUnlockViewModel) {
+    override fun subscribe(viewModel: ConfirmGovernanceUnlockViewModel) {
         observeRetries(viewModel)
         observeValidations(viewModel)
         setupExternalActions(viewModel)
         // TODO observeHints(viewModel.hintsMixin, confirmReferendumUnlockHints)
 
-        setupFeeLoading(viewModel, confirmReferendumUnlockInformation.fee)
+        setupFeeLoading(viewModel, confirmGovernanceUnlockInformation.fee)
 
-        viewModel.addressModel.observe(confirmReferendumUnlockInformation::setAccount)
-        viewModel.walletModel.observe(confirmReferendumUnlockInformation::setWallet)
+        viewModel.addressModel.observe(confirmGovernanceUnlockInformation::setAccount)
+        viewModel.walletModel.observe(confirmGovernanceUnlockInformation::setWallet)
 
-        viewModel.showNextProgress.observe(confirmReferendumUnlockConfirm::setProgress)
+        viewModel.showNextProgress.observe(confirmGovernanceUnlockConfirm::setProgress)
     }
 }
