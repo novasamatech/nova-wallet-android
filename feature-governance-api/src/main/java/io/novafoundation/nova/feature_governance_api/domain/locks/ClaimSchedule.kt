@@ -7,7 +7,6 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimSchedule.UnlockChunk
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 
-
 @JvmInline
 value class ClaimSchedule(val chunks: List<UnlockChunk>) {
 
@@ -18,12 +17,11 @@ value class ClaimSchedule(val chunks: List<UnlockChunk>) {
         class Pending(val amount: Balance, claimableAt: BlockNumber) : UnlockChunk()
     }
 
-
     sealed class ClaimAction {
 
-        class Unlock(val trackId: TrackId): ClaimAction()
+        class Unlock(val trackId: TrackId) : ClaimAction()
 
-        class RemoveVote(val trackId: TrackId, val referendumId: ReferendumId): ClaimAction()
+        class RemoveVote(val trackId: TrackId, val referendumId: ReferendumId) : ClaimAction()
     }
 }
 

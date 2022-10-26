@@ -31,9 +31,9 @@ private data class ClaimableLock(
 
 private sealed class ClaimAffect(open val trackId: TrackId) {
 
-    data class Prior(override val trackId: TrackId): ClaimAffect(trackId)
+    data class Prior(override val trackId: TrackId) : ClaimAffect(trackId)
 
-    data class Vote(override val trackId: TrackId, val referendumId: ReferendumId): ClaimAffect(trackId)
+    data class Vote(override val trackId: TrackId, val referendumId: ReferendumId) : ClaimAffect(trackId)
 }
 
 private class ClaimFoldState(val previousMaxLock: Balance, val currentSchedule: MutableList<ClaimableLock>)
@@ -316,7 +316,7 @@ private fun Collection<ClaimAffect>.toClaimActions(): List<ClaimAction> {
             }
 
             if (trackAffects.votes.isNotEmpty()) {
-                trackAffects.votes.forEach {  voteAffect ->
+                trackAffects.votes.forEach { voteAffect ->
                     add(RemoveVote(voteAffect.trackId, voteAffect.referendumId))
                 }
 
@@ -335,4 +335,3 @@ private fun Collection<ClaimAffect>.groupByTrack(): List<GroupedClaimAffects> {
         )
     }
 }
-

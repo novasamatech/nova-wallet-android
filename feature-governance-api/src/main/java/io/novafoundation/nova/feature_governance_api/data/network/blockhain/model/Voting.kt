@@ -102,7 +102,7 @@ fun Voting.votes(): Map<ReferendumId, AccountVote> {
 }
 
 fun Voting.totalLock(): Balance {
-    return when(this) {
+    return when (this) {
         is Voting.Casting -> {
             val fromVotes = votes.maxOfOrNull { it.value.amount() }.orZero()
 
