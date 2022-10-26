@@ -1,8 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository
 
-import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
-import io.novafoundation.nova.common.data.network.runtime.binding.bindBlockNumber
-import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.utils.numberConstant
 import io.novafoundation.nova.common.utils.parachainStaking
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -55,11 +52,5 @@ class RuntimeParachainStakingConstantsRepository(
         val runtime = chainRegistry.getRuntime(chainId)
 
         return runtime.metadata.parachainStaking().numberConstant(name, runtime)
-    }
-
-    private fun bindBlocksPerRound(decoded: Any?): BlockNumber {
-        val round = decoded.castToStruct()
-
-        return bindBlockNumber(round["length"])
     }
 }
