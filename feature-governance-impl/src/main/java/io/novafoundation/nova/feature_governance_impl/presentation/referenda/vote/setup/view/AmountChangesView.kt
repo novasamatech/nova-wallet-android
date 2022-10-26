@@ -13,7 +13,7 @@ import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.useAttributes
-import io.novafoundation.nova.common.utils.useNonNullOrHide
+import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.model.AmountChangeModel
 import kotlinx.android.synthetic.main.view_amount_changes.view.valueChangesDifference
@@ -62,7 +62,7 @@ class AmountChangesView @JvmOverloads constructor(
         valueChangesTitle.text = title
     }
 
-    fun setIcon(icon: Drawable?) = valueChangesIcon.useNonNullOrHide(icon, valueChangesIcon::setImageDrawable)
+    fun setIcon(icon: Drawable?) = valueChangesIcon.letOrHide(icon, valueChangesIcon::setImageDrawable)
 
     private fun applyAttributes(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.AmountChangesView) { typedArray ->
         val title = typedArray.getString(R.styleable.AmountChangesView_amountChanges_title)

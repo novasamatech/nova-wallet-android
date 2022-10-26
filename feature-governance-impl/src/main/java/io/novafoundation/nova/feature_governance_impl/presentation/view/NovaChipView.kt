@@ -5,15 +5,20 @@ import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
+import androidx.annotation.ColorRes
+import androidx.core.content.res.getDimensionOrThrow
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import coil.ImageLoader
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.images.setIcon
+import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.feature_governance_impl.R
 import kotlinx.android.synthetic.main.view_chip.view.chipIcon
 import kotlinx.android.synthetic.main.view_chip.view.chipText
+import kotlin.math.roundToInt
 
 class NovaChipView @JvmOverloads constructor(
     context: Context,
@@ -34,14 +39,40 @@ class NovaChipView @JvmOverloads constructor(
             setIcon(null)
         }
 
-        val text = typedArray.getString(R.styleable.NovaChipView_android_text)
-        setText(text)
+        if (typedArray.hasValue(R.styleable.NovaChipView_chipIconSize)) {
+            val iconSize = typedArray.getDimensionOrThrow(R.styleable.NovaChipView_chipIconSize)
+            setIconSize(iconSize)
+        }
 
         val backgroundTintColor = typedArray.getResourceId(R.styleable.NovaChipView_backgroundColor, R.color.white_8)
         background = getRoundedCornerDrawable(backgroundTintColor, cornerSizeDp = 8)
             .withRippleMask(getRippleMask(cornerSizeDp = 8))
 
+        val textAppearanceId = typedArray.getResourceId(
+            R.styleable.NovaChipView_chipTextAppearance,
+            R.style.TextAppearance_NovaFoundation_SemiBold_Caps1
+        )
+        chipText.setTextAppearance(textAppearanceId)
+
+        val text = typedArray.getString(R.styleable.NovaChipView_android_text)
+        setText(text)
+
+        @ColorRes
+        val textColorRes = typedArray.getResourceId(
+            R.styleable.NovaChipView_android_textColor,
+            R.color.white_64
+        )
+        chipText.setTextColorRes(textColorRes)
+
         typedArray.recycle()
+    }
+
+    fun setIconSize(value: Float) {
+        chipIcon.updateLayoutParams<LayoutParams> {
+            val intValue = value.roundToInt()
+            this.height = intValue
+            this.width = intValue
+        }
     }
 
     fun setIcon(icon: Icon?, imageLoader: ImageLoader) {

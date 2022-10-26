@@ -7,7 +7,7 @@ import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.utils.WithContextExtensions
-import io.novafoundation.nova.common.utils.useNonNullOrHide
+import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.feature_governance_impl.R
 import kotlinx.android.synthetic.main.view_voters.view.votersViewVoteType
 import kotlinx.android.synthetic.main.view_voters.view.votersViewVoteTypeColor
@@ -41,7 +41,7 @@ class VotersModel(
     val votesValue: String
 )
 
-fun VotersView.setVotersModel(maybeModel: VotersModel?) = useNonNullOrHide(maybeModel) { model ->
+fun VotersView.setVotersModel(maybeModel: VotersModel?) = letOrHide(maybeModel) { model ->
     setVoteType(model.voteTypeRes, model.voteTypeColorRes)
     setVotesValue(model.votesValue)
 }
