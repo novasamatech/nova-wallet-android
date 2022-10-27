@@ -58,7 +58,7 @@ class RealClaimScheduleCalculator(
 ) : ClaimScheduleCalculator {
 
     override fun totalGovernanceLock(): Balance {
-       return trackLocks.values.maxOrNull().orZero()
+        return trackLocks.values.maxOrNull().orZero()
     }
 
     override fun maxConvictionEndOf(vote: AccountVote, referendumId: ReferendumId): BlockNumber {
