@@ -17,7 +17,10 @@ sealed class Voting {
         val prior: PriorLock
     ) : Voting()
 
-    class Delegating(val amount: Balance) : Voting()
+    class Delegating(
+        val amount: Balance,
+        val prior: PriorLock
+    ) : Voting()
 }
 
 sealed class AccountVote {
@@ -116,7 +119,7 @@ fun Voting.totalLock(): Balance {
             fromVotes.max(prior.amount)
         }
 
-        is Voting.Delegating -> amount
+        is Voting.Delegating -> amount.max(prior.amount)
     }
 }
 
