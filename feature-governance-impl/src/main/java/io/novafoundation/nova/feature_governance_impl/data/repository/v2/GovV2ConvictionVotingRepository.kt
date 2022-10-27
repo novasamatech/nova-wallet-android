@@ -116,7 +116,14 @@ class GovV2ConvictionVotingRepository(
                 Voting.Casting(votes, prior)
             }
 
-            "Delegating" -> Voting.Delegating
+            "Delegating" -> {
+                val delegating = decoded.value.castToStruct()
+
+                val balance = bindNumber(delegating["balance"])
+                val prior = bindPriorLock(delegating["prior"])
+
+                Voting.Delegating(balance, prior)
+            }
 
             else -> incompatible()
         }
