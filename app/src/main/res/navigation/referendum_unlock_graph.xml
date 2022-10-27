@@ -3,12 +3,28 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/referendum_unlock_graph"
-    app:startDestination="@id/confirmReferendumUnlock">
+    app:startDestination="@id/governanceLocksOverview">
 
     <fragment
-        android:id="@+id/confirmReferendumUnlock"
-        android:name="io.novafoundation.nova.feature_governance_impl.presentation.referenda.unlock.ConfirmReferendumUnlockFragment"
-        android:label="ConfirmReferendumUnlock"
-        tools:layout="@layout/fragment_referendum_confirm_unlock" />
+        android:id="@+id/governanceLocksOverview"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.unlock.list.GovernanceLocksOverviewFragment"
+        android:label="GovernanceLocksOverview"
+        tools:layout="@layout/fragment_governance_locks_overview">
+
+        <action
+            android:id="@+id/action_governanceLocksOverview_to_confirmGovernanceUnlock"
+            app:destination="@id/confirmGovernanceUnlock"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/confirmGovernanceUnlock"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.unlock.confirm.ConfirmGovernanceUnlockFragment"
+        android:label="ConfirmGovernanceUnlock"
+        tools:layout="@layout/fragment_governance_confirm_unlock" />
 
 </navigation>

@@ -195,4 +195,8 @@
     <declare-styleable name="LinkView">
         <attr name="linkText" format="string" />
     </declare-styleable>
+
+    <declare-styleable name="TotalAmountView">
+        <attr name="title" />
+    </declare-styleable>
 </resources>

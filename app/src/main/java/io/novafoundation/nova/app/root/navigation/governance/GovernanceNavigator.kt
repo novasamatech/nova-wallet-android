@@ -63,7 +63,11 @@ class GovernanceNavigator(
         args = ConfirmReferendumVoteFragment.getBundle(payload)
     )
 
-    override fun openReferendumUnlockConfirm() {
-        // TODO
-    }
+    override fun openGovernanceLocksOverview() = performNavigation(
+        actionId = R.id.action_mainFragment_to_governanceLocksOverview
+    )
+
+    override fun openConfirmGovernanceUnlock() = performNavigation(
+        actionId = R.id.action_governanceLocksOverview_to_confirmGovernanceUnlock
+    )
 }

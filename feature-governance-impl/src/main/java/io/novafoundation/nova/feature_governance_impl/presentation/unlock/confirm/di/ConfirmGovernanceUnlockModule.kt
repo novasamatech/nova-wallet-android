@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.presentation.referenda.unlock.di
+package io.novafoundation.nova.feature_governance_impl.presentation.unlock.confirm.di
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
@@ -12,15 +12,15 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.unlock.ConfirmReferendumUnlockViewModel
+import io.novafoundation.nova.feature_governance_impl.presentation.unlock.confirm.ConfirmGovernanceUnlockViewModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 
 @Module(includes = [ViewModelModule::class])
-class ConfirmReferendumUnlockModule {
+class ConfirmGovernanceUnlockModule {
 
     @Provides
     @IntoMap
-    @ViewModelKey(ConfirmReferendumUnlockViewModel::class)
+    @ViewModelKey(ConfirmGovernanceUnlockViewModel::class)
     fun provideViewModel(
         governanceRouter: GovernanceRouter,
         feeLoaderMixin: FeeLoaderMixin.Presentation,
@@ -28,7 +28,7 @@ class ConfirmReferendumUnlockModule {
         governanceSharedState: GovernanceSharedState,
         externalActions: ExternalActions.Presentation
     ): ViewModel {
-        return ConfirmReferendumUnlockViewModel(
+        return ConfirmGovernanceUnlockViewModel(
             governanceRouter,
             feeLoaderMixin,
             externalActions,
@@ -41,7 +41,7 @@ class ConfirmReferendumUnlockModule {
     fun provideViewModelCreator(
         fragment: Fragment,
         viewModelFactory: ViewModelProvider.Factory,
-    ): ConfirmReferendumUnlockViewModel {
-        return ViewModelProvider(fragment, viewModelFactory).get(ConfirmReferendumUnlockViewModel::class.java)
+    ): ConfirmGovernanceUnlockViewModel {
+        return ViewModelProvider(fragment, viewModelFactory).get(ConfirmGovernanceUnlockViewModel::class.java)
     }
 }

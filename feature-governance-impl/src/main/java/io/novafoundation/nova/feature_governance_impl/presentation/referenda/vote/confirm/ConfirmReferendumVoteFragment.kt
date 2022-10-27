@@ -59,7 +59,7 @@ class ConfirmReferendumVoteFragment : BaseFragment<ConfirmReferendumVoteViewMode
             requireContext(),
             GovernanceFeatureApi::class.java
         )
-            .confirmReferendumVote()
+            .confirmReferendumVoteFactory()
             .create(this, argument(PAYLOAD))
             .inject(this)
     }

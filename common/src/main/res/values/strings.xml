@@ -143,6 +143,9 @@
     <string name="governance_unlock">Unlock</string>
     <string name="confirm_governance_unlock_governance_lock">Governance lock</string>
 
+    <string name="governance_unlock_tokens_title">Locked</string>
+    <string name="governance_unlock_tokens_action">Unlock</string>
+
     <string name="crowdloan_contributions_liquid_source">Liquid</string>
     <string name="crowdloan_contributions_parallel_source">Parallel</string>
 
