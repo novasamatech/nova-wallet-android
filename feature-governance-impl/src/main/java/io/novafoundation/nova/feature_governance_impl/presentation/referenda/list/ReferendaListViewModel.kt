@@ -26,12 +26,15 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.det
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendaGroupModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.YourVotePreviewModel
+import io.novafoundation.nova.feature_governance_impl.presentation.view.GovernanceLocksModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.WithAssetSelector
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.selectedChainFlow
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 
 class ReferendaListViewModel(
@@ -56,6 +59,12 @@ class ReferendaListViewModel(
         val accountId = account.accountIdIn(chain)
 
         referendaListInteractor.referendaFlow(accountId, chain)
+    }
+
+    val governanceTotalLocks = flow {
+        emit(null)
+        delay(1000)
+        emit(GovernanceLocksModel("135 KSM", true))
     }
 
     val referendaUiFlow = referendaFlow.mapLoading { groupedReferenda ->
@@ -129,5 +138,9 @@ class ReferendaListViewModel(
             colorRes = colorRes,
             details = resourceManager.getString(R.string.referendum_your_vote_format, votes.total.format())
         )
+    }
+
+    fun governanceLocksClicked() {
+        // TODO
     }
 }
