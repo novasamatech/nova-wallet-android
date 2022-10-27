@@ -1,20 +1,20 @@
-package io.novafoundation.nova.feature_crowdloan_impl.presentation.contributions
+package io.novafoundation.nova.feature_governance_impl.presentation.unlock.list
 
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
-import io.novafoundation.nova.feature_crowdloan_impl.R
+import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
-import kotlinx.android.synthetic.main.item_contributions_header.view.totalContributedAmount
+import kotlinx.android.synthetic.main.item_governance_total_locks_header.view.governanceTotalLocksAmount
 
-class TotalContributionsHeaderAdapter : RecyclerView.Adapter<TotalContributionsHeaderAdapter.HeaderHolder>() {
+class TotalGovernanceLocksHeaderAdapter : RecyclerView.Adapter<TotalGovernanceLocksHeaderAdapter.HeaderHolder>() {
 
     private var amount: AmountModel? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HeaderHolder {
-        return HeaderHolder(parent.inflateChild(R.layout.item_contributions_header))
+        return HeaderHolder(parent.inflateChild(R.layout.item_governance_total_locks_header))
     }
 
     override fun onBindViewHolder(holder: HeaderHolder, position: Int) {
@@ -36,7 +36,7 @@ class TotalContributionsHeaderAdapter : RecyclerView.Adapter<TotalContributionsH
         }
 
         fun bind(amount: AmountModel?) {
-            itemView.totalContributedAmount.setAmount(amount)
+            itemView.governanceTotalLocksAmount.setAmount(amount)
         }
     }
 }
