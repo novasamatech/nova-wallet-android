@@ -26,7 +26,7 @@ value class ClaimSchedule(val chunks: List<UnlockChunk>) {
 }
 
 fun ClaimSchedule.claimableChunk(): UnlockChunk.Claimable? {
-    return chunks.first().castOrNull<UnlockChunk.Claimable>()
+    return chunks.firstOrNull().castOrNull<UnlockChunk.Claimable>()
 }
 
 fun ClaimSchedule.hasClaimableLocks(): Boolean {

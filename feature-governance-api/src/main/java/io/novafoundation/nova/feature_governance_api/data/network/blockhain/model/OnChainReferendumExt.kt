@@ -63,7 +63,7 @@ fun Map<TrackId, Voting>.flattenCastingVotes(): Map<ReferendumId, AccountVote> {
     return flatMap { (_, voting) ->
         when (voting) {
             is Voting.Casting -> voting.votes.toList()
-            Voting.Delegating -> emptyList()
+            is Voting.Delegating -> emptyList()
         }
     }.toMap()
 }

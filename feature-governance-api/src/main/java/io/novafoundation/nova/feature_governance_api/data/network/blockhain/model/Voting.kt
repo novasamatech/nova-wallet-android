@@ -17,8 +17,7 @@ sealed class Voting {
         val prior: PriorLock
     ) : Voting()
 
-    // do not yet care about delegations
-    object Delegating : Voting()
+    class Delegating(val amount: Balance) : Voting()
 }
 
 sealed class AccountVote {
@@ -50,7 +49,7 @@ enum class VoteType {
 fun Voting.trackVotesNumber(): Int {
     return when (this) {
         is Voting.Casting -> votes.size
-        Voting.Delegating -> 0
+        is Voting.Delegating -> 0
     }
 }
 
@@ -105,7 +104,7 @@ fun AccountVote.voteType(): VoteType? {
 fun Voting.votes(): Map<ReferendumId, AccountVote> {
     return when (this) {
         is Voting.Casting -> votes
-        Voting.Delegating -> emptyMap()
+        is Voting.Delegating -> emptyMap()
     }
 }
 
@@ -117,7 +116,7 @@ fun Voting.totalLock(): Balance {
             fromVotes.max(prior.amount)
         }
 
-        Voting.Delegating -> Balance.ZERO // not yet supported
+        is Voting.Delegating -> amount
     }
 }
 
