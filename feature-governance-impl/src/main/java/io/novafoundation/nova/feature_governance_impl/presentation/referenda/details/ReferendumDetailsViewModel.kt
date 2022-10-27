@@ -20,7 +20,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.PreImage
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumVoting
-import io.novafoundation.nova.feature_governance_api.domain.referendum.details.GovernanceDApp
+import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumDApp
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumCall
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumDetails
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumDetailsInteractor
@@ -28,13 +28,14 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.details.R
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.PreparingReason
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumStatus
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.domain.dapp.GovernanceDAppsInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.identity.GovernanceIdentityProviderFactory
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumCallModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumTimeEstimation
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.description.ReferendumDescriptionPayload
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.GovernanceDAppModel
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.ReferendumDAppModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.ReferendumDetailsModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.ShortenedTextModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.PreImagePreviewPayload
@@ -72,7 +73,8 @@ class ReferendumDetailsViewModel(
     private val tokenUseCase: TokenUseCase,
     private val referendumFormatter: ReferendumFormatter,
     private val externalActions: ExternalActions.Presentation,
-    private val markwon: Markwon
+    private val markwon: Markwon,
+    private val governanceDAppsInteractor: GovernanceDAppsInteractor
 ) : BaseViewModel(), ExternalActions by externalActions {
 
     private val selectedAccount = selectedAccountUseCase.selectedMetaAccountFlow()
@@ -133,7 +135,9 @@ class ReferendumDetailsViewModel(
         .inBackground()
         .shareWhileSubscribed()
 
-    val governanceDApps = selectedChainFlow.map(interactor::getAvailableDApps)
+    val referendumDApps = selectedChainFlow.map {
+        governanceDAppsInteractor.getReferendumDapps(it.id, payload.toReferendumId())
+    }
         .mapList(::mapGovernanceDAppToUi)
         .shareInBackground()
 
@@ -171,10 +175,8 @@ class ReferendumDetailsViewModel(
         router.openReferendumVoters(votersPayload)
     }
 
-    fun dAppClicked(dAppModel: GovernanceDAppModel) {
-        val url = dAppModel.urlConstructor.urlFor(payload.toReferendumId())
-
-        router.openDAppBrowser(url)
+    fun dAppClicked(dAppModel: ReferendumDAppModel) {
+        router.openDAppBrowser(dAppModel.referendumUrl)
     }
 
     fun fullDetailsClicked() = launch {
@@ -323,12 +325,12 @@ class ReferendumDetailsViewModel(
         }
     }
 
-    private fun mapGovernanceDAppToUi(governanceDApp: GovernanceDApp): GovernanceDAppModel {
-        return GovernanceDAppModel(
-            name = governanceDApp.metadata?.name ?: governanceDApp.urlConstructor.baseUrl,
-            iconUrl = governanceDApp.metadata?.iconLink,
-            description = resourceManager.getString(R.string.referendum_dapp_comment_react),
-            urlConstructor = governanceDApp.urlConstructor
+    private fun mapGovernanceDAppToUi(referendumDApp: ReferendumDApp): ReferendumDAppModel {
+        return ReferendumDAppModel(
+            name = referendumDApp.name,
+            iconUrl = referendumDApp.iconUrl,
+            description = referendumDApp.details,
+            referendumUrl = referendumDApp.referendumUrl
         )
     }
 
