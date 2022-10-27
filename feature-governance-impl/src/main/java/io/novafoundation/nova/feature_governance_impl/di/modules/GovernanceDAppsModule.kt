@@ -8,7 +8,7 @@ import io.novafoundation.nova.core_db.dao.GovernanceDAppsDao
 import io.novafoundation.nova.feature_governance_api.data.repository.GovernanceDAppsRepository
 import io.novafoundation.nova.feature_governance_impl.data.dapps.GovernanceDAppsSyncService
 import io.novafoundation.nova.feature_governance_impl.data.dapps.remote.GovernanceDappsFetcher
-import io.novafoundation.nova.feature_governance_impl.data.repository.v2.RealGovernanceDAppsRepository
+import io.novafoundation.nova.feature_governance_impl.data.repository.RealGovernanceDAppsRepository
 import io.novafoundation.nova.feature_governance_impl.domain.dapp.GovernanceDAppsInteractor
 
 @Module

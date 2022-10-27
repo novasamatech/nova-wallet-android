@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.data.repository.v2
+package io.novafoundation.nova.feature_governance_impl.data.repository
 
 import io.novafoundation.nova.common.utils.formatNamed
 import io.novafoundation.nova.core_db.dao.GovernanceDAppsDao
@@ -7,14 +7,16 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.repository.GovernanceDAppsRepository
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumDApp
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class RealGovernanceDAppsRepository(
-    val governanceDAppsDao: GovernanceDAppsDao
+    private val governanceDAppsDao: GovernanceDAppsDao
 ) : GovernanceDAppsRepository {
 
-    override fun getReferendumDApps(chainId: ChainId, referendumId: ReferendumId): List<ReferendumDApp> {
-        val dapps = governanceDAppsDao.getChainDapps(chainId)
-        return mapDappsLocalToDomain(referendumId, dapps)
+    override fun observeReferendumDApps(chainId: ChainId, referendumId: ReferendumId): Flow<List<ReferendumDApp>> {
+        return governanceDAppsDao.observeChainDapps(chainId)
+            .map { mapDappsLocalToDomain(referendumId, it) }
     }
 }
 
@@ -23,7 +25,7 @@ private fun mapDappsLocalToDomain(referendumId: ReferendumId, dapps: List<Govern
         ReferendumDApp(
             it.chainId,
             it.name,
-            it.referendumUrl.formatNamed("referendumId" to referendumId.toString()),
+            it.referendumUrl.formatNamed("referendumId" to referendumId.value.toString()),
             it.iconUrl,
             it.details
         )

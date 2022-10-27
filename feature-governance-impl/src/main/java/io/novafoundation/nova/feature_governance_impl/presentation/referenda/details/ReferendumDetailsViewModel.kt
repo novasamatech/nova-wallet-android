@@ -135,8 +135,9 @@ class ReferendumDetailsViewModel(
         .inBackground()
         .shareWhileSubscribed()
 
-    val referendumDApps = selectedChainFlow.map {
-        governanceDAppsInteractor.getReferendumDapps(it.id, payload.toReferendumId())
+    val referendumDApps = flowOfAll {
+        val chainId = selectedAssetSharedState.chainId()
+        governanceDAppsInteractor.observeReferendumDapps(chainId, payload.toReferendumId())
     }
         .mapList(::mapGovernanceDAppToUi)
         .shareInBackground()
@@ -342,7 +343,6 @@ class ReferendumDetailsViewModel(
             proposer = referendumDetails.proposer?.let {
                 ReferendumProposerPayload(it.accountId, it.offChainNickname)
             },
-
             voteThreshold = null,
             approveThreshold = referendumDetails.fullDetails.approvalCurve?.name,
             supportThreshold = referendumDetails.fullDetails.supportCurve?.name,

@@ -17,7 +17,7 @@ class GovernanceDAppsInteractor(
         governanceDAppsSyncService.syncDapps()
     }
 
-    fun getReferendumDapps(chainId: ChainId, referendumId: ReferendumId): List<ReferendumDApp> {
-        return governanceDAppsRepository.getReferendumDApps(chainId, referendumId)
+    fun observeReferendumDapps(chainId: ChainId, referendumId: ReferendumId): Flow<List<ReferendumDApp>> {
+        return governanceDAppsRepository.observeReferendumDApps(chainId, referendumId)
     }
 }

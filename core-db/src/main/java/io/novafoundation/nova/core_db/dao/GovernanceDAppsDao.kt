@@ -9,6 +9,7 @@ import androidx.room.Transaction
 import androidx.room.Update
 import io.novafoundation.nova.common.utils.CollectionDiffer
 import io.novafoundation.nova.core_db.model.GovernanceDAppLocal
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 abstract class GovernanceDAppsDao {
@@ -27,14 +28,14 @@ abstract class GovernanceDAppsDao {
     abstract fun getAll(): List<GovernanceDAppLocal>
 
     @Query("SELECT * FROM governance_dapps WHERE chainId = :chainId")
-    abstract fun getChainDapps(chainId: String): List<GovernanceDAppLocal>
+    abstract fun observeChainDapps(chainId: String): Flow<List<GovernanceDAppLocal>>
 
     @Delete
-    protected abstract suspend fun deleteDapps(dapps: List<GovernanceDAppLocal>)
+    abstract suspend fun deleteDapps(dapps: List<GovernanceDAppLocal>)
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    protected abstract suspend fun insertDapps(dapps: List<GovernanceDAppLocal>)
+    abstract suspend fun insertDapps(dapps: List<GovernanceDAppLocal>)
 
     @Update
-    protected abstract suspend fun updateDapps(dapps: List<GovernanceDAppLocal>)
+    abstract suspend fun updateDapps(dapps: List<GovernanceDAppLocal>)
 }

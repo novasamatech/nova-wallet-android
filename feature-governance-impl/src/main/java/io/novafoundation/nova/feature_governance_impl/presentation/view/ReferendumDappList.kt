@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
+import androidx.core.view.children
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.feature_dapp_api.presentation.view.DAppView
 import io.novafoundation.nova.feature_governance_impl.R
@@ -31,7 +32,7 @@ class ReferendumDappList @JvmOverloads constructor(
     }
 
     fun setDApps(dApps: List<ReferendumDAppModel>) {
-        removeAllViews()
+        removeAllDApps()
 
         dApps.forEach(::addDApp)
     }
@@ -48,5 +49,11 @@ class ReferendumDappList @JvmOverloads constructor(
         }
 
         addView(dAppView)
+    }
+
+    private fun removeAllDApps() {
+        children.toList()
+            .filterIsInstance<DAppView>()
+            .forEach { removeView(it) }
     }
 }
