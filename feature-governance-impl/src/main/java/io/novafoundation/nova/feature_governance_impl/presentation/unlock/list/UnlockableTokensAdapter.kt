@@ -8,8 +8,11 @@ import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.setDrawableEnd
 import io.novafoundation.nova.common.utils.setTextColorRes
+import io.novafoundation.nova.common.view.startTimer
+import io.novafoundation.nova.common.view.stopTimer
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.unlock.list.model.GovernanceLockModel
+import io.novafoundation.nova.feature_governance_impl.presentation.unlock.list.model.GovernanceLockModel.StatusContent
 import kotlinx.android.synthetic.main.item_governance_lock.view.leftToUnlock
 import kotlinx.android.synthetic.main.item_governance_lock.view.unlockableTokensAmount
 
@@ -27,11 +30,11 @@ class UnlockableTokensAdapter : ListAdapter<GovernanceLockModel, UnlockableToken
 private object GovernanceLockCallback : DiffUtil.ItemCallback<GovernanceLockModel>() {
 
     override fun areItemsTheSame(oldItem: GovernanceLockModel, newItem: GovernanceLockModel): Boolean {
-        return oldItem.referendumId == newItem.referendumId
+        return oldItem.index == newItem.index
     }
 
     override fun areContentsTheSame(oldItem: GovernanceLockModel, newItem: GovernanceLockModel): Boolean {
-        return true
+        return oldItem == newItem
     }
 }
 
@@ -41,7 +44,18 @@ class UnlockableTokenHolder(
 
     fun bind(item: GovernanceLockModel) = with(itemView) {
         unlockableTokensAmount.text = item.amount
-        leftToUnlock.text = item.status
+
+        when(val status = item.status) {
+            is StatusContent.Text -> {
+                leftToUnlock.stopTimer()
+
+                leftToUnlock.text = status.text
+            }
+            is StatusContent.Timer -> {
+                leftToUnlock.startTimer(value = status.timer, customMessageFormat = R.string.common_left)
+            }
+        }
+
         leftToUnlock.setDrawableEnd(item.statusIconRes, widthInDp = 16, paddingInDp = 4, tint = item.statusIconColorRes)
         leftToUnlock.setTextColorRes(item.statusColorRes)
     }

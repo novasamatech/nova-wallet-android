@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="referendum_unlock_unlockable">Unlockable</string>
+
     <string name="referendum_vote_chip_governance_lock">Reuse governance lock: %s</string>
     <string name="referendum_vote_chip_all_locks">Reuse all locks : %s</string>
 
