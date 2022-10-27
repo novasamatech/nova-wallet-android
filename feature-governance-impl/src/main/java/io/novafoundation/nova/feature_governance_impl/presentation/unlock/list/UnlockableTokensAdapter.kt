@@ -45,7 +45,7 @@ class UnlockableTokenHolder(
     fun bind(item: GovernanceLockModel) = with(itemView) {
         unlockableTokensAmount.text = item.amount
 
-        when(val status = item.status) {
+        when (val status = item.status) {
             is StatusContent.Text -> {
                 leftToUnlock.stopTimer()
 

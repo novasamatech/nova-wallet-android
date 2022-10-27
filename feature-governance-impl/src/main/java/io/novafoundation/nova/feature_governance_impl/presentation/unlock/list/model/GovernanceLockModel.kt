@@ -15,8 +15,8 @@ data class GovernanceLockModel(
 
     sealed class StatusContent {
 
-        data class Timer(val timer: TimerValue): StatusContent()
+        data class Timer(val timer: TimerValue) : StatusContent()
 
-        data class Text(val text: String): StatusContent()
+        data class Text(val text: String) : StatusContent()
     }
 }

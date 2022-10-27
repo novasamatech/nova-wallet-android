@@ -54,7 +54,7 @@ class GovernanceLocksOverviewViewModel(
     }
 
     private fun mapUnlockChunkToUi(lock: Lock, index: Int, token: Token): GovernanceLockModel {
-        return when(lock) {
+        return when (lock) {
             is Lock.Claimable -> GovernanceLockModel(
                 index = index,
                 amount = mapAmountToAmountModel(lock.amount, token).token,

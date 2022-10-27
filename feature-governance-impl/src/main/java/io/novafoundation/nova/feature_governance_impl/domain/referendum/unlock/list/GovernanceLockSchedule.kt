@@ -12,9 +12,9 @@ class GovernanceLocksOverview(
 
     sealed class Lock {
 
-        class Claimable(val amount: Balance, val actions: List<ClaimSchedule.ClaimAction>): Lock()
+        class Claimable(val amount: Balance, val actions: List<ClaimSchedule.ClaimAction>) : Lock()
 
-        class Pending(val amount: Balance, val timer: TimerValue): Lock()
+        class Pending(val amount: Balance, val timer: TimerValue) : Lock()
     }
 }
 

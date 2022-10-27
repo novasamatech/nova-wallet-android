@@ -92,7 +92,7 @@ class RealGovernanceLocksOverviewInteractor(
 
     private fun ClaimSchedule.toOverviewLocks(durationEstimator: BlockDurationEstimator): List<GovernanceLocksOverview.Lock> {
         return chunks.map { chunk ->
-            when(chunk) {
+            when (chunk) {
                 is UnlockChunk.Claimable -> GovernanceLocksOverview.Lock.Claimable(chunk.amount, chunk.actions)
 
                 is UnlockChunk.Pending -> GovernanceLocksOverview.Lock.Pending(
