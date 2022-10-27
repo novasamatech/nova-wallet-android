@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface ReferendaListInteractor {
 
-    fun referendaFlow(voterAccountId: AccountId?, chain: Chain): Flow<ReferendaListState>
+    fun referendaListStateFlow(voterAccountId: AccountId?, chain: Chain): Flow<ReferendaListState>
 }

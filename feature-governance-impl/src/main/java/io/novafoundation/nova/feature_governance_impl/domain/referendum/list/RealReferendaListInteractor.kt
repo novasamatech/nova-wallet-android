@@ -64,11 +64,11 @@ class RealReferendaListInteractor(
     private val referendaSortingProvider: ReferendaSortingProvider,
 ) : ReferendaListInteractor {
 
-    override fun referendaFlow(voterAccountId: AccountId?, chain: Chain): Flow<ReferendaListState> {
-        return flowOfAll { referendaFlowSuspend(voterAccountId, chain) }
+    override fun referendaListStateFlow(voterAccountId: AccountId?, chain: Chain): Flow<ReferendaListState> {
+        return flowOfAll { referendaListStateFlowSuspend(voterAccountId, chain) }
     }
 
-    private suspend fun referendaFlowSuspend(voterAccountId: AccountId?, chain: Chain): Flow<ReferendaListState> {
+    private suspend fun referendaListStateFlowSuspend(voterAccountId: AccountId?, chain: Chain): Flow<ReferendaListState> {
         val governanceSource = governanceSourceRegistry.sourceFor(chain.id)
         val tracksById = governanceSource.referenda.getTracksById(chain.id)
         val undecidingTimeout = governanceSource.referenda.undecidingTimeout(chain.id)

@@ -79,7 +79,7 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
 
         val accountId = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".toAccountId()
 
-        val referendaByGroup = referendaListInteractor.referendaFlow(accountId, chain()).first()
+        val referendaByGroup = referendaListInteractor.referendaListStateFlow(accountId, chain()).first()
         val referenda = referendaByGroup.values.flatten()
 
         Log.d(this@GovernanceIntegrationTest.LOG_TAG,referenda.joinToString("\n"))

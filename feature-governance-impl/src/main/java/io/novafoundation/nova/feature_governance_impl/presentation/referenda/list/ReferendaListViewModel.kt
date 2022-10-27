@@ -59,7 +59,7 @@ class ReferendaListViewModel(
     private val referendaListStateFLow = accountAndChainFlow.withLoading { (account, chain) ->
         val accountId = account.accountIdIn(chain)
 
-        referendaListInteractor.referendaFlow(accountId, chain)
+        referendaListInteractor.referendaListStateFlow(accountId, chain)
     }
         .inBackground()
         .shareWhileSubscribed()
