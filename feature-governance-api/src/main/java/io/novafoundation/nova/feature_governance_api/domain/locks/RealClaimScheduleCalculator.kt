@@ -57,6 +57,10 @@ class RealClaimScheduleCalculator(
     private val trackLocks: Map<TrackId, Balance>,
 ) : ClaimScheduleCalculator {
 
+    override fun totalGovernanceLock(): Balance {
+        return trackLocks.values.maxOrNull().orZero()
+    }
+
     override fun maxConvictionEndOf(vote: AccountVote, referendumId: ReferendumId): BlockNumber {
         return referenda.getValue(referendumId).maxConvictionEnd(vote)
     }
