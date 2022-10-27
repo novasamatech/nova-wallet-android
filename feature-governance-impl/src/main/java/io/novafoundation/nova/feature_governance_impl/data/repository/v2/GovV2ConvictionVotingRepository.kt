@@ -48,7 +48,7 @@ class GovV2ConvictionVotingRepository(
         return runtime.metadata.convictionVoting().numberConstant("MaxVotes", runtime)
     }
 
-    override suspend fun trackLocksFlow(accountId: AccountId, chainId: ChainId): Flow<Map<TrackId, Balance>> {
+    override fun trackLocksFlow(accountId: AccountId, chainId: ChainId): Flow<Map<TrackId, Balance>> {
         return remoteStorageSource.subscribe(chainId) {
             runtime.metadata.convictionVoting().storage("ClassLocksFor").observe(accountId, binding = ::bindTrackLocks)
                 .map { it.toMap() }

@@ -9,6 +9,7 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.presentation.LoadingState
+import io.novafoundation.nova.common.presentation.dataOrNull
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
@@ -64,7 +65,7 @@ class ReferendaListFragment : BaseFragment<ReferendaListViewModel>(), ReferendaL
         }
 
         viewModel.governanceTotalLocks.observe {
-            referendaHeaderAdapter.setLocks(it)
+            referendaHeaderAdapter.setLocks(it.dataOrNull)
         }
 
         viewModel.referendaUiFlow.observe {
