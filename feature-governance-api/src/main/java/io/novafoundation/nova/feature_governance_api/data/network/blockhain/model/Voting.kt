@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_governance_api.data.network.blockhain.model
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -53,6 +54,14 @@ fun Voting.trackVotesNumber(): Int {
     }
 }
 
+fun AyeVote(amount: Balance, conviction: Conviction) = AccountVote.Standard(
+    vote = Vote(
+        aye = true,
+        conviction = conviction
+    ),
+    balance = amount
+)
+
 fun AccountVote.votes(chainAsset: Chain.Asset): VotesAmount? {
     return when (this) {
         // TODO handle split votes
@@ -97,6 +106,18 @@ fun Voting.votes(): Map<ReferendumId, AccountVote> {
     return when (this) {
         is Voting.Casting -> votes
         Voting.Delegating -> emptyMap()
+    }
+}
+
+fun Voting.totalLock(): Balance {
+    return when (this) {
+        is Voting.Casting -> {
+            val fromVotes = votes.maxOfOrNull { it.value.amount() }.orZero()
+
+            fromVotes.max(prior.amount)
+        }
+
+        Voting.Delegating -> Balance.ZERO // not yet supported
     }
 }
 
