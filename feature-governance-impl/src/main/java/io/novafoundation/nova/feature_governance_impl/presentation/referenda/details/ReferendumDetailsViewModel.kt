@@ -302,7 +302,9 @@ class ReferendumDetailsViewModel(
 
     private fun mapShortenedMarkdownDescription(referendumDetails: ReferendumDetails): ShortenedTextModel {
         val referendumDescription = mapReferendumDescriptionToUi(referendumDetails)
-        return ShortenedTextModel.from(removeMarkdown(referendumDescription), DESCRIPTION_LENGTH_LIMIT)
+        val referendumCleanedDescription = removeMarkdown(referendumDescription)
+            .trimStart()
+        return ShortenedTextModel.from(referendumCleanedDescription, DESCRIPTION_LENGTH_LIMIT)
     }
 
     private fun mapReferendumTitleToUi(referendumDetails: ReferendumDetails): String {

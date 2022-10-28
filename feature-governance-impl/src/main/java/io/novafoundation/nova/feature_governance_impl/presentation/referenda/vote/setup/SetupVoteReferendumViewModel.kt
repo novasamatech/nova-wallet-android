@@ -215,7 +215,7 @@ class SetupVoteReferendumViewModel(
         val values = Conviction.values().mapIndexed { index, conviction ->
             SeekbarValue(
                 value = conviction,
-                label = "${conviction.amountMultiplier()}x",
+                label = "${conviction.amountMultiplier().format()}x",
                 labelColorRes = colors.getOrNull(index) ?: R.color.multicolor_pink_polkadot
             )
         }

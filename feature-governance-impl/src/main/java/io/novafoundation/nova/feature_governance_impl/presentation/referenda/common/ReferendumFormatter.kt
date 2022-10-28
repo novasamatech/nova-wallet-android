@@ -288,7 +288,7 @@ class RealReferendumFormatter(
         val multiplierFormatted = votes.multiplier.format()
 
         val votesFormatted = resourceManager.getString(R.string.referendum_votes_format, votes.total.format())
-        val votesDetails = "$votesAmountFormatted × $multiplierFormatted"
+        val votesDetails = "$votesAmountFormatted × ${multiplierFormatted}x"
 
         return YourVoteModel(
             voteTypeTitleRes = voteTypeRes,
