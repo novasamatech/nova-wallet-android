@@ -8,8 +8,11 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.list.GovernanceLocksOverviewInteractor
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.unlock.list.GovernanceLocksOverviewViewModel
+import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 
 @Module(includes = [ViewModelModule::class])
 class GovernanceLocksOverviewModule {
@@ -18,10 +21,16 @@ class GovernanceLocksOverviewModule {
     @IntoMap
     @ViewModelKey(GovernanceLocksOverviewViewModel::class)
     fun provideViewModel(
-        governanceRouter: GovernanceRouter,
+        router: GovernanceRouter,
+        interactor: GovernanceLocksOverviewInteractor,
+        tokenUseCase: TokenUseCase,
+        resourceManager: ResourceManager,
     ): ViewModel {
         return GovernanceLocksOverviewViewModel(
-            governanceRouter
+            router = router,
+            interactor = interactor,
+            tokenUseCase = tokenUseCase,
+            resourceManager = resourceManager
         )
     }
 

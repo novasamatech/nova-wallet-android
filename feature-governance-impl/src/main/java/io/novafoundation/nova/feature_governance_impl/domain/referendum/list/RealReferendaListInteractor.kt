@@ -14,12 +14,12 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.proposal
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.track
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.OffChainReferendumPreview
-import io.novafoundation.nova.feature_governance_api.data.repository.ConvictionVotingRepository
 import io.novafoundation.nova.feature_governance_api.data.repository.PreImageRepository
 import io.novafoundation.nova.feature_governance_api.data.repository.PreImageRequest
 import io.novafoundation.nova.feature_governance_api.data.repository.PreImageRequest.FetchCondition
 import io.novafoundation.nova.feature_governance_api.data.repository.getTracksById
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
+import io.novafoundation.nova.feature_governance_api.data.source.trackLocksFlowOrEmpty
 import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimScheduleCalculator
 import io.novafoundation.nova.feature_governance_api.domain.locks.RealClaimScheduleCalculator
 import io.novafoundation.nova.feature_governance_api.domain.locks.hasClaimableLocks
@@ -33,9 +33,7 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.list.Refe
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumStatus
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.ReferendaConstructor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.sorting.ReferendaSortingProvider
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.TotalIssuanceRepository
 import jp.co.soramitsu.fearless_utils.extensions.requireHexPrefix
@@ -44,7 +42,6 @@ import jp.co.soramitsu.fearless_utils.hash.isPositive
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import java.math.BigInteger
 
@@ -115,14 +112,6 @@ class RealReferendaListInteractor(
             )
         } else {
             null
-        }
-    }
-
-    private fun ConvictionVotingRepository.trackLocksFlowOrEmpty(voterAccountId: AccountId?, chainId: ChainId): Flow<Map<TrackId, Balance>> {
-        return if (voterAccountId != null) {
-            trackLocksFlow(voterAccountId, chainId)
-        } else {
-            flowOf(emptyMap())
         }
     }
 

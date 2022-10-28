@@ -155,6 +155,6 @@ class ReferendaListViewModel(
     }
 
     fun governanceLocksClicked() {
-        // TODO
+        governanceRouter.openGovernanceLocksOverview()
     }
 }

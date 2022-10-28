@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_governance_api.domain.locks
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.utils.castOrNull
-import io.novafoundation.nova.common.utils.mapNotNullToSet
 import io.novafoundation.nova.common.utils.mapValuesNotNull
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
@@ -31,7 +30,7 @@ private data class ClaimableLock(
 
 private sealed class ClaimAffect(open val trackId: TrackId) {
 
-    data class Prior(override val trackId: TrackId) : ClaimAffect(trackId)
+    data class Track(override val trackId: TrackId) : ClaimAffect(trackId)
 
     data class Vote(override val trackId: TrackId, val referendumId: ReferendumId) : ClaimAffect(trackId)
 }
@@ -42,10 +41,7 @@ private class GroupedClaimAffects(
     val votes: List<ClaimAffect.Vote>
 )
 
-private class UnlockGap(
-    val balance: Balance,
-    val tracks: Set<TrackId>
-)
+typealias UnlockGap = Map<TrackId, Balance>
 
 class RealClaimScheduleCalculator(
     private val voting: Map<TrackId, Voting>,
@@ -84,6 +80,11 @@ class RealClaimScheduleCalculator(
      * a. Each non-zero prior has a single individual unlock
      * b. Each non-zero vote has a single individual unlock.
      *    However, unlock time for votes is at least unlock time of corresponding prior.
+     * c. Find a gap between [voting] and [trackLocks], which indicates an extra claimable amount
+     *    To provide additive effect of gap, we add total voting lock on top of it:
+     if [voting] has some pending locks - they gonna delay their amount but always leaving trackGap untouched & claimable
+     On the other hand, if other tracks have locks bigger than [voting]'s total lock,
+     trackGap will be partially or full delayed by them
      *
      * During this step we also determine the list of [ClaimAffect],
      * which later gets translated to [ClaimSchedule.ClaimAction].
@@ -102,8 +103,7 @@ class RealClaimScheduleCalculator(
      *
      * 4. Check which if unlocks are claimable and which are not by constructing [ClaimSchedule.UnlockChunk] based on [currentBlockNumber]
      * 5. Fold all [ClaimSchedule.UnlockChunk] into single chunk.
-     * 6. Find a gap between [voting] and [trackLocks], which indicates an extra claimable amount
-     * 7. If gap exists, then we should add it to claimable chunk. We should also check if we should perform extra [ClaimSchedule.ClaimAction.Unlock]
+     * 6. If gap exists, then we should add it to claimable chunk. We should also check if we should perform extra [ClaimSchedule.ClaimAction.Unlock]
      *  for each track that is included in the gap. We do that by finding by checking which [ClaimSchedule.ClaimAction.Unlock] unlocks are already present
      *  in claimable chunk's actions in order to not to do them twice.
      */
@@ -131,17 +131,20 @@ class RealClaimScheduleCalculator(
     }
 
     private fun individualClaimableLocks(castingVotes: List<Pair<TrackId, Voting.Casting>>): List<ClaimableLock> {
+        val gapBetweenVotingAndLocked = voting.gapWith(trackLocks)
+
         return castingVotes.flatMap { (trackId, voting) ->
+            val trackAffects = setOf(ClaimAffect.Track(trackId))
+
             val priorLock = ClaimableLock(
                 claimAt = voting.prior.unlockAt,
                 amount = voting.prior.amount,
-                affected = setOf(ClaimAffect.Prior(trackId))
+                affected = trackAffects
             )
 
             val standardVotes = voting.votes.mapValuesNotNull { (_, votes) ->
                 votes.castOrNull<AccountVote.Standard>()
             }
-
             val standardVoteLocks = standardVotes.map { (referendumId, standardVote) ->
                 val estimatedEnd = maxConvictionEndOf(standardVote, referendumId)
                 val lock = ClaimableLock(
@@ -154,8 +157,20 @@ class RealClaimScheduleCalculator(
                 lock.timeAtLeast(priorLock.claimAt)
             }
 
+            val trackGap = gapBetweenVotingAndLocked[trackId].orZero()
+            val trackGapLock = if (trackGap.isPositive()) {
+                ClaimableLock(
+                    claimAt = currentBlockNumber,
+                    amount = trackGap + voting.totalLock(),
+                    affected = trackAffects
+                )
+            } else {
+                null
+            }
+
             buildList {
                 if (priorLock.reasonableToClaim()) add(priorLock)
+                if (trackGapLock != null) add(trackGapLock)
 
                 addAll(standardVoteLocks)
             }
@@ -199,8 +214,7 @@ class RealClaimScheduleCalculator(
                 }
             }
 
-        return result.toSortedMap(reverseOrder())
-            .values.toList()
+        return result.toSortedMap().values.toList()
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -210,21 +224,8 @@ class RealClaimScheduleCalculator(
 
         // fold all claimable chunks to single one
         val initialClaimable = UnlockChunk.Claimable(amount = Balance.ZERO, actions = emptyList())
-        var claimableChunk = (claimable as List<UnlockChunk.Claimable>).fold(initialClaimable) { acc, unlockChunk ->
+        val claimableChunk = (claimable as List<UnlockChunk.Claimable>).fold(initialClaimable) { acc, unlockChunk ->
             UnlockChunk.Claimable(acc.amount + unlockChunk.amount, acc.actions + unlockChunk.actions)
-        }
-
-        // handle gap between tracks locked and votes
-        val gapBetweenVotingAndLocked = voting.gapWith(trackLocks)
-        if (gapBetweenVotingAndLocked.balance.isPositive()) {
-            val tracksAlreadyToUnlock = claimableChunk.actions.mapNotNullToSet { it.castOrNull<Unlock>()?.trackId }
-            val additionalTracksToUnlock = gapBetweenVotingAndLocked.tracks - tracksAlreadyToUnlock
-            val additionalUnlockActions = additionalTracksToUnlock.map(ClaimAction::Unlock)
-
-            val totalClaimable = claimableChunk.amount + gapBetweenVotingAndLocked.balance
-            val totalClaimableActions = additionalUnlockActions + claimableChunk.actions
-
-            claimableChunk = UnlockChunk.Claimable(amount = totalClaimable, actions = totalClaimableActions)
         }
 
         return buildList {
@@ -312,13 +313,13 @@ private fun ClaimableLock.foldSameTime(another: ClaimableLock): ClaimableLock {
 
     return ClaimableLock(
         claimAt = claimAt,
-        amount = another.amount.max(another.amount),
+        amount = amount.max(another.amount),
         affected = affected + another.affected
     )
 }
 
 private fun ClaimableLock.reasonableToClaim(): Boolean {
-    return amount > Balance.ZERO
+    return amount.isPositive()
 }
 
 private infix fun ClaimableLock.timeAtLeast(time: BlockNumber): ClaimableLock {
@@ -348,10 +349,7 @@ private fun Map<TrackId, Voting>.gapWith(locksByTrackId: Map<TrackId, Balance>):
         gap
     }
 
-    return UnlockGap(
-        balance = gapByTrack.values.maxOrNull().orZero(),
-        tracks = gapByTrack.entries.mapNotNullToSet { (trackId, gap) -> trackId.takeIf { gap.isPositive() } }
-    )
+    return gapByTrack
 }
 
 private fun Collection<ClaimAffect>.toClaimActions(): List<ClaimAction> {
@@ -376,7 +374,7 @@ private fun Collection<ClaimAffect>.groupByTrack(): List<GroupedClaimAffects> {
     return groupBy(ClaimAffect::trackId).entries.map { (trackId, trackAffects) ->
         GroupedClaimAffects(
             trackId = trackId,
-            hasPriorAffect = trackAffects.any { it is ClaimAffect.Prior },
+            hasPriorAffect = trackAffects.any { it is ClaimAffect.Track },
             votes = trackAffects.filterIsInstance<ClaimAffect.Vote>()
         )
     }
