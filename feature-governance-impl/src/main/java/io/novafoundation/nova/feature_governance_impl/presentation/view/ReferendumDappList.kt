@@ -4,13 +4,14 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
+import androidx.core.view.children
 import androidx.core.view.isGone
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.feature_dapp_api.presentation.view.DAppView
 import io.novafoundation.nova.feature_governance_impl.R
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.GovernanceDAppModel
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.ReferendumDAppModel
 
-typealias OnDAppClicked = (GovernanceDAppModel) -> Unit
+typealias OnDAppClicked = (ReferendumDAppModel) -> Unit
 
 class ReferendumDappList @JvmOverloads constructor(
     context: Context,
@@ -31,8 +32,8 @@ class ReferendumDappList @JvmOverloads constructor(
         onDAppClicked = listener
     }
 
-    fun setDApps(dApps: List<GovernanceDAppModel>) {
-        removeAllViews()
+    fun setDApps(dApps: List<ReferendumDAppModel>) {
+        removeAllDApps()
 
         dApps.forEach(::addDApp)
     }
@@ -42,7 +43,7 @@ class ReferendumDappList @JvmOverloads constructor(
         setDApps(dApps)
     }
 
-    private fun addDApp(model: GovernanceDAppModel) {
+    private fun addDApp(model: ReferendumDAppModel) {
         val dAppView = DAppView.createUsingMathParentWidth(context).apply {
             setTitle(model.name)
             setSubtitle(model.description)
@@ -54,5 +55,11 @@ class ReferendumDappList @JvmOverloads constructor(
         }
 
         addView(dAppView)
+    }
+
+    private fun removeAllDApps() {
+        children.toList()
+            .filterIsInstance<DAppView>()
+            .forEach { removeView(it) }
     }
 }

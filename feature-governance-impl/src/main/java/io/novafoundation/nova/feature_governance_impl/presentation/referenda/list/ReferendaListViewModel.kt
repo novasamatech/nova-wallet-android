@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.list.Refe
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumPreview
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumProposal
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.domain.dapp.GovernanceDAppsInteractor
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsPayload
@@ -47,6 +48,7 @@ class ReferendaListViewModel(
     private val updateSystem: UpdateSystem,
     private val governanceRouter: GovernanceRouter,
     private val referendumFormatter: ReferendumFormatter,
+    private val governanceDAppsInteractor: GovernanceDAppsInteractor
 ) : BaseViewModel(), WithAssetSelector {
 
     override val assetSelectorMixin = assetSelectorFactory.create(scope = this)
@@ -84,6 +86,9 @@ class ReferendaListViewModel(
         .shareWhileSubscribed()
 
     init {
+        governanceDAppsInteractor.syncGovernanceDapps()
+            .launchIn(this)
+
         updateSystem.start()
             .launchIn(this)
     }
@@ -155,6 +160,6 @@ class ReferendaListViewModel(
     }
 
     fun governanceLocksClicked() {
-        // TODO
+        governanceRouter.openGovernanceLocksOverview()
     }
 }
