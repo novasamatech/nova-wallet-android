@@ -17,7 +17,6 @@ fun ValidationSystem.Companion.voteReferendumValidationSystem(
 
     sufficientBalance(
         fee = { it.fee },
-        amount = { it.voteAmount },
         available = { it.asset.transferable },
         error = { payload, leftForFees ->
             VoteReferendumValidationFailure.NotEnoughToPayFees(
