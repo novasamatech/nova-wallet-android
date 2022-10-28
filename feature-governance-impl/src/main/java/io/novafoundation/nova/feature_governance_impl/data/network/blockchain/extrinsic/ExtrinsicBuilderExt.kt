@@ -32,8 +32,22 @@ fun ExtrinsicBuilder.convictionVotingUnlock(
         moduleName = Modules.CONVICTION_VOTING,
         callName = "unlock",
         arguments = mapOf(
-            "class" to trackId,
+            "class" to trackId.value,
             "target" to AddressInstanceConstructor.constructInstance(runtime.typeRegistry, accountId)
+        )
+    )
+}
+
+fun ExtrinsicBuilder.convictionVotingRemoveVote(
+    trackId: TrackId,
+    referendumId: ReferendumId,
+): ExtrinsicBuilder {
+    return call(
+        moduleName = Modules.CONVICTION_VOTING,
+        callName = "remove_vote",
+        arguments = mapOf(
+            "class" to trackId.value,
+            "index" to referendumId.value
         )
     )
 }

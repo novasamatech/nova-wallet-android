@@ -10,8 +10,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
-import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
-import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createIdentityAddressModel
+import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -80,14 +79,10 @@ class ConfirmReferendumVoteViewModel(
         mapAmountToAmountModel(payload.vote.amount, it)
     }.shareInBackground()
 
-    val currentAddressModelFlow = selectedAccountUseCase.selectedMetaAccountFlow().map {
+    val currentAddressModelFlow = selectedAccountUseCase.selectedMetaAccountFlow().map { metaAccount ->
         val chain = governanceSharedState.chain()
 
-        addressIconGenerator.createIdentityAddressModel(
-            chain = chain,
-            accountId = it.accountIdIn(chain)!!,
-            identityProvider = localIdentityProvider
-        )
+        addressIconGenerator.createAccountAddressModel(chain, metaAccount)
     }.shareInBackground()
 
     private val accountVoteFlow = assetFlow.map(::constructAccountVote)
