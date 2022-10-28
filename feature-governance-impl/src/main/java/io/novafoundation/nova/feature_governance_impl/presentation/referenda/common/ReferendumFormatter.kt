@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.com
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumVotingModel
 import io.novafoundation.nova.feature_governance_impl.presentation.view.YourVoteModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
+import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
@@ -165,7 +166,7 @@ class RealReferendumFormatter(
         token: Token
     ): String {
         val thresholdFormatted = mapAmountToAmountModel(support.threshold, token).token
-        val turnoutFormatted = mapAmountToAmountModel(support.turnout, token).token
+        val turnoutFormatted = token.amountFromPlanks(support.turnout).format()
 
         return resourceManager.getString(R.string.referendum_support_threshold_format, turnoutFormatted, thresholdFormatted)
     }

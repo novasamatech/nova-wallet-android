@@ -43,16 +43,17 @@ fun TextView.startTimer(
     if (currentTimer is CountDownTimer) {
         currentTimer.cancel()
     }
+    val formattedTime = millis.milliseconds.formatTimer(context)
+
+    val message = customMessageFormat?.let {
+        resources.getString(customMessageFormat, formattedTime)
+    } ?: formattedTime
+
+    this@startTimer.text = message
 
     val newTimer = object : CountDownTimer(millis - timePassedSinceCalculation, 1000) {
         override fun onTick(millisUntilFinished: Long) {
-            val formattedTime = millisUntilFinished.milliseconds.formatTimer(context)
-
-            val message = customMessageFormat?.let {
-                resources.getString(customMessageFormat, formattedTime)
-            } ?: formattedTime
-
-            this@startTimer.text = message
+            setNewValue(millisUntilFinished, customMessageFormat)
 
             onTick?.invoke(this@startTimer, millisUntilFinished)
         }
@@ -74,6 +75,7 @@ fun TextView.startTimer(
         newTimer.cancel()
     }
 
+    setNewValue(millis - timePassedSinceCalculation, customMessageFormat)
     newTimer.start()
 
     setTag(TIMER_TAG, newTimer)
@@ -86,6 +88,17 @@ private fun Duration.formatTimer(
     context = context,
     timeFormat = { hours, minutes, seconds -> "%02d:%02d:%02d".format(hours, minutes, seconds) }
 )
+
+@OptIn(ExperimentalTime::class)
+private fun TextView.setNewValue(mills: Long, timeFormatRes: Int?) {
+    val formattedTime = mills.milliseconds.formatTimer(context)
+
+    val message = timeFormatRes?.let {
+        resources.getString(timeFormatRes, formattedTime)
+    } ?: formattedTime
+
+    this.text = message
+}
 
 fun TextView.stopTimer() {
     val currentTimer = getTag(TIMER_TAG)

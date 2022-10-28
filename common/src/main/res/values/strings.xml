@@ -17,7 +17,7 @@
 
     <string name="vote_revote">Revote</string>
 
-    <string name="referendum_vote_unlock_hint">After locking period don’t forget to redeem your tokens</string>
+    <string name="referendum_vote_unlock_hint">After locking period don’t forget to unlock your tokens</string>
 
     <string name="common_maximum_format">%s maximum</string>
 
