@@ -84,7 +84,7 @@ class RealClaimScheduleCalculator(
      *    To provide additive effect of gap, we add total voting lock on top of it:
      if [voting] has some pending locks - they gonna delay their amount but always leaving trackGap untouched & claimable
      On the other hand, if other tracks have locks bigger than [voting]'s total lock,
-     trackGap will be partially or full covered by them
+     trackGap will be partially or full delayed by them
      *
      * During this step we also determine the list of [ClaimAffect],
      * which later gets translated to [ClaimSchedule.ClaimAction].
