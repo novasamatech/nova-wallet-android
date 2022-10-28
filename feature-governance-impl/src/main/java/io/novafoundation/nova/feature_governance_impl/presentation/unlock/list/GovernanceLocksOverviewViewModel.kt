@@ -25,23 +25,23 @@ class GovernanceLocksOverviewViewModel(
     private val resourceManager: ResourceManager,
 ) : BaseViewModel() {
 
-    private val lockOverViewFlow = interactor.locksOverviewFlow(scope = viewModelScope)
+    private val lockOverviewFlow = interactor.locksOverviewFlow(scope = viewModelScope)
         .shareInBackground()
 
     private val tokenFlow = tokenUseCase.currentTokenFlow()
         .shareInBackground()
 
-    val totalAmount = combine(lockOverViewFlow, tokenFlow) { locksOverview, token ->
+    val totalAmount = combine(lockOverviewFlow, tokenFlow) { locksOverview, token ->
         mapAmountToAmountModel(locksOverview.totalLocked, token)
     }.shareInBackground()
 
-    val lockModels = combine(lockOverViewFlow, tokenFlow) { locksOverview, token ->
+    val lockModels = combine(lockOverviewFlow, tokenFlow) { locksOverview, token ->
         locksOverview.claimSchedule.mapIndexed { index, lock -> mapUnlockChunkToUi(lock, index, token) }
     }
         .withLoading()
         .shareInBackground()
 
-    val isUnlockAvailable = lockOverViewFlow.map(GovernanceLocksOverview::canClaimTokens)
+    val isUnlockAvailable = lockOverviewFlow.map(GovernanceLocksOverview::canClaimTokens)
         .withLoading()
         .share()
 

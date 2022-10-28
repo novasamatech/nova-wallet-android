@@ -5,6 +5,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import io.novafoundation.nova.common.list.PayloadGenerator
+import io.novafoundation.nova.common.list.resolvePayload
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.setDrawableEnd
 import io.novafoundation.nova.common.utils.setTextColorRes
@@ -25,7 +27,23 @@ class UnlockableTokensAdapter : ListAdapter<GovernanceLockModel, UnlockableToken
     override fun onBindViewHolder(holder: UnlockableTokenHolder, position: Int) {
         holder.bind(getItem(position))
     }
+
+    override fun onBindViewHolder(holder: UnlockableTokenHolder, position: Int, payloads: MutableList<Any>) {
+        resolvePayload(holder, position, payloads) {
+            val item = getItem(position)
+
+            when (it) {
+                GovernanceLockModel::amount -> holder.bindUnlockAmount(item)
+                GovernanceLockModel::status -> holder.bindUnlockStatus(item)
+            }
+        }
+    }
 }
+
+private val LocksPayloadGenerator = PayloadGenerator(
+    GovernanceLockModel::amount,
+    GovernanceLockModel::status
+)
 
 private object GovernanceLockCallback : DiffUtil.ItemCallback<GovernanceLockModel>() {
 
@@ -36,6 +54,10 @@ private object GovernanceLockCallback : DiffUtil.ItemCallback<GovernanceLockMode
     override fun areContentsTheSame(oldItem: GovernanceLockModel, newItem: GovernanceLockModel): Boolean {
         return oldItem == newItem
     }
+
+    override fun getChangePayload(oldItem: GovernanceLockModel, newItem: GovernanceLockModel): Any? {
+        return LocksPayloadGenerator.diff(oldItem, newItem)
+    }
 }
 
 class UnlockableTokenHolder(
@@ -43,8 +65,16 @@ class UnlockableTokenHolder(
 ) : RecyclerView.ViewHolder(containerView) {
 
     fun bind(item: GovernanceLockModel) = with(itemView) {
-        unlockableTokensAmount.text = item.amount
+        bindUnlockAmount(item)
 
+        bindUnlockStatus(item)
+    }
+
+    fun bindUnlockAmount(item: GovernanceLockModel) = with(itemView) {
+        unlockableTokensAmount.text = item.amount
+    }
+
+    fun bindUnlockStatus(item: GovernanceLockModel) = with(itemView) {
         when (val status = item.status) {
             is StatusContent.Text -> {
                 leftToUnlock.stopTimer()

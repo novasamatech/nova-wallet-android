@@ -4,7 +4,7 @@ import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
-data class TimerValue(
+class TimerValue(
     val millis: Long,
     val millisCalculatedAt: Long, // used to offset timer value if timer is rerun, e.g. in the RecyclerView
 ) {
