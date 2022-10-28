@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
@@ -19,6 +20,7 @@ import kotlinx.android.synthetic.main.fragment_governance_confirm_unlock.confirm
 import kotlinx.android.synthetic.main.fragment_governance_confirm_unlock.confirmGovernanceUnlockToolbar
 import kotlinx.android.synthetic.main.fragment_governance_confirm_unlock.confirmReferendumUnlockAmount
 import kotlinx.android.synthetic.main.fragment_governance_confirm_unlock.confirmReferendumUnlockGovernanceLockChange
+import kotlinx.android.synthetic.main.fragment_governance_confirm_unlock.confirmReferendumUnlockHints
 import kotlinx.android.synthetic.main.fragment_governance_confirm_unlock.confirmReferendumUnlockTransferableChange
 
 class ConfirmGovernanceUnlockFragment : BaseFragment<ConfirmGovernanceUnlockViewModel>() {
@@ -51,8 +53,7 @@ class ConfirmGovernanceUnlockFragment : BaseFragment<ConfirmGovernanceUnlockView
     override fun subscribe(viewModel: ConfirmGovernanceUnlockViewModel) {
         observeValidations(viewModel)
         setupExternalActions(viewModel)
-        // TODO observeHints(viewModel.hintsMixin, confirmReferendumUnlockHints)
-
+        observeHints(viewModel.hintsMixin, confirmReferendumUnlockHints)
         setupFeeLoading(viewModel, confirmGovernanceUnlockInformation.fee)
 
         viewModel.currentAddressModelFlow.observe(confirmGovernanceUnlockInformation::setAccount)

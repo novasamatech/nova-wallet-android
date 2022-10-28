@@ -23,6 +23,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.v
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common.LocksChangeFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.unlock.confirm.ConfirmGovernanceUnlockViewModel
+import io.novafoundation.nova.feature_governance_impl.presentation.unlock.confirm.hints.ConfirmGovernanceUnlockHintsMixinFactory
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 
@@ -32,6 +33,12 @@ class ConfirmGovernanceUnlockModule {
     @Provides
     @ScreenScope
     fun provideValidationSystem(): UnlockReferendumValidationSystem = ValidationSystem.unlockReferendumValidationSystem()
+
+    @Provides
+    @ScreenScope
+    fun provieHintsFactory(
+        resourceManager: ResourceManager
+    ) = ConfirmGovernanceUnlockHintsMixinFactory(resourceManager)
 
     @Provides
     @IntoMap
@@ -50,6 +57,7 @@ class ConfirmGovernanceUnlockModule {
         resourceManager: ResourceManager,
         locksChangeFormatter: LocksChangeFormatter,
         validationSystem: UnlockReferendumValidationSystem,
+        hintsMixinFactory: ConfirmGovernanceUnlockHintsMixinFactory,
     ): ViewModel {
         return ConfirmGovernanceUnlockViewModel(
             router = router,
@@ -64,7 +72,8 @@ class ConfirmGovernanceUnlockModule {
             addressIconGenerator = addressIconGenerator,
             resourceManager = resourceManager,
             locksChangeFormatter = locksChangeFormatter,
-            validationSystem = validationSystem
+            validationSystem = validationSystem,
+            hintsMixinFactory = hintsMixinFactory
         )
     }
 

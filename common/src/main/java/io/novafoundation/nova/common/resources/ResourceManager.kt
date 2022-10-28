@@ -7,7 +7,6 @@ import io.novafoundation.nova.common.R
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalTime::class)
 interface ResourceManager {
 
     fun loadRawString(@RawRes res: Int): String

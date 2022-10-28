@@ -23,6 +23,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.v
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.validations.handleUnlockReferendumValidationFailure
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common.LocksChangeFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.unlock.confirm.hints.ConfirmGovernanceUnlockHintsMixinFactory
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
@@ -51,6 +52,7 @@ class ConfirmGovernanceUnlockViewModel(
     private val resourceManager: ResourceManager,
     private val locksChangeFormatter: LocksChangeFormatter,
     private val validationSystem: UnlockReferendumValidationSystem,
+    private val hintsMixinFactory: ConfirmGovernanceUnlockHintsMixinFactory,
 ) : BaseViewModel(),
     WithFeeLoaderMixin,
     Validatable by validationExecutor,
@@ -66,7 +68,11 @@ class ConfirmGovernanceUnlockViewModel(
 
     override val originFeeMixin = feeMixinFactory.create(assetFlow)
 
-    // TODO val hintsMixin = hintsMixinFactory.create(coroutineScope = this, payload)
+    val hintsMixin = hintsMixinFactory.create(
+        scope = viewModelScope,
+        assetFlow = assetFlow,
+        remainsLockedInfoFlow = unlockAffectsFlow.map { it.remainsLockedInfo }
+    )
 
     val walletModel: Flow<WalletModel> = walletUiUseCase.selectedWalletUiFlow()
         .shareInBackground()

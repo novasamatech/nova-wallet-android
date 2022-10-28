@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_governance_api.domain.locks.RealClaimSched
 import io.novafoundation.nova.feature_governance_api.domain.locks.claimableChunk
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.Change
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.Change
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.GovernanceUnlockAffects.RemainsLockedInfo
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -34,6 +35,7 @@ import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.chainAndAsset
 import io.novafoundation.nova.runtime.util.BlockDurationEstimator
 import io.novafoundation.nova.runtime.util.timerUntil
+import jp.co.soramitsu.fearless_utils.hash.isPositive
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import kotlinx.coroutines.CoroutineScope
@@ -194,21 +196,40 @@ class RealGovernanceUnlockInteractor(
             val newTotalLocked = balanceLocks.maxLockReplacing(convictionVoting.voteLockId, replaceWith = newGovernanceLock)
             val newTransferable = asset.freeInPlanks - newTotalLocked
 
+            val governanceLockChange = claimable.amount
+            val transferableChange = (newTransferable - transferableCurrent).abs()
+
+            val remainsLocked = governanceLockChange - transferableChange
+
+            val remainsLockedInfo = if (remainsLocked.isPositive()) {
+                RemainsLockedInfo(
+                    amount = remainsLocked,
+                    lockedInIds = balanceLocks.otherLocksPreventingLockBeingLessThan(newGovernanceLock, thisLockId = convictionVoting.voteLockId)
+                )
+            } else null
+
             GovernanceUnlockAffects(
                 transferableChange = Change(
                     previousValue = transferableCurrent,
                     newValue = newTransferable,
-                    absoluteDifference = (newTransferable - transferableCurrent).abs()
+                    absoluteDifference = transferableChange
                 ),
                 governanceLockChange = Change(
                     previousValue = locksOverview.totalLocked,
                     newValue = newGovernanceLock,
                     absoluteDifference = claimable.amount
                 ),
-                claimableChunk = claimable
+                claimableChunk = claimable,
+                remainsLockedInfo = remainsLockedInfo,
             )
         } else {
             constructEmptyUnlockAffects(asset, locksOverview.totalLocked)
+        }
+    }
+
+    private fun List<BalanceLock>.otherLocksPreventingLockBeingLessThan(amount: Balance, thisLockId: String): List<String> {
+        return filter { it.id != thisLockId }.mapNotNull { lock ->
+            lock.id.takeIf { lock.amountInPlanks > amount }
         }
     }
 
@@ -220,7 +241,8 @@ class RealGovernanceUnlockInteractor(
         return GovernanceUnlockAffects(
             transferableChange = Change.Same(asset.transferableInPlanks),
             governanceLockChange = Change.Same(totalGovernanceLock),
-            claimableChunk = null
+            claimableChunk = null,
+            remainsLockedInfo = null,
         )
     }
 }

@@ -8,4 +8,11 @@ data class GovernanceUnlockAffects(
     val transferableChange: Change<Balance>,
     val governanceLockChange: Change<Balance>,
     val claimableChunk: ClaimSchedule.UnlockChunk.Claimable?,
-)
+    val remainsLockedInfo:RemainsLockedInfo?
+) {
+
+    data class RemainsLockedInfo(
+        val amount: Balance,
+        val lockedInIds: List<String>
+    )
+}
