@@ -76,7 +76,6 @@ class RealGovernanceUnlockInteractor(
     private val extrinsicService: ExtrinsicService,
 ) : GovernanceUnlockInteractor {
 
-
     override suspend fun calculateFee(claimable: UnlockChunk.Claimable?): Balance {
         if (claimable == null) return Balance.ZERO
 
@@ -206,7 +205,9 @@ class RealGovernanceUnlockInteractor(
                     amount = remainsLocked,
                     lockedInIds = balanceLocks.otherLocksPreventingLockBeingLessThan(newGovernanceLock, thisLockId = convictionVoting.voteLockId)
                 )
-            } else null
+            } else {
+                null
+            }
 
             GovernanceUnlockAffects(
                 transferableChange = Change(
@@ -237,7 +238,6 @@ class RealGovernanceUnlockInteractor(
         asset: Asset,
         totalGovernanceLock: Balance,
     ): GovernanceUnlockAffects {
-
         return GovernanceUnlockAffects(
             transferableChange = Change.Same(asset.transferableInPlanks),
             governanceLockChange = Change.Same(totalGovernanceLock),

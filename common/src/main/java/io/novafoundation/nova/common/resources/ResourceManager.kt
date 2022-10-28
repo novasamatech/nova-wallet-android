@@ -5,7 +5,6 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.RawRes
 import io.novafoundation.nova.common.R
 import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
 
 interface ResourceManager {
 

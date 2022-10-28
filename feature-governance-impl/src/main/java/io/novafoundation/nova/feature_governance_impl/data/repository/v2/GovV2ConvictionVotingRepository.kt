@@ -103,7 +103,7 @@ class GovV2ConvictionVotingRepository(
 
     override fun ExtrinsicBuilder.unlock(accountId: AccountId, claimable: ClaimSchedule.UnlockChunk.Claimable) {
         claimable.actions.forEach { claimAction ->
-            when(claimAction) {
+            when (claimAction) {
                 is ClaimSchedule.ClaimAction.RemoveVote -> {
                     convictionVotingRemoveVote(claimAction.trackId, claimAction.referendumId)
                 }
