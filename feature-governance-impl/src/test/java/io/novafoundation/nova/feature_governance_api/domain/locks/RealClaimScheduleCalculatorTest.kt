@@ -152,11 +152,11 @@ class RealClaimScheduleCalculatorTest {
 
         expect {
             claimable(amount = 2) {
-                removeVote(trackId = 0, referendumId = 0)
-                unlock(trackId = 0)
-
                 removeVote(trackId = 1, referendumId = 1)
                 unlock(trackId = 1)
+
+                removeVote(trackId = 0, referendumId = 0)
+                unlock(trackId = 0)
             }
         }
     }
@@ -194,14 +194,14 @@ class RealClaimScheduleCalculatorTest {
 
         expect {
             claimable(amount = 2) {
-                removeVote(trackId = 3, referendumId = 3)
-                unlock(3)
-
                 removeVote(trackId = 2, referendumId = 2)
                 unlock(2)
 
                 removeVote(trackId = 1, referendumId = 1)
                 unlock(1)
+
+                removeVote(trackId = 3, referendumId = 3)
+                unlock(3)
             }
         }
     }
@@ -310,6 +310,60 @@ class RealClaimScheduleCalculatorTest {
             claimable(amount = 10) {
                 unlock(trackId = 0)
             }
+        }
+    }
+
+    @Test
+    fun `pending should be sorted by remaining time`() = ClaimScheduleTest {
+        given {
+            currentBlock(1000)
+
+            track(0) {
+                voting {
+                    vote(amount = 3, unlockAt = 1100, referendumId = 0)
+                    vote(amount = 2, unlockAt = 1200, referendumId = 2)
+                    vote(amount = 1, unlockAt = 1300, referendumId = 1)
+                }
+            }
+        }
+
+        expect {
+            nonClaimable(amount = 1, claimAt = 1100)
+            nonClaimable(amount = 1, claimAt = 1200)
+            nonClaimable(amount = 1, claimAt = 1300)
+        }
+    }
+
+    @Test
+    fun `gap should not be covered by its track locks`() = ClaimScheduleTest {
+        given {
+            currentBlock(1000)
+
+            track(20) {
+                lock(1)
+
+                voting {
+                    vote(amount = 1, unlockAt = 2000, referendumId = 13)
+                }
+            }
+
+            track(21) {
+                // gap is 101 - 10 = 91 - should not be delayed by its own track voting
+                lock(101)
+
+                voting {
+                    vote(amount = 10, unlockAt = 1500, referendumId = 5)
+                }
+            }
+        }
+
+        expect {
+            claimable(amount = 91) {
+                unlock(21)
+            }
+
+            nonClaimable(amount = 9, claimAt = 1500)
+            nonClaimable(amount = 1, claimAt = 2000)
         }
     }
 }

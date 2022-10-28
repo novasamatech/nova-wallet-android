@@ -21,7 +21,6 @@ import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimSchedule.
 import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimSchedule.UnlockChunk
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import jp.co.soramitsu.fearless_utils.hash.isPositive
-import java.math.BigInteger
 
 private data class ClaimableLock(
     val claimAt: BlockNumber,
@@ -82,8 +81,10 @@ class RealClaimScheduleCalculator(
      * b. Each non-zero vote has a single individual unlock.
      *    However, unlock time for votes is at least unlock time of corresponding prior.
      * c. Find a gap between [voting] and [trackLocks], which indicates an extra claimable amount
-     *    To provide additive effect of gap, we add on top of it the maximum amount that can be claimed now in current track
-
+     *    To provide additive effect of gap, we add total voting lock on top of it:
+     if [voting] has some pending locks - they gonna delay their amount but always leaving trackGap untouched & claimable
+     On the other hand, if other tracks have locks bigger than [voting]'s total lock,
+     trackGap will be partially or full covered by them
      *
      * During this step we also determine the list of [ClaimAffect],
      * which later gets translated to [ClaimSchedule.ClaimAction].
@@ -102,7 +103,7 @@ class RealClaimScheduleCalculator(
      *
      * 4. Check which if unlocks are claimable and which are not by constructing [ClaimSchedule.UnlockChunk] based on [currentBlockNumber]
      * 5. Fold all [ClaimSchedule.UnlockChunk] into single chunk.
-     * 7. If gap exists, then we should add it to claimable chunk. We should also check if we should perform extra [ClaimSchedule.ClaimAction.Unlock]
+     * 6. If gap exists, then we should add it to claimable chunk. We should also check if we should perform extra [ClaimSchedule.ClaimAction.Unlock]
      *  for each track that is included in the gap. We do that by finding by checking which [ClaimSchedule.ClaimAction.Unlock] unlocks are already present
      *  in claimable chunk's actions in order to not to do them twice.
      */
@@ -158,13 +159,9 @@ class RealClaimScheduleCalculator(
 
             val trackGap = gapBetweenVotingAndLocked[trackId].orZero()
             val trackGapLock = if (trackGap.isPositive()) {
-                // we search for maximum claimable now amount so we can add it with track gap
-                // to provide additive effect of gap since algorithm uses maximums
-                val maxUnlockableNow = maxTrackUnlockableNow(standardVoteLocks, priorLock)
-
                 ClaimableLock(
                     claimAt = currentBlockNumber,
-                    amount = trackGap + maxUnlockableNow,
+                    amount = trackGap + voting.totalLock(),
                     affected = trackAffects
                 )
             } else {
@@ -217,20 +214,7 @@ class RealClaimScheduleCalculator(
                 }
             }
 
-        return result.toSortedMap(reverseOrder())
-            .values.toList()
-    }
-
-    private fun maxTrackUnlockableNow(
-        standardVoteLocks: List<ClaimableLock>,
-        priorLock: ClaimableLock
-    ): BigInteger {
-        val maxUnlockableNowFromVotes = standardVoteLocks.filter { it.claimableAt(currentBlockNumber) }
-            .maxOfOrNull(ClaimableLock::amount)
-            .orZero()
-        val maxUnlockableNowFromPrior = if (priorLock.claimableAt(currentBlockNumber)) priorLock.amount else Balance.ZERO
-
-        return maxUnlockableNowFromVotes.max(maxUnlockableNowFromPrior)
+        return result.toSortedMap().values.toList()
     }
 
     @Suppress("UNCHECKED_CAST")
