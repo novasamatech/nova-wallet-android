@@ -12,8 +12,8 @@
         tools:layout="@layout/fragment_referendum_details">
 
         <action
-            android:id="@+id/action_referendumDetailsFragment_to_DAppBrowserFragment"
-            app:destination="@id/DAppBrowserFragment"
+            android:id="@+id/action_referendumDetailsFragment_to_DAppBrowserGraph"
+            app:destination="@id/dapp_browser_graph"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
@@ -59,12 +59,6 @@
         tools:layout="@layout/fragment_referendum_full_details" />
 
     <fragment
-        android:id="@id/DAppBrowserFragment"
-        android:name="io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBrowserFragment"
-        android:label="DAppBrowserFragment"
-        tools:layout="@layout/fragment_dapp_browser" />
-
-    <fragment
         android:id="@+id/referendumDescription"
         android:name="io.novafoundation.nova.feature_governance_impl.presentation.referenda.description.ReferendumDescriptionFragment"
         android:label="ReferendumDescriptionFragment"
@@ -104,4 +98,6 @@
             app:popExitAnim="@anim/fragment_open_exit"
             app:popUpTo="@id/referendumDetailsFragment" />
     </fragment>
+
+    <include app:graph="@navigation/dapp_browser_graph" />
 </navigation>

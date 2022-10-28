@@ -12,12 +12,12 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.det
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumFullDetailsFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumFullDetailsPayload
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.ReferendumVotersFragment
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.ReferendumVotersPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.confirm.ConfirmReferendumVoteFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.confirm.ConfirmVoteReferendumPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.SetupVoteReferendumFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.SetupVoteReferendumPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.ReferendumVotersFragment
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.ReferendumVotersPayload
 
 class GovernanceNavigator(
     private val navigationHolder: NavigationHolder
@@ -49,7 +49,7 @@ class GovernanceNavigator(
     override fun backToReferendumDetails() = performNavigation(R.id.action_confirmReferendumVote_to_referendumDetailsFragment)
 
     override fun openDAppBrowser(initialUrl: String) = performNavigation(
-        actionId = R.id.action_referendumDetailsFragment_to_DAppBrowserFragment,
+        actionId = R.id.action_referendumDetailsFragment_to_DAppBrowserGraph,
         args = DAppBrowserFragment.getBundle(initialUrl)
     )
 
