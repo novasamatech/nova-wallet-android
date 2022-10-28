@@ -8,10 +8,20 @@ import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Generic
 import java.math.BigInteger
 
 @JvmInline
-value class TrackId(val value: BigInteger)
+value class TrackId(val value: BigInteger) {
+
+    override fun toString(): String {
+        return value.toString()
+    }
+}
 
 @JvmInline
-value class ReferendumId(val value: BigInteger)
+value class ReferendumId(val value: BigInteger) {
+
+    override fun toString(): String {
+        return value.toString()
+    }
+}
 
 class OnChainReferendum(
     val status: OnChainReferendumStatus,

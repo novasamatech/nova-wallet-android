@@ -142,7 +142,7 @@ class RealReferendaConstructor(
 
                         if (executionBlock != null) {
                             val executeIn = blockDurationEstimator.timerUntil(executionBlock)
-                            ReferendumStatus.Approved(executeIn = executeIn)
+                            ReferendumStatus.Approved(executeIn = executeIn, since = status.since)
                         } else {
                             ReferendumStatus.Executed
                         }

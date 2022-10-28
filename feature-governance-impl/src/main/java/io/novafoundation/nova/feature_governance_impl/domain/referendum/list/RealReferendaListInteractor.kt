@@ -1,10 +1,14 @@
 package io.novafoundation.nova.feature_governance_impl.domain.referendum.list
 
+import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.OnChainReferendum
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Proposal
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackInfo
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.flattenCastingVotes
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.hash
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.proposal
@@ -15,8 +19,14 @@ import io.novafoundation.nova.feature_governance_api.data.repository.PreImageReq
 import io.novafoundation.nova.feature_governance_api.data.repository.PreImageRequest.FetchCondition
 import io.novafoundation.nova.feature_governance_api.data.repository.getTracksById
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
+import io.novafoundation.nova.feature_governance_api.data.source.trackLocksFlowOrEmpty
+import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimScheduleCalculator
+import io.novafoundation.nova.feature_governance_api.domain.locks.RealClaimScheduleCalculator
+import io.novafoundation.nova.feature_governance_api.domain.locks.hasClaimableLocks
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumTrack
+import io.novafoundation.nova.feature_governance_api.domain.referendum.list.GovernanceLocksOverview
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaListInteractor
+import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaListState
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumGroup
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumPreview
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumProposal
@@ -28,9 +38,19 @@ import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.TotalIssuanceRepository
 import jp.co.soramitsu.fearless_utils.extensions.requireHexPrefix
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
+import jp.co.soramitsu.fearless_utils.hash.isPositive
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import java.math.BigInteger
+
+private class IntermediateData(
+    val voting: Map<TrackId, Voting>,
+    val currentBlockNumber: BlockNumber,
+    val onChainReferenda: Map<ReferendumId, OnChainReferendum>,
+    val referenda: GroupedList<ReferendumGroup, ReferendumPreview>,
+)
 
 class RealReferendaListInteractor(
     private val chainStateRepository: ChainStateRepository,
@@ -41,63 +61,109 @@ class RealReferendaListInteractor(
     private val referendaSortingProvider: ReferendaSortingProvider,
 ) : ReferendaListInteractor {
 
-    override fun referendaFlow(voterAccountId: AccountId?, chain: Chain): Flow<GroupedList<ReferendumGroup, ReferendumPreview>> {
-        return flowOfAll { referendaFlowSuspend(voterAccountId, chain) }
+    override fun referendaListStateFlow(voterAccountId: AccountId?, chain: Chain): Flow<ReferendaListState> {
+        return flowOfAll { referendaListStateFlowSuspend(voterAccountId, chain) }
     }
 
-    private suspend fun referendaFlowSuspend(voterAccountId: AccountId?, chain: Chain): Flow<GroupedList<ReferendumGroup, ReferendumPreview>> {
+    private suspend fun referendaListStateFlowSuspend(voterAccountId: AccountId?, chain: Chain): Flow<ReferendaListState> {
         val governanceSource = governanceSourceRegistry.sourceFor(chain.id)
         val tracksById = governanceSource.referenda.getTracksById(chain.id)
+        val undecidingTimeout = governanceSource.referenda.undecidingTimeout(chain.id)
+        val voteLockingPeriod = governanceSource.convictionVoting.voteLockingPeriod(chain.id)
 
-        return chainStateRepository.currentBlockNumberFlow(chain.id).map { currentBlockNumber ->
+        val trackLocksFlow = governanceSource.convictionVoting.trackLocksFlowOrEmpty(voterAccountId, chain.id)
+
+        val intermediateFlow = chainStateRepository.currentBlockNumberFlow(chain.id).map { currentBlockNumber ->
             val onChainReferenda = governanceSource.referenda.getAllOnChainReferenda(chain.id)
             val offChainInfo = governanceSource.offChainInfo.referendumPreviews(chain).associateBy(OffChainReferendumPreview::referendumId)
             val totalIssuance = totalIssuanceRepository.getTotalIssuance(chain.id)
+            val voting = voterAccountId?.let { governanceSource.convictionVoting.votingFor(voterAccountId, chain.id) }.orEmpty()
 
-            val statuses = referendaConstructor.constructReferendaStatuses(
-                chain = chain,
-                onChainReferenda = onChainReferenda,
-                tracksById = tracksById,
-                currentBlockNumber = currentBlockNumber,
-            )
+            val referenda = constructReferendumPreviews(voting, onChainReferenda, chain, tracksById, currentBlockNumber, offChainInfo, totalIssuance)
+            val sortedReferenda = sortReferendaPreviews(referenda)
 
-            val proposals = constructReferendaProposals(onChainReferenda, chain)
+            val onChainReferendaById = onChainReferenda.associateBy(OnChainReferendum::id)
 
-            val userVotes = voterAccountId?.let {
-                governanceSource.convictionVoting.votingFor(voterAccountId, chain.id)
-            }?.flattenCastingVotes().orEmpty()
-
-            val referenda = onChainReferenda.map { onChainReferendum ->
-                ReferendumPreview(
-                    id = onChainReferendum.id,
-                    offChainMetadata = offChainInfo[onChainReferendum.id]?.let {
-                        ReferendumPreview.OffChainMetadata(it.title)
-                    },
-                    onChainMetadata = proposals[onChainReferendum.id]
-                        ?.let(ReferendumPreview::OnChainMetadata),
-                    track = onChainReferendum.track()?.let { trackId ->
-                        tracksById[trackId]?.let { trackInfo ->
-                            ReferendumTrack(trackId, trackInfo.name)
-                        }
-                    },
-                    status = statuses.getValue(onChainReferendum.id),
-                    voting = referendaConstructor.constructReferendumVoting(
-                        referendum = onChainReferendum,
-                        tracksById = tracksById,
-                        currentBlockNumber = currentBlockNumber,
-                        totalIssuance = totalIssuance
-                    ),
-                    userVote = userVotes[onChainReferendum.id]
-                )
-            }
-
-            referenda.groupBy { it.group() }
-                .mapValues { (group, referenda) ->
-                    val sorting = referendaSortingProvider.getReferendumSorting(group)
-
-                    referenda.sortedWith(sorting)
-                }.toSortedMap(referendaSortingProvider.getGroupSorting())
+            IntermediateData(voting, currentBlockNumber, onChainReferendaById, sortedReferenda)
         }
+
+        return combine(intermediateFlow, trackLocksFlow) { intermediateData, trackLocks ->
+            val claimScheduleCalculator = with(intermediateData) {
+                RealClaimScheduleCalculator(voting, currentBlockNumber, onChainReferenda, tracksById, undecidingTimeout, voteLockingPeriod, trackLocks)
+            }
+            val locksOverview = claimScheduleCalculator.governanceLocksOverview()
+
+            ReferendaListState(
+                groupedReferenda = intermediateData.referenda,
+                locksOverview = locksOverview
+            )
+        }
+    }
+
+    private fun ClaimScheduleCalculator.governanceLocksOverview(): GovernanceLocksOverview? {
+        val totalLock = totalGovernanceLock()
+
+        return if (totalLock.isPositive()) {
+            val claimableSchedule = estimateClaimSchedule()
+
+            GovernanceLocksOverview(
+                locked = totalLock,
+                hasClaimableLocks = claimableSchedule.hasClaimableLocks()
+            )
+        } else {
+            null
+        }
+    }
+
+    private suspend fun sortReferendaPreviews(referenda: List<ReferendumPreview>) =
+        referenda.groupBy { it.group() }
+            .mapValues { (group, referenda) ->
+                val sorting = referendaSortingProvider.getReferendumSorting(group)
+
+                referenda.sortedWith(sorting)
+            }.toSortedMap(referendaSortingProvider.getGroupSorting())
+
+    private suspend fun constructReferendumPreviews(
+        voting: Map<TrackId, Voting>,
+        onChainReferenda: Collection<OnChainReferendum>,
+        chain: Chain,
+        tracksById: Map<TrackId, TrackInfo>,
+        currentBlockNumber: BlockNumber,
+        offChainInfo: Map<ReferendumId, OffChainReferendumPreview>,
+        totalIssuance: BigInteger
+    ): List<ReferendumPreview> {
+        val userVotes = voting.flattenCastingVotes()
+        val proposals = constructReferendaProposals(onChainReferenda, chain)
+        val statuses = referendaConstructor.constructReferendaStatuses(
+            chain = chain,
+            onChainReferenda = onChainReferenda,
+            tracksById = tracksById,
+            currentBlockNumber = currentBlockNumber,
+        )
+        val referenda = onChainReferenda.map { onChainReferendum ->
+            ReferendumPreview(
+                id = onChainReferendum.id,
+                offChainMetadata = offChainInfo[onChainReferendum.id]?.let {
+                    ReferendumPreview.OffChainMetadata(it.title)
+                },
+                onChainMetadata = proposals[onChainReferendum.id]
+                    ?.let(ReferendumPreview::OnChainMetadata),
+                track = onChainReferendum.track()?.let { trackId ->
+                    tracksById[trackId]?.let { trackInfo ->
+                        ReferendumTrack(trackId, trackInfo.name)
+                    }
+                },
+                status = statuses.getValue(onChainReferendum.id),
+                voting = referendaConstructor.constructReferendumVoting(
+                    referendum = onChainReferendum,
+                    tracksById = tracksById,
+                    currentBlockNumber = currentBlockNumber,
+                    totalIssuance = totalIssuance
+                ),
+                userVote = userVotes[onChainReferendum.id]
+            )
+        }
+        return referenda
     }
 
     // Attempts to use call-based by proposals by either taking inlined call or fetching preimage if it's size does not exceed threshold

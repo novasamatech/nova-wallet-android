@@ -17,7 +17,7 @@ interface ConvictionVotingRepository {
 
     suspend fun maxTrackVotes(chainId: ChainId): BigInteger
 
-    suspend fun trackLocksFlow(accountId: AccountId, chainId: ChainId): Flow<Map<TrackId, Balance>>
+    fun trackLocksFlow(accountId: AccountId, chainId: ChainId): Flow<Map<TrackId, Balance>>
 
     suspend fun votingFor(accountId: AccountId, chainId: ChainId): Map<TrackId, Voting>
 

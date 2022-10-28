@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_governance_api.domain.referendum.list
 
+import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.utils.formatting.TimerValue
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
@@ -47,7 +48,7 @@ sealed class ReferendumStatus {
         data class Confirming(val approveIn: TimerValue) : Ongoing()
     }
 
-    data class Approved(val executeIn: TimerValue) : ReferendumStatus()
+    data class Approved(val since: BlockNumber, val executeIn: TimerValue) : ReferendumStatus()
 
     object Executed : ReferendumStatus()
 

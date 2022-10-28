@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_governance_api.data.network.blockhain.model
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -16,8 +17,10 @@ sealed class Voting {
         val prior: PriorLock
     ) : Voting()
 
-    // do not yet care about delegations
-    object Delegating : Voting()
+    class Delegating(
+        val amount: Balance,
+        val prior: PriorLock
+    ) : Voting()
 }
 
 sealed class AccountVote {
@@ -49,9 +52,17 @@ enum class VoteType {
 fun Voting.trackVotesNumber(): Int {
     return when (this) {
         is Voting.Casting -> votes.size
-        Voting.Delegating -> 0
+        is Voting.Delegating -> 0
     }
 }
+
+fun AyeVote(amount: Balance, conviction: Conviction) = AccountVote.Standard(
+    vote = Vote(
+        aye = true,
+        conviction = conviction
+    ),
+    balance = amount
+)
 
 fun AccountVote.votes(chainAsset: Chain.Asset): VotesAmount? {
     return when (this) {
@@ -96,7 +107,19 @@ fun AccountVote.voteType(): VoteType? {
 fun Voting.votes(): Map<ReferendumId, AccountVote> {
     return when (this) {
         is Voting.Casting -> votes
-        Voting.Delegating -> emptyMap()
+        is Voting.Delegating -> emptyMap()
+    }
+}
+
+fun Voting.totalLock(): Balance {
+    return when (this) {
+        is Voting.Casting -> {
+            val fromVotes = votes.maxOfOrNull { it.value.amount() }.orZero()
+
+            fromVotes.max(prior.amount)
+        }
+
+        is Voting.Delegating -> amount.max(prior.amount)
     }
 }
 

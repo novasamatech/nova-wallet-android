@@ -32,6 +32,7 @@ import io.novafoundation.nova.feature_governance_impl.di.modules.GovernanceV2
 import io.novafoundation.nova.feature_governance_impl.di.modules.GovernanceV2Module
 import io.novafoundation.nova.feature_governance_impl.di.modules.screens.ReferendumDetailsModule
 import io.novafoundation.nova.feature_governance_impl.di.modules.screens.ReferendumListModule
+import io.novafoundation.nova.feature_governance_impl.di.modules.screens.ReferendumUnlockModule
 import io.novafoundation.nova.feature_governance_impl.di.modules.screens.ReferendumVoteModule
 import io.novafoundation.nova.feature_governance_impl.di.modules.screens.ReferendumVotersModule
 import io.novafoundation.nova.feature_governance_impl.domain.identity.GovernanceIdentityProviderFactory
@@ -64,6 +65,7 @@ import javax.inject.Named
         ReferendumListModule::class,
         ReferendumVotersModule::class,
         ReferendumVoteModule::class,
+        ReferendumUnlockModule::class,
         GovernanceDAppsModule::class
     ]
 )

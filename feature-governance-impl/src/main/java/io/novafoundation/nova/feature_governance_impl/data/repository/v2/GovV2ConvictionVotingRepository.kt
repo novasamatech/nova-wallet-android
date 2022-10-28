@@ -48,7 +48,7 @@ class GovV2ConvictionVotingRepository(
         return runtime.metadata.convictionVoting().numberConstant("MaxVotes", runtime)
     }
 
-    override suspend fun trackLocksFlow(accountId: AccountId, chainId: ChainId): Flow<Map<TrackId, Balance>> {
+    override fun trackLocksFlow(accountId: AccountId, chainId: ChainId): Flow<Map<TrackId, Balance>> {
         return remoteStorageSource.subscribe(chainId) {
             runtime.metadata.convictionVoting().storage("ClassLocksFor").observe(accountId, binding = ::bindTrackLocks)
                 .map { it.toMap() }
@@ -116,7 +116,14 @@ class GovV2ConvictionVotingRepository(
                 Voting.Casting(votes, prior)
             }
 
-            "Delegating" -> Voting.Delegating
+            "Delegating" -> {
+                val delegating = decoded.value.castToStruct()
+
+                val balance = bindNumber(delegating["balance"])
+                val prior = bindPriorLock(delegating["prior"])
+
+                Voting.Delegating(balance, prior)
+            }
 
             else -> incompatible()
         }

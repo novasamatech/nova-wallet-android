@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.isAye
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.votes
+import io.novafoundation.nova.feature_governance_api.domain.referendum.list.GovernanceLocksOverview
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaListInteractor
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumGroup
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumPreview
@@ -28,14 +29,14 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.lis
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.YourVotePreviewModel
 import io.novafoundation.nova.feature_governance_impl.presentation.view.GovernanceLocksModel
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.WithAssetSelector
+import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.selectedChainFlow
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 
 class ReferendaListViewModel(
@@ -57,22 +58,26 @@ class ReferendaListViewModel(
 
     private val accountAndChainFlow = combineToPair(selectedAccount, selectedChainFlow)
 
-    private val referendaFlow = accountAndChainFlow.withLoading { (account, chain) ->
+    private val referendaListStateFLow = accountAndChainFlow.withLoading { (account, chain) ->
         val accountId = account.accountIdIn(chain)
 
-        referendaListInteractor.referendaFlow(accountId, chain)
+        referendaListInteractor.referendaListStateFlow(accountId, chain)
     }
+        .inBackground()
+        .shareWhileSubscribed()
 
-    val governanceTotalLocks = flow {
-        emit(null)
-        delay(1000)
-        emit(GovernanceLocksModel("135 KSM", true))
-    }
-
-    val referendaUiFlow = referendaFlow.mapLoading { groupedReferenda ->
+    val governanceTotalLocks = referendaListStateFLow.mapLoading {
         val asset = assetSelectorMixin.selectedAssetFlow.first()
 
-        groupedReferenda.toListWithHeaders(
+        mapLocksOverviewToUi(it.locksOverview, asset)
+    }
+        .inBackground()
+        .shareWhileSubscribed()
+
+    val referendaUiFlow = referendaListStateFLow.mapLoading { state ->
+        val asset = assetSelectorMixin.selectedAssetFlow.first()
+
+        state.groupedReferenda.toListWithHeaders(
             keyMapper = { group, referenda -> mapReferendumGroupToUi(group, referenda.size) },
             valueMapper = { mapReferendumPreviewToUi(it, asset.token) }
         )
@@ -91,6 +96,15 @@ class ReferendaListViewModel(
     fun openReferendum(referendum: ReferendumModel) {
         val payload = ReferendumDetailsPayload(referendum.id.value)
         governanceRouter.openReferendum(payload)
+    }
+
+    private fun mapLocksOverviewToUi(locksOverview: GovernanceLocksOverview?, asset: Asset): GovernanceLocksModel? {
+        if (locksOverview == null) return null
+
+        return GovernanceLocksModel(
+            amount = mapAmountToAmountModel(locksOverview.locked, asset).token,
+            hasUnlockableLocks = locksOverview.hasClaimableLocks
+        )
     }
 
     private fun mapReferendumGroupToUi(referendumGroup: ReferendumGroup, groupSize: Int): ReferendaGroupModel {
@@ -146,6 +160,6 @@ class ReferendaListViewModel(
     }
 
     fun governanceLocksClicked() {
-        // TODO
+        governanceRouter.openGovernanceLocksOverview()
     }
 }
