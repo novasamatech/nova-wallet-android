@@ -13,6 +13,7 @@ import io.novafoundation.nova.core_db.dao.ContributionDao
 import io.novafoundation.nova.core_db.dao.CurrencyDao
 import io.novafoundation.nova.core_db.dao.DappAuthorizationDao
 import io.novafoundation.nova.core_db.dao.FavouriteDAppsDao
+import io.novafoundation.nova.core_db.dao.GovernanceDAppsDao
 import io.novafoundation.nova.core_db.dao.LockDao
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.dao.NftDao
@@ -141,5 +142,11 @@ class DbModule {
     @ApplicationScope
     fun provideCurrencyDao(appDatabase: AppDatabase): CurrencyDao {
         return appDatabase.currencyDao()
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideGovernanceDAppDao(appDatabase: AppDatabase): GovernanceDAppsDao {
+        return appDatabase.governanceDAppsDao()
     }
 }

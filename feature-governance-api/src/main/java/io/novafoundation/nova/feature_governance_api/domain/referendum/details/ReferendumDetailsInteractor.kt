@@ -8,8 +8,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface ReferendumDetailsInteractor {
 
-    suspend fun getAvailableDApps(chain: Chain): List<GovernanceDApp>
-
     fun referendumDetailsFlow(
         referendumId: ReferendumId,
         chain: Chain,

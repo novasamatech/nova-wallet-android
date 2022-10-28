@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumDetailsInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
+import io.novafoundation.nova.feature_governance_impl.domain.dapp.GovernanceDAppsInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.identity.GovernanceIdentityProviderFactory
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
@@ -40,7 +41,8 @@ class ReferendumDetailsModule {
         tokenUseCase: TokenUseCase,
         referendumFormatter: ReferendumFormatter,
         externalActions: ExternalActions.Presentation,
-        markwon: Markwon
+        markwon: Markwon,
+        governanceDAppsInteractor: GovernanceDAppsInteractor
     ): ViewModel {
         return ReferendumDetailsViewModel(
             router = router,
@@ -54,7 +56,8 @@ class ReferendumDetailsModule {
             tokenUseCase = tokenUseCase,
             referendumFormatter = referendumFormatter,
             externalActions = externalActions,
-            markwon = markwon
+            markwon = markwon,
+            governanceDAppsInteractor = governanceDAppsInteractor
         )
     }
 
