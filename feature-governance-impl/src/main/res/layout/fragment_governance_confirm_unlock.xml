@@ -91,6 +91,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
-            android:text="@string/common_confirm" />
+            android:text="@string/common_confirm"
+            app:size="large" />
     </FrameLayout>
 </LinearLayout>

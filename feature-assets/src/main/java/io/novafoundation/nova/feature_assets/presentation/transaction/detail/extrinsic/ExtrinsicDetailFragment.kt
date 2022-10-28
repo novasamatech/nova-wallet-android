@@ -80,7 +80,7 @@ class ExtrinsicDetailFragment : BaseFragment<ExtrinsicDetailViewModel>() {
             extrinsicDetailStatus.showOperationStatus(statusAppearance)
             extrinsicDetailAmount.setTextColorRes(statusAppearance.amountTint)
 
-            extrinsicDetailToolbar.setTitle(time.formatDateTime(requireContext()))
+            extrinsicDetailToolbar.setTitle(time.formatDateTime())
             extrinsicDetailModule.showValue(module)
             extrinsicDetailCall.showValue(call)
 

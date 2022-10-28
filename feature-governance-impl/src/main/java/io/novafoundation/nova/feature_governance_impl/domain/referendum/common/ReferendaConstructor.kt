@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackInfo
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackQueue
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.asOngoing
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.asTimeSinceStatus
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ayeVotes
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.inQueue
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.nayVotes
@@ -186,27 +187,28 @@ class RealReferendaConstructor(
                 // for other kind of referenda, there is not historic timestamps on-chain
                 ReferendumStatus.NotExecuted.Cancelled -> {
                     add(State.CREATED, at = null)
-                    add(State.CANCELLED, at = null)
+                    add(State.CANCELLED, at = onChainReferendum.status.asTimeSinceStatus().since)
                 }
                 ReferendumStatus.NotExecuted.Killed -> {
                     add(State.CREATED, at = null)
-                    add(State.KILLED, at = null)
+                    add(State.KILLED, at = onChainReferendum.status.asTimeSinceStatus().since)
                 }
                 ReferendumStatus.NotExecuted.Rejected -> {
                     add(State.CREATED, at = null)
-                    add(State.REJECTED, at = null)
+                    add(State.REJECTED, at = onChainReferendum.status.asTimeSinceStatus().since)
                 }
                 ReferendumStatus.NotExecuted.TimedOut -> {
                     add(State.CREATED, at = null)
-                    add(State.TIMED_OUT, at = null)
+                    add(State.TIMED_OUT, at = onChainReferendum.status.asTimeSinceStatus().since)
                 }
                 is ReferendumStatus.Approved -> {
                     add(State.CREATED, at = null)
+                    // Approved status will be added in another place because this is a historical status but approved is an active status
                 }
                 ReferendumStatus.Executed -> {
                     add(State.CREATED, at = null)
-                    add(State.APPROVED, at = null)
-                    add(State.EXECUTED, at = null)
+                    add(State.APPROVED, at = onChainReferendum.status.asTimeSinceStatus().since)
+                    add(State.EXECUTED, at = onChainReferendum.status.asTimeSinceStatus().since)
                 }
             }
         }

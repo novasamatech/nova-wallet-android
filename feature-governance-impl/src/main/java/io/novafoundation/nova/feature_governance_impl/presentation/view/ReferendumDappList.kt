@@ -5,7 +5,6 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
 import androidx.core.view.isGone
-import androidx.core.view.isVisible
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.feature_dapp_api.presentation.view.DAppView
 import io.novafoundation.nova.feature_governance_impl.R

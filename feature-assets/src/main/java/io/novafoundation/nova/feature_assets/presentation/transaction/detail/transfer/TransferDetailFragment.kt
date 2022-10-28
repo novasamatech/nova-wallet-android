@@ -83,7 +83,7 @@ class TransferDetailFragment : BaseFragment<TransactionDetailViewModel>() {
             transactionDetailStatus.showOperationStatus(statusAppearance)
             transactionDetailTransferDirection.setImageResource(transferDirectionIcon)
 
-            transactionDetailToolbar.setTitle(time.formatDateTime(requireContext()))
+            transactionDetailToolbar.setTitle(time.formatDateTime())
 
             transactionDetailFee.showValue(fee)
 

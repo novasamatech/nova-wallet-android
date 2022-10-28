@@ -40,8 +40,16 @@ fun OnChainReferendumStatus.asOngoing(): OnChainReferendumStatus.Ongoing {
     return asOngoingOrNull() ?: error("Referendum is not ongoing")
 }
 
+fun OnChainReferendumStatus.asTimeSinceStatus(): OnChainReferendumStatus.TimeSinceStatus {
+    return asTimeSinceStatusOrNull() ?: error("Referendum is not ongoing")
+}
+
 fun OnChainReferendumStatus.asOngoingOrNull(): OnChainReferendumStatus.Ongoing? {
     return castOrNull<OnChainReferendumStatus.Ongoing>()
+}
+
+fun OnChainReferendumStatus.asTimeSinceStatusOrNull(): OnChainReferendumStatus.TimeSinceStatus? {
+    return castOrNull<OnChainReferendumStatus.TimeSinceStatus>()
 }
 
 fun Tally.ayeVotes(): Approval.Votes {

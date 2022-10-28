@@ -68,7 +68,7 @@ class RewardDetailFragment : BaseFragment<RewardDetailViewModel>() {
 
         with(viewModel.operation) {
             rewardDetailEvent.showValue(eventId)
-            rewardDetailToolbar.setTitle(time.formatDateTime(requireContext()))
+            rewardDetailToolbar.setTitle(time.formatDateTime())
             rewardDetailAmount.text = amount
 
             rewardDetailEra.showValue(era)
