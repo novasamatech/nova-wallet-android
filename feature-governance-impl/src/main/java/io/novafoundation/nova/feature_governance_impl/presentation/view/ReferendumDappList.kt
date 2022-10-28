@@ -38,7 +38,7 @@ class ReferendumDappList @JvmOverloads constructor(
         dApps.forEach(::addDApp)
     }
 
-    fun setDAppsOrHide(dApps: List<GovernanceDAppModel>) {
+    fun setDAppsOrHide(dApps: List<ReferendumDAppModel>) {
         isGone = dApps.isEmpty()
         setDApps(dApps)
     }
