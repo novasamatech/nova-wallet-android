@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
+import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
@@ -61,5 +62,7 @@ class ConfirmGovernanceUnlockFragment : BaseFragment<ConfirmGovernanceUnlockView
 
         viewModel.transferableChange.observe(confirmReferendumUnlockTransferableChange::setAmountChangeModel)
         viewModel.governanceLockChange.observe(confirmReferendumUnlockGovernanceLockChange::setAmountChangeModel)
+
+        viewModel.confirmButtonState.observe(confirmGovernanceUnlockConfirm::setState)
     }
 }
