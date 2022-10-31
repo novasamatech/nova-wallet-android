@@ -52,13 +52,6 @@ fun Tally.nayVotes(): Approval.Votes {
     return votesOf(Tally::nays)
 }
 
-fun TrackInfo.supportThreshold(x: Perbill, totalIssuance: Balance): Balance {
-    val fractionThreshold = minSupport.threshold(x)
-    val balanceThreshold = fractionThreshold * totalIssuance.toBigDecimal()
-
-    return balanceThreshold.toBigInteger()
-}
-
 fun Map<TrackId, Voting>.flattenCastingVotes(): Map<ReferendumId, AccountVote> {
     return flatMap { (_, voting) ->
         when (voting) {
