@@ -18,7 +18,7 @@ class ChainLocal(
     val isEthereumBased: Boolean,
     val isTestNet: Boolean,
     val hasCrowdloans: Boolean,
-    val hasGovernance: Boolean,
+    val governance: String,
     val additional: String?,
 ) {
 
