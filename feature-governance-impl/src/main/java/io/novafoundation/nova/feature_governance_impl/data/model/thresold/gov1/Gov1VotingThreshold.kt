@@ -17,6 +17,8 @@ enum class Gov1VotingThreshold : VotingThreshold {
         // ayes > nays * sqrt(total_issuance) / sqrt(turnout)  =>
         // ayes / (ayes + nays) > [nays / (ayes + nays)] * [sqrt(total_issuance) / sqrt(turnout)]
         override fun ayesFractionNeeded(tally: Tally, totalIssuance: Balance, passedSinceDecidingFraction: Perbill): Perbill {
+            if (totalIssuance == Balance.ZERO || tally.support == Balance.ZERO) return Perbill.ONE
+
             val sqrtTurnout = tally.support.intSqrt()
             val sqrtTotalIssuance = totalIssuance.intSqrt()
 
@@ -34,6 +36,8 @@ enum class Gov1VotingThreshold : VotingThreshold {
         // ayes > nays * sqrt(turnout) / sqrt(total_issuance)  =>
         // ayes / (ayes + nays) > [nays / (ayes + nays)] * [sqrt(turnout) / sqrt(total_issuance)]
         override fun ayesFractionNeeded(tally: Tally, totalIssuance: Balance, passedSinceDecidingFraction: Perbill): Perbill {
+            if (totalIssuance == Balance.ZERO || tally.support == Balance.ZERO) return Perbill.ONE
+
             val sqrtTurnout = tally.support.intSqrt()
             val sqrtTotalIssuance = totalIssuance.intSqrt()
 
