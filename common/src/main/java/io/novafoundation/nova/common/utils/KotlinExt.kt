@@ -14,6 +14,7 @@ import java.util.UUID
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.math.sqrt
 
 private val PERCENTAGE_MULTIPLIER = 100.toBigDecimal()
 
@@ -28,6 +29,8 @@ infix fun Int.floorMod(divisor: Int) = Math.floorMod(this, divisor)
  * Compares two BigDecimals taking into account only values but not scale unlike `==` operator
  */
 infix fun BigDecimal.hasTheSaveValueAs(another: BigDecimal) = compareTo(another) == 0
+
+fun BigInteger.intSqrt() = sqrt(toDouble()).toLong().toBigInteger()
 
 val BigDecimal.isZero: Boolean
     get() = signum() == 0

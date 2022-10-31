@@ -15,7 +15,6 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.nayVotes
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.orEmpty
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.positionOf
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.supportThreshold
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.track
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
@@ -96,14 +95,14 @@ class RealReferendaConstructor(
 
         return ReferendumVoting(
             support = ReferendumVoting.Support(
-                threshold = track.supportThreshold(elapsedSinceDecidingFraction, totalIssuance),
+                threshold = status.threshold.supportNeeded(status.tally, totalIssuance, elapsedSinceDecidingFraction),
                 turnout = status.tally.support,
                 electorate = totalIssuance
             ),
             approval = ReferendumVoting.Approval(
                 ayeVotes = status.tally.ayeVotes(),
                 nayVotes = status.tally.nayVotes(),
-                threshold = track.minApproval.threshold(elapsedSinceDecidingFraction)
+                threshold = status.threshold.ayesFractionNeeded(status.tally, totalIssuance, elapsedSinceDecidingFraction)
             )
         )
     }

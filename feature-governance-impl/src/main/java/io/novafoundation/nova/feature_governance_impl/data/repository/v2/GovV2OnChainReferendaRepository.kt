@@ -6,7 +6,6 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountId
 import io.novafoundation.nova.common.data.network.runtime.binding.bindBlockNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.bindBoolean
 import io.novafoundation.nova.common.data.network.runtime.binding.bindByteArray
-import io.novafoundation.nova.common.data.network.runtime.binding.bindDispatchTime
 import io.novafoundation.nova.common.data.network.runtime.binding.bindFixedI64
 import io.novafoundation.nova.common.data.network.runtime.binding.bindList
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
@@ -39,9 +38,11 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VotingCurve
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.empty
 import io.novafoundation.nova.feature_governance_api.data.repository.OnChainReferendaRepository
-import io.novafoundation.nova.feature_governance_impl.data.model.curve.LinearDecreasingCurve
-import io.novafoundation.nova.feature_governance_impl.data.model.curve.ReciprocalCurve
-import io.novafoundation.nova.feature_governance_impl.data.model.curve.SteppedDecreasingCurve
+import io.novafoundation.nova.feature_governance_api.data.repository.getTracksById
+import io.novafoundation.nova.feature_governance_impl.data.model.thresold.gov2.Gov2VotingThreshold
+import io.novafoundation.nova.feature_governance_impl.data.model.thresold.gov2.curve.LinearDecreasingCurve
+import io.novafoundation.nova.feature_governance_impl.data.model.thresold.gov2.curve.ReciprocalCurve
+import io.novafoundation.nova.feature_governance_impl.data.model.thresold.gov2.curve.SteppedDecreasingCurve
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
@@ -96,29 +97,35 @@ class GovV2OnChainReferendaRepository(
 
     override suspend fun getAllOnChainReferenda(chainId: ChainId): Collection<OnChainReferendum> {
         return remoteStorageSource.query(chainId) {
+            val allTracks = getTracksById(chainId)
+
             runtime.metadata.referenda().storage("ReferendumInfoFor").entries(
                 prefixArgs = emptyArray(),
                 keyExtractor = { (id: BigInteger) -> ReferendumId(id) },
-                binding = { decoded, id -> bindReferendum(decoded, id, runtime) }
+                binding = { decoded, id -> bindReferendum(decoded, id, allTracks, runtime) }
             ).values.filterNotNull()
         }
     }
 
     override suspend fun getOnChainReferenda(chainId: ChainId, referendaIds: Collection<ReferendumId>): Map<ReferendumId, OnChainReferendum> {
         return remoteStorageSource.query(chainId) {
+            val allTracks = getTracksById(chainId)
+
             runtime.metadata.referenda().storage("ReferendumInfoFor").entries(
                 keysArguments = referendaIds.map { id -> listOf(id.value) },
                 keyExtractor = { (id: BigInteger) -> ReferendumId(id) },
-                binding = { decoded, id -> bindReferendum(decoded, id, runtime) }
+                binding = { decoded, id -> bindReferendum(decoded, id, allTracks, runtime) }
             )
         }.filterNotNull()
     }
 
     override suspend fun onChainReferendumFlow(chainId: ChainId, referendumId: ReferendumId): Flow<OnChainReferendum> {
         return remoteStorageSource.subscribe(chainId) {
+            val allTracks = getTracksById(chainId)
+
             runtime.metadata.referenda().storage("ReferendumInfoFor").observe(
                 referendumId.value,
-                binding = { bindReferendum(it, referendumId, runtime)!! }
+                binding = { bindReferendum(it, referendumId, allTracks, runtime)!! }
             )
         }
     }
@@ -146,23 +153,29 @@ class GovV2OnChainReferendaRepository(
         }
     }
 
-    private fun bindReferendum(decoded: Any?, id: ReferendumId, runtime: RuntimeSnapshot): OnChainReferendum? = runCatching {
+    private fun bindReferendum(
+        decoded: Any?,
+        id: ReferendumId,
+        tracksById: Map<TrackId, TrackInfo>,
+        runtime: RuntimeSnapshot
+    ): OnChainReferendum? = runCatching {
         val asDictEnum = decoded.castToDictEnum()
 
         val referendumStatus = when (asDictEnum.name) {
             "Ongoing" -> {
                 val status = asDictEnum.value.castToStruct()
+                val trackId = TrackId(bindNumber(status["track"]))
 
                 OnChainReferendumStatus.Ongoing(
-                    track = TrackId(bindNumber(status["track"])),
+                    track = trackId,
                     proposal = bindProposal(status["proposal"], runtime),
-                    desiredEnactment = bindDispatchTime(status.getTyped("enactment")),
                     submitted = bindBlockNumber(status["submitted"]),
                     submissionDeposit = bindReferendumDeposit(status["submissionDeposit"])!!,
                     decisionDeposit = bindReferendumDeposit(status["decisionDeposit"]),
                     deciding = bindDecidingStatus(status["deciding"]),
                     tally = bindTally(status.getTyped("tally")),
-                    inQueue = bindBoolean(status["inQueue"])
+                    inQueue = bindBoolean(status["inQueue"]),
+                    threshold = Gov2VotingThreshold(tracksById.getValue(trackId))
                 )
             }
             "Approved" -> OnChainReferendumStatus.Approved(bindCompletedReferendumSince(asDictEnum.value))

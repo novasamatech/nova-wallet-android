@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.data.model.curve
 
+import io.novafoundation.nova.feature_governance_impl.data.model.thresold.gov2.curve.SteppedDecreasingCurve
 import org.junit.Test
 
 class SteppedDecreasingCurveTest {
