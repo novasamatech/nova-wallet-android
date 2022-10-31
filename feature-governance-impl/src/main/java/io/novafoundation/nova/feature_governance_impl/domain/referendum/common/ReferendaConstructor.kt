@@ -10,7 +10,7 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackInfo
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackQueue
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.asOngoing
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.asTimeSinceStatus
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.sinceOrThrow
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ayeVotes
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.inQueue
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.nayVotes
@@ -187,19 +187,19 @@ class RealReferendaConstructor(
                 // for other kind of referenda, there is not historic timestamps on-chain
                 ReferendumStatus.NotExecuted.Cancelled -> {
                     add(State.CREATED, at = null)
-                    add(State.CANCELLED, at = onChainReferendum.status.asTimeSinceStatus().since)
+                    add(State.CANCELLED, at = onChainReferendum.status.sinceOrThrow())
                 }
                 ReferendumStatus.NotExecuted.Killed -> {
                     add(State.CREATED, at = null)
-                    add(State.KILLED, at = onChainReferendum.status.asTimeSinceStatus().since)
+                    add(State.KILLED, at = onChainReferendum.status.sinceOrThrow())
                 }
                 ReferendumStatus.NotExecuted.Rejected -> {
                     add(State.CREATED, at = null)
-                    add(State.REJECTED, at = onChainReferendum.status.asTimeSinceStatus().since)
+                    add(State.REJECTED, at = onChainReferendum.status.sinceOrThrow())
                 }
                 ReferendumStatus.NotExecuted.TimedOut -> {
                     add(State.CREATED, at = null)
-                    add(State.TIMED_OUT, at = onChainReferendum.status.asTimeSinceStatus().since)
+                    add(State.TIMED_OUT, at = onChainReferendum.status.sinceOrThrow())
                 }
                 is ReferendumStatus.Approved -> {
                     add(State.CREATED, at = null)
@@ -207,8 +207,8 @@ class RealReferendaConstructor(
                 }
                 ReferendumStatus.Executed -> {
                     add(State.CREATED, at = null)
-                    add(State.APPROVED, at = onChainReferendum.status.asTimeSinceStatus().since)
-                    add(State.EXECUTED, at = onChainReferendum.status.asTimeSinceStatus().since)
+                    add(State.APPROVED, at = onChainReferendum.status.sinceOrThrow())
+                    add(State.EXECUTED, at = onChainReferendum.status.sinceOrThrow())
                 }
             }
         }

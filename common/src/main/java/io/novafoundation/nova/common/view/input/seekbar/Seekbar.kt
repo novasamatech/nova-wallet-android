@@ -76,7 +76,7 @@ class Seekbar @JvmOverloads constructor(
 
     private fun addTickLabelOnLayoutListener() {
         seekbarTickLabelsContainer.addOnLayoutChangeListener { viewGroup, _, _, _, _, _, _, _, _ ->
-            viewGroup as ViewGroup
+            require(viewGroup is ViewGroup)
 
             val seekbarSteps = seekbarInner.max
             val seekbarStartPadding = seekbarInner.paddingStart

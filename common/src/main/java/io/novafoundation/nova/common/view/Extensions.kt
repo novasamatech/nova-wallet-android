@@ -43,13 +43,6 @@ fun TextView.startTimer(
     if (currentTimer is CountDownTimer) {
         currentTimer.cancel()
     }
-    val formattedTime = millis.milliseconds.formatTimer(context)
-
-    val message = customMessageFormat?.let {
-        resources.getString(customMessageFormat, formattedTime)
-    } ?: formattedTime
-
-    this@startTimer.text = message
 
     val newTimer = object : CountDownTimer(millis - timePassedSinceCalculation, 1000) {
         override fun onTick(millisUntilFinished: Long) {
