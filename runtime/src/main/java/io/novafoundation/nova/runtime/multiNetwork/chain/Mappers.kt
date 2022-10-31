@@ -18,7 +18,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainRemot
 
 private const val ETHEREUM_OPTION = "ethereumBased"
 private const val CROWDLOAN_OPTION = "crowdloans"
-private const val GOVERNANCE_OPTION = "governance"
 private const val TESTNET_OPTION = "testnet"
 
 private fun mapSectionTypeRemoteToSectionType(section: String) = when (section) {
@@ -198,9 +197,18 @@ fun mapChainRemoteToChain(
             isEthereumBased = ETHEREUM_OPTION in optionsOrEmpty,
             isTestNet = TESTNET_OPTION in optionsOrEmpty,
             hasCrowdloans = CROWDLOAN_OPTION in optionsOrEmpty,
-            hasGovernance = GOVERNANCE_OPTION in optionsOrEmpty,
+            governance = optionsOrEmpty.governanceTypeFromOptions(),
             additional = additional
         )
+    }
+}
+
+private fun Set<String>.governanceTypeFromOptions(): Chain.Governance {
+    return when {
+        "governance" in this -> Chain.Governance.V2 // for backward compatibility of dev builds. Can be removed once everyone will update dev app
+        "governance-v2" in this -> Chain.Governance.V2
+        "governance-v1" in this -> Chain.Governance.V1
+        else -> Chain.Governance.NONE
     }
 }
 
@@ -276,7 +284,7 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
             isEthereumBased = isEthereumBased,
             isTestNet = isTestNet,
             hasCrowdloans = hasCrowdloans,
-            hasGovernance = hasGovernance,
+            governance = Chain.Governance.valueOf(governance),
             additional = additional
         )
     }
@@ -351,7 +359,7 @@ fun mapChainToChainLocal(chain: Chain, gson: Gson): ChainLocal {
             isEthereumBased = isEthereumBased,
             isTestNet = isTestNet,
             hasCrowdloans = hasCrowdloans,
-            hasGovernance = hasGovernance,
+            governance = governance.name,
             additional = additional,
         )
     }

@@ -10,7 +10,7 @@ data class ChainRemote(
     val icon: String,
     val addressPrefix: Int,
     val types: ChainTypesInfo?,
-    val options: List<String>?,
+    val options: Set<String>?,
     val parentId: String?,
     val additional: Map<String, Any?>?,
 )
