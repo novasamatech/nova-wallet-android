@@ -25,7 +25,7 @@ enum class Gov1VotingThreshold : VotingThreshold {
             val naysFraction = tally.nays.divideToDecimal(tally.ayes + tally.nays)
             val totalIssuanceToTurnout = sqrtTotalIssuance.divideToDecimal(sqrtTurnout)
 
-            return naysFraction * totalIssuanceToTurnout
+            return (naysFraction * totalIssuanceToTurnout).coerceAtMost(Perbill.ONE)
         }
     },
 
@@ -44,7 +44,7 @@ enum class Gov1VotingThreshold : VotingThreshold {
             val naysFraction = tally.nays.divideToDecimal(tally.ayes + tally.nays)
             val turnoutToTotalIssuance = sqrtTurnout.divideToDecimal(sqrtTotalIssuance)
 
-            return naysFraction * turnoutToTotalIssuance
+            return (naysFraction * turnoutToTotalIssuance).coerceAtMost(Perbill.ONE)
         }
     },
 
