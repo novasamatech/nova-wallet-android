@@ -1,8 +1,8 @@
-package io.novafoundation.nova.feature_assets.presentation.common
+package io.novafoundation.nova.feature_wallet_api.presentation.formatters
 
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.capitalize
-import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_wallet_api.R
 
 fun mapBalanceIdToUi(resourceManager: ResourceManager, id: String): String {
     return when (id.trim()) {

@@ -9,7 +9,7 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.list.GovernanceLocksOverviewInteractor
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.GovernanceUnlockInteractor
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.unlock.list.GovernanceLocksOverviewViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
@@ -22,7 +22,7 @@ class GovernanceLocksOverviewModule {
     @ViewModelKey(GovernanceLocksOverviewViewModel::class)
     fun provideViewModel(
         router: GovernanceRouter,
-        interactor: GovernanceLocksOverviewInteractor,
+        interactor: GovernanceUnlockInteractor,
         tokenUseCase: TokenUseCase,
         resourceManager: ResourceManager,
     ): ViewModel {

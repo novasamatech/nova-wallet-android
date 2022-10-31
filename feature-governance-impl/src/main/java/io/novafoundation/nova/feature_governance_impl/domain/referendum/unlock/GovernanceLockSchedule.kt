@@ -1,13 +1,14 @@
-package io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.list
+package io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock
 
 import io.novafoundation.nova.common.utils.formatting.TimerValue
 import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimSchedule
-import io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.list.GovernanceLocksOverview.Lock
+import io.novafoundation.nova.feature_governance_api.domain.locks.hasClaimableLocks
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 
 class GovernanceLocksOverview(
     val totalLocked: Balance,
-    val claimSchedule: List<Lock>,
+    val locks: List<Lock>,
+    val claimSchedule: ClaimSchedule,
 ) {
 
     sealed class Lock {
@@ -19,5 +20,5 @@ class GovernanceLocksOverview(
 }
 
 fun GovernanceLocksOverview.canClaimTokens(): Boolean {
-    return claimSchedule.any { it is Lock.Claimable }
+    return claimSchedule.hasClaimableLocks()
 }

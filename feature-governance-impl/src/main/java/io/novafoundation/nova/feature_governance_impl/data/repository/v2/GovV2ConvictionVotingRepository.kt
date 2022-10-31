@@ -19,6 +19,9 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.votes
 import io.novafoundation.nova.feature_governance_api.data.repository.ConvictionVotingRepository
+import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimSchedule
+import io.novafoundation.nova.feature_governance_impl.data.network.blockchain.extrinsic.convictionVotingRemoveVote
+import io.novafoundation.nova.feature_governance_impl.data.network.blockchain.extrinsic.convictionVotingUnlock
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -26,6 +29,7 @@ import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Vote
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -35,6 +39,8 @@ class GovV2ConvictionVotingRepository(
     private val remoteStorageSource: StorageDataSource,
     private val chainRegistry: ChainRegistry,
 ) : ConvictionVotingRepository {
+
+    override val voteLockId: String = "pyconvot"
 
     override suspend fun voteLockingPeriod(chainId: ChainId): BlockNumber {
         val runtime = chainRegistry.getRuntime(chainId)
@@ -91,6 +97,20 @@ class GovV2ConvictionVotingRepository(
                     accountId = voterId,
                     vote = accountVote
                 )
+            }
+        }
+    }
+
+    override fun ExtrinsicBuilder.unlock(accountId: AccountId, claimable: ClaimSchedule.UnlockChunk.Claimable) {
+        claimable.actions.forEach { claimAction ->
+            when (claimAction) {
+                is ClaimSchedule.ClaimAction.RemoveVote -> {
+                    convictionVotingRemoveVote(claimAction.trackId, claimAction.referendumId)
+                }
+
+                is ClaimSchedule.ClaimAction.Unlock -> {
+                    convictionVotingUnlock(claimAction.trackId, accountId)
+                }
             }
         }
     }

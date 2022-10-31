@@ -5,10 +5,10 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_governance_impl.R
-import io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.list.GovernanceLocksOverview
-import io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.list.GovernanceLocksOverview.Lock
-import io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.list.GovernanceLocksOverviewInteractor
-import io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.list.canClaimTokens
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.GovernanceLocksOverview
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.GovernanceLocksOverview.Lock
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.GovernanceUnlockInteractor
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.canClaimTokens
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.unlock.list.model.GovernanceLockModel
 import io.novafoundation.nova.feature_governance_impl.presentation.unlock.list.model.GovernanceLockModel.StatusContent
@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.map
 
 class GovernanceLocksOverviewViewModel(
     private val router: GovernanceRouter,
-    private val interactor: GovernanceLocksOverviewInteractor,
+    private val interactor: GovernanceUnlockInteractor,
     private val tokenUseCase: TokenUseCase,
     private val resourceManager: ResourceManager,
 ) : BaseViewModel() {
@@ -36,7 +36,7 @@ class GovernanceLocksOverviewViewModel(
     }.shareInBackground()
 
     val lockModels = combine(lockOverviewFlow, tokenFlow) { locksOverview, token ->
-        locksOverview.claimSchedule.mapIndexed { index, lock -> mapUnlockChunkToUi(lock, index, token) }
+        locksOverview.locks.mapIndexed { index, lock -> mapUnlockChunkToUi(lock, index, token) }
     }
         .withLoading()
         .shareInBackground()

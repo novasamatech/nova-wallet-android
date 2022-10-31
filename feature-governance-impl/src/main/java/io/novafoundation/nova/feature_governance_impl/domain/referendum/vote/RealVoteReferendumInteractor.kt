@@ -29,6 +29,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
+import io.novafoundation.nova.feature_wallet_api.domain.model.maxLockReplacing
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
@@ -121,7 +122,7 @@ class RealVoteReferendumInteractor(
                 tracks = tracks,
                 undecidingTimeout = undecidingTimeout,
                 voteLockingPeriod = voteLockingPeriod,
-                votingLockId = "pyconvot"
+                votingLockId = governanceSource.convictionVoting.voteLockId
             )
         }
     }
@@ -156,9 +157,7 @@ private class RealGovernanceLocksEstimator(
     private val currentMaxGovernanceLocked = governanceLocksByTrack.values.maxOrNull().orZero()
     private val currentMaxUnlocksAt = estimateUnlocksAt(changedVote = null)
 
-    private val otherMaxLocked = balanceLocks.filter { it.id != votingLockId }
-        .maxOfOrNull { it.amountInPlanks }
-        .orZero()
+    private val otherMaxLocked = balanceLocks.maxLockReplacing(votingLockId, replaceWith = Balance.ZERO)
 
     private val allMaxLocked = balanceLocks.maxOfOrNull { it.amountInPlanks }
         .orZero()
