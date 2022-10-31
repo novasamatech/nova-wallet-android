@@ -10,6 +10,8 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.RoundingMode
 import java.text.DecimalFormat
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 
@@ -20,6 +22,8 @@ private const val DECIMAL_SEPARATOR = '.'
 
 private const val FULL_PRECISION = 5
 const val ABBREVIATED_PRECISION = 2
+
+private val dateTimeFormat = SimpleDateFormat.getDateTimeInstance()
 
 private val defaultAbbreviationFormatter = FixedPrecisionFormatter(ABBREVIATED_PRECISION)
 private val defaultFullFormatter = FixedPrecisionFormatter(FULL_PRECISION)
@@ -100,9 +104,7 @@ fun Long.formatDaysSinceEpoch(context: Context): String? {
     }
 }
 
-fun Long.formatDateFromMillis(context: Context) = DateUtils.formatDateTime(context, this, 0)
-
-fun Long.formatDateTime(context: Context) = DateUtils.getRelativeDateTimeString(context, this, DateUtils.SECOND_IN_MILLIS, 0, 0)
+fun Long.formatDateTime() = dateTimeFormat.format(Date(this))
 
 fun decimalFormatterFor(pattern: String): DecimalFormat {
     return DecimalFormat(pattern).apply {

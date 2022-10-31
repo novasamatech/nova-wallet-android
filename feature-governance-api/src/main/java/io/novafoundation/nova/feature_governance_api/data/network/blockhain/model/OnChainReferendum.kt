@@ -41,15 +41,19 @@ sealed class OnChainReferendumStatus {
         val threshold: VotingThreshold,
     ) : OnChainReferendumStatus()
 
-    class Approved(val since: BlockNumber) : OnChainReferendumStatus()
+    class Approved(override val since: BlockNumber) : OnChainReferendumStatus(), TimeSinceStatus
 
-    class Rejected(val since: BlockNumber) : OnChainReferendumStatus()
+    class Rejected(override val since: BlockNumber) : OnChainReferendumStatus(), TimeSinceStatus
 
-    class Cancelled(val since: BlockNumber) : OnChainReferendumStatus()
+    class Cancelled(override val since: BlockNumber) : OnChainReferendumStatus(), TimeSinceStatus
 
-    class TimedOut(val since: BlockNumber) : OnChainReferendumStatus()
+    class TimedOut(override val since: BlockNumber) : OnChainReferendumStatus(), TimeSinceStatus
 
-    class Killed(val since: BlockNumber) : OnChainReferendumStatus()
+    class Killed(override val since: BlockNumber) : OnChainReferendumStatus(), TimeSinceStatus
+
+    interface TimeSinceStatus {
+        val since: BlockNumber
+    }
 }
 
 sealed class Proposal {

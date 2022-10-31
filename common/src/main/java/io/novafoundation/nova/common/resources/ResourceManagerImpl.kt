@@ -53,7 +53,7 @@ class ResourceManagerImpl(
     }
 
     override fun formatDate(timestamp: Long): String {
-        return timestamp.formatDateTime(contextManager.getApplicationContext()).toString()
+        return timestamp.formatDateTime().toString()
     }
 
     override fun formatTime(timestamp: Long): String {

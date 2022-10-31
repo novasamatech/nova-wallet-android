@@ -5,9 +5,9 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import io.novafoundation.nova.common.utils.formatting.TimerValue
-import io.novafoundation.nova.common.utils.setDrawableEnd
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.letOrHide
+import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.view.startTimer
 import io.novafoundation.nova.common.view.stopTimer
 
@@ -72,5 +72,5 @@ fun TextView.setReferendumTimeEstimation(maybeTimeEstimation: ReferendumTimeEsti
 
 private fun TextView.setReferendumTextStyle(textStyle: ReferendumTimeEstimation.TextStyle) {
     setTextColorRes(textStyle.colorRes)
-    setDrawableEnd(textStyle.iconRes, widthInDp = 16, paddingInDp = 4, tint = textStyle.colorRes)
+    setDrawableStart(textStyle.iconRes, widthInDp = 16, paddingInDp = 4, tint = textStyle.colorRes)
 }
