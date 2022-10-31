@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository
 
+import io.novafoundation.nova.common.data.network.runtime.binding.Perbill
+import io.novafoundation.nova.common.data.network.runtime.binding.bindPerbill
 import io.novafoundation.nova.common.utils.parachainStaking
-import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.Perbill
-import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindPerbill
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.InflationInfo
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.ParachainBondConfig
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.bindInflationInfo

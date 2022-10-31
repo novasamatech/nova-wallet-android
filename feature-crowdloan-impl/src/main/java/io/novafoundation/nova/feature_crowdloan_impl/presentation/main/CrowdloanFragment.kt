@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import coil.ImageLoader
-import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -22,7 +21,17 @@ import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.di.CrowdloanFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.setupAssetSelector
-import kotlinx.android.synthetic.main.fragment_crowdloans.*
+import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanAbout
+import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanAssetSelector
+import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanList
+import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanMainDescription
+import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanPlaceholder
+import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanShimmering
+import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanTotalContributedContainer
+import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanTotalContributedFiat
+import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanTotalContributedShimmering
+import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanTotalContributedValue
+import kotlinx.android.synthetic.main.fragment_crowdloans.crowdloanTotalContributionsCount
 import javax.inject.Inject
 
 class CrowdloanFragment : BaseFragment<CrowdloanViewModel>(), CrowdloanAdapter.Handler {
@@ -43,14 +52,6 @@ class CrowdloanFragment : BaseFragment<CrowdloanViewModel>(), CrowdloanAdapter.H
     }
 
     override fun initViews() {
-        crowdloanContainer.applyInsetter {
-            type(statusBars = true) {
-                padding()
-            }
-        }
-
-        crowdloanAvatar.setOnClickListener { viewModel.avatarClicked() }
-
         crowdloanList.adapter = adapter
 
         with(requireContext()) {
@@ -107,8 +108,6 @@ class CrowdloanFragment : BaseFragment<CrowdloanViewModel>(), CrowdloanAdapter.H
         }
 
         viewModel.mainDescription.observe(crowdloanMainDescription::setText)
-
-        viewModel.selectedWalletModel.observe(crowdloanAvatar::setModel)
     }
 
     override fun crowdloanClicked(paraId: ParaId) {

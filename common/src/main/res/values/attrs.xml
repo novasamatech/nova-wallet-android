@@ -103,6 +103,8 @@
             <enum name="primaryTransparent" value="1" />
             <enum name="secondary" value="2" />
             <enum name="secondaryTransparent" value="3" />
+            <enum name="primaryGreen" value="4" />
+            <enum name="primaryRed" value="5" />
         </attr>
 
         <attr name="size" format="enum">
@@ -114,7 +116,11 @@
     <declare-styleable name="PlaceholderView">
         <attr name="android:text" />
         <attr name="image" format="color|reference" />
-        <attr name="showBackground" format="boolean" />
+        <attr name="placeholderBackgroundStyle" format="enum">
+            <enum name="dark" value="0" />
+            <enum name="light" value="1" />
+            <enum name="no_background" value="2" />
+        </attr>
     </declare-styleable>
 
     <declare-styleable name="TitleImageContentSectionView">
@@ -188,5 +194,9 @@
 
     <declare-styleable name="LinkView">
         <attr name="linkText" format="string" />
+    </declare-styleable>
+
+    <declare-styleable name="TotalAmountView">
+        <attr name="title" />
     </declare-styleable>
 </resources>

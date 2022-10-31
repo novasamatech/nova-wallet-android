@@ -8,6 +8,7 @@ import kotlinx.android.synthetic.main.fragment_balance_breakdown.balanceBreakdow
 import kotlinx.android.synthetic.main.fragment_balance_breakdown.balanceBreakdownTotal
 
 class BalanceBreakdownBottomSheet(context: Context) : BaseBottomSheet(context) {
+
     private var totalBreakdown: TotalBalanceBreakdownModel? = null
 
     private val adapter = BalanceBreakdownAdapter()

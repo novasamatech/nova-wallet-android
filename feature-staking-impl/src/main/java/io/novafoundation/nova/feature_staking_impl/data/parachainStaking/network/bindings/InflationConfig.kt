@@ -1,9 +1,9 @@
 package io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings
 
+import io.novafoundation.nova.common.data.network.runtime.binding.Perbill
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
+import io.novafoundation.nova.common.data.network.runtime.binding.bindPerbill
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
-import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.Perbill
-import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindPerbill
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 
 class InflationInfo(

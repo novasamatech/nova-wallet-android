@@ -6,10 +6,9 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_staking_api.domain.api.IdentityRepository
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
-import io.novafoundation.nova.feature_staking_impl.data.common.repository.CommonStakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.RealRoundDurationEstimator
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.RoundDurationEstimator
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CandidatesRepository
@@ -45,6 +44,7 @@ import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
+import io.novafoundation.nova.runtime.repository.TotalIssuanceRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
@@ -94,7 +94,7 @@ class ParachainStakingModule {
     @FeatureScope
     fun provideRewardCalculatorFactory(
         rewardsRepository: RewardsRepository,
-        commonStakingRepository: CommonStakingRepository,
+        commonStakingRepository: TotalIssuanceRepository,
         currentRoundRepository: CurrentRoundRepository,
         turingStakingRewardsRepository: TuringStakingRewardsRepository,
     ) = ParachainStakingRewardCalculatorFactory(rewardsRepository, currentRoundRepository, commonStakingRepository, turingStakingRewardsRepository)
@@ -119,7 +119,7 @@ class ParachainStakingModule {
     @FeatureScope
     fun provideCollatorProvider(
         currentRoundRepository: CurrentRoundRepository,
-        identityRepository: IdentityRepository,
+        identityRepository: OnChainIdentityRepository,
         parachainStakingConstantsRepository: ParachainStakingConstantsRepository,
         candidatesRepository: CandidatesRepository,
         rewardCalculatorFactory: ParachainStakingRewardCalculatorFactory,
@@ -177,7 +177,7 @@ class ParachainStakingModule {
         delegatorStateRepository: DelegatorStateRepository,
         currentRoundRepository: CurrentRoundRepository,
         roundDurationEstimator: RoundDurationEstimator,
-        identityRepository: IdentityRepository
+        identityRepository: OnChainIdentityRepository
     ) = ParachainStakingUnbondingsInteractor(delegatorStateRepository, currentRoundRepository, roundDurationEstimator, identityRepository)
 
     @Provides

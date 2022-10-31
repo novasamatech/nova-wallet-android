@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards
 
+import io.novafoundation.nova.common.data.network.runtime.binding.Perbill
 import io.novafoundation.nova.common.utils.percentageToFraction
-import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.Perbill
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.InflationInfo
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.ParachainBondConfig
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.PeriodReturns

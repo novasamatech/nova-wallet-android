@@ -22,6 +22,8 @@ import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_currency_impl.di.CurrencyFeatureHolder
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureHolder
+import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
+import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureHolder
 import io.novafoundation.nova.feature_ledger_api.di.LedgerFeatureApi
 import io.novafoundation.nova.feature_ledger_impl.di.LedgerFeatureHolder
 import io.novafoundation.nova.feature_nft_api.NftFeatureApi
@@ -30,6 +32,8 @@ import io.novafoundation.nova.feature_onboarding_api.di.OnboardingFeatureApi
 import io.novafoundation.nova.feature_onboarding_impl.di.OnboardingFeatureHolder
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureHolder
+import io.novafoundation.nova.feature_vote.di.VoteFeatureApi
+import io.novafoundation.nova.feature_vote.di.VoteFeatureHolder
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.feature_wallet_impl.di.WalletFeatureHolder
 import io.novafoundation.nova.runtime.di.RuntimeApi
@@ -76,6 +80,12 @@ interface ComponentHolderModule {
 
     @ApplicationScope
     @Binds
+    @ClassKey(GovernanceFeatureApi::class)
+    @IntoMap
+    fun provideGovernanceFeature(accountFeatureHolder: GovernanceFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
     @ClassKey(AccountFeatureApi::class)
     @IntoMap
     fun provideAccountFeature(accountFeatureHolder: AccountFeatureHolder): FeatureApiHolder
@@ -85,6 +95,12 @@ interface ComponentHolderModule {
     @ClassKey(AssetsFeatureApi::class)
     @IntoMap
     fun provideAssetsFeature(holder: AssetsFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(VoteFeatureApi::class)
+    @IntoMap
+    fun provideVoteFeature(holder: VoteFeatureHolder): FeatureApiHolder
 
     @ApplicationScope
     @Binds

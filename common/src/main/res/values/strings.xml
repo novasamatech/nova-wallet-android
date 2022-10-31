@@ -1,5 +1,155 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="referendum_unlock_remains_locked_format">remains locked in %s</string>
+
+    <string name="referendum_unlock_unlockable">Unlockable</string>
+
+    <string name="referendum_vote_chip_governance_lock">Reuse governance lock: %s</string>
+    <string name="referendum_vote_chip_all_locks">Reuse all locks : %s</string>
+
+    <string name="common_amount_too_big">Amount is too big</string>
+    <string name="refrendum_vote_not_enough_available_message">You don’t have enough available tokens to vote. Available to vote: %s.</string>
+
+    <string name="refrendum_vote_already_completed_title">Referendum is completed</string>
+    <string name="refrendum_vote_already_completed_message">Referendum is completed and voting has finished</string>
+
+    <string name="refrendum_vote_already_delegating_title">Already delegating votes</string>
+    <string name="refrendum_vote_already_delegating_message">You are delegating votes for selected referendum’s track. Please either ask your delegatee to vote or remove delegation to be able to vote directly.</string>
+
+    <string name="refrendum_vote_max_votes_reached_title">Maximum number of votes reached</string>
+    <string name="refrendum_vote_max_votes_reached_message">You have reached a maximum of %s votes for track</string>
+
+    <string name="vote_revote">Revote</string>
+
+    <string name="referendum_vote_unlock_hint">After locking period don’t forget to redeem your tokens</string>
+
+    <string name="common_maximum_format">%s maximum</string>
+
+    <string name="referendum_vote_governance_lock">Governance lock</string>
+    <string name="referendum_vote_locking_period">Locking period</string>
+
+    <string name="referendum_vote_setup_title">Vote for %s</string>
+    <string name="referendum_vote_select_conviction_title">Multiply votes by increasing locking period</string>
+
+    <string name="referendum_timeline_state_preparing">Voting: Preparing</string>
+    <string name="referendum_timeline_state_waiting_deposit">Voting: Waiting for deposit</string>
+    <string name="referendum_timeline_state_in_queue">Voting: In queue</string>
+    <string name="referendum_timeline_state_passing">Voting: Passing</string>
+    <string name="referendum_timeline_state_not_passing">Voting: Not passing</string>
+
+    <string name="referendum_in_queue_position_format">Position: %s of %s</string>
+
+    <string name="referendum_timeline_state_created">Created</string>
+    <string name="referendum_timeline_state_approved">Voted: Approved</string>
+    <string name="referendum_timeline_state_rejected">Voted: Rejected</string>
+    <string name="referendum_timeline_state_executed">Executed</string>
+    <string name="referendum_timeline_state_cancelled">Cancelled</string>
+    <string name="referendum_timeline_state_killed">Killed</string>
+    <string name="referendum_timeline_state_timed_out">Timed out</string>
+
+    <string name="referendum_votes_format">%s votes</string>
+
+    <string name="referendum_dapp_comment_react">Comment and react</string>
+
+    <string name="common_read_more">Read more</string>
+
+    <string name="common_ongoing">Ongoing</string>
+    <string name="common_completed">Completed</string>
+    <!--    <string name="crowdloan_completed_section">Completed</string>-->
+
+    <string name="referendum_aye_format">Aye: %s</string>
+    <string name="referendum_nay_format">Nay: %s</string>
+    <string name="referendum_to_pass_format">To pass: %s</string>
+
+    <string name="vote_vote">Vote</string>
+    <string name="common_governance">Governance</string>
+
+    <string name="referendum_name_unknown">Referendum %s</string>
+
+    <string name="referendum_support_threshold_format">Threshold: %s of %s</string>
+    <string name="referendum_your_vote_format">Your vote: %s votes</string>
+
+    <string name="referendum_status_approved">Approved</string>
+    <string name="referendum_status_in_queue_format">In queue (%s of %s)</string>
+    <string name="referendum_status_timeout">Timed out</string>
+    <string name="referendum_status_cancelled">Cancelled</string>
+    <string name="referendum_status_passing">Passing</string>
+    <string name="referendum_status_not_passing">Not passing</string>
+    <string name="referendum_status_rejected">Rejected</string>
+    <string name="referendum_status_preparing">Preparing</string>
+    <string name="referendum_status_executed">Executed</string>
+    <string name="referendum_status_killed">Killed</string>
+
+    <string name="referendum_status_deciding_in">Deciding in %s</string>
+    <string name="referendum_status_waiting_deposit">Waiting for deposit</string>
+    <string name="referendum_status_time_out_in">Time out in %s</string>
+    <string name="referendum_status_time_reject_in">Reject in %s</string>
+    <string name="referendum_status_time_approve_in">Approve in %s</string>
+    <string name="referendum_status_time_execute_in">Execute in %s</string>
+
+    <string name="referendum_track_root">main agenda</string>
+    <string name="referendum_whitelisted_caller">fellowship: whitelist</string>
+    <string name="referendum_staking_admin">staking</string>
+    <string name="referendum_track_treasurer">Treasury: ANY</string>
+    <string name="referendum_track_lease_admin">Governance: lease</string>
+    <string name="referendum_track_fellowship_admin">fellowship: admin</string>
+    <string name="referendum_track_general_admin">governance: registrar</string>
+    <string name="referendum_track_auction_admin">crowdloans</string>
+    <string name="referendum_track_referendum_canceller">governance: canceller</string>
+    <string name="referendum_track_referendum_killer">governance: killer</string>
+    <string name="referendum_track_small_tipper">Treasury: small tips</string>
+    <string name="referendum_track_big_tipper">Treasury: big tips</string>
+    <string name="referendum_track_small_spender">Treasury: Small spend</string>
+    <string name="referendum_track_medium_spender">Treasury: medium spend</string>
+    <string name="referendum_track_big_spender">Treasury: big spend</string>
+
+    <string name="referendum_vote_aye">Aye</string>
+    <string name="referendum_vote_nay">Nay</string>
+
+    <string name="referendum_details_your_vote">Your vote:</string>
+    <string name="referendum_details_timeline">Timeline</string>
+    <string name="votes_view_start_vote">Vote</string>
+
+    <string name="referendum_dapp_list_title">Use Nova DApp browser</string>
+
+    <string name="referendum_details_full_details">Full details</string>
+    <string name="voting_status">Voting status</string>
+    <string name="referendum_details_requested_amount">Requested amount</string>
+
+    <string name="referendum_full_details_parameters_json">Parameters JSON</string>
+    <string name="referendum_full_details_long_for_preview">Too long for preview</string>
+    <string name="referendum_full_details_title">Full details</string>
+    <string name="referendum_full_details_proposal">Proposal</string>
+    <string name="referendum_full_details_deposit">Deposit</string>
+    <string name="referendum_full_details_beneficiary">Beneficiary</string>
+    <string name="referendum_full_details_requested_amount">Requested amount</string>
+    <string name="referendum_full_details_vote_threshold">Vote threshold</string>
+    <string name="referendum_full_details_turnout">Turnout</string>
+    <string name="referendum_full_details_electorate">Electorate</string>
+    <string name="referendum_full_details_hash">Call hash</string>
+    <string name="referendum_full_details_approve_threshold">Approve curve</string>
+    <string name="referendum_full_details_support_threshold">Support curve</string>
+    <string name="referendum_full_details_copy_hash">Copy hash</string>
+    <string name="referendum_positive_voters_title">Aye votes</string>
+    <string name="referendum_negative_voters_title">Nay votes</string>
+
+    <string name="referendum_description_fallback">Only the proposer can edit this description and the title. If you own proposer\'s account, visit Polkassembly and fill in information about your proposal</string>
+
+    <string name="referendum_voter_vote">%s votes</string>
+    <string name="referendum_voter_vote_details">%s × %sx</string>
+
+    <string name="confirm_referendum_vote_title">Vote</string>
+    <string name="confirm_referendum_vote_note">After locking period don’t forget to redeem your tokens</string>
+    <string name="confirm_referendum_vote_track">Track</string>
+    <string name="confirm_referendum_vote_referendum">Referendum</string>
+    <string name="referendum_voters_empty_list_placeholder">List of voters will appear here</string>
+
+    <string name="governance_unlock">Unlock</string>
+    <string name="confirm_governance_unlock_governance_lock">Governance lock</string>
+
+    <string name="governance_unlock_tokens_title">Locked</string>
+    <string name="governance_unlock_tokens_action">Unlock</string>
+
     <string name="crowdloan_contributions_liquid_source">Liquid</string>
     <string name="crowdloan_contributions_parallel_source">Parallel</string>
 
@@ -610,7 +760,6 @@
     <string name="crowdloan_cap_reached_amount_message">Cannot contribute chosen amount since resulting raised amount will exceed crowdloan cap. Maximum allowed contribution is %s.</string>
     <string name="crowdloan_cap_reached_raised_message">Cannot contribute to selected crowdloan  since its cap is already reached.</string>
     <string name="crowdloan_cap_reached_title">Crowdloan cap exceeded</string>
-    <string name="crowdloan_completed_section">Completed</string>
     <string name="crowdloan_contribute_title">Contribute to crowdloan</string>
     <string name="crowdloan_contribution">Contribution</string>
     <string name="crowdloan_contribution_format">You contributed: %s</string>

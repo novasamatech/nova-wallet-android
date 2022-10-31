@@ -17,6 +17,7 @@ import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.network.updaters.BlockNumberUpdater
 import io.novafoundation.nova.runtime.network.updaters.BlockTimeUpdater
+import io.novafoundation.nova.runtime.network.updaters.TotalIssuanceUpdater
 import io.novafoundation.nova.runtime.storage.SampledBlockTimeStorage
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
@@ -38,12 +39,13 @@ class UpdatersModule {
         @Turing turingUpdaters: List<@JvmSuppressWildcards Updater>,
         blockTimeUpdater: BlockTimeUpdater,
         blockNumberUpdater: BlockNumberUpdater,
+        totalIssuanceUpdater: TotalIssuanceUpdater,
         chainRegistry: ChainRegistry,
         singleAssetSharedState: StakingSharedState
     ) = StakingUpdateSystem(
         relaychainUpdaters = relaychainUpdaters,
         parachainUpdaters = parachainUpdaters,
-        commonUpdaters = listOf(blockTimeUpdater, blockNumberUpdater),
+        commonUpdaters = listOf(blockTimeUpdater, blockNumberUpdater, totalIssuanceUpdater),
         chainRegistry = chainRegistry,
         singleAssetSharedState = singleAssetSharedState,
         turingExtraUpdaters = turingUpdaters
@@ -65,4 +67,16 @@ class UpdatersModule {
         crowdloanSharedState: StakingSharedState,
         storageCache: StorageCache,
     ) = BlockNumberUpdater(chainRegistry, crowdloanSharedState, storageCache)
+
+    @Provides
+    @FeatureScope
+    fun provideTotalInsuranceUpdater(
+        sharedState: StakingSharedState,
+        chainRegistry: ChainRegistry,
+        storageCache: StorageCache,
+    ) = TotalIssuanceUpdater(
+        sharedState,
+        storageCache,
+        chainRegistry
+    )
 }

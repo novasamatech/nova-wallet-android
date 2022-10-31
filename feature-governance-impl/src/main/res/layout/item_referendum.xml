@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/itemCrowdloanGroup"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="4dp"
+    android:orientation="vertical"
+    android:paddingVertical="16dp"
+    tools:background="@color/blurColor">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp">
+
+        <TextView
+            android:id="@+id/itemReferendumStatus"
+            style="@style/TextAppearance.NovaFoundation.SemiBold.Caps1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:includeFontPadding="false"
+            tools:text="Passing" />
+
+        <TextView
+            android:id="@+id/itemReferendumTimeEstimate"
+            style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:includeFontPadding="false"
+            tools:text="Approve in 3:59:59" />
+
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/itemReferendumName"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        tools:text="Runtime upgrade to 9280" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="12dp"
+        android:orientation="horizontal">
+
+        <io.novafoundation.nova.feature_governance_impl.presentation.view.NovaChipView
+            android:id="@+id/itemReferendumTrack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:chipIcon="@drawable/ic_info_16"
+            tools:text="main agenda" />
+
+        <io.novafoundation.nova.feature_governance_impl.presentation.view.NovaChipView
+            android:id="@+id/itemReferendumNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            tools:text="#228" />
+
+    </LinearLayout>
+
+    <io.novafoundation.nova.feature_governance_impl.presentation.view.VotingThresholdView
+        android:id="@+id/itemReferendumThreshold"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:clipToPadding="false"
+        android:paddingHorizontal="16dp" />
+
+    <FrameLayout
+        android:id="@+id/itemReferendumYourVoiceGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="12dp">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/white_8" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp">
+
+            <TextView
+                android:id="@+id/itemReferendumYourVoteType"
+                style="@style/TextAppearance.NovaFoundation.SemiBold.Caps1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/bg_chip"
+                android:includeFontPadding="false"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4.5dp"
+                tools:text="AYE" />
+
+            <TextView
+                android:id="@+id/itemReferendumYourVoteDetails"
+                style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="6dp"
+                android:includeFontPadding="false"
+                android:textColor="@color/white_64"
+                tools:text="To pass: 50%" />
+
+        </LinearLayout>
+    </FrameLayout>
+</LinearLayout>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="DefaultVotesView">
+        <item name="noVotesColor">@color/white_16</item>
+        <item name="positiveColor">@color/green</item>
+        <item name="negativeColor">@color/faded_red</item>
+        <item name="thresholdColor">@color/white</item>
+        <item name="thresholdShadowColor">@color/black_72</item>
+        <item name="thresholdWidth">3dp</item>
+        <item name="thresholdHeight">11dp</item>
+        <item name="thresholdCornerRadius">1.5dp</item>
+        <item name="thresholdShadowSize">8dp</item>
+        <item name="votesLineWidth">5dp</item>
+        <item name="marginBetweenVotes">6dp</item>
+        <item name="minimumLineLength">3dp</item>
+    </style>
+
+    <style name="ReferendumChip" parent="@style/TextAppearance.NovaFoundation.SemiBold.Caps1">
+        <item name="android:drawablePadding">6dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:minHeight">22dp</item>
+        <item name="android:paddingTop">3dp</item>
+        <item name="android:paddingBottom">3dp</item>
+        <item name="android:paddingStart">6dp</item>
+        <item name="android:paddingEnd">8dp</item>
+        <item name="android:textColor">@color/white_64</item>
+    </style>
+
+    <style name="DefaultTimelineLayout">
+        <item name="timelineDefaultColor">@color/accentBlue</item>
+        <item name="timelineUnfinishedColor">@color/white_24</item>
+        <item name="timelineStrokeWidth">1dp</item>
+        <item name="timelineItemStartPadding">16dp</item>
+        <item name="timelinePointToStrokeOffset">6dp</item>
+        <item name="timelineItemStatePointSize">12dp</item>
+        <item name="paddingStart">16dp</item>
+    </style>
+</resources>

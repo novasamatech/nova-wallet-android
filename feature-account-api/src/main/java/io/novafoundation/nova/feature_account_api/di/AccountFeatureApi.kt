@@ -2,7 +2,11 @@ package io.novafoundation.nova.feature_account_api.di
 
 import io.novafoundation.nova.common.utils.MutableSharedState
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
+import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
+import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
+import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
@@ -45,4 +49,12 @@ interface AccountFeatureApi {
     val watchOnlyMissingKeysPresenter: WatchOnlyMissingKeysPresenter
 
     val signSharedState: MutableSharedState<SignerPayloadExtrinsic>
+
+    val onChainIdentityRepository: OnChainIdentityRepository
+
+    @LocalIdentity
+    fun localIdentityProvider(): IdentityProvider
+
+    @OnChainIdentity
+    fun onChainIdentityProvider(): IdentityProvider
 }

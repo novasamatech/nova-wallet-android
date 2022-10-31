@@ -1,0 +1,39 @@
+<resources>
+    <declare-styleable name="VotesView">
+        <attr name="noVotesColor" format="color" />
+        <attr name="positiveColor" format="color" />
+        <attr name="negativeColor" format="color" />
+        <attr name="thresholdColor" format="color" />
+        <attr name="thresholdShadowColor" format="color" />
+        <attr name="thresholdWidth" format="dimension" />
+        <attr name="thresholdHeight" format="dimension" />
+        <attr name="thresholdCornerRadius" format="dimension" />
+        <attr name="thresholdShadowSize" format="dimension" />
+        <attr name="votesLineWidth" format="dimension" />
+        <attr name="marginBetweenVotes" format="dimension" />
+        <attr name="minimumLineLength" format="dimension" />
+    </declare-styleable>
+
+    <declare-styleable name="TimelineLayout">
+        <attr name="timelineDefaultColor" format="color" />
+        <attr name="timelineUnfinishedColor" format="color" />
+        <attr name="timelineStrokeWidth" format="dimension" />
+        <attr name="timelineItemStartPadding" format="dimension" />
+        <attr name="timelinePointToStrokeOffset" format="dimension" />
+        <attr name="timelineItemStatePointSize" format="dimension" />
+    </declare-styleable>
+
+    <declare-styleable name="AmountChangesView">
+        <attr name="amountChanges_title" format="string" />
+        <attr name="amountChanges_icon" format="reference|color" />
+    </declare-styleable>
+
+    <declare-styleable name="NovaChipView">
+        <attr name="chipIcon" format="reference" />
+        <attr name="chipIconSize" format="dimension" />
+        <attr name="android:text" />
+        <attr name="android:textColor" />
+        <attr name="chipTextAppearance" format="reference" />
+        <attr name="backgroundColor" format="color" />
+    </declare-styleable>
+</resources>

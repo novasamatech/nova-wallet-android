@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
@@ -21,15 +20,11 @@ import kotlinx.android.synthetic.main.fragment_authorized_dapps.authorizedDAppsW
 import kotlinx.android.synthetic.main.fragment_authorized_dapps.authorizedPlaceholder
 import kotlinx.android.synthetic.main.fragment_authorized_dapps.authorizedPlaceholderSpacerBottom
 import kotlinx.android.synthetic.main.fragment_authorized_dapps.authorizedPlaceholderSpacerTop
-import javax.inject.Inject
 
 class AuthorizedDAppsFragment : BaseFragment<AuthorizedDAppsViewModel>(), AuthorizedDAppAdapter.Handler {
 
-    @Inject
-    lateinit var imageLoader: ImageLoader
-
     private val adapter by lazy(LazyThreadSafetyMode.NONE) {
-        AuthorizedDAppAdapter(this, imageLoader)
+        AuthorizedDAppAdapter(this)
     }
 
     private val placeholderViews by lazy(LazyThreadSafetyMode.NONE) {

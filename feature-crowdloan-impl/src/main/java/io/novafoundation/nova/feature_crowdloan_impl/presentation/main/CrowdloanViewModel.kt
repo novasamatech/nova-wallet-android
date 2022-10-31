@@ -95,9 +95,6 @@ class CrowdloanViewModel(
     val contributionsInfo = crowdloansMixin.contributionsInfoFlow
         .shareInBackground()
 
-    val selectedWalletModel = selectedAccountUseCase.selectedWalletModelFlow()
-        .shareInBackground()
-
     init {
         crowdloanUpdateSystem.start()
             .launchIn(this)
@@ -106,7 +103,7 @@ class CrowdloanViewModel(
     private fun mapCrowdloanStatusToUi(statusClass: KClass<out Crowdloan.State>, statusCount: Int): CrowdloanStatusModel {
         return when (statusClass) {
             Crowdloan.State.Finished::class -> CrowdloanStatusModel(
-                status = resourceManager.getString(R.string.crowdloan_completed_section),
+                status = resourceManager.getString(R.string.common_completed),
                 count = statusCount.toString()
             )
             Crowdloan.State.Active::class -> CrowdloanStatusModel(
@@ -180,10 +177,6 @@ class CrowdloanViewModel(
 
     fun myContributionsClicked() {
         router.openUserContributions()
-    }
-
-    fun avatarClicked() {
-        router.openSwitchWallet()
     }
 
     private suspend fun openStandardContributionFlow(contributionPayload: ContributePayload) {

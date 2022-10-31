@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository
 
 import io.novafoundation.nova.common.utils.parachainStaking
-import io.novafoundation.nova.feature_staking_api.domain.api.AccountIdMap
+import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.CandidateMetadata
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.bindCandidateMetadata
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId

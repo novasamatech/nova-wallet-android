@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.validators.change.start
 
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.mixin.api.Browserable
@@ -68,7 +69,7 @@ class StartChangeValidatorsViewModel(
 
     init {
         launch {
-            validatorRecommendatorFactory.awaitValidatorLoading(router.currentStackEntryLifecycle)
+            validatorRecommendatorFactory.awaitValidatorLoading(scope = viewModelScope)
 
             validatorsLoading.value = false
         }

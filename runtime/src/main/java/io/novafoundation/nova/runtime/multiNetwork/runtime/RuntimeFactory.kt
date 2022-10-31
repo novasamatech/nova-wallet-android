@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.utils.md5
 import io.novafoundation.nova.common.utils.newLimitedThreadPoolExecutor
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.TypesUsage
+import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.SiVoteTypeMapping
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.TypeDefinitionParser.parseBaseDefinitions
 import jp.co.soramitsu.fearless_utils.runtime.definitions.TypeDefinitionParser.parseNetworkVersioning
@@ -16,6 +17,9 @@ import jp.co.soramitsu.fearless_utils.runtime.definitions.registry.TypeRegistry
 import jp.co.soramitsu.fearless_utils.runtime.definitions.registry.v13Preset
 import jp.co.soramitsu.fearless_utils.runtime.definitions.registry.v14Preset
 import jp.co.soramitsu.fearless_utils.runtime.definitions.v14.TypesParserV14
+import jp.co.soramitsu.fearless_utils.runtime.definitions.v14.typeMapping.SiTypeMapping
+import jp.co.soramitsu.fearless_utils.runtime.definitions.v14.typeMapping.default
+import jp.co.soramitsu.fearless_utils.runtime.definitions.v14.typeMapping.plus
 import jp.co.soramitsu.fearless_utils.runtime.metadata.RuntimeMetadataReader
 import jp.co.soramitsu.fearless_utils.runtime.metadata.builder.VersionedRuntimeBuilder
 import jp.co.soramitsu.fearless_utils.runtime.metadata.v14.RuntimeMetadataSchemaV14
@@ -73,7 +77,11 @@ class RuntimeFactory(
         val typePreset = if (metadataReader.metadataVersion < 14) {
             v13Preset()
         } else {
-            TypesParserV14.parse(metadataReader.metadata[RuntimeMetadataSchemaV14.lookup], v14Preset())
+            TypesParserV14.parse(
+                lookup = metadataReader.metadata[RuntimeMetadataSchemaV14.lookup],
+                typePreset = v14Preset(),
+                typeMapping = allSiTypeMappings()
+            )
         }
 
         val (types, baseHash, ownHash) = when (typesUsage) {
@@ -141,4 +149,6 @@ class RuntimeFactory(
     }
 
     private fun fromJson(types: String): TypeDefinitionsTree = gson.fromJson(types, TypeDefinitionsTree::class.java)
+
+    private fun allSiTypeMappings() = SiTypeMapping.default() + SiVoteTypeMapping
 }

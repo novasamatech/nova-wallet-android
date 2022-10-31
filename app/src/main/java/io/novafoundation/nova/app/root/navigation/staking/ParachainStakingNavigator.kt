@@ -1,6 +1,5 @@
 package io.novafoundation.nova.app.root.navigation.staking
 
-import androidx.lifecycle.Lifecycle
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
@@ -45,9 +44,6 @@ class ParachainStakingNavigator(
     }
 
     override fun returnToStartStaking() = performNavigation(R.id.action_return_to_start_staking)
-
-    override val currentStackEntryLifecycle: Lifecycle
-        get() = commonNavigator.currentStackEntryLifecycle
 
     override fun openCurrentCollators() = performNavigation(R.id.action_mainFragment_to_currentCollatorsFragment)
 

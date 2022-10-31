@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/stakingConfirmationContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical"
+    tools:background="@color/black">
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/confirmGovernanceUnlockToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:dividerVisible="false"
+        app:titleText="@string/governance_unlock" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:overScrollMode="never"
+            android:paddingBottom="84dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="70dp">
+
+                <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.PrimaryAmountView
+                    android:id="@+id/confirmReferendumUnlockAmount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp" />
+
+                <io.novafoundation.nova.feature_wallet_api.presentation.view.extrinsic.GenericExtrinsicInformationView
+                    android:id="@+id/confirmGovernanceUnlockInformation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginEnd="16dp" />
+
+                <io.novafoundation.nova.common.view.TableView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginEnd="16dp">
+
+                    <io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.view.AmountChangesView
+                        android:layout_width="match_parent"
+                        android:id="@+id/confirmReferendumUnlockTransferableChange"
+                        android:layout_height="wrap_content"
+                        app:amountChanges_icon="@drawable/ic_transferable"
+                        app:amountChanges_title="@string/wallet_balance_transferable" />
+
+                    <io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.view.AmountChangesView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/confirmReferendumUnlockGovernanceLockChange"
+                        app:amountChanges_icon="@drawable/ic_lock"
+                        app:amountChanges_title="@string/confirm_governance_unlock_governance_lock" />
+
+                </io.novafoundation.nova.common.view.TableView>
+
+                <io.novafoundation.nova.common.mixin.hints.HintsView
+                    android:id="@+id/confirmReferendumUnlockHints"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp" />
+            </LinearLayout>
+        </ScrollView>
+
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/confirmGovernanceUnlockConfirm"
+            style="@style/Widget.Nova.Button.Primary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/common_confirm" />
+    </FrameLayout>
+</LinearLayout>

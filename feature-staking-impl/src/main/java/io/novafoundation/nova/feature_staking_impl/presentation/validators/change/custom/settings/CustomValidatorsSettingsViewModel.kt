@@ -42,7 +42,7 @@ class CustomValidatorsSettingsViewModel(
 ) : BaseViewModel() {
 
     private val recommendationSettingsProvider by lazyAsync {
-        recommendationSettingsProviderFactory.create(router.currentStackEntryLifecycle)
+        recommendationSettingsProviderFactory.create(scope = viewModelScope)
     }
 
     val selectedSortingIdFlow = MutableStateFlow(R.id.customValidatorSettingsSortAPY)

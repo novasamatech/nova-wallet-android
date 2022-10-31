@@ -4,6 +4,7 @@ import io.emeraldpay.polkaj.scale.ScaleCodecReader
 import io.emeraldpay.polkaj.scale.ScaleCodecWriter
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNullableNumberConstant
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumberConstant
+import io.novafoundation.nova.common.data.network.runtime.binding.fromByteArrayOrIncompatible
 import io.novafoundation.nova.common.data.network.runtime.binding.fromHexOrIncompatible
 import io.novafoundation.nova.core.model.Node
 import jp.co.soramitsu.fearless_utils.encrypt.SignatureWrapper
@@ -119,6 +120,12 @@ fun StorageEntry.decodeValue(value: String?, runtimeSnapshot: RuntimeSnapshot) =
     type.fromHexOrIncompatible(it, runtimeSnapshot)
 }
 
+fun Constant.decodedValue(runtimeSnapshot: RuntimeSnapshot): Any? {
+    val type = type ?: throw IllegalStateException("Unknown value type for constant ${this.name}")
+
+    return type.fromByteArrayOrIncompatible(value, runtimeSnapshot)
+}
+
 fun String.toHexAccountId(): String = toAccountId().toHexString()
 
 fun Extrinsic.DecodedInstance.tip(): BigInteger? = signature?.signedExtras?.get(SignedExtras.TIP) as? BigInteger
@@ -171,6 +178,16 @@ fun RuntimeMetadata.automationTime() = module(Modules.AUTOMATION_TIME)
 
 fun RuntimeMetadata.parachainInfoOrNull() = moduleOrNull(Modules.PARACHAIN_INFO)
 
+fun RuntimeMetadata.referenda() = module(Modules.REFERENDA)
+
+fun RuntimeMetadata.convictionVoting() = module(Modules.CONVICTION_VOTING)
+
+fun RuntimeMetadata.scheduler() = module(Modules.SCHEDULER)
+
+fun RuntimeMetadata.treasury() = module(Modules.TREASURY)
+
+fun RuntimeMetadata.preImage() = module(Modules.PREIMAGE)
+
 fun RuntimeMetadata.firstExistingModule(vararg options: String): String {
     return options.first(::hasModule)
 }
@@ -196,6 +213,8 @@ private fun cropSeedTo32Bytes(seedResult: SeedFactory.Result): SeedFactory.Resul
 
 fun GenericCall.Instance.oneOf(vararg functionCandidates: MetadataFunction): Boolean = functionCandidates.any { function == it }
 fun GenericCall.Instance.instanceOf(functionCandidate: MetadataFunction): Boolean = function == functionCandidate
+
+fun GenericCall.Instance.instanceOf(moduleName: String, callName: String): Boolean = moduleName == module.name && callName == function.name
 
 fun structOf(vararg pairs: Pair<String, Any?>) = Struct.Instance(mapOf(*pairs))
 
@@ -234,4 +253,13 @@ object Modules {
     const val X_TOKENS = "XTokens"
 
     const val AUTOMATION_TIME = "AutomationTime"
+
+    const val REFERENDA = "Referenda"
+    const val CONVICTION_VOTING = "ConvictionVoting"
+
+    const val SCHEDULER = "Scheduler"
+
+    const val TREASURY = "Treasury"
+
+    const val PREIMAGE = "Preimage"
 }

@@ -38,6 +38,8 @@ interface AccountRepository {
 
     suspend fun findMetaAccount(accountId: ByteArray): MetaAccount?
 
+    suspend fun accountNameFor(accountId: AccountId): String?
+
     suspend fun allMetaAccounts(): List<MetaAccount>
 
     fun allMetaAccountsFlow(): Flow<List<MetaAccount>>

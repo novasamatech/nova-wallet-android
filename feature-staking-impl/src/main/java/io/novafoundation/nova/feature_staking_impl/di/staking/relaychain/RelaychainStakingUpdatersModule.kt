@@ -11,7 +11,6 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
-import io.novafoundation.nova.feature_staking_impl.data.common.network.blockhain.updaters.TotalIssuanceUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.AccountNominationsUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.AccountRewardDestinationUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.AccountValidatorPrefsUpdater
@@ -28,11 +27,10 @@ import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.update
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.historical.HistoricalUpdateMediator
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.historical.HistoricalValidatorRewardPointsUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.scope.AccountStakingScope
-import io.novafoundation.nova.feature_staking_impl.di.staking.common.CommonStakingUpdatersModule
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
-@Module(includes = [CommonStakingUpdatersModule::class])
+@Module
 class RelaychainStakingUpdatersModule {
 
     @Provides
@@ -237,7 +235,6 @@ class RelaychainStakingUpdatersModule {
     fun provideRelaychainStakingUpdaters(
         activeEraUpdater: ActiveEraUpdater,
         validatorExposureUpdater: ValidatorExposureUpdater,
-        totalIssuanceUpdater: TotalIssuanceUpdater,
         currentEraUpdater: CurrentEraUpdater,
         stakingLedgerUpdater: StakingLedgerUpdater,
         accountValidatorPrefsUpdater: AccountValidatorPrefsUpdater,
@@ -252,7 +249,6 @@ class RelaychainStakingUpdatersModule {
     ): List<Updater> = listOf(
         activeEraUpdater,
         validatorExposureUpdater,
-        totalIssuanceUpdater,
         currentEraUpdater,
         stakingLedgerUpdater,
         accountValidatorPrefsUpdater,

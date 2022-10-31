@@ -67,7 +67,7 @@
         android:textColor="@color/white_64" />
 
 
-    <io.novafoundation.nova.feature_account_api.view.AddressView
+    <io.novafoundation.nova.feature_account_api.view.AccountView
         android:id="@+id/rewardDestinationChooserPayoutTarget"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

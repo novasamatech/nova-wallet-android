@@ -20,7 +20,7 @@ class HintsView @JvmOverloads constructor(
         orientation = VERTICAL
     }
 
-    fun setHints(hints: List<String>) {
+    fun setHints(hints: List<CharSequence>) {
         removeAllViews()
 
         hints.mapIndexed { index, hint ->
@@ -39,5 +39,5 @@ class HintsView @JvmOverloads constructor(
 }
 
 fun BaseFragment<*>.observeHints(mixin: HintsMixin, view: HintsView) {
-    mixin.hintsFlow.observe { view.setHints(it) }
+    mixin.hintsFlow.observe(view::setHints)
 }

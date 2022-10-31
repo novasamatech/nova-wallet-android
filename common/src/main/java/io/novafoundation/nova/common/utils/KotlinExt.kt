@@ -1,23 +1,26 @@
 package io.novafoundation.nova.common.utils
 
 import android.net.Uri
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.math.MathContext
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
 
 private val PERCENTAGE_MULTIPLIER = 100.toBigDecimal()
 
 fun BigDecimal.fractionToPercentage() = this * PERCENTAGE_MULTIPLIER
 
-fun Double.percentageToFraction() = this / 100
+fun Double.percentageToFraction() = this / PERCENTAGE_MULTIPLIER.toDouble()
+fun BigDecimal.percentageToFraction() = this.divide(PERCENTAGE_MULTIPLIER, MathContext.DECIMAL64)
 
 infix fun Int.floorMod(divisor: Int) = Math.floorMod(this, divisor)
 
@@ -37,6 +40,10 @@ val BigDecimal.isNonNegative: Boolean
 
 fun BigInteger?.orZero(): BigInteger = this ?: BigInteger.ZERO
 fun BigDecimal?.orZero(): BigDecimal = this ?: 0.toBigDecimal()
+
+fun BigInteger.divideToDecimal(divisor: BigInteger, mathContext: MathContext = MathContext.DECIMAL64): BigDecimal {
+    return toBigDecimal().divide(divisor.toBigDecimal(), mathContext)
+}
 
 fun Long.daysFromMillis() = TimeUnit.MILLISECONDS.toDays(this)
 
@@ -115,6 +122,10 @@ inline fun <T> CoroutineScope.lazyAsync(context: CoroutineContext = EmptyCorouti
     async(context) { producer() }
 }
 
+inline fun CoroutineScope.invokeOnCompletion(crossinline action: () -> Unit) {
+    coroutineContext[Job]?.invokeOnCompletion { action() }
+}
+
 inline fun <T> Iterable<T>.filterToSet(predicate: (T) -> Boolean): Set<T> = filterTo(mutableSetOf(), predicate)
 
 fun String.nullIfEmpty(): String? = if (isEmpty()) null else this
@@ -172,7 +183,8 @@ fun <K, V> Map<K, V>.inserted(key: K, value: V): Map<K, V> {
     return toMutableMap().apply { put(key, value) }
 }
 
-inline fun <T, R> List<T>.mapToSet(mapper: (T) -> R): Set<R> = mapTo(mutableSetOf(), mapper)
+inline fun <T, R> Iterable<T>.mapToSet(mapper: (T) -> R): Set<R> = mapTo(mutableSetOf(), mapper)
+inline fun <T, R : Any> Iterable<T>.mapNotNullToSet(mapper: (T) -> R?): Set<R> = mapNotNullTo(mutableSetOf(), mapper)
 
 fun <T> List<T>.indexOfFirstOrNull(predicate: (T) -> Boolean) = indexOfFirst(predicate).takeIf { it >= 0 }
 
@@ -199,6 +211,9 @@ fun buildByteArray(block: (ByteArrayOutputStream) -> Unit): ByteArray = ByteArra
 }.toByteArray()
 
 fun String.toUuid() = UUID.fromString(this)
+
+val Int.kilobytes: BigInteger
+    get() = this.toBigInteger() * 1024.toBigInteger()
 
 operator fun ByteArray.compareTo(other: ByteArray): Int {
     if (size != other.size) {

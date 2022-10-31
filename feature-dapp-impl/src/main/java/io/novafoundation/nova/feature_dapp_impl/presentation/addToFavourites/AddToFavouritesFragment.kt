@@ -18,7 +18,7 @@ import io.novafoundation.nova.common.utils.showSoftKeyboard
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
-import io.novafoundation.nova.feature_dapp_impl.presentation.common.showDAppIcon
+import io.novafoundation.nova.feature_dapp_api.presentation.common.showDAppIcon
 import kotlinx.android.synthetic.main.fragment_add_to_favourites.addToFavouritesAddressInput
 import kotlinx.android.synthetic.main.fragment_add_to_favourites.addToFavouritesIcon
 import kotlinx.android.synthetic.main.fragment_add_to_favourites.addToFavouritesTitleInput

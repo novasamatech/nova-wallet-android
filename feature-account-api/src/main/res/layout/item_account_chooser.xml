@@ -8,7 +8,7 @@
     android:orientation="horizontal"
     tools:background="@color/black">
 
-    <io.novafoundation.nova.feature_account_api.view.AddressView
+    <io.novafoundation.nova.feature_account_api.view.AccountView
         android:id="@+id/itemAccountChooserAddress"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
