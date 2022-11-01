@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_governance_api.data.network.blockhain.model
 
+import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.Perbill
 import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.common.utils.divideToDecimal
@@ -40,8 +41,16 @@ fun OnChainReferendumStatus.asOngoing(): OnChainReferendumStatus.Ongoing {
     return asOngoingOrNull() ?: error("Referendum is not ongoing")
 }
 
+fun OnChainReferendumStatus.sinceOrThrow(): BlockNumber {
+    return asTimeSinceStatusOrNull()?.since ?: error("Status doesn't have since field")
+}
+
 fun OnChainReferendumStatus.asOngoingOrNull(): OnChainReferendumStatus.Ongoing? {
     return castOrNull<OnChainReferendumStatus.Ongoing>()
+}
+
+fun OnChainReferendumStatus.asTimeSinceStatusOrNull(): OnChainReferendumStatus.TimeSinceStatus? {
+    return castOrNull<OnChainReferendumStatus.TimeSinceStatus>()
 }
 
 fun Tally.ayeVotes(): Approval.Votes {
