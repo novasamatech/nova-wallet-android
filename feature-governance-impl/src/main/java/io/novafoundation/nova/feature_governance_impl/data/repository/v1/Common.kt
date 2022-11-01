@@ -4,3 +4,4 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import java.math.BigInteger
 
 val DemocracyTrackId = TrackId(BigInteger.ZERO)
+const val DEMOCRACY_ID = "democrac"
