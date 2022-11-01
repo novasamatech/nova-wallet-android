@@ -135,7 +135,7 @@ class RealReferendumDetailsInteractor(
                         preImageHash = hash
                     )
                 },
-                track = track?.let { ReferendumTrack(it.id, it.name) },
+                track = track?.let { ReferendumTrack(it.id, it.name, sameWithOther = tracksById.size == 1) },
                 voting = voting,
                 timeline = ReferendumTimeline(
                     currentStatus = currentStatus,
