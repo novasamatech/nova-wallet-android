@@ -14,10 +14,10 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.proposal
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.track
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.OffChainReferendumPreview
-import io.novafoundation.nova.feature_governance_api.data.repository.PreImageRepository
 import io.novafoundation.nova.feature_governance_api.data.repository.PreImageRequest
 import io.novafoundation.nova.feature_governance_api.data.repository.PreImageRequest.FetchCondition
 import io.novafoundation.nova.feature_governance_api.data.repository.getTracksById
+import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.data.source.trackLocksFlowOrEmpty
 import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimScheduleCalculator
@@ -56,7 +56,6 @@ class RealReferendaListInteractor(
     private val chainStateRepository: ChainStateRepository,
     private val governanceSourceRegistry: GovernanceSourceRegistry,
     private val totalIssuanceRepository: TotalIssuanceRepository,
-    private val preImageRepository: PreImageRepository,
     private val referendaConstructor: ReferendaConstructor,
     private val referendaSortingProvider: ReferendaSortingProvider,
 ) : ReferendaListInteractor {
@@ -79,7 +78,7 @@ class RealReferendaListInteractor(
             val totalIssuance = totalIssuanceRepository.getTotalIssuance(chain.id)
             val voting = voterAccountId?.let { governanceSource.convictionVoting.votingFor(voterAccountId, chain.id) }.orEmpty()
 
-            val referenda = constructReferendumPreviews(
+            val referenda = governanceSource.constructReferendumPreviews(
                 voting = voting,
                 onChainReferenda = onChainReferenda,
                 chain = chain,
@@ -131,7 +130,7 @@ class RealReferendaListInteractor(
                 referenda.sortedWith(sorting)
             }.toSortedMap(referendaSortingProvider.getGroupSorting())
 
-    private suspend fun constructReferendumPreviews(
+    private suspend fun GovernanceSource.constructReferendumPreviews(
         voting: Map<TrackId, Voting>,
         onChainReferenda: Collection<OnChainReferendum>,
         chain: Chain,
@@ -186,7 +185,7 @@ class RealReferendaListInteractor(
 
     // Attempts to use call-based by proposals by either taking inlined call or fetching preimage if it's size does not exceed threshold
     // Otherwise uses hash-based proposals
-    private suspend fun constructReferendaProposals(
+    private suspend fun GovernanceSource.constructReferendaProposals(
         onChainReferenda: Collection<OnChainReferendum>,
         chain: Chain,
     ): Map<ReferendumId, ReferendumProposal?> {

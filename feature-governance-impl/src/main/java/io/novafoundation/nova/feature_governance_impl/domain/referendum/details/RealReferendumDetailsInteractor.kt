@@ -39,7 +39,6 @@ import kotlinx.coroutines.flow.combine
 
 class RealReferendumDetailsInteractor(
     private val preImageParsers: Collection<ReferendumCallParser>,
-    private val preImageRepository: PreImageRepository,
     private val governanceSourceRegistry: GovernanceSourceRegistry,
     private val chainStateRepository: ChainStateRepository,
     private val totalIssuanceRepository: TotalIssuanceRepository,
@@ -91,7 +90,7 @@ class RealReferendumDetailsInteractor(
             governanceSource.referenda.onChainReferendumFlow(chain.id, referendumId),
             chainStateRepository.currentBlockNumberFlow(chain.id)
         ) { onChainReferendum, currentBlockNumber ->
-            val preImage = preImageRepository.preImageOf(onChainReferendum.proposal(), chain.id)
+            val preImage = governanceSource.preImageRepository.preImageOf(onChainReferendum.proposal(), chain.id)
             val track = onChainReferendum.track()?.let(tracksById::get)
 
             val vote = voterAccountId?.let {
