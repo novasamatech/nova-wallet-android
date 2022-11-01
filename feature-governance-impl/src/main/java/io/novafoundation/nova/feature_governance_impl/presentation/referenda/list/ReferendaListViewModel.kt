@@ -35,7 +35,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelecto
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.WithAssetSelector
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
-import io.novafoundation.nova.runtime.state.selectedChainFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 
@@ -54,19 +53,19 @@ class ReferendaListViewModel(
     override val assetSelectorMixin = assetSelectorFactory.create(scope = this)
 
     private val selectedAccount = selectedAccountUseCase.selectedMetaAccountFlow()
-    private val selectedChainFlow = selectedAssetSharedState.selectedChainFlow()
+    private val selectedChainAndAssetFlow = selectedAssetSharedState.assetWithChain
 
-    private val accountAndChainFlow = combineToPair(selectedAccount, selectedChainFlow)
+    private val accountAndChainFlow = combineToPair(selectedAccount, selectedChainAndAssetFlow)
 
-    private val referendaListStateFLow = accountAndChainFlow.withLoading { (account, chain) ->
-        val accountId = account.accountIdIn(chain)
+    private val referendaListStateFlow = accountAndChainFlow.withLoading { (account, chainAndAsset) ->
+        val accountId = account.accountIdIn(chainAndAsset.chain)
 
-        referendaListInteractor.referendaListStateFlow(accountId, chain)
+        referendaListInteractor.referendaListStateFlow(accountId, chainAndAsset.chain, chainAndAsset.asset)
     }
         .inBackground()
         .shareWhileSubscribed()
 
-    val governanceTotalLocks = referendaListStateFLow.mapLoading {
+    val governanceTotalLocks = referendaListStateFlow.mapLoading {
         val asset = assetSelectorMixin.selectedAssetFlow.first()
 
         mapLocksOverviewToUi(it.locksOverview, asset)
@@ -74,7 +73,7 @@ class ReferendaListViewModel(
         .inBackground()
         .shareWhileSubscribed()
 
-    val referendaUiFlow = referendaListStateFLow.mapLoading { state ->
+    val referendaUiFlow = referendaListStateFlow.mapLoading { state ->
         val asset = assetSelectorMixin.selectedAssetFlow.first()
 
         state.groupedReferenda.toListWithHeaders(

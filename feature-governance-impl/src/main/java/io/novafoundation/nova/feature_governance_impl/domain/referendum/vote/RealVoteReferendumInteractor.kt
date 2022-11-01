@@ -30,6 +30,7 @@ import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRep
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
 import io.novafoundation.nova.feature_wallet_api.domain.model.maxLockReplacing
+import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
@@ -98,7 +99,7 @@ class RealVoteReferendumInteractor(
         val undecidingTimeout = governanceSource.referenda.undecidingTimeout(chain.id)
         val voteLockingPeriod = governanceSource.convictionVoting.voteLockingPeriod(chain.id)
 
-        val votingInformation = governanceSource.convictionVoting.trackLocksFlow(voterAccountId, chain.id).map { locksByTrack ->
+        val votingInformation = governanceSource.convictionVoting.trackLocksFlow(voterAccountId, chainAsset.fullId).map { locksByTrack ->
             val voting = governanceSource.convictionVoting.votingFor(voterAccountId, chain.id)
             val accountVotesByReferendumId = voting.flattenCastingVotes()
             val votedReferenda = governanceSource.referenda.getOnChainReferenda(chain.id, accountVotesByReferendumId.keys)
