@@ -4,6 +4,7 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.repository.ConvictionVotingRepository
 import io.novafoundation.nova.feature_governance_api.data.repository.OffChainReferendaInfoRepository
 import io.novafoundation.nova.feature_governance_api.data.repository.OnChainReferendaRepository
+import io.novafoundation.nova.feature_governance_api.data.repository.PreImageRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
@@ -17,6 +18,8 @@ interface GovernanceSource {
     val convictionVoting: ConvictionVotingRepository
 
     val offChainInfo: OffChainReferendaInfoRepository
+
+    val preImageRepository: PreImageRepository
 }
 
 fun ConvictionVotingRepository.trackLocksFlowOrEmpty(voterAccountId: AccountId?, chainId: ChainId): Flow<Map<TrackId, Balance>> {

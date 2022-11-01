@@ -16,14 +16,12 @@ import io.novafoundation.nova.feature_account_api.domain.account.identity.Identi
 import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
 import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_governance_api.data.repository.PreImageRepository
 import io.novafoundation.nova.feature_governance_api.data.repository.TreasuryRepository
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.data.preimage.PreImageSizer
 import io.novafoundation.nova.feature_governance_impl.data.preimage.RealPreImageSizer
-import io.novafoundation.nova.feature_governance_impl.data.repository.RealPreImageRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.RealTreasuryRepository
 import io.novafoundation.nova.feature_governance_impl.data.source.RealGovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_impl.di.modules.GovernanceDAppsModule
@@ -143,13 +141,6 @@ class GovernanceFeatureModule {
         governanceV2Source = governanceV2Source,
         governanceV1Source = governanceV1Source
     )
-
-    @Provides
-    @FeatureScope
-    fun providePreImageRepository(
-        @Named(REMOTE_STORAGE_SOURCE) storageSource: StorageDataSource,
-        preImageSizer: PreImageSizer,
-    ): PreImageRepository = RealPreImageRepository(storageSource, preImageSizer)
 
     @Provides
     @FeatureScope

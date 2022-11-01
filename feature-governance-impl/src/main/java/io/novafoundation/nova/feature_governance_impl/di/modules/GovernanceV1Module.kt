@@ -7,6 +7,8 @@ import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourc
 import io.novafoundation.nova.feature_governance_impl.data.repository.v1.Gov1OffChainReferendaInfoRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.v1.GovV1ConvictionVotingRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.v1.GovV1OnChainReferendaRepository
+import io.novafoundation.nova.feature_governance_impl.data.repository.v1.GovV1PreImageRepository
+import io.novafoundation.nova.feature_governance_impl.data.repository.v2.Gov2PreImageRepository
 import io.novafoundation.nova.feature_governance_impl.data.source.StaticGovernanceSource
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -40,14 +42,23 @@ class GovernanceV1Module {
 
     @Provides
     @FeatureScope
+    fun providePreImageRepository(
+        @Named(REMOTE_STORAGE_SOURCE) storageSource: StorageDataSource,
+        v2Delegate: Gov2PreImageRepository,
+    ) = GovV1PreImageRepository(storageSource, v2Delegate)
+
+    @Provides
+    @FeatureScope
     @GovernanceV1
     fun provideGovernanceSource(
         referendaRepository: GovV1OnChainReferendaRepository,
         convictionVotingRepository: GovV1ConvictionVotingRepository,
         offChainInfoRepository: Gov1OffChainReferendaInfoRepository,
+        preImageRepository: GovV1PreImageRepository
     ): GovernanceSource = StaticGovernanceSource(
         referenda = referendaRepository,
         convictionVoting = convictionVotingRepository,
-        offChainInfo = offChainInfoRepository
+        offChainInfo = offChainInfoRepository,
+        preImageRepository = preImageRepository
     )
 }

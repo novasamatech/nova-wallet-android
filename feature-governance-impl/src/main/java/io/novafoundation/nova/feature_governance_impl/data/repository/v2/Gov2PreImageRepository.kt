@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.data.repository
+package io.novafoundation.nova.feature_governance_impl.data.repository.v2
 
 import io.novafoundation.nova.common.data.network.runtime.binding.bindByteArray
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
@@ -28,7 +28,7 @@ import jp.co.soramitsu.fearless_utils.runtime.metadata.module.StorageEntryType
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import java.math.BigInteger
 
-class RealPreImageRepository(
+class Gov2PreImageRepository(
     private val remoteSource: StorageDataSource,
     private val preImageSizer: PreImageSizer,
 ) : PreImageRepository {
@@ -93,7 +93,7 @@ class RealPreImageRepository(
             storage.entries(
                 keysArguments = keysToFetch.wrapSingleArgumentKeys(),
                 keyExtractor = { (hashAndLen: List<*>) -> bindByteArray(hashAndLen.first()).toHexString() },
-                binding = { decoded, hashHex -> bindPreimage(decoded, runtime) }
+                binding = { decoded, _ -> bindPreimage(decoded, runtime) }
             )
         }
     }

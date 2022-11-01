@@ -5,7 +5,6 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.feature_governance_api.data.repository.PreImageRepository
 import io.novafoundation.nova.feature_governance_api.data.repository.TreasuryRepository
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumDetailsInteractor
@@ -38,7 +37,6 @@ class ReferendumDetailsModule {
     @FeatureScope
     fun provideReferendumDetailsInteractor(
         callParsers: Set<@JvmSuppressWildcards ReferendumCallParser>,
-        preImageRepository: PreImageRepository,
         governanceSourceRegistry: GovernanceSourceRegistry,
         chainStateRepository: ChainStateRepository,
         totalIssuanceRepository: TotalIssuanceRepository,
@@ -47,7 +45,6 @@ class ReferendumDetailsModule {
         @ExtrinsicSerialization callFormatter: Gson,
     ): ReferendumDetailsInteractor = RealReferendumDetailsInteractor(
         preImageParsers = callParsers,
-        preImageRepository = preImageRepository,
         governanceSourceRegistry = governanceSourceRegistry,
         chainStateRepository = chainStateRepository,
         totalIssuanceRepository = totalIssuanceRepository,
