@@ -2,7 +2,9 @@ package io.novafoundation.nova.feature_governance_impl.domain.referendum.common
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.Perbill
+import io.novafoundation.nova.common.data.network.runtime.binding.cast
 import io.novafoundation.nova.common.utils.divideToDecimal
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ConfirmingSource
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.OnChainReferendum
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.OnChainReferendumStatus
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
@@ -19,6 +21,7 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumVoting
+import io.novafoundation.nova.feature_governance_api.domain.referendum.common.passing
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumTimeline
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumTimeline.State
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.PreparingReason
@@ -43,6 +46,7 @@ interface ReferendaConstructor {
     suspend fun constructReferendaStatuses(
         chain: Chain,
         onChainReferenda: Collection<OnChainReferendum>,
+        votingByReferenda: Map<ReferendumId, ReferendumVoting?>,
         tracksById: Map<TrackId, TrackInfo>,
         currentBlockNumber: BlockNumber,
     ): Map<ReferendumId, ReferendumStatus>
@@ -59,12 +63,14 @@ suspend fun ReferendaConstructor.constructReferendumStatus(
     chain: Chain,
     onChainReferendum: OnChainReferendum,
     tracksById: Map<TrackId, TrackInfo>,
+    votingByReferenda: Map<ReferendumId, ReferendumVoting?>,
     currentBlockNumber: BlockNumber,
 ): ReferendumStatus = constructReferendaStatuses(
     chain = chain,
     onChainReferenda = listOf(onChainReferendum),
     tracksById = tracksById,
     currentBlockNumber = currentBlockNumber,
+    votingByReferenda = votingByReferenda
 ).values.first()
 
 class RealReferendaConstructor(
@@ -95,14 +101,14 @@ class RealReferendaConstructor(
 
         return ReferendumVoting(
             support = ReferendumVoting.Support(
-                threshold = status.threshold.supportNeeded(status.tally, totalIssuance, elapsedSinceDecidingFraction),
+                threshold = status.threshold.supportThreshold(status.tally, totalIssuance, elapsedSinceDecidingFraction),
                 turnout = status.tally.support,
                 electorate = totalIssuance
             ),
             approval = ReferendumVoting.Approval(
                 ayeVotes = status.tally.ayeVotes(),
                 nayVotes = status.tally.nayVotes(),
-                threshold = status.threshold.ayesFractionNeeded(status.tally, totalIssuance, elapsedSinceDecidingFraction)
+                threshold = status.threshold.ayesFractionThreshold(status.tally, totalIssuance, elapsedSinceDecidingFraction)
             )
         )
     }
@@ -110,6 +116,7 @@ class RealReferendaConstructor(
     override suspend fun constructReferendaStatuses(
         chain: Chain,
         onChainReferenda: Collection<OnChainReferendum>,
+        votingByReferenda: Map<ReferendumId, ReferendumVoting?>,
         tracksById: Map<TrackId, TrackInfo>,
         currentBlockNumber: BlockNumber,
     ): Map<ReferendumId, ReferendumStatus> {
@@ -133,6 +140,7 @@ class RealReferendaConstructor(
                         undecidingTimeout = undecidingTimeout,
                         track = tracksById.getValue(status.track),
                         referendumId = referendum.id,
+                        votingByReferenda = votingByReferenda,
                         queuePositions = queuePositions,
                     )
 
@@ -217,6 +225,7 @@ class RealReferendaConstructor(
         undecidingTimeout: BlockNumber,
         track: TrackInfo,
         referendumId: ReferendumId,
+        votingByReferenda: Map<ReferendumId, ReferendumVoting?>,
         queuePositions: Map<ReferendumId, TrackQueue.Position>
     ): ReferendumStatus {
         return when {
@@ -228,20 +237,35 @@ class RealReferendaConstructor(
                 ReferendumStatus.Ongoing.InQueue(timeOutIn, positionInQueue)
             }
 
-            // confirming
-            status.deciding?.confirming != null -> {
-                val approveBlock = status.deciding!!.confirming!!.till
-                val approveIn = blockDurationEstimator.timerUntil(approveBlock)
+            // confirming status from on-chain
+            status.deciding?.confirming is ConfirmingSource.OnChain -> {
+                val confirmingStatus = status.deciding!!.confirming.cast<ConfirmingSource.OnChain>().status
 
-                ReferendumStatus.Ongoing.Confirming(approveIn = approveIn)
+                if (confirmingStatus != null) {
+                    val approveBlock = confirmingStatus.till
+                    val approveIn = blockDurationEstimator.timerUntil(approveBlock)
+
+                    ReferendumStatus.Ongoing.Confirming(approveIn = approveIn)
+                } else {
+                    val rejectBlock = status.deciding!!.since + track.decisionPeriod
+                    val rejectIn = blockDurationEstimator.timerUntil(rejectBlock)
+
+                    ReferendumStatus.Ongoing.Rejecting(rejectIn)
+                }
             }
 
-            // rejecting
-            status.deciding != null -> {
-                val rejectBlock = status.deciding!!.since + track.decisionPeriod
-                val rejectIn = blockDurationEstimator.timerUntil(rejectBlock)
+            // confirming status from threshold
+            status.deciding?.confirming is ConfirmingSource.FromThreshold -> {
+                val end = status.deciding!!.confirming.cast<ConfirmingSource.FromThreshold>().end
+                val finishIn = blockDurationEstimator.timerUntil(end)
 
-                ReferendumStatus.Ongoing.Rejecting(rejectIn)
+                val passing = votingByReferenda[referendumId]?.passing() ?: false
+
+                if (passing) {
+                    ReferendumStatus.Ongoing.Confirming(approveIn = finishIn)
+                } else {
+                    ReferendumStatus.Ongoing.Rejecting(rejectIn = finishIn)
+                }
             }
 
             // preparing

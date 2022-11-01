@@ -182,6 +182,8 @@ fun RuntimeMetadata.referenda() = module(Modules.REFERENDA)
 
 fun RuntimeMetadata.convictionVoting() = module(Modules.CONVICTION_VOTING)
 
+fun RuntimeMetadata.democracy() = module(Modules.DEMOCRACY)
+
 fun RuntimeMetadata.scheduler() = module(Modules.SCHEDULER)
 
 fun RuntimeMetadata.treasury() = module(Modules.TREASURY)
@@ -262,4 +264,6 @@ object Modules {
     const val TREASURY = "Treasury"
 
     const val PREIMAGE = "Preimage"
+
+    const val DEMOCRACY = "Democracy"
 }

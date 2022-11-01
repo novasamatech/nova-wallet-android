@@ -24,6 +24,7 @@ import io.novafoundation.nova.common.utils.numberConstant
 import io.novafoundation.nova.common.utils.referenda
 import io.novafoundation.nova.common.utils.scheduler
 import io.novafoundation.nova.common.utils.toByteArray
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ConfirmingSource
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ConfirmingStatus
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.DecidingStatus
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.OnChainReferendum
@@ -31,7 +32,6 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Proposal
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumDeposit
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Tally
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackInfo
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackQueue
@@ -43,6 +43,7 @@ import io.novafoundation.nova.feature_governance_impl.data.model.thresold.gov2.G
 import io.novafoundation.nova.feature_governance_impl.data.model.thresold.gov2.curve.LinearDecreasingCurve
 import io.novafoundation.nova.feature_governance_impl.data.model.thresold.gov2.curve.ReciprocalCurve
 import io.novafoundation.nova.feature_governance_impl.data.model.thresold.gov2.curve.SteppedDecreasingCurve
+import io.novafoundation.nova.feature_governance_impl.data.repository.common.bindTally
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
@@ -224,21 +225,14 @@ class GovV2OnChainReferendaRepository(
         if (decoded == null) return null
         val decodedStruct = decoded.castToStruct()
 
+        val confirming = decodedStruct.get<Any?>("confirming")?.let {
+            ConfirmingStatus(
+                till = bindBlockNumber(it)
+            )
+        }
         return DecidingStatus(
             since = bindBlockNumber(decodedStruct["since"]),
-            confirming = decodedStruct.get<Any?>("confirming")?.let {
-                ConfirmingStatus(
-                    till = bindBlockNumber(it)
-                )
-            }
-        )
-    }
-
-    private fun bindTally(decoded: Struct.Instance): Tally {
-        return Tally(
-            ayes = bindNumber(decoded["ayes"]),
-            nays = bindNumber(decoded["nays"]),
-            support = bindNumber(decoded["support"])
+            confirming = ConfirmingSource.OnChain(confirming)
         )
     }
 
@@ -266,12 +260,8 @@ class GovV2OnChainReferendaRepository(
             TrackInfo(
                 id = TrackId(bindNumber(id)),
                 name = bindString(trackInfoStruct["name"]),
-                maxDeciding = bindNumber(trackInfoStruct["maxDeciding"]),
-                decisionDeposit = bindNumber(trackInfoStruct["decisionDeposit"]),
                 preparePeriod = bindBlockNumber(trackInfoStruct["preparePeriod"]),
                 decisionPeriod = bindBlockNumber(trackInfoStruct["decisionPeriod"]),
-                confirmPeriod = bindBlockNumber(trackInfoStruct["confirmPeriod"]),
-                minEnactmentPeriod = bindBlockNumber(trackInfoStruct["minEnactmentPeriod"]),
                 minApproval = bindCurve(trackInfoStruct.getTyped("minApproval")),
                 minSupport = bindCurve(trackInfoStruct.getTyped("minSupport"))
             )

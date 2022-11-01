@@ -61,11 +61,11 @@ fun Map<TrackId, Voting>.flattenCastingVotes(): Map<ReferendumId, AccountVote> {
     }.toMap()
 }
 
-val OnChainReferendumStatus.Ongoing.proposer: AccountId
-    get() = submissionDeposit.who
+val OnChainReferendumStatus.Ongoing.proposer: AccountId?
+    get() = submissionDeposit?.who
 
-fun OnChainReferendumStatus.Ongoing.proposerDeposit(): Balance {
-    return depositBy(proposer)
+fun OnChainReferendumStatus.Ongoing.proposerDeposit(): Balance? {
+    return proposer?.let(::depositBy)
 }
 
 fun OnChainReferendumStatus.Ongoing.depositBy(accountId: AccountId): Balance {

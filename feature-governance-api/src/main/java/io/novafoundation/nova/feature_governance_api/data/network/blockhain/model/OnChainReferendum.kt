@@ -33,7 +33,7 @@ sealed class OnChainReferendumStatus {
         val track: TrackId,
         val proposal: Proposal,
         val submitted: BlockNumber,
-        val submissionDeposit: ReferendumDeposit,
+        val submissionDeposit: ReferendumDeposit?,
         val decisionDeposit: ReferendumDeposit?,
         val deciding: DecidingStatus?,
         val tally: Tally,
@@ -63,8 +63,15 @@ sealed class Proposal {
 
 class DecidingStatus(
     val since: BlockNumber,
-    val confirming: ConfirmingStatus?
+    val confirming: ConfirmingSource
 )
+
+sealed class ConfirmingSource {
+
+    class FromThreshold(val end: BlockNumber) : ConfirmingSource()
+
+    class OnChain(val status: ConfirmingStatus?) : ConfirmingSource()
+}
 
 class ConfirmingStatus(val till: BlockNumber)
 
