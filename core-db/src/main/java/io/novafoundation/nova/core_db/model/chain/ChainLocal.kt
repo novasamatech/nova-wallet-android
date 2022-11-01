@@ -36,6 +36,9 @@ class ChainLocal(
 
         @Embedded(prefix = "crowdloans_")
         val crowdloans: Section?,
+
+        @Embedded(prefix = "governance_")
+        val governance: Section?,
     ) {
 
         class Section(val url: String, val type: String)

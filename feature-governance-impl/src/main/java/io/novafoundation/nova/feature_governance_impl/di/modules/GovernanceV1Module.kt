@@ -4,6 +4,7 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
+import io.novafoundation.nova.feature_governance_impl.data.offchain.remote.PolkassemblyApi
 import io.novafoundation.nova.feature_governance_impl.data.repository.v1.Gov1OffChainReferendaInfoRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.v1.GovV1ConvictionVotingRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.v1.GovV1OnChainReferendaRepository
@@ -36,7 +37,7 @@ class GovernanceV1Module {
 
     @Provides
     @FeatureScope
-    fun provideOffChainInfoRepository() = Gov1OffChainReferendaInfoRepository()
+    fun provideOffChainInfoRepository(polkassemblyApi: PolkassemblyApi) = Gov1OffChainReferendaInfoRepository(polkassemblyApi)
 
     @Provides
     @FeatureScope

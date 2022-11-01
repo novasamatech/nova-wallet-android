@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.data.repository.v2
 
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.OffChainReferendumDetails
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.OffChainReferendumPreview
 import io.novafoundation.nova.feature_governance_api.data.repository.OffChainReferendaInfoRepository
@@ -12,7 +13,7 @@ class Gov2OffChainReferendaInfoRepository : OffChainReferendaInfoRepository {
         return emptyList()
     }
 
-    override suspend fun referendumDetails(chain: Chain): OffChainReferendumDetails? {
+    override suspend fun referendumDetails(referendumId: ReferendumId, chain: Chain): OffChainReferendumDetails? {
         return null
     }
 }
