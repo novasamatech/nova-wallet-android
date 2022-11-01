@@ -32,6 +32,7 @@ import jp.co.soramitsu.fearless_utils.runtime.metadata.module.Module
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module.StorageEntry
 import jp.co.soramitsu.fearless_utils.runtime.metadata.moduleOrNull
 import jp.co.soramitsu.fearless_utils.runtime.metadata.splitKey
+import jp.co.soramitsu.fearless_utils.runtime.metadata.storageOrNull
 import jp.co.soramitsu.fearless_utils.scale.EncodableStruct
 import jp.co.soramitsu.fearless_utils.scale.Schema
 import jp.co.soramitsu.fearless_utils.scale.dataType.DataType
@@ -182,6 +183,8 @@ fun RuntimeMetadata.referenda() = module(Modules.REFERENDA)
 
 fun RuntimeMetadata.convictionVoting() = module(Modules.CONVICTION_VOTING)
 
+fun RuntimeMetadata.democracy() = module(Modules.DEMOCRACY)
+
 fun RuntimeMetadata.scheduler() = module(Modules.SCHEDULER)
 
 fun RuntimeMetadata.treasury() = module(Modules.TREASURY)
@@ -202,6 +205,7 @@ fun String.networkType() = Node.NetworkType.findByAddressByte(addressPrefix())!!
 
 fun RuntimeMetadata.hasModule(name: String) = moduleOrNull(name) != null
 fun RuntimeMetadata.hasConstant(module: String, constant: String) = moduleOrNull(module)?.constantOrNull(constant) != null
+fun Module.hasStorage(storage: String) = storageOrNull(storage) != null
 
 fun SeedFactory.createSeed32(length: Mnemonic.Length, password: String?) = cropSeedTo32Bytes(createSeed(length, password))
 
@@ -262,4 +266,6 @@ object Modules {
     const val TREASURY = "Treasury"
 
     const val PREIMAGE = "Preimage"
+
+    const val DEMOCRACY = "Democracy"
 }

@@ -1,32 +1,26 @@
 package io.novafoundation.nova.feature_governance_impl.data.repository.v2
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
-import io.novafoundation.nova.common.data.network.runtime.binding.bindBlockNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.bindList
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
-import io.novafoundation.nova.common.data.network.runtime.binding.cast
-import io.novafoundation.nova.common.data.network.runtime.binding.castToDictEnum
 import io.novafoundation.nova.common.data.network.runtime.binding.castToList
-import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
-import io.novafoundation.nova.common.data.network.runtime.binding.incompatible
 import io.novafoundation.nova.common.utils.convictionVoting
 import io.novafoundation.nova.common.utils.numberConstant
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.PriorLock
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumVoter
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.votes
 import io.novafoundation.nova.feature_governance_api.data.repository.ConvictionVotingRepository
 import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimSchedule
 import io.novafoundation.nova.feature_governance_impl.data.network.blockchain.extrinsic.convictionVotingRemoveVote
 import io.novafoundation.nova.feature_governance_impl.data.network.blockchain.extrinsic.convictionVotingUnlock
+import io.novafoundation.nova.feature_governance_impl.data.repository.common.bindVoting
+import io.novafoundation.nova.feature_governance_impl.data.repository.common.votersFor
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
-import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Vote
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
@@ -54,8 +48,8 @@ class GovV2ConvictionVotingRepository(
         return runtime.metadata.convictionVoting().numberConstant("MaxVotes", runtime)
     }
 
-    override fun trackLocksFlow(accountId: AccountId, chainId: ChainId): Flow<Map<TrackId, Balance>> {
-        return remoteStorageSource.subscribe(chainId) {
+    override fun trackLocksFlow(accountId: AccountId, chainAssetId: FullChainAssetId): Flow<Map<TrackId, Balance>> {
+        return remoteStorageSource.subscribe(chainAssetId.chainId) {
             runtime.metadata.convictionVoting().storage("ClassLocksFor").observe(accountId, binding = ::bindTrackLocks)
                 .map { it.toMap() }
         }
@@ -66,7 +60,7 @@ class GovV2ConvictionVotingRepository(
             runtime.metadata.convictionVoting().storage("VotingFor").entries(
                 accountId,
                 keyExtractor = { (_: AccountId, trackId: BigInteger) -> TrackId(trackId) },
-                binding = { decoded, _ -> bindVoting(decoded) }
+                binding = { decoded, _ -> bindVoting(decoded!!) }
             )
         }
     }
@@ -84,21 +78,11 @@ class GovV2ConvictionVotingRepository(
         val allVotings = remoteStorageSource.query(chainId) {
             runtime.metadata.convictionVoting().storage("VotingFor").entries(
                 keyExtractor = { it },
-                binding = { decoded, _ -> bindVoting(decoded) }
+                binding = { decoded, _ -> bindVoting(decoded!!) }
             )
         }
 
-        return allVotings.mapNotNull { (keyComponents, voting) ->
-            val (voterId: AccountId, _: BigInteger) = keyComponents
-            val votes = voting.votes()
-
-            votes[referendumId]?.let { accountVote ->
-                ReferendumVoter(
-                    accountId = voterId,
-                    vote = accountVote
-                )
-            }
-        }
+        return allVotings.votersFor(referendumId)
     }
 
     override fun ExtrinsicBuilder.unlock(accountId: AccountId, claimable: ClaimSchedule.UnlockChunk.Claimable) {
@@ -121,72 +105,5 @@ class GovV2ConvictionVotingRepository(
 
             TrackId(bindNumber(trackId)) to bindNumber(balance)
         }
-    }
-
-    private fun bindVoting(decoded: Any?): Voting {
-        decoded.castToDictEnum()
-
-        return when (decoded.name) {
-            "Casting" -> {
-                val casting = decoded.value.castToStruct()
-
-                val votes = bindVotes(casting["votes"])
-                val prior = bindPriorLock(casting["prior"])
-
-                Voting.Casting(votes, prior)
-            }
-
-            "Delegating" -> {
-                val delegating = decoded.value.castToStruct()
-
-                val balance = bindNumber(delegating["balance"])
-                val prior = bindPriorLock(delegating["prior"])
-
-                Voting.Delegating(balance, prior)
-            }
-
-            else -> incompatible()
-        }
-    }
-
-    private fun bindVotes(decoded: Any?): Map<ReferendumId, AccountVote> {
-        return bindList(decoded) { item ->
-            val (trackId, accountVote) = item.castToList()
-
-            ReferendumId(bindNumber(trackId)) to bindAccountVote(accountVote)
-        }.toMap()
-    }
-
-    private fun bindAccountVote(decoded: Any?): AccountVote {
-        decoded.castToDictEnum()
-
-        return when (decoded.name) {
-            "Standard" -> {
-                val standardVote = decoded.value.castToStruct()
-
-                AccountVote.Standard(
-                    vote = bindVote(standardVote["vote"]),
-                    balance = bindNumber(standardVote["balance"])
-                )
-            }
-
-            "Split" -> AccountVote.Split
-
-            else -> incompatible()
-        }
-    }
-
-    private fun bindPriorLock(decoded: Any?): PriorLock {
-        // 2-tuple
-        val (unlockAt, amount) = decoded.castToList()
-
-        return PriorLock(
-            unlockAt = bindBlockNumber(unlockAt),
-            amount = bindNumber(amount)
-        )
-    }
-
-    private fun bindVote(decoded: Any?): Vote {
-        return decoded.cast()
     }
 }

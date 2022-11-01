@@ -9,6 +9,7 @@ import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.runtime.multiNetwork.chain.ChainSyncService
 import io.novafoundation.nova.runtime.multiNetwork.chain.mapChainLocalToChain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
 import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionPool
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeProvider
@@ -114,6 +115,9 @@ suspend fun ChainRegistry.asset(chainId: String, assetId: Int): Chain.Asset {
     val chain = chainsById.first().getValue(chainId)
 
     return chain.assetsById.getValue(assetId)
+}
+suspend fun ChainRegistry.asset(fullChainAssetId: FullChainAssetId): Chain.Asset {
+    return asset(fullChainAssetId.chainId, fullChainAssetId.assetId)
 }
 
 suspend inline fun ChainRegistry.findChain(predicate: (Chain) -> Boolean): Chain? = currentChains.first().firstOrNull(predicate)

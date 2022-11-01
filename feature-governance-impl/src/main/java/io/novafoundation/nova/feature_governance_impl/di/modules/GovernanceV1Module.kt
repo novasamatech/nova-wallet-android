@@ -8,7 +8,10 @@ import io.novafoundation.nova.feature_governance_impl.data.offchain.remote.Polka
 import io.novafoundation.nova.feature_governance_impl.data.repository.v1.Gov1OffChainReferendaInfoRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.v1.GovV1ConvictionVotingRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.v1.GovV1OnChainReferendaRepository
+import io.novafoundation.nova.feature_governance_impl.data.repository.v1.GovV1PreImageRepository
+import io.novafoundation.nova.feature_governance_impl.data.repository.v2.Gov2PreImageRepository
 import io.novafoundation.nova.feature_governance_impl.data.source.StaticGovernanceSource
+import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
@@ -32,12 +35,20 @@ class GovernanceV1Module {
     @FeatureScope
     fun provideConvictionVotingRepository(
         @Named(REMOTE_STORAGE_SOURCE) storageSource: StorageDataSource,
-        chainRegistry: ChainRegistry
-    ) = GovV1ConvictionVotingRepository(storageSource, chainRegistry)
+        chainRegistry: ChainRegistry,
+        balanceLocksRepository: BalanceLocksRepository
+    ) = GovV1ConvictionVotingRepository(storageSource, chainRegistry, balanceLocksRepository)
 
     @Provides
     @FeatureScope
     fun provideOffChainInfoRepository(polkassemblyApi: PolkassemblyApi) = Gov1OffChainReferendaInfoRepository(polkassemblyApi)
+
+    @Provides
+    @FeatureScope
+    fun providePreImageRepository(
+        @Named(REMOTE_STORAGE_SOURCE) storageSource: StorageDataSource,
+        v2Delegate: Gov2PreImageRepository,
+    ) = GovV1PreImageRepository(storageSource, v2Delegate)
 
     @Provides
     @FeatureScope
@@ -46,9 +57,11 @@ class GovernanceV1Module {
         referendaRepository: GovV1OnChainReferendaRepository,
         convictionVotingRepository: GovV1ConvictionVotingRepository,
         offChainInfoRepository: Gov1OffChainReferendaInfoRepository,
+        preImageRepository: GovV1PreImageRepository
     ): GovernanceSource = StaticGovernanceSource(
         referenda = referendaRepository,
         convictionVoting = convictionVotingRepository,
-        offChainInfo = offChainInfoRepository
+        offChainInfo = offChainInfoRepository,
+        preImageRepository = preImageRepository
     )
 }

@@ -25,6 +25,14 @@ class RealBalanceLocksRepository(
         }
     }
 
+    override suspend fun observeBalanceLock(chainAsset: Chain.Asset, lockId: String): Flow<BalanceLock?> {
+        val metaAccount = accountRepository.getSelectedMetaAccount()
+
+        return lockDao.observeBalanceLock(metaAccount.id, chainAsset.chainId, chainAsset.id, lockId).map { lockLocal ->
+            lockLocal?.let { mapBalanceLockFromLocal(chainAsset, it) }
+        }
+    }
+
     override fun observeLocksForMetaAccount(metaAccount: MetaAccount): Flow<List<BalanceLock>> {
         return combine(lockDao.observeLocksForMetaAccount(metaAccount.id), chainRegistry.chainsById) { locks, chains ->
             locks.map {

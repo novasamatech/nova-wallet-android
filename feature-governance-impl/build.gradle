@@ -64,6 +64,8 @@ dependencies {
 
     implementation viewModelKtxDep
 
+    implementation shimmerDep
+
     implementation daggerDep
     kapt daggerKapt
 

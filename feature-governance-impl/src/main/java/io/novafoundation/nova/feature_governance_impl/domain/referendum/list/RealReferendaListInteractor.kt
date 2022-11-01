@@ -14,10 +14,10 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.proposal
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.track
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.OffChainReferendumPreview
-import io.novafoundation.nova.feature_governance_api.data.repository.PreImageRepository
 import io.novafoundation.nova.feature_governance_api.data.repository.PreImageRequest
 import io.novafoundation.nova.feature_governance_api.data.repository.PreImageRequest.FetchCondition
 import io.novafoundation.nova.feature_governance_api.data.repository.getTracksById
+import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.data.source.trackLocksFlowOrEmpty
 import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimScheduleCalculator
@@ -33,6 +33,7 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.list.Refe
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumStatus
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.ReferendaConstructor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.sorting.ReferendaSortingProvider
+import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.TotalIssuanceRepository
@@ -56,22 +57,21 @@ class RealReferendaListInteractor(
     private val chainStateRepository: ChainStateRepository,
     private val governanceSourceRegistry: GovernanceSourceRegistry,
     private val totalIssuanceRepository: TotalIssuanceRepository,
-    private val preImageRepository: PreImageRepository,
     private val referendaConstructor: ReferendaConstructor,
     private val referendaSortingProvider: ReferendaSortingProvider,
 ) : ReferendaListInteractor {
 
-    override fun referendaListStateFlow(voterAccountId: AccountId?, chain: Chain): Flow<ReferendaListState> {
-        return flowOfAll { referendaListStateFlowSuspend(voterAccountId, chain) }
+    override fun referendaListStateFlow(voterAccountId: AccountId?, chain: Chain, chainAsset: Chain.Asset): Flow<ReferendaListState> {
+        return flowOfAll { referendaListStateFlowSuspend(voterAccountId, chain, chainAsset) }
     }
 
-    private suspend fun referendaListStateFlowSuspend(voterAccountId: AccountId?, chain: Chain): Flow<ReferendaListState> {
+    private suspend fun referendaListStateFlowSuspend(voterAccountId: AccountId?, chain: Chain, asset: Chain.Asset): Flow<ReferendaListState> {
         val governanceSource = governanceSourceRegistry.sourceFor(chain.id)
         val tracksById = governanceSource.referenda.getTracksById(chain.id)
         val undecidingTimeout = governanceSource.referenda.undecidingTimeout(chain.id)
         val voteLockingPeriod = governanceSource.convictionVoting.voteLockingPeriod(chain.id)
 
-        val trackLocksFlow = governanceSource.convictionVoting.trackLocksFlowOrEmpty(voterAccountId, chain.id)
+        val trackLocksFlow = governanceSource.convictionVoting.trackLocksFlowOrEmpty(voterAccountId, asset.fullId)
 
         val intermediateFlow = chainStateRepository.currentBlockNumberFlow(chain.id).map { currentBlockNumber ->
             val onChainReferenda = governanceSource.referenda.getAllOnChainReferenda(chain.id)
@@ -79,7 +79,15 @@ class RealReferendaListInteractor(
             val totalIssuance = totalIssuanceRepository.getTotalIssuance(chain.id)
             val voting = voterAccountId?.let { governanceSource.convictionVoting.votingFor(voterAccountId, chain.id) }.orEmpty()
 
-            val referenda = constructReferendumPreviews(voting, onChainReferenda, chain, tracksById, currentBlockNumber, offChainInfo, totalIssuance)
+            val referenda = governanceSource.constructReferendumPreviews(
+                voting = voting,
+                onChainReferenda = onChainReferenda,
+                chain = chain,
+                tracksById = tracksById,
+                currentBlockNumber = currentBlockNumber,
+                offChainInfo = offChainInfo,
+                totalIssuance = totalIssuance
+            )
             val sortedReferenda = sortReferendaPreviews(referenda)
 
             val onChainReferendaById = onChainReferenda.associateBy(OnChainReferendum::id)
@@ -123,7 +131,7 @@ class RealReferendaListInteractor(
                 referenda.sortedWith(sorting)
             }.toSortedMap(referendaSortingProvider.getGroupSorting())
 
-    private suspend fun constructReferendumPreviews(
+    private suspend fun GovernanceSource.constructReferendumPreviews(
         voting: Map<TrackId, Voting>,
         onChainReferenda: Collection<OnChainReferendum>,
         chain: Chain,
@@ -134,12 +142,27 @@ class RealReferendaListInteractor(
     ): List<ReferendumPreview> {
         val userVotes = voting.flattenCastingVotes()
         val proposals = constructReferendaProposals(onChainReferenda, chain)
+
+        val votingsById = onChainReferenda.associateBy(
+            keySelector = { it.id },
+            valueTransform = {
+                referendaConstructor.constructReferendumVoting(
+                    referendum = it,
+                    tracksById = tracksById,
+                    currentBlockNumber = currentBlockNumber,
+                    totalIssuance = totalIssuance
+                )
+            }
+        )
+
         val statuses = referendaConstructor.constructReferendaStatuses(
             chain = chain,
             onChainReferenda = onChainReferenda,
             tracksById = tracksById,
             currentBlockNumber = currentBlockNumber,
+            votingByReferenda = votingsById
         )
+
         val referenda = onChainReferenda.map { onChainReferendum ->
             ReferendumPreview(
                 id = onChainReferendum.id,
@@ -154,12 +177,7 @@ class RealReferendaListInteractor(
                     }
                 },
                 status = statuses.getValue(onChainReferendum.id),
-                voting = referendaConstructor.constructReferendumVoting(
-                    referendum = onChainReferendum,
-                    tracksById = tracksById,
-                    currentBlockNumber = currentBlockNumber,
-                    totalIssuance = totalIssuance
-                ),
+                voting = votingsById[onChainReferendum.id],
                 userVote = userVotes[onChainReferendum.id]
             )
         }
@@ -168,7 +186,7 @@ class RealReferendaListInteractor(
 
     // Attempts to use call-based by proposals by either taking inlined call or fetching preimage if it's size does not exceed threshold
     // Otherwise uses hash-based proposals
-    private suspend fun constructReferendaProposals(
+    private suspend fun GovernanceSource.constructReferendaProposals(
         onChainReferenda: Collection<OnChainReferendum>,
         chain: Chain,
     ): Map<ReferendumId, ReferendumProposal?> {

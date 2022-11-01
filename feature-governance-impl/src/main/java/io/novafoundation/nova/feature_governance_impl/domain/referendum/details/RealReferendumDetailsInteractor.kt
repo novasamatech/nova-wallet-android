@@ -39,7 +39,6 @@ import kotlinx.coroutines.flow.combine
 
 class RealReferendumDetailsInteractor(
     private val preImageParsers: Collection<ReferendumCallParser>,
-    private val preImageRepository: PreImageRepository,
     private val governanceSourceRegistry: GovernanceSourceRegistry,
     private val chainStateRepository: ChainStateRepository,
     private val totalIssuanceRepository: TotalIssuanceRepository,
@@ -91,7 +90,7 @@ class RealReferendumDetailsInteractor(
             governanceSource.referenda.onChainReferendumFlow(chain.id, referendumId),
             chainStateRepository.currentBlockNumberFlow(chain.id)
         ) { onChainReferendum, currentBlockNumber ->
-            val preImage = preImageRepository.preImageOf(onChainReferendum.proposal(), chain.id)
+            val preImage = governanceSource.preImageRepository.preImageOf(onChainReferendum.proposal(), chain.id)
             val track = onChainReferendum.track()?.let(tracksById::get)
 
             val vote = voterAccountId?.let {
@@ -101,11 +100,19 @@ class RealReferendumDetailsInteractor(
                 voteByReferendumId[onChainReferendum.id]
             }
 
+            val voting = referendaConstructor.constructReferendumVoting(
+                referendum = onChainReferendum,
+                tracksById = tracksById,
+                currentBlockNumber = currentBlockNumber,
+                totalIssuance = totalIssuance
+            )
+
             val currentStatus = referendaConstructor.constructReferendumStatus(
                 chain = chain,
                 onChainReferendum = onChainReferendum,
                 tracksById = tracksById,
                 currentBlockNumber = currentBlockNumber,
+                votingByReferenda = mapOf(referendumId to voting)
             )
 
             ReferendumDetails(
@@ -129,12 +136,7 @@ class RealReferendumDetailsInteractor(
                     )
                 },
                 track = track?.let { ReferendumTrack(it.id, it.name) },
-                voting = referendaConstructor.constructReferendumVoting(
-                    referendum = onChainReferendum,
-                    tracksById = tracksById,
-                    currentBlockNumber = currentBlockNumber,
-                    totalIssuance = totalIssuance
-                ),
+                voting = voting,
                 timeline = ReferendumTimeline(
                     currentStatus = currentStatus,
                     pastEntries = offChainInfo?.pastTimeline ?: referendaConstructor.constructPastTimeline(

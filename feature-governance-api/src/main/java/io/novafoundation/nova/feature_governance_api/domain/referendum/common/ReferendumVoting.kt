@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_governance_api.domain.referendum.common
 
 import io.novafoundation.nova.common.data.network.runtime.binding.Perbill
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VotingThreshold.Threshold
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 
 data class ReferendumVoting(
@@ -9,7 +10,7 @@ data class ReferendumVoting(
 ) {
 
     data class Support(
-        val threshold: Balance,
+        val threshold: Threshold<Balance>,
         val turnout: Balance,
         val electorate: Balance
     )
@@ -17,7 +18,7 @@ data class ReferendumVoting(
     data class Approval(
         val ayeVotes: Votes,
         val nayVotes: Votes,
-        val threshold: Perbill
+        val threshold: Threshold<Perbill>
     ) {
 
         // post-conviction
@@ -28,8 +29,16 @@ data class ReferendumVoting(
     }
 }
 
-fun ReferendumVoting.Support.passes(): Boolean {
-    return turnout > threshold
+fun ReferendumVoting.Support.passing(): Boolean {
+    return threshold.passing
+}
+
+fun ReferendumVoting.Approval.passing(): Boolean {
+    return threshold.passing
+}
+
+fun ReferendumVoting.passing(): Boolean {
+    return support.passing() && approval.passing()
 }
 
 fun ReferendumVoting.Approval.totalVotes(): Balance {

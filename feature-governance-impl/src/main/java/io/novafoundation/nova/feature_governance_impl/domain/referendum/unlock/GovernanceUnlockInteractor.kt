@@ -27,6 +27,7 @@ import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRep
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
 import io.novafoundation.nova.feature_wallet_api.domain.model.maxLockReplacing
+import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
@@ -112,11 +113,11 @@ class RealGovernanceUnlockInteractor(
 
     override fun locksOverviewFlow(scope: CoroutineScope): Flow<GovernanceLocksOverview> {
         return computationalCache.useSharedFlow(LOCKS_OVERVIEW_KEY, scope) {
-            val chain = selectedAssetState.chain()
+            val (chain, asset) = selectedAssetState.chainAndAsset()
             val metaAccount = accountRepository.getSelectedMetaAccount()
             val voterAccountId = metaAccount.accountIdIn(chain)
 
-            locksOverviewFlowSuspend(voterAccountId, chain)
+            locksOverviewFlowSuspend(voterAccountId, chain, asset)
         }
     }
 
@@ -135,13 +136,13 @@ class RealGovernanceUnlockInteractor(
         }.distinctUntilChanged()
     }
 
-    private suspend fun locksOverviewFlowSuspend(voterAccountId: AccountId?, chain: Chain): Flow<GovernanceLocksOverview> {
+    private suspend fun locksOverviewFlowSuspend(voterAccountId: AccountId?, chain: Chain, asset: Chain.Asset): Flow<GovernanceLocksOverview> {
         val governanceSource = governanceSourceRegistry.sourceFor(chain.id)
         val tracksById = governanceSource.referenda.getTracksById(chain.id)
         val undecidingTimeout = governanceSource.referenda.undecidingTimeout(chain.id)
         val voteLockingPeriod = governanceSource.convictionVoting.voteLockingPeriod(chain.id)
 
-        val trackLocksFlow = governanceSource.convictionVoting.trackLocksFlowOrEmpty(voterAccountId, chain.id)
+        val trackLocksFlow = governanceSource.convictionVoting.trackLocksFlowOrEmpty(voterAccountId, asset.fullId)
 
         val intermediateFlow = chainStateRepository.currentBlockNumberFlow(chain.id).map { currentBlockNumber ->
             val onChainReferenda = governanceSource.referenda.getAllOnChainReferenda(chain.id).associateBy(OnChainReferendum::id)

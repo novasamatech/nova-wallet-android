@@ -10,10 +10,13 @@ fun <T> bindList(dynamicInstance: Any?, itemBinder: (Any?) -> T): List<T> {
     }
 }
 
-inline fun <reified T : Enum<T>> bindCollectionEnum(dynamicInstance: Any?): T {
+inline fun <reified T : Enum<T>> bindCollectionEnum(
+    dynamicInstance: Any?,
+    enumValueFromName: (String) -> T = ::enumValueOf
+): T {
     return when (dynamicInstance) {
-        is String -> enumValueOf(dynamicInstance) // collection enum
-        is DictEnum.Entry<*> -> enumValueOf(dynamicInstance.name) // dict enum with empty values
+        is String -> enumValueFromName(dynamicInstance) // collection enum
+        is DictEnum.Entry<*> -> enumValueFromName(dynamicInstance.name) // dict enum with empty values
         else -> incompatible()
     }
 }
