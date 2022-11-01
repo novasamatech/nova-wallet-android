@@ -6,10 +6,11 @@ class ReferendumPreviewRequest() {
             posts(
                 where: {type: {id: {_eq: 2}}, onchain_link: {onchain_referendum_id: {_is_null: false}}}
             ) {
-                id
                 title
+                onchain_link {
+                    onchain_referendum_id
+                }
             }
         }
     """.trimIndent()
 }
-// where: {title: {_is_null: false}, id: {_in: [${ids.joinToString()}]}}

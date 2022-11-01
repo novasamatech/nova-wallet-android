@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.data.offchain.remote.model.response
 
+import com.google.gson.annotations.SerializedName
 import java.math.BigInteger
 
 class ReferendaPreviewResponse(
@@ -7,7 +8,9 @@ class ReferendaPreviewResponse(
 ) {
 
     class Post(
-        val id: BigInteger,
-        val title: String?
+        val title: String?,
+        @SerializedName("onchain_link") val onChainLink: OnChainLink
     )
+
+    class OnChainLink(@SerializedName("onchain_referendum_id") val onChainReferendumId: BigInteger)
 }

@@ -6,7 +6,7 @@ class ReferendumDetailsRequest(id: BigInteger) {
     val query = """
         query {
             posts(
-                where: {id: {_eq: $id}}
+                where: {onchain_link: {onchain_referendum_id: {_eq: $id}}}
             ) {
                 title
                 content

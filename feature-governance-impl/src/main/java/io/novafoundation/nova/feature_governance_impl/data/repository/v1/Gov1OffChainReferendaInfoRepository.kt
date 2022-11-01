@@ -53,7 +53,7 @@ class Gov1OffChainReferendaInfoRepository(
     private fun mapPolkassemblyPostToPreview(post: ReferendaPreviewResponse.Post): OffChainReferendumPreview {
         return OffChainReferendumPreview(
             post.title,
-            ReferendumId(post.id),
+            ReferendumId(post.onChainLink.onChainReferendumId),
         )
     }
 

@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_governance_impl.data.offchain.remote.model.response
 
+import com.google.gson.annotations.SerializedName
 import java.math.BigInteger
-import retrofit2.http.Field
 
 class ReferendumDetailsResponse(
     val posts: List<Post>
@@ -11,13 +11,13 @@ class ReferendumDetailsResponse(
         val title: String?,
         val content: String,
         val author: Author,
-        @Field("onchain_link") val onchainLink: OnChainLink?
+        @SerializedName("onchain_link") val onchainLink: OnChainLink?
     )
 
     class Author(val username: String)
 
     class OnChainLink(
-        @Field("onchain_referendum") val onchainReferendum: List<OnChainReferendum>?
+        @SerializedName("onchain_referendum") val onchainReferendum: List<OnChainReferendum>?
     )
 
     class OnChainReferendum(
