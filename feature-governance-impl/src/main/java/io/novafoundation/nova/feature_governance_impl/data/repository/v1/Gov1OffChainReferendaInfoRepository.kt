@@ -12,32 +12,39 @@ import io.novafoundation.nova.feature_governance_impl.data.offchain.remote.model
 import io.novafoundation.nova.feature_governance_impl.data.offchain.remote.model.response.ReferendaPreviewResponse
 import io.novafoundation.nova.feature_governance_impl.data.offchain.remote.model.response.ReferendumDetailsResponse
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import java.util.*
 
 class Gov1OffChainReferendaInfoRepository(
     private val polkassemblyApi: PolkassemblyApi
 ) : OffChainReferendaInfoRepository {
 
     override suspend fun referendumPreviews(chain: Chain): List<OffChainReferendumPreview> {
-        val governanceExternalApi = chain.externalApi?.governance
-        if (governanceExternalApi?.type == Chain.ExternalApi.Section.Type.POLKASSEMBLY) {
-            val request = ReferendumPreviewRequest()
-            val response = polkassemblyApi.getReferendumPreviews(governanceExternalApi.url, request)
-            return response.data.posts.map {
-                mapPolkassemblyPostToPreview(it)
+        try {
+            val governanceExternalApi = chain.externalApi?.governance
+            if (governanceExternalApi?.type == Chain.ExternalApi.Section.Type.POLKASSEMBLY) {
+                val request = ReferendumPreviewRequest()
+                val response = polkassemblyApi.getReferendumPreviews(governanceExternalApi.url, request)
+                return response.data.posts.map {
+                    mapPolkassemblyPostToPreview(it)
+                }
             }
+        } catch (e: Exception) {
+            return emptyList()
         }
 
         return emptyList()
     }
 
     override suspend fun referendumDetails(referendumId: ReferendumId, chain: Chain): OffChainReferendumDetails? {
-        val governanceExternalApi = chain.externalApi?.governance
-        if (governanceExternalApi?.type == Chain.ExternalApi.Section.Type.POLKASSEMBLY) {
-            val request = ReferendumDetailsRequest(referendumId.value)
-            val response = polkassemblyApi.getReferendumDetails(governanceExternalApi.url, request)
-            val referendumDetails = response.data.posts.getOrNull(0)
-            return referendumDetails?.let(::mapPolkassemblyPostToDetails)
+        try {
+            val governanceExternalApi = chain.externalApi?.governance
+            if (governanceExternalApi?.type == Chain.ExternalApi.Section.Type.POLKASSEMBLY) {
+                val request = ReferendumDetailsRequest(referendumId.value)
+                val response = polkassemblyApi.getReferendumDetails(governanceExternalApi.url, request)
+                val referendumDetails = response.data.posts.getOrNull(0)
+                return referendumDetails?.let(::mapPolkassemblyPostToDetails)
+            }
+        } catch (e: Exception) {
+            return null
         }
 
         return null
@@ -51,9 +58,9 @@ class Gov1OffChainReferendaInfoRepository(
     }
 
     private fun mapPolkassemblyPostToDetails(post: ReferendumDetailsResponse.Post): OffChainReferendumDetails {
-        val timeline = post.onchain_link
-            .onchain_referendum
-            .getOrNull(0)
+        val timeline = post.onchainLink
+            ?.onchainReferendum
+            ?.getOrNull(0)
             ?.referendumStatus
             ?.map {
                 mapReferendumStatusToTimelineEntry(it)

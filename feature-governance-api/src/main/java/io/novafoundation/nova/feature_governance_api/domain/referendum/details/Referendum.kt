@@ -28,7 +28,7 @@ data class ReferendumDetails(
         val supportCurve: VotingCurve?,
     )
 
-    data class OffChainMetadata(val title: String, val description: String)
+    data class OffChainMetadata(val title: String?, val description: String)
 
     data class OnChainMetadata(val preImage: PreImage?, val preImageHash: ByteArray)
 }

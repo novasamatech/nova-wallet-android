@@ -75,7 +75,9 @@ class RealReferendaListInteractor(
 
         val intermediateFlow = chainStateRepository.currentBlockNumberFlow(chain.id).map { currentBlockNumber ->
             val onChainReferenda = governanceSource.referenda.getAllOnChainReferenda(chain.id)
-            val offChainInfo = governanceSource.offChainInfo.referendumPreviews(chain).associateBy(OffChainReferendumPreview::referendumId)
+            val referendaIds = onChainReferenda.map { it.id }
+            val offChainInfo = governanceSource.offChainInfo.referendumPreviews(chain)
+                .associateBy(OffChainReferendumPreview::referendumId)
             val totalIssuance = totalIssuanceRepository.getTotalIssuance(chain.id)
             val voting = voterAccountId?.let { governanceSource.convictionVoting.votingFor(voterAccountId, chain.id) }.orEmpty()
 
@@ -166,8 +168,8 @@ class RealReferendaListInteractor(
         val referenda = onChainReferenda.map { onChainReferendum ->
             ReferendumPreview(
                 id = onChainReferendum.id,
-                offChainMetadata = offChainInfo[onChainReferendum.id]?.let {
-                    ReferendumPreview.OffChainMetadata(it.title)
+                offChainMetadata = offChainInfo[onChainReferendum.id]?.title?.let {
+                    ReferendumPreview.OffChainMetadata(it)
                 },
                 onChainMetadata = proposals[onChainReferendum.id]
                     ?.let(ReferendumPreview::OnChainMetadata),

@@ -8,6 +8,6 @@ class ReferendaPreviewResponse(
 
     class Post(
         val id: BigInteger,
-        val title: String
+        val title: String?
     )
 }
