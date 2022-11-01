@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_governance_impl.data.repository.v1.GovV1On
 import io.novafoundation.nova.feature_governance_impl.data.repository.v1.GovV1PreImageRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.v2.Gov2PreImageRepository
 import io.novafoundation.nova.feature_governance_impl.data.source.StaticGovernanceSource
+import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
@@ -33,8 +34,9 @@ class GovernanceV1Module {
     @FeatureScope
     fun provideConvictionVotingRepository(
         @Named(REMOTE_STORAGE_SOURCE) storageSource: StorageDataSource,
-        chainRegistry: ChainRegistry
-    ) = GovV1ConvictionVotingRepository(storageSource, chainRegistry)
+        chainRegistry: ChainRegistry,
+        balanceLocksRepository: BalanceLocksRepository
+    ) = GovV1ConvictionVotingRepository(storageSource, chainRegistry, balanceLocksRepository)
 
     @Provides
     @FeatureScope
