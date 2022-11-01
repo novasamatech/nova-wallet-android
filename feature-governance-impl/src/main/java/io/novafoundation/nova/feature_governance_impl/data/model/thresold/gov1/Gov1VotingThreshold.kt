@@ -6,6 +6,8 @@ import io.novafoundation.nova.common.utils.intSqrt
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Tally
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VotingThreshold
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VotingThreshold.Threshold
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ayeVotes
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.nayVotes
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.notPassing
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.passing
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -52,12 +54,10 @@ enum class Gov1VotingThreshold : VotingThreshold {
             val sqrtTurnout = tally.support.intSqrt()
             val sqrtTotalIssuance = totalIssuance.intSqrt()
 
-            val totalVotes = tally.ayes + tally.nays
-            val naysFraction = tally.nays.divideToDecimal(totalVotes)
-            val aysFraction = tally.ayes.divideToDecimal(totalVotes)
+            val naysFraction = tally.nayVotes().fraction
+            val aysFraction = tally.ayeVotes().fraction
 
             val turnoutToTotalIssuance = sqrtTurnout.divideToDecimal(sqrtTotalIssuance)
-
             val threshold = (naysFraction * turnoutToTotalIssuance).coerceAtMost(Perbill.ONE)
 
             return Threshold(
@@ -75,8 +75,7 @@ enum class Gov1VotingThreshold : VotingThreshold {
         override fun ayesFractionThreshold(tally: Tally, totalIssuance: Balance, passedSinceDecidingFraction: Perbill): Threshold<Perbill> {
             val threshold = 0.5.toBigDecimal()
 
-            val totalVotes = tally.ayes + tally.nays
-            val aysFraction = tally.ayes.divideToDecimal(totalVotes)
+            val aysFraction = tally.ayeVotes().fraction
 
             return Threshold(
                 value = threshold,
