@@ -38,12 +38,16 @@ class GovV1PreImageRepository(
         }
     }
 
-    /*
-     * Since it democracy pallet preimages stored un-sized - we do not implement bulk fetch due to possible big calls being stored
-     * We cant efficiently use `state_getStorageSize` since it only allows to query one key at the time
-     */
     override suspend fun getPreimagesFor(requests: Collection<PreImageRequest>, chainId: ChainId): Map<HexHash, PreImage?> {
-        return emptyMap()
+        return remoteStorageSource.query(chainId) {
+            if (runtime.metadata.democracy().hasStorage("Preimages")) {
+                // Since it democracy pallet preimages stored un-sized - we do not implement bulk fetch due to possible big calls being stored
+                // We cant efficiently use `state_getStorageSize` since it only allows to query one key at the time
+                emptyMap()
+            } else {
+                runCatching { v2Delegate.getPreimagesFor(requests, chainId) }.getOrDefault(emptyMap())
+            }
+        }
     }
 
     private fun bindPreimage(
@@ -59,7 +63,7 @@ class GovV1PreImageRepository(
 
                 val runtimeCall = GenericCall.fromByteArray(runtime, callData)
 
-                PreImage(encodedCall = callData, call = runtimeCall,)
+                PreImage(encodedCall = callData, call = runtimeCall)
             }
 
             else -> null
