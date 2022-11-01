@@ -24,7 +24,6 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.Gove
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.GovernanceVoteAssistant.LocksChange
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.GovernanceVoteAssistant.ReusableLock
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
-import io.novafoundation.nova.feature_governance_impl.data.network.blockchain.extrinsic.convictionVotingVote
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -72,9 +71,12 @@ class RealVoteReferendumInteractor(
     override suspend fun estimateFee(amount: Balance, conviction: Conviction, referendumId: ReferendumId): Balance {
         val chain = selectedChainState.chain()
         val vote = AyeVote(amount, conviction) // vote direction does not influence fee estimation
+        val governanceSource = governanceSourceRegistry.sourceFor(chain.id)
 
         return extrinsicService.estimateFee(chain) {
-            convictionVotingVote(referendumId, vote)
+            with(governanceSource.convictionVoting) {
+                vote(referendumId, vote)
+            }
         }
     }
 
@@ -83,8 +85,12 @@ class RealVoteReferendumInteractor(
         referendumId: ReferendumId,
     ): Result<String> {
         val chain = selectedChainState.chain()
+        val governanceSource = governanceSourceRegistry.sourceFor(chain.id)
+
         return extrinsicService.submitExtrinsicWithSelectedWallet(chain) {
-            convictionVotingVote(referendumId, vote)
+            with(governanceSource.convictionVoting) {
+                vote(referendumId, vote)
+            }
         }
     }
 
