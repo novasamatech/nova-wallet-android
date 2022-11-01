@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumTrack
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumVoting
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ayeVotesIfNotEmpty
-import io.novafoundation.nova.feature_governance_api.domain.referendum.common.passes
+import io.novafoundation.nova.feature_governance_api.domain.referendum.common.passing
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.PreparingReason
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumStatus
 import io.novafoundation.nova.feature_governance_impl.R
@@ -60,11 +60,11 @@ class RealReferendumFormatter(
     override fun formatVoting(voting: ReferendumVoting, token: Token): ReferendumVotingModel {
         return ReferendumVotingModel(
             positiveFraction = voting.approval.ayeVotesIfNotEmpty()?.fraction?.toFloat(),
-            thresholdFraction = voting.approval.threshold.toFloat(),
+            thresholdFraction = voting.approval.threshold.value.toFloat(),
             votingResultIcon = R.drawable.ic_close,
             votingResultIconColor = R.color.multicolor_red_100,
             thresholdInfo = formatThresholdInfo(voting.support, token),
-            thresholdInfoVisible = !voting.support.passes(),
+            thresholdInfoVisible = !voting.support.passing(),
             positivePercentage = resourceManager.getString(
                 R.string.referendum_aye_format,
                 voting.approval.ayeVotes.fraction.formatFractionAsPercentage()
@@ -75,7 +75,7 @@ class RealReferendumFormatter(
             ),
             thresholdPercentage = resourceManager.getString(
                 R.string.referendum_to_pass_format,
-                voting.approval.threshold.formatFractionAsPercentage()
+                voting.approval.threshold.value.formatFractionAsPercentage()
             )
         )
     }
@@ -165,7 +165,7 @@ class RealReferendumFormatter(
         support: ReferendumVoting.Support,
         token: Token
     ): String {
-        val thresholdFormatted = mapAmountToAmountModel(support.threshold, token).token
+        val thresholdFormatted = mapAmountToAmountModel(support.threshold.value, token).token
         val turnoutFormatted = token.amountFromPlanks(support.turnout).format()
 
         return resourceManager.getString(R.string.referendum_support_threshold_format, turnoutFormatted, thresholdFormatted)

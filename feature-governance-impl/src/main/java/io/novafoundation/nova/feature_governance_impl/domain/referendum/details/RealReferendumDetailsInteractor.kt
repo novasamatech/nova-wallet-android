@@ -101,11 +101,19 @@ class RealReferendumDetailsInteractor(
                 voteByReferendumId[onChainReferendum.id]
             }
 
+            val voting = referendaConstructor.constructReferendumVoting(
+                referendum = onChainReferendum,
+                tracksById = tracksById,
+                currentBlockNumber = currentBlockNumber,
+                totalIssuance = totalIssuance
+            )
+
             val currentStatus = referendaConstructor.constructReferendumStatus(
                 chain = chain,
                 onChainReferendum = onChainReferendum,
                 tracksById = tracksById,
                 currentBlockNumber = currentBlockNumber,
+                votingByReferenda = mapOf(referendumId to voting)
             )
 
             ReferendumDetails(
@@ -129,12 +137,7 @@ class RealReferendumDetailsInteractor(
                     )
                 },
                 track = track?.let { ReferendumTrack(it.id, it.name) },
-                voting = referendaConstructor.constructReferendumVoting(
-                    referendum = onChainReferendum,
-                    tracksById = tracksById,
-                    currentBlockNumber = currentBlockNumber,
-                    totalIssuance = totalIssuance
-                ),
+                voting = voting,
                 timeline = ReferendumTimeline(
                     currentStatus = currentStatus,
                     pastEntries = offChainInfo?.pastTimeline ?: referendaConstructor.constructPastTimeline(

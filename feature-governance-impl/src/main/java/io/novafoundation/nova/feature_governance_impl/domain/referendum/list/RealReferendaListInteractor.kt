@@ -79,7 +79,15 @@ class RealReferendaListInteractor(
             val totalIssuance = totalIssuanceRepository.getTotalIssuance(chain.id)
             val voting = voterAccountId?.let { governanceSource.convictionVoting.votingFor(voterAccountId, chain.id) }.orEmpty()
 
-            val referenda = constructReferendumPreviews(voting, onChainReferenda, chain, tracksById, currentBlockNumber, offChainInfo, totalIssuance)
+            val referenda = constructReferendumPreviews(
+                voting = voting,
+                onChainReferenda = onChainReferenda,
+                chain = chain,
+                tracksById = tracksById,
+                currentBlockNumber = currentBlockNumber,
+                offChainInfo = offChainInfo,
+                totalIssuance = totalIssuance
+            )
             val sortedReferenda = sortReferendaPreviews(referenda)
 
             val onChainReferendaById = onChainReferenda.associateBy(OnChainReferendum::id)
@@ -134,12 +142,27 @@ class RealReferendaListInteractor(
     ): List<ReferendumPreview> {
         val userVotes = voting.flattenCastingVotes()
         val proposals = constructReferendaProposals(onChainReferenda, chain)
+
+        val votingsById = onChainReferenda.associateBy(
+            keySelector = { it.id },
+            valueTransform = {
+                referendaConstructor.constructReferendumVoting(
+                    referendum = it,
+                    tracksById = tracksById,
+                    currentBlockNumber = currentBlockNumber,
+                    totalIssuance = totalIssuance
+                )
+            }
+        )
+
         val statuses = referendaConstructor.constructReferendaStatuses(
             chain = chain,
             onChainReferenda = onChainReferenda,
             tracksById = tracksById,
             currentBlockNumber = currentBlockNumber,
+            votingByReferenda = votingsById
         )
+
         val referenda = onChainReferenda.map { onChainReferendum ->
             ReferendumPreview(
                 id = onChainReferendum.id,
@@ -154,12 +177,7 @@ class RealReferendaListInteractor(
                     }
                 },
                 status = statuses.getValue(onChainReferendum.id),
-                voting = referendaConstructor.constructReferendumVoting(
-                    referendum = onChainReferendum,
-                    tracksById = tracksById,
-                    currentBlockNumber = currentBlockNumber,
-                    totalIssuance = totalIssuance
-                ),
+                voting = votingsById[onChainReferendum.id],
                 userVote = userVotes[onChainReferendum.id]
             )
         }

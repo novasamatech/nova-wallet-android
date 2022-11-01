@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.common.utils.mapValuesNotNull
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ConfirmingSource
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.OnChainReferendum
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.OnChainReferendumStatus
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
@@ -281,19 +282,23 @@ class RealClaimScheduleCalculator(
                 maxDecideSince + decisionPeriod
             }
 
-            // confirming
-            deciding?.confirming != null -> {
-                val approveBlock = deciding.confirming.till
-                val rejectBlock = deciding.since + decisionPeriod
-
-                approveBlock.max(rejectBlock)
-            }
-
-            // rejecting
             deciding != null -> {
-                val rejectBlock = deciding.since + decisionPeriod
+                when (val source = deciding.confirming) {
+                    is ConfirmingSource.FromThreshold -> source.end
 
-                rejectBlock
+                    is ConfirmingSource.OnChain -> if (source.status != null) {
+                        // confirming
+                        val approveBlock = source.status.till
+                        val rejectBlock = deciding.since + decisionPeriod
+
+                        approveBlock.max(rejectBlock)
+                    } else {
+                        // rejecting
+                        val rejectBlock = deciding.since + decisionPeriod
+
+                        rejectBlock
+                    }
+                }
             }
 
             // preparing

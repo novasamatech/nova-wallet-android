@@ -14,7 +14,7 @@ import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
 import java.math.BigInteger
 
 class GovV1ConvictionVotingRepository(
@@ -36,7 +36,7 @@ class GovV1ConvictionVotingRepository(
 
     override fun trackLocksFlow(accountId: AccountId, chainId: ChainId): Flow<Map<TrackId, Balance>> {
         // TODO
-        return emptyFlow()
+        return flowOf(emptyMap())
     }
 
     override suspend fun votingFor(accountId: AccountId, chainId: ChainId): Map<TrackId, Voting> {
