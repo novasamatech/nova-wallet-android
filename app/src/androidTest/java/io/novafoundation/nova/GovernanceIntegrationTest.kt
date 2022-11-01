@@ -80,7 +80,7 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
         val accountId = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".toAccountId()
 
         val referendaByGroup = referendaListInteractor.referendaListStateFlow(accountId, chain()).first()
-        val referenda = referendaByGroup.values.flatten()
+        val referenda = referendaByGroup.groupedReferenda.values.flatten()
 
         Log.d(this@GovernanceIntegrationTest.LOG_TAG,referenda.joinToString("\n"))
 
@@ -133,7 +133,7 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
     private suspend fun source(chain: Chain) = governanceApi.governanceSourceRegistry.sourceFor(chain.id)
 
     private suspend fun chain(): Chain = chainRegistry.currentChains.map { chains ->
-        chains.find(Chain::hasGovernance)
+        chains.find { it.governance != Chain.Governance.NONE }
     }
         .filterNotNull()
         .first()

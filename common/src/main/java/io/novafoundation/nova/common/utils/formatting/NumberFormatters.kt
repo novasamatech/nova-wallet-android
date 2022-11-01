@@ -11,9 +11,11 @@ import java.math.BigInteger
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
-import java.util.Date
+import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
+
+const val DATE_ISO_8601 = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
 
 private const val DECIMAL_PATTERN_BASE = "###,###."
 
@@ -24,6 +26,7 @@ private const val FULL_PRECISION = 5
 const val ABBREVIATED_PRECISION = 2
 
 private val dateTimeFormat = SimpleDateFormat.getDateTimeInstance()
+private val dateTimeFormatISO_8601 by lazy { SimpleDateFormat(DATE_ISO_8601, Locale.getDefault()) }
 
 private val defaultAbbreviationFormatter = FixedPrecisionFormatter(ABBREVIATED_PRECISION)
 private val defaultFullFormatter = FixedPrecisionFormatter(FULL_PRECISION)
@@ -105,6 +108,10 @@ fun Long.formatDaysSinceEpoch(context: Context): String? {
 }
 
 fun Long.formatDateTime() = dateTimeFormat.format(Date(this))
+
+fun parseDateISO_8601(value: String): Date? {
+    return runCatching { dateTimeFormatISO_8601.parse(value) }.getOrNull()
+}
 
 fun decimalFormatterFor(pattern: String): DecimalFormat {
     return DecimalFormat(pattern).apply {

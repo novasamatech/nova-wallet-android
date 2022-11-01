@@ -23,6 +23,7 @@ private const val TESTNET_OPTION = "testnet"
 private fun mapSectionTypeRemoteToSectionType(section: String) = when (section) {
     "subquery" -> Chain.ExternalApi.Section.Type.SUBQUERY
     "github" -> Chain.ExternalApi.Section.Type.GITHUB
+    "polkassembly" -> Chain.ExternalApi.Section.Type.POLKASSEMBLY
     else -> Chain.ExternalApi.Section.Type.UNKNOWN
 }
 
@@ -171,6 +172,7 @@ fun mapChainRemoteToChain(
             history = mapSectionRemoteToSection(externalApi.history),
             staking = mapSectionRemoteToSection(externalApi.staking),
             crowdloans = mapSectionRemoteToSection(externalApi.crowdloans),
+            governance = mapSectionRemoteToSection(externalApi.governance)
         )
     }
 
@@ -261,7 +263,8 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
         Chain.ExternalApi(
             staking = mapSectionLocalToSection(externalApi.staking),
             history = mapSectionLocalToSection(externalApi.history),
-            crowdloans = mapSectionLocalToSection(externalApi.crowdloans)
+            crowdloans = mapSectionLocalToSection(externalApi.crowdloans),
+            governance = mapSectionLocalToSection(externalApi.governance)
         )
     }
 
@@ -343,7 +346,8 @@ fun mapChainToChainLocal(chain: Chain, gson: Gson): ChainLocal {
         ChainLocal.ExternalApi(
             staking = mapSectionToSectionLocal(externalApi.staking),
             history = mapSectionToSectionLocal(externalApi.history),
-            crowdloans = mapSectionToSectionLocal(externalApi.crowdloans)
+            crowdloans = mapSectionToSectionLocal(externalApi.crowdloans),
+            governance = mapSectionToSectionLocal(externalApi.governance)
         )
     }
 

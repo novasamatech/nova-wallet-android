@@ -83,7 +83,7 @@ class RealReferendumDetailsInteractor(
     ): Flow<ReferendumDetails> {
         val governanceSource = governanceSourceRegistry.sourceFor(chain.id)
         val tracksById = governanceSource.referenda.getTracksById(chain.id)
-        val offChainInfo = governanceSource.offChainInfo.referendumDetails(chain)
+        val offChainInfo = governanceSource.offChainInfo.referendumDetails(referendumId, chain)
         val totalIssuance = totalIssuanceRepository.getTotalIssuance(chain.id)
 
         return combine(
