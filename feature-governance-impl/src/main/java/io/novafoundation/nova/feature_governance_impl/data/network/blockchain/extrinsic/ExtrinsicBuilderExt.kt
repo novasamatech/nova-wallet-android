@@ -52,6 +52,42 @@ fun ExtrinsicBuilder.convictionVotingRemoveVote(
     )
 }
 
+fun ExtrinsicBuilder.democracyVote(
+    referendumId: ReferendumId,
+    vote: AccountVote
+): ExtrinsicBuilder {
+    return call(
+        moduleName = Modules.DEMOCRACY,
+        callName = "vote",
+        arguments = mapOf(
+            "ref_index" to referendumId.value,
+            "vote" to vote.prepareForEncoding()
+        )
+    )
+}
+
+fun ExtrinsicBuilder.democracyUnlock(accountId: AccountId): ExtrinsicBuilder {
+    return call(
+        moduleName = Modules.DEMOCRACY,
+        callName = "unlock",
+        arguments = mapOf(
+            "target" to AddressInstanceConstructor.constructInstance(runtime.typeRegistry, accountId)
+        )
+    )
+}
+
+fun ExtrinsicBuilder.democracyRemoveVote(
+    referendumId: ReferendumId,
+): ExtrinsicBuilder {
+    return call(
+        moduleName = Modules.DEMOCRACY,
+        callName = "remove_vote",
+        arguments = mapOf(
+            "index" to referendumId.value
+        )
+    )
+}
+
 private fun AccountVote.prepareForEncoding(): Any {
     return when (this) {
         AccountVote.Split -> NotImplementedError("Split voting not yet supported")

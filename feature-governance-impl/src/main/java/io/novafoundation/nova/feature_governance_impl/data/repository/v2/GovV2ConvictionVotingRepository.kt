@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.castToList
 import io.novafoundation.nova.common.utils.convictionVoting
 import io.novafoundation.nova.common.utils.numberConstant
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumVoter
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
@@ -14,6 +15,7 @@ import io.novafoundation.nova.feature_governance_api.data.repository.ConvictionV
 import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimSchedule
 import io.novafoundation.nova.feature_governance_impl.data.network.blockchain.extrinsic.convictionVotingRemoveVote
 import io.novafoundation.nova.feature_governance_impl.data.network.blockchain.extrinsic.convictionVotingUnlock
+import io.novafoundation.nova.feature_governance_impl.data.network.blockchain.extrinsic.convictionVotingVote
 import io.novafoundation.nova.feature_governance_impl.data.repository.common.bindVoting
 import io.novafoundation.nova.feature_governance_impl.data.repository.common.votersFor
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -97,6 +99,10 @@ class GovV2ConvictionVotingRepository(
                 }
             }
         }
+    }
+
+    override fun ExtrinsicBuilder.vote(referendumId: ReferendumId, vote: AccountVote) {
+        convictionVotingVote(referendumId, vote)
     }
 
     private fun bindTrackLocks(decoded: Any?): List<Pair<TrackId, Balance>> {

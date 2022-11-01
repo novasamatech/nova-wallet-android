@@ -51,7 +51,7 @@ class NativeAssetBalance(
             .map { change ->
                 val balanceLocks = bindBalanceLocks(storage.decodeValue(change.value, runtime))
                 balanceLocks?.map { mapBlockchainLockToLocal(metaAccount.id, chain.id, chainAsset.id, it) }
-                    ?.let { lockDao.insert(it) }
+                    ?.let { lockDao.updateLocks(it, metaAccount.id, chain.id, chainAsset.id) }
             }
     }
 
