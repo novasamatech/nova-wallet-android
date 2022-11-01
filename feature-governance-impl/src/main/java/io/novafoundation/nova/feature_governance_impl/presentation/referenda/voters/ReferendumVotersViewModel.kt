@@ -41,12 +41,10 @@ class ReferendumVotersViewModel(
     private val chainFlow = flowOf { governanceSharedState.chain() }
     private val chainAssetFlow = flowOf { governanceSharedState.chainAsset() }
 
-    private val voterList = chainFlow.flatMapLatest {
+    private val voterList = chainAssetFlow.flatMapLatest { asset ->
         val referendumId = ReferendumId(payload.referendumId)
-        referendumVotersInteractor.votersFlow(referendumId, it, payload.voteType)
+        referendumVotersInteractor.votersFlow(referendumId, asset, payload.voteType)
     }
-
-    private val defaultIdentityProvider = identityProviderFactory.defaultProvider()
 
     val title: String = mapTypeToString(payload.voteType)
 
