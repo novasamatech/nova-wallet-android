@@ -8,10 +8,9 @@ import androidx.recyclerview.widget.ConcatAdapter
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.list.ShimmeringAdapter
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.presentation.dataOrNull
-import io.novafoundation.nova.common.utils.makeGone
-import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
@@ -19,7 +18,6 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.lis
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.subscribeOnAssetChange
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.subscribeOnAssetClick
 import kotlinx.android.synthetic.main.fragment_referenda_list.referendaList
-import kotlinx.android.synthetic.main.fragment_referenda_list.referendaProgress
 import javax.inject.Inject
 
 class ReferendaListFragment : BaseFragment<ReferendaListViewModel>(), ReferendaListAdapter.Handler, ReferendaListHeaderAdapter.Handler {
@@ -28,6 +26,8 @@ class ReferendaListFragment : BaseFragment<ReferendaListViewModel>(), ReferendaL
     protected lateinit var imageLoader: ImageLoader
 
     private val referendaHeaderAdapter by lazy(LazyThreadSafetyMode.NONE) { ReferendaListHeaderAdapter(imageLoader, this) }
+
+    private val referendaShimmeringAdapter by lazy(LazyThreadSafetyMode.NONE) { ShimmeringAdapter(R.layout.item_referenda_shimmering) }
 
     private val referendaListAdapter by lazy(LazyThreadSafetyMode.NONE) { ReferendaListAdapter(this, imageLoader) }
 
@@ -45,7 +45,7 @@ class ReferendaListFragment : BaseFragment<ReferendaListViewModel>(), ReferendaL
     }
 
     override fun initViews() {
-        referendaList.adapter = ConcatAdapter(referendaHeaderAdapter, referendaListAdapter)
+        referendaList.adapter = ConcatAdapter(referendaHeaderAdapter, referendaShimmeringAdapter, referendaListAdapter)
     }
 
     override fun inject() {
@@ -71,11 +71,11 @@ class ReferendaListFragment : BaseFragment<ReferendaListViewModel>(), ReferendaL
         viewModel.referendaUiFlow.observe {
             when (it) {
                 is LoadingState.Loaded -> {
-                    referendaProgress.makeGone()
+                    referendaShimmeringAdapter.showShimmering(false)
                     referendaListAdapter.submitList(it.data)
                 }
                 is LoadingState.Loading -> {
-                    referendaProgress.makeVisible()
+                    referendaShimmeringAdapter.showShimmering(true)
                     referendaListAdapter.submitList(emptyList())
                 }
             }
