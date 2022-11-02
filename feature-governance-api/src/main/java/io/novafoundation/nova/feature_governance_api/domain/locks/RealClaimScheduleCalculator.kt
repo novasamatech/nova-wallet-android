@@ -361,7 +361,11 @@ private fun Collection<ClaimAffect>.toClaimActions(): List<ClaimAction> {
     return groupByTrack().flatMap { trackAffects ->
         buildList {
             if (trackAffects.hasPriorAffect) {
-                add(Unlock(trackAffects.trackId))
+                val requiresStandaloneUnlock = trackAffects.votes.isEmpty()
+
+                if (requiresStandaloneUnlock) {
+                    add(Unlock(trackAffects.trackId))
+                }
             }
 
             if (trackAffects.votes.isNotEmpty()) {
