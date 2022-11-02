@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_governance_impl.presentation.referenda.li
 
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.list.toListWithHeaders
-import io.novafoundation.nova.common.mixin.MixinFactory
 import io.novafoundation.nova.common.presentation.mapLoading
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.combineToPair
@@ -31,7 +30,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.lis
 import io.novafoundation.nova.feature_governance_impl.presentation.view.GovernanceLocksModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.WithAssetSelector
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
@@ -39,7 +38,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 
 class ReferendaListViewModel(
-    assetSelectorFactory: MixinFactory<AssetSelectorMixin.Presentation>,
+    assetSelectorFactory: AssetSelectorFactory,
     private val referendaListInteractor: ReferendaListInteractor,
     private val selectedAccountUseCase: SelectedAccountUseCase,
     private val selectedAssetSharedState: SingleAssetSharedState,
@@ -50,7 +49,10 @@ class ReferendaListViewModel(
     private val governanceDAppsInteractor: GovernanceDAppsInteractor
 ) : BaseViewModel(), WithAssetSelector {
 
-    override val assetSelectorMixin = assetSelectorFactory.create(scope = this)
+    override val assetSelectorMixin = assetSelectorFactory.create(
+        scope = this,
+        amountProvider = Asset::free
+    )
 
     private val selectedAccount = selectedAccountUseCase.selectedMetaAccountFlow()
     private val selectedChainAndAssetFlow = selectedAssetSharedState.assetWithChain

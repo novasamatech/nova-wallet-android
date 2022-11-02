@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector
 
 import androidx.lifecycle.MutableLiveData
-import io.novafoundation.nova.common.mixin.MixinFactory
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.inBackground
@@ -18,15 +17,19 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
 
 class AssetSelectorFactory(
     private val assetUseCase: AssetUseCase,
     private val singleAssetSharedState: SingleAssetSharedState,
     private val resourceManager: ResourceManager
-) : MixinFactory<AssetSelectorMixin.Presentation> {
+) {
 
-    override fun create(scope: CoroutineScope): AssetSelectorMixin.Presentation {
-        return AssetSelectorProvider(assetUseCase, resourceManager, singleAssetSharedState, scope)
+    fun create(
+        scope: CoroutineScope,
+        amountProvider: (Asset) -> BigDecimal
+    ): AssetSelectorMixin.Presentation {
+        return AssetSelectorProvider(assetUseCase, resourceManager, singleAssetSharedState, scope, amountProvider)
     }
 }
 
@@ -35,6 +38,7 @@ private class AssetSelectorProvider(
     private val resourceManager: ResourceManager,
     private val singleAssetSharedState: SingleAssetSharedState,
     private val scope: CoroutineScope,
+    private val amountProvider: (Asset) -> BigDecimal
 ) : AssetSelectorMixin.Presentation, CoroutineScope by scope {
 
     override val showAssetChooser = MutableLiveData<Event<DynamicListBottomSheet.Payload<AssetModel>>>()
@@ -45,7 +49,7 @@ private class AssetSelectorProvider(
 
     override val selectedAssetModelFlow: Flow<AssetModel> = selectedAssetFlow
         .map {
-            mapAssetToAssetModel(it, resourceManager, patternId = null)
+            mapAssetToAssetModel(it, resourceManager, patternId = null, retrieveAmount = amountProvider)
         }
         .shareIn(this, SharingStarted.Eagerly, replay = 1)
 
@@ -53,7 +57,7 @@ private class AssetSelectorProvider(
         launch {
             val availableToSelect = assetUseCase.availableAssetsToSelect()
 
-            val models = availableToSelect.map { mapAssetToAssetModel(it, resourceManager, patternId = null) }
+            val models = availableToSelect.map { mapAssetToAssetModel(it, resourceManager, patternId = null, retrieveAmount = amountProvider) }
 
             val selectedChainAsset = selectedAssetFlow.first().token.configuration
 

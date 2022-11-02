@@ -10,7 +10,6 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
-import io.novafoundation.nova.common.mixin.MixinFactory
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
@@ -28,7 +27,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.domain.main.validations.mai
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.main.CrowdloanViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorFactory
 
 @Module(includes = [ViewModelModule::class])
 class CrowdloanModule {
@@ -66,11 +65,10 @@ class CrowdloanModule {
         crowdloanSharedState: CrowdloanSharedState,
         router: CrowdloanRouter,
         crowdloanUpdateSystem: UpdateSystem,
-        assetSelectorFactory: MixinFactory<AssetSelectorMixin.Presentation>,
+        assetSelectorFactory: AssetSelectorFactory,
         customDialogDisplayer: CustomDialogDisplayer.Presentation,
         customContributeManager: CustomContributeManager,
         statefulCrowdloanMixinFactory: StatefulCrowdloanMixin.Factory,
-        selectedAccountUseCase: SelectedAccountUseCase,
         validationExecutor: ValidationExecutor,
         validationSystem: MainCrowdloanValidationSystem,
     ): ViewModel {
@@ -80,7 +78,6 @@ class CrowdloanModule {
             crowdloanSharedState = crowdloanSharedState,
             router = router,
             customContributeManager = customContributeManager,
-            selectedAccountUseCase = selectedAccountUseCase,
             validationSystem = validationSystem,
             validationExecutor = validationExecutor,
             crowdloanUpdateSystem = crowdloanUpdateSystem,
