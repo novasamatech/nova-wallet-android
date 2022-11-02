@@ -174,7 +174,7 @@ class RealReferendaListInteractor(
                     ?.let(ReferendumPreview::OnChainMetadata),
                 track = onChainReferendum.track()?.let { trackId ->
                     tracksById[trackId]?.let { trackInfo ->
-                        ReferendumTrack(trackId, trackInfo.name)
+                        ReferendumTrack(trackId, trackInfo.name, sameWithOther = tracksById.size == 1)
                     }
                 },
                 status = statuses.getValue(onChainReferendum.id),

@@ -170,7 +170,7 @@ private class RealGovernanceLocksEstimator(
         .orZero()
 
     override val track: ReferendumTrack? = onChainReferendum.status.asOngoingOrNull()?.let {
-        ReferendumTrack(it.track, tracks.getValue(it.track).name)
+        ReferendumTrack(it.track, tracks.getValue(it.track).name, sameWithOther = tracks.size == 1)
     }
 
     override val trackVoting: Voting? = voting.findVotingFor(onChainReferendum)
