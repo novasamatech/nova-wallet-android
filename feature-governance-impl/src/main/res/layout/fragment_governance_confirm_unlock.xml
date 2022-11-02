@@ -69,7 +69,7 @@
                         android:layout_height="wrap_content"
                         android:id="@+id/confirmReferendumUnlockGovernanceLockChange"
                         app:amountChanges_icon="@drawable/ic_lock"
-                        app:amountChanges_title="@string/confirm_governance_unlock_governance_lock" />
+                        app:amountChanges_title="@string/referendum_vote_governance_lock" />
 
                 </io.novafoundation.nova.common.view.TableView>
 

@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         app:dividerVisible="false"
         app:homeButtonIcon="@drawable/ic_close"
-        app:titleText="@string/referendum_full_details_title" />
+        app:titleText="@string/referendum_details_full_details" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/referendumDetailsScrollView"
@@ -41,7 +41,7 @@
                     android:layout_height="wrap_content"
                     app:primaryValueIcon="@drawable/ic_info_16"
                     app:primaryValueIconTint="@color/white_64"
-                    app:title="@string/referendum_full_details_proposal" />
+                    app:title="@string/referendum_full_details_proposer" />
 
                 <io.novafoundation.nova.common.view.TableCellView
                     android:id="@+id/referendumFullDetailsDeposit"
@@ -69,7 +69,7 @@
                     android:id="@+id/referendumFullDetailsRequestedAmount"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:title="@string/referendum_full_details_requested_amount" />
+                    app:title="@string/referendum_details_requested_amount" />
 
             </io.novafoundation.nova.common.view.TableView>
 
