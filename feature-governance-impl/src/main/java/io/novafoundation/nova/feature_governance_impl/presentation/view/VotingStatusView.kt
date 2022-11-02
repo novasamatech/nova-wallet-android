@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_governance_impl.presentation.view
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.Gravity
 import android.view.View
 import android.widget.LinearLayout
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
@@ -46,7 +47,7 @@ class VotingStatusView @JvmOverloads constructor(
         }
 
         votingStatusTimeEstimation.makeVisible()
-        votingStatusTimeEstimation.setReferendumTimeEstimation(timeEstimation)
+        votingStatusTimeEstimation.setReferendumTimeEstimation(timeEstimation, Gravity.END)
     }
 
     fun setStatus(referendumStatusModel: ReferendumStatusModel) {
