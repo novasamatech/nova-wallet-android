@@ -121,7 +121,6 @@ class RealClaimScheduleCalculatorTest {
 
         expect {
             claimable(amount = 2) {
-                unlock(trackId = 0)
                 removeVote(trackId = 0, referendumId = 1)
                 unlock(trackId = 0)
             }
@@ -222,8 +221,6 @@ class RealClaimScheduleCalculatorTest {
 
         expect {
             claimable(amount = 10) {
-                unlock(trackId = 0)
-
                 removeVote(trackId = 0, referendumId = 0)
                 unlock(trackId = 0)
             }
@@ -259,7 +256,6 @@ class RealClaimScheduleCalculatorTest {
 
         expect {
             claimable(amount = 9) {
-                unlock(trackId = 0)
                 removeVote(trackId = 0, referendumId = 0)
                 unlock(trackId = 0)
 
