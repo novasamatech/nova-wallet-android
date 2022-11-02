@@ -44,6 +44,6 @@ class RealReferendaSortingProvider : ReferendaSortingProvider {
                 // approved at the end
                 else -> Long.MAX_VALUE
             }
-        }.thenBy { it.id.value }
+        }.thenByDescending { it.id.value }
     }
 }

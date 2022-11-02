@@ -9,7 +9,7 @@ interface ReferendumVotersInteractor {
 
     fun votersFlow(
         referendumId: ReferendumId,
-        chain: Chain,
+        chainAsset: Chain.Asset,
         type: VoteType
     ): Flow<List<ReferendumVoter>>
 }
