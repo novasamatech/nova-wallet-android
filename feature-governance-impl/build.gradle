@@ -48,6 +48,7 @@ dependencies {
     implementation markdownDep
     implementation markdownImage
     implementation markdownTables
+    implementation markdownLinkify
     implementation markdownStrikethrough
 
     implementation materialDep

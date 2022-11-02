@@ -73,8 +73,8 @@ class ReferendumDetailsViewModel(
     private val tokenUseCase: TokenUseCase,
     private val referendumFormatter: ReferendumFormatter,
     private val externalActions: ExternalActions.Presentation,
-    private val markwon: Markwon,
-    private val governanceDAppsInteractor: GovernanceDAppsInteractor
+    private val governanceDAppsInteractor: GovernanceDAppsInteractor,
+    val markwon: Markwon,
 ) : BaseViewModel(), ExternalActions by externalActions {
 
     private val selectedAccount = selectedAccountUseCase.selectedMetaAccountFlow()
@@ -305,9 +305,8 @@ class ReferendumDetailsViewModel(
 
     private fun mapShortenedMarkdownDescription(referendumDetails: ReferendumDetails): ShortenedTextModel {
         val referendumDescription = mapReferendumDescriptionToUi(referendumDetails)
-        val referendumCleanedDescription = removeMarkdown(referendumDescription)
-            .trimStart()
-        return ShortenedTextModel.from(referendumCleanedDescription, DESCRIPTION_LENGTH_LIMIT)
+        val markdownDescription = markwon.toMarkdown(referendumDescription)
+        return ShortenedTextModel.from(markdownDescription, DESCRIPTION_LENGTH_LIMIT)
     }
 
     private fun mapReferendumTitleToUi(referendumDetails: ReferendumDetails): String {
@@ -381,10 +380,5 @@ class ReferendumDetailsViewModel(
         return preImage?.let {
             PreImagePreviewPayload(interactor.previewFor(preImage))
         }
-    }
-
-    private fun removeMarkdown(value: String): String {
-        return markwon.toMarkdown(value)
-            .toString()
     }
 }

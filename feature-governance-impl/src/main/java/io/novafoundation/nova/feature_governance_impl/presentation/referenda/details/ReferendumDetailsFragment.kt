@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_governance_impl.presentation.referenda.de
 
 import android.content.Context
 import android.os.Bundle
+import android.text.Spanned
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -194,7 +195,14 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
     }
 
     private fun setDescription(maybeModel: ShortenedTextModel?) = referendumDetails.letOrHide(maybeModel) { model ->
-        referendumDetailsDescription.text = model.shortenedText
+        val shortenedText = model.shortenedText
+
+        if (shortenedText is Spanned) {
+            viewModel.markwon.setParsedMarkdown(referendumDetailsDescription, shortenedText)
+        } else {
+            referendumDetailsDescription.text = shortenedText
+        }
+
         referendumDetailsReadMore.setVisible(model.hasMore)
     }
 }
