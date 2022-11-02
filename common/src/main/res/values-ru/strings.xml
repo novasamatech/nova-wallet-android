@@ -525,10 +525,10 @@
     <string name="referendum_status_passing">Проходит</string>
     <string name="referendum_status_preparing">Подготовка</string>
     <string name="referendum_status_rejected">Отклонён</string>
-    <string name="referendum_status_time_approve_in">Будет одобрен через %s</string>
-    <string name="referendum_status_time_execute_in">Будет выполнен через %s</string>
+    <string name="referendum_status_time_approve_in">Одобрение через %s</string>
+    <string name="referendum_status_time_execute_in">Выполнение через %s</string>
     <string name="referendum_status_time_out_in">Тайм-аут через %s</string>
-    <string name="referendum_status_time_reject_in">Будет отклонён через %s</string>
+    <string name="referendum_status_time_reject_in">Отклонение через %s</string>
     <string name="referendum_status_timeout">Тайм-аут</string>
     <string name="referendum_status_waiting_deposit">Ожидание депозита</string>
     <string name="referendum_support_threshold_format" formatted="false">Порог: %s из %s</string>
