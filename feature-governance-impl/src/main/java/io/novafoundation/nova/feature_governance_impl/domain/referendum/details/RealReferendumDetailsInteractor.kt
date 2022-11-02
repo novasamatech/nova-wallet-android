@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_governance_api.data.repository.PreImageReq
 import io.novafoundation.nova.feature_governance_api.data.repository.PreImageRequest.FetchCondition.ALWAYS
 import io.novafoundation.nova.feature_governance_api.data.repository.getTracksById
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
+import io.novafoundation.nova.feature_governance_api.data.thresold.gov1.asGovV1VotingThresholdOrNull
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumProposer
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumTrack
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.PreimagePreview
@@ -149,6 +150,7 @@ class RealReferendumDetailsInteractor(
                 userVote = vote,
                 fullDetails = ReferendumDetails.FullDetails(
                     deposit = onChainReferendum.status.asOngoingOrNull()?.proposerDeposit(),
+                    voteThreshold = onChainReferendum.status.asOngoingOrNull()?.threshold?.asGovV1VotingThresholdOrNull(),
                     approvalCurve = track?.minApproval,
                     supportCurve = track?.minSupport,
                 )

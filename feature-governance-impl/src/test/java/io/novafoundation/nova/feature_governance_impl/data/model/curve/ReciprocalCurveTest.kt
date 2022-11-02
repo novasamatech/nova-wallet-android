@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.data.model.curve
 
-import io.novafoundation.nova.feature_governance_impl.data.model.thresold.gov2.curve.ReciprocalCurve
+import io.novafoundation.nova.feature_governance_api.data.thresold.gov2.curve.ReciprocalCurve
 import org.junit.Test
 import java.math.BigDecimal
 

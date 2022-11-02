@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.data.model.thresold.gov2
+package io.novafoundation.nova.feature_governance_api.data.thresold.gov2
 
 import io.novafoundation.nova.common.data.network.runtime.binding.Perbill
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Tally
