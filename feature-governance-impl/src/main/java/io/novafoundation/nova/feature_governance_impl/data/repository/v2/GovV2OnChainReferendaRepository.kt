@@ -86,12 +86,10 @@ class GovV2OnChainReferendaRepository(
     override suspend fun getTrackQueues(trackIds: Set<TrackId>, chainId: ChainId): Map<TrackId, TrackQueue> {
         if (trackIds.isEmpty()) return emptyMap()
         return remoteStorageSource.query(chainId) {
-            val maxQueued = runtime.metadata.referenda().numberConstant("MaxQueued", runtime)
-
             runtime.metadata.referenda().storage("TrackQueue").entries(
                 keysArguments = trackIds.map { listOf(it.value) },
                 keyExtractor = { (trackIdRaw: BigInteger) -> TrackId(trackIdRaw) },
-                binding = { decoded, _ -> bindTrackQueue(decoded, maxQueued) }
+                binding = { decoded, _ -> bindTrackQueue(decoded) }
             )
         }
     }
@@ -298,8 +296,8 @@ class GovV2OnChainReferendaRepository(
         }
     }
 
-    private fun bindTrackQueue(decoded: Any?, maxQueued: BigInteger): TrackQueue {
-        if (decoded == null) return TrackQueue.empty(maxQueued.toInt())
+    private fun bindTrackQueue(decoded: Any?): TrackQueue {
+        if (decoded == null) return TrackQueue.empty()
 
         val referendumIds = bindList(decoded) {
             val (referendumIndex, _) = it.castToList()
@@ -307,7 +305,7 @@ class GovV2OnChainReferendaRepository(
             ReferendumId(bindNumber(referendumIndex))
         }
 
-        return TrackQueue(referendumIds, maxQueued.toInt())
+        return TrackQueue(referendumIds)
     }
 
     // https://github.com/paritytech/substrate/blob/fc67cbb66d8c484bc7b7506fc1300344d12ecbad/frame/referenda/src/lib.rs#L716
