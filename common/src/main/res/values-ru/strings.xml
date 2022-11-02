@@ -545,7 +545,7 @@
     <string name="referendum_timeline_state_timed_out">Тайм-аут</string>
     <string name="referendum_timeline_state_waiting_deposit">Голосование: Ожидание депозита</string>
     <string name="referendum_to_pass_format">Для принятия: %s</string>
-    <string name="referendum_track_auction_admin">Краудлоаны</string>
+    <string name="referendum_track_auction_admin">Краудлоуны</string>
     <string name="referendum_track_big_spender">Казна: большие траты</string>
     <string name="referendum_track_big_tipper">Казна: большие чаевые</string>
     <string name="referendum_track_fellowship_admin">fellowship: управление</string>
