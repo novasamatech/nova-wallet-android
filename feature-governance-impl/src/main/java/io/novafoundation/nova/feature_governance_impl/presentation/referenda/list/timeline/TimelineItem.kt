@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_governance_impl.presentation.referenda.li
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.Gravity
 import android.view.View
 import android.widget.LinearLayout
 import io.novafoundation.nova.common.view.stopTimer
@@ -37,7 +38,7 @@ class TimelineItem @JvmOverloads constructor(
             }
             is TimelineLayout.TimelineState.Current -> {
                 itemTimelineTitle.text = timelineState.title
-                itemTimelineSubtitle.setReferendumTimeEstimation(timelineState.subtitle)
+                itemTimelineSubtitle.setReferendumTimeEstimation(timelineState.subtitle, Gravity.START)
             }
         }
     }

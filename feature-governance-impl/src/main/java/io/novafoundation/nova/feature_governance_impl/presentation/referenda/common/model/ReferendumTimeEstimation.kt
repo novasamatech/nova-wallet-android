@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model
 
+import android.view.Gravity
 import android.widget.TextView
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
@@ -7,6 +8,7 @@ import androidx.annotation.StringRes
 import io.novafoundation.nova.common.utils.formatting.TimerValue
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.letOrHide
+import io.novafoundation.nova.common.utils.setDrawableEnd
 import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.view.startTimer
 import io.novafoundation.nova.common.view.stopTimer
@@ -19,6 +21,7 @@ sealed class ReferendumTimeEstimation {
         @DrawableRes val iconRes: Int,
         @ColorRes val colorRes: Int
     ) {
+
         companion object
     }
 
@@ -47,30 +50,37 @@ sealed class ReferendumTimeEstimation {
     ) : ReferendumTimeEstimation()
 }
 
-fun TextView.setReferendumTimeEstimation(maybeTimeEstimation: ReferendumTimeEstimation?) = letOrHide(maybeTimeEstimation) { timeEstimation ->
+fun TextView.setReferendumTimeEstimation(maybeTimeEstimation: ReferendumTimeEstimation?, iconGravity: Int) = letOrHide(maybeTimeEstimation) { timeEstimation ->
     when (timeEstimation) {
         is ReferendumTimeEstimation.Text -> {
             stopTimer()
 
             text = timeEstimation.text
-            setReferendumTextStyle(timeEstimation.textStyle)
+            setReferendumTextStyle(timeEstimation.textStyle, iconGravity)
         }
 
         is ReferendumTimeEstimation.Timer -> {
-            setReferendumTextStyle(timeEstimation.textStyleRefresher())
+            setReferendumTextStyle(timeEstimation.textStyleRefresher(), iconGravity)
 
             startTimer(
                 value = timeEstimation.time,
                 customMessageFormat = timeEstimation.timeFormat,
                 onTick = { view, _ ->
-                    view.setReferendumTextStyle(timeEstimation.textStyleRefresher())
+                    view.setReferendumTextStyle(timeEstimation.textStyleRefresher(), iconGravity)
                 }
             )
         }
     }
 }
 
-private fun TextView.setReferendumTextStyle(textStyle: ReferendumTimeEstimation.TextStyle) {
+private fun TextView.setReferendumTextStyle(textStyle: ReferendumTimeEstimation.TextStyle, iconGravity: Int) {
     setTextColorRes(textStyle.colorRes)
-    setDrawableStart(textStyle.iconRes, widthInDp = 16, paddingInDp = 4, tint = textStyle.colorRes)
+    when (iconGravity) {
+        Gravity.START -> {
+            setDrawableStart(textStyle.iconRes, widthInDp = 16, paddingInDp = 4, tint = textStyle.colorRes)
+        }
+        Gravity.END -> {
+            setDrawableEnd(textStyle.iconRes, widthInDp = 16, paddingInDp = 4, tint = textStyle.colorRes)
+        }
+    }
 }

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.list
 
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
@@ -150,7 +151,7 @@ private class ReferendumChildHolder(
     }
 
     fun bindTimeEstimation(item: ReferendumModel) = with(containerView) {
-        itemReferendumTimeEstimate.setReferendumTimeEstimation(item.timeEstimation)
+        itemReferendumTimeEstimate.setReferendumTimeEstimation(item.timeEstimation, Gravity.END)
     }
 
     private fun setNumber(number: String) = with(containerView) {
