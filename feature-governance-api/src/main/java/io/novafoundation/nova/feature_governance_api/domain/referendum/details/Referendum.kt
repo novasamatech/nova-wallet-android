@@ -4,6 +4,7 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.PreImage
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VotingCurve
+import io.novafoundation.nova.feature_governance_api.data.thresold.gov1.Gov1VotingThreshold
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumProposer
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumTrack
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumVoting
@@ -24,6 +25,7 @@ data class ReferendumDetails(
 
     data class FullDetails(
         val deposit: Balance?,
+        val voteThreshold: Gov1VotingThreshold?,
         val approvalCurve: VotingCurve?,
         val supportCurve: VotingCurve?,
     )

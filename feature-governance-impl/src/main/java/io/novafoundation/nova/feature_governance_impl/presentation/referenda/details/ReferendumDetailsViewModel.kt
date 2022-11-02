@@ -345,7 +345,7 @@ class ReferendumDetailsViewModel(
             proposer = referendumDetails.proposer?.let {
                 ReferendumProposerPayload(it.accountId, it.offChainNickname)
             },
-            voteThreshold = null,
+            voteThreshold = referendumDetails.fullDetails.voteThreshold?.readableName,
             approveThreshold = referendumDetails.fullDetails.approvalCurve?.name,
             supportThreshold = referendumDetails.fullDetails.supportCurve?.name,
             hash = referendumDetails.onChainMetadata?.preImageHash,
@@ -363,6 +363,7 @@ class ReferendumDetailsViewModel(
 
         return checkAnyNonNull(
             referendumDetails.proposer,
+            referendumDetails.fullDetails.voteThreshold,
             referendumDetails.fullDetails.approvalCurve,
             referendumDetails.fullDetails.supportCurve,
             referendumDetails.fullDetails.deposit,

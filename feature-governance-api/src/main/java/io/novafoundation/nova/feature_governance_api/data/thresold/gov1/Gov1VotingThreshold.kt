@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.data.model.thresold.gov1
+package io.novafoundation.nova.feature_governance_api.data.thresold.gov1
 
 import io.novafoundation.nova.common.data.network.runtime.binding.Perbill
 import io.novafoundation.nova.common.utils.divideToDecimal
@@ -13,9 +13,9 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import java.math.BigInteger
 
-enum class Gov1VotingThreshold : VotingThreshold {
+enum class Gov1VotingThreshold(val readableName: String) : VotingThreshold {
 
-    SUPER_MAJORITY_APPROVE {
+    SUPER_MAJORITY_APPROVE("SimpleMajorityApprove") {
 
         // https://github.com/paritytech/substrate/blob/5ae005c244295d23586c93da43148b2bc826b137/frame/democracy/src/vote_threshold.rs#L101
         // nays / sqrt(turnout) < ayes / sqrt(total_issuance) =>
@@ -42,7 +42,7 @@ enum class Gov1VotingThreshold : VotingThreshold {
         }
     },
 
-    SUPER_MAJORITY_AGAINST {
+    SUPER_MAJORITY_AGAINST("SimpleMajority") {
 
         // https://github.com/paritytech/substrate/blob/5ae005c244295d23586c93da43148b2bc826b137/frame/democracy/src/vote_threshold.rs#L103
         // nays / sqrt(total_issuance) < ayes / sqrt(turnout) =>
@@ -67,7 +67,7 @@ enum class Gov1VotingThreshold : VotingThreshold {
         }
     },
 
-    SIMPLE_MAJORITY {
+    SIMPLE_MAJORITY("SimpleMajority") {
 
         // https://github.com/paritytech/substrate/blob/5ae005c244295d23586c93da43148b2bc826b137/frame/democracy/src/vote_threshold.rs#L105
         // ayes > nays =>
@@ -87,4 +87,8 @@ enum class Gov1VotingThreshold : VotingThreshold {
     override fun supportThreshold(tally: Tally, totalIssuance: Balance, passedSinceDecidingFraction: Perbill): Threshold<Balance> {
         return Threshold.passing(BigInteger.ZERO)
     }
+}
+
+fun VotingThreshold.asGovV1VotingThresholdOrNull(): Gov1VotingThreshold? {
+    return this as? Gov1VotingThreshold
 }
