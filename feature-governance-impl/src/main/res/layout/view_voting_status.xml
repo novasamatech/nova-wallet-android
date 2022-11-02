@@ -71,7 +71,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="16dp"
-        android:text="@string/votes_view_start_vote"
+        android:text="@string/vote_vote"
         app:size="small" />
 
 </merge>

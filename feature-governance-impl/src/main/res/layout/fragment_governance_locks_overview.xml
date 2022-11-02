@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         app:dividerVisible="false"
         app:homeButtonIcon="@drawable/ic_close"
-        app:titleText="@string/governance_unlock_tokens_title" />
+        app:titleText="@string/wallet_balance_locked" />
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -47,7 +47,7 @@
             android:layout_gravity="bottom"
             android:layout_marginHorizontal="16dp"
             android:layout_marginBottom="16dp"
-            android:text="@string/governance_unlock_tokens_action" />
+            android:text="@string/governance_unlock" />
 
     </FrameLayout>
 </LinearLayout>

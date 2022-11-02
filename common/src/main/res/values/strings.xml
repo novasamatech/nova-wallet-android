@@ -49,13 +49,10 @@
 
     <string name="referendum_votes_format">%s votes</string>
 
-    <string name="referendum_dapp_comment_react">Comment and react</string>
-
     <string name="common_read_more">Read more</string>
 
     <string name="common_ongoing">Ongoing</string>
     <string name="common_completed">Completed</string>
-    <!--    <string name="crowdloan_completed_section">Completed</string>-->
 
     <string name="referendum_aye_format">Aye: %s</string>
     <string name="referendum_nay_format">Nay: %s</string>
@@ -108,7 +105,6 @@
 
     <string name="referendum_details_your_vote">Your vote:</string>
     <string name="referendum_details_timeline">Timeline</string>
-    <string name="votes_view_start_vote">Vote</string>
 
     <string name="referendum_dapp_list_title">Use Nova DApp browser</string>
 
@@ -118,11 +114,9 @@
 
     <string name="referendum_full_details_parameters_json">Parameters JSON</string>
     <string name="referendum_full_details_long_for_preview">Too long for preview</string>
-    <string name="referendum_full_details_title">Full details</string>
-    <string name="referendum_full_details_proposal">Proposal</string>
+    <string name="referendum_full_details_proposer">Proposer</string>
     <string name="referendum_full_details_deposit">Deposit</string>
     <string name="referendum_full_details_beneficiary">Beneficiary</string>
-    <string name="referendum_full_details_requested_amount">Requested amount</string>
     <string name="referendum_full_details_vote_threshold">Vote threshold</string>
     <string name="referendum_full_details_turnout">Turnout</string>
     <string name="referendum_full_details_electorate">Electorate</string>
@@ -139,16 +133,11 @@
     <string name="referendum_voter_vote_details">%s × %sx</string>
 
     <string name="confirm_referendum_vote_title">Vote</string>
-    <string name="confirm_referendum_vote_note">After locking period don’t forget to redeem your tokens</string>
     <string name="confirm_referendum_vote_track">Track</string>
     <string name="confirm_referendum_vote_referendum">Referendum</string>
     <string name="referendum_voters_empty_list_placeholder">List of voters will appear here</string>
 
     <string name="governance_unlock">Unlock</string>
-    <string name="confirm_governance_unlock_governance_lock">Governance lock</string>
-
-    <string name="governance_unlock_tokens_title">Locked</string>
-    <string name="governance_unlock_tokens_action">Unlock</string>
 
     <string name="crowdloan_contributions_liquid_source">Liquid</string>
     <string name="crowdloan_contributions_parallel_source">Parallel</string>
