@@ -11,7 +11,6 @@ import io.noties.markwon.image.coil.CoilImagesPlugin
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.common.mixin.MixinFactory
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
@@ -50,7 +49,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.implementations.SharedSt
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorFactory
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
@@ -123,7 +121,7 @@ class GovernanceFeatureModule {
         assetUseCase: AssetUseCase,
         assetSharedState: GovernanceSharedState,
         resourceManager: ResourceManager
-    ): MixinFactory<AssetSelectorMixin.Presentation> = AssetSelectorFactory(
+    ) = AssetSelectorFactory(
         assetUseCase = assetUseCase,
         singleAssetSharedState = assetSharedState,
         resourceManager = resourceManager

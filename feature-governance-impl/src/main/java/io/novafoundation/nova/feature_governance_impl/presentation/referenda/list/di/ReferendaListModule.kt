@@ -8,7 +8,6 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
-import io.novafoundation.nova.common.mixin.MixinFactory
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -18,7 +17,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.dapp.GovernanceDApp
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.ReferendaListViewModel
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorFactory
 
 @Module(includes = [ViewModelModule::class])
 class ReferendaListModule {
@@ -27,7 +26,7 @@ class ReferendaListModule {
     @IntoMap
     @ViewModelKey(ReferendaListViewModel::class)
     fun provideViewModel(
-        assetSelectorFactory: MixinFactory<AssetSelectorMixin.Presentation>,
+        assetSelectorFactory: AssetSelectorFactory,
         referendaListInteractor: ReferendaListInteractor,
         selectedAccountUseCase: SelectedAccountUseCase,
         selectedAssetSharedState: GovernanceSharedState,
