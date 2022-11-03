@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
-    <string name="common_zero" translatable="false">0</string>
-
     <string name="dapp_sign_error_unsupported_chain">Unsupported chain with genesis hash %s</string>
 
     <string name="referendum_unlock_remains_locked_format">remains locked in %s</string>
