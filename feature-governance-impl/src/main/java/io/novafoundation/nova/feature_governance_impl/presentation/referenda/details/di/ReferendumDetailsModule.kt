@@ -12,12 +12,17 @@ import io.noties.markwon.Markwon
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
 import io.noties.markwon.linkify.LinkifyPlugin
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumDetailsInteractor
+import io.novafoundation.nova.feature_governance_api.domain.referendum.details.valiadtions.ReferendumPreVoteValidationSystem
+import io.novafoundation.nova.feature_governance_api.domain.referendum.details.valiadtions.referendumPreVote
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.dapp.GovernanceDAppsInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.identity.GovernanceIdentityProviderFactory
@@ -32,6 +37,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 class ReferendumDetailsModule {
 
     @Provides
+    @ScreenScope
     fun provideMarkwon(context: Context): Markwon {
         return Markwon.builder(context)
             .usePlugin(LinkifyPlugin.create(Linkify.EMAIL_ADDRESSES or Linkify.WEB_URLS))
@@ -39,6 +45,10 @@ class ReferendumDetailsModule {
             .usePlugin(StrikethroughPlugin.create())
             .build()
     }
+
+    @Provides
+    @ScreenScope
+    fun provideValidationSystem(): ReferendumPreVoteValidationSystem = ValidationSystem.referendumPreVote()
 
     @Provides
     @IntoMap
@@ -56,7 +66,9 @@ class ReferendumDetailsModule {
         referendumFormatter: ReferendumFormatter,
         externalActions: ExternalActions.Presentation,
         markwon: Markwon,
-        governanceDAppsInteractor: GovernanceDAppsInteractor
+        governanceDAppsInteractor: GovernanceDAppsInteractor,
+        validationSystem: ReferendumPreVoteValidationSystem,
+        validationExecutor: ValidationExecutor,
     ): ViewModel {
         return ReferendumDetailsViewModel(
             router = router,
@@ -71,7 +83,9 @@ class ReferendumDetailsModule {
             referendumFormatter = referendumFormatter,
             externalActions = externalActions,
             markwon = markwon,
-            governanceDAppsInteractor = governanceDAppsInteractor
+            governanceDAppsInteractor = governanceDAppsInteractor,
+            validationExecutor = validationExecutor,
+            validationSystem = validationSystem
         )
     }
 

@@ -9,13 +9,14 @@ import android.view.ViewGroup
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setVisible
-import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.view.setAddressOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
@@ -26,7 +27,6 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.com
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.ReferendumDetailsModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.ShortenedTextModel
 import io.novafoundation.nova.feature_governance_impl.presentation.view.setVoteModelOrHide
-import javax.inject.Inject
 import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetails
 import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsContainer
 import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsDappList
@@ -48,6 +48,7 @@ import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDeta
 import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsYourVote
 import kotlinx.android.synthetic.main.fragment_referendum_details.referendumFullDetails
 import kotlinx.android.synthetic.main.fragment_referendum_details.referendumTimelineContainer
+import javax.inject.Inject
 
 class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), WithContextExtensions {
 
@@ -130,6 +131,7 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
 
     override fun subscribe(viewModel: ReferendumDetailsViewModel) {
         setupExternalActions(viewModel)
+        observeValidations(viewModel)
 
         viewModel.referendumDetailsModelFlow.observe {
             when (it) {
