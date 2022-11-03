@@ -22,5 +22,5 @@ sealed class ConfirmTxResponse : Parcelable {
     class Sent(override val requestId: String, val txHash: String) : ConfirmTxResponse()
 
     @Parcelize
-    class SigningFailed(override val requestId: String) : ConfirmTxResponse()
+    class SigningFailed(override val requestId: String, val shouldPresent: Boolean) : ConfirmTxResponse()
 }

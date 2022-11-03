@@ -2,6 +2,8 @@ package io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrin
 
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.base.TitleAndMessage
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
@@ -18,11 +20,18 @@ import io.novafoundation.nova.feature_dapp_impl.domain.browser.signExtrinsic.DAp
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator.Response
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
+private typealias SigningError = String
 
 class DAppSignViewModel(
     private val router: DAppRouter,
@@ -35,9 +44,12 @@ class DAppSignViewModel(
     walletUiUseCase: WalletUiUseCase,
     selectedAccountUseCase: SelectedAccountUseCase,
     feeLoaderMixinFactory: FeeLoaderMixin.Factory,
+    actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
 ) : BaseViewModel(),
     WithFeeLoaderMixin,
     Validatable by validationExecutor {
+
+    val confirmUnrecoverableError = actionAwaitableMixinFactory.confirmingAction<SigningError>()
 
     private val commissionTokenFlow = interactor.commissionTokenFlow()
         ?.shareInBackground()
@@ -66,6 +78,7 @@ class DAppSignViewModel(
     val maybeChainUi = flowOf {
         interactor.chainUi()
     }
+        .successOrFinish()
         .shareInBackground()
 
     val dAppInfo = flowOf { commonInteractor.getDAppInfo(payload.dappUrl) }
@@ -116,6 +129,29 @@ class DAppSignViewModel(
         )
     }
 
+    private suspend fun respondError(errorMessage: String?) = withContext(Dispatchers.Main) {
+        val shouldPresent = if (errorMessage != null) {
+            confirmUnrecoverableError.awaitAction(errorMessage)
+            false
+        } else {
+            true
+        }
+
+        val response = Response.SigningFailed(payload.body.id, shouldPresent)
+
+        responder.respond(response)
+        exit()
+    }
+
+    private suspend fun respondError(error: Throwable) {
+        val errorMessage = when (error) {
+            is DAppSignInteractor.Error.UnsupportedChain -> resourceManager.getString(R.string.dapp_sign_error_unsupported_chain, error.chainId)
+            else -> null
+        }
+
+        respondError(errorMessage)
+    }
+
     fun detailsClicked() {
         launch {
             val extrinsicContent = interactor.readableOperationContent()
@@ -136,5 +172,10 @@ class DAppSignViewModel(
                     resourceManager.getString(R.string.common_not_enough_funds_message)
             }
         }
+    }
+
+    private fun <T> Flow<Result<T>>.successOrFinish(): Flow<T> {
+        return onEach { result -> result.onFailure { respondError(it) } }
+            .mapNotNull { it.getOrNull() }
     }
 }
