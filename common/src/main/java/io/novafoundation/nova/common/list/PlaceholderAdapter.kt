@@ -6,9 +6,9 @@ import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.utils.inflateChild
 
-class ShimmeringAdapter(@LayoutRes val layoutId: Int) : RecyclerView.Adapter<ShimmeringHolder>() {
+class PlaceholderAdapter(@LayoutRes val layoutId: Int) : RecyclerView.Adapter<ShimmeringHolder>() {
 
-    private var shouldShowShimmering = false
+    private var showPlaceholder = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ShimmeringHolder {
         return ShimmeringHolder(parent.inflateChild(layoutId))
@@ -17,12 +17,16 @@ class ShimmeringAdapter(@LayoutRes val layoutId: Int) : RecyclerView.Adapter<Shi
     override fun onBindViewHolder(holder: ShimmeringHolder, position: Int) {}
 
     override fun getItemCount(): Int {
-        return if (shouldShowShimmering) 1 else 0
+        return if (showPlaceholder) 1 else 0
     }
 
-    fun showShimmering(show: Boolean) {
-        if (shouldShowShimmering != show) {
-            shouldShowShimmering = show
+    override fun getItemViewType(position: Int): Int {
+        return layoutId
+    }
+
+    fun showPlaceholder(show: Boolean) {
+        if (showPlaceholder != show) {
+            showPlaceholder = show
             if (show) {
                 notifyItemInserted(1)
             } else {
