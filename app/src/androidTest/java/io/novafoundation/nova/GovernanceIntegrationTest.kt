@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
+import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
@@ -53,7 +54,7 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
 
         val accountId = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".toAccountId()
 
-        val fullChainAssetId = FullChainAssetId(chain.id, chain.assets[0].id)
+        val fullChainAssetId = FullChainAssetId(chain.id, chain.utilityAsset.id)
 
         val trackLocks = convictionVotingRepository.trackLocksFlow(accountId, fullChainAssetId).first()
         Log.d(this@GovernanceIntegrationTest.LOG_TAG, trackLocks.toString())
@@ -82,7 +83,9 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
 
         val accountId = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".toAccountId()
 
-        val referendaByGroup = referendaListInteractor.referendaListStateFlow(accountId, chain(), chain().assets[0]).first()
+        val chain = chain()
+
+        val referendaByGroup = referendaListInteractor.referendaListStateFlow(accountId, chain, chain.utilityAsset).first()
         val referenda = referendaByGroup.groupedReferenda.values.flatten()
 
         Log.d(this@GovernanceIntegrationTest.LOG_TAG,referenda.joinToString("\n"))
@@ -127,7 +130,7 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
         val referendumId = ReferendumId(BigInteger.ZERO)
         val chain = chain()
 
-        val referendumVoters = interactor.votersFlow(referendumId, chain.assets[0], VoteType.AYE)
+        val referendumVoters = interactor.votersFlow(referendumId, chain.utilityAsset, VoteType.AYE)
             .first()
 
         Log.d(this@GovernanceIntegrationTest.LOG_TAG, referendumVoters.toString())
