@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_governance_impl.data
 
 import io.novafoundation.nova.common.data.storage.Preferences
+import io.novafoundation.nova.runtime.ext.isUtilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
@@ -13,6 +14,6 @@ class GovernanceSharedState(
 ) : SingleAssetSharedState(
     preferences = preferences,
     chainRegistry = chainRegistry,
-    filter = { chain, _ -> chain.governance != Chain.Governance.NONE },
+    filter = { chain, asset -> chain.governance != Chain.Governance.NONE && asset.isUtilityAsset },
     preferencesKey = GOVERNANCE_SHARED_STATE
 )
