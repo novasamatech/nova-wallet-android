@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.address.createAddressModel
 import io.novafoundation.nova.common.utils.asHexString
 import io.novafoundation.nova.common.utils.bigIntegerFromHex
 import io.novafoundation.nova.common.utils.intFromHex
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.validation.EmptyValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
@@ -104,9 +105,11 @@ class PolkadotJsSignInteractor(
         )
     }
 
-    override suspend fun chainUi(): ChainUi? {
-        return signerPayload.maybeSignExtrinsic()?.let {
-            mapChainToUi(it.chain())
+    override suspend fun chainUi(): Result<ChainUi?> {
+        return runCatching {
+            signerPayload.maybeSignExtrinsic()?.let {
+                mapChainToUi(it.chain())
+            }
         }
     }
 
@@ -143,24 +146,26 @@ class PolkadotJsSignInteractor(
         }
     }
 
-    override suspend fun calculateFee(): BigInteger = withContext(Dispatchers.Default) {
+    override suspend fun calculateFee(): BigInteger? = withContext(Dispatchers.Default) {
         require(signerPayload is SignerPayload.Json)
 
+        val chain = signerPayload.chainOrNull() ?: return@withContext null
+
         val extrinsicBuilder = signerPayload.toExtrinsicBuilderWithoutCall(forFee = true)
-        val runtime = chainRegistry.getRuntime(signerPayload.chain().id)
+        val runtime = chainRegistry.getRuntime(chain.id)
 
         val extrinsic = when (val callRepresentation = signerPayload.callRepresentation(runtime)) {
             is CallRepresentation.Instance -> extrinsicBuilder.call(callRepresentation.call).build()
             is CallRepresentation.Bytes -> extrinsicBuilder.build(rawCallBytes = callRepresentation.bytes)
         }
 
-        extrinsicService.estimateFee(signerPayload.chain().id, extrinsic)
+        extrinsicService.estimateFee(chain.id, extrinsic)
     }
 
     private fun operationValidationSystem(operationPayload: SignerPayload.Json): ConfirmDAppOperationValidationSystem = ValidationSystem {
         // since we don't know how arbitrary extrinsic gonna affect transferable balance we only check for fees
         sufficientBalance(
-            fee = { it.convertingToAmount { calculateFee() } },
+            fee = { it.convertingToAmount { calculateFee().orZero() } },
             available = {
                 val asset = walletRepository.getAsset(
                     metaId = accountRepository.getSelectedMetaAccount().id,
@@ -247,7 +252,11 @@ class PolkadotJsSignInteractor(
     }.getOrDefault(CallRepresentation.Bytes(method.fromHex()))
 
     private suspend fun SignerPayload.Json.chain(): Chain {
-        return chainRegistry.getChain(genesisHash)
+        return chainRegistry.getChainOrNull(genesisHash) ?: throw DAppSignInteractor.Error.UnsupportedChain(genesisHash)
+    }
+
+    private suspend fun SignerPayload.Json.chainOrNull(): Chain? {
+        return chainRegistry.getChainOrNull(genesisHash)
     }
 
     private fun parseDAppExtrinsic(runtime: RuntimeSnapshot, payloadJSON: SignerPayload.Json): DAppParsedExtrinsic {

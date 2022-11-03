@@ -100,7 +100,7 @@ class DAppBrowserViewModel(
         return when (response) {
             is DAppSignCommunicator.Response.Rejected -> ConfirmTxResponse.Rejected(response.requestId)
             is DAppSignCommunicator.Response.Signed -> ConfirmTxResponse.Signed(response.requestId, response.signature)
-            is DAppSignCommunicator.Response.SigningFailed -> ConfirmTxResponse.SigningFailed(response.requestId)
+            is DAppSignCommunicator.Response.SigningFailed -> ConfirmTxResponse.SigningFailed(response.requestId, response.shouldPresent)
             is DAppSignCommunicator.Response.Sent -> ConfirmTxResponse.Sent(response.requestId, response.txHash)
         }
     }

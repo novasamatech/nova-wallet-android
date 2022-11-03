@@ -114,11 +114,13 @@ class MetamaskSignInteractor(
         addressIconGenerator.createAccountAddressModel(someEthereumChain, address)
     }
 
-    override suspend fun chainUi(): ChainUi = withContext(Dispatchers.Default) {
-        val metamaskChain = request.payload.chain
+    override suspend fun chainUi(): Result<ChainUi> = withContext(Dispatchers.Default) {
+        runCatching {
+            val metamaskChain = request.payload.chain
 
-        metamaskInteractor.tryFindChainFromEthereumChainId(metamaskChain.chainId)?.let(::mapChainToUi)
-            ?: mapMetamaskChainToUi(metamaskChain)
+            metamaskInteractor.tryFindChainFromEthereumChainId(metamaskChain.chainId)?.let(::mapChainToUi)
+                ?: mapMetamaskChainToUi(metamaskChain)
+        }
     }
 
     override fun commissionTokenFlow(): Flow<Token>? {
