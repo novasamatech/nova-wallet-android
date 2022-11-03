@@ -45,6 +45,7 @@ class CrowdloanFragment : BaseFragment<CrowdloanViewModel>(), CrowdloanAdapter.H
     }
 
     override fun initViews() {
+        crowdloanList.itemAnimator = null
         crowdloanList.adapter = ConcatAdapter(headerAdapter, shimmeringAdapter, placeholderAdapter, adapter)
     }
 

@@ -39,12 +39,8 @@ class ReferendaListFragment : BaseFragment<ReferendaListViewModel>(), ReferendaL
         return inflater.inflate(R.layout.fragment_referenda_list, container, false)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        initViews()
-    }
-
     override fun initViews() {
+        referendaList.itemAnimator = null
         referendaList.adapter = ConcatAdapter(referendaHeaderAdapter, shimmeringAdapter, referendaListAdapter)
     }
 
