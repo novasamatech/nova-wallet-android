@@ -16,7 +16,6 @@ import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getBlurDrawable
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_governance_impl.R
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumTrackModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.setReferendumTimeEstimation
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.setReferendumTrackModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendaGroupModel
@@ -68,20 +67,26 @@ class ReferendaListAdapter(
 
         resolvePayload(holder, position, payloads) {
             when (it) {
+                ReferendumModel::name -> holder.bindName(child)
                 ReferendumModel::voting -> holder.bindVoting(child)
                 ReferendumModel::status -> holder.bindStatus(child)
                 ReferendumModel::timeEstimation -> holder.bindTimeEstimation(child)
                 ReferendumModel::yourVote -> holder.bindYourVote(child)
+                ReferendumModel::track -> holder.bindTrack(child)
+                ReferendumModel::number -> holder.bindNumber(child)
             }
         }
     }
 }
 
 private object ReferendaPayloadGenerator : PayloadGenerator<ReferendumModel>(
+    ReferendumModel::name,
     ReferendumModel::voting,
     ReferendumModel::status,
     ReferendumModel::timeEstimation,
-    ReferendumModel::yourVote
+    ReferendumModel::yourVote,
+    ReferendumModel::track,
+    ReferendumModel::number
 )
 
 private object ReferendaDiffCallback : BaseGroupedDiffCallback<ReferendaGroupModel, ReferendumModel>(ReferendaGroupModel::class.java) {
@@ -134,15 +139,19 @@ private class ReferendumChildHolder(
     }
 
     fun bind(item: ReferendumModel) = with(containerView) {
-        itemReferendumName.text = item.name
-        setTrack(item.track)
-        setNumber(item.number)
+        bindName(item)
+        bindTrack(item)
+        bindNumber(item)
         bindStatus(item)
         bindTimeEstimation(item)
         bindVoting(item)
         bindYourVote(item)
 
         itemView.setOnClickListener { eventHandler.onReferendaClick(item) }
+    }
+
+    fun bindName(item: ReferendumModel) = with(containerView) {
+        itemReferendumName.text = item.name
     }
 
     fun bindStatus(item: ReferendumModel) = with(containerView) {
@@ -154,12 +163,12 @@ private class ReferendumChildHolder(
         itemReferendumTimeEstimate.setReferendumTimeEstimation(item.timeEstimation, Gravity.END)
     }
 
-    private fun setNumber(number: String) = with(containerView) {
-        itemReferendumNumber.setText(number)
+    fun bindNumber(item: ReferendumModel) = with(containerView) {
+        itemReferendumNumber.setText(item.number)
     }
 
-    private fun setTrack(track: ReferendumTrackModel?) = with(containerView) {
-        itemReferendumTrack.setReferendumTrackModel(track, imageLoader)
+    fun bindTrack(item: ReferendumModel) = with(containerView) {
+        itemReferendumTrack.setReferendumTrackModel(item.track, imageLoader)
     }
 
     fun bindYourVote(item: ReferendumModel) = with(containerView) {
@@ -174,5 +183,9 @@ private class ReferendumChildHolder(
 
     fun bindVoting(child: ReferendumModel) = with(containerView) {
         itemReferendumThreshold.setThresholdModel(child.voting)
+    }
+
+    override fun unbind() {
+        containerView.itemReferendumTrack.setIcon(null)
     }
 }
