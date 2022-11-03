@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -14,6 +15,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.W
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimSchedule
+import io.novafoundation.nova.feature_governance_api.domain.referendum.common.Change
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.absoluteDifference
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
@@ -24,6 +26,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.v
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common.LocksChangeFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.unlock.confirm.hints.ConfirmGovernanceUnlockHintsMixinFactory
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
@@ -135,6 +138,7 @@ class ConfirmGovernanceUnlockViewModel(
     fun confirmClicked() = originFeeMixin.requireFee(this) { fee ->
         launch {
             val claimable = unlockAffectsFlow.first().claimableChunk
+            val locksChange = unlockAffectsFlow.first().governanceLockChange
 
             val validationPayload = UnlockReferendumValidationPayload(
                 asset = assetFlow.first(),
@@ -147,17 +151,21 @@ class ConfirmGovernanceUnlockViewModel(
                 validationFailureTransformer = { handleUnlockReferendumValidationFailure(it, resourceManager) },
                 progressConsumer = submissionInProgress.progressConsumer(),
             ) {
-                executeUnlock(claimable)
+                executeUnlock(claimable, locksChange)
             }
         }
     }
 
-    private fun executeUnlock(claimable: ClaimSchedule.UnlockChunk.Claimable?) = launch {
+    private fun executeUnlock(
+        claimable: ClaimSchedule.UnlockChunk.Claimable?,
+        lockChange: Change<Balance>
+    ) = launch {
         interactor.unlock(claimable)
             .onFailure(::showError)
             .onSuccess {
                 showMessage(resourceManager.getString(R.string.common_transaction_submitted))
-                router.back()
+
+                router.finishUnlockFlow(shouldCloseLocksScreen = lockChange.newValue.isZero)
             }
 
         submissionInProgress.value = false
