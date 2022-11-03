@@ -1,13 +1,7 @@
 package io.novafoundation.nova.feature_governance_impl.di
 
-import android.content.Context
-import coil.ImageLoader
 import dagger.Module
 import dagger.Provides
-import io.noties.markwon.Markwon
-import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
-import io.noties.markwon.ext.tables.TablePlugin
-import io.noties.markwon.image.coil.CoilImagesPlugin
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
@@ -39,7 +33,6 @@ import io.novafoundation.nova.feature_governance_impl.di.modules.screens.Referen
 import io.novafoundation.nova.feature_governance_impl.domain.identity.GovernanceIdentityProviderFactory
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.RealReferendaConstructor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.ReferendaConstructor
-import io.novafoundation.nova.feature_governance_impl.markdown.StylePlugin
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.RealReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
@@ -75,17 +68,6 @@ class GovernanceFeatureModule {
     @Provides
     @FeatureScope
     fun providePolkassemblyApi(apiCreator: NetworkApiCreator) = apiCreator.create(PolkassemblyApi::class.java)
-
-    @Provides
-    @FeatureScope
-    fun provideMarkwon(context: Context, imageLoader: ImageLoader): Markwon {
-        return Markwon.builder(context)
-            .usePlugin(StylePlugin(context))
-            .usePlugin(CoilImagesPlugin.create(context, imageLoader))
-            .usePlugin(StrikethroughPlugin.create())
-            .usePlugin(TablePlugin.create(context))
-            .build()
-    }
 
     @Provides
     @FeatureScope
