@@ -511,6 +511,7 @@
     <string name="referendum_full_details_turnout">Явка</string>
     <string name="referendum_full_details_vote_threshold">Порог голосования</string>
     <string name="referendum_in_queue_position_format" formatted="false">Позиция: %s из %s</string>
+    <string name="referendum_missing_account_message">Вы должны добавить %s аккаунт в кошелёк для того, чтобы голосовать</string>
     <string name="referendum_name_unknown">Референдум %s</string>
     <string name="referendum_nay_format">Против: %s</string>
     <string name="referendum_negative_voters_title">Голоса \"против\"</string>
