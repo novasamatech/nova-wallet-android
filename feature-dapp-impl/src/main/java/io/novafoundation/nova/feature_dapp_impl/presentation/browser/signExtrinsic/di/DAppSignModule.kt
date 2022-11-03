@@ -9,6 +9,7 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -59,7 +60,8 @@ class DAppSignModule {
         communicator: DAppSignCommunicator,
         walletUiUseCase: WalletUiUseCase,
         validationExecutor: ValidationExecutor,
-        resourceManager: ResourceManager
+        resourceManager: ResourceManager,
+        actionAwaitableMixin: ActionAwaitableMixin.Factory
     ): ViewModel {
         return DAppSignViewModel(
             router = router,
@@ -71,7 +73,8 @@ class DAppSignModule {
             responder = communicator,
             walletUiUseCase = walletUiUseCase,
             validationExecutor = validationExecutor,
-            resourceManager = resourceManager
+            resourceManager = resourceManager,
+            actionAwaitableMixinFactory = actionAwaitableMixin
         )
     }
 }

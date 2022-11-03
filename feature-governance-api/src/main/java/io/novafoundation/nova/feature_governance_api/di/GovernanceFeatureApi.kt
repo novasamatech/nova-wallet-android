@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_governance_api.di
 
-import io.noties.markwon.Markwon
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumDetailsInteractor
@@ -18,6 +17,4 @@ interface GovernanceFeatureApi {
     val referendumVotersInteractor: ReferendumVotersInteractor
 
     val governanceUpdateSystem: UpdateSystem
-
-    val markwon: Markwon
 }

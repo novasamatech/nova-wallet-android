@@ -48,6 +48,14 @@ class GovernanceNavigator(
 
     override fun backToReferendumDetails() = performNavigation(R.id.action_confirmReferendumVote_to_referendumDetailsFragment)
 
+    override fun finishUnlockFlow(shouldCloseLocksScreen: Boolean) {
+        if (shouldCloseLocksScreen) {
+            performNavigation(R.id.action_confirmReferendumVote_to_mainFragment)
+        } else {
+            back()
+        }
+    }
+
     override fun openDAppBrowser(initialUrl: String) = performNavigation(
         actionId = R.id.action_referendumDetailsFragment_to_DAppBrowserGraph,
         args = DAppBrowserFragment.getBundle(initialUrl)

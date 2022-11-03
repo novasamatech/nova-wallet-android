@@ -174,6 +174,7 @@ buildscript {
         markdownDep = "io.noties.markwon:core:$markdownVersion"
         markdownImage = "io.noties.markwon:image-coil:$markdownVersion"
         markdownTables = "io.noties.markwon:ext-tables:$markdownVersion"
+        markdownLinkify = "io.noties.markwon:linkify:$markdownVersion"
         markdownStrikethrough = "io.noties.markwon:ext-strikethrough:$markdownVersion"
     }
 

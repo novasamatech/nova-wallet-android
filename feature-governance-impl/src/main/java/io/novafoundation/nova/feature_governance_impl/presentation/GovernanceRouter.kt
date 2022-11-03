@@ -29,4 +29,6 @@ interface GovernanceRouter : ReturnableRouter {
     fun openGovernanceLocksOverview()
 
     fun backToReferendumDetails()
+
+    fun finishUnlockFlow(shouldCloseLocksScreen: Boolean)
 }
