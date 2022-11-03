@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.ConcatAdapter
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.list.ShimmeringAdapter
+import io.novafoundation.nova.common.list.PlaceholderAdapter
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.presentation.dataOrNull
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
@@ -27,7 +27,7 @@ class ReferendaListFragment : BaseFragment<ReferendaListViewModel>(), ReferendaL
 
     private val referendaHeaderAdapter by lazy(LazyThreadSafetyMode.NONE) { ReferendaListHeaderAdapter(imageLoader, this) }
 
-    private val referendaShimmeringAdapter by lazy(LazyThreadSafetyMode.NONE) { ShimmeringAdapter(R.layout.item_referenda_shimmering) }
+    private val shimmeringAdapter by lazy(LazyThreadSafetyMode.NONE) { PlaceholderAdapter(R.layout.item_referenda_shimmering) }
 
     private val referendaListAdapter by lazy(LazyThreadSafetyMode.NONE) { ReferendaListAdapter(this, imageLoader) }
 
@@ -39,13 +39,9 @@ class ReferendaListFragment : BaseFragment<ReferendaListViewModel>(), ReferendaL
         return inflater.inflate(R.layout.fragment_referenda_list, container, false)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        initViews()
-    }
-
     override fun initViews() {
-        referendaList.adapter = ConcatAdapter(referendaHeaderAdapter, referendaShimmeringAdapter, referendaListAdapter)
+        referendaList.itemAnimator = null
+        referendaList.adapter = ConcatAdapter(referendaHeaderAdapter, shimmeringAdapter, referendaListAdapter)
     }
 
     override fun inject() {
@@ -71,11 +67,11 @@ class ReferendaListFragment : BaseFragment<ReferendaListViewModel>(), ReferendaL
         viewModel.referendaUiFlow.observe {
             when (it) {
                 is LoadingState.Loaded -> {
-                    referendaShimmeringAdapter.showShimmering(false)
+                    shimmeringAdapter.showPlaceholder(false)
                     referendaListAdapter.submitList(it.data)
                 }
                 is LoadingState.Loading -> {
-                    referendaShimmeringAdapter.showShimmering(true)
+                    shimmeringAdapter.showPlaceholder(true)
                     referendaListAdapter.submitList(emptyList())
                 }
             }
