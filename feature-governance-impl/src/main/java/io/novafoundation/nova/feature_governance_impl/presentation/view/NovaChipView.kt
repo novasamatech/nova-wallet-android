@@ -10,6 +10,7 @@ import androidx.core.content.res.getDimensionOrThrow
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import coil.ImageLoader
+import coil.clear
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.images.setIcon
@@ -76,7 +77,11 @@ class NovaChipView @JvmOverloads constructor(
     }
 
     fun setIcon(icon: Icon?, imageLoader: ImageLoader) {
-        icon?.let { chipIcon.setIcon(icon, imageLoader) }
+        if (icon == null) {
+            setIcon(null)
+        } else {
+            chipIcon.setIcon(icon, imageLoader)
+        }
         useIcon(icon != null)
     }
 
@@ -94,5 +99,9 @@ class NovaChipView @JvmOverloads constructor(
 
         val startPadding = if (useIcon) 6 else 8
         updatePadding(start = startPadding.dp)
+    }
+
+    fun clearIcon() {
+        chipIcon.clear()
     }
 }
