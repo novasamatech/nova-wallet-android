@@ -49,7 +49,8 @@ class RpcCalls(
         val type = runtime.typeRegistry[FEE_DECODE_TYPE]
 
         return if (type != null) {
-            val encodedLength = u32.toHex(runtime, extrinsic.length.toBigInteger()).removeHexPrefix()
+            val lengthInBytes = extrinsic.length / 2
+            val encodedLength = u32.toHex(runtime, lengthInBytes.toBigInteger()).removeHexPrefix()
             val param = extrinsic + encodedLength
             val request = StateCallRequest("TransactionPaymentApi_query_info", param)
             val response = socketFor(chainId).executeAsync(request, mapper = pojo<String>().nonNull())
