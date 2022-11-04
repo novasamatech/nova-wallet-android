@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingVertical="16dp"
+    tools:background="@color/black"
+    tools:parentTag="android.widget.LinearLayout">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp">
+
+        <TextView
+            style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:includeFontPadding="false"
+            android:text="@string/voting_status" />
+
+        <TextView
+            android:id="@+id/votingStatusTimeEstimation"
+            style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:includeFontPadding="false"
+            tools:text="Approve in 3:59:59" />
+
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/votingStatus"
+        style="@style/TextAppearance.NovaFoundation.Bold.Title2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:textAllCaps="true"
+        android:textColor="@color/multicolor_green_100"
+        tools:text="PASSING" />
+
+    <io.novafoundation.nova.feature_governance_impl.presentation.view.VotingThresholdView
+        android:id="@+id/votingStatusThreshold"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp" />
+
+    <io.novafoundation.nova.feature_governance_impl.presentation.view.VotersView
+        android:id="@+id/positiveVotersDetails"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:paddingHorizontal="16dp" />
+
+    <io.novafoundation.nova.feature_governance_impl.presentation.view.VotersView
+        android:id="@+id/negativeVotersDetails"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="16dp" />
+
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/votingStatusStartVote"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.SubHeadline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/vote_vote"
+        app:size="small" />
+
+</merge>

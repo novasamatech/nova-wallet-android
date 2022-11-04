@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.presentation
 
-import androidx.lifecycle.Lifecycle
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.rebond.model.ParachainStakingRebondPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.model.ConfirmStartParachainStakingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.confirm.model.ParachainStakingUnbondConfirmPayload
@@ -20,8 +19,6 @@ interface ParachainStakingRouter {
     fun back()
     fun returnToMain()
     fun returnToStartStaking()
-
-    val currentStackEntryLifecycle: Lifecycle
 
     fun openCurrentCollators()
 

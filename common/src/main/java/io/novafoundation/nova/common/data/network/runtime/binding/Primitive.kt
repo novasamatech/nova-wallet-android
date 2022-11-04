@@ -10,3 +10,6 @@ fun bindString(dynamicInstance: Any?): String = dynamicInstance.cast<ByteArray>(
 
 @HelperBinding
 fun bindBoolean(dynamicInstance: Any?): Boolean = dynamicInstance.cast()
+
+@HelperBinding
+fun bindByteArray(dynamicInstance: Any?): ByteArray = dynamicInstance.cast()

@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.utils.input.Input
 import io.novafoundation.nova.common.utils.input.isModifiable
 import io.novafoundation.nova.common.utils.input.modifyInput
 import io.novafoundation.nova.common.utils.input.valueOrNull
+import io.novafoundation.nova.common.view.input.seekbar.Seekbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
@@ -46,6 +47,14 @@ fun <T> Flow<T>.withLoading(): Flow<LoadingState<T>> {
         .onStart { emit(LoadingState.Loading()) }
 }
 
+suspend fun <T> Flow<LoadingState<T>>.firstOnLoad(): T = transform {
+    collect {
+        if (it is LoadingState.Loaded<T>) {
+            emit(it.data)
+        }
+    }
+}.first()
+
 fun <T1, T2> combineToPair(flow1: Flow<T1>, flow2: Flow<T2>): Flow<Pair<T1, T2>> = combine(flow1, flow2, ::Pair)
 
 /**
@@ -70,6 +79,10 @@ fun <T> Flow<T>.takeWhileInclusive(predicate: suspend (T) -> Boolean) = transfor
     emit(it)
 
     predicate(it)
+}
+
+inline fun <T, R> Flow<T?>.mapNullable(crossinline mapper: suspend (T) -> R): Flow<R?> {
+    return map { it?.let { mapper(it) } }
 }
 
 /**
@@ -232,6 +245,22 @@ fun RadioGroup.bindTo(flow: MutableStateFlow<Int>, scope: LifecycleCoroutineScop
     }
 }
 
+fun Seekbar.bindTo(flow: MutableStateFlow<Int>, scope: LifecycleCoroutineScope) {
+    setOnProgressChangedListener { progress ->
+        if (flow.value != progress) {
+            flow.value = progress
+        }
+    }
+
+    scope.launchWhenResumed {
+        flow.collect {
+            if (it != progress) {
+                progress = it
+            }
+        }
+    }
+}
+
 fun <T> Flow<T>.observe(
     scope: LifecycleCoroutineScope,
     collector: FlowCollector<T>,
@@ -247,6 +276,10 @@ fun MutableStateFlow<Boolean>.toggle() {
 
 fun <T> flowOf(producer: suspend () -> T) = flow {
     emit(producer())
+}
+
+inline fun <T> flowOfAll(crossinline producer: suspend () -> Flow<T>): Flow<T> = flow {
+    emitAll(producer())
 }
 
 fun <T> List<Flow<T>>.accumulate(): Flow<List<T>> {

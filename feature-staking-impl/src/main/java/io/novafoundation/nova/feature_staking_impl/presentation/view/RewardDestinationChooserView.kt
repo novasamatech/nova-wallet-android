@@ -5,7 +5,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
-import io.novafoundation.nova.feature_account_api.view.AddressView
+import io.novafoundation.nova.feature_account_api.view.AccountView
 import io.novafoundation.nova.feature_staking_impl.R
 import kotlinx.android.synthetic.main.view_reward_destination_chooser.view.rewardDestinationChooserLearnMore
 import kotlinx.android.synthetic.main.view_reward_destination_chooser.view.rewardDestinationChooserPayout
@@ -34,7 +34,7 @@ class RewardDestinationChooserView @JvmOverloads constructor(
     val destinationPayout: RewardDestinationView
         get() = rewardDestinationChooserPayout
 
-    val payoutTarget: AddressView
+    val payoutTarget: AccountView
         get() = rewardDestinationChooserPayoutTarget
 
     val payoutTitle: TextView

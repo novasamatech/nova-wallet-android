@@ -11,14 +11,15 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.postToSelf
+import io.novafoundation.nova.common.view.dialog.errorDialog
 import io.novafoundation.nova.common.view.setProgress
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.showWallet
 import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_account_api.view.showChain
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
+import io.novafoundation.nova.feature_dapp_api.presentation.common.showDAppIcon
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
-import io.novafoundation.nova.feature_dapp_impl.presentation.common.showDAppIcon
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 import kotlinx.android.synthetic.main.bottom_sheet_confirm_dapp_action.confirmDAppActionAllow
 import kotlinx.android.synthetic.main.bottom_sheet_confirm_dapp_action.confirmDAppActionReject
@@ -101,6 +102,15 @@ class DAppSignExtrinsicFragment : BaseFragment<DAppSignViewModel>() {
 
             confirmDAppActionReject.isEnabled = actionsAllowed
             confirmDAppActionAllow.setProgress(show = operationInProgress)
+        }
+
+        viewModel.confirmUnrecoverableError.awaitableActionLiveData.observeEvent {
+            errorDialog(
+                context = requireContext(),
+                onConfirm = { it.onSuccess(Unit) }
+            ) {
+                setMessage(it.payload)
+            }
         }
     }
 }

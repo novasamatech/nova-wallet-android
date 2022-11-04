@@ -1,8 +1,6 @@
 package io.novafoundation.nova.feature_dapp_impl.presentation.search
 
 import android.view.ViewGroup
-import coil.ImageLoader
-import coil.clear
 import io.novafoundation.nova.common.list.BaseGroupedDiffCallback
 import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
@@ -10,20 +8,13 @@ import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.headers.TextHeader
 import io.novafoundation.nova.common.list.resolvePayload
 import io.novafoundation.nova.common.utils.inflateChild
-import io.novafoundation.nova.common.utils.setImageResource
-import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.domain.search.DappSearchResult
-import io.novafoundation.nova.feature_dapp_impl.presentation.common.showDAppIcon
+import io.novafoundation.nova.feature_dapp_api.presentation.view.DAppView
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.model.DappSearchModel
-import kotlinx.android.synthetic.main.item_dapp.view.itemDAppIcon
-import kotlinx.android.synthetic.main.item_dapp.view.itemDAppSubtitle
-import kotlinx.android.synthetic.main.item_dapp.view.itemDAppTitle
-import kotlinx.android.synthetic.main.item_dapp.view.itemDappAction
 import kotlinx.android.synthetic.main.item_dapp_search_category.view.searchCategory
 
 class SearchDappAdapter(
-    private val imageLoader: ImageLoader,
     private val handler: Handler
 ) : GroupedListAdapter<TextHeader, DappSearchModel>(DiffCallback) {
 
@@ -37,7 +28,7 @@ class SearchDappAdapter(
     }
 
     override fun createChildViewHolder(parent: ViewGroup): GroupedListHolder {
-        return SearchHolder(parent, imageLoader, handler)
+        return SearchHolder(DAppView.createUsingMathParentWidth(parent.context), handler)
     }
 
     override fun bindGroup(holder: GroupedListHolder, group: TextHeader) {
@@ -101,28 +92,28 @@ private class CategoryHolder(parentView: ViewGroup) : GroupedListHolder(parentVi
 }
 
 private class SearchHolder(
-    parentView: ViewGroup,
-    private val imageLoader: ImageLoader,
+    private val dAppView: DAppView,
     private val itemHandler: SearchDappAdapter.Handler
-) : GroupedListHolder(parentView.inflateChild(R.layout.item_dapp)) {
+) : GroupedListHolder(dAppView) {
 
-    override fun unbind() = with(containerView) {
-        itemDAppIcon.clear()
+    override fun unbind() {
+        dAppView.clearIcon()
     }
 
-    fun bind(item: DappSearchModel) = with(containerView) {
-        itemDAppIcon.showDAppIcon(item.icon, imageLoader)
+    fun bind(item: DappSearchModel) = with(dAppView) {
+        setIconUrl(item.icon)
 
         bindTitle(item)
-        itemDAppSubtitle.setTextOrHide(item.description)
+        setSubtitle(item.description)
+        showSubtitle(item.description != null)
 
-        itemDappAction.setImageResource(item.actionIcon)
+        setActionResource(item.actionIcon)
 
         bindClick(item)
     }
 
-    fun bindTitle(item: DappSearchModel) = with(containerView) {
-        itemDAppTitle.text = item.title
+    fun bindTitle(item: DappSearchModel) {
+        dAppView.setTitle(item.title)
     }
 
     fun rebind(item: DappSearchModel, action: SearchHolder.() -> Unit) = with(containerView) {
@@ -131,7 +122,7 @@ private class SearchHolder(
         action()
     }
 
-    private fun bindClick(item: DappSearchModel) = with(containerView) {
+    private fun bindClick(item: DappSearchModel) = with(dAppView) {
         setOnClickListener { itemHandler.itemClicked(item.searchResult) }
     }
 }

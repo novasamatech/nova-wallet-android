@@ -1,11 +1,11 @@
 package io.novafoundation.nova.feature_dapp_impl.data.mappers
 
+import io.novafoundation.nova.common.utils.Urls
 import io.novafoundation.nova.feature_dapp_api.data.model.DApp
 import io.novafoundation.nova.feature_dapp_api.data.model.DappCategory
 import io.novafoundation.nova.feature_dapp_api.data.model.DappMetadata
 import io.novafoundation.nova.feature_dapp_impl.data.network.metadata.DappMetadataResponse
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.DappModel
-import io.novafoundation.nova.feature_dapp_impl.util.Urls
 
 fun mapDAppMetadataResponseToDAppMetadatas(
     response: DappMetadataResponse

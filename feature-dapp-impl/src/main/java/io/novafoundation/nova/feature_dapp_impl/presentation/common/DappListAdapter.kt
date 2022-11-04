@@ -1,23 +1,14 @@
 package io.novafoundation.nova.feature_dapp_impl.presentation.common
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
-import coil.ImageLoader
-import coil.clear
 import io.novafoundation.nova.common.list.BaseListAdapter
 import io.novafoundation.nova.common.list.BaseViewHolder
-import io.novafoundation.nova.common.utils.inflateChild
-import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.feature_dapp_impl.R
-import kotlinx.android.synthetic.main.item_dapp.view.itemDAppIcon
-import kotlinx.android.synthetic.main.item_dapp.view.itemDAppSubtitle
-import kotlinx.android.synthetic.main.item_dapp.view.itemDAppTitle
-import kotlinx.android.synthetic.main.item_dapp.view.itemDappAction
+import io.novafoundation.nova.feature_dapp_api.presentation.view.DAppView
 
 class DappListAdapter(
-    private val handler: Handler,
-    private val imageLoader: ImageLoader,
+    private val handler: Handler
 ) : BaseListAdapter<DappModel, DappViewHolder>(DappDiffCallback) {
 
     interface Handler {
@@ -28,7 +19,7 @@ class DappListAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DappViewHolder {
-        return DappViewHolder(parent.inflateChild(R.layout.item_dapp), handler, imageLoader)
+        return DappViewHolder(DAppView.createUsingMathParentWidth(parent.context), handler)
     }
 
     override fun onBindViewHolder(holder: DappViewHolder, position: Int) {
@@ -48,31 +39,29 @@ private object DappDiffCallback : DiffUtil.ItemCallback<DappModel>() {
 }
 
 class DappViewHolder(
-    containerView: View,
+    private val dAppView: DAppView,
     private val itemHandler: DappListAdapter.Handler,
-    private val imageLoader: ImageLoader,
-) : BaseViewHolder(containerView) {
+) : BaseViewHolder(dAppView) {
 
-    fun bind(item: DappModel) = with(containerView) {
-        itemDAppIcon.showDAppIcon(item.iconUrl, imageLoader)
-        itemDAppTitle.text = item.name
-        itemDAppSubtitle.text = item.description
-
-        itemDappAction.isActivated = item.isFavourite
-        itemDappAction.setOnClickListener { itemHandler.onItemFavouriteClicked(item) }
+    fun bind(item: DappModel) = with(dAppView) {
+        setTitle(item.name)
+        setSubtitle(item.description)
+        setIconUrl(item.iconUrl)
+        activateActionIcon(item.isFavourite)
+        setOnActionClickListener { itemHandler.onItemFavouriteClicked(item) }
 
         if (item.isFavourite) {
-            itemDappAction.setImageResource(R.drawable.ic_heart_filled)
-            itemDappAction.imageTintList = null
+            setActionResource(R.drawable.ic_heart_filled)
+            setActionTintRes(null)
         } else {
-            itemDappAction.setImageResource(R.drawable.ic_heart_outline)
-            itemDappAction.setImageTintRes(R.color.white_48)
+            setActionResource(R.drawable.ic_heart_outline)
+            setActionTintRes(R.color.white_48)
         }
 
         setOnClickListener { itemHandler.onItemClicked(item) }
     }
 
     override fun unbind() {
-        containerView.itemDAppIcon.clear()
+        dAppView.clearIcon()
     }
 }

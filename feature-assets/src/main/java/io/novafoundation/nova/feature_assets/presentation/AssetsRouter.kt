@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_assets.presentation
 
 import android.os.Bundle
-import androidx.lifecycle.Lifecycle
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 
@@ -36,6 +35,4 @@ interface AssetsRouter {
     fun openAssetSearch()
 
     fun openNfts()
-
-    val currentStackEntryLifecycle: Lifecycle
 }

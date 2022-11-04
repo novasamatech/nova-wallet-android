@@ -68,6 +68,12 @@ class SpannableBuilder(private val resourceManager: ResourceManager) {
         return append(text, span)
     }
 
+    fun append(text: String): SpannableBuilder {
+        builder.append(text)
+
+        return this
+    }
+
     fun build(): SpannableString = SpannableString(builder)
 
     private fun append(text: String, span: Any): SpannableBuilder {

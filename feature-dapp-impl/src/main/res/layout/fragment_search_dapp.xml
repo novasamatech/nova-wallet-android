@@ -22,5 +22,5 @@
         android:layout_weight="1"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         android:id="@+id/searchDappList"
-        tools:listitem="@layout/item_dapp" />
+        tools:listitem="@layout/view_dapp" />
 </LinearLayout>

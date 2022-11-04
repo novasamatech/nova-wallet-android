@@ -23,6 +23,7 @@ private const val TESTNET_OPTION = "testnet"
 private fun mapSectionTypeRemoteToSectionType(section: String) = when (section) {
     "subquery" -> Chain.ExternalApi.Section.Type.SUBQUERY
     "github" -> Chain.ExternalApi.Section.Type.GITHUB
+    "polkassembly" -> Chain.ExternalApi.Section.Type.POLKASSEMBLY
     else -> Chain.ExternalApi.Section.Type.UNKNOWN
 }
 
@@ -171,6 +172,7 @@ fun mapChainRemoteToChain(
             history = mapSectionRemoteToSection(externalApi.history),
             staking = mapSectionRemoteToSection(externalApi.staking),
             crowdloans = mapSectionRemoteToSection(externalApi.crowdloans),
+            governance = mapSectionRemoteToSection(externalApi.governance)
         )
     }
 
@@ -197,8 +199,18 @@ fun mapChainRemoteToChain(
             isEthereumBased = ETHEREUM_OPTION in optionsOrEmpty,
             isTestNet = TESTNET_OPTION in optionsOrEmpty,
             hasCrowdloans = CROWDLOAN_OPTION in optionsOrEmpty,
+            governance = optionsOrEmpty.governanceTypeFromOptions(),
             additional = additional
         )
+    }
+}
+
+private fun Set<String>.governanceTypeFromOptions(): Chain.Governance {
+    return when {
+        "governance" in this -> Chain.Governance.V2 // for backward compatibility of dev builds. Can be removed once everyone will update dev app
+        "governance-v2" in this -> Chain.Governance.V2
+        "governance-v1" in this -> Chain.Governance.V1
+        else -> Chain.Governance.NONE
     }
 }
 
@@ -251,7 +263,8 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
         Chain.ExternalApi(
             staking = mapSectionLocalToSection(externalApi.staking),
             history = mapSectionLocalToSection(externalApi.history),
-            crowdloans = mapSectionLocalToSection(externalApi.crowdloans)
+            crowdloans = mapSectionLocalToSection(externalApi.crowdloans),
+            governance = mapSectionLocalToSection(externalApi.governance)
         )
     }
 
@@ -274,6 +287,7 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
             isEthereumBased = isEthereumBased,
             isTestNet = isTestNet,
             hasCrowdloans = hasCrowdloans,
+            governance = Chain.Governance.valueOf(governance),
             additional = additional
         )
     }
@@ -332,7 +346,8 @@ fun mapChainToChainLocal(chain: Chain, gson: Gson): ChainLocal {
         ChainLocal.ExternalApi(
             staking = mapSectionToSectionLocal(externalApi.staking),
             history = mapSectionToSectionLocal(externalApi.history),
-            crowdloans = mapSectionToSectionLocal(externalApi.crowdloans)
+            crowdloans = mapSectionToSectionLocal(externalApi.crowdloans),
+            governance = mapSectionToSectionLocal(externalApi.governance)
         )
     }
 
@@ -348,6 +363,7 @@ fun mapChainToChainLocal(chain: Chain, gson: Gson): ChainLocal {
             isEthereumBased = isEthereumBased,
             isTestNet = isTestNet,
             hasCrowdloans = hasCrowdloans,
+            governance = governance.name,
             additional = additional,
         )
     }

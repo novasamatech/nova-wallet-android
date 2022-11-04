@@ -2,10 +2,12 @@
 
 package io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.search
 
+import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
+import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.utils.toggle
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_impl.R
@@ -25,7 +27,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.detai
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
@@ -58,8 +59,8 @@ class SearchCustomValidatorsViewModel(
     private val currentTokenFlow = tokenUseCase.currentTokenFlow()
         .share()
 
-    private val allElectedValidators by lazy {
-        async { validatorRecommendatorFactory.create(router.currentStackEntryLifecycle).availableValidators.toSet() }
+    private val allElectedValidators by lazyAsync {
+        validatorRecommendatorFactory.create(scope = viewModelScope).availableValidators.toSet()
     }
 
     private val foundValidatorsState = enteredQuery

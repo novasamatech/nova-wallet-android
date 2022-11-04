@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.presentation
 
-import androidx.lifecycle.Lifecycle
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.model.ConfirmPayoutPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.model.PendingPayoutParcelable
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.confirm.ConfirmBondMorePayload
@@ -73,6 +72,4 @@ interface StakingRouter {
     fun openConfirmRewardDestination(payload: ConfirmRewardDestinationPayload)
 
     fun openAccountDetails(metaAccountId: Long)
-
-    val currentStackEntryLifecycle: Lifecycle
 }

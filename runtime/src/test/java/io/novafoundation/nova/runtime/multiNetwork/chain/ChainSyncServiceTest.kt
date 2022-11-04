@@ -54,7 +54,7 @@ class ChainSyncServiceTest {
         icon = "test",
         addressPrefix = 0,
         types = null,
-        options = emptyList(),
+        options = emptySet(),
         parentId = null,
         externalApi = null,
         explorers = emptyList(),

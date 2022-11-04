@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:orientation="vertical"
+    tools:parentTag="android.widget.LinearLayout">
+
+    <FrameLayout
+        android:id="@+id/seekbarTickLabelsContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp"
+        android:paddingTop="1dp"
+        android:paddingBottom="1dp" />
+
+    <SeekBar
+        android:id="@+id/seekbarInner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="6"
+        android:maxHeight="10dp"
+        android:paddingStart="14dp"
+        android:paddingTop="2dp"
+        android:paddingEnd="14dp"
+        android:paddingBottom="2dp"
+        android:progress="2"
+        android:progressDrawable="@drawable/bg_seekbar_progress"
+        android:splitTrack="false"
+        android:thumb="@drawable/bg_seekbar_thumb"
+        android:tickMark="@drawable/bg_seekbar_tick" />
+
+</merge>

@@ -76,7 +76,7 @@ class DefaultPolkadotJsState(
             is ConfirmTxResponse.Sent -> throw IllegalStateException("Unexpected 'Sent' response for PolkadotJs extension")
             is ConfirmTxResponse.Signed -> request.accept(SignerResult(response.requestId, response.signature))
             is ConfirmTxResponse.SigningFailed -> {
-                hostApi.showError(resourceManager.getString(R.string.dapp_sign_extrinsic_failed))
+                if (response.shouldPresent) hostApi.showError(resourceManager.getString(R.string.dapp_sign_extrinsic_failed))
 
                 request.reject(Web3StateMachineHost.SigningFailedException)
             }

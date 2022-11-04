@@ -27,6 +27,7 @@ data class Chain(
     val isEthereumBased: Boolean,
     val isTestNet: Boolean,
     val hasCrowdloans: Boolean,
+    val governance: Governance,
     val parentId: String?,
     val additional: Additional?
 ) : Identifiable {
@@ -109,13 +110,18 @@ data class Chain(
     data class ExternalApi(
         val staking: Section?,
         val history: Section?,
-        val crowdloans: Section?
+        val crowdloans: Section?,
+        val governance: Section?
     ) {
         data class Section(val type: Type, val url: String) {
             enum class Type {
-                SUBQUERY, GITHUB, UNKNOWN
+                SUBQUERY, GITHUB, UNKNOWN, POLKASSEMBLY
             }
         }
+    }
+
+    enum class Governance {
+        V1, V2, NONE
     }
 
     override val identifier: String = id

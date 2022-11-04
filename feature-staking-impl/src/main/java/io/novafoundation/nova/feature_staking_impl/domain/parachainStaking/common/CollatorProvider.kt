@@ -1,7 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common
 
-import io.novafoundation.nova.feature_staking_api.domain.api.AccountIdMap
-import io.novafoundation.nova.feature_staking_api.domain.api.IdentityRepository
+import io.novafoundation.nova.common.address.get
+import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
+import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.CollatorSnapshot
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.minimumStakeToGetRewards
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CandidatesRepository
@@ -36,7 +37,7 @@ interface CollatorProvider {
 }
 
 class RealCollatorProvider(
-    private val identityRepository: IdentityRepository,
+    private val identityRepository: OnChainIdentityRepository,
     private val currentRoundRepository: CurrentRoundRepository,
     private val parachainStakingConstantsRepository: ParachainStakingConstantsRepository,
     private val candidatesRepository: CandidatesRepository,
@@ -61,7 +62,7 @@ class RealCollatorProvider(
         val requestedCollatorIds = requestedCollatorIdsHex.map { it.fromHex() }
 
         val candidateMetadatas = candidatesRepository.getCandidatesMetadata(chainId, requestedCollatorIds)
-        val identities = identityRepository.getIdentitiesFromIds(chainId, requestedCollatorIdsHex)
+        val identities = identityRepository.getIdentitiesFromIds(requestedCollatorIds, chainId)
 
         val systemForcedMinimumStake = parachainStakingConstantsRepository.systemForcedMinStake(chainId)
         val rewardCalculator = rewardCalculatorFactory.create(chainAsset, snapshots)
@@ -69,11 +70,12 @@ class RealCollatorProvider(
         return requestedCollatorIdsHex.map { accountIdHex ->
             val collatorSnapshot = snapshots[accountIdHex]
             val candidateMetadata = candidateMetadatas.getValue(accountIdHex)
+            val accountId = accountIdHex.fromHex()
 
             Collator(
                 accountIdHex = accountIdHex,
-                address = chain.addressOf(accountIdHex.fromHex()),
-                identity = identities[accountIdHex],
+                address = chain.addressOf(accountId),
+                identity = identities[accountId],
                 snapshot = collatorSnapshot,
                 minimumStakeToGetRewards = candidateMetadata.minimumStakeToGetRewards(systemForcedMinimumStake),
                 candidateMetadata = candidateMetadata,

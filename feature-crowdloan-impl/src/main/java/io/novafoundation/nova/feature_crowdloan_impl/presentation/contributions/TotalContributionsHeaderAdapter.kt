@@ -7,8 +7,7 @@ import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
-import kotlinx.android.synthetic.main.item_contributions_header.view.totalContributionsFiat
-import kotlinx.android.synthetic.main.item_contributions_header.view.totalContributionsValue
+import kotlinx.android.synthetic.main.item_contributions_header.view.totalContributedAmount
 
 class TotalContributionsHeaderAdapter : RecyclerView.Adapter<TotalContributionsHeaderAdapter.HeaderHolder>() {
 
@@ -37,8 +36,7 @@ class TotalContributionsHeaderAdapter : RecyclerView.Adapter<TotalContributionsH
         }
 
         fun bind(amount: AmountModel?) {
-            itemView.totalContributionsValue.text = amount?.token
-            itemView.totalContributionsFiat.text = amount?.fiat
+            itemView.totalContributedAmount.setAmount(amount)
         }
     }
 }

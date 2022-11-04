@@ -12,7 +12,6 @@ import com.github.razir.progressbutton.isProgressActive
 import com.github.razir.progressbutton.showProgress
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
-import io.novafoundation.nova.common.utils.doOnGlobalLayout
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.getColorFromAttr
 import io.novafoundation.nova.common.utils.getEnum
@@ -56,6 +55,18 @@ class PrimaryButton @JvmOverloads constructor(
             override fun disabledColor(context: Context) = context.getColor(R.color.disabledTransparent)
 
             override fun enabledColor(context: Context) = context.getColor(R.color.white_16)
+        },
+
+        PRIMARY_GREEN {
+            override fun disabledColor(context: Context) = context.getColor(R.color.disabledColor)
+
+            override fun enabledColor(context: Context) = context.getColor(R.color.multicolor_green_100)
+        },
+
+        PRIMARY_RED {
+            override fun disabledColor(context: Context) = context.getColor(R.color.disabledColor)
+
+            override fun enabledColor(context: Context) = context.getColor(R.color.multicolor_red_100)
         };
 
         @ColorInt
@@ -71,21 +82,28 @@ class PrimaryButton @JvmOverloads constructor(
 
     private var cachedText: String? = null
 
+    private lateinit var size: Size
+
     private var preparedForProgress = false
 
     init {
         attrs?.let(this::applyAttrs)
     }
 
-    private fun applyAttrs(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.PrimaryButton) { typedArray ->
-        val appearance = typedArray.getEnum(R.styleable.PrimaryButton_appearance, Appearance.PRIMARY)
-        val size = typedArray.getEnum(R.styleable.PrimaryButton_size, Size.LARGE)
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val heightMode = MeasureSpec.getMode(heightMeasureSpec)
 
-        setConfiguration(size, appearance)
+        var newHeightMeasureSpec = heightMeasureSpec
+        if (heightMode == MeasureSpec.AT_MOST) {
+            newHeightMeasureSpec = MeasureSpec.makeMeasureSpec(size.heightDp.dp(context), heightMode)
+        }
+
+        super.onMeasure(widthMeasureSpec, newHeightMeasureSpec)
     }
 
-    fun setConfiguration(size: Size, appearance: Appearance) {
-        setSize(size)
+    private fun applyAttrs(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.PrimaryButton) { typedArray ->
+        val appearance = typedArray.getEnum(R.styleable.PrimaryButton_appearance, Appearance.PRIMARY)
+        size = typedArray.getEnum(R.styleable.PrimaryButton_size, Size.LARGE)
 
         setAppearance(appearance, cornerSizeDp = size.cornerSizeDp)
     }
@@ -106,14 +124,6 @@ class PrimaryButton @JvmOverloads constructor(
             showProgress()
         } else {
             hideProgress()
-        }
-    }
-
-    private fun setSize(size: Size) {
-        doOnGlobalLayout {
-            layoutParams.apply {
-                height = size.heightDp.dp(context)
-            }
         }
     }
 

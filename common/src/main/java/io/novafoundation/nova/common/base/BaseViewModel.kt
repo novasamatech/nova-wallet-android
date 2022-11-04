@@ -43,6 +43,8 @@ open class BaseViewModel : ViewModel(), CoroutineScope, WithCoroutineScopeExtens
 
     fun showError(throwable: Throwable) {
         if (!shouldIgnore(throwable)) {
+            throwable.printStackTrace()
+
             throwable.message?.let(this::showError)
         }
     }

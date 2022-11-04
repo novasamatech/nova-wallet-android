@@ -80,7 +80,7 @@ class NetworkModule {
 
     @Provides
     @ApplicationScope
-    fun provideLogger(): Logger = AndroidLogger()
+    fun provideLogger(): Logger = AndroidLogger(debug = BuildConfig.DEBUG)
 
     @Provides
     @ApplicationScope

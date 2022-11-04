@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards
 
-import io.novafoundation.nova.feature_staking_api.domain.api.AccountIdMap
-import io.novafoundation.nova.feature_staking_impl.data.common.repository.CommonStakingRepository
+import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.CollatorSnapshot
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CurrentRoundRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.RewardsRepository
@@ -14,11 +13,12 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Staki
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.TURING
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.UNSUPPORTED
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.repository.TotalIssuanceRepository
 
 class ParachainStakingRewardCalculatorFactory(
     private val rewardsRepository: RewardsRepository,
     private val currentRoundRepository: CurrentRoundRepository,
-    private val commonStakingRepository: CommonStakingRepository,
+    private val commonStakingRepository: TotalIssuanceRepository,
     private val turingStakingRewardsRepository: TuringStakingRewardsRepository,
 ) {
 

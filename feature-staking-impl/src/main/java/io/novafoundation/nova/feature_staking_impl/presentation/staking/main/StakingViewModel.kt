@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.main
 
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.mixin.MixinFactory
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.core.updater.UpdateSystem
@@ -15,13 +14,14 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.startStaking.StartStakingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.UnbondingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.UserRewardsComponentFactory
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorMixin
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorFactory
 import kotlinx.coroutines.flow.launchIn
 
 class StakingViewModel(
     selectedAccountUseCase: SelectedAccountUseCase,
 
-    assetSelectorMixinFactory: MixinFactory<AssetSelectorMixin.Presentation>,
+    assetSelectorMixinFactory: AssetSelectorFactory,
     alertsComponentFactory: AlertsComponentFactory,
     unbondingComponentFactory: UnbondingComponentFactory,
     startStakingComponentFactory: StartStakingComponentFactory,
@@ -36,7 +36,10 @@ class StakingViewModel(
 ) : BaseViewModel(),
     Validatable by validationExecutor {
 
-    val assetSelectorMixin = assetSelectorMixinFactory.create(scope = this)
+    val assetSelectorMixin = assetSelectorMixinFactory.create(
+        scope = this,
+        amountProvider = Asset::transferable
+    )
 
     private val selectedAccountFlow = selectedAccountUseCase.selectedMetaAccountFlow()
         .shareInBackground()

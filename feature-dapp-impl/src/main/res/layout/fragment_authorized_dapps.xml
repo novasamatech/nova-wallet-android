@@ -8,10 +8,10 @@
     tools:background="@color/black">
 
     <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/authorizedDAppsToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:dividerVisible="false"
-        android:id="@+id/authorizedDAppsToolbar"
         app:homeButtonIcon="@drawable/ic_close"
         app:titleText="@string/dapp_authorized_title" />
 
@@ -25,9 +25,9 @@
         android:text="@string/dapp_authorized_description" />
 
     <io.novafoundation.nova.common.view.TableCellView
+        android:id="@+id/authorizedDAppsWallet"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/authorizedDAppsWallet"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
@@ -41,12 +41,12 @@
         android:layout_weight="1" />
 
     <io.novafoundation.nova.common.view.PlaceholderView
-        android:layout_width="match_parent"
-        app:showBackground="false"
-        app:image="@drawable/ic_placeholder"
         android:id="@+id/authorizedPlaceholder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:text="@string/dapp_list_placeholder"
-        android:layout_height="wrap_content" />
+        app:placeholderBackgroundStyle="no_background"
+        app:image="@drawable/ic_placeholder"/>
 
     <Space
         android:id="@+id/authorizedPlaceholderSpacerBottom"
@@ -55,12 +55,12 @@
         android:layout_weight="2" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:layout_width="match_parent"
-        tools:visibility="gone"
         android:id="@+id/authorizedDAppsList"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
         android:layout_weight="1"
-        tools:listitem="@layout/item_dapp" />
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/view_dapp"
+        tools:visibility="gone" />
 </LinearLayout>

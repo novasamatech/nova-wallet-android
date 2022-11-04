@@ -18,6 +18,7 @@ class ChainLocal(
     val isEthereumBased: Boolean,
     val isTestNet: Boolean,
     val hasCrowdloans: Boolean,
+    val governance: String,
     val additional: String?,
 ) {
 
@@ -35,6 +36,9 @@ class ChainLocal(
 
         @Embedded(prefix = "crowdloans_")
         val crowdloans: Section?,
+
+        @Embedded(prefix = "governance_")
+        val governance: Section?,
     ) {
 
         class Section(val url: String, val type: String)

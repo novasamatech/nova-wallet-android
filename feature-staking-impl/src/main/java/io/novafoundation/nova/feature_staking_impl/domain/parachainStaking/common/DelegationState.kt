@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common
 
-import io.novafoundation.nova.feature_staking_api.domain.api.AccountIdMap
+import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorBond
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.CandidateMetadata

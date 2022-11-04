@@ -1,9 +1,9 @@
 package io.novafoundation.nova.feature_dapp_impl.domain.browser.addToFavourites
 
+import io.novafoundation.nova.common.utils.Urls
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_dapp_impl.data.model.FavouriteDApp
 import io.novafoundation.nova.feature_dapp_impl.data.repository.FavouritesDAppRepository
-import io.novafoundation.nova.feature_dapp_impl.util.Urls
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

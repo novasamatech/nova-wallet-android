@@ -38,7 +38,7 @@ private class MetaAccountWithBalanceListingMixin(
 
     override val metaAccountsFlow = metaAccountGroupingInteractor.metaAccountsWithTotalBalanceFlow().map { list ->
         list.toListWithHeaders(
-            keyMapper = { mapMetaAccountTypeToUi(it, resourceManager) },
+            keyMapper = { type, _ -> mapMetaAccountTypeToUi(type, resourceManager) },
             valueMapper = { mapMetaAccountToUi(it) }
         )
     }

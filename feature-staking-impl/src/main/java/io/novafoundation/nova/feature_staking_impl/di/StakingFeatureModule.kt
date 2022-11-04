@@ -9,21 +9,18 @@ import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.common.mixin.MixinFactory
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
-import io.novafoundation.nova.feature_staking_api.domain.api.IdentityRepository
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
-import io.novafoundation.nova.feature_staking_impl.data.common.repository.CommonStakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.StakingApi
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.SubQueryValidatorSetFetcher
-import io.novafoundation.nova.feature_staking_impl.data.repository.IdentityRepositoryImpl
 import io.novafoundation.nova.feature_staking_impl.data.repository.PayoutRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.RealSessionRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.SessionRepository
@@ -38,7 +35,6 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.St
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingStoriesDataSource
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingStoriesDataSourceImpl
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.SubqueryStakingRewardsDataSource
-import io.novafoundation.nova.feature_staking_impl.di.staking.common.CommonsStakingModule
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.alerts.AlertsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.common.EraTimeCalculatorFactory
@@ -68,17 +64,17 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenReposito
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorFactory
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
+import io.novafoundation.nova.runtime.repository.TotalIssuanceRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
-@Module(includes = [CommonsStakingModule::class])
+@Module
 class StakingFeatureModule {
 
     @Provides
@@ -100,7 +96,7 @@ class StakingFeatureModule {
         assetUseCase: AssetUseCase,
         singleAssetSharedState: StakingSharedState,
         resourceManager: ResourceManager
-    ): MixinFactory<AssetSelectorMixin.Presentation> = AssetSelectorFactory(
+    ): AssetSelectorFactory = AssetSelectorFactory(
         assetUseCase,
         singleAssetSharedState,
         resourceManager
@@ -164,19 +160,13 @@ class StakingFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideIdentityRepository(
-        @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource
-    ): IdentityRepository = IdentityRepositoryImpl(remoteStorageSource)
-
-    @Provides
-    @FeatureScope
     fun provideStakingInteractor(
         walletRepository: WalletRepository,
         accountRepository: AccountRepository,
         stakingRepository: StakingRepository,
         stakingRewardsRepository: StakingRewardsRepository,
         stakingConstantsRepository: StakingConstantsRepository,
-        identityRepository: IdentityRepository,
+        identityRepository: OnChainIdentityRepository,
         payoutRepository: PayoutRepository,
         stakingSharedState: StakingSharedState,
         assetUseCase: AssetUseCase,
@@ -248,9 +238,9 @@ class StakingFeatureModule {
     @FeatureScope
     fun provideRewardCalculatorFactory(
         repository: StakingRepository,
-        commonStakingRepository: CommonStakingRepository,
+        totalIssuanceRepository: TotalIssuanceRepository,
         sharedState: StakingSharedState
-    ) = RewardCalculatorFactory(repository, commonStakingRepository, sharedState)
+    ) = RewardCalculatorFactory(repository, totalIssuanceRepository, sharedState)
 
     @Provides
     @FeatureScope
@@ -264,7 +254,7 @@ class StakingFeatureModule {
     @FeatureScope
     fun provideValidatorProvider(
         stakingRepository: StakingRepository,
-        identityRepository: IdentityRepository,
+        identityRepository: OnChainIdentityRepository,
         rewardCalculatorFactory: RewardCalculatorFactory,
         stakingConstantsRepository: StakingConstantsRepository,
     ) = ValidatorProvider(

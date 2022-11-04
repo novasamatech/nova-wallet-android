@@ -4,5 +4,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface HintsMixin {
 
-    val hintsFlow: Flow<List<String>>
+    val hintsFlow: Flow<List<CharSequence>>
 }

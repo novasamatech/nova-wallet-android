@@ -1,10 +1,10 @@
 package io.novafoundation.nova.feature_dapp_impl.data.repository
 
+import io.novafoundation.nova.common.utils.Urls
 import io.novafoundation.nova.common.utils.retryUntilDone
 import io.novafoundation.nova.core_db.dao.PhishingSitesDao
 import io.novafoundation.nova.core_db.model.PhishingSiteLocal
 import io.novafoundation.nova.feature_dapp_impl.data.network.phishing.PhishingSitesApi
-import io.novafoundation.nova.feature_dapp_impl.util.Urls
 
 interface PhishingSitesRepository {
 

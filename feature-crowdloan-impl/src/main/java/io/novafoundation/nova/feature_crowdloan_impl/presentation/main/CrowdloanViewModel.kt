@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.list.toValueList
-import io.novafoundation.nova.common.mixin.MixinFactory
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.LoadingState
@@ -19,7 +18,6 @@ import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.validation.TransformedFailure
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.core.updater.UpdateSystem
-import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.validation.handleChainAccountNotFound
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.data.CrowdloanSharedState
@@ -38,7 +36,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.presentation.model.generate
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.WithAssetSelector
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -55,11 +53,10 @@ class CrowdloanViewModel(
     private val crowdloanSharedState: CrowdloanSharedState,
     private val router: CrowdloanRouter,
     private val customContributeManager: CustomContributeManager,
-    private val selectedAccountUseCase: SelectedAccountUseCase,
     private val validationSystem: MainCrowdloanValidationSystem,
     private val validationExecutor: ValidationExecutor,
     crowdloanUpdateSystem: UpdateSystem,
-    assetSelectorFactory: MixinFactory<AssetSelectorMixin.Presentation>,
+    assetSelectorFactory: AssetSelectorFactory,
     statefulCrowdloanMixinFactory: StatefulCrowdloanMixin.Factory,
     customDialogDisplayer: CustomDialogDisplayer
 ) : BaseViewModel(),
@@ -67,7 +64,10 @@ class CrowdloanViewModel(
     WithAssetSelector,
     CustomDialogDisplayer by customDialogDisplayer {
 
-    override val assetSelectorMixin = assetSelectorFactory.create(scope = this)
+    override val assetSelectorMixin = assetSelectorFactory.create(
+        scope = this,
+        amountProvider = Asset::transferable,
+    )
 
     val mainDescription = assetSelectorMixin.selectedAssetFlow.map {
         resourceManager.getString(R.string.crowdloan_main_description_v2_2_0, it.token.configuration.symbol)
@@ -95,9 +95,6 @@ class CrowdloanViewModel(
     val contributionsInfo = crowdloansMixin.contributionsInfoFlow
         .shareInBackground()
 
-    val selectedWalletModel = selectedAccountUseCase.selectedWalletModelFlow()
-        .shareInBackground()
-
     init {
         crowdloanUpdateSystem.start()
             .launchIn(this)
@@ -106,7 +103,7 @@ class CrowdloanViewModel(
     private fun mapCrowdloanStatusToUi(statusClass: KClass<out Crowdloan.State>, statusCount: Int): CrowdloanStatusModel {
         return when (statusClass) {
             Crowdloan.State.Finished::class -> CrowdloanStatusModel(
-                status = resourceManager.getString(R.string.crowdloan_completed_section),
+                status = resourceManager.getString(R.string.common_completed),
                 count = statusCount.toString()
             )
             Crowdloan.State.Active::class -> CrowdloanStatusModel(
@@ -180,10 +177,6 @@ class CrowdloanViewModel(
 
     fun myContributionsClicked() {
         router.openUserContributions()
-    }
-
-    fun avatarClicked() {
-        router.openSwitchWallet()
     }
 
     private suspend fun openStandardContributionFlow(contributionPayload: ContributePayload) {

@@ -26,7 +26,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.mode
 import io.novafoundation.nova.feature_assets.presentation.balance.common.mapGroupedAssetsToUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.NftPreviewUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.TotalBalanceModel
-import io.novafoundation.nova.feature_assets.presentation.common.mapBalanceIdToUi
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.mapBalanceIdToUi
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
@@ -221,7 +221,7 @@ class BalanceListViewModel(
                 BalanceBreakdownTotal(
                     resourceManager.getString(R.string.wallet_balance_transferable),
                     balanceBreakdown.transferableTotal.amount.formatAsCurrency(currency),
-                    R.drawable.ic_staking_operations,
+                    R.drawable.ic_transferable,
                     balanceBreakdown.transferableTotal.percentage.formatAsPercentage()
                 )
             )

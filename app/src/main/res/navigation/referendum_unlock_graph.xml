@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/referendum_unlock_graph"
+    app:startDestination="@id/governanceLocksOverview">
+
+    <fragment
+        android:id="@+id/governanceLocksOverview"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.unlock.list.GovernanceLocksOverviewFragment"
+        android:label="GovernanceLocksOverview"
+        tools:layout="@layout/fragment_governance_locks_overview">
+
+        <action
+            android:id="@+id/action_governanceLocksOverview_to_confirmGovernanceUnlock"
+            app:destination="@id/confirmGovernanceUnlock"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/confirmGovernanceUnlock"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.unlock.confirm.ConfirmGovernanceUnlockFragment"
+        android:label="ConfirmGovernanceUnlock"
+        tools:layout="@layout/fragment_governance_confirm_unlock">
+
+        <action
+            android:id="@+id/action_confirmReferendumVote_to_mainFragment"
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_open_enter"
+            app:popExitAnim="@anim/fragment_open_exit"
+            app:popUpTo="@+id/mainFragment" />
+    </fragment>
+
+</navigation>

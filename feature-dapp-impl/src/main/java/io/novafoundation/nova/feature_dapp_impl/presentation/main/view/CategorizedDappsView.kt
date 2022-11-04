@@ -6,14 +6,10 @@ import android.view.View
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import coil.ImageLoader
-import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
-import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.R
-import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.DappListAdapter
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.DappModel
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.DappCategoriesAdapter
@@ -22,7 +18,6 @@ import kotlinx.android.synthetic.main.view_categorized_dapps.view.categorizedDap
 import kotlinx.android.synthetic.main.view_categorized_dapps.view.categorizedDappsCategoriesShimmer
 import kotlinx.android.synthetic.main.view_categorized_dapps.view.categorizedDappsDappsShimmer
 import kotlinx.android.synthetic.main.view_categorized_dapps.view.categorizedDappsList
-import javax.inject.Inject
 
 typealias OnCategoryClickListener = (id: String) -> Unit
 
@@ -34,9 +29,7 @@ class CategorizedDappsView @JvmOverloads constructor(
     DappListAdapter.Handler,
     DappCategoriesAdapter.Handler {
 
-    @Inject lateinit var imageLoader: ImageLoader
-
-    private val dappListAdapter by lazy(LazyThreadSafetyMode.NONE) { DappListAdapter(this, imageLoader) }
+    private val dappListAdapter by lazy(LazyThreadSafetyMode.NONE) { DappListAdapter(this) }
     private val categoriesAdapter by lazy(LazyThreadSafetyMode.NONE) { DappCategoriesAdapter(this) }
 
     private var dAppListEventHandler: DappListAdapter.Handler? = null
@@ -47,11 +40,6 @@ class CategorizedDappsView @JvmOverloads constructor(
         orientation = VERTICAL
 
         background = context.getRoundedCornerDrawable(fillColorRes = R.color.black_48)
-
-        FeatureUtils.getFeature<DAppFeatureComponent>(
-            context,
-            DAppFeatureApi::class.java
-        ).inject(this)
 
         categorizedDappsList.adapter = dappListAdapter
         categorizedDappsCategories.adapter = categoriesAdapter

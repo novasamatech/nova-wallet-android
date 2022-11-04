@@ -1,12 +1,11 @@
 package io.novafoundation.nova.feature_staking_impl.domain.rewards
 
-import io.novafoundation.nova.feature_staking_api.domain.api.AccountIdMap
+import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.domain.api.getActiveElectedValidatorsExposures
 import io.novafoundation.nova.feature_staking_api.domain.model.Exposure
 import io.novafoundation.nova.feature_staking_api.domain.model.ValidatorPrefs
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
-import io.novafoundation.nova.feature_staking_impl.data.common.repository.CommonStakingRepository
 import io.novafoundation.nova.feature_staking_impl.domain.error.accountIdNotFound
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.ALEPH_ZERO
@@ -15,6 +14,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Staki
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN_AURA
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.TURING
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.UNSUPPORTED
+import io.novafoundation.nova.runtime.repository.TotalIssuanceRepository
 import io.novafoundation.nova.runtime.state.chainAsset
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -22,7 +22,7 @@ import java.math.BigInteger
 
 class RewardCalculatorFactory(
     private val stakingRepository: StakingRepository,
-    private val commonStakingRepository: CommonStakingRepository,
+    private val totalIssuanceRepository: TotalIssuanceRepository,
     @Deprecated("To be removed")
     private val sharedState: StakingSharedState,
 ) {
@@ -32,7 +32,7 @@ class RewardCalculatorFactory(
         exposures: AccountIdMap<Exposure>,
         validatorsPrefs: AccountIdMap<ValidatorPrefs?>
     ): RewardCalculator = withContext(Dispatchers.Default) {
-        val totalIssuance = commonStakingRepository.getTotalIssuance(chainAsset.chainId)
+        val totalIssuance = totalIssuanceRepository.getTotalIssuance(chainAsset.chainId)
 
         val validators = exposures.keys.mapNotNull { accountIdHex ->
             val exposure = exposures[accountIdHex] ?: accountIdNotFound(accountIdHex)
