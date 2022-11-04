@@ -11,7 +11,6 @@ import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import coil.ImageLoader
 import coil.clear
-import coil.util.CoilUtils
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.images.setIcon
