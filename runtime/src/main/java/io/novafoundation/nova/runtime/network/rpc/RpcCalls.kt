@@ -20,6 +20,7 @@ import io.novafoundation.nova.runtime.extrinsic.asExtrinsicStatus
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
+import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.primitives.u32
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.toHex
 import jp.co.soramitsu.fearless_utils.wsrpc.executeAsync
@@ -49,7 +50,7 @@ class RpcCalls(
         val type = runtime.typeRegistry[FEE_DECODE_TYPE]
 
         return if (type != null) {
-            val lengthInBytes = extrinsic.length / 2
+            val lengthInBytes = extrinsic.fromHex().size
             val encodedLength = u32.toHex(runtime, lengthInBytes.toBigInteger()).removeHexPrefix()
             val param = extrinsic + encodedLength
             val request = StateCallRequest("TransactionPaymentApi_query_info", param)
