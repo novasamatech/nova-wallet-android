@@ -186,6 +186,6 @@ private class ReferendumChildHolder(
     }
 
     override fun unbind() {
-        containerView.itemReferendumTrack.setIcon(null)
+        containerView.itemReferendumTrack.clearIcon()
     }
 }
