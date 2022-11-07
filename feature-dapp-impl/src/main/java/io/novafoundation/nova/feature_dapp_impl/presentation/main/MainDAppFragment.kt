@@ -59,7 +59,7 @@ class MainDAppFragment :
     override fun initViews() {
         dappRecyclerView.applyStatusBarInsets()
         dappRecyclerView.adapter = ConcatAdapter(headerAdapter, categoriesAdapter, dappsShimmering, dappListAdapter)
-        dappRecyclerView.addItemDecoration(DAppItemDecoration(requireContext(), dappRecyclerView))
+        dappRecyclerView.addItemDecoration(DAppItemDecoration(requireContext()))
     }
 
     override fun inject() {
