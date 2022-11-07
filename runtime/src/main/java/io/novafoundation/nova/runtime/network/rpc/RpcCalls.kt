@@ -1,6 +1,9 @@
 package io.novafoundation.nova.runtime.network.rpc
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
+import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
+import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
+import io.novafoundation.nova.common.data.network.runtime.binding.fromHexOrIncompatible
 import io.novafoundation.nova.common.data.network.runtime.calls.FeeCalculationRequest
 import io.novafoundation.nova.common.data.network.runtime.calls.GetBlockHashRequest
 import io.novafoundation.nova.common.data.network.runtime.calls.GetBlockRequest
@@ -11,10 +14,15 @@ import io.novafoundation.nova.common.data.network.runtime.model.FeeResponse
 import io.novafoundation.nova.common.data.network.runtime.model.SignedBlock
 import io.novafoundation.nova.common.data.network.runtime.model.SignedBlock.Block.Header
 import io.novafoundation.nova.common.utils.extrinsicHash
+import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.extrinsic.asExtrinsicStatus
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.getRuntime
+import jp.co.soramitsu.fearless_utils.extensions.fromHex
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.primitives.u32
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.toHex
 import jp.co.soramitsu.fearless_utils.wsrpc.executeAsync
 import jp.co.soramitsu.fearless_utils.wsrpc.mappers.nonNull
 import jp.co.soramitsu.fearless_utils.wsrpc.mappers.pojo
@@ -30,15 +38,30 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import java.math.BigInteger
 
+private const val FEE_DECODE_TYPE = "RuntimeDispatchInfo"
+
 @Suppress("EXPERIMENTAL_API_USAGE")
 class RpcCalls(
     private val chainRegistry: ChainRegistry,
 ) {
 
     suspend fun getExtrinsicFee(chainId: ChainId, extrinsic: String): FeeResponse {
-        val request = FeeCalculationRequest(extrinsic)
+        val runtime = chainRegistry.getRuntime(chainId)
+        val type = runtime.typeRegistry[FEE_DECODE_TYPE]
 
-        return socketFor(chainId).executeAsync(request, mapper = pojo<FeeResponse>().nonNull())
+        return if (type != null) {
+            val lengthInBytes = extrinsic.fromHex().size
+            val encodedLength = u32.toHex(runtime, lengthInBytes.toBigInteger()).removeHexPrefix()
+            val param = extrinsic + encodedLength
+            val request = StateCallRequest("TransactionPaymentApi_query_info", param)
+            val response = socketFor(chainId).executeAsync(request, mapper = pojo<String>().nonNull())
+            val decoded = type.fromHexOrIncompatible(response, runtime)
+
+            bindPartialFee(decoded)
+        } else {
+            val request = FeeCalculationRequest(extrinsic)
+            socketFor(chainId).executeAsync(request, mapper = pojo<FeeResponse>().nonNull())
+        }
     }
 
     suspend fun submitExtrinsic(chainId: ChainId, extrinsic: String): String {
@@ -114,4 +137,10 @@ class RpcCalls(
     }
 
     private fun socketFor(chainId: ChainId) = chainRegistry.getConnection(chainId).socketService
+
+    private fun bindPartialFee(decoded: Any?): FeeResponse {
+        val asStruct = decoded.castToStruct()
+
+        return FeeResponse(bindNumber(asStruct["partialFee"]))
+    }
 }
