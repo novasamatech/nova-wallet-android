@@ -41,6 +41,9 @@ val BigDecimal.isPositive: Boolean
 val BigDecimal.isNonNegative: Boolean
     get() = signum() >= 0
 
+val BigInteger.isZero: Boolean
+    get() = signum() == 0
+
 fun BigInteger?.orZero(): BigInteger = this ?: BigInteger.ZERO
 fun BigDecimal?.orZero(): BigDecimal = this ?: 0.toBigDecimal()
 

@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_governance_impl.presentation.referenda.de
 import io.noties.markwon.Markwon
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.firstOnLoad
@@ -13,18 +14,24 @@ import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.common.utils.mapNullable
 import io.novafoundation.nova.common.utils.withLoading
+import io.novafoundation.nova.common.validation.TransformedFailure
+import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
+import io.novafoundation.nova.feature_account_api.domain.validation.handleChainAccountNotFound
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createIdentityAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.PreImage
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumVoting
-import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumDApp
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumCall
+import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumDApp
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumDetails
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumDetailsInteractor
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumTimeline
+import io.novafoundation.nova.feature_governance_api.domain.referendum.details.valiadtions.ReferendumPreVoteValidationFailure
+import io.novafoundation.nova.feature_governance_api.domain.referendum.details.valiadtions.ReferendumPreVoteValidationPayload
+import io.novafoundation.nova.feature_governance_api.domain.referendum.details.valiadtions.ReferendumPreVoteValidationSystem
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.PreparingReason
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumStatus
 import io.novafoundation.nova.feature_governance_impl.R
@@ -73,9 +80,13 @@ class ReferendumDetailsViewModel(
     private val tokenUseCase: TokenUseCase,
     private val referendumFormatter: ReferendumFormatter,
     private val externalActions: ExternalActions.Presentation,
-    private val markwon: Markwon,
-    private val governanceDAppsInteractor: GovernanceDAppsInteractor
-) : BaseViewModel(), ExternalActions by externalActions {
+    private val governanceDAppsInteractor: GovernanceDAppsInteractor,
+    val markwon: Markwon,
+    private val validationSystem: ReferendumPreVoteValidationSystem,
+    private val validationExecutor: ValidationExecutor,
+) : BaseViewModel(),
+    ExternalActions by externalActions,
+    Validatable by validationExecutor {
 
     private val selectedAccount = selectedAccountUseCase.selectedMetaAccountFlow()
     private val selectedChainFlow = selectedAssetSharedState.selectedChainFlow()
@@ -185,9 +196,20 @@ class ReferendumDetailsViewModel(
         router.openReferendumFullDetails(payload)
     }
 
-    fun voteClicked() {
-        val votePayload = SetupVoteReferendumPayload(payload.referendumId)
-        router.openSetupVoteReferendum(votePayload)
+    fun voteClicked() = launch {
+        val validationPayload = ReferendumPreVoteValidationPayload(
+            metaAccount = selectedAccount.first(),
+            chain = selectedChainFlow.first()
+        )
+
+        validationExecutor.requireValid(
+            validationSystem = validationSystem,
+            payload = validationPayload,
+            validationFailureTransformerCustom = { status, _ -> mapValidationFailureToUi(status.reason) },
+        ) {
+            val votePayload = SetupVoteReferendumPayload(payload.referendumId)
+            router.openSetupVoteReferendum(votePayload)
+        }
     }
 
     private suspend fun mapReferendumDetailsToUi(referendumDetails: ReferendumDetails): ReferendumDetailsModel {
@@ -305,9 +327,8 @@ class ReferendumDetailsViewModel(
 
     private fun mapShortenedMarkdownDescription(referendumDetails: ReferendumDetails): ShortenedTextModel {
         val referendumDescription = mapReferendumDescriptionToUi(referendumDetails)
-        val referendumCleanedDescription = removeMarkdown(referendumDescription)
-            .trimStart()
-        return ShortenedTextModel.from(referendumCleanedDescription, DESCRIPTION_LENGTH_LIMIT)
+        val markdownDescription = markwon.toMarkdown(referendumDescription)
+        return ShortenedTextModel.from(markdownDescription, DESCRIPTION_LENGTH_LIMIT)
     }
 
     private fun mapReferendumTitleToUi(referendumDetails: ReferendumDetails): String {
@@ -383,8 +404,14 @@ class ReferendumDetailsViewModel(
         }
     }
 
-    private fun removeMarkdown(value: String): String {
-        return markwon.toMarkdown(value)
-            .toString()
+    private fun mapValidationFailureToUi(failure: ReferendumPreVoteValidationFailure): TransformedFailure {
+        return when (failure) {
+            is ReferendumPreVoteValidationFailure.NoRelaychainAccount -> handleChainAccountNotFound(
+                failure = failure,
+                resourceManager = resourceManager,
+                goToWalletDetails = { router.openAccountDetails(failure.account.id) },
+                addAccountDescriptionRes = R.string.referendum_missing_account_message
+            )
+        }
     }
 }

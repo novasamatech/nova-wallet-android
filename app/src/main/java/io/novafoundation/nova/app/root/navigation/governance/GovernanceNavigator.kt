@@ -4,6 +4,7 @@ import androidx.navigation.NavController
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
+import io.novafoundation.nova.app.root.navigation.Navigator
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBrowserFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.description.ReferendumDescriptionFragment
@@ -20,7 +21,8 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vot
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.ReferendumVotersPayload
 
 class GovernanceNavigator(
-    private val navigationHolder: NavigationHolder
+    private val navigationHolder: NavigationHolder,
+    private val commonNavigator: Navigator,
 ) : BaseNavigator(navigationHolder), GovernanceRouter {
 
     private val navController: NavController?
@@ -47,6 +49,18 @@ class GovernanceNavigator(
     )
 
     override fun backToReferendumDetails() = performNavigation(R.id.action_confirmReferendumVote_to_referendumDetailsFragment)
+
+    override fun finishUnlockFlow(shouldCloseLocksScreen: Boolean) {
+        if (shouldCloseLocksScreen) {
+            performNavigation(R.id.action_confirmReferendumVote_to_mainFragment)
+        } else {
+            back()
+        }
+    }
+
+    override fun openAccountDetails(id: Long) {
+        commonNavigator.openAccountDetails(id)
+    }
 
     override fun openDAppBrowser(initialUrl: String) = performNavigation(
         actionId = R.id.action_referendumDetailsFragment_to_DAppBrowserGraph,

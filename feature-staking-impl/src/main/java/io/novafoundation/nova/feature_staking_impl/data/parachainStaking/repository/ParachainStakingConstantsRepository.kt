@@ -17,8 +17,6 @@ interface ParachainStakingConstantsRepository {
 
     suspend fun delegationBondLessDelay(chainId: ChainId): BigInteger
 
-    suspend fun defaultBlocksPerRound(chainId: ChainId): BigInteger
-
     suspend fun maxDelegationsPerDelegator(chainId: ChainId): BigInteger
 }
 
@@ -44,10 +42,6 @@ class RuntimeParachainStakingConstantsRepository(
 
     override suspend fun delegationBondLessDelay(chainId: ChainId): BigInteger {
         return numberConstant(chainId, "DelegationBondLessDelay")
-    }
-
-    override suspend fun defaultBlocksPerRound(chainId: ChainId): BigInteger {
-        return numberConstant(chainId, "DefaultBlocksPerRound")
     }
 
     override suspend fun maxDelegationsPerDelegator(chainId: ChainId): BigInteger {

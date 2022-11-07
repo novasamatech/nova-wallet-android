@@ -170,7 +170,7 @@ class DefaultMetamaskState(
             is ConfirmTxResponse.Signed -> metamaskRequest.accept(response.signature)
             is ConfirmTxResponse.Sent -> metamaskRequest.accept(response.txHash)
             is ConfirmTxResponse.SigningFailed -> {
-                hostApi.showError(resourceManager.getString(R.string.dapp_sign_extrinsic_failed))
+                if (response.shouldPresent) hostApi.showError(resourceManager.getString(R.string.dapp_sign_extrinsic_failed))
 
                 metamaskRequest.reject(MetamaskError.TxSendingFailed())
             }

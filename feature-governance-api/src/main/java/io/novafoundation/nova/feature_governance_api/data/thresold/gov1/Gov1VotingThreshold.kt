@@ -7,7 +7,6 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VotingThreshold
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VotingThreshold.Threshold
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ayeVotes
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.nayVotes
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.notPassing
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.passing
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -21,19 +20,19 @@ enum class Gov1VotingThreshold(val readableName: String) : VotingThreshold {
         // nays / sqrt(turnout) < ayes / sqrt(total_issuance) =>
         // ayes > nays * sqrt(total_issuance) / sqrt(turnout)  =>
         // ayes / (ayes + nays) > [nays / (ayes + nays)] * [sqrt(total_issuance) / sqrt(turnout)]
+        // let a = ayes / (ayes + nays), to = sqrt(total_issuance), tu = sqrt(turnout)
+        // a > (1 - a) * to / tu
+        // a > to / tu - a * to / tu => a > (to / tu) / (1 + to / tu)
+        // a > to / (tu + to)
         override fun ayesFractionThreshold(tally: Tally, totalIssuance: Balance, passedSinceDecidingFraction: Perbill): Threshold<Perbill> {
             if (totalIssuance == Balance.ZERO || tally.support == Balance.ZERO) return Threshold.notPassing(Perbill.ONE)
 
             val sqrtTurnout = tally.support.intSqrt()
             val sqrtTotalIssuance = totalIssuance.intSqrt()
 
-            val totalVotes = tally.ayes + tally.nays
-            val aysFraction = tally.ayes.divideToDecimal(totalVotes)
-            val naysFraction = tally.nays.divideToDecimal(tally.ayes + tally.nays)
+            val aysFraction = tally.ayeVotes().fraction
 
-            val totalIssuanceToTurnout = sqrtTotalIssuance.divideToDecimal(sqrtTurnout)
-
-            val threshold = (naysFraction * totalIssuanceToTurnout).coerceAtMost(Perbill.ONE)
+            val threshold = sqrtTotalIssuance.divideToDecimal(sqrtTurnout + sqrtTotalIssuance)
 
             return Threshold(
                 value = threshold,
@@ -48,17 +47,17 @@ enum class Gov1VotingThreshold(val readableName: String) : VotingThreshold {
         // nays / sqrt(total_issuance) < ayes / sqrt(turnout) =>
         // ayes > nays * sqrt(turnout) / sqrt(total_issuance)  =>
         // ayes / (ayes + nays) > [nays / (ayes + nays)] * [sqrt(turnout) / sqrt(total_issuance)]
+        // let a = ayes / (ayes + nays), to = sqrt(total_issuance), tu = sqrt(turnout)
+        // a > tu / (tu + to)
         override fun ayesFractionThreshold(tally: Tally, totalIssuance: Balance, passedSinceDecidingFraction: Perbill): Threshold<Perbill> {
             if (totalIssuance == Balance.ZERO || tally.support == Balance.ZERO) return Threshold.notPassing(Perbill.ONE)
 
             val sqrtTurnout = tally.support.intSqrt()
             val sqrtTotalIssuance = totalIssuance.intSqrt()
 
-            val naysFraction = tally.nayVotes().fraction
             val aysFraction = tally.ayeVotes().fraction
 
-            val turnoutToTotalIssuance = sqrtTurnout.divideToDecimal(sqrtTotalIssuance)
-            val threshold = (naysFraction * turnoutToTotalIssuance).coerceAtMost(Perbill.ONE)
+            val threshold = sqrtTurnout.divideToDecimal(sqrtTurnout + sqrtTotalIssuance)
 
             return Threshold(
                 value = threshold,

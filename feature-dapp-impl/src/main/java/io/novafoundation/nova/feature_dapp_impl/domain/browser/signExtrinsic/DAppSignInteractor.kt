@@ -9,15 +9,19 @@ import java.math.BigInteger
 
 interface DAppSignInteractor {
 
+    sealed class Error : Throwable() {
+        class UnsupportedChain(val chainId: String) : Error()
+    }
+
     val validationSystem: ConfirmDAppOperationValidationSystem
 
     suspend fun createAccountAddressModel(): AddressModel
 
-    suspend fun chainUi(): ChainUi?
+    suspend fun chainUi(): Result<ChainUi?>
 
     fun commissionTokenFlow(): Flow<Token>?
 
-    suspend fun calculateFee(): BigInteger
+    suspend fun calculateFee(): BigInteger?
 
     suspend fun performOperation(): DAppSignCommunicator.Response?
 

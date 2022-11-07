@@ -1,8 +1,8 @@
 buildscript {
     ext {
         // App version
-        versionName = '3.9.3'
-        versionCode = 41
+        versionName = '4.0.0'
+        versionCode = 43
 
         applicationId = "io.novafoundation.nova"
         releaseApplicationSuffix = "market"
@@ -174,6 +174,7 @@ buildscript {
         markdownDep = "io.noties.markwon:core:$markdownVersion"
         markdownImage = "io.noties.markwon:image-coil:$markdownVersion"
         markdownTables = "io.noties.markwon:ext-tables:$markdownVersion"
+        markdownLinkify = "io.noties.markwon:linkify:$markdownVersion"
         markdownStrikethrough = "io.noties.markwon:ext-strikethrough:$markdownVersion"
     }
 

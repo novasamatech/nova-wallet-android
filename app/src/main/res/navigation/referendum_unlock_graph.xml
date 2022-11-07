@@ -25,6 +25,15 @@
         android:id="@+id/confirmGovernanceUnlock"
         android:name="io.novafoundation.nova.feature_governance_impl.presentation.unlock.confirm.ConfirmGovernanceUnlockFragment"
         android:label="ConfirmGovernanceUnlock"
-        tools:layout="@layout/fragment_governance_confirm_unlock" />
+        tools:layout="@layout/fragment_governance_confirm_unlock">
+
+        <action
+            android:id="@+id/action_confirmReferendumVote_to_mainFragment"
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_open_enter"
+            app:popExitAnim="@anim/fragment_open_exit"
+            app:popUpTo="@+id/mainFragment" />
+    </fragment>
 
 </navigation>

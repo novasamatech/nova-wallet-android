@@ -38,7 +38,8 @@
             android:textColor="@color/white_80"
             android:paddingHorizontal="8dp"
             android:paddingVertical="2dp"
-            android:text="@string/common_zero" />
+            android:text="0"
+            tools:ignore="HardcodedText" />
 
     </LinearLayout>
 

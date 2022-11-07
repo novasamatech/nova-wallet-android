@@ -381,6 +381,7 @@
     <string name="dapp_phishing_subtitle">Nova Wallet считает, что этот веб-сайт может поставить под угрозу безопасность ваших учетных записей и ваших токенов.</string>
     <string name="dapp_phishing_title">Обнаружен фишинг</string>
     <string name="dapp_search_hint">Введите имя или URL</string>
+    <string name="dapp_sign_error_unsupported_chain">Неподдерживаемый блокчейн с генезис хэшем %s</string>
     <string name="dapp_sign_extrinsic_details_subtitle">Убедитесь, что операция правильная</string>
     <string name="dapp_sign_extrinsic_failed">Не удалось подписать запрошенную операцию</string>
     <string name="ecdsa_selection_subtitle">(BTC/ETH совместимый)</string>
@@ -510,6 +511,7 @@
     <string name="referendum_full_details_turnout">Явка</string>
     <string name="referendum_full_details_vote_threshold">Порог голосования</string>
     <string name="referendum_in_queue_position_format" formatted="false">Позиция: %s из %s</string>
+    <string name="referendum_missing_account_message">Вы должны добавить %s аккаунт в кошелёк для того, чтобы голосовать</string>
     <string name="referendum_name_unknown">Референдум %s</string>
     <string name="referendum_nay_format">Против: %s</string>
     <string name="referendum_negative_voters_title">Голоса \"против\"</string>
