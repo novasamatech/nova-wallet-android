@@ -12,7 +12,7 @@
         android:layout_width="88dp"
         android:layout_height="14dp"
         android:layout_marginBottom="20dp"
-        android:background="@drawable/bg_shimerring_light" />
+        android:background="@drawable/bg_shimmering_light" />
 
     <include layout="@layout/item_crowdloan_shimmering" />
 
