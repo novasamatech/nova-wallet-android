@@ -17,6 +17,7 @@ class SubstrateApplicationConfig(
                 SubstrateApplicationConfig(chainId = Chain.Geneses.STATEMINT, coin = 354, cla = 0x96u),
                 SubstrateApplicationConfig(chainId = Chain.Geneses.STATEMINE, coin = 434, cla = 0x97u),
                 SubstrateApplicationConfig(chainId = Chain.Geneses.EDGEWARE, coin = 523, cla = 0x94u),
+                SubstrateApplicationConfig(chainId = Chain.Geneses.KARURA, coin = 686, cla = 0x9au)
             )
         }
 
