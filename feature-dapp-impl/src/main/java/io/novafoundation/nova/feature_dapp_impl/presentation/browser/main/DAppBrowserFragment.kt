@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_dapp_impl.presentation.browser.main
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -21,6 +22,7 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.sheets
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.sheets.ConfirmAuthorizeBottomSheet
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.favourites.setupRemoveFavouritesConfirmation
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3WebViewClientFactory
+import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewFileChooser
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewHolder
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.injectWeb3
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.uninjectWeb3
@@ -55,12 +57,18 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
 
     var backCallback: OnBackPressedCallback? = null
 
+    private var fileChooser: WebViewFileChooser? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         return layoutInflater.inflate(R.layout.fragment_dapp_browser, container, false)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        fileChooser?.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun initViews() {
@@ -111,11 +119,14 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
     override fun subscribe(viewModel: DAppBrowserViewModel) {
         setupRemoveFavouritesConfirmation(viewModel.removeFromFavouritesConfirmation)
 
+        fileChooser = WebViewFileChooser(this)
+
         dappBrowserWebView.injectWeb3(
             web3ClientFactory = web3WebViewClientFactory,
             extensionsStore = viewModel.extensionsStore,
             progressBar = dappBrowserProgress,
             onPageChanged = viewModel::onPageChanged,
+            fileChooser = fileChooser!!
         )
 
         viewModel.showConfirmationSheet.observeEvent {
