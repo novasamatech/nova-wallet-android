@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBr
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator
 import io.novafoundation.nova.feature_dapp_impl.web3.states.ExtensionStoreFactory
+import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewFileChooser
 
 @Module(includes = [ViewModelModule::class])
 class DAppBrowserModule {
@@ -32,6 +33,12 @@ class DAppBrowserModule {
         phishingSitesRepository = phishingSitesRepository,
         favouritesDAppRepository = favouritesDAppRepository
     )
+
+    @Provides
+    @ScreenScope
+    fun provideFileChooser(
+        fragment: Fragment
+    ) = WebViewFileChooser(fragment)
 
     @Provides
     internal fun provideViewModel(fragment: Fragment, factory: ViewModelProvider.Factory): DAppBrowserViewModel {

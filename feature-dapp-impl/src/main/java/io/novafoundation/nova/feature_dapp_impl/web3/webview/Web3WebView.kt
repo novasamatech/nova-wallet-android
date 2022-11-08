@@ -13,6 +13,7 @@ fun WebView.injectWeb3(
     extensionsStore: ExtensionsStore,
     progressBar: ProgressBar,
     onPageChanged: OnPageChangedListener,
+    fileChooser: WebViewFileChooser,
 ) {
     settings.javaScriptEnabled = true
     settings.cacheMode = WebSettings.LOAD_DEFAULT
@@ -27,7 +28,7 @@ fun WebView.injectWeb3(
     web3Client.initialInject()
 
     webViewClient = web3Client
-    webChromeClient = Web3ChromeClient(progressBar)
+    webChromeClient = Web3ChromeClient(fileChooser, progressBar)
 
     WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
 

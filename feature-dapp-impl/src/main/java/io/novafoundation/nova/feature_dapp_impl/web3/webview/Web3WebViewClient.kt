@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_dapp_impl.web3.webview
 
 import android.graphics.Bitmap
+import android.net.Uri
+import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -55,6 +57,7 @@ class Web3WebViewClient(
 private const val MAX_PROGRESS = 100
 
 class Web3ChromeClient(
+    private val fileChooser: WebViewFileChooser,
     private val progressBar: ProgressBar
 ) : WebChromeClient() {
 
@@ -62,5 +65,10 @@ class Web3ChromeClient(
         progressBar.progress = newProgress
 
         progressBar.setVisible(newProgress < MAX_PROGRESS)
+    }
+
+    override fun onShowFileChooser(webView: WebView?, filePathCallback: ValueCallback<Array<Uri>>?, fileChooserParams: FileChooserParams?): Boolean {
+        fileChooser.onShowFileChooser(filePathCallback, fileChooserParams)
+        return true
     }
 }
