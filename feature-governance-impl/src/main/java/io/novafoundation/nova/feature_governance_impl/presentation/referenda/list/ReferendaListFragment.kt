@@ -29,6 +29,8 @@ class ReferendaListFragment : BaseFragment<ReferendaListViewModel>(), ReferendaL
 
     private val shimmeringAdapter by lazy(LazyThreadSafetyMode.NONE) { PlaceholderAdapter(R.layout.item_referenda_shimmering) }
 
+    private val placeholderAdapter by lazy(LazyThreadSafetyMode.NONE) { PlaceholderAdapter(R.layout.item_referenda_placeholder  ) }
+
     private val referendaListAdapter by lazy(LazyThreadSafetyMode.NONE) { ReferendaListAdapter(this, imageLoader) }
 
     override fun onCreateView(
@@ -41,7 +43,7 @@ class ReferendaListFragment : BaseFragment<ReferendaListViewModel>(), ReferendaL
 
     override fun initViews() {
         referendaList.itemAnimator = null
-        referendaList.adapter = ConcatAdapter(referendaHeaderAdapter, shimmeringAdapter, referendaListAdapter)
+        referendaList.adapter = ConcatAdapter(referendaHeaderAdapter, shimmeringAdapter, placeholderAdapter, referendaListAdapter)
     }
 
     override fun inject() {
@@ -69,6 +71,7 @@ class ReferendaListFragment : BaseFragment<ReferendaListViewModel>(), ReferendaL
                 is LoadingState.Loaded -> {
                     shimmeringAdapter.showPlaceholder(false)
                     referendaListAdapter.submitList(it.data)
+                    placeholderAdapter.showPlaceholder(it.data.isEmpty())
                 }
                 is LoadingState.Loading -> {
                     shimmeringAdapter.showPlaceholder(true)
