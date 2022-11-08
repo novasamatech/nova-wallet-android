@@ -29,7 +29,7 @@ class ReferendaListFragment : BaseFragment<ReferendaListViewModel>(), ReferendaL
 
     private val shimmeringAdapter by lazy(LazyThreadSafetyMode.NONE) { PlaceholderAdapter(R.layout.item_referenda_shimmering) }
 
-    private val placeholderAdapter by lazy(LazyThreadSafetyMode.NONE) { PlaceholderAdapter(R.layout.item_referenda_placeholder  ) }
+    private val placeholderAdapter by lazy(LazyThreadSafetyMode.NONE) { PlaceholderAdapter(R.layout.item_referenda_placeholder) }
 
     private val referendaListAdapter by lazy(LazyThreadSafetyMode.NONE) { ReferendaListAdapter(this, imageLoader) }
 
