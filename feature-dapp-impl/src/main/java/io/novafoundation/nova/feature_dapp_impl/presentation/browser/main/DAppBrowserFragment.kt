@@ -55,9 +55,10 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
     @Inject
     lateinit var imageLoader: ImageLoader
 
-    var backCallback: OnBackPressedCallback? = null
+    @Inject
+    lateinit var fileChooser: WebViewFileChooser
 
-    private var fileChooser: WebViewFileChooser? = null
+    var backCallback: OnBackPressedCallback? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -119,14 +120,12 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
     override fun subscribe(viewModel: DAppBrowserViewModel) {
         setupRemoveFavouritesConfirmation(viewModel.removeFromFavouritesConfirmation)
 
-        fileChooser = WebViewFileChooser(this)
-
         dappBrowserWebView.injectWeb3(
             web3ClientFactory = web3WebViewClientFactory,
             extensionsStore = viewModel.extensionsStore,
             progressBar = dappBrowserProgress,
             onPageChanged = viewModel::onPageChanged,
-            fileChooser = fileChooser!!
+            fileChooser = fileChooser
         )
 
         viewModel.showConfirmationSheet.observeEvent {
