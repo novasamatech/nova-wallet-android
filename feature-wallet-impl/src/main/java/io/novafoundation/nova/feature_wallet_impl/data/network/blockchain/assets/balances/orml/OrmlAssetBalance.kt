@@ -9,7 +9,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.bindBalanceLocks
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.mapBlockchainLockToLocal
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.updateLocks
 import io.novafoundation.nova.runtime.ext.ormlCurrencyId
 import io.novafoundation.nova.runtime.ext.requireOrml
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -46,9 +46,8 @@ class OrmlAssetBalance(
 
         return subscriptionBuilder.subscribe(key)
             .map { change ->
-                val balanceLocks = bindBalanceLocks(storage.decodeValue(change.value, runtime))
-                balanceLocks?.map { mapBlockchainLockToLocal(metaAccount.id, chain.id, chainAsset.id, it) }
-                    ?.let { lockDao.updateLocks(it, metaAccount.id, chain.id, chainAsset.id) }
+                val balanceLocks = bindBalanceLocks(storage.decodeValue(change.value, runtime)).orEmpty()
+               lockDao.updateLocks(balanceLocks, metaAccount.id, chain.id, chainAsset.id)
             }
     }
 
