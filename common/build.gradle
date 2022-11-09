@@ -99,6 +99,9 @@ dependencies {
     api coilDep
     api coilSvg
 
+    api web3jDep
+    api coroutinesFutureDep
+
     implementation shimmerDep
 
     testImplementation jUnitDep

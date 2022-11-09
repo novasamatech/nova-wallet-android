@@ -1,19 +1,17 @@
 package io.novafoundation.nova.feature_dapp_impl.data.network.ethereum
 
+import io.novafoundation.nova.common.data.network.ethereum.sendSuspend
 import jp.co.soramitsu.fearless_utils.encrypt.SignatureWrapper
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.Signer
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadRaw
-import kotlinx.coroutines.future.asDeferred
 import okhttp3.OkHttpClient
 import org.web3j.crypto.RawTransaction
 import org.web3j.crypto.Sign.SignatureData
 import org.web3j.crypto.TransactionEncoder
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.core.DefaultBlockParameterName
-import org.web3j.protocol.core.Request
-import org.web3j.protocol.core.Response
 import org.web3j.protocol.core.methods.request.Transaction
 import org.web3j.protocol.http.HttpService
 import org.web3j.rlp.RlpEncoder
@@ -142,6 +140,4 @@ private class Web3JEthereumApi(
         val rlpList = RlpList(values)
         return RlpEncoder.encode(rlpList)
     }
-
-    private suspend fun <S, T : Response<*>> Request<S, T>.sendSuspend() = sendAsync().asDeferred().await()
 }

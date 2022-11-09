@@ -17,6 +17,7 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeProviderPool
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeSubscriptionPool
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeSyncService
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.BaseTypeSynchronizer
+import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
@@ -126,6 +127,16 @@ suspend inline fun ChainRegistry.findChains(predicate: (Chain) -> Boolean): List
 suspend fun ChainRegistry.getRuntime(chainId: String) = getRuntimeProvider(chainId).get()
 
 fun ChainRegistry.getSocket(chainId: String) = getConnection(chainId).socketService
+
+suspend fun ChainRegistry.awaitChains() {
+    chainsById.first()
+}
+
+suspend fun ChainRegistry.awaitSocket(chainId: String): SocketService {
+    awaitChains()
+
+    return getSocket(chainId)
+}
 
 fun ChainRegistry.getService(chainId: String) = ChainService(
     runtimeProvider = getRuntimeProvider(chainId),
