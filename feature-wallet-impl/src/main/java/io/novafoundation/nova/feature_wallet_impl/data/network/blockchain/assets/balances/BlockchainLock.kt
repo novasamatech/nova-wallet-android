@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindList
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.bindString
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
+import io.novafoundation.nova.core_db.dao.LockDao
 import io.novafoundation.nova.core_db.model.BalanceLockLocal
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
@@ -34,4 +35,9 @@ fun mapBlockchainLockToLocal(
     lock: BlockchainLock
 ): BalanceLockLocal {
     return BalanceLockLocal(metaId, chainId, assetId, lock.id, lock.amount)
+}
+
+suspend fun LockDao.updateLocks(locks: List<BlockchainLock>, metaId: Long, chainId: ChainId, chainAssetId: ChainAssetId) {
+    val balanceLocksLocal = locks.map { mapBlockchainLockToLocal(metaId, chainId, chainAssetId, it) }
+    updateLocks(balanceLocksLocal, metaId, chainId, chainAssetId)
 }
