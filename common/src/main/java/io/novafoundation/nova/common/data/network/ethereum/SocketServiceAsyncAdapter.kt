@@ -26,7 +26,6 @@ fun SocketService.executeRequestAsFuture(
         override fun onNext(response: RpcResponse) {
             future.complete(response)
         }
-
     }
 
     future.cancellable = executeRequest(request, deliveryType, callback)
@@ -48,7 +47,6 @@ fun SocketService.subscribeAsObservable(
         override fun onNext(response: SubscriptionChange) {
             subject.onNext(response)
         }
-
     }
 
     val cancellable = subscribe(request, callback, unsubscribeMethod)
@@ -68,4 +66,3 @@ private class RequestCancellableFuture<T> : CompletableFuture<T>() {
 }
 
 suspend fun <S, T : Response<*>> Request<S, T>.sendSuspend(): T = sendAsync().asDeferred().await()
-
