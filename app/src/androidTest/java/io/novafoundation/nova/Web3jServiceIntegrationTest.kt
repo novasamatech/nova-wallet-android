@@ -30,7 +30,7 @@ class Web3jServiceIntegrationTest : BaseIntegrationTest() {
     }
 
     @Test
-    fun shouldSubscribeToTransferEvents(): Unit = runBlocking {
+    fun shouldSubscribeToNewHeadEvents(): Unit = runBlocking {
         val web3j = moonbeamWeb3j()
         val newHead = web3j.newHeadsNotifications().asFlow().first()
 
