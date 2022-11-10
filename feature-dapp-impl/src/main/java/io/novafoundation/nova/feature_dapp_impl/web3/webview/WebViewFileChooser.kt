@@ -1,10 +1,13 @@
 package io.novafoundation.nova.feature_dapp_impl.web3.webview
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import io.novafoundation.nova.feature_dapp_impl.R
 
 class WebViewFileChooser(
     private val fragment: Fragment
@@ -39,8 +42,14 @@ class WebViewFileChooser(
             fileChooserParams.createIntent()
         }
 
-        fragment.startActivityForResult(chooserIntent, REQUEST_CODE)
-        return true
+        try {
+            fragment.startActivityForResult(chooserIntent, REQUEST_CODE)
+            return true
+        } catch (e: ActivityNotFoundException) {
+            Toast.makeText(fragment.context, R.string.common_no_app_to_handle_import_intent, Toast.LENGTH_LONG)
+                .show()
+            return false
+        }
     }
 
     companion object {
