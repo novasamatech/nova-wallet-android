@@ -106,6 +106,8 @@ buildscript {
         coroutinesAndroidDep = "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion"
         coroutinesTestDep = "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion"
         coroutinesFutureDep = "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$coroutinesVersion"
+        coroutinesRxDep =  "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:$coroutinesVersion"
+
 
         web3jDep = "org.web3j:core:$web3jVersion"
 

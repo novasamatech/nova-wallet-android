@@ -55,7 +55,7 @@ class WebSocketWeb3jService(
         val runtimeRequest = request.toRuntimeRequest()
 
         return socketService.subscribeAsObservable(runtimeRequest, unsubscribeMethod).map {
-            jsonMapper.convertValue(it.params.result, responseType)
+            jsonMapper.convertValue(it, responseType)
         }.toFlowable(BackpressureStrategy.LATEST)
     }
 

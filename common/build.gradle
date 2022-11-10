@@ -101,6 +101,7 @@ dependencies {
 
     api web3jDep
     api coroutinesFutureDep
+    api coroutinesRxDep
 
     implementation shimmerDep
 

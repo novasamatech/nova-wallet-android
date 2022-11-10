@@ -5,10 +5,13 @@ import io.novafoundation.nova.common.data.network.ethereum.WebSocketWeb3jService
 import io.novafoundation.nova.common.data.network.ethereum.sendSuspend
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.runtime.multiNetwork.awaitSocket
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.core.DefaultBlockParameterName
+
 
 class Web3jServiceIntegrationTest : BaseIntegrationTest() {
 
@@ -24,6 +27,14 @@ class Web3jServiceIntegrationTest : BaseIntegrationTest() {
         val web3j = moonbeamWeb3j()
         val block = web3j.ethGetBlockByNumber(DefaultBlockParameterName.LATEST, true).sendSuspend()
         Log.d(LOG_TAG, block.block.hash)
+    }
+
+    @Test
+    fun shouldSubscribeToTransferEvents(): Unit = runBlocking {
+        val web3j = moonbeamWeb3j()
+        val newHead = web3j.newHeadsNotifications().asFlow().first()
+
+        Log.d(LOG_TAG, "New head appended to chain: ${newHead.params.result.hash}")
     }
 
 
