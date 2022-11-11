@@ -1,0 +1,19 @@
+                    -HC:\Users\spect\GitHub\nova-wallet-android\renderscript-toolkit\src\main\cpp
+-DCMAKE_SYSTEM_NAME=Android
+-DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+-DCMAKE_SYSTEM_VERSION=24
+-DANDROID_PLATFORM=android-24
+-DANDROID_ABI=x86_64
+-DCMAKE_ANDROID_ARCH_ABI=x86_64
+-DANDROID_NDK=C:\Users\spect\AppData\Local\Android\Sdk\ndk\23.1.7779620
+-DCMAKE_ANDROID_NDK=C:\Users\spect\AppData\Local\Android\Sdk\ndk\23.1.7779620
+-DCMAKE_TOOLCHAIN_FILE=C:\Users\spect\AppData\Local\Android\Sdk\ndk\23.1.7779620\build\cmake\android.toolchain.cmake
+-DCMAKE_MAKE_PROGRAM=C:\Users\spect\AppData\Local\Android\Sdk\cmake\3.18.1\bin\ninja.exe
+-DCMAKE_CXX_FLAGS=-std=c++17
+-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=C:\Users\spect\GitHub\nova-wallet-android\renderscript-toolkit\build\intermediates\cxx\Debug\2h132i2j\obj\x86_64
+-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=C:\Users\spect\GitHub\nova-wallet-android\renderscript-toolkit\build\intermediates\cxx\Debug\2h132i2j\obj\x86_64
+-DCMAKE_BUILD_TYPE=Debug
+-BC:\Users\spect\GitHub\nova-wallet-android\renderscript-toolkit\.cxx\Debug\2h132i2j\x86_64
+-GNinja
+                    Build command args: []
+                    Version: 2

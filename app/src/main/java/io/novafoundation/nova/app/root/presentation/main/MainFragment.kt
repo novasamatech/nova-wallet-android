@@ -1,5 +1,6 @@
 package io.novafoundation.nova.app.root.presentation.main
 
+import android.graphics.RectF
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -76,8 +77,24 @@ class MainFragment : BaseFragment<MainViewModel>() {
         navController!!.addOnDestinationChangedListener { _, destination, _ ->
             backCallback.isEnabled = !isAtHomeTab(destination)
         }
+/*
+        SweetBlur.getInstance().blurBackground(
+            bottomNavigationView,
+            bottomNavHost,
+            extraSpace = RectF(0f, 65f, 0f, 0f),
+            inset = RectF(30f, 0f, 30f, 65f),
+            25,
+            0.24f
+        )*/
 
-        SweetBlur.getInstance().blurBackground(bottomNavigationView, bottomNavHost, 25, 0.6f)
+        val radiusInPx = 32.dp
+        SweetBlur.getInstance().blurBackground(
+            bottomNavigationView,
+            bottomNavHost,
+            extraSpace = RectF(0f, radiusInPx.toFloat()/2, 0f, 0f),
+            inset = RectF(0f, 0f, 0f, radiusInPx.toFloat()/4),
+            radiusInPx
+        )
     }
 
     override fun inject() {
