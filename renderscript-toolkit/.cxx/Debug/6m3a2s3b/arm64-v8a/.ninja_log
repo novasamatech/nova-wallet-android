@@ -1,0 +1,25 @@
+# ninja log v5
+107	389	689883717	CMakeFiles/renderscript-toolkit.dir/Convolve_advsimd.S.o	5cf3b073bf5c3766
+87	419	689883717	CMakeFiles/renderscript-toolkit.dir/Blend_advsimd.S.o	8ba589f67fa0c965
+93	559	689883717	CMakeFiles/renderscript-toolkit.dir/ColorMatrix_advsimd.S.o	3b7a8d99d7f0ef84
+99	573	689883717	CMakeFiles/renderscript-toolkit.dir/Blur_advsimd.S.o	91512762238b0c09
+389	647	689883717	CMakeFiles/renderscript-toolkit.dir/Lut3d_advsimd.S.o	6d74a7bf14871387
+419	684	689883717	CMakeFiles/renderscript-toolkit.dir/Resize_advsimd.S.o	6e4a1ed5a1c7af1d
+560	743	689883717	CMakeFiles/renderscript-toolkit.dir/YuvToRgb_advsimd.S.o	36efeccc5a5fe9bd
+574	1348	689883718	CMakeFiles/cpufeatures.dir/C_/Users/spect/AppData/Local/Android/Sdk/ndk/23.1.7779620/sources/android/cpufeatures/cpu-features.c.o	2d0952bcab944ff1
+81	1456	689883718	CMakeFiles/renderscript-toolkit.dir/Utils.cpp.o	4d223d46fe3ab8f2
+30	1674	689883718	CMakeFiles/renderscript-toolkit.dir/JniEntryPoints.cpp.o	a60888a6bfd3304b
+1351	1784	689883718	libcpufeatures.a	b69c6647bad3946b
+55	2192	689883719	CMakeFiles/renderscript-toolkit.dir/RenderScriptToolkit.cpp.o	40e9f4b6f3b90751
+49	2215	689883719	CMakeFiles/renderscript-toolkit.dir/Lut.cpp.o	add272f6ca625799
+75	2227	689883719	CMakeFiles/renderscript-toolkit.dir/YuvToRgb.cpp.o	bb1da53bd76671d3
+42	2232	689883719	CMakeFiles/renderscript-toolkit.dir/Lut3d.cpp.o	72133582c0a02c6e
+2	2267	689883719	CMakeFiles/renderscript-toolkit.dir/Blend.cpp.o	d99ec1e351a9dd2f
+18	2290	689883719	CMakeFiles/renderscript-toolkit.dir/Convolve3x3.cpp.o	2323c5a2be7afdc9
+68	2310	689883719	CMakeFiles/renderscript-toolkit.dir/Resize.cpp.o	e9e7325233e84a2e
+13	2318	689883719	CMakeFiles/renderscript-toolkit.dir/Convolve5x5.cpp.o	2dd8abfb1eb9a205
+24	2345	689883719	CMakeFiles/renderscript-toolkit.dir/ColorMatrix.cpp.o	efd8c62d83495dc6
+36	2367	689883719	CMakeFiles/renderscript-toolkit.dir/Histogram.cpp.o	72aecebae42e9e61
+8	2412	689883719	CMakeFiles/renderscript-toolkit.dir/Blur.cpp.o	454504dc05b99b73
+62	2608	689883719	CMakeFiles/renderscript-toolkit.dir/TaskProcessor.cpp.o	1df7a5abf2179908
+2609	2904	689883719	C:/Users/spect/GitHub/nova-wallet-android/renderscript-toolkit/build/intermediates/cxx/Debug/6m3a2s3b/obj/arm64-v8a/librenderscript-toolkit.so	b70d64ce8d5d97fa

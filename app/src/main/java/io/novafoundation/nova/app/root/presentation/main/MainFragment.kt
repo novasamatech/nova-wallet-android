@@ -15,6 +15,8 @@ import io.novafoundation.nova.app.root.di.RootApi
 import io.novafoundation.nova.app.root.di.RootComponent
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.blur.SweetBlur
+import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.updatePadding
 import kotlinx.android.synthetic.main.fragment_main.bottomNavHost
 import kotlinx.android.synthetic.main.fragment_main.bottomNavigationView
@@ -74,6 +76,8 @@ class MainFragment : BaseFragment<MainViewModel>() {
         navController!!.addOnDestinationChangedListener { _, destination, _ ->
             backCallback.isEnabled = !isAtHomeTab(destination)
         }
+
+        SweetBlur.getInstance().blurBackground(bottomNavigationView, bottomNavHost, 25, 0.6f)
     }
 
     override fun inject() {

@@ -226,6 +226,8 @@ dependencies {
 
     implementation liveDataKtxDep
 
+    implementation blurKit
+
     kaptAndroidTest daggerKapt
 
     androidTestImplementation androidTestRunnerDep

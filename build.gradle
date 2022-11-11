@@ -8,9 +8,9 @@ buildscript {
         releaseApplicationSuffix = "market"
 
         // SDK and tools
-        compileSdkVersion = 31
+        compileSdkVersion = 33
         minSdkVersion = 24
-        targetSdkVersion = 31
+        targetSdkVersion = 33
 
         kotlinVersion = '1.7.10'
 
@@ -176,6 +176,8 @@ buildscript {
         markdownTables = "io.noties.markwon:ext-tables:$markdownVersion"
         markdownLinkify = "io.noties.markwon:linkify:$markdownVersion"
         markdownStrikethrough = "io.noties.markwon:ext-strikethrough:$markdownVersion"
+
+        blurKit = "io.alterac.blurkit:blurkit:1.1.0"
     }
 
     repositories {

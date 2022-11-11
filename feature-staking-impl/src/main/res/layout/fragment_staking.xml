@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/stakingRoot"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/drawable_background_image">
 
     <LinearLayout
         android:id="@+id/stakingContainer"
@@ -57,8 +58,8 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
             android:visibility="gone"
-            tools:visibility="visible"
-            app:expanded="false" />
+            app:expanded="false"
+            tools:visibility="visible" />
 
         <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.alerts.AlertsView
             android:id="@+id/stakingAlertsInfo"

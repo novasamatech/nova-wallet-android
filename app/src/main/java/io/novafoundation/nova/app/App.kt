@@ -3,17 +3,20 @@ package io.novafoundation.nova.app
 import android.app.Application
 import android.content.Context
 import android.content.res.Configuration
+import io.alterac.blurkit.BlurKit
 import io.novafoundation.nova.app.di.app.AppComponent
 import io.novafoundation.nova.app.di.deps.FeatureHolderManager
 import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.LanguagesHolder
+import io.novafoundation.nova.common.utils.blur.SweetBlur
 import javax.inject.Inject
 
 open class App : Application(), FeatureContainer {
 
-    @Inject lateinit var featureHolderManager: FeatureHolderManager
+    @Inject
+    lateinit var featureHolderManager: FeatureHolderManager
 
     private lateinit var appComponent: AppComponent
 
@@ -41,6 +44,9 @@ open class App : Application(), FeatureContainer {
             .build()
 
         appComponent.inject(this)
+
+        BlurKit.init(this)
+        SweetBlur.init(this)
     }
 
     override fun <T> getFeature(key: Class<*>): T {

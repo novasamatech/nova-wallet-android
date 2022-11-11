@@ -22,3 +22,5 @@ include ':feature-currency-impl'
 include ':feature-governance-api'
 include ':feature-governance-impl'
 include ':feature-vote'
+include ':renderscript-toolkit'
+
