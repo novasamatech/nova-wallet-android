@@ -19,7 +19,7 @@ class DappCategoriesAdapter(
 
     interface Handler {
 
-        fun onItemClicked(id: String)
+        fun onCategoryClicked(id: String)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DappCategoryViewHolder {
@@ -68,7 +68,7 @@ class DappCategoryViewHolder(
 
         bindSelected(item.selected)
 
-        containerView.setOnClickListener { itemHandler.onItemClicked(item.id) }
+        containerView.setOnClickListener { itemHandler.onCategoryClicked(item.id) }
     }
 
     fun bindSelected(isSelected: Boolean) = with(containerView) {

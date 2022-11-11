@@ -16,7 +16,6 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.di.DAp
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.di.DAppSignComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.di.MainDAppComponent
-import io.novafoundation.nova.feature_dapp_impl.presentation.main.view.CategorizedDappsView
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.di.DAppSearchComponent
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
@@ -48,10 +47,6 @@ interface DAppFeatureComponent : DAppFeatureApi {
     fun addToFavouritesComponentFactory(): AddToFavouritesComponent.Factory
 
     fun authorizedDAppsComponentFactory(): AuthorizedDAppsComponent.Factory
-
-    // Views
-
-    fun inject(view: CategorizedDappsView)
 
     @Component.Factory
     interface Factory {

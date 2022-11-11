@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/dappMainContainer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/dappMainTitle"
+        style="@style/TextAppearance.NovaFoundation.Bold.LargeTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="17dp"
+        android:layout_marginTop="25dp"
+        android:includeFontPadding="false"
+        android:text="@string/dapp_dapps"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <io.novafoundation.nova.feature_account_api.view.SelectedWalletView
+        android:id="@+id/dappMainSelectedWallet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/dappMainWelcomeGroup"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:adjustViewBounds="true"
+        android:scaleType="fitXY"
+        android:src="@drawable/bg_dapp_welcome"
+        app:layout_constraintBottom_toBottomOf="@+id/dappMainWelcomeBottomMargin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dappMainTitle" />
+
+    <TextView
+        android:id="@+id/dappMainWelcomeTitle"
+        style="@style/TextAppearance.NovaFoundation.Bold.Title2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="24dp"
+        android:gravity="center"
+        android:text="@string/dapp_main_welcome_title"
+        app:layout_constraintEnd_toEndOf="@id/dappMainWelcomeGroup"
+        app:layout_constraintStart_toStartOf="@id/dappMainWelcomeGroup"
+        app:layout_constraintTop_toTopOf="@id/dappMainWelcomeGroup" />
+
+    <TextView
+        android:id="@+id/dappMainWelcomeSubtitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="24dp"
+        android:gravity="center"
+        android:text="@string/dapp_main_welcome_subtitle"
+        android:textColor="@color/white_64"
+        app:layout_constraintEnd_toEndOf="@id/dappMainWelcomeGroup"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@id/dappMainWelcomeGroup"
+        app:layout_constraintTop_toBottomOf="@+id/dappMainWelcomeTitle"
+        app:layout_constraintVertical_bias="0.0"
+        app:layout_goneMarginBottom="24dp" />
+
+    <Space
+        android:id="@+id/dappMainWelcomeBottomMargin"
+        android:layout_width="wrap_content"
+        android:layout_height="24dp"
+        app:layout_constraintStart_toStartOf="@id/dappMainWelcomeSubtitle"
+        app:layout_constraintTop_toBottomOf="@+id/dappMainWelcomeSubtitle" />
+
+    <io.novafoundation.nova.feature_dapp_impl.presentation.main.view.TapToSearchView
+        android:id="@+id/dappMainSearch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dappMainWelcomeGroup" />
+
+    <TextView
+        android:id="@+id/dappMainCatalogTitle"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:includeFontPadding="false"
+        android:text="@string/dapp_catalog"
+        app:layout_constraintStart_toStartOf="@+id/dappMainSearch"
+        app:layout_constraintTop_toBottomOf="@+id/dappMainSearch" />
+
+    <io.novafoundation.nova.common.view.IconButton
+        android:id="@+id/dappMainManage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_options"
+        app:layout_constraintBottom_toBottomOf="@+id/dappMainCatalogTitle"
+        app:layout_constraintEnd_toEndOf="@+id/dappMainSearch"
+        app:layout_constraintTop_toTopOf="@+id/dappMainCatalogTitle" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/categorizedDappsCategories"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="32dp"
+        android:clipToPadding="false"
+        android:orientation="horizontal"
+        android:overScrollMode="never"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintTop_toBottomOf="@+id/dappMainCatalogTitle"
+        tools:listitem="@layout/item_dapp_category"
+        tools:visibility="visible" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

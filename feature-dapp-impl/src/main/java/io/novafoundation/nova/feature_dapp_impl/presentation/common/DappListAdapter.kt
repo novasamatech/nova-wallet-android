@@ -13,7 +13,7 @@ class DappListAdapter(
 
     interface Handler {
 
-        fun onItemClicked(item: DappModel)
+        fun onDAppClicked(item: DappModel)
 
         fun onItemFavouriteClicked(item: DappModel)
     }
@@ -58,7 +58,7 @@ class DappViewHolder(
             setActionTintRes(R.color.white_48)
         }
 
-        setOnClickListener { itemHandler.onItemClicked(item) }
+        setOnClickListener { itemHandler.onDAppClicked(item) }
     }
 
     override fun unbind() {

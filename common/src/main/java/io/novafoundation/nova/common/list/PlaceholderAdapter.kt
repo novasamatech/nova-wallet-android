@@ -28,9 +28,9 @@ class PlaceholderAdapter(@LayoutRes val layoutId: Int) : RecyclerView.Adapter<Sh
         if (showPlaceholder != show) {
             showPlaceholder = show
             if (show) {
-                notifyItemInserted(1)
+                notifyItemInserted(0)
             } else {
-                notifyItemRemoved(1)
+                notifyItemRemoved(0)
             }
         }
     }

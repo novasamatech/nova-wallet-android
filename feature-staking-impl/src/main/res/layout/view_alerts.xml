@@ -39,14 +39,14 @@
                 android:layout_width="160dp"
                 android:layout_height="12dp"
                 android:layout_marginTop="10dp"
-                android:background="@drawable/bg_shimerring_light" />
+                android:background="@drawable/bg_shimmering_light" />
 
             <View
                 android:layout_width="130dp"
                 android:layout_height="10dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
-                android:background="@drawable/bg_shimerring_light" />
+                android:background="@drawable/bg_shimmering_light" />
         </LinearLayout>
     </com.facebook.shimmer.ShimmerFrameLayout>
 

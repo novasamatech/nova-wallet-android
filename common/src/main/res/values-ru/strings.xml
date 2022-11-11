@@ -287,6 +287,7 @@
     <string name="common_warning">Предупреждение</string>
     <string name="common_yes">Да</string>
     <string name="common_zero_amount_error">Сумма должна быть больше нуля</string>
+    <string name="common_no_app_to_handle_import_intent">Приложение для импорта файлов не найдено на устройстве. Пожалуйста, установите его и повторите попытку</string>
     <string name="confirm_referendum_vote_referendum">Референдум</string>
     <string name="confirm_referendum_vote_title">Голосование</string>
     <string name="confirm_referendum_vote_track">Трек</string>
@@ -577,6 +578,7 @@
     <string name="referendum_votes_format">%s голосов</string>
     <string name="referendum_whitelisted_caller">fellowship: белый список</string>
     <string name="referendum_your_vote_format">Ваш голос: %s голосов</string>
+    <string name="referenda_list_placeholder">Информация о референдумах появится здесь, когда они начнутся</string>
     <string name="refrendum_vote_already_completed_message">Референдум завершен, голосовать больше нельзя</string>
     <string name="refrendum_vote_already_completed_title">Референдум завершен</string>
     <string name="refrendum_vote_already_delegating_message">Вы делегируете голоса в треке данного референдума. Пожалуйста, либо попросите делегата проголосовать, либо удалите делегирование, чтобы иметь возможность голосовать напрямую.</string>

@@ -9,29 +9,38 @@
     tools:background="@color/black"
     tools:parentTag="android.widget.LinearLayout">
 
-    <FrameLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp">
 
         <TextView
+            android:id="@+id/votingStatusTitle"
             style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:includeFontPadding="false"
-            android:text="@string/voting_status" />
+            android:text="@string/voting_status"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/votingStatusTimeEstimation"
             style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
+            android:layout_marginStart="16dp"
+            android:ellipsize="end"
+            android:gravity="end"
             android:includeFontPadding="false"
+            android:maxLines="2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/votingStatusTitle"
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="Approve in 3:59:59" />
 
-    </FrameLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
         android:id="@+id/votingStatus"
