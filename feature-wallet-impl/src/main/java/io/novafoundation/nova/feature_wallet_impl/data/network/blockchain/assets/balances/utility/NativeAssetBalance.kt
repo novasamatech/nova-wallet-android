@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.utility
 
 import android.util.Log
-import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.balances
 import io.novafoundation.nova.common.utils.decodeValue
@@ -14,6 +13,7 @@ import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.cache.bindAccountInfoOrDefault
 import io.novafoundation.nova.feature_wallet_api.data.cache.updateAsset
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.SubstrateRemoteSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.bindBalanceLocks
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.updateLocks
@@ -76,7 +76,7 @@ class NativeAssetBalance(
         metaAccount: MetaAccount,
         accountId: AccountId,
         subscriptionBuilder: SubscriptionBuilder
-    ): Flow<BlockHash?> {
+    ): Flow<BalanceSyncUpdate> {
         val runtime = chainRegistry.getRuntime(chain.id)
 
         val key = try {
@@ -92,7 +92,11 @@ class NativeAssetBalance(
                 val accountInfo = bindAccountInfoOrDefault(change.value, runtime)
                 val assetChanged = assetCache.updateAsset(metaAccount.id, chain.utilityAsset, accountInfo)
 
-                change.block.takeIf { assetChanged }
+                if (assetChanged) {
+                    BalanceSyncUpdate.CauseFetchable(change.block)
+                } else {
+                    BalanceSyncUpdate.NoCause
+                }
             }
     }
 }

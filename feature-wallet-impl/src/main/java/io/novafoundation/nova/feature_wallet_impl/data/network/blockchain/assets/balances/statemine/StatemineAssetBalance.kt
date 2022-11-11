@@ -1,21 +1,20 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.statemine
 
-import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.common.utils.decodeValue
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core.updater.SubscriptionBuilder
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
-import io.novafoundation.nova.runtime.ext.palletNameOrDefault
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
+import io.novafoundation.nova.runtime.ext.palletNameOrDefault
 import io.novafoundation.nova.runtime.ext.requireStatemine
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.network.updaters.insert
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import java.math.BigInteger
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.metadata.RuntimeMetadata
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module
@@ -26,6 +25,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import java.math.BigInteger
 
 class StatemineAssetBalance(
     private val chainRegistry: ChainRegistry,
@@ -73,7 +73,7 @@ class StatemineAssetBalance(
         metaAccount: MetaAccount,
         accountId: AccountId,
         subscriptionBuilder: SubscriptionBuilder
-    ): Flow<BlockHash?> {
+    ): Flow<BalanceSyncUpdate> {
         val statemineType = chainAsset.requireStatemine()
 
         val runtime = chainRegistry.getRuntime(chain.id)
@@ -104,7 +104,11 @@ class StatemineAssetBalance(
 
             val assetChanged = updateAssetBalance(metaAccount.id, chainAsset, isAssetFrozen, assetAccount)
 
-            balanceStorageChange.block.takeIf { assetChanged }
+            if (assetChanged) {
+                BalanceSyncUpdate.CauseFetchable(balanceStorageChange.block)
+            } else {
+                BalanceSyncUpdate.NoCause
+            }
         }
     }
 

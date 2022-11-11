@@ -18,6 +18,9 @@ internal class Erc20Contract(
     gasProvider: ContractGasProvider,
 ) : Contract("", contractAddress, web3j, transactionManager, gasProvider), ReadOnlyErc20 {
 
+    override val address: String
+        get() = getContractAddress()
+
     override suspend fun balanceOf(account: String): BigInteger {
         val function = Function(
             /* name = */

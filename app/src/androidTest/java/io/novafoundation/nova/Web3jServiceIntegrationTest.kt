@@ -4,10 +4,11 @@ import android.util.Log
 import io.novafoundation.nova.common.data.network.ethereum.Web3Api
 import io.novafoundation.nova.common.data.network.ethereum.WebSocketWeb3jService
 import io.novafoundation.nova.common.data.network.ethereum.contract.erc20.ReadOnlyErc20
-import io.novafoundation.nova.common.data.network.ethereum.log.Topic
 import io.novafoundation.nova.common.data.network.ethereum.sendSuspend
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.second
+import io.novafoundation.nova.core.ethereum.Web3Api
+import io.novafoundation.nova.core.ethereum.log.Topic
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.awaitSocket
 import kotlinx.coroutines.flow.Flow

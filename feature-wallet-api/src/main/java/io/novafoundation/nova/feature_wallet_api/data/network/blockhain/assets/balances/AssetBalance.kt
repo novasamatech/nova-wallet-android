@@ -8,6 +8,15 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 import java.math.BigInteger
 
+sealed class BalanceSyncUpdate {
+
+    class CauseFetchable(val blockHash: BlockHash) : BalanceSyncUpdate()
+
+    class CauseFetched(val cause: TransferExtrinsic) : BalanceSyncUpdate()
+
+    object NoCause : BalanceSyncUpdate()
+}
+
 interface AssetBalance {
 
     suspend fun startSyncingBalanceLocks(
@@ -40,5 +49,5 @@ interface AssetBalance {
         metaAccount: MetaAccount,
         accountId: AccountId,
         subscriptionBuilder: SubscriptionBuilder
-    ): Flow<BlockHash?>
+    ): Flow<BalanceSyncUpdate>
 }

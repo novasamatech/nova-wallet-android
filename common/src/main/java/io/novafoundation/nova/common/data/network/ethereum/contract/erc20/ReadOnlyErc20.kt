@@ -1,5 +1,6 @@
 package io.novafoundation.nova.common.data.network.ethereum.contract.erc20
 
+import io.novafoundation.nova.common.data.network.ethereum.contract.EvmContract
 import org.web3j.abi.TypeDecoder
 import org.web3j.abi.TypeReference
 import org.web3j.abi.datatypes.Address
@@ -11,7 +12,7 @@ import org.web3j.tx.ReadonlyTransactionManager
 import org.web3j.tx.gas.DefaultGasProvider
 import java.math.BigInteger
 
-interface ReadOnlyErc20 {
+interface ReadOnlyErc20: EvmContract {
 
     class Transfer(val from: Address, val to: Address, val amount: Uint256)
 

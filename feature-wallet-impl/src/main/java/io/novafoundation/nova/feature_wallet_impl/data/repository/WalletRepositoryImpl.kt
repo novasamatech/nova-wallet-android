@@ -208,7 +208,8 @@ class WalletRepositoryImpl(
                 mapOperationLocalToOperation(it, chainAsset)
             }
             .mapLatest { operations ->
-                val cursor = if (chain.historySupported) {
+                // TODO remove evm bypass #33859e7
+                val cursor = if (chain.historySupported && chainAsset.type !is Chain.Asset.Type.Evm) {
                     cursorStorage.awaitCursor(chain.id, chainAsset.id, accountId)
                 } else {
                     null

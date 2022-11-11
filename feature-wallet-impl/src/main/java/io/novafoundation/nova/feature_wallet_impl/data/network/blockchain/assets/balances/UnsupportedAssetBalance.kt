@@ -1,9 +1,9 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances
 
-import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.core.updater.SubscriptionBuilder
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
@@ -31,7 +31,7 @@ class UnsupportedAssetBalance : AssetBalance {
         metaAccount: MetaAccount,
         accountId: AccountId,
         subscriptionBuilder: SubscriptionBuilder
-    ): Flow<BlockHash> {
+    ): Flow<BalanceSyncUpdate> {
         return emptyFlow()
     }
 

@@ -9,6 +9,7 @@ import io.novafoundation.nova.core_db.model.OperationLocal
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.TransferExtrinsic
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.AssetHistory
 import io.novafoundation.nova.runtime.ext.addressOf
@@ -18,7 +19,6 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 
@@ -62,10 +62,8 @@ class PaymentUpdater(
                 .getOrNull()
 
             assetUpdateFlow
-                ?.filterNotNull()
                 ?.catch { logSyncError(chain, chainAsset, error = it) }
-                ?.onEach { Log.d(LOG_TAG, "Starting block fetching for ${chain.name}.${chainAsset.symbol}") }
-                ?.onEach { blockHash -> assetSource.history.syncOperationsForBalanceChange(chainAsset, blockHash, accountId) }
+                ?.onEach { balanceUpdate -> assetSource.history.syncOperationsForBalanceChange(chainAsset, balanceUpdate, accountId) }
         }
 
         val chainSyncingFlow = if (assetSyncs.size == 1) {
@@ -83,15 +81,24 @@ class PaymentUpdater(
         Log.e(LOG_TAG, "Failed to sync balance for ${chainAsset.symbol} in ${chain.name}", error)
     }
 
-    private suspend fun AssetHistory.syncOperationsForBalanceChange(chainAsset: Chain.Asset, blockHash: String, accountId: AccountId) {
-        fetchOperationsForBalanceChange(chain, chainAsset, blockHash, accountId)
-            .onSuccess { blockTransfers ->
-                val localOperations = blockTransfers.map { transfer -> createTransferOperationLocal(chainAsset, transfer, accountId) }
+    private suspend fun AssetHistory.syncOperationsForBalanceChange(chainAsset: Chain.Asset, balanceSyncUpdate: BalanceSyncUpdate, accountId: AccountId) {
+        when(balanceSyncUpdate) {
+            is BalanceSyncUpdate.CauseFetchable -> fetchOperationsForBalanceChange(chain, chainAsset, balanceSyncUpdate.blockHash, accountId)
+                .onSuccess { blockTransfers ->
+                    val localOperations = blockTransfers.map { transfer -> createTransferOperationLocal(chainAsset, transfer, accountId) }
 
-                operationDao.insertAll(localOperations)
-            }.onFailure {
-                Log.e(LOG_TAG, "Failed to retrieve transactions from block (${chain.name}.${chainAsset.symbol}): ${it.message}")
+                    operationDao.insertAll(localOperations)
+                }.onFailure {
+                    Log.e(LOG_TAG, "Failed to retrieve transactions from block (${chain.name}.${chainAsset.symbol}): ${it.message}")
+                }
+
+            is BalanceSyncUpdate.CauseFetched -> {
+                val local = createTransferOperationLocal(chainAsset, balanceSyncUpdate.cause, accountId)
+                operationDao.insert(local)
             }
+
+            BalanceSyncUpdate.NoCause -> {}
+        }
     }
 
     private suspend fun createTransferOperationLocal(

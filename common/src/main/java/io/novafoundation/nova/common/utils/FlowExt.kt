@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -54,6 +55,12 @@ suspend fun <T> Flow<LoadingState<T>>.firstOnLoad(): T = transform {
         }
     }
 }.first()
+
+fun <T> List<Flow<T>>.mergeIfMultiple(): Flow<T> = when(size) {
+    0 -> emptyFlow()
+    1 -> first()
+    else -> merge()
+}
 
 fun <T1, T2> combineToPair(flow1: Flow<T1>, flow2: Flow<T2>): Flow<Pair<T1, T2>> = combine(flow1, flow2, ::Pair)
 
