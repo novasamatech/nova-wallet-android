@@ -2,7 +2,9 @@ package io.novafoundation.nova.runtime.multiNetwork.chain
 
 import com.google.gson.Gson
 import io.novafoundation.nova.common.utils.CollectionDiffer
+import io.novafoundation.nova.core_db.dao.ChainAssetDao
 import io.novafoundation.nova.core_db.dao.ChainDao
+import io.novafoundation.nova.core_db.model.chain.AssetSourceLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
@@ -69,19 +71,23 @@ class ChainSyncServiceTest {
     lateinit var dao: ChainDao
 
     @Mock
+    lateinit var chainAssetDao: ChainAssetDao
+
+    @Mock
     lateinit var chainFetcher: ChainFetcher
 
     lateinit var chainSyncService: ChainSyncService
 
     @Before
     fun setup() {
-        chainSyncService = ChainSyncService(dao, chainFetcher, gson)
+        chainSyncService = ChainSyncService(dao, chainAssetDao, chainFetcher, gson)
     }
 
     @Test
     fun `should insert new chain`() {
         runBlocking {
             localReturns(emptyList())
+            localAssetReturn(listOf())
             remoteReturns(listOf(REMOTE_CHAIN))
 
             chainSyncService.syncUp()
@@ -99,6 +105,7 @@ class ChainSyncServiceTest {
     fun `should not insert the same chain`() {
         runBlocking {
             localReturns(listOf(LOCAL_CHAIN))
+            localAssetReturn(LOCAL_CHAIN.assets)
             remoteReturns(listOf(REMOTE_CHAIN))
 
             chainSyncService.syncUp()
@@ -111,7 +118,7 @@ class ChainSyncServiceTest {
     fun `should update chain's own params`() {
         runBlocking {
             localReturns(listOf(LOCAL_CHAIN))
-
+            localAssetReturn(LOCAL_CHAIN.assets)
             remoteReturns(listOf(REMOTE_CHAIN.copy(name = "new name")))
 
             chainSyncService.syncUp()
@@ -129,6 +136,7 @@ class ChainSyncServiceTest {
     fun `should update chain's asset`() {
         runBlocking {
             localReturns(listOf(LOCAL_CHAIN))
+            localAssetReturn(LOCAL_CHAIN.assets)
 
             remoteReturns(listOf(REMOTE_CHAIN.copy(
                 assets = listOf(
@@ -151,6 +159,7 @@ class ChainSyncServiceTest {
     fun `should remove chain`() {
         runBlocking {
             localReturns(listOf(LOCAL_CHAIN))
+            localAssetReturn(LOCAL_CHAIN.assets)
 
             remoteReturns(emptyList())
 
@@ -167,6 +176,10 @@ class ChainSyncServiceTest {
 
     private suspend fun remoteReturns(chains: List<ChainRemote>) {
         `when`(chainFetcher.getChains()).thenReturn(chains)
+    }
+
+    private suspend fun localAssetReturn(assets: List<ChainAssetLocal>) {
+        `when`(chainAssetDao.getAssetsBySource(AssetSourceLocal.DEFAULT)).thenReturn(assets)
     }
 
     private suspend fun localReturns(chains: List<JoinedChainInfo>) {

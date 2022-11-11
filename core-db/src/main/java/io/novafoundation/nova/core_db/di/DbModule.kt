@@ -8,6 +8,7 @@ import io.novafoundation.nova.core_db.AppDatabase
 import io.novafoundation.nova.core_db.dao.AccountDao
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.dao.AssetDao
+import io.novafoundation.nova.core_db.dao.ChainAssetDao
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.dao.ContributionDao
 import io.novafoundation.nova.core_db.dao.CurrencyDao
@@ -106,6 +107,12 @@ class DbModule {
     @ApplicationScope
     fun provideChainDao(appDatabase: AppDatabase): ChainDao {
         return appDatabase.chainDao()
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideChainAssetDao(appDatabase: AppDatabase): ChainAssetDao {
+        return appDatabase.chainAssetDao()
     }
 
     @Provides

@@ -4,6 +4,7 @@ import io.novafoundation.nova.core_db.AppDatabase
 import io.novafoundation.nova.core_db.dao.AccountDao
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.dao.AssetDao
+import io.novafoundation.nova.core_db.dao.ChainAssetDao
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.dao.ContributionDao
 import io.novafoundation.nova.core_db.dao.CurrencyDao
@@ -48,6 +49,8 @@ interface DbApi {
     fun stakingTotalRewardDao(): StakingTotalRewardDao
 
     fun chainDao(): ChainDao
+
+    fun chainAssetDao(): ChainAssetDao
 
     fun metaAccountDao(): MetaAccountDao
 

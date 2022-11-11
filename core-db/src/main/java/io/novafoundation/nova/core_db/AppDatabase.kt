@@ -5,6 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import io.novafoundation.nova.core_db.converters.AssetSourceConverter
 import io.novafoundation.nova.core_db.converters.CryptoTypeConverters
 import io.novafoundation.nova.core_db.converters.CurrencyConverters
 import io.novafoundation.nova.core_db.converters.LongMathConverters
@@ -15,6 +16,7 @@ import io.novafoundation.nova.core_db.converters.OperationConverters
 import io.novafoundation.nova.core_db.dao.AccountDao
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.dao.AssetDao
+import io.novafoundation.nova.core_db.dao.ChainAssetDao
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.dao.ContributionDao
 import io.novafoundation.nova.core_db.dao.CurrencyDao
@@ -45,6 +47,7 @@ import io.novafoundation.nova.core_db.migrations.AddLocks_22_23
 import io.novafoundation.nova.core_db.migrations.AddMetaAccountType_14_15
 import io.novafoundation.nova.core_db.migrations.AddNfts_5_6
 import io.novafoundation.nova.core_db.migrations.AddSitePhishing_6_7
+import io.novafoundation.nova.core_db.migrations.AddSourceToLocalAsset_28_29
 import io.novafoundation.nova.core_db.migrations.AssetTypes_2_3
 import io.novafoundation.nova.core_db.migrations.BetterChainDiffing_8_9
 import io.novafoundation.nova.core_db.migrations.ChangeAsset_3_4
@@ -84,7 +87,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
 import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
 
 @Database(
-    version = 28,
+    version = 29,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -120,6 +123,7 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
     NftTypeConverters::class,
     MetaAccountTypeConverters::class,
     CurrencyConverters::class,
+    AssetSourceConverter::class
 )
 abstract class AppDatabase : RoomDatabase() {
 
@@ -145,7 +149,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(AddCurrencies_18_19, ChangeTokens_19_20, ChangeChainNodes_20_21)
                     .addMigrations(NullableSubstrateAccountId_21_22, AddLocks_22_23, AddContributions_23_24)
                     .addMigrations(AddGovernanceFlagToChains_24_25, AddGovernanceDapps_25_26, GovernanceFlagToEnum_26_27)
-                    .addMigrations(AddGovernanceExternalApiToChain_27_28)
+                    .addMigrations(AddGovernanceExternalApiToChain_27_28, AddSourceToLocalAsset_28_29)
                     .fallbackToDestructiveMigration()
                     .build()
             }
@@ -172,6 +176,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun stakingTotalRewardDao(): StakingTotalRewardDao
 
     abstract fun chainDao(): ChainDao
+
+    abstract fun chainAssetDao(): ChainAssetDao
 
     abstract fun metaAccountDao(): MetaAccountDao
 

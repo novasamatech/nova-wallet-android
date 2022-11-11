@@ -56,8 +56,13 @@ data class Chain(
         val buyProviders: Map<BuyProviderId, BuyProviderArguments>,
         val staking: StakingType,
         val type: Type,
+        val source: Source,
         val name: String,
     ) : Identifiable {
+
+        enum class Source {
+            DEFAULT, ERC20
+        }
 
         sealed class Type {
             object Native : Type()
