@@ -27,6 +27,7 @@ import java.util.UUID
 
 typealias SubscriptionId = String
 typealias BatchId = String
+typealias RequestId  = Int
 
 sealed class EthereumSubscription<S>(val id: SubscriptionId) {
 
@@ -75,12 +76,14 @@ class EthereumRequestsAggregator private constructor(
     ): Result<BatchResponse> {
         return runCatching { batch.sendAsync().asDeferred().await() }
             .onSuccess { batchResponse ->
-                pendingBatchRequest.callbacks.zip(batchResponse.responses) { callback, response ->
+                batchResponse.responses.onEach { response ->
+                    val callback = pendingBatchRequest.callbacks[response.id.toInt()] ?: return@onEach
+
                     callback.cast<BatchCallback<Any?>>().onNext(response)
                 }
             }
             .onFailure { error ->
-                pendingBatchRequest.callbacks.forEach {
+                pendingBatchRequest.callbacks.values.forEach {
                     it.onError(error)
                 }
             }
@@ -136,7 +139,7 @@ class EthereumRequestsAggregator private constructor(
             val callback = BatchCallback<T>()
 
             batch.requests += request
-            batch.callbacks += callback
+            batch.callbacks[request.id.toInt()] = callback
 
             return callback.deferred
         }
@@ -201,17 +204,17 @@ private class LogsCallback(contractAddress: String) : SubscribeCallback<LogNotif
     }
 }
 
-private class PendingBatchRequest(val requests: List<Request<*, *>>, val callbacks: List<BatchCallback<*>>)
+private class PendingBatchRequest(val requests: List<Request<*, *>>, val callbacks: Map<RequestId, BatchCallback<*>>)
 
 private class PendingBatchRequestBuilder(
     val requests: MutableList<Request<*, *>> = mutableListOf(),
-    val callbacks: MutableList<BatchCallback<*>> = mutableListOf()
+    val callbacks: MutableMap<RequestId, BatchCallback<*>> = mutableMapOf()
 ) {
 
     fun build(): PendingBatchRequest = PendingBatchRequest(requests, callbacks)
 }
 
-private class BatchCallback<R> : ResponseListener<R> {
+private class BatchCallback<R>: ResponseListener<R> {
 
     val deferred = CompletableDeferred<R>()
 

@@ -5,6 +5,7 @@ import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
 import jp.co.soramitsu.fearless_utils.wsrpc.request.base.RpcRequest
+import jp.co.soramitsu.fearless_utils.wsrpc.response.RpcResponse
 import org.web3j.protocol.ObjectMapperFactory
 import org.web3j.protocol.Web3jService
 import org.web3j.protocol.core.BatchRequest
@@ -77,8 +78,12 @@ class WebSocketWeb3jService(
         val rpcRequests = batchRequest.requests.map { it.toRpcRequest() }
 
         return socketService.executeBatchRequestAsFuture(rpcRequests).thenApply { responses ->
-            val parsedResponses = responses.zip(batchRequest.requests) { response, request ->
-                jsonMapper.convertValue(response, request.responseType)
+            val responsesById = responses.associateBy(RpcResponse::id)
+
+            val parsedResponses = batchRequest.requests.mapNotNull { request ->
+                responsesById[request.id.toInt()]?.let { rpcResponse ->
+                    jsonMapper.convertValue(rpcResponse, request.responseType)
+                }
             }
 
             BatchResponse(batchRequest.requests, parsedResponses)

@@ -3,8 +3,9 @@ package io.novafoundation.nova
 import android.util.Log
 import io.novafoundation.nova.common.data.network.ethereum.Web3Api
 import io.novafoundation.nova.common.data.network.ethereum.WebSocketWeb3jService
-import io.novafoundation.nova.common.data.network.ethereum.contract.erc20.ReadOnlyErc20
+import io.novafoundation.nova.common.data.network.ethereum.contract.base.querySingle
 import io.novafoundation.nova.common.data.network.ethereum.contract.erc20.Erc20Queries
+import io.novafoundation.nova.common.data.network.ethereum.contract.erc20.Erc20Standard
 import io.novafoundation.nova.common.data.network.ethereum.sendSuspend
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.second
@@ -75,13 +76,13 @@ class Web3jServiceIntegrationTest : BaseIntegrationTest() {
 
     private fun Web3Api.erc20BalanceFlow(account: String, contract: String): Flow<Balance> {
         return flow {
-            val erc20 = ReadOnlyErc20(contract, web3j = this@erc20BalanceFlow)
-            val initialBalance = erc20.balanceOf(account)
+            val erc20 = Erc20Standard().querySingle(contract, web3j = this@erc20BalanceFlow)
+            val initialBalance = erc20.balanceOfAsync(account).await()
 
             emit(initialBalance)
 
             val changes = accountErcTransfersFlow(account).map {
-                erc20.balanceOf(account)
+                erc20.balanceOfAsync(account).await()
             }
 
             emitAll(changes)
