@@ -19,6 +19,6 @@ class EvmAssetHistory : AssetHistory {
     }
 
     override fun availableOperationFilters(asset: Chain.Asset): Set<TransactionFilter> {
-       return setOf(TransactionFilter.TRANSFER)
+        return setOf(TransactionFilter.TRANSFER)
     }
 }

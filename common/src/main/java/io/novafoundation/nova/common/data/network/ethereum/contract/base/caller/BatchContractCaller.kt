@@ -10,7 +10,7 @@ import org.web3j.protocol.core.methods.response.EthCall
 class BatchContractCaller(
     private val batchId: BatchId,
     private val ethereumSharedRequestsBuilder: EthereumSharedRequestsBuilder,
-): ContractCaller {
+) : ContractCaller {
 
     override fun ethCall(transaction: Transaction, defaultBlockParameter: DefaultBlockParameter): Deferred<EthCall> {
         val request = ethereumSharedRequestsBuilder.web3Api.ethCall(transaction, defaultBlockParameter)

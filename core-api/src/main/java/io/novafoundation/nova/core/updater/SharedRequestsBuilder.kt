@@ -19,7 +19,7 @@ interface EthereumSharedRequestsBuilder {
 
     val web3Api: Web3Api
 
-    fun <S, T: Response<*>> ethBatchRequestAsync(batchId: String, request: Request<S, T>): Deferred<T>
+    fun <S, T : Response<*>> ethBatchRequestAsync(batchId: String, request: Request<S, T>): Deferred<T>
 
     fun subscribeEthLogs(address: String, topics: List<Topic>): Flow<LogNotification>
 }

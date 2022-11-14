@@ -113,7 +113,7 @@ private fun mapChainAssetTypeFromRaw(type: String?, typeExtras: Map<String, Any?
         }
         ASSET_EVM -> {
             Chain.Asset.Type.Evm(
-               contractAddress = typeExtras!![EVM_EXTRAS_CONTRACT_ADDRESS] as String
+                contractAddress = typeExtras!![EVM_EXTRAS_CONTRACT_ADDRESS] as String
             )
         }
         else -> Chain.Asset.Type.Unsupported

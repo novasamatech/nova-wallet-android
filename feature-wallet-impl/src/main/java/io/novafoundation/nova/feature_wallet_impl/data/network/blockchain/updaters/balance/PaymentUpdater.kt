@@ -82,7 +82,7 @@ class PaymentUpdater(
     }
 
     private suspend fun AssetHistory.syncOperationsForBalanceChange(chainAsset: Chain.Asset, balanceSyncUpdate: BalanceSyncUpdate, accountId: AccountId) {
-        when(balanceSyncUpdate) {
+        when (balanceSyncUpdate) {
             is BalanceSyncUpdate.CauseFetchable -> fetchOperationsForBalanceChange(chain, chainAsset, balanceSyncUpdate.blockHash, accountId)
                 .onSuccess { blockTransfers ->
                     val localOperations = blockTransfers.map { transfer -> createTransferOperationLocal(chainAsset, transfer, accountId) }

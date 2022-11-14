@@ -18,7 +18,6 @@ interface ContractStandard<C> {
     ): C
 }
 
-
 fun <C> ContractStandard<C>.queryBatched(
     address: String,
     batchId: BatchId,

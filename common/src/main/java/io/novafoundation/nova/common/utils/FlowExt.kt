@@ -56,7 +56,7 @@ suspend fun <T> Flow<LoadingState<T>>.firstOnLoad(): T = transform {
     }
 }.first()
 
-fun <T> List<Flow<T>>.mergeIfMultiple(): Flow<T> = when(size) {
+fun <T> List<Flow<T>>.mergeIfMultiple(): Flow<T> = when (size) {
     0 -> emptyFlow()
     1 -> first()
     else -> merge()

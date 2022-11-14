@@ -69,7 +69,6 @@ class EthereumRequestsAggregator private constructor(
         }
     }
 
-
     private suspend fun executeBatch(
         batch: BatchRequest,
         pendingBatchRequest: PendingBatchRequest

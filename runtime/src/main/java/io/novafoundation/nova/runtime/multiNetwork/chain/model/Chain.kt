@@ -76,7 +76,7 @@ data class Chain(
 
             data class Evm(
                 val contractAddress: String
-            ): Type()
+            ) : Type()
 
             object Unsupported : Type()
         }
