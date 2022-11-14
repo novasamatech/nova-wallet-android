@@ -4,16 +4,17 @@ import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
 import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
 import jp.co.soramitsu.fearless_utils.wsrpc.request.DeliveryType
-import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.RuntimeRequest
+import jp.co.soramitsu.fearless_utils.wsrpc.request.base.RpcRequest
 import jp.co.soramitsu.fearless_utils.wsrpc.response.RpcResponse
 import jp.co.soramitsu.fearless_utils.wsrpc.subscription.response.SubscriptionChange
 import kotlinx.coroutines.future.asDeferred
+import org.web3j.protocol.core.RemoteCall
 import org.web3j.protocol.core.Request
 import org.web3j.protocol.core.Response
 import java.util.concurrent.CompletableFuture
 
 fun SocketService.executeRequestAsFuture(
-    request: RuntimeRequest,
+    request: RpcRequest,
     deliveryType: DeliveryType = DeliveryType.AT_LEAST_ONCE,
 ): CompletableFuture<RpcResponse> {
     val future = RequestCancellableFuture<RpcResponse>()
@@ -34,7 +35,7 @@ fun SocketService.executeRequestAsFuture(
 }
 
 fun SocketService.subscribeAsObservable(
-    request: RuntimeRequest,
+    request: RpcRequest,
     unsubscribeMethod: String
 ): Observable<SubscriptionChange> {
     val subject = BehaviorSubject.create<SubscriptionChange>()
@@ -66,3 +67,4 @@ private class RequestCancellableFuture<T> : CompletableFuture<T>() {
 }
 
 suspend fun <S, T : Response<*>> Request<S, T>.sendSuspend(): T = sendAsync().asDeferred().await()
+suspend fun <T> RemoteCall<T>.sendSuspend(): T = sendAsync().asDeferred().await()

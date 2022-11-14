@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
-import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.RuntimeRequest
+import jp.co.soramitsu.fearless_utils.wsrpc.request.base.RpcRequest
 import org.web3j.protocol.ObjectMapperFactory
 import org.web3j.protocol.Web3jService
 import org.web3j.protocol.core.BatchRequest
@@ -40,9 +40,9 @@ class WebSocketWeb3jService(
     }
 
     override fun <T : Response<*>?> sendAsync(request: Request<*, out Response<*>>, responseType: Class<T>): CompletableFuture<T> {
-        val runtimeRequest = request.toRuntimeRequest()
+        val rpcRequest = request.toRpcRequest()
 
-        return socketService.executeRequestAsFuture(runtimeRequest).thenApply {
+        return socketService.executeRequestAsFuture(rpcRequest).thenApply {
             jsonMapper.convertValue(it, responseType)
         }
     }
@@ -52,9 +52,9 @@ class WebSocketWeb3jService(
         unsubscribeMethod: String,
         responseType: Class<T>
     ): Flowable<T> {
-        val runtimeRequest = request.toRuntimeRequest()
+        val rpcRequest = request.toRpcRequest()
 
-        return socketService.subscribeAsObservable(runtimeRequest, unsubscribeMethod).map {
+        return socketService.subscribeAsObservable(rpcRequest, unsubscribeMethod).map {
             jsonMapper.convertValue(it, responseType)
         }.toFlowable(BackpressureStrategy.LATEST)
     }
@@ -71,7 +71,9 @@ class WebSocketWeb3jService(
         // other components handle lifecycle of socketService
     }
 
-    private fun Request<*, *>.toRuntimeRequest(): RuntimeRequest {
-        return RuntimeRequest(method = method, params = params, id = id.toInt())
+    private fun Request<*, *>.toRpcRequest(): RpcRequest {
+        val raw = jsonMapper.writeValueAsString(this)
+
+        return RpcRequest.Raw(raw, id.toInt())
     }
 }
