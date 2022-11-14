@@ -59,7 +59,7 @@ class EvmAssetBalance(
     }
 
     override suspend fun existentialDeposit(chain: Chain, chainAsset: Chain.Asset): BigInteger {
-        // ERC20 tokens do not have
+        // ERC20 tokens do not have ED
         return BigInteger.ZERO
     }
 
