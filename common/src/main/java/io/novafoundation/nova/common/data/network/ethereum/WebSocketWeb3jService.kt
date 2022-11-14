@@ -60,11 +60,29 @@ class WebSocketWeb3jService(
     }
 
     override fun sendBatch(batchRequest: BatchRequest): BatchResponse {
-        TODO("Batches not yet supported")
+        return try {
+            sendBatchAsync(batchRequest).get()
+        } catch (e: InterruptedException) {
+            Thread.interrupted()
+            throw IOException("Interrupted WebSocket batch request", e)
+        } catch (e: ExecutionException) {
+            if (e.cause is IOException) {
+                throw e.cause as IOException
+            }
+            throw RuntimeException("Unexpected exception", e.cause)
+        }
     }
 
     override fun sendBatchAsync(batchRequest: BatchRequest): CompletableFuture<BatchResponse> {
-        TODO("Batches not yet supported")
+        val rpcRequests = batchRequest.requests.map { it.toRpcRequest() }
+
+        return socketService.executeBatchRequestAsFuture(rpcRequests).thenApply { responses ->
+            val parsedResponses = responses.zip(batchRequest.requests) { response, request ->
+                jsonMapper.convertValue(response, request.responseType)
+            }
+
+            BatchResponse(batchRequest.requests, parsedResponses)
+        }
     }
 
     override fun close() {

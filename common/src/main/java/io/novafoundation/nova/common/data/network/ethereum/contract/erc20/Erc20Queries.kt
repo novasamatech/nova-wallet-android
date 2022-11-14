@@ -1,18 +1,15 @@
 package io.novafoundation.nova.common.data.network.ethereum.contract.erc20
 
-import io.novafoundation.nova.common.data.network.ethereum.contract.EvmContract
+import kotlinx.coroutines.Deferred
 import org.web3j.abi.TypeDecoder
 import org.web3j.abi.TypeReference
 import org.web3j.abi.datatypes.Address
 import org.web3j.abi.datatypes.Event
 import org.web3j.abi.datatypes.generated.Uint256
-import org.web3j.protocol.Web3j
 import org.web3j.protocol.websocket.events.Log
-import org.web3j.tx.ReadonlyTransactionManager
-import org.web3j.tx.gas.DefaultGasProvider
 import java.math.BigInteger
 
-interface ReadOnlyErc20: EvmContract {
+interface Erc20Queries {
 
     class Transfer(val from: Address, val to: Address, val amount: Uint256)
 
@@ -35,17 +32,5 @@ interface ReadOnlyErc20: EvmContract {
         }
     }
 
-    suspend fun balanceOf(account: String): BigInteger
-}
-
-fun ReadOnlyErc20(
-    contractAddress: String,
-    web3j: Web3j,
-): ReadOnlyErc20 {
-    return Erc20Contract(
-        contractAddress= contractAddress,
-        web3j = web3j,
-        transactionManager = ReadonlyTransactionManager(web3j, null),
-        gasProvider = DefaultGasProvider()
-    )
+    suspend fun balanceOfAsync(account: String): Deferred<BigInteger>
 }

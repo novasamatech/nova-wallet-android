@@ -12,7 +12,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         // TODO switch back to master before merge
-        buildConfigField "String", "CHAINS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/02bf82c77a862272fc2d6bdc719a9631ba5956f5/chains/v5/chains_dev.json\""
+        buildConfigField "String", "CHAINS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/789b8b170692e8f1cb59a8eb7a55470636c08498/chains/v5/chains_dev.json\""
 
         buildConfigField "String", "TEST_CHAINS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/tests/chains_for_testBalance.json\""
     }

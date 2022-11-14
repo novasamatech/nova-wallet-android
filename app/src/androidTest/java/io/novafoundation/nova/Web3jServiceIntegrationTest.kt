@@ -4,6 +4,7 @@ import android.util.Log
 import io.novafoundation.nova.common.data.network.ethereum.Web3Api
 import io.novafoundation.nova.common.data.network.ethereum.WebSocketWeb3jService
 import io.novafoundation.nova.common.data.network.ethereum.contract.erc20.ReadOnlyErc20
+import io.novafoundation.nova.common.data.network.ethereum.contract.erc20.Erc20Queries
 import io.novafoundation.nova.common.data.network.ethereum.sendSuspend
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.second
@@ -91,7 +92,7 @@ class Web3jServiceIntegrationTest : BaseIntegrationTest() {
     private fun Web3Api.accountErcTransfersFlow(address: String): Flow<Erc20Transfer> {
         val addressTopic = TypeEncoder.encode(Address(address))
 
-        val transferEvent = ReadOnlyErc20.TRANSFER_EVENT
+        val transferEvent = Erc20Queries.TRANSFER_EVENT
         val transferEventSignature = EventEncoder.encode(transferEvent)
         val contractAddresses = emptyList<String>() // everything
 
@@ -115,7 +116,7 @@ class Web3jServiceIntegrationTest : BaseIntegrationTest() {
             val log = logNotification.params.result
 
             val contract = log.address
-            val event = ReadOnlyErc20.parseTransferEvent(log)
+            val event = Erc20Queries.parseTransferEvent(log)
 
             Erc20Transfer(
                 txHash = log.transactionHash,

@@ -1,7 +1,7 @@
 package io.novafoundation.nova.runtime.network.updaters
 
 import android.util.Log
-import io.novafoundation.nova.common.data.network.StorageSubscriptionBuilder
+import io.novafoundation.nova.common.data.network.StorageSharedRequestsBuilder
 import io.novafoundation.nova.common.data.network.subscribe
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.hasModule
@@ -39,7 +39,7 @@ abstract class SingleChainUpdateSystem(
 
         val scopeFlows = updaters.groupBy(Updater::scope).map { (scope, scopeUpdaters) ->
             scope.invalidationFlow().flatMapLatest {
-                val subscriptionBuilder = StorageSubscriptionBuilder.create(socket)
+                val subscriptionBuilder = StorageSharedRequestsBuilder.create(socket)
 
                 val updatersFlow = scopeUpdaters
                     .filter { it.requiredModules.all(runtimeMetadata::hasModule) }

@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.asset
 
 import io.novafoundation.nova.common.utils.decodeValue
 import io.novafoundation.nova.core.storage.StorageCache
-import io.novafoundation.nova.core.updater.SubscriptionBuilder
+import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
@@ -40,7 +40,7 @@ class StatemineAssetBalance(
         chain: Chain,
         chainAsset: Chain.Asset,
         accountId: AccountId,
-        subscriptionBuilder: SubscriptionBuilder
+        subscriptionBuilder: SharedRequestsBuilder
     ): Flow<List<BalanceLock>> {
         return emptyFlow()
     }
@@ -72,7 +72,7 @@ class StatemineAssetBalance(
         chainAsset: Chain.Asset,
         metaAccount: MetaAccount,
         accountId: AccountId,
-        subscriptionBuilder: SubscriptionBuilder
+        subscriptionBuilder: SharedRequestsBuilder
     ): Flow<BalanceSyncUpdate> {
         val statemineType = chainAsset.requireStatemine()
 

@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances
 
-import io.novafoundation.nova.core.updater.SubscriptionBuilder
+import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
@@ -16,7 +16,7 @@ class UnsupportedAssetBalance : AssetBalance {
         chain: Chain,
         chainAsset: Chain.Asset,
         accountId: AccountId,
-        subscriptionBuilder: SubscriptionBuilder
+        subscriptionBuilder: SharedRequestsBuilder
     ) = unsupported()
 
     override suspend fun isSelfSufficient(chainAsset: Chain.Asset) = unsupported()
@@ -30,7 +30,7 @@ class UnsupportedAssetBalance : AssetBalance {
         chainAsset: Chain.Asset,
         metaAccount: MetaAccount,
         accountId: AccountId,
-        subscriptionBuilder: SubscriptionBuilder
+        subscriptionBuilder: SharedRequestsBuilder
     ): Flow<BalanceSyncUpdate> {
         return emptyFlow()
     }

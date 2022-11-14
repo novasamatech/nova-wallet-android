@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_wallet_impl.di.modules
 
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.common.data.network.ethereum.contract.erc20.Erc20Standard
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSource
@@ -20,10 +21,15 @@ class EvmAssetsModule {
 
     @Provides
     @FeatureScope
+    fun provideErc20Standard() = Erc20Standard()
+
+    @Provides
+    @FeatureScope
     fun provideBalance(
         chainRegistry: ChainRegistry,
         assetCache: AssetCache,
-    ) = EvmAssetBalance(chainRegistry, assetCache)
+        erc20Standard: Erc20Standard,
+    ) = EvmAssetBalance(chainRegistry, assetCache, erc20Standard)
 
     @Provides
     @FeatureScope

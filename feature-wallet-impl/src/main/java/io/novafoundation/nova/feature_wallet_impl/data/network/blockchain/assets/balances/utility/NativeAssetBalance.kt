@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.utils.balances
 import io.novafoundation.nova.common.utils.decodeValue
 import io.novafoundation.nova.common.utils.numberConstant
 import io.novafoundation.nova.common.utils.system
-import io.novafoundation.nova.core.updater.SubscriptionBuilder
+import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core_db.dao.LockDao
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
@@ -41,7 +41,7 @@ class NativeAssetBalance(
         chain: Chain,
         chainAsset: Chain.Asset,
         accountId: AccountId,
-        subscriptionBuilder: SubscriptionBuilder
+        subscriptionBuilder: SharedRequestsBuilder
     ): Flow<*> {
         val runtime = chainRegistry.getRuntime(chain.id)
         val storage = runtime.metadata.balances().storage("Locks")
@@ -75,7 +75,7 @@ class NativeAssetBalance(
         chainAsset: Chain.Asset,
         metaAccount: MetaAccount,
         accountId: AccountId,
-        subscriptionBuilder: SubscriptionBuilder
+        subscriptionBuilder: SharedRequestsBuilder
     ): Flow<BalanceSyncUpdate> {
         val runtime = chainRegistry.getRuntime(chain.id)
 

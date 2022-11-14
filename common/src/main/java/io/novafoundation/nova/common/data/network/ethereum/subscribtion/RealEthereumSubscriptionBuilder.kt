@@ -7,25 +7,36 @@ import io.novafoundation.nova.core.ethereum.log.Topic
 import jp.co.soramitsu.fearless_utils.extensions.asEthereumAddress
 import jp.co.soramitsu.fearless_utils.extensions.toAccountId
 import jp.co.soramitsu.fearless_utils.wsrpc.SocketService.ResponseListener
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.future.asDeferred
+import org.web3j.protocol.core.BatchRequest
+import org.web3j.protocol.core.BatchResponse
+import org.web3j.protocol.core.Request
+import org.web3j.protocol.core.Response
 import org.web3j.protocol.websocket.events.LogNotification
 import java.util.UUID
 
 typealias SubscriptionId = String
+typealias BatchId = String
 
 sealed class EthereumSubscription<S>(val id: SubscriptionId) {
 
     class Log(val addresses: List<String>, val topics: List<Topic>, id: SubscriptionId) : EthereumSubscription<LogNotification>(id)
 }
 
-class EthereumSubscriptionMultiplexer private constructor(
+class EthereumRequestsAggregator private constructor(
     private val subscriptions: List<EthereumSubscription<*>>,
-    private val collectors: Map<SubscriptionId, List<ResponseListener<*>>>
+    private val collectors: Map<SubscriptionId, List<ResponseListener<*>>>,
+    private val batches: List<PendingBatchRequest>
 ) {
 
     fun subscribeUsing(web3Api: Web3Api): Flow<*> {
@@ -36,12 +47,44 @@ class EthereumSubscriptionMultiplexer private constructor(
         }.mergeIfMultiple()
     }
 
+    fun executeBatches(scope: CoroutineScope, web3Api: Web3Api) {
+        batches.forEach { pendingBatchRequest ->
+            scope.async {
+                val batch = web3Api.newBatch().apply {
+                    pendingBatchRequest.requests.forEach {
+                        add(it)
+                    }
+                }
+
+                executeBatch(batch, pendingBatchRequest)
+            }
+        }
+    }
+
     private fun Web3Api.subscribeLogs(subscription: EthereumSubscription.Log): Flow<*> {
         return logsNotifications(subscription.addresses, subscription.topics).onEach { logNotification ->
             subscription.dispatchChange(logNotification)
         }.catch {
             subscription.dispatchError(it)
         }
+    }
+
+
+    private suspend fun executeBatch(
+        batch: BatchRequest,
+        pendingBatchRequest: PendingBatchRequest
+    ): Result<BatchResponse> {
+        return runCatching { batch.sendAsync().asDeferred().await() }
+            .onSuccess { batchResponse ->
+                pendingBatchRequest.callbacks.zip(batchResponse.responses) { callback, response ->
+                    callback.cast<BatchCallback<Any?>>().onNext(response)
+                }
+            }
+            .onFailure { error ->
+                pendingBatchRequest.callbacks.forEach {
+                    it.onError(error)
+                }
+            }
     }
 
     private inline fun <reified S> EthereumSubscription<S>.dispatchChange(change: S) {
@@ -64,6 +107,8 @@ class EthereumSubscriptionMultiplexer private constructor(
         private var subscriptions: MutableList<EthereumSubscriptionBuilder<*>>? = null
         private var collectors: MutableMap<SubscriptionId, MutableList<ResponseListener<*>>>? = null
 
+        private var batches: MutableMap<BatchId, PendingBatchRequestBuilder>? = null
+
         fun subscribeLogs(address: String, topics: List<Topic>): Flow<LogNotification> {
             val subscriptions = ensureSubscriptions()
             val existingSubscription = subscriptions.firstOrNull { it is EthereumSubscriptionBuilder.Log && it.topics == topics }
@@ -73,7 +118,7 @@ class EthereumSubscriptionMultiplexer private constructor(
                 existingSubscription.addresses.add(address)
                 existingSubscription
             } else {
-                val newSubscription = EthereumSubscriptionBuilder.Log(topics = topics)
+                val newSubscription = EthereumSubscriptionBuilder.Log(topics = topics, addresses = mutableListOf(address))
                 subscriptions.add(newSubscription)
                 newSubscription
             }
@@ -85,10 +130,23 @@ class EthereumSubscriptionMultiplexer private constructor(
             return collector.inner.map { it.getOrThrow() }
         }
 
-        fun build() : EthereumSubscriptionMultiplexer {
-            return EthereumSubscriptionMultiplexer(
+        fun <S, T : Response<*>> batchRequest(batchId: BatchId, request: Request<S, T>): Deferred<T> {
+            val batches = ensureBatches()
+            val batch = batches.getOrPut(batchId, ::PendingBatchRequestBuilder)
+
+            val callback = BatchCallback<T>()
+
+            batch.requests += request
+            batch.callbacks += callback
+
+            return callback.deferred
+        }
+
+        fun build(): EthereumRequestsAggregator {
+            return EthereumRequestsAggregator(
                 subscriptions = subscriptions.orEmpty().map { it.build() },
-                collectors = collectors.orEmpty()
+                collectors = collectors.orEmpty(),
+                batches = batches.orEmpty().values.map { it.build() }
             )
         }
 
@@ -107,6 +165,14 @@ class EthereumSubscriptionMultiplexer private constructor(
 
             return collectors!!
         }
+
+        private fun ensureBatches(): MutableMap<BatchId, PendingBatchRequestBuilder> {
+            if (batches == null) {
+                batches = mutableMapOf()
+            }
+
+            return batches!!
+        }
     }
 }
 
@@ -124,7 +190,7 @@ private sealed class EthereumSubscriptionBuilder<S> {
     }
 }
 
-private class LogsCallback(contractAddress: String): FlowCallback<LogNotification>() {
+private class LogsCallback(contractAddress: String) : SubscribeCallback<LogNotification>() {
 
     val contractAccountId = contractAddress.asEthereumAddress().toAccountId().value
 
@@ -136,7 +202,30 @@ private class LogsCallback(contractAddress: String): FlowCallback<LogNotificatio
     }
 }
 
-private abstract class FlowCallback<R> : ResponseListener<R> {
+private class PendingBatchRequest(val requests: List<Request<*, *>>, val callbacks: List<BatchCallback<*>>)
+
+private class PendingBatchRequestBuilder(
+    val requests: MutableList<Request<*, *>> = mutableListOf(),
+    val callbacks: MutableList<BatchCallback<*>> = mutableListOf()
+) {
+
+    fun build(): PendingBatchRequest = PendingBatchRequest(requests, callbacks)
+}
+
+private class BatchCallback<R> : ResponseListener<R> {
+
+    val deferred = CompletableDeferred<R>()
+
+    override fun onError(throwable: Throwable) {
+        deferred.completeExceptionally(throwable)
+    }
+
+    override fun onNext(response: R) {
+        deferred.complete(response)
+    }
+}
+
+private abstract class SubscribeCallback<R> : ResponseListener<R> {
 
     val inner = MutableSharedFlow<Result<R>>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 

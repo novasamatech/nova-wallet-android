@@ -1,9 +1,13 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.evm
 
-import io.novafoundation.nova.common.data.network.ethereum.contract.erc20.ReadOnlyErc20
+import io.novafoundation.nova.common.data.network.ethereum.contract.base.queryBatched
+import io.novafoundation.nova.common.data.network.ethereum.contract.base.querySingle
+import io.novafoundation.nova.common.data.network.ethereum.contract.erc20.Erc20Queries
+import io.novafoundation.nova.common.data.network.ethereum.contract.erc20.Erc20Standard
+import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.core.ethereum.log.Topic
-import io.novafoundation.nova.core.updater.EthereumSubscriptionBuilder
-import io.novafoundation.nova.core.updater.SubscriptionBuilder
+import io.novafoundation.nova.core.updater.EthereumSharedRequestsBuilder
+import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
@@ -19,6 +23,7 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.ExtrinsicS
 import jp.co.soramitsu.fearless_utils.extensions.asEthereumAddress
 import jp.co.soramitsu.fearless_utils.extensions.toAccountId
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.emptyFlow
@@ -30,9 +35,12 @@ import org.web3j.abi.TypeEncoder
 import org.web3j.abi.datatypes.Address
 import java.math.BigInteger
 
+private const val BATCH_ID = "EvmAssetBalance.InitialBalance"
+
 class EvmAssetBalance(
     private val chainRegistry: ChainRegistry,
     private val assetCache: AssetCache,
+    private val erc20Standard: Erc20Standard,
 ) : AssetBalance {
 
     override suspend fun startSyncingBalanceLocks(
@@ -40,7 +48,7 @@ class EvmAssetBalance(
         chain: Chain,
         chainAsset: Chain.Asset,
         accountId: AccountId,
-        subscriptionBuilder: SubscriptionBuilder
+        subscriptionBuilder: SharedRequestsBuilder
     ): Flow<*> {
         // ERC20 tokens doe not support locks
         return emptyFlow<Nothing>()
@@ -58,10 +66,11 @@ class EvmAssetBalance(
     override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {
         val erc20Type = chainAsset.requireErc20()
         val ethereumApi = chainRegistry.ethereumApi(chain.id)
-        val erc20 = ReadOnlyErc20(erc20Type.contractAddress, ethereumApi)
         val accountAddress = chain.addressOf(accountId)
 
-        return erc20.balanceOf(accountAddress)
+        return erc20Standard.querySingle(erc20Type.contractAddress, ethereumApi)
+            .balanceOfAsync(accountAddress)
+            .await()
     }
 
     override suspend fun startSyncingBalance(
@@ -69,15 +78,17 @@ class EvmAssetBalance(
         chainAsset: Chain.Asset,
         metaAccount: MetaAccount,
         accountId: AccountId,
-        subscriptionBuilder: SubscriptionBuilder
+        subscriptionBuilder: SharedRequestsBuilder
     ): Flow<BalanceSyncUpdate> {
         val address = chain.addressOf(accountId)
 
         val erc20Type = chainAsset.requireErc20()
         val ethereumApi = chainRegistry.ethereumApi(chain.id)
-        val erc20 = ReadOnlyErc20(erc20Type.contractAddress, ethereumApi)
 
-        return subscriptionBuilder.erc20BalanceFlow(address, erc20, chainAsset)
+        val initialBalanceAsync = erc20Standard.queryBatched(erc20Type.contractAddress, BATCH_ID, subscriptionBuilder)
+            .balanceOfAsync(address)
+
+        return subscriptionBuilder.erc20BalanceFlow(address, ethereumApi, chainAsset, initialBalanceAsync)
             .map { balanceUpdate ->
                 updateAsset(metaAccount.id, chainAsset, balanceUpdate.newBalance)
 
@@ -99,19 +110,24 @@ class EvmAssetBalance(
         }
     }
 
-    private fun EthereumSubscriptionBuilder.erc20BalanceFlow(
+    private fun EthereumSharedRequestsBuilder.erc20BalanceFlow(
         account: String,
-        contract: ReadOnlyErc20,
+        web3Api: Web3Api,
         chainAsset: Chain.Asset,
+        initialBalanceAsync: Deferred<BigInteger>
     ): Flow<Erc20BalanceUpdate> {
-        val changes = accountErcTransfersFlow(account, contract.address, chainAsset).map { erc20Transfer ->
-            val newBalance = contract.balanceOf(account)
+        val contractAddress = chainAsset.requireErc20().contractAddress
+
+        val changes = accountErcTransfersFlow(account, contractAddress, chainAsset).map { erc20Transfer ->
+            val newBalance = erc20Standard.querySingle(contractAddress, web3Api)
+                .balanceOfAsync(account)
+                .await()
 
             Erc20BalanceUpdate(newBalance, cause = erc20Transfer)
         }
 
         return flow {
-            val initialBalance = contract.balanceOf(account)
+            val initialBalance = initialBalanceAsync.await()
 
             emit(Erc20BalanceUpdate(initialBalance, cause = null))
 
@@ -119,14 +135,14 @@ class EvmAssetBalance(
         }
     }
 
-    private fun EthereumSubscriptionBuilder.accountErcTransfersFlow(
+    private fun EthereumSharedRequestsBuilder.accountErcTransfersFlow(
         accountAddress: String,
         contractAddress: String,
         chainAsset: Chain.Asset,
     ): Flow<TransferExtrinsic> {
         val addressTopic = TypeEncoder.encode(Address(accountAddress))
 
-        val transferEvent = ReadOnlyErc20.TRANSFER_EVENT
+        val transferEvent = Erc20Queries.TRANSFER_EVENT
         val transferEventSignature = EventEncoder.encode(transferEvent)
 
         val erc20SendTopic = listOf(
@@ -147,7 +163,7 @@ class EvmAssetBalance(
 
         return transferNotifications.map { logNotification ->
             val log = logNotification.params.result
-            val event = ReadOnlyErc20.parseTransferEvent(log)
+            val event = Erc20Queries.parseTransferEvent(log)
 
             TransferExtrinsic(
                 senderId = event.from.accountId(),

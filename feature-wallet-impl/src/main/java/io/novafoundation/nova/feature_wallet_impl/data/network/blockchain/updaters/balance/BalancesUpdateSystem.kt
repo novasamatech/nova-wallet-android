@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.balance
 
 import android.util.Log
-import io.novafoundation.nova.common.data.network.StorageSubscriptionBuilder
+import io.novafoundation.nova.common.data.network.StorageSharedRequestsBuilder
 import io.novafoundation.nova.common.data.network.subscribe
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.core.updater.UpdateSystem
@@ -42,7 +42,7 @@ class BalancesUpdateSystem(
     private suspend fun balanceChainUpdaters(chain: Chain): Flow<Updater.SideEffect> {
         return flow {
             val socket = chainRegistry.getSocket(chain.id)
-            val subscriptionBuilder = StorageSubscriptionBuilder.create(socket)
+            val subscriptionBuilder = StorageSharedRequestsBuilder.create(socket)
 
             val updaters: List<Updater> = listOf(paymentUpdaterFactory.create(chain), balanceLocksUpdater.create(chain))
             val sideEffectFlows = updaters.map { updater ->
