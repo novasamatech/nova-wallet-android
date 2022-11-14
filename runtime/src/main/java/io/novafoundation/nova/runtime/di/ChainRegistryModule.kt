@@ -9,7 +9,7 @@ import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.asset.AssetSyncService
+import io.novafoundation.nova.runtime.multiNetwork.asset.EvmAssetsSyncService
 import io.novafoundation.nova.runtime.multiNetwork.asset.remote.AssetFetcher
 import io.novafoundation.nova.runtime.multiNetwork.chain.ChainSyncService
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.ChainFetcher
@@ -43,7 +43,7 @@ class ChainRegistryModule {
         chainAssetDao: ChainAssetDao,
         chainFetcher: ChainFetcher,
         gson: Gson
-    ) = ChainSyncService(dao, chainAssetDao, chainFetcher, gson)
+    ) = ChainSyncService(dao, chainFetcher, gson)
 
     @Provides
     @ApplicationScope
@@ -54,7 +54,7 @@ class ChainRegistryModule {
     fun provideAssetSyncService(
         dao: ChainAssetDao,
         assetFetcher: AssetFetcher
-    ) = AssetSyncService(dao, assetFetcher)
+    ) = EvmAssetsSyncService(dao, assetFetcher)
 
     @Provides
     @ApplicationScope
@@ -146,7 +146,7 @@ class ChainRegistryModule {
         runtimeSubscriptionPool: RuntimeSubscriptionPool,
         chainDao: ChainDao,
         chainSyncService: ChainSyncService,
-        assetSyncService: AssetSyncService,
+        evmAssetsSyncService: EvmAssetsSyncService,
         baseTypeSynchronizer: BaseTypeSynchronizer,
         runtimeSyncService: RuntimeSyncService,
         gson: Gson
@@ -156,7 +156,7 @@ class ChainRegistryModule {
         runtimeSubscriptionPool,
         chainDao,
         chainSyncService,
-        assetSyncService,
+        evmAssetsSyncService,
         baseTypeSynchronizer,
         runtimeSyncService,
         gson

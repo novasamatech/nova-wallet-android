@@ -18,9 +18,9 @@ fun mapEVMAssetRemoteToLocalAssets(evmAssetRemote: EVMAssetRemote): List<ChainAs
             precision = evmAssetRemote.precision,
             priceId = evmAssetRemote.priceId,
             icon = evmAssetRemote.icon,
-            staking = Chain.Asset.StakingType.UNSUPPORTED.toString(),
+            staking = mapStakingTypeToLocal(Chain.Asset.StakingType.UNSUPPORTED),
             source = AssetSourceLocal.ERC20,
-            type = null,
+            type = "EVM",
             buyProviders = null,
             typeExtras = null
         )

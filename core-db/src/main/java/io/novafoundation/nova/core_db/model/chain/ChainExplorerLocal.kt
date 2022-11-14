@@ -2,7 +2,9 @@ package io.novafoundation.nova.core_db.model.chain
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Ignore
 import androidx.room.Index
+import io.novafoundation.nova.common.utils.Identifiable
 
 @Entity(
     tableName = "chain_explorers",
@@ -25,4 +27,8 @@ class ChainExplorerLocal(
     val extrinsic: String?,
     val account: String?,
     val event: String?
-)
+) : Identifiable {
+
+    @Ignore
+    override val identifier: String = "$chainId:$name"
+}

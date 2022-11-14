@@ -9,6 +9,10 @@ import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.JoinedChainInfo
+import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapChainAssetToLocal
+import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapChainExplorersToLocal
+import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapChainNodeToLocal
+import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapChainToChainLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.ChainFetcher
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainAssetRemote
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainNodeRemote

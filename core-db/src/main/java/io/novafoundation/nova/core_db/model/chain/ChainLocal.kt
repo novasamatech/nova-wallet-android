@@ -2,7 +2,9 @@ package io.novafoundation.nova.core_db.model.chain
 
 import androidx.room.Embedded
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import io.novafoundation.nova.common.utils.Identifiable
 
 @Entity(tableName = "chains")
 class ChainLocal(
@@ -20,7 +22,10 @@ class ChainLocal(
     val hasCrowdloans: Boolean,
     val governance: String,
     val additional: String?,
-) {
+) : Identifiable {
+
+    @Ignore
+    override val identifier: String = id
 
     class TypesConfig(
         val url: String,

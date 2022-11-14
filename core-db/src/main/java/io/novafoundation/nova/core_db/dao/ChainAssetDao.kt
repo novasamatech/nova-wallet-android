@@ -14,9 +14,9 @@ import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 abstract class ChainAssetDao {
 
     @Transaction
-    open suspend fun updateAssetsByTokenType(assets: List<ChainAssetLocal>, source: AssetSourceLocal) {
-        val sourceAssets = getAssetsBySource(source)
-        val diff = CollectionDiffer.findDiff(assets, sourceAssets, false)
+    open suspend fun updateAssetsBySource(newAssets: List<ChainAssetLocal>, source: AssetSourceLocal) {
+        val oldAssets = getAssetsBySource(source)
+        val diff = CollectionDiffer.findDiff(newAssets, oldAssets, forceUseNewItems = false)
         insertAssets(diff.newOrUpdated)
         deleteChainAssets(diff.removed)
     }

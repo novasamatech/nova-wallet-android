@@ -8,7 +8,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapEVMAssetRemo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class AssetSyncService(
+class EvmAssetsSyncService(
     private val dao: ChainAssetDao,
     private val chainFetcher: AssetFetcher
 ) {
@@ -20,6 +20,6 @@ class AssetSyncService(
     private suspend fun syncEVMAssets() {
         val assets = retryUntilDone { chainFetcher.getEVMAssets() }
             .flatMap(::mapEVMAssetRemoteToLocalAssets)
-        dao.updateAssetsByTokenType(assets, AssetSourceLocal.ERC20)
+        dao.updateAssetsBySource(assets, AssetSourceLocal.ERC20)
     }
 }

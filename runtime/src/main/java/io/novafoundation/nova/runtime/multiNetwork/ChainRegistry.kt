@@ -6,9 +6,9 @@ import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.core_db.dao.ChainDao
-import io.novafoundation.nova.runtime.multiNetwork.asset.AssetSyncService
+import io.novafoundation.nova.runtime.multiNetwork.asset.EvmAssetsSyncService
 import io.novafoundation.nova.runtime.multiNetwork.chain.ChainSyncService
-import io.novafoundation.nova.runtime.multiNetwork.chain.mapChainLocalToChain
+import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapChainLocalToChain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
@@ -44,7 +44,7 @@ class ChainRegistry(
     private val runtimeSubscriptionPool: RuntimeSubscriptionPool,
     private val chainDao: ChainDao,
     private val chainSyncService: ChainSyncService,
-    private val assetSyncService: AssetSyncService,
+    private val evmAssetsSyncService: EvmAssetsSyncService,
     private val baseTypeSynchronizer: BaseTypeSynchronizer,
     private val runtimeSyncService: RuntimeSyncService,
     private val gson: Gson
@@ -85,7 +85,7 @@ class ChainRegistry(
 
     init {
         launch { chainSyncService.syncUp() }
-        launch { assetSyncService.syncUp() }
+        launch { evmAssetsSyncService.syncUp() }
 
         baseTypeSynchronizer.sync()
     }

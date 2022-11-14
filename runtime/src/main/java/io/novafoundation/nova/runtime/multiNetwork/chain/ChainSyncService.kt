@@ -2,64 +2,47 @@ package io.novafoundation.nova.runtime.multiNetwork.chain
 
 import com.google.gson.Gson
 import io.novafoundation.nova.common.utils.CollectionDiffer
-import io.novafoundation.nova.common.utils.Identifiable
-import io.novafoundation.nova.common.utils.map
 import io.novafoundation.nova.common.utils.retryUntilDone
-import io.novafoundation.nova.core_db.dao.ChainAssetDao
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.model.chain.AssetSourceLocal
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteAssetsToLocal
+import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteChainToLocal
+import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteExplorersToLocal
+import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteNodesToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.ChainFetcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class ChainSyncService(
     private val chainDao: ChainDao,
-    private val chainAssetDao: ChainAssetDao,
     private val chainFetcher: ChainFetcher,
     private val gson: Gson
 ) {
 
     suspend fun syncUp() = withContext(Dispatchers.Default) {
         val localChainsJoinedInfo = chainDao.getJoinChainInfo()
-        val oldAssets = chainAssetDao.getAssetsBySource(AssetSourceLocal.DEFAULT)
+        val oldChains = localChainsJoinedInfo.map { it.chain }
+        val oldAssets = localChainsJoinedInfo.flatMap { it.assets }
+            .filter { it.source == AssetSourceLocal.DEFAULT }
+        val oldNodes = localChainsJoinedInfo.flatMap { it.nodes }
+        val oldExplorers = localChainsJoinedInfo.flatMap { it.explorers }
 
-        val remoteChains = retryUntilDone { chainFetcher.getChains() }.map(::mapChainRemoteToChain)
-        val localChains = localChainsJoinedInfo.map { mapChainLocalToChain(it, gson) }
-        val newAssets = remoteChains.flatMap { chain -> chain.assets.map { mapChainAssetToLocal(it, gson) } }
+        val remoteChains = retryUntilDone { chainFetcher.getChains() }
+        val newChains = remoteChains.map { mapRemoteChainToLocal(it, gson) }
+        val newAssets = remoteChains.flatMap { mapRemoteAssetsToLocal(it, gson) }
+        val newNodes = remoteChains.flatMapIndexed { index, chain -> mapRemoteNodesToLocal(chain, index) }
+        val newExplorers = remoteChains.flatMap { mapRemoteExplorersToLocal(it) }
 
-        val chainsDiff = CollectionDiffer.findDiff(newItems = remoteChains, oldItems = localChains, forceUseNewItems = false)
-            .map { mapChainToChainLocal(it, gson) }
+        val chainsDiff = CollectionDiffer.findDiff(newChains, oldChains, forceUseNewItems = false)
+        val assetDiff = CollectionDiffer.findDiff(newAssets, oldAssets, forceUseNewItems = false)
+        val nodesDiff = CollectionDiffer.findDiff(newNodes, oldNodes, forceUseNewItems = false)
+        val explorersDiff = CollectionDiffer.findDiff(newExplorers, oldExplorers, forceUseNewItems = false)
 
         chainDao.applyDiff(
             chainDiff = chainsDiff,
-            assetsDiff = CollectionDiffer.findDiff(newAssets, oldAssets, false),
-            nodesDiff = nestedCollectionDiff(
-                newChains = remoteChains,
-                oldChains = localChains,
-                collection = Chain::nodes,
-                domainToLocalMapper = ::mapChainNodeToLocal
-            ),
-            explorersDiff = nestedCollectionDiff(
-                newChains = remoteChains,
-                oldChains = localChains,
-                collection = Chain::explorers,
-                domainToLocalMapper = ::mapChainExplorersToLocal
-            ),
+            assetsDiff = assetDiff,
+            nodesDiff = nodesDiff,
+            explorersDiff = explorersDiff,
         )
-    }
-
-    private fun <T : Identifiable, R> nestedCollectionDiff(
-        newChains: List<Chain>,
-        oldChains: List<Chain>,
-        collection: (Chain) -> List<T>,
-        domainToLocalMapper: (T) -> R
-    ): CollectionDiffer.Diff<R> {
-        val old = oldChains.flatMap(collection)
-        val new = newChains.flatMap(collection)
-
-        val diffed = CollectionDiffer.findDiff(newItems = new, oldItems = old, forceUseNewItems = false)
-
-        return diffed.map(domainToLocalMapper)
     }
 }
