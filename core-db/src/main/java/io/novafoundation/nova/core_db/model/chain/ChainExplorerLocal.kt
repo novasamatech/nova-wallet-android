@@ -21,7 +21,7 @@ import io.novafoundation.nova.common.utils.Identifiable
         Index(value = ["chainId"])
     ]
 )
-class ChainExplorerLocal(
+data class ChainExplorerLocal(
     val chainId: String,
     val name: String,
     val extrinsic: String?,

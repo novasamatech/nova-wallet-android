@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 import io.novafoundation.nova.common.utils.Identifiable
 
 @Entity(tableName = "chains")
-class ChainLocal(
+data class ChainLocal(
     @PrimaryKey val id: String,
     val parentId: String?,
     val name: String,
@@ -27,12 +27,12 @@ class ChainLocal(
     @Ignore
     override val identifier: String = id
 
-    class TypesConfig(
+    data class TypesConfig(
         val url: String,
         val overridesCommon: Boolean,
     )
 
-    class ExternalApi(
+    data class ExternalApi(
         @Embedded(prefix = "staking_")
         val staking: Section?,
 
@@ -46,6 +46,6 @@ class ChainLocal(
         val governance: Section?,
     ) {
 
-        class Section(val url: String, val type: String)
+        data class Section(val url: String, val type: String)
     }
 }

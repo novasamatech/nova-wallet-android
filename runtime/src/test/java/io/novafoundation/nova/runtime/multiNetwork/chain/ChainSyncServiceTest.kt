@@ -6,6 +6,7 @@ import io.novafoundation.nova.core_db.dao.ChainAssetDao
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.model.chain.AssetSourceLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
+import io.novafoundation.nova.core_db.model.chain.ChainExplorerLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.JoinedChainInfo
@@ -19,10 +20,14 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteExplor
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteNodesToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.ChainFetcher
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainAssetRemote
+import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainExplorerRemote
+import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainExternalApiRemote
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainNodeRemote
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainRemote
+import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainTypesInfo
 import io.novafoundation.nova.test_shared.argThat
 import io.novafoundation.nova.test_shared.eq
+import jp.co.soramitsu.fearless_utils.scale.dataType.list
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
@@ -37,6 +42,7 @@ class ChainSyncServiceTest {
 
     private val assetId = 0
     private val nodeUrl = "url"
+    private val explorerName = "explorer"
 
     private val REMOTE_CHAIN = ChainRemote(
         chainId = "0x00",
@@ -67,7 +73,14 @@ class ChainSyncServiceTest {
         options = emptySet(),
         parentId = null,
         externalApi = null,
-        explorers = emptyList(),
+        explorers = listOf(
+            ChainExplorerRemote(
+                explorerName,
+                "extrinsic",
+                "account",
+                "event"
+            )
+        ),
         additional = emptyMap()
     )
 
@@ -95,7 +108,6 @@ class ChainSyncServiceTest {
     fun `should insert new chain`() {
         runBlocking {
             localReturns(emptyList())
-            localAssetReturn(listOf())
             remoteReturns(listOf(REMOTE_CHAIN))
 
             chainSyncService.syncUp()
@@ -104,7 +116,7 @@ class ChainSyncServiceTest {
                 chainDiff = insertsChainWithId(REMOTE_CHAIN.chainId),
                 assetsDiff = insertsAssetWithId(assetId),
                 nodesDiff = insertsNodeWithUrl(nodeUrl),
-                explorersDiff = emptyDiff()
+                explorersDiff = insertsExplorerByName(explorerName)
             )
         }
     }
@@ -113,7 +125,6 @@ class ChainSyncServiceTest {
     fun `should not insert the same chain`() {
         runBlocking {
             localReturns(listOf(LOCAL_CHAIN))
-            localAssetReturn(LOCAL_CHAIN.assets)
             remoteReturns(listOf(REMOTE_CHAIN))
 
             chainSyncService.syncUp()
@@ -126,7 +137,6 @@ class ChainSyncServiceTest {
     fun `should update chain's own params`() {
         runBlocking {
             localReturns(listOf(LOCAL_CHAIN))
-            localAssetReturn(LOCAL_CHAIN.assets)
             remoteReturns(listOf(REMOTE_CHAIN.copy(name = "new name")))
 
             chainSyncService.syncUp()
@@ -144,7 +154,6 @@ class ChainSyncServiceTest {
     fun `should update chain's asset`() {
         runBlocking {
             localReturns(listOf(LOCAL_CHAIN))
-            localAssetReturn(LOCAL_CHAIN.assets)
 
             remoteReturns(listOf(REMOTE_CHAIN.copy(
                 assets = listOf(
@@ -155,7 +164,7 @@ class ChainSyncServiceTest {
             chainSyncService.syncUp()
 
             verify(dao).applyDiff(
-                chainDiff = insertsChainWithId(REMOTE_CHAIN.chainId),
+                chainDiff = emptyDiff(),
                 assetsDiff = insertsAssetWithId(assetId),
                 nodesDiff = emptyDiff(),
                 explorersDiff = emptyDiff(),
@@ -164,10 +173,53 @@ class ChainSyncServiceTest {
     }
 
     @Test
+    fun `should update chain's node`() {
+        runBlocking {
+            localReturns(listOf(LOCAL_CHAIN))
+
+            remoteReturns(listOf(REMOTE_CHAIN.copy(
+                nodes = listOf(
+                    REMOTE_CHAIN.nodes.first().copy(name = "NEW")
+                )
+            )))
+
+            chainSyncService.syncUp()
+
+            verify(dao).applyDiff(
+                chainDiff = emptyDiff(),
+                assetsDiff = emptyDiff(),
+                nodesDiff = insertsNodeWithUrl(nodeUrl),
+                explorersDiff = emptyDiff(),
+            )
+        }
+    }
+
+    @Test
+    fun `should update chain's explorer`() {
+        runBlocking {
+            localReturns(listOf(LOCAL_CHAIN))
+
+            remoteReturns(listOf(REMOTE_CHAIN.copy(
+                explorers = listOf(
+                    REMOTE_CHAIN.explorers!!.first().copy(extrinsic = "NEW")
+                )
+            )))
+
+            chainSyncService.syncUp()
+
+            verify(dao).applyDiff(
+                chainDiff = emptyDiff(),
+                assetsDiff = emptyDiff(),
+                nodesDiff = emptyDiff(),
+                explorersDiff = insertsExplorerByName(explorerName),
+            )
+        }
+    }
+
+    @Test
     fun `should remove chain`() {
         runBlocking {
             localReturns(listOf(LOCAL_CHAIN))
-            localAssetReturn(LOCAL_CHAIN.assets)
 
             remoteReturns(emptyList())
 
@@ -177,7 +229,7 @@ class ChainSyncServiceTest {
                 chainDiff = removesChainWithId(REMOTE_CHAIN.chainId),
                 assetsDiff = removesAssetWithId(assetId),
                 nodesDiff = removesNodeWithUrl(nodeUrl),
-                explorersDiff = emptyDiff()
+                explorersDiff = removesExplorerByName(explorerName)
             )
         }
     }
@@ -186,18 +238,14 @@ class ChainSyncServiceTest {
         `when`(chainFetcher.getChains()).thenReturn(chains)
     }
 
-    private suspend fun localAssetReturn(assets: List<ChainAssetLocal>) {
-        `when`(chainAssetDao.getAssetsBySource(AssetSourceLocal.DEFAULT)).thenReturn(assets)
-    }
-
     private suspend fun localReturns(chains: List<JoinedChainInfo>) {
         `when`(dao.getJoinChainInfo()).thenReturn(chains)
     }
 
-
     private fun insertsChainWithId(id: String) = insertsElement<ChainLocal> { it.id == id }
     private fun insertsAssetWithId(id: Int) = insertsElement<ChainAssetLocal> { it.id == id }
     private fun insertsNodeWithUrl(url: String) = insertsElement<ChainNodeLocal> { it.url == url }
+    private fun insertsExplorerByName(name: String) = insertsElement<ChainExplorerLocal> { it.name == name }
 
     private fun <T> insertsElement(elementCheck: (T) -> Boolean) = argThat<CollectionDiffer.Diff<T>> {
         it.removed.isEmpty() && elementCheck(it.newOrUpdated.single())
@@ -206,6 +254,7 @@ class ChainSyncServiceTest {
     private fun removesChainWithId(id: String) = removesElement<ChainLocal> { it.id == id }
     private fun removesAssetWithId(id: Int) = removesElement<ChainAssetLocal> { it.id == id }
     private fun removesNodeWithUrl(url: String) = removesElement<ChainNodeLocal> { it.url == url }
+    private fun removesExplorerByName(name: String) = removesElement<ChainExplorerLocal> { it.name == name }
 
     private fun <T> removesElement(elementCheck: (T) -> Boolean) = argThat<CollectionDiffer.Diff<T>> {
         it.newOrUpdated.isEmpty() && elementCheck(it.removed.single())
