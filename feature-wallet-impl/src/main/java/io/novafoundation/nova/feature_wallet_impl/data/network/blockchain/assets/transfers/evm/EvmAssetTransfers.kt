@@ -6,6 +6,9 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfers
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystem
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.amountInPlanks
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.positiveAmount
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.sufficientBalanceInUsedAsset
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.sufficientTransferableBalanceToPayOriginFee
 import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Standard
 import io.novafoundation.nova.runtime.ethereum.transaction.builder.EvmTransactionBuilder
 import io.novafoundation.nova.runtime.ethereum.transaction.builder.contractCall
@@ -19,10 +22,12 @@ class EvmAssetTransfers(
     private val erc20Standard: Erc20Standard
 ) : AssetTransfers {
 
-    override val validationSystem: AssetTransfersValidationSystem
-        get() = ValidationSystem {
-            // TODO validations
-        }
+    override val validationSystem: AssetTransfersValidationSystem = ValidationSystem {
+        positiveAmount()
+
+        sufficientTransferableBalanceToPayOriginFee()
+        sufficientBalanceInUsedAsset()
+    }
 
     override suspend fun calculateFee(transfer: AssetTransfer): BigInteger {
         return evmTransactionService.calculateFee(transfer.originChain.id) {
