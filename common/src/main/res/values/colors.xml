@@ -4,7 +4,6 @@
     <color name="colorPrimaryDark">#80004CB7</color>
     <color name="colorSelected">@color/colorPrimaryDark</color>
     <color name="colorAccent">#FF009A</color>
-    <color name="white">#fff</color>
     <color name="colorHint">@color/white_64</color>
     <color name="black">#000</color>
     <color name="gray1">#CCCCCC</color>
@@ -82,4 +81,65 @@
     <color name="pms_black">#2D2926</color>
 
     <color name="textInactive">@color/white_32</color>
+
+    <!-- Text Colors -->
+    <color name="text_primary">#E0FFFFFF</color>
+    <color name="text_secondary">#A3FFFFFF</color>
+    <color name="text_tertiary">#7AFFFFFF</color>
+    <color name="button_text">#E0FFFFFF</color>
+    <color name="chip_text">#A3FFFFFF</color>
+    <color name="button_text_inactive">#52FFFFFF</color>
+    <color name="hint_text">#52FFFFFF</color>
+    <color name="button_text_accent">#1F78FF</color>
+    <color name="text_warning">#EBC50A</color>
+    <color name="text_negative">#E53450</color>
+    <color name="text_positive">#2FC864</color>
+    <color name="conviction_slider_text_01x">#2AB0F2</color>
+    <color name="conviction_slider_text_1x">#41D4D2</color>
+    <color name="conviction_slider_text_2x">#58F8B2</color>
+    <color name="conviction_slider_text_3x">#86F574</color>
+    <color name="conviction_slider_text_4x">#B6F234</color>
+    <color name="conviction_slider_text_5x">#DAC71B</color>
+    <color name="conviction_slider_text_6x">#F19B27</color>
+
+    <color name="icon_primary">#E0FFFFFF</color>
+    <color name="icon_secondary">#7AFFFFFF</color>
+    <color name="icon_tertiary">#52FFFFFF</color>
+    <color name="icon_inactive">#29FFFFFF</color>
+    <color name="icon_nav_bar_inactive">#66FFFFFF</color>
+    <color name="icon_accent">#1F78FF</color>
+    <color name="icon_warning">#EBC50A</color>
+    <color name="icon_negative">#E53450</color>
+    <color name="icon_positive">#2FC864</color>
+
+    <color name="secondary_screen_background">#08090E</color>
+    <color name="bottom_sheet_background">#181920</color>
+    <color name="block_background">#29999EC7</color>
+    <color name="input_background">#1A999EC7</color>
+    <color name="chips_background">#29999EC7</color>
+    <color name="container_background">#1A999EC7</color>
+    <color name="token_container_background">#3D08090E</color>
+    <color name="segmented_background">#5208090E</color>
+    <color name="segmented_tab_active">#3D999EC7</color>
+    <color name="switch_background">#3D999EC7</color>
+    <color name="block_background_error">#29E53450</color>
+    <color name="block_background_warning">#29EDCE36</color>
+    <color name="blur_navigation_background">#66151D27</color>
+    <color name="solid_navigation_background">#0F111A</color>
+
+    <color name="button_background_primary">#1F78FF</color>
+    <color name="button_background_secondary">#29999EC7</color>
+    <color name="button_background_approve">#2FC864</color>
+    <color name="button_background_reject">#E53450</color>
+    <color name="button_background_inactive_on_gradient">#1A999EC7</color>
+    <color name="button_background_inactive">#181920</color>
+    <color name="button_background_pressed">291F78FF</color>
+
+    <color name="active_border">#181920</color>
+    <color name="checkbox_border">#3D999EC7</color>
+    <color name="radio_border">#3D999EC7</color>
+    <color name="container_border">#3D999EC7</color>
+
+    <color name="divider">#14999EC7</color>
+
 </resources>
