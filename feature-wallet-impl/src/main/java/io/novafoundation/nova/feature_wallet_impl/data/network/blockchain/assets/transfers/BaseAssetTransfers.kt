@@ -82,8 +82,6 @@ abstract class BaseAssetTransfers(
         doNotCrossExistentialDeposit()
     }
 
-
-
     protected fun AssetTransfersValidationSystemBuilder.doNotCrossExistentialDeposit() = doNotCrossExistentialDeposit(
         assetSourceRegistry = assetSourceRegistry,
         fee = { it.originFeeInUsedAsset },
