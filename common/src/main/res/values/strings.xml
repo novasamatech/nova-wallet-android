@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="common_no_app_to_handle_import_intent">File import application not found on device. Please install it and try again</string>
+
     <string name="referenda_list_placeholder">Referenda information will appear here when they start</string>
 
     <string name="referendum_missing_account_message">You should add %s account to the wallet in order to vote</string>

@@ -27,7 +27,7 @@ import java.util.UUID
 
 typealias SubscriptionId = String
 typealias BatchId = String
-typealias RequestId  = Int
+typealias RequestId = Int
 
 sealed class EthereumSubscription<S>(val id: SubscriptionId) {
 
@@ -214,7 +214,7 @@ private class PendingBatchRequestBuilder(
     fun build(): PendingBatchRequest = PendingBatchRequest(requests, callbacks)
 }
 
-private class BatchCallback<R>: ResponseListener<R> {
+private class BatchCallback<R> : ResponseListener<R> {
 
     val deferred = CompletableDeferred<R>()
 
