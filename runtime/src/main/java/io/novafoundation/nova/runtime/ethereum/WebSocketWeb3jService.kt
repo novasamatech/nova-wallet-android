@@ -44,6 +44,10 @@ class WebSocketWeb3jService(
         val rpcRequest = request.toRpcRequest()
 
         return socketService.executeRequestAsFuture(rpcRequest).thenApply {
+            if (it.error != null) {
+                throw EvmRpcException(it.error!!.code, it.error!!.message)
+            }
+
             jsonMapper.convertValue(it, responseType)
         }
     }
