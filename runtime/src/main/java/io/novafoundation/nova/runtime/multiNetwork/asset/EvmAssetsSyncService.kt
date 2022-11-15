@@ -1,5 +1,6 @@
 package io.novafoundation.nova.runtime.multiNetwork.asset
 
+import com.google.gson.Gson
 import io.novafoundation.nova.common.utils.retryUntilDone
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
 import io.novafoundation.nova.core_db.model.chain.AssetSourceLocal
@@ -10,7 +11,8 @@ import kotlinx.coroutines.withContext
 
 class EvmAssetsSyncService(
     private val dao: ChainAssetDao,
-    private val chainFetcher: AssetFetcher
+    private val chainFetcher: AssetFetcher,
+    private val gson: Gson,
 ) {
 
     suspend fun syncUp() = withContext(Dispatchers.Default) {
@@ -19,7 +21,7 @@ class EvmAssetsSyncService(
 
     private suspend fun syncEVMAssets() {
         val assets = retryUntilDone { chainFetcher.getEVMAssets() }
-            .flatMap(::mapEVMAssetRemoteToLocalAssets)
+            .flatMap { mapEVMAssetRemoteToLocalAssets(it, gson) }
         dao.updateAssetsBySource(assets, AssetSourceLocal.ERC20)
     }
 }
