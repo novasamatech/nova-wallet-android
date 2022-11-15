@@ -31,7 +31,7 @@ data class ChainAssetLocal(
     val precision: Int,
     val icon: String?,
     val type: String?,
-    val source: AssetSourceLocal?,
+    val source: AssetSourceLocal,
     val buyProviders: String?,
     val typeExtras: String?
 ) : Identifiable {

@@ -82,11 +82,11 @@ fun mapRemoteAssetsToLocal(chainRemote: ChainRemote, gson: Gson): List<ChainAsse
     }
 }
 
-fun mapRemoteNodesToLocal(chainRemote: ChainRemote, index: Int): List<ChainNodeLocal> {
-    return chainRemote.nodes.map {
+fun mapRemoteNodesToLocal(chainRemote: ChainRemote): List<ChainNodeLocal> {
+    return chainRemote.nodes.mapIndexed { index, chainNodeRemote ->
         ChainNodeLocal(
-            url = it.url,
-            name = it.name,
+            url = chainNodeRemote.url,
+            name = chainNodeRemote.name,
             chainId = chainRemote.chainId,
             orderId = index
         )
@@ -104,7 +104,7 @@ fun mapRemoteExplorersToLocal(chainRemote: ChainRemote): List<ChainExplorerLocal
         )
     }
 
-    return explorers?.map { it }.orEmpty()
+    return explorers.orEmpty()
 }
 
 private fun mapSectionRemoteToLocal(sectionRemote: ChainExternalApiRemote.Section?) = sectionRemote?.let {

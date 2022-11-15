@@ -30,7 +30,7 @@ class ChainSyncService(
         val remoteChains = retryUntilDone { chainFetcher.getChains() }
         val newChains = remoteChains.map { mapRemoteChainToLocal(it, gson) }
         val newAssets = remoteChains.flatMap { mapRemoteAssetsToLocal(it, gson) }
-        val newNodes = remoteChains.flatMapIndexed { index, chain -> mapRemoteNodesToLocal(chain, index) }
+        val newNodes = remoteChains.flatMap { mapRemoteNodesToLocal(it) }
         val newExplorers = remoteChains.flatMap { mapRemoteExplorersToLocal(it) }
 
         val chainsDiff = CollectionDiffer.findDiff(newChains, oldChains, forceUseNewItems = false)

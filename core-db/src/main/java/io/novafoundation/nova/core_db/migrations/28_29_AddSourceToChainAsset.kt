@@ -6,7 +6,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 val AddSourceToLocalAsset_28_29 = object : Migration(27, 28) {
 
     override fun migrate(database: SupportSQLiteDatabase) {
-        // new column
-        database.execSQL("ALTER TABLE `chain_assets` ADD COLUMN `source` TEXT")
+        database.execSQL("ALTER TABLE `chain_assets` ADD COLUMN `source` TEXT NOT NULL")
+        database.execSQL("UPDATE `chain_assets` SET `source`='DEFAULT'")
     }
 }

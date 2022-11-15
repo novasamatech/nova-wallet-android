@@ -13,6 +13,10 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapChainAssetTo
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapChainExplorersToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapChainNodeToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapChainToChainLocal
+import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteAssetsToLocal
+import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteChainToLocal
+import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteExplorersToLocal
+import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteNodesToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.ChainFetcher
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainAssetRemote
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainNodeRemote
@@ -84,7 +88,7 @@ class ChainSyncServiceTest {
 
     @Before
     fun setup() {
-        chainSyncService = ChainSyncService(dao, chainAssetDao, chainFetcher, gson)
+        chainSyncService = ChainSyncService(dao, chainFetcher, gson)
     }
 
     @Test
@@ -208,13 +212,16 @@ class ChainSyncServiceTest {
     }
 
     private fun createLocalCopy(remote: ChainRemote): JoinedChainInfo {
-        val domain = mapChainRemoteToChain(remote)
+        val domain = mapRemoteChainToLocal(remote, gson)
+        val assets = mapRemoteAssetsToLocal(remote, gson)
+        val nodes = mapRemoteNodesToLocal(remote)
+        val explorers = mapRemoteExplorersToLocal(remote)
 
         return JoinedChainInfo(
-            chain = mapChainToChainLocal(domain, gson),
-            nodes = domain.nodes.map(::mapChainNodeToLocal),
-            assets = domain.assets.map { mapChainAssetToLocal(it, gson) },
-            explorers = domain.explorers.map(::mapChainExplorersToLocal)
+            chain = domain,
+            nodes = nodes,
+            assets = assets,
+            explorers = explorers
         )
     }
 
