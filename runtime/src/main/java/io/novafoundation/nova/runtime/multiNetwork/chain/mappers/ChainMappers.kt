@@ -1,4 +1,4 @@
-package io.novafoundation.nova.runtime.multiNetwork.chain
+package io.novafoundation.nova.runtime.multiNetwork.chain.mappers
 
 import android.util.Log
 import com.google.gson.Gson
@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.utils.asGsonParsedNumberOrNull
 import io.novafoundation.nova.common.utils.fromJson
 import io.novafoundation.nova.common.utils.fromJsonOrNull
 import io.novafoundation.nova.common.utils.parseArbitraryObject
+import io.novafoundation.nova.core_db.model.chain.AssetSourceLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 import io.novafoundation.nova.core_db.model.chain.ChainExplorerLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
@@ -14,43 +15,25 @@ import io.novafoundation.nova.core_db.model.chain.JoinedChainInfo
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.BuyProviderArguments
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.BuyProviderId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainExternalApiRemote
-import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainRemote
 
-private const val ETHEREUM_OPTION = "ethereumBased"
-private const val CROWDLOAN_OPTION = "crowdloans"
-private const val TESTNET_OPTION = "testnet"
-
-private fun mapSectionTypeRemoteToSectionType(section: String) = when (section) {
-    "subquery" -> Chain.ExternalApi.Section.Type.SUBQUERY
-    "github" -> Chain.ExternalApi.Section.Type.GITHUB
-    "polkassembly" -> Chain.ExternalApi.Section.Type.POLKASSEMBLY
-    else -> Chain.ExternalApi.Section.Type.UNKNOWN
-}
-
-private fun mapSectionTypeToSectionTypeLocal(sectionType: Chain.ExternalApi.Section.Type): String = sectionType.name
+fun mapSectionTypeToSectionTypeLocal(sectionType: Chain.ExternalApi.Section.Type): String = sectionType.name
 private fun mapSectionTypeLocalToSectionType(sectionType: String): Chain.ExternalApi.Section.Type = enumValueOf(sectionType)
 
-private fun mapStakingStringToStakingType(stakingString: String?): Chain.Asset.StakingType {
-    return when (stakingString) {
-        null -> Chain.Asset.StakingType.UNSUPPORTED
-        "relaychain" -> Chain.Asset.StakingType.RELAYCHAIN
-        "parachain" -> Chain.Asset.StakingType.PARACHAIN
-        "aura-relaychain" -> Chain.Asset.StakingType.RELAYCHAIN_AURA
-        "turing" -> Chain.Asset.StakingType.TURING
-        "aleph-zero" -> Chain.Asset.StakingType.ALEPH_ZERO
-        else -> Chain.Asset.StakingType.UNSUPPORTED
+fun mapStakingTypeToLocal(stakingType: Chain.Asset.StakingType): String = stakingType.name
+private fun mapStakingTypeFromLocal(stakingTypeLocal: String): Chain.Asset.StakingType = enumValueOf(stakingTypeLocal)
+
+private fun mapAssetSourceToLocal(source: Chain.Asset.Source): AssetSourceLocal {
+    return when (source) {
+        Chain.Asset.Source.DEFAULT -> AssetSourceLocal.DEFAULT
+        Chain.Asset.Source.ERC20 -> AssetSourceLocal.ERC20
     }
 }
 
-private fun mapStakingTypeToLocal(stakingType: Chain.Asset.StakingType): String = stakingType.name
-private fun mapStakingTypeFromLocal(stakingTypeLocal: String): Chain.Asset.StakingType = enumValueOf(stakingTypeLocal)
-
-private fun mapSectionRemoteToSection(sectionRemote: ChainExternalApiRemote.Section?) = sectionRemote?.let {
-    Chain.ExternalApi.Section(
-        type = mapSectionTypeRemoteToSectionType(sectionRemote.type),
-        url = sectionRemote.url
-    )
+private fun mapAssetSourceFromLocal(source: AssetSourceLocal): Chain.Asset.Source {
+    return when (source) {
+        AssetSourceLocal.DEFAULT -> Chain.Asset.Source.DEFAULT
+        AssetSourceLocal.ERC20 -> Chain.Asset.Source.ERC20
+    }
 }
 
 private fun mapSectionLocalToSection(sectionLocal: ChainLocal.ExternalApi.Section?) = sectionLocal?.let {
@@ -85,8 +68,6 @@ private const val ORML_EXTRAS_TRANSFERS_ENABLED = "transfersEnabled"
 private const val EVM_EXTRAS_CONTRACT_ADDRESS = "contractAddress"
 
 private const val ORML_TRANSFERS_ENABLED_DEFAULT = true
-
-private const val CHAIN_ADDITIONAL_TIP = "defaultTip"
 
 private inline fun unsupportedOnError(creator: () -> Chain.Asset.Type): Chain.Asset.Type {
     return runCatching(creator)
@@ -139,97 +120,6 @@ private fun mapChainAssetTypeToRaw(type: Chain.Asset.Type): Pair<String, Map<Str
     Chain.Asset.Type.Unsupported -> ASSET_UNSUPPORTED to null
 }
 
-fun mapChainRemoteToChain(
-    chainRemote: ChainRemote,
-): Chain {
-    val nodes = chainRemote.nodes.mapIndexed { index, node ->
-        Chain.Node(
-            url = node.url,
-            name = node.name,
-            chainId = chainRemote.chainId,
-            orderId = index
-        )
-    }
-
-    val assets = chainRemote.assets.map {
-        Chain.Asset(
-            iconUrl = it.icon,
-            chainId = chainRemote.chainId,
-            id = it.assetId,
-            symbol = it.symbol,
-            precision = it.precision,
-            name = it.name ?: chainRemote.name,
-            priceId = it.priceId,
-            staking = mapStakingStringToStakingType(it.staking),
-            type = mapChainAssetTypeFromRaw(it.type, it.typeExtras),
-            buyProviders = it.buyProviders.orEmpty()
-        )
-    }
-
-    val explorers = chainRemote.explorers.orEmpty().map {
-        Chain.Explorer(
-            name = it.name,
-            account = it.account,
-            extrinsic = it.extrinsic,
-            event = it.event,
-            chainId = chainRemote.chainId
-        )
-    }
-
-    val types = chainRemote.types?.let {
-        Chain.Types(
-            url = it.url,
-            overridesCommon = it.overridesCommon
-        )
-    }
-
-    val externalApi = chainRemote.externalApi?.let { externalApi ->
-        Chain.ExternalApi(
-            history = mapSectionRemoteToSection(externalApi.history),
-            staking = mapSectionRemoteToSection(externalApi.staking),
-            crowdloans = mapSectionRemoteToSection(externalApi.crowdloans),
-            governance = mapSectionRemoteToSection(externalApi.governance)
-        )
-    }
-
-    val additional = chainRemote.additional?.let {
-        Chain.Additional(
-            defaultTip = (it[CHAIN_ADDITIONAL_TIP] as? String)?.toBigInteger()
-        )
-    }
-
-    return with(chainRemote) {
-        val optionsOrEmpty = options.orEmpty()
-
-        Chain(
-            id = chainId,
-            parentId = parentId,
-            name = name,
-            assets = assets,
-            types = types,
-            nodes = nodes,
-            explorers = explorers,
-            icon = icon,
-            externalApi = externalApi,
-            addressPrefix = addressPrefix,
-            isEthereumBased = ETHEREUM_OPTION in optionsOrEmpty,
-            isTestNet = TESTNET_OPTION in optionsOrEmpty,
-            hasCrowdloans = CROWDLOAN_OPTION in optionsOrEmpty,
-            governance = optionsOrEmpty.governanceTypeFromOptions(),
-            additional = additional
-        )
-    }
-}
-
-private fun Set<String>.governanceTypeFromOptions(): Chain.Governance {
-    return when {
-        "governance" in this -> Chain.Governance.V2 // for backward compatibility of dev builds. Can be removed once everyone will update dev app
-        "governance-v2" in this -> Chain.Governance.V2
-        "governance-v1" in this -> Chain.Governance.V1
-        else -> Chain.Governance.NONE
-    }
-}
-
 fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
     val nodes = chainLocal.getSortedNodes().map {
         Chain.Node(
@@ -254,7 +144,8 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
             priceId = it.priceId,
             buyProviders = buyProviders,
             staking = mapStakingTypeFromLocal(it.staking),
-            type = mapChainAssetTypeFromRaw(it.type, typeExtrasParsed)
+            type = mapChainAssetTypeFromRaw(it.type, typeExtrasParsed),
+            source = mapAssetSourceFromLocal(it.source)
         )
     }
 
@@ -330,6 +221,7 @@ fun mapChainAssetToLocal(asset: Chain.Asset, gson: Gson): ChainAssetLocal = with
         priceId = priceId,
         staking = mapStakingTypeToLocal(staking),
         type = type,
+        source = mapAssetSourceToLocal(source),
         buyProviders = gson.toJson(buyProviders),
         typeExtras = gson.toJson(typeExtras),
         icon = iconUrl
