@@ -20,7 +20,7 @@ class EvmAssetTransfers(
 
     override val validationSystem: AssetTransfersValidationSystem
         get() = ValidationSystem {
-            //TODO validations
+            // TODO validations
         }
 
     override suspend fun calculateFee(transfer: AssetTransfer): BigInteger {

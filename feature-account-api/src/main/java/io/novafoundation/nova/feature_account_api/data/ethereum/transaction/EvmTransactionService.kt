@@ -19,5 +19,3 @@ interface EvmTransactionService {
         building: EvmTransactionBuilding
     ): Result<TransactionHash>
 }
-
-

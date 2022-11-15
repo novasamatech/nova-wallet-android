@@ -78,7 +78,6 @@ fun Chain.emptyAccountId() = if (isEthereumBased) {
     ByteArray(32)
 }
 
-
 fun Chain.accountIdOrDefault(maybeAddress: String): ByteArray {
     return accountIdOrNull(maybeAddress) ?: emptyAccountId()
 }

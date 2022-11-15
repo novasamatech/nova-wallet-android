@@ -26,7 +26,7 @@ class Erc20Standard : ContractStandard<Erc20Queries, Erc20Transactions> {
 private class Erc20TransactionsImpl(
     private val contractAddress: String,
     private val evmTransactionsBuilder: EvmTransactionBuilder,
-): Erc20Transactions {
+) : Erc20Transactions {
 
     override fun transfer(recipient: String, amount: BigInteger) {
         evmTransactionsBuilder.contractCall(contractAddress) {

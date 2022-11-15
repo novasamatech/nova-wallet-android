@@ -32,7 +32,7 @@ internal class RealEvmTransactionService(
     private val accountRepository: AccountRepository,
     private val chainRegistry: ChainRegistry,
     private val signerProvider: SignerProvider,
-): EvmTransactionService {
+) : EvmTransactionService {
 
     override suspend fun calculateFee(
         chainId: ChainId,
@@ -84,7 +84,7 @@ internal class RealEvmTransactionService(
     }
 
     private suspend fun findMetaAccountFor(origin: TransactionOrigin): MetaAccount {
-        return when(origin) {
+        return when (origin) {
             TransactionOrigin.SelectedWallet -> accountRepository.getSelectedMetaAccount()
         }
     }
@@ -114,4 +114,3 @@ internal class RealEvmTransactionService(
         return ethSendRawTransaction(transactionData).sendSuspend().transactionHash
     }
 }
-
