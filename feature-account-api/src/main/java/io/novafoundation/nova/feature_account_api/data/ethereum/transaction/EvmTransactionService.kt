@@ -10,6 +10,7 @@ interface EvmTransactionService {
 
     suspend fun calculateFee(
         chainId: ChainId,
+        origin: TransactionOrigin = TransactionOrigin.SelectedWallet,
         building: EvmTransactionBuilding
     ): BigInteger
 

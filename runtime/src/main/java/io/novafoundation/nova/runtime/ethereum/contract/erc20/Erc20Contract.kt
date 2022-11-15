@@ -1,9 +1,11 @@
 package io.novafoundation.nova.runtime.ethereum.contract.erc20
 
+import io.novafoundation.nova.common.utils.ethereumAccountIdToAddress
 import io.novafoundation.nova.runtime.ethereum.contract.base.CallableContract
 import io.novafoundation.nova.runtime.ethereum.contract.base.ContractStandard
 import io.novafoundation.nova.runtime.ethereum.contract.base.caller.ContractCaller
 import io.novafoundation.nova.runtime.ethereum.transaction.builder.EvmTransactionBuilder
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.Deferred
 import org.web3j.abi.TypeReference
 import org.web3j.abi.datatypes.Address
@@ -28,11 +30,11 @@ private class Erc20TransactionsImpl(
     private val evmTransactionsBuilder: EvmTransactionBuilder,
 ) : Erc20Transactions {
 
-    override fun transfer(recipient: String, amount: BigInteger) {
+    override fun transfer(recipient: AccountId, amount: BigInteger) {
         evmTransactionsBuilder.contractCall(contractAddress) {
             function = "transfer"
 
-            inputParameter(Address(recipient))
+            inputParameter(Address(recipient.ethereumAccountIdToAddress(withChecksum = true)))
             inputParameter(Uint256(amount))
         }
     }

@@ -36,11 +36,17 @@ internal class RealEvmTransactionService(
 
     override suspend fun calculateFee(
         chainId: ChainId,
+        origin: TransactionOrigin,
         building: EvmTransactionBuilding
     ): BigInteger {
         val web3Api = chainRegistry.ethereumApi(chainId)
+        val chain = chainRegistry.getChain(chainId)
+
+        val submittingMetaAccount = findMetaAccountFor(origin)
+        val submittingAddress = submittingMetaAccount.requireAddressIn(chain)
+
         val txBuilder = EvmTransactionBuilder().apply(building)
-        val txForFee = txBuilder.buildForFee()
+        val txForFee = txBuilder.buildForFee(submittingAddress)
 
         return web3Api.gasPrice() * web3Api.gasLimitOf(txForFee)
     }
@@ -56,7 +62,7 @@ internal class RealEvmTransactionService(
 
         val web3Api = chainRegistry.ethereumApi(chainId)
         val txBuilder = EvmTransactionBuilder().apply(building)
-        val txForFee = txBuilder.buildForFee()
+        val txForFee = txBuilder.buildForFee(submittingAddress)
 
         val gasPrice = web3Api.gasPrice()
         val gasLimit = web3Api.gasLimitOf(txForFee)

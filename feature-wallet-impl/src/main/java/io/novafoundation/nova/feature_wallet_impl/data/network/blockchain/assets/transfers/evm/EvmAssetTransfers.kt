@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Standard
 import io.novafoundation.nova.runtime.ethereum.transaction.builder.EvmTransactionBuilder
 import io.novafoundation.nova.runtime.ethereum.transaction.builder.contractCall
+import io.novafoundation.nova.runtime.ext.accountIdOrDefault
 import io.novafoundation.nova.runtime.ext.requireErc20
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger
@@ -37,9 +38,10 @@ class EvmAssetTransfers(
 
     private fun EvmTransactionBuilder.transfer(transfer: AssetTransfer) {
         val erc20 = transfer.originChainAsset.requireErc20()
+        val recipient = transfer.originChain.accountIdOrDefault(transfer.recipient)
 
         contractCall(erc20.contractAddress, erc20Standard) {
-            transfer(recipient = transfer.recipient, amount = transfer.amountInPlanks)
+            transfer(recipient = recipient, amount = transfer.amountInPlanks)
         }
     }
 

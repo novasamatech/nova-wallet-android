@@ -1,6 +1,5 @@
 package io.novafoundation.nova.runtime.ethereum.transaction.builder
 
-import io.novafoundation.nova.common.utils.emptyEthereumAddress
 import org.web3j.abi.FunctionEncoder
 import org.web3j.abi.TypeReference
 import org.web3j.abi.datatypes.Type
@@ -19,15 +18,13 @@ class RealEvmTransactionBuilder : EvmTransactionBuilder {
             .build()
     }
 
-    fun buildForFee(): Transaction {
-        val feeOrigin = emptyEthereumAddress()
-
+    fun buildForFee(originAddress: String): Transaction {
         return when (val txData = requireNotNull(transactionData)) {
             is EvmTransactionData.ContractCall -> {
                 val data = FunctionEncoder.encode(txData.function)
 
                 Transaction.createFunctionCallTransaction(
-                    feeOrigin,
+                    originAddress,
                     null,
                     null,
                     null,
