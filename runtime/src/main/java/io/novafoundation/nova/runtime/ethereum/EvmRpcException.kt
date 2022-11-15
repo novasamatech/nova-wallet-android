@@ -1,6 +1,6 @@
 package io.novafoundation.nova.runtime.ethereum
 
-class EvmRpcException(val type: Type, message: String): Throwable("${type.name}: $message") {
+class EvmRpcException(val type: Type, message: String) : Throwable("${type.name}: $message") {
 
     enum class Type(val code: Int?) {
         EXECUTION_REVERTED(-32603),

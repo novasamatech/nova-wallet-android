@@ -134,5 +134,4 @@ internal class RealEvmTransactionService(
     private suspend fun Web3Api.sendTransaction(transactionData: String): String {
         return ethSendRawTransaction(transactionData).sendSuspend().transactionHash
     }
-
 }
