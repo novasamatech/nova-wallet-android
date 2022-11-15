@@ -39,7 +39,7 @@ interface Updater : SideEffectScope {
      * Implementations should be aware of cancellation
      */
     suspend fun listenForUpdates(
-        storageSubscriptionBuilder: SubscriptionBuilder
+        storageSubscriptionBuilder: SharedRequestsBuilder
     ): Flow<SideEffect>
 
     interface SideEffect

@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.data.holders.ChainIdHolder
 import io.novafoundation.nova.core.model.StorageChange
 import io.novafoundation.nova.core.model.StorageEntry
 import io.novafoundation.nova.core.storage.StorageCache
-import io.novafoundation.nova.core.updater.SubscriptionBuilder
+import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core.updater.UpdateScope
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -41,7 +41,7 @@ abstract class SingleStorageKeyUpdater<S : UpdateScope>(
 
     protected open fun fallbackValue(runtime: RuntimeSnapshot): String? = null
 
-    override suspend fun listenForUpdates(storageSubscriptionBuilder: SubscriptionBuilder): Flow<Updater.SideEffect> {
+    override suspend fun listenForUpdates(storageSubscriptionBuilder: SharedRequestsBuilder): Flow<Updater.SideEffect> {
         val chainId = chainIdHolder.chainId()
         val runtime = chainRegistry.getRuntime(chainId)
 

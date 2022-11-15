@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_crowdloan_impl.data.network.updater
 
 import io.novafoundation.nova.common.utils.CollectionDiffer
-import io.novafoundation.nova.core.updater.SubscriptionBuilder
+import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core.updater.UpdateScope
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.core_db.dao.ContributionDao
@@ -48,7 +48,7 @@ class ContributionsUpdater(
 
     override val requiredModules: List<String> = emptyList()
 
-    override suspend fun listenForUpdates(storageSubscriptionBuilder: SubscriptionBuilder): Flow<Updater.SideEffect> {
+    override suspend fun listenForUpdates(storageSubscriptionBuilder: SharedRequestsBuilder): Flow<Updater.SideEffect> {
         return scope.invalidationFlow().flatMapLatest {
             val metaAccount = accountScope.getAccount()
             val accountId = metaAccount.accountIdIn(chain) ?: return@flatMapLatest emptyFlow()

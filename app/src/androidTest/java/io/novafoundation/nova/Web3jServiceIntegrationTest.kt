@@ -3,11 +3,14 @@ package io.novafoundation.nova
 import android.util.Log
 import io.novafoundation.nova.common.data.network.ethereum.Web3Api
 import io.novafoundation.nova.common.data.network.ethereum.WebSocketWeb3jService
-import io.novafoundation.nova.common.data.network.ethereum.contract.erc20.ReadOnlyErc20
-import io.novafoundation.nova.common.data.network.ethereum.log.Topic
+import io.novafoundation.nova.common.data.network.ethereum.contract.base.querySingle
+import io.novafoundation.nova.common.data.network.ethereum.contract.erc20.Erc20Queries
+import io.novafoundation.nova.common.data.network.ethereum.contract.erc20.Erc20Standard
 import io.novafoundation.nova.common.data.network.ethereum.sendSuspend
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.second
+import io.novafoundation.nova.core.ethereum.Web3Api
+import io.novafoundation.nova.core.ethereum.log.Topic
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.awaitSocket
 import kotlinx.coroutines.flow.Flow
@@ -73,13 +76,13 @@ class Web3jServiceIntegrationTest : BaseIntegrationTest() {
 
     private fun Web3Api.erc20BalanceFlow(account: String, contract: String): Flow<Balance> {
         return flow {
-            val erc20 = ReadOnlyErc20(contract, web3j = this@erc20BalanceFlow)
-            val initialBalance = erc20.balanceOf(account)
+            val erc20 = Erc20Standard().querySingle(contract, web3j = this@erc20BalanceFlow)
+            val initialBalance = erc20.balanceOfAsync(account).await()
 
             emit(initialBalance)
 
             val changes = accountErcTransfersFlow(account).map {
-                erc20.balanceOf(account)
+                erc20.balanceOfAsync(account).await()
             }
 
             emitAll(changes)
@@ -90,7 +93,7 @@ class Web3jServiceIntegrationTest : BaseIntegrationTest() {
     private fun Web3Api.accountErcTransfersFlow(address: String): Flow<Erc20Transfer> {
         val addressTopic = TypeEncoder.encode(Address(address))
 
-        val transferEvent = ReadOnlyErc20.TRANSFER_EVENT
+        val transferEvent = Erc20Queries.TRANSFER_EVENT
         val transferEventSignature = EventEncoder.encode(transferEvent)
         val contractAddresses = emptyList<String>() // everything
 
@@ -114,7 +117,7 @@ class Web3jServiceIntegrationTest : BaseIntegrationTest() {
             val log = logNotification.params.result
 
             val contract = log.address
-            val event = ReadOnlyErc20.parseTransferEvent(log)
+            val event = Erc20Queries.parseTransferEvent(log)
 
             Erc20Transfer(
                 txHash = log.transactionHash,

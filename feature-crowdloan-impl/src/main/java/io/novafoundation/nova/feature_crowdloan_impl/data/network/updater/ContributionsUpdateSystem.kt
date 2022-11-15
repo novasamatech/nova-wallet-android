@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_crowdloan_impl.data.network.updater
 
 import android.util.Log
-import io.novafoundation.nova.common.data.network.StorageSubscriptionBuilder
+import io.novafoundation.nova.common.data.network.StorageSharedRequestsBuilder
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.core.updater.Updater
@@ -59,7 +59,7 @@ class ContributionsUpdateSystem(
     private fun run(chain: Chain, metaAccount: MetaAccount): Flow<Updater.SideEffect> {
         return flow {
             val socket = chainRegistry.getSocket(chain.id)
-            val subscriptionBuilder = StorageSubscriptionBuilder.create(socket)
+            val subscriptionBuilder = StorageSharedRequestsBuilder.create(socket)
             val invalidationScope = assetBalanceScopeFactory.create(chain.utilityAsset, metaAccount)
             val updater = contributionsUpdaterFactory.create(chain, invalidationScope)
 

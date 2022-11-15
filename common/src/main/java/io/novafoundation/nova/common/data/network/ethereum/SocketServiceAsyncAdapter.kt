@@ -34,6 +34,27 @@ fun SocketService.executeRequestAsFuture(
     return future
 }
 
+fun SocketService.executeBatchRequestAsFuture(
+    requests: List<RpcRequest>,
+    deliveryType: DeliveryType = DeliveryType.AT_LEAST_ONCE,
+): CompletableFuture<List<RpcResponse>> {
+    val future = RequestCancellableFuture<List<RpcResponse>>()
+
+    val callback = object : SocketService.ResponseListener<List<RpcResponse>> {
+        override fun onError(throwable: Throwable) {
+            future.completeExceptionally(throwable)
+        }
+
+        override fun onNext(response: List<RpcResponse>) {
+            future.complete(response)
+        }
+    }
+
+    future.cancellable = executeBatchRequest(requests, deliveryType, callback)
+
+    return future
+}
+
 fun SocketService.subscribeAsObservable(
     request: RpcRequest,
     unsubscribeMethod: String

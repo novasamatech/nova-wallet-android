@@ -1,6 +1,8 @@
 package io.novafoundation.nova.common.data.network.ethereum
 
-import io.novafoundation.nova.common.data.network.ethereum.log.Topic
+import io.novafoundation.nova.core.ethereum.Web3Api
+import io.novafoundation.nova.core.ethereum.log.Topic
+import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
 import org.web3j.protocol.Web3j
@@ -9,12 +11,8 @@ import org.web3j.protocol.core.Request
 import org.web3j.protocol.core.methods.response.EthSubscribe
 import org.web3j.protocol.websocket.events.LogNotification
 
-interface Web3Api : Web3j {
-
-    fun logsNotifications(addresses: List<String>, topics: List<Topic>): Flow<LogNotification>
-}
-
 fun Web3Api(web3jService: Web3jService): Web3Api = RealWeb3Api(web3jService)
+fun Web3Api(socketService: SocketService): Web3Api = RealWeb3Api(WebSocketWeb3jService(socketService))
 
 internal class RealWeb3Api(
     private val web3jService: Web3jService,

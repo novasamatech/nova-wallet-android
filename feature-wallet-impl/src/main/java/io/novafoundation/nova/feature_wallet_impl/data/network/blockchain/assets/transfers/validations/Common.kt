@@ -88,5 +88,6 @@ private fun Chain.Asset.existentialDepositError(amount: BigDecimal): WillRemoveA
     Chain.Asset.Type.Native -> WillRemoveAccount.WillBurnDust
     is Chain.Asset.Type.Orml -> WillRemoveAccount.WillBurnDust
     is Chain.Asset.Type.Statemine -> WillRemoveAccount.WillTransferDust(amount)
+    is Chain.Asset.Type.Evm -> WillRemoveAccount.WillBurnDust
     Chain.Asset.Type.Unsupported -> throw IllegalArgumentException("Unsupported")
 }

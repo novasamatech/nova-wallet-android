@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger
 
-class UnsupportedAssetTransfers : AssetTransfers {
+open class UnsupportedAssetTransfers : AssetTransfers {
 
     override val validationSystem: AssetTransfersValidationSystem
         get() = throw UnsupportedOperationException("Unsupported")
