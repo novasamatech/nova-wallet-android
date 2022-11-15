@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updat
 import io.novafoundation.nova.common.utils.staking
 import io.novafoundation.nova.core.model.StorageChange
 import io.novafoundation.nova.core.storage.StorageCache
-import io.novafoundation.nova.core.updater.SubscriptionBuilder
+import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.model.AccountStakingLocal
@@ -56,7 +56,7 @@ class StakingLedgerUpdater(
     override val scope: AccountUpdateScope,
 ) : StakingUpdater {
 
-    override suspend fun listenForUpdates(storageSubscriptionBuilder: SubscriptionBuilder): Flow<Updater.SideEffect> {
+    override suspend fun listenForUpdates(storageSubscriptionBuilder: SharedRequestsBuilder): Flow<Updater.SideEffect> {
         val (chain, chainAsset) = stakingSharedState.assetWithChain.first()
         val runtime = chainRegistry.getRuntime(chain.id)
 

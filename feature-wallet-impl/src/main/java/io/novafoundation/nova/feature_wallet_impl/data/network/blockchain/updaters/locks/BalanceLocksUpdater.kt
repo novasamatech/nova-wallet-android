@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.locks
 
-import io.novafoundation.nova.core.updater.SubscriptionBuilder
+import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
@@ -32,7 +32,7 @@ class BalanceLocksUpdater(
 ) : Updater {
     override val requiredModules: List<String> = emptyList()
 
-    override suspend fun listenForUpdates(storageSubscriptionBuilder: SubscriptionBuilder): Flow<Updater.SideEffect> {
+    override suspend fun listenForUpdates(storageSubscriptionBuilder: SharedRequestsBuilder): Flow<Updater.SideEffect> {
         return chain.assets.map { chainAsset ->
             val metaAccount = scope.getAccount()
             val accountId = metaAccount.accountIdIn(chain) ?: return emptyFlow()

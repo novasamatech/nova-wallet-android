@@ -79,6 +79,10 @@ data class Chain(
                 val transfersEnabled: Boolean,
             ) : Type()
 
+            data class Evm(
+                val contractAddress: String
+            ) : Type()
+
             object Unsupported : Type()
         }
 

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.runtime.multiNetwork.chain.mappers
 
+import android.util.Log
 import com.google.gson.Gson
 import io.novafoundation.nova.common.utils.asGsonParsedNumberOrNull
 import io.novafoundation.nova.common.utils.fromJson
@@ -54,6 +55,8 @@ private const val ASSET_STATEMINE = "statemine"
 private const val ASSET_ORML = "orml"
 private const val ASSET_UNSUPPORTED = "unsupported"
 
+private const val ASSET_EVM = "evm"
+
 private const val STATEMINE_EXTRAS_ID = "assetId"
 private const val STATEMINE_EXTRAS_PALLET_NAME = "palletName"
 
@@ -62,10 +65,14 @@ private const val ORML_EXTRAS_CURRENCY_TYPE = "currencyIdType"
 private const val ORML_EXTRAS_EXISTENTIAL_DEPOSIT = "existentialDeposit"
 private const val ORML_EXTRAS_TRANSFERS_ENABLED = "transfersEnabled"
 
+private const val EVM_EXTRAS_CONTRACT_ADDRESS = "contractAddress"
+
 private const val ORML_TRANSFERS_ENABLED_DEFAULT = true
 
 private inline fun unsupportedOnError(creator: () -> Chain.Asset.Type): Chain.Asset.Type {
-    return runCatching(creator).getOrDefault(Chain.Asset.Type.Unsupported)
+    return runCatching(creator)
+        .onFailure { Log.e("ChainMapper", "Failed to construct chain type", it) }
+        .getOrDefault(Chain.Asset.Type.Unsupported)
 }
 
 private fun mapChainAssetTypeFromRaw(type: String?, typeExtras: Map<String, Any?>?): Chain.Asset.Type = unsupportedOnError {
@@ -85,6 +92,11 @@ private fun mapChainAssetTypeFromRaw(type: String?, typeExtras: Map<String, Any?
                 transfersEnabled = typeExtras[ORML_EXTRAS_TRANSFERS_ENABLED] as Boolean? ?: ORML_TRANSFERS_ENABLED_DEFAULT,
             )
         }
+        ASSET_EVM -> {
+            Chain.Asset.Type.Evm(
+                contractAddress = typeExtras!![EVM_EXTRAS_CONTRACT_ADDRESS] as String
+            )
+        }
         else -> Chain.Asset.Type.Unsupported
     }
 }
@@ -101,6 +113,10 @@ private fun mapChainAssetTypeToRaw(type: Chain.Asset.Type): Pair<String, Map<Str
         ORML_EXTRAS_EXISTENTIAL_DEPOSIT to type.existentialDeposit.toString(),
         ORML_EXTRAS_TRANSFERS_ENABLED to type.transfersEnabled
     )
+    is Chain.Asset.Type.Evm -> ASSET_EVM to mapOf(
+        EVM_EXTRAS_CONTRACT_ADDRESS to type.contractAddress
+    )
+
     Chain.Asset.Type.Unsupported -> ASSET_UNSUPPORTED to null
 }
 

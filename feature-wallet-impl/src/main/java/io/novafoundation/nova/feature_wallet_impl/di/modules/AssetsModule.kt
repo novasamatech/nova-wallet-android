@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets
         NativeAssetsModule::class,
         StatemineAssetsModule::class,
         OrmlAssetsModule::class,
+        EvmAssetsModule::class,
         UnsupportedAssetsModule::class
     ]
 )
@@ -24,11 +25,13 @@ class AssetsModule {
         @NativeAsset native: Lazy<AssetSource>,
         @StatemineAssets statemine: Lazy<AssetSource>,
         @OrmlAssets orml: Lazy<AssetSource>,
+        @EvmAssets evm: Lazy<AssetSource>,
         @UnsupportedAssets unsupported: AssetSource,
     ): AssetSourceRegistry = TypeBasedAssetSourceRegistry(
         nativeSource = native,
         statemineSource = statemine,
         ormlSource = orml,
+        evmSource = evm,
         unsupportedBalanceSource = unsupported
     )
 }

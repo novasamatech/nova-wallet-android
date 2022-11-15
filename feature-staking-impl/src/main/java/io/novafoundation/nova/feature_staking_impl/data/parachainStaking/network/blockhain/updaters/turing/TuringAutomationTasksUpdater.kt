@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.utils.automationTime
 import io.novafoundation.nova.common.utils.system
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core.storage.insertPrefixEntries
-import io.novafoundation.nova.core.updater.SubscriptionBuilder
+import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
@@ -29,7 +29,7 @@ class TuringAutomationTasksUpdater(
     override val scope: AccountUpdateScope,
 ) : ParachainStakingUpdater {
 
-    override suspend fun listenForUpdates(storageSubscriptionBuilder: SubscriptionBuilder): Flow<Updater.SideEffect> {
+    override suspend fun listenForUpdates(storageSubscriptionBuilder: SharedRequestsBuilder): Flow<Updater.SideEffect> {
         val chain = stakingSharedState.chain()
         val metaAccount = scope.getAccount()
         val accountId = metaAccount.accountIdIn(chain) ?: return emptyFlow()

@@ -1,7 +1,8 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.balance
 
 import android.util.Log
-import io.novafoundation.nova.common.data.network.StorageSubscriptionBuilder
+import io.novafoundation.nova.common.data.network.StorageSharedRequestsBuilder
+import io.novafoundation.nova.common.data.network.subscribe
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.core.updater.Updater
@@ -10,7 +11,6 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getSocket
-import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.storage.subscribeUsing
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.onCompletion
+import kotlin.coroutines.coroutineContext
 
 class BalancesUpdateSystem(
     private val chainRegistry: ChainRegistry,
@@ -42,7 +42,7 @@ class BalancesUpdateSystem(
     private suspend fun balanceChainUpdaters(chain: Chain): Flow<Updater.SideEffect> {
         return flow {
             val socket = chainRegistry.getSocket(chain.id)
-            val subscriptionBuilder = StorageSubscriptionBuilder.create(socket)
+            val subscriptionBuilder = StorageSharedRequestsBuilder.create(socket)
 
             val updaters: List<Updater> = listOf(paymentUpdaterFactory.create(chain), balanceLocksUpdater.create(chain))
             val sideEffectFlows = updaters.map { updater ->
@@ -53,9 +53,8 @@ class BalancesUpdateSystem(
                 }
             }
 
-            val cancellable = socket.subscribeUsing(subscriptionBuilder.build())
+            subscriptionBuilder.subscribe(coroutineContext)
             val resultFlow = sideEffectFlows.merge()
-                .onCompletion { cancellable.cancel() }
 
             emitAll(resultFlow)
         }

@@ -19,6 +19,7 @@ class TypeBasedAssetSourceRegistry(
     private val nativeSource: Lazy<AssetSource>,
     private val statemineSource: Lazy<AssetSource>,
     private val ormlSource: Lazy<AssetSource>,
+    private val evmSource: Lazy<AssetSource>,
     private val unsupportedBalanceSource: AssetSource,
 ) : AssetSourceRegistry {
 
@@ -27,6 +28,7 @@ class TypeBasedAssetSourceRegistry(
             is Chain.Asset.Type.Native -> nativeSource.get()
             is Chain.Asset.Type.Statemine -> statemineSource.get()
             is Chain.Asset.Type.Orml -> ormlSource.get()
+            is Chain.Asset.Type.Evm -> evmSource.get()
             Chain.Asset.Type.Unsupported -> unsupportedBalanceSource
         }
     }
