@@ -1,12 +1,12 @@
 package io.novafoundation.nova.runtime.network.updaters
 
 import android.util.Log
-import io.novafoundation.nova.common.data.network.StorageSharedRequestsBuilder
-import io.novafoundation.nova.common.data.network.subscribe
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.hasModule
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.core.updater.Updater
+import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilder
+import io.novafoundation.nova.runtime.ethereum.subscribe
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime

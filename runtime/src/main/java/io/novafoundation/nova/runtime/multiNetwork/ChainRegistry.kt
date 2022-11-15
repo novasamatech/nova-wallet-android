@@ -1,14 +1,14 @@
 package io.novafoundation.nova.runtime.multiNetwork
 
 import com.google.gson.Gson
-import io.novafoundation.nova.common.data.network.ethereum.Web3Api
-import io.novafoundation.nova.common.data.network.ethereum.WebSocketWeb3jService
 import io.novafoundation.nova.common.utils.diffed
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.core_db.dao.ChainDao
+import io.novafoundation.nova.runtime.ethereum.Web3Api
+import io.novafoundation.nova.runtime.ethereum.WebSocketWeb3jService
 import io.novafoundation.nova.runtime.multiNetwork.chain.ChainSyncService
 import io.novafoundation.nova.runtime.multiNetwork.chain.mapChainLocalToChain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain

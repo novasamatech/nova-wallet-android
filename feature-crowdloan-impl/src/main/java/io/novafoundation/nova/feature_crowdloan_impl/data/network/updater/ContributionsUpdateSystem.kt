@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_crowdloan_impl.data.network.updater
 
 import android.util.Log
-import io.novafoundation.nova.common.data.network.StorageSharedRequestsBuilder
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.core.updater.Updater
@@ -9,6 +8,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_crowdloan_api.data.network.updater.ContributionsUpdateSystemFactory
 import io.novafoundation.nova.feature_crowdloan_api.data.network.updater.ContributionsUpdaterFactory
+import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilder
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain

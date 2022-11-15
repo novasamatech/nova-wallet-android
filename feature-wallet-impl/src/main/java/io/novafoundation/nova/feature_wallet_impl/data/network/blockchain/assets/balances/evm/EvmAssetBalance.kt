@@ -1,9 +1,9 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.evm
 
-import io.novafoundation.nova.common.data.network.ethereum.contract.base.queryBatched
-import io.novafoundation.nova.common.data.network.ethereum.contract.base.querySingle
-import io.novafoundation.nova.common.data.network.ethereum.contract.erc20.Erc20Queries
-import io.novafoundation.nova.common.data.network.ethereum.contract.erc20.Erc20Standard
+import io.novafoundation.nova.runtime.ethereum.contract.base.queryBatched
+import io.novafoundation.nova.runtime.ethereum.contract.base.querySingle
+import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Queries
+import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Standard
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.core.ethereum.log.Topic
 import io.novafoundation.nova.core.updater.EthereumSharedRequestsBuilder

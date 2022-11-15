@@ -1,4 +1,4 @@
-package io.novafoundation.nova.common.data.network.ethereum
+package io.novafoundation.nova.runtime.ethereum
 
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.core.ethereum.log.Topic

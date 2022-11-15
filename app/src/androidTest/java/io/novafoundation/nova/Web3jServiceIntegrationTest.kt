@@ -1,12 +1,12 @@
 package io.novafoundation.nova
 
 import android.util.Log
-import io.novafoundation.nova.common.data.network.ethereum.Web3Api
-import io.novafoundation.nova.common.data.network.ethereum.WebSocketWeb3jService
-import io.novafoundation.nova.common.data.network.ethereum.contract.base.querySingle
-import io.novafoundation.nova.common.data.network.ethereum.contract.erc20.Erc20Queries
-import io.novafoundation.nova.common.data.network.ethereum.contract.erc20.Erc20Standard
-import io.novafoundation.nova.common.data.network.ethereum.sendSuspend
+import io.novafoundation.nova.runtime.ethereum.Web3Api
+import io.novafoundation.nova.runtime.ethereum.WebSocketWeb3jService
+import io.novafoundation.nova.runtime.ethereum.contract.base.querySingle
+import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Queries
+import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Standard
+import io.novafoundation.nova.runtime.ethereum.sendSuspend
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.second
 import io.novafoundation.nova.core.ethereum.Web3Api

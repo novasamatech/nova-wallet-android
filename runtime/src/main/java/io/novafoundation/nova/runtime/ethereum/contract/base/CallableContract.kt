@@ -1,6 +1,6 @@
-package io.novafoundation.nova.common.data.network.ethereum.contract.base
+package io.novafoundation.nova.runtime.ethereum.contract.base
 
-import io.novafoundation.nova.common.data.network.ethereum.contract.base.caller.ContractCaller
+import io.novafoundation.nova.runtime.ethereum.contract.base.caller.ContractCaller
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async

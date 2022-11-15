@@ -1,13 +1,12 @@
-package io.novafoundation.nova.common.data.network
+package io.novafoundation.nova.runtime.ethereum
 
-import io.novafoundation.nova.common.data.network.ethereum.Web3Api
-import io.novafoundation.nova.common.data.network.ethereum.subscribtion.EthereumRequestsAggregator
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invokeOnCompletion
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.core.ethereum.log.Topic
 import io.novafoundation.nova.core.model.StorageChange
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
+import io.novafoundation.nova.runtime.ethereum.subscribtion.EthereumRequestsAggregator
 import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
 import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.storage.StorageSubscriptionMultiplexer
 import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.storage.subscribeUsing

@@ -1,4 +1,4 @@
-package io.novafoundation.nova.common.data.network.ethereum.subscribtion
+package io.novafoundation.nova.runtime.ethereum.subscribtion
 
 import io.novafoundation.nova.common.data.network.runtime.binding.cast
 import io.novafoundation.nova.common.utils.mergeIfMultiple
