@@ -102,13 +102,6 @@ fun Chain.multiAddressOf(accountId: ByteArray): MultiAddress {
     }
 }
 
-val Chain.historySupported: Boolean
-    get() {
-        val historyType = externalApi?.history?.type ?: return false
-
-        return historyType != Chain.ExternalApi.Section.Type.UNKNOWN
-    }
-
 fun Chain.isValidAddress(address: String): Boolean {
     return runCatching {
         if (isEthereumBased) {

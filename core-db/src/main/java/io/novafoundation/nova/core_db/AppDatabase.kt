@@ -48,6 +48,7 @@ import io.novafoundation.nova.core_db.migrations.AddMetaAccountType_14_15
 import io.novafoundation.nova.core_db.migrations.AddNfts_5_6
 import io.novafoundation.nova.core_db.migrations.AddSitePhishing_6_7
 import io.novafoundation.nova.core_db.migrations.AddSourceToLocalAsset_28_29
+import io.novafoundation.nova.core_db.migrations.AddTransferApisTable_29_30
 import io.novafoundation.nova.core_db.migrations.AssetTypes_2_3
 import io.novafoundation.nova.core_db.migrations.BetterChainDiffing_8_9
 import io.novafoundation.nova.core_db.migrations.ChangeAsset_3_4
@@ -84,10 +85,11 @@ import io.novafoundation.nova.core_db.model.chain.ChainExplorerLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
+import io.novafoundation.nova.core_db.model.chain.ChainTransferHistoryApiLocal
 import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
 
 @Database(
-    version = 29,
+    version = 30,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -103,6 +105,7 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
         ChainAssetLocal::class,
         ChainRuntimeInfoLocal::class,
         ChainExplorerLocal::class,
+        ChainTransferHistoryApiLocal::class,
         MetaAccountLocal::class,
         ChainAccountLocal::class,
         DappAuthorizationLocal::class,
@@ -149,7 +152,8 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(AddCurrencies_18_19, ChangeTokens_19_20, ChangeChainNodes_20_21)
                     .addMigrations(NullableSubstrateAccountId_21_22, AddLocks_22_23, AddContributions_23_24)
                     .addMigrations(AddGovernanceFlagToChains_24_25, AddGovernanceDapps_25_26, GovernanceFlagToEnum_26_27)
-                    .addMigrations(AddGovernanceExternalApiToChain_27_28, AddSourceToLocalAsset_28_29)
+                    .addMigrations(AddGovernanceExternalApiToChain_27_28)
+                    .addMigrations(AddSourceToLocalAsset_28_29, AddTransferApisTable_29_30)
                     .fallbackToDestructiveMigration()
                     .build()
             }

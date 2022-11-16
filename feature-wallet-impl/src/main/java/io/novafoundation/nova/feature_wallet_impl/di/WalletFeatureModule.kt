@@ -27,6 +27,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossCh
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.di.Wallet
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionHistoryRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
@@ -46,6 +47,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.phishing.Phishing
 import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RealBalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RealCrossChainTransfersRepository
+import io.novafoundation.nova.feature_wallet_impl.data.repository.RealTransactionHistoryRepository
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RuntimeWalletConstants
 import io.novafoundation.nova.feature_wallet_impl.data.repository.TokenRepositoryImpl
 import io.novafoundation.nova.feature_wallet_impl.data.repository.WalletRepositoryImpl
@@ -111,27 +113,33 @@ class WalletFeatureModule {
     fun provideWalletRepository(
         substrateSource: SubstrateRemoteSource,
         operationsDao: OperationDao,
-        subQueryOperationsApi: SubQueryOperationsApi,
         httpExceptionHandler: HttpExceptionHandler,
         phishingApi: PhishingApi,
         phishingAddressDao: PhishingAddressDao,
         assetCache: AssetCache,
         coingeckoApi: CoingeckoApi,
         accountRepository: AccountRepository,
-        cursorStorage: TransferCursorStorage,
         chainRegistry: ChainRegistry,
     ): WalletRepository = WalletRepositoryImpl(
         substrateSource,
         operationsDao,
-        subQueryOperationsApi,
         httpExceptionHandler,
         phishingApi,
         accountRepository,
         assetCache,
         phishingAddressDao,
-        cursorStorage,
         coingeckoApi,
         chainRegistry,
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideTransactionHistoryRepository(
+        assetSourceRegistry: AssetSourceRegistry,
+        operationsDao: OperationDao
+    ): TransactionHistoryRepository = RealTransactionHistoryRepository(
+        assetSourceRegistry = assetSourceRegistry,
+        operationDao = operationsDao
     )
 
     @Provides

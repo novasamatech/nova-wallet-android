@@ -118,13 +118,24 @@ data class Chain(
 
     data class ExternalApi(
         val staking: Section?,
-        val history: Section?,
+        val history: List<TransferHistoryApi>,
         val crowdloans: Section?,
         val governance: Section?
     ) {
         data class Section(val type: Type, val url: String) {
             enum class Type {
-                SUBQUERY, GITHUB, UNKNOWN, POLKASSEMBLY
+                SUBQUERY, GITHUB, UNKNOWN, POLKASSEMBLY, ETHERSCAN
+            }
+        }
+
+        data class TransferHistoryApi(
+            val assetType: AssetType,
+            val apiType: Section.Type,
+            val url: String
+        ) {
+
+            enum class AssetType {
+                SUBSTRATE, EVM, UNSUPPORTED
             }
         }
     }

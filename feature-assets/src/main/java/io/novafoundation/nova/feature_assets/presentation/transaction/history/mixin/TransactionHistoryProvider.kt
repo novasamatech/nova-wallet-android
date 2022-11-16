@@ -173,7 +173,7 @@ class TransactionHistoryProvider(
 
     private fun loadNewPage(sideEffect: TransactionStateMachine.SideEffect.LoadPage) {
         launch {
-            walletInteractor.getOperations(chainId, assetId, sideEffect.pageSize, sideEffect.nextCursor, sideEffect.filters)
+            walletInteractor.getOperations(chainId, assetId, sideEffect.pageSize, sideEffect.nextPageOffset, sideEffect.filters)
                 .onFailure {
                     performTransition(Action.PageError(error = it))
                 }.onSuccess {

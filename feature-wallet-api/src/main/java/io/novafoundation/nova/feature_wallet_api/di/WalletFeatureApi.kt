@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossCh
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionHistoryRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
@@ -40,4 +41,6 @@ interface WalletFeatureApi {
     val crossChainTransactor: CrossChainTransactor
 
     val balanceLocksRepository: BalanceLocksRepository
+
+    val transactionHistoryRepository: TransactionHistoryRepository
 }

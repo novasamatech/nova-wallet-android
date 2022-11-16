@@ -32,7 +32,7 @@ data class OperationLocal(
     }
 
     enum class Source {
-        BLOCKCHAIN, SUBQUERY, APP
+        BLOCKCHAIN, REMOTE, APP
     }
 
     enum class Status {

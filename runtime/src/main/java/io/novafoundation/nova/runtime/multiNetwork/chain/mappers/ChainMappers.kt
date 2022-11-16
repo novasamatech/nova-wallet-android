@@ -7,10 +7,7 @@ import io.novafoundation.nova.common.utils.fromJson
 import io.novafoundation.nova.common.utils.fromJsonOrNull
 import io.novafoundation.nova.common.utils.parseArbitraryObject
 import io.novafoundation.nova.core_db.model.chain.AssetSourceLocal
-import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
-import io.novafoundation.nova.core_db.model.chain.ChainExplorerLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
-import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.JoinedChainInfo
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.BuyProviderArguments
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.BuyProviderId
@@ -22,12 +19,7 @@ private fun mapSectionTypeLocalToSectionType(sectionType: String): Chain.Externa
 fun mapStakingTypeToLocal(stakingType: Chain.Asset.StakingType): String = stakingType.name
 private fun mapStakingTypeFromLocal(stakingTypeLocal: String): Chain.Asset.StakingType = enumValueOf(stakingTypeLocal)
 
-private fun mapAssetSourceToLocal(source: Chain.Asset.Source): AssetSourceLocal {
-    return when (source) {
-        Chain.Asset.Source.DEFAULT -> AssetSourceLocal.DEFAULT
-        Chain.Asset.Source.ERC20 -> AssetSourceLocal.ERC20
-    }
-}
+fun mapTransferApiAssetTypeFromLocal(localType: String): Chain.ExternalApi.TransferHistoryApi.AssetType = enumValueOf(localType)
 
 private fun mapAssetSourceFromLocal(source: AssetSourceLocal): Chain.Asset.Source {
     return when (source) {
@@ -39,13 +31,6 @@ private fun mapAssetSourceFromLocal(source: AssetSourceLocal): Chain.Asset.Sourc
 private fun mapSectionLocalToSection(sectionLocal: ChainLocal.ExternalApi.Section?) = sectionLocal?.let {
     Chain.ExternalApi.Section(
         type = mapSectionTypeLocalToSectionType(sectionLocal.type),
-        url = sectionLocal.url
-    )
-}
-
-private fun mapSectionToSectionLocal(sectionLocal: Chain.ExternalApi.Section?) = sectionLocal?.let {
-    ChainLocal.ExternalApi.Section(
-        type = mapSectionTypeToSectionTypeLocal(sectionLocal.type),
         url = sectionLocal.url
     )
 }
@@ -166,10 +151,18 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
         )
     }
 
+    val historyApis = chainLocal.transferHistoryApis.map {
+        Chain.ExternalApi.TransferHistoryApi(
+            assetType = mapTransferApiAssetTypeFromLocal(it.assetType),
+            apiType = mapSectionTypeLocalToSectionType(it.apiType),
+            url = it.url
+        )
+    }
+
     val externalApi = chainLocal.chain.externalApi?.let { externalApi ->
         Chain.ExternalApi(
             staking = mapSectionLocalToSection(externalApi.staking),
-            history = mapSectionLocalToSection(externalApi.history),
+            history = historyApis,
             crowdloans = mapSectionLocalToSection(externalApi.crowdloans),
             governance = mapSectionLocalToSection(externalApi.governance)
         )
@@ -198,83 +191,4 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
             additional = additional
         )
     }
-}
-
-fun mapChainNodeToLocal(node: Chain.Node): ChainNodeLocal {
-    return ChainNodeLocal(
-        url = node.url,
-        name = node.name,
-        chainId = node.chainId,
-        orderId = node.orderId
-    )
-}
-
-fun mapChainAssetToLocal(asset: Chain.Asset, gson: Gson): ChainAssetLocal = with(asset) {
-    val (type, typeExtras) = mapChainAssetTypeToRaw(type)
-
-    return ChainAssetLocal(
-        id = id,
-        symbol = symbol,
-        precision = precision,
-        chainId = chainId,
-        name = name,
-        priceId = priceId,
-        staking = mapStakingTypeToLocal(staking),
-        type = type,
-        source = mapAssetSourceToLocal(source),
-        buyProviders = gson.toJson(buyProviders),
-        typeExtras = gson.toJson(typeExtras),
-        icon = iconUrl
-    )
-}
-
-fun mapChainExplorersToLocal(explorer: Chain.Explorer): ChainExplorerLocal {
-    return with(explorer) {
-        ChainExplorerLocal(
-            chainId = chainId,
-            name = name,
-            extrinsic = extrinsic,
-            account = account,
-            event = event
-        )
-    }
-}
-
-fun mapChainToChainLocal(chain: Chain, gson: Gson): ChainLocal {
-    val additional = chain.additional?.let { gson.toJson(it) }
-
-    val types = chain.types?.let {
-        ChainLocal.TypesConfig(
-            url = it.url,
-            overridesCommon = it.overridesCommon
-        )
-    }
-
-    val externalApi = chain.externalApi?.let { externalApi ->
-        ChainLocal.ExternalApi(
-            staking = mapSectionToSectionLocal(externalApi.staking),
-            history = mapSectionToSectionLocal(externalApi.history),
-            crowdloans = mapSectionToSectionLocal(externalApi.crowdloans),
-            governance = mapSectionToSectionLocal(externalApi.governance)
-        )
-    }
-
-    val chainLocal = with(chain) {
-        ChainLocal(
-            id = id,
-            parentId = parentId,
-            name = name,
-            types = types,
-            icon = icon,
-            prefix = addressPrefix,
-            externalApi = externalApi,
-            isEthereumBased = isEthereumBased,
-            isTestNet = isTestNet,
-            hasCrowdloans = hasCrowdloans,
-            governance = governance.name,
-            additional = additional,
-        )
-    }
-
-    return chainLocal
 }
