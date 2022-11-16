@@ -53,8 +53,9 @@ class ChainRegistryModule {
     @ApplicationScope
     fun provideAssetSyncService(
         dao: ChainAssetDao,
-        assetFetcher: AssetFetcher
-    ) = EvmAssetsSyncService(dao, assetFetcher)
+        assetFetcher: AssetFetcher,
+        gson: Gson
+    ) = EvmAssetsSyncService(dao, assetFetcher, gson)
 
     @Provides
     @ApplicationScope

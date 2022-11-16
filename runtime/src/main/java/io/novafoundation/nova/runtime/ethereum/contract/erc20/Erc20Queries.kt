@@ -1,4 +1,4 @@
-package io.novafoundation.nova.common.data.network.ethereum.contract.erc20
+package io.novafoundation.nova.runtime.ethereum.contract.erc20
 
 import kotlinx.coroutines.Deferred
 import org.web3j.abi.TypeDecoder

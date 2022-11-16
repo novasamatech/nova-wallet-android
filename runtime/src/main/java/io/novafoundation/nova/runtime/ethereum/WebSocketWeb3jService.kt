@@ -1,4 +1,4 @@
-package io.novafoundation.nova.common.data.network.ethereum
+package io.novafoundation.nova.runtime.ethereum
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.reactivex.BackpressureStrategy
@@ -44,6 +44,10 @@ class WebSocketWeb3jService(
         val rpcRequest = request.toRpcRequest()
 
         return socketService.executeRequestAsFuture(rpcRequest).thenApply {
+            if (it.error != null) {
+                throw EvmRpcException(it.error!!.code, it.error!!.message)
+            }
+
             jsonMapper.convertValue(it, responseType)
         }
     }

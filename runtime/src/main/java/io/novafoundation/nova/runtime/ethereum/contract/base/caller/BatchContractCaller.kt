@@ -1,6 +1,6 @@
-package io.novafoundation.nova.common.data.network.ethereum.contract.base.caller
+package io.novafoundation.nova.runtime.ethereum.contract.base.caller
 
-import io.novafoundation.nova.common.data.network.ethereum.subscribtion.BatchId
+import io.novafoundation.nova.runtime.ethereum.subscribtion.BatchId
 import io.novafoundation.nova.core.updater.EthereumSharedRequestsBuilder
 import kotlinx.coroutines.Deferred
 import org.web3j.protocol.core.DefaultBlockParameter

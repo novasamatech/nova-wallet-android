@@ -1,4 +1,4 @@
-package io.novafoundation.nova.common.data.network.ethereum
+package io.novafoundation.nova.runtime.ethereum
 
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject

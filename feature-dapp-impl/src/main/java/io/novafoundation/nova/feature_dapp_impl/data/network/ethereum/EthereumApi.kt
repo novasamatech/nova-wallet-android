@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_dapp_impl.data.network.ethereum
 
-import io.novafoundation.nova.common.data.network.ethereum.sendSuspend
+import io.novafoundation.nova.runtime.ethereum.sendSuspend
 import jp.co.soramitsu.fearless_utils.encrypt.SignatureWrapper
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.AccountId

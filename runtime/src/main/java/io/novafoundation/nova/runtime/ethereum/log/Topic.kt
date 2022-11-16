@@ -1,4 +1,5 @@
-package io.novafoundation.nova.common.data.network.ethereum.log
+package io.novafoundation.nova.runtime.ethereum.log
+
 sealed class Topic {
 
     object Any : Topic()

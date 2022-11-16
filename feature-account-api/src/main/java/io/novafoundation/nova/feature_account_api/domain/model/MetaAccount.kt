@@ -117,6 +117,10 @@ fun MetaAccount.accountIdIn(chain: Chain): ByteArray? {
     }
 }
 
+fun MetaAccount.requireAccountIdIn(chain: Chain): ByteArray {
+    return requireNotNull(accountIdIn(chain))
+}
+
 fun MetaAccount.publicKeyIn(chain: Chain): ByteArray? {
     return when {
         hasChainAccountIn(chain.id) -> chainAccounts.getValue(chain.id).publicKey

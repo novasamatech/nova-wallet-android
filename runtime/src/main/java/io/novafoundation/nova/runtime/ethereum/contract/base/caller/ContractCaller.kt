@@ -1,4 +1,4 @@
-package io.novafoundation.nova.common.data.network.ethereum.contract.base.caller
+package io.novafoundation.nova.runtime.ethereum.contract.base.caller
 
 import kotlinx.coroutines.Deferred
 import org.web3j.protocol.core.DefaultBlockParameter
