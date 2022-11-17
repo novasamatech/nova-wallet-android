@@ -4,30 +4,25 @@ import com.google.gson.Gson
 import io.novafoundation.nova.common.utils.CollectionDiffer
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
 import io.novafoundation.nova.core_db.dao.ChainDao
-import io.novafoundation.nova.core_db.model.chain.AssetSourceLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 import io.novafoundation.nova.core_db.model.chain.ChainExplorerLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
+import io.novafoundation.nova.core_db.model.chain.ChainTransferHistoryApiLocal
 import io.novafoundation.nova.core_db.model.chain.JoinedChainInfo
-import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapChainAssetToLocal
-import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapChainExplorersToLocal
-import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapChainNodeToLocal
-import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapChainToChainLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteAssetsToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteChainToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteExplorersToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteNodesToLocal
+import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteTransferApisToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.ChainFetcher
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainAssetRemote
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainExplorerRemote
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainExternalApiRemote
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainNodeRemote
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainRemote
-import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainTypesInfo
 import io.novafoundation.nova.test_shared.argThat
 import io.novafoundation.nova.test_shared.eq
-import jp.co.soramitsu.fearless_utils.scale.dataType.list
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
@@ -43,6 +38,7 @@ class ChainSyncServiceTest {
     private val assetId = 0
     private val nodeUrl = "url"
     private val explorerName = "explorer"
+    private val transferApiUrl = "url"
 
     private val REMOTE_CHAIN = ChainRemote(
         chainId = "0x00",
@@ -72,7 +68,18 @@ class ChainSyncServiceTest {
         types = null,
         options = emptySet(),
         parentId = null,
-        externalApi = null,
+        externalApi = ChainExternalApiRemote(
+            staking = null,
+            history = listOf(
+                ChainExternalApiRemote.TransferApi(
+                    type = "subquery",
+                    assetType = "substrate",
+                    url = transferApiUrl
+                )
+            ),
+            crowdloans = null,
+            governance = null
+        ),
         explorers = listOf(
             ChainExplorerRemote(
                 explorerName,
@@ -116,7 +123,8 @@ class ChainSyncServiceTest {
                 chainDiff = insertsChainWithId(REMOTE_CHAIN.chainId),
                 assetsDiff = insertsAssetWithId(assetId),
                 nodesDiff = insertsNodeWithUrl(nodeUrl),
-                explorersDiff = insertsExplorerByName(explorerName)
+                explorersDiff = insertsExplorerByName(explorerName),
+                transferApisDiff = insertsTransferApiByUrl(transferApiUrl)
             )
         }
     }
@@ -129,7 +137,7 @@ class ChainSyncServiceTest {
 
             chainSyncService.syncUp()
 
-            verify(dao).applyDiff(emptyDiff(), emptyDiff(), emptyDiff(), emptyDiff())
+            verify(dao).applyDiff(emptyDiff(), emptyDiff(), emptyDiff(), emptyDiff(), emptyDiff())
         }
     }
 
@@ -146,6 +154,7 @@ class ChainSyncServiceTest {
                 assetsDiff = emptyDiff(),
                 nodesDiff = emptyDiff(),
                 explorersDiff = emptyDiff(),
+                transferApisDiff = emptyDiff()
             )
         }
     }
@@ -168,6 +177,7 @@ class ChainSyncServiceTest {
                 assetsDiff = insertsAssetWithId(assetId),
                 nodesDiff = emptyDiff(),
                 explorersDiff = emptyDiff(),
+                transferApisDiff = emptyDiff()
             )
         }
     }
@@ -190,6 +200,7 @@ class ChainSyncServiceTest {
                 assetsDiff = emptyDiff(),
                 nodesDiff = insertsNodeWithUrl(nodeUrl),
                 explorersDiff = emptyDiff(),
+                transferApisDiff = emptyDiff()
             )
         }
     }
@@ -212,6 +223,36 @@ class ChainSyncServiceTest {
                 assetsDiff = emptyDiff(),
                 nodesDiff = emptyDiff(),
                 explorersDiff = insertsExplorerByName(explorerName),
+                transferApisDiff = emptyDiff()
+            )
+        }
+    }
+
+    @Test
+    fun `should update chain's transfer apis`() {
+        runBlocking {
+            localReturns(listOf(LOCAL_CHAIN))
+
+            val currentHistoryApi = REMOTE_CHAIN.externalApi!!.history.first()
+            val anotherUrl = "another url"
+
+            remoteReturns(listOf(REMOTE_CHAIN.copy(
+                externalApi = REMOTE_CHAIN.externalApi!!.copy(
+                    history = listOf(
+                        currentHistoryApi,
+                        currentHistoryApi.copy(url = anotherUrl)
+                    )
+                )
+            )))
+
+            chainSyncService.syncUp()
+
+            verify(dao).applyDiff(
+                chainDiff = emptyDiff(),
+                assetsDiff = emptyDiff(),
+                nodesDiff = emptyDiff(),
+                explorersDiff = emptyDiff(),
+                transferApisDiff = insertsTransferApiByUrl(anotherUrl)
             )
         }
     }
@@ -229,7 +270,8 @@ class ChainSyncServiceTest {
                 chainDiff = removesChainWithId(REMOTE_CHAIN.chainId),
                 assetsDiff = removesAssetWithId(assetId),
                 nodesDiff = removesNodeWithUrl(nodeUrl),
-                explorersDiff = removesExplorerByName(explorerName)
+                explorersDiff = removesExplorerByName(explorerName),
+                transferApisDiff = removesTransferApiByUrl(transferApiUrl)
             )
         }
     }
@@ -246,6 +288,7 @@ class ChainSyncServiceTest {
     private fun insertsAssetWithId(id: Int) = insertsElement<ChainAssetLocal> { it.id == id }
     private fun insertsNodeWithUrl(url: String) = insertsElement<ChainNodeLocal> { it.url == url }
     private fun insertsExplorerByName(name: String) = insertsElement<ChainExplorerLocal> { it.name == name }
+    private fun insertsTransferApiByUrl(url: String) = insertsElement<ChainTransferHistoryApiLocal> { it.url == url }
 
     private fun <T> insertsElement(elementCheck: (T) -> Boolean) = argThat<CollectionDiffer.Diff<T>> {
         it.removed.isEmpty() && elementCheck(it.newOrUpdated.single())
@@ -255,6 +298,7 @@ class ChainSyncServiceTest {
     private fun removesAssetWithId(id: Int) = removesElement<ChainAssetLocal> { it.id == id }
     private fun removesNodeWithUrl(url: String) = removesElement<ChainNodeLocal> { it.url == url }
     private fun removesExplorerByName(name: String) = removesElement<ChainExplorerLocal> { it.name == name }
+    private fun removesTransferApiByUrl(url: String) = removesElement<ChainTransferHistoryApiLocal> { it.url == url }
 
     private fun <T> removesElement(elementCheck: (T) -> Boolean) = argThat<CollectionDiffer.Diff<T>> {
         it.newOrUpdated.isEmpty() && elementCheck(it.removed.single())
@@ -265,12 +309,14 @@ class ChainSyncServiceTest {
         val assets = mapRemoteAssetsToLocal(remote, gson)
         val nodes = mapRemoteNodesToLocal(remote)
         val explorers = mapRemoteExplorersToLocal(remote)
+        val transferHistoryApis = mapRemoteTransferApisToLocal(remote)
 
         return JoinedChainInfo(
             chain = domain,
             nodes = nodes,
             assets = assets,
-            explorers = explorers
+            explorers = explorers,
+            transferHistoryApis = transferHistoryApis
         )
     }
 
