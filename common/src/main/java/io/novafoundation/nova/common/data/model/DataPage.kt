@@ -13,23 +13,22 @@ data class DataPage<T>(
     }
 }
 
-
 sealed class PageOffset {
 
     companion object;
 
-    sealed class Loadable: PageOffset() {
-        data class Cursor(val value: String): Loadable()
+    sealed class Loadable : PageOffset() {
+        data class Cursor(val value: String) : Loadable()
 
-        data class PageNumber(val page: Int): Loadable()
+        data class PageNumber(val page: Int) : Loadable()
 
-        object FistPage: Loadable()
+        object FistPage : Loadable()
     }
 
-    object FullData: PageOffset()
+    object FullData : PageOffset()
 }
 
-fun PageOffset.Companion.CursorOrFull(value: String?) : PageOffset = if (value != null) {
+fun PageOffset.Companion.CursorOrFull(value: String?): PageOffset = if (value != null) {
     PageOffset.Loadable.Cursor(value)
 } else {
     PageOffset.FullData
@@ -38,7 +37,6 @@ fun PageOffset.Companion.CursorOrFull(value: String?) : PageOffset = if (value !
 fun PageOffset.asCursorOrNull(): PageOffset.Loadable.Cursor? {
     return castOrNull()
 }
-
 
 fun PageOffset.requirePageNumber(): PageOffset.Loadable.PageNumber {
     require(this is PageOffset.Loadable.PageNumber)

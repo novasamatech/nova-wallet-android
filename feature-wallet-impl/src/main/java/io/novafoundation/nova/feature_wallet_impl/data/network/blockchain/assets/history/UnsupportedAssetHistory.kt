@@ -28,7 +28,6 @@ class UnsupportedAssetHistory : AssetHistory {
         // do nothing
     }
 
-
     override suspend fun getOperations(
         pageSize: Int,
         pageOffset: PageOffset.Loadable,

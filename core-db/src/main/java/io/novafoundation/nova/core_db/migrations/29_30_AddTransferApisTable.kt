@@ -27,13 +27,13 @@ val AddTransferApisTable_29_30 = object : Migration(29, 30) {
                 PRIMARY KEY(`chainId`, `url`),
                 FOREIGN KEY(`chainId`) REFERENCES `chains`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE
             )
-        """.trimIndent()
+            """.trimIndent()
         )
 
         database.execSQL(
             """
             CREATE INDEX IF NOT EXISTS `index_chain_transfer_history_apis_chainId` ON `chain_transfer_history_apis` (`chainId`)
-        """.trimIndent()
+            """.trimIndent()
         )
     }
 

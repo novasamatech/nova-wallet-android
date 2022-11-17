@@ -19,12 +19,11 @@ interface AssetHistory {
 
     fun availableOperationFilters(asset: Chain.Asset): Set<TransactionFilter>
 
-
     suspend fun additionalFirstPageSync(
-       chain: Chain,
-       chainAsset: Chain.Asset,
-       accountId: AccountId,
-       page: DataPage<Operation>
+        chain: Chain,
+        chainAsset: Chain.Asset,
+        accountId: AccountId,
+        page: DataPage<Operation>
     )
 
     suspend fun getOperations(

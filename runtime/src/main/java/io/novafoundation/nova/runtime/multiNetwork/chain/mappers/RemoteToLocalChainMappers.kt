@@ -122,7 +122,7 @@ fun mapRemoteTransferApisToLocal(chainRemote: ChainRemote): List<ChainTransferHi
 }
 
 private fun mapTransferApiAssetTypeToLocal(type: String?): String {
-    val domain = when(type) {
+    val domain = when (type) {
         null, "substrate" -> TransferHistoryApi.AssetType.SUBSTRATE
         "evm" -> TransferHistoryApi.AssetType.EVM
         else -> TransferHistoryApi.AssetType.UNSUPPORTED
