@@ -156,6 +156,8 @@ object ChainGeneses {
     const val EDGEWARE = "742a2ca70c2fda6cee4f8df98d64c4c670a052d9568058982dad9d5a7a135c5b"
 
     const val KARURA = "baf5aabe40646d11f0ee8abbdc64f4a4b7674925cba08e4a05ff9ebed6e2126b"
+
+    const val NODLE_PARACHAIN = "97da7ede98d7bad4e36b4d734b6055425a3be036da2a332ea5a7037656427a21"
 }
 
 val Chain.Companion.Geneses
