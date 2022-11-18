@@ -2,7 +2,7 @@
     <item android:id="@android:id/background">
         <shape>
             <corners android:radius="2dp" />
-            <solid android:color="@color/white_24" />
+            <solid android:color="@color/indicator_inactive" />
         </shape>
     </item>
 
@@ -12,13 +12,13 @@
                 <item android:state_enabled="true">
                     <shape>
                         <corners android:radius="2dp" />
-                        <solid android:color="?attr/colorAccent" />
+                        <solid android:color="@color/progress_bar_indicator" />
                     </shape>
                 </item>
                 <item>
                     <shape>
                         <corners android:radius="2dp" />
-                        <solid android:color="@color/text_secondary" />
+                        <solid android:color="@color/indicator_inactive" />
                     </shape>
                 </item>
             </selector>

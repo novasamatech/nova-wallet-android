@@ -61,6 +61,7 @@
     <color name="text_warning">#EBC50A</color>
     <color name="text_negative">#E53450</color>
     <color name="text_positive">#2FC864</color>
+    <color name="progress_bar_text">#2AB0F2</color>
     <color name="conviction_slider_text_01x">#2AB0F2</color>
     <color name="conviction_slider_text_1x">#41D4D2</color>
     <color name="conviction_slider_text_2x">#58F8B2</color>
@@ -123,6 +124,7 @@
     <color name="shimmering_indicator">#A3FFFFFF</color>
     <color name="nay_indicator">#E53450</color>
     <color name="aye_indicator">#2FC864</color>
+    <color name="progress_bar_indicator">#2AB0F2</color>
     <color name="votes_to_pass_indicator">#FFFFFF</color>
     <color name="voting_slider_indicator_active">#08090E</color>
     <color name="voting_slider_indicator_inactive">#7A08090E</color>

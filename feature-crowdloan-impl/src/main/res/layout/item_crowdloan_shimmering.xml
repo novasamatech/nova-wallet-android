@@ -6,8 +6,7 @@
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
     android:background="@drawable/bg_shimmering_container"
-    android:padding="16dp"
-    tools:background="@color/block_background">
+    android:padding="16dp">
 
     <com.facebook.shimmer.ShimmerFrameLayout
         android:id="@+id/itemCrowdloanShimmeringIcon"
