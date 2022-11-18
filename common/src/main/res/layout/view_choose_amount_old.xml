@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="80dp"
-    tools:background="@color/black"
+    tools:background="@color/secondary_screen_background"
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
     <TextView
@@ -68,7 +68,7 @@
         android:hint="0"
         android:inputType="numberDecimal"
         android:paddingBottom="27dp"
-        android:textColor="@color/white"
+        android:textColor="@color/text_primary"
         android:textColorHint="@color/white_30"
         android:textCursorDrawable="@null"
         android:textStyle="bold"

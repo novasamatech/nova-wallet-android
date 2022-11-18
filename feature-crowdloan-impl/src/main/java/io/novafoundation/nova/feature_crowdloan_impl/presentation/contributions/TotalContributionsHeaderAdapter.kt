@@ -32,7 +32,7 @@ class TotalContributionsHeaderAdapter : RecyclerView.Adapter<TotalContributionsH
 
     inner class HeaderHolder(view: View) : RecyclerView.ViewHolder(view) {
         init {
-            view.background = view.context.getRoundedCornerDrawable(R.color.white_8)
+            view.background = view.context.getRoundedCornerDrawable(R.color.divider)
         }
 
         fun bind(amount: AmountModel?) {

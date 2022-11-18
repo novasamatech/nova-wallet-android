@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="80dp"
     android:orientation="horizontal"
-    tools:background="@color/blurColor"
+    tools:background="@color/block_background"
     tools:parentTag="android.widget.LinearLayout">
 
     <TextView

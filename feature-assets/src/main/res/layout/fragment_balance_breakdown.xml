@@ -14,7 +14,7 @@
         <View
             style="@style/Widget.Nova.Puller"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="6dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -28,7 +28,7 @@
             android:layout_marginTop="24dp"
             android:layout_marginBottom="8dp"
             android:text="@string/wallet_balance_details_total"
-            android:textColor="@color/white"
+            android:textColor="@color/text_primary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -40,7 +40,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:layout_marginEnd="16dp"
-            android:textColor="@color/white"
+            android:textColor="@color/text_primary"
             app:layout_constraintBottom_toBottomOf="@+id/balanceBreakdownTitle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/balanceBreakdownTitle"

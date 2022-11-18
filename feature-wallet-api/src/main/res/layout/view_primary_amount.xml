@@ -4,16 +4,16 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center_horizontal"
-    tools:background="@color/black"
+    tools:background="@color/secondary_screen_background"
     tools:orientation="vertical"
     tools:parentTag="android.widget.LinearLayout">
 
     <ProgressBar
         android:id="@+id/primaryAmountProgress"
-        tools:visibility="gone"
+        style="@style/Widget.Nova.ProgressBar.Indeterminate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:indeterminateTint="@color/white" />
+        tools:visibility="gone" />
 
     <TextView
         android:id="@+id/primaryAmountToken"
@@ -29,6 +29,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:textColor="@color/white_64"
+        android:textColor="@color/text_secondary"
         tools:text="$1,524.11" />
 </merge>

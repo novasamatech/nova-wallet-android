@@ -6,7 +6,7 @@
     android:layout_height="48dp"
     android:paddingStart="16dp"
     android:paddingEnd="16dp"
-    tools:background="@color/blurColor">
+    tools:background="@color/block_background">
 
     <ImageView
         android:id="@+id/itemBreakdownTotalIcon"
@@ -15,7 +15,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/white"
+        app:tint="@color/icon_secondary"
         tools:src="@drawable/ic_lock" />
 
     <TextView
@@ -25,7 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginStart="8dp"
-        android:textColor="@color/white"
+        android:textColor="@color/text_secondary"
         android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/itemBreakdownTotalIcon"
@@ -38,7 +38,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:textColor="@color/white"
+        android:textColor="@color/chip_text"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/itemBreakdownTotalName"
         app:layout_constraintTop_toTopOf="parent"
@@ -50,7 +50,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|end"
-        android:textColor="@color/white"
+        android:textColor="@color/text_primary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"

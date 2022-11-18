@@ -40,7 +40,7 @@ fun SelectedStakeTargetStatusModel.Companion.Active(
         text = resourceManager.getString(R.string.staking_your_elected_format, groupSize),
         iconRes = R.drawable.ic_checkmark_circle_16,
         iconTintRes = R.color.green,
-        textColorRes = R.color.white,
+        textColorRes = R.color.text_primary,
     ),
     description = resourceManager.getString(description)
 )
@@ -53,8 +53,8 @@ fun SelectedStakeTargetStatusModel.Companion.Inactive(
     SelectedStakeTargetStatusModel.TitleConfig(
         text = resourceManager.getString(R.string.staking_your_not_elected_format, groupSize),
         iconRes = R.drawable.ic_time_16,
-        iconTintRes = R.color.white_64,
-        textColorRes = R.color.white_64,
+        iconTintRes = R.color.text_secondary,
+        textColorRes = R.color.text_secondary,
     ),
     description = resourceManager.getString(description)
 )
@@ -75,8 +75,8 @@ fun SelectedStakeTargetStatusModel.Companion.Waiting(
     SelectedStakeTargetStatusModel.TitleConfig(
         text = title,
         iconRes = R.drawable.ic_time_16,
-        iconTintRes = R.color.white_64,
-        textColorRes = R.color.white_64,
+        iconTintRes = R.color.text_secondary,
+        textColorRes = R.color.text_secondary,
     ),
     description = resourceManager.getString(description)
 )

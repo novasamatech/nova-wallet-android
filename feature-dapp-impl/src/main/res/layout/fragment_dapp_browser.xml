@@ -5,13 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:background="@color/black">
+    tools:background="@color/secondary_screen_background">
 
     <LinearLayout
         android:id="@+id/dappBrowserAddressBarGroup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/bar_bg_64"
+        android:background="@color/solid_navigation_background"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -36,9 +36,9 @@
 
     <ProgressBar
         android:id="@+id/dappBrowserProgress"
+        style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="4dp"
-        style="?android:attr/progressBarStyleHorizontal"
         android:max="100"
         tools:progress="45" />
 
@@ -52,7 +52,7 @@
         android:id="@+id/dappBrowserBottomNavigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/gray3"
+        android:background="@color/solid_navigation_background"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -94,8 +94,7 @@
             android:layout_weight="1"
             android:paddingTop="11dp"
             android:paddingBottom="11dp"
-            android:src="@drawable/ic_heart_outline"
-            app:tint="@color/actions_color" />
+            android:src="@drawable/ic_heart_outline" />
 
     </LinearLayout>
 </LinearLayout>

@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#004CB7</color>
-    <color name="colorPrimaryDark">#80004CB7</color>
-    <color name="colorSelected">@color/colorPrimaryDark</color>
-    <color name="colorAccent">#FF009A</color>
-    <color name="colorHint">@color/white_64</color>
-    <color name="black">#000</color>
+    <color name="failed_transaction_color">#E53450</color>
+
     <color name="gray1">#CCCCCC</color>
     <color name="gray2">#888888</color>
     <color name="gray3">#444444</color>
@@ -14,13 +10,10 @@
     <color name="colorGreyText">#888888</color>
     <color name="green">@color/multicolor_green_100</color>
     <color name="darkGreen">@color/multicolor_green_100</color>
-    <color name="dividerGray">#444444</color>
     <color name="bottomSheetBackground">#80838383</color>
     <color name="blurColorDark">#B3000000</color>
-    <color name="blurColor">#8C000000</color>
     <color name="blurColorLight">#66000000</color>
 
-    <color name="white_8">#14FFFFFF</color>
     <color name="white_10">#1AFFFFFF</color>
     <color name="white_12">#1FFFFFFF</color>
     <color name="white_16">#29FFFFFF</color>
@@ -31,15 +24,12 @@
     <color name="white_40">#66FFFFFF</color>
     <color name="white_48">#7AFFFFFF</color>
     <color name="white_50">#80FFFFFF</color>
-    <color name="white_64">#A8FFFFFF</color>
     <color name="white_80">#CCFFFFFF</color>
 
     <color name="black_24">#3D000000</color>
-    <color name="black_48">#7A000000</color>
     <color name="black_65">#A6000000</color>
     <color name="black_72">#B8000000</color>
 
-    <color name="black1">@color/gray1</color>
     <color name="black2">@color/gray2</color>
     <color name="black3">@color/gray3</color>
     <color name="black4">@color/gray4</color>
@@ -56,7 +46,6 @@
     <color name="multicolor_cyan_medium">#1AD1FF</color>
     <color name="multicolor_cyan_dark">#1EB3FF</color>
 
-    <color name="multicolor_blue_100">#2194FF</color>
     <color name="multicolor_indigo">#7471FF</color>
     <color name="multicolor_violet">#DF00FF</color>
     <color name="multicolor_pink_polkadot">#FF0087</color>
@@ -66,26 +55,25 @@
     <color name="settings_group_background">#1D1D20</color>
 
     <color name="account_icon_light">#eeeeee</color>
-    <color name="account_icon_dark">@color/black</color>
+    <color name="account_icon_dark">@color/secondary_screen_background</color>
 
     <color name="red">@color/multicolor_red_100</color>
 
-    <color name="bar_bg_64">#A8252528</color>
-
-    <color name="accentBlue">@color/multicolor_blue_100</color>
     <color name="accentSecondary">#2D2D30</color>
 
     <color name="disabledColor">#1D1D20</color>
-    <color name="disabledTransparent">@color/white_8</color>
+    <color name="disabledTransparent">@color/divider</color>
 
     <color name="pms_black">#2D2926</color>
 
     <color name="textInactive">@color/white_32</color>
 
+    <!-- System -->
+    <color name="android_system_accent">#1F78FF</color>
+
     <!-- Text Colors -->
     <color name="text_primary">#E0FFFFFF</color>
-    <color name="text_secondary">#A3FFFFFF</color>
-    <color name="text_tertiary">#7AFFFFFF</color>
+    <color name="text_secondary">#7AFFFFFF</color>
     <color name="button_text">#E0FFFFFF</color>
     <color name="chip_text">#A3FFFFFF</color>
     <color name="button_text_inactive">#52FFFFFF</color>
@@ -102,19 +90,22 @@
     <color name="conviction_slider_text_5x">#DAC71B</color>
     <color name="conviction_slider_text_6x">#F19B27</color>
 
+    <!-- Icon Colors -->
     <color name="icon_primary">#E0FFFFFF</color>
-    <color name="icon_secondary">#7AFFFFFF</color>
-    <color name="icon_tertiary">#52FFFFFF</color>
+    <color name="icon_secondary">#52FFFFFF</color>
+    <color name="icon_pressed">#7AFFFFFF</color>
     <color name="icon_inactive">#29FFFFFF</color>
     <color name="icon_nav_bar_inactive">#66FFFFFF</color>
     <color name="icon_accent">#1F78FF</color>
     <color name="icon_warning">#EBC50A</color>
     <color name="icon_negative">#E53450</color>
     <color name="icon_positive">#2FC864</color>
+    <color name="icon_favorite">#E53450</color>
 
+    <!-- Background Colors -->
     <color name="secondary_screen_background">#08090E</color>
     <color name="bottom_sheet_background">#181920</color>
-    <color name="block_background">#29999EC7</color>
+    <color name="block_background">#1A999EC7</color>
     <color name="input_background">#1A999EC7</color>
     <color name="chips_background">#29999EC7</color>
     <color name="container_background">#1A999EC7</color>
@@ -126,20 +117,28 @@
     <color name="block_background_warning">#29EDCE36</color>
     <color name="blur_navigation_background">#66151D27</color>
     <color name="solid_navigation_background">#0F111A</color>
+    <color name="cell_background_pressed">#291F78FF</color>
 
+    <!-- Button Colors -->
     <color name="button_background_primary">#1F78FF</color>
     <color name="button_background_secondary">#29999EC7</color>
     <color name="button_background_approve">#2FC864</color>
     <color name="button_background_reject">#E53450</color>
     <color name="button_background_inactive_on_gradient">#1A999EC7</color>
     <color name="button_background_inactive">#181920</color>
-    <color name="button_background_pressed">291F78FF</color>
 
-    <color name="active_border">#181920</color>
+    <!-- Border Colors -->
+    <color name="active_border">#1F78FF</color>
     <color name="checkbox_border">#3D999EC7</color>
     <color name="radio_border">#3D999EC7</color>
     <color name="container_border">#3D999EC7</color>
 
-    <color name="divider">#14999EC7</color>
+    <!-- Divider Colors -->
+    <color name="divider">#29999EC7</color>
+
+    <!-- Indicator Colors -->
+    <color name="indicator_active">#1F78FF</color>
+    <color name="indicator_inactive">#29FFFFFF</color>
+    <color name="pull_indicator">#29FFFFFF</color>
 
 </resources>

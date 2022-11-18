@@ -22,9 +22,9 @@ class PlaceholderView @JvmOverloads constructor(
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
     enum class Style(val showBackground: Boolean, val backgroundColorRes: Int?, val textColorRes: Int) {
-        BACKGROUND_DARK(true, R.color.black_48, R.color.white_48),
-        BACKGROUND_LIGHT(true, R.color.white_8, R.color.white_64),
-        NO_BACKGROUND(false, null, R.color.white_64)
+        BACKGROUND_PRIMARY(true, R.color.block_background, R.color.text_secondary),
+        BACKGROUND_SECONDARY(true, R.color.block_background, R.color.text_secondary),
+        NO_BACKGROUND(false, null, R.color.text_secondary)
     }
 
     init {
@@ -40,7 +40,7 @@ class PlaceholderView @JvmOverloads constructor(
         val text = typedArray.getString(R.styleable.PlaceholderView_android_text)
         text?.let(::setText)
 
-        val backgroundStyle = typedArray.getEnum(R.styleable.PlaceholderView_placeholderBackgroundStyle, Style.BACKGROUND_DARK)
+        val backgroundStyle = typedArray.getEnum(R.styleable.PlaceholderView_placeholderBackgroundStyle, Style.BACKGROUND_PRIMARY)
         setStyle(backgroundStyle)
 
         val image = typedArray.getResourceIdOrNull(R.styleable.PlaceholderView_image)

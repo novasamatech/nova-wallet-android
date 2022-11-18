@@ -21,7 +21,7 @@ class ReferendumDappList @JvmOverloads constructor(
 
     init {
         View.inflate(context, R.layout.view_referendum_dapp_list, this)
-        background = getRoundedCornerDrawable(R.color.white_8)
+        background = getRoundedCornerDrawable(R.color.divider)
         orientation = VERTICAL
         setPadding(0, 16.dp, 0, 8.dp)
     }

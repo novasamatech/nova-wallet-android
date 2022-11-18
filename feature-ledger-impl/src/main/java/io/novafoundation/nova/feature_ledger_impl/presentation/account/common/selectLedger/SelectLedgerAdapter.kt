@@ -46,7 +46,7 @@ class SelectLedgerHolder(
 ) : BaseViewHolder(containerView) {
     init {
         containerView.itemLedger.background = with(containerView.context) {
-            addRipple(getRoundedCornerDrawable(R.color.white_8))
+            addRipple(getRoundedCornerDrawable(R.color.block_background))
         }
 
         containerView.itemLedger.setProgressTint(R.color.white_48)

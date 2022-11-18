@@ -14,7 +14,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
-        android:textColor="@color/white"
+        android:textColor="@color/text_primary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -34,6 +34,6 @@
         tools:drawablePadding="4dp"
         tools:drawableTint="@color/white_48"
         tools:text="4 days left"
-        tools:textColor="@color/white_64" />
+        tools:textColor="@color/text_secondary" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

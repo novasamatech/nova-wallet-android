@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <io.novafoundation.nova.common.view.GoNextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/itemLedger"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:layout_marginStart="16dp"
     android:layout_marginEnd="16dp"
-    app:actionIcon="@drawable/ic_chevron_right"
     android:layout_marginBottom="16dp"
-    app:actionTint="@color/white_48"
-    app:dividerVisible="false"
-    android:layout_height="wrap_content" />
+    app:actionIcon="@drawable/ic_chevron_right"
+    app:actionTint="@color/text_secondary"
+    app:dividerVisible="false" />

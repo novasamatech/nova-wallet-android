@@ -105,7 +105,7 @@ fun FixedListBottomSheet.item(
         view.itemExternalActionContent.setDrawableStart(
             drawableRes = icon,
             widthInDp = 24,
-            tint = R.color.white,
+            tint = R.color.text_primary,
             paddingInDp = 12
         )
 

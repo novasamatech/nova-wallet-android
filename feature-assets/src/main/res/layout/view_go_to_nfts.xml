@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:background="@color/black_48"
+    tools:background="@color/block_background"
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
     <TextView
@@ -16,7 +16,7 @@
         android:layout_marginTop="18dp"
         android:layout_marginBottom="18dp"
         android:text="@string/nft_your_nfts"
-        android:textColor="@color/white"
+        android:textColor="@color/text_primary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -32,10 +32,10 @@
         tools:text="6" />
 
     <com.facebook.shimmer.ShimmerFrameLayout
-        android:layout_marginEnd="8dp"
         android:id="@+id/goToNftsShimmer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/imageView2"
         app:layout_constraintTop_toTopOf="parent">
@@ -47,34 +47,34 @@
     </com.facebook.shimmer.ShimmerFrameLayout>
 
     <ImageView
-        android:visibility="gone"
         android:id="@+id/goToNftPreview1"
-        tools:visibility="visible"
         style="@style/Widget.Nova.NftPreview"
         android:layout_marginEnd="8dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/imageView2"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
 
     <ImageView
-        android:visibility="gone"
         android:id="@+id/goToNftPreview2"
-        tools:visibility="visible"
         style="@style/Widget.Nova.NftPreview"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/goToNftPreview1"
         app:layout_constraintEnd_toStartOf="@+id/goToNftPreview1"
         app:layout_constraintStart_toStartOf="@+id/goToNftPreview1"
-        app:layout_constraintTop_toTopOf="@+id/goToNftPreview1" />
+        app:layout_constraintTop_toTopOf="@+id/goToNftPreview1"
+        tools:visibility="visible" />
 
     <ImageView
-        android:visibility="gone"
-        tools:visibility="visible"
         android:id="@+id/goToNftPreview3"
         style="@style/Widget.Nova.NftPreview"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/goToNftPreview2"
         app:layout_constraintEnd_toStartOf="@+id/goToNftPreview2"
         app:layout_constraintStart_toStartOf="@+id/goToNftPreview2"
-        app:layout_constraintTop_toTopOf="@+id/goToNftPreview2" />
+        app:layout_constraintTop_toTopOf="@+id/goToNftPreview2"
+        tools:visibility="visible" />
 
     <ImageView
         android:id="@+id/imageView2"
@@ -85,6 +85,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/white_48" />
+        app:tint="@color/icon_secondary" />
 
 </merge>

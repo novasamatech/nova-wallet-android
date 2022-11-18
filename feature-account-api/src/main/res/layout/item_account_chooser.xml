@@ -6,7 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/bg_primary_list_item"
     android:orientation="horizontal"
-    tools:background="@color/black">
+    tools:background="@color/secondary_screen_background">
 
     <io.novafoundation.nova.feature_account_api.view.AccountView
         android:id="@+id/itemAccountChooserAddress"

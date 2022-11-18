@@ -17,7 +17,7 @@
         android:layout_marginEnd="@dimen/x1_2"
         android:drawablePadding="@dimen/x2"
         style="@style/TextAppearance.NovaFoundation.Body0"
-        android:textColor="@color/white" />
+        android:textColor="@color/text_primary" />
 
     <ImageView
         android:id="@+id/rightIcon"

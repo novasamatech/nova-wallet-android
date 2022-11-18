@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:background="@color/black"
+    tools:background="@color/secondary_screen_background"
     tools:parentTag="android.widget.FrameLayout">
 
     <ImageView
@@ -11,7 +11,7 @@
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_gravity="center_vertical"
-        tools:background="@color/white" />
+        tools:background="@color/text_primary" />
 
     <TextView
         android:id="@+id/addressValue"
@@ -24,7 +24,7 @@
         android:layout_marginStart="26dp"
         android:gravity="center_vertical"
         android:includeFontPadding="false"
-        android:textColor="@color/white_64"
+        android:textColor="@color/text_secondary"
         tools:text="RTTI-5220" />
 
 </merge>

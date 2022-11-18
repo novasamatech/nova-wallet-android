@@ -5,7 +5,7 @@
         <item name="noVotesColor">@color/white_16</item>
         <item name="positiveColor">@color/multicolor_green_100</item>
         <item name="negativeColor">@color/multicolor_red_100</item>
-        <item name="thresholdColor">@color/white</item>
+        <item name="thresholdColor">@color/text_primary</item>
         <item name="thresholdShadowColor">@color/black_72</item>
         <item name="thresholdWidth">3dp</item>
         <item name="thresholdHeight">11dp</item>
@@ -25,11 +25,11 @@
         <item name="android:paddingBottom">3dp</item>
         <item name="android:paddingStart">6dp</item>
         <item name="android:paddingEnd">8dp</item>
-        <item name="android:textColor">@color/white_64</item>
+        <item name="android:textColor">@color/text_secondary</item>
     </style>
 
     <style name="DefaultTimelineLayout">
-        <item name="timelineDefaultColor">@color/accentBlue</item>
+        <item name="timelineDefaultColor">@color/button_background_primary</item>
         <item name="timelineUnfinishedColor">@color/white_24</item>
         <item name="timelineStrokeWidth">1dp</item>
         <item name="timelineItemStartPadding">16dp</item>

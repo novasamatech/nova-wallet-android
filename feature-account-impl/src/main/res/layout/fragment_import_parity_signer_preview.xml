@@ -4,17 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:background="@color/black">
+    tools:background="@color/secondary_screen_background">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-
         <io.novafoundation.nova.common.view.Toolbar
-            android:layout_width="match_parent"
             android:id="@+id/previewImportParitySignerToolbar"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:dividerVisible="false" />
 
@@ -25,7 +24,8 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
-            android:text="@string/account_parity_signer_import_preview_title" />
+            android:text="@string/account_parity_signer_import_preview_title"
+            android:textColor="@color/text_primary" />
 
         <TextView
             style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
@@ -35,26 +35,25 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
             android:text="@string/account_parity_signer_import_preview_description"
-            android:textColor="@color/white_64" />
+            android:textColor="@color/text_secondary" />
 
         <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/previewImportParitySignerAccounts"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:id="@+id/previewImportParitySignerAccounts"
             android:layout_marginTop="16dp"
             android:layout_weight="1"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             android:clipToPadding="false"
             android:paddingBottom="93dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/item_chain_account" />
     </LinearLayout>
 
-
     <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/previewImportParitySignerContinue"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:id="@+id/previewImportParitySignerContinue"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="25dp"

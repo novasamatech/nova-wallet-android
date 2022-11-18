@@ -8,7 +8,7 @@
     android:paddingTop="15dp"
     android:paddingEnd="16dp"
     android:paddingBottom="15dp"
-    tools:background="@color/black">
+    tools:background="@color/secondary_screen_background">
 
     <TextView
         style="@style/TextAppearance.NovaFoundation.Body1"

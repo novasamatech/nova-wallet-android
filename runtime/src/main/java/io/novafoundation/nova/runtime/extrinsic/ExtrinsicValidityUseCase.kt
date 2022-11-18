@@ -56,7 +56,7 @@ fun LifecycleOwner.startExtrinsicValidityTimer(
         customMessageFormat = timerFormat,
         lifecycle = lifecycle,
         onTick = { view, _ ->
-            val textColorRes = if (validityPeriod.closeToExpire()) R.color.red else R.color.white_64
+            val textColorRes = if (validityPeriod.closeToExpire()) R.color.red else R.color.text_secondary
 
             view.setTextColorRes(textColorRes)
         },

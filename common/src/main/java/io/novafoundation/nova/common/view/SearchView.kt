@@ -31,7 +31,7 @@ class SearchView @JvmOverloads constructor(
     init {
         View.inflate(context, R.layout.view_search, this)
 
-        background = getRoundedCornerDrawable(fillColorRes = R.color.white_8)
+        background = getRoundedCornerDrawable(fillColorRes = R.color.input_background, cornerSizeDp = 10)
 
         orientation = HORIZONTAL
 

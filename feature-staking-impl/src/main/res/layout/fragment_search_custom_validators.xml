@@ -5,7 +5,7 @@
     android:id="@+id/searchCustomValidatorsContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:background="@color/black">
+    tools:background="@color/secondary_screen_background">
 
     <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/searchCustomValidatorsToolbar"
@@ -81,9 +81,9 @@
 
     <ProgressBar
         android:id="@+id/searchCustomValidatorProgress"
+        style="@style/Widget.Nova.ProgressBar.Indeterminate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:indeterminateTint="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -94,11 +94,11 @@
         android:id="@+id/searchCustomValidatorsPlaceholder"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:placeholderBackgroundStyle="no_background"
         app:image="@drawable/ic_placeholder"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/searchCustomValidatorAccounts"
-        app:layout_constraintVertical_bias="0.4" />
+        app:layout_constraintVertical_bias="0.4"
+        app:placeholderBackgroundStyle="no_background" />
 </androidx.constraintlayout.widget.ConstraintLayout>

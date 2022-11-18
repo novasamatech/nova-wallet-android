@@ -155,7 +155,7 @@ class LedgerMessageBottomSheet(
                     value = footer.timerValue,
                     customMessageFormat = footer.messageFormat,
                     onTick = { view, _ ->
-                        val textColorRes = if (footer.closeToExpire(footer.timerValue)) R.color.red else R.color.white_64
+                        val textColorRes = if (footer.closeToExpire(footer.timerValue)) R.color.red else R.color.text_secondary
 
                         view.setTextColorRes(textColorRes)
                     },

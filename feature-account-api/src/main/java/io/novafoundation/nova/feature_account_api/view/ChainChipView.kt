@@ -51,7 +51,7 @@ class ChainChipView @JvmOverloads constructor(
             itemAssetGroupLabel.setTextColorRes(accentColorRes)
             itemAssetGroupLabel.setDrawableEnd(R.drawable.ic_chevron_down, widthInDp = 16, paddingInDp = 4, tint = accentColorRes)
         } else {
-            itemAssetGroupLabel.setTextColorRes(R.color.white)
+            itemAssetGroupLabel.setTextColorRes(R.color.text_primary)
             itemAssetGroupLabel.setDrawableEnd(null)
         }
     }

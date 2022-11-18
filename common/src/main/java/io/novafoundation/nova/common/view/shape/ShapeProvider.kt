@@ -12,14 +12,13 @@ import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
 import io.novafoundation.nova.common.R
-import io.novafoundation.nova.common.utils.getAccentColor
 
 fun Int.toColorStateList() = ColorStateList.valueOf(this)
 
 fun Context.addRipple(
     drawable: Drawable? = null,
     mask: Drawable? = null,
-    @ColorInt rippleColor: Int = getColor(R.color.colorSelected)
+    @ColorInt rippleColor: Int = getColor(R.color.cell_background_pressed)
 ): Drawable {
     return RippleDrawable(rippleColor.toColorStateList(), drawable, mask)
 }
@@ -48,22 +47,22 @@ fun Context.getCornersCheckableDrawable(
 
 fun Context.getInputBackground() = getCornersStateDrawable(
     focusedDrawable = getRoundedCornerDrawableFromColors(
-        fillColor = getColor(R.color.white_8),
-        strokeColor = getAccentColor(),
+        fillColor = getColor(R.color.input_background),
+        strokeColor = getColor(R.color.active_border),
         strokeSizeInDp = 1f
     ),
-    idleDrawable = getRoundedCornerDrawable(R.color.white_8)
+    idleDrawable = getRoundedCornerDrawable(R.color.input_background)
 )
 
-fun Context.getFocusedDrawable(): Drawable = getRoundedCornerDrawable(strokeColorRes = R.color.white)
-fun Context.getDisabledDrawable(): Drawable = getRoundedCornerDrawable(fillColorRes = R.color.gray3)
-fun Context.getIdleDrawable(): Drawable = getRoundedCornerDrawable(strokeColorRes = R.color.white_16)
-fun Context.getBlurDrawable(@ColorRes strokeColorRes: Int? = null): Drawable {
-    return getRoundedCornerDrawable(fillColorRes = R.color.black_48, strokeColorRes = strokeColorRes)
+fun Context.getFocusedDrawable(): Drawable = getRoundedCornerDrawable(strokeColorRes = R.color.active_border)
+fun Context.getDisabledDrawable(): Drawable = getRoundedCornerDrawable(fillColorRes = R.color.input_background)
+fun Context.getIdleDrawable(): Drawable = getRoundedCornerDrawable(strokeColorRes = R.color.container_border)
+fun Context.getBlockDrawable(@ColorRes strokeColorRes: Int? = null): Drawable {
+    return getRoundedCornerDrawable(fillColorRes = R.color.block_background, strokeColorRes = strokeColorRes)
 }
 
 fun Context.getRoundedCornerDrawable(
-    @ColorRes fillColorRes: Int = R.color.black,
+    @ColorRes fillColorRes: Int = R.color.secondary_screen_background,
     @ColorRes strokeColorRes: Int? = null,
     cornerSizeInDp: Int = 12,
     strokeSizeInDp: Float = 1.0f,
@@ -75,7 +74,7 @@ fun Context.getRoundedCornerDrawable(
 }
 
 fun Context.getTopRoundedCornerDrawable(
-    @ColorRes fillColorRes: Int = R.color.black,
+    @ColorRes fillColorRes: Int = R.color.secondary_screen_background,
     @ColorRes strokeColorRes: Int? = null,
     cornerSizeInDp: Int = 12,
     strokeSizeInDp: Float = 1.0f,
@@ -87,7 +86,7 @@ fun Context.getTopRoundedCornerDrawable(
 }
 
 fun Context.getTopRoundedCornerDrawableFromColors(
-    @ColorInt fillColor: Int = getColor(R.color.black),
+    @ColorInt fillColor: Int = getColor(R.color.secondary_screen_background),
     @ColorInt strokeColor: Int? = null,
     cornerSizeInDp: Int = 12,
     strokeSizeInDp: Float = 1.0f,
@@ -107,7 +106,7 @@ fun Context.getTopRoundedCornerDrawableFromColors(
 }
 
 fun Context.getRoundedCornerDrawableFromColors(
-    @ColorInt fillColor: Int = getColor(R.color.black),
+    @ColorInt fillColor: Int = getColor(R.color.secondary_screen_background),
     @ColorInt strokeColor: Int? = null,
     cornerSizeInDp: Int = 12,
     strokeSizeInDp: Float = 1.0f,

@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:layout_marginTop="4dp"
     android:background="@drawable/bg_primary_list_item"
-    tools:background="@color/black">
+    tools:background="@color/secondary_screen_background">
 
     <ImageView
         android:id="@+id/itemSourceTypeIcon"
@@ -16,7 +16,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/white"
+        app:tint="@color/text_primary"
         tools:src="@drawable/ic_document" />
 
     <TextView

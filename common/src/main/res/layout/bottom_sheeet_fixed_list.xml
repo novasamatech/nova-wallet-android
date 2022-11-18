@@ -10,17 +10,19 @@
 
     <View
         style="@style/Widget.Nova.Puller"
-        android:layout_marginTop="4dp"
-        android:layout_gravity="center_horizontal" />
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="6dp" />
 
     <TextView
         android:id="@+id/fixedListSheetTitle"
         style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
+        android:textColor="@color/text_primary"
         tools:text="Title" />
+
 </LinearLayout>

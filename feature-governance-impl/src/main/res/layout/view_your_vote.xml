@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    tools:background="@color/black"
+    tools:background="@color/secondary_screen_background"
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
     <TextView
@@ -16,7 +16,7 @@
         android:layout_marginStart="16dp"
         android:includeFontPadding="false"
         android:text="@string/referendum_details_your_vote"
-        android:textColor="@color/white_64"
+        android:textColor="@color/text_secondary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -54,7 +54,7 @@
             style="@style/TextAppearance.NovaFoundation.Regular"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/white"
+            android:textColor="@color/text_primary"
             android:textSize="13sp"
             tools:text="60 votes" />
 
@@ -63,7 +63,7 @@
             style="@style/TextAppearance.NovaFoundation.Regular"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/white_64"
+            android:textColor="@color/text_secondary"
             android:textSize="12sp"
             tools:text="10 KSM × 6x" />
 

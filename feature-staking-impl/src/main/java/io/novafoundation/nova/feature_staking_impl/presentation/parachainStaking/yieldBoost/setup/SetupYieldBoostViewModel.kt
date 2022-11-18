@@ -415,7 +415,7 @@ class SetupYieldBoostViewModel(
 
             if (hasActiveYieldBoost) {
                 appendColored(", ", R.color.green)
-                appendColored(resourceManager.getString(R.string.yiled_boost_yield_boosted), R.color.white_64)
+                appendColored(resourceManager.getString(R.string.yiled_boost_yield_boosted), R.color.text_secondary)
             }
         }
     }

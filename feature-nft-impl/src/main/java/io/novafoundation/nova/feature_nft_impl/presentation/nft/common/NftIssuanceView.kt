@@ -19,8 +19,8 @@ class NftIssuanceView @JvmOverloads constructor(
 
     init {
         setTextAppearance(R.style.TextAppearance_NovaFoundation_SemiBold_Caps2)
-        setTextColorRes(R.color.white_64)
-        updatePadding(top = 1.5f.dp, bottom = 1.5f.dp, start = 6.dp, end = 8.dp)
-        background = context.getRoundedCornerDrawable(R.color.white_16, cornerSizeInDp = 4)
+        setTextColorRes(R.color.chip_text)
+        updatePadding(top = 1.5f.dp, bottom = 1.5f.dp, start = 6.dp, end = 6.dp)
+        background = context.getRoundedCornerDrawable(R.color.chips_background, cornerSizeInDp = 4)
     }
 }

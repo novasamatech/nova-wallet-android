@@ -25,7 +25,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/crowdloanAssetSelector"
-        tools:background="@color/blurColor"
+        tools:background="@color/block_background"
         tools:visibility="visible">
 
         <TextView
@@ -45,7 +45,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:textColor="@color/white_64"
+            android:textColor="@color/text_secondary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -65,7 +65,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/crowdloanAbout"
-        tools:background="@color/blurColor"
+        tools:background="@color/block_background"
         tools:visibility="visible">
 
         <LinearLayout
@@ -83,7 +83,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/crowdloan_your_contributions"
-                android:textColor="@color/white_64"
+                android:textColor="@color/text_secondary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -113,7 +113,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
             android:layout_marginTop="3dp"
-            android:textColor="@color/white"
+            android:textColor="@color/text_primary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/crowdloanTotalContributedTitle"
@@ -127,7 +127,7 @@
             android:layout_marginHorizontal="16dp"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="20dp"
-            android:textColor="@color/white_64"
+            android:textColor="@color/text_secondary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -147,7 +147,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/crowdloanTotalContributedContainer"
-        tools:background="@color/blurColor"
+        tools:background="@color/block_background"
         tools:visibility="visible">
 
         <com.facebook.shimmer.ShimmerFrameLayout

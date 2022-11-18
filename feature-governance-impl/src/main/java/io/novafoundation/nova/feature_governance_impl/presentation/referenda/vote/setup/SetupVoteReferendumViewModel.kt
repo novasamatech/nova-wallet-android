@@ -203,13 +203,13 @@ class SetupVoteReferendumViewModel(
 
     private fun convictionValues(): SeekbarValues<Conviction> {
         val colors = listOf(
-            R.color.multicolor_cyan_light,
-            R.color.multicolor_cyan_medium,
-            R.color.multicolor_cyan_dark,
-            R.color.multicolor_blue_100,
-            R.color.multicolor_indigo,
-            R.color.multicolor_violet,
-            R.color.multicolor_pink_polkadot
+            R.color.conviction_slider_text_01x,
+            R.color.conviction_slider_text_1x,
+            R.color.conviction_slider_text_2x,
+            R.color.conviction_slider_text_3x,
+            R.color.conviction_slider_text_4x,
+            R.color.conviction_slider_text_5x,
+            R.color.conviction_slider_text_6x
         )
 
         val values = Conviction.values().mapIndexed { index, conviction ->

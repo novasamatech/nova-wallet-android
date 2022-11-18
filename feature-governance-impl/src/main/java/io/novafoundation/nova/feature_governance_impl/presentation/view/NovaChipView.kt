@@ -45,7 +45,7 @@ class NovaChipView @JvmOverloads constructor(
             setIconSize(iconSize)
         }
 
-        val backgroundTintColor = typedArray.getResourceId(R.styleable.NovaChipView_backgroundColor, R.color.white_8)
+        val backgroundTintColor = typedArray.getResourceId(R.styleable.NovaChipView_backgroundColor, R.color.divider)
         background = getRoundedCornerDrawable(backgroundTintColor, cornerSizeDp = 8)
             .withRippleMask(getRippleMask(cornerSizeDp = 8))
 
@@ -61,7 +61,7 @@ class NovaChipView @JvmOverloads constructor(
         @ColorRes
         val textColorRes = typedArray.getResourceId(
             R.styleable.NovaChipView_android_textColor,
-            R.color.white_64
+            R.color.text_secondary
         )
         chipText.setTextColorRes(textColorRes)
 

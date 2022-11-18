@@ -69,7 +69,7 @@ class GovernanceLocksOverviewViewModel(
                 status = StatusContent.Timer(lock.timer),
                 statusIconColorRes = R.color.white_48,
                 statusIconRes = R.drawable.ic_time_16,
-                statusColorRes = R.color.white_64
+                statusColorRes = R.color.text_secondary
             )
         }
     }

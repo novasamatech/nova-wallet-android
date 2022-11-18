@@ -7,7 +7,7 @@
     tools:parentTag="android.widget.LinearLayout"
     tools:gravity="center_vertical"
     tools:orientation="horizontal"
-    tools:background="@color/black">
+    tools:background="@color/secondary_screen_background">
 
     <ImageView
         android:layout_width="24dp"
@@ -33,7 +33,7 @@
         android:paddingEnd="12dp"
         android:paddingBottom="9dp"
         android:singleLine="true"
-        android:textColor="@color/white"
+        android:textColor="@color/text_primary"
         android:textColorHint="@color/white_32" />
 
     <TextView
@@ -46,8 +46,8 @@
         android:paddingTop="6dp"
         android:paddingRight="12dp"
         android:paddingBottom="8dp"
-        android:textColor="@color/accentBlue"
-        tools:background="@color/white_8"
+        android:textColor="@color/button_background_primary"
+        tools:background="@color/divider"
         android:text="@string/wallet_send_myself" />
 
     <TextView
@@ -60,8 +60,8 @@
         android:paddingTop="6dp"
         android:paddingRight="12dp"
         android:paddingBottom="8dp"
-        android:textColor="@color/accentBlue"
-        tools:background="@color/white_8"
+        android:textColor="@color/button_background_primary"
+        tools:background="@color/divider"
         android:text="@string/common_paste" />
 
     <ImageView
@@ -74,8 +74,8 @@
         android:paddingRight="8dp"
         android:paddingBottom="6dp"
         android:src="@drawable/ic_scan_qr"
-        app:tint="@color/accentBlue"
-        tools:background="@color/white_8" />
+        app:tint="@color/button_background_primary"
+        tools:background="@color/divider" />
 
     <ImageView
         android:id="@+id/addressInputClear"
@@ -85,6 +85,6 @@
         android:layout_marginEnd="16dp"
         android:src="@drawable/ic_close_circle"
         android:visibility="gone"
-        app:tint="@color/white_64"
+        app:tint="@color/text_secondary"
         tools:visibility="visible" />
 </merge>

@@ -21,7 +21,7 @@ class TabItem @JvmOverloads constructor(
                 checked = addRipple(getRoundedCornerDrawable(fillColorRes = R.color.white_16)),
                 unchecked = addRipple(
                     drawable = getRoundedCornerDrawable(fillColorRes = android.R.color.transparent),
-                    mask = getRoundedCornerDrawable(fillColorRes = R.color.black_48)
+                    mask = getRoundedCornerDrawable(fillColorRes = R.color.block_background)
                 )
             )
         }

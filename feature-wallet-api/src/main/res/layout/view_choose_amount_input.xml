@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:background="@color/white_8"
+    tools:background="@color/divider"
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
 
@@ -48,7 +48,7 @@
         android:hint="0"
         android:inputType="numberDecimal"
         android:paddingBottom="26dp"
-        android:textColor="@color/white"
+        android:textColor="@color/text_primary"
         android:textColorHint="@color/white_32"
         android:textCursorDrawable="@null"
         android:textStyle="bold"
@@ -65,7 +65,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="9dp"
         android:singleLine="true"
-        android:textColor="@color/white_64"
+        android:textColor="@color/text_secondary"
         app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/chooseAmountInputField"

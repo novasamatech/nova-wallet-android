@@ -12,7 +12,7 @@ import coil.load
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.setTextOrHide
-import io.novafoundation.nova.common.view.shape.getBlurDrawable
+import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.common.view.shape.getCornersStateDrawable
 import kotlinx.android.synthetic.main.view_choose_amount_old.view.stakingAmountInput
 import kotlinx.android.synthetic.main.view_choose_amount_old.view.stakingAssetBalance
@@ -65,10 +65,10 @@ class AmountView @JvmOverloads constructor(
 
     private fun setBackground() {
         background = context.getCornersStateDrawable(
-            focusedDrawable = context.getBlurDrawable(
-                strokeColorRes = R.color.white
+            focusedDrawable = context.getBlockDrawable(
+                strokeColorRes = R.color.text_primary
             ),
-            idleDrawable = context.getBlurDrawable(
+            idleDrawable = context.getBlockDrawable(
                 strokeColorRes = R.color.white_40
             )
         )

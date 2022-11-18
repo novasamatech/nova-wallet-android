@@ -5,7 +5,6 @@
     android:id="@+id/toolbarContainer"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
-    android:background="@android:color/black"
     android:gravity="center_vertical"
     android:orientation="horizontal"
     tools:layout_height="48dp">
@@ -29,7 +28,7 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:padding="@dimen/x1"
-        android:textColor="@color/white"
+        android:textColor="@color/text_primary"
         tools:text="Title" />
 
     <ImageView
@@ -51,7 +50,7 @@
         android:gravity="center_vertical"
         android:paddingStart="@dimen/x2"
         android:paddingEnd="@dimen/x2"
-        android:textColor="?attr/colorAccent"
+        android:textColor="@color/button_text_accent"
         android:visibility="gone"
         tools:text="Action" />
 
@@ -67,5 +66,5 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_gravity="bottom"
-        android:background="@color/dividerGray" />
+        android:background="@color/divider" />
 </FrameLayout>

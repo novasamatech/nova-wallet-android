@@ -11,7 +11,7 @@
         style="@style/Widget.Nova.Puller"
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="16dp"
-        android:layout_marginTop="4dp" />
+        android:layout_marginTop="6dp" />
 
     <io.novafoundation.nova.feature_account_api.view.ChainChipView
         android:id="@+id/externalActionsChain"

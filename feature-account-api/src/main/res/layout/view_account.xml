@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:background="@color/black"
+    tools:background="@color/secondary_screen_background"
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
     <ImageView
@@ -39,7 +39,7 @@
         android:layout_marginEnd="29dp"
         app:layout_goneMarginBottom="9dp"
         android:includeFontPadding="false"
-        android:textColor="@color/white"
+        android:textColor="@color/text_primary"
         android:ellipsize="middle"
         android:singleLine="true"
         app:layout_constraintBottom_toTopOf="@+id/addressSubtitle"
@@ -60,7 +60,7 @@
         android:ellipsize="middle"
         android:singleLine="true"
         android:layout_marginBottom="9dp"
-        android:textColor="@color/white_64"
+        android:textColor="@color/text_secondary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/addressTitle"
         app:layout_constraintHorizontal_bias="0.5"

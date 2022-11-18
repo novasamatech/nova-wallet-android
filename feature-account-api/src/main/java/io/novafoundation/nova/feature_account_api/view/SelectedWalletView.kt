@@ -30,7 +30,7 @@ class SelectedWalletView @kotlin.jvm.JvmOverloads constructor(
         if (model.typeIcon != null) {
             background = context.getRoundedCornerDrawable(
                 fillColorRes = R.color.white_16,
-                strokeColorRes = R.color.white_8,
+                strokeColorRes = R.color.divider,
                 cornerSizeInDp = 80,
             )
 

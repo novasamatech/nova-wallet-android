@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:paddingVertical="16dp"
-    tools:background="@color/black"
+    tools:background="@color/secondary_screen_background"
     tools:parentTag="android.widget.LinearLayout">
 
     <androidx.constraintlayout.widget.ConstraintLayout

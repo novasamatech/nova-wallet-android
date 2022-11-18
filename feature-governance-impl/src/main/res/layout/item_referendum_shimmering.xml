@@ -9,7 +9,7 @@
     android:paddingHorizontal="16dp"
     android:paddingTop="18dp"
     android:paddingBottom="21dp"
-    tools:background="@color/blurColor">
+    tools:background="@color/block_background">
 
     <com.facebook.shimmer.ShimmerFrameLayout
         android:id="@+id/itemReferendumShimmeringStatus"

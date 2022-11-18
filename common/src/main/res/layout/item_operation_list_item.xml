@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout"
     android:layout_height="wrap_content"
-    android:background="@drawable/bg_primary_list_item">
+    android:background="@drawable/bg_primary_list_item"
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
     <ImageView
         android:id="@+id/itemOperationIcon"
@@ -29,7 +29,7 @@
         android:layout_marginEnd="48dp"
         android:ellipsize="middle"
         android:singleLine="true"
-        android:textColor="@color/white"
+        android:textColor="@color/text_primary"
         app:layout_constraintEnd_toStartOf="@+id/itemOperationValuePrimary"
         app:layout_constraintStart_toEndOf="@+id/itemOperationIcon"
         app:layout_constraintTop_toTopOf="parent"
@@ -41,7 +41,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="9dp"
-        android:textColor="@color/white_48"
+        android:textColor="@color/text_secondary"
         app:layout_constraintStart_toStartOf="@+id/itemOperationHeader"
         app:layout_constraintTop_toBottomOf="@+id/itemOperationValuePrimary"
         tools:text="Transfer" />
@@ -54,7 +54,7 @@
         android:layout_marginEnd="4dp"
         android:ellipsize="middle"
         android:singleLine="true"
-        android:textColor="@color/white"
+        android:textColor="@color/text_primary"
         app:layout_constraintEnd_toStartOf="@+id/itemOperationValueStatus"
         app:layout_constraintTop_toTopOf="@+id/itemOperationHeader"
         app:layout_goneMarginEnd="0dp"
@@ -67,7 +67,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
-        android:textColor="@color/white_48"
+        android:textColor="@color/text_secondary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/itemOperationValuePrimary"
         tools:text="22:36" />
@@ -80,6 +80,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/itemOperationValuePrimary"
         app:layout_constraintEnd_toEndOf="@+id/itemOperationValueSecondary"
         app:layout_constraintTop_toTopOf="@+id/itemOperationValuePrimary"
-        tools:src="@drawable/ic_time_16"
-        />
+        app:tint="@color/icon_secondary"
+        tools:src="@drawable/ic_time_16" />
+
 </merge>

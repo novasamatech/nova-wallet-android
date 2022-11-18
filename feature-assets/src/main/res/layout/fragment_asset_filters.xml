@@ -5,12 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:background="@color/black">
+    tools:background="@color/secondary_screen_background">
 
     <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/assetsFilterToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:dividerVisible="false"
         app:homeButtonIcon="@drawable/ic_close"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_assets.presentation.transaction.history
 
+import android.animation.ArgbEvaluator
 import android.content.Context
 import android.content.res.ColorStateList
-import android.graphics.Color
 import android.os.Bundle
 import android.os.Parcelable
 import android.util.AttributeSet
@@ -31,12 +31,10 @@ import kotlinx.android.synthetic.main.view_transfer_history.view.transactionHist
 import kotlinx.android.synthetic.main.view_transfer_history.view.transactionHistoryPuller
 import kotlinx.android.synthetic.main.view_transfer_history.view.transactionHistoryTitle
 
+
 typealias ScrollingListener = (position: Int) -> Unit
 typealias SlidingStateListener = (Int) -> Unit
 typealias TransactionClickListener = (OperationModel) -> Unit
-
-private const val MIN_ALPHA = (0.48 * 255).toInt()
-private const val MAX_ALPHA = 1 * 255
 
 private const val MIN_MARGIN = 20 // dp
 private const val MAX_MARGIN = 32 // dp
@@ -61,10 +59,16 @@ class TransferHistorySheet @JvmOverloads constructor(
     private var transactionClickListener: TransactionClickListener? = null
 
     private val imageLoader: ImageLoader by lazy(LazyThreadSafetyMode.NONE) {
-        FeatureUtils.getCommonApi(context).imageLoader()
+        if (isInEditMode) {
+            ImageLoader.invoke(context)
+        } else {
+            FeatureUtils.getCommonApi(context).imageLoader()
+        }
     }
 
-    private val adapter = TransactionHistoryAdapter(this, imageLoader)
+    private val adapter: TransactionHistoryAdapter by lazy(LazyThreadSafetyMode.NONE) {
+        TransactionHistoryAdapter(this, imageLoader)
+    }
 
     private var lastOffset: Float = 0.0F
 
@@ -76,10 +80,13 @@ class TransferHistorySheet @JvmOverloads constructor(
         }
     }
 
+    private val collapsedBackgroundColor: Int = context.getColor(R.color.block_background)
+    private val expandedBackgroundColor: Int = context.getColor(R.color.secondary_screen_background)
+
     init {
         View.inflate(context, R.layout.view_transfer_history, this)
 
-        background = context.getTopRoundedCornerDrawable(fillColorRes = R.color.black)
+        background = context.getTopRoundedCornerDrawable(fillColorRes = R.color.secondary_screen_background, cornerSizeInDp = 16)
 
         transactionHistoryList.adapter = adapter
         transactionHistoryList.setHasFixedSize(true)
@@ -243,11 +250,9 @@ class TransferHistorySheet @JvmOverloads constructor(
     }
 
     private fun updateBackgroundAlpha() {
-        val updatedAlpha = linearUpdate(MIN_ALPHA, MAX_ALPHA, lastOffset)
-
-        val color = Color.argb(updatedAlpha, 0, 0, 0)
-
-        backgroundTintList = ColorStateList.valueOf(color)
+        val argbEvaluator = ArgbEvaluator()
+        val resultColor = argbEvaluator.evaluate(lastOffset, collapsedBackgroundColor, expandedBackgroundColor)
+        backgroundTintList = ColorStateList.valueOf(resultColor as Int)
     }
 
     private val parentView: View

@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    tools:background="@color/black"
+    tools:background="@color/secondary_screen_background"
     tools:orientation="vertical"
     tools:parentTag="android.widget.LinearLayout">
 
@@ -67,7 +67,7 @@
         android:layout_marginTop="2dp"
         android:singleLine="true"
         android:visibility="gone"
-        android:textColor="@color/white_64"
+        android:textColor="@color/text_secondary"
         tools:text="$8.131" />
 
 </merge>

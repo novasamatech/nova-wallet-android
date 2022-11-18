@@ -38,7 +38,7 @@ open class TableView @JvmOverloads constructor(
     init {
         orientation = VERTICAL
 
-        background = getRoundedCornerDrawable(R.color.white_8)
+        background = getRoundedCornerDrawable(R.color.block_background)
         clipToOutline = true
 
         titleView = addTitleView()
@@ -46,7 +46,7 @@ open class TableView @JvmOverloads constructor(
         attrs?.let(::applyAttributes)
 
         dividerPaint.apply {
-            color = context.getColor(R.color.white_8)
+            color = context.getColor(R.color.divider)
             style = Paint.Style.STROKE
         }
     }
@@ -82,7 +82,7 @@ open class TableView @JvmOverloads constructor(
 
     private fun addTitleView(): TextView = TextView(context).also { title ->
         title.setTextAppearance(R.style.TextAppearance_NovaFoundation_Regular_SubHeadline)
-        title.setTextColorRes(R.color.white)
+        title.setTextColorRes(R.color.text_primary)
         title.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).also { params ->
             params.updateMarginsRelative(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 4.dp)
         }

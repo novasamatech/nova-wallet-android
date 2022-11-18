@@ -12,7 +12,7 @@
     android:paddingEnd="@dimen/x2"
     android:paddingBottom="@dimen/x1"
     android:textAllCaps="true"
-    android:textColor="@color/white"
+    android:textColor="@color/text_primary"
     android:textSize="@dimen/text_size_b1"
-    tools:background="@color/black"
+    tools:background="@color/secondary_screen_background"
     tools:text="Polcadot" />

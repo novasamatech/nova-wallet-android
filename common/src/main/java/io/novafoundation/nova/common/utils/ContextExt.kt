@@ -100,14 +100,14 @@ interface WithContextExtensions {
     fun Drawable.withRippleMask(mask: Drawable) = addRipple(this, mask)
 
     fun getRoundedCornerDrawable(
-        @ColorRes fillColorRes: Int = R.color.black,
+        @ColorRes fillColorRes: Int = R.color.secondary_screen_background,
         @ColorRes strokeColorRes: Int? = null,
         cornerSizeDp: Int = 12,
     ) = providedContext.getRoundedCornerDrawable(fillColorRes, strokeColorRes, cornerSizeDp)
 
     fun getRippleMask(
         cornerSizeDp: Int = 12,
-    ) = providedContext.getRoundedCornerDrawable(R.color.colorSelected, null, cornerSizeDp)
+    ) = providedContext.getRoundedCornerDrawable(R.color.cell_background_pressed, null, cornerSizeDp)
 }
 
 fun WithContextExtensions(context: Context) = object : WithContextExtensions {

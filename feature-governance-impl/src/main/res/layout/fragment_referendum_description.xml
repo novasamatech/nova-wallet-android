@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:orientation="vertical"
-    tools:background="@color/black">
+    tools:background="@color/secondary_screen_background">
 
     <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/referendumDescriptionToolbar"
@@ -46,7 +46,7 @@
                 style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/white_64"
+                android:textColor="@color/text_secondary"
                 tools:text="Sovereign Nature Initiative (SNI) is a non-profit foundation that has brought together multiple partners and engineers from the Kusama ecosystem including Kodadot, Unique Network, Kilt Protocol, Momentum, and Ocean Protocol, to support the building of Web3 capacities for wildlife" />
 
         </LinearLayout>

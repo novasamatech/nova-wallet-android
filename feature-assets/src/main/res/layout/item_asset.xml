@@ -7,7 +7,7 @@
     android:layout_height="56dp"
     android:layout_weight="1"
     android:background="@drawable/bg_primary_list_item"
-    tools:background="@color/blurColor">
+    tools:background="@color/block_background">
 
     <ImageView
         android:id="@+id/itemAssetImage"
@@ -19,6 +19,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/itemAssetRate"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/itemAssetToken"
+        app:tint="@color/icon_primary"
         tools:src="@drawable/ic_token_ksm" />
 
     <TextView
@@ -28,7 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
         android:layout_marginTop="8dp"
-        android:textColor="@color/white"
+        android:textColor="@color/text_primary"
         app:layout_constraintStart_toEndOf="@+id/itemAssetImage"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="KSM" />
@@ -39,7 +40,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:textColor="@color/white_64"
+        android:textColor="@color/text_secondary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@+id/itemAssetToken"
         app:layout_constraintTop_toBottomOf="@+id/itemAssetToken"
@@ -52,7 +53,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
-        android:textColor="@color/green"
+        android:textColor="@color/text_positive"
         app:layout_constraintBottom_toBottomOf="@+id/itemAssetRate"
         app:layout_constraintStart_toEndOf="@+id/itemAssetRate"
         app:layout_constraintTop_toTopOf="@+id/itemAssetRate"
@@ -68,7 +69,7 @@
         android:ellipsize="end"
         android:gravity="end|center_vertical"
         android:maxLines="1"
-        android:textColor="@color/white_64"
+        android:textColor="@color/text_secondary"
         app:layout_constraintBaseline_toBaselineOf="@id/itemAssetRateChange"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1"
@@ -84,6 +85,7 @@
         android:ellipsize="end"
         android:gravity="end|center_vertical"
         android:maxLines="1"
+        android:textColor="@color/text_primary"
         app:layout_constraintBaseline_toBaselineOf="@id/itemAssetToken"
         app:layout_constraintEnd_toEndOf="@+id/itemAssetPriceAmount"
         app:layout_constraintHorizontal_bias="1"

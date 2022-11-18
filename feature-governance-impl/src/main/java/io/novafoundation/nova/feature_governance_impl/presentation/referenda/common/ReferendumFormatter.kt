@@ -198,7 +198,7 @@ class RealReferendumFormatter(
 
                 ReferendumStatusModel(
                     name = resourceManager.getString(titleRes),
-                    colorRes = R.color.white_64
+                    colorRes = R.color.text_secondary
                 )
             }
             is ReferendumStatus.Ongoing.InQueue -> ReferendumStatusModel(
@@ -207,7 +207,7 @@ class RealReferendumFormatter(
                     status.position.index,
                     status.position.maxSize
                 ),
-                colorRes = R.color.white_64
+                colorRes = R.color.text_secondary
             )
             is ReferendumStatus.Ongoing.Rejecting -> ReferendumStatusModel(
                 name = resourceManager.getString(R.string.referendum_status_not_passing),
@@ -231,11 +231,11 @@ class RealReferendumFormatter(
             )
             ReferendumStatus.NotExecuted.Cancelled -> ReferendumStatusModel(
                 name = resourceManager.getString(R.string.referendum_status_cancelled),
-                colorRes = R.color.white_64
+                colorRes = R.color.text_secondary
             )
             ReferendumStatus.NotExecuted.TimedOut -> ReferendumStatusModel(
                 name = resourceManager.getString(R.string.referendum_status_timeout),
-                colorRes = R.color.white_64
+                colorRes = R.color.text_secondary
             )
             ReferendumStatus.NotExecuted.Killed -> ReferendumStatusModel(
                 name = resourceManager.getString(R.string.referendum_status_killed),
@@ -330,7 +330,7 @@ class RealReferendumFormatter(
 
     private fun ReferendumTimeEstimation.TextStyle.Companion.regular() = ReferendumTimeEstimation.TextStyle(
         iconRes = R.drawable.ic_time_16,
-        colorRes = R.color.white_64
+        colorRes = R.color.text_secondary
     )
 
     private fun TimerValue.referendumStatusIsHot(): Boolean {

@@ -48,7 +48,6 @@ class NetworkInfoHolder(override val containerView: TableCellView) : BaseViewHol
             is LoadingState.Loading -> showProgress()
         }
 
-        setDividerColor(R.color.white_8)
         setDividerVisible(!isLast)
     }
 

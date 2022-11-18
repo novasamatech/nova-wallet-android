@@ -25,7 +25,7 @@ class TabsView @JvmOverloads constructor(
     private var onTabSelected: OnTabSelected? = null
 
     init {
-        background = context.getRoundedCornerDrawable(R.color.black_48)
+        background = context.getRoundedCornerDrawable(R.color.block_background)
 
         updatePadding(top = 4.dp, bottom = 4.dp, start = 4.dp)
     }

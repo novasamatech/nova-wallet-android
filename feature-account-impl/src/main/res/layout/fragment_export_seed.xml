@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:orientation="vertical"
-    tools:background="@color/black">
+    tools:background="@color/secondary_screen_background">
 
     <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/exportSeedToolbar"
@@ -32,7 +32,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:text="@string/account_create_details_v2_2_0"
-        android:textColor="@color/black1" />
+        android:textColor="@color/text_secondary" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/exportSeedContentContainer"
@@ -51,7 +51,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:text="@string/recovery_raw_seed"
-            android:textColor="@color/black1"
+            android:textColor="@color/text_secondary"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -79,7 +79,7 @@
             android:layout_height="wrap_content"
             style="@style/TextAppearance.NovaFoundation.Body1"
             tools:text="0x3a603512d3bba4939481389139b499521504d36b82834819af"
-            android:textColor="@color/white" />
+            android:textColor="@color/text_primary" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
@@ -90,5 +90,5 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:text="@string/account_backup_secret_caption"
-        android:textColor="@color/black1" />
+        android:textColor="@color/text_secondary" />
 </LinearLayout>

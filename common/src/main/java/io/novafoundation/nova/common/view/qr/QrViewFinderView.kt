@@ -23,7 +23,7 @@ class QrViewFinderView @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr) {
 
     private val maskColor = context.getColor(R.color.black_65)
-    private val whiteColor = context.getColor(R.color.white)
+    private val whiteColor = context.getColor(R.color.text_primary)
 
     // Cache the framingRect so that we can still draw it after the preview
     // stopped.

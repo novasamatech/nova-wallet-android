@@ -6,7 +6,7 @@
     android:orientation="horizontal"
     android:paddingStart="24dp"
     android:paddingEnd="24dp"
-    tools:background="@color/black">
+    tools:background="@color/secondary_screen_background">
 
     <TextView
         android:id="@+id/numberTv"
@@ -23,7 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-        android:textColor="@color/white"
+        android:textColor="@color/text_primary"
         tools:text="song" />
 
 </FrameLayout>
