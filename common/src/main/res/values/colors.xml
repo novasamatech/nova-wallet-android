@@ -8,8 +8,6 @@
     <color name="gray4">#181818</color>
     <color name="gray_disabled">#D0D0D0</color>
     <color name="colorGreyText">#888888</color>
-    <color name="green">@color/multicolor_green_100</color>
-    <color name="darkGreen">@color/multicolor_green_100</color>
     <color name="bottomSheetBackground">#80838383</color>
     <color name="blurColorDark">#B3000000</color>
     <color name="blurColorLight">#66000000</color>
@@ -34,14 +32,6 @@
     <color name="black3">@color/gray3</color>
     <color name="black4">@color/gray4</color>
 
-    <color name="multicolor_yellow_100">#EBC50A</color>
-    <color name="multicolor_yellow_16">#29EBC50A</color>
-
-    <color name="multicolor_green_100">#15CF37</color>
-
-    <color name="multicolor_red_100">#FF3A69</color>
-    <color name="multicolor_red_16">#29FF3A69</color>
-
     <color name="multicolor_cyan_light">#1DE4FF</color>
     <color name="multicolor_cyan_medium">#1AD1FF</color>
     <color name="multicolor_cyan_dark">#1EB3FF</color>
@@ -56,8 +46,6 @@
 
     <color name="account_icon_light">#eeeeee</color>
     <color name="account_icon_dark">@color/secondary_screen_background</color>
-
-    <color name="red">@color/multicolor_red_100</color>
 
     <color name="accentSecondary">#2D2D30</color>
 

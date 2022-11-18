@@ -44,6 +44,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:textColor="@color/text_primary"
                 tools:text="-4 KSM" />
 
             <TextView
@@ -55,9 +56,9 @@
                 android:gravity="center_vertical"
                 tools:drawablePadding="4dp"
                 tools:drawableStart="@drawable/ic_checkmark_circle_16"
-                tools:drawableTint="@color/green"
+                tools:drawableTint="@color/icon_positive"
                 tools:text="completed"
-                tools:textColor="@color/green" />
+                tools:textColor="@color/text_positive" />
 
             <io.novafoundation.nova.common.view.TableView
                 android:layout_width="match_parent"

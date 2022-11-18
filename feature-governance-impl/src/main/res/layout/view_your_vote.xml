@@ -32,7 +32,7 @@
         android:includeFontPadding="false"
         android:paddingHorizontal="8dp"
         android:paddingVertical="4.5dp"
-        android:textColor="@color/green"
+        android:textColor="@color/text_positive"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/viewYourVote"
         app:layout_constraintTop_toTopOf="parent"

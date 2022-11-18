@@ -39,7 +39,7 @@ fun SelectedStakeTargetStatusModel.Companion.Active(
     SelectedStakeTargetStatusModel.TitleConfig(
         text = resourceManager.getString(R.string.staking_your_elected_format, groupSize),
         iconRes = R.drawable.ic_checkmark_circle_16,
-        iconTintRes = R.color.green,
+        iconTintRes = R.color.icon_positive,
         textColorRes = R.color.text_primary,
     ),
     description = resourceManager.getString(description)

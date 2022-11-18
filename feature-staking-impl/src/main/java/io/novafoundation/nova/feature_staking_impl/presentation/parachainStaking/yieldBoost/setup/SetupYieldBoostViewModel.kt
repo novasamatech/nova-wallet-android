@@ -411,10 +411,10 @@ class SetupYieldBoostViewModel(
         return buildSpannable(resourceManager) {
             val aprText = RewardSuffix.APR.format(resourceManager, collator.apr.orZero())
 
-            appendColored(aprText, R.color.green)
+            appendColored(aprText, R.color.text_positive)
 
             if (hasActiveYieldBoost) {
-                appendColored(", ", R.color.green)
+                appendColored(", ", R.color.text_positive)
                 appendColored(resourceManager.getString(R.string.yiled_boost_yield_boosted), R.color.text_secondary)
             }
         }

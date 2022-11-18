@@ -18,7 +18,7 @@
         android:layout_weight="1"
         android:drawablePadding="8dp"
         android:text="@string/staking_alert_title"
-        android:textColor="@color/multicolor_yellow_100"
+        android:textColor="@color/text_warning"
         app:drawableStartCompat="@drawable/ic_warning_filled" />
 
     <com.facebook.shimmer.ShimmerFrameLayout

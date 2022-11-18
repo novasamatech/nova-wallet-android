@@ -59,7 +59,7 @@ class GovernanceLocksOverviewViewModel(
                 index = index,
                 amount = mapAmountToAmountModel(lock.amount, token).token,
                 status = StatusContent.Text(resourceManager.getString(R.string.referendum_unlock_unlockable)),
-                statusColorRes = R.color.multicolor_green_100,
+                statusColorRes = R.color.text_positive,
                 statusIconRes = null,
                 statusIconColorRes = null
             )

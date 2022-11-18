@@ -20,7 +20,7 @@
         android:includeFontPadding="false"
         android:drawablePadding="8dp"
         tools:drawableStart="@drawable/ic_checkmark_circle_16"
-        tools:drawableTint="@color/green"
+        tools:drawableTint="@color/icon_positive"
         tools:text="Active (1)" />
 
     <TextView

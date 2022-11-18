@@ -105,7 +105,7 @@ fun FixedListBottomSheet.item(
         view.itemExternalActionContent.setDrawableStart(
             drawableRes = icon,
             widthInDp = 24,
-            tint = R.color.text_primary,
+            tint = R.color.icon_primary,
             paddingInDp = 12
         )
 
@@ -113,7 +113,7 @@ fun FixedListBottomSheet.item(
             view.itemExternalActionContent.setDrawableEnd(
                 drawableRes = R.drawable.ic_chevron_right,
                 widthInDp = 24,
-                tint = R.color.white_48,
+                tint = R.color.icon_secondary,
                 paddingInDp = paddingInDp
             )
         }

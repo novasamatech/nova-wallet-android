@@ -14,7 +14,7 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginStart="12dp"
-        android:background="@drawable/bg_icon_round_black"
+        android:background="@drawable/bg_token_container"
         android:padding="6dp"
         app:layout_constraintBottom_toBottomOf="@+id/itemAssetRate"
         app:layout_constraintStart_toStartOf="parent"

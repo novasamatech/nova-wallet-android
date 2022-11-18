@@ -3,8 +3,8 @@
 
     <style name="DefaultVotesView">
         <item name="noVotesColor">@color/white_16</item>
-        <item name="positiveColor">@color/multicolor_green_100</item>
-        <item name="negativeColor">@color/multicolor_red_100</item>
+        <item name="positiveColor">@color/icon_positive</item>
+        <item name="negativeColor">@color/icon_negative</item>
         <item name="thresholdColor">@color/text_primary</item>
         <item name="thresholdShadowColor">@color/black_72</item>
         <item name="thresholdWidth">3dp</item>

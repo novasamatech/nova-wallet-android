@@ -50,7 +50,7 @@
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="8dp"
         android:textAllCaps="true"
-        android:textColor="@color/multicolor_green_100"
+        android:textColor="@color/text_positive"
         tools:text="PASSING" />
 
     <io.novafoundation.nova.feature_governance_impl.presentation.view.VotingThresholdView

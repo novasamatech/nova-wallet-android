@@ -159,7 +159,7 @@ class CurrentValidatorsViewModel(
             SelectedStakeTargetStatusModel.TitleConfig(
                 text = resourceManager.getString(R.string.staking_your_elected_format, statusGroup.numberOfValidators),
                 iconRes = R.drawable.ic_checkmark_circle_16,
-                iconTintRes = R.color.green,
+                iconTintRes = R.color.text_positive,
                 textColorRes = R.color.text_primary,
             ),
             description = resourceManager.getString(R.string.staking_your_allocated_description_v2_2_0)

@@ -29,7 +29,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:singleLine="true"
-        android:textColor="@color/green"
+        android:textColor="@color/icon_positive"
         android:visibility="gone"
         tools:text="22.12%" />
 

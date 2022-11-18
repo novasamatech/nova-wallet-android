@@ -62,7 +62,7 @@ class RealReferendumFormatter(
             positiveFraction = voting.approval.ayeVotesIfNotEmpty()?.fraction?.toFloat(),
             thresholdFraction = voting.approval.threshold.value.toFloat(),
             votingResultIcon = R.drawable.ic_close,
-            votingResultIconColor = R.color.multicolor_red_100,
+            votingResultIconColor = R.color.icon_negative,
             thresholdInfo = formatThresholdInfo(voting.support, token),
             thresholdInfoVisible = !voting.support.passing(),
             positivePercentage = resourceManager.getString(
@@ -211,23 +211,23 @@ class RealReferendumFormatter(
             )
             is ReferendumStatus.Ongoing.Rejecting -> ReferendumStatusModel(
                 name = resourceManager.getString(R.string.referendum_status_not_passing),
-                colorRes = R.color.multicolor_red_100
+                colorRes = R.color.text_negative
             )
             is ReferendumStatus.Ongoing.Confirming -> ReferendumStatusModel(
                 name = resourceManager.getString(R.string.referendum_status_passing),
-                colorRes = R.color.multicolor_green_100
+                colorRes = R.color.text_positive
             )
             is ReferendumStatus.Approved -> ReferendumStatusModel(
                 name = resourceManager.getString(R.string.referendum_status_approved),
-                colorRes = R.color.multicolor_green_100
+                colorRes = R.color.text_positive
             )
             ReferendumStatus.Executed -> ReferendumStatusModel(
                 name = resourceManager.getString(R.string.referendum_status_executed),
-                colorRes = R.color.multicolor_green_100
+                colorRes = R.color.text_positive
             )
             ReferendumStatus.NotExecuted.Rejected -> ReferendumStatusModel(
                 name = resourceManager.getString(R.string.referendum_status_rejected),
-                colorRes = R.color.multicolor_red_100
+                colorRes = R.color.text_negative
             )
             ReferendumStatus.NotExecuted.Cancelled -> ReferendumStatusModel(
                 name = resourceManager.getString(R.string.referendum_status_cancelled),
@@ -239,7 +239,7 @@ class RealReferendumFormatter(
             )
             ReferendumStatus.NotExecuted.Killed -> ReferendumStatusModel(
                 name = resourceManager.getString(R.string.referendum_status_killed),
-                colorRes = R.color.multicolor_red_100
+                colorRes = R.color.text_negative
             )
         }
     }
@@ -299,7 +299,7 @@ class RealReferendumFormatter(
         val votes = vote.votes(token.configuration) ?: return null
 
         val voteTypeRes = if (isAye) R.string.referendum_vote_aye else R.string.referendum_vote_nay
-        val colorRes = if (isAye) R.color.multicolor_green_100 else R.color.multicolor_red_100
+        val colorRes = if (isAye) R.color.text_positive else R.color.text_negative
 
         val votesAmountFormatted = mapAmountToAmountModel(votes.amount, token).token
         val multiplierFormatted = votes.multiplier.format()
@@ -325,7 +325,7 @@ class RealReferendumFormatter(
 
     private fun ReferendumTimeEstimation.TextStyle.Companion.hot() = ReferendumTimeEstimation.TextStyle(
         iconRes = R.drawable.ic_fire,
-        colorRes = R.color.multicolor_yellow_100
+        colorRes = R.color.text_warning
     )
 
     private fun ReferendumTimeEstimation.TextStyle.Companion.regular() = ReferendumTimeEstimation.TextStyle(

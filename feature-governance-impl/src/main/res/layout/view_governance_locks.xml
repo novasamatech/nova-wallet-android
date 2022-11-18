@@ -50,7 +50,7 @@
         android:includeFontPadding="false"
         android:maxLines="1"
         android:text="@string/governance_unlock"
-        android:textColor="@color/multicolor_green_100"
+        android:textColor="@color/text_positive"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/governanceUnlockForwardIcon"
         app:layout_constraintStart_toEndOf="@+id/governanceLockAmount"

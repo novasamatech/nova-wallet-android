@@ -156,7 +156,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
             dappBrowserAddressBar.showSecureIcon(it.isSecure)
 
             val favouriteIcon = if (it.isFavourite) R.drawable.ic_heart_filled else R.drawable.ic_heart_outline
-            val favoriteIconTint = if (it.isFavourite) null else R.color.icon_primary
+            val favoriteIconTint = if (it.isFavourite) R.color.icon_favorite else R.color.icon_primary
             dappBrowserFavourite.setImageResource(favouriteIcon)
             dappBrowserFavourite.setImageTintRes(favoriteIconTint)
 
