@@ -10,24 +10,16 @@ import io.novafoundation.nova.core_db.model.NodeLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.JoinedMetaAccountInfo
 import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
-import io.novafoundation.nova.feature_account_api.data.mappers.stubNetwork
-import io.novafoundation.nova.feature_account_api.domain.model.Account
 import io.novafoundation.nova.feature_account_api.domain.model.AddAccountType
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
-import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.AccountNameChooserMixin
 import io.novafoundation.nova.feature_account_impl.presentation.node.model.NodeModel
 import io.novafoundation.nova.feature_account_impl.presentation.view.advanced.encryption.model.CryptoTypeModel
 import io.novafoundation.nova.feature_account_impl.presentation.view.advanced.network.model.NetworkModel
-import io.novafoundation.nova.runtime.ext.addressOf
-import io.novafoundation.nova.runtime.ext.hexAccountIdOf
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
 
 fun mapNetworkTypeToNetworkModel(networkType: NetworkType): NetworkModel {
     val type = when (networkType) {
@@ -116,19 +108,15 @@ fun mapMetaAccountWithBalanceFromLocal(local: MetaAccountWithBalanceLocal): Meta
 }
 
 fun mapMetaAccountLocalToMetaAccount(
-    chainsById: Map<ChainId, Chain>,
     joinedMetaAccountInfo: JoinedMetaAccountInfo
 ): MetaAccount {
     val chainAccounts = joinedMetaAccountInfo.chainAccounts.associateBy(
         keySelector = ChainAccountLocal::chainId,
         valueTransform = {
-            // ignore chainAccounts with unknown chainId
-            val chain = chainsById[it.chainId] ?: return@associateBy null
-
             MetaAccount.ChainAccount(
                 metaId = joinedMetaAccountInfo.metaAccount.id,
-                chain = chain,
                 publicKey = it.publicKey,
+                chainId = it.chainId,
                 accountId = it.accountId,
                 cryptoType = it.cryptoType
             )
@@ -149,39 +137,6 @@ fun mapMetaAccountLocalToMetaAccount(
             type = mapMetaAccountTypeFromLocal(type)
         )
     }
-}
-
-@Deprecated("Accounts are deprecated")
-fun mapMetaAccountToAccount(chain: Chain, metaAccount: MetaAccount): Account? {
-    return metaAccount.addressIn(chain)?.let { address ->
-        val accountId = chain.hexAccountIdOf(address)
-
-        Account(
-            address = address,
-            name = metaAccount.name,
-            accountIdHex = accountId,
-            cryptoType = metaAccount.substrateCryptoType ?: CryptoType.SR25519,
-            position = 0,
-            network = stubNetwork(chain.id),
-        )
-    }
-}
-
-@Deprecated("Accounts are deprecated")
-fun mapChainAccountToAccount(
-    parent: MetaAccount,
-    chainAccount: MetaAccount.ChainAccount,
-): Account {
-    val chain = chainAccount.chain
-
-    return Account(
-        address = chain.addressOf(chainAccount.accountId),
-        name = parent.name,
-        accountIdHex = chainAccount.accountId.toHexString(),
-        cryptoType = chainAccount.cryptoType ?: CryptoType.SR25519,
-        position = 0,
-        network = stubNetwork(chain.id),
-    )
 }
 
 fun mapAddAccountPayloadToAddAccountType(

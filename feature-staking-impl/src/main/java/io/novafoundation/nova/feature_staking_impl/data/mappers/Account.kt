@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.data.mappers
 
-import io.novafoundation.nova.feature_account_api.data.mappers.stubNetwork
 import io.novafoundation.nova.feature_account_api.domain.model.Account
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
@@ -8,7 +7,7 @@ import io.novafoundation.nova.feature_staking_api.domain.model.StakingAccount
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 fun mapAccountToStakingAccount(account: Account) = with(account) {
-    StakingAccount(address, name, network)
+    StakingAccount(address, name)
 }
 
 fun mapAccountToStakingAccount(chain: Chain, metaAccount: MetaAccount): StakingAccount? = with(metaAccount) {
@@ -18,7 +17,6 @@ fun mapAccountToStakingAccount(chain: Chain, metaAccount: MetaAccount): StakingA
         StakingAccount(
             address = address,
             name = name,
-            network = stubNetwork(chain.id),
         )
     }
 }

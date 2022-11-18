@@ -24,7 +24,6 @@ import jp.co.soramitsu.fearless_utils.runtime.definitions.types.toHexUntyped
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.addressPrefix
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAddress
-import java.math.BigInteger
 
 val Chain.typesUsage: TypesUsage
     get() = when {
@@ -196,13 +195,7 @@ fun Chain.Asset.ormlCurrencyId(runtime: RuntimeSnapshot): Any? {
 val Chain.Asset.fullId: FullChainAssetId
     get() = FullChainAssetId(chainId, id)
 
-fun Chain.findAssetByStatemineId(statemineAssetId: BigInteger): Chain.Asset? {
-    return assets.find {
-        if (it.type !is Type.Statemine) return@find false
-
-        it.type.id == statemineAssetId
-    }
-}
+fun Chain.enabledAssets(): List<Chain.Asset> = assets.filter { it.enabled }
 
 fun Chain.findAssetByOrmlCurrencyId(runtime: RuntimeSnapshot, currencyId: Any?): Chain.Asset? {
     return assets.find { asset ->

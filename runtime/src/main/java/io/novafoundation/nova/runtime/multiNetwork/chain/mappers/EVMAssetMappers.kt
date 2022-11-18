@@ -27,7 +27,8 @@ fun mapEVMAssetRemoteToLocalAssets(evmAssetRemote: EVMAssetRemote, gson: Gson): 
             source = AssetSourceLocal.ERC20,
             type = type,
             buyProviders = null,
-            typeExtras = gson.toJson(typeExtras)
+            typeExtras = gson.toJson(typeExtras),
+            enabled = true
         )
     }
 }

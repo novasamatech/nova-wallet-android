@@ -13,6 +13,7 @@ import io.novafoundation.nova.runtime.multiNetwork.asset.EvmAssetsSyncService
 import io.novafoundation.nova.runtime.multiNetwork.chain.ChainSyncService
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapChainLocalToChain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
 import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionPool
@@ -42,6 +43,14 @@ data class ChainWithAsset(
     val asset: Chain.Asset
 )
 
+@JvmInline
+value class ChainsById(val value: Map<ChainId, Chain>) : Map<ChainId, Chain> by value {
+
+    override operator fun get(key: ChainId): Chain? {
+        return value[key.removeHexPrefix()]
+    }
+}
+
 class ChainRegistry(
     private val runtimeProviderPool: RuntimeProviderPool,
     private val connectionPool: ConnectionPool,
@@ -57,8 +66,8 @@ class ChainRegistry(
     val currentChains = chainDao.joinChainInfoFlow()
         .mapList { mapChainLocalToChain(it, gson) }
         .diffed()
-        .map { (removed, addedOrModified, all) ->
-            removed.forEach {
+        .map { diff ->
+            diff.removed.forEach {
                 val chainId = it.id
 
                 runtimeProviderPool.removeRuntimeProvider(chainId)
@@ -67,7 +76,7 @@ class ChainRegistry(
                 connectionPool.removeConnection(chainId)
             }
 
-            addedOrModified.forEach { chain ->
+            diff.newOrUpdated.forEach { chain ->
                 val connection = connectionPool.setupConnection(chain)
 
                 runtimeProviderPool.setupRuntimeProvider(chain)
@@ -76,7 +85,7 @@ class ChainRegistry(
                 runtimeProviderPool.setupRuntimeProvider(chain)
             }
 
-            all
+            diff.all
         }
         .filter { it.isNotEmpty() }
         .distinctUntilChanged()
@@ -145,6 +154,8 @@ suspend fun ChainRegistry.awaitSocket(chainId: String): SocketService {
 
     return getSocket(chainId)
 }
+
+suspend fun ChainRegistry.chainsById(): ChainsById = ChainsById(chainsById.first())
 
 fun ChainRegistry.getService(chainId: String) = ChainService(
     runtimeProvider = getRuntimeProvider(chainId),
