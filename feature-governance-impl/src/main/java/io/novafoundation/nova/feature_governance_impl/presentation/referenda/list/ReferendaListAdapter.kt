@@ -133,8 +133,8 @@ private class ReferendumChildHolder(
     init {
         with(containerView.context) {
             containerView.background = addRipple(getBlockDrawable())
-            containerView.itemReferendumTrack.background = addRipple(getRoundedCornerDrawable(R.color.divider, cornerSizeInDp = 8))
-            containerView.itemReferendumNumber.background = addRipple(getRoundedCornerDrawable(R.color.divider, cornerSizeInDp = 8))
+            containerView.itemReferendumTrack.background = addRipple(getRoundedCornerDrawable(R.color.chips_background, cornerSizeInDp = 8))
+            containerView.itemReferendumNumber.background = addRipple(getRoundedCornerDrawable(R.color.chips_background, cornerSizeInDp = 8))
         }
     }
 

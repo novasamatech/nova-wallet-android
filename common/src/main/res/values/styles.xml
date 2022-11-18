@@ -357,7 +357,7 @@
         <item name="android:paddingTop">6dp</item>
         <item name="android:paddingBottom">8dp</item>
         <item name="android:gravity">center</item>
-        <item name="android:textColor">@color/chip_text</item>
+        <item name="android:textColor">@color/tab_item_text_color</item>
         <item name="android:textAppearance">@style/TextAppearance.NovaFoundation.Regular.Footnote
         </item>
     </style>
@@ -465,7 +465,7 @@
     </style>
 
     <style name="AccentDialogNegativeButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
-        <item name="android:textColor">@color/red</item>
+        <item name="android:textColor">@color/text_negative</item>
     </style>
 
     <!-- Dialog -->

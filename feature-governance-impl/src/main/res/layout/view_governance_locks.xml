@@ -29,7 +29,6 @@
         android:layout_height="wrap_content"
         android:layout_marginVertical="16dp"
         android:layout_marginStart="8dp"
-        app:backgroundColor="@color/white_16"
         app:chipIcon="@drawable/ic_lock"
         app:chipIconSize="12dp"
         app:chipTextAppearance="@style/TextAppearance.NovaFoundation.Regular.Footnote"
@@ -66,7 +65,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/white_48"
+        app:tint="@color/icon_secondary"
         tools:text="139 KSM" />
 
 </merge>

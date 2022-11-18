@@ -325,12 +325,14 @@ class RealReferendumFormatter(
 
     private fun ReferendumTimeEstimation.TextStyle.Companion.hot() = ReferendumTimeEstimation.TextStyle(
         iconRes = R.drawable.ic_fire,
-        colorRes = R.color.text_warning
+        textColorRes = R.color.text_warning,
+        iconColorRes = R.color.icon_warning,
     )
 
     private fun ReferendumTimeEstimation.TextStyle.Companion.regular() = ReferendumTimeEstimation.TextStyle(
         iconRes = R.drawable.ic_time_16,
-        colorRes = R.color.text_secondary
+        textColorRes = R.color.text_secondary,
+        iconColorRes = R.color.icon_secondary,
     )
 
     private fun TimerValue.referendumStatusIsHot(): Boolean {

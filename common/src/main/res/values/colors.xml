@@ -26,7 +26,6 @@
 
     <color name="black_24">#3D000000</color>
     <color name="black_65">#A6000000</color>
-    <color name="black_72">#B8000000</color>
 
     <color name="black2">@color/gray2</color>
     <color name="black3">@color/gray3</color>
@@ -128,5 +127,12 @@
     <color name="indicator_active">#1F78FF</color>
     <color name="indicator_inactive">#29FFFFFF</color>
     <color name="pull_indicator">#29FFFFFF</color>
+    <color name="shimmering_indicator">#A3FFFFFF</color>
+    <color name="nay_negative">#E53450</color>
+    <color name="aye_positive">#2FC864</color>
+    <color name="votes_to_pass_indicator">#2FC864</color>
+
+    <!-- Utility colors -->
+    <color name="votes_to_pass_indicator_shadow">#B8000000</color>
 
 </resources>

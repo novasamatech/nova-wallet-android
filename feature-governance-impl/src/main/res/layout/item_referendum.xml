@@ -23,6 +23,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:includeFontPadding="false"
+            android:textColor="@color/text_primary"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Passing" />
@@ -37,6 +38,7 @@
             android:gravity="end"
             android:includeFontPadding="false"
             android:maxLines="2"
+            android:textColor="@color/text_secondary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toEndOf="@+id/itemReferendumStatus"
@@ -113,6 +115,7 @@
                 android:includeFontPadding="false"
                 android:paddingHorizontal="8dp"
                 android:paddingVertical="4.5dp"
+                android:textColor="@color/chip_text"
                 tools:text="AYE" />
 
             <TextView
