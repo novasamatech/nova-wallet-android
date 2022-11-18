@@ -130,7 +130,8 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
             buyProviders = buyProviders,
             staking = mapStakingTypeFromLocal(it.staking),
             type = mapChainAssetTypeFromRaw(it.type, typeExtrasParsed),
-            source = mapAssetSourceFromLocal(it.source)
+            source = mapAssetSourceFromLocal(it.source),
+            enabled = it.enabled
         )
     }
 

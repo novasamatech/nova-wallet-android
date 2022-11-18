@@ -39,6 +39,7 @@ import io.novafoundation.nova.core_db.migrations.AddChainColor_4_5
 import io.novafoundation.nova.core_db.migrations.AddContributions_23_24
 import io.novafoundation.nova.core_db.migrations.AddCurrencies_18_19
 import io.novafoundation.nova.core_db.migrations.AddDAppAuthorizations_1_2
+import io.novafoundation.nova.core_db.migrations.AddEnabledColumnToChainAssets_30_31
 import io.novafoundation.nova.core_db.migrations.AddFavouriteDApps_9_10
 import io.novafoundation.nova.core_db.migrations.AddGovernanceDapps_25_26
 import io.novafoundation.nova.core_db.migrations.AddGovernanceExternalApiToChain_27_28
@@ -89,7 +90,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainTransferHistoryApiLocal
 import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
 
 @Database(
-    version = 30,
+    version = 31,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -153,7 +154,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(NullableSubstrateAccountId_21_22, AddLocks_22_23, AddContributions_23_24)
                     .addMigrations(AddGovernanceFlagToChains_24_25, AddGovernanceDapps_25_26, GovernanceFlagToEnum_26_27)
                     .addMigrations(AddGovernanceExternalApiToChain_27_28)
-                    .addMigrations(AddSourceToLocalAsset_28_29, AddTransferApisTable_29_30)
+                    .addMigrations(AddSourceToLocalAsset_28_29, AddTransferApisTable_29_30, AddEnabledColumnToChainAssets_30_31)
                     .build()
             }
             return instance!!

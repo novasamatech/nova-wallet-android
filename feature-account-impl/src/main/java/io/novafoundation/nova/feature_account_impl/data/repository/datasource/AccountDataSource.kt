@@ -12,7 +12,6 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.scale.EncodableStruct
 import kotlinx.coroutines.flow.Flow
@@ -35,9 +34,6 @@ interface AccountDataSource : SecretStoreV1 {
 
     suspend fun saveSelectedAccount(account: Account)
 
-    // TODO for compatibility only
-    val selectedAccountMapping: Flow<Map<ChainId, Account?>>
-
     suspend fun getSelectedMetaAccount(): MetaAccount
     fun selectedMetaAccountFlow(): Flow<MetaAccount>
     suspend fun findMetaAccount(accountId: ByteArray): MetaAccount?
@@ -50,8 +46,6 @@ interface AccountDataSource : SecretStoreV1 {
     fun metaAccountsWithBalancesFlow(): Flow<List<MetaAccountAssetBalance>>
     suspend fun selectMetaAccount(metaId: Long)
     suspend fun updateAccountPositions(accountOrdering: List<MetaAccountOrdering>)
-
-    fun selectedNodeFlow(): Flow<Node>
 
     suspend fun getSelectedLanguage(): Language
     suspend fun changeSelectedLanguage(language: Language)

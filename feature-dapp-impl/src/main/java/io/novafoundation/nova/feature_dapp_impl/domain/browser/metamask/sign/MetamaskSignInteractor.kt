@@ -280,7 +280,8 @@ class MetamaskSignInteractor(
                 staking = Chain.Asset.StakingType.UNSUPPORTED,
                 type = Chain.Asset.Type.Native,
                 name = chainCurrency.name,
-                source = Chain.Asset.Source.ERC20
+                source = Chain.Asset.Source.ERC20,
+                enabled = true
             ),
             currency = currency
         )

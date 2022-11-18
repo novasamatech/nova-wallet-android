@@ -61,9 +61,13 @@ class StorageSharedRequestsBuilder(
         ethereumRequestsAggregator.executeBatches(coroutineScope, web3Api)
 
         val cancellable = socketService.subscribeUsing(substrateProxy.build())
-        coroutineScope.invokeOnCompletion { cancellable.cancel() }
+        if (cancellable != null) {
+            coroutineScope.invokeOnCompletion { cancellable.cancel() }
+        }
     }
 }
+
+
 
 fun StorageSharedRequestsBuilder.subscribe(coroutineContext: CoroutineContext) {
     subscribe(CoroutineScope(coroutineContext))

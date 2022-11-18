@@ -58,6 +58,7 @@ data class Chain(
         val type: Type,
         val source: Source,
         val name: String,
+        val enabled: Boolean,
     ) : Identifiable {
 
         enum class Source {

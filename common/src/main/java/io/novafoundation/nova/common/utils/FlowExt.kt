@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.utils.input.valueOrNull
 import io.novafoundation.nova.common.view.input.seekbar.Seekbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
@@ -34,6 +35,7 @@ import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
+import kotlin.coroutines.coroutineContext
 
 inline fun <T, R> Flow<List<T>>.mapList(crossinline mapper: suspend (T) -> R) = map { list ->
     list.map { item -> mapper(item) }
@@ -123,12 +125,9 @@ data class ListDiff<T>(
     val all: List<T>
 )
 
-fun <T> Flow<List<T>>.diffed(): Flow<ListDiff<T>> {
+fun <T: Identifiable> Flow<List<T>>.diffed(): Flow<CollectionDiffer.Diff<T>> {
     return zipWithPrevious().map { (previous, new) ->
-        val addedOrModified = new - previous.orEmpty()
-        val removed = previous.orEmpty() - new
-
-        ListDiff(removed = removed, addedOrModified = addedOrModified, all = new)
+        CollectionDiffer.findDiff(newItems = new, oldItems = previous.orEmpty(), forceUseNewItems = false)
     }
 }
 
@@ -140,6 +139,32 @@ fun <T> Flow<T>.zipWithPrevious(): Flow<Pair<T?, T>> = flow {
 
         current = it
     }
+}
+
+private fun <K> MutableMap<K, CoroutineScope>.removeAndCancel(key: K) {
+    remove(key)?.also(CoroutineScope::cancel)
+}
+
+fun <T: Identifiable, R> Flow<List<T>>.transformLatestDiffed(transform: suspend FlowCollector<R>.(value: T) -> Unit): Flow<R> = flow {
+    val parentScope = CoroutineScope(coroutineContext)
+    val itemScopes = mutableMapOf<String, CoroutineScope>()
+
+    diffed().onEach { diff ->
+        diff.removed.forEach { removedItem ->
+            itemScopes.removeAndCancel(removedItem.identifier)
+        }
+
+        diff.newOrUpdated.forEach { newOrUpdatedItem ->
+            itemScopes.removeAndCancel(newOrUpdatedItem.identifier)
+
+            val chainScope = parentScope.childScope(supervised = false)
+            itemScopes[newOrUpdatedItem.identifier] = chainScope
+
+            chainScope.launch {
+                transform(this@flow, newOrUpdatedItem)
+            }
+        }
+    }.launchIn(parentScope)
 }
 
 fun <T> singleReplaySharedFlow() = MutableSharedFlow<T>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)

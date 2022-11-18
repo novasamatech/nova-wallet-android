@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updat
 
 import android.util.Log
 import io.novafoundation.nova.common.utils.LOG_TAG
+import io.novafoundation.nova.common.utils.mergeIfMultiple
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.core_db.dao.OperationDao
@@ -13,13 +14,13 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.b
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.TransferExtrinsic
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.AssetHistory
 import io.novafoundation.nova.runtime.ext.addressOf
+import io.novafoundation.nova.runtime.ext.enabledAssets
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.ExtrinsicStatus
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 
 class PaymentUpdaterFactory(
@@ -52,7 +53,7 @@ class PaymentUpdater(
 
         val accountId = metaAccount.accountIdIn(chain) ?: return emptyFlow()
 
-        val assetSyncs = chain.assets.mapNotNull { chainAsset ->
+        val assetSyncs = chain.enabledAssets().mapNotNull { chainAsset ->
             val assetSource = assetSourceRegistry.sourceFor(chainAsset)
 
             val assetUpdateFlow = runCatching {
@@ -66,12 +67,7 @@ class PaymentUpdater(
                 ?.onEach { balanceUpdate -> assetSource.history.syncOperationsForBalanceChange(chainAsset, balanceUpdate, accountId) }
         }
 
-        val chainSyncingFlow = if (assetSyncs.size == 1) {
-            // skip unnecessary flows merges
-            assetSyncs.first()
-        } else {
-            assetSyncs.merge()
-        }
+        val chainSyncingFlow = assetSyncs.mergeIfMultiple()
 
         return chainSyncingFlow
             .noSideAffects()

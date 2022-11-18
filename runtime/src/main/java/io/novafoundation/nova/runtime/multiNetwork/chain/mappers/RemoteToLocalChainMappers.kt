@@ -78,7 +78,8 @@ fun mapRemoteAssetsToLocal(chainRemote: ChainRemote, gson: Gson): List<ChainAsse
             source = AssetSourceLocal.DEFAULT,
             buyProviders = gson.toJson(it.buyProviders),
             typeExtras = gson.toJson(it.typeExtras),
-            icon = it.icon
+            icon = it.icon,
+            enabled = true
         )
     }
 }

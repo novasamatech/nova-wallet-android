@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.utils.DEFAULT_PREFIX
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.toEthereumAddress
+import io.novafoundation.nova.runtime.multiNetwork.ChainsById
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.encrypt.MultiChainEncryption
@@ -71,7 +72,7 @@ class MetaAccount(
 
     class ChainAccount(
         val metaId: Long,
-        val chain: Chain,
+        val chainId: ChainId,
         val publicKey: ByteArray?,
         val accountId: ByteArray,
         val cryptoType: CryptoType?,
@@ -130,7 +131,19 @@ fun MetaAccount.publicKeyIn(chain: Chain): ByteArray? {
 }
 
 fun MetaAccount.multiChainEncryptionIn(chain: Chain): MultiChainEncryption? {
-    return accountIdIn(chain)?.let { multiChainEncryptionFor(it) }
+    return when {
+        hasChainAccountIn(chain.id) -> {
+            val cryptoType = chainAccounts.getValue(chain.id).cryptoType ?: return null
+
+            if (chain.isEthereumBased) {
+                MultiChainEncryption.Ethereum
+            } else {
+                MultiChainEncryption.substrateFrom(cryptoType)
+            }
+        }
+        chain.isEthereumBased -> MultiChainEncryption.Ethereum
+        else -> substrateCryptoType?.let(MultiChainEncryption.Companion::substrateFrom)
+    }
 }
 
 fun MetaAccount.ethereumAccountId() = ethereumPublicKey?.asEthereumPublicKey()?.toAccountId()?.value
@@ -138,15 +151,16 @@ fun MetaAccount.ethereumAccountId() = ethereumPublicKey?.asEthereumPublicKey()?.
 /**
 @return [MultiChainEncryption] for given [accountId] inside this meta account or null in case it was not possible to determine result
  */
-fun MetaAccount.multiChainEncryptionFor(accountId: ByteArray): MultiChainEncryption? {
+fun MetaAccount.multiChainEncryptionFor(accountId: ByteArray, chainsById: ChainsById): MultiChainEncryption? {
     return when {
         substrateAccountId.contentEquals(accountId) -> substrateCryptoType?.let(MultiChainEncryption.Companion::substrateFrom)
         ethereumAccountId().contentEquals(accountId) -> MultiChainEncryption.Ethereum
         else -> {
             val chainAccount = chainAccounts.values.firstOrNull { it.accountId.contentEquals(accountId) } ?: return null
             val cryptoType = chainAccount.cryptoType ?: return null
+            val chain = chainsById[chainAccount.chainId] ?: return null
 
-            if (chainAccount.chain.isEthereumBased) {
+            if (chain.isEthereumBased) {
                 MultiChainEncryption.Ethereum
             } else {
                 MultiChainEncryption.substrateFrom(cryptoType)

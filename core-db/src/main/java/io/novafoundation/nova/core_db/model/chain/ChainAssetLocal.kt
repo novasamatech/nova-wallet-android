@@ -35,12 +35,15 @@ data class ChainAssetLocal(
     @ColumnInfo(defaultValue = SOURCE_DEFAULT)
     val source: AssetSourceLocal,
     val buyProviders: String?,
-    val typeExtras: String?
+    val typeExtras: String?,
+    @ColumnInfo(defaultValue = ENABLED_DEFAULT)
+    val enabled: Boolean,
 ) : Identifiable {
 
     companion object {
 
         const val SOURCE_DEFAULT = "DEFAULT"
+        const val ENABLED_DEFAULT = "1"
     }
 
     @Ignore
