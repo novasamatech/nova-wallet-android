@@ -23,10 +23,18 @@ import io.novafoundation.nova.common.utils.Identifiable
 )
 data class ChainTransferHistoryApiLocal(
     val chainId: String,
-    val assetType: String,
-    val apiType: String,
+    val assetType: AssetType,
+    val apiType: ApiType,
     val url: String
 ) : Identifiable {
+
+    enum class AssetType {
+        SUBSTRATE, EVM, UNSUPPORTED
+    }
+
+    enum class ApiType {
+        SUBQUERY, GITHUB, UNKNOWN, POLKASSEMBLY, ETHERSCAN
+    }
 
     @Ignore
     override val identifier: String = "$chainId:$url"

@@ -8,7 +8,6 @@ import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.ChainTransferHistoryApiLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.ExternalApi.TransferHistoryApi
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainExternalApiRemote
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainRemote
 
@@ -114,7 +113,7 @@ fun mapRemoteTransferApisToLocal(chainRemote: ChainRemote): List<ChainTransferHi
         ChainTransferHistoryApiLocal(
             chainId = chainRemote.chainId,
             assetType = mapTransferApiAssetTypeToLocal(it.assetType),
-            apiType = mapSectionTypeRemoteToLocal(it.type),
+            apiType = mapTransferHistoryApiTypeRemoteToLocal(it.type),
             url = it.url
         )
     }
@@ -122,14 +121,12 @@ fun mapRemoteTransferApisToLocal(chainRemote: ChainRemote): List<ChainTransferHi
     return explorers
 }
 
-private fun mapTransferApiAssetTypeToLocal(type: String?): String {
-    val domain = when (type) {
-        null, "substrate" -> TransferHistoryApi.AssetType.SUBSTRATE
-        "evm" -> TransferHistoryApi.AssetType.EVM
-        else -> TransferHistoryApi.AssetType.UNSUPPORTED
+private fun mapTransferApiAssetTypeToLocal(type: String?): ChainTransferHistoryApiLocal.AssetType {
+    return when (type) {
+        null, "substrate" -> ChainTransferHistoryApiLocal.AssetType.SUBSTRATE
+        "evm" -> ChainTransferHistoryApiLocal.AssetType.EVM
+        else -> ChainTransferHistoryApiLocal.AssetType.UNSUPPORTED
     }
-
-    return domain.name
 }
 
 private fun mapSectionRemoteToLocal(sectionRemote: ChainExternalApiRemote.Section?) = sectionRemote?.let {
@@ -142,6 +139,21 @@ private fun mapSectionRemoteToLocal(sectionRemote: ChainExternalApiRemote.Sectio
 private fun mapSectionTypeRemoteToLocal(section: String): String {
     val sectionType = mapSectionTypeRemoteToSectionType(section)
     return mapSectionTypeToSectionTypeLocal(sectionType)
+}
+
+private fun mapTransferHistoryApiTypeRemoteToLocal(type: String): ChainTransferHistoryApiLocal.ApiType {
+    val sectionType = mapSectionTypeRemoteToSectionType(type)
+    return mapApiSectionTypeTypeToTransferHistoryApiLocal(sectionType)
+}
+
+private fun mapApiSectionTypeTypeToTransferHistoryApiLocal(type: Chain.ExternalApi.Section.Type): ChainTransferHistoryApiLocal.ApiType {
+    return when (type) {
+        Chain.ExternalApi.Section.Type.SUBQUERY -> ChainTransferHistoryApiLocal.ApiType.SUBQUERY
+        Chain.ExternalApi.Section.Type.GITHUB -> ChainTransferHistoryApiLocal.ApiType.GITHUB
+        Chain.ExternalApi.Section.Type.UNKNOWN -> ChainTransferHistoryApiLocal.ApiType.UNKNOWN
+        Chain.ExternalApi.Section.Type.POLKASSEMBLY -> ChainTransferHistoryApiLocal.ApiType.POLKASSEMBLY
+        Chain.ExternalApi.Section.Type.ETHERSCAN -> ChainTransferHistoryApiLocal.ApiType.ETHERSCAN
+    }
 }
 
 private fun mapSectionTypeRemoteToSectionType(section: String) = when (section) {

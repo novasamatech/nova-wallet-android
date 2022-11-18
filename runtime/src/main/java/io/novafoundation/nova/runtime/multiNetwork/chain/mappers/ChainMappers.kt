@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.utils.fromJsonOrNull
 import io.novafoundation.nova.common.utils.parseArbitraryObject
 import io.novafoundation.nova.core_db.model.chain.AssetSourceLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
+import io.novafoundation.nova.core_db.model.chain.ChainTransferHistoryApiLocal
 import io.novafoundation.nova.core_db.model.chain.JoinedChainInfo
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.BuyProviderArguments
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.BuyProviderId
@@ -19,7 +20,23 @@ private fun mapSectionTypeLocalToSectionType(sectionType: String): Chain.Externa
 fun mapStakingTypeToLocal(stakingType: Chain.Asset.StakingType): String = stakingType.name
 private fun mapStakingTypeFromLocal(stakingTypeLocal: String): Chain.Asset.StakingType = enumValueOf(stakingTypeLocal)
 
-fun mapTransferApiAssetTypeFromLocal(localType: String): Chain.ExternalApi.TransferHistoryApi.AssetType = enumValueOf(localType)
+private fun mapTransferApiAssetTypeFromLocal(localType: ChainTransferHistoryApiLocal.AssetType): Chain.ExternalApi.TransferHistoryApi.AssetType {
+    return when (localType) {
+        ChainTransferHistoryApiLocal.AssetType.SUBSTRATE -> Chain.ExternalApi.TransferHistoryApi.AssetType.SUBSTRATE
+        ChainTransferHistoryApiLocal.AssetType.EVM -> Chain.ExternalApi.TransferHistoryApi.AssetType.EVM
+        ChainTransferHistoryApiLocal.AssetType.UNSUPPORTED -> Chain.ExternalApi.TransferHistoryApi.AssetType.UNSUPPORTED
+    }
+}
+
+private fun mapTransferApiTypeFromLocal(localType: ChainTransferHistoryApiLocal.ApiType): Chain.ExternalApi.Section.Type {
+    return when (localType) {
+        ChainTransferHistoryApiLocal.ApiType.SUBQUERY -> Chain.ExternalApi.Section.Type.SUBQUERY
+        ChainTransferHistoryApiLocal.ApiType.GITHUB -> Chain.ExternalApi.Section.Type.GITHUB
+        ChainTransferHistoryApiLocal.ApiType.POLKASSEMBLY -> Chain.ExternalApi.Section.Type.POLKASSEMBLY
+        ChainTransferHistoryApiLocal.ApiType.ETHERSCAN -> Chain.ExternalApi.Section.Type.ETHERSCAN
+        ChainTransferHistoryApiLocal.ApiType.UNKNOWN -> Chain.ExternalApi.Section.Type.UNKNOWN
+    }
+}
 
 private fun mapAssetSourceFromLocal(source: AssetSourceLocal): Chain.Asset.Source {
     return when (source) {
@@ -155,7 +172,7 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
     val historyApis = chainLocal.transferHistoryApis.map {
         Chain.ExternalApi.TransferHistoryApi(
             assetType = mapTransferApiAssetTypeFromLocal(it.assetType),
-            apiType = mapSectionTypeLocalToSectionType(it.apiType),
+            apiType = mapTransferApiTypeFromLocal(it.apiType),
             url = it.url
         )
     }
