@@ -11,19 +11,19 @@
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_gravity="center_vertical"
-        tools:background="@color/text_primary" />
+        tools:background="@color/icon_primary" />
 
     <TextView
         android:id="@+id/addressValue"
-        android:singleLine="true"
-        android:ellipsize="middle"
         style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginStart="26dp"
+        android:ellipsize="middle"
         android:gravity="center_vertical"
         android:includeFontPadding="false"
+        android:singleLine="true"
         android:textColor="@color/text_secondary"
         tools:text="RTTI-5220" />
 

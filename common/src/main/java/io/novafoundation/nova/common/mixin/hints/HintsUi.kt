@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.setDrawableStart
+import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.updatePadding
 
 class HintsView @JvmOverloads constructor(
@@ -27,7 +28,9 @@ class HintsView @JvmOverloads constructor(
             TextView(context).apply {
                 setTextAppearance(R.style.TextAppearance_NovaFoundation_Regular_Caption1)
 
-                setDrawableStart(R.drawable.ic_nova, widthInDp = 16, paddingInDp = 8, tint = R.color.white_48)
+                setTextColorRes(R.color.text_secondary)
+                setDrawableStart(R.drawable.ic_nova, widthInDp = 16, paddingInDp = 8, tint = R.color.icon_secondary)
+                
                 text = hint
 
                 if (index > 0) {

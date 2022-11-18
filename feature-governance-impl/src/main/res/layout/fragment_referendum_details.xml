@@ -25,7 +25,7 @@
                 android:id="@+id/referendumDetailsTrack"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:backgroundColor="@color/white_16"
+                app:backgroundColor="@color/chips_background"
                 tools:chipIcon="@drawable/ic_info_16"
                 tools:text="main agenda" />
 
@@ -35,7 +35,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
                 android:layout_marginEnd="16dp"
-                app:backgroundColor="@color/white_16"
+                app:backgroundColor="@color/chips_background"
                 tools:text="#228" />
 
         </LinearLayout>
@@ -74,6 +74,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
+                android:textColor="@color/text_primary"
                 tools:text="Polkadot and Kusama participation in the 10th Pais Digital Chile Summit." />
 
             <LinearLayout
@@ -100,9 +101,9 @@
                     android:includeFontPadding="false"
                     android:paddingVertical="7dp"
                     android:text="@string/common_read_more"
-                    android:textColor="@color/button_background_primary"
+                    android:textColor="@color/button_text_accent"
                     app:drawableEndCompat="@drawable/ic_chevron_right"
-                    app:drawableTint="@color/button_background_primary" />
+                    app:drawableTint="@color/icon_accent" />
             </LinearLayout>
 
             <LinearLayout
@@ -110,9 +111,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                android:background="@drawable/bg_primary_list_item"
                 android:orientation="vertical"
-                tools:background="@color/divider">
+                tools:background="@color/block_background">
 
                 <TextView
                     style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
@@ -174,7 +174,7 @@
                 android:orientation="vertical"
                 android:paddingHorizontal="16dp"
                 android:paddingTop="16dp"
-                tools:background="@color/divider">
+                tools:background="@color/block_background">
 
                 <TextView
                     style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
@@ -200,7 +200,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:background="@drawable/bg_primary_list_item"
-                tools:background="@color/divider">
+                tools:background="@color/block_background">
 
                 <TextView
                     style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
@@ -210,7 +210,7 @@
                     android:layout_marginVertical="17dp"
                     android:layout_marginStart="16dp"
                     android:text="@string/referendum_details_full_details"
-                    android:textColor="@color/button_background_primary" />
+                    android:textColor="@color/button_text_accent" />
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -219,7 +219,7 @@
                     android:layout_marginVertical="14dp"
                     android:layout_marginEnd="16dp"
                     android:src="@drawable/ic_chevron_right"
-                    app:tint="@color/white_48" />
+                    app:tint="@color/icon_secondary" />
 
             </FrameLayout>
 

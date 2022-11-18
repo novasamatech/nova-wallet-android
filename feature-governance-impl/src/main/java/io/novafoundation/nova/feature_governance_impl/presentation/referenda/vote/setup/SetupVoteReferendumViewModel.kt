@@ -216,7 +216,7 @@ class SetupVoteReferendumViewModel(
             SeekbarValue(
                 value = conviction,
                 label = "${conviction.amountMultiplier().format()}x",
-                labelColorRes = colors.getOrNull(index) ?: R.color.multicolor_pink_polkadot
+                labelColorRes = colors[index]
             )
         }
 

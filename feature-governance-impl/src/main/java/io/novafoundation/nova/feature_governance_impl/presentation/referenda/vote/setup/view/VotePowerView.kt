@@ -31,6 +31,6 @@ class VotePowerView @JvmOverloads constructor(
 
         setPadding(16.dp)
 
-        background = getRoundedCornerDrawable(fillColorRes = R.color.divider)
+        background = getRoundedCornerDrawable(fillColorRes = R.color.block_background)
     }
 }

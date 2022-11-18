@@ -31,7 +31,7 @@ class YourVoteView @JvmOverloads constructor(
 
     init {
         View.inflate(context, R.layout.view_your_vote, this)
-        background = getRoundedCornerDrawable(R.color.divider)
+        background = getRoundedCornerDrawable(R.color.block_background)
     }
 
     fun setVoteType(@StringRes voteTypeRes: Int, @ColorRes voteColorRes: Int) {

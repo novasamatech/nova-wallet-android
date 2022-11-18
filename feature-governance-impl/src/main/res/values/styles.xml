@@ -29,8 +29,8 @@
     </style>
 
     <style name="DefaultTimelineLayout">
-        <item name="timelineDefaultColor">@color/button_background_primary</item>
-        <item name="timelineUnfinishedColor">@color/white_24</item>
+        <item name="timelineDefaultColor">@color/icon_accent</item>
+        <item name="timelineUnfinishedColor">@color/icon_inactive</item>
         <item name="timelineStrokeWidth">1dp</item>
         <item name="timelineItemStartPadding">16dp</item>
         <item name="timelinePointToStrokeOffset">6dp</item>

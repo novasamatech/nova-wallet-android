@@ -39,6 +39,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
+                android:textColor="@color/text_primary"
                 tools:text="Polkadot and Kusama participation in the 10th Pais Digital Chile Summit." />
 
             <TextView

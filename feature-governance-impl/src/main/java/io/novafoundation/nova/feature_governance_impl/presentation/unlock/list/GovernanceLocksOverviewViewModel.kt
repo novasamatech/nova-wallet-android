@@ -67,7 +67,7 @@ class GovernanceLocksOverviewViewModel(
                 index = index,
                 amount = mapAmountToAmountModel(lock.amount, token).token,
                 status = StatusContent.Timer(lock.timer),
-                statusIconColorRes = R.color.white_48,
+                statusIconColorRes = R.color.icon_secondary,
                 statusIconRes = R.drawable.ic_time_16,
                 statusColorRes = R.color.text_secondary
             )

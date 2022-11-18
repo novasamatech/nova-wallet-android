@@ -31,14 +31,6 @@
     <color name="black3">@color/gray3</color>
     <color name="black4">@color/gray4</color>
 
-    <color name="multicolor_cyan_light">#1DE4FF</color>
-    <color name="multicolor_cyan_medium">#1AD1FF</color>
-    <color name="multicolor_cyan_dark">#1EB3FF</color>
-
-    <color name="multicolor_indigo">#7471FF</color>
-    <color name="multicolor_violet">#DF00FF</color>
-    <color name="multicolor_pink_polkadot">#FF0087</color>
-
     <color name="bg_bottom_sheet">#1D1D20</color>
 
     <color name="settings_group_background">#1D1D20</color>
@@ -105,6 +97,7 @@
     <color name="blur_navigation_background">#66151D27</color>
     <color name="solid_navigation_background">#0F111A</color>
     <color name="cell_background_pressed">#291F78FF</color>
+    <color name="voting_slider_background">#29999EC7</color>
 
     <!-- Button Colors -->
     <color name="button_background_primary">#1F78FF</color>
@@ -128,9 +121,12 @@
     <color name="indicator_inactive">#29FFFFFF</color>
     <color name="pull_indicator">#29FFFFFF</color>
     <color name="shimmering_indicator">#A3FFFFFF</color>
-    <color name="nay_negative">#E53450</color>
-    <color name="aye_positive">#2FC864</color>
-    <color name="votes_to_pass_indicator">#2FC864</color>
+    <color name="nay_indicator">#E53450</color>
+    <color name="aye_indicator">#2FC864</color>
+    <color name="votes_to_pass_indicator">#FFFFFF</color>
+    <color name="voting_slider_indicator_active">#08090E</color>
+    <color name="voting_slider_indicator_inactive">#7A08090E</color>
+    <color name="voting_slider_knob_icon">#FFFFFF</color>
 
     <!-- Utility colors -->
     <color name="votes_to_pass_indicator_shadow">#B8000000</color>
