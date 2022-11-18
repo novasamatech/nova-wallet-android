@@ -9,6 +9,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteAssets
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteChainToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteExplorersToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteNodesToLocal
+import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteTransferApisToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.ChainFetcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -26,23 +27,27 @@ class ChainSyncService(
             .filter { it.source == AssetSourceLocal.DEFAULT }
         val oldNodes = localChainsJoinedInfo.flatMap { it.nodes }
         val oldExplorers = localChainsJoinedInfo.flatMap { it.explorers }
+        val oldTransferApis = localChainsJoinedInfo.flatMap { it.transferHistoryApis }
 
         val remoteChains = retryUntilDone { chainFetcher.getChains() }
         val newChains = remoteChains.map { mapRemoteChainToLocal(it, gson) }
         val newAssets = remoteChains.flatMap { mapRemoteAssetsToLocal(it, gson) }
         val newNodes = remoteChains.flatMap { mapRemoteNodesToLocal(it) }
         val newExplorers = remoteChains.flatMap { mapRemoteExplorersToLocal(it) }
+        val newTransferApis = remoteChains.flatMap { mapRemoteTransferApisToLocal(it) }
 
         val chainsDiff = CollectionDiffer.findDiff(newChains, oldChains, forceUseNewItems = false)
         val assetDiff = CollectionDiffer.findDiff(newAssets, oldAssets, forceUseNewItems = false)
         val nodesDiff = CollectionDiffer.findDiff(newNodes, oldNodes, forceUseNewItems = false)
         val explorersDiff = CollectionDiffer.findDiff(newExplorers, oldExplorers, forceUseNewItems = false)
+        val transferApisDiff = CollectionDiffer.findDiff(newTransferApis, oldTransferApis, forceUseNewItems = false)
 
         chainDao.applyDiff(
             chainDiff = chainsDiff,
             assetsDiff = assetDiff,
             nodesDiff = nodesDiff,
             explorersDiff = explorersDiff,
+            transferApisDiff = transferApisDiff
         )
     }
 }

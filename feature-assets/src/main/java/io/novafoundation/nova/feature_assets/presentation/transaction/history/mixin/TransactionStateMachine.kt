@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin
 
-import io.novafoundation.nova.common.data.model.CursorPage
+import io.novafoundation.nova.common.data.model.DataPage
+import io.novafoundation.nova.common.data.model.PageOffset
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 
@@ -29,14 +30,14 @@ object TransactionStateMachine {
         ) : State(allAvailableFilters, usedFilters)
 
         class Data(
-            val nextCursor: String,
+            val nextPageOffset: PageOffset.Loadable,
             override val data: List<Operation>,
             allAvailableFilters: Set<TransactionFilter>,
             usedFilters: Set<TransactionFilter>,
         ) : State(allAvailableFilters, usedFilters), WithData
 
         class NewPageProgress(
-            val nextCursor: String,
+            val nextPageOffset: PageOffset.Loadable,
             override val data: List<Operation>,
             allAvailableFilters: Set<TransactionFilter>,
             usedFilters: Set<TransactionFilter>,
@@ -54,11 +55,11 @@ object TransactionStateMachine {
         class Scrolled(val currentItemIndex: Int) : Action()
 
         data class CachePageArrived(
-            val newPage: CursorPage<Operation>,
+            val newPage: DataPage<Operation>,
             val accountChanged: Boolean
         ) : Action()
 
-        data class NewPage(val newPage: CursorPage<Operation>, val loadedWith: Set<TransactionFilter>) : Action()
+        data class NewPage(val newPage: DataPage<Operation>, val loadedWith: Set<TransactionFilter>) : Action()
 
         data class PageError(val error: Throwable) : Action()
 
@@ -68,7 +69,7 @@ object TransactionStateMachine {
     sealed class SideEffect {
 
         data class LoadPage(
-            val nextCursor: String?,
+            val nextPageOffset: PageOffset.Loadable,
             val filters: Set<TransactionFilter>,
             val pageSize: Int = PAGE_SIZE,
         ) : SideEffect()
@@ -85,13 +86,13 @@ object TransactionStateMachine {
     ): State =
         when (action) {
             is Action.CachePageArrived -> {
-                val nextCursor = action.newPage.nextCursor
+                val nextOffset = action.newPage.nextOffset
 
                 when {
                     !canUseCache(state.allAvailableFilters, state.usedFilters) -> {
                         if (action.accountChanged) {
                             // trigger cold load for new account when not able to use cache
-                            sideEffectListener(SideEffect.LoadPage(nextCursor = null, filters = state.usedFilters))
+                            sideEffectListener(SideEffect.LoadPage(nextPageOffset = PageOffset.Loadable.FistPage, filters = state.usedFilters))
 
                             State.EmptyProgress(
                                 allAvailableFilters = state.allAvailableFilters,
@@ -103,8 +104,8 @@ object TransactionStateMachine {
                         }
                     }
                     action.newPage.isEmpty() -> State.Empty(state.allAvailableFilters, state.usedFilters)
-                    nextCursor != null -> State.Data(
-                        nextCursor = nextCursor,
+                    nextOffset is PageOffset.Loadable -> State.Data(
+                        nextPageOffset = nextOffset,
                         data = action.newPage,
                         allAvailableFilters = state.allAvailableFilters,
                         usedFilters = state.usedFilters
@@ -121,10 +122,10 @@ object TransactionStateMachine {
                 when (state) {
                     is State.Data -> {
                         if (action.currentItemIndex >= state.data.size - SCROLL_OFFSET) {
-                            sideEffectListener(SideEffect.LoadPage(state.nextCursor, state.usedFilters))
+                            sideEffectListener(SideEffect.LoadPage(state.nextPageOffset, state.usedFilters))
 
                             State.NewPageProgress(
-                                nextCursor = state.nextCursor,
+                                nextPageOffset = state.nextPageOffset,
                                 data = state.data,
                                 allAvailableFilters = state.allAvailableFilters,
                                 usedFilters = state.usedFilters
@@ -140,7 +141,7 @@ object TransactionStateMachine {
 
             is Action.NewPage -> {
                 val page = action.newPage
-                val nextCursor = page.nextCursor
+                val nextPageOffset = page.nextOffset
 
                 when (state) {
                     is State.EmptyProgress -> {
@@ -150,13 +151,13 @@ object TransactionStateMachine {
                                 allAvailableFilters = state.allAvailableFilters,
                                 usedFilters = state.usedFilters
                             )
-                            nextCursor == null -> State.FullData(
+                            nextPageOffset is PageOffset.Loadable -> State.Data(
+                                nextPageOffset = nextPageOffset,
                                 data = page,
                                 allAvailableFilters = state.allAvailableFilters,
                                 usedFilters = state.usedFilters
                             )
-                            else -> State.Data(
-                                nextCursor = nextCursor,
+                            else -> State.FullData(
                                 data = page,
                                 allAvailableFilters = state.allAvailableFilters,
                                 usedFilters = state.usedFilters
@@ -171,13 +172,13 @@ object TransactionStateMachine {
                                 allAvailableFilters = state.allAvailableFilters,
                                 usedFilters = state.usedFilters
                             )
-                            nextCursor == null -> State.FullData(
+                            nextPageOffset is PageOffset.Loadable -> State.Data(
+                                nextPageOffset = nextPageOffset,
                                 data = state.data + page,
                                 allAvailableFilters = state.allAvailableFilters,
                                 usedFilters = state.usedFilters
                             )
-                            else -> State.Data(
-                                nextCursor = nextCursor,
+                            else -> State.FullData(
                                 data = state.data + page,
                                 allAvailableFilters = state.allAvailableFilters,
                                 usedFilters = state.usedFilters
@@ -198,7 +199,7 @@ object TransactionStateMachine {
                         usedFilters = state.usedFilters
                     )
                     is State.NewPageProgress -> State.Data(
-                        nextCursor = state.nextCursor,
+                        nextPageOffset = state.nextPageOffset,
                         data = state.data,
                         allAvailableFilters = state.allAvailableFilters,
                         usedFilters = state.usedFilters
@@ -213,7 +214,7 @@ object TransactionStateMachine {
                 if (canUseCache(state.allAvailableFilters, newFilters)) {
                     sideEffectListener(SideEffect.TriggerCache)
                 } else {
-                    sideEffectListener(SideEffect.LoadPage(nextCursor = null, filters = newFilters))
+                    sideEffectListener(SideEffect.LoadPage(nextPageOffset = PageOffset.Loadable.FistPage, filters = newFilters))
                 }
 
                 State.EmptyProgress(

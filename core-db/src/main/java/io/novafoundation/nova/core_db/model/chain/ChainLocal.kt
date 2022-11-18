@@ -36,9 +36,6 @@ data class ChainLocal(
         @Embedded(prefix = "staking_")
         val staking: Section?,
 
-        @Embedded(prefix = "history_")
-        val history: Section?,
-
         @Embedded(prefix = "crowdloans_")
         val crowdloans: Section?,
 

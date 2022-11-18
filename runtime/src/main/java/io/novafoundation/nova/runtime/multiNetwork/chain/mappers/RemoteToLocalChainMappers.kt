@@ -6,7 +6,9 @@ import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 import io.novafoundation.nova.core_db.model.chain.ChainExplorerLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
+import io.novafoundation.nova.core_db.model.chain.ChainTransferHistoryApiLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.ExternalApi.TransferHistoryApi
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainExternalApiRemote
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainRemote
 
@@ -29,7 +31,6 @@ fun mapRemoteChainToLocal(
     val externalApi = chainRemote.externalApi?.let { externalApi ->
         ChainLocal.ExternalApi(
             staking = mapSectionRemoteToLocal(externalApi.staking),
-            history = mapSectionRemoteToLocal(externalApi.history),
             crowdloans = mapSectionRemoteToLocal(externalApi.crowdloans),
             governance = mapSectionRemoteToLocal(externalApi.governance)
         )
@@ -107,6 +108,29 @@ fun mapRemoteExplorersToLocal(chainRemote: ChainRemote): List<ChainExplorerLocal
     return explorers.orEmpty()
 }
 
+fun mapRemoteTransferApisToLocal(chainRemote: ChainRemote): List<ChainTransferHistoryApiLocal> {
+    val explorers = chainRemote.externalApi?.history.orEmpty().map {
+        ChainTransferHistoryApiLocal(
+            chainId = chainRemote.chainId,
+            assetType = mapTransferApiAssetTypeToLocal(it.assetType),
+            apiType = mapSectionTypeRemoteToLocal(it.type),
+            url = it.url
+        )
+    }
+
+    return explorers
+}
+
+private fun mapTransferApiAssetTypeToLocal(type: String?): String {
+    val domain = when (type) {
+        null, "substrate" -> TransferHistoryApi.AssetType.SUBSTRATE
+        "evm" -> TransferHistoryApi.AssetType.EVM
+        else -> TransferHistoryApi.AssetType.UNSUPPORTED
+    }
+
+    return domain.name
+}
+
 private fun mapSectionRemoteToLocal(sectionRemote: ChainExternalApiRemote.Section?) = sectionRemote?.let {
     ChainLocal.ExternalApi.Section(
         type = mapSectionTypeRemoteToLocal(sectionRemote.type),
@@ -123,6 +147,7 @@ private fun mapSectionTypeRemoteToSectionType(section: String) = when (section) 
     "subquery" -> Chain.ExternalApi.Section.Type.SUBQUERY
     "github" -> Chain.ExternalApi.Section.Type.GITHUB
     "polkassembly" -> Chain.ExternalApi.Section.Type.POLKASSEMBLY
+    "etherscan" -> Chain.ExternalApi.Section.Type.ETHERSCAN
     else -> Chain.ExternalApi.Section.Type.UNKNOWN
 }
 

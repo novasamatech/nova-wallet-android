@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_wallet_impl.di.modules
 
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmTransactionService
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
@@ -10,6 +11,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.evm.EvmAssetBalance
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.evm.EvmAssetHistory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.evm.EvmAssetTransfers
+import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.EtherscanTransactionsApi
 import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Standard
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import javax.inject.Qualifier
@@ -41,7 +43,15 @@ class EvmAssetsModule {
 
     @Provides
     @FeatureScope
-    fun provideHistory() = EvmAssetHistory()
+    fun provideEtherscanTransfersApi(
+        networkApiCreator: NetworkApiCreator
+    ): EtherscanTransactionsApi = networkApiCreator.create(EtherscanTransactionsApi::class.java)
+
+    @Provides
+    @FeatureScope
+    fun provideHistory(
+        etherscanTransactionsApi: EtherscanTransactionsApi
+    ) = EvmAssetHistory(etherscanTransactionsApi)
 
     @Provides
     @EvmAssets
