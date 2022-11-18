@@ -13,6 +13,7 @@ import io.novafoundation.nova.core_db.converters.MetaAccountTypeConverters
 import io.novafoundation.nova.core_db.converters.NetworkTypeConverters
 import io.novafoundation.nova.core_db.converters.NftTypeConverters
 import io.novafoundation.nova.core_db.converters.OperationConverters
+import io.novafoundation.nova.core_db.converters.TransferHistoryApiConverters
 import io.novafoundation.nova.core_db.dao.AccountDao
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.dao.AssetDao
@@ -127,7 +128,8 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
     NftTypeConverters::class,
     MetaAccountTypeConverters::class,
     CurrencyConverters::class,
-    AssetSourceConverter::class
+    AssetSourceConverter::class,
+    TransferHistoryApiConverters::class
 )
 abstract class AppDatabase : RoomDatabase() {
 
