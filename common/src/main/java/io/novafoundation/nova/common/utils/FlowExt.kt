@@ -119,13 +119,7 @@ fun <T> Flow<T>.asLiveData(scope: CoroutineScope): LiveData<T> {
     return liveData
 }
 
-data class ListDiff<T>(
-    val removed: List<T>,
-    val addedOrModified: List<T>,
-    val all: List<T>
-)
-
-fun <T: Identifiable> Flow<List<T>>.diffed(): Flow<CollectionDiffer.Diff<T>> {
+fun <T : Identifiable> Flow<List<T>>.diffed(): Flow<CollectionDiffer.Diff<T>> {
     return zipWithPrevious().map { (previous, new) ->
         CollectionDiffer.findDiff(newItems = new, oldItems = previous.orEmpty(), forceUseNewItems = false)
     }
@@ -145,7 +139,7 @@ private fun <K> MutableMap<K, CoroutineScope>.removeAndCancel(key: K) {
     remove(key)?.also(CoroutineScope::cancel)
 }
 
-fun <T: Identifiable, R> Flow<List<T>>.transformLatestDiffed(transform: suspend FlowCollector<R>.(value: T) -> Unit): Flow<R> = flow {
+fun <T : Identifiable, R> Flow<List<T>>.transformLatestDiffed(transform: suspend FlowCollector<R>.(value: T) -> Unit): Flow<R> = flow {
     val parentScope = CoroutineScope(coroutineContext)
     val itemScopes = mutableMapOf<String, CoroutineScope>()
 

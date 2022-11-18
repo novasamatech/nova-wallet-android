@@ -22,7 +22,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainExter
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainNodeRemote
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainRemote
 import io.novafoundation.nova.test_shared.argThat
-import io.novafoundation.nova.test_shared.eq
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
@@ -164,11 +163,15 @@ class ChainSyncServiceTest {
         runBlocking {
             localReturns(listOf(LOCAL_CHAIN))
 
-            remoteReturns(listOf(REMOTE_CHAIN.copy(
-                assets = listOf(
-                    REMOTE_CHAIN.assets.first().copy(symbol = "NEW")
+            remoteReturns(
+                listOf(
+                    REMOTE_CHAIN.copy(
+                        assets = listOf(
+                            REMOTE_CHAIN.assets.first().copy(symbol = "NEW")
+                        )
+                    )
                 )
-            )))
+            )
 
             chainSyncService.syncUp()
 
@@ -187,11 +190,15 @@ class ChainSyncServiceTest {
         runBlocking {
             localReturns(listOf(LOCAL_CHAIN))
 
-            remoteReturns(listOf(REMOTE_CHAIN.copy(
-                nodes = listOf(
-                    REMOTE_CHAIN.nodes.first().copy(name = "NEW")
+            remoteReturns(
+                listOf(
+                    REMOTE_CHAIN.copy(
+                        nodes = listOf(
+                            REMOTE_CHAIN.nodes.first().copy(name = "NEW")
+                        )
+                    )
                 )
-            )))
+            )
 
             chainSyncService.syncUp()
 
@@ -210,11 +217,15 @@ class ChainSyncServiceTest {
         runBlocking {
             localReturns(listOf(LOCAL_CHAIN))
 
-            remoteReturns(listOf(REMOTE_CHAIN.copy(
-                explorers = listOf(
-                    REMOTE_CHAIN.explorers!!.first().copy(extrinsic = "NEW")
+            remoteReturns(
+                listOf(
+                    REMOTE_CHAIN.copy(
+                        explorers = listOf(
+                            REMOTE_CHAIN.explorers!!.first().copy(extrinsic = "NEW")
+                        )
+                    )
                 )
-            )))
+            )
 
             chainSyncService.syncUp()
 
@@ -236,14 +247,18 @@ class ChainSyncServiceTest {
             val currentHistoryApi = REMOTE_CHAIN.externalApi!!.history.first()
             val anotherUrl = "another url"
 
-            remoteReturns(listOf(REMOTE_CHAIN.copy(
-                externalApi = REMOTE_CHAIN.externalApi!!.copy(
-                    history = listOf(
-                        currentHistoryApi,
-                        currentHistoryApi.copy(url = anotherUrl)
+            remoteReturns(
+                listOf(
+                    REMOTE_CHAIN.copy(
+                        externalApi = REMOTE_CHAIN.externalApi!!.copy(
+                            history = listOf(
+                                currentHistoryApi,
+                                currentHistoryApi.copy(url = anotherUrl)
+                            )
+                        )
                     )
                 )
-            )))
+            )
 
             chainSyncService.syncUp()
 
@@ -320,5 +335,7 @@ class ChainSyncServiceTest {
         )
     }
 
-    private fun <T> emptyDiff() = eq(CollectionDiffer.Diff<T>(emptyList(), emptyList(), emptyList()))
+    private fun <T> emptyDiff() = argThat<CollectionDiffer.Diff<T>> {
+        it.newOrUpdated.isEmpty() && it.removed.isEmpty()
+    }
 }

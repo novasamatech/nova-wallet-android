@@ -44,7 +44,7 @@ data class ChainWithAsset(
 )
 
 @JvmInline
-value class ChainsById(val value: Map<ChainId, Chain>): Map<ChainId, Chain> by value {
+value class ChainsById(val value: Map<ChainId, Chain>) : Map<ChainId, Chain> by value {
 
     override operator fun get(key: ChainId): Chain? {
         return value[key.removeHexPrefix()]
