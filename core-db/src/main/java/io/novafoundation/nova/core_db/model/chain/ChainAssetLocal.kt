@@ -1,5 +1,6 @@
 package io.novafoundation.nova.core_db.model.chain
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Ignore
@@ -31,10 +32,16 @@ data class ChainAssetLocal(
     val precision: Int,
     val icon: String?,
     val type: String?,
+    @ColumnInfo(defaultValue = SOURCE_DEFAULT)
     val source: AssetSourceLocal,
     val buyProviders: String?,
     val typeExtras: String?
 ) : Identifiable {
+
+    companion object {
+
+        const val SOURCE_DEFAULT = "DEFAULT"
+    }
 
     @Ignore
     override val identifier: String = "$id:$chainId"

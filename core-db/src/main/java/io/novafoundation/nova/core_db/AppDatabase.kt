@@ -154,7 +154,6 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(AddGovernanceFlagToChains_24_25, AddGovernanceDapps_25_26, GovernanceFlagToEnum_26_27)
                     .addMigrations(AddGovernanceExternalApiToChain_27_28)
                     .addMigrations(AddSourceToLocalAsset_28_29, AddTransferApisTable_29_30)
-                    .fallbackToDestructiveMigration()
                     .build()
             }
             return instance!!
