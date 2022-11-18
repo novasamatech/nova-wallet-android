@@ -21,7 +21,7 @@ fun mapStakingTypeToLocal(stakingType: Chain.Asset.StakingType): String = stakin
 private fun mapStakingTypeFromLocal(stakingTypeLocal: String): Chain.Asset.StakingType = enumValueOf(stakingTypeLocal)
 
 private fun mapTransferApiAssetTypeFromLocal(localType: ChainTransferHistoryApiLocal.AssetType): Chain.ExternalApi.TransferHistoryApi.AssetType {
-    return when(localType) {
+    return when (localType) {
         ChainTransferHistoryApiLocal.AssetType.SUBSTRATE -> Chain.ExternalApi.TransferHistoryApi.AssetType.SUBSTRATE
         ChainTransferHistoryApiLocal.AssetType.EVM -> Chain.ExternalApi.TransferHistoryApi.AssetType.EVM
         ChainTransferHistoryApiLocal.AssetType.UNSUPPORTED -> Chain.ExternalApi.TransferHistoryApi.AssetType.UNSUPPORTED
@@ -29,7 +29,7 @@ private fun mapTransferApiAssetTypeFromLocal(localType: ChainTransferHistoryApiL
 }
 
 private fun mapTransferApiTypeFromLocal(localType: ChainTransferHistoryApiLocal.ApiType): Chain.ExternalApi.Section.Type {
-    return when(localType) {
+    return when (localType) {
         ChainTransferHistoryApiLocal.ApiType.SUBQUERY -> Chain.ExternalApi.Section.Type.SUBQUERY
         ChainTransferHistoryApiLocal.ApiType.GITHUB -> Chain.ExternalApi.Section.Type.GITHUB
         ChainTransferHistoryApiLocal.ApiType.POLKASSEMBLY -> Chain.ExternalApi.Section.Type.POLKASSEMBLY

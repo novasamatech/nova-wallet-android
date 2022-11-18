@@ -147,7 +147,7 @@ private fun mapTransferHistoryApiTypeRemoteToLocal(type: String): ChainTransferH
 }
 
 private fun mapApiSectionTypeTypeToTransferHistoryApiLocal(type: Chain.ExternalApi.Section.Type): ChainTransferHistoryApiLocal.ApiType {
-    return when(type) {
+    return when (type) {
         Chain.ExternalApi.Section.Type.SUBQUERY -> ChainTransferHistoryApiLocal.ApiType.SUBQUERY
         Chain.ExternalApi.Section.Type.GITHUB -> ChainTransferHistoryApiLocal.ApiType.GITHUB
         Chain.ExternalApi.Section.Type.UNKNOWN -> ChainTransferHistoryApiLocal.ApiType.UNKNOWN
