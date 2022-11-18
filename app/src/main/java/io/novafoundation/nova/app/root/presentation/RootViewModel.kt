@@ -57,12 +57,6 @@ class RootViewModel(
 
     fun jsonFileOpened(content: String?) {}
 
-    override fun onCleared() {
-        super.onCleared()
-
-        externalConnectionRequirementFlow.value = ExternalRequirement.FORBIDDEN
-    }
-
     fun noticeInBackground() {
         if (!willBeClearedForLanguageChange) {
             externalConnectionRequirementFlow.value = ExternalRequirement.STOPPED
@@ -70,9 +64,7 @@ class RootViewModel(
     }
 
     fun noticeInForeground() {
-        if (externalConnectionRequirementFlow.value == ExternalRequirement.STOPPED) {
-            externalConnectionRequirementFlow.value = ExternalRequirement.ALLOWED
-        }
+        externalConnectionRequirementFlow.value = ExternalRequirement.ALLOWED
     }
 
     fun noticeLanguageLanguage() {
