@@ -10,6 +10,8 @@ import io.novafoundation.nova.common.utils.CollectionDiffer
 import io.novafoundation.nova.core_db.model.chain.AssetSourceLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 
+typealias FullAssetIdLocal = Pair<String, Int>
+
 @Dao
 abstract class ChainAssetDao {
 
@@ -26,6 +28,16 @@ abstract class ChainAssetDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     protected abstract suspend fun insertAssets(assets: List<ChainAssetLocal>)
+
+    @Query("UPDATE chain_assets SET enabled = :enabled WHERE chainId = :chainId AND id = :assetId")
+    protected abstract suspend fun setAssetEnabled(enabled: Boolean, chainId: String, assetId: Int)
+
+    @Transaction
+    open suspend fun setAssetsEnabled(enabled: Boolean, fullAssetIds: List<FullAssetIdLocal>) {
+        fullAssetIds.forEach { (chainId, assetId) ->
+            setAssetEnabled(enabled, chainId, assetId)
+        }
+    }
 
     @Delete
     protected abstract suspend fun deleteChainAssets(assets: List<ChainAssetLocal>)

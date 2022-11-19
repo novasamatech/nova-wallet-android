@@ -29,6 +29,7 @@ import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
@@ -154,6 +155,10 @@ class WalletRepositoryImpl(
         )
 
         operationDao.insert(operation)
+    }
+
+    override suspend fun clearAssets(fullAssetIds: List<FullChainAssetId>) {
+        assetCache.clearAssets(fullAssetIds)
     }
 
     // TODO adapt for ethereum chains

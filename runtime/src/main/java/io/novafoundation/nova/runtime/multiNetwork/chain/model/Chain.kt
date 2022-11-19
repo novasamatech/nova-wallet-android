@@ -14,6 +14,8 @@ typealias BuyProviderArguments = Map<String, Any?>
 
 data class FullChainAssetId(val chainId: ChainId, val assetId: ChainAssetId)
 
+fun FullChainAssetId.toPair() = chainId to assetId
+
 data class Chain(
     val id: ChainId,
     val name: String,
