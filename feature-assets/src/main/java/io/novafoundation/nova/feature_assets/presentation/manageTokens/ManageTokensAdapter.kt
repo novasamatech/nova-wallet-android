@@ -19,7 +19,6 @@ import kotlinx.android.synthetic.main.item_manage_token_multichain.view.itemMana
 import kotlinx.android.synthetic.main.item_manage_token_multichain.view.itemManageTokenMultichainIcon
 import kotlinx.android.synthetic.main.item_manage_token_multichain.view.itemManageTokenMultichainNetworks
 import kotlinx.android.synthetic.main.item_manage_token_multichain.view.itemManageTokenMultichainSymbol
-import kotlinx.android.synthetic.main.item_manage_token_multichain.view.itemManageTokensEdit
 
 private val subtitleExtractor = { model: MultiChainTokenModel -> model.header.networks }
 
@@ -65,7 +64,7 @@ class ManageTokensViewHolder(
 ) : BaseViewHolder(containerView) {
 
     init {
-        containerView.itemManageTokensEdit.setOnClickListener {
+        containerView.setOnClickListener {
             itemHandler.editClocked(bindingAdapterPosition)
         }
     }
