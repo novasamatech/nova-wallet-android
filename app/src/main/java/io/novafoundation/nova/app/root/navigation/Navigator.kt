@@ -405,6 +405,10 @@ class Navigator(
         navController?.navigate(R.id.action_mainFragment_to_assetSearchFragment)
     }
 
+    override fun openManageTokens() {
+        navController?.navigate(R.id.action_mainFragment_to_manageTokensGraph)
+    }
+
     override fun openNfts() {
         navController?.navigate(R.id.action_mainFragment_to_nfts_nav_graph)
     }

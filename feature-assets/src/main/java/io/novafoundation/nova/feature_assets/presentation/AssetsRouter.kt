@@ -34,5 +34,7 @@ interface AssetsRouter {
 
     fun openAssetSearch()
 
+    fun openManageTokens()
+
     fun openNfts()
 }

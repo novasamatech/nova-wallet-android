@@ -26,13 +26,13 @@ import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.mode
 import io.novafoundation.nova.feature_assets.presentation.balance.common.mapGroupedAssetsToUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.NftPreviewUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.TotalBalanceModel
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.mapBalanceIdToUi
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.mapBalanceIdToUi
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.combine
@@ -178,8 +178,12 @@ class BalanceListViewModel(
         router.openSwitchWallet()
     }
 
-    fun manageClicked() {
+    fun filtersClicked() {
         router.openAssetFilters()
+    }
+
+    fun manageClicked() {
+        router.openManageTokens()
     }
 
     fun goToNftsClicked() {

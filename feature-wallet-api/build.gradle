@@ -39,7 +39,6 @@ dependencies {
     implementation lifeCycleKtxDep
 
     api project(':core-api')
-    api project(':core-db')
 
     testImplementation project(':test-shared')
 }
