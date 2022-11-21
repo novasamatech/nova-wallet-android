@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import coil.ImageLoader
 import dev.chrisbanes.insetter.applyInsetter
-import io.novafoundation.nova.common.base.BaseBottomSheetFragment
+import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
@@ -25,8 +25,7 @@ import kotlinx.android.synthetic.main.fragment_manage_tokens.manageTokensSearch
 import kotlinx.android.synthetic.main.fragment_manage_tokens.manageTokensToolbar
 import javax.inject.Inject
 
-class ManageTokensFragment :
-    BaseBottomSheetFragment<ManageTokensViewModel>(),
+class ManageTokensFragment : BaseFragment<ManageTokensViewModel>(),
     ManageTokensAdapter.ItemHandler {
 
     @Inject
@@ -93,6 +92,6 @@ class ManageTokensFragment :
     }
 
     override fun editClocked(position: Int) {
-        viewModel.editClicked()
+        viewModel.editClicked(position)
     }
 }

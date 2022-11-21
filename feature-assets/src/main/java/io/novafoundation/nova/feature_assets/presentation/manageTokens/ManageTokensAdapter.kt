@@ -21,6 +21,8 @@ import kotlinx.android.synthetic.main.item_manage_token_multichain.view.itemMana
 import kotlinx.android.synthetic.main.item_manage_token_multichain.view.itemManageTokenMultichainSymbol
 import kotlinx.android.synthetic.main.item_manage_token_multichain.view.itemManageTokensEdit
 
+private val subtitleExtractor = { model: MultiChainTokenModel -> model.header.networks }
+
 class ManageTokensAdapter(
     private val imageLoader: ImageLoader,
     private val handler: ItemHandler
@@ -50,7 +52,7 @@ class ManageTokensAdapter(
         resolvePayload(holder, position, payloads) {
             when (it) {
                 MultiChainTokenModel::enabled -> holder.bindEnabled(item)
-                MultiChainTokenModel::networks -> holder.bindNetworks(item)
+                subtitleExtractor -> holder.bindNetworks(item)
             }
         }
     }
@@ -73,12 +75,12 @@ class ManageTokensViewHolder(
 
         bindEnabled(item)
 
-        itemManageTokenMultichainIcon.loadTokenIcon(item.icon, imageLoader)
-        itemManageTokenMultichainSymbol.text = item.symbol
+        itemManageTokenMultichainIcon.loadTokenIcon(item.header.icon, imageLoader)
+        itemManageTokenMultichainSymbol.text = item.header.symbol
     }
 
     fun bindNetworks(item: MultiChainTokenModel) {
-        containerView.itemManageTokenMultichainNetworks.text = item.networks
+        containerView.itemManageTokenMultichainNetworks.text = item.header.networks
     }
 
     fun bindEnabled(item: MultiChainTokenModel) = with(containerView) {
@@ -100,10 +102,10 @@ class ManageTokensViewHolder(
 
 private class DiffCallback : DiffUtil.ItemCallback<MultiChainTokenModel>() {
 
-    private val payloadGenerator = PayloadGenerator(MultiChainTokenModel::enabled, MultiChainTokenModel::networks)
+    private val payloadGenerator = PayloadGenerator(MultiChainTokenModel::enabled, subtitleExtractor)
 
     override fun areItemsTheSame(oldItem: MultiChainTokenModel, newItem: MultiChainTokenModel): Boolean {
-        return oldItem.symbol == newItem.symbol
+        return oldItem.header.symbol == newItem.header.symbol
     }
 
     override fun areContentsTheSame(oldItem: MultiChainTokenModel, newItem: MultiChainTokenModel): Boolean {

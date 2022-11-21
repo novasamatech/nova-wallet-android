@@ -35,6 +35,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.change
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.BalanceDetailFragment
+import io.novafoundation.nova.feature_assets.presentation.manageTokens.chain.ManageChainTokensFragment
+import io.novafoundation.nova.feature_assets.presentation.manageTokens.chain.ManageChainTokensPayload
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.receive.ReceiveFragment
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
@@ -407,6 +409,11 @@ class Navigator(
 
     override fun openManageTokens() {
         navController?.navigate(R.id.action_mainFragment_to_manageTokensGraph)
+    }
+
+    override fun openManageChainTokens(payload: ManageChainTokensPayload) {
+        val args = ManageChainTokensFragment.getBundle(payload)
+        navController?.navigate(R.id.action_manageTokensFragment_to_manageChainTokensFragment, args)
     }
 
     override fun openNfts() {
