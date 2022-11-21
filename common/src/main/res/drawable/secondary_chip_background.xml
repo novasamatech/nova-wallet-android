@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_enabled="true">
-        <ripple android:color="@color/white_48">
+        <ripple android:color="@color/cell_background_pressed">
             <item android:id="@android:id/mask" android:gravity="center">
                 <shape android:shape="rectangle">
                     <corners android:radius="10dp" />
@@ -10,7 +10,7 @@
 
             <item android:gravity="center">
                 <shape android:shape="rectangle">
-                    <solid android:color="@color/accentSecondary" />
+                    <solid android:color="@color/button_background_secondary" />
 
                     <corners android:radius="10dp" />
                 </shape>
@@ -20,7 +20,7 @@
 
     <item android:state_enabled="false">
         <shape android:shape="rectangle">
-            <solid android:color="@color/disabledColor" />
+            <solid android:color="@color/button_background_inactive" />
 
             <corners android:radius="10dp" />
         </shape>

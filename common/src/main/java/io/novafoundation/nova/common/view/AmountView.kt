@@ -66,11 +66,9 @@ class AmountView @JvmOverloads constructor(
     private fun setBackground() {
         background = context.getCornersStateDrawable(
             focusedDrawable = context.getBlockDrawable(
-                strokeColorRes = R.color.text_primary
+                strokeColorRes = R.color.active_border
             ),
-            idleDrawable = context.getBlockDrawable(
-                strokeColorRes = R.color.white_40
-            )
+            idleDrawable = context.getBlockDrawable()
         )
     }
 

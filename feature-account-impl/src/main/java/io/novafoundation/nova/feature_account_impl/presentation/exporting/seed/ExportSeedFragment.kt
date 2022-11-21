@@ -36,7 +36,7 @@ class ExportSeedFragment : ExportFragment<ExportSeedViewModel>() {
 
         exportSeedToolbar.setRightActionClickListener { viewModel.optionsClicked() }
 
-        exportSeedContentContainer.background = requireContext().getRoundedCornerDrawable(fillColorRes = R.color.white_16)
+        exportSeedContentContainer.background = requireContext().getRoundedCornerDrawable(fillColorRes = R.color.input_background)
     }
 
     override fun inject() {

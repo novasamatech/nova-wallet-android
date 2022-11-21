@@ -49,7 +49,7 @@ class SelectLedgerHolder(
             addRipple(getRoundedCornerDrawable(R.color.block_background))
         }
 
-        containerView.itemLedger.setProgressTint(R.color.white_48)
+        containerView.itemLedger.setProgressTint(R.color.icon_secondary)
     }
 
     fun bind(model: SelectLedgerModel) = with(containerView) {

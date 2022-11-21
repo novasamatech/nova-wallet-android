@@ -31,9 +31,7 @@
     <color name="black3">@color/gray3</color>
     <color name="black4">@color/gray4</color>
 
-    <color name="bg_bottom_sheet">#1D1D20</color>
-
-    <color name="settings_group_background">#1D1D20</color>
+    <color name="settings_group_background">@color/block_background</color>
 
     <color name="account_icon_light">#eeeeee</color>
     <color name="account_icon_dark">@color/secondary_screen_background</color>
@@ -113,6 +111,9 @@
     <color name="checkbox_border">#3D999EC7</color>
     <color name="radio_border">#3D999EC7</color>
     <color name="container_border">#3D999EC7</color>
+    <color name="mnemonic_border_active">#29999EC7</color>
+    <color name="mnemonic_border_inactive">#3D999EC7</color>
+    <color name="no_key_container_border">#52999EC7</color>
 
     <!-- Divider Colors -->
     <color name="divider">#29999EC7</color>

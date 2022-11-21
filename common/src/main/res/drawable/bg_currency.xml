@@ -6,5 +6,5 @@
 
     <solid android:color="@color/container_border" />
 
-    <stroke android:color="@color/block_background" android:width="0.5dp" />
+    <stroke android:color="@color/container_background" android:width="0.5dp" />
 </shape>

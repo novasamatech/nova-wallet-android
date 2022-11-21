@@ -32,6 +32,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
+                android:textColor="@color/text_primary"
                 android:text="@string/account_add_watch_wallet" />
 
             <TextView

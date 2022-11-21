@@ -20,7 +20,8 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:text="@string/accounts_change_chain_secrets" />
+        android:text="@string/accounts_change_chain_secrets"
+        android:textColor="@color/text_primary" />
 
     <TextView
         style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
@@ -29,16 +30,18 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
-        android:text="@string/account_watch_add_subtitle" />
+        android:text="@string/account_watch_add_subtitle"
+        android:textColor="@color/text_secondary" />
 
     <TextView
+        android:id="@+id/changeWatchAccountChainAddressHint"
         style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/changeWatchAccountChainAddressHint"
         android:layout_marginStart="16dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="16dp"
+        android:textColor="@color/text_secondary"
         tools:text="Moonbeam address" />
 
     <io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputField

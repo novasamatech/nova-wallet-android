@@ -5,6 +5,6 @@
     <corners android:radius="10dp" />
 
     <stroke
-        android:color="@color/container_border"
+        android:color="@color/mnemonic_border_active"
         android:width="1dp" />
 </shape>

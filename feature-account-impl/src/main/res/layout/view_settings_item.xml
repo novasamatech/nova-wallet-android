@@ -16,7 +16,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="12dp"
         android:layout_marginBottom="12dp"
-        app:tint="?attr/colorAccent"
+        app:tint="@color/icon_accent"
         tools:src="@drawable/ic_wallet_24" />
 
     <TextView
@@ -31,6 +31,7 @@
         android:drawablePadding="12dp"
         android:gravity="center_vertical"
         android:includeFontPadding="false"
+        android:textColor="@color/text_primary"
         tools:text="Settings Item Name" />
 
     <TextView
@@ -50,5 +51,5 @@
         android:layout_gravity="center_vertical"
         android:layout_marginEnd="20dp"
         android:src="@drawable/ic_chevron_right"
-        app:tint="@color/text_secondary" />
+        app:tint="@color/icon_secondary" />
 </merge>

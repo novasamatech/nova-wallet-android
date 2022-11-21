@@ -47,7 +47,7 @@
         android:layout_marginEnd="80dp"
         android:ellipsize="middle"
         android:singleLine="true"
-        android:textColor="@color/hint_text"
+        android:textColor="@color/text_secondary"
         app:layout_constraintBottom_toBottomOf="@+id/accountIcon"
         app:layout_constraintEnd_toStartOf="@+id/accountAction"
         app:layout_constraintHorizontal_bias="0.5"
@@ -65,10 +65,10 @@
         android:background="@drawable/bg_primary_list_item"
         android:clickable="true"
         android:focusable="true"
-        app:tint="@color/white_48"
         android:padding="@dimen/x1"
         android:src="@drawable/ic_copy"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/text_secondary" />
 </merge>

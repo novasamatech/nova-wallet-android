@@ -63,13 +63,6 @@ class ConfirmMnemonicAdapter(
 
             itemConfirmMnemonicWord.setVisible(hasWord, falseState = View.INVISIBLE)
 
-            if (item.indexDisplay != null) {
-                itemConfirmMnemonicWord.setTextColorRes(R.color.text_primary)
-                itemConfirmMnemonicIndex.setVisible(hasWord, falseState = View.INVISIBLE)
-            } else {
-                itemConfirmMnemonicWord.setTextColorRes(R.color.text_primary)
-            }
-
             if (item.removed) {
                 setOnClickListener(null)
             } else {

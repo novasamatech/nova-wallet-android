@@ -94,7 +94,7 @@ private fun LedgerMessageCommand.Graphics.Companion.error() = LedgerMessageComma
 
 private fun LedgerMessageCommand.Graphics.Companion.info() = LedgerMessageCommand.Graphics(
     icon = R.drawable.ic_checkmark_circle_16,
-    iconTint = R.color.white_32,
+    iconTint = R.color.icon_secondary,
     background = R.drawable.ic_ledger_info
 )
 
