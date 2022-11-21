@@ -16,8 +16,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 
-
-
 class AssetSearchInteractor(
     private val walletRepository: WalletRepository,
     private val accountRepository: AccountRepository,

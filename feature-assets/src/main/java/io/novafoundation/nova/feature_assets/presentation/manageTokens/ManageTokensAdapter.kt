@@ -48,7 +48,7 @@ class ManageTokensAdapter(
     override fun onBindViewHolder(holder: ManageTokensViewHolder, position: Int, payloads: MutableList<Any>) {
         val item = getItem(position)
         resolvePayload(holder, position, payloads) {
-            when(it) {
+            when (it) {
                 MultiChainTokenModel::enabled -> holder.bindEnabled(item)
                 MultiChainTokenModel::networks -> holder.bindNetworks(item)
             }

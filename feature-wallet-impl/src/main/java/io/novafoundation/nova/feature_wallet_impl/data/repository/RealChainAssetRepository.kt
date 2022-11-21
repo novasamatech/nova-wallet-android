@@ -7,7 +7,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.toPair
 
 class RealChainAssetRepository(
     private val chainAssetDao: ChainAssetDao
-): ChainAssetRepository {
+) : ChainAssetRepository {
     override suspend fun setAssetsEnabled(enabled: Boolean, assetIds: List<FullChainAssetId>) {
         val localAssetIds = assetIds.map { it.toPair() }
 

@@ -76,7 +76,8 @@ class ManageTokensViewModel(
 
                 resourceManager.getString(
                     R.string.assets_manage_tokens_partial_networks,
-                    firstChain.chainAssetId, othersCount.format()
+                    firstChain.chainAssetId,
+                    othersCount.format()
                 )
             }
         }
