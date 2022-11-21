@@ -44,6 +44,12 @@ val Chain.commissionAsset
 val Chain.Asset.isUtilityAsset: Boolean
     get() = id == 0
 
+private const val MOONBEAM_XC_PREFIX = "xc"
+
+fun Chain.Asset.unifiedSymbol(): String {
+    return symbol.removePrefix(MOONBEAM_XC_PREFIX)
+}
+
 val Chain.genesisHash: String
     get() = id
 

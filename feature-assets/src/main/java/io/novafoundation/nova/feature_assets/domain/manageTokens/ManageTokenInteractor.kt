@@ -4,6 +4,7 @@ import io.novafoundation.nova.feature_assets.domain.common.searchTokens
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.ext.defaultComparator
+import io.novafoundation.nova.runtime.ext.unifiedSymbol
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -69,7 +70,7 @@ class RealManageTokenInteractor(
             chain.assets.map { asset -> ChainWithAsset(chain, asset) }
         }
 
-        return assetsWithChains.groupBy { (_, asset) -> asset.symbol }
+        return assetsWithChains.groupBy { (_, asset) -> asset.unifiedSymbol() }
             .map { (symbol, chainsWithAssets) ->
                 val (_, firstAsset) = chainsWithAssets.first()
 
