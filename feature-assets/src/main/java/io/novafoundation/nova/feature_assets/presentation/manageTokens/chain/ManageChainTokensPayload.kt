@@ -6,4 +6,4 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 class ManageChainTokensPayload(
     val multiChainTokenId: String
-): Parcelable
+) : Parcelable

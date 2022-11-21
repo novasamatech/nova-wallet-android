@@ -25,7 +25,8 @@ import kotlinx.android.synthetic.main.fragment_manage_tokens.manageTokensSearch
 import kotlinx.android.synthetic.main.fragment_manage_tokens.manageTokensToolbar
 import javax.inject.Inject
 
-class ManageTokensFragment : BaseFragment<ManageTokensViewModel>(),
+class ManageTokensFragment :
+    BaseFragment<ManageTokensViewModel>(),
     ManageTokensAdapter.ItemHandler {
 
     @Inject

@@ -27,5 +27,4 @@ class ManageTokensCommonModule {
         walletRepository: WalletRepository,
         chainAssetRepository: ChainAssetRepository,
     ): ManageTokenInteractor = RealManageTokenInteractor(chainRegistry, walletRepository, chainAssetRepository)
-
 }
