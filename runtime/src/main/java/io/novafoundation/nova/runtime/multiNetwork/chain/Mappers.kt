@@ -305,7 +305,9 @@ fun mapChainNodeToLocal(node: Chain.Node): ChainNodeLocal {
 }
 
 fun mapGovernanceListToLocal(governance: List<Chain.Governance>) = governance.joinToString(separator = ",", transform = Chain.Governance::name)
-fun mapGovernanceListFromLocal(governanceLocal: String) = governanceLocal.split(",").map { Chain.Governance.valueOf(it) }
+fun mapGovernanceListFromLocal(governanceLocal: String) = governanceLocal.split(",").mapNotNull {
+    runCatching { Chain.Governance.valueOf(it) }.getOrNull()
+}
 
 fun mapChainAssetToLocal(asset: Chain.Asset, gson: Gson): ChainAssetLocal = with(asset) {
     val (type, typeExtras) = mapChainAssetTypeToRaw(type)

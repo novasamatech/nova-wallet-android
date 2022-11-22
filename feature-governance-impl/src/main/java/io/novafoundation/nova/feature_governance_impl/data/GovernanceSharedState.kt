@@ -16,7 +16,8 @@ class GovernanceSharedState(
     chainRegistry = chainRegistry,
     supportedOptions = { chain, asset ->
         if (asset.isUtilityAsset) {
-            chain.governance.map(::GovernanceAdditionalState)
+            val shouldIncludeSuffix = chain.governance.size > 1
+            chain.governance.map { GovernanceAdditionalState(it, shouldIncludeSuffix) }
         } else {
             emptyList()
         }
