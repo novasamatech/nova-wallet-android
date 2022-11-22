@@ -16,6 +16,7 @@ import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.view.shape.addRipple
+import io.novafoundation.nova.common.view.shape.getRippleMask
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_nft_impl.R
 import kotlinx.android.extensions.LayoutContainer
@@ -73,7 +74,7 @@ class NftHolder(
     init {
         with(containerView) {
             itemNftContent.background = with(context) {
-                addRipple(getRoundedCornerDrawable(R.color.block_background, cornerSizeInDp = 12))
+                addRipple(getRoundedCornerDrawable(R.color.block_background, cornerSizeInDp = 12), mask = getRippleMask(cornerSizeDp = 12))
             }
         }
     }

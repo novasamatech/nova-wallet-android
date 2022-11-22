@@ -89,7 +89,7 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
         referendumDetailsNumber.background = getRoundedCornerDrawable(R.color.chips_background, cornerSizeDp = 8)
             .withRippleMask(getRippleMask(cornerSizeDp = 8))
         referendumFullDetails.background = getRoundedCornerDrawable(R.color.block_background)
-            .withRippleMask(getRippleMask())
+            .withRippleMask()
         referendumTimelineContainer.background = getRoundedCornerDrawable(R.color.block_background)
 
         referendumDetailsReadMore.setOnClickListener {

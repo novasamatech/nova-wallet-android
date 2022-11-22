@@ -136,7 +136,7 @@ class PrimaryButton @JvmOverloads constructor(
         )
 
         val rippleColor = getColorFromAttr(R.attr.colorControlHighlight)
-        val background = addRipple(baseBackground, rippleColor = rippleColor)
+        val background = addRipple(baseBackground, mask = null, rippleColor = rippleColor)
 
         setBackground(background)
     }

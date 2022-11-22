@@ -15,6 +15,7 @@ import androidx.annotation.StyleRes
 import androidx.core.content.ContextCompat
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.view.shape.addRipple
+import io.novafoundation.nova.common.view.shape.getRippleMask
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 
 fun Context.getDrawableCompat(@DrawableRes drawableRes: Int) =
@@ -95,9 +96,8 @@ interface WithContextExtensions {
     val Float.dp: Int
         get() = dp(providedContext)
 
-    fun addRipple(to: Drawable, mask: Drawable? = null) = providedContext.addRipple(to, mask)
-    fun Drawable.withRipple() = addRipple(this, null)
-    fun Drawable.withRippleMask(mask: Drawable) = addRipple(this, mask)
+    fun addRipple(to: Drawable, mask: Drawable? = getRippleMask()) = providedContext.addRipple(to, mask)
+    fun Drawable.withRippleMask(mask: Drawable = getRippleMask()) = addRipple(this, mask)
 
     fun getRoundedCornerDrawable(
         @ColorRes fillColorRes: Int = R.color.secondary_screen_background,
@@ -107,7 +107,7 @@ interface WithContextExtensions {
 
     fun getRippleMask(
         cornerSizeDp: Int = 12,
-    ) = providedContext.getRoundedCornerDrawable(R.color.cell_background_pressed, null, cornerSizeDp)
+    ) = providedContext.getRippleMask(cornerSizeDp)
 }
 
 fun WithContextExtensions(context: Context) = object : WithContextExtensions {

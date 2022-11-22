@@ -25,7 +25,7 @@ class AddressBarView @JvmOverloads constructor(
         orientation = HORIZONTAL
         gravity = Gravity.CENTER
 
-        background = addRipple(getRoundedCornerDrawable(R.color.input_background, cornerSizeDp = 10))
+        background = addRipple(getRoundedCornerDrawable(R.color.input_background, cornerSizeDp = 10), mask = getRippleMask(cornerSizeDp = 10))
     }
 
     fun setAddress(address: String) {
