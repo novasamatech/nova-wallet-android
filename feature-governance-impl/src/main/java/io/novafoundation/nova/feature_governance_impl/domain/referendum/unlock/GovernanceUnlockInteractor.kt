@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.repository.getTracksById
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
+import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
 import io.novafoundation.nova.feature_governance_api.data.source.trackLocksFlowOrEmpty
 import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimSchedule
 import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimSchedule.UnlockChunk
@@ -21,6 +22,7 @@ import io.novafoundation.nova.feature_governance_api.domain.locks.RealClaimSched
 import io.novafoundation.nova.feature_governance_api.domain.locks.claimableChunk
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.Change
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.Change
+import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.GovernanceUnlockAffects.RemainsLockedInfo
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
@@ -29,11 +31,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
 import io.novafoundation.nova.feature_wallet_api.domain.model.maxLockReplacing
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
-import io.novafoundation.nova.runtime.state.chain
-import io.novafoundation.nova.runtime.state.chainAndAsset
+import io.novafoundation.nova.runtime.state.selectedOption
 import io.novafoundation.nova.runtime.util.BlockDurationEstimator
 import io.novafoundation.nova.runtime.util.timerUntil
 import jp.co.soramitsu.fearless_utils.hash.isPositive
@@ -68,7 +67,7 @@ private class IntermediateData(
 private const val LOCKS_OVERVIEW_KEY = "RealGovernanceUnlockInteractor.LOCKS_OVERVIEW_KEY"
 
 class RealGovernanceUnlockInteractor(
-    private val selectedAssetState: SingleAssetSharedState,
+    private val selectedAssetState: GovernanceSharedState,
     private val governanceSourceRegistry: GovernanceSourceRegistry,
     private val chainStateRepository: ChainStateRepository,
     private val computationalCache: ComputationalCache,
@@ -80,31 +79,34 @@ class RealGovernanceUnlockInteractor(
     override suspend fun calculateFee(claimable: UnlockChunk.Claimable?): Balance {
         if (claimable == null) return Balance.ZERO
 
-        val chain = selectedAssetState.chain()
+        val governanceSelectedOption = selectedAssetState.selectedOption()
+        val chain = governanceSelectedOption.assetWithChain.chain
+
         val metaAccount = accountRepository.getSelectedMetaAccount()
         val origin = metaAccount.accountIdIn(chain)!!
 
         return extrinsicService.estimateFee(chain) {
-            executeUnlock(origin, chain, claimable)
+            executeUnlock(origin, governanceSelectedOption, claimable)
         }
     }
 
     override suspend fun unlock(claimable: UnlockChunk.Claimable?) = withContext(Dispatchers.Default) {
-        val chain = selectedAssetState.chain()
+        val governanceSelectedOption = selectedAssetState.selectedOption()
+        val chain = governanceSelectedOption.assetWithChain.chain
 
         extrinsicService.submitExtrinsicWithSelectedWalletAndWaitBlockInclusion(chain) { origin ->
             if (claimable == null) error("Nothing to claim")
 
-            executeUnlock(origin, chain, claimable)
+            executeUnlock(origin, governanceSelectedOption, claimable)
         }
     }
 
     private suspend fun ExtrinsicBuilder.executeUnlock(
         origin: AccountId,
-        chain: Chain,
+        selectedGovernanceOption: SupportedGovernanceOption,
         claimable: UnlockChunk.Claimable
     ) {
-        val governanceSource = governanceSourceRegistry.sourceFor(chain.id)
+        val governanceSource = governanceSourceRegistry.sourceFor(selectedGovernanceOption)
 
         with(governanceSource.convictionVoting) {
             unlock(origin, claimable)
@@ -113,18 +115,22 @@ class RealGovernanceUnlockInteractor(
 
     override fun locksOverviewFlow(scope: CoroutineScope): Flow<GovernanceLocksOverview> {
         return computationalCache.useSharedFlow(LOCKS_OVERVIEW_KEY, scope) {
-            val (chain, asset) = selectedAssetState.chainAndAsset()
-            val metaAccount = accountRepository.getSelectedMetaAccount()
-            val voterAccountId = metaAccount.accountIdIn(chain)
+            val governanceSelectedOption = selectedAssetState.selectedOption()
 
-            locksOverviewFlowSuspend(voterAccountId, chain, asset)
+            val metaAccount = accountRepository.getSelectedMetaAccount()
+            val voterAccountId = metaAccount.accountIdIn(governanceSelectedOption.assetWithChain.chain)
+
+            locksOverviewFlowSuspend(voterAccountId, governanceSelectedOption)
         }
     }
 
     override fun unlockAffectsFlow(scope: CoroutineScope, assetFlow: Flow<Asset>): Flow<GovernanceUnlockAffects> {
         return flowOfAll {
-            val (chain, chainAsset) = selectedAssetState.chainAndAsset()
-            val governanceSource = governanceSourceRegistry.sourceFor(chain.id)
+            val governanceSelectedOption = selectedAssetState.selectedOption()
+            val chain = governanceSelectedOption.assetWithChain.chain
+            val chainAsset = governanceSelectedOption.assetWithChain.asset
+
+            val governanceSource = governanceSourceRegistry.sourceFor(governanceSelectedOption)
 
             combine(
                 assetFlow,
@@ -136,8 +142,14 @@ class RealGovernanceUnlockInteractor(
         }.distinctUntilChanged()
     }
 
-    private suspend fun locksOverviewFlowSuspend(voterAccountId: AccountId?, chain: Chain, asset: Chain.Asset): Flow<GovernanceLocksOverview> {
-        val governanceSource = governanceSourceRegistry.sourceFor(chain.id)
+    private suspend fun locksOverviewFlowSuspend(
+        voterAccountId: AccountId?,
+        selectedGovernanceOption: SupportedGovernanceOption
+    ): Flow<GovernanceLocksOverview> {
+        val chain = selectedGovernanceOption.assetWithChain.chain
+        val asset = selectedGovernanceOption.assetWithChain.asset
+
+        val governanceSource = governanceSourceRegistry.sourceFor(selectedGovernanceOption)
         val tracksById = governanceSource.referenda.getTracksById(chain.id)
         val undecidingTimeout = governanceSource.referenda.undecidingTimeout(chain.id)
         val voteLockingPeriod = governanceSource.convictionVoting.voteLockingPeriod(chain.id)

@@ -10,7 +10,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.UserRewardsState
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState.AssetWithChain
+import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
@@ -21,7 +21,7 @@ class ParachainUserRewardsComponentFactory(
 ) {
 
     fun create(
-        assetWithChain: AssetWithChain,
+        assetWithChain: ChainWithAsset,
         hostContext: ComponentHostContext
     ): UserRewardsComponent = ParachainUserRewardsComponent(
         interactor = interactor,
@@ -35,7 +35,7 @@ private class ParachainUserRewardsComponent(
     private val delegatorStateUseCase: DelegatorStateUseCase,
     private val interactor: ParachainStakingUserRewardsInteractor,
 
-    private val assetWithChain: AssetWithChain,
+    private val assetWithChain: ChainWithAsset,
     private val hostContext: ComponentHostContext,
 ) : BaseRewardComponent(hostContext) {
 

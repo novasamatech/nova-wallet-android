@@ -15,7 +15,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.StakeActionsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.StakeActionsState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.parachain.ParachainStakeActionsComponent
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
+import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
@@ -33,7 +33,7 @@ class TuringStakeActionsComponentFactory(
 ) {
 
     fun create(
-        assetWithChain: SingleAssetSharedState.AssetWithChain,
+        assetWithChain: ChainWithAsset,
         hostContext: ComponentHostContext
     ): StakeActionsComponent = TuringStakeActionsComponent(
         delegatorStateUseCase = delegatorStateUseCase,
@@ -51,7 +51,7 @@ private class TuringStakeActionsComponent(
     delegatorStateUseCase: DelegatorStateUseCase,
     private val resourceManager: ResourceManager,
     private val router: ParachainStakingRouter,
-    assetWithChain: SingleAssetSharedState.AssetWithChain,
+    assetWithChain: ChainWithAsset,
     private val hostContext: ComponentHostContext,
     unbondValidationSystem: ParachainStakingUnbondPreliminaryValidationSystem,
     validationExecutor: ValidationExecutor,

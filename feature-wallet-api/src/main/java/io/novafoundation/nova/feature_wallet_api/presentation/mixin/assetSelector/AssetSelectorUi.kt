@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelect
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetModel
 import io.novafoundation.nova.feature_wallet_api.presentation.view.AssetSelectorBottomSheet
 import io.novafoundation.nova.feature_wallet_api.presentation.view.AssetSelectorView
 
@@ -22,14 +21,14 @@ fun <V> BaseFragment<V>.setupAssetSelector(
     }
 
     subscribeOnAssetChange(selectorMixin) {
-        view.setState(imageLoader, it)
+        view.setState(imageLoader, it.assetModel)
     }
     subscribeOnAssetClick(selectorMixin, imageLoader)
 }
 
 fun <V> BaseFragment<V>.subscribeOnAssetChange(
     selectorMixin: AssetSelectorMixin,
-    onAssetChanged: (AssetModel) -> Unit
+    onAssetChanged: (AssetSelectorModel) -> Unit
 ) where V : BaseViewModel {
     selectorMixin.selectedAssetModelFlow.observe {
         onAssetChanged(it)

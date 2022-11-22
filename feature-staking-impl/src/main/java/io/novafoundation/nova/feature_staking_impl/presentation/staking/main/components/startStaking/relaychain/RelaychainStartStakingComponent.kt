@@ -22,7 +22,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.startStaking.StartStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.startStaking.StartStakingEvent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.welcomeStakingValidationFailure
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState.AssetWithChain
+import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
@@ -42,7 +42,7 @@ class RelaychainStartStakingComponentFactory(
 ) {
 
     fun create(
-        assetWithChain: AssetWithChain,
+        assetWithChain: ChainWithAsset,
         hostContext: ComponentHostContext
     ): StartStakingComponent = RelaychainStartStakingComponent(
         stakingInteractor = stakingInteractor,
@@ -66,7 +66,7 @@ private class RelaychainStartStakingComponent(
     private val validationSystem: WelcomeStakingValidationSystem,
     private val validationExecutor: ValidationExecutor,
 
-    private val assetWithChain: AssetWithChain,
+    private val assetWithChain: ChainWithAsset,
     private val hostContext: ComponentHostContext,
 ) : BaseStartStakingComponent(assetWithChain, hostContext, resourceManager) {
 

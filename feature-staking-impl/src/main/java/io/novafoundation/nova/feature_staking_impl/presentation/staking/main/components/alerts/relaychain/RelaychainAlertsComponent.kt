@@ -25,7 +25,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.mainStakingValidationFailure
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
+import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -44,7 +44,7 @@ class RelaychainAlertsComponentFactory(
 ) {
 
     fun create(
-        assetWithChain: SingleAssetSharedState.AssetWithChain,
+        assetWithChain: ChainWithAsset,
         hostContext: ComponentHostContext,
     ): AlertsComponent = RelaychainAlertsComponent(
         stakingInteractor = stakingInteractor,
@@ -65,7 +65,7 @@ private class RelaychainAlertsComponent(
     private val resourceManager: ResourceManager,
 
     private val hostContext: ComponentHostContext,
-    private val assetWithChain: SingleAssetSharedState.AssetWithChain,
+    private val assetWithChain: ChainWithAsset,
 
     private val redeemValidationSystem: StakeActionsValidationSystem,
     private val bondMoreValidationSystem: StakeActionsValidationSystem,

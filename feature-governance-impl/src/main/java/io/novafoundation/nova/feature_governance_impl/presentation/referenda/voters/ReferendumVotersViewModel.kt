@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
@@ -23,7 +24,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.chainAsset
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -41,9 +41,9 @@ class ReferendumVotersViewModel(
     private val chainFlow = flowOf { governanceSharedState.chain() }
     private val chainAssetFlow = flowOf { governanceSharedState.chainAsset() }
 
-    private val voterList = chainAssetFlow.flatMapLatest { asset ->
+    private val voterList = flowOfAll {
         val referendumId = ReferendumId(payload.referendumId)
-        referendumVotersInteractor.votersFlow(referendumId, asset, payload.voteType)
+        referendumVotersInteractor.votersFlow(referendumId, payload.voteType)
     }
 
     val title: String = mapTypeToString(payload.voteType)

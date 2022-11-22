@@ -89,12 +89,10 @@ class GovernanceFeatureModule {
         walletRepository: WalletRepository,
         accountRepository: AccountRepository,
         assetSharedState: GovernanceSharedState,
-        chainRegistry: ChainRegistry
     ): AssetUseCase = AssetUseCaseImpl(
         walletRepository = walletRepository,
         accountRepository = accountRepository,
         sharedState = assetSharedState,
-        chainRegistry = chainRegistry
     )
 
     @Provides
@@ -121,9 +119,7 @@ class GovernanceFeatureModule {
     fun provideGovernanceSourceRegistry(
         @GovernanceV2 governanceV2Source: GovernanceSource,
         @GovernanceV1 governanceV1Source: GovernanceSource,
-        chainRegistry: ChainRegistry
     ): GovernanceSourceRegistry = RealGovernanceSourceRegistry(
-        chainRegistry = chainRegistry,
         governanceV2Source = governanceV2Source,
         governanceV1Source = governanceV1Source
     )
