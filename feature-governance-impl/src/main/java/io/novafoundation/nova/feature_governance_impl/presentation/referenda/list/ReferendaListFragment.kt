@@ -59,7 +59,7 @@ class ReferendaListFragment : BaseFragment<ReferendaListViewModel>(), ReferendaL
     override fun subscribe(viewModel: ReferendaListViewModel) {
         subscribeOnAssetClick(viewModel.assetSelectorMixin, imageLoader)
         subscribeOnAssetChange(viewModel.assetSelectorMixin) {
-            referendaHeaderAdapter.setAsset(it.assetModel)
+            referendaHeaderAdapter.setAsset(it)
         }
 
         viewModel.governanceTotalLocks.observe {

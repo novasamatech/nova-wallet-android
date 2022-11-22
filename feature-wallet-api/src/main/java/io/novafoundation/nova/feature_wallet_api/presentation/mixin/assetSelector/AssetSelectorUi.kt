@@ -21,7 +21,7 @@ fun <V> BaseFragment<V>.setupAssetSelector(
     }
 
     subscribeOnAssetChange(selectorMixin) {
-        view.setState(imageLoader, it.assetModel)
+        view.setState(imageLoader, it)
     }
     subscribeOnAssetClick(selectorMixin, imageLoader)
 }

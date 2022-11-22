@@ -62,7 +62,7 @@ class CrowdloanFragment : BaseFragment<CrowdloanViewModel>(), CrowdloanAdapter.H
     override fun subscribe(viewModel: CrowdloanViewModel) {
         subscribeOnAssetClick(viewModel.assetSelectorMixin, imageLoader)
         subscribeOnAssetChange(viewModel.assetSelectorMixin) {
-            headerAdapter.setAsset(it.assetModel)
+            headerAdapter.setAsset(it)
         }
         setupCustomDialogDisplayer(viewModel)
         observeValidations(viewModel)
