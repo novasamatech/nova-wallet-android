@@ -22,6 +22,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
+        android:textColor="@color/text_primary"
         android:text="@string/wallet_filters_header" />
 
     <io.novafoundation.nova.common.view.Switch
@@ -65,6 +66,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="16dp"
+        android:textColor="@color/text_primary"
         android:text="@string/common_filter_sort_header" />
 
     <RadioGroup

@@ -30,7 +30,7 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/confirmAuthorizeNovaIcon"
         app:layout_constraintTop_toTopOf="@+id/confirmAuthorizeNovaIcon"
-        app:tint="@color/white_32" />
+        app:tint="@color/icon_secondary" />
 
     <ImageView
         android:id="@+id/confirmAuthorizeDappIcon"

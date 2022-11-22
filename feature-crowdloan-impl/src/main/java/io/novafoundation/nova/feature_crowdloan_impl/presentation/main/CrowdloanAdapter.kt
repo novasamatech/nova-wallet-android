@@ -139,9 +139,7 @@ private class CrowdloanChildHolder(
             itemCrowdloanTimeRemaining.text = item.state.timeRemaining
 
             itemCrowdloanParaName.setTextColorRes(R.color.text_primary)
-            itemCrowdloanParaDescription.setTextColorRes(R.color.text_secondary)
-            itemCrowdloanParaRaised.setTextColorRes(R.color.text_primary)
-            itemCrowdloanParaRaisedPercentage.setTextColorRes(R.color.button_background_primary)
+            itemCrowdloanParaRaisedPercentage.setTextColorRes(R.color.progress_bar_text)
 
             itemCrowdloanArrow.makeVisible()
 
@@ -153,8 +151,6 @@ private class CrowdloanChildHolder(
             itemCrowdloanArrow.makeGone()
 
             itemCrowdloanParaName.setTextColorRes(R.color.text_secondary)
-            itemCrowdloanParaDescription.setTextColorRes(R.color.text_secondary)
-            itemCrowdloanParaRaised.setTextColorRes(R.color.text_secondary)
             itemCrowdloanParaRaisedPercentage.setTextColorRes(R.color.text_secondary)
 
             itemCrowdloanParaRaisedProgress.isEnabled = false

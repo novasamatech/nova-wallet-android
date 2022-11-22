@@ -67,7 +67,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/black4"
+        android:background="@color/secondary_screen_background"
         android:orientation="vertical">
 
         <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView

@@ -17,7 +17,7 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:layout_height="24dp"
         tools:layout_width="24dp"
-        tools:src="@color/colorAccent" />
+        tools:src="@color/icon_accent" />
 
     <TextView
         android:id="@+id/itemContactTitle"
@@ -59,7 +59,7 @@
         android:layout_height="wrap_content"
         android:padding="16dp"
         android:src="@drawable/ic_chevron_right"
-        android:tint="@color/text_primary"
+        app:tint="@color/icon_primary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

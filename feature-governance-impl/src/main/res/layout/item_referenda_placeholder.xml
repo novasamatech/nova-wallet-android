@@ -35,7 +35,7 @@
             android:background="@drawable/bg_voting_status_chip"
             android:includeFontPadding="false"
             android:minHeight="22dp"
-            android:textColor="@color/white_80"
+            android:textColor="@color/chip_text"
             android:paddingHorizontal="8dp"
             android:paddingVertical="2dp"
             android:text="0"

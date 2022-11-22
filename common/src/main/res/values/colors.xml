@@ -1,49 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="failed_transaction_color">#E53450</color>
-
-    <color name="gray1">#CCCCCC</color>
-    <color name="gray2">#888888</color>
-    <color name="gray3">#444444</color>
-    <color name="gray4">#181818</color>
-    <color name="gray_disabled">#D0D0D0</color>
-    <color name="colorGreyText">#888888</color>
-    <color name="bottomSheetBackground">#80838383</color>
-    <color name="blurColorDark">#B3000000</color>
-    <color name="blurColorLight">#66000000</color>
-
-    <color name="white_10">#1AFFFFFF</color>
-    <color name="white_12">#1FFFFFFF</color>
-    <color name="white_16">#29FFFFFF</color>
-    <color name="white_20">#33FFFFFF</color>
-    <color name="white_24">#3DFFFFFF</color>
-    <color name="white_30">#4DFFFFFF</color>
-    <color name="white_32">#52FFFFFF</color>
-    <color name="white_40">#66FFFFFF</color>
-    <color name="white_48">#7AFFFFFF</color>
-    <color name="white_50">#80FFFFFF</color>
-    <color name="white_80">#CCFFFFFF</color>
-
-    <color name="black_24">#3D000000</color>
-    <color name="black_65">#A6000000</color>
-
-    <color name="black2">@color/gray2</color>
-    <color name="black3">@color/gray3</color>
-    <color name="black4">@color/gray4</color>
-
-    <color name="settings_group_background">@color/block_background</color>
-
-    <color name="account_icon_light">#eeeeee</color>
-    <color name="account_icon_dark">@color/secondary_screen_background</color>
-
-    <color name="accentSecondary">#2D2D30</color>
-
-    <color name="disabledColor">#1D1D20</color>
-    <color name="disabledTransparent">@color/divider</color>
-
-    <color name="pms_black">#2D2926</color>
-
-    <color name="textInactive">@color/white_32</color>
+    <!-- Colors not included in the design system -->
+    <color name="votes_to_pass_indicator_shadow">#B8000000</color>
+    <color name="address_icon_background">#eeeeee</color>
 
     <!-- System -->
     <color name="android_system_accent">#1F78FF</color>
@@ -97,6 +56,7 @@
     <color name="solid_navigation_background">#0F111A</color>
     <color name="cell_background_pressed">#291F78FF</color>
     <color name="voting_slider_background">#29999EC7</color>
+    <color name="dim_background">#7A08090E</color>
 
     <!-- Button Colors -->
     <color name="button_background_primary">#1F78FF</color>
@@ -130,8 +90,5 @@
     <color name="voting_slider_indicator_active">#08090E</color>
     <color name="voting_slider_indicator_inactive">#7A08090E</color>
     <color name="voting_slider_knob_icon">#FFFFFF</color>
-
-    <!-- Utility colors -->
-    <color name="votes_to_pass_indicator_shadow">#B8000000</color>
 
 </resources>

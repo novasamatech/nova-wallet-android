@@ -9,13 +9,13 @@
 
     <ImageView
         android:id="@+id/labeledTextPrimaryIcon"
+        android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_marginStart="16dp"
         android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_width="24dp" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/labeledTextIcon"
@@ -33,7 +33,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
-        app:layout_goneMarginStart="16dp"
         android:layout_marginTop="8dp"
         android:includeFontPadding="false"
         android:textColor="@color/text_primary"
@@ -42,6 +41,7 @@
         app:layout_constraintStart_toEndOf="@id/labeledTextPrimaryIcon"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
+        app:layout_goneMarginStart="16dp"
         tools:text="@string/common_account" />
 
     <TextView
@@ -80,7 +80,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/ic_copy"
-        app:tint="@color/icon_secondary" />
+        app:tint="@color/icon_secondary"
+        tools:src="@drawable/ic_copy" />
 
 </merge>

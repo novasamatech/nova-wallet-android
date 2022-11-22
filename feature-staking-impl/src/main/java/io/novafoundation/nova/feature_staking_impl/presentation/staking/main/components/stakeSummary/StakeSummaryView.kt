@@ -36,12 +36,12 @@ class StakeSummaryView @JvmOverloads constructor(
 
         object Active : Status(R.string.staking_nominator_status_active, R.color.text_positive)
 
-        object Inactive : Status(R.string.staking_nominator_status_inactive, R.color.white_80)
+        object Inactive : Status(R.string.staking_nominator_status_inactive, R.color.text_secondary)
 
         class Waiting(
             val timeLeft: Long,
             @StringRes customMessageFormat: Int
-        ) : Status(customMessageFormat, R.color.white_80)
+        ) : Status(customMessageFormat, R.color.text_secondary)
     }
 
     init {
@@ -49,7 +49,7 @@ class StakeSummaryView @JvmOverloads constructor(
 
         with(context) {
             background = getBlockDrawable()
-            stakeSummaryStatus.background = addRipple(getRoundedCornerDrawable(fillColorRes = R.color.divider))
+            stakeSummaryStatus.background = addRipple(getRoundedCornerDrawable(fillColorRes = R.color.block_background))
         }
     }
 

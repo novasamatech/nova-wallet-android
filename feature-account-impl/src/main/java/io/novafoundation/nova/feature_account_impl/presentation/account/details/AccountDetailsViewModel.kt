@@ -121,7 +121,7 @@ class AccountDetailsViewModel(
         }
 
         val accountIcon = projection?.let {
-            iconGenerator.createAddressIcon(it.accountId, AddressIconGenerator.SIZE_SMALL, backgroundColorRes = R.color.account_icon_dark)
+            iconGenerator.createAddressIcon(it.accountId, AddressIconGenerator.SIZE_SMALL, backgroundColorRes = AddressIconGenerator.BACKGROUND_TRANSPARENT)
         } ?: resourceManager.getDrawable(R.drawable.ic_warning_filled)
 
         val availableActionsForChain = availableActionsFor(accountInChain)
@@ -178,14 +178,14 @@ class AccountDetailsViewModel(
         return when (accountType) {
             Type.WATCH_ONLY -> AccountTypeAlert(
                 style = AlertView.Style(
-                    backgroundColorRes = R.color.white_12,
+                    backgroundColorRes = R.color.block_background,
                     iconRes = R.drawable.ic_watch
                 ),
                 text = resourceManager.getString(R.string.account_details_watch_only_alert)
             )
             Type.PARITY_SIGNER -> AccountTypeAlert(
                 style = AlertView.Style(
-                    backgroundColorRes = R.color.white_12,
+                    backgroundColorRes = R.color.block_background,
                     iconRes = R.drawable.ic_parity_signer
                 ),
                 text = resourceManager.getString(R.string.account_details_parity_signer_alert)
@@ -193,7 +193,7 @@ class AccountDetailsViewModel(
             Type.SECRETS -> null
             Type.LEDGER -> AccountTypeAlert(
                 style = AlertView.Style(
-                    backgroundColorRes = R.color.white_12,
+                    backgroundColorRes = R.color.block_background,
                     iconRes = R.drawable.ic_ledger
                 ),
                 text = resourceManager.getString(R.string.ledger_wallet_details_description)

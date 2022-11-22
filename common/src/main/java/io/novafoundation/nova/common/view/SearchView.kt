@@ -50,7 +50,7 @@ class SearchView @JvmOverloads constructor(
     }
 
     fun setIcon(@DrawableRes icon: Int?) {
-        searchContent.setDrawableStart(icon, widthInDp = 16, paddingInDp = 6, tint = R.color.white_32)
+        searchContent.setDrawableStart(icon, widthInDp = 16, paddingInDp = 6, tint = R.color.icon_secondary)
     }
 
     private fun applyAttrs(attributeSet: AttributeSet) = context.useAttributes(attributeSet, R.styleable.SearchView) {

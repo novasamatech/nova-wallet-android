@@ -190,7 +190,7 @@ suspend fun mapValidatorDetailsParcelToValidatorDetailsModel(
                 status = ValidatorStakeModel.Status(
                     text = resourceManager.getString(R.string.staking_nominator_status_inactive),
                     icon = R.drawable.ic_time_16,
-                    iconTint = R.color.white_48
+                    iconTint = R.color.icon_secondary
                 ),
                 activeStakeModel = null
             )

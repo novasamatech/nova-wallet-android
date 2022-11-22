@@ -48,7 +48,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/itemValidationCheck"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@color/colorAccent" />
+        tools:src="@color/icon_accent" />
 
     <TextView
         android:id="@+id/itemValidatorName"
@@ -131,7 +131,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/white_48" />
+        app:tint="@color/icon_secondary" />
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/amountBarrier"

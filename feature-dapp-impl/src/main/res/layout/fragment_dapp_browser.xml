@@ -86,7 +86,6 @@
             android:src="@drawable/ic_refresh"
             app:tint="@color/actions_color" />
 
-
         <ImageView
             android:id="@+id/dappBrowserFavourite"
             android:layout_width="0dp"

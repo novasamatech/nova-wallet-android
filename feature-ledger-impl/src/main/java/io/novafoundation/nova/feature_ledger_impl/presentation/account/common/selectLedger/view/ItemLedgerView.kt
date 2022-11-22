@@ -19,7 +19,7 @@ class ItemLedgerView @JvmOverloads constructor(
         setTextAppearance(R.style.TextAppearance_NovaFoundation_Regular_SubHeadline)
         setTextColorRes(R.color.text_primary)
 
-        setDrawableEnd(R.drawable.ic_chevron_right, widthInDp = 24, paddingInDp = 4, tint = R.color.white_48)
+        setDrawableEnd(R.drawable.ic_chevron_right, widthInDp = 24, paddingInDp = 4, tint = R.color.icon_secondary)
 
         updatePadding(
             top = 14.dp,

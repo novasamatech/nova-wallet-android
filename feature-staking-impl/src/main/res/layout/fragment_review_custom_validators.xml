@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="start"
             android:textAllCaps="true"
-            android:textColor="@color/white_80"
+            android:textColor="@color/text_primary"
             tools:text="@string/staking_custom_header_validators_title" />
 
         <TextView
@@ -42,7 +42,7 @@
             android:layout_marginStart="16dp"
             android:text="@string/staking_rewards_apy"
             android:textAllCaps="true"
-            android:textColor="@color/white_80" />
+            android:textColor="@color/text_primary" />
     </FrameLayout>
 
     <androidx.recyclerview.widget.RecyclerView

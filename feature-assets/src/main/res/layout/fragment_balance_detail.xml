@@ -22,7 +22,7 @@
                 android:id="@+id/balanceDetailBlur"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:background="@color/blurColorLight"
+                android:background="@color/blur_navigation_background"
                 app:layout_constraintBottom_toBottomOf="@+id/balanceDetailBalanceBottomMargin"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"

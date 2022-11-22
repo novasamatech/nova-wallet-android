@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:includeFontPadding="false"
         android:singleLine="true"
-        android:textColor="@color/gray1"
+        android:textColor="@color/text_secondary"
         tools:text="Title" />
 
 
@@ -40,6 +40,7 @@
         android:layout_marginTop="4dp"
         android:includeFontPadding="false"
         android:singleLine="true"
+        android:textColor="@color/text_primary"
         android:visibility="gone"
         tools:text="0.164 KSM" />
 

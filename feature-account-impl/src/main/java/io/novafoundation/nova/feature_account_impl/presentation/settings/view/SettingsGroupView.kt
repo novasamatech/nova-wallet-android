@@ -20,7 +20,7 @@ class SettingsGroupView @JvmOverloads constructor(
 
         orientation = VERTICAL
 
-        background = context.getRoundedCornerDrawable(fillColorRes = R.color.settings_group_background)
+        background = context.getRoundedCornerDrawable(fillColorRes = R.color.block_background)
 
         dividerDrawable = context.getDrawableCompat(R.drawable.divider_decoration)
         showDividers = SHOW_DIVIDER_MIDDLE

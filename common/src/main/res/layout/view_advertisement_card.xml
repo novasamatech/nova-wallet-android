@@ -27,6 +27,7 @@
         app:layout_constraintEnd_toStartOf="@id/advertisementCardImage"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        android:textColor="@color/text_primary"
         tools:text="Rewards are paid every 2-3 days by validators" />
 
     <TextView

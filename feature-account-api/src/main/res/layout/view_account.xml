@@ -27,7 +27,7 @@
         app:layout_constraintBottom_toBottomOf="@id/addressSubtitle"
         app:layout_constraintStart_toStartOf="@id/addressTitle"
         app:layout_constraintTop_toTopOf="@id/addressSubtitle"
-        tools:src="@color/colorAccent" />
+        tools:src="@color/icon_accent" />
 
     <TextView
         android:id="@+id/addressTitle"
@@ -80,7 +80,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/white_48"
+        app:tint="@color/icon_secondary"
         tools:src="@drawable/ic_chevron_down" />
 
 </merge>

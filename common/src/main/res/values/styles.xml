@@ -285,6 +285,7 @@
     <style name="Widget.Nova.Puller" parent="">
         <item name="android:layout_height">4dp</item>
         <item name="android:layout_width">28dp</item>
+        <item name="android:layout_marginTop">6dp</item>
         <item name="android:background">@drawable/bg_puller</item>
     </style>
 
@@ -301,7 +302,7 @@
 
     <style name="Widget.Nova.Text.Number" parent="">
         <item name="android:textAppearance">@style/TextAppearance.NovaFoundation.Regular.Body</item>
-        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textColor">@color/chip_text</item>
         <item name="android:background">@drawable/bg_round_number</item>
         <item name="android:gravity">center</item>
         <item name="android:includeFontPadding">false</item>

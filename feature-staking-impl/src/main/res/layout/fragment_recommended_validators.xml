@@ -31,7 +31,7 @@
             android:layout_gravity="start"
             android:text="@string/profile_accounts_title"
             android:textAllCaps="true"
-            android:textColor="@color/white_80" />
+            android:textColor="@color/text_primary" />
 
         <TextView
             style="@style/TextAppearance.NovaFoundation.SemiBold.Caps2"
@@ -41,7 +41,7 @@
             android:layout_marginStart="16dp"
             android:text="@string/staking_rewards_apy"
             android:textAllCaps="true"
-            android:textColor="@color/white_80" />
+            android:textColor="@color/text_primary" />
     </FrameLayout>
 
     <ProgressBar

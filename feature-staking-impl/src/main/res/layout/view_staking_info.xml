@@ -29,7 +29,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:singleLine="true"
-        android:textColor="@color/icon_positive"
+        android:textColor="@color/text_positive"
         android:visibility="gone"
         tools:text="22.12%" />
 
@@ -41,7 +41,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="4dp"
         android:singleLine="true"
-        android:textColor="@color/gray1"
+        android:textColor="@color/text_secondary"
         tools:text="Monthly" />
 
 </merge>

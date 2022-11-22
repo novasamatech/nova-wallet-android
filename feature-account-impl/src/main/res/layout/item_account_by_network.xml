@@ -18,7 +18,7 @@
         android:layout_margin="16dp"
         tools:layout_height="24dp"
         tools:layout_width="24dp"
-        tools:src="@color/colorAccent" />
+        tools:src="@color/icon_accent" />
 
     <TextView
         android:id="@+id/accountTitle"

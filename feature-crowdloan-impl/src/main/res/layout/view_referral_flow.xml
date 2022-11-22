@@ -15,6 +15,7 @@
         android:layout_marginTop="15dp"
         android:layout_marginEnd="16dp"
         app:layout_constrainedWidth="true"
+        android:textColor="@color/text_primary"
         style="@style/TextAppearance.NovaFoundation.Body1"
         app:layout_constraintEnd_toStartOf="@+id/referralNovaBonusApply"
         app:layout_constraintHorizontal_bias="0.0"

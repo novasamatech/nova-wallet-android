@@ -99,7 +99,7 @@ suspend fun mapOperationToOperationModel(
 
             is Operation.Type.Transfer -> {
                 val amountColor = when {
-                    operationType.status == Operation.Status.FAILED -> R.color.failed_transaction_color
+                    operationType.status == Operation.Status.FAILED -> R.color.text_secondary
                     operationType.isIncome -> R.color.text_positive
                     else -> R.color.text_primary
                 }
@@ -117,7 +117,7 @@ suspend fun mapOperationToOperationModel(
             }
 
             is Operation.Type.Extrinsic -> {
-                val amountColor = if (operationType.status == Operation.Status.FAILED) R.color.failed_transaction_color else R.color.text_primary
+                val amountColor = if (operationType.status == Operation.Status.FAILED) R.color.text_secondary else R.color.text_primary
 
                 OperationModel(
                     id = id,

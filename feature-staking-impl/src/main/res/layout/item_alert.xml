@@ -48,6 +48,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_chevron_right"
-        app:tint="@color/white_48"
+        app:tint="@color/icon_secondary"
         tools:visibility="visible" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -114,7 +114,7 @@ fun ResourceManager.labeledAmountSubtitle(
         }
     } else {
         buildSpannable(this) {
-            appendColored(labelText + amount.token, R.color.textInactive)
+            appendColored(labelText + amount.token, R.color.text_secondary)
         }
     }
 }

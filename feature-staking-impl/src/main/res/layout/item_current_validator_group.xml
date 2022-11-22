@@ -19,6 +19,7 @@
         android:layout_marginBottom="8dp"
         android:includeFontPadding="false"
         android:drawablePadding="8dp"
+        android:textColor="@color/text_primary"
         tools:drawableStart="@drawable/ic_checkmark_circle_16"
         tools:drawableTint="@color/icon_positive"
         tools:text="Active (1)" />

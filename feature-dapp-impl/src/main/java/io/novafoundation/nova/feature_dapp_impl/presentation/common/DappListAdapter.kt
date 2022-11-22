@@ -55,7 +55,7 @@ class DappViewHolder(
             setActionTintRes(null)
         } else {
             setActionResource(R.drawable.ic_heart_outline)
-            setActionTintRes(R.color.white_48)
+            setActionTintRes(R.color.icon_secondary)
         }
 
         setOnClickListener { itemHandler.onDAppClicked(item) }
