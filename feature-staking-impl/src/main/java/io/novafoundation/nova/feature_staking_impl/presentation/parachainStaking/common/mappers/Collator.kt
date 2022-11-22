@@ -54,7 +54,7 @@ suspend fun mapCollatorToCollatorModel(
 
             StakeTargetModel.Subtitle(
                 label = resourceManager.getString(R.string.staking_min_stake).withSubtitleLabelSuffix(),
-                value = ColoredText(formattedMinStake, R.color.white),
+                value = ColoredText(formattedMinStake, R.color.text_primary),
             )
         }
 

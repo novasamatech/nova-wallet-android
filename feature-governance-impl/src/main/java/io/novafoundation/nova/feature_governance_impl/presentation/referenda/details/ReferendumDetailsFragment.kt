@@ -83,14 +83,14 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
             viewModel.backClicked()
         }
 
-        referendumDetailsRequestedAmountContainer.background = getRoundedCornerDrawable(R.color.white_8)
-        referendumDetailsTrack.background = getRoundedCornerDrawable(R.color.white_16, cornerSizeDp = 8)
+        referendumDetailsRequestedAmountContainer.background = getRoundedCornerDrawable(R.color.block_background)
+        referendumDetailsTrack.background = getRoundedCornerDrawable(R.color.chips_background, cornerSizeDp = 8)
             .withRippleMask(getRippleMask(cornerSizeDp = 8))
-        referendumDetailsNumber.background = getRoundedCornerDrawable(R.color.white_16, cornerSizeDp = 8)
+        referendumDetailsNumber.background = getRoundedCornerDrawable(R.color.chips_background, cornerSizeDp = 8)
             .withRippleMask(getRippleMask(cornerSizeDp = 8))
-        referendumFullDetails.background = getRoundedCornerDrawable(R.color.white_8)
+        referendumFullDetails.background = getRoundedCornerDrawable(R.color.block_background)
             .withRippleMask(getRippleMask())
-        referendumTimelineContainer.background = getRoundedCornerDrawable(R.color.white_8)
+        referendumTimelineContainer.background = getRoundedCornerDrawable(R.color.block_background)
 
         referendumDetailsReadMore.setOnClickListener {
             viewModel.readMoreClicked()

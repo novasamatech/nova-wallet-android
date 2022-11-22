@@ -4,18 +4,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:background="@color/black"
+    tools:background="@color/secondary_screen_background"
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
     <ImageView
         android:id="@+id/labeledTextPrimaryIcon"
+        android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_marginStart="16dp"
         android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_width="24dp" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/labeledTextIcon"
@@ -25,7 +25,7 @@
         app:layout_constraintBottom_toBottomOf="@id/labeledTextText"
         app:layout_constraintStart_toStartOf="@id/labeledTextLabel"
         app:layout_constraintTop_toTopOf="@id/labeledTextText"
-        tools:src="@color/colorAccent" />
+        tools:src="@color/icon_accent" />
 
     <TextView
         android:id="@+id/labeledTextLabel"
@@ -33,15 +33,15 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
-        app:layout_goneMarginStart="16dp"
         android:layout_marginTop="8dp"
         android:includeFontPadding="false"
-        android:textColor="@color/colorHint"
+        android:textColor="@color/text_primary"
         app:layout_constraintEnd_toStartOf="@id/labeledTextAction"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@id/labeledTextPrimaryIcon"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
+        app:layout_goneMarginStart="16dp"
         tools:text="@string/common_account" />
 
     <TextView
@@ -56,7 +56,7 @@
         android:ellipsize="middle"
         android:includeFontPadding="false"
         android:singleLine="true"
-        android:textColor="@color/white"
+        android:textColor="@color/text_secondary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/labeledTextAction"
         app:layout_constraintHorizontal_bias="0.0"
@@ -80,7 +80,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/ic_copy"
-        app:tint="@color/white_64" />
+        app:tint="@color/icon_secondary"
+        tools:src="@drawable/ic_copy" />
 
 </merge>

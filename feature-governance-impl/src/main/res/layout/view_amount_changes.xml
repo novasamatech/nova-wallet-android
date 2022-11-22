@@ -13,7 +13,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/valueChangesTitle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/valueChangesTitle"
-        app:tint="@color/white_48"
+        app:tint="@color/icon_secondary"
         tools:src="@drawable/ic_time_16" />
 
     <TextView
@@ -25,7 +25,7 @@
         android:layout_marginTop="13dp"
         android:layout_marginBottom="13dp"
         android:includeFontPadding="false"
-        android:textColor="@color/white_64"
+        android:textColor="@color/text_secondary"
         app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/valueBarrier"
@@ -42,7 +42,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="4dp"
         android:includeFontPadding="false"
-        android:textColor="@color/white_64"
+        android:textColor="@color/text_secondary"
         app:layout_constraintBaseline_toBaselineOf="@id/valueChangesTo"
         app:layout_constraintEnd_toStartOf="@+id/valueChangesArrow"
         tools:text="71" />
@@ -56,8 +56,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/valueChangesTo"
         app:layout_constraintEnd_toStartOf="@+id/valueChangesTo"
         app:layout_constraintTop_toTopOf="@+id/valueChangesTo"
-        app:tint="@color/white_48" />
-
+        app:tint="@color/icon_secondary" />
 
     <TextView
         android:id="@+id/valueChangesTo"
@@ -65,7 +64,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:includeFontPadding="false"
-        android:textColor="@color/white"
+        android:textColor="@color/text_primary"
         app:layout_constraintBottom_toTopOf="@+id/valueChangesDifference"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -79,14 +78,14 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:includeFontPadding="false"
-        android:textColor="@color/white_64"
-        app:drawableTint="?attr/colorAccent"
+        android:textColor="@color/text_secondary"
+        app:drawableTint="@color/icon_accent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/valueChangesTo"
         tools:drawableStart="@drawable/ic_double_chevron_up"
         tools:text="1 day"
-        tools:textColor="?attr/colorAccent" />
+        tools:textColor="@color/button_text_accent" />
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/valueBarrier"
@@ -94,6 +93,5 @@
         android:layout_height="wrap_content"
         app:barrierDirection="left"
         app:constraint_referenced_ids="valueChangesFrom, valueChangesDifference" />
-
 
 </merge>

@@ -16,7 +16,7 @@ import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.view.shape.addRipple
-import io.novafoundation.nova.common.view.shape.getBlurDrawable
+import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.main.model.CrowdloanModel
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.main.model.CrowdloanStatusModel
@@ -115,7 +115,7 @@ private class CrowdloanChildHolder(
 
     init {
         with(containerView.context) {
-            containerView.background = addRipple(getBlurDrawable())
+            containerView.background = addRipple(getBlockDrawable())
         }
     }
 
@@ -138,10 +138,8 @@ private class CrowdloanChildHolder(
             itemCrowdloanTimeRemaining.makeVisible()
             itemCrowdloanTimeRemaining.text = item.state.timeRemaining
 
-            itemCrowdloanParaName.setTextColorRes(R.color.white)
-            itemCrowdloanParaDescription.setTextColorRes(R.color.black1)
-            itemCrowdloanParaRaised.setTextColorRes(R.color.white)
-            itemCrowdloanParaRaisedPercentage.setTextColorRes(R.color.accentBlue)
+            itemCrowdloanParaName.setTextColorRes(R.color.text_primary)
+            itemCrowdloanParaRaisedPercentage.setTextColorRes(R.color.progress_bar_text)
 
             itemCrowdloanArrow.makeVisible()
 
@@ -152,10 +150,8 @@ private class CrowdloanChildHolder(
             itemCrowdloanTimeRemaining.makeGone()
             itemCrowdloanArrow.makeGone()
 
-            itemCrowdloanParaName.setTextColorRes(R.color.white_64)
-            itemCrowdloanParaDescription.setTextColorRes(R.color.white_64)
-            itemCrowdloanParaRaised.setTextColorRes(R.color.white_64)
-            itemCrowdloanParaRaisedPercentage.setTextColorRes(R.color.white_64)
+            itemCrowdloanParaName.setTextColorRes(R.color.text_secondary)
+            itemCrowdloanParaRaisedPercentage.setTextColorRes(R.color.text_secondary)
 
             itemCrowdloanParaRaisedProgress.isEnabled = false
 

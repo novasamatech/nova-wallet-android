@@ -18,10 +18,10 @@ class TabItem @JvmOverloads constructor(
     init {
         background = with(context) {
             getCornersCheckableDrawable(
-                checked = addRipple(getRoundedCornerDrawable(fillColorRes = R.color.white_16)),
+                checked = addRipple(getRoundedCornerDrawable(fillColorRes = R.color.segmented_tab_active, cornerSizeInDp = 10)),
                 unchecked = addRipple(
-                    drawable = getRoundedCornerDrawable(fillColorRes = android.R.color.transparent),
-                    mask = getRoundedCornerDrawable(fillColorRes = R.color.black_48)
+                    drawable = getRoundedCornerDrawable(fillColorRes = android.R.color.transparent, cornerSizeInDp = 10),
+                    mask = getRoundedCornerDrawable(fillColorRes = R.color.cell_background_pressed, cornerSizeInDp = 10)
                 )
             )
         }

@@ -9,7 +9,7 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.view.shape.addRipple
-import io.novafoundation.nova.common.view.shape.getBlurDrawable
+import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.domain.main.statefull.StatefulCrowdloanMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetModel
@@ -96,9 +96,9 @@ class HeaderHolder(
         itemView.crowdloanTotalContributedContainer.setOnClickListener { handler.onClickContributionsInfo() }
 
         with(itemView) {
-            crowdloanAbout.background = context.getBlurDrawable()
-            crowdloanTotalContributedContainer.background = context.addRipple(context.getBlurDrawable())
-            crowdloanTotalContributedShimmering.background = context.getBlurDrawable()
+            crowdloanAbout.background = context.getBlockDrawable()
+            crowdloanTotalContributedContainer.background = context.addRipple(context.getBlockDrawable())
+            crowdloanTotalContributedShimmering.background = context.getBlockDrawable()
         }
     }
 

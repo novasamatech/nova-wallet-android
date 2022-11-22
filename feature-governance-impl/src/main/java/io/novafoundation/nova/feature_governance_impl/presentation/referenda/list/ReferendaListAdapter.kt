@@ -13,7 +13,7 @@ import io.novafoundation.nova.common.list.resolvePayload
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.view.shape.addRipple
-import io.novafoundation.nova.common.view.shape.getBlurDrawable
+import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.setReferendumTimeEstimation
@@ -132,9 +132,9 @@ private class ReferendumChildHolder(
 
     init {
         with(containerView.context) {
-            containerView.background = addRipple(getBlurDrawable())
-            containerView.itemReferendumTrack.background = addRipple(getRoundedCornerDrawable(R.color.white_8, cornerSizeInDp = 8))
-            containerView.itemReferendumNumber.background = addRipple(getRoundedCornerDrawable(R.color.white_8, cornerSizeInDp = 8))
+            containerView.background = addRipple(getBlockDrawable())
+            containerView.itemReferendumTrack.background = addRipple(getRoundedCornerDrawable(R.color.chips_background, cornerSizeInDp = 8))
+            containerView.itemReferendumNumber.background = addRipple(getRoundedCornerDrawable(R.color.chips_background, cornerSizeInDp = 8))
         }
     }
 

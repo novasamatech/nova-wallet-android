@@ -5,7 +5,7 @@ import android.util.AttributeSet
 import android.widget.LinearLayout
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.updatePadding
-import io.novafoundation.nova.common.view.shape.getBlurDrawable
+import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.ManageStakeAction
 
 typealias ManageStakeActionClickListener = (ManageStakeAction) -> Unit
@@ -23,7 +23,7 @@ class ManageStakingView @kotlin.jvm.JvmOverloads constructor(
         orientation = VERTICAL
         updatePadding(top = 8.dp, bottom = 8.dp)
 
-        background = context.getBlurDrawable()
+        background = context.getBlockDrawable()
         clipToOutline = true
     }
 

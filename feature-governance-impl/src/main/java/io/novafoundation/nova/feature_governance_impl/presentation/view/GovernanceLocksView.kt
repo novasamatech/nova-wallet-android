@@ -6,7 +6,7 @@ import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.view.shape.addRipple
-import io.novafoundation.nova.common.view.shape.getBlurDrawable
+import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.feature_governance_impl.R
 import kotlinx.android.synthetic.main.view_governance_locks.view.governanceLockAmount
 import kotlinx.android.synthetic.main.view_governance_locks.view.governanceUnlockBadge
@@ -21,7 +21,7 @@ class GovernanceLocksView @JvmOverloads constructor(
         View.inflate(context, R.layout.view_governance_locks, this)
 
         with(context) {
-            background = addRipple(getBlurDrawable())
+            background = addRipple(getBlockDrawable())
         }
 
         governanceLockAmount.isEnabled = false

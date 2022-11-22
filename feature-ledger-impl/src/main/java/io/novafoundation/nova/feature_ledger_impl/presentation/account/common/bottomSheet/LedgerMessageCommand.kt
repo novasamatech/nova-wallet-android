@@ -94,7 +94,7 @@ private fun LedgerMessageCommand.Graphics.Companion.error() = LedgerMessageComma
 
 private fun LedgerMessageCommand.Graphics.Companion.info() = LedgerMessageCommand.Graphics(
     icon = R.drawable.ic_checkmark_circle_16,
-    iconTint = R.color.white_32,
+    iconTint = R.color.icon_secondary,
     background = R.drawable.ic_ledger_info
 )
 
@@ -155,7 +155,7 @@ class LedgerMessageBottomSheet(
                     value = footer.timerValue,
                     customMessageFormat = footer.messageFormat,
                     onTick = { view, _ ->
-                        val textColorRes = if (footer.closeToExpire(footer.timerValue)) R.color.red else R.color.white_64
+                        val textColorRes = if (footer.closeToExpire(footer.timerValue)) R.color.text_negative else R.color.text_secondary
 
                         view.setTextColorRes(textColorRes)
                     },

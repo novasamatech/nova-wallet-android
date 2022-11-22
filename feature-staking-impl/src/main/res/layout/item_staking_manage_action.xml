@@ -15,7 +15,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
-        app:tint="@color/white_48"
+        app:tint="@color/icon_secondary"
         tools:src="@drawable/ic_people_outline" />
 
     <TextView
@@ -26,7 +26,7 @@
         android:layout_marginStart="12dp"
         android:layout_marginEnd="12dp"
         android:layout_weight="1"
-        android:textColor="@color/white"
+        android:textColor="@color/text_primary"
         tools:text="Stake more" />
 
     <io.novafoundation.nova.common.view.CounterView
@@ -43,5 +43,5 @@
         android:layout_gravity="center_vertical"
         android:layout_marginEnd="16dp"
         android:src="@drawable/ic_chevron_right"
-        app:tint="@color/white_48" />
+        app:tint="@color/icon_secondary" />
 </merge>

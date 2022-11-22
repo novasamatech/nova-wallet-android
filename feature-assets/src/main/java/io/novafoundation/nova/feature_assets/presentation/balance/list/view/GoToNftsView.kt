@@ -32,7 +32,8 @@ class GoToNftsView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyleAttr), WithContextExtensions {
 
-    @Inject lateinit var imageLoader: ImageLoader
+    @Inject
+    lateinit var imageLoader: ImageLoader
 
     override val providedContext: Context = context
 
@@ -45,7 +46,7 @@ class GoToNftsView @JvmOverloads constructor(
     init {
         View.inflate(context, R.layout.view_go_to_nfts, this)
 
-        background = addRipple(getRoundedCornerDrawable(R.color.black_48))
+        background = addRipple(getRoundedCornerDrawable(R.color.block_background))
 
         FeatureUtils.getFeature<AssetsFeatureComponent>(
             context,

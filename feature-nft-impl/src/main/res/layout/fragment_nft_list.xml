@@ -11,16 +11,16 @@
         android:id="@+id/nftListToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/bar_bg_64"
+        android:background="@color/solid_navigation_background"
         android:gravity="center_vertical">
 
         <ImageView
             android:id="@+id/nftListBack"
-            app:tint="@color/actions_color"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:src="@drawable/ic_arrow_back" />
+            android:src="@drawable/ic_arrow_back"
+            app:tint="@color/actions_color" />
 
         <TextView
             style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
@@ -30,7 +30,8 @@
             android:layout_marginBottom="10dp"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="@string/nft_your_nfts" />
+            android:text="@string/nft_your_nfts"
+            android:textColor="@color/text_primary" />
 
         <io.novafoundation.nova.common.view.CounterView
             android:id="@+id/nftListCounter"

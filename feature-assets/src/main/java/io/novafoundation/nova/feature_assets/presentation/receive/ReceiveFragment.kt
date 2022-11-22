@@ -51,7 +51,7 @@ class ReceiveFragment : BaseFragment<ReceiveViewModel>() {
 
         receiveFrom.primaryIcon.setVisible(true)
 
-        receiveQrCode.background = requireContext().getRoundedCornerDrawable(fillColorRes = R.color.white)
+        receiveQrCode.background = requireContext().getRoundedCornerDrawable(fillColorRes = R.color.text_primary)
         receiveQrCode.clipToOutline = true // for round corners
     }
 

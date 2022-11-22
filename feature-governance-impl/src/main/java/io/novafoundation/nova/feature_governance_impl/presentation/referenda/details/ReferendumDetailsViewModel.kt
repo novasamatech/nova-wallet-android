@@ -302,12 +302,12 @@ class ReferendumDetailsViewModel(
 
         return when (type) {
             VoteType.AYE -> VotersModel(
-                voteTypeColorRes = R.color.multicolor_green_100,
+                voteTypeColorRes = R.color.aye_indicator,
                 voteTypeRes = R.string.referendum_vote_aye,
                 votesValue = formatVotesAmount(voting.approval.ayeVotes.amount, chainAsset)
             )
             VoteType.NAY -> VotersModel(
-                voteTypeColorRes = R.color.multicolor_red_100,
+                voteTypeColorRes = R.color.nay_indicator,
                 voteTypeRes = R.string.referendum_vote_nay,
                 votesValue = formatVotesAmount(voting.approval.nayVotes.amount, chainAsset)
             )

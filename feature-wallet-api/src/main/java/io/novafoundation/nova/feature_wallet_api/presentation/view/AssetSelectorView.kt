@@ -10,7 +10,7 @@ import coil.load
 import io.novafoundation.nova.common.utils.getEnum
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.common.view.shape.addRipple
-import io.novafoundation.nova.common.view.shape.getBlurDrawable
+import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.common.view.shape.getIdleDrawable
 import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetModel
@@ -52,7 +52,7 @@ class AssetSelectorView @JvmOverloads constructor(
 
     fun setBackgroundStyle(style: BackgroundStyle) = with(context) {
         val baseBackground = when (style) {
-            BackgroundStyle.BLURRED -> getBlurDrawable()
+            BackgroundStyle.BLURRED -> getBlockDrawable()
             BackgroundStyle.BORDERED -> getIdleDrawable()
         }
 

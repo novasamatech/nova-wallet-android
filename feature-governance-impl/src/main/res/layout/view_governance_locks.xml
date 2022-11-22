@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    tools:background="@color/black"
+    tools:background="@color/secondary_screen_background"
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
     <TextView
@@ -18,7 +18,7 @@
         android:layout_marginBottom="13dp"
         android:includeFontPadding="false"
         android:text="@string/wallet_balance_locked"
-        android:textColor="@color/white"
+        android:textColor="@color/text_primary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -29,7 +29,6 @@
         android:layout_height="wrap_content"
         android:layout_marginVertical="16dp"
         android:layout_marginStart="8dp"
-        app:backgroundColor="@color/white_16"
         app:chipIcon="@drawable/ic_lock"
         app:chipIconSize="12dp"
         app:chipTextAppearance="@style/TextAppearance.NovaFoundation.Regular.Footnote"
@@ -50,7 +49,7 @@
         android:includeFontPadding="false"
         android:maxLines="1"
         android:text="@string/governance_unlock"
-        android:textColor="@color/multicolor_green_100"
+        android:textColor="@color/text_positive"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/governanceUnlockForwardIcon"
         app:layout_constraintStart_toEndOf="@+id/governanceLockAmount"
@@ -66,7 +65,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/white_48"
+        app:tint="@color/icon_secondary"
         tools:text="139 KSM" />
 
 </merge>

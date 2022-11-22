@@ -64,8 +64,8 @@ class ButtonLarge @kotlin.jvm.JvmOverloads constructor(
 
     private fun setStyle(style: Style) = with(context) {
         val backgroundColor = when (style) {
-            Style.PRIMARY -> getColorFromAttr(R.attr.colorAccent)
-            Style.SECONDARY -> getColor(R.color.white_16)
+            Style.PRIMARY -> context.getColor(R.color.button_background_primary)
+            Style.SECONDARY -> context.getColor(R.color.button_background_secondary)
         }
 
         val rippleColor = getColorFromAttr(R.attr.colorControlHighlight)

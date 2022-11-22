@@ -7,7 +7,7 @@
     android:background="@drawable/bg_primary_list_item"
     android:paddingTop="@dimen/x1"
     android:paddingBottom="@dimen/x1"
-    tools:background="@color/black">
+    tools:background="@color/secondary_screen_background">
 
     <ImageView
         android:id="@+id/languageCheck"
@@ -16,6 +16,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:src="@drawable/ic_checkmark"
+        app:tint="@color/text_primary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -27,7 +28,7 @@
         android:layout_height="wrap_content"
         android:paddingStart="20dp"
         android:paddingEnd="20dp"
-        android:textColor="@color/white"
+        android:textColor="@color/text_primary"
         android:textSize="15sp"
         app:layout_constraintEnd_toStartOf="@id/languageCheck"
         app:layout_constraintStart_toStartOf="parent"
@@ -40,7 +41,7 @@
         android:layout_height="wrap_content"
         android:paddingStart="20dp"
         android:paddingEnd="20dp"
-        android:textColor="@color/white"
+        android:textColor="@color/text_secondary"
         app:layout_constraintEnd_toStartOf="@id/languageCheck"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/languageNameTv"

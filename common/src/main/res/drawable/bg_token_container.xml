@@ -4,7 +4,7 @@
 
     <corners android:radius="999dp" />
 
-    <solid android:color="@color/black_24" />
+    <solid android:color="@color/token_container_background" />
 
-    <stroke android:color="@color/white_16" android:width="0.5dp" />
+    <stroke android:color="@color/container_border" android:width="0.5dp" />
 </shape>

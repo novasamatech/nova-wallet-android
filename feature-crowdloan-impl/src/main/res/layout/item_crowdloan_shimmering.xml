@@ -5,15 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
-    android:background="@drawable/bg_shimmering_dark"
-    android:padding="16dp"
-    tools:background="@color/blurColor">
+    android:background="@drawable/bg_shimmering_container"
+    android:padding="16dp">
 
     <com.facebook.shimmer.ShimmerFrameLayout
         android:id="@+id/itemCrowdloanShimmeringIcon"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:background="@drawable/bg_shimmering_light"
+        android:background="@drawable/bg_shimmering"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -23,7 +22,7 @@
         android:layout_height="12dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="2dp"
-        android:background="@drawable/bg_shimmering_light"
+        android:background="@drawable/bg_shimmering"
         app:layout_constraintStart_toEndOf="@+id/itemCrowdloanShimmeringIcon"
         app:layout_constraintTop_toTopOf="@+id/itemCrowdloanShimmeringIcon" />
 
@@ -32,7 +31,7 @@
         android:layout_width="127dp"
         android:layout_height="12dp"
         android:layout_marginTop="9dp"
-        android:background="@drawable/bg_shimmering_light"
+        android:background="@drawable/bg_shimmering"
         app:layout_constraintStart_toStartOf="@+id/itemCrowdloanParaNameShimmering"
         app:layout_constraintTop_toBottomOf="@+id/itemCrowdloanParaNameShimmering" />
 
@@ -41,7 +40,7 @@
         android:layout_width="138dp"
         android:layout_height="12dp"
         android:layout_marginTop="24dp"
-        android:background="@drawable/bg_shimmering_light"
+        android:background="@drawable/bg_shimmering"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/itemCrowdloanShimmeringIcon" />
 
@@ -50,8 +49,8 @@
         android:layout_width="match_parent"
         android:layout_height="5dp"
         android:layout_marginTop="12dp"
-        android:background="@drawable/bg_shimmering_light"
-        android:textColor="@color/black2"
+        android:background="@drawable/bg_shimmering"
+        android:textColor="@color/text_secondary"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/itemCrowdloanParaRaisedShimmering" />
 
@@ -60,7 +59,7 @@
         android:layout_width="40dp"
         android:layout_height="12dp"
         android:layout_marginTop="11dp"
-        android:background="@drawable/bg_shimmering_light"
+        android:background="@drawable/bg_shimmering"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/itemCrowdloanParaRaisedProgressShimmering" />
 
@@ -69,7 +68,7 @@
         android:layout_width="67dp"
         android:layout_height="12dp"
         android:layout_marginTop="11dp"
-        android:background="@drawable/bg_shimmering_light"
+        android:background="@drawable/bg_shimmering"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/itemCrowdloanParaRaisedProgressShimmering" />
 

@@ -37,7 +37,7 @@ class AddressView @JvmOverloads constructor(
         if (iconRes == null) {
             addressValue.setDrawableEnd(null)
         } else {
-            addressValue.setDrawableEnd(iconRes, widthInDp = 16, tint = R.color.white_48, paddingInDp = 6)
+            addressValue.setDrawableEnd(iconRes, widthInDp = 16, tint = R.color.text_secondary, paddingInDp = 6)
         }
     }
 }

@@ -62,10 +62,6 @@ class ConfirmMnemonicAdapter(
 
             itemConfirmMnemonicWord.setVisible(hasWord, falseState = View.INVISIBLE)
 
-            if (item.indexDisplay != null) {
-                itemConfirmMnemonicIndex.setVisible(hasWord, falseState = View.INVISIBLE)
-            }
-
             if (item.removed) {
                 setOnClickListener(null)
             } else {

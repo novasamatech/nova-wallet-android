@@ -36,7 +36,7 @@ class VotingStatusView @JvmOverloads constructor(
 
         View.inflate(context, R.layout.view_voting_status, this)
 
-        background = getRoundedCornerDrawable(R.color.white_8)
+        background = getRoundedCornerDrawable(R.color.block_background)
         setPadding(0, 16.dp, 0, 16.dp)
     }
 

@@ -11,22 +11,21 @@
         android:layout_width="wrap_content"
         android:layout_height="22dp"
         android:layout_gravity="center_vertical"
+        android:gravity="center_vertical"
         android:includeFontPadding="false"
         android:paddingStart="32dp"
         android:paddingTop="4.5dp"
-        android:gravity="center_vertical"
         android:paddingEnd="8dp"
-        android:singleLine="true"
         android:paddingBottom="4.5dp"
-        android:textColor="@color/white_80"
-        tools:background="@color/white_16"
+        android:singleLine="true"
+        android:textColor="@color/chip_text"
+        tools:background="@color/chips_background"
         tools:text="Polkadot" />
 
     <ImageView
         android:id="@+id/itemAssetGroupLabelIcon"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        tools:background="@color/colorAccent"
         tools:src="@drawable/ic_polkadot_24" />
 
 </merge>

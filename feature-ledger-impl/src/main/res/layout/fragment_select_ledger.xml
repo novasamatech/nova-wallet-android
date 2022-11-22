@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:background="@color/black">
+    tools:background="@color/secondary_screen_background">
 
     <io.novafoundation.nova.common.view.Toolbar
         android:layout_width="match_parent"
@@ -20,6 +20,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
+        android:textColor="@color/text_primary"
         android:text="@string/account_ledger_select_device_title" />
 
     <TextView
@@ -30,6 +31,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
+        android:textColor="@color/text_secondary"
         tools:text="@string/account_ledger_select_device_description" />
 
     <androidx.recyclerview.widget.RecyclerView
@@ -43,10 +45,10 @@
 
     <ProgressBar
         android:id="@+id/selectLedgerProgress"
+        style="@style/Widget.Nova.ProgressBar.Indeterminate"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_gravity="center_horizontal"
         android:layout_weight="1"
-        android:indeterminate="true"
-        android:indeterminateTint="@color/white" />
+        android:indeterminate="true" />
 </LinearLayout>

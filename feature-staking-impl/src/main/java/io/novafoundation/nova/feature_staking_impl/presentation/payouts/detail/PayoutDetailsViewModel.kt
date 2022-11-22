@@ -61,7 +61,7 @@ class PayoutDetailsViewModel(
             timeLeftCalculatedAt = payout.timeLeftCalculatedAt,
             eraDisplay = resourceManager.getString(R.string.staking_era_index_no_prefix, payout.era.toLong()),
             reward = mapAmountToAmountModel(payout.amountInPlanks, asset),
-            timerColor = if (payout.closeToExpire) R.color.red else R.color.white,
+            timerColor = if (payout.closeToExpire) R.color.text_negative else R.color.text_primary,
         )
     }
 }

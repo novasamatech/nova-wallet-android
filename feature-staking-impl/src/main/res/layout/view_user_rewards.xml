@@ -23,7 +23,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="14dp"
         android:text="@string/staking_your_rewards"
-        android:textColor="@color/white_64"
+        android:textColor="@color/text_secondary"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -36,6 +36,7 @@
         android:ellipsize="end"
         android:singleLine="true"
         app:layout_constraintEnd_toEndOf="parent"
+        android:textColor="@color/text_primary"
         app:layout_constraintStart_toStartOf="@id/userRewardsTitle"
         app:layout_constraintTop_toBottomOf="@id/userRewardsTitle"
         tools:text="0.03133 KSM" />
@@ -49,7 +50,7 @@
         android:layout_marginBottom="24dp"
         android:ellipsize="end"
         android:singleLine="true"
-        android:textColor="@color/white_64"
+        android:textColor="@color/text_secondary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@id/userRewardsTokenAmount"
@@ -69,7 +70,7 @@
             android:layout_width="150dp"
             android:layout_height="20dp"
             android:layout_gravity="center"
-            android:background="@drawable/bg_shimmering_light" />
+            android:background="@drawable/bg_shimmering" />
 
     </com.facebook.shimmer.ShimmerFrameLayout>
 
@@ -86,7 +87,7 @@
             android:layout_width="100dp"
             android:layout_height="12dp"
             android:layout_gravity="center"
-            android:background="@drawable/bg_shimmering_light" />
+            android:background="@drawable/bg_shimmering" />
 
     </com.facebook.shimmer.ShimmerFrameLayout>
 

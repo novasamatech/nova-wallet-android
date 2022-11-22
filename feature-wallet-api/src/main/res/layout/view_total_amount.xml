@@ -16,7 +16,7 @@
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="21dp"
         android:text="@string/common_total"
-        android:textColor="@color/white_64" />
+        android:textColor="@color/text_secondary" />
 
     <TextView
         android:id="@+id/totalAmountToken"
@@ -26,7 +26,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="3dp"
-        android:textColor="@color/white"
+        android:textColor="@color/text_primary"
         tools:text="$214.66" />
 
     <TextView
@@ -38,7 +38,7 @@
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="4dp"
         android:layout_marginBottom="20dp"
-        android:textColor="@color/white_64"
+        android:textColor="@color/text_secondary"
         tools:text="$214.66" />
 
 </merge>

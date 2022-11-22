@@ -22,7 +22,7 @@ interface AddressIconGenerator {
         const val SIZE_MEDIUM = 24
         const val SIZE_BIG = 32
 
-        val BACKGROUND_LIGHT = R.color.account_icon_light
+        val BACKGROUND_LIGHT = R.color.address_icon_background
         val BACKGROUND_TRANSPARENT = android.R.color.transparent
 
         val BACKGROUND_DEFAULT = BACKGROUND_LIGHT

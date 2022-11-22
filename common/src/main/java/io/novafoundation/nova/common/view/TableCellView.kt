@@ -37,7 +37,7 @@ import kotlinx.android.synthetic.main.view_table_cell.view.tableCellValuePrimary
 import kotlinx.android.synthetic.main.view_table_cell.view.tableCellValueProgress
 import kotlinx.android.synthetic.main.view_table_cell.view.tableCellValueSecondary
 
-private val ICON_TINT_DEFAULT = R.color.white_64
+private val ICON_TINT_DEFAULT = R.color.icon_secondary
 
 open class TableCellView @JvmOverloads constructor(
     context: Context,
@@ -55,10 +55,8 @@ open class TableCellView @JvmOverloads constructor(
             return TableCellView(context).apply {
                 layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
 
-                setDividerColor(R.color.white_24)
-
-                valueSecondary.setTextColorRes(R.color.white_64)
-                title.setTextColorRes(R.color.white_64)
+                valueSecondary.setTextColorRes(R.color.text_secondary)
+                title.setTextColorRes(R.color.text_secondary)
             }
         }
     }
@@ -135,10 +133,6 @@ open class TableCellView @JvmOverloads constructor(
         tableCellValueDivider.setVisible(visible)
     }
 
-    fun setDividerColor(@ColorRes colorRes: Int) {
-        tableCellValueDivider.setBackgroundColor(context.getColor(colorRes))
-    }
-
     fun setPrimaryValueIcon(@DrawableRes icon: Int, @ColorRes tint: Int? = null) {
         tableCellValuePrimary.setDrawableEnd(icon, widthInDp = 16, paddingInDp = 8, tint = tint)
     }
@@ -146,7 +140,7 @@ open class TableCellView @JvmOverloads constructor(
     fun setPrimaryValueStyle(style: FieldStyle) {
         when (style) {
             FieldStyle.TEXT -> {
-                valuePrimary.setTextColorRes(R.color.white)
+                valuePrimary.setTextColorRes(R.color.text_primary)
             }
             FieldStyle.LINK -> {
                 valuePrimary.setTextColor(context.getAccentColor())
@@ -175,9 +169,6 @@ open class TableCellView @JvmOverloads constructor(
 
         val dividerVisible = typedArray.getBoolean(R.styleable.TableCellView_dividerVisible, true)
         setDividerVisible(dividerVisible)
-
-        val dividerColor = typedArray.getResourceIdOrNull(R.styleable.TableCellView_dividerColor)
-        dividerColor?.let(::setDividerColor)
 
         val primaryValueIcon = typedArray.getResourceIdOrNull(R.styleable.TableCellView_primaryValueIcon)
         primaryValueIcon?.let {

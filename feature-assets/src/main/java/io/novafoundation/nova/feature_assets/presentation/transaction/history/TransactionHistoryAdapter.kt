@@ -93,7 +93,7 @@ class DayHolder(view: View) : GroupedListHolder(view) {
 
 object TransactionHistoryDiffCallback : BaseGroupedDiffCallback<DayHeader, OperationModel>(DayHeader::class.java) {
     override fun areGroupItemsTheSame(oldItem: DayHeader, newItem: DayHeader): Boolean {
-        return oldItem.daysSinceEpoch == oldItem.daysSinceEpoch
+        return oldItem.daysSinceEpoch == newItem.daysSinceEpoch
     }
 
     override fun areGroupContentsTheSame(oldItem: DayHeader, newItem: DayHeader): Boolean {
