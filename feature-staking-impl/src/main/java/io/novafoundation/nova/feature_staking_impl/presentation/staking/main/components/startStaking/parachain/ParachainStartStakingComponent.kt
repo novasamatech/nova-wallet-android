@@ -24,7 +24,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.startStaking.BaseStartStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.startStaking.StartStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.startStaking.StartStakingEvent
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
+import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
@@ -52,7 +52,7 @@ class ParachainStartStakingComponentFactory(
     }
 
     fun create(
-        assetWithChain: SingleAssetSharedState.AssetWithChain,
+        assetWithChain: ChainWithAsset,
         hostContext: ComponentHostContext
     ): StartStakingComponent = ParachainStartStakingComponent(
         delegatorStateUseCase = delegatorStateUseCase,
@@ -74,7 +74,7 @@ private class ParachainStartStakingComponent(
 
     private val validationSystem: ParachainStakingWelcomeValidationSystem,
     private val validationExecutor: ValidationExecutor,
-    private val assetWithChain: SingleAssetSharedState.AssetWithChain,
+    private val assetWithChain: ChainWithAsset,
     private val hostContext: ComponentHostContext,
 ) : BaseStartStakingComponent(assetWithChain, hostContext, resourceManager) {
 

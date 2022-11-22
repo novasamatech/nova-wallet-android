@@ -199,18 +199,20 @@ fun mapChainRemoteToChain(
             isEthereumBased = ETHEREUM_OPTION in optionsOrEmpty,
             isTestNet = TESTNET_OPTION in optionsOrEmpty,
             hasCrowdloans = CROWDLOAN_OPTION in optionsOrEmpty,
-            governance = optionsOrEmpty.governanceTypeFromOptions(),
+            governance = optionsOrEmpty.governanceTypesFromOptions(),
             additional = additional
         )
     }
 }
 
-private fun Set<String>.governanceTypeFromOptions(): Chain.Governance {
-    return when {
-        "governance" in this -> Chain.Governance.V2 // for backward compatibility of dev builds. Can be removed once everyone will update dev app
-        "governance-v2" in this -> Chain.Governance.V2
-        "governance-v1" in this -> Chain.Governance.V1
-        else -> Chain.Governance.NONE
+private fun Set<String>.governanceTypesFromOptions(): List<Chain.Governance> {
+    return mapNotNull { option ->
+        when (option) {
+            "governance" -> Chain.Governance.V2 // for backward compatibility of dev builds. Can be removed once everyone will update dev app
+            "governance-v2" -> Chain.Governance.V2
+            "governance-v1" -> Chain.Governance.V1
+            else -> null
+        }
     }
 }
 
@@ -287,7 +289,7 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
             isEthereumBased = isEthereumBased,
             isTestNet = isTestNet,
             hasCrowdloans = hasCrowdloans,
-            governance = Chain.Governance.valueOf(governance),
+            governance = mapGovernanceListFromLocal(governance),
             additional = additional
         )
     }
@@ -300,6 +302,11 @@ fun mapChainNodeToLocal(node: Chain.Node): ChainNodeLocal {
         chainId = node.chainId,
         orderId = node.orderId
     )
+}
+
+fun mapGovernanceListToLocal(governance: List<Chain.Governance>) = governance.joinToString(separator = ",", transform = Chain.Governance::name)
+fun mapGovernanceListFromLocal(governanceLocal: String) = governanceLocal.split(",").mapNotNull {
+    runCatching { Chain.Governance.valueOf(it) }.getOrNull()
 }
 
 fun mapChainAssetToLocal(asset: Chain.Asset, gson: Gson): ChainAssetLocal = with(asset) {
@@ -363,7 +370,7 @@ fun mapChainToChainLocal(chain: Chain, gson: Gson): ChainLocal {
             isEthereumBased = isEthereumBased,
             isTestNet = isTestNet,
             hasCrowdloans = hasCrowdloans,
-            governance = governance.name,
+            governance = mapGovernanceListToLocal(governance),
             additional = additional,
         )
     }

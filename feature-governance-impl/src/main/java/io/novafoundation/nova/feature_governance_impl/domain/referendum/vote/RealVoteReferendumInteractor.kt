@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.flattenCastingVotes
 import io.novafoundation.nova.feature_governance_api.data.repository.getTracksById
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
+import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
 import io.novafoundation.nova.feature_governance_api.domain.locks.RealClaimScheduleCalculator
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumTrack
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.Change
@@ -24,19 +25,17 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.Gove
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.GovernanceVoteAssistant.LocksChange
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.GovernanceVoteAssistant.ReusableLock
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
+import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
 import io.novafoundation.nova.feature_wallet_api.domain.model.maxLockReplacing
 import io.novafoundation.nova.runtime.ext.fullId
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.blockDurationEstimator
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
-import io.novafoundation.nova.runtime.state.chain
-import io.novafoundation.nova.runtime.state.chainAndAsset
+import io.novafoundation.nova.runtime.state.selectedOption
 import io.novafoundation.nova.runtime.util.BlockDurationEstimator
 import jp.co.soramitsu.fearless_utils.hash.isPositive
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
@@ -50,7 +49,7 @@ private const val VOTE_ASSISTANT_CACHE_KEY = "RealVoteReferendumInteractor.VoteA
 class RealVoteReferendumInteractor(
     private val governanceSourceRegistry: GovernanceSourceRegistry,
     private val chainStateRepository: ChainStateRepository,
-    private val selectedChainState: SingleAssetSharedState,
+    private val selectedChainState: GovernanceSharedState,
     private val accountRepository: AccountRepository,
     private val extrinsicService: ExtrinsicService,
     private val locksRepository: BalanceLocksRepository,
@@ -59,19 +58,21 @@ class RealVoteReferendumInteractor(
 
     override fun voteAssistantFlow(referendumId: ReferendumId, scope: CoroutineScope): Flow<GovernanceVoteAssistant> {
         return computationalCache.useSharedFlow(VOTE_ASSISTANT_CACHE_KEY, scope) {
-            val (chain, chainAsset) = selectedChainState.chainAndAsset()
+            val governanceOption = selectedChainState.selectedOption()
             val metaAccount = accountRepository.getSelectedMetaAccount()
 
-            val voterAccountId = metaAccount.accountIdIn(chain)!!
+            val voterAccountId = metaAccount.accountIdIn(governanceOption.assetWithChain.chain)!!
 
-            voteAssistantFlowSuspend(chain, chainAsset, voterAccountId, referendumId)
+            voteAssistantFlowSuspend(governanceOption, voterAccountId, referendumId)
         }
     }
 
     override suspend fun estimateFee(amount: Balance, conviction: Conviction, referendumId: ReferendumId): Balance {
-        val chain = selectedChainState.chain()
+        val governanceOption = selectedChainState.selectedOption()
+        val chain = governanceOption.assetWithChain.chain
+
         val vote = AyeVote(amount, conviction) // vote direction does not influence fee estimation
-        val governanceSource = governanceSourceRegistry.sourceFor(chain.id)
+        val governanceSource = governanceSourceRegistry.sourceFor(governanceOption)
 
         return extrinsicService.estimateFee(chain) {
             with(governanceSource.convictionVoting) {
@@ -84,10 +85,10 @@ class RealVoteReferendumInteractor(
         vote: AccountVote.Standard,
         referendumId: ReferendumId,
     ): Result<String> {
-        val chain = selectedChainState.chain()
-        val governanceSource = governanceSourceRegistry.sourceFor(chain.id)
+        val governanceSelectedOption = selectedChainState.selectedOption()
+        val governanceSource = governanceSourceRegistry.sourceFor(governanceSelectedOption)
 
-        return extrinsicService.submitExtrinsicWithSelectedWallet(chain) {
+        return extrinsicService.submitExtrinsicWithSelectedWallet(governanceSelectedOption.assetWithChain.chain) {
             with(governanceSource.convictionVoting) {
                 vote(referendumId, vote)
             }
@@ -95,12 +96,14 @@ class RealVoteReferendumInteractor(
     }
 
     private suspend fun voteAssistantFlowSuspend(
-        chain: Chain,
-        chainAsset: Chain.Asset,
+        selectedGovernanceOption: SupportedGovernanceOption,
         voterAccountId: AccountId,
         referendumId: ReferendumId
     ): Flow<GovernanceVoteAssistant> {
-        val governanceSource = governanceSourceRegistry.sourceFor(chain.id)
+        val chain = selectedGovernanceOption.assetWithChain.chain
+        val chainAsset = selectedGovernanceOption.assetWithChain.asset
+
+        val governanceSource = governanceSourceRegistry.sourceFor(selectedGovernanceOption)
         val tracks = governanceSource.referenda.getTracksById(chain.id)
         val undecidingTimeout = governanceSource.referenda.undecidingTimeout(chain.id)
         val voteLockingPeriod = governanceSource.convictionVoting.voteLockingPeriod(chain.id)

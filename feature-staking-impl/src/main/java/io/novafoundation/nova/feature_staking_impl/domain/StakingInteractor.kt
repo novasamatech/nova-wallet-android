@@ -36,9 +36,9 @@ import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.ext.accountIdOf
+import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.chainAsset
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
@@ -209,7 +209,7 @@ class StakingInteractor(
 
     fun selectedAccountStakingStateFlow(
         metaAccount: MetaAccount,
-        assetWithChain: SingleAssetSharedState.AssetWithChain
+        assetWithChain: ChainWithAsset
     ) = flow {
         val (chain, chainAsset) = assetWithChain
         val accountId = metaAccount.accountIdIn(chain)

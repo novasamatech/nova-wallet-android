@@ -23,8 +23,8 @@ import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromByteArray
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
 
 fun bindProposal(decoded: Any?, runtimeSnapshot: RuntimeSnapshot): Proposal {
-    return when(decoded) {
-        is ByteArray ->  bindProposalLegacy(decoded)
+    return when (decoded) {
+        is ByteArray -> bindProposalLegacy(decoded)
         is DictEnum.Entry<*> -> bindProposalBound(decoded, runtimeSnapshot)
         else -> incompatible()
     }
