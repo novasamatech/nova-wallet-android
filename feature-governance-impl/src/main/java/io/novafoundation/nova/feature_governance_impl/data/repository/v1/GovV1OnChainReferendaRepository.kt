@@ -125,7 +125,11 @@ class GovV1OnChainReferendaRepository(
         return remoteStorageSource.query(chainId) {
             val schedulerVersion = runtime.metadata.schedulerVersion()
 
-            val referendaIdBySchedulerId = approvedReferendaIds.associateBy { it.versionedEnactmentSchedulerId(runtime, schedulerVersion).intoKey() }
+            val referendaIdBySchedulerId = approvedReferendaIds.flatMap { referendumId ->
+                referendumId.versionedEnactmentSchedulerIdVariants(runtime, schedulerVersion).map {  enactmentKeyVariant ->
+                    enactmentKeyVariant.intoKey() to referendumId
+                }
+            }.toMap()
 
             runtime.metadata.scheduler().storage("Lookup").entries(
                 keysArguments = referendaIdBySchedulerId.keys.map { schedulerIdKey -> listOf(schedulerIdKey.value) },
@@ -206,10 +210,10 @@ class GovV1OnChainReferendaRepository(
         return metadata.democracy().numberConstant("VotingPeriod", this)
     }
 
-    private fun ReferendumId.versionedEnactmentSchedulerId(runtime: RuntimeSnapshot, schedulerVersion: SchedulerVersion): ByteArray {
+    private fun ReferendumId.versionedEnactmentSchedulerIdVariants(runtime: RuntimeSnapshot, schedulerVersion: SchedulerVersion): List<ByteArray> {
         return when (schedulerVersion) {
-            SchedulerVersion.V3 -> v3EnactmentSchedulerId(runtime)
-            SchedulerVersion.V4 -> v4EnactmentSchedulerId(runtime)
+            SchedulerVersion.V3 -> listOf(v3EnactmentSchedulerId(runtime))
+            SchedulerVersion.V4 -> listOf(v4EnactmentSchedulerId(runtime), v4MigratedEnactmentSchedulerId(runtime))
         }
     }
 
@@ -229,6 +233,10 @@ class GovV1OnChainReferendaRepository(
         } else {
             oldId.pad(SCHEDULER_KEY_BOUND, padding = 0)
         }
+    }
+
+    private fun ReferendumId.v4MigratedEnactmentSchedulerId(runtime: RuntimeSnapshot) : ByteArray {
+        return v3EnactmentSchedulerId(runtime).blake2b256()
     }
 
     private fun RuntimeMetadata.schedulerVersion(): SchedulerVersion {
