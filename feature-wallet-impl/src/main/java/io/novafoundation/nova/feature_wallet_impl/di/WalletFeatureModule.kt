@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.interfaces.FileCache
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.core_db.dao.AssetDao
+import io.novafoundation.nova.core_db.dao.ChainAssetDao
 import io.novafoundation.nova.core_db.dao.LockDao
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.dao.PhishingAddressDao
@@ -26,6 +27,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossCh
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.di.Wallet
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionHistoryRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
@@ -46,6 +48,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.RealCr
 import io.novafoundation.nova.feature_wallet_impl.data.network.phishing.PhishingApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RealBalanceLocksRepository
+import io.novafoundation.nova.feature_wallet_impl.data.repository.RealChainAssetRepository
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RealCrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RealTransactionHistoryRepository
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RuntimeWalletConstants
@@ -226,4 +229,10 @@ class WalletFeatureModule {
     ): BalanceLocksRepository {
         return RealBalanceLocksRepository(accountRepository, chainRegistry, lockDao)
     }
+
+    @Provides
+    @FeatureScope
+    fun provideChainAssetRepository(
+        chainAssetDao: ChainAssetDao
+    ): ChainAssetRepository = RealChainAssetRepository(chainAssetDao)
 }

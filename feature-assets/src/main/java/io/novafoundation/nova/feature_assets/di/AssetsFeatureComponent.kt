@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.filters.di.Ass
 import io.novafoundation.nova.feature_assets.presentation.balance.list.di.BalanceListComponent
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.GoToNftsView
 import io.novafoundation.nova.feature_assets.presentation.balance.search.di.AssetSearchComponent
+import io.novafoundation.nova.feature_assets.presentation.manageTokens.di.ManageTokensComponent
 import io.novafoundation.nova.feature_assets.presentation.receive.di.ReceiveComponent
 import io.novafoundation.nova.feature_assets.presentation.send.amount.di.SelectSendComponent
 import io.novafoundation.nova.feature_assets.presentation.send.confirm.di.ConfirmSendComponent
@@ -58,6 +59,8 @@ interface AssetsFeatureComponent : AssetsFeatureApi {
     fun assetFiltersComponentFactory(): AssetFiltersComponent.Factory
 
     fun assetSearchComponentFactory(): AssetSearchComponent.Factory
+
+    fun manageTokensComponentFactory(): ManageTokensComponent.Factory
 
     fun inject(view: GoToNftsView)
 
