@@ -90,7 +90,7 @@ private class AssetSelectorProvider(
         val tokenName = asset.token.configuration.name
 
         return if (formattedOptionLabel != null) {
-            "$tokenName - $formattedOptionLabel"
+            "$tokenName $formattedOptionLabel"
         } else {
             tokenName
         }
