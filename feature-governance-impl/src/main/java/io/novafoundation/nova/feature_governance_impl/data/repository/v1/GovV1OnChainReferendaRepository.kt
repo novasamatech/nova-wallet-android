@@ -228,7 +228,7 @@ class GovV1OnChainReferendaRepository(
         val oldId = v3EnactmentSchedulerId(runtime)
 
         return if (oldId.size > SCHEDULER_KEY_BOUND) {
-            oldId.blake2b256()
+            oldId.blake2b256().pad(SCHEDULER_KEY_BOUND, padding = 0)
         } else {
             oldId.pad(SCHEDULER_KEY_BOUND, padding = 0)
         }
