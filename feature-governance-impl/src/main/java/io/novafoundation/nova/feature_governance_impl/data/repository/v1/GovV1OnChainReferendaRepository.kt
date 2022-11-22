@@ -6,7 +6,6 @@ import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.bindBlockNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.bindBoolean
-import io.novafoundation.nova.common.data.network.runtime.binding.bindByteArray
 import io.novafoundation.nova.common.data.network.runtime.binding.bindCollectionEnum
 import io.novafoundation.nova.common.data.network.runtime.binding.castToDictEnum
 import io.novafoundation.nova.common.data.network.runtime.binding.castToList
@@ -22,25 +21,36 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.DecidingStatus
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.OnChainReferendum
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.OnChainReferendumStatus
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Proposal
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackInfo
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackQueue
 import io.novafoundation.nova.feature_governance_api.data.repository.OnChainReferendaRepository
 import io.novafoundation.nova.feature_governance_api.data.thresold.gov1.Gov1VotingThreshold
+import io.novafoundation.nova.feature_governance_impl.data.repository.common.bindProposal
 import io.novafoundation.nova.feature_governance_impl.data.repository.common.bindTally
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
+import jp.co.soramitsu.fearless_utils.extensions.pad
+import jp.co.soramitsu.fearless_utils.hash.Hasher.blake2b256
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.primitives.FixedByteArray
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.primitives.u32
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.toByteArray
+import jp.co.soramitsu.fearless_utils.runtime.metadata.RuntimeMetadata
+import jp.co.soramitsu.fearless_utils.runtime.metadata.keys
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import kotlinx.coroutines.flow.Flow
 import java.math.BigInteger
+
+private const val SCHEDULER_KEY_BOUND = 32
+
+private enum class SchedulerVersion {
+    V3, V4
+}
 
 class GovV1OnChainReferendaRepository(
     private val remoteStorageSource: StorageDataSource,
@@ -78,7 +88,7 @@ class GovV1OnChainReferendaRepository(
 
             runtime.metadata.democracy().storage("ReferendumInfoOf").entries(
                 keyExtractor = { (id: BigInteger) -> ReferendumId(id) },
-                binding = { decoded, id -> bindReferendum(decoded, id, votingPeriod) }
+                binding = { decoded, id -> bindReferendum(decoded, id, votingPeriod, runtime) }
             )
         }.values.filterNotNull()
     }
@@ -90,7 +100,7 @@ class GovV1OnChainReferendaRepository(
             runtime.metadata.democracy().storage("ReferendumInfoOf").entries(
                 keysArguments = referendaIds.map { listOf(it.value) },
                 keyExtractor = { (id: BigInteger) -> ReferendumId(id) },
-                binding = { decoded, id -> bindReferendum(decoded, id, votingPeriod) }
+                binding = { decoded, id -> bindReferendum(decoded, id, votingPeriod, runtime) }
             )
         }.filterNotNull()
     }
@@ -101,7 +111,7 @@ class GovV1OnChainReferendaRepository(
 
             runtime.metadata.democracy().storage("ReferendumInfoOf").observe(
                 referendumId.value,
-                binding = { bindReferendum(it, referendumId, votingPeriod)!! }
+                binding = { bindReferendum(it, referendumId, votingPeriod, runtime)!! }
             )
         }
     }
@@ -113,7 +123,9 @@ class GovV1OnChainReferendaRepository(
         if (approvedReferendaIds.isEmpty()) return emptyMap()
 
         return remoteStorageSource.query(chainId) {
-            val referendaIdBySchedulerId = approvedReferendaIds.associateBy { it.enactmentSchedulerId(runtime).intoKey() }
+            val schedulerVersion = runtime.metadata.schedulerVersion()
+
+            val referendaIdBySchedulerId = approvedReferendaIds.associateBy { it.versionedEnactmentSchedulerId(runtime, schedulerVersion).intoKey() }
 
             runtime.metadata.scheduler().storage("Lookup").entries(
                 keysArguments = referendaIdBySchedulerId.keys.map { schedulerIdKey -> listOf(schedulerIdKey.value) },
@@ -133,6 +145,7 @@ class GovV1OnChainReferendaRepository(
         decoded: Any?,
         id: ReferendumId,
         votingPeriod: BlockNumber,
+        runtime: RuntimeSnapshot,
     ): OnChainReferendum? = runCatching {
         val asDictEnum = decoded.castToDictEnum()
 
@@ -144,7 +157,7 @@ class GovV1OnChainReferendaRepository(
 
                 OnChainReferendumStatus.Ongoing(
                     track = DemocracyTrackId,
-                    proposal = bindProposal(status["proposalHash"]),
+                    proposal = bindProposal(status["proposalHash"] ?: status["proposal"], runtime),
                     submitted = submittedIn,
                     submissionDeposit = null,
                     decisionDeposit = null,
@@ -179,9 +192,6 @@ class GovV1OnChainReferendaRepository(
         .onFailure { Log.e(this.LOG_TAG, "Failed to decode on-chain referendum", it) }
         .getOrNull()
 
-    private fun bindProposal(decoded: Any?): Proposal {
-        return Proposal.Legacy(bindByteArray(decoded))
-    }
 
     private fun bindThreshold(decoded: Any?) = bindCollectionEnum(decoded) { name ->
         when (name) {
@@ -196,11 +206,40 @@ class GovV1OnChainReferendaRepository(
         return metadata.democracy().numberConstant("VotingPeriod", this)
     }
 
+    private fun ReferendumId.versionedEnactmentSchedulerId(runtime: RuntimeSnapshot, schedulerVersion: SchedulerVersion): ByteArray {
+        return when (schedulerVersion) {
+            SchedulerVersion.V3 -> v3EnactmentSchedulerId(runtime)
+            SchedulerVersion.V4 -> v4EnactmentSchedulerId(runtime)
+        }
+    }
+
     // https:github.com/paritytech/substrate/blob/0d64ba4268106fffe430d41b541c1aeedd4f8da5/frame/democracy/src/lib.rs#L1476
-    private fun ReferendumId.enactmentSchedulerId(runtime: RuntimeSnapshot): ByteArray {
+    private fun ReferendumId.v3EnactmentSchedulerId(runtime: RuntimeSnapshot): ByteArray {
         val encodedAssemblyId = DEMOCRACY_ID.encodeToByteArray() // 'const bytes' in rust
         val encodedIndex = u32.toByteArray(runtime, value)
 
         return encodedAssemblyId + encodedIndex
+    }
+
+    private fun ReferendumId.v4EnactmentSchedulerId(runtime: RuntimeSnapshot): ByteArray {
+        val oldId = v3EnactmentSchedulerId(runtime)
+
+        return if (oldId.size > SCHEDULER_KEY_BOUND) {
+            oldId.blake2b256()
+        } else {
+            oldId.pad(SCHEDULER_KEY_BOUND, padding = 0)
+        }
+    }
+
+    private fun RuntimeMetadata.schedulerVersion(): SchedulerVersion {
+        val lookupStorage = scheduler().storage("Lookup")
+        val lookupArgumentType = lookupStorage.keys.first()
+
+        return if (lookupArgumentType is FixedByteArray) {
+            // bounded type is used
+            SchedulerVersion.V4
+        } else {
+            SchedulerVersion.V3
+        }
     }
 }
