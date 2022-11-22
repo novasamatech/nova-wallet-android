@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_assets.presentation
 
 import android.os.Bundle
+import io.novafoundation.nova.feature_assets.presentation.manageTokens.chain.ManageChainTokensPayload
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 
@@ -35,6 +36,8 @@ interface AssetsRouter {
     fun openAssetSearch()
 
     fun openManageTokens()
+
+    fun openManageChainTokens(payload: ManageChainTokensPayload)
 
     fun openNfts()
 }

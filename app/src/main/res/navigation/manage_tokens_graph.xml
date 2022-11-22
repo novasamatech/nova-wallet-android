@@ -7,5 +7,17 @@
     <fragment
         android:id="@+id/manageTokensFragment"
         android:name="io.novafoundation.nova.feature_assets.presentation.manageTokens.ManageTokensFragment"
-        android:label="ManageTokensFragment" />
+        android:label="ManageTokensFragment">
+
+        <action
+            android:id="@+id/action_manageTokensFragment_to_manageChainTokensFragment"
+            app:destination="@id/manageChainTokensFragment" />
+    </fragment>
+
+
+    <dialog
+        android:id="@+id/manageChainTokensFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.manageTokens.chain.ManageChainTokensFragment"
+        android:label="ManageChainTokensFragment" />
+
 </navigation>
