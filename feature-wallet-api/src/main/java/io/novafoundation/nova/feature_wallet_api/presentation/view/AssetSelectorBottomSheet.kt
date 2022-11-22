@@ -63,7 +63,6 @@ private class AssetSelectorHolder(
     }
 }
 
-
 private class DiffCallback : DiffUtil.ItemCallback<AssetSelectorModel>() {
 
     override fun areItemsTheSame(oldItem: AssetSelectorModel, newItem: AssetSelectorModel): Boolean {

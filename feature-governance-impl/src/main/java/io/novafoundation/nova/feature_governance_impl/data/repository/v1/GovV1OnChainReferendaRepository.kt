@@ -126,7 +126,7 @@ class GovV1OnChainReferendaRepository(
             val schedulerVersion = runtime.metadata.schedulerVersion()
 
             val referendaIdBySchedulerId = approvedReferendaIds.flatMap { referendumId ->
-                referendumId.versionedEnactmentSchedulerIdVariants(runtime, schedulerVersion).map {  enactmentKeyVariant ->
+                referendumId.versionedEnactmentSchedulerIdVariants(runtime, schedulerVersion).map { enactmentKeyVariant ->
                     enactmentKeyVariant.intoKey() to referendumId
                 }
             }.toMap()
@@ -196,7 +196,6 @@ class GovV1OnChainReferendaRepository(
         .onFailure { Log.e(this.LOG_TAG, "Failed to decode on-chain referendum", it) }
         .getOrNull()
 
-
     private fun bindThreshold(decoded: Any?) = bindCollectionEnum(decoded) { name ->
         when (name) {
             "SimpleMajority" -> Gov1VotingThreshold.SIMPLE_MAJORITY
@@ -235,7 +234,7 @@ class GovV1OnChainReferendaRepository(
         }
     }
 
-    private fun ReferendumId.v4MigratedEnactmentSchedulerId(runtime: RuntimeSnapshot) : ByteArray {
+    private fun ReferendumId.v4MigratedEnactmentSchedulerId(runtime: RuntimeSnapshot): ByteArray {
         return v3EnactmentSchedulerId(runtime).blake2b256()
     }
 

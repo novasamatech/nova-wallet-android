@@ -66,7 +66,10 @@ class RealReferendaListInteractor(
         return flowOfAll { referendaListStateFlowSuspend(voterAccountId, selectedGovernanceOption) }
     }
 
-    private suspend fun referendaListStateFlowSuspend(voterAccountId: AccountId?, selectedGovernanceOption: SupportedGovernanceOption): Flow<ReferendaListState> {
+    private suspend fun referendaListStateFlowSuspend(
+        voterAccountId: AccountId?,
+        selectedGovernanceOption: SupportedGovernanceOption
+    ): Flow<ReferendaListState> {
         val chain = selectedGovernanceOption.assetWithChain.chain
         val asset = selectedGovernanceOption.assetWithChain.asset
 

@@ -27,16 +27,16 @@ typealias SupportedOptionsResolver<A> = (Chain, Chain.Asset) -> List<A>
 
 typealias SingleAssetSharedState = GenericSingleAssetSharedState<*>
 
-interface AssetSharedStateAdditionalData: Formatable, Identifiable
+interface AssetSharedStateAdditionalData : Formatable, Identifiable
 
-abstract class GenericSingleAssetSharedState<A: AssetSharedStateAdditionalData>(
+abstract class GenericSingleAssetSharedState<A : AssetSharedStateAdditionalData>(
     private val preferencesKey: String,
     private val chainRegistry: ChainRegistry,
     private val supportedOptions: SupportedOptionsResolver<A>,
     private val preferences: Preferences
 ) : ChainIdHolder {
 
-    data class SupportedAssetOption<A: AssetSharedStateAdditionalData>(
+    data class SupportedAssetOption<A : AssetSharedStateAdditionalData>(
         val assetWithChain: ChainWithAsset,
         val additional: A
     )
@@ -136,7 +136,7 @@ suspend fun SingleAssetSharedState.chainAsset() = assetWithChain.first().asset
 
 suspend fun SingleAssetSharedState.chainAndAsset() = assetWithChain.first()
 
-suspend fun <A: AssetSharedStateAdditionalData> GenericSingleAssetSharedState<A>.selectedOption(): SupportedAssetOption<A> {
+suspend fun <A : AssetSharedStateAdditionalData> GenericSingleAssetSharedState<A>.selectedOption(): SupportedAssetOption<A> {
     return selectedOption.first()
 }
 

@@ -11,7 +11,7 @@ internal class RealGovernanceSourceRegistry(
 ) : GovernanceSourceRegistry {
 
     override suspend fun sourceFor(option: SupportedGovernanceOption): GovernanceSource {
-        return  when (option.additional.governanceType) {
+        return when (option.additional.governanceType) {
             Chain.Governance.V1 -> governanceV1Source
             Chain.Governance.V2 -> governanceV2Source
         }

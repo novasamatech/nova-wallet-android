@@ -9,10 +9,9 @@ interface GovernanceSourceRegistry {
     suspend fun sourceFor(option: SupportedGovernanceOption): GovernanceSource
 }
 
-
 typealias SupportedGovernanceOption = GenericSingleAssetSharedState.SupportedAssetOption<GovernanceAdditionalState>
 
-interface GovernanceAdditionalState: AssetSharedStateAdditionalData {
+interface GovernanceAdditionalState : AssetSharedStateAdditionalData {
 
     val governanceType: Chain.Governance
 }

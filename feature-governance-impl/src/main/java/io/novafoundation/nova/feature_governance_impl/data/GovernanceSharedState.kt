@@ -27,7 +27,6 @@ class GovernanceSharedState(
     preferencesKey = GOVERNANCE_SHARED_STATE
 )
 
-
 class RealGovernanceAdditionalState(
     override val governanceType: Chain.Governance,
     private val shouldIncludeSuffix: Boolean

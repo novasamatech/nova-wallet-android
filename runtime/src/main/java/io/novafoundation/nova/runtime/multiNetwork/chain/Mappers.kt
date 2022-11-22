@@ -207,10 +207,10 @@ fun mapChainRemoteToChain(
 
 private fun Set<String>.governanceTypesFromOptions(): List<Chain.Governance> {
     return mapNotNull { option ->
-        when(option) {
+        when (option) {
             "governance" -> Chain.Governance.V2 // for backward compatibility of dev builds. Can be removed once everyone will update dev app
             "governance-v2" -> Chain.Governance.V2
-            "governance-v1"-> Chain.Governance.V1
+            "governance-v1" -> Chain.Governance.V1
             else -> null
         }
     }
