@@ -10,7 +10,6 @@ import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
-import io.novafoundation.nova.common.view.shape.getRippleMask
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.domain.main.statefull.StatefulCrowdloanMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetModel

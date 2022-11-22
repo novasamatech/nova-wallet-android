@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.view.shape.addRipple
-import io.novafoundation.nova.common.view.shape.getRippleMask
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_assets.R
 import kotlin.math.roundToInt

@@ -7,7 +7,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
-import io.novafoundation.nova.common.view.shape.getRippleMask
 import io.novafoundation.nova.feature_governance_impl.R
 import kotlinx.android.synthetic.main.view_governance_locks.view.governanceLockAmount
 import kotlinx.android.synthetic.main.view_governance_locks.view.governanceUnlockBadge
