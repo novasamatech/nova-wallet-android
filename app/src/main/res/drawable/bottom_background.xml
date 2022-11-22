@@ -9,7 +9,7 @@
     <item android:gravity="top">
         <shape>
             <size android:height="0.5dp" />
-            <solid android:color="@color/divider" />
+            <solid android:color="@color/navigation_divider" />
         </shape>
     </item>
 </layer-list>

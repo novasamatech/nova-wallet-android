@@ -421,7 +421,7 @@
 
     <style name="BottomSheetDialog" parent="Theme.MaterialComponents.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/bottomSheetStyleWrapper</item>
-        <item name="colorAccent">@color/button_background_primary</item>
+        <item name="colorAccent">@color/android_system_accent</item>
     </style>
 
     <style name="bottomSheetStyleWrapper" parent="Widget.MaterialComponents.BottomSheet.Modal">

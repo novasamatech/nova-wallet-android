@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Colors not included in the design system -->
-    <color name="votes_to_pass_indicator_shadow">#B8000000</color>
     <color name="address_icon_background">#eeeeee</color>
 
     <!-- System -->
@@ -30,19 +29,21 @@
     <!-- Icon Colors -->
     <color name="icon_primary">#E0FFFFFF</color>
     <color name="icon_secondary">#52FFFFFF</color>
-    <color name="icon_pressed">#7AFFFFFF</color>
     <color name="icon_inactive">#29FFFFFF</color>
-    <color name="icon_nav_bar_inactive">#66FFFFFF</color>
+    <color name="chip_icon">#7AFFFFFF</color>
+    <color name="icon_pressed">#7AFFFFFF</color>
+    <color name="nav_bar_icon_inactive">#66FFFFFF</color>
     <color name="icon_accent">#1F78FF</color>
     <color name="icon_warning">#EBC50A</color>
     <color name="icon_negative">#E53450</color>
-    <color name="icon_positive">#2FC864</color>
     <color name="icon_favorite">#E53450</color>
+    <color name="icon_positive">#2FC864</color>
 
     <!-- Background Colors -->
     <color name="secondary_screen_background">#08090E</color>
     <color name="bottom_sheet_background">#181920</color>
     <color name="block_background">#1A999EC7</color>
+    <color name="cell_background_pressed">#291F78FF</color>
     <color name="input_background">#1A999EC7</color>
     <color name="chips_background">#29999EC7</color>
     <color name="container_background">#1A999EC7</color>
@@ -50,12 +51,12 @@
     <color name="segmented_background">#5208090E</color>
     <color name="segmented_tab_active">#3D999EC7</color>
     <color name="switch_background">#3D999EC7</color>
-    <color name="block_background_error">#29E53450</color>
-    <color name="block_background_warning">#29EDCE36</color>
+    <color name="progress_bar_background">#3D999EC7</color>
+    <color name="voting_slider_background">#29999EC7</color>
+    <color name="error_block_background">#29E53450</color>
+    <color name="warning_block_background">#29EDCE36</color>
     <color name="blur_navigation_background">#66151D27</color>
     <color name="solid_navigation_background">#0F111A</color>
-    <color name="cell_background_pressed">#291F78FF</color>
-    <color name="voting_slider_background">#29999EC7</color>
     <color name="dim_background">#7A08090E</color>
 
     <!-- Button Colors -->
@@ -71,12 +72,13 @@
     <color name="checkbox_border">#3D999EC7</color>
     <color name="radio_border">#3D999EC7</color>
     <color name="container_border">#3D999EC7</color>
+    <color name="no_key_container_border">#52999EC7</color>
     <color name="mnemonic_border_active">#29999EC7</color>
     <color name="mnemonic_border_inactive">#3D999EC7</color>
-    <color name="no_key_container_border">#52999EC7</color>
 
     <!-- Divider Colors -->
     <color name="divider">#29999EC7</color>
+    <color name="navigation_divider">#29999EC7</color>
 
     <!-- Indicator Colors -->
     <color name="indicator_active">#1F78FF</color>
@@ -90,5 +92,10 @@
     <color name="voting_slider_indicator_active">#08090E</color>
     <color name="voting_slider_indicator_inactive">#7A08090E</color>
     <color name="voting_slider_knob_icon">#FFFFFF</color>
+
+    <!-- Shadow -->
+    <color name="nft_stack_shadow">#B8000000</color>
+    <color name="voting_slider_knob_shadow">#B8000000</color>
+    <color name="votes_to_pass_indicator_shadow">#B8000000</color>
 
 </resources>

@@ -50,7 +50,7 @@
         android:textColor="@color/chip_text"
         android:visibility="gone"
         app:drawableStartCompat="@drawable/ic_lock"
-        app:drawableTint="@color/icon_secondary"
+        app:drawableTint="@color/chip_icon"
         tools:background="@color/chips_background"
         tools:drawableStart="@drawable/ic_lock"
         tools:text="$214.66"

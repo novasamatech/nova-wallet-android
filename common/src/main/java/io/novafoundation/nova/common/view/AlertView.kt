@@ -76,7 +76,7 @@ class AlertView @JvmOverloads constructor(
     }
 
     private fun styleFromPreset(preset: StylePreset) = when (preset) {
-        StylePreset.WARNING -> Style(R.drawable.ic_warning_filled, R.color.block_background_warning)
-        StylePreset.ERROR -> Style(R.drawable.ic_slash, R.color.block_background_error)
+        StylePreset.WARNING -> Style(R.drawable.ic_warning_filled, R.color.warning_block_background)
+        StylePreset.ERROR -> Style(R.drawable.ic_slash, R.color.error_block_background)
     }
 }
