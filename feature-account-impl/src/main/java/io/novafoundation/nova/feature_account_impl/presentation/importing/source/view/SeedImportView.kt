@@ -5,7 +5,6 @@ import android.util.AttributeSet
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.coroutineScope
 import io.novafoundation.nova.common.utils.bindTo
-import io.novafoundation.nova.common.view.shape.getIdleDrawable
 import io.novafoundation.nova.common.view.shape.getInputBackground
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.importing.source.model.RawSeedImportSource

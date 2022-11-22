@@ -31,7 +31,6 @@ import kotlinx.android.synthetic.main.view_transfer_history.view.transactionHist
 import kotlinx.android.synthetic.main.view_transfer_history.view.transactionHistoryPuller
 import kotlinx.android.synthetic.main.view_transfer_history.view.transactionHistoryTitle
 
-
 typealias ScrollingListener = (position: Int) -> Unit
 typealias SlidingStateListener = (Int) -> Unit
 typealias TransactionClickListener = (OperationModel) -> Unit

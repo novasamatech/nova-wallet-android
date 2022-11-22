@@ -11,7 +11,6 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
-import io.novafoundation.nova.common.utils.setImageTint
 import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.themed
 import io.novafoundation.nova.common.view.dialog.dialog

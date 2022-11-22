@@ -8,7 +8,6 @@ import io.novafoundation.nova.common.list.BaseListAdapter
 import io.novafoundation.nova.common.list.BaseViewHolder
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.view.TableCellView
-import io.novafoundation.nova.feature_staking_impl.R
 
 class NetworkInfoAdapter : BaseListAdapter<NetworkInfoItem, NetworkInfoHolder>(DiffCallback()) {
 

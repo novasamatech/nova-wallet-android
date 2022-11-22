@@ -30,7 +30,7 @@ class HintsView @JvmOverloads constructor(
 
                 setTextColorRes(R.color.text_secondary)
                 setDrawableStart(R.drawable.ic_nova, widthInDp = 16, paddingInDp = 8, tint = R.color.icon_secondary)
-                
+
                 text = hint
 
                 if (index > 0) {

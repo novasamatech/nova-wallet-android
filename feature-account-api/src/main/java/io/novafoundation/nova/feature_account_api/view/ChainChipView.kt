@@ -6,7 +6,6 @@ import android.view.View
 import android.widget.FrameLayout
 import coil.ImageLoader
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.getAccentColorRes
 import io.novafoundation.nova.common.utils.setDrawableEnd
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
