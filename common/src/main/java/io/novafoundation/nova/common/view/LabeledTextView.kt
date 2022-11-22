@@ -9,6 +9,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.getDrawableCompat
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setVisible
@@ -24,13 +25,13 @@ class LabeledTextView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : ConstraintLayout(context, attrs, defStyleAttr) {
+) : ConstraintLayout(context, attrs, defStyleAttr), WithContextExtensions by WithContextExtensions(context) {
 
     init {
         View.inflate(context, R.layout.view_labeled_text, this)
 
         with(context) {
-            background = addRipple(getCornersStateDrawable())
+            background = addRipple(getCornersStateDrawable(), mask = getRippleMask())
         }
 
         applyAttributes(attrs)

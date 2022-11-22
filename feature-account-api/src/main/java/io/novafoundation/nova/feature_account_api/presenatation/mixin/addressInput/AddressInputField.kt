@@ -6,6 +6,7 @@ import android.view.Gravity
 import android.view.View
 import android.widget.EditText
 import android.widget.LinearLayout
+import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.useAttributes
@@ -24,7 +25,7 @@ class AddressInputField @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : LinearLayout(context, attrs, defStyle) {
+) : LinearLayout(context, attrs, defStyle), WithContextExtensions by WithContextExtensions(context) {
 
     val content: EditText
         get() = addressInputAddress
@@ -88,7 +89,7 @@ class AddressInputField @JvmOverloads constructor(
         addressInputScan.background = buttonBackground()
     }
 
-    private fun Context.buttonBackground() = addRipple(getRoundedCornerDrawable(R.color.button_background_secondary))
+    private fun Context.buttonBackground() = addRipple(getRoundedCornerDrawable(R.color.button_background_secondary), mask = getRippleMask())
 
     private fun applyAttributes(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.AddressInputField) {
         val hint = it.getString(R.styleable.AddressInputField_android_hint)

@@ -17,6 +17,7 @@ import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
+import io.novafoundation.nova.common.view.shape.getRippleMask
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.main.model.CrowdloanModel
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.main.model.CrowdloanStatusModel
@@ -115,7 +116,7 @@ private class CrowdloanChildHolder(
 
     init {
         with(containerView.context) {
-            containerView.background = addRipple(getBlockDrawable())
+            containerView.background = addRipple(getBlockDrawable(), mask = getRippleMask())
         }
     }
 

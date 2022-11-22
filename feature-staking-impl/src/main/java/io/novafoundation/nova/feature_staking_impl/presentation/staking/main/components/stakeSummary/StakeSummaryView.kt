@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.utils.setCompoundDrawableTint
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
+import io.novafoundation.nova.common.view.shape.getRippleMask
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.common.view.startTimer
 import io.novafoundation.nova.common.view.stopTimer
@@ -49,7 +50,7 @@ class StakeSummaryView @JvmOverloads constructor(
 
         with(context) {
             background = getBlockDrawable()
-            stakeSummaryStatus.background = addRipple(getRoundedCornerDrawable(fillColorRes = R.color.block_background))
+            stakeSummaryStatus.background = addRipple(getRoundedCornerDrawable(fillColorRes = R.color.block_background), mask = getRippleMask())
         }
     }
 

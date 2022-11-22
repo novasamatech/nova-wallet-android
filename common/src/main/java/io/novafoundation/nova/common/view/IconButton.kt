@@ -21,7 +21,7 @@ class IconButton @JvmOverloads constructor(
 
         setImageTintRes(R.color.text_secondary)
 
-        background = addRipple(getRoundedCornerDrawable(R.color.button_background_secondary))
+        background = addRipple(getRoundedCornerDrawable(R.color.button_background_secondary), mask = getRippleMask())
 
         attrs?.let(::applyAttributes)
     }

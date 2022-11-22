@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.list.BaseListAdapter
 import io.novafoundation.nova.common.list.BaseViewHolder
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.view.shape.addRipple
+import io.novafoundation.nova.common.view.shape.getRippleMask
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.model.SelectLedgerModel
@@ -46,7 +47,7 @@ class SelectLedgerHolder(
 ) : BaseViewHolder(containerView) {
     init {
         containerView.itemLedger.background = with(containerView.context) {
-            addRipple(getRoundedCornerDrawable(R.color.block_background))
+            addRipple(getRoundedCornerDrawable(R.color.block_background), mask = getRippleMask())
         }
 
         containerView.itemLedger.setProgressTint(R.color.icon_secondary)

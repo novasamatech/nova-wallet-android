@@ -2,6 +2,7 @@ package io.novafoundation.nova.common.view.shape
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.RippleDrawable
 import android.graphics.drawable.StateListDrawable
@@ -15,9 +16,13 @@ import io.novafoundation.nova.common.R
 
 fun Int.toColorStateList() = ColorStateList.valueOf(this)
 
+fun Context.getRippleMask(cornerSizeDp: Int = 12): Drawable {
+    return getRoundedCornerDrawableFromColors(Color.WHITE, null, cornerSizeDp)
+}
+
 fun Context.addRipple(
     drawable: Drawable? = null,
-    mask: Drawable? = null,
+    mask: Drawable?,
     @ColorInt rippleColor: Int = getColor(R.color.cell_background_pressed)
 ): Drawable {
     return RippleDrawable(rippleColor.toColorStateList(), drawable, mask)

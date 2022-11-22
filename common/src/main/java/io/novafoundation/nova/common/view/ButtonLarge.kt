@@ -71,6 +71,6 @@ class ButtonLarge @kotlin.jvm.JvmOverloads constructor(
         val rippleColor = getColorFromAttr(R.attr.colorControlHighlight)
         val baseBackground = context.getRoundedCornerDrawableFromColors(backgroundColor)
 
-        background = addRipple(baseBackground, rippleColor = rippleColor)
+        background = addRipple(baseBackground, mask = null, rippleColor = rippleColor)
     }
 }
