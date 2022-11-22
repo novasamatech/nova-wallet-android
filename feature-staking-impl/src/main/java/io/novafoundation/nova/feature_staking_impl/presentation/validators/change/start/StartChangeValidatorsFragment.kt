@@ -40,7 +40,7 @@ class StartChangeValidatorsFragment : BaseFragment<StartChangeValidatorsViewMode
         startChangeValidatorsRecommended.setupAction(viewLifecycleOwner) { viewModel.goToRecommendedClicked() }
         startChangeValidatorsRecommended.setOnLearnMoreClickedListener { viewModel.recommendedLearnMoreClicked() }
 
-        startChangeValidatorsCustom.background = getRoundedCornerDrawable(R.color.block_background).withRippleMask(getRippleMask())
+        startChangeValidatorsCustom.background = getRoundedCornerDrawable(R.color.block_background).withRippleMask()
         startChangeValidatorsCustom.setOnClickListener { viewModel.goToCustomClicked() }
     }
 

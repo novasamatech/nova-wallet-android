@@ -25,7 +25,7 @@ class EstimateEarningView @JvmOverloads constructor(
         View.inflate(context, R.layout.view_estimate_earning, this)
 
         with(context) {
-            background = addRipple(getBlockDrawable(), mask = getRippleMask())
+            background = addRipple(getBlockDrawable())
         }
     }
 

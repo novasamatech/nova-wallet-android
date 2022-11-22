@@ -57,7 +57,7 @@ class AssetSelectorView @JvmOverloads constructor(
             BackgroundStyle.BORDERED -> getIdleDrawable()
         }
 
-        background = addRipple(baseBackground, mask = getRippleMask())
+        background = addRipple(baseBackground)
     }
 
     fun onClick(action: (View) -> Unit) {

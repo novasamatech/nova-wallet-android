@@ -33,6 +33,6 @@ class TapToSearchView @JvmOverloads constructor(
         text = context.getString(R.string.dapp_search_hint)
         setTextColorRes(R.color.hint_text)
 
-        background = addRipple(getRoundedCornerDrawable(R.color.block_background), mask = getRippleMask())
+        background = addRipple(getRoundedCornerDrawable(R.color.block_background))
     }
 }

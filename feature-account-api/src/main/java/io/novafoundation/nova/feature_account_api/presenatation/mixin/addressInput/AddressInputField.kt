@@ -89,7 +89,7 @@ class AddressInputField @JvmOverloads constructor(
         addressInputScan.background = buttonBackground()
     }
 
-    private fun Context.buttonBackground() = addRipple(getRoundedCornerDrawable(R.color.button_background_secondary), mask = getRippleMask())
+    private fun Context.buttonBackground() = addRipple(getRoundedCornerDrawable(R.color.button_background_secondary))
 
     private fun applyAttributes(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.AddressInputField) {
         val hint = it.getString(R.styleable.AddressInputField_android_hint)

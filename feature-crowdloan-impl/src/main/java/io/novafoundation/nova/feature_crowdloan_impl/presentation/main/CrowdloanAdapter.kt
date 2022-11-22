@@ -116,7 +116,7 @@ private class CrowdloanChildHolder(
 
     init {
         with(containerView.context) {
-            containerView.background = addRipple(getBlockDrawable(), mask = getRippleMask())
+            containerView.background = addRipple(getBlockDrawable())
         }
     }
 

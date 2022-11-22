@@ -31,7 +31,7 @@ class LabeledTextView @JvmOverloads constructor(
         View.inflate(context, R.layout.view_labeled_text, this)
 
         with(context) {
-            background = addRipple(getCornersStateDrawable(), mask = getRippleMask())
+            background = addRipple(getCornersStateDrawable())
         }
 
         applyAttributes(attrs)

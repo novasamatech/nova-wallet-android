@@ -98,7 +98,7 @@ class HeaderHolder(
 
         with(itemView) {
             crowdloanAbout.background = context.getBlockDrawable()
-            crowdloanTotalContributedContainer.background = context.addRipple(context.getBlockDrawable(), mask = context.getRippleMask())
+            crowdloanTotalContributedContainer.background = context.addRipple(context.getBlockDrawable())
             crowdloanTotalContributedShimmering.background = context.getBlockDrawable()
         }
     }

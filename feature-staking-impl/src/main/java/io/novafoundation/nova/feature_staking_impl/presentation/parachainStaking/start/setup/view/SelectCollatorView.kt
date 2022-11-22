@@ -28,7 +28,7 @@ class SelectCollatorView @JvmOverloads constructor(
     init {
         View.inflate(context, R.layout.item_validator, this)
 
-        background = getRoundedCornerDrawable(R.color.block_background).withRippleMask(getRippleMask())
+        background = getRoundedCornerDrawable(R.color.block_background).withRippleMask()
         clipToOutline = true
 
         itemValidationCheck.makeGone()

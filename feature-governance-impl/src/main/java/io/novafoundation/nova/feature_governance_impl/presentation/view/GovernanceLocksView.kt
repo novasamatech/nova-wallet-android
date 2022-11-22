@@ -22,7 +22,7 @@ class GovernanceLocksView @JvmOverloads constructor(
         View.inflate(context, R.layout.view_governance_locks, this)
 
         with(context) {
-            background = addRipple(getBlockDrawable(), mask = getRippleMask())
+            background = addRipple(getBlockDrawable())
         }
 
         governanceLockAmount.isEnabled = false

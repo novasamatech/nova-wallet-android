@@ -22,7 +22,7 @@ fun Context.getRippleMask(cornerSizeDp: Int = 12): Drawable {
 
 fun Context.addRipple(
     drawable: Drawable? = null,
-    mask: Drawable?,
+    mask: Drawable? = getRippleMask(),
     @ColorInt rippleColor: Int = getColor(R.color.cell_background_pressed)
 ): Drawable {
     return RippleDrawable(rippleColor.toColorStateList(), drawable, mask)

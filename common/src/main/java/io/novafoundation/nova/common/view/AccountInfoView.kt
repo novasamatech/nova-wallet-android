@@ -23,7 +23,7 @@ class AccountInfoView @JvmOverloads constructor(
     init {
         View.inflate(context, R.layout.view_account_info, this)
 
-        background = getRoundedCornerDrawable(fillColorRes = R.color.block_background).withRippleMask(getRippleMask())
+        background = getRoundedCornerDrawable(fillColorRes = R.color.block_background).withRippleMask()
 
         isFocusable = true
         isClickable = true

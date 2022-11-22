@@ -58,7 +58,7 @@ class AssetsTotalBalanceView @JvmOverloads constructor(
 
     fun setBackgroundClickable(isClickable: Boolean) {
         background = if (isClickable) {
-            addRipple(getRoundedCornerDrawable(R.color.block_background), mask = getRippleMask())
+            addRipple(getRoundedCornerDrawable(R.color.block_background))
         } else {
             getRoundedCornerDrawable(R.color.block_background)
         }

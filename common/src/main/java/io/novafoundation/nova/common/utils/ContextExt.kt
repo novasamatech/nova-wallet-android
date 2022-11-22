@@ -96,8 +96,8 @@ interface WithContextExtensions {
     val Float.dp: Int
         get() = dp(providedContext)
 
-    fun addRipple(to: Drawable, mask: Drawable?) = providedContext.addRipple(to, mask)
-    fun Drawable.withRippleMask(mask: Drawable) = addRipple(this, mask)
+    fun addRipple(to: Drawable, mask: Drawable? = getRippleMask()) = providedContext.addRipple(to, mask)
+    fun Drawable.withRippleMask(mask: Drawable = getRippleMask()) = addRipple(this, mask)
 
     fun getRoundedCornerDrawable(
         @ColorRes fillColorRes: Int = R.color.secondary_screen_background,

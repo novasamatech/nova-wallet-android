@@ -22,7 +22,7 @@ abstract class SectionView(
         View.inflate(context, layoutId, this)
 
         background = with(context) {
-            addRipple(getRoundedCornerDrawable(R.color.block_background), mask = getRippleMask())
+            addRipple(getRoundedCornerDrawable(R.color.block_background))
         }
     }
 }

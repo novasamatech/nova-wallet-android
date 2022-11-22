@@ -50,7 +50,7 @@ class StakeSummaryView @JvmOverloads constructor(
 
         with(context) {
             background = getBlockDrawable()
-            stakeSummaryStatus.background = addRipple(getRoundedCornerDrawable(fillColorRes = R.color.block_background), mask = getRippleMask())
+            stakeSummaryStatus.background = addRipple(getRoundedCornerDrawable(fillColorRes = R.color.block_background))
         }
     }
 

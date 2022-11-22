@@ -133,7 +133,7 @@ private class ReferendumChildHolder(
 
     init {
         with(containerView.context) {
-            containerView.background = addRipple(getBlockDrawable(), getRippleMask())
+            containerView.background = addRipple(getBlockDrawable())
             containerView.itemReferendumTrack.background = addRipple(
                 getRoundedCornerDrawable(R.color.chips_background, cornerSizeInDp = 8),
                 mask = getRippleMask(cornerSizeDp = 12)
