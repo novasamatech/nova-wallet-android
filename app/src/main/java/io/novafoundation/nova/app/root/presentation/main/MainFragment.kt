@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowInsets
 import androidx.activity.OnBackPressedCallback
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
@@ -78,15 +79,16 @@ class MainFragment : BaseFragment<MainViewModel>() {
             backCallback.isEnabled = !isAtHomeTab(destination)
         }
 
-        val radiusInPx = 32.dp
+        val radiusInPx = 28.dp
+        val offset = radiusInPx.toFloat() / 1.5f
         SweetBlur.ViewBackgroundBuilder()
-            .blurColor(requireContext().getColor(R.color.white_12))
-            .cutSpace(RectF(0f, radiusInPx.toFloat() / 2, 0f, radiusInPx.toFloat() / 2))
-            .captureExtraSpace(RectF(0f, radiusInPx.toFloat() / 2, 0f, 0f))
+            .blurColor(requireContext().getColor(R.color.blur_navigation_background))
+            .captureExtraSpace(RectF(0f, offset, 0f, 0f))
+            .cutSpace(RectF(0f, offset, 0f, offset))
             .radius(radiusInPx)
             .captureFrom(bottomNavHost)
             .toTarget(bottomNavigationView)
-            .onException { bottomNavigationView.setBackgroundColorRes(R.color.red) }
+            .onException { bottomNavigationView.setBackgroundColorRes(R.color.solid_navigation_background) }
             .build()
             .start()
     }

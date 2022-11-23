@@ -100,19 +100,25 @@ class SweetBlur(
     // Попробовать написать класс, который будет вычислять возможности устройства и применять бэкграунд попроще, если устройство слабое
     fun start() {
         if (!started) {
-            captureFromView.viewTreeObserver.addOnDrawListener(this)
+            captureFromView.post {
+                captureFromView.viewTreeObserver.addOnDrawListener(this)
+            }
             started = true
         }
     }
 
     fun stop() {
         if (started) {
-            captureFromView.viewTreeObserver.removeOnDrawListener(this)
+            captureFromView.post {
+                captureFromView.viewTreeObserver.removeOnDrawListener(this)
+            }
             started = false
         }
     }
 
     override fun onDraw() {
+        if (!started) return
+
         try {
             makeBlurBackground()
         } catch (e: Exception) {
