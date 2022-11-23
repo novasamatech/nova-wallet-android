@@ -78,7 +78,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         app:buttonLargeStyle="secondary"
-        app:icon="@drawable/ic_watch"
+        app:icon="@drawable/ic_watch_only_filled"
         app:layout_constraintBottom_toTopOf="@+id/termsTv"
         app:layout_constraintEnd_toEndOf="@+id/welcomeConnectHardwareWallet"
         app:layout_constraintHorizontal_bias="0.0"

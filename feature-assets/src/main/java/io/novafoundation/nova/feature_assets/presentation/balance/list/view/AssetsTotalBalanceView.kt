@@ -50,7 +50,7 @@ class AssetsTotalBalanceView @JvmOverloads constructor(
 
         if (totalBalance.isBreakdownAbailable) {
             viewAssetsTotalBalanceLocked.text = totalBalance.lockedBalanceFiat
-            viewAssetsTotalBalanceTitle.setDrawableEnd(R.drawable.ic_info_16, paddingInDp = 4)
+            viewAssetsTotalBalanceTitle.setDrawableEnd(R.drawable.ic_info_cicrle_filled_16, paddingInDp = 4)
         } else {
             viewAssetsTotalBalanceTitle.setDrawableEnd(null)
         }

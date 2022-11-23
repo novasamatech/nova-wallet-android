@@ -45,7 +45,7 @@ class CopierBottomSheet(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTitle(value)
-        item(R.drawable.ic_copy, buttonName, false) {
+        item(R.drawable.ic_copy_outline, buttonName, false) {
             clipboardManager.addToClipboard(value)
             Toast.makeText(context, onClipboardMessage, Toast.LENGTH_LONG)
                 .show()

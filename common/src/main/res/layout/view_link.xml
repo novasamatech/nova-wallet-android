@@ -11,7 +11,7 @@
     <ImageView
         android:layout_width="16dp"
         android:layout_height="16dp"
-        android:src="@drawable/ic_info_16"
+        android:src="@drawable/ic_info_cicrle_filled_16"
         app:tint="@color/icon_accent" />
 
     <TextView

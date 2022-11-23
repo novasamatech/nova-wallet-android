@@ -25,7 +25,7 @@ class AddressView @JvmOverloads constructor(
 
     init {
         View.inflate(context, R.layout.view_address, this)
-        setEndIcon(R.drawable.ic_info_16)
+        setEndIcon(R.drawable.ic_info_cicrle_filled_16)
     }
 
     fun setAddress(icon: Drawable, address: String) {
