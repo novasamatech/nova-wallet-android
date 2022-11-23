@@ -11,7 +11,7 @@ import io.novafoundation.nova.common.utils.formatting.formatFractionAsPercentage
 import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
+import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
@@ -28,7 +28,7 @@ private const val PERIOD_MONTH = 30
 private const val PERIOD_YEAR = 365
 
 abstract class BaseStartStakingComponent(
-    private val assetWithChain: SingleAssetSharedState.AssetWithChain,
+    private val assetWithChain: ChainWithAsset,
     private val hostContext: ComponentHostContext,
     private val resourceManager: ResourceManager,
 ) : StartStakingComponent,

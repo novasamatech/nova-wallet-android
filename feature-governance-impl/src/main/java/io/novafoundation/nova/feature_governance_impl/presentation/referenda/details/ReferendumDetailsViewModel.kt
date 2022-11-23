@@ -35,6 +35,7 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.details.v
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.PreparingReason
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumStatus
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.dapp.GovernanceDAppsInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.identity.GovernanceIdentityProviderFactory
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
@@ -58,8 +59,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.selectedChainFlow
+import io.novafoundation.nova.runtime.state.selectedOption
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -73,7 +74,7 @@ class ReferendumDetailsViewModel(
     private val payload: ReferendumDetailsPayload,
     private val interactor: ReferendumDetailsInteractor,
     private val selectedAccountUseCase: SelectedAccountUseCase,
-    private val selectedAssetSharedState: SingleAssetSharedState,
+    private val selectedAssetSharedState: GovernanceSharedState,
     private val governanceIdentityProviderFactory: GovernanceIdentityProviderFactory,
     private val addressIconGenerator: AddressIconGenerator,
     private val resourceManager: ResourceManager,
@@ -93,10 +94,10 @@ class ReferendumDetailsViewModel(
 
     private val referendumDetailsFlow = flowOfAll {
         val account = selectedAccount.first()
-        val chain = selectedChainFlow.first()
-        val voterAccountId = account.accountIdIn(chain)
+        val selectedGovernanceOption = selectedAssetSharedState.selectedOption()
+        val voterAccountId = account.accountIdIn(selectedGovernanceOption.assetWithChain.chain)
 
-        interactor.referendumDetailsFlow(payload.toReferendumId(), chain, voterAccountId)
+        interactor.referendumDetailsFlow(payload.toReferendumId(), selectedGovernanceOption, voterAccountId)
     }
         .inBackground()
         .shareWhileSubscribed()

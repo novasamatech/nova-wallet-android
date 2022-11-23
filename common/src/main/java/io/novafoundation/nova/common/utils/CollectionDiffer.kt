@@ -6,6 +6,7 @@ interface Identifiable {
 }
 
 fun <T : Identifiable> List<T>.findById(other: Identifiable?): T? = find { it.identifier == other?.identifier }
+fun <T : Identifiable> List<T>.findById(id: String): T? = find { it.identifier == id }
 
 object CollectionDiffer {
 

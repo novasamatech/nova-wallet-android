@@ -61,6 +61,7 @@ class ReferendumVoteModule {
     @Provides
     @FeatureScope
     fun provideValidationSystem(
-        governanceSourceRegistry: GovernanceSourceRegistry
-    ): VoteReferendumValidationSystem = ValidationSystem.voteReferendumValidationSystem(governanceSourceRegistry)
+        governanceSourceRegistry: GovernanceSourceRegistry,
+        governanceSharedState: GovernanceSharedState,
+    ): VoteReferendumValidationSystem = ValidationSystem.voteReferendumValidationSystem(governanceSourceRegistry, governanceSharedState)
 }

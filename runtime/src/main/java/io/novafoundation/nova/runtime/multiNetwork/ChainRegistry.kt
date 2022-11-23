@@ -116,11 +116,11 @@ suspend fun ChainRegistry.getChainOrNull(chainId: String): Chain? {
     return chainsById.first()[chainId.removeHexPrefix()]
 }
 
-suspend fun ChainRegistry.chainWithAssetOrNull(chainId: String, assetId: Int): Pair<Chain, Chain.Asset>? {
+suspend fun ChainRegistry.chainWithAssetOrNull(chainId: String, assetId: Int): ChainWithAsset? {
     val chain = getChainOrNull(chainId) ?: return null
     val chainAsset = chain.assetsById[assetId] ?: return null
 
-    return chain to chainAsset
+    return ChainWithAsset(chain, chainAsset)
 }
 
 suspend fun ChainRegistry.chainWithAsset(chainId: String, assetId: Int): ChainWithAsset {

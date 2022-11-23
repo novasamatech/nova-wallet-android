@@ -28,7 +28,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.mainStakingValidationFailure
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.confirm.ConfirmRebondPayload
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState.AssetWithChain
+import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
@@ -56,7 +56,7 @@ class RelaychainUnbondingComponentFactory(
 ) {
 
     fun create(
-        assetWithChain: AssetWithChain,
+        assetWithChain: ChainWithAsset,
         hostContext: ComponentHostContext,
     ): UnbondingComponent = RelaychainUnbondingComponent(
         unbondInteractor = unbondInteractor,
@@ -80,7 +80,7 @@ private class RelaychainUnbondingComponent(
     private val router: StakingRouter,
     private val resourceManager: ResourceManager,
 
-    private val assetWithChain: AssetWithChain,
+    private val assetWithChain: ChainWithAsset,
     private val hostContext: ComponentHostContext,
 ) : UnbondingComponent,
     CoroutineScope by hostContext.scope,

@@ -45,12 +45,10 @@ class CrowdloanFeatureModule {
         walletRepository: WalletRepository,
         accountRepository: AccountRepository,
         sharedState: CrowdloanSharedState,
-        chainRegistry: ChainRegistry
     ): AssetUseCase = AssetUseCaseImpl(
         walletRepository,
         accountRepository,
         sharedState,
-        chainRegistry
     )
 
     @Provides

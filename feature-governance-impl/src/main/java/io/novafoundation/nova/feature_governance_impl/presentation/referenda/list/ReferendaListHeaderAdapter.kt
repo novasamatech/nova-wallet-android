@@ -8,8 +8,9 @@ import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.view.GovernanceLocksModel
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetModel
-import kotlinx.android.synthetic.main.item_referenda_header.view.*
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorModel
+import kotlinx.android.synthetic.main.item_referenda_header.view.governanceLocksHeader
+import kotlinx.android.synthetic.main.item_referenda_header.view.referendaAssetHeader
 
 class ReferendaListHeaderAdapter(val imageLoader: ImageLoader, val handler: Handler) : RecyclerView.Adapter<HeaderHolder>() {
 
@@ -19,7 +20,7 @@ class ReferendaListHeaderAdapter(val imageLoader: ImageLoader, val handler: Hand
         fun onClickGovernanceLocks()
     }
 
-    private var assetModel: AssetModel? = null
+    private var assetModel: AssetSelectorModel? = null
     private var locksModel: GovernanceLocksModel? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HeaderHolder {
@@ -47,7 +48,7 @@ class ReferendaListHeaderAdapter(val imageLoader: ImageLoader, val handler: Hand
         return 1
     }
 
-    fun setAsset(assetModel: AssetModel) {
+    fun setAsset(assetModel: AssetSelectorModel) {
         this.assetModel = assetModel
         notifyItemChanged(0, Payload.ASSET)
     }
@@ -69,12 +70,12 @@ class HeaderHolder(private val imageLoader: ImageLoader, view: View, handler: Re
         view.governanceLocksHeader.setOnClickListener { handler.onClickGovernanceLocks() }
     }
 
-    fun bind(assetModel: AssetModel?, locksModel: GovernanceLocksModel?) {
+    fun bind(assetModel: AssetSelectorModel?, locksModel: GovernanceLocksModel?) {
         bindAsset(assetModel)
         bindLocks(locksModel)
     }
 
-    fun bindAsset(assetModel: AssetModel?) {
+    fun bindAsset(assetModel: AssetSelectorModel?) {
         assetModel?.let { itemView.referendaAssetHeader.setState(imageLoader, assetModel) }
     }
 

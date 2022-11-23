@@ -12,7 +12,7 @@ import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getBlurDrawable
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.domain.main.statefull.StatefulCrowdloanMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetModel
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorModel
 import kotlinx.android.synthetic.main.item_crowdloan_header.view.crowdloanAbout
 import kotlinx.android.synthetic.main.item_crowdloan_header.view.crowdloanAssetSelector
 import kotlinx.android.synthetic.main.item_crowdloan_header.view.crowdloanMainDescription
@@ -33,7 +33,7 @@ class CrowdloanHeaderAdapter(
         fun onClickContributionsInfo()
     }
 
-    private var assetModel: AssetModel? = null
+    private var assetModel: AssetSelectorModel? = null
     private var showShimmering: Boolean = false
     private var contributionsInfo: StatefulCrowdloanMixin.ContributionsInfo? = null
     private var aboutDescription: String? = null
@@ -64,7 +64,7 @@ class CrowdloanHeaderAdapter(
         return 1
     }
 
-    fun setAsset(assetModel: AssetModel) {
+    fun setAsset(assetModel: AssetSelectorModel) {
         this.assetModel = assetModel
         notifyItemChanged(0, Payload.ASSET)
     }
@@ -102,12 +102,12 @@ class HeaderHolder(
         }
     }
 
-    fun bind(assetModel: AssetModel?, contributionsInfo: StatefulCrowdloanMixin.ContributionsInfo?, showShimmering: Boolean) {
+    fun bind(assetModel: AssetSelectorModel?, contributionsInfo: StatefulCrowdloanMixin.ContributionsInfo?, showShimmering: Boolean) {
         bindAsset(assetModel)
         bindContributionsInfo(contributionsInfo, showShimmering)
     }
 
-    fun bindAsset(assetModel: AssetModel?) {
+    fun bindAsset(assetModel: AssetSelectorModel?) {
         assetModel?.let { itemView.crowdloanAssetSelector.setState(imageLoader, assetModel) }
     }
 

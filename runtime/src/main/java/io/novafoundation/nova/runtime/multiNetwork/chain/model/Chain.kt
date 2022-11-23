@@ -29,7 +29,7 @@ data class Chain(
     val isEthereumBased: Boolean,
     val isTestNet: Boolean,
     val hasCrowdloans: Boolean,
-    val governance: Governance,
+    val governance: List<Governance>,
     val parentId: String?,
     val additional: Additional?
 ) : Identifiable {
@@ -144,7 +144,7 @@ data class Chain(
     }
 
     enum class Governance {
-        V1, V2, NONE
+        V1, V2
     }
 
     override val identifier: String = id

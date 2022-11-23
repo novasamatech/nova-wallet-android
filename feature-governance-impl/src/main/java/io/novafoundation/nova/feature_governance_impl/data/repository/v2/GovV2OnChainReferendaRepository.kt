@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountId
 import io.novafoundation.nova.common.data.network.runtime.binding.bindBlockNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.bindBoolean
-import io.novafoundation.nova.common.data.network.runtime.binding.bindByteArray
 import io.novafoundation.nova.common.data.network.runtime.binding.bindFixedI64
 import io.novafoundation.nova.common.data.network.runtime.binding.bindList
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
@@ -29,7 +28,6 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.DecidingStatus
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.OnChainReferendum
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.OnChainReferendumStatus
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Proposal
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumDeposit
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
@@ -43,6 +41,7 @@ import io.novafoundation.nova.feature_governance_api.data.thresold.gov2.Gov2Voti
 import io.novafoundation.nova.feature_governance_api.data.thresold.gov2.curve.LinearDecreasingCurve
 import io.novafoundation.nova.feature_governance_api.data.thresold.gov2.curve.ReciprocalCurve
 import io.novafoundation.nova.feature_governance_api.data.thresold.gov2.curve.SteppedDecreasingCurve
+import io.novafoundation.nova.feature_governance_impl.data.repository.common.bindProposal
 import io.novafoundation.nova.feature_governance_impl.data.repository.common.bindTally
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -54,8 +53,6 @@ import jp.co.soramitsu.fearless_utils.hash.Hasher.blake2b256
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.DictEnum
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromByteArray
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.primitives.u32
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.toByteArray
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
@@ -192,32 +189,6 @@ class GovV2OnChainReferendaRepository(
     }
         .onFailure { Log.e(this.LOG_TAG, "Failed to decode on-chain referendum", it) }
         .getOrNull()
-
-    private fun bindProposal(decoded: Any?, runtime: RuntimeSnapshot): Proposal {
-        val asEnum = decoded.castToDictEnum()
-
-        return when (asEnum.name) {
-            "Legacy" -> {
-                val valueAsStruct = asEnum.value.castToStruct()
-                Proposal.Legacy(bindByteArray(valueAsStruct["hash"]))
-            }
-            "Inline" -> {
-                val bytes = bindByteArray(asEnum.value)
-                val call = GenericCall.fromByteArray(runtime, bytes)
-
-                Proposal.Inline(bytes, call)
-            }
-            "Lookup" -> {
-                val valueAsStruct = asEnum.value.castToStruct()
-
-                Proposal.Lookup(
-                    hash = bindByteArray(valueAsStruct["hash"]),
-                    callLength = bindNumber(valueAsStruct["len"])
-                )
-            }
-            else -> incompatible()
-        }
-    }
 
     private fun bindDecidingStatus(decoded: Any?): DecidingStatus? {
         if (decoded == null) return null

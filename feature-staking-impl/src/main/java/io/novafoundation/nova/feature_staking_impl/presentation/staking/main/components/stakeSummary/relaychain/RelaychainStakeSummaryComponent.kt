@@ -18,7 +18,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.StakeSummaryModel
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.StakeSummaryState
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
+import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
@@ -32,7 +32,7 @@ class RelaychainStakeSummaryComponentFactory(
 ) {
 
     fun create(
-        assetWithChain: SingleAssetSharedState.AssetWithChain,
+        assetWithChain: ChainWithAsset,
         hostContext: ComponentHostContext
     ): StakeSummaryComponent = RelaychainStakeSummaryComponent(
         stakingInteractor = stakingInteractor,
@@ -44,7 +44,7 @@ class RelaychainStakeSummaryComponentFactory(
 
 private class RelaychainStakeSummaryComponent(
     private val stakingInteractor: StakingInteractor,
-    private val assetWithChain: SingleAssetSharedState.AssetWithChain,
+    private val assetWithChain: ChainWithAsset,
     private val hostContext: ComponentHostContext,
     private val resourceManager: ResourceManager,
 ) : BaseStakeSummaryComponent(hostContext.scope) {

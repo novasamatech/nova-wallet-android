@@ -1,66 +1,59 @@
 package io.novafoundation.nova.feature_wallet_api.domain.implementations
 
+import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_wallet_api.domain.AssetAndOption
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
-import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.ext.alphabeticalOrder
+import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.relaychainsFirstAscendingOrder
 import io.novafoundation.nova.runtime.ext.testnetsLastAscendingOrder
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 class AssetUseCaseImpl(
     private val walletRepository: WalletRepository,
     private val accountRepository: AccountRepository,
     private val sharedState: SingleAssetSharedState,
-    private val chainRegistry: ChainRegistry
 ) : AssetUseCase {
 
-    private class AssetAndChain(val asset: Asset, val chain: Chain)
-
-    override fun currentAssetFlow() = combine(
+    override fun currentAssetAndOptionFlow(): Flow<AssetAndOption> = combineToPair(
         accountRepository.selectedMetaAccountFlow(),
-        sharedState.assetWithChain,
-        ::Pair
-    ).flatMapLatest { (selectedMetaAccount, chainAndAsset) ->
-        val (_, chainAsset) = chainAndAsset
+        sharedState.selectedOption,
+    ).flatMapLatest { (selectedMetaAccount, selectedOption) ->
+        val (_, chainAsset) = selectedOption.assetWithChain
 
         walletRepository.assetFlow(
             metaId = selectedMetaAccount.id,
             chainAsset = chainAsset
-        )
-    }
-
-    override suspend fun availableAssetsToSelect(): List<Asset> = withContext(Dispatchers.Default) {
-        val metaAccount = accountRepository.getSelectedMetaAccount()
-        val availableChainAssets = sharedState.availableToSelect().toSet()
-
-        val chainsById = chainRegistry.chainsById.first()
-
-        walletRepository.getSupportedAssets(metaAccount.id).filter {
-            it.token.configuration in availableChainAssets
+        ).map {
+            AssetAndOption(it, selectedOption)
         }
-            .map {
-                val chain = chainsById.getValue(it.token.configuration.chainId)
-
-                AssetAndChain(it, chain)
-            }
-            .sortedWith(assetsComparator())
-            .map(AssetAndChain::asset)
     }
 
-    private fun assetsComparator(): Comparator<AssetAndChain> {
-        return compareBy<AssetAndChain> { it.chain.relaychainsFirstAscendingOrder }
-            .thenBy { it.chain.testnetsLastAscendingOrder }
+    override suspend fun availableAssetsToSelect(): List<AssetAndOption> = withContext(Dispatchers.Default) {
+        val metaAccount = accountRepository.getSelectedMetaAccount()
+
+        val balancesByChainAssets = walletRepository.getSupportedAssets(metaAccount.id).associateBy { it.token.configuration.fullId }
+
+        sharedState.availableToSelect().mapNotNull { supportedOption ->
+            val asset = balancesByChainAssets[supportedOption.assetWithChain.asset.fullId]
+
+            asset?.let { AssetAndOption(asset, supportedOption) }
+        }
+            .sortedWith(assetsComparator())
+    }
+
+    private fun assetsComparator(): Comparator<AssetAndOption> {
+        return compareBy<AssetAndOption> { it.option.assetWithChain.chain.relaychainsFirstAscendingOrder }
+            .thenBy { it.option.assetWithChain.chain.testnetsLastAscendingOrder }
             .thenByDescending { it.asset.token.priceOf(it.asset.transferable) }
             .thenByDescending { it.asset.transferable }
-            .thenBy { it.chain.alphabeticalOrder }
+            .thenBy { it.option.assetWithChain.chain.alphabeticalOrder }
     }
 }
