@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_assets.presentation.tokens.add.di
+package io.novafoundation.nova.feature_assets.presentation.tokens.add.selectChain.di
 
 import androidx.fragment.app.Fragment
 import dagger.BindsInstance

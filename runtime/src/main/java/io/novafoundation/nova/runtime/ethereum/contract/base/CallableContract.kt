@@ -1,9 +1,10 @@
 package io.novafoundation.nova.runtime.ethereum.contract.base
 
 import io.novafoundation.nova.runtime.ethereum.contract.base.caller.ContractCaller
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.withContext
 import org.web3j.abi.FunctionEncoder
 import org.web3j.abi.FunctionReturnDecoder
 import org.web3j.abi.datatypes.Function
@@ -13,7 +14,6 @@ import org.web3j.protocol.core.methods.request.Transaction
 import org.web3j.protocol.core.methods.response.EthCall
 import org.web3j.tx.TransactionManager
 import org.web3j.tx.exceptions.ContractCallException
-import kotlin.coroutines.coroutineContext
 
 open class CallableContract(
     protected val contractAddress: String,
@@ -25,14 +25,12 @@ open class CallableContract(
     protected suspend fun <T : Type<*>?, R> executeCallSingleValueReturn(
         function: Function,
         extractResult: (T) -> R
-    ): Deferred<R> {
+    ): Deferred<R> = withContext(Dispatchers.Default) {
         val encodedFunction = FunctionEncoder.encode(function)
         val tx = Transaction.createEthCallTransaction(null, contractAddress, encodedFunction)
 
-        val ethCallDeferred = contractCaller.ethCall(tx, defaultBlockParameter)
-
-        return CoroutineScope(coroutineContext).async {
-            val ethCall = ethCallDeferred.await()
+        async {
+            val ethCall = contractCaller.ethCall(tx, defaultBlockParameter).await()
             assertCallNotReverted(ethCall)
 
             val args = FunctionReturnDecoder.decode(ethCall.value, function.outputParameters)

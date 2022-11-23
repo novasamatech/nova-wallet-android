@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletReposit
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Standard
 
 interface WalletFeatureApi {
 
@@ -46,4 +47,6 @@ interface WalletFeatureApi {
     val transactionHistoryRepository: TransactionHistoryRepository
 
     val chainAssetRepository: ChainAssetRepository
+
+    val erc20Standard: Erc20Standard
 }
