@@ -35,8 +35,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.change
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.BalanceDetailFragment
-import io.novafoundation.nova.feature_assets.presentation.manageTokens.chain.ManageChainTokensFragment
-import io.novafoundation.nova.feature_assets.presentation.manageTokens.chain.ManageChainTokensPayload
+import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensFragment
+import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensPayload
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.receive.ReceiveFragment
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft

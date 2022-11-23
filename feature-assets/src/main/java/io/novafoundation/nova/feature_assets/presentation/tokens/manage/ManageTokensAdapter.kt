@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_assets.presentation.manageTokens
+package io.novafoundation.nova.feature_assets.presentation.tokens.manage
 
 import android.view.View
 import android.view.ViewGroup
@@ -14,7 +14,7 @@ import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenIcon
 import io.novafoundation.nova.feature_assets.R
-import io.novafoundation.nova.feature_assets.presentation.manageTokens.model.MultiChainTokenModel
+import io.novafoundation.nova.feature_assets.presentation.tokens.manage.model.MultiChainTokenModel
 import kotlinx.android.synthetic.main.item_manage_token_multichain.view.itemManageTokenMultichainEnabled
 import kotlinx.android.synthetic.main.item_manage_token_multichain.view.itemManageTokenMultichainIcon
 import kotlinx.android.synthetic.main.item_manage_token_multichain.view.itemManageTokenMultichainNetworks

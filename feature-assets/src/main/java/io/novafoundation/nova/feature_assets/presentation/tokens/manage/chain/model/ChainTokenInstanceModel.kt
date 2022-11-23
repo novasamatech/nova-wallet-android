@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_assets.presentation.manageTokens.chain.model
+package io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.model
 
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 

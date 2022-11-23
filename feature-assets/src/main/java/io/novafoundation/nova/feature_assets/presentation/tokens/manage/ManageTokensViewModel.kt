@@ -1,15 +1,15 @@
-package io.novafoundation.nova.feature_assets.presentation.manageTokens
+package io.novafoundation.nova.feature_assets.presentation.tokens.manage
 
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.utils.mapList
-import io.novafoundation.nova.feature_assets.domain.manageTokens.ManageTokenInteractor
-import io.novafoundation.nova.feature_assets.domain.manageTokens.MultiChainToken
-import io.novafoundation.nova.feature_assets.domain.manageTokens.allChainAssetIds
-import io.novafoundation.nova.feature_assets.domain.manageTokens.isEnabled
+import io.novafoundation.nova.feature_assets.domain.tokens.manage.ManageTokenInteractor
+import io.novafoundation.nova.feature_assets.domain.tokens.manage.MultiChainToken
+import io.novafoundation.nova.feature_assets.domain.tokens.manage.allChainAssetIds
+import io.novafoundation.nova.feature_assets.domain.tokens.manage.isEnabled
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
-import io.novafoundation.nova.feature_assets.presentation.manageTokens.chain.ManageChainTokensPayload
-import io.novafoundation.nova.feature_assets.presentation.manageTokens.model.MultiChainTokenMapper
-import io.novafoundation.nova.feature_assets.presentation.manageTokens.model.MultiChainTokenModel
+import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensPayload
+import io.novafoundation.nova.feature_assets.presentation.tokens.manage.model.MultiChainTokenMapper
+import io.novafoundation.nova.feature_assets.presentation.tokens.manage.model.MultiChainTokenModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch

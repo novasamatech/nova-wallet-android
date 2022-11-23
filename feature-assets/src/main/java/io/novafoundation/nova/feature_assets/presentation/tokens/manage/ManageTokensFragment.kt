@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_assets.presentation.manageTokens
+package io.novafoundation.nova.feature_assets.presentation.tokens.manage
 
 import android.os.Bundle
 import android.view.LayoutInflater

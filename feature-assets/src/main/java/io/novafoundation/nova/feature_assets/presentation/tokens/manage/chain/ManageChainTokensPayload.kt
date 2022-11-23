@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_assets.presentation.manageTokens.chain
+package io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize

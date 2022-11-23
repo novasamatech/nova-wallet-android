@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/manageTokensFragment"
-        android:name="io.novafoundation.nova.feature_assets.presentation.manageTokens.ManageTokensFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.tokens.manage.ManageTokensFragment"
         android:label="ManageTokensFragment">
 
         <action
@@ -17,7 +17,7 @@
 
     <dialog
         android:id="@+id/manageChainTokensFragment"
-        android:name="io.novafoundation.nova.feature_assets.presentation.manageTokens.chain.ManageChainTokensFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensFragment"
         android:label="ManageChainTokensFragment" />
 
 </navigation>

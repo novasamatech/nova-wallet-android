@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_assets.domain.manageTokens
+package io.novafoundation.nova.feature_assets.domain.tokens.manage
 
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId

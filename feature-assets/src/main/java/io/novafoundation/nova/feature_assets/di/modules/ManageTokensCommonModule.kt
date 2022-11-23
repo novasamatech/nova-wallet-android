@@ -4,9 +4,9 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.feature_assets.domain.manageTokens.ManageTokenInteractor
-import io.novafoundation.nova.feature_assets.domain.manageTokens.RealManageTokenInteractor
-import io.novafoundation.nova.feature_assets.presentation.manageTokens.model.MultiChainTokenMapper
+import io.novafoundation.nova.feature_assets.domain.tokens.manage.ManageTokenInteractor
+import io.novafoundation.nova.feature_assets.domain.tokens.manage.RealManageTokenInteractor
+import io.novafoundation.nova.feature_assets.presentation.tokens.manage.model.MultiChainTokenMapper
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry

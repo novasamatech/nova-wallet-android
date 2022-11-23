@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_assets.domain.manageTokens
+package io.novafoundation.nova.feature_assets.domain.tokens.manage
 
 import io.novafoundation.nova.feature_assets.domain.common.searchTokens
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository

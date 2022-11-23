@@ -1,9 +1,9 @@
-package io.novafoundation.nova.feature_assets.presentation.manageTokens.model
+package io.novafoundation.nova.feature_assets.presentation.tokens.manage.model
 
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.feature_assets.R
-import io.novafoundation.nova.feature_assets.domain.manageTokens.MultiChainToken
+import io.novafoundation.nova.feature_assets.domain.tokens.manage.MultiChainToken
 
 data class MultiChainTokenModel(
     val header: HeaderModel,

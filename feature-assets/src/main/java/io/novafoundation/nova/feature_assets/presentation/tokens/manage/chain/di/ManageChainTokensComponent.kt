@@ -1,11 +1,11 @@
-package io.novafoundation.nova.feature_assets.presentation.manageTokens.chain.di
+package io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.di
 
 import androidx.fragment.app.Fragment
 import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
-import io.novafoundation.nova.feature_assets.presentation.manageTokens.chain.ManageChainTokensFragment
-import io.novafoundation.nova.feature_assets.presentation.manageTokens.chain.ManageChainTokensPayload
+import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensFragment
+import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensPayload
 
 @Subcomponent(
     modules = [

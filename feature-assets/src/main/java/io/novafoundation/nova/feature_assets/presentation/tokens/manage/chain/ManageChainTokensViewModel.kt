@@ -1,11 +1,11 @@
-package io.novafoundation.nova.feature_assets.presentation.manageTokens.chain
+package io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain
 
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
-import io.novafoundation.nova.feature_assets.domain.manageTokens.ManageTokenInteractor
-import io.novafoundation.nova.feature_assets.domain.manageTokens.MultiChainToken
-import io.novafoundation.nova.feature_assets.presentation.manageTokens.chain.model.ChainTokenInstanceModel
-import io.novafoundation.nova.feature_assets.presentation.manageTokens.model.MultiChainTokenMapper
+import io.novafoundation.nova.feature_assets.domain.tokens.manage.ManageTokenInteractor
+import io.novafoundation.nova.feature_assets.domain.tokens.manage.MultiChainToken
+import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.model.ChainTokenInstanceModel
+import io.novafoundation.nova.feature_assets.presentation.tokens.manage.model.MultiChainTokenMapper
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
