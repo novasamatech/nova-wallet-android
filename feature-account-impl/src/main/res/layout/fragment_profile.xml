@@ -215,7 +215,7 @@
             android:layout_height="32dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="40dp"
-            android:src="@drawable/ic_nova"/>
+            android:src="@drawable/ic_nova_logo"/>
 
         <TextView
             android:id="@+id/settingsAppVersion"
