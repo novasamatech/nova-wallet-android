@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:background="@color/black"
+    tools:background="@color/secondary_screen_background"
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
     <ImageView
@@ -30,7 +30,7 @@
         android:layout_marginTop="13dp"
         android:layout_marginBottom="13dp"
         android:includeFontPadding="false"
-        android:textColor="@color/white_64"
+        android:textColor="@color/text_secondary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -46,6 +46,7 @@
         android:gravity="end"
         android:includeFontPadding="false"
         android:singleLine="true"
+        android:textColor="@color/text_primary"
         app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toTopOf="@id/tableCellValueSecondary"
         app:layout_constraintEnd_toEndOf="parent"
@@ -54,7 +55,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
         tools:text="Value primary"
-        tools:textColor="@color/white" />
+        tools:textColor="@color/text_primary" />
 
     <TextView
         android:id="@+id/tableCellValueSecondary"
@@ -62,7 +63,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:includeFontPadding="false"
-        android:textColor="@color/black2"
+        android:textColor="@color/text_secondary"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/tableCellValuePrimary"
@@ -71,10 +72,10 @@
 
     <ProgressBar
         android:id="@+id/tableCellValueProgress"
+        style="@style/Widget.Nova.ProgressBar.Indeterminate"
         android:layout_width="16dp"
         android:layout_height="16dp"
         android:indeterminate="true"
-        android:indeterminateTint="@color/white"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -85,7 +86,7 @@
         android:layout_width="0dp"
         android:layout_height="1dp"
         android:layout_marginTop="7dp"
-        android:background="@color/dividerGray"
+        android:background="@color/divider"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

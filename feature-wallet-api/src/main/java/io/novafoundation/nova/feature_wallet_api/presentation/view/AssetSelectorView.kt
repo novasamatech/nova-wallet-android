@@ -7,10 +7,11 @@ import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import coil.ImageLoader
 import coil.load
+import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.getEnum
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.common.view.shape.addRipple
-import io.novafoundation.nova.common.view.shape.getBlurDrawable
+import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.common.view.shape.getIdleDrawable
 import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetModel
@@ -23,7 +24,7 @@ class AssetSelectorView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : ConstraintLayout(context, attrs, defStyle) {
+) : ConstraintLayout(context, attrs, defStyle), WithContextExtensions by WithContextExtensions(context) {
 
     enum class BackgroundStyle {
         BLURRED, BORDERED
@@ -52,7 +53,7 @@ class AssetSelectorView @JvmOverloads constructor(
 
     fun setBackgroundStyle(style: BackgroundStyle) = with(context) {
         val baseBackground = when (style) {
-            BackgroundStyle.BLURRED -> getBlurDrawable()
+            BackgroundStyle.BLURRED -> getBlockDrawable()
             BackgroundStyle.BORDERED -> getIdleDrawable()
         }
 

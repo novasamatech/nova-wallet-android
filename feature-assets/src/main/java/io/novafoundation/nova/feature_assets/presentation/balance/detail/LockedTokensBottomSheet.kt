@@ -32,7 +32,6 @@ class LockedTokensBottomSheet(
         return TableCellView.createTableCellView(context).apply {
             setDividerVisible(false)
             setTitle(lock.name)
-            setDividerColor(R.color.white_8)
             showAmount(lock.amount)
             updateLayoutParams<ViewGroup.MarginLayoutParams> {
                 updateMargins(

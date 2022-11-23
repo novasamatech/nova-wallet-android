@@ -30,7 +30,7 @@ fun AmountChangeModel(
         DifferenceModel(
             icon = icon,
             text = difference,
-            color = R.color.accentBlue
+            color = R.color.button_background_primary
         )
     } else {
         null

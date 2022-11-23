@@ -11,6 +11,7 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.themed
 import io.novafoundation.nova.common.view.dialog.dialog
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
@@ -69,7 +70,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        fileChooser?.onActivityResult(requestCode, resultCode, data)
+        fileChooser.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun initViews() {
@@ -154,7 +155,9 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
             dappBrowserAddressBar.showSecureIcon(it.isSecure)
 
             val favouriteIcon = if (it.isFavourite) R.drawable.ic_heart_filled else R.drawable.ic_heart_outline
+            val favoriteIconTint = if (it.isFavourite) R.color.icon_favorite else R.color.icon_primary
             dappBrowserFavourite.setImageResource(favouriteIcon)
+            dappBrowserFavourite.setImageTintRes(favoriteIconTint)
 
             updateButtonsState()
         }

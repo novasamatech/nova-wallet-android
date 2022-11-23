@@ -62,7 +62,7 @@ class OperationListItem @kotlin.jvm.JvmOverloads constructor(
             IconStyle.BORDERED_CIRCLE -> {
                 icon.setPadding(6.dp)
                 icon.setBackgroundResource(R.drawable.bg_icon_round_white)
-                icon.setImageTintRes(R.color.white_64)
+                icon.setImageTintRes(R.color.icon_secondary)
             }
             IconStyle.DEFAULT -> {
                 icon.setPadding(0)

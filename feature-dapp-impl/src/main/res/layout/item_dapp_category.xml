@@ -15,5 +15,5 @@
     android:paddingEnd="12dp"
     android:paddingBottom="9dp"
     android:textColor="@color/dapp_tab_text_color"
-    tools:background="@color/white_64"
+    tools:background="@color/chips_background"
     tools:text="All" />

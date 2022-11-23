@@ -14,9 +14,9 @@ enum class OperationStatusAppearance(
     @ColorRes val statusTint: Int,
     @ColorRes val amountTint: Int
 ) {
-    COMPLETED(R.drawable.ic_checkmark_circle_16, R.string.transaction_status_completed, R.color.green, R.color.white),
-    PENDING(R.drawable.ic_time_16, R.string.transaction_status_pending, R.color.white_64, R.color.white_64),
-    FAILED(R.drawable.ic_red_cross, R.string.transaction_status_failed, R.color.red, R.color.white_64),
+    COMPLETED(R.drawable.ic_checkmark_circle_16, R.string.transaction_status_completed, R.color.icon_positive, R.color.text_positive),
+    PENDING(R.drawable.ic_time_16, R.string.transaction_status_pending, R.color.icon_secondary, R.color.text_secondary),
+    FAILED(R.drawable.ic_red_cross, R.string.transaction_status_failed, R.color.icon_negative, R.color.text_negative),
 }
 
 fun TextView.showOperationStatus(statusAppearance: OperationStatusAppearance) {

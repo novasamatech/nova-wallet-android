@@ -52,12 +52,12 @@ private class ConfirmGovernanceUnlockHintsMixin(
         }
 
         return buildSpannable(resourceManager) {
-            appendColored(amountPart, R.color.white)
+            appendColored(amountPart, R.color.text_primary)
 
             append(" ")
 
             val rest = resourceManager.getString(R.string.referendum_unlock_remains_locked_format, lockedIdsPart)
-            appendColored(rest, R.color.white_64)
+            appendColored(rest, R.color.text_secondary)
         }
     }
 }

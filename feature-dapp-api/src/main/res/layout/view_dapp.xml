@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_primary_list_item"
-    tools:background="@color/black_48"
+    tools:background="@color/block_background"
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
     <ImageView
@@ -34,7 +34,7 @@
         android:includeFontPadding="false"
         android:maxLines="1"
         android:singleLine="true"
-        android:textColor="@color/white"
+        android:textColor="@color/text_primary"
         app:layout_constraintBottom_toTopOf="@+id/itemDAppSubtitle"
         app:layout_constraintEnd_toStartOf="@+id/itemDappAction"
         app:layout_constraintHorizontal_bias="0.5"
@@ -53,7 +53,7 @@
         android:layout_marginEnd="24dp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:textColor="@color/white_64"
+        android:textColor="@color/text_secondary"
         app:layout_constraintBottom_toBottomOf="@+id/itemDAppIcon"
         app:layout_constraintEnd_toStartOf="@+id/itemDappAction"
         app:layout_constraintHorizontal_bias="0.0"

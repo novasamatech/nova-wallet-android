@@ -27,6 +27,6 @@ class ConfirmTransactionView @JvmOverloads constructor(
 
         orientation = VERTICAL
 
-        setBackgroundColorRes(R.color.black4)
+        setBackgroundColorRes(R.color.secondary_screen_background)
     }
 }

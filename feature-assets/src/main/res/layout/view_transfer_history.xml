@@ -4,16 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:background="@color/blurColor"
+    tools:background="@color/block_background"
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
     <ImageView
         android:id="@+id/transactionHistoryPuller"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/Widget.Nova.Puller"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="2dp"
-        android:src="@drawable/ic_bottom_sheet_pin"
+        android:layout_marginTop="6dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -24,7 +22,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="26dp"
+        android:textColor="@color/text_primary"
         android:text="@string/history_v1.9.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -41,9 +40,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/transactionHistoryTitle"
-        tools:listitem="@layout/item_operation_list_item"
         tools:visibility="visible" />
-
 
     <io.novafoundation.nova.common.view.PlaceholderView
         android:id="@+id/placeholder"
@@ -51,11 +48,11 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:text="@string/transfers_empty_v2_2_0"
-        app:placeholderBackgroundStyle="no_background"
         app:image="@drawable/ic_placeholder"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/transactionHistoryTitle" />
+        app:layout_constraintTop_toBottomOf="@+id/transactionHistoryTitle"
+        app:placeholderBackgroundStyle="no_background" />
 
     <ImageView
         android:id="@+id/transactionHistoryFilter"
@@ -70,11 +67,11 @@
 
     <ProgressBar
         android:id="@+id/transactionHistoryProgress"
+        style="@style/Widget.Nova.ProgressBar.Indeterminate"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_marginTop="16dp"
         android:indeterminate="true"
-        android:indeterminateTint="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/transactionHistoryTitle" />

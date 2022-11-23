@@ -60,7 +60,7 @@ class ReferendumFullDetailsFragment : BaseFragment<ReferendumFullDetailsViewMode
         referendumFullDetailsToolbar.setHomeButtonListener {
             viewModel.backClicked()
         }
-        referendumFullDetailsPreImage.background = getRoundedCornerDrawable(R.color.white_8)
+        referendumFullDetailsPreImage.background = getRoundedCornerDrawable(R.color.block_background)
 
         referendumFullDetailsApproveThreshold.showValueOrHide(primary = viewModel.approveThreshold)
         referendumFullDetailsSupportThreshold.showValueOrHide(primary = viewModel.supportThreshold)

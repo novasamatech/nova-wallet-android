@@ -6,14 +6,14 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:orientation="vertical"
-    tools:background="@color/black">
+    tools:background="@color/secondary_screen_background">
 
     <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/exportSeedToolbar"
         android:layout_width="match_parent"
-        app:iconRight="@drawable/ic_options"
+        android:layout_height="wrap_content"
         app:dividerVisible="false"
-        android:layout_height="wrap_content" />
+        app:iconRight="@drawable/ic_options" />
 
     <TextView
         style="@style/TextAppearance.NovaFoundation.Header2"
@@ -22,7 +22,8 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:text="@string/account_export_seed_title" />
+        android:text="@string/account_export_seed_title"
+        android:textColor="@color/text_primary" />
 
     <TextView
         style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
@@ -32,16 +33,16 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:text="@string/account_create_details_v2_2_0"
-        android:textColor="@color/black1" />
+        android:textColor="@color/text_secondary" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/exportSeedContentContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
         android:layout_marginTop="16dp"
-        tools:background="@color/white_16">
+        android:layout_marginEnd="16dp"
+        tools:background="@color/input_background">
 
         <TextView
             android:id="@+id/exportSeedTitle"
@@ -51,7 +52,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:text="@string/recovery_raw_seed"
-            android:textColor="@color/black1"
+            android:textColor="@color/text_secondary"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -63,23 +64,23 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
             android:text="@string/account_seed_hex_symbols"
-            android:textColor="@color/black2"
+            android:textColor="@color/text_secondary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            app:layout_constraintTop_toBottomOf="@id/exportSeedTitle"
-            app:layout_constraintStart_toStartOf="@id/exportSeedTitle"
-            app:layout_constraintEnd_toEndOf="@id/exportSeedHexSymbols"
-            android:layout_width="0dp"
             android:id="@+id/exportSeedValue"
+            style="@style/TextAppearance.NovaFoundation.Body1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="17dp"
+            android:textColor="@color/text_primary"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_height="wrap_content"
-            style="@style/TextAppearance.NovaFoundation.Body1"
-            tools:text="0x3a603512d3bba4939481389139b499521504d36b82834819af"
-            android:textColor="@color/white" />
+            app:layout_constraintEnd_toEndOf="@id/exportSeedHexSymbols"
+            app:layout_constraintStart_toStartOf="@id/exportSeedTitle"
+            app:layout_constraintTop_toBottomOf="@id/exportSeedTitle"
+            tools:text="0x3a603512d3bba4939481389139b499521504d36b82834819af" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
@@ -90,5 +91,5 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:text="@string/account_backup_secret_caption"
-        android:textColor="@color/black1" />
+        android:textColor="@color/text_secondary" />
 </LinearLayout>

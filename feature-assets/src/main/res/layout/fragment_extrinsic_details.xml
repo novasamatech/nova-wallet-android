@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:orientation="vertical"
-    tools:background="@color/black">
+    tools:background="@color/secondary_screen_background">
 
     <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/extrinsicDetailToolbar"
@@ -35,7 +35,7 @@
                 android:layout_marginTop="16dp"
                 android:background="@drawable/bg_icon_round_white"
                 android:padding="11dp"
-                app:tint="@color/white_64" />
+                app:tint="@color/text_secondary" />
 
             <TextView
                 android:id="@+id/extrinsicDetailAmount"
@@ -43,6 +43,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:textColor="@color/text_primary"
                 tools:text="−0.00481 KSM" />
 
             <TextView
@@ -54,9 +55,9 @@
                 android:gravity="center_vertical"
                 tools:drawablePadding="4dp"
                 tools:drawableStart="@drawable/ic_checkmark_circle_16"
-                tools:drawableTint="@color/green"
+                tools:drawableTint="@color/icon_positive"
                 tools:text="completed"
-                tools:textColor="@color/green" />
+                tools:textColor="@color/text_positive" />
 
             <io.novafoundation.nova.common.view.TableView
                 android:layout_width="match_parent"
@@ -70,7 +71,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryValueIcon="@drawable/ic_info_16"
-                    app:primaryValueIconTint="@color/white_64"
+                    app:primaryValueIconTint="@color/icon_secondary"
                     app:title="@string/wallet_sender" />
 
                 <io.novafoundation.nova.common.view.TableCellView
@@ -93,7 +94,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryValueIcon="@drawable/ic_info_16"
-                    app:primaryValueIconTint="@color/white_64"
+                    app:primaryValueIconTint="@color/icon_secondary"
                     app:title="@string/common_transaction_id" />
 
                 <io.novafoundation.nova.common.view.TableCellView

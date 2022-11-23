@@ -87,7 +87,7 @@ suspend fun mapOperationToOperationModel(
                     id = id,
                     formattedTime = formattedTime,
                     amount = formatAmount(chainAsset, operationType),
-                    amountColorRes = if (operationType.isReward) R.color.green else R.color.white,
+                    amountColorRes = if (operationType.isReward) R.color.text_positive else R.color.text_primary,
                     header = resourceManager.getString(
                         if (operationType.isReward) R.string.staking_reward else R.string.staking_slash
                     ),
@@ -99,9 +99,9 @@ suspend fun mapOperationToOperationModel(
 
             is Operation.Type.Transfer -> {
                 val amountColor = when {
-                    operationType.status == Operation.Status.FAILED -> R.color.gray2
-                    operationType.isIncome -> R.color.green
-                    else -> R.color.white
+                    operationType.status == Operation.Status.FAILED -> R.color.text_secondary
+                    operationType.isIncome -> R.color.text_positive
+                    else -> R.color.text_primary
                 }
 
                 OperationModel(
@@ -117,7 +117,7 @@ suspend fun mapOperationToOperationModel(
             }
 
             is Operation.Type.Extrinsic -> {
-                val amountColor = if (operationType.status == Operation.Status.FAILED) R.color.gray2 else R.color.white
+                val amountColor = if (operationType.status == Operation.Status.FAILED) R.color.text_secondary else R.color.text_primary
 
                 OperationModel(
                     id = id,

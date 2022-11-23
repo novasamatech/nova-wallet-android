@@ -44,7 +44,7 @@ class AuthorizedDAppViewHolder(
 
     init {
         dAppView.setActionResource(R.drawable.ic_close)
-        dAppView.setActionTintRes(R.color.white_48)
+        dAppView.setActionTintRes(R.color.icon_secondary)
     }
 
     fun bind(item: AuthorizedDAppModel) = with(dAppView) {

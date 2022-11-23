@@ -4,11 +4,11 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:paddingStart="16dp"
-    android:paddingTop="11dp"
+    android:paddingStart="12dp"
+    android:paddingTop="12dp"
     android:paddingEnd="16dp"
-    android:paddingBottom="9dp"
-    tools:background="@color/black_48">
+    android:paddingBottom="8dp"
+    tools:background="@color/block_background">
 
     <io.novafoundation.nova.feature_account_api.view.ChainChipView
         android:id="@+id/itemAssetGroupChain"
@@ -26,5 +26,6 @@
         android:ellipsize="end"
         android:gravity="end"
         android:maxLines="1"
+        android:textColor="@color/text_secondary"
         tools:text="$703.51" />
 </LinearLayout>

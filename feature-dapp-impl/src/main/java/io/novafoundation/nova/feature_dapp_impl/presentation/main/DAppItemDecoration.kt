@@ -13,7 +13,7 @@ import kotlin.math.roundToInt
 
 class DAppItemDecoration(context: Context) : RecyclerView.ItemDecoration() {
 
-    val drawable = context.getRoundedCornerDrawable(fillColorRes = R.color.black_48)
+    val drawable = context.getRoundedCornerDrawable(fillColorRes = R.color.block_background)
     val drawableVerticalPadding = 12.dp(context)
 
     override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {

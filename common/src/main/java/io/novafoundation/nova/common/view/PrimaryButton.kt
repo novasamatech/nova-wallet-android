@@ -37,36 +37,36 @@ class PrimaryButton @JvmOverloads constructor(
     enum class Appearance {
 
         PRIMARY {
-            override fun disabledColor(context: Context) = context.getColor(R.color.disabledColor)
+            override fun disabledColor(context: Context) = context.getColor(R.color.button_background_inactive)
 
-            override fun enabledColor(context: Context) = context.getColorFromAttr(R.attr.colorAccent)
+            override fun enabledColor(context: Context) = context.getColor(R.color.button_background_primary)
         },
         PRIMARY_TRANSPARENT {
-            override fun disabledColor(context: Context) = context.getColor(R.color.disabledTransparent)
+            override fun disabledColor(context: Context) = context.getColor(R.color.button_background_inactive_on_gradient)
 
-            override fun enabledColor(context: Context) = context.getColorFromAttr(R.attr.colorAccent)
+            override fun enabledColor(context: Context) = context.getColor(R.color.button_background_primary)
         },
         SECONDARY {
-            override fun disabledColor(context: Context) = context.getColor(R.color.disabledColor)
+            override fun disabledColor(context: Context) = context.getColor(R.color.button_background_inactive)
 
-            override fun enabledColor(context: Context) = context.getColor(R.color.accentSecondary)
+            override fun enabledColor(context: Context) = context.getColor(R.color.button_background_secondary)
         },
         SECONDARY_TRANSPARENT {
-            override fun disabledColor(context: Context) = context.getColor(R.color.disabledTransparent)
+            override fun disabledColor(context: Context) = context.getColor(R.color.button_background_inactive_on_gradient)
 
-            override fun enabledColor(context: Context) = context.getColor(R.color.white_16)
+            override fun enabledColor(context: Context) = context.getColor(R.color.button_background_secondary)
         },
 
-        PRIMARY_GREEN {
-            override fun disabledColor(context: Context) = context.getColor(R.color.disabledColor)
+        PRIMARY_POSITIVE {
+            override fun disabledColor(context: Context) = context.getColor(R.color.button_background_inactive)
 
-            override fun enabledColor(context: Context) = context.getColor(R.color.multicolor_green_100)
+            override fun enabledColor(context: Context) = context.getColor(R.color.button_background_approve)
         },
 
-        PRIMARY_RED {
-            override fun disabledColor(context: Context) = context.getColor(R.color.disabledColor)
+        PRIMARY_NEGATIVE {
+            override fun disabledColor(context: Context) = context.getColor(R.color.button_background_inactive)
 
-            override fun enabledColor(context: Context) = context.getColor(R.color.multicolor_red_100)
+            override fun enabledColor(context: Context) = context.getColor(R.color.button_background_reject)
         };
 
         @ColorInt
@@ -136,7 +136,7 @@ class PrimaryButton @JvmOverloads constructor(
         )
 
         val rippleColor = getColorFromAttr(R.attr.colorControlHighlight)
-        val background = addRipple(baseBackground, rippleColor = rippleColor)
+        val background = addRipple(baseBackground, mask = null, rippleColor = rippleColor)
 
         setBackground(background)
     }
@@ -159,7 +159,7 @@ class PrimaryButton @JvmOverloads constructor(
         cachedText = text.toString()
 
         showProgress {
-            progressColorRes = R.color.gray2
+            progressColor = currentTextColor
         }
     }
 }

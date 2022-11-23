@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
     android:orientation="vertical"
-    tools:background="@color/black">
+    tools:background="@color/bottom_sheet_background">
 
     <Space
         android:layout_width="match_parent"
@@ -28,7 +28,8 @@
         android:layout_marginTop="20dp"
         android:layout_marginEnd="16dp"
         android:gravity="center_horizontal"
-        android:text="@string/common_confirm_title" />
+        android:text="@string/common_confirm_title"
+        android:textColor="@color/text_primary" />
 
     <TextView
         android:id="@+id/confirmSignExtinsicSubTitle"
@@ -40,7 +41,7 @@
         android:layout_marginEnd="16dp"
         android:gravity="center_horizontal"
         android:text="@string/dapp_confirm_sign_extrinsic_subtitle"
-        android:textColor="@color/black1" />
+        android:textColor="@color/text_secondary" />
 
     <io.novafoundation.nova.common.view.TableCellView
         android:id="@+id/confirmSignExtinsicWallet"
@@ -104,7 +105,8 @@
             android:layout_marginEnd="16dp"
             android:layout_weight="1"
             android:text="@string/common_reject"
-            android:theme="@style/NegativeAccent" />
+            android:theme="@style/NegativeAccent"
+            app:appearance="secondary" />
 
         <io.novafoundation.nova.common.view.PrimaryButton
             android:id="@+id/confirmDAppActionAllow"

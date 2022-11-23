@@ -29,7 +29,7 @@ class RewardDestinationView @JvmOverloads constructor(
     init {
         View.inflate(context, R.layout.view_payout_target, this)
 
-        background = context.getRoundedCornerDrawable(R.color.white_8)
+        background = context.getRoundedCornerDrawable(R.color.block_background)
 
         attrs?.let(this::applyAttrs)
     }

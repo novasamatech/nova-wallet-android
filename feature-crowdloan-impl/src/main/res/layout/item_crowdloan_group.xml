@@ -15,6 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:includeFontPadding="false"
+        android:textColor="@color/text_primary"
         tools:text="Active" />
 
     <TextView
@@ -30,7 +31,7 @@
         android:minHeight="22dp"
         android:paddingHorizontal="8dp"
         android:paddingVertical="2dp"
-        android:textColor="@color/white_80"
+        android:textColor="@color/chip_text"
         tools:text="13" />
 
 </LinearLayout>
