@@ -205,8 +205,12 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
             isEthereumBased = isEthereumBased,
             isTestNet = isTestNet,
             hasCrowdloans = hasCrowdloans,
-            governance = Chain.Governance.valueOf(governance),
+            governance = mapGovernanceListFromLocal(governance),
             additional = additional
         )
     }
+}
+
+private fun mapGovernanceListFromLocal(governanceLocal: String) = governanceLocal.split(",").mapNotNull {
+    runCatching { Chain.Governance.valueOf(it) }.getOrNull()
 }

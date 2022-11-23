@@ -55,12 +55,20 @@ fun mapRemoteChainToLocal(
             isEthereumBased = ETHEREUM_OPTION in optionsOrEmpty,
             isTestNet = TESTNET_OPTION in optionsOrEmpty,
             hasCrowdloans = CROWDLOAN_OPTION in optionsOrEmpty,
-            governance = optionsOrEmpty.governanceTypeFromOptions(),
+            governance = mapGovernanceRemoteOptionsToLocal(optionsOrEmpty),
             additional = gson.toJson(additional),
         )
     }
 
     return chainLocal
+}
+
+fun mapGovernanceListToLocal(governance: List<Chain.Governance>) = governance.joinToString(separator = ",", transform = Chain.Governance::name)
+
+fun mapGovernanceRemoteOptionsToLocal(remoteOptions: Set<String>): String {
+    val domainGovernanceTypes = remoteOptions.governanceTypesFromOptions()
+
+    return mapGovernanceListToLocal(domainGovernanceTypes)
 }
 
 fun mapRemoteAssetsToLocal(chainRemote: ChainRemote, gson: Gson): List<ChainAssetLocal> {
@@ -181,13 +189,13 @@ private fun mapStakingStringToStakingType(stakingString: String?): Chain.Asset.S
     }
 }
 
-private fun Set<String>.governanceTypeFromOptions(): String {
-    val govType = when {
-        "governance" in this -> Chain.Governance.V2 // for backward compatibility of dev builds. Can be removed once everyone will update dev app
-        "governance-v2" in this -> Chain.Governance.V2
-        "governance-v1" in this -> Chain.Governance.V1
-        else -> Chain.Governance.NONE
+private fun Set<String>.governanceTypesFromOptions(): List<Chain.Governance> {
+    return mapNotNull { option ->
+        when (option) {
+            "governance" -> Chain.Governance.V2 // for backward compatibility of dev builds. Can be removed once everyone will update dev app
+            "governance-v2" -> Chain.Governance.V2
+            "governance-v1" -> Chain.Governance.V1
+            else -> null
+        }
     }
-
-    return govType.name
 }
