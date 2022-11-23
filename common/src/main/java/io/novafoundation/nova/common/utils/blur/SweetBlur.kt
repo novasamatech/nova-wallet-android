@@ -18,7 +18,6 @@ import androidx.annotation.ColorInt
 import androidx.core.graphics.times
 import kotlin.math.roundToInt
 
-
 class SweetBlur(
     private val targetView: View,
     private val captureFromView: View,
@@ -95,7 +94,6 @@ class SweetBlur(
             null
         }
     }
-
 
     // Попробовать написать класс, который будет вычислять возможности устройства и применять бэкграунд попроще, если устройство слабое
     fun start() {
