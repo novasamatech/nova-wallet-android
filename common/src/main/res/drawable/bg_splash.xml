@@ -5,9 +5,17 @@
     <item android:drawable="@drawable/bg_welcome" />
 
     <item
-        android:width="193dp"
-        android:height="265dp"
+        android:width="325dp"
+        android:height="341dp"
         android:gravity="center"
-        android:drawable="@drawable/drawable_nova_logo" />
+        android:bottom="120dp"
+        android:drawable="@drawable/ic_loading_screen_logo" />
+
+    <item
+        android:width="124dp"
+        android:height="60dp"
+        android:gravity="center_horizontal|bottom"
+        android:bottom="58dp"
+        android:drawable="@drawable/ic_loading_screen_developed_by" />
 
 </layer-list>
