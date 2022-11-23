@@ -17,7 +17,7 @@ import io.novafoundation.nova.app.root.di.RootComponent
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.blur.SweetBlur
-import io.novafoundation.nova.common.utils.dp
+import io.novafoundation.nova.common.utils.setBackgroundColorRes
 import io.novafoundation.nova.common.utils.updatePadding
 import kotlinx.android.synthetic.main.fragment_main.bottomNavHost
 import kotlinx.android.synthetic.main.fragment_main.bottomNavigationView
@@ -77,24 +77,18 @@ class MainFragment : BaseFragment<MainViewModel>() {
         navController!!.addOnDestinationChangedListener { _, destination, _ ->
             backCallback.isEnabled = !isAtHomeTab(destination)
         }
-/*
-        SweetBlur.getInstance().blurBackground(
-            bottomNavigationView,
-            bottomNavHost,
-            extraSpace = RectF(0f, 65f, 0f, 0f),
-            inset = RectF(30f, 0f, 30f, 65f),
-            25,
-            0.24f
-        )*/
 
         val radiusInPx = 32.dp
-        SweetBlur.getInstance().blurBackground(
-            bottomNavigationView,
-            bottomNavHost,
-            extraSpace = RectF(0f, radiusInPx.toFloat()/2, 0f, 0f),
-            inset = RectF(0f, 0f, 0f, radiusInPx.toFloat()/4),
-            radiusInPx
-        )
+        SweetBlur.ViewBackgroundBuilder()
+            .blurColor(requireContext().getColor(R.color.white_12))
+            .cutSpace(RectF(0f, radiusInPx.toFloat() / 2, 0f, radiusInPx.toFloat() / 2))
+            .captureExtraSpace(RectF(0f, radiusInPx.toFloat() / 2, 0f, 0f))
+            .radius(radiusInPx)
+            .captureFrom(bottomNavHost)
+            .toTarget(bottomNavigationView)
+            .onException { bottomNavigationView.setBackgroundColorRes(R.color.red) }
+            .build()
+            .start()
     }
 
     override fun inject() {

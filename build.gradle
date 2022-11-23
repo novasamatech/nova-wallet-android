@@ -176,8 +176,6 @@ buildscript {
         markdownTables = "io.noties.markwon:ext-tables:$markdownVersion"
         markdownLinkify = "io.noties.markwon:linkify:$markdownVersion"
         markdownStrikethrough = "io.noties.markwon:ext-strikethrough:$markdownVersion"
-
-        blurKit = "io.alterac.blurkit:blurkit:1.1.0"
     }
 
     repositories {

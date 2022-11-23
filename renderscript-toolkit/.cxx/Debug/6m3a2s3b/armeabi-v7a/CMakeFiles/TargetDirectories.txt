@@ -1,4 +1,0 @@
-C:/Users/spect/GitHub/nova-wallet-android/renderscript-toolkit/.cxx/Debug/6m3a2s3b/armeabi-v7a/CMakeFiles/renderscript-toolkit.dir
-C:/Users/spect/GitHub/nova-wallet-android/renderscript-toolkit/.cxx/Debug/6m3a2s3b/armeabi-v7a/CMakeFiles/cpufeatures.dir
-C:/Users/spect/GitHub/nova-wallet-android/renderscript-toolkit/.cxx/Debug/6m3a2s3b/armeabi-v7a/CMakeFiles/edit_cache.dir
-C:/Users/spect/GitHub/nova-wallet-android/renderscript-toolkit/.cxx/Debug/6m3a2s3b/armeabi-v7a/CMakeFiles/rebuild_cache.dir
