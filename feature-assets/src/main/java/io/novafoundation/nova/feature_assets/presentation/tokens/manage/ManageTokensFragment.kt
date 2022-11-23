@@ -85,7 +85,7 @@ class ManageTokensFragment :
     override fun onDestroyView() {
         super.onDestroyView()
 
-        manageTokensSearch.hideSoftKeyboard()
+        requireActivity().hideSoftKeyboard()
     }
 
     override fun enableSwitched(position: Int) {

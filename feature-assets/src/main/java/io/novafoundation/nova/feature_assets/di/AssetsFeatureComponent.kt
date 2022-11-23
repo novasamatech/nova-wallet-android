@@ -13,11 +13,12 @@ import io.novafoundation.nova.feature_assets.presentation.balance.filters.di.Ass
 import io.novafoundation.nova.feature_assets.presentation.balance.list.di.BalanceListComponent
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.GoToNftsView
 import io.novafoundation.nova.feature_assets.presentation.balance.search.di.AssetSearchComponent
-import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.di.ManageChainTokensComponent
-import io.novafoundation.nova.feature_assets.presentation.tokens.manage.di.ManageTokensComponent
 import io.novafoundation.nova.feature_assets.presentation.receive.di.ReceiveComponent
 import io.novafoundation.nova.feature_assets.presentation.send.amount.di.SelectSendComponent
 import io.novafoundation.nova.feature_assets.presentation.send.confirm.di.ConfirmSendComponent
+import io.novafoundation.nova.feature_assets.presentation.tokens.add.di.AddTokenSelectChainComponent
+import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.di.ManageChainTokensComponent
+import io.novafoundation.nova.feature_assets.presentation.tokens.manage.di.ManageTokensComponent
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.ExtrinsicDetailComponent
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.RewardDetailComponent
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.TransactionDetailComponent
@@ -64,6 +65,8 @@ interface AssetsFeatureComponent : AssetsFeatureApi {
     fun manageTokensComponentFactory(): ManageTokensComponent.Factory
 
     fun manageChainTokensComponentFactory(): ManageChainTokensComponent.Factory
+
+    fun addTokenSelectChainComponentFactory(): AddTokenSelectChainComponent.Factory
 
     fun inject(view: GoToNftsView)
 

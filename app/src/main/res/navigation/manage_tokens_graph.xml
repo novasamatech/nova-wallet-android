@@ -12,12 +12,24 @@
         <action
             android:id="@+id/action_manageTokensFragment_to_manageChainTokensFragment"
             app:destination="@id/manageChainTokensFragment" />
-    </fragment>
 
+        <action
+            android:id="@+id/action_manageTokensFragment_to_addTokenSelectChainFragment"
+            app:destination="@id/addTokenSelectChainFragment" />
+    </fragment>
 
     <dialog
         android:id="@+id/manageChainTokensFragment"
         android:name="io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensFragment"
         android:label="ManageChainTokensFragment" />
+
+    <fragment
+        android:id="@+id/addTokenSelectChainFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.tokens.add.selectChain.AddTokenSelectChainFragment"
+        android:label="AddTokenSelectChainFragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
 
 </navigation>

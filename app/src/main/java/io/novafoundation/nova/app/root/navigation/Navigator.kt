@@ -35,13 +35,13 @@ import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.change
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.BalanceDetailFragment
-import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensFragment
-import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensPayload
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.receive.ReceiveFragment
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SelectSendFragment
 import io.novafoundation.nova.feature_assets.presentation.send.confirm.ConfirmSendFragment
+import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensFragment
+import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensPayload
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.extrinsic.ExtrinsicDetailFragment
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.reward.RewardDetailFragment
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.transfer.TransferDetailFragment
@@ -414,6 +414,10 @@ class Navigator(
     override fun openManageChainTokens(payload: ManageChainTokensPayload) {
         val args = ManageChainTokensFragment.getBundle(payload)
         navController?.navigate(R.id.action_manageTokensFragment_to_manageChainTokensFragment, args)
+    }
+
+    override fun openAddTokenSelectChain() {
+        navController?.navigate(R.id.action_manageTokensFragment_to_addTokenSelectChainFragment)
     }
 
     override fun openNfts() {
