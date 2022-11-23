@@ -5,6 +5,7 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.utils.makeGone
+import io.novafoundation.nova.common.utils.makeInvisible
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
@@ -27,7 +28,7 @@ class UserRewardsView @JvmOverloads constructor(
 
     fun showLoading() {
         userRewardsShimmerGroup.makeVisible()
-        userRewardsContentGroup.makeGone()
+        userRewardsContentGroup.makeInvisible()
 
         userRewardsTokenAmountShimmer.startShimmer()
         userRewardsFiatAmountShimmer.startShimmer()

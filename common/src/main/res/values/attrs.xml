@@ -199,4 +199,9 @@
     <declare-styleable name="TotalAmountView">
         <attr name="title" />
     </declare-styleable>
+
+    <declare-styleable name="BannerView">
+        <attr name="android:src" format="reference" />
+        <attr name="bannerBackground" format="reference|color" />
+    </declare-styleable>
 </resources>
