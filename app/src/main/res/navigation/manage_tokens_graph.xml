@@ -14,12 +14,12 @@
             app:destination="@id/manageChainTokensFragment" />
 
         <action
+            android:id="@+id/action_manageTokensFragment_to_addTokenSelectChainFragment"
+            app:destination="@id/addTokenSelectChainFragment"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit"
-            android:id="@+id/action_manageTokensFragment_to_addTokenSelectChainFragment"
-            app:destination="@id/addTokenSelectChainFragment" />
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
     <dialog
