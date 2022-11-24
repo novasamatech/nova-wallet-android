@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="assets_add_token_select_chain_title">Select network to add ERC-20 token</string>
+
     <string name="common_disabled">Disabled</string>
 
     <string name="assets_manage_tokens_title">Manage tokens</string>

@@ -34,7 +34,7 @@ class ManageTokensViewModel(
     }
 
     fun addClicked() {
-        showMessage("TODO open add")
+        router.openAddTokenSelectChain()
     }
 
     fun editClicked(position: Int) = launch {

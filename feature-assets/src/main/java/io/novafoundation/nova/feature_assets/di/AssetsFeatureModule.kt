@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_assets.data.buyToken.providers.RampProvide
 import io.novafoundation.nova.feature_assets.data.buyToken.providers.TransakProvider
 import io.novafoundation.nova.feature_assets.data.repository.assetFilters.AssetFiltersRepository
 import io.novafoundation.nova.feature_assets.data.repository.assetFilters.PreferencesAssetFiltersRepository
+import io.novafoundation.nova.feature_assets.di.modules.AddTokenModule
 import io.novafoundation.nova.feature_assets.di.modules.ManageTokensCommonModule
 import io.novafoundation.nova.feature_assets.di.modules.SendModule
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
@@ -25,7 +26,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionHi
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
-@Module(includes = [SendModule::class, ManageTokensCommonModule::class])
+@Module(includes = [SendModule::class, ManageTokensCommonModule::class, AddTokenModule::class])
 class AssetsFeatureModule {
 
     @Provides
