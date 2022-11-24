@@ -17,7 +17,7 @@
         android:layout_marginTop="12dp"
         android:layout_marginBottom="12dp"
         app:tint="@color/icon_accent"
-        tools:src="@drawable/ic_wallet_24" />
+        tools:src="@drawable/ic_buy_outline" />
 
     <TextView
         android:id="@+id/settingsItemTitle"

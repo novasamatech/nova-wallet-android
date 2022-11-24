@@ -43,38 +43,67 @@
         <View
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:background="@drawable/bg_shimmering" />
+            android:background="@drawable/bg_shimerring_8" />
+
     </com.facebook.shimmer.ShimmerFrameLayout>
 
-    <ImageView
-        android:id="@+id/goToNftPreview1"
-        style="@style/Widget.Nova.NftPreview"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/goToNftPreviewHolder1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:visibility="gone"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/imageView2"
         app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="visible" />
+        tools:visibility="visible">
 
-    <ImageView
-        android:id="@+id/goToNftPreview2"
-        style="@style/Widget.Nova.NftPreview"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/goToNftPreview1"
-        app:layout_constraintEnd_toStartOf="@+id/goToNftPreview1"
-        app:layout_constraintStart_toStartOf="@+id/goToNftPreview1"
-        app:layout_constraintTop_toTopOf="@+id/goToNftPreview1"
-        tools:visibility="visible" />
+        <ImageView
+            android:id="@+id/goToNftPreview1"
+            style="@style/Widget.Nova.NftPreview" />
 
-    <ImageView
-        android:id="@+id/goToNftPreview3"
-        style="@style/Widget.Nova.NftPreview"
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/goToNftPreviewHolder2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/goToNftPreview2"
-        app:layout_constraintEnd_toStartOf="@+id/goToNftPreview2"
-        app:layout_constraintStart_toStartOf="@+id/goToNftPreview2"
-        app:layout_constraintTop_toTopOf="@+id/goToNftPreview2"
-        tools:visibility="visible" />
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp"
+        app:layout_constraintBottom_toBottomOf="@+id/goToNftPreviewHolder1"
+        app:layout_constraintEnd_toStartOf="@+id/goToNftPreviewHolder1"
+        app:layout_constraintStart_toStartOf="@+id/goToNftPreviewHolder1"
+        app:layout_constraintTop_toTopOf="@+id/goToNftPreviewHolder1"
+        tools:visibility="visible">
+
+        <ImageView
+            android:id="@+id/goToNftPreview2"
+            style="@style/Widget.Nova.NftPreview" />
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/goToNftPreviewHolder3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:visibility="gone"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/goToNftPreviewHolder2"
+        app:layout_constraintEnd_toStartOf="@+id/goToNftPreviewHolder2"
+        app:layout_constraintStart_toStartOf="@+id/goToNftPreviewHolder2"
+        app:layout_constraintTop_toTopOf="@+id/goToNftPreviewHolder2"
+        tools:visibility="visible">
+
+        <ImageView
+            android:id="@+id/goToNftPreview3"
+            style="@style/Widget.Nova.NftPreview" />
+
+    </androidx.cardview.widget.CardView>
 
     <ImageView
         android:id="@+id/imageView2"

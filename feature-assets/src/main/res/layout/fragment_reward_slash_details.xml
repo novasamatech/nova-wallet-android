@@ -36,7 +36,7 @@
                 android:background="@drawable/bg_icon_round_white"
                 android:padding="11dp"
                 android:src="@drawable/ic_staking_filled"
-                app:tint="@color/text_secondary" />
+                app:tint="@color/icon_secondary" />
 
             <TextView
                 android:id="@+id/rewardDetailAmount"
@@ -71,7 +71,7 @@
                     android:id="@+id/rewardDetailValidator"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:primaryValueIcon="@drawable/ic_info_16"
+                    app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
                     app:primaryValueIconTint="@color/icon_secondary"
                     app:title="@string/staking_reward_details_validator" />
 
@@ -101,7 +101,7 @@
                     android:id="@+id/rewardDetailEvent"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:primaryValueIcon="@drawable/ic_info_16"
+                    app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
                     app:primaryValueIconTint="@color/icon_secondary"
                     app:title="@string/common_event" />
 

@@ -56,7 +56,7 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_info_16"
+                    android:src="@drawable/ic_info_cicrle_filled_16"
                     app:tint="@color/icon_secondary" />
 
                 <TextView
