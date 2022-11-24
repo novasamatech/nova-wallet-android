@@ -47,10 +47,10 @@ class AmountView @JvmOverloads constructor(
         amountInput.isEnabled = enabled
         amountInput.inputType = if (enabled) InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL else InputType.TYPE_NULL
     }
-
+/*
     override fun childDrawableStateChanged(child: View?) {
         refreshDrawableState()
-    }
+    }*/
 
     // Make this view be aware of amountInput state changes (i.e. state_focused)
     override fun onCreateDrawableState(extraSpace: Int): IntArray {

@@ -5,9 +5,9 @@
     android:id="@+id/dappRecyclerView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/drawable_background_image"
     android:clipToPadding="false"
     android:overScrollMode="never"
-    android:paddingBottom="40dp"
+    android:paddingBottom="84dp"
     android:scrollbars="none"
-    app:layoutManager="io.novafoundation.nova.common.view.recyclerview.LinearLayoutManagerFixed"
-    tools:background="@drawable/drawable_background_image" />
+    app:layoutManager="io.novafoundation.nova.common.view.recyclerview.LinearLayoutManagerFixed" />
