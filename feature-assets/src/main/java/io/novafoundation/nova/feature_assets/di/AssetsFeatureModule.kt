@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_assets.BuildConfig
 import io.novafoundation.nova.feature_assets.data.buyToken.BuyTokenRegistry
+import io.novafoundation.nova.feature_assets.data.buyToken.providers.MercuryoProvider
 import io.novafoundation.nova.feature_assets.data.buyToken.providers.RampProvider
 import io.novafoundation.nova.feature_assets.data.buyToken.providers.TransakProvider
 import io.novafoundation.nova.feature_assets.data.repository.assetFilters.AssetFiltersRepository
@@ -50,6 +51,16 @@ class AssetsFeatureModule {
 
     @Provides
     @FeatureScope
+    fun provideMercuryoProvider(): MercuryoProvider {
+        return MercuryoProvider(
+            host = BuildConfig.MERCURYO_HOST,
+            widgetId = BuildConfig.MERCURYO_WIDGET_ID,
+            secret = BuildConfig.MERCURYO_SECRET
+        )
+    }
+
+    @Provides
+    @FeatureScope
     fun provideTransakProvider(): TransakProvider {
         val environment = if (BuildConfig.DEBUG) "STAGING" else "PRODUCTION"
 
@@ -73,12 +84,14 @@ class AssetsFeatureModule {
     @FeatureScope
     fun provideBuyTokenIntegration(
         rampProvider: RampProvider,
-        transakProvider: TransakProvider
+        transakProvider: TransakProvider,
+        mercuryoProvider: MercuryoProvider
     ): BuyTokenRegistry {
         return BuyTokenRegistry(
             providers = listOf(
                 rampProvider,
                 transakProvider,
+                mercuryoProvider
                 // TODO waiting for secret keys for Moonpay
 //                MoonPayProvider(host = BuildConfig.MOONPAY_HOST, publicKey = BuildConfig.MOONPAY_PUBLIC_KEY, privateKey = BuildConfig.MOONPAY_PRIVATE_KEY)
             )
