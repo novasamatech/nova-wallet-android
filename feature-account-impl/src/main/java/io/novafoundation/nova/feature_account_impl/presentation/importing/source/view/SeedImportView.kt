@@ -5,7 +5,7 @@ import android.util.AttributeSet
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.coroutineScope
 import io.novafoundation.nova.common.utils.bindTo
-import io.novafoundation.nova.common.view.shape.getInputBackground
+import io.novafoundation.nova.common.view.shape.getIdleDrawable
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.importing.source.model.RawSeedImportSource
 import kotlinx.android.synthetic.main.import_source_seed.view.importSeedContent
@@ -26,7 +26,7 @@ class SeedImportView @JvmOverloads constructor(
         )
 
     init {
-        importSeedContentContainer.background = context.getInputBackground()
+        importSeedContentContainer.background = context.getIdleDrawable()
     }
 
     override fun observeSource(source: RawSeedImportSource, lifecycleOwner: LifecycleOwner) {

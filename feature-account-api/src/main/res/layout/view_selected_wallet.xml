@@ -15,7 +15,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginEnd="8dp"
         app:tint="@color/icon_primary"
-        tools:src="@drawable/ic_watch" />
+        tools:src="@drawable/ic_watch_only_filled" />
 
     <ImageView
         android:id="@+id/viewSelectedWalletAccountIcon"

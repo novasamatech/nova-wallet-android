@@ -73,7 +73,7 @@
         android:paddingTop="6dp"
         android:paddingRight="8dp"
         android:paddingBottom="6dp"
-        android:src="@drawable/ic_scan_qr"
+        android:src="@drawable/ic_scan"
         app:tint="@color/icon_accent"
         tools:background="@color/divider" />
 

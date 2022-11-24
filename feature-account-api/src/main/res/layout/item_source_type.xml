@@ -17,7 +17,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:tint="@color/text_primary"
-        tools:src="@drawable/ic_document" />
+        tools:src="@drawable/ic_file_outline" />
 
     <TextView
         android:id="@+id/itemSourceTypeTitle"

@@ -13,5 +13,5 @@
     android:paddingBottom="12dp"
     android:textColor="@color/text_primary"
     tools:drawablePadding="12dp"
-    tools:drawableStart="@drawable/ic_copy"
+    tools:drawableStart="@drawable/ic_copy_outline"
     tools:text="@string/transaction_details_copy_hash" />

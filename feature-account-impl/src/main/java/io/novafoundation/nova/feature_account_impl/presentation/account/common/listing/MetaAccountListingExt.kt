@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_account_impl.R
 fun mapMetaAccountTypeToUi(type: LightMetaAccount.Type, resourceManager: ResourceManager): ChipLabelModel? = when (type) {
     LightMetaAccount.Type.SECRETS -> null
     LightMetaAccount.Type.WATCH_ONLY -> ChipLabelModel(
-        iconRes = R.drawable.ic_watch,
+        iconRes = R.drawable.ic_watch_only_filled,
         title = resourceManager.getString(R.string.account_watch_only)
     )
     LightMetaAccount.Type.PARITY_SIGNER -> ChipLabelModel(

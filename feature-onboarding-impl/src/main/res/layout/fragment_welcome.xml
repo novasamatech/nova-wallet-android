@@ -3,8 +3,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/bg_welcome">
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/logoImg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_create_wallet_background"
+        app:layout_constraintBottom_toTopOf="@+id/createAccountBtn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/back"
@@ -19,16 +29,6 @@
         app:srcCompat="@drawable/ic_arrow_back"
         app:tint="@color/icon_primary"
         tools:visibility="visible" />
-
-    <ImageView
-        android:id="@+id/logoImg"
-        android:layout_width="193dp"
-        android:layout_height="265dp"
-        android:src="@drawable/drawable_nova_logo"
-        app:layout_constraintBottom_toTopOf="@+id/createAccountBtn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <io.novafoundation.nova.common.view.ButtonLarge
         android:id="@+id/createAccountBtn"
@@ -78,7 +78,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         app:buttonLargeStyle="secondary"
-        app:icon="@drawable/ic_watch"
+        app:icon="@drawable/ic_watch_only_filled"
         app:layout_constraintBottom_toTopOf="@+id/termsTv"
         app:layout_constraintEnd_toEndOf="@+id/welcomeConnectHardwareWallet"
         app:layout_constraintHorizontal_bias="0.0"
@@ -93,7 +93,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/x2"
         android:layout_marginEnd="@dimen/x2"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="24dp"
         android:gravity="center"
         android:text="@string/onboarding_terms_and_conditions_1_v2_2_0"
         android:textColor="@color/text_secondary"

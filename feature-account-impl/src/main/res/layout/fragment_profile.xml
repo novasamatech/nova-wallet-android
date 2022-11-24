@@ -59,7 +59,7 @@
                 android:id="@+id/settingsWallets"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/ic_wallet_24"
+                app:icon="@drawable/ic_buy_outline"
                 app:title="@string/profile_accounts_title_2_0" />
 
             <io.novafoundation.nova.feature_account_impl.presentation.settings.view.SettingsItemView
@@ -199,14 +199,14 @@
                 android:id="@+id/settingsTerms"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/ic_document"
+                app:icon="@drawable/ic_file_outline"
                 app:title="@string/about_terms_v2_2_0" />
 
             <io.novafoundation.nova.feature_account_impl.presentation.settings.view.SettingsItemView
                 android:id="@+id/settingsPrivacy"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/ic_document"
+                app:icon="@drawable/ic_file_outline"
                 app:title="@string/about_privacy" />
         </io.novafoundation.nova.feature_account_impl.presentation.settings.view.SettingsGroupView>
 
@@ -215,7 +215,7 @@
             android:layout_height="32dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="40dp"
-            android:src="@drawable/ic_nova"/>
+            android:src="@drawable/ic_nova_logo"/>
 
         <TextView
             android:id="@+id/settingsAppVersion"

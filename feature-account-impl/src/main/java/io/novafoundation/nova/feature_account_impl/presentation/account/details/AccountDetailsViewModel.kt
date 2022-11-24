@@ -179,7 +179,7 @@ class AccountDetailsViewModel(
             Type.WATCH_ONLY -> AccountTypeAlert(
                 style = AlertView.Style(
                     backgroundColorRes = R.color.block_background,
-                    iconRes = R.drawable.ic_watch
+                    iconRes = R.drawable.ic_watch_only_filled
                 ),
                 text = resourceManager.getString(R.string.account_details_watch_only_alert)
             )

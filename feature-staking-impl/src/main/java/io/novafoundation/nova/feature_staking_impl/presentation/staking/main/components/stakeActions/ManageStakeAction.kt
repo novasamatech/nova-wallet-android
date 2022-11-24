@@ -23,7 +23,7 @@ fun ManageStakeAction.Companion.bondMore(resourceManager: ResourceManager): Mana
     return ManageStakeAction(
         id = SYSTEM_MANAGE_STAKING_BOND_MORE,
         label = resourceManager.getString(R.string.staking_bond_more_v1_9_0),
-        iconRes = R.drawable.ic_plus_circle
+        iconRes = R.drawable.ic_add_circle_outline
     )
 }
 
@@ -31,7 +31,7 @@ fun ManageStakeAction.Companion.unbond(resourceManager: ResourceManager): Manage
     return ManageStakeAction(
         id = SYSTEM_MANAGE_STAKING_UNBOND,
         label = resourceManager.getString(R.string.staking_unbond_v1_9_0),
-        iconRes = R.drawable.ic_unstake_24
+        iconRes = R.drawable.ic_minus_circle_outline
     )
 }
 
@@ -39,7 +39,7 @@ fun ManageStakeAction.Companion.rewardDestination(resourceManager: ResourceManag
     return ManageStakeAction(
         id = SYSTEM_MANAGE_REWARD_DESTINATION,
         label = resourceManager.getString(R.string.staking_rewards_destination_title_v2_0_0),
-        iconRes = R.drawable.ic_wallet_24
+        iconRes = R.drawable.ic_buy_outline
     )
 }
 
