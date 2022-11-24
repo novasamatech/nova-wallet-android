@@ -64,7 +64,7 @@ data class Chain(
     ) : Identifiable {
 
         enum class Source {
-            DEFAULT, ERC20
+            DEFAULT, ERC20, MANUAL
         }
 
         sealed class Type {

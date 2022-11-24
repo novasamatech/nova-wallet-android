@@ -7,10 +7,14 @@ import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 import io.novafoundation.nova.runtime.multiNetwork.asset.remote.model.EVMAssetRemote
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
+fun chainAssetIdOfErc20Token(contractAddress: String): Int {
+    return contractAddress.ethereumAddressToAccountId()
+        .contentHashCode()
+}
+
 fun mapEVMAssetRemoteToLocalAssets(evmAssetRemote: EVMAssetRemote, gson: Gson): List<ChainAssetLocal> {
     return evmAssetRemote.instances.map {
-        val assetId = it.contractAddress.ethereumAddressToAccountId()
-            .contentHashCode()
+        val assetId = chainAssetIdOfErc20Token(it.contractAddress)
 
         val domainType = Chain.Asset.Type.Evm(it.contractAddress)
         val (type, typeExtras) = mapChainAssetTypeToRaw(domainType)

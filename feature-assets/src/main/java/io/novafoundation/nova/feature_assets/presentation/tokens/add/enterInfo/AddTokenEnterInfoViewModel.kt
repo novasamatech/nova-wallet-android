@@ -1,13 +1,11 @@
 package io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo
 
-import android.util.Log
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState.Disabled
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState.Enabled
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState.Loading
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.tokens.add.AddTokensInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
@@ -53,7 +51,6 @@ class AddTokenEnterInfoViewModel(
     private fun autoFillFieldsBasedOnContractAddress() {
         contractAddressInput
             .mapLatest { contractAddress ->
-                Log.d(this@AddTokenEnterInfoViewModel.LOG_TAG, "Start fetching metadata")
                 interactor.retrieveContractMetadata(payload.chainId, contractAddress)
             }
             .onEach { contractMetadata ->
