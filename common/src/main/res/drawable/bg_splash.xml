@@ -10,7 +10,7 @@
         android:height="800dp"
         android:bottom="120dp"
         android:drawable="@drawable/ic_splash_background"
-        android:gravity="top" />
+        android:gravity="center_horizontal|top" />
 
     <item
         android:width="325dp"
