@@ -70,8 +70,8 @@ class GoNextView @JvmOverloads constructor(
         icon.setVisible(drawable != null)
     }
 
-    fun setIconTint(@ColorInt color: Int) {
-        icon.imageTintList = ColorStateList.valueOf(color)
+    fun setIconTint(colorStateList: ColorStateList?) {
+        icon.imageTintList = colorStateList
     }
 
     fun setActionTint(@ColorInt color: Int) {
@@ -91,7 +91,7 @@ class GoNextView @JvmOverloads constructor(
         val iconDrawable = typedArray.getDrawable(R.styleable.GoNextView_icon)
         setIcon(iconDrawable)
 
-        val iconTint = typedArray.getColor(R.styleable.GoNextView_iconTint, context.getColor(R.color.icon_primary))
+        val iconTint = typedArray.getColorStateList(R.styleable.GoNextView_iconTint)
         setIconTint(iconTint)
 
         val actionIconDrawable = typedArray.getDrawable(R.styleable.GoNextView_actionIcon)
