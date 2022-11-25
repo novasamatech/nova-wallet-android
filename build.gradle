@@ -201,6 +201,7 @@ allprojects {
         maven { url "https://nexus.iroha.tech/repository/maven-soramitsu/" }
         mavenCentral()
         mavenLocal()
+        flatDir { dirs "$rootDir/common/libs" }
     }
 }
 

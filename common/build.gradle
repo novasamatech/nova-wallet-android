@@ -54,8 +54,11 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
 
+    implementation(name: 'renderscript-toolkit', ext: 'aar')
+
+    api project(":core-api")
     api project(":core-api")
 
     implementation kotlinDep
