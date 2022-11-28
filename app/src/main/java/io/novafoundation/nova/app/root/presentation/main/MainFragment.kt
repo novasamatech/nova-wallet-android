@@ -78,7 +78,7 @@ class MainFragment : BaseFragment<MainViewModel>() {
             backCallback.isEnabled = !isAtHomeTab(destination)
         }
 
-        //startBlur()
+        // startBlur()
     }
 
     override fun inject() {
