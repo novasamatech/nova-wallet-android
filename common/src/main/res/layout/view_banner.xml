@@ -19,7 +19,7 @@
             android:id="@+id/bannerImage"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
-            android:scaleType="centerCrop"
+            android:scaleType="center"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
@@ -39,7 +39,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.64" />
+            app:layout_constraintGuide_percent="0.74" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
