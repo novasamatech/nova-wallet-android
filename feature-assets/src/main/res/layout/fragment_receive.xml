@@ -36,6 +36,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="48dp"
+            android:gravity="center_horizontal"
+            android:layout_marginHorizontal="16dp"
             android:text="@string/wallet_receive_description_v2_2_0"
             android:textColor="@color/text_primary" />
 
