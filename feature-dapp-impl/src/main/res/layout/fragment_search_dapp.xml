@@ -21,6 +21,5 @@
         android:clipToPadding="false"
         android:layout_weight="1"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        android:id="@+id/searchDappList"
-        tools:listitem="@layout/view_dapp" />
+        android:id="@+id/searchDappList" />
 </LinearLayout>

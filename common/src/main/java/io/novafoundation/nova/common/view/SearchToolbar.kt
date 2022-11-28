@@ -25,7 +25,7 @@ class SearchToolbar @JvmOverloads constructor(
         View.inflate(context, R.layout.view_search_toolbar, this)
 
         orientation = HORIZONTAL
-        setBackgroundResource(R.color.solid_navigation_background)
+        setBackgroundResource(R.color.blur_navigation_background)
 
         attrs?.let(::applyAttributes)
     }
