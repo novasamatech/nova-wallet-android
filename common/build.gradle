@@ -59,7 +59,6 @@ dependencies {
     implementation(name: 'renderscript-toolkit', ext: 'aar')
 
     api project(":core-api")
-    api project(":core-api")
 
     implementation kotlinDep
 
