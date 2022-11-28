@@ -78,18 +78,7 @@ class MainFragment : BaseFragment<MainViewModel>() {
             backCallback.isEnabled = !isAtHomeTab(destination)
         }
 
-        val radiusInPx = 28.dp
-        val offset = radiusInPx.toFloat() / 1.5f
-        SweetBlur.ViewBackgroundBuilder()
-            .blurColor(requireContext().getColor(R.color.blur_navigation_background))
-            .captureExtraSpace(RectF(0f, offset, 0f, 0f))
-            .cutSpace(RectF(0f, offset, 0f, offset))
-            .radius(radiusInPx)
-            .captureFrom(bottomNavHost)
-            .toTarget(bottomNavigationView)
-            .onException { bottomNavigationView.setBackgroundColorRes(R.color.solid_navigation_background) }
-            .build()
-            .start()
+        //startBlur()
     }
 
     override fun inject() {
@@ -107,4 +96,19 @@ class MainFragment : BaseFragment<MainViewModel>() {
 
     private fun isAtHomeTab(destination: NavDestination) =
         destination.id == navController!!.graph.startDestination
+
+    private fun startBlur() {
+        val radiusInPx = 28.dp
+        val offset = radiusInPx.toFloat() / 1.5f
+        SweetBlur.ViewBackgroundBuilder()
+            .blurColor(requireContext().getColor(R.color.blur_navigation_background))
+            .captureExtraSpace(RectF(0f, offset, 0f, 0f))
+            .cutSpace(RectF(0f, offset, 0f, offset))
+            .radius(radiusInPx)
+            .captureFrom(bottomNavHost)
+            .toTarget(bottomNavigationView)
+            .onException { bottomNavigationView.setBackgroundColorRes(R.color.solid_navigation_background) }
+            .build()
+            .start()
+    }
 }
