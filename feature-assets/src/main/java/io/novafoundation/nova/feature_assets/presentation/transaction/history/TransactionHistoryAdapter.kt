@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
+import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.view.recyclerview.item.OperationListItem
 import io.novafoundation.nova.feature_assets.R
@@ -70,6 +71,7 @@ class TransactionHolder(
             if (item.statusAppearance != OperationStatusAppearance.COMPLETED) {
                 status.makeVisible()
                 status.setImageResource(item.statusAppearance.icon)
+                status.setImageTintRes(item.statusAppearance.statusIconTint)
             } else {
                 status.makeGone()
             }

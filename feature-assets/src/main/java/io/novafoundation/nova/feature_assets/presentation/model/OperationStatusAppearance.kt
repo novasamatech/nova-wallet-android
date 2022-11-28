@@ -11,12 +11,13 @@ import io.novafoundation.nova.feature_assets.R
 enum class OperationStatusAppearance(
     @DrawableRes val icon: Int,
     @StringRes val labelRes: Int,
-    @ColorRes val statusTint: Int,
+    @ColorRes val statusIconTint: Int,
+    @ColorRes val statusTextTint: Int,
     @ColorRes val amountTint: Int
 ) {
-    COMPLETED(R.drawable.ic_checkmark_circle_16, R.string.transaction_status_completed, R.color.icon_positive, R.color.text_positive),
-    PENDING(R.drawable.ic_time_16, R.string.transaction_status_pending, R.color.icon_secondary, R.color.text_secondary),
-    FAILED(R.drawable.ic_red_cross, R.string.transaction_status_failed, R.color.icon_negative, R.color.text_negative),
+    COMPLETED(R.drawable.ic_checkmark_circle_16, R.string.transaction_status_completed, R.color.icon_positive, R.color.text_positive, R.color.text_primary),
+    PENDING(R.drawable.ic_time_16, R.string.transaction_status_pending, R.color.icon_secondary, R.color.text_secondary, R.color.text_primary),
+    FAILED(R.drawable.ic_red_cross, R.string.transaction_status_failed, R.color.icon_negative, R.color.text_negative, R.color.text_secondary),
 }
 
 fun TextView.showOperationStatus(statusAppearance: OperationStatusAppearance) {
@@ -25,7 +26,7 @@ fun TextView.showOperationStatus(statusAppearance: OperationStatusAppearance) {
         drawableRes = statusAppearance.icon,
         widthInDp = 16,
         paddingInDp = 4,
-        tint = statusAppearance.statusTint
+        tint = statusAppearance.statusIconTint
     )
-    setTextColorRes(statusAppearance.statusTint)
+    setTextColorRes(statusAppearance.statusTextTint)
 }
